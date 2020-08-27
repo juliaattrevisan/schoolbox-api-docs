@@ -11,6 +11,7 @@ use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
+use House;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -807,8 +808,8 @@ class Mapper extends BaseMapper
         }
 
         $this->addFilter($students, '`student_id`');
-        $this->addFilter($years, '`s`.`year`');
-        $this->addFilter($houses, '`s`.`house`');
+        $this->addYearFilter($years, $includeStudentsWithoutYear);
+        $this->addHouseFilter($houses, $includeStudentsWithoutHouse);
         $this->addTypeFilter($types, $subtypes);
         $this->addFilter($authors, '`owner_id`');
 
@@ -969,5 +970,64 @@ class Mapper extends BaseMapper
         if (!empty($typeFilters)) {
             $this->filters[] = '(' . implode(' OR ', $typeFilters) . ')';
         }
+    }
+
+
+    /**
+     * Filter the report on the student's year level.
+     *
+     * @param Collection|string[] $years
+     * @param bool                $includeStudentsWithoutYear
+     */
+    private function addYearFilter(Collection $years, bool $includeStudentsWithoutYear): void
+    {
+        $bindings = [];
+        $filters  = [];
+        if ($includeStudentsWithoutYear) {
+            $filters[] = "`s`.`year` IS NULL";
+            $filters[] = "`s`.`year` = ''";
+        }
+        if ($years->count()) {
+            $pbArray = PredicateBuilder::getArrayBindings(
+                $years->getAll(),
+                's_year' . self::$placeholderIndex
+            );
+
+            $bindings  = $pbArray['bindings'];
+            $filters[] = "`s`.`year` IN ({$pbArray['placeholders']})";
+        }
+        $this->bindings  = array_merge($this->bindings, $bindings);
+        $this->filters[] = implode(' OR ', $filters);
+
+        self::$placeholderIndex++;
+    }
+
+
+    /**
+     * Filter the report on the student's house.
+     *
+     * @param Collection|House[] $houses
+     * @param bool               $includeStudentsWithoutHouse
+     */
+    private function addHouseFilter(Collection $houses, bool $includeStudentsWithoutHouse): void
+    {
+        $bindings = [];
+        $filters  = [];
+        if ($includeStudentsWithoutHouse) {
+            $filters[] = "`s`.`house` IS NULL";
+        }
+        if ($houses->count()) {
+            $pbArray = PredicateBuilder::getArrayBindings(
+                $houses->getPropertyValues('id'),
+                's_house' . self::$placeholderIndex
+            );
+
+            $bindings  = $pbArray['bindings'];
+            $filters[] = "`s`.`house` IN ({$pbArray['placeholders']})";
+        }
+        $this->bindings  = array_merge($this->bindings, $bindings);
+        $this->filters[] = implode(' OR ', $filters);
+
+        self::$placeholderIndex++;
     }
 }
