@@ -58,6 +58,10 @@ class Mapper extends BaseMapper
         $this->uses('years', self::TYPE_STRING, null, 'yearsCsv');
         $this->uses('houses', self::TYPE_STRING, null, 'housesCsv');
 
+        // Are students with no year or house included?
+        $this->uses('include_students_without_year', self::TYPE_BOOLEAN);
+        $this->uses('include_students_without_house', self::TYPE_BOOLEAN);
+
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

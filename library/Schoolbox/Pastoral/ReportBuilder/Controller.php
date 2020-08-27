@@ -455,7 +455,9 @@ class Controller extends Base
             $report->getOrder(),
             $report->getInvolved(),
             $report->getYears(),
-            $report->getHouses()
+            $report->getHouses(),
+            $report->getIncludeStudentsWithoutYear(),
+            $report->getIncludeStudentsWithoutHouse()
         );
     }
 
@@ -566,6 +568,9 @@ class Controller extends Base
         } else {
             $pastoralReport->setHousesCsv('');
         }
+
+        $pastoralReport->setIncludeStudentsWithoutYear($post->getBool('includeStudentsWithoutYear', false));
+        $pastoralReport->setIncludeStudentsWithoutHouse($post->getBool('includeStudentsWithoutHouse', false));
 
         // Save groups the report is shared with
 
