@@ -9,7 +9,9 @@
 
 use Schoolbox\Config\ConfigMapper;
 
-use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as Response;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Permission\Access\UserAccess;
 
 class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
@@ -83,44 +85,35 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
         /* Avoid that iterative silliness by pre-processing a bit
          */
-        $allSubjects = array();
-        $j = 0;
+        $allSubjects = [];
+        $assessments = $this->getAssessments($allShowcasedItems);
 
         if ($allShowcasedItems->count()) {
             $previousCategory = null;
 
             foreach ($allShowcasedItems as $currentShowcasedItem) {
-                try {
-                    /** @var SubmissionBox $currentBox */
-                    $currentBox = $currentShowcasedItem->getSubmissionBox();
+                $currentBox = $currentShowcasedItem->getSubmissionBox();
+                /** @var IAssessable $assessment */
+                $assessment  = $assessments->getOffset($currentBox->getAssessmentId());
+                $participant = $assessment->getParticipantIfExtant($this->user);
+                /** @var Response $latestSubmission */
+                $submission = $participant->findMostRecentSubmittedResponse();
+                /** @var Feedback $latestReturn */
+                $return = $participant->findMostRecentInstructorGivenPublishedFeedback();
 
-                    $submission = $this->getLatestSubmission(
-                        $this->getUser(),
-                        $currentBox
-                    );
+                /* Set up subject info
+                 */
+                $allSubjects[$currentBox->getCategory()->getId()]['id']   = $currentBox->getCategory()->getId();
+                $allSubjects[$currentBox->getCategory()->getId()]['name'] = $currentBox->getCategory()->getName();
 
-                    $return = $this->getLatestReturn(
-                        $this->getUser(),
-                        $currentBox
-                    );
-
-                    /* Set up subject info
-                     */
-                    $allSubjects[$currentBox->getCategory()->getId()]['id'] = $currentBox->getCategory()->getId();
-                    $allSubjects[$currentBox->getCategory()->getId()]['name'] = $currentBox->getCategory()->getName();
-
-                    /* Push individual items into the subject
-                     */
-                    $allSubjects[$currentBox->getCategory()->getId()]['items'][] = array(
-                        'currentBox' => $currentBox,
-                        'currentShowcasedItem' => $currentShowcasedItem,
-                        'latestSubmission' => $submission,
-                        'latestReturn' => $return,
-                    );
-                } catch (\Exception $e) {
-                    /* Skip showcased work that has been linked to nonexistent submission box
-                     */
-                }
+                /* Push individual items into the subject
+                 */
+                $allSubjects[$currentBox->getCategory()->getId()]['items'][] = [
+                    'currentBox'           => $currentBox,
+                    'currentShowcasedItem' => $currentShowcasedItem,
+                    'latestSubmission'     => $submission,
+                    'latestReturn'         => $return,
+                ];
             }
         }
 
@@ -146,10 +139,11 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                     foreach ($currentSubject['items'] as $currentItem) {
                         /** @var Eportfolio\Showcase $showcase */
                         /** @var Schoolbox\Assessment\Component\SubmissionBox $box */
-                        /** @var Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission $submission */
-                        /** @var Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork $return */
+                        /** @var Response $submission */
+                        /** @var Feedback $return */
                         $showcase   = $currentItem['currentShowcasedItem'];
                         $box        = $currentItem['currentBox'];
+                        $assessment = $assessments->getOffset($box->getAssessmentId());
                         $submission = $currentItem['latestSubmission'];
                         $return     = $currentItem['latestReturn'];
                         $workType   = $box->getAssessmentModel()->getWorkType();
@@ -166,7 +160,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                         /* Show submitted work information (if available)
                          */
                         if ($submission) {
-                            foreach($submission->getFiles() as $currentFile) {
+                            foreach($submission->getAllFiles() as $currentFile) {
                                 $this->getPage()->setVar(
                                     array(
                                         'SHOWCASED_WORK_SUBMISSION_ID'        => $submission->getId(),
@@ -186,19 +180,19 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
                         /* Show returned work information (if available)
                          */
-                        if ($return && $box->isMarkShownToRole($currentUser->getRole())) {
+                        if ($return && $assessment->isFeedbackVisibleToUser($currentUser)) {
                             $this->getPage()->setVar(
-                                array(
-                                    'SHOWCASED_WORK_RETURNED_MARK' => $return->getHumanReadableMark(),
-                                    'SHOWCASED_WORK_RETURNED_GRADIENT' => Config::get('grade_gradient_enable') ? $return->getGradientFromNormalizedMark() : 'none',
-                                )
+                                [
+                                    'SHOWCASED_WORK_RETURNED_MARK'     => $return->getHumanReadableMark(),
+                                    'SHOWCASED_WORK_RETURNED_GRADIENT' => Config::get('grade_gradient_enable') ? (int)($return->getNormalisedMark() / 10) : 'none',
+                                ]
                             );
                         } else {
                             $this->getPage()->setVar(
-                                array(
-                                    'SHOWCASED_WORK_RETURNED_MARK' => '',
+                                [
+                                    'SHOWCASED_WORK_RETURNED_MARK'     => '',
                                     'SHOWCASED_WORK_RETURNED_GRADIENT' => '',
-                                )
+                                ]
                             );
                         }
 

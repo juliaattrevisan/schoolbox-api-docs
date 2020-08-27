@@ -7,10 +7,14 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as Response;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 {
@@ -97,6 +101,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
     /**
      * Render page
+     * @throws ServiceNotFound
      */
     protected function render()
     {
@@ -169,7 +174,8 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
      * Render recent showcased work
      * @todo For now, just to get this working for 165, we are rendering the first file in StudentSubmissions and
      * ReturnedWork. But since 165+ can have multiple files per Submission or Return, this templates needs updating.
-     * @see SA-1606
+     * @see  SA-1606
+     * @throws ServiceNotFound
      */
     private function renderShowcasedWork()
     {
@@ -181,18 +187,19 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
         if ($allShowcasedItems->count()) {
             $previousCategory = null;
+            $assessments = $this->getAssessments($allShowcasedItems);
 
-            $currentUser = $this->getCurrentUser();
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 $currentBox = $currentShowcasedItem->getSubmissionBox();
+                /** @var IAssessable $assessment */
+                $assessment  = $assessments->getOffset($currentBox->getAssessmentId());
+                $participant = $assessment->getParticipantIfExtant($this->user);
+                /** @var Response $latestSubmission */
+                $latestSubmission = $participant->findMostRecentSubmittedResponse();
+                /** @var Feedback $latestReturn */
+                $latestReturn = $participant->findMostRecentInstructorGivenPublishedFeedback();
 
-                if (!($currentBox instanceof Schoolbox\Assessment\Component\SubmissionBox)) {
-                    continue;
-                }
-
-                $latestSubmission = $this->getLatestSubmission($this->getUser(), $currentBox);
-                $latestReturn = $this->getLatestReturn($this->getUser(), $currentBox);
-                $workType = $currentBox->getAssessmentModel()->getWorkType();
+                $workType = $assessment->getWorkType();
 
                 $this->getPage()->setVar(array(
                     'SHOWCASED_WORK_ITEM_ID' => $currentShowcasedItem->getId(),
@@ -206,7 +213,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                 /* Show submitted work information (if available)
                  */
                 if ($latestSubmission) {
-                    foreach($latestSubmission->getFiles() as $currentFile) {
+                    foreach($latestSubmission->getAllFiles() as $currentFile) {
                         $this->getPage()->setVar([
                             'SHOWCASED_WORK_SUBMISSION_ID'        => $currentFile->getId(),
                             'SHOWCASED_WORK_FILE_NAME'            => $currentFile->getFilename(),
@@ -229,17 +236,17 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
                 /* Show returned work information (if available)
                  */
-                if ($latestReturn && $currentBox->isMarkShownToRole($currentUser->getRole())) {
+                if ($latestReturn && $assessment->isFeedbackVisibleToUser($this->getCurrentUser())) {
                     $mark = $latestReturn->getHumanReadableMark();
-                    $this->getPage()->setVar(array(
-                        'SHOWCASED_WORK_RETURNED_MARK' => $mark,
-                        'SHOWCASED_WORK_RETURNED_GRADIENT' => Config::get('grade_gradient_enable') ? $latestReturn->getGradientFromNormalizedMark() : 'none',
-                    ));
+                    $this->getPage()->setVar([
+                        'SHOWCASED_WORK_RETURNED_MARK'     => $mark,
+                        'SHOWCASED_WORK_RETURNED_GRADIENT' => Config::get('grade_gradient_enable') ? (int)($latestReturn->getNormalisedMark() / 10) : 'none',
+                    ]);
                 } else {
-                    $this->getPage()->setVar(array(
-                        'SHOWCASED_WORK_RETURNED_MARK' => '',
-                        'SHOWCASED_WORK_RETURNED_GRADIENT' => ''
-                    ));
+                    $this->getPage()->setVar([
+                        'SHOWCASED_WORK_RETURNED_MARK'     => '',
+                        'SHOWCASED_WORK_RETURNED_GRADIENT' => '',
+                    ]);
                 }
 
                 $this->getPage()->parse('showcased_work_block', 'showcased_work', true);
@@ -382,7 +389,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                      */
                     $this->getPage()->setVar(array(
                         'group_linked_block' => '',
-                        'group_unlinked_block' => ''
+                        'group_unlinked_block' => '',
                     ));
                 }
             }
@@ -431,7 +438,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                  */
                 $this->getPage()->setVar(array(
                     'subject_linked_block' => '',
-                    'subject_unlinked_block' => ''
+                    'subject_unlinked_block' => '',
                 ));
             }
 
