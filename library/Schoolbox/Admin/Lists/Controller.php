@@ -764,7 +764,7 @@ class Controller extends Base
                     'mandatory' => false,
                 ],
                 'showOverallGrade'         => [
-                    'caption'   => 'Show Overall Grade',
+                    'caption'   => 'Display Overall Grade',
                     'tooltip'   => 'If checked, the grade average for a subject with this year level will be displayed to students and their parents on the student\'s grades page.',
                     'checkbox'  => true,
                     'width'     => 1,
@@ -786,7 +786,7 @@ class Controller extends Base
                 ],
                 // Learning Levels tab, display_rubric_grade (global config: enable_grades_criteria)
                 'displayRubricGrade'      => [
-                    'caption'   => 'Display Rubric Table',
+                    'caption'   => 'Display Learning Levels',
                     'tooltip'   => 'If toggled to \'ON\', assessed Capabilities and Indicators will be displayed on subject grades pages.',
                     'checkbox'  => true,
                     'width'     => 1,
@@ -794,7 +794,7 @@ class Controller extends Base
                 ],
                 // Capability Marks tab, display_capability_grade (global config: grade_capability_display)
                 'displayCapabilityGrade'  => [
-                    'caption'   => 'Display Capability Grades',
+                    'caption'   => 'Display Capability Marks',
                     'tooltip'   => 'If toggled to \'ON\', attainment for each rubric capability will be displayed on the subject grades pages.',
                     'checkbox'  => true,
                     'width'     => 1,
