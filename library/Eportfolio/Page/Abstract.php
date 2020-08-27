@@ -7,7 +7,11 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
@@ -222,53 +226,28 @@ abstract class Eportfolio_Page_Abstract
     }
 
     /**
-     * Get the latest entry for a Submission History
-     *
-     * @param User          $user
-     * @param SubmissionBox $box
-     * @return \Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission
+     * Get assessments linked to given showcased items
+     * @param Collection $showcasedItems
+     * @return GenericCollection
+     * @throws ServiceNotFound
      */
-    protected function getLatestSubmission(User $user, SubmissionBox $box)
+    protected function getAssessments(Collection $showcasedItems): GenericCollection
     {
-        // TODO use findByPredicates() in SA-1543 when it becomes available
-        $mapper = \Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper::getInstance();
+        $assessmentIds = [];
+        /** @var Eportfolio\Showcase $showcasedItem**/
+        foreach ($showcasedItems as $showcasedItem) {
+            if (!$showcasedItem->getSubmissionBox() instanceof SubmissionBox) {
+                continue;
+            }
+            $assessmentIds[] = $showcasedItem->getSubmissionBox()->getAssessmentId();
+        }
 
-        $columnList = [
-            'box_id' => $box->getId(),
-            'owner'  => $user->getId(),
-        ];
-
-        $options = [
-            'order' => [
-                'submitted_at' => 'DESC',
-            ],
-            'limit' => 1,
-        ];
-        return $mapper->findByColumnList($columnList, $options)->first();
-    }
-
-    /**
-     * Get the latest entry for a Returned Work history
-     *
-     * @param User          $user
-     * @param SubmissionBox $box
-     * @return SubmissionBox\ReturnedWork
-     */
-    protected function getLatestReturn(User $user, SubmissionBox $box)
-    {
-        $mapper = \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper::getInstance();
-        $pb     = $mapper->getPredicateBuilder()
-                         ->equals('box_id', $box->getId())
-                         ->equals('owner', $user->getId())
-                         ->equals('review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
-
-        $options = [
-            'order' => [
-                'published_at' => 'DESC',
-            ],
-            'limit' => 1,
-        ];
-        return $mapper->findByPredicates($pb, $options)->first();
+        /** @var MapperProxy $assessmentDataSource */
+        $assessmentDataSource = $this->getPage()->getDi()->get('assessmentDataSource');
+        $assessments = $assessmentDataSource->findAllByIds($assessmentIds);
+        $assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments);
+        $assessments->indexBy('id');
+        return $assessments;
     }
 
     /* Getters/Setters
