@@ -22,6 +22,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
@@ -82,7 +83,14 @@ class Module extends BaseModule
                                 new Rule\IsSuperuser(),
                                 new Rule\All(
                                     new Rule\IsConfigOn('lms_permit_staff_feedback_delete', $this->getConfig()),
-                                    new Rule\HasRole(Role::STAFF)
+                                    new Rule\HasRole(Role::STAFF),
+                                    new Rule\Callback(function (array $params, User $user) {
+                                        if($params['feedback'] instanceof IFeedback) {
+                                            $params['feedback']->getReviewer()->getId() === $user->getId();
+                                            return;
+                                        }
+                                        throw new Forbidden("Unable to delete feedback you did not create");
+                                    })
                                 )
         );
 
