@@ -22,7 +22,7 @@ Data:
                         on behalf of {{ student.fullname }}
                     {% endif %}
                 {% endspaceless %}{% endset %}
-                <a class="submit button expand" href="{{ submitRoute }}">{{ submitText }}</a>
+                <a class="submit button" href="{{ submitRoute }}">{{ submitText }}</a>
             {% endif %}
         {% elseif not acknowlegementBlocked %}
             {% if selfAcknowledgeRoute %}
