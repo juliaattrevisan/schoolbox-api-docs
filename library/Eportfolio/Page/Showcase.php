@@ -96,6 +96,9 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                 /** @var IAssessable $assessment */
                 $assessment  = $assessments->getOffset($currentBox->getAssessmentId());
                 $participant = $assessment->getParticipantIfExtant($this->user);
+                if (!$participant) {
+                    continue;
+                }
                 /** @var Response $submission */
                 $submission = $participant->findMostRecentSubmittedResponse();
                 /** @var Feedback $return */

@@ -194,6 +194,9 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                 /** @var IAssessable $assessment */
                 $assessment  = $assessments->getOffset($currentBox->getAssessmentId());
                 $participant = $assessment->getParticipantIfExtant($this->user);
+                if (!$participant) {
+                    continue;
+                }
                 /** @var Response $latestSubmission */
                 $latestSubmission = $participant->findMostRecentSubmittedResponse();
                 /** @var Feedback $latestReturn */
