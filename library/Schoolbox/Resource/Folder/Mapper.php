@@ -1339,12 +1339,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             if ($externalUser instanceof External_UserInterface) {
                 $subjectList = $externalUser->getSubjectList($user);
                 if (is_array($subjectList) && !empty($subjectList)) {
-                    $category_codes = array_map(
-                        static function ($row) {
-                            return trim($row['code']);
-                        },
-                        $subjectList
-                    );
+                    $folderCodes = $this->extractFolderCodes($subjectList);
 
 
                     // Fetch these folders with a UNION of two optimized queries
@@ -1375,21 +1370,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                         $subjectQuery .= ' AND h.cid IS NOT NULL';
                     }
                     $subjectQueryParts = [];
-                    if (!empty($category_codes)) {
-                        $subjectQueryParts[] = 'cc.code IN ' . $this->getArrayPlaceholders($category_codes, 'code');
-                        $params = array_merge($params, $this->getArrayParameters($category_codes, 'code'));
-
-                        // Allow search of codes with a campus prefix.
-                        $category_like_codes = array_map(
-                            function ($code) {
-                                return '%/' . $code;
-                            },
-                            $category_codes
-                        );
-                        foreach ($category_like_codes as $i => $like_code) {
-                            $subjectQueryParts[] = 'cc.code LIKE :like_code_' . $i;
-                            $params['like_code_' . $i] = $like_code;
-                        }
+                    if (!empty($folderCodes)) {
+                        $subjectQueryParts[] = 'cc.code IN ' . $this->getArrayPlaceholders($folderCodes, 'code');
+                        $params = array_merge($params, $this->getArrayParameters($folderCodes, 'code'));
                     }
 
                     if (!empty($subjectQueryParts)) {
@@ -2258,5 +2241,46 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             }
         }
         return $folders;
+    }
+
+
+    /**
+     * Extract folder codes from the subject list.
+     *
+     * Used by `findForUserQuery` to find a list of folder codes from a subject
+     * list: that method will then return any folder with a folder code that is
+     * in that list.
+     *
+     * This will match any folder whose code matches either:
+     * * a subject's campus code + class code
+     * * a subject's class code, without any campus code
+     *
+     * (Previous implementations matched any folders whose class code matched
+     *  the subject's class code, even if the campus code did not match: this
+     *  caused SA-10886)
+     *
+     * @param array $subjectList
+     * @return array
+     */
+    private function extractFolderCodes(array $subjectList): array
+    {
+        $folderCodesWithCampusCode    = array_map(
+            static function ($row) {
+                return trim($row['campusCode']) . '/' . trim($row['code']);
+            },
+            array_filter(
+                $subjectList,
+                static function ($row) {
+                    return (string)($row['campusCode'] ?? '') !== '';
+                }
+            )
+        );
+        $folderCodesWithoutCampusCode = array_map(
+            static function ($row) {
+                return trim($row['code']);
+            },
+            $subjectList
+        );
+        return array_merge($folderCodesWithoutCampusCode, $folderCodesWithCampusCode);
     }
 }
