@@ -455,7 +455,9 @@ class Controller extends Base
             $report->getOrder(),
             $report->getInvolved(),
             $report->getYears(),
-            $report->getHouses()
+            $report->getHouses(),
+            $report->getIncludeStudentsWithoutYear(),
+            $report->getIncludeStudentsWithoutHouse()
         );
     }
 

@@ -457,6 +457,8 @@ class DataSource
      * @param bool                  $involved
      * @param Collection            $years
      * @param Collection            $houses
+     * @param bool                  $includeStudentsWithoutYear
+     * @param bool                  $includeStudentsWithoutHouse
      *
      * @return Collection
      * @throws MapperException\InsufficientHydrationException
@@ -474,7 +476,9 @@ class DataSource
         Collection $order,
         $involved,
         Collection $years,
-        Collection $houses
+        Collection $houses,
+        bool $includeStudentsWithoutYear,
+        bool $includeStudentsWithoutHouse
     ): Collection {
         // The mapper method is user-sensitive,
         // but filter anyway as it's better to be explicit than implicit.
@@ -492,7 +496,9 @@ class DataSource
                 $order,
                 $involved,
                 $years,
-                $houses
+                $houses,
+                $includeStudentsWithoutYear,
+                $includeStudentsWithoutHouse
             ),
             $currentUser
         );

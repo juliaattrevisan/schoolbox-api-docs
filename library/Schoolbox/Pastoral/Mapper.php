@@ -764,6 +764,8 @@ class Mapper extends BaseMapper
      * @param bool                  $involved
      * @param Collection            $years
      * @param Collection            $houses
+     * @param bool                  $includeStudentsWithoutYear
+     * @param bool                  $includeStudentsWithoutHouse
      *
      * @return Collection|Model[]
      */
@@ -780,7 +782,9 @@ class Mapper extends BaseMapper
         Collection $order,
         $involved,
         Collection $years,
-        Collection $houses
+        Collection $houses,
+        bool $includeStudentsWithoutYear,
+        bool $includeStudentsWithoutHouse
     ) {
         $this->bindings = [];
         $this->filters  = [];
