@@ -32,8 +32,8 @@ class Component_Config_ItemLayout extends Component_Config_Abstract
         $page->setVar('item_layout_block', '');
 
         $options = [
-            self::LAYOUT_LIST => 'List',
-            self::LAYOUT_LIST_REVERSED => 'List (Reversed)',
+            self::LAYOUT_LIST => 'List (left justified images)',
+            self::LAYOUT_LIST_REVERSED => 'List (right justified images)',
             self::LAYOUT_CARD => 'Card',
         ];
 
