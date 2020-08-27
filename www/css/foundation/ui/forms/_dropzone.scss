@@ -379,6 +379,11 @@ ul.az-error-list {
         background-size: 1rem 1rem;
         @include easy-transition(opacity  0.15s  $attachzone-overlay-timing);
     }
+    .card img.mime {
+        padding: .5rem 1rem 0 0;
+        margin: -.5rem .5rem 0 -.5rem;
+        width: auto;
+    }
     ul.az-list > li {
         position: relative;
         background: rgba($white, 0.8);
