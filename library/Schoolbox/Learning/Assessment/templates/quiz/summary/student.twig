@@ -44,6 +44,7 @@
             </section>
         {% endif %}
 
+        {% if quiz.sections|length > 0 %}
         <div class="scrollable">
             <table>
                 <thead>
@@ -69,6 +70,16 @@
                 </tbody>
             </table>
         </div>
+        {% else %}
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="empty-state">
+                        <i class="icon-quiz"></i>
+                        <p>This quiz does not contain any sections, it cannot be attempted yet.</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </div>
 </div>
 
