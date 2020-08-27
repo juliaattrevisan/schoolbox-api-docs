@@ -33,7 +33,11 @@ Data:
             var element = $(this);
 
             $(this).confirmDialog({
-                text: 'Are you sure you want to delete this item?',
+                header: 'Are you sure you wish to delete this activity?',
+                text: '<span class=\"alert alert-box\"><b>WARNING</b> All student responses, feedback and marks will also be deleted.</span>',
+                format: 'html',
+                confirmLabel: 'Yes, permanently delete',
+                cancelLabel: 'No, keep it',
                 confirmEvent: function() {
                     var listItem = $(element).parents('[data-assessment]');
 
