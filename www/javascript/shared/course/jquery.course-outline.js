@@ -73,7 +73,9 @@
                 var element = $(this);
 
                 element.confirmDialog({
-                    text: 'Are you sure you wish to delete this unit? All tasks, linked due work and quizzes within the unit will be deleted.',
+                    header: 'Are you sure you wish to delete this unit?',
+                    text: '<span class=\"alert alert-box\"><b>WARNING</b> All activities, student responses, feedback and marks will also be deleted.</span>',
+                    format: 'html',
                     confirmLabel: 'Delete',
                     cancelLabel: 'Cancel',
                     confirmEvent: function(element) {
@@ -116,7 +118,9 @@
                 var $assessmentRow = $element.closest('[data-unit-assessment]');
 
                 $element.confirmDialog({
-                    text: 'Are you sure you wish to delete this activity? Any student responses or feedback will also be deleted.',
+                    header: 'Are you sure you wish to delete this activity?',
+                    text: '<span class=\"alert alert-box\"><b>WARNING</b>All student responses, feedback and marks will also be deleted.</span>',
+                    format: 'html',
                     confirmEvent: function() {
                         var toaster = component.find('[data-alert]');
                         toaster.toastActivate({text: 'Deleting activity...'});
