@@ -120,7 +120,7 @@ feedback: currentFeedback,
             </div>
             {% endblock card %}
             {% if currentFeedback.humanReadableMark %}
-                <div class="grade grade-large {{ urgency.marks(currentFeedback.normalisedMark) }}-bg">
+                <div class="grade {{ urgency.marks(currentFeedback.normalisedMark) }}-bg show-for-large-up">
                     <span>{{ currentFeedback.humanReadableMark }}</span>
                 </div>
             {% endif %}
