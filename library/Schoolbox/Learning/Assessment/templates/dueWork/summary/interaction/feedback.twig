@@ -160,16 +160,16 @@ feedback: currentFeedback,
                     <li class="actions-small-1">
                         <div class="list-item">
                             <div class="card attachment small-12">
-                                {% set kamiViewRoute = currentFile.kami
+                                {% set kamiViewRoute = currentFile.kami is defined
                                     ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiView', {
-                                    kamiId:       currentFile.kami.id,
-                                    assessment:   assessment,
-                                    student:      participant.user,
-                                    feedback:     currentFeedback,
-                                })
+                                        kamiId:       currentFile.kami.id,
+                                        assessment:   assessment,
+                                        student:      participant.user,
+                                        feedback:     currentFeedback,
+                                    })
                                     : null
                                 %}
-                                {% if currentFile.kami and kamiViewRoute %}
+                                {% if kamiViewRoute %}
                                     <a href="{{ kamiViewRoute }}" title="{{ currentFile.filename }}">
                                         <img src="/ajax/mime/{{ currentFile.mime }}" alt="View Annotated Document" />
                                         <p>Annotated Feedback</p>
@@ -184,13 +184,13 @@ feedback: currentFeedback,
                             </div>
                         </div>
                         <nav>
-                            {% set kamiExportRoute = currentFile.kami
+                            {% set kamiExportRoute = currentFile.kami is defined
                                 ? routeLookupIfAuthorized('learningDueWorkResponse.getKamiExport', {
-                                kamiId:       currentFile.kami.id,
-                                assessment:   assessment,
-                                student:      participant.user,
-                                feedback:     currentFeedback,
-                            })
+                                    kamiId:       currentFile.kami.id,
+                                    assessment:   assessment,
+                                    student:      participant.user,
+                                    feedback:     currentFeedback,
+                                })
                                 : null
                             %}
                             {% if kamiExportRoute %}
