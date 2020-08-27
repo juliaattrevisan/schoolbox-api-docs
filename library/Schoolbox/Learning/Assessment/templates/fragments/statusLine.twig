@@ -20,17 +20,12 @@
                 {% if assessable is task %}
                     Self-Assessed
                 {% elseif assessable is quiz %}
-                    {% if multipleResponses %}
-                        Reattempted
-                    {% else %}
-                        Attempted
-                    {% endif %}
+                    {{ multipleResponses ? 'Reattempted' : 'Attempted' }}
                 {% else %}
-                    {% if multipleResponses %}
-                        Resubmitted {{ latestResponse.isSubmittedOffline ? 'in person' : ''  }}
-                    {% else %}
-                        Submitted {{ latestResponse.isSubmittedOffline ? 'in person' : ''  }}
-                    {% endif %}
+                    {{ multipleResponses ? 'Resubmitted' : 'Submitted' }}
+                {% endif %}
+                {% if assessable is dueWork and latestResponse.isSubmittedOffline %}
+                    in person
                 {% endif %}
                 {% if assessable is not project %}
                     {% if latestResponse.submittedOnTime %}
