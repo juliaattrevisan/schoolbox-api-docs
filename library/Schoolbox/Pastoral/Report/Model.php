@@ -144,6 +144,22 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Are students without a year level included in this report?
+     *
+     * @var bool
+     */
+    private $includeStudentsWithoutYear = false;
+
+
+    /**
+     * Are students without a house included in this report?
+     *
+     * @var bool
+     */
+    private $includeStudentsWithoutHouse = false;
+
+
+    /**
      * Model constructor
      */
     public function __construct()
@@ -691,6 +707,47 @@ class Model implements ISoftDeletable
     {
         return $this->dashboard;
     }
+
+
+    /**
+     * @return bool
+     */
+    public function getIncludeStudentsWithoutYear(): bool
+    {
+        return $this->includeStudentsWithoutYear;
+    }
+
+
+    /**
+     * @param bool $includeStudentsWithoutYear
+     * @return static
+     */
+    public function setIncludeStudentsWithoutYear(bool $includeStudentsWithoutYear): self
+    {
+        $this->includeStudentsWithoutYear = $includeStudentsWithoutYear;
+        return $this;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function getIncludeStudentsWithoutHouse(): bool
+    {
+        return $this->includeStudentsWithoutHouse;
+    }
+
+
+    /**
+     * @param bool $includeStudentsWithoutHouse
+     * @return static
+     */
+    public function setIncludeStudentsWithoutHouse(bool $includeStudentsWithoutHouse): self
+    {
+        $this->includeStudentsWithoutHouse = $includeStudentsWithoutHouse;
+        return $this;
+    }
+
 
     /**
      * @param User $user
