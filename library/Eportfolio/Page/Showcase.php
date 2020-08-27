@@ -96,9 +96,9 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                 /** @var IAssessable $assessment */
                 $assessment  = $assessments->getOffset($currentBox->getAssessmentId());
                 $participant = $assessment->getParticipantIfExtant($this->user);
-                /** @var Response $latestSubmission */
+                /** @var Response $submission */
                 $submission = $participant->findMostRecentSubmittedResponse();
-                /** @var Feedback $latestReturn */
+                /** @var Feedback $return */
                 $return = $participant->findMostRecentInstructorGivenPublishedFeedback();
 
                 /* Set up subject info
@@ -138,13 +138,13 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                 if (count($currentSubject['items'])) {
                     foreach ($currentSubject['items'] as $currentItem) {
                         /** @var Eportfolio\Showcase $showcase */
-                        /** @var Schoolbox\Assessment\Component\SubmissionBox $box */
-                        /** @var Response $submission */
-                        /** @var Feedback $return */
                         $showcase   = $currentItem['currentShowcasedItem'];
+                        /** @var Schoolbox\Assessment\Component\SubmissionBox $box */
                         $box        = $currentItem['currentBox'];
                         $assessment = $assessments->getOffset($box->getAssessmentId());
+                        /** @var Response $submission */
                         $submission = $currentItem['latestSubmission'];
+                        /** @var Feedback $return */
                         $return     = $currentItem['latestReturn'];
                         $workType   = $box->getAssessmentModel()->getWorkType();
                         $this->getPage()->setVar(
