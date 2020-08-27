@@ -4,17 +4,6 @@
  */
 @mixin action-html-classes($size, $button-size: $global-button-height, $button-color: $content-ui-foreground) {
 
-	// forms + list items: compensate for input{margin-bottom:1rem}
-	form {
-		@for $i from 0 through 4 {
-			.actions-#{$size}-#{$i} {
-				.list-item {
-					padding-top: 1rem;
-				}
-			}
-		}
-	}
-
 	// We shoudln't use more than 4 action buttons in a row
 	@for $i from 1 through 4 {
 		.actions-#{$size}-#{$i},

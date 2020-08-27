@@ -46,92 +46,102 @@
 </script>
 
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 columns">
         <h1>Message Settings</h1>
-        <form method="post" action="{{ routeLookup('messages.saveConfig') }}" id="msg-settings">
-            {% if groups %}
-                <h2 class="subheader">Homepages</h2>
+    </div>
+</div>
+<form method="post" action="{{ routeLookup('messages.saveConfig') }}" id="msg-settings">
+    {% if groups %}
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Homepages</h2>
 
-                <section>
-                    <p class="content">
-                        If you unfollow a homepage, you will receive <em>no</em> messages that come from it.
-                    </p>
-                    <table id="follow-settings">
-                        <thead>
+            <section>
+                <p class="content">
+                    If you unfollow a homepage, you will receive <em>no</em> messages that come from it.
+                </p>
+                <table id="follow-settings">
+                    <thead>
+                    <tr>
+                        <th>Homepage</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for groupId, group in groups %}
                         <tr>
-                            <th>Homepage</th>
-                            <th>&nbsp;</th>
+                            <td>
+                                <label for="follow-{{ groupId }}">{{ group.name }}</label>
+                            </td>
+                            <td>
+                                <div class="long switch">
+                                    <input type="hidden" name="follow[{{ groupId }}]" value="{{ group.force ? 1 : 0 }}">
+                                    <input id="follow-{{ groupId }}"
+                                           type="checkbox"
+                                           name="follow[{{ groupId }}]"
+                                           value="1"
+                                           {% if group.follow %}checked="checked"{% endif %}
+                                            {% if group.force %}disabled="disabled"{% endif %} />
+                                    <label for="follow-{{ groupId }}">
+                                        <span>Following</span>
+                                        <span>Muted</span>
+                                    </label>
+                                </div>
+                            </td>
                         </tr>
-                        </thead>
-                        <tbody>
-                        {% for groupId, group in groups %}
-                            <tr>
-                                <td>
-                                    <label for="follow-{{ groupId }}">{{ group.name }}</label>
-                                </td>
-                                <td>
-                                    <div class="long switch">
-                                        <input type="hidden" name="follow[{{ groupId }}]" value="{{ group.force ? 1 : 0 }}">
-                                        <input id="follow-{{ groupId }}"
-                                               type="checkbox"
-                                               name="follow[{{ groupId }}]"
-                                               value="1"
-                                               {% if group.follow %}checked="checked"{% endif %}
-                                                {% if group.force %}disabled="disabled"{% endif %} />
-                                        <label for="follow-{{ groupId }}">
-                                            <span>Following</span>
-                                            <span>Muted</span>
-                                        </label>
-                                    </div>
-                                </td>
-                            </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row actions-small-1">
+        <div class="list-item">
+            <div class="small-12 columns">
+                <h2 class="subheader">Messages</h2>
+            </div>
+        </div>
+        <nav>
+            <a href="#" data-reveal-id="legend-modal" class="icon-help" title="View Help"></a>
+        </nav>
+    <div class="small-12 columns">
+        <div class="alert-box">
+            <p>
+                Customise when and how you receive messages.
+                <em>Options that are unavailable have been disabled by your system administrator.</em>
+            </p>
+        </div>
+    </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 island">
+            {% for namespace in config %}
+            {% if ns[namespace.id] %}
+            <h3 class="subheader">Receive {{ locale.translateSentence(namespace.label) }} messages when&hellip;</h3>
+            <section>
+                    <ul class='permission-list' data-roles data-digest-settings>
+                        {% for source in namespace.sources %}
+                            <li>
+                                <label class="content">&hellip;{{ locale.translateSentence(source.description) }}.</label>
+                                <div class="actions-small-6" data-source="{{ source.id }}">
+                                    <nav>
+                                        {% include '@messages/options.twig' with { mode: 'p', role: source } %}
+                                    </nav>
+                                </div>
+                            </li>
                         {% endfor %}
-                        </tbody>
-                    </table>
+                    </ul>
                 </section>
             {% endif %}
-
-            <div class="actions-small-1 row">
-                <div class="list-item">
-                    <div class="small-12 columns">
-                        <h2 class="subheader">Messages</h2>
-                    </div>
-                </div>
-                <nav>
-                    <a href="#" data-reveal-id="legend-modal" class="icon-help" title="View Help"></a>
-                </nav>
-            </div>
-            <div class="alert-box">
-                <p>
-                    Customise when and how you receive messages.
-                    <em>Options that are unavailable have been disabled by your system administrator.</em>
-                </p>
-            </div>
-
-            {% for namespace in config %}
-                {% if ns[namespace.id] %}
-                <h3 class="subheader">Receive {{ locale.translateSentence(namespace.label) }} messages when&hellip;</h3>
-                <section>
-                        <ul class='permission-list' data-roles data-digest-settings>
-                            {% for source in namespace.sources %}
-                                <li>
-                                    <label class="content">&hellip;{{ locale.translateSentence(source.description) }}.</label>
-                                    <div class="actions-small-6" data-source="{{ source.id }}">
-                                        <nav>
-                                            {% include '@messages/options.twig' with { mode: 'p', role: source } %}
-                                        </nav>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </section>
-                {% endif %}
             {% endfor %}
 
             <input type="submit" value="Submit" />
-        </form>
+        </div>
     </div>
-</div>
+</form>
 
 <div id="legend-modal" class="reveal-modal" data-reveal>
     {% include '@messages/legend.twig' with { who: 'you' } %}
