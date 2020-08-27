@@ -84,9 +84,9 @@ class Module extends BaseModule
                                 new Rule\All(
                                     new Rule\IsConfigOn('lms_permit_staff_feedback_delete', $this->getConfig()),
                                     new Rule\HasRole(Role::STAFF),
-                                    new Rule\Callback(function (array $params, User $user) {
-                                        if($params['feedback'] instanceof IFeedback) {
-                                            $params['feedback']->getReviewer()->getId() === $user->getId();
+                                    new Rule\Callback(static function (array $params, User $user) {
+                                        if ($params['feedback'] instanceof IFeedback
+                                            && $params['feedback']->getReviewer()->getId() === $user->getId()) {
                                             return;
                                         }
                                         throw new Forbidden("Unable to delete feedback you did not create");
