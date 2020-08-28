@@ -368,7 +368,7 @@
                  * ability to mark rolls for student attendance, in addition to the ability to invite
                  * people to attend your regular calendar events
                  */
-                if (!this.event.extendedProps.data.hasAttendance) {
+                if (!this.event?.extendedProps?.data?.attendance?.hasAttendance) {
                     return;
                 }
 
