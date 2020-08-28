@@ -506,8 +506,10 @@ class Controller extends Base\Base
 
         $courseFolder = [$courseSpec->getFolder()->getId()];
 
-        // Are we creating a new import?
+        // Transact everything from here to the redirect
+
         if ('import' === $action) {
+            // We are creating a new import
             $courseSpec = $this->courseSpecificationMapper->findById($courseSpecId);
             foreach ($folderIds as $classFolderId) {
                 $courseImpl = $this->courseImplementationMapper->createModel();
@@ -524,8 +526,8 @@ class Controller extends Base\Base
                     return;
                 }
             }
-        } // Else we are modifying an existing import
-        else {
+        } else {
+            // We are modifying an existing import
             // We can only modify a single Course Import at a time.
             $courseImpl                                     = $this->courseImplementationMapper->findById($courseImplId);
             $courseImpls[$courseImpl->getFolder()->getId()] = $courseImpl;
