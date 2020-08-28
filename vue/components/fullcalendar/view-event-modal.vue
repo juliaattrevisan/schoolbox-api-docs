@@ -363,6 +363,15 @@
                     return;
                 }
 
+                /* Events with the hasAttendance flag set to false should also exit early
+                 * Beware that this flag has dual meaning: it also refers to the timetable events'
+                 * ability to mark rolls for student attendance, in addition to the ability to invite
+                 * people to attend your regular calendar events
+                 */
+                if (!this.event.extendedProps.data.hasAttendance) {
+                    return;
+                }
+
                 /* Asynchronously fetch attendance payload
                  * This will update the modal in realtime when it's ready
                  */

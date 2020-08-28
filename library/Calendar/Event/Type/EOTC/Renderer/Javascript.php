@@ -129,6 +129,12 @@ class Javascript extends Base
                 'styles'     => [
                     'visible' => $cssClass,
                 ],
+
+                /* Hide this from the RSVP modal, even though hasAttendance doesn't really
+                 * mean RSVP in all cases
+                 */
+                'hasAttendance' => false,
+
                 'attendance' => [
                     'icon'          => false,
                     'status'        => false,
