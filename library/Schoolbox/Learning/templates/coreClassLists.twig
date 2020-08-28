@@ -107,8 +107,8 @@ Data:
             <ul class="inline-list no-margin left">
                 <template v-for="(group, index) in groups">
                     <li v-bind:class="index < 1 ? 'no-margin' : ''">
-                        <input :id="group.label" name="groups[]" type="checkbox" :value="group.label" @click="updateSelectedGroups" v-model="group.isChecked" />
-                        <label :for="group.label">${ group.label | capitalise }</label>
+                        <input :id="group.label" name="groups[]" type="checkbox" :value="group.value" @click="updateSelectedGroups" v-model="group.isChecked" />
+                        <label :for="group.label">${ group.label }</label>
                     </li>
                 </template>
             </ul>

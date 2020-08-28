@@ -90,6 +90,8 @@ class Controller extends Base
 
     private const ISCHECKED_KEY = 'isChecked';
 
+    private const LABEL_VALUE = 'value';
+
     /**
      * Controller constructor.
      *
@@ -438,19 +440,28 @@ class Controller extends Base
      */
     private function getClassListsEmailGroups(): string
     {
-        $availableEmailGroups = ['Parents' => 'email_all_parents', 'Head of House' => 'email_housemasters'];
+        // LABEL_VALUE must match createMail
+        $availableEmailGroups = [
+            'email_all_parents'  => [
+                self::LABEL_KEY   => 'Parents',
+                self::LABEL_VALUE => 'parents',
+            ],
+            'email_housemasters' => [
+                self::LABEL_KEY   => 'Head of House',
+                self::LABEL_VALUE => 'housemasters',
+            ],
+        ];
 
         $result[] = [
-            self::LABEL_KEY => 'students',
+            self::LABEL_KEY     => 'Students',
+            self::LABEL_VALUE   => 'students',
             self::ISCHECKED_KEY => true,
         ];
 
-        foreach ($availableEmailGroups as $key => $configName) {
-            if ($this->getConfigLoader()->get($configName)) {
-                $result[] = [
-                    self::LABEL_KEY => $key,
-                    self::ISCHECKED_KEY => false,
-                ];
+        foreach ($availableEmailGroups as $key => $settings) {
+            if ($this->getConfigLoader()->get($key)) {
+                $settings[self::ISCHECKED_KEY] = false;
+                $result[]                      = $settings;
             }
         }
 
