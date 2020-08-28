@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Course\Import;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Web\Controller as Base;
+use Aura\Web\Request;
 use Component_ConfigDefinition;
 use Component_ConfigDefinitionMapper;
 use Component_ConfigMapper;
@@ -461,75 +462,10 @@ class Controller extends Base\Base
      */
     public function postAssessments()
     {
-        // Parse form data
-        $post         = $this->getRequest()->post;
-        $action       = trim($post['action']);
-        $courseSpecId = trim($post['course_spec_id']);
-        $courseImplId = trim($post['course_impl_id']);
-        $componentId  = trim($post['component_id']);
-        $folderIds    = $this->parseFolderIds($post['import_folders']);
-        $unitImplData = $post['unit'];
-
-        // Algorithm:
-        //
-        // 1. Create a graph of the CourseImpl that exists in DB
-        // 2. Create a graph of the CourseImpl as indicated in POST data
-        // 3. Traverse DB-graph
-        //   3.1 if(entity not in POST-graph)
-        //       3.1.1 delete entity
-        // 4. Traverse POST-graph
-        //   4.1 if(entity not in DB-graph)
-        //       4.1.1 create entity
-        //   4.2 else(entity in DB-graph)
-        //       4.2.1 update entity
-        //   4.3 save entity
-
-
-        // On new-import, we may be creating multiple courseImpls.
-        // Therefore store in array and index by ClassFolderId
-        /** @var CourseImplementation\Model[] $courseImpls */
-        $courseImpls = [];
-        $courseSpec  = $this->courseSpecificationMapper->findById($courseSpecId);
-
-        // Collect folders for unit and course pages - needed for criteria import
-        $unitSpecs = [];
-        foreach ($unitImplData as $unitImp) {
-            $unitSpecs[] = (int)$unitImp['unit_spec_id'];
-        }
-
-        $unitFolders = [];
-        foreach ($courseSpec->getUnits() as $unitSpec) {
-            if (in_array((int)$unitSpec->getId(), $unitSpecs, true)) {
-                $unitFolders[] = $unitSpec->getFolder()->getId();
-            }
-        }
-
-        $courseFolder = [$courseSpec->getFolder()->getId()];
-
-        // Transact everything from here to the redirect
+        // Transact this entire request, rolling back if any exception is raised
         try {
-            $this->unitImplementationMapper->getDatabase()->transact(function () use (
-                $action,
-                $courseSpecId,
-                $folderIds,
-                $courseImpls,
-                $courseFolder,
-                $unitFolders,
-                $courseImplId,
-                $unitImplData,
-                $componentId
-            ) {
-                $this->persistCourseImplementation(
-                    $action,
-                    $courseSpecId,
-                    $folderIds,
-                    $courseImpls,
-                    $courseFolder,
-                    $unitFolders,
-                    $courseImplId,
-                    $unitImplData,
-                    $componentId
-                );
+            $this->unitImplementationMapper->getDatabase()->transact(function () {
+                $this->persistCourseImplementation($this->request->post);
             });
         } catch (\Throwable $e) {
             $this->sendError($e->getMessage());
@@ -1088,22 +1024,78 @@ class Controller extends Base\Base
 
 
     /**
-     * Persist course implementation.
+     * Persist a course implementation, based upon submitted form data.
      *
-     * @param string $action
-     * @param string $courseSpecId
-     * @param array  $folderIds
-     * @param array  $courseImpls
-     * @param array  $courseFolder
-     * @param array  $unitFolders
-     * @param string $courseImplId
-     * @param        $unitImplData
-     * @param string $componentId
+     * @param Request\Values $post POST data
+     *
+     * @var string   $post  ['action']                                           {'import' | 'modify'}
+     * @var int      $post  ['course_spec_id']
+     * @var int|null $post  ['course_impl_id']
+     * @var int|null $post  ['component_id']
+     * @var string   $post  ['import_folders']                                   comma-separated folderIds to import to
+     * @var array    $post  ['unit']  Indexed by unitSpec.id
+     * @var int      $post  ['unit'][unitSpecId]['unit_spec_id']
+     * @var int|null $post  ['unit'][unitSpecId]['unit_impl_id']
+     * @var string   $post  ['unit'][unitSpecId]['open_date']                    UnitImpl's Open Date
+     * @var string   $post  ['unit'][unitSpecId]['close_date']                   UnitImpl's Close Date
+     * @var array    $post  ['unit'][unitSpecId]['a']                            UnitImpl's Indexed by Assessment.id
+     * @var int      $post  ['unit'][unitSpecId]['a'][assId]['specId']
+     * @var int      $post  ['unit'][unitSpecId]['a'][assId]['implId']
+     * @var bool     $post  ['unit'][unitSpecId]['a'][assId]['checked']
+     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['publish']
+     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['open']
+     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['due']
+     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['date']
+     *
      * @throws MapperException
      * @throws MapperException\Deleted
      */
-    private function persistCourseImplementation(string $action, string $courseSpecId, array $folderIds, array $courseImpls, array $courseFolder, array $unitFolders, string $courseImplId, $unitImplData, string $componentId): void
+    private function persistCourseImplementation(Request\Values $post): void
     {
+        // Parse form data
+        $action       = trim($post['action']);
+        $courseSpecId = trim($post['course_spec_id']);
+        $courseImplId = trim($post['course_impl_id']);
+        $componentId  = trim($post['component_id']);
+        $folderIds    = $this->parseFolderIds($post['import_folders']);
+        $unitImplData = $post['unit'];
+
+        // Algorithm:
+        //
+        // 1. Create a graph of the CourseImpl that exists in DB
+        // 2. Create a graph of the CourseImpl as indicated in POST data
+        // 3. Traverse DB-graph
+        //   3.1 if(entity not in POST-graph)
+        //       3.1.1 delete entity
+        // 4. Traverse POST-graph
+        //   4.1 if(entity not in DB-graph)
+        //       4.1.1 create entity
+        //   4.2 else(entity in DB-graph)
+        //       4.2.1 update entity
+        //   4.3 save entity
+
+
+        // On new-import, we may be creating multiple courseImpls.
+        // Therefore store in array and index by ClassFolderId
+        /** @var CourseImplementation\Model[] $courseImpls */
+        $courseImpls = [];
+        $courseSpec  = $this->courseSpecificationMapper->findById($courseSpecId);
+
+        // Collect folders for unit and course pages - needed for criteria import
+        $unitSpecs = [];
+        foreach ($unitImplData as $unitImp) {
+            $unitSpecs[] = (int)$unitImp['unit_spec_id'];
+        }
+
+        $unitFolders = [];
+        foreach ($courseSpec->getUnits() as $unitSpec) {
+            if (in_array((int)$unitSpec->getId(), $unitSpecs, true)) {
+                $unitFolders[] = $unitSpec->getFolder()->getId();
+            }
+        }
+
+        $courseFolder = [$courseSpec->getFolder()->getId()];
+
         if ('import' === $action) {
             // We are creating a new import
             $courseSpec = $this->courseSpecificationMapper->findById($courseSpecId);
