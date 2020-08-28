@@ -285,10 +285,7 @@ ul.az-error-list {
 
     ul.az-list {
         > li {
-            @media #{$small-only} {
-                min-height: 3rem;
-            }
-            @media #{$medium-up} {
+            @media #{$mediumwide-up} {
                 min-height: 4rem;
             }
         }
@@ -378,6 +375,16 @@ ul.az-error-list {
         background-repeat: no-repeat;
         background-size: 1rem 1rem;
         @include easy-transition(opacity  0.15s  $attachzone-overlay-timing);
+    }
+    .card img.mime {
+        padding: .5rem 1rem 0 0;
+        margin: -.5rem .5rem 0 -.5rem;
+        width: auto;
+
+        @media #{$medium-down} {
+            padding: .5rem 0 0 0;
+            margin: -1rem 1rem 0 -1rem;
+        }
     }
     ul.az-list > li {
         position: relative;
