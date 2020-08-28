@@ -77,8 +77,10 @@
                         assessmentName = assessmentListItem.data('assessment-title');
 
                 $(this).confirmDialog({
-                    text: 'Are you sure you want to delete ' + assessmentName + '?',
-                    confirmLabel: 'Yes, delete it',
+                    header: 'Are you sure you want to delete ' + assessmentName + '?',
+                    text:  '<span class=\"alert alert-box\"><b>WARNING</b> All student responses, feedback and marks will also be deleted.</span>',
+                    format: 'html',
+                    confirmLabel: 'Yes, permanently delete',
                     cancelLabel: 'No, keep it',
                     confirmEvent: function (anchor) {
 
