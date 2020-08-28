@@ -139,15 +139,15 @@ Usages:
             $magePart3.mage({
                 validateOptions: {},
                 beforeAttemptingSubmit: function() {
-                    // check every visible publish date field
-                    $('input[data-role="publish_date"]:visible:enabled').each(function() {
+                    // check every enabled publish date field
+                    $('input[data-role="publish_date"]:enabled').each(function() {
                         $(this).rules('add', {
                             required: true,
                             datepickerDate: true
                         });
                     });
-                    // check every visible open date field
-                    $('input[data-role="open_date"]:visible:enabled').each(function() {
+                    // check every enabled open date field
+                    $('input[data-role="open_date"]:enabled').each(function() {
                         var lessonId = $(this).data('assessment-id');
                         var publishDate = $('input[data-role="publish_date"][data-assessment-id="' + lessonId + '"]');
                         $(this).rules('add', {
@@ -155,8 +155,8 @@ Usages:
                             datepickerDateNotBefore: publishDate
                         });
                     });
-                    // check every visible due date field
-                    $('input[data-role="due_date"]:visible:enabled').each(function() {
+                    // check every enabled due date field
+                    $('input[data-role="due_date"]:enabled').each(function() {
                         var lessonId = $(this).data('assessment-id'),
                             dateRole;
                         // if an open date exists then it needs to be before then, otherwise before publish date
@@ -171,8 +171,8 @@ Usages:
                             datepickerDateNotBefore: otherDate
                         });
                     });
-                    // check every visible close date field
-                    $('input[data-role="close_date"]:visible:enabled').each(function() {
+                    // check every enabled close date field
+                    $('input[data-role="close_date"]:enabled').each(function() {
                         var lessonId = $(this).data('assessment-id');
                         var dueDate = $('input[data-role="due_date"][data-assessment-id="' + lessonId + '"]');
                         $(this).rules('add', {
