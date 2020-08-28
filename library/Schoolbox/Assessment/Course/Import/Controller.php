@@ -1116,12 +1116,6 @@ class Controller extends Base\Base
                 //Save unit criteria to class page
                 $allFolders = array_merge($courseFolder, $unitFolders);
                 $this->copyCriteria($allFolders, $classFolderId);
-//                try {
-//                    $this->copyCriteria($allFolders, $classFolderId);
-//                } catch (MapperException $e) {
-//                    $this->sendError($e->getMessage());
-//                    return;
-//                }
             }
         } else {
             // We are modifying an existing import
@@ -1141,12 +1135,6 @@ class Controller extends Base\Base
             $classFolderId = $folderIds[0];
 
             $this->copyCriteria($unitFolders, $classFolderId);
-//            try {
-//                $this->copyCriteria($unitFolders, $classFolderId);
-//            } catch (MapperException $e) {
-//                $this->sendError($e->getMessage());
-//                return;
-//            }
         }
 
         // Delete de-selected Units and Assessments
