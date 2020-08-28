@@ -276,7 +276,7 @@
         element.find('[data-dz-name]').text(t + ' failed: ' + data).attr('title', data);
 
         // Replace bin icon with x
-        errList.find('nav .icon-delete').removeClass('icon-delete').addClass('close').html('&times;');
+        errList.find('nav .icon-delete').removeClass('icon-delete').addClass('icon-close');
 
         if (this.dropzone) {
             this.dropzone.removeFile(file);
