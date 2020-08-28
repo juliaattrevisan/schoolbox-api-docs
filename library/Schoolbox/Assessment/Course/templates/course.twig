@@ -259,34 +259,34 @@ Usage:
         {% endif %}
     </li>
 </ul>
-<div class="row">
-    <div class="small-12 actions-small-1 island">
+<div class="row actions-small-1">
+    <div class="small-12 columns">
         <div class="list-item">
             <h1>{{ courseSpec ? 'Modify' : 'New' }} Course</h1>
         </div>
-        {% if courseSpec %}
-            <nav>
-                <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ courseSpec.id }}" aria-expanded="false" title="Actions"></a>
-            </nav>
-            <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ courseSpec.id }}">
-                {% if courseSpec.folder.hasHomepage %}
-                    <li><a class="icon-home" href="/homepage/{{ courseSpec.folder.id }}">View Homepage</a></li>
-                {% else %}
-                    <li><a class="icon-folder" href="/resources/{{ courseSpec.folder.id }}">View Resources</a></li>
-                {% endif %}
-
-                {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getMarkbook', {courseSpec: courseSpec, courseSpecId: courseSpec.id}) %}
-                {% if courseMarkbookRoute %}<li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Markbook</a></li>{% endif %}
-
-                {% set assessmentCalendarUrl = routeLookupIfAuthorized('learningAssessmentCalendar.getReport') %}
-                {% if assessmentCalendarUrl %}
-                    <li>
-                        <a href="{{ assessmentCalendarUrl~'?course='~courseSpec.id }}" class="icon-calendar">{{ locale.assessment|capitalize }} Calendar</a>
-                    </li>
-                {% endif %}
-            </ul>
-        {% endif %}
     </div>
+    {% if courseSpec %}
+    <nav>
+        <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ courseSpec.id }}" aria-expanded="false" title="Actions"></a>
+    </nav>
+    <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ courseSpec.id }}">
+        {% if courseSpec.folder.hasHomepage %}
+            <li><a class="icon-home" href="/homepage/{{ courseSpec.folder.id }}">View Homepage</a></li>
+        {% else %}
+            <li><a class="icon-folder" href="/resources/{{ courseSpec.folder.id }}">View Resources</a></li>
+        {% endif %}
+
+        {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getMarkbook', {courseSpec: courseSpec, courseSpecId: courseSpec.id}) %}
+        {% if courseMarkbookRoute %}<li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Markbook</a></li>{% endif %}
+
+        {% set assessmentCalendarUrl = routeLookupIfAuthorized('learningAssessmentCalendar.getReport') %}
+        {% if assessmentCalendarUrl %}
+            <li>
+                <a href="{{ assessmentCalendarUrl~'?course='~courseSpec.id }}" class="icon-calendar">{{ locale.assessment|capitalize }} Calendar</a>
+            </li>
+        {% endif %}
+    </ul>
+    {% endif %}
 </div>
 <div class="row">
     <div class="small-12 island" id="main-course">
