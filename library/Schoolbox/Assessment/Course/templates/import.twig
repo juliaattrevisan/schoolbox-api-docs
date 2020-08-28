@@ -137,7 +137,31 @@ Usages:
 
             var $magePart3 = $('input[data-mage-next="none"]');
             $magePart3.mage({
-                validateOptions: {},
+                validateOptions: {
+                    invalidHandler: function (event, validator) {
+                        // Ensure any units with invalid inputs are expanded
+                        var mageForm    = $('[data-mage="part-3"]'),
+                            $collapsers = $();
+
+                        // Find collapsers
+                        Object.keys(validator.invalid).forEach(function(invalidInputName) {
+                            var $inputElement    = mageForm.find('[name="' + invalidInputName + '"]'),
+                                $collapsableId   = $inputElement.closest('[data-collapsable]').attr('data-collapsable'),
+                                $collapserButton = mageForm.find('[data-collapser="' + $collapsableId + '"]');
+
+                            $collapsers = $collapsers.add($collapserButton);
+                        });
+
+                        // Click each unique one
+                        $.unique($collapsers).each(function () {
+                            // Don't simulate click if collapser is already expanded
+                            var $collapsable = $(this).closest(".actions-small-1").next("[data-collapsable]");
+                            if ($collapsable.attr("data-collapse-state") === "collapsed") {
+                                $(this).click();
+                            }
+                        })
+                    }
+                },
                 beforeAttemptingSubmit: function() {
                     // check every enabled publish date field
                     $('input[data-role="publish_date"]:enabled').each(function() {
