@@ -24,19 +24,6 @@ class Controller extends FullAccessController
 {
 
     /**
-     * Controller constructor.
-     */
-    public function __construct()
-    {
-
-        /* Access to the Drives picker shouldn't cause it to enter the session history stack
-         * which opens the opportunity to be redirected back here inadvertently, full-screen
-         */
-        $this->setAllowBackToTheFuture(false);
-    }
-
-
-    /**
      * Overridden because files are uploaded to WebDav differently.
      *
      * @inheritDoc
