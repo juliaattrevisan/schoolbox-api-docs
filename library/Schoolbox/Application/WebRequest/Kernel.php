@@ -432,6 +432,23 @@ class Kernel extends WebKernelAbstract
         $redirect             = $controller->getResponse()->headers->get('location');
         $allowBackToTheFuture = $controller->getAllowBackToTheFuture();
         $isJson               = $output instanceof Json;
+
+        /* Push the current url into the session history stack
+         * pushHistory() is a more recent version of saveHistory() which exists in sitepage
+         * aura-based redirecting issues can be tracked back here
+         *
+         * xhr requests should not be in the history
+         * redirects should not be in the history
+         * controllers instantiated with "$allowBackToTheFuture = false" should not be in the history
+         * json output should not be in the history
+         *
+         * Note that storm will tell you $isJson is always false; this is a bit misleading.
+         * It's because storm can't statically interpret:
+         *
+         * $output = $this->di->get("webOutput:$format");
+         *
+         * ...to potentially overwrite $output into a new var somewhat pseudo-polymorphically
+         */
         if ($session && !($isXhr || $redirect || !$allowBackToTheFuture || $isJson)) {
             $session->pushHistory($_SERVER['REQUEST_URI']);
         }
