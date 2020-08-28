@@ -358,6 +358,24 @@
                  */
                 this.$refs.modal.open();
 
+                /* Non-numeric eventIds are ignored
+                 * These could be hashes sourced from a third party, like the sis or a subscription
+                 * In those cases, we can't do anything about their attendance
+                 * We can only deal with attendance in our local db
+                 */
+                if (isNaN(this.eventExtendedProps.eventId)) {
+                    return;
+                }
+
+                /* Events with the hasAttendance flag set to false should also exit early
+                 * Beware that this flag has dual meaning: it also refers to the timetable events'
+                 * ability to mark rolls for student attendance, in addition to the ability to invite
+                 * people to attend your regular calendar events
+                 */
+                if (!this.event?.extendedProps?.data?.attendance?.hasAttendance) {
+                    return;
+                }
+
                 /* Asynchronously fetch attendance payload
                  * This will update the modal in realtime when it's ready
                  */
@@ -370,6 +388,14 @@
                 axios.request(request)
                         .then(function (response) {
                             self.payload = response.data;
+                        })
+                        .catch(function(error) {
+
+                            /* Attendance won't be available for some events such as those
+                             * streamed from a third party source, or a sis; looking for their
+                             * identifying hashes will result in 404 because they won't exist
+                             * in our local db
+                             */
                         });
             },
 

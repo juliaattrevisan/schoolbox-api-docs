@@ -129,6 +129,7 @@ class Javascript extends Base
                 'styles'     => [
                     'visible' => $cssClass,
                 ],
+
                 'attendance' => [
                     'icon'          => false,
                     'status'        => false,
