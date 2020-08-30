@@ -38,7 +38,7 @@
         </section>
     {% endif %}
 
-    {% if courses|length %}
+    {% if courses is defined %}
         <section>
             {% if suggestions is defined and suggestions|length %}
                 <h3>All Courses</h3>
