@@ -481,9 +481,9 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
 
-        /* User must supply name, types and years
+        /* User must supply name and types
          */
-        if (!strlen(trim($post['name'])) || !count($post['types']) || !count($post['years'])) {
+        if (!strlen(trim($post['name'])) || !count($post['types'])) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
