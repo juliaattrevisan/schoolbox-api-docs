@@ -566,7 +566,7 @@ class Controller extends Base
         if (is_array($post['years'])) {
             $pastoralReport->setYearsCsv(implode(',', $post['years']));
         } else {
-            $pastoralReport->setTypesCsv('');
+            $pastoralReport->setYearsCsv('');
         }
 
         if (is_array($post['houses'])) {
