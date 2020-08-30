@@ -615,7 +615,13 @@
             rules: {
                 'name': 'required',
                 'types[]': 'required',
-                'years[]': 'required',
+                'years[]': {
+                    required: {
+                        depends: function () {
+                            return $('#includeStudentsWithoutYear').prop('checked') === false;
+                        }
+                    }
+                },
                 'after': {
                     datepickerDate: {
                         depends: function (element) {
