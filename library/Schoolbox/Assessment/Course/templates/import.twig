@@ -140,26 +140,19 @@ Usages:
                 validateOptions: {
                     invalidHandler: function (event, validator) {
                         // Ensure any units with invalid inputs are expanded
-                        var mageForm    = $('[data-mage="part-3"]'),
-                            $collapsers = $();
+                        var mageForm = $('[data-mage="part-3"]');
 
-                        // Find collapsers
+                        // Find collapsers and expand them
                         Object.keys(validator.invalid).forEach(function(invalidInputName) {
                             var $inputElement    = mageForm.find('[name="' + invalidInputName + '"]'),
-                                $collapsableId   = $inputElement.closest('[data-collapsable]').attr('data-collapsable'),
-                                $collapserButton = mageForm.find('[data-collapser="' + $collapsableId + '"]');
+                                $collapsable     = $inputElement.closest('[data-collapsable]'),
+                                collapsableId    = $collapsable.attr('data-collapsable'),
+                                $collapserButton = mageForm.find('[data-collapser="' + collapsableId + '"]');
 
-                            $collapsers = $collapsers.add($collapserButton);
-                        });
-
-                        // Click each unique one
-                        $.unique($collapsers).each(function () {
-                            // Don't simulate click if collapser is already expanded
-                            var $collapsable = $('[data-collapsable="'+$(this).attr('data-collapser')+'"]');
                             if ($collapsable.attr("data-collapse-state") === "collapsed") {
-                                $(this).click();
+                                $.fn.executeCollapsable($collapsable, $collapserButton);
                             }
-                        })
+                        });
                     }
                 },
                 beforeAttemptingSubmit: function() {
