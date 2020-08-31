@@ -20,19 +20,7 @@
 
 <script>
     $(function() {
-        $('[data-collapser]').click(function(e) {
-            e.preventDefault();
-            var unit = $('#' + $(e.target).attr('data-collapser'));
-            if (unit.hasClass('hide')) {
-                unit.removeClass('hide');
-                $(e.target).removeClass('icon-down-arrow');
-                $(e.target).addClass('icon-up-arrow');
-            } else {
-                unit.addClass('hide');
-                $(e.target).removeClass('icon-up-arrow');
-                $(e.target).addClass('icon-down-arrow');
-            }
-        });
+        $('[data-collapser]').collapsable();
 
         // User toggles the checkbox to the left of an assessment
         $(document).on('change', 'input[data-assessment-import]', function () {
