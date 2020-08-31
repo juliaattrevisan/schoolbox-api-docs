@@ -11,11 +11,10 @@ namespace Schoolbox\Comms\News;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
+use Aura\Di\ContainerInterface;
+use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
 use Schoolbox\Comms\News\Audience\IUserResolver;
-use Schoolbox\Comms\News\Audience\RelationshipFilterer;
-use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
-use Schoolbox\Comms\News\Audience\UserResolver;
 use Schoolbox\Comms\News\Model as Article;
 use Schoolbox\Comms\News\Moderation\IUserResolver as IModeratorResolver;
 use Schoolbox\Comms\News\Moderation\UserResolver as ModeratorResolver;
@@ -61,9 +60,9 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @inheritdoc
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      */
-    public static function getSetters(\Aura\Di\ContainerInterface $di): array
+    public static function getSetters(ContainerInterface $di): array
     {
         /** @var MapperFactory $mf */
         $mf = $di->get('mapperFactory');
@@ -216,6 +215,8 @@ class Notifier extends AbstractModuleNotifier
                     $bundle->attach(self::TRIGGER_EXPIRED, $expiresAt->getUnixTimeStamp());
                 }
             } else {
+                // flag to check whether retraction has been triggered, so that it'll not try retracting twice
+                $retracted = false;
                 // publish date changed
                 if (isset($diff['publishAt'])) {
                     // past -> past .. noop
@@ -228,6 +229,7 @@ class Notifier extends AbstractModuleNotifier
                     } elseif ($publishAt->isFuture()) {
                         $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
                         $bundle->attach(self::TRIGGER_POSTED, $publishAt->getUnixTimeStamp());
+                        $retracted = true;
                     }
                 }
                 // expiry date changed
@@ -242,6 +244,14 @@ class Notifier extends AbstractModuleNotifier
                     } elseif ($previous->getExpiresAt()->isFuture()) {
                         $bundle->detach(self::TRIGGER_EXPIRED);
                     }
+                }
+                // If there's any change to contents of posted notification, re-trigger posted
+                if (!$retracted
+                    && (($previous->getTitle() !== $article->getTitle())
+                        || ($previous->getBlurb() !== $article->getBlurb())
+                        || ($previous->getBody() !== $article->getBody())
+                    )) {
+                    $bundle->attach(self::TRIGGER_POSTED, $publishAt->getUnixTimeStamp());
                 }
             }
             return;
@@ -296,7 +306,12 @@ class Notifier extends AbstractModuleNotifier
     private function notifySubmitted(string $roleType, Article $article, User $effector): Envelope
     {
         $envelope     = new Envelope();
-        $recipientIds = $this->moderatorResolver->findModeratorsForArticle($article);
+        try {
+            $recipientIds = $this->moderatorResolver->findModeratorsForArticle($article);
+        } catch (Exception $e) {
+            // shouldn't happen, but just in case
+            return $envelope;
+        }
 
         if (empty($recipientIds)) {
             // no recipients? do nothing
@@ -474,9 +489,10 @@ class Notifier extends AbstractModuleNotifier
      * @param string  $roleType
      * @param Article $article
      * @param User    $effector
+     * @param array   $diff
      * @return Envelope
      */
-    private function notifyPosted(string $roleType, Article $article, User $effector): Envelope
+    private function notifyPosted(string $roleType, Article $article, User $effector, array $diff): Envelope
     {
         $envelope = new Envelope();
 
@@ -547,11 +563,11 @@ class Notifier extends AbstractModuleNotifier
 
 
         $bob = new Builder();
+        $previous = $this->buildPrevious($article, $diff);
 
         $notifBody = strlen($article->getBlurb()) > 0 ? $article->getBlurb() : $article->getBody();
 
-        $instance = $bob
-            ->setTitle(self::PATTERN_POSTED_TITLE)
+        $bob->setTitle(self::PATTERN_POSTED_TITLE)
             ->setParams([
                 'user'  => new UserParam($author, Param::STACKING_REPLACE),
                 'title' => new Param($heading, sprintf(self::PATTERN_ARTICLE_HREF, $articleId), Param::STACKING_APPEND),
@@ -574,8 +590,14 @@ class Notifier extends AbstractModuleNotifier
             // timestamp and filters are optional
             ->setTimestamp($activeDate->getUnixTimeStamp())
             // and then you build
-            ->addFilter('roleType', [$roleType])
-            ->build();
+            ->addFilter('roleType', [$roleType]);
+
+        if ($previous->isPublished()) {
+            // magical meta to delete messages related to object first.
+            $bob->setRetractFirst(true);
+        }
+
+        $instance = $bob->build();
 
         foreach ($recipients as $recipient) {
             // to avoid author getting the notification
@@ -606,7 +628,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentPosted(Article $article, User $user, array $diff = []): Envelope
     {
-        return $this->notifyPosted(Role::STUDENT, $article, $user);
+        return $this->notifyPosted(Role::STUDENT, $article, $user, $diff);
     }
 
     /**
@@ -619,7 +641,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffPosted(Article $article, User $user, array $diff = []): Envelope
     {
-        return $this->notifyPosted(Role::STAFF, $article, $user);
+        return $this->notifyPosted(Role::STAFF, $article, $user, $diff);
     }
 
     /**
@@ -632,7 +654,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentPosted(Article $article, User $user, array $diff = []): Envelope
     {
-        return $this->notifyPosted(Role::PARENT, $article, $user);
+        return $this->notifyPosted(Role::PARENT, $article, $user, $diff);
     }
 
 }
