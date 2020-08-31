@@ -6,9 +6,10 @@
     {% set saveType  = 'create' %}
 {% endif %}
 
-<form method="post" action="{{ routeLookup('adminLti.postModify') }}" class="row" data-term-form="{{ saveType }}">
+<form method="post" action="{{ routeLookup('adminLti.postModify') }}" data-term-form="{{ saveType }}">
     <input type="hidden" name="id" value="{{ provider.id ?? '' }}">
-    <div data-mage-wrapper>
+
+    <div class="row" data-mage-wrapper>
         <div class="small-6 columns">
             <label>
                 Provider Name
@@ -42,9 +43,11 @@
                 </select>
             </label>
         </div>
-        <input type="submit" class="expand" value="{{ saveValue }}" data-mage-working="Saving..." data-mage-reset="{{ saveValue }}" />
+
         <!-- Don't delete the inline style, it's needed -->
         <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
         <p data-mage-custom-error class="hide alert alert-box icon-alert"></p>
     </div>
+
+    <input type="submit" class="expand" value="{{ saveValue }}" data-mage-working="Saving..." data-mage-reset="{{ saveValue }}" />
 </form>
