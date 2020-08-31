@@ -155,7 +155,7 @@ Usages:
                         // Click each unique one
                         $.unique($collapsers).each(function () {
                             // Don't simulate click if collapser is already expanded
-                            var $collapsable = $(this).closest(".actions-small-1").next("[data-collapsable]");
+                            var $collapsable = $('[data-collapsable="'+$(this).attr('data-collapser')+'"]');
                             if ($collapsable.attr("data-collapse-state") === "collapsed") {
                                 $(this).click();
                             }
