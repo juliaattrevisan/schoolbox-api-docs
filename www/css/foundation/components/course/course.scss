@@ -46,7 +46,7 @@ fieldset[disabled] {
 }
 
 input[type="submit"][readonly] {
-    background-color: rgba($content-ui-submit-background, 0.4);
+    background-color: css-change-color($content-ui-submit-background, $alpha: 0.4);
     background-image: url('/images/foundation/preloader.gif');
     background-repeat: no-repeat;
     background-size: 1rem;

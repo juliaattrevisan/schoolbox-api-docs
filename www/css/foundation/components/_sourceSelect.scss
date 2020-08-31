@@ -41,6 +41,6 @@ fieldset[disabled] {
 
     .source-select {
         opacity: 0.5;
-        background-color: rgba($input-hover-bg-color, 0.05);
+        background-color: css-change-color($input-hover-bg-color, $alpha: 0.05);
     }
 }
