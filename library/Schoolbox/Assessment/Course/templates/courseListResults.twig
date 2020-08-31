@@ -38,7 +38,7 @@
         </section>
     {% endif %}
 
-    {% if courses|length %}
+    {% if courses is defined %}
         <section>
             {% if suggestions is defined and suggestions|length %}
                 <h3>All Courses</h3>
@@ -61,12 +61,15 @@
             </ul>
         </section>
     {% else %}
-        <section>
-            <p class="content">No results found.</p>
-        </section>
-
-        {% set label = search ? "Create a Course called "~search : "Create a new Course" %}
-        <a class='button submit expand' href="/course/new/{{ search | url_encode }}">{{ label }}</a>
+        {% set label = search ? "create a new course called '"~search~"'" : "create a new course" %}
+        <div class="row">
+            <div class="small-12 columns">
+                <div class="empty-state">
+                    <i class="icon-course"></i>
+                    <p>Your search for '{{ search }}' did not return any matches.<br>Please try your search again or <a  href="/course/new/{{ search | url_encode }}">{{ label }}</a>.</p>
+                </div>
+            </div>
+        </div>
     {% endif %}
 </div>
 
