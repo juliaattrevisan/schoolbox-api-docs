@@ -82,7 +82,7 @@ $align-block-grid-to-grid: true;
 @mixin top-content-alignment($media: $small-only, $wide-margin: 2rem, $narrow-margin: 0.5rem) {
 
     @media #{$media} {
-        > h1,
+        h1,
         .subheader,
         ul.meta,
         .pagination,
