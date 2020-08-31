@@ -996,8 +996,10 @@ class Mapper extends BaseMapper
             $bindings  = $pbArray['bindings'];
             $filters[] = "`s`.`year` IN ({$pbArray['placeholders']})";
         }
-        $this->bindings  = array_merge($this->bindings, $bindings);
-        $this->filters[] = implode(' OR ', $filters);
+        $this->bindings = array_merge($this->bindings, $bindings);
+        if (!empty($filters)) {
+            $this->filters[] = implode(' OR ', $filters);
+        }
 
         self::$placeholderIndex++;
     }
@@ -1025,8 +1027,10 @@ class Mapper extends BaseMapper
             $bindings  = $pbArray['bindings'];
             $filters[] = "`s`.`house` IN ({$pbArray['placeholders']})";
         }
-        $this->bindings  = array_merge($this->bindings, $bindings);
-        $this->filters[] = implode(' OR ', $filters);
+        $this->bindings = array_merge($this->bindings, $bindings);
+        if (!empty($filters)) {
+            $this->filters[] = implode(' OR ', $filters);
+        }
 
         self::$placeholderIndex++;
     }
