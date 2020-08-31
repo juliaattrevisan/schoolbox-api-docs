@@ -10,11 +10,11 @@ $allow-notification-stash: $xlarge-up;
     height: $tabbar-height;
     display: block;
     cursor: pointer;
+    text-align: center;
 
     /* The Notification Bell
      */
     &[data-unread] {
-        padding-left: 1.65rem;
         color: $navigation-foreground;
 
         /* The colour of the bell in its idle state
@@ -31,7 +31,6 @@ $allow-notification-stash: $xlarge-up;
         &:not([data-unread="0"]) {
             background-color: $notification-unread-background;
             color: $notification-unread-color;
-            padding-left: .875rem;
 
             span {
                 opacity: 1;
