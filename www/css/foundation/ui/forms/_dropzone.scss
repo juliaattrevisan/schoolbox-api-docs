@@ -229,7 +229,8 @@ ul.az-error-list {
         cursor: pointer;
     }
     nav a {
-        color: $attachzone-error-color;
+        opacity: 1;
+
         &:hover {
             background-color: tint($attachzone-error-color, 74%);
         }
