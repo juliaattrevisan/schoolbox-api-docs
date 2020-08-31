@@ -481,9 +481,15 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
 
-        /* User must supply name, types and years
+        /* User must supply name, types, years and houses
          */
-        if (!strlen(trim($post['name'])) || !count($post['types']) || !count($post['years'])) {
+        $includeStudentsWithoutYear  = $post->getBool('includeStudentsWithoutYear', false);
+        $includeStudentsWithoutHouse = $post->getBool('includeStudentsWithoutHouse', false);
+        if (!strlen(trim($post['name']))
+            || !count($post['types'])
+            || (!count($post['years']) && !$includeStudentsWithoutYear)
+            || (!count($post['houses']) && !$includeStudentsWithoutHouse)
+        ) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
@@ -560,7 +566,7 @@ class Controller extends Base
         if (is_array($post['years'])) {
             $pastoralReport->setYearsCsv(implode(',', $post['years']));
         } else {
-            $pastoralReport->setTypesCsv('');
+            $pastoralReport->setYearsCsv('');
         }
 
         if (is_array($post['houses'])) {
@@ -569,8 +575,8 @@ class Controller extends Base
             $pastoralReport->setHousesCsv('');
         }
 
-        $pastoralReport->setIncludeStudentsWithoutYear($post->getBool('includeStudentsWithoutYear', false));
-        $pastoralReport->setIncludeStudentsWithoutHouse($post->getBool('includeStudentsWithoutHouse', false));
+        $pastoralReport->setIncludeStudentsWithoutYear($includeStudentsWithoutYear);
+        $pastoralReport->setIncludeStudentsWithoutHouse($includeStudentsWithoutHouse);
 
         // Save groups the report is shared with
 

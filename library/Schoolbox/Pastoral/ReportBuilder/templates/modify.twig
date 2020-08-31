@@ -615,7 +615,20 @@
             rules: {
                 'name': 'required',
                 'types[]': 'required',
-                'years[]': 'required',
+                'years[]': {
+                    required: {
+                        depends: function () {
+                            return $('#includeStudentsWithoutYear').prop('checked') === false;
+                        }
+                    }
+                },
+                'houses[]': {
+                    required: {
+                        depends: function () {
+                            return $('#includeStudentsWithoutHouse').prop('checked') === false;
+                        }
+                    }
+                },
                 'after': {
                     datepickerDate: {
                         depends: function (element) {
@@ -633,7 +646,8 @@
             },
             messages: {
                 'types[]': 'You must select at least one record type to show in the report',
-                'years[]': 'You must select at least one year level to show in the report'
+                'years[]': 'You must select at least one year level to show in the report',
+                'house[]': 'You must select at least one house to show in the report'
             },
             submitHandler: function (form) {
                 {# Prior to submitting the form we need to set the hidden `order` #}
