@@ -73,6 +73,11 @@
 					}
 				}
 			}
+            // Override for dropzone error
+            &.dz-error > nav a {
+                color: $attachzone-error-color;
+            }
+
 		}
 
 		/* Inside a containing column, but not an action-
