@@ -210,19 +210,26 @@
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this?',
                 confirmEvent: function (anchor) {
-                    $
-                        .ajax({
-                            url: anchor.attr('href'),
-                            type: 'DELETE',
-                        })
-                        .done(function () {
-                            jstree.delete_node(deleteNode);
-                            jstree.select_node(selectParent);
-                        });
+                    let toast = $('#resource-browser-toast');
+
+                    toast.toastActivate({text: 'Deleting...'});
+
+                    $.ajax({
+                        url: anchor.attr('href'),
+                        type: 'DELETE',
+                    })
+                    .done(function () {
+                        jstree.delete_node(deleteNode);
+                        jstree.select_node(selectParent);
+
+                        toast.toastTimeout({text: 'Deleted', css: 'success'});
+                    })
+                    .fail(function() {
+                        toast.toastTimeout({text: 'Unable to delete', css: 'alert'});
+                    });
                 }
             });
         });
-
     });
 </script>
 {# /HEAD #}
@@ -246,3 +253,5 @@
         </section>
     </div>
 </div>
+
+<div id="resource-browser-toast" class="toast"></div>
