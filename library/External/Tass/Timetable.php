@@ -361,7 +361,7 @@ class External_Tass_Timetable implements External_TimetableInterface
         $predicate = PredicateBuilder::getArrayBindings($roomCodes, 'roomCodes');
         $query = "
             SELECT
-                room_code AS RoomCode,
+                RTRIM(room_code) AS RoomCode,
                 subtab.sub_desc AS Description,
                 ttmast.day_code AS DayNumber,
                 RTRIM(CAST(ttmast.cmpy_code AS VARCHAR(20)))
