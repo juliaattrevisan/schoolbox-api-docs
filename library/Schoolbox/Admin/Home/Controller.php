@@ -414,7 +414,15 @@ class Controller extends Base
             'version'     => $s3Version,
         ]);
 
-        $bucketSize  = (new CloudWatchMetrics($cloudWatchClient))->getBucketSize($s3Bucket);
+        $bucketSize = 0;
+        // Note that the docs at https://docs.aws.amazon.com/AmazonS3/latest/dev/cloudwatch-monitoring.html state
+        // the correct value is 'IntelligentTieringStorage'.
+        // This appears to be an error in the docs and has been reported to AWS
+        $storageTypes = ['StandardStorage', 'IntelligentTieringFAStorage'];
+        foreach ($storageTypes as $storageType) {
+            $bucketSize += (new CloudWatchMetrics($cloudWatchClient))->getBucketSize($s3Bucket, $storageType);
+        }
+
 
         if ($bucketSizeOnly) {
             return ['bucketSize' => Alaress_Byte_Format::bytesToString($bucketSize)];

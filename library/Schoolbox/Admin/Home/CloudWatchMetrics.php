@@ -60,6 +60,9 @@ class CloudWatchMetrics
         ]);
         $dataPoints          = $result->get('Datapoints');
         $mostRecentDataPoint = end($dataPoints);
+        if (is_null($mostRecentDataPoint['Average'])){
+            return 0;
+        }
         return $mostRecentDataPoint['Average'];
     }
 
