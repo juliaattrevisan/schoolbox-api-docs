@@ -217,21 +217,24 @@ class Profile implements IStrategy
 
         foreach ($students as $student) {
             $externalId = trim((string)$student->xpath('@id')[0]);
-            $username = trim((string)$student->username);
+
+            $academicHouse = trim((string)$student->house);
+
             $title = '';
-            $firstname = trim((string)$student->firstname);
-            $lastname = trim((string)$student->lastname);
             $campus = $this->campus;
             $dob = trim((string)$student->datebirth);
             $email = trim((string)$student->email);
             $enrolmentDate = trim((string)$student->enrolmentdate);
+            $firstname = trim((string)$student->firstname);
             $form = '';
             $gender = trim((string)$student->genderpreferred);
-            $academicHouse = trim((string)$student->house);
+            $lastname = trim((string)$student->lastname);
             $leavingDate = trim((string)$student->leavingdate);
             $mobile = trim((string)$student->mobile);
             $nsn = trim((string)$student->nsn);
+            $startingDate = $this->traverser->findDate(trim((string)$student->startingdate));
             $tutorGroup = trim((string)$student->tutor);
+            $username = trim((string)$student->username);
             $yearLevel = trim((string)$student->yearlevel);
 
             /* Flags
@@ -247,6 +250,17 @@ class Profile implements IStrategy
             if ('' === $username) {
                 $this->log->warning(sprintf(
                     'Skipping base profile for student %s - no username detected',
+                    trim("{$firstname} {$lastname}")
+                ));
+
+                continue;
+            }
+
+            /* Students whose startingdate is in the future get skipped
+             */
+            if ($startingDate && $startingDate->isFuture()) {
+                $this->log->warning(sprintf(
+                    'Skipping base profile for student %s - start date in the future',
                     trim("{$firstname} {$lastname}")
                 ));
 
