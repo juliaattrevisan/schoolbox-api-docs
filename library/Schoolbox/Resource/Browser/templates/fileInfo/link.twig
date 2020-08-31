@@ -15,9 +15,15 @@
     <dd class="small-12 medium-8"><a href="{{ file.getHref() }}">{{ file.getUrl() }}</a></dd>
 
     {% if namespace == 'resourceBrowser' %}
-        {% if file.createdAt.unixTimestamp != file.modifiedAt.unixTimestamp %}
-            <dt class="small-12 medium-4">Last modified</dt>
-            <dd class="small-12 medium-8">{{ file.modifiedAt.dateOnly }}</dd>
+
+        {# Resource/Browser/Resources/Controller::showLinkInfo
+         # doesn't return createdAt or modifiedAt; concepts don't exist in schema
+         #}
+        {% if file.createdAt is defined and file.modifiedAt is defined %}
+            {% if file.createdAt.unixTimestamp != file.modifiedAt.unixTimestamp %}
+                <dt class="small-12 medium-4">Last modified</dt>
+                <dd class="small-12 medium-8">{{ file.modifiedAt.dateOnly }}</dd>
+            {% endif %}
         {% endif %}
 
         <dt class="small-12 medium-4">Hidden</dt>
