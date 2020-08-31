@@ -212,7 +212,7 @@ try {
 
                         self = $j(this);
 						url  = self.attr('href');
-						name = self.html();
+						name = self.attr('title');
                         meta = {
                             mime: self.data('mime'),
                             size: self.data('size')
