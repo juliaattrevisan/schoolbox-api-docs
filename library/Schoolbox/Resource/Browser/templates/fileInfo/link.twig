@@ -19,11 +19,9 @@
         {# Resource/Browser/Resources/Controller::showLinkInfo
          # doesn't return createdAt or modifiedAt; concepts don't exist in schema
          #}
-        {% if file.createdAt is defined and file.modifiedAt is defined %}
-            {% if file.createdAt.unixTimestamp != file.modifiedAt.unixTimestamp %}
-                <dt class="small-12 medium-4">Last modified</dt>
-                <dd class="small-12 medium-8">{{ file.modifiedAt.dateOnly }}</dd>
-            {% endif %}
+        {% if file.submitted.unixTimestamp != file.modified.unixTimestamp %}
+            <dt class="small-12 medium-4">Last modified</dt>
+            <dd class="small-12 medium-8">{{ file.modified.short }}</dd>
         {% endif %}
 
         <dt class="small-12 medium-4">Hidden</dt>
