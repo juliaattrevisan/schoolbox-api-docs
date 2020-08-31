@@ -182,7 +182,7 @@
                     </header>
                 </div>
 
-                {% set ulAttr = sortable ? 'class="information-list sortable ui-sortable" data-sortable data-list' : 'class="information-list" data-list' %}
+                {% set ulAttr = sortable ? 'class="information-list sortable ui-sortable" data-sortable data-list' : 'class="information-list unsortable" data-list' %}
 
                 <ul {{ ulAttr | raw }}>
                     {# Render each row of data#}
