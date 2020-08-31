@@ -139,7 +139,7 @@ class HandlerFactory
     public function getFileLogHandler($topic)
     {
         if(!is_dir($this->conf->get('logs_dir'))) {
-            if(!mkdir($concurrentDirectory = $this->conf->get('logs_dir'), 0770, true) && !is_dir($concurrentDirectory)) {
+            if(!mkdir($concurrentDirectory = $this->conf->get('logs_dir'), 0775, true) && !is_dir($concurrentDirectory)) {
                 throw new RuntimeException("Cannot create log directory: $concurrentDirectory");
             }
         }
