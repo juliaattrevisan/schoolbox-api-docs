@@ -137,17 +137,34 @@ Usages:
 
             var $magePart3 = $('input[data-mage-next="none"]');
             $magePart3.mage({
-                validateOptions: {},
+                validateOptions: {
+                    invalidHandler: function (event, validator) {
+                        // Ensure any units with invalid inputs are expanded
+                        var mageForm = $('[data-mage="part-3"]');
+
+                        // Find collapsers and expand them
+                        Object.keys(validator.invalid).forEach(function(invalidInputName) {
+                            var $inputElement    = mageForm.find('[name="' + invalidInputName + '"]'),
+                                $collapsable     = $inputElement.closest('[data-collapsable]'),
+                                collapsableId    = $collapsable.attr('data-collapsable'),
+                                $collapserButton = mageForm.find('[data-collapser="' + collapsableId + '"]');
+
+                            if ($collapsable.attr("data-collapse-state") === "collapsed") {
+                                $.fn.executeCollapsable($collapsable, $collapserButton);
+                            }
+                        });
+                    }
+                },
                 beforeAttemptingSubmit: function() {
-                    // check every visible publish date field
-                    $('input[data-role="publish_date"]:visible:enabled').each(function() {
+                    // check every enabled publish date field
+                    $('input[data-role="publish_date"]:enabled').each(function() {
                         $(this).rules('add', {
                             required: true,
                             datepickerDate: true
                         });
                     });
-                    // check every visible open date field
-                    $('input[data-role="open_date"]:visible:enabled').each(function() {
+                    // check every enabled open date field
+                    $('input[data-role="open_date"]:enabled').each(function() {
                         var lessonId = $(this).data('assessment-id');
                         var publishDate = $('input[data-role="publish_date"][data-assessment-id="' + lessonId + '"]');
                         $(this).rules('add', {
@@ -155,8 +172,8 @@ Usages:
                             datepickerDateNotBefore: publishDate
                         });
                     });
-                    // check every visible due date field
-                    $('input[data-role="due_date"]:visible:enabled').each(function() {
+                    // check every enabled due date field
+                    $('input[data-role="due_date"]:enabled').each(function() {
                         var lessonId = $(this).data('assessment-id'),
                             dateRole;
                         // if an open date exists then it needs to be before then, otherwise before publish date
@@ -171,8 +188,8 @@ Usages:
                             datepickerDateNotBefore: otherDate
                         });
                     });
-                    // check every visible close date field
-                    $('input[data-role="close_date"]:visible:enabled').each(function() {
+                    // check every enabled close date field
+                    $('input[data-role="close_date"]:enabled').each(function() {
                         var lessonId = $(this).data('assessment-id');
                         var dueDate = $('input[data-role="due_date"][data-assessment-id="' + lessonId + '"]');
                         $(this).rules('add', {

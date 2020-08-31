@@ -42,7 +42,13 @@
                     </nav>
                 </li>
             </ul>
-            <div id="unit-{{ unitSpec.id }}" data-start_date="{{ unitImpl.openDate.localShort }}" data-finish_date="{{ unitImpl.dueDate.localShort }}" class="hide">
+            <div id="unit-{{ unitSpec.id }}"
+                 data-collapsable="unit-{{ unitSpec.id }}"
+                 data-start_date="{{ unitImpl.openDate.localShort }}"
+                 data-finish_date="{{ unitImpl.dueDate.localShort }}"
+                 data-collapse-state="collapsed"
+                 class="hide"
+            >
                 <div class="row">
                     <section>
                         {% if unitAssessmentCount %}

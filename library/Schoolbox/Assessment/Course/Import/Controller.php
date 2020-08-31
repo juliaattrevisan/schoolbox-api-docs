@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Course\Import;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Web\Controller as Base;
+use Aura\Web\Request;
 use Component_ConfigDefinition;
 use Component_ConfigDefinitionMapper;
 use Component_ConfigMapper;
@@ -461,190 +462,12 @@ class Controller extends Base\Base
      */
     public function postAssessments()
     {
-        // Parse form data
-        $post         = $this->getRequest()->post;
-        $action       = trim($post['action']);
-        $courseSpecId = trim($post['course_spec_id']);
-        $courseImplId = trim($post['course_impl_id']);
-        $componentId  = trim($post['component_id']);
-        $folderIds    = $this->parseFolderIds($post['import_folders']);
-        $unitImplData = $post['unit'];
-
-        // Algorithm:
-        //
-        // 1. Create a graph of the CourseImpl that exists in DB
-        // 2. Create a graph of the CourseImpl as indicated in POST data
-        // 3. Traverse DB-graph
-        //   3.1 if(entity not in POST-graph)
-        //       3.1.1 delete entity
-        // 4. Traverse POST-graph
-        //   4.1 if(entity not in DB-graph)
-        //       4.1.1 create entity
-        //   4.2 else(entity in DB-graph)
-        //       4.2.1 update entity
-        //   4.3 save entity
-
-
-        // On new-import, we may be creating multiple courseImpls.
-        // Therefore store in array and index by ClassFolderId
-        /** @var CourseImplementation\Model[] $courseImpls */
-        $courseImpls = [];
-        $courseSpec  = $this->courseSpecificationMapper->findById($courseSpecId);
-
-        // Collect folders for unit and course pages - needed for criteria import
-        $unitSpecs = [];
-        foreach ($unitImplData as $unitImp) {
-            $unitSpecs[] = (int)$unitImp['unit_spec_id'];
-        }
-
-        $unitFolders = [];
-        foreach ($courseSpec->getUnits() as $unitSpec) {
-            if (in_array((int)$unitSpec->getId(), $unitSpecs, true)) {
-                $unitFolders[] = $unitSpec->getFolder()->getId();
-            }
-        }
-
-        $courseFolder = [$courseSpec->getFolder()->getId()];
-
-        // Are we creating a new import?
-        if ('import' === $action) {
-            $courseSpec = $this->courseSpecificationMapper->findById($courseSpecId);
-            foreach ($folderIds as $classFolderId) {
-                $courseImpl = $this->courseImplementationMapper->createModel();
-                $courseImpl->setSpecification($courseSpec);
-                $courseImpl->setFolder($this->folderMapper->findById($classFolderId));
-                $courseImpls[$classFolderId] = $courseImpl;
-
-                //Save unit criteria to class page
-                $allFolders = array_merge($courseFolder, $unitFolders);
-                try {
-                    $this->copyCriteria($allFolders, $classFolderId);
-                } catch (MapperException $e) {
-                    $this->sendError($e->getMessage());
-                    return;
-                }
-            }
-        } // Else we are modifying an existing import
-        else {
-            // We can only modify a single Course Import at a time.
-            $courseImpl                                     = $this->courseImplementationMapper->findById($courseImplId);
-            $courseImpls[$courseImpl->getFolder()->getId()] = $courseImpl;
-
-            // Load UnitImplementations
-            $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
-
-            // Load IAssessables
-            foreach ($courseImpl->getUnits() as $unitImpl) {
-                $unitImpl->setAssessables($this->assessmentMapperProxy->findAllByUnitImplementationIds([$unitImpl->getId()]));
-            }
-
-            //Save unit criteria to class page
-            $classFolderId = $folderIds[0];
-
-            try {
-                $this->copyCriteria($unitFolders, $classFolderId);
-            } catch (MapperException $e) {
-                $this->sendError($e->getMessage());
-                return;
-            }
-        }
-
-        // Delete de-selected Units and Assessments
-
-        // For each Class we are importing the Course to:
-        foreach ($courseImpls as $classFolderId => $courseImpl) {
-
-            // Traverse pre-existing course import, deleting any unitImpls not in POST
-            // Deleting a UnitImpl automatically cascades the deletion to enclosed Assessments
-            // This loop will be skipped during a new-import (CourseImpl will not yet contain Units)
-            foreach ($courseImpl->getUnits() as $unitImpl) {
-                $unitSpec = $unitImpl->getSpecification();
-
-                // Did user de-select this unit?
-                if (!array_key_exists($unitSpec->getId(), $unitImplData)) {
-                    // Delete the unitImpl. Cascading the delete to subsidiary IAssessables
-                    $this->unitImplementationMapper->delete($unitImpl);
-                }
-            }
-        }
-
+        // Transact this entire request, rolling back if any exception is raised
         try {
-            // Create any un-imported UnitImpls from corresponding UnitSpec
-            // Update any already-imported UnitImpls
-            // Create any un-imported AssessmentImpls from corresponding AssessmentSpec
-            // Update any already-imported AssessmentImpls
-            foreach ($courseImpls as $classFolderId => $courseImpl) {
-
-                // Even if an import-modify, we need to explicitly save to update timestamps (and possibly the folderId)
-                $this->courseImplementationMapper->save($courseImpl);
-
-                // For each UnitImpl in POST data
-                foreach ($unitImplData as $unitPair) {
-                    // Retrieve UnitSpec from DB (even if deleted)
-                    try {
-                        $unitSpec = $this->unitSpecificationMapper->findById($unitPair['unit_spec_id']);
-                    } catch (MapperException\Deleted $e) {
-                        $unitSpec = $e->getDeletedObject();
-                    }
-                    $unitImplOpenDate  = \Alaress_Date_Format::newLocalShort($unitPair['open_date']);
-                    $unitImplCloseDate = \Alaress_Date_Format::newLocalShort($unitPair['close_date'])->endOfDay();
-
-                    // Does the CourseImpl already contain this Unit ?
-                    $unitSpecId = $unitSpec->getId();
-                    $callback   = function ($unitImpl) use ($unitSpecId) {
-                        /** @var UnitImplementation\Model $unitImpl */
-                        return (int)$unitSpecId === (int)$unitImpl->getSpecification()->getId();
-                    };
-                    /** @var UnitImplementation\Model $unitImpl */
-                    $unitImpl = $courseImpl->getUnits()->filter($callback)->first();
-
-                    // Did we already delete this UnitImpl ?
-                    if ($unitImpl && $unitImpl->isDeleted()) {
-                        continue;
-                    }
-
-                    // If the CourseImpl does not yet contain this UnitSpec
-                    if (!$unitImpl) {
-                        // Create a UnitImpl from this UnitSpec
-                        $unitImpl = $this->unitImplementationMapper->createModel();
-                        $unitImpl->setSpecification($unitSpec);
-                        $unitImpl->setCourse($courseImpl);
-                        $unitImpl->setTitle($unitSpec->getFolder()->getTitle());
-                        $courseImpl->getUnits()->add($unitImpl);
-                    }
-                    $unitImpl->setOpenDate($unitImplOpenDate);
-                    $unitImpl->setDueDate($unitImplCloseDate);
-                    $this->unitImplementationMapper->save($unitImpl);
-
-                    if (is_array($unitPair['a'])) {
-                        // Create/Update AssessmentImpls
-                        foreach ($unitPair['a'] as $aData) {
-                            $this->parseAssessmentForm($unitImpl, $aData);
-                        }
-                    }
-                }
-
-                // Associate the CourseImpl with a CourseOutline Component
-
-                /* If (componentId was supplied)
-                 *   update that.
-                 * elseif (empty CourseOutline component available)
-                 *   use that (filter for first sequence)
-                 * else
-                 *   create a new CourseOutline component (at top of the page)
-                 */
-                if ('import' === $action) {
-                    $componentInstance = null;
-                    // Was a componentId supplied?
-                    if ($componentId) {
-                        $componentInstance = $this->componentInstanceMapper->findByInstanceId($componentId);
-                    } else {
-                        $componentInstance = $this->findAvailableCourseOutlineComponent($classFolderId);
-                    }
-                    $this->injectImportIntoComponent($courseImpl, $componentInstance);
-                }
-            }
-        } catch (\Exception $e) {
+            $this->unitImplementationMapper->getDatabase()->transact(function () {
+                $this->persistCourseImplementation($this->request->post);
+            });
+        } catch (\Throwable $e) {
             $this->sendError($e->getMessage());
             return;
         }
@@ -1197,5 +1020,208 @@ class Controller extends Base\Base
             $canReadUnitSpecs[$unit->getId()] = $this->access->getFolderAccess($this->getUser(), $unit->getFolder()->getId()) >= UserAccess::ACCESS_READ;
         }
         return $canReadUnitSpecs;
+    }
+
+
+    /**
+     * Persist a course implementation, based upon submitted form data.
+     *
+     * @param Request\Values $post POST data
+     *
+     * @var string   $post  ['action']                                           {'import' | 'modify'}
+     * @var int      $post  ['course_spec_id']
+     * @var int|null $post  ['course_impl_id']
+     * @var int|null $post  ['component_id']
+     * @var string   $post  ['import_folders']                                   comma-separated folderIds to import to
+     * @var array    $post  ['unit']  Indexed by unitSpec.id
+     * @var int      $post  ['unit'][unitSpecId]['unit_spec_id']
+     * @var int|null $post  ['unit'][unitSpecId]['unit_impl_id']
+     * @var string   $post  ['unit'][unitSpecId]['open_date']                    UnitImpl's Open Date
+     * @var string   $post  ['unit'][unitSpecId]['close_date']                   UnitImpl's Close Date
+     * @var array    $post  ['unit'][unitSpecId]['a']                            UnitImpl's Indexed by Assessment.id
+     * @var int      $post  ['unit'][unitSpecId]['a'][assId]['specId']
+     * @var int      $post  ['unit'][unitSpecId]['a'][assId]['implId']
+     * @var bool     $post  ['unit'][unitSpecId]['a'][assId]['checked']
+     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['publish']
+     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['open']
+     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['due']
+     * @var string   $post  ['unit'][unitSpecId]['a'][assId]['dates']['date']
+     *
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     */
+    private function persistCourseImplementation(Request\Values $post): void
+    {
+        // Parse form data
+        $action       = trim($post['action']);
+        $courseSpecId = trim($post['course_spec_id']);
+        $courseImplId = trim($post['course_impl_id']);
+        $componentId  = trim($post['component_id']);
+        $folderIds    = $this->parseFolderIds($post['import_folders']);
+        $unitImplData = $post['unit'];
+
+        // Algorithm:
+        //
+        // 1. Create a graph of the CourseImpl that exists in DB
+        // 2. Create a graph of the CourseImpl as indicated in POST data
+        // 3. Traverse DB-graph
+        //   3.1 if(entity not in POST-graph)
+        //       3.1.1 delete entity
+        // 4. Traverse POST-graph
+        //   4.1 if(entity not in DB-graph)
+        //       4.1.1 create entity
+        //   4.2 else(entity in DB-graph)
+        //       4.2.1 update entity
+        //   4.3 save entity
+
+
+        // On new-import, we may be creating multiple courseImpls.
+        // Therefore store in array and index by ClassFolderId
+        /** @var CourseImplementation\Model[] $courseImpls */
+        $courseImpls = [];
+        $courseSpec  = $this->courseSpecificationMapper->findById($courseSpecId);
+
+        // Collect folders for unit and course pages - needed for criteria import
+        $unitSpecs = [];
+        foreach ($unitImplData as $unitImp) {
+            $unitSpecs[] = (int)$unitImp['unit_spec_id'];
+        }
+
+        $unitFolders = [];
+        foreach ($courseSpec->getUnits() as $unitSpec) {
+            if (in_array((int)$unitSpec->getId(), $unitSpecs, true)) {
+                $unitFolders[] = $unitSpec->getFolder()->getId();
+            }
+        }
+
+        $courseFolder = [$courseSpec->getFolder()->getId()];
+
+        if ('import' === $action) {
+            // We are creating a new import
+            $courseSpec = $this->courseSpecificationMapper->findById($courseSpecId);
+            foreach ($folderIds as $classFolderId) {
+                $courseImpl = $this->courseImplementationMapper->createModel();
+                $courseImpl->setSpecification($courseSpec);
+                $courseImpl->setFolder($this->folderMapper->findById($classFolderId));
+                $courseImpls[$classFolderId] = $courseImpl;
+
+                //Save unit criteria to class page
+                $allFolders = array_merge($courseFolder, $unitFolders);
+                $this->copyCriteria($allFolders, $classFolderId);
+            }
+        } else {
+            // We are modifying an existing import
+            // We can only modify a single Course Import at a time.
+            $courseImpl                                     = $this->courseImplementationMapper->findById($courseImplId);
+            $courseImpls[$courseImpl->getFolder()->getId()] = $courseImpl;
+
+            // Load UnitImplementations
+            $courseImpl->setUnits($this->unitImplementationMapper->findAllByCourseId($courseImpl->getId()));
+
+            // Load IAssessables
+            foreach ($courseImpl->getUnits() as $unitImpl) {
+                $unitImpl->setAssessables($this->assessmentMapperProxy->findAllByUnitImplementationIds([$unitImpl->getId()]));
+            }
+
+            //Save unit criteria to class page
+            $classFolderId = $folderIds[0];
+
+            $this->copyCriteria($unitFolders, $classFolderId);
+        }
+
+        // Delete de-selected Units and Assessments
+
+        // For each Class we are importing the Course to:
+        foreach ($courseImpls as $classFolderId => $courseImpl) {
+
+            // Traverse pre-existing course import, deleting any unitImpls not in POST
+            // Deleting a UnitImpl automatically cascades the deletion to enclosed Assessments
+            // This loop will be skipped during a new-import (CourseImpl will not yet contain Units)
+            foreach ($courseImpl->getUnits() as $unitImpl) {
+                $unitSpec = $unitImpl->getSpecification();
+
+                // Did user de-select this unit?
+                if (!array_key_exists($unitSpec->getId(), $unitImplData)) {
+                    // Delete the unitImpl. Cascading the delete to subsidiary IAssessables
+                    $this->unitImplementationMapper->delete($unitImpl);
+                }
+            }
+        }
+
+        // Create any un-imported UnitImpls from corresponding UnitSpec
+        // Update any already-imported UnitImpls
+        // Create any un-imported AssessmentImpls from corresponding AssessmentSpec
+        // Update any already-imported AssessmentImpls
+        foreach ($courseImpls as $classFolderId => $courseImpl) {
+
+            // Even if an import-modify, we need to explicitly save to update timestamps (and possibly the folderId)
+            $this->courseImplementationMapper->save($courseImpl);
+
+            // For each UnitImpl in POST data
+            foreach ($unitImplData as $unitPair) {
+                // Retrieve UnitSpec from DB (even if deleted)
+                try {
+                    $unitSpec = $this->unitSpecificationMapper->findById($unitPair['unit_spec_id']);
+                } catch (MapperException\Deleted $e) {
+                    $unitSpec = $e->getDeletedObject();
+                }
+                $unitImplOpenDate  = \Alaress_Date_Format::newLocalShort($unitPair['open_date']);
+                $unitImplCloseDate = \Alaress_Date_Format::newLocalShort($unitPair['close_date'])->endOfDay();
+
+                // Does the CourseImpl already contain this Unit ?
+                $unitSpecId = $unitSpec->getId();
+                $callback   = function ($unitImpl) use ($unitSpecId) {
+                    /** @var UnitImplementation\Model $unitImpl */
+                    return (int)$unitSpecId === (int)$unitImpl->getSpecification()->getId();
+                };
+                /** @var UnitImplementation\Model $unitImpl */
+                $unitImpl = $courseImpl->getUnits()->filter($callback)->first();
+
+                // Did we already delete this UnitImpl ?
+                if ($unitImpl && $unitImpl->isDeleted()) {
+                    continue;
+                }
+
+                // If the CourseImpl does not yet contain this UnitSpec
+                if (!$unitImpl) {
+                    // Create a UnitImpl from this UnitSpec
+                    $unitImpl = $this->unitImplementationMapper->createModel();
+                    $unitImpl->setSpecification($unitSpec);
+                    $unitImpl->setCourse($courseImpl);
+                    $unitImpl->setTitle($unitSpec->getFolder()->getTitle());
+                    $courseImpl->getUnits()->add($unitImpl);
+                }
+                $unitImpl->setOpenDate($unitImplOpenDate);
+                $unitImpl->setDueDate($unitImplCloseDate);
+                $this->unitImplementationMapper->save($unitImpl);
+
+                if (is_array($unitPair['a'])) {
+                    // Create/Update AssessmentImpls
+                    foreach ($unitPair['a'] as $aData) {
+                        $this->parseAssessmentForm($unitImpl, $aData);
+                    }
+                }
+            }
+
+            // Associate the CourseImpl with a CourseOutline Component
+
+            /* If (componentId was supplied)
+             *   update that.
+             * elseif (empty CourseOutline component available)
+             *   use that (filter for first sequence)
+             * else
+             *   create a new CourseOutline component (at top of the page)
+             */
+            if ('import' === $action) {
+                $componentInstance = null;
+                // Was a componentId supplied?
+                if ($componentId) {
+                    $componentInstance = $this->componentInstanceMapper->findByInstanceId($componentId);
+                } else {
+                    $componentInstance = $this->findAvailableCourseOutlineComponent($classFolderId);
+                }
+                $this->injectImportIntoComponent($courseImpl, $componentInstance);
+            }
+        }
     }
 }
