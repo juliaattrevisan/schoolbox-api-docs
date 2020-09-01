@@ -1,26 +1,29 @@
 <?php
 /**
- * Calendar_Layout_Full_Ajax_JSON
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+use Calendar\Event\Collection\Renderer;
+use Calendar\Event\Type\EventBase;
+
+/**
+ * Class Calendar_Layout_Full_Ajax_JSON
  *
  * This renders the JSON data, but not the page
  * The JSON array contains a set of events that lie
  * within the range specified by the 'start' and 'end'
  * querystring parameters that Fullcalendar uses
- *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
  */
-
-use Calendar\Event\Collection\Renderer;
-use Calendar\Event\Type\EventBase;
-
 class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
 {
     /**
      * Render calendar
+     *
+     * @param bool $saveHistory
+     * @throws InvalidArgumentException
      */
-    public function render(): void
+    public function render(bool $saveHistory = false): void
     {
         header('Content-type: application/json');
 
@@ -38,7 +41,7 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
 
         /* Render all registered events
          */
-        echo "[" . \implode(',', $renderer->renderAll(EventBase::RENDER_FORMAT_JSON)) . "]";
+        echo '[' . \implode(',', $renderer->renderAll(EventBase::RENDER_FORMAT_JSON)) . ']';
 
         // Save page that is being viewed into history.
         // Problem with storing start of sequence:
@@ -48,8 +51,22 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
         $page        = new SitePage(false);
         $midSequence = new Alaress_Date_Format((intval($_GET['start']) + intval($_GET['end'])) / 2, 'U');
 
-        // Also store the current user in the history
-        $page->saveHistory('/calendar/' . $midSequence->getURLDate() . '/' . $this->user->getId());
+        /* When you view another person's calendar and try to manage events;
+         *
+         * e.g. such as staff viewing a student's calendar then adding an event for them,
+         * redirect back to the student's calendar
+         *
+         * But you should only do this in some places, such as /calendar, where you can
+         * actually manage someone else's calendar.
+         *
+         * Viewing a homepage calendar component shouldn't add to the history, nor the dashboard
+         * component; both of which use this method to generate data
+         */
+        if ($saveHistory) {
+            // Also store the current user in the history
+            $page->saveHistory('/calendar/' . $midSequence->getURLDate() . '/' . $this->user->getId());
+        }
+
         exit();
     }
 }
