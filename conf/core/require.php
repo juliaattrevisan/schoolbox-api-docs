@@ -25,10 +25,10 @@ if (!defined('INSTANCE_ID') || trim((string)INSTANCE_ID) === '') {
     }
 }
 
-// Class auto-loading
+// Class auto-loading: handle with Composer instead
 \set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . \get_include_path());
-require_once __DIR__ . '/../../library/Autoloader.php';
-Autoloader::initialise();
+//require_once __DIR__ . '/../../library/Autoloader.php';
+//Autoloader::initialise();
 
 // Global functions and constants
 require_once __DIR__ . '/../../www/include/stdfuncs.php';
