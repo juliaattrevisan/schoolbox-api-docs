@@ -43,6 +43,7 @@ class MultibytePathInfoTest extends TestCase
                 'jpg',
                 'file-20200731-29-1pb85px',
             ],
+            ['/assets/img/favicon.6c717b9f.svg', '/assets/img', 'favicon.6c717b9f.svg', 'svg', 'favicon.6c717b9f'],
         ];
     }
 
