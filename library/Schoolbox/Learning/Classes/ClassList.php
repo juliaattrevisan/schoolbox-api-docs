@@ -122,8 +122,9 @@ class ClassList
                 $homepageUrls[$folder->getId()] = false;
             }
         }
-        $folderList->sortByCallback(static function (Folder\Model $a, Folder\Model $b): int {
-            return \strnatcasecmp($a->getCodeString(), $b->getCodeString());
+        $folderList->sortByCallback(static function (Folder\Model $a, Folder\Model $b) use ($classTypes): int {
+            //Sort on Class Type, Folder Name, Code
+            return \strnatcasecmp($classTypes[$a->getId()].$a->getNameWithCodes(), $classTypes[$b->getId()].$b->getNameWithCodes());
         }, true);
 
         return [

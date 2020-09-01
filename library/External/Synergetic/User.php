@@ -826,8 +826,9 @@ class External_Synergetic_User implements External_UserInterface
                 WHERE             StudentClasses.StartDate <= getdate() AND
                                   (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
                                   {$allowedFileTypesSql}
-                ORDER BY          SubjectClasses.FileType ASC,
-                                  SubjectClasses.Description ASC
+                ORDER BY          luFileType.Description ASC,
+                                  SubjectClasses.Description ASC,
+                                  SubjectClasses.ClassCode ASC
             ";
         } else if ($user->getRole()->isStaff()) {
             $allowedFileTypesSql = empty($allowedFileTypes) ? '' : " WHERE luFileType.Code IN ({$allowedFileTypes})";
@@ -852,8 +853,9 @@ class External_Synergetic_User implements External_UserInterface
                                       Semester.SystemCurrentFlag = 1
                 LEFT JOIN         luFileType ON c2.FileType = luFileType.Code
                 {$allowedFileTypesSql}
-                ORDER BY          luFileType.Description ASC,
-                                  c2.Description ASC
+                ORDER BY          classType ASC,
+                                  name ASC,
+                                  code ASC
             ";
         } else {
 
