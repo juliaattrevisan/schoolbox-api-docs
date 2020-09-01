@@ -109,6 +109,10 @@
     font-family: $font-family-icon;
 }
 
+.icon-canvas-lms:before {
+  content: "\e912";
+}
+
 .icon-calendar:before {
     content: '\e609';
     font-family: $font-family-icon;
