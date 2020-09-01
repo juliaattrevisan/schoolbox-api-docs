@@ -117,13 +117,17 @@
                     check_callback: function(operation, node, node_parent) {
                         // Ensure the node I'm dragging onto is one I have write access to
                         if (operation === 'move_node') {
-                            var permission = node_parent.original.li_attr['data-permission'];
+                            var permission = null,
+                                parentId   = Number(node_parent.id);
+                            if (node_parent.original && node_parent.original.li_attr) {
+                                permission = node_parent.original.li_attr['data-permission'];
+                            }
                             if (!(permission === 'write' || permission === 'full')) {
                                 return false;
                             }
 
                             // Cannot move a file to root
-                            if("file" === node.type && 0 === node_parent.id){
+                            if ("file" === node.type && 0 === parentId) {
                                 return false;
                             }
 
@@ -136,7 +140,7 @@
                             // * no dragging a unit into a unit or into the root
                             // * no dragging a course into a course or a unit
                             if (node.type === 'unit') {
-                                if (node_parent.type === 'unit' || node_parent.id === 0) {
+                                if (node_parent.type === 'unit' || parentId === 0) {
                                     return false;
                                 }
                             }
