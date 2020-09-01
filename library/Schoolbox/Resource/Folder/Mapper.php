@@ -213,31 +213,38 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
 
     /**
-     * Validate a course hasn't been moved into a course or unit folder.
+     * Validate a course hasn't been moved into a course or unit folder. This
+     * would create an invalid state
      *
      * @param Model $folder
-     * @return bool
+     * @throws UnexpectedValueException if the course folder is within another
+     *                                  course folder, or within a unit
+     * @throws Exception                if the folder has a parent, but it
+     *                                  doesn't exist
+     *
      */
-    public function validateCourse(Model $folder)
+    public function validateCourse(Model $folder): void
     {
         if ($folder->hasCourseSpecification()) {
             // Parent probably isn't hydrated: hydrate it
             $parent = $folder->getParent();
             if ($parent->getId()) {
-                $parent = $this->findByIdWithFallback($parent->getId());
+                try {
+                    $parent = $this->findById($parent->getId());
+                } catch (Exception\Deleted $e) {
+                    $parent = $e->getDeletedObject();
+                }
                 if ($parent->hasCourseSpecification()) {
-                    return false;
+                    throw new UnexpectedValueException('A course folder may not be moved into another course folder');
                 }
                 if ($parent->hasUnitSpecification()) {
-                    return false;
+                    throw new UnexpectedValueException('A course folder may not be moved into a unit folder');
                 }
             }
         }
 
         // Other folders always get a clean bill of health
-        return true;
     }
-
 
 
     /**
@@ -245,25 +252,31 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * unit.
      *
      * @param Model $folder
-     * @return bool
+     * @throws UnexpectedValueException if the unit folder is within another
+     *                                  unit folder, or has no parent folder.
+     * @throws Exception                if the folder has a parent, but it
+     *                                  doesn't exist
      */
-    public function validateUnit(Model $folder)
+    public function validateUnit(Model $folder): void
     {
         if ($folder->hasUnitSpecification()) {
             $parent = $folder->getParent();
             // Parent probably isn't hydrated: hydrate it
             if ($parent->getId()) {
-                $parent = $this->findByIdWithFallback($parent->getId());
+                try {
+                    $parent = $this->findById($parent->getId());
+                } catch (Exception\Deleted $e) {
+                    $parent = $e->getDeletedObject();
+                }
                 if ($parent->hasUnitSpecification()) {
-                    return false;
+                    throw new UnexpectedValueException('A unit folder may not be moved into another unit folder');
                 }
             } else {
-                return false;
+                throw new UnexpectedValueException('A unit folder may not be moved into the root folder');
             }
         }
 
         // Other folders always get a clean bill of health
-        return true;
     }
 
 
