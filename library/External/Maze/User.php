@@ -645,7 +645,7 @@ class External_Maze_User implements External_UserInterface
                     '' AS ClassCampus,
                     KGC.DESCRIPTION AS name
                 FROM KGC
-                WHERE TEACHER = '{$externalId}'
+                WHERE TEACHER = '{$externalId}' OR TEACHERB = '{$externalId}'
             ";
 
             $part1 = $this->getDb()->getAll($query);
