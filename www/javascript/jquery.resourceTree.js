@@ -132,11 +132,19 @@
                                 return false;
                             }
 
-                            // also check that we're not dragging a course into a course
-                            if (node.type === 'course' && node_parent.type === 'course') {
-                                return false;
+                            // also check course/unit dragging:
+                            // * no dragging a unit into a unit or into the root
+                            // * no dragging a course into a course or a unit
+                            if (node.type === 'unit') {
+                                if (node_parent.type === 'unit' || node_parent.id === 0) {
+                                    return false;
+                                }
                             }
-
+                            if (node.type === 'course') {
+                                if (node_parent.type === 'unit' || node_parent.type === 'course') {
+                                    return false;
+                                }
+                            }
                         }
                         return true;
                     },
