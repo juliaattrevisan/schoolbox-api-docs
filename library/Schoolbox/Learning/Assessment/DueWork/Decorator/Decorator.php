@@ -71,7 +71,7 @@ class Decorator implements DecoratorInterface
         ?float $maxMark,
         ?array $rubricData,
         array $attachedFiles,
-        string $selfReviewable,
+        ?string $selfReviewable,
         bool $similarityCheckEnabled,
         ?DueWork $original
     ) {
