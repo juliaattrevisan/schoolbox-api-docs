@@ -1,13 +1,14 @@
 <?php
-
 /**
- *
- * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
- *
  */
 
+/**
+ * Schoolbox autoloader
+ *
+ * @deprecated Use Composer PSR-0 (eventually PSR-4) autoloading instead
+ */
 class Autoloader {
     /**
      * @var string Root path to installation directory
