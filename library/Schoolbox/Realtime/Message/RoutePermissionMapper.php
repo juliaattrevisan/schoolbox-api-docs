@@ -191,7 +191,7 @@ class RoutePermissionMapper extends Mapper
      */
     public function findRouteLevels(string $topic, int $roleId, int $userId = 0, int $folderId = 0): array
     {
-        // find the routing levels that match this role, user and topic regex
+        // find the routing levels that match this role, user and topic regex: REGEXP CONCAT(ns.slug, '(\\.[a-z0-9]+)+\\.', src.key, '$')
         $stmt = $this->prepare("
             SELECT
                 perm.mask, perm.role_default, reroute.delivery
@@ -201,7 +201,7 @@ class RoutePermissionMapper extends Mapper
             LEFT JOIN msg_reroute reroute ON src.id = reroute.msg_source_id AND reroute.user_id = :user_id
             LEFT JOIN groups g ON perm.role_id = g.id
             WHERE role_id IS NOT NULL
-            AND :topic REGEXP CONCAT(ns.slug, '(\\.[a-z0-9]+)+\\.', src.key, '$')
+            AND :topic REGEXP CONCAT(ns.slug, '(\\\.[a-z0-9]+)+\\\.', src.key, '$')
             AND g.group_type = src.role_type
         ");
 
