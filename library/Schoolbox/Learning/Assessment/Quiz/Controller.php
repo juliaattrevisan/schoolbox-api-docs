@@ -199,8 +199,16 @@ class Controller extends Assessment\Controller
         // TODO this should eventually be route permission based
         $actionValidator = new ActionValidator($now, $this->getAccess());
 
+        $hasQuestions = false;
+        foreach ($quiz->getSections() as $section) {
+            if ($section->getQuestions()->count() > 0) {
+                $hasQuestions = true;
+                break;
+            }
+        }
+
         // TODO this will produce a false-positive if there is an attempt unfinished but the time limit on it has expired
-        $canAttempt = $student->getId() === $this->getUser()->getId()
+        $canAttempt = $hasQuestions && $student->getId() === $this->getUser()->getId()
             && $actionValidator->canAttemptQuiz($this->getUser(), $assessment);
 
         $twigData = [
