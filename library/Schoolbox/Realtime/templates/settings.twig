@@ -60,13 +60,7 @@
                 <p class="content">
                     If you unfollow a homepage, you will receive <em>no</em> messages that come from it.
                 </p>
-                <table id="follow-settings">
-                    <thead>
-                    <tr>
-                        <th>Homepage</th>
-                        <th>&nbsp;</th>
-                    </tr>
-                    </thead>
+                <table id="follow-settings" class="no-margin">
                     <tbody>
                     {% for groupId, group in groups %}
                         <tr>
@@ -74,7 +68,7 @@
                                 <label for="follow-{{ groupId }}">{{ group.name }}</label>
                             </td>
                             <td>
-                                <div class="long switch">
+                                <div class="long switch no-margin">
                                     <input type="hidden" name="follow[{{ groupId }}]" value="{{ group.force ? 1 : 0 }}">
                                     <input id="follow-{{ groupId }}"
                                            type="checkbox"
