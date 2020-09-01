@@ -209,7 +209,7 @@ class Module extends BaseModule
             $assessment  = $this->preloadAssessment($params, $student)['assessment'];
         } catch (UnexpectedValueException $e) {
             // Student isn't a participant
-            throw new InvalidPath();
+            throw new NotFound();
         } catch (OutOfBoundsException $e) {
             // given user/assessment combination is invalid: not a participant
             throw new NotFound();

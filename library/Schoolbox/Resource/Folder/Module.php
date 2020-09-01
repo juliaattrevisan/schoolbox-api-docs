@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Alaress\Twig\Loader\IChainLoader;
 use InvalidArgumentException;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Curriculum;
 use Schoolbox\Error;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -56,7 +57,7 @@ class Module extends BaseModule
             try {
                 return ['parent' => $this->getMapper()->findById($params['parentId'])];
             } catch (MapperException $e) {
-                throw new InvalidPath($e->getMessage(), 0, $e);
+                throw new NotFound($e->getMessage());
             }
         };
 
@@ -74,7 +75,7 @@ class Module extends BaseModule
             try {
                 return ['folder' => $this->getMapper()->findById($params['id'])];
             } catch (MapperException $e) {
-                throw new InvalidPath($e->getMessage(), 0, $e);
+                throw new NotFound($e->getMessage());
             }
         };
 
@@ -90,7 +91,7 @@ class Module extends BaseModule
                         : $this->getMapper()->findById($params['parentId']),
                 ];
             } catch (MapperException $e) {
-                throw new InvalidPath($e->getMessage(), 0, $e);
+                throw new NotFound($e->getMessage());
             }
         };
 
