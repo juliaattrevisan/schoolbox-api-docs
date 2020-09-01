@@ -221,12 +221,16 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function validateCourse(Model $folder)
     {
         if ($folder->hasCourseSpecification()) {
+            // Parent probably isn't hydrated: hydrate it
             $parent = $folder->getParent();
-            if ($parent->hasCourseSpecification()) {
-                return false;
-            }
-            if ($parent->hasUnitSpecification()) {
-                return false;
+            if ($parent->getId()) {
+                $parent = $this->findByIdWithFallback($parent->getId());
+                if ($parent->hasCourseSpecification()) {
+                    return false;
+                }
+                if ($parent->hasUnitSpecification()) {
+                    return false;
+                }
             }
         }
 
@@ -247,11 +251,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     {
         if ($folder->hasUnitSpecification()) {
             $parent = $folder->getParent();
-            if ((int)$parent->getId() === 0) {
-                return false;
-            }
-
-            if ($parent->hasUnitSpecification()) {
+            // Parent probably isn't hydrated: hydrate it
+            if ($parent->getId()) {
+                $parent = $this->findByIdWithFallback($parent->getId());
+                if ($parent->hasUnitSpecification()) {
+                    return false;
+                }
+            } else {
                 return false;
             }
         }
