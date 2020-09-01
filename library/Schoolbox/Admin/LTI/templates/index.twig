@@ -16,9 +16,7 @@
     <div class="small-12 island">
         {% for provider in providers %}
         <section>
-            <ul class="information-list">
-                {% include '@adminLti/listItem.twig' with {provider: provider} %}
-            </ul>
+            {% include '@adminLti/listItem.twig' with {provider: provider} %}
         </section>
         {% endfor %}
 
