@@ -826,7 +826,7 @@ class External_Synergetic_User implements External_UserInterface
                 WHERE             StudentClasses.StartDate <= getdate() AND
                                   (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
                                   {$allowedFileTypesSql}
-                ORDER BY          SubjectClasses.FileType ASC,
+                ORDER BY          luFileType.Description ASC,
                                   SubjectClasses.Description ASC
             ";
         } else if ($user->getRole()->isStaff()) {
