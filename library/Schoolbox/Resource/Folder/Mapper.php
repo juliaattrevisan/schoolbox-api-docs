@@ -192,6 +192,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateFolderCodes']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateCourse']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateUnit']);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateInheritedPermissions']);
@@ -210,24 +211,55 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteAssessments']);
     }
 
+
     /**
-     * Validate a unit hasn't been moved into the root folder
+     * Validate a course hasn't been moved into a course or unit folder.
+     *
+     * @param Model $folder
+     * @return bool
+     */
+    public function validateCourse(Model $folder)
+    {
+        if ($folder->hasCourseSpecification()) {
+            $parent = $folder->getParent();
+            if ($parent->hasCourseSpecification()) {
+                return false;
+            }
+            if ($parent->hasUnitSpecification()) {
+                return false;
+            }
+        }
+
+        // Other folders always get a clean bill of health
+        return true;
+    }
+
+
+
+    /**
+     * Validate a unit hasn't been moved into the root folder, or into another
+     * unit.
      *
      * @param Model $folder
      * @return bool
      */
     public function validateUnit(Model $folder)
     {
-        // Units cannot be put in root folder
+        if ($folder->hasUnitSpecification()) {
+            $parent = $folder->getParent();
+            if ((int)$parent->getId() === 0) {
+                return false;
+            }
 
-        if ($folder->hasUnitSpecification() && $folder->getParent()->getId() == 0) {
-            return false;
+            if ($parent->hasUnitSpecification()) {
+                return false;
+            }
         }
 
         // Other folders always get a clean bill of health
-
         return true;
     }
+
 
     /**
      * Update a units course specification. If its parent is not a course this will make it a course
@@ -249,9 +281,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @param Model $folder
      * @param Model $previous
-     * @return bool
      */
-    public function updateCourseSpecification(Model $folder, $previous = null)
+    public function updateCourseSpecification(Model $folder): void
     {
         // If the folder is a unit, we need to make sure its course specification is right
 
@@ -286,15 +317,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             $folder->getUnitSpecification()->setCourse($courseSpecification);
             UnitSpecification\Mapper::getInstance()->save($folder->getUnitSpecification());
-
-            // We didn't find a course specification- this unit isn't where its supposed to be
-
-            return false;
         }
-
-        // Wasn't a unit being updated, just move on
-
-        return true;
     }
 
 
