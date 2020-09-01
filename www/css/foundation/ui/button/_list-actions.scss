@@ -107,6 +107,7 @@
 	@extend .show-for-medium-up;
 	font-weight: $font-weight-bold;
 	font-size: $paragraph-font-size;
+    padding-top: .5rem;
 }
 
 .sortable, .sortable-card {

@@ -73,7 +73,7 @@
             <li class="icon-info">(JS not implemented, spawn button shown for markup purposes)</li>
         </ul>
 
-        <form id="unsortable" class="no-margin" data-nosubmit>
+        <form data-nosubmit>
             <section>
                 <header class="list-header actions-small-0">
                     <div class="list-item">
@@ -81,7 +81,7 @@
                         <div class="medium-4 column">Visibility</div>
                     </div>
                 </header>
-                <ul class="information-list">
+                <ul class="information-list unsortable">
                     {% for item in items %}
                         {% set c = item | length %}
                         <li>

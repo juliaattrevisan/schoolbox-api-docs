@@ -985,6 +985,24 @@ $selector-width: 2.25rem;
             @extend %ui-sortable-helper;
         }
     }
+    &.sortable, &.sortable-card, &.unsortable {
+      .columns, .column {
+        padding-bottom: 1rem;
+        padding-top: 1rem;
+
+        @media #{$medium-only} {
+          padding-bottom: .75rem;
+          padding-top: .75rem;
+        }
+        @media #{$small-only} {
+          padding-bottom: .5rem;
+          padding-top: .5rem;
+        }
+      }
+      input, select {
+        margin-bottom: 0;
+      }
+    }
     &.group {
         border-bottom: .5rem solid $body-bg;
         &:last-of-type {
