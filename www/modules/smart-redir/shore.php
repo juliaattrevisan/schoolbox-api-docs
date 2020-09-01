@@ -274,11 +274,10 @@ break;
 
 case "dramaonline":
     $form = "form";
-    $action = "https://www.dramaonlinelibrary.com:443/LOGIN";
+    $action = "https://www.dramaonlinelibrary.com/login?recentUrl=/custom-browse?docid=nationalTheatreCollection";
     $method="POST";
-    $formArray['dest'] = 'https://www.dramaonlinelibrary.com/series/national-theatre-collection-iid-190464';
-    $formArray['user']	= 'SHORE';
-    $formArray['pass']	= 'Dr@maOnline';
+    $formArray['login-username']	= 'SHORE';
+    $formArray['login-password']	= 'Dr@maOnline';
     break;
 
 
