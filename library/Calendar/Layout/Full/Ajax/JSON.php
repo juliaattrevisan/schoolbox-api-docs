@@ -1,24 +1,26 @@
 <?php
 /**
- * Calendar_Layout_Full_Ajax_JSON
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+use Calendar\Event\Collection\Renderer;
+use Calendar\Event\Type\EventBase;
+
+/**
+ * Class Calendar_Layout_Full_Ajax_JSON
  *
  * This renders the JSON data, but not the page
  * The JSON array contains a set of events that lie
  * within the range specified by the 'start' and 'end'
  * querystring parameters that Fullcalendar uses
- *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
  */
-
-use Calendar\Event\Collection\Renderer;
-use Calendar\Event\Type\EventBase;
-
 class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
 {
     /**
      * Render calendar
+     *
+     * @throws InvalidArgumentException
      */
     public function render(): void
     {
@@ -38,18 +40,8 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
 
         /* Render all registered events
          */
-        echo "[" . \implode(',', $renderer->renderAll(EventBase::RENDER_FORMAT_JSON)) . "]";
+        echo '[' . \implode(',', $renderer->renderAll(EventBase::RENDER_FORMAT_JSON)) . ']';
 
-        // Save page that is being viewed into history.
-        // Problem with storing start of sequence:
-        // month view often starts at a day in the previous month.
-        // Therefore, consider setting as midpoint between two dates, or the
-        // first of the actual month being shown.
-        $page        = new SitePage(false);
-        $midSequence = new Alaress_Date_Format((intval($_GET['start']) + intval($_GET['end'])) / 2, 'U');
-
-        // Also store the current user in the history
-        $page->saveHistory('/calendar/' . $midSequence->getURLDate() . '/' . $this->user->getId());
         exit();
     }
 }
