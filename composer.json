@@ -19,6 +19,9 @@
             }
         }
     ],
+    "autoload": {
+        "psr-0": {"": "library/"}
+    },
     "require": {
         "php": "^7.4",
         "gggeek/phpxmlrpc": "0.1.0",

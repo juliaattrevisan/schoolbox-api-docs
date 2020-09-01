@@ -25,10 +25,11 @@ if (!defined('INSTANCE_ID') || trim((string)INSTANCE_ID) === '') {
     }
 }
 
-// Class auto-loading: handle with Composer instead
+// I'm not sure what this does anymore?
 \set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . \get_include_path());
-//require_once __DIR__ . '/../../library/Autoloader.php';
-//Autoloader::initialise();
+
+// Configure autoloading with Composer
+require __DIR__ . '/../../vendor/autoload.php';
 
 // Global functions and constants
 require_once __DIR__ . '/../../www/include/stdfuncs.php';
