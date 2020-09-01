@@ -14,7 +14,6 @@ namespace Schoolbox\Resource\Folder;
 use Alaress;
 use InvalidArgumentException;
 use Schoolbox\File\MimetypeMapper;
-use Schoolbox\IModel;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
@@ -213,8 +212,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
 
     /**
-     * Validate a course hasn't been moved into a course or unit folder. This
-     * would create an invalid state
+     * Validate a course hasn't been moved into a course or unit folder.
+     *
+     * This would put the course structure into an invalid state, as it would be
+     * possible for a folder to simultaneously be a course and a unit.
      *
      * @param Model $folder
      * @throws UnexpectedValueException if the course folder is within another
@@ -250,6 +251,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * Validate a unit hasn't been moved into the root folder, or into another
      * unit.
+     *
+     * Having a unit within another unit would make the parent unit a course as
+     * well, which is invalid.
+     *
+     * Having a unit in the root folder would be invalid because there's no
+     * parent folder to make into a course.
      *
      * @param Model $folder
      * @throws UnexpectedValueException if the unit folder is within another
@@ -1854,7 +1861,18 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
     /**
-     * Move folder to new parent with permission check
+     * Move folder to new parent with permission and validity checks.
+     *
+     * Permissions:
+     * * `$mover` must have write access on the source, destination and the
+     *   destination's parent folder
+     *
+     * Validity:
+     * * folders may not be moved into themselves, or into an ancestor
+     * * course spec folders may not be moved into another course spec folder,
+     *   or a unit spec folder
+     * * unit spec folders may not be moved into another unit spec folder, or
+     *   the root folder
      *
      * @param int $source
      * @param int $destination
