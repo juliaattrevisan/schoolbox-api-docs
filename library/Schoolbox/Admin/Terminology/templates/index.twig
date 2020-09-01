@@ -13,6 +13,12 @@
 <script>
     $(function() {
         $('#terminology-form').alaressValidate();
+
+        $('#terminology-form input[type=text]').each(function(index, element) {
+            $(element).rules('add', {
+                requiredNotBlank: true
+            });
+        });
     });
 </script>
 
@@ -43,10 +49,10 @@
                                     {{ term.title }}
                                 </div>
                                 <div class="small-3 column">
-                                    <input required type="text" name="singularForm[{{ term.term }}]" value="{{ term.singularForm }}">
+                                    <input data-input required type="text" name="singularForm[{{ term.term }}]" value="{{ term.singularForm }}">
                                 </div>
                                 <div class="small-3 column">
-                                    <input required type="text" name="pluralForm[{{ term.term }}]" value="{{ term.pluralForm }}">
+                                    <input data-input required type="text" name="pluralForm[{{ term.term }}]" value="{{ term.pluralForm }}">
                                 </div>
                                 <div class="small-1 column">
                                     <input required type="text" name="indefiniteArticle[{{ term.term }}]" value="{{ term.indefiniteArticle }}">
