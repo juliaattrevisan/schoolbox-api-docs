@@ -51,49 +51,49 @@
     </div>
 </div>
 <form method="post" action="{{ routeLookup('messages.saveConfig') }}" id="msg-settings" class="row">
+    {% if groups %}
+    <div class="small-12 columns">
+        <h2 class="subheader">Homepages</h2>
 
-        <div class="small-12 columns">
-            <h2 class="subheader">Homepages</h2>
-
-            <section>
-                <p class="content">
-                    If you unfollow a homepage, you will receive <em>no</em> messages that come from it.
-                </p>
-                <table id="follow-settings" class="no-margin">
-                    <thead>
+        <section>
+            <p class="content">
+                If you unfollow a homepage, you will receive <em>no</em> messages that come from it.
+            </p>
+            <table id="follow-settings" class="no-margin">
+                <thead>
+                <tr>
+                    <th>Homepage</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for groupId, group in groups %}
                     <tr>
-                        <th>Homepage</th>
-                        <th>&nbsp;</th>
+                        <td>
+                            <label for="follow-{{ groupId }}">{{ group.name }}</label>
+                        </td>
+                        <td>
+                            <div class="long switch no-margin">
+                                <input type="hidden" name="follow[{{ groupId }}]" value="{{ group.force ? 1 : 0 }}">
+                                <input id="follow-{{ groupId }}"
+                                       type="checkbox"
+                                       name="follow[{{ groupId }}]"
+                                       value="1"
+                                       {% if group.follow %}checked="checked"{% endif %}
+                                        {% if group.force %}disabled="disabled"{% endif %} />
+                                <label for="follow-{{ groupId }}">
+                                    <span>Following</span>
+                                    <span>Muted</span>
+                                </label>
+                            </div>
+                        </td>
                     </tr>
-                    </thead>
-                    <tbody>
-                    {% for groupId, group in groups %}
-                        <tr>
-                            <td>
-                                <label for="follow-{{ groupId }}">{{ group.name }}</label>
-                            </td>
-                            <td>
-                                <div class="long switch no-margin">
-                                    <input type="hidden" name="follow[{{ groupId }}]" value="{{ group.force ? 1 : 0 }}">
-                                    <input id="follow-{{ groupId }}"
-                                           type="checkbox"
-                                           name="follow[{{ groupId }}]"
-                                           value="1"
-                                           {% if group.follow %}checked="checked"{% endif %}
-                                            {% if group.force %}disabled="disabled"{% endif %} />
-                                    <label for="follow-{{ groupId }}">
-                                        <span>Following</span>
-                                        <span>Muted</span>
-                                    </label>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </section>
-        </div>
-
+                {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </div>
+    {% endif %}
 
     <div class="small-12 columns">
         <div class="row actions-small-1">
