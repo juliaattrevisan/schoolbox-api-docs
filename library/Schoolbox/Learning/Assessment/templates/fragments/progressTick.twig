@@ -6,7 +6,12 @@
  # * student:     User         - The relevant student
  #}
 
-{# Leverage module route logic #}
+{# Only set this var if the assessment is a task so participants can create a
+ # response asychronously without reloading the page. This only applies to Tasks.
+ # Due Work and Quiz require more indepth workflows to submit a Response.
+ #}
+{% set postRoute = null %}
+
 {% if assessment is task %}
     {% set postRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
         assessment:   assessment,
@@ -14,13 +19,18 @@
         student:      student,
         studentId:    student.id
     }) %}
-{% else %}
-    {% set postRoute = null %}
 {% endif %}
 
+{# Find the user's participation record
+ #
+ # This is used to find out a user's current progress in an assessment,
+ # such as whether they need to create a Response or what their latest
+ # Feedback status happens to be
+ #}
 {% set participant = assessment.participantIfExtant(student) %}
 
-{% if postRoute is defined %}
+{# Tasks only #}
+{% if postRoute is not null %}
     <form action="{{ postRoute }}"
           method="POST"
           class="progress-tick-form"
@@ -43,6 +53,9 @@
         {% endif %}
     </form>
 {% else %}
+
+    {# Other assessment types get non-POST behaviour
+     #}
     {% if not participant or participant.isExcluded or participant.isResponseRequired %}
         <!-- deliberately empty  -->
     {% elseif participant.isFeedbackRequired %}
