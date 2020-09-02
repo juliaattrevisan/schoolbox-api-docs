@@ -81,7 +81,7 @@
                             {% if not data.hidden %}
                                 <div class="small-12 columns">
                                 <label for="{{ data.name }}" {{ data.required and data.editable ? 'class="required"' }}>{{ data.title }}</label>
-                                <span data-tooltip class="has-tip tip-top hint" title="{{ data.description }}">?</span>
+                                <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="{{ data.description|replace({'<': '&lt;'}) }}">?</span>
                                     {% include '@settings/fieldType/' ~ setting.template with data only %}
                                 </div>
                             {% endif %}
