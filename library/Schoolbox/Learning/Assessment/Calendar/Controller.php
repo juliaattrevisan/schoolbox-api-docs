@@ -11,7 +11,6 @@ use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
-use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Folder\Readable\Definition as FolderReadableDefinition;
@@ -159,7 +158,7 @@ class Controller extends Base
         $termDates['past'] = [];
         $termDates['future'] = [];
 
-        $terms = $this->termMapper->findAll()->sortBy('start', 'DESC');
+        $terms = $this->termMapper->findByColumn('archived', false)->sortBy('start', 'DESC');
 
         $currentTermStartDate = $this->getCurrentTermDates()->getStart()->getDatabaseDate();
 
