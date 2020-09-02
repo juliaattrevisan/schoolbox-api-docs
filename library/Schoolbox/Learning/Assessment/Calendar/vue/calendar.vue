@@ -45,6 +45,8 @@
     const RESOURCE_FOLDER_PREFIX = 'folder-';
     const RESOURCE_EVENT_TYPE_PREFIX = 'eventType-';
 
+    const MILLISECONDS_PER_DAY = (1000 * 60 * 60 * 24);
+
     export default {
         components: {
             ViewGroupedEventsModal,
@@ -415,7 +417,8 @@
                     // Figure out which term I'm in: go to the next one
                     let termIndex = this.findTermIndex(this.convertDateToDateString(api.getDate()));
                     if (this.allTerms[termIndex+1]) {
-                        api.gotoDate(this.allTerms[termIndex+1].start);
+                        // Go somewhere between the start and end of term
+                        api.gotoDate(this.allTerms[termIndex+1].mid);
                         this.redrawWeekNumbers();
                     }
                 } else {
@@ -433,7 +436,8 @@
                     // Figure out which term I'm in: go to the previous one
                     let termIndex = this.findTermIndex(this.convertDateToDateString(api.getDate()));
                     if (this.allTerms[termIndex-1]) {
-                        api.gotoDate(this.allTerms[termIndex-1].start);
+                        // Go somewhere between the start and end of term
+                        api.gotoDate(this.allTerms[termIndex-1].mid);
                         this.redrawWeekNumbers();
                     }
                 } else {
@@ -704,8 +708,12 @@
                         return 0;
                     })
                     .map(function (term) {
-                        let end = new Date(term.end);
+                        let start = new Date(term.start),
+                            mid   = new Date(term.start),
+                            end   = new Date(term.end);
                         end.setDate(end.getDate() + 1);
+                        mid.setDate(mid.getDate() + Math.ceil(((end - start) / MILLISECONDS_PER_DAY) / 2))
+                        term.mid = self.convertDateToDateString(mid);
                         term.end = self.convertDateToDateString(end);
                         return term;
                     });
