@@ -6,7 +6,9 @@
  */
 namespace Schoolbox\Statistics;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder\Log\Mapper AS FolderLogMapper;
 use Schoolbox\Resource\Folder\Visits\Mapper AS VisitsMapper;
@@ -113,7 +115,7 @@ class DataSource
      * @return Collection
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function getVisits($folderId, $startDate, $endDate, $role = null)
     {
@@ -167,7 +169,7 @@ class DataSource
      * @return Collection
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function getVisitors($folderId, $startDate, $endDate, $role = null, $orderBy, $limit = null)
     {
@@ -360,22 +362,19 @@ class DataSource
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
      * @param string|null          $role
-     * @param int|null             $limit
      * @return Collection
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnderflowException
+     * @throws MapperException
      */
-    public function getYetToVisit(Folder\Model $folder, $startDate, $endDate, $role = null, $limit = null): Collection
+    public function getYetToVisit(Folder\Model $folder, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, ?string $role = null): Collection
     {
 
         /* Find a list of users who are known to be in this class
          * These are indexed by id so we can unset them later
          */
         $expectedUsers = $this->userAccessMapper->findUsersInCategory($folder, $role);
+        if ($expectedUsers->count() === 0) {
+            return new Collection();
+        }
 
         /* Find a list of users who have visited this class
          *
@@ -396,12 +395,7 @@ class DataSource
             $roleFilter = 'AND r.group_type = :role';
             $params['role'] = $role;
         }
-
-        $queryLimit = '';
-
-        if ($limit !== null) {
-            $queryLimit = 'LIMIT ' . (int)$limit;
-        }
+        $bindings = Builder::getBindings($expectedUsers->getPropertyValues('id'), 'uid');
 
         /* Pile it in the way it used to work
          */
@@ -412,12 +406,12 @@ class DataSource
             INNER JOIN `groups` r on u.group_id = r.id
             WHERE folder_id = :folderId
             AND datetime BETWEEN :startDate AND :endDate
+            AND user_id IN ({$bindings->getPlaceholder()})
             {$roleFilter}
-            {$queryLimit}
         ";
 
         $statement = $this->userAccessMapper->getDatabase()->prepare($query);
-        $statement->execute($params);
+        $statement->execute(array_merge($params, $bindings->getParams()));
 
         /* Find the diff, which tells you known users who should be visiting this class
          * but haven't done so yet
@@ -437,57 +431,4 @@ class DataSource
          */
         return $expectedUsers;
     }
-
-
-    /**
-     * Get count of visitors that have not visited a homepage
-     *
-     * @param int                  $folderId
-     * @param \Alaress_Date_Format $startDate
-     * @param \Alaress_Date_Format $endDate
-     * @param string|null          $role
-     * @return int
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     */
-    public function getYetToVisitCount(int $folderId, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, string $role = null): int
-    {
-        $queryParams = [
-            'folderId' => $folderId,
-            'startDate' => $startDate->getDatabase(),
-            'endDate' => $endDate->getDatabase()
-        ];
-
-        $roleFilter = '';
-        if ($role !== null) {
-            $roleFilter = "AND ur.group_type = :role";
-            $queryParams['role'] = $role;
-        }
-
-        $query = "
-            SELECT          COUNT(uid)
-            FROM            {$this->userMapper->getTable()} AS u
-            LEFT JOIN       {$this->userMapper->getJoinSql('userAccess', 'u', 'ua')}
-            LEFT JOIN       {$this->userAccessMapper->getJoinSql('user.role', 'u', 'ur')}
-            RIGHT JOIN      userGroups ug ON ug.cid = ua.sid
-            LEFT JOIN       groups g ON u.group_id = g.id
-            WHERE           ua.sid = :folderId
-                            AND ua.service = '1'
-                            AND u.deleted_at IS NULL
-                            {$roleFilter}
-                            AND u.id NOT IN (
-                                SELECT    `user_id`
-                                FROM      homepage_log
-                                WHERE     folder_id = :folderId
-                                          AND datetime BETWEEN :startDate AND :endDate
-                                GROUP BY  `user_id`
-                            )
-        ";
-
-        $statement = $this->userAccessMapper->getDatabase()->prepare($query);
-        $statement->execute($queryParams);
-        return $statement->fetchColumn();
-
-    }
-
 }

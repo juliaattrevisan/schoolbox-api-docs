@@ -9,6 +9,7 @@ namespace Schoolbox\Statistics;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
 
@@ -401,12 +402,13 @@ class Controller extends Base
      * @api   GET /statistics/homepage/{folderId}/yetToVisit{/startDate,endDate,roleFilter}
      * @since 165
      *
-     * @param FolderModel         $folder
-     * @param Alaress_Date_Format $startDate
-     * @param Alaress_Date_Format $endDate
-     * @param string              $roleFilter
+     * @param FolderModel              $folder
+     * @param Alaress_Date_Format|null $startDate
+     * @param Alaress_Date_Format|null $endDate
+     * @param string|null              $roleFilter
+     * @throws MapperException
      */
-    public function getYetToVisit($folder, $startDate = null, $endDate = null, $roleFilter = null)
+    public function getYetToVisit(FolderModel $folder, ?Alaress_Date_Format $startDate = null, ?Alaress_Date_Format $endDate = null, ?string $roleFilter = null): void
     {
         $dataSource = $this->getDataSource();
 
@@ -420,7 +422,7 @@ class Controller extends Base
             $this->setRoleFilter($roleFilter);
         }
 
-        $yetToVisitors = $dataSource->getYetToVisit($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
+        $yetToVisitors = $dataSource->getYetToVisit($folder, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
 
         $this->getResponse()->content->set(
             [
@@ -673,17 +675,17 @@ class Controller extends Base
      * @return array [$yetToVisitors, $yetToVisitMore]
      *               $yetToVisitors:  a list of `self::MAX_YET_TO_VISIT` yet to visit
      *               $yetToVisitMore: are there more yet to visit?
+     * @throws MapperException
      */
     private function compileNotYetVisitedData(FolderModel $folder, DataSource $dataSource): array
     {
-        $yetToVisitors = $dataSource->getYetToVisit($folder, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter(), self::MAX_YET_TO_VISIT);
+        $yetToVisitors = $dataSource->getYetToVisit($folder, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
 
         $yetToVisitMore  = false;
-        $yetToVisitCount = $dataSource->getYetToVisitCount($folder->getId(), $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
-        if ($yetToVisitCount > self::MAX_YET_TO_VISIT) {
+        if ($yetToVisitors->count() > self::MAX_YET_TO_VISIT) {
             $yetToVisitMore = true;
         }
-        return [$yetToVisitors, $yetToVisitMore];
+        return [$yetToVisitors->limit(self::MAX_YET_TO_VISIT), $yetToVisitMore];
     }
 
 
