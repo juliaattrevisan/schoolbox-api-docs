@@ -44,26 +44,27 @@ class Controller extends Base
         ]);
     }
 
+
     /**
      * Update the term
      */
-    public function postUpdateTerms()
+    public function postUpdateTerms(): void
     {
         $post = $this->getRequest()->post;
 
         try {
-
             foreach ($post['singularForm'] as $term => $singularForm) {
-                /** @var L10n $localisation */
-                $localisation = $this->l10nMapper->findById($term);
-                $localisation->setSingularForm($singularForm);
-                $localisation->setPluralForm($post['pluralForm'][$term]);
-                $localisation->setCapitaliseFirst(!empty($post['capitaliseFirst'][$term]));
-                $localisation->setIndefiniteArticle($post['indefiniteArticle'][$term]);
+                $localisation = $this->l10nMapper->findById($term)
+                    ->setSingularForm(trim($singularForm))
+                    ->setPluralForm(trim($post['pluralForm'][$term]))
+                    ->setCapitaliseFirst(!empty($post['capitaliseFirst'][$term]))
+                    ->setIndefiniteArticle(trim($post['indefiniteArticle'][$term]));
+
                 $this->l10nMapper->save($localisation);
             }
-
         } catch (MapperException $e) {
+
+            // noop, I guess? skip unknown terminologies
         }
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminTerminology.getIndex'));
