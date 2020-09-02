@@ -233,6 +233,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 try {
                     $parent = $this->findById($parent->getId());
                 } catch (Exception\Deleted $e) {
+                    /** @var Model $parent */
                     $parent = $e->getDeletedObject();
                 }
                 if ($parent->hasCourseSpecification()) {
@@ -273,6 +274,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 try {
                     $parent = $this->findById($parent->getId());
                 } catch (Exception\Deleted $e) {
+                    /** @var Model $parent */
                     $parent = $e->getDeletedObject();
                 }
                 if ($parent->hasUnitSpecification()) {
@@ -306,7 +308,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *   ||||||       |_______|
      *
      * @param Model $folder
-     * @param Model $previous
      */
     public function updateCourseSpecification(Model $folder): void
     {
