@@ -698,4 +698,18 @@ class Model implements ISoftDeletable, IAssessableDataModel
         $this->attempts = $attempts;
         return $this;
     }
+
+    /**
+     * Returns whether this quiz has any questions
+     * @return bool
+     */
+    public function hasQuestions(): bool
+    {
+        foreach ($this->getSections() as $section) {
+            if ($section->getQuestions()->count() > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
