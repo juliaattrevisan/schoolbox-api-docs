@@ -48,6 +48,10 @@ interface IDatabase
     /**
      * Wraps `$callback` in a transaction.
      *
+     * If `$callback` throws an exception, rollback and rethrow exception
+     * If `$callback()` === false, rollback
+     * Otherwise, commit
+     *
      * @param callable $callback
      * @return bool
      * @throws \Throwable
@@ -67,6 +71,20 @@ interface IDatabase
 
     /**
      * Begin transaction
+     *
+     * Usage example:
+     * <code>
+     * $db->beginTransaction();
+     * try {
+     *     // a set of updates which must be atomic
+     * } catch (\Throwable $e) {
+     *     // Rollback, and then rethrow to ensure that commit() is not called
+     *     $db->rollback();
+     *     throw $e;
+     * }
+     * // Commit only if the try/catch block has completed without error
+     * $db->commit();
+     * </code>
      *
      * @return bool
      */
