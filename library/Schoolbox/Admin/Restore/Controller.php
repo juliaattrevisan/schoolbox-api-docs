@@ -103,12 +103,12 @@ class Controller extends Base
         $db->beginTransaction();
         try {
             $recursiveUndeleter->restoreSoftDeletedModels();
-            $db->commit();
         } catch (\Throwable $e) {
             $db->rollBack();
             throw $this->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to restore objects, rolling back.");
         }
 
+        $db->commit();
         $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
     }
 
@@ -125,12 +125,12 @@ class Controller extends Base
         $db->beginTransaction();
         try {
             $recursiveUndeleter->restoreSoftDeletedModels();
-            $db->commit();
         } catch (\Throwable $e) {
             $db->rollBack();
             throw $this->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to restore objects, rolling back.");
         }
 
+        $db->commit();
         $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
     }
 }
