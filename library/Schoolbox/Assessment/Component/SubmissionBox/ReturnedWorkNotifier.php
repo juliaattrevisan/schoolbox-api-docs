@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as assessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -27,7 +28,6 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -50,6 +50,11 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
     /** @var Term\Mapper */
     protected $termMapper;
 
+    /**
+     * @var WorkTypeMapper
+     */
+    protected $workTypeMapper;
+
     /** @var assessmentDataSource $assessmentDataSource */
     protected $assessmentDataSource;
 
@@ -65,6 +70,8 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         $this->userMapper           = UserMapper::getInstance();
         $this->boxMapper            = SubmissionBoxMapper::getInstance();
         $this->termMapper           = Term\Mapper::getInstance();
+        $this->workTypeMapper       = WorkTypeMapper::getInstance();
+
         $this->assessmentDataSource = Mapper::getDi()->get("assessmentDataSource");
         parent::loadDependencies($dependencies);
     }
@@ -110,9 +117,17 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         }
 
         // As this notifier is for student and parents, if it's only visible to staff, return.
-        $worktype = $box->getAssessmentModel()->getWorkType();
-        if ($worktype && $worktype->isStaffOrInstructorVisibleOnly()) {
-            return;
+        if ($box->getAssessmentModel()->getWorkType()) {
+            // The work type might not be hydrated, and thus unable to determine
+            // if it's staff-only. Hydrate it here
+            try {
+                $workType = $this->workTypeMapper->findById($box->getAssessmentModel()->getWorkType()->getId());
+            } catch (Mapper\Exception $e) {
+                return;
+            }
+            if ($workType->isStaffOrInstructorVisibleOnly()) {
+                return;
+            }
         }
 
         switch ($bundle->getMethod()) {
