@@ -132,7 +132,8 @@ REGEXP;
     }
     if (isset($m['basename']) && $m['basename']) {
         $ret[$map[PATHINFO_BASENAME]] = $m['basename'];
-        $parts = explode('.', $m['basename']);
+        $params = explode('?', $m['basename']);
+        $parts = explode('.', $params[0]);
         if (count($parts) === 1) {
             $filename = $m['basename'];
         } else {
