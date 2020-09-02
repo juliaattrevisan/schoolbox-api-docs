@@ -468,18 +468,20 @@ class ListController extends Web\Controller\Base
             $plans = $this->savePlanData($assessment, $postData['plans'] ?? []);
 
             $this->saveParticipationData($plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
-
-            $db->commit();
-            // Retrieve assessment, as I need the assessment's participation
-            $assessment = $this->assessmentMapper->findByIdForReview($assessment->getId());
-
-            // And send notifications
-            $notifier->notify($assessment, $this->getUser(), $before);
         } catch (\Exception $e) {
             $db->rollback();
             // cast
             throw new DomainException($e->getMessage(), $e->getCode(), $e);
         }
+
+        // If we're here the assessment must have saved properly.
+        // Commit and send the notifications
+        $db->commit();
+        // Retrieve assessment, as I need the assessment's participation
+        $assessment = $this->assessmentMapper->findByIdForReview($assessment->getId());
+
+        // And send notifications
+        $notifier->notify($assessment, $this->getUser(), $before);
 
         return $transactionSummary;
     }
