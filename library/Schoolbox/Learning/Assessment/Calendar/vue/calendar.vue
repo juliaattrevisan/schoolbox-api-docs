@@ -614,7 +614,11 @@
                     // Next:  disable if there is no next
                     // Prev:  disable if there is no prev
                     // Today: disable if today isn't within a term
-                    let currentIndex    = this.findTermIndex(this.toMoment(start).format('YYYY-MM-DD'));
+                    let startMoment     = this.toMoment(start),
+                        endMoment       = this.toMoment(end),
+                        diff            = endMoment.diff(startMoment, 'day'),
+                        midMoment       = this.toMoment(start).add(Math.ceil(diff / 2), 'day'),
+                        currentIndex    = this.findTermIndex(midMoment.format('YYYY-MM-DD'));
                     nextButton.disabled = (currentIndex === this.allTerms.length - 1);
                     prevButton.disabled = (currentIndex === 0);
                     if (!todayButton.disabled) {
