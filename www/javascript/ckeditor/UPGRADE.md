@@ -26,15 +26,20 @@ With the file downloaded by the previous step:
 > customisation is also separate from the downloaded build.
 > (The custom backend exists in `www/ajax/nanospell/server/ajax/php/tinyspell.php`)
 
-## Restore Schoolbox's CKEditor Configuration
+## Restore Schoolbox's CKEditor Configuration and Custom Styles
 
 Schoolbox has customised configuration for CKEditor in `config.js`: the previous
 step overwrote this custom configuration.
 
-Restore Schoolbox's CKEditor configuration by reverting the changes made to it:
+Schoolbox also has a custom set of styles available in its CKEditor instances in
+`styles.js`: this custom set removes a host of unused styles, and adds a
+highlighted note style.
+
+Restore Schoolbox's CKEditor configuration and styles by reverting the changes
+made to them:
 
 ```
-git restore www/javascript/ckeditor/config.js
+git restore www/javascript/ckeditor/config.js www/javascript/ckeditor/styles.js
 ```
 
 ## Commit CKEditor build
