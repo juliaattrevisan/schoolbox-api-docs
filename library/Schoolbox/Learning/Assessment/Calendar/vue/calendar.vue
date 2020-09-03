@@ -45,6 +45,8 @@
     const RESOURCE_FOLDER_PREFIX = 'folder-';
     const RESOURCE_EVENT_TYPE_PREFIX = 'eventType-';
 
+    const MILLISECONDS_PER_DAY = (1000 * 60 * 60 * 24);
+
     export default {
         components: {
             ViewGroupedEventsModal,
@@ -415,7 +417,10 @@
                     // Figure out which term I'm in: go to the next one
                     let termIndex = this.findTermIndex(this.convertDateToDateString(api.getDate()));
                     if (this.allTerms[termIndex+1]) {
-                        api.gotoDate(this.allTerms[termIndex+1].start);
+                        // Go to the midpoint of the term, as we can reasonably
+                        // assume that will not overlap the view for another
+                        // term.
+                        api.gotoDate(this.allTerms[termIndex+1].mid);
                         this.redrawWeekNumbers();
                     }
                 } else {
@@ -433,7 +438,11 @@
                     // Figure out which term I'm in: go to the previous one
                     let termIndex = this.findTermIndex(this.convertDateToDateString(api.getDate()));
                     if (this.allTerms[termIndex-1]) {
-                        api.gotoDate(this.allTerms[termIndex-1].start);
+                        // As with clickNext():
+                        // Go to the midpoint of the term, as we can reasonably
+                        // assume that will not overlap the view for another
+                        // term.
+                        api.gotoDate(this.allTerms[termIndex-1].mid);
                         this.redrawWeekNumbers();
                     }
                 } else {
@@ -607,10 +616,20 @@
 
                 // What about next/prev?
                 if (this.currentViewIsSemester()) {
-                    // Next:  disable if there is no next
-                    // Prev:  disable if there is no prev
+                    // Figure out the midpoint between the start and end of the
+                    // view, and use that to determine which term the calendar
+                    // is displaying.
+                    // That's because the start of the view may overlap another
+                    // term (see `determineVisibleRange`)
+                    let startMoment     = this.toMoment(start),
+                        endMoment       = this.toMoment(end),
+                        diff            = endMoment.diff(startMoment, 'day'),
+                        midMoment       = this.toMoment(start).add(Math.ceil(diff / 2), 'day'),
+                        currentIndex    = this.findTermIndex(midMoment.format('YYYY-MM-DD'));
+
+                    // Next:  disable if there is no next term
+                    // Prev:  disable if there is no prev term
                     // Today: disable if today isn't within a term
-                    let currentIndex    = this.findTermIndex(this.toMoment(start).format('YYYY-MM-DD'));
                     nextButton.disabled = (currentIndex === this.allTerms.length - 1);
                     prevButton.disabled = (currentIndex === 0);
                     if (!todayButton.disabled) {
@@ -641,6 +660,15 @@
 
             /**
              * Determine which visible range is shown on the semester view.
+             *
+             * The semester view shows an entire semester, expanded out to
+             * include the start/end of the week that it starts/ends on:
+             * for example, if the semester starts on a Tuesday and finishes on
+             * a Friday, the start will be set to the Monday before the term's
+             * start and the end to the Monday after the term's end.
+             *
+             * This ensures that no events are left off the calendar because
+             * they fall within a week that the calendar view wouldn't render.
              *
              * @param currentDate A Date object matching the date to show
              * @return {*} An object which can be passed to FullCalendar's
@@ -704,8 +732,21 @@
                         return 0;
                     })
                     .map(function (term) {
-                        let end = new Date(term.end);
+                        let start = new Date(term.start),
+                            mid   = new Date(term.start),
+                            end   = new Date(term.end);
+
+                        // Extend the end date by one day, as FullCalendar dates
+                        // are exclusive.
                         end.setDate(end.getDate() + 1);
+
+                        // Add a midpoint to the terms list as well.
+                        // This is the date the calendar will actually go to, as
+                        // when we query the calendar's date in `datesRender` we
+                        // can reasonably assume it doesn't overlap the view
+                        // window for another term.
+                        mid.setDate(mid.getDate() + Math.ceil(((end - start) / MILLISECONDS_PER_DAY) / 2))
+                        term.mid = self.convertDateToDateString(mid);
                         term.end = self.convertDateToDateString(end);
                         return term;
                     });
