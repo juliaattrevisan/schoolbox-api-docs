@@ -16,17 +16,19 @@
 
 <li data-participant="{{ participant.user.id }}" data-email="{{ participant.user.email }}">
     {% if isTask %}
-        <div class="compact card small-11">
+    <div class="compact card small-11">
+        <div>
             <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullName }}">
-            <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
+            <p>{{ participant.user.firstname }} {{ participant.user.lastname }}</p>
         </div>
-        <div class="small-1 columns no-pad">
-            {# An icon that shows if the student has attempted the task or not #}
-            {% include '@learningAssessment/fragments/progressTick.twig' with {
-                assessment:  assessment,
-                student: participant.user
-            } only %}
-        </div>
+    </div>
+    <div class="small-1 columns no-pad">
+        {# An icon that shows if the student has attempted the task or not #}
+        {% include '@learningAssessment/fragments/progressTick.twig' with {
+            assessment:  assessment,
+            student: participant.user
+        } only %}
+    </div>
     {% else %}
         {% if isDueWork %}
             {% set ackReceipt = routeLookupIfAuthorized('learningAssessment.postPendingAcknowledge', {
@@ -47,8 +49,10 @@
         <div class="{% if ackReceipt %}small-6 medium-8{% else %}small-12{% endif %} columns no-pad">
             <a class="link-row" href="{{ href }}" title="{{ title }}">
                 <div class="compact card">
-                    <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullName }}">
-                    <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
+                    <div>
+                        <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullName }}">
+                        <p>{{ participant.user.firstname }} {{ participant.user.lastname }}</p>
+                    </div>
                 </div>
             </a>
         </div>
