@@ -26,6 +26,6 @@ mkdir -p "$data_dir"/{cache,files,purifier,storage}
 mkdir -p "$data_dir"/cache/{logs,portrait,stream,zip}
 
 # Create logs files so they have the correct perms SB-5193
-touch "$data_dir"/cache/logs/{sys,notif,db,sb,syn,admin,login,cms,cmd.sched,cmd.digest,audit}.log
+touch "$data_dir"/cache/logs/{audit,image-processor,kami,plagscan,preparseVcalSubscription,saml,sb,transcode,ups}.log
 
 # End of script
