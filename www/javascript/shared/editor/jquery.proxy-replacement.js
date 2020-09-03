@@ -167,9 +167,11 @@
                 '</video>' +
                 '</div>';
         } else if (type === 'audio') {
-            return '<audio data-schoolboxmedia-replacement-container data-schoolboxmedia-replacement controls preload="none" style="' + style + ';width:100%;height:40px;border:0px;">' +
+            return '<div data-schoolboxmedia-replacement-container>' +
+                '<audio data-schoolboxmedia-replacement controls preload="none" style="' + style + ';width:100%;height:40px;border:0px;">' +
                 '<source src="' + source + '" type="audio/mpeg">' +
-                '</audio>';
+                '</audio>' +
+                '</div>';
         }
 
         return false;
