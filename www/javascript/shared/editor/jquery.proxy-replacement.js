@@ -39,6 +39,27 @@
 
 
     /**
+     * Mass-restore all media placeholders that were hidden by
+     * `$.fn.schoolboxResource_ReplaceAll`.
+     *
+     * This will remove the replacements, but they ought to be restored by
+     * calling `$.fn.schoolboxResource_ReplaceAll` on the element again.
+     *
+     * @param selector
+     * @return {Number} the number of placeholders which got restored
+     */
+    $.fn.schoolboxResource_RestoreAll = function(selector) {
+        var count = 0;
+        selector.find('[data-schoolboxmedia-replacement-container]').each(function () {
+            if ($.fn.schoolboxResource_RestoreOne(this)) {
+                count++;
+            }
+        });
+        return count;
+    };
+
+
+    /**
      * Apply all the placeholders that were found in element.
      *
      * This used to replace the placeholders completely: the inline editor
@@ -56,6 +77,34 @@
             return true;
         }
 
+        return false;
+    };
+
+
+    /**
+     * Restores the placeholder that was replaced by
+     * `$.fn.schoolboxResource_ReplaceOne`.
+     *
+     * This will remove the replacement, and its video player.
+     *
+     * @param element
+     * @returns {boolean}
+     */
+    $.fn.schoolboxResource_RestoreOne = function(element) {
+        var $element = $(element),
+            $placeholder = $element.prev('[data-schoolboxresource-type]');
+        if ($placeholder.length) {
+            // Does this actually have a placeholder to restore?
+            $placeholder.css('display', '');
+            $element.find('.mejs__container').each(function () {
+                var playerId = this.id;
+                if (playerId && mejs.players && mejs.players[playerId]) {
+                    mejs.players[playerId].remove();
+                }
+            });
+            element.remove();
+            return true;
+        }
         return false;
     };
 

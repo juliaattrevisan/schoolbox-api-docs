@@ -159,12 +159,8 @@
         if (window.CKEDITOR.instances[editorInstanceId]) {
             window.CKEDITOR.instances[editorInstanceId].focus();
         } else {
-            // Destroy any video players, and restore their hidden placeholder
-            // for use in the editor
-            self.element.find('video, audio').each(function () {
-                $(this).closest('[data-schoolboxmedia-replacement-container]').prev('[data-schoolboxresource-type]').css('display', '');
-                $(this).data('mediaelementplayer').remove();
-            });
+            // Restore any video/audio placeholders
+            $.fn.schoolboxResource_RestoreAll(self.element);
 
             self.editor = window.CKEDITOR.inline(
                 editorInstanceId,
