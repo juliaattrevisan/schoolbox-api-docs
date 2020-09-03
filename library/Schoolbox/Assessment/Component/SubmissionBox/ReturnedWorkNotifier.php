@@ -117,7 +117,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         }
 
         // As this notifier is for student and parents, if it's only visible to staff, return.
-        if ($box->getAssessmentModel()->getWorkType()) {
+        if ($box->getAssessmentModel()->getWorkType() && $box->getAssessmentModel()->getWorkType()->getId()) {
             // The work type might not be hydrated, and thus unable to determine
             // if it's staff-only. Hydrate it here
             try {
