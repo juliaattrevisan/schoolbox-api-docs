@@ -139,8 +139,7 @@
                 .on('inlineTextboxEditor.editorDestroy', function () {
                     content.removeClass('no-pad');
                     window.removeEventListener('beforeunload', beforeUnloadListener);
-                    $.fn.schoolboxResource_ReplaceAll(component);
-                    $.fn.schoolboxResource_InitialiseMediaElementPlayer(component);
+                    $.fn.schoolboxResource_ProxyReplacement(component);
                 })
                 // Pre/post save/delete: apply toast
                 .on('inlineTextboxEditor.preSave', function () {
