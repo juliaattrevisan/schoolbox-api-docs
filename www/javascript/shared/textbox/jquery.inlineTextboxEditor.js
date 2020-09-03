@@ -159,9 +159,7 @@
         if (window.CKEDITOR.instances[editorInstanceId]) {
             window.CKEDITOR.instances[editorInstanceId].focus();
         } else {
-            // Restore any video/audio placeholders
-            $.fn.schoolboxResource_RestoreAllPlaceholders(self.element);
-
+            self.element.trigger('inlineTextboxEditor.preEditorCreate', [self]);
             self.editor = window.CKEDITOR.inline(
                 editorInstanceId,
                 self.editorInstanceOptions
@@ -214,9 +212,6 @@
             self.switchState(self.states.clean);
             self.element.trigger('inlineTextboxEditor.editorDestroy', [self]);
             self.element.trigger('inlineTextboxEditor.save', [self]);
-
-            // Put the media players back now the editor is destroyed
-            $.fn.schoolboxResource_ReplaceAll(self.element);
         }).fail(function () {
             self.switchState(previousState);
             self.element.trigger('inlineTextboxEditor.saveFail', [self]);

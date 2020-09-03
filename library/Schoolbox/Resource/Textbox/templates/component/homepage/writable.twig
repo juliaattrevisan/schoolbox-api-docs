@@ -114,8 +114,14 @@
                     editorInstance:        '[data-content]',
                     editorInstanceOptions: editorInstanceOptions,
                 })
+                // Before creating an editor: restore any placeholders, so that
+                // the editor doesn't let you edit the mediaelement player
+                .on('inlineTextboxEditor.preEditorCreate', function () {
+                    $.fn.schoolboxResource_RestoreAllPlaceholders(component);
+                })
                 // On create/destroy of editor:
                 // add/remove no-pad class to its container, to offset padding
+                // Also: put the media players back when the editor is destroyed
                 .on('inlineTextboxEditor.editorCreate', function (event, inlineTextboxEditor) {
                     content.addClass('no-pad');
 
@@ -133,6 +139,7 @@
                 .on('inlineTextboxEditor.editorDestroy', function () {
                     content.removeClass('no-pad');
                     window.removeEventListener('beforeunload', beforeUnloadListener);
+                    $.fn.schoolboxResource_ReplaceAll(component);
                 })
                 // Pre/post save/delete: apply toast
                 .on('inlineTextboxEditor.preSave', function () {
