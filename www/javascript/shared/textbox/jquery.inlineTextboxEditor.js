@@ -214,6 +214,9 @@
             self.switchState(self.states.clean);
             self.element.trigger('inlineTextboxEditor.editorDestroy', [self]);
             self.element.trigger('inlineTextboxEditor.save', [self]);
+
+            // Put the media players back now the editor is destroyed
+            $.fn.schoolboxResource_ReplaceAll(self.element);
         }).fail(function () {
             self.switchState(previousState);
             self.element.trigger('inlineTextboxEditor.saveFail', [self]);
