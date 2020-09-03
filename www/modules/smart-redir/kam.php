@@ -5,7 +5,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = new SitePage;
 
 
-//A Semi-Smart Autologon Script 
+//A Semi-Smart Autologon Script
 //It remains to be seen who falls for it
 //010405, time to pull an April Fools!!!
 //lwcawood
@@ -41,8 +41,7 @@ switch($to)
 
 <html>
 <head>
-<title>Redirecting <? echo $to ?></title>
-
+    <title>Redirecting to <?php echo htmlentities($to) ?></title>
 </head>
 
 <?php
@@ -51,14 +50,14 @@ echo "<body>";
 echo"<form method='{$method}' name='{$form}' action='{$action}'>";
 if(is_array($formArray)) {
 	foreach($formArray as $key => $value)
-	{	
+	{
 		if($key == "submit")
 			{
 			echo "<br><br><br><br><br><br><br><br><div align='center'>Please $value to continue<br>";
 			echo "<input name='$key' type='submit' value='$value'></div>";
 			$nojs = 1;
 			}
-		else	
+		else
 			echo "<input name='$key' type='hidden' value='$value'>";
 	}
 }
