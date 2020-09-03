@@ -849,6 +849,7 @@ $rotate-span-width: 11rem;
 
 // Collapsible content
 .collapsible {
+    overflow: auto;
     .information-list{
         clear: both;
     }

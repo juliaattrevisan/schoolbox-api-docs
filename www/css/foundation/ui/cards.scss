@@ -23,7 +23,10 @@
       width: (3 * rem-calc($base-font-size));
     }
   }
-
+  .card-content {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
   .card-feature-avatar {
     background-color: $gainsboro;
     margin-bottom: 1rem;
