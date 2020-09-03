@@ -159,6 +159,7 @@
         if (window.CKEDITOR.instances[editorInstanceId]) {
             window.CKEDITOR.instances[editorInstanceId].focus();
         } else {
+            self.element.trigger('inlineTextboxEditor.preEditorCreate', [self]);
             self.editor = window.CKEDITOR.inline(
                 editorInstanceId,
                 self.editorInstanceOptions

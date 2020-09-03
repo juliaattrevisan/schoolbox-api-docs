@@ -39,7 +39,33 @@
 
 
     /**
-     * Replace all the placeholders that were found in element
+     * Mass-restore all media placeholders that were hidden by
+     * `$.fn.schoolboxResource_ReplaceAll`.
+     *
+     * This will remove the replacements, but they ought to be restored by
+     * calling `$.fn.schoolboxResource_ReplaceAll` on the element again.
+     *
+     * @param selector
+     * @return {Number} the number of placeholders which got restored
+     */
+    $.fn.schoolboxResource_RestoreAllPlaceholders = function(selector) {
+        var count = 0;
+        selector.find('[data-schoolboxmedia-replacement-container]').each(function () {
+            if ($.fn.schoolboxResource_RestorePlaceholder(this)) {
+                count++;
+            }
+        });
+        return count;
+    };
+
+
+    /**
+     * Apply all the placeholders that were found in element.
+     *
+     * This used to replace the placeholders completely: the inline editor
+     * requires that the placeholder continues to exist (as the replacement
+     * breaks the inline editor), so now it hides the placeholder and adds the
+     * replacement after it.
      *
      * @param element
      */
@@ -47,11 +73,38 @@
         var replacement = $.fn.schoolboxResource_GenerateReplacement(element);
 
         if (replacement !== false) {
-            $(element).replaceWith(replacement);
-
+            $(element).css('display', 'none').after(replacement);
             return true;
         }
 
+        return false;
+    };
+
+
+    /**
+     * Restores the placeholder that was replaced by
+     * `$.fn.schoolboxResource_ReplaceOne`.
+     *
+     * This will remove the replacement, and its video player.
+     *
+     * @param element
+     * @returns {boolean}
+     */
+    $.fn.schoolboxResource_RestorePlaceholder = function(element) {
+        var $element = $(element),
+            $placeholder = $element.prev('[data-schoolboxresource-type]');
+        if ($placeholder.length) {
+            // Does this actually have a placeholder to restore?
+            $placeholder.css('display', '');
+            $element.find('.mejs__container').each(function () {
+                var playerId = this.id;
+                if (playerId && mejs.players && mejs.players[playerId]) {
+                    mejs.players[playerId].remove();
+                }
+            });
+            element.remove();
+            return true;
+        }
         return false;
     };
 
@@ -107,16 +160,18 @@
         source = source.replace('type=browse', 'type=sbfs').replace('type=store', 'type=storage');
 
         if (type === 'video') {
-            return '<div style="max-width:' + maxwidth + style + '">' +
+            return '<div data-schoolboxmedia-replacement-container style="max-width:' + maxwidth + style + '">' +
                 '<video width="' + width + '" height="' + height + '" data-schoolboxmedia-replacement controls preload="none" ' +
                 'poster="' + thumbnail + '" class="' + classes + '" style="width:100%;height:100%;">' +
                 '<source src="' + source + '" type="video/mp4">' +
                 '</video>' +
                 '</div>';
         } else if (type === 'audio') {
-            return '<audio data-schoolboxmedia-replacement controls preload="none" style="' + style + ';width:100%;height:40px;border:0px;">' +
+            return '<div data-schoolboxmedia-replacement-container>' +
+                '<audio data-schoolboxmedia-replacement controls preload="none" style="' + style + ';width:100%;height:40px;border:0px;">' +
                 '<source src="' + source + '" type="audio/mpeg">' +
-                '</audio>';
+                '</audio>' +
+                '</div>';
         }
 
         return false;
