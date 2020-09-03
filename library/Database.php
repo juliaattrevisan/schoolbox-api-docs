@@ -376,6 +376,20 @@ class Database implements IDatabase, Serializable, IQuoter
      * Wrapper for PDO::beginTransaction
      * Initiates a transaction
      *
+     * Usage example:
+     * <code>
+     * $db->beginTransaction();
+     * try {
+     *     // a set of updates which must be atomic
+     * } catch (\Throwable $e) {
+     *     // Rollback, and then rethrow to ensure that commit() is not called
+     *     $db->rollback();
+     *     throw $e;
+     * }
+     * // Commit only if the try/catch block has completed without error
+     * $db->commit();
+     * </code>
+     *
      * @return bool true on success or false on failure.
      */
     public function beginTransaction()
