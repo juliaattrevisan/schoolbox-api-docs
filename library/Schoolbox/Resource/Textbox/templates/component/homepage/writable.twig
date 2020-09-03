@@ -140,6 +140,7 @@
                     content.removeClass('no-pad');
                     window.removeEventListener('beforeunload', beforeUnloadListener);
                     $.fn.schoolboxResource_ReplaceAll(component);
+                    $.fn.schoolboxResource_InitialiseMediaElementPlayer(component);
                 })
                 // Pre/post save/delete: apply toast
                 .on('inlineTextboxEditor.preSave', function () {
