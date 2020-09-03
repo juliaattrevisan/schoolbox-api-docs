@@ -28,8 +28,7 @@ if ($_GET) {
 
     <html>
     <head>
-        <title>Redirecting <? echo $to ?></title>
-
+        <title>Redirecting to <?php echo htmlentities($to) ?></title>
     </head>
 
     <?php
