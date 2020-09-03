@@ -278,6 +278,8 @@ class Controller extends Base
         $assessments = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
 
         $toChaseLimit = \Alaress_Date_Format::now()->addDays(1);
+        $totalAssessmentsToMark = 0;
+        $totalAssessmentsToChase = 0;
 
         /**
          * Indexed by assessment.id
@@ -291,6 +293,7 @@ class Controller extends Base
         foreach ($assessments as $assessment) {
             $assessmentStatistics[$assessment->getId()] = new Statistics($assessment);
             if ($assessmentStatistics[$assessment->getId()]->getCountFeedbackRequired()) {
+                $totalAssessmentsToMark += $assessmentStatistics[$assessment->getId()]->getCountFeedbackRequired();
                 $assessmentsToMark[$assessment->getId()] = $assessment;
             }
         }
@@ -303,6 +306,7 @@ class Controller extends Base
 
         foreach ($assessments as $assessment) {
             if ($assessment->getDueAt()->lt($toChaseLimit) && $assessmentStatistics[$assessment->getId()]->getCountResponseRequired()) {
+                $totalAssessmentsToChase += $assessmentStatistics[$assessment->getId()]->getCountResponseRequired();
                 $assessmentsToChase[$assessment->getId()] = $assessment;
                 $assessmentStudentsToEmail[$assessment->getId()] = [];
                 foreach($assessment->getAllParticipants() as $participant){
@@ -317,6 +321,8 @@ class Controller extends Base
 
         return $this->buildUnthemedHtmlOutput('@learning/pendingAssessmentsContent.twig', [
             'statistics'                => $assessmentStatistics,
+            'totalAssessmentsToMark'    => $totalAssessmentsToMark,
+            'totalAssessmentsToChase'   => $totalAssessmentsToChase,
             'assessmentsToMark'         => $assessmentsToMark,
             'assessmentsToChase'        => $assessmentsToChase,
             'assessmentStudentsToEmail' => $assessmentStudentsToEmail,
