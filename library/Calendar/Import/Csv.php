@@ -11,6 +11,7 @@ namespace Calendar\Import;
 
 use \Schoolbox\Calendar\Event;
 use \Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventType;
 use \Schoolbox\Calendar\Relation\Category;
 use \Schoolbox\Calendar\Relation\CategoryMapper;
 use \Schoolbox\Calendar\Relation\Role;
@@ -154,6 +155,7 @@ class Csv extends Base
              * If one not found, report error and move on
              */
             try {
+                /** @var EventType $eventType */
                 $eventType = $eventTypeMapper->findById($event_type);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $output[] = array(
