@@ -39,7 +39,12 @@
 
 
     /**
-     * Replace all the placeholders that were found in element
+     * Apply all the placeholders that were found in element.
+     *
+     * This used to replace the placeholders completely: the inline editor
+     * requires that the placeholder continues to exist (as the replacement
+     * breaks the inline editor), so now it hides the placeholder and adds the
+     * replacement after it.
      *
      * @param element
      */
@@ -47,8 +52,7 @@
         var replacement = $.fn.schoolboxResource_GenerateReplacement(element);
 
         if (replacement !== false) {
-            $(element).replaceWith(replacement);
-
+            $(element).css('display', 'none').after(replacement);
             return true;
         }
 
@@ -107,14 +111,14 @@
         source = source.replace('type=browse', 'type=sbfs').replace('type=store', 'type=storage');
 
         if (type === 'video') {
-            return '<div style="max-width:' + maxwidth + style + '">' +
+            return '<div data-schoolboxmedia-replacement-container style="max-width:' + maxwidth + style + '">' +
                 '<video width="' + width + '" height="' + height + '" data-schoolboxmedia-replacement controls preload="none" ' +
                 'poster="' + thumbnail + '" class="' + classes + '" style="width:100%;height:100%;">' +
                 '<source src="' + source + '" type="video/mp4">' +
                 '</video>' +
                 '</div>';
         } else if (type === 'audio') {
-            return '<audio data-schoolboxmedia-replacement controls preload="none" style="' + style + ';width:100%;height:40px;border:0px;">' +
+            return '<audio data-schoolboxmedia-replacement-container data-schoolboxmedia-replacement controls preload="none" style="' + style + ';width:100%;height:40px;border:0px;">' +
                 '<source src="' + source + '" type="audio/mpeg">' +
                 '</audio>';
         }
