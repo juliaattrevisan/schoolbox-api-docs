@@ -170,7 +170,7 @@ class Seeder extends App
                    $this->transcodeImages[] = [
                        'hash' => $file[0],
                        'transform' => $file[1],
-                       'size' => (int)filesize($filePath),
+                       'size' => (int)filesize(dirname($filePath) . '/' . $entry),
                    ];
                    $this->getLogger()->info($entry);
                }
