@@ -157,7 +157,11 @@ foreach ($userList as $user) {
                 /* Continue as normal
                  */
                 $days = count($timetable[array_keys($timetable)[0]]['day']);
-
+                if ($days == 0) {
+                    //In case no timetable has been output for what ever reason
+                    $this->setVar('timetable_listing', '');
+                    continue;
+                }
                 $periodCount = 1;
                 //for each period
                 foreach ($timetable as $row) {
@@ -302,9 +306,6 @@ foreach ($userList as $user) {
                 //reset blocks in case we coming back...
                 $this->setVar('period_listing', '');
                 $this->setVar('day_header_listing', '');
-            } else {
-                //In case no timetable has been output for what ever reason
-                $this->setVar('timetable_listing', '');
             }
         }
     }
