@@ -30,7 +30,7 @@
 
 
 <div id="pending_assessments" class="small-12 island">
-    <h2 data-heading-to-mark class="subheader {% if not assessmentsToMark|length %}hide{% endif %}">Requires {{ locale.assessment.proper }} ({{ totalAssessmentsToChase }})</h2>
+    <h2 data-heading-to-mark class="subheader {% if not assessmentsToMark|length %}hide{% endif %}">Requires {{ locale.assessment.proper }} ({{ totalAssessmentsToMark }})</h2>
     <div data-list-to-mark>
         {% for assessment in assessmentsToMark %}
             {% include '@learning/fragments/toMarkAssessment.twig' with {
@@ -40,7 +40,7 @@
         {% endfor %}
     </div>
 
-    <h2 data-heading-to-chase class="subheader {% if not assessmentsToChase|length %}hide{% endif %}">Not Submitted ({{ totalAssessmentsToMark }})</h2>
+    <h2 data-heading-to-chase class="subheader {% if not assessmentsToChase|length %}hide{% endif %}">Not Submitted ({{ totalAssessmentsToChase }})</h2>
     <div data-list-to-chase>
     {% for assessment in assessmentsToChase %}
         {% include '@learning/fragments/toSubmitAssessment.twig' with {
