@@ -5,6 +5,7 @@
  */
 .card {
   // card "extends" column
+  display: flex;
   float: left;
   position: relative;
   padding: 0.5rem 1rem 0 1rem;
@@ -23,7 +24,11 @@
       width: (3 * rem-calc($base-font-size));
     }
   }
-
+  .card-content {
+    flex-grow: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
   .card-feature-avatar {
     background-color: $gainsboro;
     margin-bottom: 1rem;

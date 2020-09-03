@@ -21,19 +21,21 @@
 
 <section data-assessment="{{ assessment.id }}" data-due-timestamp="{{ assessment.dueAt ? assessment.dueAt.unixTimeStamp : '' }}">
     <div class="content collapsible">
-        <div class="card small-6 columns no-pad">
+        <div class="card small-8 medium-6 no-pad">
             {#- Dessicator -#}
             <span data-collapser="to-mark-{{ assessment.id }}" class="icon-down-arrow"></span>
             <i class="size-32 icon-{{ icon }}"></i>
-            <h3>
-                {#- Dessicator -#}
-                <a data-title href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
-                {#- Dessicator -#}
-            </h3>
-            <div data-crumbs>{{ assessmentContext.crumbs(assessment) }}</div>
-            <p class="meta" data-due-date>{{ dueDate.forAssessment(assessment) }}</p>
+            <div class="card-content">
+                <h3>
+                    {#- Dessicator -#}
+                    <a data-title href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
+                    {#- Dessicator -#}
+                </h3>
+                <div data-crumbs>{{ assessmentContext.crumbs(assessment) }}</div>
+                <p class="meta" data-due-date>{{ dueDate.forAssessment(assessment) }}</p>
+            </div>
         </div>
-        <div class="small-4 columns hide-for-small-only">
+        <div class="card small-4 hide-for-small-only">
 
             {%- if isQuiz -%}
                 {%- set submitTitleSuffix = 'attempted this quiz' -%}
@@ -63,10 +65,12 @@
                 <span class="pipe-meter slow" data-pipe style="left: {{ stats.percentageReviewComplete }}%" title="{{ stats.countFeedbackRequired }} of {{ stats.countParticipants }} students require {{ markedTitleSuffix }}" data-title-suffix="{{ markedTitleSuffix }}"></span>
             </div>
         </div>
-        <div class="small-6 medium-2 columns text-right">
+        <div class="small-4 medium-2 columns text-right">
             <p data-count-to-mark title="{{ stats.countFeedbackRequired }} of {{ stats.countParticipants }} students require marking"><span data-user-count>{{ stats.countFeedbackRequired }}</span> unmarked</p>
         </div>
-        <ul class="information-list hide" data-participant-list data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
+    </div>
+    <div class="content collapsible hide" data-participant-list data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
+        <ul class="information-list">
             {% for participant in assessment.allParticipants if not participant.excluded %}
                 {% if participant.isFeedbackRequired %}
                     {% include '@learning/fragments/toMarkParticipant.twig' with {
