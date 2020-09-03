@@ -160,7 +160,7 @@
             window.CKEDITOR.instances[editorInstanceId].focus();
         } else {
             // Restore any video/audio placeholders
-            $.fn.schoolboxResource_RestoreAll(self.element);
+            $.fn.schoolboxResource_RestoreAllPlaceholders(self.element);
 
             self.editor = window.CKEDITOR.inline(
                 editorInstanceId,

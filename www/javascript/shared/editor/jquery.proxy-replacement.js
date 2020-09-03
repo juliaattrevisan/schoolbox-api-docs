@@ -48,10 +48,10 @@
      * @param selector
      * @return {Number} the number of placeholders which got restored
      */
-    $.fn.schoolboxResource_RestoreAll = function(selector) {
+    $.fn.schoolboxResource_RestoreAllPlaceholders = function(selector) {
         var count = 0;
         selector.find('[data-schoolboxmedia-replacement-container]').each(function () {
-            if ($.fn.schoolboxResource_RestoreOne(this)) {
+            if ($.fn.schoolboxResource_RestorePlaceholder(this)) {
                 count++;
             }
         });
@@ -90,7 +90,7 @@
      * @param element
      * @returns {boolean}
      */
-    $.fn.schoolboxResource_RestoreOne = function(element) {
+    $.fn.schoolboxResource_RestorePlaceholder = function(element) {
         var $element = $(element),
             $placeholder = $element.prev('[data-schoolboxresource-type]');
         if ($placeholder.length) {
