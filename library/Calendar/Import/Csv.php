@@ -234,7 +234,7 @@ class Csv extends Base
             $event->setDetail(nl2br(\Scrub::text($detail)));
             $event->setLocation($location);
             $event->setAllDay($all_day);
-            $event->setType($event_type);
+            $event->setType($eventType);
             $event->setAttendance($attendance);
             $event->setCampusCollection($allCampuses);
             $event->setSource($this->getSource());
