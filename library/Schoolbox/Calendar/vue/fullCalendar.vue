@@ -797,7 +797,8 @@
                 ref="flatPickr"
                 :config="{
                     defaultDate: config.defaultDate,
-                    selector: '.fc-quickSwitchButton-button'
+                    selector: '.fc-quickSwitchButton-button',
+                    disableMobile: true,
                 }"
                 @dateSelected="onQuickSwitch"
         />
