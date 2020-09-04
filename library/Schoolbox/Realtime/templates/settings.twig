@@ -50,72 +50,70 @@
         <h1>Message Settings</h1>
     </div>
 </div>
-<form method="post" action="{{ routeLookup('messages.saveConfig') }}" id="msg-settings">
+<form method="post" action="{{ routeLookup('messages.saveConfig') }}" id="msg-settings" class="row">
     {% if groups %}
-    <div class="row">
-        <div class="small-12 island">
-            <h2 class="subheader">Homepages</h2>
+    <div class="small-12 columns">
+        <h2 class="subheader">Homepages</h2>
 
-            <section>
-                <p class="content">
-                    If you unfollow a homepage, you will receive <em>no</em> messages that come from it.
-                </p>
-                <table id="follow-settings" class="no-margin">
-                    <tbody>
-                    {% for groupId, group in groups %}
-                        <tr>
-                            <td>
-                                <label for="follow-{{ groupId }}">{{ group.name }}</label>
-                            </td>
-                            <td>
-                                <div class="long switch no-margin">
-                                    <input type="hidden" name="follow[{{ groupId }}]" value="{{ group.force ? 1 : 0 }}">
-                                    <input id="follow-{{ groupId }}"
-                                           type="checkbox"
-                                           name="follow[{{ groupId }}]"
-                                           value="1"
-                                           {% if group.follow %}checked="checked"{% endif %}
-                                            {% if group.force %}disabled="disabled"{% endif %} />
-                                    <label for="follow-{{ groupId }}">
-                                        <span>Following</span>
-                                        <span>Muted</span>
-                                    </label>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </section>
-        </div>
+        <section>
+            <p class="content">
+                If you unfollow a homepage, you will receive <em>no</em> messages that come from it.
+            </p>
+            <table id="follow-settings" class="no-margin">
+                <tbody>
+                {% for groupId, group in groups %}
+                    <tr>
+                        <td>
+                            <label for="follow-{{ groupId }}">{{ group.name }}</label>
+                        </td>
+                        <td>
+                            <div class="long switch no-margin">
+                                <input type="hidden" name="follow[{{ groupId }}]" value="{{ group.force ? 1 : 0 }}">
+                                <input id="follow-{{ groupId }}"
+                                       type="checkbox"
+                                       name="follow[{{ groupId }}]"
+                                       value="1"
+                                       {% if group.follow %}checked="checked"{% endif %}
+                                        {% if group.force %}disabled="disabled"{% endif %} />
+                                <label for="follow-{{ groupId }}">
+                                    <span>Following</span>
+                                    <span>Muted</span>
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </section>
     </div>
     {% endif %}
 
-    <div class="row actions-small-1">
-        <div class="list-item">
-            <div class="small-12 columns">
-                <h2 class="subheader">Messages</h2>
-            </div>
-        </div>
-        <nav>
-            <a href="#" data-reveal-id="legend-modal" class="icon-help" title="View Help"></a>
-        </nav>
     <div class="small-12 columns">
-        <div class="alert-box">
+        <div class="row actions-small-1">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Messages</h2>
+                </div>
+            </div>
+            <nav>
+                <a href="#" data-reveal-id="legend-modal" class="icon-help" title="View Help"></a>
+            </nav>
+        </div>
+    </div>
+    <div class="small-12 columns">
+        <div class="alert-box no-margin">
             <p>
                 Customise when and how you receive messages.
                 <em>Options that are unavailable have been disabled by your system administrator.</em>
             </p>
         </div>
     </div>
-    </div>
-
-    <div class="row">
-        <div class="small-12 island">
-            {% for namespace in config %}
+    <div class="small-12 island">
+        {% for namespace in config %}
             {% if ns[namespace.id] %}
-            <h3 class="subheader">Receive {{ locale.translateSentence(namespace.label) }} messages when&hellip;</h3>
-            <section>
+                <h3 class="subheader">Receive {{ locale.translateSentence(namespace.label) }} messages when&hellip;</h3>
+                <section>
                     <ul class='permission-list' data-roles data-digest-settings>
                         {% for source in namespace.sources %}
                             <li>
@@ -130,10 +128,9 @@
                     </ul>
                 </section>
             {% endif %}
-            {% endfor %}
+        {% endfor %}
 
-            <input type="submit" value="Submit" />
-        </div>
+        <input type="submit" value="Submit" />
     </div>
 </form>
 
