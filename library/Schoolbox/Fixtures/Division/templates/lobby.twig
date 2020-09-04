@@ -116,7 +116,7 @@
     <h2 id="addPlayersModalTitle">Add Players</h2>
     <form action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.id}) }}" method="post">
         <select data-role="userSelector" name="userId[]" multiple placeholder="Search Users"></select>
-        <input type="submit" class="full-width" value="Add" />
+        <input type="submit" value="Add" />
     </form>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
@@ -134,7 +134,7 @@
                 <input data-position id="position-{{ position.id }}" name="positions[]" value="{{ position.id }}" type="checkbox"><label for="position-{{ position.id }}">{{ position.name }}</label>
             {% endfor %}
         </fieldset>
-        <input type="submit" class="full-width" value="Save Changes" />
+        <input type="submit" value="Save Changes" />
     </form>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
@@ -151,7 +151,7 @@
         </label>
         <textarea name="bulkAdd" id="addUsersByList" cols="30" rows="20"></textarea>
         <ul class="flex-list buttons">
-            <li><input type="submit" class="full-width" value="Upload" /></li>
+            <li><input type="submit" value="Upload" /></li>
         </ul>
     </form>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
