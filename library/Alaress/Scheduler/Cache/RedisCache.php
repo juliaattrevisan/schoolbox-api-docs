@@ -10,7 +10,6 @@ namespace Alaress\Scheduler\Cache;
 
 use Alaress\Scheduler\Stomp\ResolutionManager;
 use Alaress\Scheduler\Trigger\TriggerInterface;
-use ErrorException;
 use Predis;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Notif\MQ\Connector;
@@ -120,7 +119,7 @@ class RedisCache implements ICache
                 $hash = sha1($zip); // this might not be...erm..good.
                 $size = strlen($zip);
                 $timestamp = date('Y-m-d H:i:s', $trigger->getTimestamp());
-                $name = "{$trigger->getIdString()} ({$timestamp}) as {$this->getNamespacedKey($hash)} [$size bytes]";
+                $name = "{$trigger->getEventObjectId()} - {$trigger->getLabel()} ({$timestamp}) as {$this->getNamespacedKey($hash)} [$size bytes]";
 
                 // store this compressed data
                 $stored = $this->storeCache($hash, $zip);
