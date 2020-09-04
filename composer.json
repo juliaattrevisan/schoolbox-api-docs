@@ -20,7 +20,32 @@
         }
     ],
     "autoload": {
-        "psr-0": {"": "library/"}
+        "psr-4": {
+            "Alaress\\": "library/Alaress/",
+            "Assess\\": "library/Assess/",
+            "Calendar\\": "library/Calendar/",
+            "Component\\": "library/Component/",
+            "Config\\": "conf/",
+            "Config\\Modules\\": "conf/modules/",
+            "Custom\\": "library/Custom/",
+            "DailyQuote\\": "library/DailyQuote/",
+            "EOTC\\": "library/EOTC/",
+            "Eportfolio\\": "library/Eportfolio/",
+            "Etherpad\\": "library/Etherpad/",
+            "Evaluation\\": "library/Evaluation/",
+            "Event\\": "library/Event/",
+            "External\\": "library/External/",
+            "Leave\\": "library/Leave/",
+            "Proxy\\": "library/Proxy/",
+            "Schoolbox\\": "library/Schoolbox/",
+            "SocialStream\\": "library/SocialStream/",
+            "Survey\\": "library/Survey/",
+            "Synchronise\\": "library/Synchronise/",
+            "User\\": "library/User"
+        },
+        "psr-0": {
+            "": "library/"
+        }
     },
     "require": {
         "php": "^7.4",
