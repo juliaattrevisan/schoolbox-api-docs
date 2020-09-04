@@ -133,7 +133,7 @@
 
             <ul class="flex-list buttons">
                 <li><button @click.prevent="$refs.feedUrlModal.open">Generate URL</button></li>
-                <li><input type="submit" class="icon-download" value="Download CSV" /></li>
+                <li><input type="submit" value="Download CSV" /></li>
             </ul>
         </form>
 

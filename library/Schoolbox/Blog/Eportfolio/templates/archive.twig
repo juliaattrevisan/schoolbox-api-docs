@@ -125,7 +125,7 @@
                             <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post" data-blog-comment-form>
                                 <input type="hidden" name="pageId" value="{{ page.getPageId }}">
                                 <textarea name="commentBody" rows="2" cols="100" placeholder="Add your comment"></textarea>
-                                <input type="submit" class="expand" name="comment" value="Add comment"/>
+                                <input type="submit" name="comment" value="Add comment"/>
                             </form>
                         </div>
                         {% endif %}

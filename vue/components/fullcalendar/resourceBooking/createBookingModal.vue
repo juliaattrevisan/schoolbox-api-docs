@@ -14,7 +14,7 @@
                  -->
             </template>
             <p>Create booking for: <span>{{ displayDate }}</span></p>
-            <input type="submit" class='expand' value="Create Booking" v-on:click="submitForm" />
+            <input type="submit" value="Create Booking" v-on:click="submitForm" />
         </form>
     </reveal-modal>
 </template>
