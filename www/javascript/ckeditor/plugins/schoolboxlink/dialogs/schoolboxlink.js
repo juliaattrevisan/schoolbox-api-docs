@@ -66,10 +66,12 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
             }
         }
         /* Applying link to some kind of element like an img
-         * Use the element as children of element
+         * Clone the selected element, and put it in the element
+         * (Can't put the selection directly in the element, as that rips it out
+         *  of the DOM: CKEditor then has no idea of where to put it back)
          */
         else if (selection.getType() == CKEDITOR.SELECTION_ELEMENT) {
-            element.append(selection.getSelectedElement());
+            element.append(selection.getSelectedElement().clone(true, true));
         }
 
         return element;
