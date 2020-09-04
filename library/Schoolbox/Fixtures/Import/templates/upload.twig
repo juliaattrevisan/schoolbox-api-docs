@@ -108,12 +108,7 @@
         <form method="post" enctype="multipart/form-data" action="{{ routeLookup('sportsfixturesImport.postUpload') }}">
             <h2 class="subheader">Attach Files</h2>
             {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-
-            <ul class="flex-list buttons">
-                <li><input type="submit" data-submit value="Import"></li>
-                <li><input type="button" data-cancel class="button icon-cancel" value="Cancel Changes"></li>
-            </ul>
+            <input type="submit" data-submit value="Import">
         </form>
-
     </div>
 </div>
