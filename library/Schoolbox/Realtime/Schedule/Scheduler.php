@@ -13,7 +13,6 @@ use Alaress\Async\Broker\DuplicateResolutionException;
 use Alaress\Async\Broker\IBrokerException;
 use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\IResolver;
-use Alaress\Async\Broker\PayloadMissingException;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\Async\Notification\Postman;
@@ -184,7 +183,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
     public function onMessage($trigger, IResolver $resolver, ?array $context)
     {
         try {
-            $this->log->info("Received trigger to schedule: {$trigger->getIdString()}", [ 'char' => '>' ]);
+            $this->log->info("[Scheduler] Received trigger to schedule: {$trigger->getEventObjectId()} - {$trigger->getLabel()}", [ 'char' => '>' ]);
 
             // attempt to schedule this trigger - there are a fair few things that could go wrong...
             $this->scheduleNotification($trigger, $resolver);
