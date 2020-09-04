@@ -64,7 +64,7 @@
                 <label class="required" for="addTextboxModal-{{ component.instance.id }}-form-heading">Title</label>
                 <input id="addTextboxModal-{{ component.instance.id }}-form-heading" type="text" name="heading" value="" required maxlength="100" />
                 <input type="hidden" name="body" value="" />
-                <input type="submit" value="Create Textbox">
+                <input type="submit" value="Create Text Box">
             </section>
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </form>
@@ -216,7 +216,7 @@
                             .val(response.heading);
                         configForm.submit();
                     }).fail(function () {
-                        toast.toastTimeout({text: 'Could not create textbox', css: 'alert'});
+                        toast.toastTimeout({text: 'Could not create text box', css: 'alert'});
                     }).always(function () {
                         $submit.prop("disabled", false).text(submitText);
                     });
