@@ -39,6 +39,7 @@
                 onChange: self.onChange,
                 onOpen: self.onOpen,
                 onClose: self.onClose,
+                disableMobile: self.config.disableMobile
             });
 
             document.querySelector(".fc-quickSwitchButton-button").addEventListener('click', function (element) {
