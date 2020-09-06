@@ -343,7 +343,6 @@
                 }"
                 :event-time-format="helper.eventTimeFormat"
                 :content-height="this.contentHeight"
-                :height="'auto'"
                 :custom-buttons="{
                     customExport: {
                         text: 'Export',
