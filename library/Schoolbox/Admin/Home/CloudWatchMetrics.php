@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Home;
 
 use Alaress_Date_Format;
+use Aws\Api\DateTimeResult;
 use Aws\CloudWatch\CloudWatchClient;
 use function end;
 
@@ -58,12 +59,18 @@ class CloudWatchMetrics
             'Statistics' => ['Average'],
             'Unit'       => 'Bytes',
         ]);
-        $dataPoints          = $result->get('Datapoints');
-        $mostRecentDataPoint = end($dataPoints);
-        if (is_null($mostRecentDataPoint['Average'])){
-            return 0;
+
+        $bucketSize          = 0.0;
+        $mostRecentTimestamp = null;
+        foreach ($result->get('Datapoints') ?? [] as $dataPoint) {
+            /** @var DateTimeResult $timestamp */
+            $timestamp = $dataPoint['Timestamp'];
+            if ($mostRecentTimestamp === null || $timestamp->getTimestamp() > $mostRecentTimestamp) {
+                $mostRecentTimestamp = $timestamp->getTimestamp();
+                $bucketSize          = $dataPoint['Average'];
+            }
         }
-        return $mostRecentDataPoint['Average'];
+        return $bucketSize;
     }
 
 
