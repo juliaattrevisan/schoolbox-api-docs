@@ -29,9 +29,13 @@ interface TXRX
      * @param ITransaction $tx
      * @param mixed        $payload
      * @return void
-     * @throws InvalidArgumentException if the payload is in an unacceptable format
+     * @throws BadMethodCallException   if not correctly configured. May happen
+     *                                  if this object was constructed to allow
+     *                                  receipt only.
+     * @throws InvalidArgumentException if the payload is in an unacceptable
+     *                                  format.
      */
-    public function send($identifier, ITransaction $tx, $payload);
+    public function send($identifier, ITransaction $tx, $payload): void;
 
     /**
      * EXECUTED WORKER-SIDE
@@ -39,8 +43,12 @@ interface TXRX
      *
      * @param array $args
      * @return int
-     * @throws BadMethodCallException if not correctly configured
+     * @throws BadMethodCallException   if not correctly configured. May happen
+     *                                  if this object was constructed to allow
+     *                                  sending only.
+     * @throws InvalidArgumentException if args contains something that's not
+     *                                  acceptable (i.e. a user which cannot be
+     *                                  found).
      */
-    public function receive(array $args);
-
+    public function receive(array $args): int;
 }
