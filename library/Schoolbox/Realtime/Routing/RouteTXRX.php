@@ -153,7 +153,11 @@ class RouteTXRX implements TXRX
                     try {
                         $user = $this->mapper->findById($userId);
                     } catch (MapperException $e) {
-                        throw new InvalidArgumentException(sprintf('User #%d not found"', $userId), 0, $e);
+                        throw new InvalidArgumentException(
+                            sprintf('Cannot receive messages for missing user #%d', $userId),
+                            0,
+                            $e
+                        );
                     }
                     // if need to retract existing messages first, do so.
                     if ($instance->retractFirst()) {
