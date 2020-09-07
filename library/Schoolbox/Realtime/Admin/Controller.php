@@ -221,7 +221,6 @@ class Controller extends BaseController
         $post = $rq->post;
 
         $provider    = strtoupper($post->get('provider'));
-        $id          = trim($post->get('id', null));
         $appId       = trim($post->get('app'));
         $key         = trim($post->get('key'));
         $certificate = null;
@@ -256,7 +255,8 @@ class Controller extends BaseController
         $serviceMapper = MobileApp\ServiceMapper::getInstance();
 
         // Find the existing app, if one was passed
-        if (isset($id)) {
+        $id = trim($post->get('id', null));
+        if ($id) {
             $serviceModel = $serviceMapper->findById($id);
         } else {
             $serviceModel = $serviceMapper->createModel();
