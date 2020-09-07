@@ -13,6 +13,7 @@ use Alaress\WorkerCrew\Transaction\ITransaction;
 use Alaress\WorkerCrew\TXRX;
 use BadMethodCallException;
 use InvalidArgumentException;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\UserMapper;
 
@@ -85,14 +86,9 @@ class RouteTXRX implements TXRX
      * EXECUTED DAEMON-SIDE
      * Send the work from the daemon to the worker
      *
-     * @param Instance     $instance
-     * @param ITransaction $tx
-     * @param array        $userIds
-     * @throws InvalidArgumentException
-     * @throws BadMethodCallException if using the receiver variant
-     * @return void
+     * {@inheritDoc}
      */
-    public function send($instance, ITransaction $tx, $userIds)
+    public function send($instance, ITransaction $tx, $userIds): void
     {
         if (null === $this->listFactory) {
             throw new BadMethodCallException('Attempting to send using the receiver variant of RouteTXRX');
@@ -134,12 +130,9 @@ class RouteTXRX implements TXRX
      * EXECUTED WORKER-SIDE
      * Receive and process the work sent from the daemon
      *
-     * @param array $args
-     * @return int
-     * @throws BadMethodCallException if using the transmitter variant
-     * @throws \Schoolbox\Mapper\Exception if user doesn't exist or was deleted
+     * {@inheritDoc}
      */
-    public function receive(array $args)
+    public function receive(array $args): int
     {
         if (null === $this->mapper || null === $this->sorter) {
             throw new BadMethodCallException('Attempting to receive using the transmitter variant of RouteTXRX');
@@ -152,12 +145,16 @@ class RouteTXRX implements TXRX
          * @var  int $userId
          * @var  string $type
          */
-        foreach ($args as list($instance, $userId, $type)) {
+        foreach ($args as [$instance, $userId, $type]) {
             $count = 0;
             switch ($type) {
                 case self::TYPE_USER:
                     // this is the payload from $tx->put() above
-                    $user = $this->mapper->findById($userId);
+                    try {
+                        $user = $this->mapper->findById($userId);
+                    } catch (MapperException $e) {
+                        throw new InvalidArgumentException(sprintf('User #%d not found"', $userId), 0, $e);
+                    }
                     // if need to retract existing messages first, do so.
                     if ($instance->retractFirst()) {
                         // no need to clone, but just in case
