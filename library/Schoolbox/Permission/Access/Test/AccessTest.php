@@ -368,7 +368,7 @@ class AccessTest extends TestCase
             [self::FOLDER_2_ID, self::ROLE_3_ID, UserAccess::ACCESS_FULL],
         ];
         $access    = $this->newAccess(null, null, null, null, null, null, $rolePerms);
-        $user      = (new User)->setRole((new Role())->setId(self::ROLE_3_ID));
+        $user      = (new User())->setId(self::USER_1_ID)->setRole((new Role())->setId(self::ROLE_3_ID));
 
         $this->assertSame(UserAccess::ACCESS_FULL, $access->getFolderAccess($user, self::FOLDER_2_ID));
     }
