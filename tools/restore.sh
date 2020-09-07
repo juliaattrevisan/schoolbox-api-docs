@@ -585,7 +585,7 @@ function restore_pre_v20.1_config_dirs(){
   local xml_dir;
   local file_dir;
   if [[  "$(echo -e "20.1.alpha1\n${sql_ver}" | sort -V | head -n 1)" != "20.1.alpha1"  ]]; then
-    echo "Restored DB is older than normalisation script. Try to restore previous value, or set new sane value if previous value not available"
+    echo "Restored schema is older than this normalisation script. Trying to restore previous local data_dir values, or set new sane values if previous local values are not available"
 
     if [[ -n "$temp_sql_xml_dir" ]]; then
       xml_dir=$temp_sql_xml_dir
