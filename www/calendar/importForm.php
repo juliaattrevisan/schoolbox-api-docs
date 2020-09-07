@@ -32,8 +32,9 @@ if ($groupHandler->getPermission($_POST['homepageId']) < UserAccess::ACCESS_WRIT
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($_POST['homepageId']);
 
-
-        if (isset($_POST['attachment'])) {
+        /* A file is mandatory
+         */
+        if (isset($_POST['attachment']) && null !== $_POST['attachment']) {
             $factory = new CollectorFactory();
             try {
                 /** @var Storage\Model $result */

@@ -1,3 +1,25 @@
+<script>
+    $(function() {
+        $('#uploadForm').alaressValidate({
+            rules: {
+                attachedFile: {
+                    required: {
+                        depends: function (element) {
+                            return !$(element).parents('form').find('input[name="attachment[]"]').length;
+                        }
+                    }
+                }
+            },
+            messages: {
+                attachedFile: "Please attach a file."
+            }
+        });
+
+        $('#upload-calendar-zone').on('success.attachzone', function(event, file) {
+            $('#attachedFile-error').remove();
+        });
+    });
+</script>
 {BREADCRUMB}
 <div class="row actions-small-1">
     <div class="list-item">
@@ -20,10 +42,11 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
+                        <label class="required">
                             Import File
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Upload a Microsoft Outlook .ics file or a CSV file, sample available in heading menu">?</span>
                         </label>
+                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Upload a Microsoft Outlook .ics file or a CSV file, sample available in heading menu">?</span>
+                        <input type="hidden" name="attachedFile">
                         {ATTACHZONE}
                     </div>
                 </fieldset>
