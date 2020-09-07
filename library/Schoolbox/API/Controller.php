@@ -100,8 +100,8 @@ class Controller extends Base
         }
 
         // Authenticate, and if so register app
-        if ($this->authenticate($this->request->post->getArrayCopy())) {
-            $sessionUser = $this->getUser();
+        $sessionUser = $this->authenticate($this->request->post->getArrayCopy());
+        if ($sessionUser) {
 
             // token may be absent or blank, in which case we don't store anything in the registry
             $token = $this->request->post->get('token');
@@ -147,7 +147,7 @@ class Controller extends Base
                 }
             }
 
-            $this->response->content->set($this->buildAuthenticatedJsonOutput($this->getUser()));
+            $this->response->content->set($this->buildAuthenticatedJsonOutput($sessionUser));
         }
     }
 
@@ -161,9 +161,10 @@ class Controller extends Base
      */
     public function initSession(): void
     {
-        if ($this->authenticate($this->request->post->getArrayCopy())) {
+        $sessionuser = $this->authenticate($this->request->post->getArrayCopy());
+        if ($sessionuser) {
             if ($this->isJsonRequest()) {
-                $this->response->content->set($this->buildAuthenticatedJsonOutput($this->getUser()));
+                $this->response->content->set($this->buildAuthenticatedJsonOutput($sessionuser));
             } else {
                 // Redirect somewhere (locally only?)
                 $page = $this->getRequest()->query->get('redirect');
@@ -186,48 +187,43 @@ class Controller extends Base
      * @noinspection PhpDocMissingThrowsInspection Spurious exception raised by setCode
      *
      * @param array $postData A copy of the POST data passed to the form
-     * @return bool Was a user auth session created?
-     *              If it wasn't, JSON should have been put into the response.
+     * @return User|null The user who was authenticated, or null if they could
+     *                   not be.
      */
-    private function authenticate(array $postData): bool
+    private function authenticate(array $postData): ?User
     {
         try {
             if (isset($postData['username'], $postData['password'])) {
-                $this->authenticateViaPostData($postData['username'], $postData['password']);
-            } elseif (isset($postData['jwt'])) {
-                $this->authenticateViaJwt($postData['jwt']);
-            } else {
-                /** @noinspection PhpUnhandledExceptionInspection */
-                $this->response->status->setCode(400);
-                $this->response->content->set(
-                    $this->buildJsonOutput([
-                        'required' => 'Either the "username" and "password" or the "jwt" POST fields must be set',
-                    ])
-                );
-                return false;
+                return $this->authenticateViaPostData($postData['username'], $postData['password']);
             }
+            if (isset($postData['jwt'])) {
+                return $this->authenticateViaJwt($postData['jwt']);
+            }
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $this->response->status->setCode(400);
+            $this->response->content->set(
+                $this->buildJsonOutput([
+                    'required' => 'Either the "username" and "password" or the "jwt" POST fields must be set',
+                ])
+            );
         } catch (SchoolboxAccessDeniedException $e) {
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(401);
             $this->response->content->set($this->buildJsonOutput('Invalid username or password'));
-            return false;
         } catch (SchoolboxAccountDisabledException $e) {
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(400);
             $this->response->content->set($this->buildJsonOutput('Account disabled'));
-            return false;
         } catch (SchoolboxNotFoundException $e) {
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(400);
             $this->response->content->set($this->buildJsonOutput('User not found'));
-            return false;
         } catch (SchoolboxPasswordExpiredException $e) {
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(400);
             $this->response->content->set($this->buildJsonOutput('Password has expired'));
-            return false;
         }
-        return true;
+        return null;
     }
 
 
