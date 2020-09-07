@@ -35,7 +35,7 @@ interface TXRX
      * @throws InvalidArgumentException if the payload is in an unacceptable
      *                                  format.
      */
-    public function send($identifier, ITransaction $tx, $payload): void;
+    public function send($identifier, ITransaction $tx, $payload);
 
     /**
      * EXECUTED WORKER-SIDE
@@ -47,8 +47,8 @@ interface TXRX
      *                                  if this object was constructed to allow
      *                                  sending only.
      * @throws InvalidArgumentException if args contains something that's not
-     *                                  acceptable (i.e. a user which cannot be
-     *                                  found).
+     *                                  acceptable.
      */
-    public function receive(array $args): int;
+    public function receive(array $args);
+
 }

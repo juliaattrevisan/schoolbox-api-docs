@@ -88,7 +88,7 @@ class RouteTXRX implements TXRX
      *
      * {@inheritDoc}
      */
-    public function send($instance, ITransaction $tx, $userIds): void
+    public function send($instance, ITransaction $tx, $userIds)
     {
         if (null === $this->listFactory) {
             throw new BadMethodCallException('Attempting to send using the receiver variant of RouteTXRX');
@@ -132,7 +132,7 @@ class RouteTXRX implements TXRX
      *
      * {@inheritDoc}
      */
-    public function receive(array $args): int
+    public function receive(array $args)
     {
         if (null === $this->mapper || null === $this->sorter) {
             throw new BadMethodCallException('Attempting to receive using the transmitter variant of RouteTXRX');
