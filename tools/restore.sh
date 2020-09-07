@@ -583,7 +583,7 @@ function restore_pre_v20.1_config_dirs(){
   readsqlver;
   local sql_ver="$tempsqlver";
   local xml_dir;
-  local file_dir,
+  local file_dir;
   if [[  "$(echo -e "20.1.alpha1\n${sql_ver}" | sort -V | head -n 1)" != "20.1.alpha1"  ]]; then
     echo "Restored DB is older than normalisation script. Try to restore previous value, or set new sane value if previous value not available"
 
