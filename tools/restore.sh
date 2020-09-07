@@ -557,7 +557,7 @@ then
 fi
 echo "Restoring database '$sourcedb'";
 ## Restore specified database (commenting out VIEW DEFINER clause on the fly)
-cat $sourcedb | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb
+cat $sourcedb | pv -s "$(du -b "$sourcedb" | cut -f 1)" | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb
 
 # Move data files to correct location if restoring from backup
 if [ "$sourceloc" = '[B]' ];
