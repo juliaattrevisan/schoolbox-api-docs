@@ -243,8 +243,7 @@ class Controller extends Base
      */
     private function authenticateViaPostData(string $username, string $password): User
     {
-        $this->auth->authenticate($username, $password, true);
-        return $this->getUser();
+        return $this->auth->authenticate($username, $password, true);
     }
 
 
@@ -273,7 +272,7 @@ class Controller extends Base
         );
         $user        = $tokenParser->findUserFromToken($jwt);
         $this->auth->createSession($user->getUsername(), true);
-        return $this->getUser();
+        return $user;
     }
 
 
