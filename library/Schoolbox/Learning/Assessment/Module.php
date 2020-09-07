@@ -555,6 +555,7 @@ class Module extends BaseModule
     private function buildAuthRuleCanAcknowledgeSubmission()
     {
         return new Rule\All(
+            new Rule\IsLoggedIn(),
             new ValidAssessmentType([AssessmentType::TYPE_DUE_WORK]),
             new Rule\Any(
                 new Rule\All(
