@@ -133,21 +133,21 @@ class Event implements ISoftDeletable
     /**
      * Title of the event
      *
-     * @var string
+     * @var string|null
      */
     protected $title = '';
 
     /**
      * A description of the event
      *
-     * @var string
+     * @var string|null
      */
     protected $detail = '';
 
     /**
      * Where the event is being held
      *
-     * @var string
+     * @var string|null
      */
     protected $location = '';
 
@@ -573,10 +573,10 @@ class Event implements ISoftDeletable
     /**
      * Set detail
      *
-     * @param string $detail
+     * @param string|null $detail
      * @return $this
      */
-    public function setDetail(string $detail): self
+    public function setDetail(?string $detail): self
     {
         $this->detail = $detail;
         return $this;
@@ -585,9 +585,9 @@ class Event implements ISoftDeletable
     /**
      * Get detail
      *
-     * @return string
+     * @return string|null
      */
-    public function getDetail(): string
+    public function getDetail(): ?string
     {
         return $this->detail;
     }
@@ -644,10 +644,10 @@ class Event implements ISoftDeletable
     /**
      * Set location
      *
-     * @param string $location
+     * @param string|null $location
      * @return $this
      */
-    public function setLocation(string $location): self
+    public function setLocation(?string $location): self
     {
         $this->location = $location;
         return $this;
@@ -656,9 +656,9 @@ class Event implements ISoftDeletable
     /**
      * Get location
      *
-     * @return string
+     * @return string|null
      */
-    public function getLocation(): string
+    public function getLocation(): ?string
     {
         return $this->location;
     }
@@ -666,10 +666,10 @@ class Event implements ISoftDeletable
     /**
      * Set title
      *
-     * @param string $title
+     * @param string|null $title
      * @return $this
      */
-    public function setTitle(string $title): self
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
 
@@ -679,9 +679,9 @@ class Event implements ISoftDeletable
     /**
      * Get title
      *
-     * @return string
+     * @return string|null
      */
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
