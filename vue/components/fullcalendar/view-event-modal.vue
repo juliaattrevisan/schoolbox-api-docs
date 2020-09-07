@@ -796,7 +796,22 @@
                     </section>
                 </div>
             </template>
+            <!--
+            When using reveal-modal.vue, all <template v-if> usages *must* have <template v-else>
+            This is something to do with the vue/jquery/foundation modal crossover that we have
+            because it happens only in our reveal-modal.vue usage (something might be broken there
+            but digging deeper into this.modal init suggests there's something else going on in
+            either jquery or foundation itself, as that syntax/usage seems fine)
+
+            Interestingly someone else encountered it differently but had the same solution:
+            https://stackoverflow.com/questions/50662851/v-if-not-working-on-template
+
+            ...despite the official docs saying that the v-else is optional:
+            https://vuejs.org/v2/guide/conditional.html#Conditional-Groups-with-v-if-on-lt-template-gt
+            -->
+            <template v-else></template>
         </template>
+
 
         <!-- Modals within a modal you say? Sure, why not? -->
         <reveal-modal ref="eventDeleteModal">
