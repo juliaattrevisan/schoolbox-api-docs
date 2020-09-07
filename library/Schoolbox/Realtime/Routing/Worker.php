@@ -53,16 +53,9 @@ class Worker extends AbstractProcess
         }
 
         $this->log->debug(sprintf('Iterating %d frame%s provided', count($args), count($args) === 1 ? '' : 's'));
-        try {
-            $count = $this->txrx->receive($args);
-        } catch (InvalidArgumentException $e) {
-            // Probably couldn't find the user in the audience:
-            // raise a notice, but don't error out as there's naught that can be
-            // done to fix this.
-            $this->log->notice($e->getMessage(), ['exception' => $e]);
-            return 0;
-        }
+        $count = $this->txrx->receive($args);
         $this->log->info("Rerouted $count message" . ($count === 1 ? '' : 's'));
+
         return $count;
     }
 
