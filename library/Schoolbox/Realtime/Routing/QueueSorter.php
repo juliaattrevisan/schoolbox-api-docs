@@ -70,7 +70,7 @@ class QueueSorter implements FilterInterface
     {
         $this->log->notice(
             sprintf(
-                'DROP %s:%s -> user %d is missing',
+                'DROP %s:%s -> user %d: user does not exist or was deleted',
                 $instance->getBaseHash(),
                 $instance->getParamHash(),
                 $userId
