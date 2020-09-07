@@ -467,7 +467,15 @@ class Controller extends BaseController
         bool $recurseYearLevels,
         User $user
     ): Model {
-        $folder->setName($name);
+
+        /* Folders must have a name
+         */
+        $folder->setName(trim($name));
+
+        if ('' === $folder->getName()) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+
         $homepageTemplate = $this->buildHomepageTemplate($folder, $templateId);
 
         // Either user is SU, or insertion of new Folder, or Folder did not have Class Codes
