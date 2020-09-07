@@ -153,12 +153,12 @@ class RouteTXRX implements TXRX
                     try {
                         $user = $this->mapper->findById($userId);
                     } catch (MapperException $e) {
-                        throw new InvalidArgumentException(
-                            sprintf('Cannot receive messages for missing user #%d', $userId),
-                            0,
-                            $e
-                        );
+                        // User is missing?
+                        // Tell the sorter to handle that somehow
+                        $this->sorter->processForMissingUser($userId, $instance);
+                        break;
                     }
+
                     // if need to retract existing messages first, do so.
                     if ($instance->retractFirst()) {
                         // no need to clone, but just in case

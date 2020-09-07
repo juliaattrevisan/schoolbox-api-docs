@@ -58,6 +58,28 @@ class QueueSorter implements FilterInterface
 
 
     /**
+     * Process a message for a missing user.
+     *
+     * This currently does nothing besides raise a log message that the given
+     * user ID is missing.
+     *
+     * @param int      $userId
+     * @param Instance $instance
+     */
+    public function processForMissingUser(int $userId, Instance $instance): void
+    {
+        $this->log->notice(
+            sprintf(
+                'DROP %s:%s -> user %d is missing',
+                $instance->getBaseHash(),
+                $instance->getParamHash(),
+                $userId
+            )
+        );
+    }
+
+
+    /**
      * @param User     $user
      * @param Instance $instance
      * @return bool
