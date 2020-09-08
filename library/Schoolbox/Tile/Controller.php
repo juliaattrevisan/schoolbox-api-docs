@@ -358,9 +358,16 @@ class Controller extends Base
      *
      * @param Model        $item The tile to update
      * @param \ArrayObject $post An array-like object that abstracts $_POST
+     * @throws \Exception if the title text min/max size is missing, or the
+     *                    background image can't be set
      */
     private function updateItemWithFormValues(Model $item, $post)
     {
+        // Generic error if title text min/max size are not set
+        if ($post['title_text_min_size'] === '' || $post['title_text_max_size'] === '') {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+
         $colorFactory = new ColorFactory();
         $item
             ->setTitleText($post['title_text'])
