@@ -1,4 +1,7 @@
 {% autoescape 'css' %}
+{% set customCss = config.skin_custom_css ?? '' %}
+{{ customCss | raw }}
+
 :root {
     {% for configKey, colorOptions in colors %}
         {{ colorOptions.cssVar | raw }}-r: {{ colorOptions.r }};
@@ -16,6 +19,4 @@
         );
     {% endfor %}
 }
-{% set customCss = config.skin_custom_css ?? '' %}
-{{ customCss | raw }}
 {% endautoescape %}
