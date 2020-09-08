@@ -265,17 +265,7 @@ class Controller extends BaseController
             $folder->enableInherit();
         }
 
-        /* Current user's permission level on this folder
-         * If the folder already exists, use the usual getFolderAccess method on it
-         * Otherwise, check that you have CMS Permissions in particular
-         */
-        if ($folder->getId()) {
-            $userAccess = $this->access->getFolderAccess($this->getUser(), $permissionFolder);
-        } else {
-            $userAccess = $this->access->getAccessLevel($this->getUser(), UserAccess::SERVICE_CMS);
-        }
-
-        $canChangeClassCodes = $userAccess === UserAccess::ACCESS_FULL || $this->getUser()->isSuperuser();
+        $canChangeClassCodes = $this->getUser()->isSuperuser() || $this->access->getAccessLevel($this->getUser(), UserAccess::SERVICE_CMS) === UserAccess::ACCESS_FULL;
 
         $this->getResponse()->content->set(
             [
@@ -299,7 +289,7 @@ class Controller extends BaseController
                     'write'               => UserAccess::ACCESS_WRITE,
                     'moderate'            => UserAccess::ACCESS_FULL,
                     'coverImageZone'      => $zone->getTwigContext(),
-                    'editYearLevelUsage'  => $this->getUser()->isSuperuser(),
+                    'editYearLevelUsage'  => $canChangeClassCodes,
                     'yearLevelOptions'    => $yearLevelOptions,
                     'yearLevelValues'     => $yearLevelValues,
                 ],
@@ -522,17 +512,7 @@ class Controller extends BaseController
             $folder->setColour(null);
         }
 
-        /* Current user's permission level on this folder
-         * If the folder already exists, use the usual getFolderAccess method on it
-         * Otherwise, check that you have CMS Permissions in particular
-         */
-        if ($folder->getId()) {
-            $userAccess = $this->access->getFolderAccess($this->getUser(), $folder->getId());
-        } else {
-            $userAccess = $this->access->getAccessLevel($this->getUser(), UserAccess::SERVICE_CMS);
-        }
-
-        $canChangeClassCodes = $userAccess === UserAccess::ACCESS_FULL || $user->isSuperuser();
+        $canChangeClassCodes = $this->getUser()->isSuperuser() || $this->access->getAccessLevel($this->getUser(), UserAccess::SERVICE_CMS) === UserAccess::ACCESS_FULL;
 
         // Validate class codes (prior to saving anything)
         if ($canChangeClassCodes && !$folder->getInherit()) {
@@ -550,7 +530,7 @@ class Controller extends BaseController
         }
 
         // Only superusers get to change year levels
-        if ($user->isSuperuser()) {
+        if ($canChangeClassCodes) {
             $this->updateFolderYearLevels($folder, $yearLevelIds);
         }
 
