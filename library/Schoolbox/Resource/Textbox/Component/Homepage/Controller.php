@@ -19,9 +19,16 @@ use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 class Controller extends Component_Homepage_ControllerAbstract
 {
     /**
+     * Default heading for this component.
+     */
+    private const DEFAULT_COMPONENT_HEADING = 'Text Box';
+
+
+    /**
      * @var \Schoolbox\Resource\Textbox\Model
      */
     private $textbox;
+
 
     /**
      * Prepares data for the render function. Business logic.
@@ -46,7 +53,22 @@ class Controller extends Component_Homepage_ControllerAbstract
             $this->textbox = $textboxMapper
                 ->createModel()
                 ->setCategory(FolderMapper::getInstance()->createModel()->setId($this->getSource()->getId()));
-            $this->setComponentName('Text Box');
+        }
+
+        // Set the component heading. In order of preference:
+        // * heading from config
+        // * textbox's name
+        // * self::DEFAULT_COMPONENT_HEADING
+        $headingCandidates = [
+            $this->getConfig('componentname'),
+            $this->textbox->getHeading(),
+            self::DEFAULT_COMPONENT_HEADING,
+        ];
+        foreach ($headingCandidates as $candidate) {
+            if (isset($candidate) && $candidate !== '') {
+                $this->setComponentName($candidate);
+                break;
+            }
         }
 
         return true;
