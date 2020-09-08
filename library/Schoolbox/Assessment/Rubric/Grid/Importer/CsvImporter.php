@@ -171,11 +171,9 @@ class CsvImporter implements IImporter
                 $descriptorNames  = array_slice($this->square[$i], 2);
                 $descriptorValues = $this->square[$i + 1] ? array_slice($this->square[$i + 1], 2) : null;
                 $descriptors      = [];
-                $indicatorInUse   = false;
                 foreach ($descriptorNames as $level => $descriptorName) {
                     $descriptorValue = $descriptorValues[$level] ?? '';
                     if (!($descriptorName === '' && $descriptorValue === '')) {
-                        $indicatorInUse      = true;
                         $descriptors[$level] = [
                             'name'  => $descriptorName,
                             'value' => filter_var($descriptorValue, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE),
@@ -185,13 +183,12 @@ class CsvImporter implements IImporter
                     }
                 }
 
-                // Don't use the indicator if it has no descriptors
-                if ($indicatorInUse) {
-                    $result[] = [
-                        'name'        => $indName,
-                        'descriptors' => $descriptors,
-                    ];
-                }
+                // As of SA-11047, indicators are always used;
+                // even if they have no descriptors
+                $result[] = [
+                    'name'        => $indName,
+                    'descriptors' => $descriptors,
+                ];
             }
         }
         return $result;
