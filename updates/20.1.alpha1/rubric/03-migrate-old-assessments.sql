@@ -16,8 +16,7 @@ WHERE _rubric_mark_per_capability = 1;
 -- the elected Capability Mark Type
 
 UPDATE submission_box
-SET rubric_capability_mark_type_id = (SELECT mark_type_id FROM submission_mark_type WHERE slug = 'none'),
-    rubric_capability_grade_group_id = submission_grade_group_id
+SET rubric_capability_mark_type_id = (SELECT mark_type_id FROM submission_mark_type WHERE slug = 'none')
 WHERE _rubric_mark_per_capability = 0 OR _rubric_mark_per_capability IS NULL;
 
 # TODO: tigs might have done something with their Due Works that makes the above query incorrect
