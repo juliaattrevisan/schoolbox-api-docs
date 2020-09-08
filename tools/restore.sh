@@ -111,6 +111,7 @@ readsqlconfig() {
 
 	temp_sql_xml_dir=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='xml_dir'" 2>/dev/null);
 	temp_sql_file_dir=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='file_dir'" 2>/dev/null);
+  temp_otfs_verify_previous_file=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='otfs_verify_previous_file'" 2>/dev/null);
 }
 
 setsqlconfig() {
@@ -151,7 +152,7 @@ setsqlconfig() {
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapuseralt' WHERE name='ldap_user_alt'";
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapbasealt' WHERE name='ldap_base_alt'";
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapusername' WHERE name='ldap_username'";
-
+  mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "UPDATE config SET value='$temp_otfs_verify_previous_file' WHERE name='otfs_verify_previous_file'";
 }
 
 truncateTables() {
