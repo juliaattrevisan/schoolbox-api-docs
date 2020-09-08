@@ -254,9 +254,15 @@ class Controller extends BaseController
 
         $serviceMapper = MobileApp\ServiceMapper::getInstance();
 
+        // Find the existing app, if one was passed
+        $id = trim($post->get('id', null));
+        if ($id) {
+            $serviceModel = $serviceMapper->findById($id);
+        } else {
+            $serviceModel = $serviceMapper->createModel();
+        }
         $serviceMapper->save(
-            $serviceMapper
-                ->createModel()
+            $serviceModel
                 ->setAppIdentifier($appId)
                 ->setProviderName($provider)
                 ->setKey($key)

@@ -31,9 +31,10 @@ class Authenticator
      * @param string $username
      * @param string $password
      * @param bool   $remember
+     * @return User
      * @throws SchoolboxAccessDeniedException
      */
-    public function authenticate(string $username, string $password, bool $remember = false): void
+    public function authenticate(string $username, string $password, bool $remember = false): User
     {
         $s    = new Session();
         $user = $s->authenticate($username, $password);
@@ -44,9 +45,9 @@ class Authenticator
         // if successful, go ahead and create a session
         if ($this->isAuthenticated()) {
             $this->createSession($user->getUsername(), $remember);
-        } else {
-            throw new SchoolboxAccessDeniedException('Username or password is incorrect');
+            return $user;
         }
+        throw new SchoolboxAccessDeniedException('Username or password is incorrect');
     }
 
     /**
@@ -55,11 +56,12 @@ class Authenticator
      * @param string $username
      * @param string $password
      * @param bool   $remember
+     * @return User
      */
-    public function reauthenticate(string $username, string $password, bool $remember = false): void
+    public function reauthenticate(string $username, string $password, bool $remember = false): User
     {
         $this->authenticated = false;
-        $this->authenticate($username, $password, $remember);
+        return $this->authenticate($username, $password, $remember);
     }
 
     /* Session Functions */
