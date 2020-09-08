@@ -409,6 +409,23 @@ class Access
      */
     public function getFolderAccess(User $user, int $folderId, $cache = true): int
     {
+
+        /* $user can be an empty object stub
+         * In that case, no primary identifier is ACCESS_DENY
+         * We don't know who you are
+         */
+        if (null === $user->getId()) {
+            return UserAccess::ACCESS_DENY;
+        }
+
+        /* Also a missing role id is cause for ACCESS_DENY
+         * because we can't identify your roletype for whatever reasons
+         * We don't know if you can have access to anything
+         */
+        if (null === $user->getRole()->getId()) {
+            return UserAccess::ACCESS_DENY;
+        }
+
         // 1. Superusers always have full access if folder exists
         if ($user->isSuperuser()) {
             return UserAccess::ACCESS_FULL;

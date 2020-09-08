@@ -6,7 +6,6 @@
  */
 namespace Schoolbox\Learning\Assessment;
 
-use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -89,8 +88,6 @@ class Module extends BaseModule
      *
      * @return void
      * @throws InvalidArgumentException
-     * @throws NotFound
-     * @throws InvalidPath
      */
     protected function registerRoutes()
     {
@@ -195,7 +192,6 @@ class Module extends BaseModule
      * @throws ApplicationException\Exception If assessment is not found
      * @throws DomainException If user has interaction but not participant record
      * @throws InvalidArgumentException If assessment class not registered
-     * @throws InvalidPath
      * @throws LogicException If cyclic graph detected
      * @throws Mapper\DefinitionException If a specified join mapper is not found
      * @throws NotFound
@@ -555,6 +551,7 @@ class Module extends BaseModule
     private function buildAuthRuleCanAcknowledgeSubmission()
     {
         return new Rule\All(
+            new Rule\IsLoggedIn(),
             new ValidAssessmentType([AssessmentType::TYPE_DUE_WORK]),
             new Rule\Any(
                 new Rule\All(
@@ -611,22 +608,25 @@ class Module extends BaseModule
      */
     private function buildAuthRuleHasInstructorAccess(): Rule\IAuthorizationRule
     {
-        return new IsInstructor(
-            $this->getAccess(),
-            static function (array $params): FolderModel
-            {
-                if (isset($params['assessment'])) {
-                    $ctx = $params['assessment']->getContext()->getFolder();
-                } elseif (isset($params['participant'])) {
-                    $ctx = $params['participant']->getAssessable()->getContext()->getFolder();
-                } elseif (isset($params['context'])) {
-                    $ctx = $params['context']->getFolder();
-                } else {
-                    throw new NotFound('No assessment or context preloaded');
-                }
+        return new Rule\All(
+            new Rule\IsLoggedIn(),
+            new IsInstructor(
+                $this->getAccess(),
+                static function (array $params): FolderModel
+                {
+                    if (isset($params['assessment'])) {
+                        $ctx = $params['assessment']->getContext()->getFolder();
+                    } elseif (isset($params['participant'])) {
+                        $ctx = $params['participant']->getAssessable()->getContext()->getFolder();
+                    } elseif (isset($params['context'])) {
+                        $ctx = $params['context']->getFolder();
+                    } else {
+                        throw new NotFound('No assessment or context preloaded');
+                    }
 
-                return $ctx;
-            }
+                    return $ctx;
+                }
+            )
         );
     }
 
@@ -638,8 +638,6 @@ class Module extends BaseModule
      *
      * @return Rule\IAuthorizationRule
      * @throws InvalidArgumentException If required route param not found
-     * @throws InvalidPath If URL does not exist for this user
-     * @throws NotFound
      */
     private function buildAuthRuleCanViewSummary(): Rule\IAuthorizationRule
     {
