@@ -745,22 +745,27 @@
             <template v-if="hasComponentActions()">
                 <div class="component-action">
                     <section>
-                        <div v-if="this.canRsvp(
+                        <template v-if="this.canRsvp(
                                     eventExtendedProps.attendance.payload.level,
                                     eventExtendedProps.attendance.payload.attendees.guests,
                                     eventExtendedProps.attendance.payload.currentUser.user.id,
                                     eventExtendedProps.attendance.payload.currentUser.status,
                                     eventExtendedProps.attendance.payload.attendees.max,
-                                    eventExtendedProps.attendance.payload.attendees.available)" :class="'rsvp'">
-                            <span :class="'attend-label'">Attending?</span>
-                            <span>
-                                <a :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.payload.currentUser.status) }" data-rsvp="accept">Yes</a>
-                            </span>
-                            <span>
-                                <a :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)" @click.prevent="rsvpDecline" :class="{ button: true, declined: this.isDeclined(eventExtendedProps.attendance.payload.currentUser.status) }" data-rsvp="decline">No</a>
-                            </span>
-                        </div>
+                                    eventExtendedProps.attendance.payload.attendees.available)">
+                            <div :class="'rsvp'">
+                                <span :class="'attend-label'">Attending?</span>
+                                <span>
+                                    <a :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.payload.currentUser.status) }" data-rsvp="accept">Yes</a>
+                                </span>
+                                <span>
+                                    <a :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)" @click.prevent="rsvpDecline" :class="{ button: true, declined: this.isDeclined(eventExtendedProps.attendance.payload.currentUser.status) }" data-rsvp="decline">No</a>
+                                </span>
+                            </div>
+                        </template>
+                        <template v-else></template>
+
                         <span class="spacer"></span>
+
                         <div>
                             <!-- Various buttons -->
                             <span v-if="eventExtendedProps.folder.id">
@@ -796,7 +801,22 @@
                     </section>
                 </div>
             </template>
+            <!--
+            When using reveal-modal.vue, all <template v-if> usages *must* have <template v-else>
+            This is something to do with the vue/jquery/foundation modal crossover that we have
+            because it happens only in our reveal-modal.vue usage (something might be broken there
+            but digging deeper into this.modal init suggests there's something else going on in
+            either jquery or foundation itself, as that syntax/usage seems fine)
+
+            Interestingly someone else encountered it differently but had the same solution:
+            https://stackoverflow.com/questions/50662851/v-if-not-working-on-template
+
+            ...despite the official docs saying that the v-else is optional:
+            https://vuejs.org/v2/guide/conditional.html#Conditional-Groups-with-v-if-on-lt-template-gt
+            -->
+            <template v-else></template>
         </template>
+
 
         <!-- Modals within a modal you say? Sure, why not? -->
         <reveal-modal ref="eventDeleteModal">
