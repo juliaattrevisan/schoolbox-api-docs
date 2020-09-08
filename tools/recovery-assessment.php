@@ -20,11 +20,16 @@ $app = new class extends CliTool\App
     public function run(): void
     {
         $db      = $this->getDatabaseInternal();
-        $assessmentQuery = $db->prepareQuery('SELECT id, rubric_capability_mark_type_id, rubric_capability_grade_group_id FROM submission_box WHERE use_rubric = 1');
+        $assessmentQuery = $db->prepareQuery('SELECT id, rubric_capability_mark_type_id, rubric_capability_grade_group_id FROM submission_box WHERE use_rubric = 1 AND _rubric_mark_per_capability=1');
         $assessmentQuery->execute();
 
         while($row = $assessmentQuery->fetch()) {
-            printf("UPDATE submission_box SET rubric_capability_mark_type_id = %d, rubric_capability_grade_group_id = %d WHERE id = %d;\n", $row['rubric_capability_mark_type_id'], $row['rubric_capability_grade_group_id'], $row['id']);
+            if($row['rubric_capability_grade_group_id']) {
+                printf("UPDATE submission_box SET rubric_capability_mark_type_id = %d, rubric_capability_grade_group_id = %d WHERE id = %d;\n", $row['rubric_capability_mark_type_id'], $row['rubric_capability_grade_group_id'], $row['id']);
+            }
+            else {
+                printf("UPDATE submission_box SET rubric_capability_mark_type_id = %d WHERE id = %d;\n", $row['rubric_capability_mark_type_id'], $row['id']);
+            }
         }
     }
 };
