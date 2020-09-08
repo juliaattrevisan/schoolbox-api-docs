@@ -253,6 +253,16 @@ class UserMapper extends Mapper
      */
     public function updateCommunityPortalPassword(User $model)
     {
+        /* User must have an externalId for community portal changes
+         * getExternalId can return nulls so check for that too
+         */
+        if ('' === (string)$model->getExternalId()) {
+            return;
+        }
+
+        /* Parents can get their community portal password changed
+         * using the externalId and password they supplied
+         */
         if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
             $this->retrieveExternalCommunityPortal()->changePassword(
                 $model->getExternalId(),
