@@ -60,7 +60,14 @@ then
     exit;
 fi
 
-backupdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='backup_dir' \G;" | grep 'value' | cut -d' ' -f2`;
+if [[ "$(echo -e "20.1.alpha1\n${sqlver}" | sort -V | head -n 1)" != "20.1.alpha1" ]]; then
+  # DB schema is < 20.1.alpha1
+  backup_dir_name='file_dir'
+else
+  # DB schema is >= 20.1.alpha1
+  backup_dir_name='backup_dir'
+fi
+backupdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='$backup_dir_name' \G;" | grep 'value' | cut -d' ' -f2`;
 backupdir=`readlink -f $backupdir/../`
 if [ "$backupdir" == "" ];
 then
@@ -147,7 +154,7 @@ then
 fi
 
 # Only run DB backup if not completed in the last hour
-existingbackup=$(ls -1 $backupdir/$sqlver-`date +%Y-%m-%d_%H-`*.sql 2>/dev/null);
+existingbackup=$(find $backupdir -mindepth 1 -maxdepth 1 -name "$sqlver-$(date +%Y-%m-%d_%H-)*.sql" | head -n 1);
 if [[ (-f $existingbackup) && (! -z $existingbackup) ]];
 then
     echo "Backup already completed";
