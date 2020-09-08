@@ -51,6 +51,8 @@ class Factory
     /**
      * Build an attachzone with any Attached Files preloaded into the attachzone
      *
+     * @deprecated Tasks no longer have attachzones
+     *
      * @param Task $task
      * @return Zone
      */
@@ -70,12 +72,9 @@ class Factory
             $zone->attachFiles([$hash]);
 
             /* Ram in an actual file instance to the task
-             * Clear url field Since this is really about files now
              */
             try {
-                $task
-                    ->setAttachedFile(StorageMapper::getInstance()->findByHash($hash))
-                    ->setUrl('');
+                $task->setAttachedFile(StorageMapper::getInstance()->findByHash($hash));
             }
             catch (MapperException $e) {
                 /* noop (pretend file didn't exist if it couldn't be findByHash()'d)
