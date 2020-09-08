@@ -8,7 +8,7 @@ SELECT
     sb.mark_type                  AS assessment_mark_type,
     sb.max_mark                   AS assessment_max_mark,
     sb.submission_grade_group_id  AS assessment_grade_group_id,
-    sb.rubric_mark_per_capability AS assessment_mark_per_capability,
+    sb._rubric_mark_per_capability AS assessment_mark_per_capability,
     a.weight                      AS assessment_weight,
 
     -- Rubric capability fields
