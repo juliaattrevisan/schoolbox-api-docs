@@ -71,6 +71,9 @@
 
         form.alaressValidate({
             rules: {
+                'name': {
+                    requiredNotBlank: true
+                },
                 'code': {
                     checkCodes: true
                 },
