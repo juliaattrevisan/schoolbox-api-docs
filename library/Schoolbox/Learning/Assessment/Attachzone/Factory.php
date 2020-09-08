@@ -51,6 +51,8 @@ class Factory
     /**
      * Build an attachzone with any Attached Files preloaded into the attachzone
      *
+     * @deprecated Tasks no longer have attachzones
+     *
      * @param Task $task
      * @return Zone
      */
