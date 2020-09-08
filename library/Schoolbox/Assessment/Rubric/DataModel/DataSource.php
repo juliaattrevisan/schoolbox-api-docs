@@ -906,6 +906,15 @@ class DataSource
      */
     public function importGridFromCsv(IStorage $file, DueWorkModel $dueWork, int $maxLevels): void
     {
+        // Verify that the file is actually a CSV.
+        // (I think extension checking is the most reliable way to do this. We
+        //  have had issues with mimetype checking in the past, because the CSV
+        //  mimetype isn't always recognized by the browser's operating system.)
+        if (!(strtolower($file->getExtension()) === 'csv')) {
+            throw new UnexpectedValueException('Only CSV files may be uploaded');
+        }
+
+
         // Create the factory
         $markTypeMapper  = SubmissionBox\MarkTypeMapper::getInstance();
         $importerFactory = new CsvImporterFactory($markTypeMapper);
