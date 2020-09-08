@@ -266,8 +266,15 @@ class Controller extends BaseController
         }
 
         /* Current user's permission level on this folder
+         * If the folder already exists, use the usual getFolderAccess method on it
+         * Otherwise, check that you have CMS Permissions in particular
          */
-        $userAccess = $this->access->getFolderAccess($this->getUser(), $permissionFolder);
+        if ($folder->getId()) {
+            $userAccess = $this->access->getFolderAccess($this->getUser(), $permissionFolder);
+        } else {
+            $userAccess = $this->access->getAccessLevel($this->getUser(), UserAccess::SERVICE_CMS);
+        }
+
         $canChangeClassCodes = $userAccess === UserAccess::ACCESS_FULL || $this->getUser()->isSuperuser();
 
         $this->getResponse()->content->set(
@@ -508,8 +515,15 @@ class Controller extends BaseController
         }
 
         /* Current user's permission level on this folder
+         * If the folder already exists, use the usual getFolderAccess method on it
+         * Otherwise, check that you have CMS Permissions in particular
          */
-        $userAccess = $this->access->getFolderAccess($this->getUser(), $folder->getId());
+        if ($folder->getId()) {
+            $userAccess = $this->access->getFolderAccess($this->getUser(), $folder->getId());
+        } else {
+            $userAccess = $this->access->getAccessLevel($this->getUser(), UserAccess::SERVICE_CMS);
+        }
+
         $canChangeClassCodes = $userAccess === UserAccess::ACCESS_FULL || $user->isSuperuser();
 
         // Validate class codes (prior to saving anything)
