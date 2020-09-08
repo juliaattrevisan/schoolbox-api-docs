@@ -265,30 +265,43 @@ class Controller extends BaseController
             $folder->enableInherit();
         }
 
+        /* Current user's permission level on this folder
+         * If the folder already exists, use the usual getFolderAccess method on it
+         * Otherwise, check that you have CMS Permissions in particular
+         */
+        if ($folder->getId()) {
+            $userAccess = $this->access->getFolderAccess($this->getUser(), $permissionFolder);
+        } else {
+            $userAccess = $this->access->getAccessLevel($this->getUser(), UserAccess::SERVICE_CMS);
+        }
+
+        $canChangeClassCodes = $userAccess === UserAccess::ACCESS_FULL || $this->getUser()->isSuperuser();
+
         $this->getResponse()->content->set(
             [
                 'template' => '@folder/modify.twig',
                 'data'     => [
-                    'user'               => $this->getUser(),
-                    'breadcrumbs'        => $breadcrumbs,
-                    'formAction'         => $formAction,
-                    'folder'             => $folder,
-                    'parent'             => $folder->getParent(),
-                    'templates'          => $homepageTemplates,
-                    'templateId'         => $templateId,
-                    'roles'              => $this->roleMapper->findAll(),
-                    'rolePermissions'    => $rolePermissions,
-                    'database'           => ucfirst($this->getConfigLoader()->get('external_type')),
-                    'curriculumTagging'  => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-                    'userAccess'         => $this->access->getFolderAccess($this->getUser(), $permissionFolder),
-                    'deny'               => UserAccess::ACCESS_DENY,
-                    'read'               => UserAccess::ACCESS_READ,
-                    'write'              => UserAccess::ACCESS_WRITE,
-                    'moderate'           => UserAccess::ACCESS_FULL,
-                    'coverImageZone'     => $zone->getTwigContext(),
-                    'editYearLevelUsage' => $this->getUser()->isSuperuser(),
-                    'yearLevelOptions'   => $yearLevelOptions,
-                    'yearLevelValues'    => $yearLevelValues,
+                    'user'                => $this->getUser(),
+                    'breadcrumbs'         => $breadcrumbs,
+                    'formAction'          => $formAction,
+                    'folder'              => $folder,
+                    'parent'              => $folder->getParent(),
+                    'templates'           => $homepageTemplates,
+                    'templateId'          => $templateId,
+                    'roles'               => $this->roleMapper->findAll(),
+                    'rolePermissions'     => $rolePermissions,
+                    'database'            => ucfirst($this->getConfigLoader()->get('external_type')),
+                    'curriculumTagging'   => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+                    'userAccess'          => $this->access->getFolderAccess($this->getUser(), $permissionFolder),
+                    'canChangeClassCodes' => $canChangeClassCodes,
+                    'deny'                => UserAccess::ACCESS_DENY,
+                    'read'                => UserAccess::ACCESS_READ,
+                    'write'               => UserAccess::ACCESS_WRITE,
+                    'moderate'            => UserAccess::ACCESS_FULL,
+                    'coverImageZone'      => $zone->getTwigContext(),
+                    'editYearLevelUsage'  => $this->getUser()->isSuperuser(),
+                    'yearLevelOptions'    => $yearLevelOptions,
+                    'yearLevelValues'     => $yearLevelValues,
                 ],
             ]
         );
@@ -501,8 +514,20 @@ class Controller extends BaseController
             $folder->setColour(null);
         }
 
+        /* Current user's permission level on this folder
+         * If the folder already exists, use the usual getFolderAccess method on it
+         * Otherwise, check that you have CMS Permissions in particular
+         */
+        if ($folder->getId()) {
+            $userAccess = $this->access->getFolderAccess($this->getUser(), $folder->getId());
+        } else {
+            $userAccess = $this->access->getAccessLevel($this->getUser(), UserAccess::SERVICE_CMS);
+        }
+
+        $canChangeClassCodes = $userAccess === UserAccess::ACCESS_FULL || $user->isSuperuser();
+
         // Validate class codes (prior to saving anything)
-        if ($user->isSuperuser() && !$folder->getInherit()) {
+        if ($canChangeClassCodes && !$folder->getInherit()) {
             foreach ($classCodes as $code) {
                 if (strlen(trim($code)) > Code\Model::CODE_LENGTH_MAX) {
                     throw $this->errorMapper->generateException(ErrorMapper::ERROR_CODE_TOO_LONG);
@@ -510,9 +535,14 @@ class Controller extends BaseController
             }
         }
 
-        // Only superusers get to change class codes and year levels
-        if ($user->isSuperuser()) {
+        /* Superusers and CMS Moderators can change class codes
+         */
+        if ($canChangeClassCodes) {
             $this->updateFolderClassCodes($folder, $classCodes);
+        }
+
+        // Only superusers get to change year levels
+        if ($user->isSuperuser()) {
             $this->updateFolderYearLevels($folder, $yearLevelIds);
         }
 
