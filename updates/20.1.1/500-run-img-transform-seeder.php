@@ -11,34 +11,29 @@ use Schoolbox\Application\CliTool;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
- * Simple app that forks.
- * * Parent just returns immediately to not block upgrade
- * * Child forks off and asynchronously invokes the transform seeder to run in background
+ * It's difficult to fork in PHP and have the parent process finished due to shared resources.
+ * Instead, we'll just call an intermediate shell script that will fork for us and call the PHP tool.
  */
 $app = new class extends CliTool\App {
     public function run(): void
     {
-        $logDir   = $this->getDatabaseInternal()
-                         ->executeQuery("SELECT value FROM config WHERE name = 'logs_dir'")
-                         ->fetchColumn();
-        $logFile  = rtrim($logDir, '/') . "/storage-transform-seeder.log";
-        $fileName = __DIR__ . '/../../tools/storage-transform-seeder.php';
-        $cmd      = "$fileName --perform -vvv 2>> $logFile";
+        $logDir = $this->getDatabaseInternal()
+                       ->executeQuery("SELECT value FROM config WHERE name = 'logs_dir'")
+                       ->fetchColumn();
 
-        $this->getLogger()->notice("Executing command in async child process: '$cmd'");
+        $logFile     = rtrim($logDir, '/') . "/storage-transform-seeder.log";
+        $toolScript = __DIR__ . '/../../tools/storage-transform-seeder.php';
+        $forkScript = __DIR__ . '/../../tools/fork.sh';
 
-        $pid = pcntl_fork();
-        if ($pid === -1) {
-            $this->getLogger()->error("Error - Unable to fork");
+        $cmd         = "$forkScript --cmd '$toolScript -p' --out $logFile --err $logFile -a";
+        $this->getLogger()->notice("Executing command: '$cmd'");
+        exec($cmd, $output, $returnVar);
+        if ($returnVar) {
+            foreach ($output as $line) {
+                $this->getLogger()->error($line);
+            }
             exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
         }
-        if ($pid) {
-            $this->getLogger()->debug("Parent process exiting");
-            exit(CliTool\Kernel::EXIT_STATUS_OK);
-        }
-
-        // Child process
-        exec($cmd);
     }
 };
 
