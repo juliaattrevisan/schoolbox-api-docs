@@ -157,6 +157,10 @@ class Seeder extends App
      */
    private function getTranscodedImagesInLocalFs(string $filePath): void
    {
+       if (!file_exists($filePath)) {
+           $this->getLogger()->error("Storage file '$filePath' not found in local filesystem, skipping");
+           return;
+       }
        $dir = opendir(dirname($filePath));
 
        while (($entry = readdir($dir)) !== false) {
