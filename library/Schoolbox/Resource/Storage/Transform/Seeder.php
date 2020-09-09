@@ -157,31 +157,31 @@ class Seeder extends App
      */
    private function getTranscodedImagesInLocalFs(string $filePath): void
    {
-       try {
-           $dir = opendir(dirname($filePath));
+       if (!file_exists($filePath)) {
+           $this->getLogger()->error("Storage file '$filePath' not found in local filesystem, skipping");
+           return;
+       }
+       $dir = opendir(dirname($filePath));
 
-           while (($entry = readdir($dir)) !== false) {
-               if ($entry === '.' || $entry === '..') {
-                   continue;
-               }
-
-               if (strpos($entry, '-') !== false) {
-                   $file = explode('-', $entry, 2);
-                   if (count($file) > 1) {
-                       $this->transcodeImages[] = [
-                           'hash' => $file[0],
-                           'transform' => $file[1],
-                           'size' => (int)filesize(dirname($filePath) . '/' . $entry),
-                       ];
-                       $this->getLogger()->info($entry);
-                   }
-               }
+       while (($entry = readdir($dir)) !== false) {
+           if ($entry === '.' || $entry === '..') {
+               continue;
            }
 
-           closedir($dir);
-       } catch (\Exception $e) {
-           // noop
+           if (strpos($entry, '-') !== false) {
+               $file = explode('-', $entry, 2);
+               if (count($file) > 1) {
+                   $this->transcodeImages[] = [
+                       'hash' => $file[0],
+                       'transform' => $file[1],
+                       'size' => (int)filesize(dirname($filePath) . '/' . $entry),
+                   ];
+                   $this->getLogger()->info($entry);
+               }
+           }
        }
+
+       closedir($dir);
    }
 
     /**
