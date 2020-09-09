@@ -238,7 +238,7 @@ Data:
                                      #}
                                     {# nesaGraphData.data.2 ... NESA, nesaGraphData.data.2 ... FAL in semester 2,   #}
                                     {% if folderData.nesaGraphData %}
-                                        {% set commentData = folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.2 ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
+                                        {% set commentData = folderData.nesaGraphData.data.2 is defined ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
                                     {% endif %}
                                 {% else %}
                                     {# All other comments come from the unitspec #}
