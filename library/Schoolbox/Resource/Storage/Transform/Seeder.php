@@ -157,27 +157,31 @@ class Seeder extends App
      */
    private function getTranscodedImagesInLocalFs(string $filePath): void
    {
-       $dir = opendir(dirname($filePath));
+       try {
+           $dir = opendir(dirname($filePath));
 
-       while (($entry = readdir($dir)) !== false) {
-           if ($entry === '.' || $entry === '..') {
-               continue;
-           }
+           while (($entry = readdir($dir)) !== false) {
+               if ($entry === '.' || $entry === '..') {
+                   continue;
+               }
 
-           if (strpos($entry, '-') !== false) {
-               $file = explode('-', $entry, 2);
-               if (count($file) > 1) {
-                   $this->transcodeImages[] = [
-                       'hash' => $file[0],
-                       'transform' => $file[1],
-                       'size' => (int)filesize(dirname($filePath) . '/' . $entry),
-                   ];
-                   $this->getLogger()->info($entry);
+               if (strpos($entry, '-') !== false) {
+                   $file = explode('-', $entry, 2);
+                   if (count($file) > 1) {
+                       $this->transcodeImages[] = [
+                           'hash' => $file[0],
+                           'transform' => $file[1],
+                           'size' => (int)filesize(dirname($filePath) . '/' . $entry),
+                       ];
+                       $this->getLogger()->info($entry);
+                   }
                }
            }
-       }
 
-       closedir($dir);
+           closedir($dir);
+       } catch (\Exception $e) {
+           // noop
+       }
    }
 
     /**
