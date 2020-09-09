@@ -288,13 +288,18 @@ class ListController extends Web\Controller\Base
     }
 
     /**
-     * @param string $type
-     * @return Controller
+     * Fetch the controller for the given type of assessment.
+     *
+     * @param string $type One of the `AssessmentType::TYPE_*` constants
+     * @return Controller  The controller for the given assessment type
      * @throws ServiceNotFound
      */
     private function getDelegateController($type)
     {
-        return $this->getDi()->get("controller:learningAssessment/$type");
+        // We know this will be a Controller object:
+        // We've configured this controller in the module.
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getController("learningAssessment/$type");
     }
 
     /**
