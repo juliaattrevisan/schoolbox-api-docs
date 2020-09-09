@@ -178,11 +178,11 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Find all indicators for a folder.
+     * Find all capabilities for a folder.
      *
      * @param int|int[] $folderId The folder ID (or list thereof) to find for
      * @param bool      $cache    If false, bypass result cache
-     * @return GenericCollection|IndicatorModel[]
+     * @return GenericCollection|Model[]
      * @throws MapperException
      */
     public function findForFolder($folderId, bool $cache = true): GenericCollection
