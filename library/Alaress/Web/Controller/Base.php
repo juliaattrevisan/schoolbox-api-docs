@@ -302,17 +302,24 @@ abstract class Base {
     }
 
 
-
-
     /**
-     * @param  string $name
+     * Retrieves another controller instance, so that this controller may access
+     * actions provided by another controller.
+     *
+     * For convenience, this controller's user will be injected into the other
+     * controller, though `setUser()` may be called on the other controller to
+     * override that setting.
+     *
+     * @param  string $name The name of the controller, as defined in the
+     *                      controller's module's basename.
      * @return self
      * @throws ServiceNotFound
      */
     protected function getController($name)
     {
+        /** @var self $controller */
         try {
-            return $this->getDi()->get("controller:$name");
+            $controller = $this->getDi()->get("controller:$name");
 
         } catch (ServiceNotFound $e) {
             // the controller isn't registered... hawkward. Let's remedy that
@@ -328,10 +335,11 @@ abstract class Base {
             unset($module);
 
             // obtain and return the controller from DI now that it's been registered
-            return $this->getDi()->get("controller:$name");
-
-
+            $controller = $this->getDi()->get("controller:$name");
         }
+
+        $controller->setUser($this->user);
+        return $controller;
     }
 
     /**
