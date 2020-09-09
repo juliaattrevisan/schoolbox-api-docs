@@ -172,6 +172,9 @@
             var singleElement = $(this);
 
             // Clear required attr to avoid jQuery validation conflict
+            // (I'd like to add the validation rule to the form at this point,
+            //  but there is no guarantee that the validation has even been set
+            //  up yet: if it isn't, applying a rule will raise an error.)
             singleElement.removeAttr('required');
 
             singleElement.val('').selectize(settings.selectize);
