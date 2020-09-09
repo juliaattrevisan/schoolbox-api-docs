@@ -20,7 +20,7 @@ if [ -n "$1" ] && [ -d "$1" ]; then
 fi
 
 # First level dirs
-mkdir -p "$data_dir"/{cache,files,purifier,storage}
+mkdir -p "$data_dir"/{cache,files,purifier,storage,twig}
 
 # Cache dirs
 mkdir -p "$data_dir"/cache/{logs,portrait,stream,zip}
