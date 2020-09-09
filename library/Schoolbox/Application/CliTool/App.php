@@ -143,6 +143,40 @@ abstract class App
 
 
     /**
+     * Strongly typed convenience method to launch another process in the background and enable
+     * this process to exit cleanly without hanging
+     *
+     * @param string $command
+     * @param string $outputFile
+     * @param string $logFile
+     * @param bool   $append
+     * @return int
+     */
+    protected function forkProcess(string $command, string $outputFile, string $logFile, bool $append = false): int
+    {
+        $forkScript = __DIR__ . '/../../../../tools/fork.sh';
+        $appendFlag = $append ? '-a' : '';
+
+        $this->getLogger()->info("Forking command: '$command'");
+        $verb = $append ? 'Appending' : 'Writing';
+        $this->getLogger()->info("$verb output to '$outputFile'");
+        $this->getLogger()->info("$verb logs to '$logFile'");
+
+        exec(
+            sprintf("$forkScript --cmd '$command' --out $outputFile --err $logFile %s", $appendFlag),
+            $output,
+            $returnVar
+        );
+        if($returnVar){
+            foreach($output as $line){
+                $this->getLogger()->error($line);
+            }
+        }
+        return $returnVar;
+    }
+
+
+    /**
      * Helper to fetch a CLI option value.
      *
      * Supports options that are still have colon chars suffixed to indicate required/optional status
