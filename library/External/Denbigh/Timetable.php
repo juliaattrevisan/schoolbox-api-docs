@@ -169,8 +169,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                     : date($this->config->get('date_time'), strtotime($lesson['endTime']));
 
             if (isset($periodList[$period]['day'][$day]) &&
-                !isset($periodList[$period]['day'][$day][$lesson['ClassCode']])) {
-                $periodList[$period]['day'][$day][$lesson['ClassCode']] = [
+                !isset($periodList[$period]['day'][$day][$lesson['classCode']])) {
+                $periodList[$period]['day'][$day][$lesson['classCode']] = [
                     'description' => $lesson['subjectName'],
                     'code'        => $lesson['classCode'],
                     'campus'      => $campus->getExtTimetableCode(),
@@ -423,7 +423,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                 'periodStart'    => '',
                 'periodEnd'      => '',
                 'periodSequence' => '1',
-                'day'            => array_fill(1, $definition['dayCount'], []),
+                'day'            => array_fill(1, $definition['cycle_length'], []),
                 'class'          => [],
             ];
         }
