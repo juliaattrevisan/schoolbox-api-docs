@@ -5,7 +5,13 @@
 <script type="text/javascript">
 	$(function() {
 
-		$('form[data-validate]').alaressValidate();
+		$('form[data-validate]').alaressValidate({
+            rules: {
+                userId: {
+                    required: true
+                }
+            }
+        });
 
         // Hide host details if "self" is selected
 		$('[data-relation="host_type_selector"]').change(function(){
