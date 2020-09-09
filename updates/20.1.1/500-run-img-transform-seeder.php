@@ -23,15 +23,8 @@ $app = new class extends CliTool\App {
 
         $logFile     = rtrim($logDir, '/') . "/storage-transform-seeder.log";
         $toolScript = __DIR__ . '/../../tools/storage-transform-seeder.php';
-        $forkScript = __DIR__ . '/../../tools/fork.sh';
 
-        $cmd         = "$forkScript --cmd '$toolScript -p' --out $logFile --err $logFile -a";
-        $this->getLogger()->notice("Executing command: '$cmd'");
-        exec($cmd, $output, $returnVar);
-        if ($returnVar) {
-            foreach ($output as $line) {
-                $this->getLogger()->error($line);
-            }
+        if($this->forkProcess("$toolScript -p", $logFile, $logFile, true)){
             exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
         }
     }
