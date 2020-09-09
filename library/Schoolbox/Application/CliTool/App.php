@@ -157,6 +157,11 @@ abstract class App
         $forkScript = __DIR__ . '/../../../../tools/fork.sh';
         $appendFlag = $append ? '-a' : '';
 
+        $this->getLogger()->info("Forking command: '$command'");
+        $verb = $append ? 'Appending' : 'Writing';
+        $this->getLogger()->info("$verb output to '$outputFile'");
+        $this->getLogger()->info("$verb logs to '$logFile'");
+
         exec(
             sprintf("$forkScript --cmd '$command' --out $outputFile --err $logFile %s", $appendFlag),
             $output,
