@@ -169,7 +169,7 @@ class PreviousClassIdCache
 
         /* Give this as output, but also remember it, because we'll need it later
          */
-        return $this->previousClassIds;
+        return array_merge($this->previousClassIds, $currentClassIds);
     }
 
 
