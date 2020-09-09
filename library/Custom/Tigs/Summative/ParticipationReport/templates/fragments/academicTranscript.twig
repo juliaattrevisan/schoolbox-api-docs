@@ -90,12 +90,13 @@ Data:
                 {% set folderData = data[folderId] %}
                 {% set firstTeacher = folderData.teachers | first %}
 
-                {% if firstTeacher %}
                 <li class="subject-list-item">
                     <a href="{{ routeLookup('tigsSubjectReport.getReport', {userId: student.id, folderId: subject.folderId, reportDate: reportDate}) }}" class="link-row">
                         <div class="card small-12 medium-6">
 
+                            {% if firstTeacher %}
                             <img src="/portrait.php?id={{ firstTeacher.id }}&amp;size=square64" width="48" alt="{{ firstTeacher.fullName }}">
+                            {% endif %}
                             <h3 class="subject-name">{{ subject.name }}
                                 <span class="meta">
                                 {% for code in subject.codes %}
@@ -104,9 +105,11 @@ Data:
                             </span>
                             </h3>
 
+                            {% if firstTeacher %}
                             <div class="meta">
                                 <p class="teacher-name">{{ firstTeacher.fullName }} <span class="pipe meta">{{ firstTeacher.role.name }}</span></p>
                             </div>
+                            {% endif %}
                         </div>
                         <div class="column small-12 medium-6 results">
                             {% if not subject.isPreviousClass %}
@@ -262,7 +265,6 @@ Data:
                         </div>
                     </a>
                 </li>
-                {% endif %}
             {% endfor %}
         </ul>
     {% endset %}
