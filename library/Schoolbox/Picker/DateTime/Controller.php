@@ -28,6 +28,13 @@ use Schoolbox\Role;
 
 class Controller extends Base
 {
+    /**
+     * The maximum number of students to query when building the heatmap
+     * (`getHeat()`) or heaviest workload (`getDueByDate()`).
+     */
+    private const MAX_STUDENTS_IN_HEATMAP = 50;
+
+
     /** @var UserMapper */
     private $userMapper;
 
@@ -413,27 +420,22 @@ class Controller extends Base
     private function studentsDueWithinRange(Alaress_Date_Format $start, Alaress_Date_Format $end, $folder)
     {
         // Get all students for the class or the group
+        $studentList = $this->userAccessMapper->findUsersInCategory(
+            $folder,
+            Role::STUDENT,
+            UserAccess::ACCESS_READ,
+            true
+        );
 
-            $externalStudents = $this->userAccessMapper->findUsersInCategory(
-                $folder,
-                Role::STUDENT,
-                UserAccess::ACCESS_READ,
-                true
-            );
+        // Reduce the student list to a sensible number.
+        // The for-loop below otherwise finds all assessments for a potentially
+        // limitless number of students.
+        // (This does mean that results are less accurate for larger classes:
+        //  a necessary tradeoff when the alternative is overloading Schoolbox.)
+        $studentList = $studentList->slice(0, self::MAX_STUDENTS_IN_HEATMAP);
 
-        // Get a lookup array of external IDs for the students in this class
-
-        $externalIds = [];
-
-        foreach ($externalStudents as $studentCurrent) {
-            $externalIds[] = $studentCurrent->getExternalId();
-        }
-
-        $studentList = $this->userMapper->findByColumn('synergy_id', $externalIds);
-        // Iterate each student in the class
 
         $students = [];
-
         foreach ($studentList as $studentCurrent) {
 
             // Create a mock user object and find all assessments for this student
