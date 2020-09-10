@@ -48,54 +48,38 @@ if (!isset($_REQUEST['mimeFilter'])) {
     $mimeFilter = $_REQUEST['mimeFilter'];
 }
 
-/* NodeFactory leaks all manner of exceptions from the pieces in its constructor
- * There's a variety that could be thrown but storm can't detect them, apparently
- */
-define('CONNECT_365_HTML', '<a data-gettoken href="/ajax/oauth/microsoft" class="button submit">Connect Office 365 account</a>');
-
 try {
-    $factory = new \Schoolbox\Resource\Browser\NodeFactory();
-} catch (\Schoolbox\Resource\Exception|\DomainException|\InvalidArgumentException $e) {
+    $factory  = new \Schoolbox\Resource\Browser\NodeFactory();
+
+    if ($oAuthToken = $_SESSION['azureAccessToken']) {
+        $conf       = $this->getDi()->get('config');
+        $tenant     = new Tenant($conf->get('office365_tenant'), $conf->get('sharepoint_sitepath') ?: null);
+        $browser    = $factory->buildOAuth($source, $resourceId, $tenant, $oAuthToken, $mimeFilter);
+
+    } else {
+        try {
+            $browser = $factory->build($source, $resourceId, $mimeFilter);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+
+            /* Our mappers encountered deleted node; go back to root node
+             */
+            $browser = $factory->build($source, 0, $mimeFilter);
+        }
+    }
+
+    $nodeData = $browser->render();
+
+    // Render the stuff in this node
+    $renderer = new \Schoolbox\Resource\Browser\NodeRenderer($this, $nodeData);
+    $renderer->render($useFolder);
+} catch (Unauthorized $e) {
+    $this->error(2);
+} catch (\Schoolbox\Resource\Exception $e) {
     $this->error(6);
+} catch (OutOfBoundsException $e) {
+    $this->error(2);
+} catch (AuthenticationTimedOut $e) {
+    $this->error(null, "Office 365 error: {$e->getMessage()}");
 } catch (RuntimeException $e) {
-    die(CONNECT_365_HTML);
+    die('<a data-gettoken href="/ajax/oauth/microsoft" class="button submit">Connect Office 365 account</a>');
 }
-
-if ($oAuthToken = $_SESSION['azureAccessToken']) {
-
-    /* Try to connect to the Office365 filesystem
-     */
-    $conf = $this->getDi()->get('config');
-    try {
-        $tenant = new Tenant($conf->get('office365_tenant'), $conf->get('sharepoint_sitepath') ?: null);
-        $browser = $factory->buildOAuth($source, $resourceId, $tenant, $oAuthToken, $mimeFilter);
-    } catch (InvalidArgumentException|OutOfBoundsException $e) {
-
-        /* Any errors results in you getting the button since you weren't previously connected
-         */
-        die(CONNECT_365_HTML);
-    } catch (AuthenticationTimedOut $e) {
-        $this->error(null, "Office 365 error: {$e->getMessage()}");
-    }
-} else {
-
-    /* Otherwise try to load up a node from our resource tree
-     */
-    try {
-        $browser = $factory->build($source, $resourceId, $mimeFilter);
-    } catch (OutOfRangeException|UnexpectedValueException|OutOfBoundsException|Unauthorized $e) {
-        $this->error(2);
-    } catch (\Schoolbox\Mapper\Exception $e) {
-
-        /* This node couldn't be found or was deleted
-         * Send them back to the root node instead
-         */
-        $browser = $factory->build($source, 0, $mimeFilter);
-    }
-}
-
-$nodeData = $browser->render();
-
-// Render the stuff in this node
-$renderer = new \Schoolbox\Resource\Browser\NodeRenderer($this, $nodeData);
-$renderer->render($useFolder);
