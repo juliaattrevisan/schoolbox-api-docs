@@ -64,7 +64,7 @@ class NodeFactory
      * @param string      $label
      * @param int         $nodeId
      * @param string|null $mimeFilter
-     * @param string|null $tenant
+     * @param Tenant|null $tenant
      * @param string|null $oAuthToken
      * @return NodeInterface
      * @throws OutOfBoundsException
