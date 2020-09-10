@@ -74,6 +74,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
     /**
      * Render page
+     * @throws Aura\Di\Exception\ServiceNotFound
      */
     protected function render()
     {
@@ -95,6 +96,10 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                 $currentBox = $currentShowcasedItem->getSubmissionBox();
                 /** @var IAssessable $assessment */
                 $assessment  = $assessments->getOffset($currentBox->getAssessmentId());
+                // if box's assessment is deleted, it's not included in $assessments
+                if (!$assessment) {
+                    continue;
+                }
                 $participant = $assessment->getParticipantIfExtant($this->user);
                 if (!$participant) {
                     continue;

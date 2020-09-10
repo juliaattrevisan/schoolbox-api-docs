@@ -185,14 +185,21 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
          */
         $allShowcasedItems = $showcaseMapper->getRecentShowcasedSubmissionBoxes($this->getUser(), $this->getNumShowcasedItems());
 
+        $assessments = new Schoolbox\Collection();
         if ($allShowcasedItems->count()) {
-            $previousCategory = null;
             $assessments = $this->getAssessments($allShowcasedItems);
+        }
+
+        if ($allShowcasedItems->count() && $assessments->count()) {
 
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 $currentBox = $currentShowcasedItem->getSubmissionBox();
                 /** @var IAssessable $assessment */
                 $assessment  = $assessments->getOffset($currentBox->getAssessmentId());
+                // if box's assessment is deleted, it's not included in $assessments
+                if (!$assessment) {
+                    continue;
+                }
                 $participant = $assessment->getParticipantIfExtant($this->user);
                 if (!$participant) {
                     continue;
@@ -272,6 +279,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         } else {
             $this->getPage()->parse('no_showcased_work_block', 'no_showcased_work');
             $this->getPage()->setVar('has_showcased_work_block', '');
+            $this->getPage()->setVar('showcase_page_block', '');
         }
     }
 
