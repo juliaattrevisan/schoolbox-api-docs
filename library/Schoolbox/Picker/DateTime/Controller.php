@@ -210,7 +210,7 @@ class Controller extends Base
         $end = clone $start;
         $end = $end->endOfMonth();
 
-        $students = $this->studentsDueWithinRange($start, $end, $folder);
+        $students = $this->studentsDueWithinRange($start, $end, $folder, self::MAX_STUDENTS_IN_HEATMAP);
 
         foreach ($students as $student) {
             foreach ($student['assessmentList'] as $assessment) {
@@ -403,7 +403,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'format' => 'json',
             'data' => [
-                'students' => $this->studentsDueWithinRange($start, $end, $folder),
+                'students' => $this->studentsDueWithinRange($start, $end, $folder, self::MAX_STUDENTS_IN_HEATMAP),
                 'date' => $date->toIso8601String()
             ]
         ]);
@@ -411,14 +411,29 @@ class Controller extends Base
 
 
     /**
+     * Find all students within `$folder` which have assessments due between
+     * `$start` and `$end`.
+     *
+     * `$limit` allows the student list to be reduced to a sensible number.
+     * This method will otherwise find all assessments for a potentially
+     * limitless number of students.
+     * (This does mean that results are less accurate for larger classes:
+     *  a necessary tradeoff when the alternative is overloading Schoolbox.)
+     *
      * @param Alaress_Date_Format $start
      * @param Alaress_Date_Format $end
      * @param Folder              $folder
+     * @param int|null            $limit
      * @return array
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception If something went wrong when finding
+     *                                     students
      */
-    private function studentsDueWithinRange(Alaress_Date_Format $start, Alaress_Date_Format $end, $folder)
-    {
+    private function studentsDueWithinRange(
+        Alaress_Date_Format $start,
+        Alaress_Date_Format $end,
+        Folder $folder,
+        ?int $limit
+    ): array {
         // Get all students for the class or the group
         $studentList = $this->userAccessMapper->findUsersInCategory(
             $folder,
@@ -426,13 +441,9 @@ class Controller extends Base
             UserAccess::ACCESS_READ,
             true
         );
-
-        // Reduce the student list to a sensible number.
-        // The for-loop below otherwise finds all assessments for a potentially
-        // limitless number of students.
-        // (This does mean that results are less accurate for larger classes:
-        //  a necessary tradeoff when the alternative is overloading Schoolbox.)
-        $studentList = $studentList->slice(0, self::MAX_STUDENTS_IN_HEATMAP);
+        if (isset($limit)) {
+            $studentList = $studentList->slice(0, $limit);
+        }
 
 
         $students = [];
