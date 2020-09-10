@@ -63,7 +63,7 @@ try {
 
             /* Our mappers encountered deleted node; go back to root node
              */
-            $browser = $factory->build($source, 0, $mimeFilter);
+            $browser = $factory->build($source, IFolder::ROOT_ID, $mimeFilter);
         }
     }
 
