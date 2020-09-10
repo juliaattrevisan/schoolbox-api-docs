@@ -37,9 +37,10 @@ class Node extends AbstractNode
 
 
     /**
-     * @param int  $nodeId
-     * @param null $mimeFilter
-     * @throws \Schoolbox\Resource\Exception
+     * @param int         $nodeId
+     * @param string|null $mimeFilter
+     * @throws Exception
+     * @throws \InvalidArgumentException
      */
     public function __construct($nodeId, $mimeFilter = null)
     {

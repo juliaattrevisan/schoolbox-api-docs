@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -15,10 +15,11 @@ class Node extends AbstractNode
 {
 
     /**
-     * @param int    $nodeId
-     * @param string $mimeFilter
-     * @param Tenant $tenant
-     * @param string $oAuthToken
+     * @param int         $nodeId
+     * @param string|null $mimeFilter
+     * @param Tenant|null $tenant
+     * @param string|null $oAuthToken
+     * @throws RuntimeException
      */
     public function __construct($nodeId, $mimeFilter = null, $tenant = null, $oAuthToken = null)
     {
@@ -49,4 +50,4 @@ class Node extends AbstractNode
         return true;
     }
 
-} 
+}
