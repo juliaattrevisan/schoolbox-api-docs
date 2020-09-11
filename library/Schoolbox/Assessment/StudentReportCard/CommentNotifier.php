@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\StudentReportCard;
 
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Assessment\Term;
@@ -152,14 +153,22 @@ class CommentNotifier extends AbstractModuleNotifier
         $student  = $comment->getStudent();
         $category = $comment->getCategory();
 
-        $category = $this->categoryMapper->findById($category->getId());
+        try {
+            $category = $this->categoryMapper->findById($category->getId());
+        } catch (Mapper\Exception $e) {
+            return $envelope;
+        }
         if (!$category->isGradePageEnabled()) {
             // there is no grades page to show
             return $envelope;
         }
 
         if (!$student->getFirstname()) {
-            $student = $this->userMapper->findById($comment->getStudent()->getId());
+            try {
+                $student = $this->userMapper->findById($comment->getStudent()->getId());
+            } catch (Mapper\Exception $e) {
+                return $envelope;
+            }
         }
 
         $category->loadTeachers();
@@ -174,21 +183,22 @@ class CommentNotifier extends AbstractModuleNotifier
             ->setBody($comment->getBody())
             ->setSeverity(Logger::WARNING)
             ->addTopic("report_card.{$category->getId()}.{$student->getId()}.commented")
-            ->setParams(array(
+            ->setParams([
                 'author'   => new UserParam($author),
-                'category' => new CategoryParam($category)
-            ));
+                'category' => new CategoryParam($category),
+                'grades'   => new Param('grades', $href),
+            ]);
 
 
         // send to student (if relevant)
         if ($author->getId() != $student->getId() && $comment->getStudentVisibility()) {
-            $bob->setTitle(":author commented on your grades in :category");
+            $bob->setTitle(":author commented on your :grades in :category");
 
             $envelope->targetToUser($student->getId(), $bob->build());
         }
 
         // revise text...
-        $bob->setTitle(":author commented on :student's grades in :category");
+        $bob->setTitle(":author commented on :student's :grades in :category");
 
         // send to parents (if relevant)
         if ($comment->getParentVisibility()) {
