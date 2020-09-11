@@ -165,6 +165,7 @@ button.submit {
  * the actual flex-list button dimensions aren't right.
  */
 .flex-list {
+    line-height: 1.5;
     &.buttons {
 		a, button {
 			@include flex;
