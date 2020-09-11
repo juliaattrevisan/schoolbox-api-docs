@@ -247,7 +247,7 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
         if (!$assessment
             || $this->conf->get('restrict_parent_duework_access')  // hide due work
             || ($restrictGrades && $this->conf->get('restrict_student_submissions'))
-            || !($assessment->isFeedbackVisibleToRoleType(Role::PARENT) || $requestResubmission)) {
+            || !($assessment->isFeedbackVisibleToRoleType(Role::PARENT))) {
             return $envelope;
         }
 
