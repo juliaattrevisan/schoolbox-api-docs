@@ -1,3 +1,13 @@
+/*
+vagrant ssh
+cd /vagrant
+# dump Dio's custom SCSS into dio.scss
+node_modules/.bin/sass www/custom/diocesan/achievementreport/css/styles.scss
+
+then delete the comments from the output and copypasta that compiled css
+into their skin config textarea
+*/
+
 /* Custom: My Child Component
  */
 .dio-buttons li {
