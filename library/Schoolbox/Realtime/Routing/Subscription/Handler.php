@@ -74,6 +74,7 @@ class Handler implements IConsumer, EventListener
     public function onMessage($instance, IResolver $resolver, ?array $context)
     {
         if (!$instance instanceof Instance) {
+            $this->log->error('[Routing Subscription Handler] instance received is broken');
             $resolver->reject();
             return;
         }

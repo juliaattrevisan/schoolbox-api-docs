@@ -38,6 +38,7 @@ use Schoolbox\External;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Notif\Formatter\CompressionException;
+use Schoolbox\User;
 
 /**
  * The scheduler is a consumer of brokered Triggers. It holds them until the time they are scheduled to fire (hence
@@ -182,8 +183,19 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      */
     public function onMessage($trigger, IResolver $resolver, ?array $context)
     {
+        if (!$trigger instanceof TriggerInterface) {
+            $this->log->error('[Scheduler] trigger received is broken');
+            $resolver->reject();
+            return;
+        }
+
         try {
             $this->log->info("[Scheduler] Received trigger to schedule: {$trigger->getEventObjectId()} - {$trigger->getLabel()}", [ 'char' => '>' ]);
+
+            $effector = $trigger->getEvent()->getEffector();
+            if ($effector && $effector instanceof User) {
+                $this->log->debug('[Scheduler] triggered by user.' . $effector->getId());
+            }
 
             // attempt to schedule this trigger - there are a fair few things that could go wrong...
             $this->scheduleNotification($trigger, $resolver);
