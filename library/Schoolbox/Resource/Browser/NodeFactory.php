@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -61,11 +61,11 @@ class NodeFactory
 
 
     /**
-     * @param string $label
-     * @param int    $nodeId
-     * @param string $mimeFilter
-     * @param Tenant $tenant
-     * @param string $oAuthToken
+     * @param string      $label
+     * @param int         $nodeId
+     * @param string|null $mimeFilter
+     * @param Tenant|null $tenant
+     * @param string|null $oAuthToken
      * @return NodeInterface
      * @throws OutOfBoundsException
      */
@@ -82,10 +82,11 @@ class NodeFactory
 
 
     /**
-     * @param string $label
-     * @param int    $nodeId
-     * @param string $mimeFilter
+     * @param string      $label
+     * @param int         $nodeId
+     * @param string|null $mimeFilter
      * @return NodeInterface
+     * @throws OutOfBoundsException
      */
     public function build($label, $nodeId, $mimeFilter = null) {
         return $this->buildNode($label, $nodeId, $mimeFilter);
@@ -93,16 +94,17 @@ class NodeFactory
 
 
     /**
-     * @param string $label
-     * @param int    $nodeId
-     * @param Tenant $tenant
-     * @param string $oAuth
-     * @param string $mimeFilter
+     * @param string      $label
+     * @param int         $nodeId
+     * @param Tenant      $tenant
+     * @param string      $oAuth
+     * @param string|null $mimeFilter
      * @return NodeInterface
+     * @throws OutOfBoundsException
      */
     public function buildOAuth($label, $nodeId, $tenant, $oAuth, $mimeFilter = null)
     {
         return $this->buildNode($label, $nodeId, $mimeFilter, $tenant, $oAuth);
     }
 
-} 
+}

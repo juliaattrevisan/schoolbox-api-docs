@@ -57,8 +57,14 @@ try {
         $browser    = $factory->buildOAuth($source, $resourceId, $tenant, $oAuthToken, $mimeFilter);
 
     } else {
-        $browser = $factory->build($source, $resourceId, $mimeFilter);
+        try {
+            $browser = $factory->build($source, $resourceId, $mimeFilter);
+        } catch (\Schoolbox\Mapper\Exception $e) {
 
+            /* Our mappers encountered deleted node; go back to root node
+             */
+            $browser = $factory->build($source, IFolder::ROOT_ID, $mimeFilter);
+        }
     }
 
     $nodeData = $browser->render();
