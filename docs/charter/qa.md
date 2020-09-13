@@ -2,6 +2,7 @@
 * [The Role of QA](#the-role-of-qa)
 * [Areas to QA](#areas-to-qa)
 * [QA Check list](#qa-check-list)
+* [QA Data Migration](#qa-for-data-migration)
 * [QA transition to done response](#qa-transition-to-done-response)
 * [Tools that help](#tools-that-help)
 
@@ -101,6 +102,54 @@ Has any data been compromised by the change in the code, can a user see somethin
     * If not then does the code show the impact of change?
     * Can the user see things they shouldn't see due to the change?
     * Can the user do things they shouldn't be able to do due to the change?
+
+## QA for Data Migration
+
+This particular process is focused on ensuring data integrity when we have changes being done to the structure of the database, this includes:
+
+* Changes of database table schema or table and column renames
+* Updating of new columns with default values
+* Moving of data between tables and columns
+* Updating of database tables to new values
+* Or any combination of the above
+
+It is best practice to keep the migration as simple as possible. Each change being tested with this process before proceeding to the next. This is to reduce complexity in the last step of observation of the results.
+
+The process itself can be divided in three steps:
+
+* Set-up
+* Test
+* Observe
+
+This test process should be done for a migration from master to the latest develop which will execute the migration scripts.
+In the event we need to test further into the past because we need to update data on master (strongly recommend against this) there must be a valid past version for QA before the change on master is merged.
+
+**Set-up**
+
+1. provision on qa-test dataset.
+1. git checkout master.
+1. review that there is data ready to test migration with.
+	1. if there is no data build said data
+	1. after building any additional test data save the qa-test dataset.
+1. identify what you expect each case to turn into on the other end.
+
+**Test**
+
+1. you should be on master branch with data ready from set up step
+1. git checkout develop
+1. run build-sql-update.sh
+1. run update-sql.sh
+1. run npm install
+1. run grunt build
+
+**Observe**
+
+1. you should be on develop branch with test completed. Ready to check status after migration.
+1. run through [QA check list](#qa-check-list). 
+1. ensure changed data doesn't regress functionality and usability.
+1. check the actual changed data to see if it adheres to what we expect.
+1. based on findings during observation pass or fail the migration.
+
 
 ## QA transition to done response
 
