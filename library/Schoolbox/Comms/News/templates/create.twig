@@ -625,6 +625,15 @@
             });
         }
 
+        {##
+         # SA-7580 introduced the below stall-submit when clicking the submit
+         # if the form was invalid, and resolved it if clicked when the form is
+         # valid.
+         #
+         # Removing it appears to have made no difference to the way that this
+         # form is handled: maybe it was required because of the now removed
+         # AJAX date conversion?
+         #}
         {#/**#}
         {# * Listen for a click on one of the submit buttons#}
         {# * This bypasses the staller because the event is assigned directly to the element (rather than doing $(document).on)#}
