@@ -13,8 +13,6 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Resource\Attachment\Zone;
-use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use \Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Factory for creating \Schoolbox\Resource\Attachment\Zone instances for an
@@ -63,24 +61,14 @@ class Factory
              ->setAttachmentsLabel('');
 
         /* Figure out what the hash is
-         * TODO: I'm sure there's a better way, but I can't remember it right now
          */
-        $foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $task->getUrl(), $matches);
-        $hash = $matches[1];
+        $hashes = [];
 
-        if ($foundHash) {
-            $zone->attachFiles([$hash]);
-
-            /* Ram in an actual file instance to the task
-             */
-            try {
-                $task->setAttachedFile(StorageMapper::getInstance()->findByHash($hash));
-            }
-            catch (MapperException $e) {
-                /* noop (pretend file didn't exist if it couldn't be findByHash()'d)
-                 */
-            }
+        foreach ($task->getAttachedFiles() as $file) {
+            $hashes[] = $file->getHash();
         }
+
+        $zone->attachFiles($hashes);
 
         return $zone;
     }
