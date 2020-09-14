@@ -15,6 +15,7 @@ use Alaress_Date_Format;
 use External_TimetableInterface;
 use InvalidArgumentException;
 use Calendar\Event\Type\EventBase;
+use Schoolbox\Assessment\Participant\Finder;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Campus;
@@ -424,30 +425,12 @@ class Controller extends Base
 
 
         // Get all custom participation for folder assessments
-        $customParticipationQuery = $this->userAccessMapper->getDatabase()->query(
-            '
-                SELECT *
-                FROM v_assessment_participation
-                WHERE folder_id = :folderId
-                AND   (excluded_at IS NOT NULL OR (due_date >= :startDate AND due_date <= :endDate))
-            ',
-            [
-                'folderId'  => $folder->getId(),
-                'startDate' => $start->getDatabase(),
-                'endDate'   => $end->getDatabase(),
-            ]
+        $customParticipationFinder = new Finder($this->userMapper->getDatabase());
+        $customParticipations      = $customParticipationFinder->findParticipationsForFolder(
+            $folder->getId(),
+            $start,
+            $end
         );
-
-        // Group by assessment, then by student
-        $customParticipations = [];
-        foreach ($customParticipationQuery as $row) {
-            $customParticipations[$row['assessment_id']][$row['student_id']] = [
-                'excluded' => (bool)$row['excluded_at'],
-                'dueDate'  => Alaress_Date_Format::newDatabaseDate($row['due_date']),
-            ];
-        }
-
-
 
 
         // Get all students for the class or the group
