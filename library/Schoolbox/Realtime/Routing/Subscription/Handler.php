@@ -65,7 +65,7 @@ class Handler implements IConsumer, EventListener
     /**
      * Handle a message sent from a broker to which you've subscribed
      *
-     * @param Instance   $instance
+     * @param Instance|boolean   $instance
      * @param IResolver  $resolver
      * @param array|null $context
      * @throws DuplicateResolutionException
@@ -73,6 +73,11 @@ class Handler implements IConsumer, EventListener
      */
     public function onMessage($instance, IResolver $resolver, ?array $context)
     {
+        if (!$instance instanceof Instance) {
+            $this->log->error('[Routing Subscription Handler] instance received is broken');
+            $resolver->reject();
+            return;
+        }
         try {
             $this->handleMessage($instance, $context);
             $resolver->acknowledge();
