@@ -42,9 +42,6 @@ class Controller extends Base
     /** @var UserAccessMapper */
     private $userAccessMapper;
 
-    /** @var AssessmentMapperProxy */
-    private $assessmentMapperProxy;
-
     /** @var External_TimetableInterface */
     private $timetableHandler;
 
@@ -62,7 +59,6 @@ class Controller extends Base
      * @param TermMapper                  $termMapper
      * @param FolderMapper                $folderMapper
      * @param UserAccessMapper            $userAccessMapper
-     * @param AssessmentMapperProxy       $assessmentMapperProxy
      * @param External_TimetableInterface $timetableHandler
      */
     public function __construct(
@@ -70,15 +66,13 @@ class Controller extends Base
         TermMapper $termMapper,
         FolderMapper $folderMapper,
         UserAccessMapper $userAccessMapper,
-        AssessmentMapperProxy $assessmentMapperProxy,
         External_TimetableInterface $timetableHandler
     ) {
-        $this->userMapper            = $userMapper;
-        $this->termMapper            = $termMapper;
-        $this->folderMapper          = $folderMapper;
-        $this->userAccessMapper      = $userAccessMapper;
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->timetableHandler      = $timetableHandler;
+        $this->userMapper       = $userMapper;
+        $this->termMapper       = $termMapper;
+        $this->folderMapper     = $folderMapper;
+        $this->userAccessMapper = $userAccessMapper;
+        $this->timetableHandler = $timetableHandler;
     }
 
     /**
