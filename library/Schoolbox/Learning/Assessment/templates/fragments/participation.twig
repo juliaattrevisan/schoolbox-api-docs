@@ -97,8 +97,19 @@
                 </script>
                 <ul class="information-list card-selectable" id="participants">
                     <li>
-                        <input type="checkbox" id="selectAll">
-                        <label for="selectAll" class="checkbox-label">Select all</label>
+                        <div>
+                            <div class="selector">
+                                <input type="checkbox" id="selectAll">
+                                <label for="selectAll" class="checkbox-label"></label>
+                            </div>
+                            <div class="small-12 column">
+                                <div class="row">
+                                    <label for="selectAll" class="checkbox-label">
+                                        Select all
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </li>
 
                     {% for participant in assessment.allParticipants %}
