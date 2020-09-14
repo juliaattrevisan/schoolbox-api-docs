@@ -211,9 +211,12 @@ class Finder
                     INNER JOIN assessment a              ON vap.assessment_id = a.id
                     INNER JOIN v_assessment_relation var ON vap.assessment_id = var.assessment_id
                     INNER JOIN folder f                  ON vap.folder_id     = f.id
-                    WHERE vap.assessment_id IN {$assessmentPlaceholders}
+                    WHERE vap.student_id = :studentId
+                    AND   vap.assessment_id IN {$assessmentPlaceholders}
                 ",
-                $assessmentParams
+                $assessmentParams + [
+                    'studentId' => $studentId,
+                ]
             );
             foreach ($query as $row) {
                 $assessmentId = (int)$row['assessment_id'];
@@ -243,7 +246,7 @@ class Finder
                 INNER JOIN assessment a              ON vap.assessment_id = a.id
                 INNER JOIN v_assessment_relation var ON vap.assessment_id = var.assessment_id
                 INNER JOIN folder f                  ON vap.folder_id     = f.id
-                WHERE student_id = :studentId
+                WHERE vap.student_id = :studentId
                 AND   a.deleted_at IS NULL
                 AND   vap.folder_id IN {$folderIdPlaceholders}
                 AND   vap.due_date >= :startDate
