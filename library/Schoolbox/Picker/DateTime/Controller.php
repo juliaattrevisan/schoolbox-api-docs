@@ -434,6 +434,39 @@ class Controller extends Base
         Folder $folder,
         ?int $limit
     ): array {
+        // Get all assessments for the folder
+        // Cannot filter by due date because some students will have custom
+        // participation due within the window, but the base assessment is due
+        // without
+        $assessments = $this->assessmentMapperProxy->findAllByFolderIdExclusively($folder->getId());
+
+
+        // Get all custom participation for folder assessments
+        $customParticipationQuery = $this->userAccessMapper->getDatabase()->query(
+            '
+                SELECT *
+                FROM v_assessment_participation
+                WHERE folder_id = :folderId
+                AND   (excluded_at IS NOT NULL OR (due_date >= :startDate AND due_date <= :endDate))
+            ',
+            [
+                'folderId'  => $folder->getId(),
+                'startDate' => $start->getDatabase(),
+                'endDate'   => $end->getDatabase(),
+            ]
+        );
+
+        $customParticipation = [];
+        foreach ($customParticipationQuery as $row) {
+            $customParticipation[$row['assessment_id']][$row['student_id']] = [
+                'excluded' => (bool)$row['excluded_at'],
+                'dueDate'  => Alaress_Date_Format::newDatabaseDate($row['due_date']),
+            ];
+        }
+
+
+
+
         // Get all students for the class or the group
         $studentList = $this->userAccessMapper->findUsersInCategory(
             $folder,
