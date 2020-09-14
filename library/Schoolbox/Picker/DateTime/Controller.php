@@ -28,13 +28,6 @@ use Schoolbox\Role;
 
 class Controller extends Base
 {
-    /**
-     * The maximum number of students to query when building the heatmap
-     * (`getHeat()`) or heaviest workload (`getDueByDate()`).
-     */
-    private const MAX_STUDENTS_IN_HEATMAP = 50;
-
-
     /** @var UserMapper */
     private $userMapper;
 
@@ -210,7 +203,7 @@ class Controller extends Base
         $end = clone $start;
         $end = $end->endOfMonth();
 
-        $students = $this->studentsDueWithinRange($start, $end, $folder, self::MAX_STUDENTS_IN_HEATMAP);
+        $students = $this->studentsDueWithinRange($start, $end, $folder);
 
         foreach ($students as $student) {
             foreach ($student['assessmentList'] as $assessment) {
@@ -403,7 +396,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'format' => 'json',
             'data' => [
-                'students' => $this->studentsDueWithinRange($start, $end, $folder, self::MAX_STUDENTS_IN_HEATMAP),
+                'students' => $this->studentsDueWithinRange($start, $end, $folder),
                 'date' => $date->toIso8601String()
             ]
         ]);
@@ -414,26 +407,15 @@ class Controller extends Base
      * Find all students within `$folder` which have assessments due between
      * `$start` and `$end`.
      *
-     * `$limit` allows the student list to be reduced to a sensible number.
-     * This method will otherwise find all assessments for a potentially
-     * limitless number of students.
-     * (This does mean that results are less accurate for larger classes:
-     *  a necessary tradeoff when the alternative is overloading Schoolbox.)
-     *
      * @param Alaress_Date_Format $start
      * @param Alaress_Date_Format $end
      * @param Folder              $folder
-     * @param int|null            $limit
      * @return array
      * @throws \Schoolbox\Mapper\Exception If something went wrong when finding
      *                                     students
      */
-    private function studentsDueWithinRange(
-        Alaress_Date_Format $start,
-        Alaress_Date_Format $end,
-        Folder $folder,
-        ?int $limit
-    ): array {
+    private function studentsDueWithinRange(Alaress_Date_Format $start, Alaress_Date_Format $end, Folder $folder): array
+    {
         // Get all assessments for the folder
         // Cannot filter by due date because some students will have custom
         // participation due within the window, but the base assessment is due
@@ -475,9 +457,6 @@ class Controller extends Base
             UserAccess::ACCESS_READ,
             true
         );
-        if (isset($limit)) {
-            $studentList = $studentList->slice(0, $limit);
-        }
 
 
         $students = [];
