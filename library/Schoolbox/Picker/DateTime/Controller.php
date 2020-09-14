@@ -418,20 +418,8 @@ class Controller extends Base
      */
     private function studentsDueWithinRange(Alaress_Date_Format $start, Alaress_Date_Format $end, Folder $folder): array
     {
-        // Get all assessments for the folder.
-        // Cannot filter by due date because some students will have custom
-        // participation due within the window, but the base assessment is due
-        // outside of the window.
-        $assessments = $this->assessmentMapperProxy->findAllByFolderIdExclusively($folder->getId());
-
-
-        // Get all custom participation for folder assessments
+        // Build the finder object
         $customParticipationFinder = new Finder($this->userMapper->getDatabase());
-        $customParticipations      = $customParticipationFinder->findParticipationsForFolder(
-            $folder->getId(),
-            $start,
-            $end
-        );
 
 
         // Get all students for the class or the group
@@ -450,7 +438,7 @@ class Controller extends Base
 
 
             // Step 1: retrieve folder IDs
-            // TODO inject
+            // TODO inject folder mapper
             $folderIds = FolderMapper::getInstance()->findFolderIdsForUser(
                 $studentCurrent,
                 $studentCurrent->getRole()->isStudent() && !$studentCurrent->getHideTimetable(),
@@ -480,51 +468,7 @@ class Controller extends Base
             }
 
 
-//            // Iteration 1: find all assessments for student
-//            // (include subjects, disregard plan dates)
-//            $assessments = $this->assessmentMapperProxy->findAllByStudentBetweenDates($studentCurrent, false, $start, $end);
-//            foreach ($assessments as $assessment) {
-//                $assessmentId = $assessment->getId();
-//                $assessmentList[$assessmentId] = [
-//                    'id'      => $assessmentId,
-//                    'title'   => $assessment->getTitle(),
-//                    'duedate' => $assessment->getDueAt()->getDay(),
-//                    'duetime' => $assessment->getDueAt()->getTimeOnly(),
-//                    'context' => $assessment->getBaseContext()->getFolder()->getName(),
-//                ];
-//            }
-//
-//
-//            // Iteration 2: find all custom participations for student,
-//            // override assessment settings
-//            $customParticipations = $customParticipationFinder->findParticipationsForStudent($studentCurrent->getId(), $start, $end);
-//            foreach ($customParticipations as $assessmentId => $participation) {
-//                // participation excluded? unset
-//                if ($participation['excluded']) {
-//                    unset($assessmentList[$assessmentId]);
-//                    continue;
-//                }
-//
-//                // participation included, but due date outside of window? unset
-//                /** @var Alaress_Date_Format $dueDate */
-//                $dueDate = $participation['dueDate'];
-//                if (!$dueDate->between($start, $end)) {
-//                    unset($assessmentList[$assessmentId]);
-//                    continue;
-//                }
-//
-//                // Override whatever might have been in the assessment list
-//                $assessmentList[$assessmentId] = [
-//                    'id'      => $assessmentId,
-//                    'title'   => $participation['title'],
-//                    'duedate' => $participation['dueDate']->getDay(),
-//                    'duetime' => $participation['dueDate']->getTimeOnly(),
-//                    'context' => $participation['folderName'],
-//                ];
-//            }
-
-
-            // Put them all together
+            // Create a list of students
             $assessmentsDue = count($assessmentList);
             if ($assessmentsDue > 0) {
                 $students[] = [

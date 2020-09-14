@@ -143,6 +143,33 @@ class Finder
     }
 
 
+    /**
+     * Finds all participation records for a student in a set of folders,
+     * between the window bounded by the start and end date.
+     *
+     * This respects custom assessment participation (CAP) as closely as
+     * possible:
+     * * Assess in window, no CAP:           use assess dates
+     * * Assess in window, CAP in:           use CAP dates
+     * * Assess in window, CAP out:          use assess dates
+     * * Assess in window, CAP excluded:     use CAP dates, mark as excluded
+     * * Assess out of window, no CAP:       ignore assess
+     * * Assess out of window, CAP in:       use CAP dates
+     * * Assess out of window, CAP out:      ignore assess
+     * * Assess out of window, CAP excluded: ignore assess
+     *
+     * @param array               $folderIds IDs of folders to find within
+     * @param int                 $studentId ID of student to find for
+     * @param Alaress_Date_Format $start     Find only after this time
+     * @param Alaress_Date_Format $end       Find only before this time
+     * @return array * key:                 assessment ID
+     *               * value['title']:      the assessment's title
+     *               * value['folderName']: the assessment's folder's name
+     *               * value['folderId']:   the assessment's folder's ID
+     *               * value['excluded']:   is the student excluded?
+     *               * value['dueDate']:    the assessment's due date for the
+     *                                      student
+     */
     public function findParticipationsForStudentInFolders(
         array $folderIds,
         int $studentId,
@@ -160,7 +187,7 @@ class Finder
         $folderIdPlaceholders = Builder::getArrayPlaceholders($folderIds, $folderIdPrefix);
 
 
-        // Part 1: get all assessments in folder
+        // Part 1: get all assessments in folder due within the window
         $assessmentQuery = $this->database->query(
             "
                 SELECT
@@ -231,7 +258,8 @@ class Finder
         }
 
 
-        // Part 3: get CAP for student for folder
+        // Part 3: get CAP for student for folder, within the window
+        // Override any assessment details
         $customParticipationQuery = $this->database->query(
             "
                 SELECT
@@ -267,21 +295,6 @@ class Finder
                 'dueDate'    => Alaress_Date_Format::newDatabaseDate($row['due_date']),
             ];
         }
-
-
-        // Check all combinations of:
-        // Assessment:
-        // * in window, out of window
-        // CAP:
-        // * no CAP, in window, out of window, excluded
-        // Assess in, no CAP: use assess
-        // Assess in, CAP in: use CAP
-        // Assess in, CAP out: use assess
-        // Assess in, CAP excluded: ignore
-        // Assess out, no CAP: ignore
-        // Assess out, CAP in: use CAP
-        // Assess out, CAP out: ignore
-        // Assess out, CAP excluded: ignore
 
 
         return $assessments;
