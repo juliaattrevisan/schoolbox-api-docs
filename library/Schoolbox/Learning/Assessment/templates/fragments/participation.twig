@@ -65,36 +65,15 @@
                     </div>
                 </div>
 
+                <script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.basic.js"></script>
                 <script>
                     $(function() {
 
-                        /* Avoid woefully inefficient implementations of select-all
-                         * You can shrink this further but I'm going to humour the select-all-for-group var
-                         */
-                        const selectAll = $('#selectAll');
-                        const selector = '#participants [data-participant-select]';
-                        const allCheckboxes = $(selector);
-                        const selectedCheckboxes = selector + ':checked';
+                        $('#selectAll').selectAllBasic({
+                            selector: '#participants [data-participant-select]',
 
-                        selectAll.on('click', function(event) {
-                            if ($(this).is(':checked')) {
-                                allCheckboxes.prop('checked', true);
-                            } else {
-                                allCheckboxes.prop('checked', false);
-                            }
-
-                            /* onAfterSelectAll()
-                             */
-                            allCheckboxes.trigger('change');
-                        });
-
-                        /* Checkboxes in the group affect the select-all parent
-                         */
-                        allCheckboxes.on('change', function(event) {
-                            if ($(this).prop('checked') === false) {
-                                selectAll.prop('checked', false);
-                            } else if ($(selectedCheckboxes).length === allCheckboxes.length) {
-                                selectAll.prop('checked', true);
+                            onAfterSelectAllChange: function(allCheckboxes) {
+                                allCheckboxes.trigger('change');
                             }
                         });
                     });
