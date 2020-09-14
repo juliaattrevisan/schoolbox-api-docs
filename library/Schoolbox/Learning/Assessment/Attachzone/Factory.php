@@ -59,8 +59,8 @@ class Factory
     protected function buildForTask(Task $task)
     {
         $zone = new Zone('files');
-        $zone->setMulti(false)->setAttachmentsLabel('');
-        $zone->setAttachPrompt('attach file');
+        $zone->setMulti(true)
+             ->setAttachmentsLabel('Attach Files');
 
         /* Figure out what the hash is
          * TODO: I'm sure there's a better way, but I can't remember it right now
@@ -110,7 +110,8 @@ class Factory
     public function buildForDueWorkResponse(Submission $response)
     {
         $zone = new Zone('files');
-        $zone->setMulti(true)->setAttachmentsLabel('');
+        $zone->setMulti(true)
+             ->setAttachmentsLabel('');
 
         $files = [];
         /* Sort files alphabetically
@@ -134,7 +135,7 @@ class Factory
     /**
      * Build an attachzone with $feedback's attached files preloaded.
      *
-     * @param Feedback $feedback If null, build an empty attachzone
+     * @param Feedback|null $feedback If null, build an empty attachzone
      * @return Zone
      */
     public function buildForDueWorkFeedback(Feedback $feedback = null)
