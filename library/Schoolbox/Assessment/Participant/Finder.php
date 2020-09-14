@@ -79,4 +79,13 @@ class Finder
         }
         return $customParticipations;
     }
+
+
+    public function findParticipationsForStudent(
+        int $studentId,
+        Alaress_Date_Format $start,
+        Alaress_Date_Format $end
+    ): array {
+        return [];
+    }
 }
