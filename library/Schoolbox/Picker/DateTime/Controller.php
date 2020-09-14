@@ -445,36 +445,55 @@ class Controller extends Base
         $students = [];
         foreach ($studentList as $studentCurrent) {
             // Count how many assessments are due for this user on the specified date
-            $assessmentsDue = 0;
             $assessmentList = [];
-            $assessments    = $this->assessmentMapperProxy->findAllByStudentBetweenDates($studentCurrent, false, $start, $end);
-            $customParticipations = $customParticipationFinder->findParticipationsForStudent($studentCurrent->getId(), $start, $end);
-            foreach ($assessments as $assessment) {
-                // Use excluded/dueDate from custom participation if there
-                $customParticipation = $customParticipations[$assessment->getId()] ?? null;
-                if ($customParticipation) {
-                    $excluded = $customParticipation['excluded'];
-                    $dueDate  = $customParticipation['dueDate'];
-                } else {
-                    $excluded = false;
-                    $dueDate  = $assessment->getDueAt();
-                }
 
-                // if excluded: continue
-                // if due outside start/end: continue
-                if ($excluded || !$dueDate->between($start, $end)) {
+
+            // Iteration 1: find all assessments for student
+            // (include subjects, disregard plan dates)
+            $assessments = $this->assessmentMapperProxy->findAllByStudentBetweenDates($studentCurrent, false, $start, $end);
+            foreach ($assessments as $assessment) {
+                $assessmentId = $assessment->getId();
+                $assessmentList[$assessmentId] = [
+                    'id'      => $assessmentId,
+                    'title'   => $assessment->getTitle(),
+                    'duedate' => $assessment->getDueAt()->getDay(),
+                    'duetime' => $assessment->getDueAt()->getTimeOnly(),
+                    'context' => $assessment->getBaseContext()->getFolder()->getName(),
+                ];
+            }
+
+
+            // Iteration 2: find all custom participations for student,
+            // override assessment settings
+            $customParticipations = $customParticipationFinder->findParticipationsForStudent($studentCurrent->getId(), $start, $end);
+            foreach ($customParticipations as $assessmentId => $participation) {
+                // participation excluded? unset
+                if ($participation['excluded']) {
+                    unset($assessmentList[$assessmentId]);
                     continue;
                 }
 
-                $assessmentList[] = [
-                    'id'      => $assessment->getId(),
-                    'title'   => $assessment->getTitle(),
-                    'duedate' => $dueDate->getDay(),
-                    'duetime' => $dueDate->getTimeOnly(),
-                    'context' => $assessment->getBaseContext()->getFolder()->getName(),
+                // participation included, but due date outside of window? unset
+                /** @var Alaress_Date_Format $dueDate */
+                $dueDate = $participation['dueDate'];
+                if (!$dueDate->between($start, $end)) {
+                    unset($assessmentList[$assessmentId]);
+                    continue;
+                }
+
+                // Override whatever might have been in the assessment list
+                $assessmentList[$assessmentId] = [
+                    'id'      => $assessmentId,
+                    'title'   => $participation['title'],
+                    'duedate' => $participation['dueDate']->getDay(),
+                    'duetime' => $participation['dueDate']->getTimeOnly(),
+                    'context' => $participation['folderName'],
                 ];
-                $assessmentsDue++;
             }
+
+
+            // Put them all together
+            $assessmentsDue = count($assessmentList);
             if ($assessmentsDue > 0) {
                 $students[] = [
                     'id'             => $studentCurrent->getId(),         // Required for link to student profile

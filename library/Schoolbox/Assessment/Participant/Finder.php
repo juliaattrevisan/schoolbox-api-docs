@@ -54,13 +54,15 @@ class Finder
         $customParticipationQuery = $this->database->query(
             '
                 SELECT
-                    assessment_id,
-                    student_id,
-                    due_date,
-                    excluded_at
-                FROM v_assessment_participation
+                    vap.assessment_id,
+                    vap.student_id,
+                    vap.due_date,
+                    vap.excluded_at
+                FROM v_assessment_participation vap
+                INNER JOIN assessment a ON vap.assessment_id = a.id
                 WHERE folder_id = :folderId
-                AND   (excluded_at IS NOT NULL OR (due_date >= :startDate AND due_date <= :endDate))
+                AND   (excluded_at IS NOT NULL OR (vap.due_date >= :startDate AND vap.due_date <= :endDate))
+                AND   a.deleted_at IS NULL
             ',
             [
                 'folderId'  => $folderId,
@@ -81,6 +83,14 @@ class Finder
     }
 
 
+    /**
+     * Finds all participations for this student between the start and end date.
+     *
+     * @param int                 $studentId
+     * @param Alaress_Date_Format $start
+     * @param Alaress_Date_Format $end
+     * @return array
+     */
     public function findParticipationsForStudent(
         int $studentId,
         Alaress_Date_Format $start,
@@ -89,14 +99,26 @@ class Finder
         $customParticipationQuery = $this->database->query(
             '
                 SELECT
-                    assessment_id,
-                    student_id,
-                    folder_id,
-                    due_date,
-                    excluded_at
-                FROM v_assessment_participation
+                    vap.assessment_id,
+                    vap.student_id,
+                    vap.folder_id,
+                    vap.due_date,
+                    vap.excluded_at,
+                    f.name AS folderName,
+                    a.title AS assessmentTitle
+                FROM v_assessment_participation vap
+                INNER JOIN assessment a              ON vap.assessment_id = a.id
+                INNER JOIN v_assessment_relation var ON vap.assessment_id = var.assessment_id
+                INNER JOIN folder f                  ON vap.folder_id     = f.id
                 WHERE student_id = :studentId
-                AND   (excluded_at IS NOT NULL OR (due_date >= :startDate AND due_date <= :endDate))
+                AND   a.deleted_at IS NULL
+                AND (
+                    excluded_at IS NOT NULL
+                    OR
+                    (vap.due_date >= :startDate AND vap.due_date <= :endDate)
+                    OR
+                    (a.due_date >= :startDate AND a.due_date <= :endDate)
+                )
             ',
             [
                 'studentId' => $studentId,
@@ -109,9 +131,11 @@ class Finder
         $customParticipations = [];
         foreach ($customParticipationQuery as $row) {
             $customParticipations[(int)$row['assessment_id']] = [
-                'folderId' => (int)$row['folder_id'],
-                'excluded' => (bool)$row['excluded_at'],
-                'dueDate'  => Alaress_Date_Format::newDatabaseDate($row['due_date']),
+                'title'      => $row['assessmentTitle'],
+                'folderName' => $row['folderName'],
+                'folderId'   => (int)$row['folder_id'],
+                'excluded'   => (bool)$row['excluded_at'],
+                'dueDate'    => Alaress_Date_Format::newDatabaseDate($row['due_date']),
             ];
         }
         return $customParticipations;
