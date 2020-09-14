@@ -96,13 +96,13 @@ abstract class Broker implements IBroker
                     try {
                         $gzip   = $this->redis->get($key);
                         $serial = gzuncompress($gzip);
-                        if (!$serial) {
+                        if ($serial === false) {
                             // the payload is likely to be broken
                             $consumer->onException(new PayloadBrokenException($key, $resolve));
                             return;
                         }
                         $payload = unserialize($serial);
-                        if (!$payload) {
+                        if ($payload === false) {
                             // the payload is likely to be broken
                             $consumer->onException(new PayloadBrokenException($key, $resolve));
                             return;
