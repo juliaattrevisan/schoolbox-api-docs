@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Assessment\Course;
 
+use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
@@ -26,6 +27,11 @@ class Task implements IAssessableDataModel, ISoftDeletable
     protected $link;
 
     /**
+     * @var Collection
+     */
+    protected $attachments;
+
+    /**
      * @var bool
      */
     protected $requires_confirmation;
@@ -34,6 +40,16 @@ class Task implements IAssessableDataModel, ISoftDeletable
      * @var User
      */
     protected $owner;
+
+
+    /**
+     * Task constructor.
+     */
+    public function __construct()
+    {
+        $this->attachments = new Collection();
+    }
+
 
     /**
      * Clears any attempts from the clone, and clones each Section in the Quiz
@@ -47,7 +63,6 @@ class Task implements IAssessableDataModel, ISoftDeletable
 
     /* Getters / Setters
      */
-
 
     /**
      * @param  \Schoolbox\User $owner
@@ -101,5 +116,23 @@ class Task implements IAssessableDataModel, ISoftDeletable
     public function getRequiresConfirmation()
     {
         return $this->requires_confirmation;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAttachments(): Collection
+    {
+        return $this->attachments;
+    }
+
+    /**
+     * @param Collection $attachments
+     * @return $this
+     */
+    public function setAttachments(Collection $attachments): self
+    {
+        $this->attachments = $attachments;
+        return $this;
     }
 }

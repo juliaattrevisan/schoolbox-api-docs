@@ -688,6 +688,7 @@ class Mapper extends BaseMapper
         $dueWorkIds        = [];
         $quizIds           = [];
         $projectIds        = [];
+        $taskIds           = [];
         $contextProjectIds = [];
 
         /** @noinspection PhpAssignmentInConditionInspection */
@@ -699,6 +700,8 @@ class Mapper extends BaseMapper
             // Task?
             if ($row['t.id']) {
                 $model->setTask($this->hydrateJoin($row, 'task', 't'));
+
+                $taskIds[] = $row['t.id'];
             } else {
                 $model->setTask(null);
             }
@@ -775,6 +778,11 @@ class Mapper extends BaseMapper
         // Load related 1-M models
         // Due work files
         $modelList = $this->augmentListWithDueWorkFiles($modelList, $dueWorkIds);
+
+        /* Task files
+         */
+        $modelList = $this->augmentListWithTaskFiles($modelList, $taskIds);
+
         // Project contexts
         if ($hydrateProjectContext) {
             // Infinite-cycle breakout.
@@ -937,6 +945,42 @@ class Mapper extends BaseMapper
                         $submodel->setAttachments($files[$submodel->getId()]);
                     } else {
                         $submodel->setAttachments($this->getJoinMapper('duework.files')->createCollection());
+                    }
+                }
+            }
+        }
+        return $modelList;
+    }
+
+
+    /**
+     * Augments the list from hydrateSelect() with task files.
+     *
+     * @param Collection|Model[] $modelList
+     * @param array|int[]        $taskIds
+     * @return Collection|Model[]
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
+     * @throws BaseMapper\Exception  If join $name isn't on this mapper
+     */
+    protected function augmentListWithTaskFiles($modelList, $taskIds)
+    {
+        if (!empty($taskIds)) {
+            // Retrieve and sort list of duework files
+            $files = $this->getJoinMapper('task.files')
+                          ->findByColumn('task_id', $taskIds)
+                          ->groupByCallback(function (Task\File\Model $file) {
+                              return $file->getTask()->getId();
+                          });
+
+            // Augment list with due work files
+            foreach ($modelList as $model) {
+                $submodel = $model->getSubObject();
+
+                if ($submodel instanceof \Schoolbox\Assessment\Course\Task) {
+                    if (!empty($files[$submodel->getId()])) {
+                        $submodel->setAttachments($files[$submodel->getId()]);
+                    } else {
+                        $submodel->setAttachments($this->getJoinMapper('task.files')->createCollection());
                     }
                 }
             }

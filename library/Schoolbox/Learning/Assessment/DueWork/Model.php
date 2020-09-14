@@ -151,7 +151,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
          */
         parent::__construct();
 
-        $this->setAttachedFiles(new Collection());
         $this->setAcceptOnline(self::ACCEPT_ONLINE_NONE);
         $this->setAttachedFiles(new Collection());
     }

@@ -17,12 +17,12 @@
 namespace Schoolbox\Learning\Assessment\Task;
 
 use InvalidArgumentException;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
-use \Schoolbox\Resource\Storage\Model as StorageFile;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
@@ -48,13 +48,26 @@ class Model extends AbstractAssessment
      */
     protected $url = '';
 
-    /**
-     * An optional attached File
-     *
-     * @var StorageFile|null
-     */
-    protected $attachedFile = null;
 
+    /**
+     * Optionally attached Files
+     *
+     * @var Collection|File[]
+     */
+    protected $attachedFiles;
+
+    /**
+     * Model constructor.
+     */
+    public function __construct()
+    {
+
+        /* I know Dr hates hook methods, so do this instead
+         */
+        parent::__construct();
+
+        $this->setAttachedFiles(new Collection());
+    }
 
     /**
      * @return string
@@ -368,22 +381,23 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @return null|StorageFile
+     * @return Collection|File[]
      */
-    public function getAttachedFile()
+    public function getAttachedFiles()
     {
-        return $this->attachedFile;
+        return $this->attachedFiles;
     }
 
     /**
-     * @param null|StorageFile $attachedFile
-     * @return $this
+     * @param Collection|File[] $attachedFiles
+     * @return \Schoolbox\Learning\Assessment\Task\Model
      */
-    public function setAttachedFile($attachedFile)
+    public function setAttachedFiles($attachedFiles)
     {
-        $this->attachedFile = $attachedFile;
+        $this->attachedFiles = $attachedFiles;
         return $this;
     }
+
 
     /**
      * @return \Alaress_Date_Format
