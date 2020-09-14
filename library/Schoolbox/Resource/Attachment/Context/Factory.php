@@ -32,7 +32,7 @@ class Factory
      */
     private const OPTIONS = [
 
-        /* Enable every accordion
+        /* Enable every filesystem option
          */
         'all' => [
             'upload'    => Filesystem\UploadController::class,
