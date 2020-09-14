@@ -456,9 +456,10 @@ class Controller extends Base
             ]
         );
 
-        $customParticipation = [];
+        // Group by assessment, then by student
+        $customParticipations = [];
         foreach ($customParticipationQuery as $row) {
-            $customParticipation[$row['assessment_id']][$row['student_id']] = [
+            $customParticipations[$row['assessment_id']][$row['student_id']] = [
                 'excluded' => (bool)$row['excluded_at'],
                 'dueDate'  => Alaress_Date_Format::newDatabaseDate($row['due_date']),
             ];
@@ -481,29 +482,43 @@ class Controller extends Base
 
         $students = [];
         foreach ($studentList as $studentCurrent) {
-
-            // Create a mock user object and find all assessments for this student
-            $assessments = $this->assessmentMapperProxy->findAllByStudentBetweenDates($studentCurrent, true, $start, $end);
-            // Count how many assessments are due on the specified date
-            $assessmentsDue = \count($assessments);
+            // Count how many assessments are due for this user on the specified date
+            $assessmentsDue = 0;
             $assessmentList = [];
             foreach ($assessments as $assessment) {
+                // Use excluded/dueDate from custom participation if there
+                $customParticipation = $customParticipations[$assessment->getId()][$studentCurrent->getId()] ?? null;
+                if ($customParticipation) {
+                    $excluded = $customParticipation['excluded'];
+                    $dueDate  = $customParticipation['dueDate'];
+                } else {
+                    $excluded = false;
+                    $dueDate  = $assessment->getDueAt();
+                }
+
+                // if excluded: continue
+                // if due outside start/end: continue
+                if ($excluded || !$dueDate->between($start, $end)) {
+                    continue;
+                }
+
                 $assessmentList[] = [
                     'id'      => $assessment->getId(),
                     'title'   => $assessment->getTitle(),
-                    'duedate' => $assessment->getDueAt()->getDay(),
-                    'duetime' => $assessment->getDueAt()->getTimeOnly(),
-                    'context' => $assessment->getBaseContext()->getFolder()->getName()
+                    'duedate' => $dueDate->getDay(),
+                    'duetime' => $dueDate->getTimeOnly(),
+                    'context' => $assessment->getBaseContext()->getFolder()->getName(),
                 ];
+                $assessmentsDue++;
             }
             if ($assessmentsDue > 0) {
                 $students[] = [
-                    'id'             => $studentCurrent->getId(),                      // Required for link to student profile
-                    'externalId'     => $studentCurrent->getExternalId(),      // Required for rendering student photo
+                    'id'             => $studentCurrent->getId(),         // Required for link to student profile
+                    'externalId'     => $studentCurrent->getExternalId(), // Required for rendering student photo
                     'firstname'      => $studentCurrent->getFirstname(),
                     'lastname'       => $studentCurrent->getLastname(),
                     'assessmentList' => $assessmentList,
-                    'assessmentsDue' => $assessmentsDue                    // Number of assessments they have due on the date
+                    'assessmentsDue' => $assessmentsDue,                  // Number of assessments they have due on the date
                 ];
             }
         }
