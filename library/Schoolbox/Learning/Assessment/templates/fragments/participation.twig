@@ -69,9 +69,13 @@
                 <script>
                     $(function() {
 
+                        /* Select all for Participation Plans
+                         */
                         $('#selectAll').selectAllBasic({
                             selector: '#participants [data-participant-select]',
 
+                            /* Initiate Modify Participation change whenever you tick/untick a person
+                             */
                             onAfterSelectAllChange: function(allCheckboxes) {
                                 allCheckboxes.trigger('change');
                             }
