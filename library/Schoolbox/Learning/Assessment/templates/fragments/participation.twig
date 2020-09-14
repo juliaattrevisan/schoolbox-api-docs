@@ -82,6 +82,10 @@
                             } else {
                                 allCheckboxes.prop('checked', false);
                             }
+
+                            /* onAfterSelectAll()
+                             */
+                            allCheckboxes.trigger('change');
                         });
 
                         /* Checkboxes in the group affect the select-all parent
