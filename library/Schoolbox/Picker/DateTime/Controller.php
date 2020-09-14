@@ -447,6 +447,7 @@ class Controller extends Base
             // Count how many assessments are due for this user on the specified date
             $assessmentsDue = 0;
             $assessmentList = [];
+            $assessments    = $this->assessmentMapperProxy->findAllByStudentBetweenDates($studentCurrent, false, $start, $end);
             foreach ($assessments as $assessment) {
                 // Use excluded/dueDate from custom participation if there
                 $customParticipation = $customParticipations[$assessment->getId()][$studentCurrent->getId()] ?? null;
