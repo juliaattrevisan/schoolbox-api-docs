@@ -478,7 +478,7 @@ class Controller extends Base
                     'externalId'     => $studentCurrent->getExternalId(), // Required for rendering student photo
                     'firstname'      => $studentCurrent->getFirstname(),
                     'lastname'       => $studentCurrent->getLastname(),
-                    'assessmentList' => $assessmentList,
+                    'assessmentList' => array_values($assessmentList),
                     'assessmentsDue' => $assessmentsDue,                  // Number of assessments they have due on the date
                 ];
             }
