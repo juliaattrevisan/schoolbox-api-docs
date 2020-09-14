@@ -60,7 +60,7 @@ class Factory
     {
         $zone = new Zone('files');
         $zone->setMulti(true)
-             ->setAttachmentsLabel('Attach Files');
+             ->setAttachmentsLabel('');
 
         /* Figure out what the hash is
          * TODO: I'm sure there's a better way, but I can't remember it right now
