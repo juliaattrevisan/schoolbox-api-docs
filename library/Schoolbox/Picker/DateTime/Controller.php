@@ -50,9 +50,9 @@ class Controller extends Base
 
     /**
      * Test URLS:
-     * http://192.168.36.10/picker/datetime                                         <-- HTML for injecting into modal
-     * http://192.168.36.10/picker/datetime/date/{date}                             <-- All appointments on a given date
-     * http://192.168.36.10/picker/datetime/date/{date}/class/{classcode}           <-- All student for a given class and how many due work items they have that day
+     * https://vagrant.dev.schoolbox.cloud/picker/datetime                                         <-- HTML for injecting into modal
+     * https://vagrant.dev.schoolbox.cloud/picker/datetime/date/{date}                             <-- All appointments on a given date
+     * https://vagrant.dev.schoolbox.cloud/picker/datetime/date/{date}/class/{classcode}           <-- All student for a given class and how many due work items they have that day
      */
 
     /**
