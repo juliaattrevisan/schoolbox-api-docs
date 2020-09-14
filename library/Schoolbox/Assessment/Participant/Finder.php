@@ -86,6 +86,34 @@ class Finder
         Alaress_Date_Format $start,
         Alaress_Date_Format $end
     ): array {
-        return [];
+        $customParticipationQuery = $this->database->query(
+            '
+                SELECT
+                    assessment_id,
+                    student_id,
+                    folder_id,
+                    due_date,
+                    excluded_at
+                FROM v_assessment_participation
+                WHERE student_id = :studentId
+                AND   (excluded_at IS NOT NULL OR (due_date >= :startDate AND due_date <= :endDate))
+            ',
+            [
+                'studentId' => $studentId,
+                'startDate' => $start->getDatabase(),
+                'endDate'   => $end->getDatabase(),
+            ]
+        );
+
+        // Group by assessment
+        $customParticipations = [];
+        foreach ($customParticipationQuery as $row) {
+            $customParticipations[(int)$row['assessment_id']] = [
+                'folderId' => (int)$row['folder_id'],
+                'excluded' => (bool)$row['excluded_at'],
+                'dueDate'  => Alaress_Date_Format::newDatabaseDate($row['due_date']),
+            ];
+        }
+        return $customParticipations;
     }
 }

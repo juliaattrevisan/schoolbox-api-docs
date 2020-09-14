@@ -448,9 +448,10 @@ class Controller extends Base
             $assessmentsDue = 0;
             $assessmentList = [];
             $assessments    = $this->assessmentMapperProxy->findAllByStudentBetweenDates($studentCurrent, false, $start, $end);
+            $customParticipations = $customParticipationFinder->findParticipationsForStudent($studentCurrent->getId(), $start, $end);
             foreach ($assessments as $assessment) {
                 // Use excluded/dueDate from custom participation if there
-                $customParticipation = $customParticipations[$assessment->getId()][$studentCurrent->getId()] ?? null;
+                $customParticipation = $customParticipations[$assessment->getId()] ?? null;
                 if ($customParticipation) {
                     $excluded = $customParticipation['excluded'];
                     $dueDate  = $customParticipation['dueDate'];
