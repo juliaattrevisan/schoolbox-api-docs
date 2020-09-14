@@ -416,10 +416,10 @@ class Controller extends Base
      */
     private function studentsDueWithinRange(Alaress_Date_Format $start, Alaress_Date_Format $end, Folder $folder): array
     {
-        // Get all assessments for the folder
+        // Get all assessments for the folder.
         // Cannot filter by due date because some students will have custom
         // participation due within the window, but the base assessment is due
-        // without
+        // outside of the window.
         $assessments = $this->assessmentMapperProxy->findAllByFolderIdExclusively($folder->getId());
 
 
