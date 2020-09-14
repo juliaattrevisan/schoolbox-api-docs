@@ -20,6 +20,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Permission\Access\UserAccess;
@@ -448,40 +449,27 @@ class Controller extends Base
             $assessmentList = [];
 
 
-            // Iteration 1: find all assessments for student
-            // (include subjects, disregard plan dates)
-            $assessments = $this->assessmentMapperProxy->findAllByStudentBetweenDates($studentCurrent, false, $start, $end);
-            foreach ($assessments as $assessment) {
-                $assessmentId = $assessment->getId();
-                $assessmentList[$assessmentId] = [
-                    'id'      => $assessmentId,
-                    'title'   => $assessment->getTitle(),
-                    'duedate' => $assessment->getDueAt()->getDay(),
-                    'duetime' => $assessment->getDueAt()->getTimeOnly(),
-                    'context' => $assessment->getBaseContext()->getFolder()->getName(),
-                ];
-            }
+            // Step 1: retrieve folder IDs
+            // TODO inject
+            $folderIds = FolderMapper::getInstance()->findFolderIdsForUser(
+                $studentCurrent,
+                $studentCurrent->getRole()->isStudent() && !$studentCurrent->getHideTimetable(),
+                UserAccess::ACCESS_READ,
+                true
+            );
 
 
-            // Iteration 2: find all custom participations for student,
-            // override assessment settings
-            $customParticipations = $customParticipationFinder->findParticipationsForStudent($studentCurrent->getId(), $start, $end);
-            foreach ($customParticipations as $assessmentId => $participation) {
-                // participation excluded? unset
+            // Step 2: get participation for the student from the folder
+            $participations = $customParticipationFinder->findParticipationsForStudentInFolders(
+                $folderIds,
+                $studentCurrent->getId(),
+                $start,
+                $end
+            );
+            foreach ($participations as $assessmentId => $participation) {
                 if ($participation['excluded']) {
-                    unset($assessmentList[$assessmentId]);
                     continue;
                 }
-
-                // participation included, but due date outside of window? unset
-                /** @var Alaress_Date_Format $dueDate */
-                $dueDate = $participation['dueDate'];
-                if (!$dueDate->between($start, $end)) {
-                    unset($assessmentList[$assessmentId]);
-                    continue;
-                }
-
-                // Override whatever might have been in the assessment list
                 $assessmentList[$assessmentId] = [
                     'id'      => $assessmentId,
                     'title'   => $participation['title'],
@@ -490,6 +478,50 @@ class Controller extends Base
                     'context' => $participation['folderName'],
                 ];
             }
+
+
+//            // Iteration 1: find all assessments for student
+//            // (include subjects, disregard plan dates)
+//            $assessments = $this->assessmentMapperProxy->findAllByStudentBetweenDates($studentCurrent, false, $start, $end);
+//            foreach ($assessments as $assessment) {
+//                $assessmentId = $assessment->getId();
+//                $assessmentList[$assessmentId] = [
+//                    'id'      => $assessmentId,
+//                    'title'   => $assessment->getTitle(),
+//                    'duedate' => $assessment->getDueAt()->getDay(),
+//                    'duetime' => $assessment->getDueAt()->getTimeOnly(),
+//                    'context' => $assessment->getBaseContext()->getFolder()->getName(),
+//                ];
+//            }
+//
+//
+//            // Iteration 2: find all custom participations for student,
+//            // override assessment settings
+//            $customParticipations = $customParticipationFinder->findParticipationsForStudent($studentCurrent->getId(), $start, $end);
+//            foreach ($customParticipations as $assessmentId => $participation) {
+//                // participation excluded? unset
+//                if ($participation['excluded']) {
+//                    unset($assessmentList[$assessmentId]);
+//                    continue;
+//                }
+//
+//                // participation included, but due date outside of window? unset
+//                /** @var Alaress_Date_Format $dueDate */
+//                $dueDate = $participation['dueDate'];
+//                if (!$dueDate->between($start, $end)) {
+//                    unset($assessmentList[$assessmentId]);
+//                    continue;
+//                }
+//
+//                // Override whatever might have been in the assessment list
+//                $assessmentList[$assessmentId] = [
+//                    'id'      => $assessmentId,
+//                    'title'   => $participation['title'],
+//                    'duedate' => $participation['dueDate']->getDay(),
+//                    'duetime' => $participation['dueDate']->getTimeOnly(),
+//                    'context' => $participation['folderName'],
+//                ];
+//            }
 
 
             // Put them all together
