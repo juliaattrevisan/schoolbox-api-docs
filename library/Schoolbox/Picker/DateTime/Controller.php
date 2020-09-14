@@ -438,6 +438,9 @@ class Controller extends Base
 
 
             // Step 1: retrieve folder IDs
+            // * Only fetch subjects if user is a student and has timetable
+            // * Only fetch read access folders, as they're the ones which a
+            //   user is a student in
             $folderIds = $this->folderMapper->findFolderIdsForUser(
                 $studentCurrent,
                 $studentCurrent->getRole()->isStudent() && !$studentCurrent->getHideTimetable(),
