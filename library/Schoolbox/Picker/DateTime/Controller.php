@@ -36,6 +36,9 @@ class Controller extends Base
     /** @var TermMapper */
     private $termMapper;
 
+    /** @var FolderMapper */
+    private $folderMapper;
+
     /** @var UserAccessMapper */
     private $userAccessMapper;
 
@@ -57,6 +60,7 @@ class Controller extends Base
      *
      * @param UserMapper                  $userMapper
      * @param TermMapper                  $termMapper
+     * @param FolderMapper                $folderMapper
      * @param UserAccessMapper            $userAccessMapper
      * @param AssessmentMapperProxy       $assessmentMapperProxy
      * @param External_TimetableInterface $timetableHandler
@@ -64,12 +68,14 @@ class Controller extends Base
     public function __construct(
         UserMapper $userMapper,
         TermMapper $termMapper,
+        FolderMapper $folderMapper,
         UserAccessMapper $userAccessMapper,
         AssessmentMapperProxy $assessmentMapperProxy,
         External_TimetableInterface $timetableHandler
     ) {
         $this->userMapper            = $userMapper;
         $this->termMapper            = $termMapper;
+        $this->folderMapper          = $folderMapper;
         $this->userAccessMapper      = $userAccessMapper;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->timetableHandler      = $timetableHandler;
@@ -438,8 +444,7 @@ class Controller extends Base
 
 
             // Step 1: retrieve folder IDs
-            // TODO inject folder mapper
-            $folderIds = FolderMapper::getInstance()->findFolderIdsForUser(
+            $folderIds = $this->folderMapper->findFolderIdsForUser(
                 $studentCurrent,
                 $studentCurrent->getRole()->isStudent() && !$studentCurrent->getHideTimetable(),
                 UserAccess::ACCESS_READ,
