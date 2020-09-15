@@ -42,7 +42,6 @@ class Decorator implements DecoratorInterface
     /**
      * @param Task $assessment
      * @throws \InvalidArgumentException
-     * @throws \Schoolbox\Resource\Exception
      * @throws \UnexpectedValueException
      */
     public function decorate($assessment)
@@ -57,21 +56,38 @@ class Decorator implements DecoratorInterface
          */
         $newList = new Collection();
 
+        /* $this->getAttachedFiles() is a list of hashes
+         */
         if (count($this->getAttachedFiles())) {
+
+            /* These are the task_file relations we already know about
+             */
+            $existing = $assessment->getAttachedFiles()->indexBy('hash')->getAll();
+
             $factory     = new CollectorFactory();
             $attachments = $factory->build($this->getAttachedFiles())->getAll();
 
+            /* Exclude any hashes that are no longer in the set
+             */
             foreach ($attachments as $file) {
-                $x = new TaskFile();
 
-                $newList->add(
-                    (new TaskFile())
-                        ->setStorage($file)
-                        ->setBasename($file->getBasename())
-                );
+                /* If this was already in the $assessment model:
+                 *
+                 * Reuse the id in the task_file table so we don't keep accumulating relations
+                 * Get its latest name and update that
+                 *
+                 * Otherwise insert it as a new task_file relationship
+                 */
+                $taskFile = $existing[$file->getHash()] ?? new TaskFile();
+
+                $taskFile->setStorage($file)
+                    ->setBasename($file->getBasename());
+
+                $newList->add($taskFile);
             }
         }
 
         $assessment->setAttachedFiles($newList);
     }
 }
+
