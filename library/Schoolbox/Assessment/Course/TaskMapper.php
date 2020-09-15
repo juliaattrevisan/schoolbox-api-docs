@@ -112,6 +112,17 @@ class TaskMapper extends Schoolbox\Mapper
 
 
     /**
+     * Persist Task files.
+     *
+     * @param Task $task
+     */
+    public function saveFiles(Task $task): void
+    {
+        $this->cascadeJoin('files', ['task_id' => $task->getId()], $task->getAttachments());
+    }
+
+
+    /**
      * Soft deletes all Completions for the specified Task
      *
      * @param Task $task

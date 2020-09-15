@@ -906,8 +906,13 @@ class MapperProxy
         }
 
         if ($subObject instanceof Task) {
-            TaskMapper::getInstance()->save($subObject);
+            $taskMapper = TaskMapper::getInstance();
 
+            /* Save the Task before the files, because you need the primary key
+             * in the relational table
+             */
+            $taskMapper->save($subObject);
+            $taskMapper->saveFiles($subObject);
         } elseif ($subObject instanceof SubmissionBox) {
             // Legacy DueWork SitePage Controllers require that we preserve this field
             $subObject->setCategory($assessable->getBaseContext()->getFolder());
