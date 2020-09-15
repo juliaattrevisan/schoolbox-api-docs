@@ -18,7 +18,7 @@
                     } %}
                 </label>
             </div>
-            <div class="small-12 medium-3 large-3 columns">
+            <div class="small-12 medium-3 columns">
                 <label title="Mapping Type">
                     {% include 'sub/select.twig' with {
                         name: 'rule[' ~ currentEffect.rule.id ~ '][effect][' ~ currentEffect.id ~ '][type]',
@@ -34,7 +34,7 @@
                     } %}
                 </label>
             </div>
-            <div class="small-12 columns">
+            <div class="small-12 columns no-pad">
                 <div data-effect-fragment="{{ currentEffect.id }}">
                     {% include allEffectStructures.fragments[currentEffect.id].fragment.getFilename() %}
                 </div>
