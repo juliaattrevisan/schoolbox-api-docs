@@ -22,7 +22,6 @@ use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -46,6 +45,11 @@ class Controller extends Base
     private $timetableHandler;
 
     /**
+     * @var Finder
+     */
+    private $participationFinder;
+
+    /**
      * Test URLS:
      * https://vagrant.dev.schoolbox.cloud/picker/datetime                                         <-- HTML for injecting into modal
      * https://vagrant.dev.schoolbox.cloud/picker/datetime/date/{date}                             <-- All appointments on a given date
@@ -60,19 +64,22 @@ class Controller extends Base
      * @param FolderMapper                $folderMapper
      * @param UserAccessMapper            $userAccessMapper
      * @param External_TimetableInterface $timetableHandler
+     * @param Finder                      $participationFinder
      */
     public function __construct(
         UserMapper $userMapper,
         TermMapper $termMapper,
         FolderMapper $folderMapper,
         UserAccessMapper $userAccessMapper,
-        External_TimetableInterface $timetableHandler
+        External_TimetableInterface $timetableHandler,
+        Finder $participationFinder
     ) {
-        $this->userMapper       = $userMapper;
-        $this->termMapper       = $termMapper;
-        $this->folderMapper     = $folderMapper;
-        $this->userAccessMapper = $userAccessMapper;
-        $this->timetableHandler = $timetableHandler;
+        $this->userMapper          = $userMapper;
+        $this->termMapper          = $termMapper;
+        $this->folderMapper        = $folderMapper;
+        $this->userAccessMapper    = $userAccessMapper;
+        $this->timetableHandler    = $timetableHandler;
+        $this->participationFinder = $participationFinder;
     }
 
     /**
@@ -418,10 +425,6 @@ class Controller extends Base
      */
     private function studentsDueWithinRange(Alaress_Date_Format $start, Alaress_Date_Format $end, Folder $folder): array
     {
-        // Build the finder object
-        $customParticipationFinder = new Finder($this->userMapper->getDatabase());
-
-
         // Get all students for the class or the group
         $studentList = $this->userAccessMapper->findUsersInCategory(
             $folder,
@@ -450,7 +453,7 @@ class Controller extends Base
 
 
             // Step 2: get participation for the student from the folder
-            $participations = $customParticipationFinder->findParticipationsForStudentInFolders(
+            $participations = $this->participationFinder->findParticipationsForStudentInFolders(
                 $folderIds,
                 $studentCurrent->getId(),
                 $start,
