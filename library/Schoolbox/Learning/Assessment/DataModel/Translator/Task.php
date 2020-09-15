@@ -94,6 +94,8 @@ class Task implements IAssessmentTypeTranslator
 
         // Translate files
         if ($domainObject->getAttachedFiles() !== null) {
+            $now = \Alaress_Date_Format::now();
+
             $dataModel->setAttachments(new GenericCollection(TaskFileModel::class));
 
             foreach ($domainObject->getAttachedFiles() as $file) {
@@ -103,6 +105,8 @@ class Task implements IAssessmentTypeTranslator
                         ->setTask($dataModel)
                         ->setStorage($file->getStorage())
                         ->setBasename($file->getBasename())
+                        ->setCreatedAt($now)
+                        ->setUpdatedAt($now)
                 );
             }
         }
@@ -137,6 +141,9 @@ class Task implements IAssessmentTypeTranslator
                         ->setId($attachment->getId())
                         ->setFilename($attachment->getFilename())
                         ->setStorage($attachment)
+                        ->setCreatedAt($attachment->getCreatedAt())
+                        ->setUpdatedAt($attachment->getUpdatedAt())
+                        ->setDeletedAt($attachment->getDeletedAt())
                 );
             }
         }

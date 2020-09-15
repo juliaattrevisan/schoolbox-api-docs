@@ -5,6 +5,9 @@ CREATE TABLE `task_file` (
     `storage_id` VARCHAR(100) NULL DEFAULT NULL,
     `task_id` INT(10) UNSIGNED NOT NULL,
     `realname` VARCHAR(255) NULL DEFAULT NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `deleted_at` DATETIME NULL DEFAULT NULL,
     PRIMARY KEY (`id`));
 
 -- Set up indexes

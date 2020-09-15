@@ -12,6 +12,7 @@ use PDOStatement;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\File\Mimetype;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -35,6 +36,9 @@ class Mapper extends BaseMapper
         $this->joins('task_id', TaskMapper::class, 'id', null, null, 'task', 'task');
         $this->joins('storage_id', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('realname', self::TYPE_STRING, null, 'filename');
+        $this->uses('created_at', self::TYPE_DATETIME);
+        $this->uses('updated_at', self::TYPE_DATETIME);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
 

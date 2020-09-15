@@ -9,6 +9,10 @@ namespace Schoolbox\Assessment\Course\Task\File;
 
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\User;
@@ -16,9 +20,12 @@ use Schoolbox\User;
 /**
  * File attached to a task.
  */
-class Model implements IFile
+class Model implements IFile, ISoftDeletable
 {
     use StorableTrait;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
 
     /**
@@ -62,5 +69,15 @@ class Model implements IFile
     public function getCreatedAt()
     {
         return $this->storage->getCreatedAt();
+    }
+
+
+    /**
+     * Is this object deleted?
+     *
+     * @return bool
+     */
+    public function isDeleted() {
+        return ($this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull());
     }
 }

@@ -6,7 +6,9 @@
  */
 namespace Schoolbox\Learning\Assessment\Task;
 
-use Alaress_Date_Format;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\Resource\Storage\IStorage;
 
@@ -20,12 +22,7 @@ use Schoolbox\Resource\Storage\IStorage;
 class File implements IStorage
 {
     use StorableTrait;
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->storage->getCreatedAt();
-    }
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 }
