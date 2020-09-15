@@ -144,7 +144,7 @@ class CompletionMapper extends Mapper {
             // Try to streamline task+assessment creation too
             /** @var Task $task */
             $task = $this->createJoinModel('task', $row['t.id']);
-            $task->setAssessmentModel($this->createJoinModel('task.assessment_id', $row['t.assessment_id']));
+            $task->setAssessmentModel($this->createJoinModel('task.assessmentModel', $row['t.assessment_id']));
 
             $completion
                 ->setTask($task)
