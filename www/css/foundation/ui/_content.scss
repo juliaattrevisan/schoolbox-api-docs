@@ -1706,12 +1706,17 @@ $progress-tick-size-tiny:    rem-calc($base-font-size * 0.75);
 
     &.failed {
         background-color: $alert-color;
-      //border-radius: $progress-tick-size-regular;
+
         &:before {
             visibility: visible;
             content: '\0021';
-            font-weight: bolder;
-            font-size: 1.3rem;
+            font-weight: $font-weight-bold;
+            font-size: 1.5rem;
+            line-height: 1.2;
+        }
+        &.small:before {
+            font-size: 1.25rem;
+            line-height: .85;
         }
     }
 }
