@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## Smoke test runs a setup script first
-./schoolbox-qa/tools/ci/smoketest-setup.sh
+./schoolbox-develop/tools/ci/smoketest-setup.sh
 echo "smoke tests setup"
 cd /vagrant
 echo "cd into vagrant"
