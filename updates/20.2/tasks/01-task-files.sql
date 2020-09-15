@@ -11,5 +11,4 @@ CREATE TABLE `task_file` (
 
 ALTER TABLE `task_file`
     ADD INDEX `task_id` (`task_id` ASC),
-    ADD INDEX `storage_id` (`storage_id` ASC),
-    ADD UNIQUE INDEX `storage_id_task_id` (`storage_id` ASC, `task_id` ASC);
+    ADD INDEX `storage_id` (`storage_id` ASC);
