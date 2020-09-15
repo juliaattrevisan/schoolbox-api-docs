@@ -16,7 +16,7 @@ use Schoolbox\Learning\Assessment\Task\File as TaskFile;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as TaskObject;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
-
+use Schoolbox\Assessment\Course\Task\File\Model as TaskFileModel;
 
 /**
  * Sub-translator for task specific fields.
@@ -94,11 +94,11 @@ class Task implements IAssessmentTypeTranslator
 
         // Translate files
         if ($domainObject->getAttachedFiles() !== null) {
-            $dataModel->setAttachments(new GenericCollection(TaskFile::class));
+            $dataModel->setAttachments(new GenericCollection(TaskFileModel::class));
 
             foreach ($domainObject->getAttachedFiles() as $file) {
                 $dataModel->getAttachments()->add(
-                    (new \Schoolbox\Assessment\Course\Task\File\Model())
+                    (new TaskFileModel())
                         ->setId($file->getId())
                         ->setTask($dataModel)
                         ->setStorage($file->getStorage())
