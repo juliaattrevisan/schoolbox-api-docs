@@ -10,8 +10,8 @@
                 preselected: currentCondition.arguments[0] ?? null
             } %}
         </div>
-        <div class="small-12 columns">
-            <span id='condition-{{ currentCondition.id }}-status' data-label-status class="label highlight full-width {{ (meta.condition[currentCondition.id].status ?? false) ? '' : 'hide' }}">{{ meta.condition[currentCondition.id] ?? '' }}</span>
+        <div class="small-12 columns {{ (meta.condition[currentCondition.id].status ?? false) ? '' : 'hide' }}">
+            <div id='condition-{{ currentCondition.id }}-status' data-label-status class="label highlight full-width">{{ meta.condition[currentCondition.id] ?? '' }}</div>
         </div>
     </div>
 </div>

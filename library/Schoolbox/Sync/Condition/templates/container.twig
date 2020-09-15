@@ -1,8 +1,7 @@
-<li id="condition-{{ currentCondition.id }}" class="actions-small-1 content" data-condition data-locked="{{ meta.condition[currentCondition.id].lock.status ?? '' }}">
+<li id="condition-{{ currentCondition.id }}" class="actions-small-1" data-condition data-locked="{{ meta.condition[currentCondition.id].lock.status ?? '' }}">
     <input type="hidden" name="rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][type]" value="{{ currentCondition.conditionType.id }}">
 
     {% include allConditionStructures.fragments[currentCondition.id].subfragments.fragment.getFilename() %}
-
     <nav>
         <a href="/adminv2/ups/condition/delete/{{ currentCondition.id }}" class="icon-delete" title="Delete" data-condition-delete="{{ currentCondition.id }}"></a>
     </nav>
