@@ -390,7 +390,7 @@ class Model extends AbstractAssessment
 
     /**
      * @param Collection|File[] $attachedFiles
-     * @return \Schoolbox\Learning\Assessment\Task\Model
+     * @return $this
      */
     public function setAttachedFiles($attachedFiles)
     {
