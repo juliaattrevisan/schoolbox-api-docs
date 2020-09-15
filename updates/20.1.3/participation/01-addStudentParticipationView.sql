@@ -1,8 +1,9 @@
 -- A view for querying custom assessment participation
 CREATE OR REPLACE VIEW v_assessment_participation AS
 SELECT
-    a.id      AS assessment_id,
-    p.user_id AS student_id,
+    a.id         AS assessment_id,
+    a.deleted_at AS assessment_deleted_at,
+    p.user_id    AS student_id,
     var.folder_id,
     pp.is_dynamic,
     COALESCE(pp.description, a.description)   AS description,
