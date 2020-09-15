@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Participant;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
-use Alaress\IDatabase;
 use Alaress_Date_Format;
 
 /**
@@ -19,7 +19,7 @@ use Alaress_Date_Format;
 class Finder
 {
     /**
-     * @var IDatabase
+     * @var IConnector
      */
     private $database;
 
@@ -27,9 +27,9 @@ class Finder
     /**
      * Constructor
      *
-     * @param IDatabase $database
+     * @param IConnector $database
      */
-    public function __construct(IDatabase $database)
+    public function __construct(IConnector $database)
     {
         $this->database = $database;
     }
@@ -81,7 +81,7 @@ class Finder
 
 
         // Part 1: get all assessments in folder due within the window
-        $assessmentQuery = $this->database->query(
+        $assessmentQuery = $this->database->getQueryIterator(
             "
                 SELECT
                     var.assessment_id,
@@ -121,7 +121,7 @@ class Finder
             $assessmentPrefix       = 'assessment';
             $assessmentParams       = Builder::getArrayParameters($assessmentIds, $assessmentPrefix);
             $assessmentPlaceholders = Builder::getArrayPlaceholders($assessmentIds, $assessmentPrefix);
-            $query                  = $this->database->query(
+            $query                  = $this->database->getQueryIterator(
                 "
                     SELECT
                         vap.assessment_id,
@@ -153,7 +153,7 @@ class Finder
 
         // Part 3: get CAP for student for folder, within the window
         // Override any assessment details
-        $customParticipationQuery = $this->database->query(
+        $customParticipationQuery = $this->database->getQueryIterator(
             "
                 SELECT
                     vap.assessment_id,
