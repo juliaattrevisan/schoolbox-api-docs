@@ -12,7 +12,6 @@ use PDOStatement;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\File\Mimetype;
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
