@@ -62,23 +62,4 @@ trait TaskTrait
         $this->url = $url;
         return $this;
     }
-
-    /**
-     * @return array|string[]
-     */
-    public function getAttachedFiles()
-    {
-        return $this->attachedFiles;
-    }
-
-    /**
-     * @param array|string[] $attachedFiles
-     * @return $this
-     */
-    public function setAttachedFiles($attachedFiles)
-    {
-        $this->attachedFiles = $attachedFiles;
-        return $this;
-    }
-
 }

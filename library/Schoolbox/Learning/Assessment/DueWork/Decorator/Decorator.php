@@ -20,6 +20,7 @@ use Schoolbox\Assessment\Rubric\Grid\Importer\GenericImporter;
 use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
 use Schoolbox\Collection;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Assessment\AttachedFilesTrait;
 use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -39,6 +40,7 @@ use UnexpectedValueException;
 class Decorator implements DecoratorInterface
 {
     use DueWorkTrait;
+    use AttachedFilesTrait;
 
     /** @var DueWork|null $original */
     private $original;
@@ -56,7 +58,7 @@ class Decorator implements DecoratorInterface
      * @param float|null   $maxMark
      * @param array|null   $rubricData
      * @param array        $attachedFiles
-     * @param string       $selfReviewable
+     * @param string|null  $selfReviewable
      * @param bool         $similarityCheckEnabled
      * @param DueWork|null $original
      */

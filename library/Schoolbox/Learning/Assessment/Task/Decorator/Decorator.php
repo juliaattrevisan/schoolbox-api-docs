@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Learning\Assessment\Task\Decorator;
 
+use Schoolbox\Learning\Assessment\AttachedFilesTrait;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -18,19 +19,20 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 class Decorator implements DecoratorInterface
 {
     use TaskTrait;
+    use AttachedFilesTrait;
 
     /**
      * Decorator constructor.
      *
      * @param bool $hasSelfAssessed
      * @param string $url
-     * @param string $attachedFile
+     * @param array|string[] $attachedFiles
      */
-    public function __construct($hasSelfAssessed, $url, $attachedFile)
+    public function __construct($hasSelfAssessed, $url, $attachedFiles)
     {
         $this->setHasSelfAssessed($hasSelfAssessed);
         $this->setUrl($url);
-        $this->setAttachedFile($attachedFile);
+        $this->setAttachedFiles($attachedFiles);
     }
 
     /**
@@ -46,7 +48,7 @@ class Decorator implements DecoratorInterface
         // (ripped out of old task save form)
         $url = $this->getUrl();
         if (empty($url)) {
-            $attachment = $this->getAttachedFile();
+            $attachment = $this->getAttachedFiles();
             if (!empty($attachment)) {
                 $folderPrefix = \Schoolbox\Resource\Browser\NodeFactory::SBFS . '.folder:';
                 if (strpos($attachment, $folderPrefix) === 0) {
