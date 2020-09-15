@@ -818,10 +818,10 @@ class MapperProxy
      *
      * This method does not load participation.
      *
-     * @param User                $staff
-     * @param Alaress_Date_Format $from    If provided, fetch only assessables due on or after this date
-     * @param Alaress_Date_Format $to      If provided, fetch only assessables due on or before this date
-     * @param array               $options Any other query options
+     * @param User                     $staff
+     * @param Alaress_Date_Format|null $from    If provided, fetch only assessables due on or after this date
+     * @param Alaress_Date_Format|null $to      If provided, fetch only assessables due on or before this date
+     * @param array                    $options Any other query options
      * @return GenericCollection|IAssessable[]
      */
     public function findAllByStaffBetweenDates(
