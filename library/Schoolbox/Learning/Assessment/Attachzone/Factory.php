@@ -54,21 +54,26 @@ class Factory
      */
     protected function buildForTask(Task $task)
     {
-        $zone = new Zone('files');
-        $zone->setMulti(true)
-             ->setAttachmentsLabel('');
-
-        /* Figure out what the hash is
-         */
         $hashes = [];
 
+        /* Take advantage of a somewhat obscure implementation inside the Attachzone
+         * see Zone.php:99, where it will just use an IStorage instance with whatever its
+         * contents are. If you provide it a hash, it'll go to the storage table and extract
+         * the last known details about the file (including its latest name)
+         *
+         * If you give it the IStorage instance, it'll just blindly use that without visiting
+         * the storage table
+         *
+         * This seems really obscure, not sure if intentionally obscure? Anyway
+         */
         foreach ($task->getAttachedFiles() as $file) {
-            $hashes[] = $file->getHash();
+            $hashes[] = $file;
         }
 
-        $zone->attachFiles($hashes);
-
-        return $zone;
+        return (new Zone('files'))
+             ->setMulti(true)
+             ->setAttachmentsLabel('')
+             ->attachFiles($hashes);
     }
 
     /**
