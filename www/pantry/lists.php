@@ -26,14 +26,12 @@ $data = [
         '/icons' => 'Icons',
         '/typography' => 'Typography',
         '/editor' => 'Editor',
-        '/layout' => 'Layouts',
         '/form' => 'Form',
         '/form-progressive' => 'Form Progressive',
         '/tables' => 'Tables',
         '/lists' => 'Lists',
         '/feature-tour' => 'Feature Tour',
         '/reveal' => 'Reveal',
-        '/redux' => 'Sample Entities',
         '/reference' => 'Visibility Classes'
 
     ]
