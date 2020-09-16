@@ -76,10 +76,16 @@ $app = new class extends CliTool\App {
             ));
         }
 
-        /* TODO Potentially clear task.link of any contents that contained STORAGE_LINK_PREFIX
-         *  since those were supposed to have migrated to task_link
-         *  but should we even try to do that in a master fix...?
+        /* Clear task.link of any contents that contained STORAGE_LINK_PREFIX
+         * since those were supposed to have migrated to task_link
          */
+        $query = "
+            UPDATE task
+            SET link = ''
+            WHERE link LIKE '" . self::STORAGE_LINK_PREFIX . "%'
+        ";
+
+        $statement = $this->getDatabaseInternal()->executeQuery($query);
     }
 };
 
