@@ -6,17 +6,22 @@ This file is internal use and is not shipped to clients.
 
 ## Directory and Structure
 
+* api - former home of Schoolbox API documentation, has since moved to
+  https://github.com/alaress/schoolbox-api-docs
+* conf - initialisation code for Schoolbox modules, see the [MVC docs](./docs/mvc/readme.md)
+  for more information
 * dav - WebDav site for exporting the Schoolbox resources
+* data - client data and caches (client side only)
 * debian - APT package building definitions (not deployed to clients)
-* include
-* library - external (from Schoolbox core) and 3rd party libraries
+* docs - documentation for developers
+* library - Schoolbox code base
+* node_modules - directory for external libraries loaded via NPM
 * sql - initial sql schema configuration for new installations
 * templates - default and per client skins
 * test - PHP and other tests (not deployed to clients)
 * tools - Build, update and maintenance tools. Also includes cli scripts for sync.
 * updates - per release update files, primarily sql schema changes
-* www
-* data - client data and caches (client side only)
+* www - files and scripts accessible directly via the web
 * vendor - directory for external libraries loaded via Composer
 
 ## Installation
