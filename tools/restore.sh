@@ -133,7 +133,7 @@ setsqlconfig() {
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternalportal' WHERE name='external_portal'";
 
     #SAML Config
-    mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlssourl' WHERE name='saml_sso_url'";
+  mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlssourl' WHERE name='saml_sso_url'";
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlidpmetadataurl' WHERE name='saml_idp_metadata_url'";
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlenabled' WHERE name='saml_enabled'";
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlsloenabled' WHERE name='saml_slo_enabled'";
@@ -161,6 +161,43 @@ truncateTables() {
     mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "TRUNCATE mobile_app_registry";
 }
 
+liveCheck() {
+	echo "Making sure this is a dev server..."
+	if [[ $package != *schoolboxdev* ]]; then
+		if [ "$syncType" != "live" ]; then
+			echo "Not a dev server. Pretty sure you don't want to run a sync from the dev to the live server. If you really really do, run the restore script with the -local flag to override";
+			#Run with -live arg do override;
+			exit 1;
+		else
+			echo "You have chosen to sync to your live server. You probably don't want to do this. Proceed with caution";
+		fi
+	else
+		echo "Looks like it is a dev server!"
+	fi
+}
+
+#Sets $syncType to "db" or "full" if args provided from cli
+setSyncType() {
+	#If the first argument is defined, we might be trying to automatically do a db or full sync from latest backup
+	if [ "$1" == "" ]; then
+			echo "No sync type chosen, requesting user input..."
+      syncType="";
+		else
+			if [ "$1" == "-db" ]; then
+				syncType="db";
+			elif [ "$1" == "-full" ]; then
+				syncType="full";
+			elif [ "$1" == "-local" ]; then
+				syncType="live";
+      else
+        echo "Invalid first arg : '$1'"
+        exit 1;
+			fi
+	fi
+}
+
+setSyncType $1;
+liveCheck;
 tempconffile="$conffile";
 readconf;
 
@@ -200,7 +237,6 @@ if [ ! -d "$thisdatadir" ]; then
   errmsg="Data directory '$thisdatadir' is not a directory";
   error;
 fi
-
 
 # Check we have correct access to this install
 echo -e "\n* Checking Permissions *";
@@ -345,49 +381,60 @@ do
 done
 
 # Provide a pretty list of backups to recover from
-echo -e "\n\nPlease select a source to restore from:";
-sbrlp="$sbrl-pretty";
-cat -n $sbrl > $sbrlp;
-sed -i 's/[L]/Local/g' $sbrlp;
-sed -i 's/\[Local\]/\[Local\]\ /g' $sbrlp;
-sed -i 's/[R]/Remote/g' $sbrlp;
-sed -i 's/[B]/Backup/g' $sbrlp;
-sed -i 's/\[D\]/DB\ \ /g' $sbrlp;
-sed -i 's/\[A\]/Full/g' $sbrlp;
-sed -i 's/,/\ -\ /g' $sbrlp;
-sed -i 's/\/etc\/schoolbox\/conf.php/Schoolbox\ Live/g' $sbrlp;
-sed -i 's/\/etc\/schoolboxdev\/conf.php/Schoolbox\ Dev/g' $sbrlp;
-sed -i 's/\/vagrant\/www\/conf\/conf.php/Vagrant\ Install/g' $sbrlp;
-sed -i 's/\/etc\/schoolbox-backup-cifs.conf/Schoolbox\ Live/g' $sbrlp;
-sed -i 's/\/etc\/schoolboxdev-backup-cifs.conf/Schoolbox\ Dev/g' $sbrlp;
-echo "Option  Location   Type   Details";
-cat $sbrlp;
+if [ "$syncType" == "" ] || [ "$syncType" == "local" ]; then
+  echo -e "\n\nPlease select a source to restore from:";
+  sbrlp="$sbrl-pretty";
+  cat -n $sbrl > $sbrlp;
+  sed -i 's/[L]/Local/g' $sbrlp;
+  sed -i 's/\[Local\]/\[Local\]\ /g' $sbrlp;
+  sed -i 's/[R]/Remote/g' $sbrlp;
+  sed -i 's/[B]/Backup/g' $sbrlp;
+  sed -i 's/\[D\]/DB\ \ /g' $sbrlp;
+  sed -i 's/\[A\]/Full/g' $sbrlp;
+  sed -i 's/,/\ -\ /g' $sbrlp;
+  sed -i 's/\/etc\/schoolbox\/conf.php/Schoolbox\ Live/g' $sbrlp;
+  sed -i 's/\/etc\/schoolboxdev\/conf.php/Schoolbox\ Dev/g' $sbrlp;
+  sed -i 's/\/vagrant\/www\/conf\/conf.php/Vagrant\ Install/g' $sbrlp;
+  sed -i 's/\/etc\/schoolbox-backup-cifs.conf/Schoolbox\ Live/g' $sbrlp;
+  sed -i 's/\/etc\/schoolboxdev-backup-cifs.conf/Schoolbox\ Dev/g' $sbrlp;
+  echo "Option  Location   Type   Details";
+  cat $sbrlp;
+  echo -e "\nOption: \c" && read restoreoption;
 
-echo -e "\nOption: \c" && read restoreoption;
+  totaloptions=`wc -l $sbrl|cut -d' ' -f1`;
+  if [ $restoreoption -gt $totaloptions ];
+  then
+	  errmsg="Your selected option '$restoreoption' is not available";
+	  error;
+  fi
 
-totaloptions=`wc -l $sbrl|cut -d' ' -f1`;
-if [ $restoreoption -gt $totaloptions ];
-then
-	errmsg="Your selected option '$restoreoption' is not available";
-	error;
-fi
-restore=`sed -n "$(echo $restoreoption)p" $sbrl 2>/dev/null`;
-restorepretty=`sed -n "$(echo $restoreoption)p" $sbrlp 2>/dev/null`;
+  restore=`sed -n "$(echo $restoreoption)p" $sbrl 2>/dev/null`;
+  restorepretty=`sed -n "$(echo $restoreoption)p" $sbrlp 2>/dev/null`;
 
-if [ -z $restore ];
-then
-	errmsg="That option does not exist";
-	error;
-fi
+  if [ -z $restore ];
+  then
+  	errmsg="That option does not exist";
+  	error;
+  fi
 
-# Provide feedback for confirmation of what is to be done based on above questions.
-echo -e "\n $restorepretty";
-echo -e "\n     Restore into '$package' at '$instdir'";
-echo -e "\nIs this the correct option? (y/n): \c" && read confirm;
-if [ "$confirm" != "y" ];
-then
-	errmsg="Restore Cancelled";
-	error;
+  # Provide feedback for confirmation of what is to be done based on above questions.
+  echo -e "\n $restorepretty";
+  echo -e "\n     Restore into '$package' at '$instdir'";
+  echo -e "\nIs this the correct option? (y/n): \c" && read confirm;
+  if [ "$confirm" != "y" ];
+  then
+  	errmsg="Restore Cancelled";
+  	error;
+  fi
+elif [ "$syncType" == "db" ]; then
+  restore=`cat $sbrl | grep '\[D\]' | grep daily | tail -n 1`;
+  restorepretty=`cat $sbrlp | grep "DB" | grep daily | tail -n 1`
+elif [ "$syncType" == "full" ]; then
+  restore=`cat $sbrl | grep '\[A\]' | grep daily | tail -n 1`;
+  restorepretty=`cat $sbrlp | grep "Full" | grep daily | tail -n 1`
+else
+  errmsg="Your selected sync type '$syncType' is not available";
+  error;
 fi
 
 # Details of restore source
@@ -396,6 +443,17 @@ sourcetype=`echo $restore | cut -d',' -f2`;
 sourcep1=`echo $restore | cut -d',' -f3`;
 sourcep2=`echo $restore | cut -d',' -f4`;
 sourcep3=`echo $restore | cut -d',' -f5`;
+
+# Check if a full restor can be done
+if [ "$sourcetype" == '[A]' ] && [ "$sourceloc" == '[R]' ]; then
+  localAvailableStorage=$(df | grep datapool | awk -F " " '{print $2}');
+  remoteUsedStorage=$(ssh $host df | grep datapool | awk -F " " '{print $3}');
+  if [ $localAvailableStorage -le $remoteUsedStorage ]
+    errmsg="You are trying to restore more data ($remoteUsedStorage 1K-blocks) than disk that is available ($localAvailableStorage 1K-blocks)";
+    error;
+  fi
+  echo "Full sync space check passed: available - $localAvailableStorage 1K-blocks / needed - $remoteUsedStorage 1K-blocks"
+fi
 
 # Sync the datafiles, with progress if possible
 backup_dir='/mnt/SchoolboxBackupRestore';
