@@ -162,56 +162,16 @@ class Controller extends Assessment\Controller
 
             $previewFragment = (new PreviewFactory($translator))->urlFragment($assessment->getUrl());
 
-            if (($previewFragment['type'] === 'redirect' || $previewFragment['type'] === 'iframe')
-                && !$assessment->getDescription()) {
-
-                // Don't save a response if instructor is looking at student's summary page
-                if ($assessment->isSelfAssessable() && (int)$student->getId() === (int)$this->getUser()->getId()) {
-                    try {
-                        $this->saveTaskResponse(TaskCompletion::STATUS_SELF_ASSESSED_COMPLETE, $assessment, $student);
-                    } catch (ConcurrentModificationException $e) {
-                        // noop. This is expected to happen from time to time. No need to log.
-                    } catch (InvalidTaskResponseException $e) {
-                        // Something else when wrong. Probably a bug. Need to know about this.
-                        $this->captureException($e);
-                    }
-                }
-
-                /* Just forward if we only have a URL, regardless of iframe safe or not.
-                 */
-                $this->getResponse()->redirect->temporaryRedirect($previewFragment['fragment']);
-                return;
-            } elseif ($previewFragment['type'] === 'image') {
-
-                /* The specified url is actually an image
-                 *
-                 * This actually has the same url structure as any other regular file
-                 * so we need to check for image-ness first
-                 *
-                 * In this case $previewFragment['fragment'] already contains the url
-                 * and we don't need to do anything more
-                 */
-
-            } elseif ($previewFragment['type'] === 'inline') {
-
-                /* Embedded content like youtube videos etc
-                 */
+            /* Embedded content like youtube videos etc as an inline hunk of html
+             * It manifests under the file list
+             */
+            if ($previewFragment['type'] === 'inline') {
                 $previewFragment['fragment'] = $this->buildUnthemedHtmlOutput($previewFragment['twig']['template'], $previewFragment['twig']['data'])->getAsString();
-            } elseif ($foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $assessment->getUrl(), $matches)) {
-
-                /* Other regular files
-                 *
-                 * Download them as some kind of attachment
-                 */
-                $previewFragment['type'] = 'file';
-                try {
-                    $previewFragment['file'] = StorageMapper::getInstance()->findByHash($matches[1]);
-                }
-                catch (MapperException $e) {
-                    $previewFragment = [];
-                }
             }
 
+            /* Otherwise, just go to the Summary screen and show all these pieces:
+             * previewFragment['type'] is one of ['redirect', 'iframe', 'image']
+             */
         }
 
         if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
