@@ -73,11 +73,10 @@ class Mapper extends BaseMapper
             /** @var Model $result */
             $result = $this->hydrate($row);
 
-            /**
-             * @var Storage      $storage
-             * @var Mimetype     $mime
-             */
+            /** @var Storage $storage */
             $storage = $this->hydrateJoin($row, 'storage', 'f');
+
+            /** @var Mimetype $mime */
             $mime    = $this->hydrateJoin($row, 'storage.allowedFileExtension', 'm');
 
             $resultSet[$result->getId()] = $result->setStorage($storage->setMimetype($mime));
