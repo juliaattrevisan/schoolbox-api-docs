@@ -75,6 +75,11 @@ $app = new class extends CliTool\App {
                 $row['id']
             ));
         }
+
+        /* TODO Potentially clear task.link of any contents that contained STORAGE_LINK_PREFIX
+         *  since those were supposed to have migrated to task_link
+         *  but should we even try to do that in a master fix...?
+         */
     }
 };
 
