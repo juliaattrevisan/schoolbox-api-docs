@@ -68,42 +68,34 @@
 </section>
 {% endif %}
 
+{% if preview.type is not defined or preview.type in ['image', 'file', 'redirect'] %}
 
-{% if preview.type is not defined %}
     {# noop #}
-{% elseif preview.type == 'image' %}
-<section>
-    <div class="content">
-        <img src="{{ preview.fragment }}">
-    </div>
-</section>
-{% elseif preview.type == 'file' %}
-<section>
-    <div class="card small-12 compact">
-        <a href="/storage/fetch.php?hash={{ preview.file.hash }}">
-            <img src="/ajax/mime/{{ preview.file.mime }}" alt="Preview" class="mime {{ preview.file.mimetype }}" />
-            <h3>{{ preview.file.filename }}</h3>
-        </a>
-        <p class="meta">{{ preview.file.size|bytes}}</p>
-    </div>
-</section>
-{# a task link should display as a link regardless of whether iframe safe url or not #}
+
+    {# Unknown preview types are just ignored
+     # Images and other Files now render in their own list
+     # Links/urls (preview.type redirect) are rendered further up the screen under the description
+     #}
+
 {% elseif preview.type == 'iframe' %}
-<section>
-    <div class="card small-12">
-        <a href="{{ preview.fragment }}" target="_blank" title="Visit {{ preview.fragment }}">
-            <div class="icon-link"></div>
-            <h3>{{ assessment.title }}</h3>
-            <p class="meta">{{ preview.fragment }}</p>
-        </a>
-    </div>
-</section>
+
+    {# a task link should display as a link regardless of whether iframe safe url or not #}
+    <section>
+        <div class="card small-12">
+            <a href="{{ preview.fragment }}" target="_blank" title="Visit {{ preview.fragment }}">
+                <div class="icon-link"></div>
+                <h3>{{ assessment.title }}</h3>
+                <p class="meta">{{ preview.fragment }}</p>
+            </a>
+        </div>
+    </section>
+
 {% elseif preview.fragment|length %}
-<section>
+
     {# This usage of raw is because the embedded code is raw html for embedding external content etc using oEmbed or multimedia videos #}
-    <div class="content">
+    <section class="content">
         {{ preview.fragment | raw }}
-    </div>
-</section>
+    </section>
+
 {% endif %}
 
