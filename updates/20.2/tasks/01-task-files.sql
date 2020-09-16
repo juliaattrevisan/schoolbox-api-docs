@@ -31,3 +31,10 @@ ALTER TABLE `task_file`
             REFERENCES `storage` (`hash`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION;
+
+-- Make backup copy of task.link into task._link
+
+ALTER TABLE `task`
+    ADD COLUMN `_link` VARCHAR(2048) NULL AFTER `link`;
+
+UPDATE `task` SET _link = link;
