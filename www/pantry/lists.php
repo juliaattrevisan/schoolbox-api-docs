@@ -21,6 +21,7 @@ $data = [
     ],
     'subnav' => [
         '/' => 'Generic Content',
+        '/cards' => 'Cards',
         '/buttons' => 'Buttons',
         '/colours' => 'Colours',
         '/icons' => 'Icons',
