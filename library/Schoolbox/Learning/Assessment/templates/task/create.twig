@@ -64,6 +64,7 @@
             <script>
                 $(function() {
                     $('#modalLinkButton').schoolboxLink({
+                        allowedFiles: false,
                         allowedFilesystems: 'task',
                         onSelect: function(url, name, dialog) {
                             $('input[name="url"]').val(url);

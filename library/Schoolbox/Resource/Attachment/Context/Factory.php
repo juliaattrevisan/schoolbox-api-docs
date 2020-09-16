@@ -83,6 +83,7 @@ class Factory
          * other non-upload filesystems for adding Links to a Task.
          */
         'task' => [
+            'browse'    => Filesystem\BrowseController::class,
             'teams'     => Filesystem\TeamsController::class,
             'webdav'    => Filesystem\WebdavController::class,
             'google'    => Filesystem\GoogleController::class,
