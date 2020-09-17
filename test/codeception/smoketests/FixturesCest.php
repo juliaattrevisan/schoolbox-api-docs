@@ -12,7 +12,7 @@ namespace smoketests;
 
 use IntegrationTester;
 use Payload;
-use React\Tests\Socket\IntegrationTest;
+#use React\Tests\Socket\IntegrationTest;
 
 class FixturesCest
 {
@@ -342,5 +342,78 @@ class FixturesCest
         $i->sendRequest($deleteSchool);
         
         $i->seeResponseCodeIs('200');
+    }
+    
+    /**
+     * Request URL:
+     *
+     *
+     * @param IntegrationTester $i
+     */
+    public function createSport(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'AutoTest SportCreate ' . $timestamp;
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $i->seeResponseCodeIs('303');
+    }
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function updateSport(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'AutoTest SportChangeMe ' . $timestamp;
+        
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $sportMapper=\Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $sportModel=$sportMapper->findOneByColumn('name', $sportName);
+        
+        $updateSport = new Payload\Fixtures\Sport\Update($sportModel);
+        
+        $updateSport->editPosition(3, 'Position 3 edited');
+        $updateSport->deletePosition(2); //This will reduce the amount of positions thus making the names not match the position number
+        $updateSport->addPosition('Added edited position'); // This will add a new position.
+        
+        $newSportName= 'AutoTest SportUpdate ' . $timestamp;
+        $updateSport->setName($newSportName);
+        
+        $i->sendRequest($updateSport);
+        
+        $i->seeResponseCodeIs('303');
+        
+    }
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function deleteSport(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'AutoTest SportDeleteMe ' . $timestamp;
+        
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $sportMapper=\Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $sportModel=$sportMapper->findOneByColumn('name', $sportName);
+        
+        $deleteSport = new Payload\Fixtures\Sport\Delete($sportModel);
+        
+        $i->sendRequest($deleteSport);
+        
+        $i->seeResponseCodeIs('204');
     }
 }
