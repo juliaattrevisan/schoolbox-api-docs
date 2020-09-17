@@ -101,8 +101,10 @@ class FolderFetcher
 
         /* Iterate through folders, unsetting everything outside of $preservedClassIds
          */
+        $classIds = array_merge($preservedClassIds, $currentClasses->getPropertyValues('id'));
+
         foreach ($folders as $idx => $folder) {
-            if (!\in_array($folder->getId(), $preservedClassIds, false)) {
+            if (!\in_array($folder->getId(), $classIds, false)) {
                 $folders->offsetUnset($idx);
             }
         }
