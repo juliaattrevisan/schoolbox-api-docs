@@ -342,8 +342,14 @@ class ListController extends Web\Controller\Base
             $this->getResponse()->content->set($this->buildJsonOutput(['error' => 'Invalid visibility']));
             return;
         }
+
+        // get assessment before the visibility change for notification
+        $previous = $this->getAssessmentMapper()->getNotifier()->dehydrate($assessment);
         $assessment->setMarkVisibility($visibility);
         $this->getAssessmentMapper()->save($assessment);
+        // triggering notification explicitly, to notify marked, if necessary
+        $this->getAssessmentMapper()->getNotifier()->notify($assessment, $this->getUser(), $previous);
+
         $this->getResponse()->content->set($this->buildJsonOutput(['message' => 'Loaded successfully']));
     }
 
