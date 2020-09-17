@@ -29,7 +29,7 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract
         $mapper = TextboxMapper::getInstance();
 
         try {
-            $textbox = $mapper->findById($configValue);
+            $textbox = $mapper->findByIdWithFallback($configValue);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $textbox = $mapper->createModel();
         }
