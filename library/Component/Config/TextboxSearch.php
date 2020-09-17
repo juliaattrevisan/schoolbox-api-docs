@@ -59,17 +59,12 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract
             /* Construct urls if there is a component instance which displays this textbox
              */
             $viewUrl = "/homepage/{$textbox->getCategory()->getId()}#component{$firstUsageComponentId}";
-            $editUrl = "/homepage/{$textbox->getCategory()->getId()}/textBoxModify/{$firstUsageComponentId}#component{$firstUsageComponentId}";
         } else {
 
             /* Otherwise, you've linked to a now-deleted textbox and you don't have an explicit
-             * component in which to edit its contents
-             *
-             * TODO How do we deal with that scenario?
-             *  Wasn't there a Modify screen somewhere
+             * component in which to view or edit its contents
              */
-            $viewUrl = '';
-            $editUrl = '';
+            $viewUrl = '#';
         }
 
         // Is this component linked to a TextBox yet?
@@ -83,7 +78,6 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract
             'VAR_IS_LINKED'          => $isLinked ? 'true' : 'false',
             'COMPONENT_TEXTBOX_NAME' => $textbox->getHeading(),
             'VIEW_URL'               => $viewUrl,
-            'EDIT_URL'               => $editUrl,
         ]);
 
         if ($isLinked) {
