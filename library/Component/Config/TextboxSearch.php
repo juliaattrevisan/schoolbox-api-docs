@@ -61,8 +61,8 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract
             $viewUrl = "/homepage/{$textbox->getCategory()->getId()}#component{$firstUsageComponentId}";
         } else {
 
-            /* Otherwise, you've linked to a now-deleted textbox and you don't have an explicit
-             * component in which to view or edit its contents
+            /* Otherwise, you've linked to a textbox which no longer gets used in any components
+             * and you don't have an explicit means to view or edit its contents
              */
             $viewUrl = '#';
         }
