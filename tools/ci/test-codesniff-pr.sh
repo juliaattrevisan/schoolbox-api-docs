@@ -55,9 +55,18 @@ fi
 echo "Preparing conf.php"
 cp -f www/conf/tarball.conf.php www/conf/conf.php;
 
+echo "Gather changed files"
+BASESHA=cat .git/resource/metadata.json | jq -r ' .[] | select(.name=="base_sha") | .value'
+
+echo "Base sha = $BASESHA"
+
+CHANGED_FILES=$(git diff "$BASESHA" --name-only)
+
+echo "Files canged = $CHANGED_FILES"
+
 echo "Running php code sniffer checks"
 
-./vendor/bin/phpcs
+./vendor/bin/phpcs $FILES
 
 codesnifferResult=$?
 
