@@ -74,3 +74,8 @@ Other teams may have their own documentation on the Schoolbox product, possibly
 written in conjunction with the product team: that documentation is the
 responsibility of the other team, though product team members may and should
 feel encouraged to contribute to this external documentation.
+
+External documentation on Schoolbox exists in the following places:
+* [Schoolbox Help end-user documentation](https://help.schoolbox.com.au/homepage/2896)
+* [Support Wiki](https://schoolbox.atlassian.net/wiki/spaces/SUP/overview)
+* [Infrastructure Services Wiki](https://schoolbox.atlassian.net/wiki/spaces/IST/overview)
