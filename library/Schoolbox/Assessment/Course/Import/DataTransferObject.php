@@ -399,6 +399,18 @@ class DataTransferObject
      */
     private function recursiveGetDefaultOpenSpan(Project $projectSpec)
     {
+        /* Empty projects don't have any sub-assessment open_spans
+         *
+         * An open span is known as the Activity Duration in the frontend, so I guess this is supposed
+         * to elucidate or infer an ending date as an offset from its start.
+         *
+         * If you don't have any open_spans, it means you don't have any activities inside this project
+         * from which you can infer an ending date, so just use the unit date instead.
+         */
+        if (!$projectSpec->getAssessables()->count()) {
+            return null;
+        }
+
         $totalOpenSpan = 0;
         foreach ($projectSpec->getAssessables() as $subAssessment) {
             // Base Case: non-project
