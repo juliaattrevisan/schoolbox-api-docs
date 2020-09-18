@@ -324,7 +324,7 @@ class User extends DeprecatedModel
     {
         //search for a user based on at least one of the above fields
         //assumes at least one contains something
-        $query = "
+        $query = '
             SELECT
                 user.id AS uid,
                 title,
@@ -332,15 +332,16 @@ class User extends DeprecatedModel
                 lastname,
                 username,
                 groups.name AS gname,
-                year,
+                lyl.name AS year,
                 local_email,
                 alt_email,
                 synergy_id
             FROM user
             LEFT JOIN groups ON user.group_id = groups.id
+            LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id
             WHERE user.deleted_at IS NULL
             AND
-        ";
+        ';
         if ($keyword != "") {
             if (is_numeric($keyword)) {
                 $param = $this->db->quote($keyword);
