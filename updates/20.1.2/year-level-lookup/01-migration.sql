@@ -1,5 +1,10 @@
 /* Make a backup of user.year to user._year
  */
+ALTER TABLE `user`
+    ADD COLUMN `_year` VARCHAR(255) CHARACTER SET 'utf8mb4' NULL DEFAULT NULL AFTER `year`;
+
+UPDATE `user`
+SET `_year` = `year`;
 
 /* Get a list of existing lu_year_level.name rows
  */
