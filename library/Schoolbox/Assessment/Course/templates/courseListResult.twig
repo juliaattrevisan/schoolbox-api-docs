@@ -23,8 +23,8 @@ Usage:
 
 {% set importUrl = routeLookup('courseImport.getImport', {
     courseSpecId: courseSpec.id ?: 0,
-    folderId:     folder ? folder.id : 0,
-    componentId:  component ? component.id : 0
+    folderId:     folder.id ?? 0,
+    componentId:  component.id ?? 0
 }) %}
 
 {% if encodedReturnUrl | length %}
