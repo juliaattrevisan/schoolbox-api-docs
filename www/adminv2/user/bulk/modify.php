@@ -27,6 +27,7 @@ $this->setBlock(TEMPLATE_content, 'has_results', 'has_results_block');
 $this->setBlock('has_results', 'user', 'user_block');
 $this->setBlock('has_results', 'apply_campus', 'apply_campus_block');
 $this->setBlock('has_results', 'apply_role', 'apply_role_block');
+$this->setBlock('has_results', 'apply_year', 'apply_year_block');
 $this->setBlock('has_results', 'apply_eportfolio', 'apply_eportfolio_block');
 $this->setBlock('has_results', 'apply_webmail', 'apply_webmail_block');
 $this->setBlock('has_results', 'apply_accountenabled', 'apply_accountenabled_block');
@@ -102,6 +103,13 @@ foreach ($yearLevels as $yearLevel) {
     ]);
 
     $this->parse('search_year_block', 'search_year', true);
+
+    $this->setVar([
+        'APPLY_YEAR_ID' => $yearLevel->getId(),
+        'APPLY_YEAR_NAME' => $yearLevel->getName(),
+    ]);
+
+    $this->parse('apply_year_block', 'apply_year', true);
 }
 
 /* Boolean options
