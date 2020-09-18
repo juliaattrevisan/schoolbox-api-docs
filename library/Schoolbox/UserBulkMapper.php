@@ -104,12 +104,14 @@ class UserBulkMapper extends UserMapper
             $params['searchEportfolio'] = $searchEportfolio;
         }
 
-        if (strlen(trim($searchYear))) {
-            $query .= ' AND u.year_id = :searchYear';
+        if ($searchYear != self::UNCHANGED) {
+            if ($searchYear) {
+                $query .= ' AND u.year_id = :searchYear';
 
-            $params['searchYear'] = $searchYear;
-        } else {
-            $query .= ' AND u.year_id IS NULL';
+                $params['searchYear'] = $searchYear;
+            } else {
+                $query .= ' AND u.year_id IS NULL';
+            }
         }
 
         /* Always order by lastname

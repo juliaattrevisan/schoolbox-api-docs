@@ -74,8 +74,7 @@ foreach ($allRoles as $currentRole) {
         array(
             'SEARCH_ROLE_ID' => $currentRole->getId(),
             'SEARCH_ROLE_NAME' => $currentRole->getName(),
-            'SEARCH_ROLE_SELECTED' => ($currentRole->getId(
-                    ) == $_POST['search_role']) && isset($_POST['search_role']) ? 'selected="selected"' : '',
+            'SEARCH_ROLE_SELECTED' => ($currentRole->getId() == $_POST['search_role']) && isset($_POST['search_role']) ? 'selected="selected"' : '',
         )
     );
 
