@@ -163,16 +163,19 @@ truncateTables() {
 
 liveCheck() {
 	echo "Making sure this is a dev server..."
-	if [[ $package != *schoolboxdev* ]]; then
-		if [ "$syncType" != "live" ]; then
-			echo "Not a dev server. Pretty sure you don't want to run a sync from the dev to the live server. If you really really do, run the restore script with the -local flag to override";
+
+	if [ "$package" = "schoolboxdev" ]; then
+    echo "Looks like it is a dev server!"
+  elif [ "$package" = 'vagrant' ]; then
+    echo "Looks like it is a vagrant server!"
+  else
+		if [ "$syncType" != "local" ]; then
+			echo "Not a dev server. Just in case, pretty sure you don't want to run a sync from the dev to the live server. If you really really do, run the restore script with the -local flag to override";
 			#Run with -live arg do override;
 			exit 1;
 		else
-			echo "You have chosen to sync to your live server. You probably don't want to do this. Proceed with caution";
+			echo "You have chosen to retore to your self server. Proceed with caution";
 		fi
-	else
-		echo "Looks like it is a dev server!"
 	fi
 }
 
@@ -188,7 +191,7 @@ setSyncType() {
 			elif [ "$1" == "-full" ]; then
 				syncType="full";
 			elif [ "$1" == "-local" ]; then
-				syncType="live";
+				syncType="local";
       else
         echo "Invalid first arg : '$1'"
         exit 1;
@@ -260,8 +263,7 @@ echo "Database Permissions - OK";
 testfilemessageorig="Testmessage-`date -I`";
 echo "$testfilemessageorig" > $thisdatadir/test.file 2>/dev/null
 testfilemessage=`cat $thisdatadir/test.file`;
-if [ $testfilemessage != $testfilemessageorig ];
-then
+if [ $testfilemessage != $testfilemessageorig ]; then
 	errmsg="Data file permission check failed";
 	error;
 else
@@ -448,11 +450,11 @@ sourcep3=`echo $restore | cut -d',' -f5`;
 if [ "$sourcetype" == '[A]' ] && [ "$sourceloc" == '[R]' ]; then
   localAvailableStorage=$(df | grep datapool | awk -F " " '{print $2}');
   remoteUsedStorage=$(ssh $host df | grep datapool | awk -F " " '{print $3}');
-  if [ $localAvailableStorage -le $remoteUsedStorage ]
+  if [ $localAvailableStorage -le $remoteUsedStorage ]; then
     errmsg="You are trying to restore more data ($remoteUsedStorage 1K-blocks) than disk that is available ($localAvailableStorage 1K-blocks)";
     error;
   fi
-  echo "Full sync space check passed: available - $localAvailableStorage 1K-blocks / needed - $remoteUsedStorage 1K-blocks"
+  echo "Full sync space check passed: available - $localAvailableStorage 1K-blocks / needed - $remoteUsedStorage 1K-blocks";
 fi
 
 # Sync the datafiles, with progress if possible
@@ -575,7 +577,13 @@ else
 	if [ "$sourceloc" = '[B]' ];
 	then
 		# Backup Source, set the file location of the db backup
-		sourcedb="$backup_dir/$sourcep2/schoolbox-$sourcep2.sql";
+		sourcedb="$backup_dir/$sourcep2/schoolboxclass rootDiskCheck(AgentCheck):
+    def check(self, instance):
+        totalBlocksFree, err, retcode = get_subprocess_output(['df','-t','ext4','--output=avail,target','|','grep','"/$"','|','grep','-o','"[0-9]*"'], self.log, raise_on_empty_output=True)
+        redisBackup, err, retcode = get_subprocess_output(['du','/var/lib/redis/dump.rdb','|','grep','-o','"^[0-9]*"'], self.log, raise_on_empty_output=True)
+        blocksFree=totalBlocksFree - redisBackup
+        self.gauge("blocks.free", blocksFree ,tags=['TAG_KEY:TAG_VALUE'])
+-$sourcep2.sql";
 	fi
 fi
 
