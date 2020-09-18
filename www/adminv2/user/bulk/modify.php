@@ -20,6 +20,7 @@ $this->setFile(TEMPLATE_content, 'adminv2/user/bulk/modify.html');
  */
 $this->setBlock(TEMPLATE_content, 'search_campus', 'search_campus_block');
 $this->setBlock(TEMPLATE_content, 'search_role', 'search_role_block');
+$this->setBlock(TEMPLATE_content, 'search_year', 'search_year_block');
 $this->setBlock(TEMPLATE_content, 'search_eportfolio', 'search_eportfolio_block');
 
 $this->setBlock(TEMPLATE_content, 'has_results', 'has_results_block');
@@ -91,11 +92,17 @@ foreach ($allRoles as $currentRole) {
 
 /* Year
  */
-$this->setVar(
-    array(
-        'SEARCH_YEAR_SELECTED' => Scrub::html($_POST['search_year']),
-    )
-);
+$yearLevels = \Schoolbox\YearLevel\Mapper::getInstance()->findAll();
+
+foreach ($yearLevels as $yearLevel) {
+    $this->setVar([
+        'SEARCH_YEAR_ID' => $yearLevel->getId(),
+        'SEARCH_YEAR_NAME' => $yearLevel->getName(),
+        'SEARCH_YEAR_SELECTED' => $yearLevel->getId() === (int)$_POST['search_year_id'] ? 'selected="selected"' : '',
+    ]);
+
+    $this->parse('search_year_block', 'search_year', true);
+}
 
 /* Boolean options
  */
