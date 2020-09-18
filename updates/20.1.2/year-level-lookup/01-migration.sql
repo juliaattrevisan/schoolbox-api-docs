@@ -32,8 +32,8 @@ WHERE `year` = '';
 INSERT INTO lu_year_level (`name`, `created_at`, `updated_at`) (
     SELECT `user`.`year`, NOW(), NOW()
     FROM `user`
-    LEFT JOIN lu_year_level ON `user`.`year` = lu_year_level.`name`
-    WHERE lu_year_level.id IS NULL
+    LEFT JOIN lu_year_level lyl ON `user`.`year` = lyl.`name` AND lyl.deleted_at IS NULL
+    WHERE lyl.id IS NULL
       AND `user`.`year` IS NOT NULL
       AND `user`.`year` != ''
 );
@@ -48,7 +48,7 @@ INSERT INTO lu_year_level (`name`, `created_at`, `updated_at`) (
 -- INNER JOIN lu_year_level lyl ON u.`year` = lyl.`name`;
 
 UPDATE `user` u
-INNER JOIN lu_year_level lyl ON u.`_year` = lyl.`name`
+INNER JOIN lu_year_level lyl ON u.`_year` = lyl.`name` AND lyl.deleted_at IS NULL
 SET u.`year` = lyl.id
 
 /* Add foreign key to user.year
