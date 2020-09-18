@@ -188,7 +188,18 @@
 
                         <div>
                             <label for="year">Year</label>
-                            <input id="year" type="text" name="year" value="{{ user.year }}"/>
+                            <select name="year_id">
+                                <option value="" disabled selected="selected">-- Please select --</option>
+                                {% for yearLevel in yearLevels %}
+                                    {% set selected = '' %}
+
+                                    {% if user.year is not null and yearLevel.id == user.year.id %}
+                                        {% set selected = 'selected="selected"' %}
+                                    {% endif %}
+
+                                    <option value="{{ yearLevel.id }}" {{ selected }}>{{ yearLevel.name }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
 
                         <div>
