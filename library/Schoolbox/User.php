@@ -397,7 +397,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         $metadata = '';
         $role     = $this->getRole()->getName();
         if (!empty($this->year)) {
-            $metadata .= 'Year ' . $this->year;
+            $metadata .= 'Year ' . $this->year->getName();
         }
         return "{$metadata} {$role}";
     }
