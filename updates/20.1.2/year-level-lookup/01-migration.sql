@@ -36,6 +36,7 @@ INSERT INTO lu_year_level (`name`, `created_at`, `updated_at`) (
     WHERE lyl.id IS NULL
       AND `user`.`year` IS NOT NULL
       AND `user`.`year` != ''
+    GROUP BY `year`
 );
 
 /* Update everyone's user.year with an id from lu_year_level where
