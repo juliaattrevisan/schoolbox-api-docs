@@ -396,6 +396,11 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
         $metadata = '';
         $role     = $this->getRole()->getName();
+
+        /* This makes a massive assumption that everyone's year level
+         * begins with "Year", which means anyone using "ELC" in lu_year_level.name
+         * will get metadata like "Year ELC"
+         */
         if (!empty($this->year)) {
             $metadata .= 'Year ' . $this->year->getName();
         }
