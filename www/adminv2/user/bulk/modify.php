@@ -218,7 +218,7 @@ if (!empty($_POST)) {
         $_POST['search_campus'],
         $_POST['search_role'],
         $_POST['search_eportfolio'],
-        $_POST['search_year']
+        $_POST['search_year_id']
     );
 
     $this->setVar(array(
@@ -234,17 +234,15 @@ if (!empty($_POST)) {
                 $campusNames[] = $currentCampus->getName();
             }
 
-            $this->setVar(
-                array(
-                    'BULK_USER_ID' => $currentUser->getId(),
-                    'BULK_USER_FIRSTNAME' => $currentUser->getFirstname(),
-                    'BULK_USER_LASTNAME' => $currentUser->getLastname(),
-                    'BULK_USER_EXTERNAL_ID' => $currentUser->getExternalId(),
-                    'BULK_USER_CAMPUS' => implode(', ', $campusNames),
-                    'BULK_USER_GROUP' => $currentUser->getRole()->getName(),
-                    'BULK_USER_YEAR' => $currentUser->getYear(),
-                )
-            );
+            $this->setVar([
+                'BULK_USER_ID' => $currentUser->getId(),
+                'BULK_USER_FIRSTNAME' => $currentUser->getFirstname(),
+                'BULK_USER_LASTNAME' => $currentUser->getLastname(),
+                'BULK_USER_EXTERNAL_ID' => $currentUser->getExternalId(),
+                'BULK_USER_CAMPUS' => implode(', ', $campusNames),
+                'BULK_USER_GROUP' => $currentUser->getRole()->getName(),
+                'BULK_USER_YEAR' => $currentUser->getYear() ? $currentUser->getYear()->getName() : '',
+            ]);
 
             $this->parse('user_block', 'user', true);
         }

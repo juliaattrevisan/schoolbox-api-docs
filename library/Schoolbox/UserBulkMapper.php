@@ -53,10 +53,10 @@ class UserBulkMapper extends UserMapper
     /**
      * Cheesy query agglutination
      *
-     * @param int    $searchCampus
-     * @param int    $searchRole
-     * @param string $searchEportfolio
-     * @param string $searchYear
+     * @param int      $searchCampus
+     * @param int      $searchRole
+     * @param string   $searchEportfolio
+     * @param int|null $searchYear
      * @return \Schoolbox\Collection
      * @throws MapperException
      * @throws \PDOException
@@ -79,6 +79,7 @@ class UserBulkMapper extends UserMapper
             LEFT JOIN `groups` g ON u.`group_id` = g.`id`
             LEFT JOIN `userCampus` uc ON uc.`uid` = u.`id`
             LEFT JOIN luCampus c ON c.id = uc.`campus`
+            LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
         ";
 
         /* Augmented where
@@ -104,9 +105,11 @@ class UserBulkMapper extends UserMapper
         }
 
         if (strlen(trim($searchYear))) {
-            $query .= ' AND u.year = :searchYear';
+            $query .= ' AND u.year_id = :searchYear';
 
             $params['searchYear'] = $searchYear;
+        } else {
+            $query .= ' AND u.year_id IS NULL';
         }
 
         /* Always order by lastname
