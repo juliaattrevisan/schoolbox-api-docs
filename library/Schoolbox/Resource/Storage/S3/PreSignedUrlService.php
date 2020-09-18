@@ -53,6 +53,8 @@ class PreSignedUrlService
      * @param string            $cacheControl
      * @param string            $attachmentType
      *
+     * @param string            $transcodePath
+     *
      * @return PreSignedUrlDataObject
      */
     public function generate(
@@ -60,12 +62,18 @@ class PreSignedUrlService
         AlaressDateFormat $expireAt,
         string $size = null,
         string $cacheControl = 'private',
-        string $attachmentType = ''
+        string $attachmentType = '',
+        string $transcodePath = null
     ): PreSignedUrlDataObject
     {
         $expires        = $expireAt->__toString();
         $storagePath    = $storage->getPath();
-        $itemPath       = ($size && strpos($storagePath, '-') === false) ? $storagePath . '-' . $size : $storagePath;
+
+        if ($transcodePath && $storage->getMimetype()->isVideo()) {
+            $itemPath = $transcodePath;
+        } else {
+            $itemPath = ($size && strpos($storagePath, '-') === false) ? $storagePath . '-' . $size : $storagePath;
+        }
 
         $commandObject = $this->getObject(
             $itemPath,
