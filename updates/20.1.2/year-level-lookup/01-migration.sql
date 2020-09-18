@@ -33,6 +33,15 @@ INSERT INTO lu_year_level (`name`, `created_at`, `updated_at`) (
 /* Update everyone's user.year with an id from lu_year_level where
  * user.year == lu_year_level.name, via a join update
  */
+-- SELECT
+--    u.`year`, u.`_year`,
+--    lyl.id, lyl.`name`
+-- FROM `user` u
+-- INNER JOIN lu_year_level lyl ON u.`year` = lyl.`name`;
+
+UPDATE `user` u
+INNER JOIN lu_year_level lyl ON u.`_year` = lyl.`name`
+SET u.`year` = lyl.id
 
 /* Add foreign key to user.year
  */
