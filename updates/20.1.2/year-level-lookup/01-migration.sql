@@ -49,7 +49,21 @@ INSERT INTO lu_year_level (`name`, `created_at`, `updated_at`) (
 
 UPDATE `user` u
 INNER JOIN lu_year_level lyl ON u.`_year` = lyl.`name` AND lyl.deleted_at IS NULL
-SET u.`year` = lyl.id
+SET u.`year` = lyl.id;
+
+/* Convert user.year into something compatible with lu_year_level.id
+ */
+ALTER TABLE `user`
+    CHANGE COLUMN `year` `year_id` INT(10) UNSIGNED NULL DEFAULT NULL;
 
 /* Add foreign key to user.year
  */
+ALTER TABLE `user`
+    ADD INDEX `fk_user_year_id_idx` (`year_id` ASC);
+
+ALTER TABLE `user`
+    ADD CONSTRAINT `fk_user_year_id`
+        FOREIGN KEY (`year_id`)
+            REFERENCES `lu_year_level` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION;
