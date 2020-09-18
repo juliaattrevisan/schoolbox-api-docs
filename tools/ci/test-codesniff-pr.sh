@@ -57,8 +57,7 @@ cp -f www/conf/tarball.conf.php www/conf/conf.php;
 
 echo "Gather changed files"
 chmod 777 .git/resource/metadata.json ##We need a peak at the metadata for the test.
-echo $(.git/resource/metadata.json | jq -r ' .[] | select(.name=="base_sha") | .value') >> basesha.txt
-BASESHA=`cat basesha.txt`
+BASESHA=$(cat .git/resource/metadata.json | jq -r ' .[] | select(.name=="base_sha")
 
 echo "Base sha = $BASESHA"
 
@@ -68,7 +67,7 @@ echo "Files canged = $CHANGED_FILES"
 
 echo "Running php code sniffer checks"
 
-./vendor/bin/phpcs $FILES
+./vendor/bin/phpcs $CHANGED_FILES
 
 codesnifferResult=$?
 
