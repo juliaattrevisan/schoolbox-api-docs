@@ -6,6 +6,14 @@ ALTER TABLE `user`
 UPDATE `user`
 SET `_year` = `year`;
 
+/* If user.year is an empty string, force it into NULL
+ * since a) we don't know what that value was meant to be and b) we're adding FKs later
+ * and I don't want a lu_year_level that corresponds to an empty string
+ */
+UPDATE `user`
+SET `year` = NULL
+WHERE `year` = '';
+
 /* Get a list of existing lu_year_level.name rows
  * Get a list of current user.year rows
  *
