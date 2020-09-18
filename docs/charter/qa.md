@@ -126,8 +126,8 @@ In the event we need to test further into the past because we need to update dat
 
 **Set-up**
 
-1. provision on qa-test dataset.
 1. git checkout master.
+1. provision on qa-test dataset.
 1. review that there is data ready to test migration with.
 	1. if there is no data build said data
 	1. after building any additional test data save the qa-test dataset.
@@ -137,18 +137,21 @@ In the event we need to test further into the past because we need to update dat
 
 1. you should be on master branch with data ready from set up step
 1. git checkout develop
-1. run build-sql-update.sh
-1. run update-sql.sh
+1. vagrant ssh (needs to be run on vagrant)
+1. cd /vagrant
+1. run sudo tools/build-sql-update.sh
+1. run sudo tools/update-sql.sh
 1. run npm install
 1. run grunt build
 
 **Observe**
 
-1. you should be on develop branch with test completed. Ready to check status after migration.
+1. you should be on develop branch in vagrant with test completed. Ready to check status after migration.
+1. checks you will do are a combination of on vagrant (scripts), db (the data itself) and the app ui using a browser.
 1. run through [QA check list](#qa-check-list). 
-1. ensure changed data doesn't regress functionality and usability.
-1. check the actual changed data to see if it adheres to what we expect.
-1. based on findings during observation pass or fail the migration.
+1. ensure changed data doesn't regress functionality and usability. (Mainly though app on a browser)
+1. check the actual changed data to see if it adheres to what we expect. (Database check)
+1. based on findings during observation pass or fail the migration test.
 
 
 ## QA transition to done response
