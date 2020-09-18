@@ -442,50 +442,50 @@ input[type=radio] {
     $input-height,
     $toggle-width:
     $input-height,
-    $hover-background-color: $content-ui-foreground-contrast,
+    $hover-background-color: $button-bg-hover,
     $active-color: $content-ui-foreground,
+    $active-text-color: $content-ui-foreground-contrast,
 ) {
 
-	$label-selector: "label";
+    $label-selector: "label";
 
-	// overwrite to append class if required
-	@if($label-class) {
-		$label-selector: "label.#{$label-class}";
-	}
+    // overwrite to append class if required
+    @if($label-class) {
+        $label-selector: "label.#{$label-class}";
+    }
 
-	+ #{$label-selector} {
-		font-weight: $font-weight-normal;
-		margin: 0;
-		line-height: $toggle-height;
-		height: $toggle-height;
-		width: $toggle-width;
-		text-align: center;
-		@include single-transition(background-color, 0.15s, linear);
+    + #{$label-selector} {
+        font-weight: $font-weight-normal;
+        margin: 0;
+        line-height: $toggle-height;
+        height: $toggle-height;
+        width: $toggle-width;
+        text-align: center;
+        @include single-transition(background-color, 0.15s, linear);
 
-		// Make sure elements inside the label don't hijack the label click
-		* {
-			pointer-events: none;
-		}
+        // Make sure elements inside the label don't hijack the label click
+        * {
+            pointer-events: none;
+        }
 
-		&:hover:enabled {
-			background-color: $hover-background-color;
-		}
+        &:hover:enabled {
+            background-color: $hover-background-color;
+        }
 
-		[class^="icon-"]:before {
-			padding-right: 0;
-		}
-	}
+        [class^="icon-"]:before {
+            padding-right: 0;
+        }
+    }
 
-	&:checked {
-		+ #{$label-selector} {
-			background-color: $active-color;
-            // DONE hover-background-color works for vaporwave
-            color: $hover-background-color;
-			[class^="icon-"]{
-                color: $hover-background-color;
-			}
-		}
-	}
+    &:checked {
+        + #{$label-selector} {
+            background-color: $active-color;
+            color: $active-text-color;
+            [class^="icon-"]{
+                color: $active-text-color;
+            }
+        }
+    }
 
 }
 
