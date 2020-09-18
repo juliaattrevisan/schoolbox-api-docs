@@ -624,10 +624,17 @@ class Controller extends Base
 
         /* Update year level with lu_year_level option from the dropdown
          */
-        try {
-            $year = YearLevel\Mapper::getInstance()->findById($post['year_id']);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            $year = null;
+        $year = null;
+
+        if ('' !== $post['year_id']) {
+            try {
+                $year = YearLevel\Mapper::getInstance()->findById($post['year_id']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+
+                /* noop - went looking for a deleted or nonexistent year_id
+                 * just use null
+                 */
+            }
         }
 
         $user->setTitle($post['title']);
