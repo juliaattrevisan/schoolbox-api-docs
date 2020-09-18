@@ -39,6 +39,20 @@ INSERT INTO lu_year_level (`name`, `created_at`, `updated_at`) (
     GROUP BY `year`
 );
 
+/* Try to resequence the newly-added rows (they'll have sequence 0)
+ * Adapted from https://stackoverflow.com/questions/53728133/mysql-update-column-with-sequential-numeric-value-if-null-continued-sequence
+ *
+ * Find the biggest lu_year_level.sequence value among all the non-deleted records,
+ * use that as a starting point to resequence all the 0-sequence rows we just added
+ *
+ * Natural Sorting is something of an adventure in mysql land so users should resort
+ * their lookup according to taste
+ */
+UPDATE lu_year_level
+JOIN (SELECT @rank := (SELECT MAX(T.sequence) FROM lu_year_level AS T WHERE deleted_at IS NULL)) r
+SET sequence=@rank:=@rank+1
+WHERE lu_year_level.sequence = 0;
+
 /* Update everyone's user.year with an id from lu_year_level where
  * user.year == lu_year_level.name, via a join update
  */
