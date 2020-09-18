@@ -8,6 +8,7 @@ namespace Schoolbox;
 
 use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
+use House;
 use HouseMapper;
 use HouseResidentialMapper;
 use PDOStatement;
@@ -90,7 +91,6 @@ class UserMapper extends Mapper
         $this->uses('title', self::TYPE_STRING);
         $this->uses('firstname', self::TYPE_STRING);
         $this->uses('lastname', self::TYPE_STRING);
-        $this->uses('year', self::TYPE_STRING);
         $this->uses('local_email', self::TYPE_BOOLEAN);
         $this->uses('alt_email', self::TYPE_STRING);
         $this->uses('webmail', self::TYPE_BOOLEAN);
@@ -114,6 +114,7 @@ class UserMapper extends Mapper
         $this->joins('house', HouseMapper::class, 'id', null, null, 'schoolHouse', 'schoolHouse');
         $this->joins('residential_house_id', HouseResidentialMapper::class, 'id', null, null, 'residentialHouse', 'residentialHouse');
         $this->joins('group_id', RoleMapper::class, 'id', null, null, 'role', 'role');
+        $this->joins('year_id', YearLevel\Mapper::class, 'id', null, null, 'year', 'year');
         $this->joinsVia('user_link', UserMapper::class, 'id', 'linked_user_id', 'user_id', null, null, null, 'linkedUser');
         $this->joinsVia('userCampus', CampusMapper::class, 'id', 'campus', 'uid', 'id', null, null, 'campusCollection');
 
@@ -352,6 +353,7 @@ class UserMapper extends Mapper
                 {$this->getJoinColumnString('schoolHouse', 'h')},
                 {$this->getColumnString('lu')},
                 {$this->getJoinColumnString('role', 'lur')},
+                {$this->getJoinColumnString('year', 'lyl')},
                 {$this->getJoinColumnString('portrait', 'portrait')},
                 {$this->getJoinColumnString('portrait.allowedFileExtension', 'afe')}
             FROM `user`
@@ -360,6 +362,7 @@ class UserMapper extends Mapper
             LEFT JOIN {$this->getJoinSql('userCampus', '', 'c')}
             LEFT JOIN {$this->getJoinSql('user_link', '', 'lu')}
             LEFT JOIN {$this->getJoinSql('role', 'lu', 'lur', true)}
+            LEFT JOIN {$this->getJoinSql('year', '', 'lyl', true)}
             LEFT JOIN {$this->getJoinSql('schoolHouse', '', 'h')}
             LEFT JOIN {$this->getJoinSql('portrait', '', 'portrait')}
             LEFT JOIN {$this->getJoinSql('portrait.allowedFileExtension', 'portrait', 'afe', true)}
@@ -383,17 +386,24 @@ class UserMapper extends Mapper
         $campusMapper = $this->getJoinMapper('userCampus');
 
         foreach ($statement as $row) {
-
             $userId = $row['id'];
 
             // Don't override previous hydrations of this user: add to it instead
             if (!isset($users[$userId])) {
+
                 /** @var Role $role */
                 $role = $this->hydrateJoin($row, 'role', 'g');
+
+                /** @var YearLevel\Model $year */
+                $year = $this->hydrateJoin($row, 'year', 'lyl');
+
+                /** @var House $schoolHouse **/
                 $schoolHouse = $this->hydrateJoin($row, 'schoolHouse', 'h');
+
                 $users[$userId] = $this->hydrate($row)
                                        ->setSuperuser($row['superuser'] == 1)
                                        ->setRole($role)
+                                       ->setYear($year)
                                        ->setSchoolHouse($schoolHouse)
                                        ->setLinkedUser($this->createCollection())
                                        ->setCampusCollection($campusMapper->createCollection());

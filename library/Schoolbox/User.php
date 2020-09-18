@@ -82,7 +82,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     private $retrievablePassword;
 
-    /** @var string */
+    /** @var YearLevel\Model|null */
     private $year;
 
     /** @var null|House */
@@ -844,10 +844,10 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * @param string $year
+     * @param YearLevel\Model|null $year
      * @return self
      */
-    public function setYear($year)
+    public function setYear(?YearLevel\Model $year)
     {
         $this->year = $year;
         return $this;
@@ -855,9 +855,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * @return string
+     * @return YearLevel\Model|null
      */
-    public function getYear()
+    public function getYear(): ?YearLevel\Model
     {
         return $this->year;
     }
