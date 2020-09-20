@@ -77,7 +77,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $statement = $this->database->prepare($query);
 
         $statement->execute([
-            'controllerClass' => 'Schoolbox\\Resource\\Textbox\\Component\\Homepage\\Controller',
+            'controllerClass' => Component\Homepage\Controller::class,
             'key' => 'textbox',
             'categoryId' => $textbox->getCategory()->getId(),
             'textboxId' => $textbox->getId()
