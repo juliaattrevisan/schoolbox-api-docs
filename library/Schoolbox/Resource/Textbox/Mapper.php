@@ -43,7 +43,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     protected function getSelectString()
     {
         return "
-            SELECT {$this->getColumnString()}, 
+            SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('category', 'f')}
             FROM `" . $this->getTable() . "`
             JOIN {$this->getJoinSql('category', '', 'f')}
@@ -54,37 +54,41 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * Search the user table for particular user(s)
      *
      * @param Model $textbox
-     * @return mixed
+     * @return Collection
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function findComponentUsage(Model $textbox)
+    public function findComponentUsage(Model $textbox): Collection
     {
-        $instanceMapper = new \Component_InstanceMapper();
+        $instanceMapper = \Component_InstanceMapper::getInstance();
 
-        $query = "
-            SELECT *
+        $query = '
+            SELECT component_instance.*
             FROM component_definition
-                INNER JOIN component_config_definition ON component_definition.id = component_config_definition.component_definition_id
-                INNER JOIN component_config_instance ON component_config_instance.component_config_definition_id = component_config_definition.id
-                INNER JOIN component_instance ON component_config_instance.component_instance_id = component_instance.id
-                WHERE class = 'Component_Homepage_TextBoxController'
-            AND `key` = 'textbox'
+            INNER JOIN component_config_definition ON component_definition.id = component_config_definition.component_definition_id
+            INNER JOIN component_config_instance ON component_config_instance.component_config_definition_id = component_config_definition.id
+            INNER JOIN component_instance ON component_config_instance.component_instance_id = component_instance.id
+            WHERE class = :controllerClass
+            AND `key` = :key
             AND `identifier` = :categoryId
             AND `value` = :textboxId
-		";
+        ';
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(':categoryId', $textbox->getCategory()->getId());
-        $statement->bindParam(':textboxId', $textbox->getId());
-        $statement->execute();
 
-        /* Manually construct hierarchy of blog items and their comments
+        $statement->execute([
+            'controllerClass' => Component\Homepage\Controller::class,
+            'key' => 'textbox',
+            'categoryId' => $textbox->getCategory()->getId(),
+            'textboxId' => $textbox->getId()
+        ]);
+
+        /* Manually construct hierarchy of component instances
          */
         $collection = new Collection();
 
-        foreach ($statement as $row) {
-            $componentInstance = $instanceMapper->hydrate($row);
-
-            $collection->add($componentInstance);
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $collection->add($instanceMapper->hydrate($row));
         }
 
         return $collection;
