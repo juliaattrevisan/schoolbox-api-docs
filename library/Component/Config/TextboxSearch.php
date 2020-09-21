@@ -73,7 +73,7 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract
         $page->setBlock($key, 'is_linked', 'is_linked_block');
 
         $page->setVar([
-            'COMPONENT_INSTANCE_ID'  => $firstUsageComponentId,
+            'COMPONENT_INSTANCE_ID'  => $component->getInstance()->getId(),
             'LINKED_TEXTBOX_ID'      => $configValue,
             'VAR_IS_LINKED'          => $isLinked ? 'true' : 'false',
             'COMPONENT_TEXTBOX_NAME' => $textbox->getHeading(),
