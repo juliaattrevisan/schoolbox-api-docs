@@ -21,10 +21,24 @@ $app = new class extends CliTool\App {
 
         /* Find a list of all the (lu_year_level.name, lu_year_level.id) tuples,
          * indexed by lu_year_level.name; we're gonna use that as a lookup
+         */
+        $yearLevelsStatement = $db->prepareQuery('
+            SELECT id, name
+            FROM lu_year_level
+            ORDER BY name
+        ');
+
+        $yearLevelsStatement->execute();
+
+        /* Set up lookup
+         */
+        $yearLevels = $yearLevelsStatement->fetchRowArray('name');
 
         /* Select all the pastoral report rows where pastoral_report.years is not '' and not null
          * These are the reports that need their year levels updated
          */
+
+
 
         /* For every row, explode pastoral_report.years by comma, into its separate pieces
          */
