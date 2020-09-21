@@ -282,11 +282,9 @@ class Controller extends Base
         $report->setUsesRelativeDate($report->getUsesRelativeDate() ?? true);
         $report->setRelativeDateString($report->getRelativeDateString() ?? self::THIS_YEAR);
 
-        /* A stack of all YearLevel instances, ordered by name in a natural-sorting way
+        /* A stack of all YearLevel instances, ordered by sequence from the admin area
          */
-        $yearLevels = $this->yearLevelMapper->findAll()->sortByCallback(static function (YearLevel\Model $a, YearLevel\Model $b) {
-            return strnatcasecmp($a->getName(), $b->getName());
-        });
+        $yearLevels = $this->yearLevelMapper->findAll()->sortBy('sequence', 'ASC');
 
         // And render this thing out
         $this->getResponse()->content->set(
