@@ -26,7 +26,7 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
     /**
      * All the Files that are part of the Feedback made by Teacher
      *
-     * @var Collection|File\Model[]
+     * @var Collection|ReturnedWork\SingleFile\Model[]
      */
     protected $allFiles;
 
@@ -129,7 +129,7 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
      */
 
     /**
-     * @return Collection|File\Model[]
+     * @return Collection|ReturnedWork\SingleFile\Model[]
      */
     public function getAllFiles()
     {
@@ -137,7 +137,7 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
     }
 
     /**
-     * @param Collection|File\Model[] $allFiles
+     * @param Collection|ReturnedWork\SingleFile\Model[] $allFiles
      * @return self
      */
     public function setAllFiles($allFiles)
