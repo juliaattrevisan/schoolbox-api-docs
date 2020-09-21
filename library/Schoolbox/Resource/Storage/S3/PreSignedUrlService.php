@@ -17,6 +17,7 @@ use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\Resource\Storage\Transform\Mapper as TransformMapper;
+use Schoolbox\Video\QueueMapper as VideoQueueMapper;
 
 class PreSignedUrlService
 {
@@ -99,10 +100,17 @@ class PreSignedUrlService
         $size = (strpos($itemPath, '-') !== false) ? substr($itemPath, strpos($itemPath, '-') + 1) : null;
 
         /**
-         * transcoded audio/videos are not stored in storage_transforms table. Therefore we'll need to check the hash
-         * in storage table instead.
+         * Check whether the transcoded audio/video exists in video_queue table by checking the hash and
+         * must have a status of completed.
          */
-        return $size && $size !== 'transcode'
+        if ($size && $size === 'transcode') {
+            return VideoQueueMapper::getInstance()->countByColumnList([
+                'hash'      => $hash,
+                'status'    => VideoQueueMapper::STATUS_COMPLETED,
+            ]) > 0;
+        }
+
+        return $size
             ? TransformMapper::getInstance()->checkIfRecordExists($hash, $size)
             : Storage\Mapper::getInstance()->countByColumn('hash', $hash) > 0;
     }
