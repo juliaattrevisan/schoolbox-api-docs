@@ -97,21 +97,21 @@ class PreSignedUrlService
         $itemPath   = $dataObject->getItemPath();
         $hash       = $dataObject->getHash();
 
-        $size = (strpos($itemPath, '-') !== false) ? substr($itemPath, strpos($itemPath, '-') + 1) : null;
+        $transformType = (strpos($itemPath, '-') !== false) ? substr($itemPath, strpos($itemPath, '-') + 1) : null;
 
         /**
          * Check whether the transcoded audio/video exists in video_queue table by checking the hash and
          * must have a status of completed.
          */
-        if ($size && $size === 'transcode') {
+        if ($transformType && $transformType === 'transcode') {
             return VideoQueueMapper::getInstance()->countByColumnList([
                 'hash'      => $hash,
                 'status'    => VideoQueueMapper::STATUS_COMPLETED,
             ]) > 0;
         }
 
-        return $size
-            ? TransformMapper::getInstance()->checkIfRecordExists($hash, $size)
+        return $transformType
+            ? TransformMapper::getInstance()->checkIfRecordExists($hash, $transformType)
             : Storage\Mapper::getInstance()->countByColumn('hash', $hash) > 0;
     }
 
