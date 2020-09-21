@@ -1,12 +1,6 @@
 <?php
 /**
- * File
- *
- * A File that was uploaded as part of a Teacher's Feedback
- * for a particular Due Work
- *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -16,6 +10,13 @@ use \Schoolbox\Resource\Storage\IStorage;
 use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use \Schoolbox\Resource\File\StorableTrait;
 
+
+/**
+ * A File that was uploaded as part of a Teacher's Feedback for a particular
+ * Due Work.
+ *
+ * @deprecated Use `\Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model` instead
+ */
 class Model implements IStorage
 {
     use StorableTrait;
