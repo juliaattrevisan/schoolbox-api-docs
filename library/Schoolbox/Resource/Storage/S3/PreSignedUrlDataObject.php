@@ -35,11 +35,6 @@ class PreSignedUrlDataObject
     private $itemPath;
 
     /**
-     * @var string|null
-     */
-    private $size;
-
-    /**
      * PreSignedUrlDataObject constructor.
      *
      * @param string      $hash
@@ -49,14 +44,13 @@ class PreSignedUrlDataObject
      * @param string      $itemPath
      * @param string|null $size
      */
-    public function __construct(string $hash, string $url, string $cacheControl, string $expires, string $itemPath, string $size = null)
+    public function __construct(string $hash, string $url, string $cacheControl, string $expires, string $itemPath)
     {
         $this->hash = $hash;
         $this->url = $url;
         $this->expires = $expires;
         $this->cacheControl = $cacheControl;
         $this->itemPath = $itemPath;
-        $this->size = $size;
     }
 
     /**
@@ -97,13 +91,5 @@ class PreSignedUrlDataObject
     public function getItemPath(): string
     {
         return $this->itemPath;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getSize(): ?string
-    {
-        return $this->size;
     }
 }

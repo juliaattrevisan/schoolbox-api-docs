@@ -38,7 +38,7 @@ try {
                 $preSignedUrlDataObject = $preSignedUrlService->generate(
                     $resource,
                     Alaress_Date_Format::now()->addDays(1),
-                    null,
+                    $resource->getPath(),
                     $cacheControl,
                     $attachmentType
                 );

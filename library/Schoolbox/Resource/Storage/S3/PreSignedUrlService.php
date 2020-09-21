@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\S3;
@@ -49,34 +51,24 @@ class PreSignedUrlService
     /**
      * @param Model             $storage
      * @param AlaressDateFormat $expireAt
-     * @param string|null       $size
+     * @param string            $path
      * @param string            $cacheControl
      * @param string            $attachmentType
-     *
-     * @param string            $transcodePath
      *
      * @return PreSignedUrlDataObject
      */
     public function generate(
         Model $storage,
         AlaressDateFormat $expireAt,
-        string $size = null,
+        string $path,
         string $cacheControl = 'private',
-        string $attachmentType = '',
-        string $transcodePath = null
-    ): PreSignedUrlDataObject
-    {
-        $expires        = $expireAt->__toString();
-        $storagePath    = $storage->getPath();
+        string $attachmentType = ''
+    ): PreSignedUrlDataObject {
 
-        if ($transcodePath && $storage->getMimetype()->isVideo()) {
-            $itemPath = $transcodePath;
-        } else {
-            $itemPath = ($size && strpos($storagePath, '-') === false) ? $storagePath . '-' . $size : $storagePath;
-        }
+        $expires = $expireAt->__toString();
 
         $commandObject = $this->getObject(
-            $itemPath,
+            $path,
             $cacheControl,
             $attachmentType,
             $storage->getBasename(),
@@ -84,10 +76,9 @@ class PreSignedUrlService
             $expires
         );
 
-
         $url = $this->s3Client->createPresignedRequest($commandObject, $expires)->getUri()->__toString();
 
-        return new PreSignedUrlDataObject($storage->getHash(), $url, $cacheControl, $expires, $storage->getPath(), $size);
+        return new PreSignedUrlDataObject($storage->getHash(), $url, $cacheControl, $expires, $path);
     }
 
     /**
@@ -102,11 +93,18 @@ class PreSignedUrlService
      */
     private function fileExists(PreSignedUrlDataObject $dataObject): bool
     {
-        $size = $dataObject->getSize();
+        $itemPath   = $dataObject->getItemPath();
+        $hash       = $dataObject->getHash();
 
-        return $size === null
-            ? Storage\Mapper::getInstance()->countByColumn('hash', $dataObject->getHash()) > 0
-            : TransformMapper::getInstance()->checkIfRecordExists($dataObject->getHash(), $size);
+        $size = (strpos($itemPath, '-') !== false) ? substr($itemPath, strpos($itemPath, '-') + 1) : null;
+
+        /**
+         * transcoded audio/videos are not stored in storage_transforms table. Therefore we'll need to check the hash
+         * in storage table instead.
+         */
+        return $size && $size !== 'transcode'
+            ? TransformMapper::getInstance()->checkIfRecordExists($hash, $size)
+            : Storage\Mapper::getInstance()->countByColumn('hash', $hash) > 0;
     }
 
     /**
@@ -136,13 +134,14 @@ class PreSignedUrlService
      *
      * @return CommandInterface
      */
-    private function getObject(string $resourcePath,
-                               string $cacheControl,
-                               string $attachmentType,
-                               string $resourceBaseName,
-                               string $contentType,
-                               string $expires): CommandInterface
-    {
+    private function getObject(
+        string $resourcePath,
+        string $cacheControl,
+        string $attachmentType,
+        string $resourceBaseName,
+        string $contentType,
+        string $expires
+    ): CommandInterface {
         $basename = utf8_encode($resourceBaseName);
 
         return $this->s3Client->getCommand('GetObject', [

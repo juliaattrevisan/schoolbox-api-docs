@@ -30,10 +30,12 @@ try {
             if ($config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
                 $preSignedUrlService = new PreSignedUrlService($config);
 
+                $resourcePath = $resource->getPath();
+
                 $preSignedUrlDataObject = $preSignedUrlService->generate(
                     $resource,
                     Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
-                    $size
+                    ($size && strpos($resourcePath, '-') === false) ? $resourcePath . '-' . $size : $resourcePath
                 );
 
                 $preSignedUrlService->download($preSignedUrlDataObject);

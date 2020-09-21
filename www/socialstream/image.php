@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -55,13 +56,11 @@ if ($urlDetect->isStorageUrl()) {
         $hash    = $file->getHash();
         $storage = Storage\Mapper::getInstance()->findByHash($hash);
     } catch (\Schoolbox\Mapper\Exception $e) {
-
         /* Unknown file
          */
         \SitePage::redirectToBrokenImageWithTransform('storage', $size);
     }
-}
-else {
+} else {
     $storage = $cache->getFile();
 }
 
@@ -70,17 +69,18 @@ try {
 
     /** @var IConfigLoader $config */
     $config = $kernel->get('config');
-    if ($fileSystem instanceof FilesystemInterface &&
+    if (
+        $fileSystem instanceof FilesystemInterface &&
         $fileSystem->getAdapter() instanceof AwsS3Adapter &&
         $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
     ) {
-
         $preSignedUrlService = new PreSignedUrlService($config);
-
+        $resourcePath = $storage->getPath();
+        
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storage,
             Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
-            $size
+            ($size && strpos($resourcePath, '-') === false) ? $resourcePath . '-' . $size : $resourcePath
         );
 
         $preSignedUrlService->download($preSignedUrlDataObject);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Optimus Prime
  * Autobots, transform and roll out!
@@ -57,15 +58,20 @@ try {
 
     $fileSystem = $portrait->load()->getFilesystem();
 
-    if ($fileSystem instanceof Filesystem &&
+    if (
+        $fileSystem instanceof Filesystem &&
         $fileSystem->getAdapter() instanceof AwsS3Adapter &&
         $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
     ) {
         $preSignedUrlService = new PreSignedUrlService($config);
+
+        $portraitPath = $portrait->load()->getPath();
+        $size = $_GET['size'] ?? null;
+
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $portrait->load(),
             Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
-            $_GET['size']
+            ($size && strpos($portraitPath, '-') === false) ? $portraitPath . '-' . $size : $portraitPath
         );
 
         $preSignedUrlService->download($preSignedUrlDataObject);

@@ -41,7 +41,6 @@ try {
     if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_READ) {
         SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
     }
-
 } catch (Exception $e) {
     SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
 }
@@ -56,16 +55,19 @@ try {
     $config     = $kernel->getDependencyInjector()->get('config');
     $fileSystem = $resource->getFilesystem();
 
-    if ($fileSystem instanceof Filesystem &&
+    if (
+        $fileSystem instanceof Filesystem &&
         $fileSystem->getAdapter() instanceof AwsS3Adapter &&
         $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
     ) {
         $preSignedUrlService = new PreSignedUrlService($config);
 
+        $resourcePath = $resource->getPath();
+
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $resource,
             Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
-            $key
+            ($key && strpos($resourcePath, '-') === false) ? $resourcePath . '-' . $key : $resourcePath
         );
 
         $preSignedUrlService->download($preSignedUrlDataObject);
