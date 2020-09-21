@@ -835,7 +835,7 @@ class Mapper extends BaseMapper
                     $orderParts[] = "`pastoral`.points";
                     break;
                 case 'year':
-                    $orderParts[] = "`s`.year";
+                    $orderParts[] = "`s`.year_id";
                     break;
                 case 'author':
                     $orderParts[] = "`o`.lastname, `o`.firstname";
@@ -983,10 +983,11 @@ class Mapper extends BaseMapper
     {
         $bindings = [];
         $filters  = [];
+
         if ($includeStudentsWithoutYear) {
-            $filters[] = "`s`.`year` IS NULL";
-            $filters[] = "`s`.`year` = ''";
+            $filters[] = '`s`.`year_id` IS NULL';
         }
+
         if ($years->count()) {
             $pbArray = PredicateBuilder::getArrayBindings(
                 $years->getAll(),
@@ -994,9 +995,11 @@ class Mapper extends BaseMapper
             );
 
             $bindings  = $pbArray['bindings'];
-            $filters[] = "`s`.`year` IN ({$pbArray['placeholders']})";
+            $filters[] = "`s`.`year_id` IN ({$pbArray['placeholders']})";
         }
+
         $this->bindings = array_merge($this->bindings, $bindings);
+
         if (!empty($filters)) {
             $this->filters[] = implode(' OR ', $filters);
         }
