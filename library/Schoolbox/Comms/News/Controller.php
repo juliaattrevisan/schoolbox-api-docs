@@ -135,7 +135,6 @@ class Controller extends Base
      * @param Folder\Mapper                    $folderMapper
      * @param IConnector                       $databaseInternal
      * @param Audience\ArticleResolver         $articleResolver
-     * @param Audience\UserResolver            $userResolver
      * @param Audience\Segment\StrategyFactory $strategyFactory
      * @param Access                           $access
      * @param Thread\Mapper                    $threadMapper
@@ -152,7 +151,6 @@ class Controller extends Base
         Folder\Mapper $folderMapper,
         IConnector $databaseInternal,
         Audience\ArticleResolver $articleResolver,
-        Audience\UserResolver $userResolver,
         Audience\Segment\StrategyFactory $strategyFactory,
         Access $access,
         Thread\Mapper $threadMapper,
@@ -168,7 +166,6 @@ class Controller extends Base
         $this->folderMapper               = $folderMapper;
         $this->databaseInternal           = $databaseInternal;
         $this->articleResolver            = $articleResolver;
-        $this->userResolver               = $userResolver;
         $this->strategyFactory            = $strategyFactory;
         $this->access                     = $access;
         $this->threadMapper               = $threadMapper;

@@ -248,7 +248,6 @@ class Module extends BaseModule
             'folderMapper'               => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
             'databaseInternal'           => $injector->lazyGet('databaseInternal'),
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
-            'userResolver'               => $injector->lazyGet('commsNewsUserResolver'),
             'strategyFactory'            => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
             'access'                     => $injector->lazy(function () {
                 return Access\Access::getInstance();
