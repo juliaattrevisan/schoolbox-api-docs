@@ -207,9 +207,11 @@ class Controller extends Base
         $studentsSelected = [];
 
         foreach ($report->getStudents() as $student) {
+            $year = $student->getYear() ? $student->getYear()->getName() : 'unknown';
+
             $studentsSelected[] = [
                 'id'   => $student->getId(),
-                'name' => "{$student->getFullName()} - Year {$student->getYear()} {$student->getRole()->getName()} " .
+                'name' => "{$student->getFullName()} - Year {$year} {$student->getRole()->getName()} " .
                     "({$student->getExternalId()})",
             ];
         }
@@ -219,9 +221,11 @@ class Controller extends Base
         $authorsSelected = [];
 
         foreach ($report->getAuthors() as $author) {
+            $year = $author->getYear() ? $author->getYear()->getName() : 'unknown';
+
             $authorsSelected[] = [
                 'id'   => $author->getId(),
-                'name' => "{$author->getFullName()} - Year {$author->getYear()} {$author->getRole()->getName()} " .
+                'name' => "{$author->getFullName()} - Year {$year} {$author->getRole()->getName()} " .
                     "({$author->getExternalId()})",
             ];
         }
