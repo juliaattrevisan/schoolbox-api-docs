@@ -122,7 +122,29 @@ class Year extends SimpleStrategy
      */
     public function getValues(GenericCollection $users): array
     {
-        $yearLevels = $users->getPropertyValues('year');
+        /* Users now come with a Year/Model instance inside
+         */
+        $userYears = $users->getPropertyValues('year');
+
+        /* We need to get the name out, because that's what it was using before
+         *
+         * Apparently NULL was an anticipated value with an optional via isValidNullEntityValue()
+         * but that's hardcoded to return false all the time, so god knows what this was
+         * meant to actually do (if anything) at all. Nevertheless, accommodate the original intent
+         */
+        $yearLevels = [];
+
+        foreach ($userYears as $userYear) {
+            if ($userYear instanceof \Schoolbox\YearLevel\Model) {
+                $yearLevels[] = $userYear->getName();
+            } else {
+                $yearLevels[] = null;
+            }
+        }
+
+        /* This is always going to execute, so whatever this was originally doing,
+         * it'll continue to do
+         */
         if (!self::isValidNullEntityValue()) {
             $yearLevels = array_filter($yearLevels, static function (?string $yearLevel): bool {
                 return $yearLevel !== null;
