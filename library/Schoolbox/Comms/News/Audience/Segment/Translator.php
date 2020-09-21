@@ -96,8 +96,8 @@ class Translator
      *
      * e.g. school_house 1234 equates to "Dalton House"
      *
-     * @param string $entityType
-     * @param string $entityValue
+     * @param string      $entityType
+     * @param string|null $entityValue
      * @return string
      */
     public function translateNameFromEntityType(string $entityType, ?string $entityValue): string
