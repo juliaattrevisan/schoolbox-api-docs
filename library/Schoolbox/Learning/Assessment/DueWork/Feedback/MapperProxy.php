@@ -132,13 +132,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
             // Add all files in return
             foreach ($submissionReturn->getFiles() as $file) {
-                $feedback->getAllFiles()->add(clone $file);
-//                $feedback->getAllFiles()->add(
-//                    (new DueWorkFeedbackFile())
-//                        ->setId($file->getId())
-//                        ->setFilename($file->getFilename())
-//                        ->setStorage($file->getStorage())
-//                );
+                $feedback->getAllFiles()->add($file);
             }
 
             $dueWorkFeedbacks->add($feedback);
@@ -186,13 +180,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
             // Add all files
             foreach ($domainObject->getAllFiles() as $file) {
-                $dataModel->getFiles()->add(clone $file);
-//                $dataModel->getFiles()->add(
-//                    (new DueWorkFeedbackFile())
-//                        ->setId($file->getId())
-//                        ->setFilename($file->getFilename())
-//                        ->setStorage($file->getStorage())
-//                );
+                $dataModel->getFiles()->add($file);
             }
 
             $dataModels->add($dataModel);
