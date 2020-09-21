@@ -15,7 +15,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as DataObject;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model as DueWorkFeedbackFile;
+//use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model as DueWorkFeedbackFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DomainObject;
@@ -132,12 +132,13 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
             // Add all files in return
             foreach ($submissionReturn->getFiles() as $file) {
-                $feedback->getAllFiles()->add(
-                    (new DueWorkFeedbackFile())
-                        ->setId($file->getId())
-                        ->setFilename($file->getFilename())
-                        ->setStorage($file->getStorage())
-                );
+                $feedback->getAllFiles()->add(clone $file);
+//                $feedback->getAllFiles()->add(
+//                    (new DueWorkFeedbackFile())
+//                        ->setId($file->getId())
+//                        ->setFilename($file->getFilename())
+//                        ->setStorage($file->getStorage())
+//                );
             }
 
             $dueWorkFeedbacks->add($feedback);
@@ -185,12 +186,13 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
             // Add all files
             foreach ($domainObject->getAllFiles() as $file) {
-                $dataModel->getFiles()->add(
-                    (new DueWorkFeedbackFile())
-                        ->setId($file->getId())
-                        ->setFilename($file->getFilename())
-                        ->setStorage($file->getStorage())
-                );
+                $dataModel->getFiles()->add(clone $file);
+//                $dataModel->getFiles()->add(
+//                    (new DueWorkFeedbackFile())
+//                        ->setId($file->getId())
+//                        ->setFilename($file->getFilename())
+//                        ->setStorage($file->getStorage())
+//                );
             }
 
             $dataModels->add($dataModel);

@@ -166,11 +166,12 @@ class Factory
             if ($this->mostRecentFeedback && $this->mostRecentFeedback->getAllFiles()->count() > 0) {
                 $filesToCopy = new Collection();
                 foreach ($this->mostRecentFeedback->getAllFiles() as $attachment) {
-                    $filesToCopy->add(
-                        (new DueWorkFeedbackFile())
-                            ->setStorage($attachment)
-                            ->setFilename($attachment->getFilename())
-                    );
+                    $filesToCopy->add(clone $attachment);
+//                    $filesToCopy->add(
+//                        (new DueWorkFeedbackFile())
+//                            ->setStorage($attachment)
+//                            ->setFilename($attachment->getFilename())
+//                    );
                 }
                 $feedback->setAllFiles($filesToCopy);
             }
