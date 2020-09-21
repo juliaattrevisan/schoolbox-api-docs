@@ -11,8 +11,6 @@
 #
 #
 
-versionlist="/tmp/sb_version_list";
-
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
 
@@ -26,11 +24,11 @@ curdir=`pwd`;
 
 echo "Starting SQL update process";
 
+versionlist=$(find "$instdir"/updates -mindepth 1 -maxdepth 1 -type d -printf %f\\n | sort -V)
+
 # Build update version list
-rm -f $versionlist;
-for release in `find $instdir/updates -maxdepth 1 -type d | sort -V | cut -c$baselength-1000`;
+for release in $versionlist;
 do
-    echo $release >> $versionlist;
     newver=$release;
 done
 
@@ -115,7 +113,7 @@ versionCompare () {
 
 # Determine the first update directory to execute
 firstUpdate='';
-for release in `cat ${versionlist}`;
+for release in ${versionlist};
 do
     versionCompare ${sqlver} ${release};
     if [[ $? == 1 ]];
@@ -125,14 +123,14 @@ do
     fi;
 done
 
-start=`grep -n "^${firstUpdate}$" $versionlist | cut -d':' -f1`;
+start=`echo "$versionlist" | grep -n "^${firstUpdate}$" | cut -d':' -f1`;
 if [ -z $start ];
 then
     echo "Error: SQL version not supported for update, no changes made";
     exit;
 fi
 
-end=`grep -n "^${newver}$" $versionlist | cut -d':' -f1`;
+end=`echo "$versionlist" | grep -n "^${newver}$" | cut -d':' -f1`;
 if [ -z $end ];
 then
     echo "Error: SQL version greater than update, no changes made";
@@ -169,58 +167,54 @@ echo "Updating database to new version";
 errorint=0;
 errormsg='';
 # Run update scripts in release order, SQL first then PHP for each release
-for release in `sed -n "$start","$end"p $versionlist`;
+for release in $(echo "$versionlist" | sed -n "$start","$end"p );
 do
     echo "Running update $release";
-    # Only run release upgrade if the scripts_list actually exists
-    if [ -f $instdir/updates/$release/scripts_list ];
-    then
-        # Run SQL update scripts for this release
-        for scriptcmd in `egrep "\.php|\.sql" $instdir/updates/$release/scripts_list`
-        do
-            script="$instdir/updates/$release/$scriptcmd";
-            # Check script listed in scripts_list actually exists
-            if [ -f $script ];
+
+    # Run SQL update scripts for this release
+    for script in $(find "${instdir}/updates/$release" -type f  | grep -E "(.+\.sql|.+\.php)$" | sort)
+    do
+        # Check script listed in scripts_list actually exists
+        if [ -f $script ];
+        then
+            echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Starting script: $script";
+            if [[ $script == *".sql" ]]
             then
-                echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Starting script: $script";
-                if [[ $scriptcmd == *".sql" ]]
+                mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $script;
+                # Check for and report errors
+                if [ $? -ne 0 ];
                 then
-                    mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $script;
-                    # Check for and report errors
-                    if [ $? -ne 0 ];
-                    then
-                        echo "[*]["`date +%Y-%m-%d\ %H:%M:%S`"] Error running update: $script" >&2;
-                        errorint=1;
-                        errormsg="$errormsg,$script";
-                    else
-                        echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Success running update: $script";
-                    fi
-                fi
-                if [[ $scriptcmd == *".php" ]]
-                then
-                    scriptpath=${script%/*};
-                    cd $scriptpath;
-                    phpscript=${scriptcmd##*/};
-                    echo $phpscript;
-                    php -f $phpscript 2>&1;
-                    # Check for and report errors
-                    if [ $? -ne 0 ];
-                    then
-                        cd $curdir;
-                        echo "[*]["`date +%Y-%m-%d\ %H:%M:%S`"] Error running update: $script";
-                        errorint=1;
-                        errormsg="$errormsg,$script";
-                    else
-                        echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Success running update: $script";
-                    fi
-                    cd $curdir;
+                    echo "[*]["`date +%Y-%m-%d\ %H:%M:%S`"] Error running update: $script" >&2;
+                    errorint=1;
+                    errormsg="$errormsg,$script";
+                else
+                    echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Success running update: $script";
                 fi
             fi
-        done
+            if [[ $script == *".php" ]]
+            then
+                scriptpath=${script%/*};
+                cd $scriptpath;
+                phpscript=${script##*/};
+                echo $phpscript;
+                php -f $phpscript 2>&1;
+                # Check for and report errors
+                if [ $? -ne 0 ];
+                then
+                    cd $curdir;
+                    echo "[*]["`date +%Y-%m-%d\ %H:%M:%S`"] Error running update: $script";
+                    errorint=1;
+                    errormsg="$errormsg,$script";
+                else
+                    echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Success running update: $script";
+                fi
+                cd $curdir;
+            fi
+        fi
+    done
 
-        # Update the config table to show current release version
-        mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb -e "UPDATE \`config\` SET value='$release' WHERE name='site_version';";
-    fi
+    # Update the config table to show current release version
+    mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb -e "UPDATE \`config\` SET value='$release' WHERE name='site_version';";
 done
 
 echo "Backup of database located at: $backupfile";
