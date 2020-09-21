@@ -19,9 +19,6 @@ $app = new class extends CliTool\App {
     {
         $db = $this->getDatabaseInternal();
 
-        /* Make a backup of pastoral_report.years into pastoral_report._years
-         */
-
         /* Find a list of all the (lu_year_level.name, lu_year_level.id) tuples,
          * indexed by lu_year_level.name; we're gonna use that as a lookup
 
