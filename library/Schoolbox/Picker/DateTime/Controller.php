@@ -33,7 +33,7 @@ class Controller extends Base
      * The maximum number of students to query when building the heatmap
      * (`getHeat()`) or heaviest workload (`getDueByDate()`).
      */
-    private const MAX_STUDENTS_IN_HEATMAP = 50;
+    private const MAX_STUDENTS_IN_HEATMAP = 100;
 
 
     /** @var UserMapper */
