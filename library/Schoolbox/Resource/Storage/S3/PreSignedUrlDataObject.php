@@ -37,12 +37,11 @@ class PreSignedUrlDataObject
     /**
      * PreSignedUrlDataObject constructor.
      *
-     * @param string      $hash
-     * @param string      $url
-     * @param string      $cacheControl
-     * @param string      $expires
-     * @param string      $itemPath
-     * @param string|null $size
+     * @param string $hash
+     * @param string $url
+     * @param string $cacheControl
+     * @param string $expires
+     * @param string $itemPath
      */
     public function __construct(string $hash, string $url, string $cacheControl, string $expires, string $itemPath)
     {
