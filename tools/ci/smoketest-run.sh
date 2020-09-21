@@ -1,5 +1,13 @@
 #!/bin/bash
 
+PHP_VERSION=$1
+
+if [ -z $PHP_VERSION ]
+then
+	echo "No PHP version set, do not run";
+	exit 1;
+fi
+
 ## Smoke test runs a setup script first
 ./schoolbox-develop/tools/ci/smoketest-setup.sh
 echo "smoke tests setup"
