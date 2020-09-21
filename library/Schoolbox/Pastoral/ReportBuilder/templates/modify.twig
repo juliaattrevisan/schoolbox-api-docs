@@ -241,14 +241,14 @@
                                 >
                                 <label for="includeStudentsWithoutYear">(No Year Level)</label>
                                 {% for year in years %}
-                                    <input id="year-{{ year }}"
+                                    <input id="year-{{ year.id }}"
                                            name="years[]"
-                                           value="{{ year }}"
+                                           value="{{ year.id }}"
                                            type="checkbox"
-                                           {% for yearSelected in report.years if yearSelected == year %}checked{% endfor %}
+                                           {% for yearSelected in report.years if yearSelected == year.id %}checked{% endfor %}
                                            data-check-year
                                     >
-                                    <label for="year-{{ year }}">{{ year }}</label>
+                                    <label for="year-{{ year.id }}">{{ year.name }}</label>
                                 {% endfor %}
                             </div>
                         </div>

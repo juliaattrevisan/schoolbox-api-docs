@@ -278,6 +278,12 @@ class Controller extends Base
         $report->setUsesRelativeDate($report->getUsesRelativeDate() ?? true);
         $report->setRelativeDateString($report->getRelativeDateString() ?? self::THIS_YEAR);
 
+        /* A stack of all YearLevel instances, ordered by name in a natural-sorting way
+         */
+        $yearLevels = $this->yearLevelMapper->findAll()->sortByCallback(static function (YearLevel\Model $a, YearLevel\Model $b) {
+            return strnatcasecmp($a->getName(), $b->getName());
+        });
+
         // And render this thing out
         $this->getResponse()->content->set(
             [
@@ -287,7 +293,7 @@ class Controller extends Base
                             'service',
                             UserAccess::SERVICE_PASTORAL
                         )->count() > 0,
-                    'years'            => $this->userMapper->getYearLevels(),
+                    'years'            => $yearLevels,
                     'houses'           => $this->houseMapper->findAll()->sortBy('sequence', 'asc'),
                     'types'            => $this->pastoralTypeMapper->findAll(),
                     'subTypes'         => $this->pastoralSubTypeMapper->findAll(),

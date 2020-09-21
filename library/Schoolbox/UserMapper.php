@@ -972,29 +972,6 @@ class UserMapper extends Mapper
 
 
     /**
-     * Retrieve a list of all year levels currently assigned to users
-     * @return array
-     * @throws \PDOException
-     */
-    public function getYearLevels()
-    {
-        $query = "SELECT DISTINCT year FROM user WHERE year IS NOT NULL AND year <> '' ORDER BY LENGTH(year), year";
-        $statement = $this->getDatabase()->prepare($query);
-
-        $statement->execute();
-        $results = $statement->fetchAll();
-
-        $years = [];
-
-        foreach ($results as $result) {
-            $years[] = $result['year'];
-        }
-
-        return $years;
-    }
-
-
-    /**
      * Port of `\User::transferOwnership` - transfers ownership of content from
      * one user to another.
      *
