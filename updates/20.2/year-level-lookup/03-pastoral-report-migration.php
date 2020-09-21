@@ -1,0 +1,47 @@
+<?php
+/**
+ * @author      Steve Chan <steve.chan@schoolbox.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        http://www.schoolbox.com.au/
+ */
+declare(strict_types=1);
+
+use Schoolbox\Application\CliTool;
+
+require_once __DIR__ . '/../../../conf/core/require.php';
+
+$app = new class extends CliTool\App {
+
+    /**
+     * Migrate pastoral_report.years values into lu_year_level.id equivalent csv strings
+     */
+    public function run(): void
+    {
+        $db = $this->getDatabaseInternal();
+
+        /* Make a backup of pastoral_report.years into pastoral_report._years
+         */
+
+        /* Find a list of all the (lu_year_level.name, lu_year_level.id) tuples,
+         * indexed by lu_year_level.name; we're gonna use that as a lookup
+
+        /* Select all the pastoral report rows where pastoral_report.years is not '' and not null
+         * These are the reports that need their year levels updated
+         */
+
+        /* For every row, explode pastoral_report.years by comma, into its separate pieces
+         */
+
+        /* Use the (name => id) tuples to find out what year_id these values were
+         * then concat them back into a csv string
+         */
+
+        /* Ram it back into the pastoral_report row and save it
+         */
+    }
+};
+
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+
+/** @noinspection PhpUnhandledExceptionInspection */
+(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
