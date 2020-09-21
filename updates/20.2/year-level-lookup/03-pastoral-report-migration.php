@@ -37,18 +37,53 @@ $app = new class extends CliTool\App {
         /* Select all the pastoral report rows where pastoral_report.years is not '' and not null
          * These are the reports that need their year levels updated
          */
+        $pastoralReportStatement = $db->prepareQuery("
+            SELECT id, years
+            FROM pastoral_report
+            WHERE years IS NOT NULL
+            AND years != ''
+        ");
 
+        $pastoralReportStatement->execute();
 
+        /* Set up update statement
+         */
+        $updateStatement = $db->prepareQuery('
+            UPDATE pastoral_report
+            SET years = :years
+            WHERE id = :id
+        ');
 
         /* For every row, explode pastoral_report.years by comma, into its separate pieces
          */
+        $reports = $pastoralReportStatement->fetchAll(PDO::FETCH_ASSOC);
 
-        /* Use the (name => id) tuples to find out what year_id these values were
-         * then concat them back into a csv string
-         */
+        foreach ($reports as $report) {
+            $yearNames = explode(',', $report['years']);
 
-        /* Ram it back into the pastoral_report row and save it
-         */
+            /* Use the (name => id) tuples to find out what year_id these values were
+             * then concat them back into a csv string
+             */
+            $newYearNames = [];
+
+            foreach($yearNames as $yearName) {
+                $newYearNames[] = $yearLevels[$yearName]['id'] ?? null;
+            }
+
+            /* Filter out any non-matching data
+             * Implode back into csv
+             */
+            $newYearIds = implode(',', array_values(array_filter($newYearNames)));
+
+            /* Ram it back into the pastoral_report row and save it
+             */
+            if ('' !== $newYearIds) {
+                $updateStatement->execute([
+                    'years' => $newYearIds,
+                    'id'    => $report['id']
+                ]);
+            }
+        }
     }
 };
 
