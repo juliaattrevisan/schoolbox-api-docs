@@ -84,14 +84,16 @@ class Year extends SimpleStrategy
 
         $pb = (new Builder(new Quoter(), 'user'))
             ->setParamPrefix($entityType)
-            ->in('year', $entityValues);
+            ->in('lu_year_level.name', $entityValues);
 
-        $sql         = "
+        $sql = "
             SELECT
                 '{$entityType}' entity_type,
-                year entity_value,
-                IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) name
-            FROM user WHERE {$pb->getWhereIntersect()}
+                lu_year_level.name AS entity_value,
+                IF(lu_year_level.name REGEXP '^[0-9]+$', CONCAT('Year ', lu_year_level.name), lu_year_level.name) name
+            FROM user
+            LEFT JOIN lu_year_level ON `user`.year_id = lu_year_level.id
+            WHERE {$pb->getWhereIntersect()}
         ";
 
         return new TranslateSql(
