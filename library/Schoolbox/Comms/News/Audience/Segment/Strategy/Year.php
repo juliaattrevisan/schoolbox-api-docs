@@ -55,19 +55,21 @@ class Year extends SimpleStrategy
      */
     public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
     {
-        $keywordFilter = null === $searchPlaceholder ? '' : "AND year LIKE :{$searchPlaceholder}";
+        $keywordFilter = null === $searchPlaceholder ? '' : "AND lu_year_level.name LIKE :{$searchPlaceholder}";
 
         // If user.year is numeric, prefix 'Year ' to read like 'Year 9'
         $entityType = self::getEntityType();
         return "
             SELECT DISTINCT
-              year AS id,
-              IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) AS name,
+              lu_year_level.name AS id,
+              IF(lu_year_level.name REGEXP '^[0-9]+$', CONCAT('Year ', lu_year_level.name), lu_year_level.name) AS name,
               '{$entityType}' AS entity_type,
               null as entity_meta
             FROM `user`
-            WHERE deleted_at IS NULL
-            AND year IS NOT NULL
+            LEFT JOIN lu_year_level ON `user`.year_id = lu_year_level.id
+            WHERE `user`.deleted_at IS NULL
+            AND lu_year_level.deleted_AT IS NULL
+            AND lu_year_level.name IS NOT NULL
             {$keywordFilter}
         ";
     }
