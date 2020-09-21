@@ -94,7 +94,7 @@
                             {% endif %}
 
                             <dt class="small-12 medium-3">Year Level</dt>
-                            <dd class="small-12 medium-9">{{ student.year | default('Unknown') }}</dd>
+                            <dd class="small-12 medium-9">{{ student.year.name | default('Unknown') }}</dd>
 
                             {# Display links to students parents #}
 
@@ -127,7 +127,7 @@
                     <div class="small-12 medium-10 columns no-pad">
                         <dl>
                             <dt class="small-12 medium-3">Year Level</dt>
-                            <dd class="small-12 medium-9">{{ linkedStudent.year | default('Unknown') }}</dd>
+                            <dd class="small-12 medium-9">{{ linkedStudent.year.name | default('Unknown') }}</dd>
 
                             {# Display links to students parents #}
 
