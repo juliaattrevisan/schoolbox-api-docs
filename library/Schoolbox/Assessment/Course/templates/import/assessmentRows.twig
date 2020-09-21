@@ -103,7 +103,7 @@
             {% set isChecked = (assessmentImpl) or ('import' == unitAction) or (depth > 0 and not assessmentPair.parentPair.implementation) %}
 
             <li data-assessment="{{ assessment.id }}" {% if project %}data-parent-project="{{ project.id }}"{% endif %} {% if depth %}class="child"{% endif %}>
-                <input type="hidden" name="{{ inputPrefix }}[{{ assessment.id }}][spec_id]" value="{{ assessmentSpec.id }}" />
+                <input type="hidden" name="{{ inputPrefix }}[{{ assessment.id }}][spec_id]" value="{{ assessmentSpec ? assessmentSpec.id : '' }}" />
                 <input type="hidden" name="{{ inputPrefix }}[{{ assessment.id }}][impl_id]" value="{{ assessmentImpl ? assessmentImpl.id : '' }}" />
 
                 <div class="compact card small-12">
@@ -136,7 +136,7 @@
                         inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
                         dateProperty: 'publish',
                         dateSyncEnd: publishDateSync,
-                        assessmentId: assessmentSpec.id
+                        assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
                     } only %}
 
                     {#open date is relevant when accepting responses#}
@@ -148,7 +148,7 @@
                             dateProperty: 'open',
                             dateSyncStart: 'publish',
                             dateSyncEnd: 'due',
-                            assessmentId: assessmentSpec.id
+                            assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
                         } only %}
                     {% else %}
                         <div class="small-12 medium-6 large-3 columns hide-for-medium-down"><p>&nbsp;</p></div>
@@ -163,7 +163,7 @@
                         dateProperty: 'due',
                         dateSyncStart: dueSyncStart,
                         dateSyncEnd: dueSyncEnd,
-                        assessmentId: assessmentSpec.id
+                        assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
                     } only %}
 
                     {#close (late) date is relevant when accepting responses#}
@@ -176,7 +176,7 @@
                             dateProperty: 'close',
                             dateSyncStart: 'due',
                             dateLabel: 'Late',
-                            assessmentId: assessmentSpec.id
+                            assessmentId: isImplOnly ? assessmentImpl.id : assessmentSpec.id
                         } only %}
                     {% else %}
                         <div class="small-12 medium-6 large-3 columns hide-for-medium-down"><p>&nbsp;</p></div>
