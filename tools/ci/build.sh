@@ -9,6 +9,14 @@ cd $instdir;
 
 echo "operating in dir: `pwd`";
 
+if [ ! -f ../vendor-php-artifact/"$branch"-vendor-php74.tar.gz ]
+	mv ../vendor-php-artifact/"$branch"-vendor-php74.tar.gz ../vendor-php-artifact/"$branch"-vendor-php.tar.gz
+fi
+
+if [ ! -f ../develop-bower/"$branch"-bower-php74.tar.gz ]
+	mv ../develop-bower/"$branch"-bower-php74.tar.gz ../develop-bower/"$branch"-bower-php.tar.gz
+fi
+
 branch='master';
 if [ ! -z $1 ];
 then
