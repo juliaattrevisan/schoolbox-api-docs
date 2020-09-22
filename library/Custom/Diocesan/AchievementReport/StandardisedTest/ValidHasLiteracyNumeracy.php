@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest;
 
+use Schoolbox\YearLevel;
+
 /**
  * Class ValidHasLiteracyNumeracy
  *
@@ -19,11 +21,17 @@ class ValidHasLiteracyNumeracy
      * Certain year levels always display the graph.
      * Other year levels display the graph only if there is data there
      *
-     * @param int   $yearLevel
+     * @param YearLevel\Model|null $yearLevel
      * @return bool
      */
-    public function isSatisfiedBy(int $yearLevel): bool
+    public function isSatisfiedBy(?YearLevel\Model $yearLevel): bool
     {
+        /* Unknown year level; no access
+         */
+        if (null === $yearLevel) {
+            return false;
+        }
+
         /* "Can you please hide the Literacy/Numeracy tab for all students in current years 0-6?"
          * https://lrs.zendesk.com/agent/tickets/76478
          */

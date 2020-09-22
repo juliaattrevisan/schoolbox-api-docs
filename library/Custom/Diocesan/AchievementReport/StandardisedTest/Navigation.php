@@ -167,7 +167,7 @@ class Navigation
 
         /* Conditional Literacy/Numeracy report
          */
-        if ((new ValidHasLiteracyNumeracy())->isSatisfiedBy((int)$this->user->getYear())) {
+        if ((new ValidHasLiteracyNumeracy())->isSatisfiedBy($this->user->getYear())) {
             $availableNavigation[self::STANDARDISEDTEST_LITERACYNUMERACY_KEY] = [
                 'url'   => $this->router->generate('achievementreport.getStandardisedTestsLiteracyNumeracy', [
                     'externalUserId' => $this->externalUser['StudentID'],
