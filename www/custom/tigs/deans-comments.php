@@ -20,10 +20,14 @@ use Schoolbox\Application\Exception\AccessDenied;
 use Schoolbox\Application\Exception\NotAuthenticated;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\WebRequest;
+use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new WebRequest\Kernel();
+
+/** @var IConfigLoader $config */
+$config = $kernel->get('config');
 
 const YEAR_LEVEL_MIN = 7;
 const YEAR_LEVEL_MAX = 12;
@@ -32,7 +36,7 @@ const YEAR_MAX       = 2030;
 const SESSION_KEY    = 'tigsDeansCommentsInsert';
 
 // Main flow
-authenticateUser($_SESSION);
+authenticateUser($_SESSION, $config);
 if (isPost($_POST)) {
     processPost($kernel, $_POST);
 } else {
@@ -43,12 +47,13 @@ if (isPost($_POST)) {
 /**
  * Authenticates the session user can access this page (must be SU)
  *
- * @param array $session
+ * @param array         $session
+ * @param IConfigLoader $config
  * @throws AccessDenied
  * @throws NotAuthenticated
  * @throws NotFound
  */
-function authenticateUser(array $session): void
+function authenticateUser(array $session, IConfigLoader $config): void
 {
     /** @var \Schoolbox\User $user */
     $user = $session['user'] ?? null;
@@ -59,7 +64,7 @@ function authenticateUser(array $session): void
         throw new AccessDenied();
     }
 
-    if(Cfg::get('site_location') !== 'tigs'){
+    if($config->get('site_location') !== 'tigs'){
         throw new NotFound();
     }
 }
