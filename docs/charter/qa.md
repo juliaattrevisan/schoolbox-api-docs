@@ -112,6 +112,7 @@ This particular process is focused on ensuring data integrity when we have chang
     * i.e. a migration of existing data to a new table or field: usually follows an ALTER TABLE
 * any other update whose result is not reversible
     * i.e. a mass hard-delete, or mass update whose original value can't be restored
+* if in doubt consider the change a migration (safe is better than)
 
 It is best practice to keep the migration as simple as possible. Each change being tested with this process before proceeding to the next. This is to reduce complexity in the last step of observation of the results.
 
