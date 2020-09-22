@@ -170,11 +170,12 @@ liveCheck() {
     echo "Looks like it is a vagrant server!"
   else
 		if [ "$syncType" != "local" ]; then
+      echo -e "\033[0;33m";
 			echo "Not a dev server. Just in case, pretty sure you don't want to run a sync from the dev to the live server. If you really really do, run the restore script with the -local flag to override";
-			#Run with -live arg do override;
+      echo -e "\033[0m";
 			exit 1;
 		else
-			echo "You have chosen to retore to your self server. Proceed with caution";
+			echo "You have chosen to retore a local backup to this server. Proceed with caution";
 		fi
 	fi
 }
@@ -429,11 +430,13 @@ if [ "$syncType" == "" ] || [ "$syncType" == "local" ]; then
   	error;
   fi
 elif [ "$syncType" == "db" ]; then
-  restore=`cat $sbrl | grep '\[D\]' | grep daily | tail -n 1`;
-  restorepretty=`cat $sbrlp | grep "DB" | grep daily | tail -n 1`
+  echo "$syncType";
+  restore=$(grep "\[D\]" $sbrl | grep daily | tail -n 1);
+  echo -e "\n Restoring remote DB backup - $restore";
 elif [ "$syncType" == "full" ]; then
-  restore=`cat $sbrl | grep '\[A\]' | grep daily | tail -n 1`;
-  restorepretty=`cat $sbrlp | grep "Full" | grep daily | tail -n 1`
+  echo "$syncType";
+  restore=$(grep "\[A\]" $sbrl | grep daily | tail -n 1);
+  echo -e "\n Restoring remote full backup - $restore";
 else
   errmsg="Your selected sync type '$syncType' is not available";
   error;
@@ -448,9 +451,14 @@ sourcep3=`echo $restore | cut -d',' -f5`;
 
 # Check if a full restor can be done
 if [ "$sourcetype" == '[A]' ] && [ "$sourceloc" == '[R]' ]; then
-  localAvailableStorage=$(df | grep datapool | awk -F " " '{print $2}');
-  remoteUsedStorage=$(ssh $host df | grep datapool | awk -F " " '{print $3}');
-  if [ $localAvailableStorage -le $remoteUsedStorage ]; then
+  lmount=$(findmnt -n -o SOURCE --target $thisdatadir);
+  localAvailableStorage=$(df | grep $lmount | awk -F " " '{print $2}');
+  rmount=$(ssh $host findmnt -n -o SOURCE --target $sourcep3);
+  remoteUsedStorage=$(ssh $host df | grep $rmount | awk -F " " '{print $3}');
+  if [ "$localAvailableStorage" == "" ] || [ "$remoteUsedStorage" == "" ]; then
+    errmsg="Please check the datapool disk on both hosts, one or both are either full or not available";
+    error;
+  elif [ $localAvailableStorage -le $remoteUsedStorage ]; then
     errmsg="You are trying to restore more data ($remoteUsedStorage 1K-blocks) than disk that is available ($localAvailableStorage 1K-blocks)";
     error;
   fi
