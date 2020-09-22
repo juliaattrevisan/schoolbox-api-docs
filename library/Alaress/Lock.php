@@ -6,8 +6,10 @@
  * Really simple process locking mechanism. Stores the PID in the file passed in
  * the constructor.
  *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @deprecated use `\Alaress\Lock\InstanceLockFactory` to generate instance
+ *             specific locks instead
+ *
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 class Alaress_Lock
