@@ -17,7 +17,7 @@ use Symfony\Component\Lock\LockInterface;
  * Wraps around a Symfony lock factory instance, and ensures that an instance ID
  * is applied to the lock key.
  */
-class Factory
+class InstanceLockFactory
 {
     /**
      * A Symfony lock factory instance.
