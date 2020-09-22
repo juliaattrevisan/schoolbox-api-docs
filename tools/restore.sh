@@ -585,13 +585,7 @@ else
 	if [ "$sourceloc" = '[B]' ];
 	then
 		# Backup Source, set the file location of the db backup
-		sourcedb="$backup_dir/$sourcep2/schoolboxclass rootDiskCheck(AgentCheck):
-    def check(self, instance):
-        totalBlocksFree, err, retcode = get_subprocess_output(['df','-t','ext4','--output=avail,target','|','grep','"/$"','|','grep','-o','"[0-9]*"'], self.log, raise_on_empty_output=True)
-        redisBackup, err, retcode = get_subprocess_output(['du','/var/lib/redis/dump.rdb','|','grep','-o','"^[0-9]*"'], self.log, raise_on_empty_output=True)
-        blocksFree=totalBlocksFree - redisBackup
-        self.gauge("blocks.free", blocksFree ,tags=['TAG_KEY:TAG_VALUE'])
--$sourcep2.sql";
+		sourcedb="$backup_dir/$sourcep2/schoolbox-$sourcep2.sql";
 	fi
 fi
 
