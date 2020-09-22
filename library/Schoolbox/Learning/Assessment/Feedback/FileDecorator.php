@@ -10,11 +10,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Feedback;
 
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model as DueWorkFeedbackFile;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 
 class FileDecorator
 {

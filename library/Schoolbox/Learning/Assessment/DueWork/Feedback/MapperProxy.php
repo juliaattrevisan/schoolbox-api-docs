@@ -15,11 +15,10 @@ use Schoolbox\Mapper;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as DataObject;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model as SubmissionReturnFile;
+//use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model as DueWorkFeedbackFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as SubmissionReturnMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DomainObject;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 
 /**
@@ -133,12 +132,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
             // Add all files in return
             foreach ($submissionReturn->getFiles() as $file) {
-                $feedback->getAllFiles()->add(
-                    (new DueWorkFeedbackFile())
-                        ->setId($file->getId())
-                        ->setFilename($file->getFilename())
-                        ->setStorage($file->getStorage())
-                );
+                $feedback->getAllFiles()->add($file);
             }
 
             $dueWorkFeedbacks->add($feedback);
@@ -186,12 +180,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
             // Add all files
             foreach ($domainObject->getAllFiles() as $file) {
-                $dataModel->getFiles()->add(
-                    (new SubmissionReturnFile())
-                        ->setId($file->getId())
-                        ->setFilename($file->getFilename())
-                        ->setStorage($file->getStorage())
-                );
+                $dataModel->getFiles()->add($file);
             }
 
             $dataModels->add($dataModel);

@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model as DueWorkFeedbackFile;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Feedback\FileDecorator;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
@@ -166,11 +166,7 @@ class Factory
             if ($this->mostRecentFeedback && $this->mostRecentFeedback->getAllFiles()->count() > 0) {
                 $filesToCopy = new Collection();
                 foreach ($this->mostRecentFeedback->getAllFiles() as $attachment) {
-                    $filesToCopy->add(
-                        (new DueWorkFeedbackFile())
-                            ->setStorage($attachment)
-                            ->setFilename($attachment->getFilename())
-                    );
+                    $filesToCopy->add($attachment);
                 }
                 $feedback->setAllFiles($filesToCopy);
             }
