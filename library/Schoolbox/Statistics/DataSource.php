@@ -135,7 +135,7 @@ class DataSource
             SELECT      {$this->visitsMapper->getColumnString('hv')},
                         {$this->visitsMapper->getJoinColumnString('role', 'r')}
             FROM        `{$this->visitsMapper->getTable()}` AS hv
-            LEFT JOIN   {$this->visitsMapper->getJoinSql('role', 'hv', 'r')}
+            JOIN        {$this->visitsMapper->getJoinSql('role', 'hv', 'r', true)}
             WHERE       hv.category_id = :folderId
                         AND hv.date BETWEEN :startDate AND :endDate
                         {$roleClause}
