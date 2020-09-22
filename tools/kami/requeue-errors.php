@@ -122,7 +122,9 @@ HELP;
             // running on other hosts.
             // Instead: assume this process is well-behaved enough to
             // self-terminate when its timeout is reached.
-            $this->getLogger()->warning('A errors-requeue instance is already running: trusting it will self-terminate on timeout');
+            $this->getLogger()->warning(
+                'A errors-requeue instance is already running: trusting it will self-terminate on timeout'
+            );
             exit(1);
 
 //            $lastModTime  = filemtime($lockFile);
@@ -146,6 +148,8 @@ HELP;
 //                exit(1);
 //            }
         }
+
+        $this->setMaxExecutionTime($timeout);
 
         // Run the tool
         $exitStatus = 0;
