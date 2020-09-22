@@ -143,6 +143,20 @@ abstract class App
 
 
     /**
+     * Convenience method for setting max execution time of this app.
+     *
+     * @param float|null $timeout The amount of time, in seconds, this app may
+     *                            run. (0: unlimited, null: no time set at all.)
+     */
+    protected function setMaxExecutionTime(?float $timeout): void
+    {
+        if (isset($timeout)) {
+            ini_set('max_execution_time', $timeout);
+        }
+    }
+
+
+    /**
      * Strongly typed convenience method to launch another process in the background and enable
      * this process to exit cleanly without hanging
      *
