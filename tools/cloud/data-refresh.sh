@@ -248,7 +248,7 @@ function create_data_dirs(){
 }
 
 
-# Wipe messages from redis
+# Upgrade SQL
 function upgrade_sql(){
   if ! "$site_root"/tools/update-sql.sh; then
     error "Unable to update SQL"
