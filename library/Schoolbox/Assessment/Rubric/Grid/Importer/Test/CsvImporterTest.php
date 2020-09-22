@@ -88,7 +88,24 @@ class CsvImporterTest extends TestCase
                 [
                     'name'       => 'Cap 2',
                     'maxValue'   => null,
-                    'indicators' => [],
+                    'indicators' => [
+                        [
+                            'name'        => 'Ind 1',
+                            'descriptors' => [
+                                null,
+                                null,
+                                null,
+                            ],
+                        ],
+                        [
+                            'name'        => 'Ind 2',
+                            'descriptors' => [
+                                null,
+                                null,
+                                null,
+                            ],
+                        ],
+                    ],
                 ],
             ],
         ];

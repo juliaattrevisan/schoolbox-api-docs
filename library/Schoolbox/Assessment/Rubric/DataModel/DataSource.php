@@ -121,35 +121,31 @@ class DataSource
         $rowSet = new RowSet($context);
 
         // Load the capabilities and indicators for this context
-        $folder = $context->getBaseContext()->getFolder();
-
-        // Capability contains indicators too: inside-out them
-        /** @var GenericCollection|\Schoolbox\Assessment\Rubric\RowSet\Capability[] $capabilities */
-        $capabilities    = new GenericCollection(\Schoolbox\Assessment\Rubric\RowSet\Capability::class);
-        $indicatorModels = IndicatorMapper::getInstance()->findForFolder($folder->getId(), $useCache);
+        $folder           = $context->getBaseContext()->getFolder();
+        $capabilityModels = CapabilityMapper::getInstance()->findForFolder($folder->getId(), $useCache);
+        $indicatorModels  = IndicatorMapper::getInstance()->findForFolder($folder->getId(), $useCache);
 
         // Unit-specs have their course spec's capabilities/indicators as well
         $courseSpecFolderId = null;
         if ($context instanceof UnitSpecification || $folder->hasUnitSpecification()) {
             $courseSpecFolderId = (int)$folder->getParent()->getId();
-            $indicatorModels    = IndicatorMapper::getInstance()->findForFolder($courseSpecFolderId, $useCache)
-                                                      ->merge($indicatorModels);
+            $capabilityModels   = CapabilityMapper::getInstance()
+                                                  ->findForFolder($courseSpecFolderId, $useCache)
+                                                  ->merge($capabilityModels);
+            $indicatorModels    = IndicatorMapper::getInstance()
+                                                 ->findForFolder($courseSpecFolderId, $useCache)
+                                                 ->merge($indicatorModels);
         }
 
-        // This is how it SHOULD work...
-//        if ($context instanceof UnitSpecification) {
-//            $indicatorModels = $indicatorModels->merge(
-//                IndicatorMapper::getInstance()->findForFolder(
-//                    $context->getCourse()->getFolder()->getId()
-//                )
-//            );
-//        }
 
-        foreach ($indicatorModels as $indicatorModel) {
-            $capabilityModel    = $indicatorModel->getCapability();
+        /** @var GenericCollection|\Schoolbox\Assessment\Rubric\RowSet\Capability[] $capabilities */
+        $capabilities = new GenericCollection(\Schoolbox\Assessment\Rubric\RowSet\Capability::class);
+
+
+        // Populate the capabilities for this context
+        foreach ($capabilityModels as $capabilityModel) {
             $isCourseCapability = $capabilityModel->getParentId() === $courseSpecFolderId;
             $capabilityId       = $capabilityModel->getId();
-            $indicatorId        = $indicatorModel->getId();
             if (!isset($capabilities[$capabilityId])) {
                 $capabilities[$capabilityId] = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
                     ->setId($capabilityId)
@@ -165,6 +161,14 @@ class DataSource
                     }
                 }
             }
+        }
+
+
+        // Populate the indicators for this context
+        foreach ($indicatorModels as $indicatorModel) {
+            $capabilityModel = $indicatorModel->getCapability();
+            $capabilityId    = $capabilityModel->getId();
+            $indicatorId     = $indicatorModel->getId();
             $capabilities[$capabilityId]->getIndicators()[$indicatorId] = (new \Schoolbox\Assessment\Rubric\RowSet\Indicator())
                 ->setId($indicatorId)
                 ->setName($indicatorModel->getName())
