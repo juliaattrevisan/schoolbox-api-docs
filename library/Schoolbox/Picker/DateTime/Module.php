@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
+use Schoolbox\Assessment\Participant\Finder;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\UserMapper;
@@ -111,11 +112,15 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'userMapper'       => $this->getMapperFactory()->getLazy(UserMapper::class),
-                'termMapper'       => $this->getMapperFactory()->getLazy(TermMapper::class),
-                'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-                'timetableHandler' => $this->getInjector()->lazyGet('externalTimetable'),
+                'userMapper'          => $this->getMapperFactory()->getLazy(UserMapper::class),
+                'termMapper'          => $this->getMapperFactory()->getLazy(TermMapper::class),
+                'folderMapper'        => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'userAccessMapper'    => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                'timetableHandler'    => $this->getInjector()->lazyGet('externalTimetable'),
+                'participationFinder' => $this->getInjector()->lazyNew(
+                    Finder::class,
+                    ['database' => $this->getInjector()->lazyGet('databaseInternal')]
+                )
             ])
         );
     }

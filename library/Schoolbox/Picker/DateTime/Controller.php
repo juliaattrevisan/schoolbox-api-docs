@@ -15,12 +15,13 @@ use Alaress_Date_Format;
 use External_TimetableInterface;
 use InvalidArgumentException;
 use Calendar\Event\Type\EventBase;
+use Schoolbox\Assessment\Participant\Finder;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -28,26 +29,38 @@ use Schoolbox\Role;
 
 class Controller extends Base
 {
+    /**
+     * The maximum number of students to query when building the heatmap
+     * (`getHeat()`) or heaviest workload (`getDueByDate()`).
+     */
+    private const MAX_STUDENTS_IN_HEATMAP = 100;
+
+
     /** @var UserMapper */
     private $userMapper;
 
     /** @var TermMapper */
     private $termMapper;
 
+    /** @var FolderMapper */
+    private $folderMapper;
+
     /** @var UserAccessMapper */
     private $userAccessMapper;
-
-    /** @var AssessmentMapperProxy */
-    private $assessmentMapperProxy;
 
     /** @var External_TimetableInterface */
     private $timetableHandler;
 
     /**
+     * @var Finder
+     */
+    private $participationFinder;
+
+    /**
      * Test URLS:
-     * http://192.168.36.10/picker/datetime                                         <-- HTML for injecting into modal
-     * http://192.168.36.10/picker/datetime/date/{date}                             <-- All appointments on a given date
-     * http://192.168.36.10/picker/datetime/date/{date}/class/{classcode}           <-- All student for a given class and how many due work items they have that day
+     * https://vagrant.dev.schoolbox.cloud/picker/datetime                                         <-- HTML for injecting into modal
+     * https://vagrant.dev.schoolbox.cloud/picker/datetime/date/{date}                             <-- All appointments on a given date
+     * https://vagrant.dev.schoolbox.cloud/picker/datetime/date/{date}/class/{classcode}           <-- All student for a given class and how many due work items they have that day
      */
 
     /**
@@ -55,22 +68,25 @@ class Controller extends Base
      *
      * @param UserMapper                  $userMapper
      * @param TermMapper                  $termMapper
+     * @param FolderMapper                $folderMapper
      * @param UserAccessMapper            $userAccessMapper
-     * @param AssessmentMapperProxy       $assessmentMapperProxy
      * @param External_TimetableInterface $timetableHandler
+     * @param Finder                      $participationFinder
      */
     public function __construct(
         UserMapper $userMapper,
         TermMapper $termMapper,
+        FolderMapper $folderMapper,
         UserAccessMapper $userAccessMapper,
-        AssessmentMapperProxy $assessmentMapperProxy,
-        External_TimetableInterface $timetableHandler
+        External_TimetableInterface $timetableHandler,
+        Finder $participationFinder
     ) {
-        $this->userMapper            = $userMapper;
-        $this->termMapper            = $termMapper;
-        $this->userAccessMapper      = $userAccessMapper;
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->timetableHandler      = $timetableHandler;
+        $this->userMapper          = $userMapper;
+        $this->termMapper          = $termMapper;
+        $this->folderMapper        = $folderMapper;
+        $this->userAccessMapper    = $userAccessMapper;
+        $this->timetableHandler    = $timetableHandler;
+        $this->participationFinder = $participationFinder;
     }
 
     /**
@@ -203,7 +219,7 @@ class Controller extends Base
         $end = clone $start;
         $end = $end->endOfMonth();
 
-        $students = $this->studentsDueWithinRange($start, $end, $folder);
+        $students = $this->studentsDueWithinRange($start, $end, $folder, self::MAX_STUDENTS_IN_HEATMAP);
 
         foreach ($students as $student) {
             foreach ($student['assessmentList'] as $assessment) {
@@ -396,7 +412,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'format' => 'json',
             'data' => [
-                'students' => $this->studentsDueWithinRange($start, $end, $folder),
+                'students' => $this->studentsDueWithinRange($start, $end, $folder, self::MAX_STUDENTS_IN_HEATMAP),
                 'date' => $date->toIso8601String()
             ]
         ]);
@@ -404,60 +420,90 @@ class Controller extends Base
 
 
     /**
+     * Find all students within `$folder` which have assessments due between
+     * `$start` and `$end`.
+     *
+     * `$limit` allows the student list to be reduced to a sensible number.
+     * This method will otherwise find all assessments for a potentially
+     * limitless number of students.
+     * (This does mean that results are less accurate for larger classes:
+     *  a necessary tradeoff when the alternative is overloading Schoolbox.)
+     *
      * @param Alaress_Date_Format $start
      * @param Alaress_Date_Format $end
      * @param Folder              $folder
+     * @param int|null            $limit
      * @return array
-     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception If something went wrong when finding
+     *                                     students
      */
-    private function studentsDueWithinRange(Alaress_Date_Format $start, Alaress_Date_Format $end, $folder)
-    {
+    private function studentsDueWithinRange(
+        Alaress_Date_Format $start,
+        Alaress_Date_Format $end,
+        Folder $folder,
+        ?int $limit
+    ): array {
         // Get all students for the class or the group
+        $studentList = $this->userAccessMapper->findUsersInCategory(
+            $folder,
+            Role::STUDENT,
+            UserAccess::ACCESS_READ,
+            true
+        );
+        if (isset($limit)) {
+            $studentList = $studentList->slice(0, $limit);
+        }
 
-            $externalStudents = $this->userAccessMapper->findUsersInCategory(
-                $folder,
-                Role::STUDENT,
+
+        $students = [];
+        foreach ($studentList as $studentCurrent) {
+            // Count how many assessments are due for this user on the specified date
+            $assessmentList = [];
+
+
+            // Step 1: retrieve folder IDs
+            // * Only fetch subjects if user is a student and has timetable
+            // * Only fetch read access folders, as they're the ones which a
+            //   user is a student in
+            $folderIds = $this->folderMapper->findFolderIdsForUser(
+                $studentCurrent,
+                $studentCurrent->getRole()->isStudent() && !$studentCurrent->getHideTimetable(),
                 UserAccess::ACCESS_READ,
                 true
             );
 
-        // Get a lookup array of external IDs for the students in this class
 
-        $externalIds = [];
-
-        foreach ($externalStudents as $studentCurrent) {
-            $externalIds[] = $studentCurrent->getExternalId();
-        }
-
-        $studentList = $this->userMapper->findByColumn('synergy_id', $externalIds);
-        // Iterate each student in the class
-
-        $students = [];
-
-        foreach ($studentList as $studentCurrent) {
-
-            // Create a mock user object and find all assessments for this student
-            $assessments = $this->assessmentMapperProxy->findAllByStudentBetweenDates($studentCurrent, true, $start, $end);
-            // Count how many assessments are due on the specified date
-            $assessmentsDue = \count($assessments);
-            $assessmentList = [];
-            foreach ($assessments as $assessment) {
-                $assessmentList[] = [
-                    'id'      => $assessment->getId(),
-                    'title'   => $assessment->getTitle(),
-                    'duedate' => $assessment->getDueAt()->getDay(),
-                    'duetime' => $assessment->getDueAt()->getTimeOnly(),
-                    'context' => $assessment->getBaseContext()->getFolder()->getName()
+            // Step 2: get participation for the student from the folder
+            $participations = $this->participationFinder->findParticipationsForStudentInFolders(
+                $folderIds,
+                $studentCurrent->getId(),
+                $start,
+                $end
+            );
+            foreach ($participations as $assessmentId => $participation) {
+                if ($participation['excluded']) {
+                    continue;
+                }
+                $assessmentList[$assessmentId] = [
+                    'id'      => $assessmentId,
+                    'title'   => $participation['title'],
+                    'duedate' => $participation['dueDate']->getDay(),
+                    'duetime' => $participation['dueDate']->getTimeOnly(),
+                    'context' => $participation['folderName'],
                 ];
             }
+
+
+            // Create a list of students
+            $assessmentsDue = count($assessmentList);
             if ($assessmentsDue > 0) {
                 $students[] = [
-                    'id'             => $studentCurrent->getId(),                      // Required for link to student profile
-                    'externalId'     => $studentCurrent->getExternalId(),      // Required for rendering student photo
+                    'id'             => $studentCurrent->getId(),         // Required for link to student profile
+                    'externalId'     => $studentCurrent->getExternalId(), // Required for rendering student photo
                     'firstname'      => $studentCurrent->getFirstname(),
                     'lastname'       => $studentCurrent->getLastname(),
-                    'assessmentList' => $assessmentList,
-                    'assessmentsDue' => $assessmentsDue                    // Number of assessments they have due on the date
+                    'assessmentList' => array_values($assessmentList),
+                    'assessmentsDue' => $assessmentsDue,                  // Number of assessments they have due on the date
                 ];
             }
         }
