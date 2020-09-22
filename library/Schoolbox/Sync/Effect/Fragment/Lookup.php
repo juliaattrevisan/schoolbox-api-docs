@@ -30,6 +30,7 @@ class Lookup
         'residentialHouse' => '\HouseResidentialMapper',
         'schoolHouse' => '\HouseMapper',
         'role' => '\Schoolbox\RoleMapper',
+        'year' => '\Schoolbox\YearLevel\Mapper',
         'campusCollectionRemove' => '\Schoolbox\CampusMapper',
         'campusCollection' => '\Schoolbox\CampusMapper',
         'userAccessRead' => '\Schoolbox\Resource\GroupMapper',
@@ -41,13 +42,14 @@ class Lookup
      * Get lookup data
      *
      * @param string $userField
-     * @param string $roleType
+     * @param string|null $roleType
      * @return Collection
      */
-    public function findData($userField, $roleType = null) {
+    public function findData(string $userField, ?string $roleType = null): Collection
+    {
         $stack = new Collection;
 
-        if (in_array($userField, array_keys($this->allLookups))) {
+        if (array_key_exists($userField, $this->allLookups)) {
             $mapperName = $this->allLookups[$userField];
 
             /* Spawn a mapper so we can utilise its findAll()
@@ -55,19 +57,19 @@ class Lookup
             if (class_exists($mapperName)) {
                 $mapper = new $mapperName();
 
-                /* Special Case for Role Mapper: this mapper should restrict
-                 * possibilities to those appropriate for the current Ruleset
-                 */
-                if ($userField == 'role') {
+                if ($userField === 'role') {
+
+                    /* Special Case for Role Mapper: this mapper should restrict
+                     * possibilities to those appropriate for the current Ruleset
+                     */
                     $allResults = $mapper->findByColumn('group_type', $roleType);
-                }
-                /* Special case for userAccess* options, which need folder selection
-                 * in the ui
-                 */
-                else if (in_array($userField, ['userAccessRead', 'userAccessWrite', 'userAccessRemove'])) {
+                } elseif (in_array($userField, ['userAccessRead', 'userAccessWrite', 'userAccessRemove'])) {
+
+                    /* Special case for userAccess* options, which need folder selection
+                     * in the ui
+                     */
                     $allResults = $mapper->findFolders();
-                }
-                else {
+                } else {
                     $allResults = $mapper->findAll();
                 }
 
