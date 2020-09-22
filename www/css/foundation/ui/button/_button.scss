@@ -26,8 +26,6 @@ a[disabled], a.disabled {
 .button {
     @include button-dimensions();
 	@extend .hide-for-print;
-	font-size: rem-calc(($base-font-size - 2));
-
     color: $content-ui-foreground;
     background-color: $content-ui-background;
 
@@ -54,6 +52,11 @@ a[disabled], a.disabled {
 		@extend .no-text;
 		max-width: $global-button-height;
 	}
+
+    &[class^="icon-"]:before,
+    &[class*=" icon-"]:before {
+        line-height: normal;
+    }
 
 	&:empty {
 		@extend .no-text;
@@ -102,7 +105,6 @@ a[disabled], a.disabled {
  */
 button {
     @extend .button;
-	font-size: $base-font-size;
     /* Remove mysterious highlight effect when you click
      */
     outline: 0;
@@ -123,7 +125,6 @@ button {
 	@extend .expand;
 	color: $submit-button-color;
 	background-color: $submit-button-bg-color;
-    font-size: $base-font-size;
     font-weight: $font-weight-semibold;
 
 	&:hover, &:focus {
@@ -152,8 +153,7 @@ button {
 a.submit,
 button.submit {
 	@extend [type="submit"];
-    font-size: $base-font-size;
-    font-weight: $font-weight-semibold;
+
 	.splash {
 		background-color: $submit-button-color;
 	}
@@ -165,12 +165,19 @@ button.submit {
  * the actual flex-list button dimensions aren't right.
  */
 .flex-list {
+    line-height: 1.5;
     &.buttons {
 		a, button {
 			@include flex;
 			@extend .button;
 			justify-content: center;
             margin-bottom: 0;
+
+            &[class^="icon-"]:before,
+            &[class*=" icon-"]:before {
+              line-height: inherit;
+            }
+
 			&.submit {
               @extend [type="submit"];
 			}
