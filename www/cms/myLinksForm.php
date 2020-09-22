@@ -2,12 +2,21 @@
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-$page = new SitePage();
+$page           = new SitePage();
 $myLinksHandler = new MyLinks();
 
+$existing = $myLinksHandler->getByID($_POST['linkID']);
+
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+
+if ($existing && ((int)$existing['owner'] !== $sessionUser->getId())) {
+    error(\Schoolbox\Error\Mapper::ERROR_PERM_LINK);
+}
+
 if (isset($_REQUEST['url']) && $_REQUEST['url'] && isset($_REQUEST['description']) && $_REQUEST['description']) {
-	$urlFormatter = new Url($_REQUEST['url']);
-    try{
+    $urlFormatter = new Url($_REQUEST['url']);
+    try {
         $urlFormatter->normalise();
     } catch (InvalidArgumentException $e) {
         error(\Schoolbox\Error\Mapper::ERROR_LINK_FORMAT);
@@ -15,41 +24,29 @@ if (isset($_REQUEST['url']) && $_REQUEST['url'] && isset($_REQUEST['description'
 
     $url = Scrub::text($urlFormatter->getUrl());
 
-	/* Create/update
-	 */
-	$existing = $myLinksHandler->getByID($_POST['linkID']);
+    /* Create/update
+     */
 
-	if ($existing) {
-		$existing['url'] = $url;
-		$existing['description'] = $_REQUEST['description'];
+    if ($existing) {
+        $existing['url']         = $url;
+        $existing['description'] = $_REQUEST['description'];
 
-		$myLinksHandler->update($existing);
-	}
-	else {
-		$myLinksHandler->create(array(
-			'owner' => $_SESSION['id'],
-			'url' => $url,
-			'description' => $_REQUEST['description']
-		));
-	}
-}
-else {
-	if (is_numeric($_GET['delete'])) {
-		if (!$link = $myLinksHandler->getByID($_GET['delete'])) {
-			$page->error(2);
-		}
-
-		if ($link['owner'] != $_SESSION['id']) {
-			$page->error(50);
-		}
-
-		$myLinksHandler->delete($_GET['delete']);
-	}
+        $myLinksHandler->update($existing);
+    } else {
+        $myLinksHandler->create([
+            'owner'       => $_SESSION['id'],
+            'url'         => $url,
+            'description' => $_REQUEST['description'],
+        ]);
+    }
+} else {
+    if (isset($_GET['delete']) && $existing) {
+        $myLinksHandler->delete($existing['id']);
+    }
 }
 
-if (isset($_REQUEST['ajax'])) {
-	die(json_encode(['result' => 'success']));
-} elseif($_GET['return'])
+if ($_GET['return']) {
     SitePage::backToTheFuture(1);
-else
+} else {
     SitePage::localRedir('/cms/myLinks');
+}
