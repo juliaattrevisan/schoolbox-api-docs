@@ -60,5 +60,4 @@ try {
 catch (Exception $ex) {}
 //
 // File not found error
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 error(Error\Mapper::ERROR_FILE_NOT_FOUND);
