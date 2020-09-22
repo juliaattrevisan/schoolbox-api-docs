@@ -123,6 +123,8 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Scrub;
 use SitePage;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\RedisStore;
 use Throwable;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
@@ -1435,6 +1437,18 @@ abstract class Kernel
                 Jwt::class,
                 ['configLoader' => $di->get('config')]
             )
+        );
+
+
+        // Lock factory
+        $di->set(
+            'lockFactory',
+            $di->lazy(function () use ($di) {
+                return new \Alaress\Lock\InstanceLockFactory(
+                    new LockFactory(new RedisStore($di->get('redis'))),
+                    INSTANCE_ID
+                );
+            })
         );
 
 
