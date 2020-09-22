@@ -80,7 +80,8 @@
         "league/commonmark": "^1.4",
         "ext-imagick": "*",
         "ext-json": "*",
-        "ssnepenthe/color-utils": "^0.4.2"
+        "ssnepenthe/color-utils": "^0.4.2",
+        "symfony/lock": "^4.4"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
