@@ -107,11 +107,11 @@ Has any data been compromised by the change in the code, can a user see somethin
 
 This particular process is focused on ensuring data integrity when we have changes being done to the structure of the database, this includes:
 
-* Changes of database table schema or table and column renames
-* Updating of new columns with default values
-* Moving of data between tables and columns
-* Updating of database tables to new values
-* Or any combination of the above
+* any ALTER TABLE update
+* any update which changes the table or field in which a particular piece of information is found
+    * i.e. a migration of existing data to a new table or field: usually follows an ALTER TABLE
+* any other update whose result is not reversible
+    * i.e. a mass hard-delete, or mass update whose original value can't be restored
 
 It is best practice to keep the migration as simple as possible. Each change being tested with this process before proceeding to the next. This is to reduce complexity in the last step of observation of the results.
 
@@ -129,8 +129,8 @@ In the event we need to test further into the past because we need to update dat
 1. git checkout master.
 1. provision on qa-test dataset.
 1. review that there is data ready to test migration with.
-	1. if there is no data build said data
-	1. after building any additional test data save the qa-test dataset.
+    1. if there is no data build said data
+    1. after building any additional test data save the qa-test dataset.
 1. identify what you expect each case to turn into on the other end.
 
 **Test**
