@@ -69,14 +69,9 @@ HELP;
             $log->info('Pastoral external attachment upload is disabled: not uploading attachments');
         }
 
-        /** @var InstanceLockFactory $lockFactory */
-        $lockFactory = $this->getDi()->get('lockFactory');
-        $lock        = $lockFactory->createLock('pastoral_export');
-
-//        $lock = new Alaress_Lock('pastoral_export.' . INSTANCE_ID . '.lock');
-        if (!$lock->acquire()) {
-            $log->warning("A pastoral export is currently in progress, exiting...");
-            exit;
+        $lock = $this->acquireLock('pastoral_export', null);
+        if (!$lock->isAcquired()) {
+            exit(1);
         }
 
         // Retrieve all pastoral records and re-save

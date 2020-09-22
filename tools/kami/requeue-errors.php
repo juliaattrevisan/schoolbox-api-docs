@@ -104,49 +104,9 @@ HELP;
         $requeueErrors = new Kami\ReQueueErrors($connector, $kamiMapper, $jitter, $this->getLogger());
 
         // Ensure only one instance of tool is running at a time
-//        $lockFile = "{$this->getConfig()->get('stream_dir')}/.kami_requeue_errors_".INSTANCE_ID.".lock";
-//        $lock     = new Alaress_Lock($lockFile);
-
-        // Ensure only one instance of tool is running at a time
-        /** @var InstanceLockFactory $lockFactory */
-        $lockFactory = $this->getDi()->get('lockFactory');
-        $lock        = $lockFactory->createLock('kami_requeue_errors', $timeout);
-        try {
-            $acquired = $lock->acquire();
-        } catch (LockConflictedException|LockAcquiringException $e) {
-            // Could not acquire for some reason
-            $acquired = false;
-        }
-        if (!$acquired) {
-            // The lock can no longer kill other processes, as they may be
-            // running on other hosts.
-            // Instead: assume this process is well-behaved enough to
-            // self-terminate when its timeout is reached.
-            $this->getLogger()->warning(
-                'A errors-requeue instance is already running: trusting it will self-terminate on timeout'
-            );
+        $lock = $this->acquireLock('kami_requeue_errors', $timeout);
+        if (!$lock->isAcquired()) {
             exit(1);
-
-//            $lastModTime  = filemtime($lockFile);
-//            $lastModDelta = time() - $lastModTime;
-//
-//            $kill = false;
-//            if (!$lastModTime) {
-//                $this->getLogger()->error('Unable to determine when lock file was last written');
-//                $kill = true;
-//            } elseif ($lastModDelta > $timeout) {
-//                $this->getLogger()->error("Lock file last modified {$lastModDelta} seconds ago");
-//                $kill = true;
-//            }
-//
-//            if ($kill) {
-//                $this->getLogger()->error('Assuming process has timed out and killing it');
-//                $lock->killProcess();
-//                $lock->acquire();
-//            } else {
-//                $this->getLogger()->info('No instance has yet timed out - exiting');
-//                exit(1);
-//            }
         }
 
         $this->setMaxExecutionTime($timeout);

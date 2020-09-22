@@ -106,29 +106,10 @@ $app = new class extends CliTool\App{
             $this->getLogger()
         );
 
-        // Check timeout before anything else
-        /** @var InstanceLockFactory $lockFactory */
-        $lockFactory = $this->getDi()->get('lockFactory');
-        $lock        = $lockFactory->createLock('kami_upload', $timeout);
 
-//        $lockFile = $this->getConfig()->get('stream_dir') . '/.kami_upload_'.INSTANCE_ID.'.lock';
-//        $lock = new Alaress_Lock($lockFile);
-        if (!$lock->acquire()) {
-            $this->getLogger()->warning(
-                'An uploader is already running: trusting it will self-terminate on timeout'
-            );
+        $lock = $this->acquireLock('kami_upload', $timeout);
+        if (!$lock->isAcquired()) {
             exit(1);
-
-//            // For now, hardcode timeout to 300s
-//            if ($uploader->isTimedOut($timeout)) {
-//                $this->getLogger()->warning('Previous uploader has timed out - continuing');
-//                $lock->killProcess();
-//                $lock->acquire();
-//                $uploader->timeout();
-//            } else {
-//                $this->getLogger()->info('No uploader process has yet timed out - exiting');
-//                exit(1);
-//            }
         }
 
         $this->setMaxExecutionTime($timeout);

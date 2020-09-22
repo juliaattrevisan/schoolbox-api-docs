@@ -104,15 +104,9 @@ HELP;
             exit(0);
         }
 
-        /** @var InstanceLockFactory $lockFactory */
-        $lockFactory = $this->getDi()->get('lockFactory');
-        $lock        = $lockFactory->createLock('pastoral_import');
-
-//        $lock = new Alaress_Lock('pastoral_import.' . INSTANCE_ID . '.lock');
-
-        if (!$lock->acquire()) {
-            $log->critical('A pastoral import is currently in progress, exiting...');
-            exit(0);
+        $lock = $this->acquireLock('pastoral_import', null);
+        if (!$lock->isAcquired()) {
+            exit(1);
         }
 
         $log->info("Beginning import of pastoral records...");
