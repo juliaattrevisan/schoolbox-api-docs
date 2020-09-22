@@ -6,10 +6,12 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Lock\InstanceLockFactory;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Pastoral;
 use Schoolbox\Application\CliTool;
+use Symfony\Component\Lock\LockInterface;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -82,41 +84,52 @@ HELP;
      *
      * Returns the acquired lock
      *
-     * @return Alaress_Lock
+     * @return LockInterface
      */
-    private function checkOverlappingExecution(): Alaress_Lock
+    private function checkOverlappingExecution(): LockInterface
     {
-        $lock = new Alaress_Lock('pastoral_upload.' . INSTANCE_ID . '.lock');
+        /** @var InstanceLockFactory $lockFactory */
+        $lockFactory = $this->getDi()->get('lockFactory');
+        $timeout     = (int)$this->getConfig()->get('pastoral_upload_timeout');
+        $lock        = $lockFactory->createLock('pastoral_upload', $timeout);
+
+//        $lock = new Alaress_Lock('pastoral_upload.' . INSTANCE_ID . '.lock');
 
         if ($lock->acquire()) {
+            $this->setMaxExecutionTime($timeout);
             return $lock;
         }
 
-        $this->getLogger()->critical('A pastoral uploader is already running, checking timeout.');
+        $this->getLogger()->critical(
+            'A pastoral uploader is already running: trusting it will self-terminate on timeout'
+        );
+        exit(1);
 
-        // Check existing upload process for timeout (should never be more than uploaded more than once).
-        $timeout = (int)$this->getConfig()->get('pastoral_upload_timeout');
-        if ($timeout <= 0) {
-            $this->getLogger()->alert('Timeout of pastoral uploading is disabled.');
-            exit;
-        }
-
-        $countTimedOut = $this->pastoralUploadQueueMapper->markProcessingAsFailed($timeout);
-        if ($countTimedOut > 0) {
-            $nounAndVerb = $countTimedOut > 1 ? 'uploads have' : 'upload has';
-            $pronoun     = $countTimedOut > 1 ? 'these' : 'this';
-            $this->getLogger()->warning("Processing of $countTimedOut pastoral $nounAndVerb timed out - marking $pronoun as failed, and continuing");
-        } else {
-            $this->getLogger()->info('No pastoral uploads have timed out.');
-        }
-
-        $lock->killProcess();
-        if(!$lock->acquire()){
-            $this->getLogger()->critical('Still unable to acquire lock after attempt to kill locking process, exiting.');
-            exit(1);
-        }
-
-        return $lock;
+//        $this->getLogger()->critical('A pastoral uploader is already running, checking timeout.');
+//
+//        // Check existing upload process for timeout (should never be more than uploaded more than once).
+//        $timeout = (int)$this->getConfig()->get('pastoral_upload_timeout');
+//        if ($timeout <= 0) {
+//            $this->getLogger()->alert('Timeout of pastoral uploading is disabled.');
+//            exit;
+//        }
+//
+//        $countTimedOut = $this->pastoralUploadQueueMapper->markProcessingAsFailed($timeout);
+//        if ($countTimedOut > 0) {
+//            $nounAndVerb = $countTimedOut > 1 ? 'uploads have' : 'upload has';
+//            $pronoun     = $countTimedOut > 1 ? 'these' : 'this';
+//            $this->getLogger()->warning("Processing of $countTimedOut pastoral $nounAndVerb timed out - marking $pronoun as failed, and continuing");
+//        } else {
+//            $this->getLogger()->info('No pastoral uploads have timed out.');
+//        }
+//
+//        $lock->killProcess();
+//        if(!$lock->acquire()){
+//            $this->getLogger()->critical('Still unable to acquire lock after attempt to kill locking process, exiting.');
+//            exit(1);
+//        }
+//
+//        return $lock;
     }
 
 

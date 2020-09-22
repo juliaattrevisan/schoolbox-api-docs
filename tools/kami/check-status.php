@@ -7,10 +7,12 @@
 declare(strict_types=1);
 
 use Alaress\Jitter\Jitter;
+use Alaress\Lock\InstanceLockFactory;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\MapperFactory;
 use Alaress\Random;
 use Schoolbox\Application\CliTool;
+use Symfony\Component\Lock\LockInterface;
 
 require __DIR__ . '/../../conf/core/require.php';
 
@@ -155,38 +157,53 @@ HELP;
      * Acquires and returns a lock
      *
      * @param int $timeout
-     * @return Alaress_Lock
+     * @return LockInterface
      */
-    private function acquireLock(int $timeout): Alaress_Lock
+    private function acquireLock(int $timeout): LockInterface
     {
         // Ensure only one instance of checker is running at a time
-        $lockFile = "{$this->getConfig()->get('stream_dir')}/.kami_status_check_" . INSTANCE_ID . ".lock";
-        $lock     = new Alaress_Lock($lockFile);
+        /** @var InstanceLockFactory $lockFactory */
+        $lockFactory = $this->getDi()->get('lockFactory');
+        $lock        = $lockFactory->createLock('kami_status_check', $timeout);
+
         if ($lock->acquire()) {
+            $this->setMaxExecutionTime($timeout);
             return $lock;
         }
-        $this->getLogger()->warning('A status-checker is already running. Checking last mod time');
-        $lastModTime  = filemtime($lockFile);
-        $lastModDelta = time() - $lastModTime;
 
-        $kill = false;
-        if (!$lastModTime) {
-            $this->getLogger()->error('Unable to determine when lock file was last written');
-            $kill = true;
-        } elseif ($lastModDelta > $timeout) {
-            $this->getLogger()->error("Lock file last modified {$lastModDelta} seconds ago");
-            $kill = true;
-        }
+        $this->getLogger()->critical(
+            'A Kami status checker is already running: trusting it will self-terminate on timeout'
+        );
+        exit;
 
-        if ($kill) {
-            $this->getLogger()->error('Assuming process has timed out and killing it');
-            $lock->killProcess();
-            $lock->acquire();
-        } else {
-            $this->getLogger()->info('No instance has yet timed out - exiting');
-            exit(1);
-        }
-        return $lock;
+
+//        $lockFile = "{$this->getConfig()->get('stream_dir')}/.kami_status_check_" . INSTANCE_ID . ".lock";
+//        $lock     = new Alaress_Lock($lockFile);
+//        if ($lock->acquire()) {
+//            return $lock;
+//        }
+//        $this->getLogger()->warning('A status-checker is already running. Checking last mod time');
+//        $lastModTime  = filemtime($lockFile);
+//        $lastModDelta = time() - $lastModTime;
+//
+//        $kill = false;
+//        if (!$lastModTime) {
+//            $this->getLogger()->error('Unable to determine when lock file was last written');
+//            $kill = true;
+//        } elseif ($lastModDelta > $timeout) {
+//            $this->getLogger()->error("Lock file last modified {$lastModDelta} seconds ago");
+//            $kill = true;
+//        }
+//
+//        if ($kill) {
+//            $this->getLogger()->error('Assuming process has timed out and killing it');
+//            $lock->killProcess();
+//            $lock->acquire();
+//        } else {
+//            $this->getLogger()->info('No instance has yet timed out - exiting');
+//            exit(1);
+//        }
+//        return $lock;
     }
 };
 
