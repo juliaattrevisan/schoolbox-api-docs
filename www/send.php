@@ -82,7 +82,7 @@ if (is_numeric($_GET['id'])) {
             $preSignedUrlDataObject = $preSignedUrlService->generate(
                 $storage,
                 Alaress_Date_Format::now()->addDays(1),
-                null,
+                $storage->getPath(),
                 $cacheControl,
                 $attachmentType
             );

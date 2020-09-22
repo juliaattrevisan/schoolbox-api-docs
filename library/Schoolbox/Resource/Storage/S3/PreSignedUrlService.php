@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\S3;
@@ -15,6 +17,7 @@ use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\Resource\Storage\Transform\Mapper as TransformMapper;
+use Schoolbox\Video\QueueMapper as VideoQueueMapper;
 
 class PreSignedUrlService
 {
@@ -49,7 +52,7 @@ class PreSignedUrlService
     /**
      * @param Model             $storage
      * @param AlaressDateFormat $expireAt
-     * @param string|null       $size
+     * @param string            $path
      * @param string            $cacheControl
      * @param string            $attachmentType
      *
@@ -58,17 +61,15 @@ class PreSignedUrlService
     public function generate(
         Model $storage,
         AlaressDateFormat $expireAt,
-        string $size = null,
+        string $path,
         string $cacheControl = 'private',
         string $attachmentType = ''
-    ): PreSignedUrlDataObject
-    {
-        $expires        = $expireAt->__toString();
-        $storagePath    = $storage->getPath();
-        $itemPath       = ($size && strpos($storagePath, '-') === false) ? $storagePath . '-' . $size : $storagePath;
+    ): PreSignedUrlDataObject {
+
+        $expires = $expireAt->__toString();
 
         $commandObject = $this->getObject(
-            $itemPath,
+            $path,
             $cacheControl,
             $attachmentType,
             $storage->getBasename(),
@@ -76,10 +77,9 @@ class PreSignedUrlService
             $expires
         );
 
-
         $url = $this->s3Client->createPresignedRequest($commandObject, $expires)->getUri()->__toString();
 
-        return new PreSignedUrlDataObject($storage->getHash(), $url, $cacheControl, $expires, $storage->getPath(), $size);
+        return new PreSignedUrlDataObject($storage->getHash(), $url, $cacheControl, $expires, $path);
     }
 
     /**
@@ -94,11 +94,35 @@ class PreSignedUrlService
      */
     private function fileExists(PreSignedUrlDataObject $dataObject): bool
     {
-        $size = $dataObject->getSize();
+        $itemPath   = $dataObject->getItemPath();
+        $hash       = $dataObject->getHash();
 
-        return $size === null
-            ? Storage\Mapper::getInstance()->countByColumn('hash', $dataObject->getHash()) > 0
-            : TransformMapper::getInstance()->checkIfRecordExists($dataObject->getHash(), $size);
+        $transformType = (strpos($itemPath, '-') !== false) ? substr($itemPath, strpos($itemPath, '-') + 1) : null;
+
+
+        if ($transformType && $transformType === 'transcode') {
+            return $this->fileExistsInVideoQueue($hash);
+        }
+
+        return $transformType
+            ? TransformMapper::getInstance()->checkIfRecordExists($hash, $transformType)
+            : Storage\Mapper::getInstance()->countByColumn('hash', $hash) > 0;
+    }
+
+    /**
+     * Check whether the transcoded audio/video exists in video_queue table by checking the hash and
+     * must have a status of completed.
+     *
+     * @param string $hash
+     *
+     * @return bool
+     */
+    private function fileExistsInVideoQueue(string $hash): bool
+    {
+        return VideoQueueMapper::getInstance()->countByColumnList([
+                'hash'      => $hash,
+                'status'    => VideoQueueMapper::STATUS_COMPLETED,
+            ]) > 0;
     }
 
     /**
@@ -128,13 +152,14 @@ class PreSignedUrlService
      *
      * @return CommandInterface
      */
-    private function getObject(string $resourcePath,
-                               string $cacheControl,
-                               string $attachmentType,
-                               string $resourceBaseName,
-                               string $contentType,
-                               string $expires): CommandInterface
-    {
+    private function getObject(
+        string $resourcePath,
+        string $cacheControl,
+        string $attachmentType,
+        string $resourceBaseName,
+        string $contentType,
+        string $expires
+    ): CommandInterface {
         $basename = utf8_encode($resourceBaseName);
 
         return $this->s3Client->getCommand('GetObject', [

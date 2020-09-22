@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -35,28 +36,21 @@ class PreSignedUrlDataObject
     private $itemPath;
 
     /**
-     * @var string|null
-     */
-    private $size;
-
-    /**
      * PreSignedUrlDataObject constructor.
      *
-     * @param string      $hash
-     * @param string      $url
-     * @param string      $cacheControl
-     * @param string      $expires
-     * @param string      $itemPath
-     * @param string|null $size
+     * @param string $hash
+     * @param string $url
+     * @param string $cacheControl
+     * @param string $expires
+     * @param string $itemPath
      */
-    public function __construct(string $hash, string $url, string $cacheControl, string $expires, string $itemPath, string $size = null)
+    public function __construct(string $hash, string $url, string $cacheControl, string $expires, string $itemPath)
     {
         $this->hash = $hash;
         $this->url = $url;
         $this->expires = $expires;
         $this->cacheControl = $cacheControl;
         $this->itemPath = $itemPath;
-        $this->size = $size;
     }
 
     /**
@@ -97,13 +91,5 @@ class PreSignedUrlDataObject
     public function getItemPath(): string
     {
         return $this->itemPath;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getSize(): ?string
-    {
-        return $this->size;
     }
 }

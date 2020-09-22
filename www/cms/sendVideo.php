@@ -118,8 +118,9 @@ if (isset($type) && isset($id)) {
             $preSignedUrlDataObject = $preSignedUrlService->generate(
                 $video->getStorage(),
                 Alaress_Date_Format::now()->addDays(1),
-                null,
-                $cacheControl
+                $video->getTranscodePath(),
+                $cacheControl,
+                $mimeType
             );
 
             $preSignedUrlService->download($preSignedUrlDataObject);
