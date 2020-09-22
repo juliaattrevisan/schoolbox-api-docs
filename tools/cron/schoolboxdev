@@ -49,6 +49,6 @@ MAILTO="support@schoolbox.com.au"
 35 */2 * * *    www-data    /usr/share/schoolboxdev/tools/calendar/preparseVcalSubscription.php -v >> /var/lib/schoolboxdev/cache/logs/preparseVcalSubscription.log 2>&1
 
 # Data dir ownership - every 10 min - skip storage dir (just a hack until we fix this properly)
-*/10 * * * * root /usr/share/schoolboxdev/tools/set-config-data-dirs-perms.sh --skip storage_dir --owner www-data --group www-data >> /var/lib/schoolboxdev/cache/logs/set-config-data-dirs-perms.log 2>&1
+*/10 * * * * root /usr/share/schoolboxdev/tools/set-config-data-dirs-perms.sh --skip storage_dir --owner www-data --group www-data >> /var/log/schoolboxdev/set-config-data-dirs-perms.log 2>&1
 
 # End of file - do not delete
