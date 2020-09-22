@@ -36,23 +36,54 @@ $app = new class extends CliTool\App {
 
         /* Find all the UPS Effects for "year"
          */
+        $effectStatement = $db->prepareQuery('
+            SELECT id, arguments
+            FROM ups_effect
+            WHERE user_property = :userPropertyYear
+        ');
 
-        /* Get their string and unpack it
+        $effectStatement->execute([
+            'userPropertyYear' => 'year'
+        ]);
+
+        $effects = $effectStatement->fetchAll(PDO::FETCH_ASSOC);
+
+        /* Set up update statement
          */
+        $updateStatement = $db->prepareQuery('
+            UPDATE ups_effect
+            SET arguments = :arguments
+            WHERE id = :id
+        ');
 
-        /* Everything inside [1] is a key-value pair
-         */
+        foreach ($effects as $effect) {
 
-            /* Replace the value which is the equivalent of lu_year_level.name,
-             * with lu_year_level.id - anything that doesn't match should be given null
-             * Such values are no longer determinate by us and the UPS admin needs to repair it
+            /* Get their string and unpack it
              */
+            $row = json_decode($effect['arguments'], true);
 
-        /* Save it back into the object
-         */
+            /* Everything inside [1] is a key-value pair
+             */
+            foreach ($row[1] as $key => $name) {
 
-        /* Repack the data payload and save it back
-         */
+                /* Replace the value which is the equivalent of lu_year_level.name,
+                 * with lu_year_level.id - anything that doesn't match should be given null
+                 * Such values are no longer determinate by us and the UPS admin needs to repair it
+                 */
+                $row[1][$key] = $yearLevels[$name]['id'] ?? null;
+            }
+
+            /* Save it back into the object
+             */
+            $newArguments = json_encode($row);
+
+            /* Repack the data payload and save it back
+             */
+            $updateStatement->execute([
+                'arguments' => $newArguments,
+                'id' => $effect['id']
+            ]);
+        }
     }
 };
 
