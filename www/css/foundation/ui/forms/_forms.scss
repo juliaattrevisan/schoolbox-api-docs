@@ -257,13 +257,12 @@ th, td{
 		@include switch-label;
 	}
 
-
 	&.inline {
 		display: inline-block;
 		margin-bottom: 0;
 	}
 
-	@include switch-label(0.5rem);
+	@include switch-label(0.4rem);
 	vertical-align: middle;
 
 	label {
