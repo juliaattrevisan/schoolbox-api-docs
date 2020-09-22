@@ -8,7 +8,11 @@ declare(strict_types=1);
 namespace Schoolbox\Application\CliTool;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Lock\InstanceLockFactory;
 use Aura\Di;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\LockInterface;
 use function floor;
 use function is_numeric;
 use Psr\Log\LoggerInterface;
@@ -153,6 +157,42 @@ abstract class App
         if (isset($timeout)) {
             ini_set('max_execution_time', (string)$timeout);
         }
+    }
+
+
+    /**
+     * Acquires and returns a lock object.
+     *
+     * @param string     $lockName The name of the lock to acquire.
+     *                             Will be automatically made unique across
+     *                             separate instances.
+     * @param float|null $timeout  The amount of time (in seconds) to hold the
+     *                             lock for.
+     * @return LockInterface
+     *
+     * @noinspection PhpDocMissingThrowsInspection
+     */
+    protected function acquireLock(string $lockName, ?float $timeout): LockInterface
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        /** @var InstanceLockFactory $lockFactory */
+        $lockFactory = $this->getDi()->get('lockFactory');
+        $lock        = $lockFactory->createLock($lockName, $timeout);
+
+        // Try to acquire this lock
+        $acquired = false;
+        try {
+            $acquired = $lock->acquire();
+        } catch (LockConflictedException|LockAcquiringException $e) {
+            // Couldn't acquire the lock: this is okay
+            // The calling code will check if the lock is acquired
+        }
+        if (!$acquired) {
+            $this->logger->warning(
+                'This process is already running for this instance: trusting it will self-terminate on timeout'
+            );
+        }
+        return $lock;
     }
 
 
