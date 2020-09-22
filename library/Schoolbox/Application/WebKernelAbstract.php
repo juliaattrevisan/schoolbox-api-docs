@@ -306,16 +306,16 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
          * TODO: Make synonymous with twig output
          */
         $output =
-            "<p><b>{$args['message']} {$args['info']}</b></p>" .
+            "<p><b>" . htmlentities("{$args['message']} {$args['info']}") . "</b></p>" .
             '<ul>' .
-            "<li>Datetime: {$args['date']->getLong()}</li>" .
-            "<li>URL: {$args['url']}" .
+            "<li>Datetime: " . htmlentities($args['date']->getLong()) . "</li>" .
+            "<li>URL: " . htmlentities($args['url']) .
             '</li>';
 
         if ($args['outputStackTrace']) {
-            $output .= "<li>Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}.</li>";
+            $output .= "<li>" . htmlentities("Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}") . "</li>";
         } else {
-            $output .= "<li>Error: {$args['error']['message']}. (Further details have been logged.)</li>";
+            $output .= "<li>" . htmlentities("Error: {$args['error']['message']}. (Further details have been logged.)") . "</li>";
         }
 
         $output .= '</ul>';
