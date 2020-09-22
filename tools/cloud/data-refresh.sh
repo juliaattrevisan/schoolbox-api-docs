@@ -25,6 +25,7 @@ readonly ARG_DATASET='dataset'
 # Global vars and defaults
 declare dataset;     # eg 'initial.tar.gz'
 declare site_root;
+declare package;
 declare sql_user;
 declare sql_passwd;
 declare sql_host;
@@ -80,6 +81,10 @@ function parse_args(){
   this_file_path=$(readlink -f "$0");
   this_file_dir=${this_file_path%/*};
   site_root=$(readlink -f "$this_file_dir"/../../);
+  package=${site_root##*/};
+  if [[ $package == '/vagrant' ]]; then
+    package='schoolbox'
+  fi
   conf_file=$(readlink -f "$site_root"/www/conf/conf.php);
 
   while [[ $# -gt 0 ]]; do
@@ -226,7 +231,7 @@ function localise_database_config(){
 
 # We need to place data dirs from inside the dataset into their canonical instance-specific locations
 function create_data_dirs(){
-  local instance_data_dir="/var/lib/schoolbox/$INSTANCE_ID"
+  local instance_data_dir="/var/lib/$package/$INSTANCE_ID"
 
   if ! "$site_root"/tools/create-data-dirs.sh "$instance_data_dir"; then
     error "Unable to create data dirs"
