@@ -12,12 +12,15 @@
 
 # Global const
 readonly LOG=/usr/bin/alaress-logger
+readonly L_DEBUG=100
 readonly L_INFO=200
 readonly L_ERROR=400
 readonly ARG_OWNER='owner'
 readonly ARG_GROUP='group'
 readonly ARG_DIR='dir'
 readonly ARG_SKIP_DIR='skip'
+readonly ARG_VERBOSE_SHORT='v'
+readonly ARG_VERBOSE_LONG='verbose'
 
 # Global vars and defaults
 declare site_root;
@@ -25,6 +28,13 @@ declare owner
 declare group
 declare available_data_dirs;
 declare data_dirs
+declare verbose='0'
+
+function debug(){
+  if [[ $verbose == '1' ]]; then
+    $LOG $L_DEBUG "$1"
+  fi
+}
 
 function log(){
   $LOG $L_INFO "$1"
@@ -79,6 +89,9 @@ function parse_cli_args(){
 
   while [[ $# -gt 0 ]]; do
     case $1 in
+      -$ARG_VERBOSE_SHORT|--$ARG_VERBOSE_LONG)
+      verbose="1"; shift;
+      ;;
       --$ARG_OWNER)
       owner="$2"; shift; shift;
       ;;
@@ -214,18 +227,18 @@ function update_directories(){
       # Change owner, group, or both
       log "Updating directory ($data_dir): $dir_path"
       if [[ -n $owner ]] && [[ -n $group ]]; then
-        log "Setting file owner and group to $owner:$group"
+        debug "Setting file owner and group to $owner:$group"
         chown -R "$owner":"$group" "$dir_path"
       elif [[ -n $owner ]] && [[ -z $group ]]; then
-        log "Setting file owner to $owner"
+        debug "Setting file owner to $owner"
         chown -R "$owner" "$dir_path"
       elif [[ -z $owner ]] && [[ -n $group ]]; then
-        log "Setting file group to $group"
+        debug "Setting file group to $group"
         chgrp -R "$group" "$dir_path"
       else
-        log "Retaining current owner and group"
+        debug "Retaining current owner and group"
       fi
-      log "Setting file mode to 755"
+      debug "Setting file mode to 755"
       chmod -R 775 "$dir_path"
     fi
   done
