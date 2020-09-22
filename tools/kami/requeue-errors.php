@@ -15,6 +15,8 @@ use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\MapperFactory;
 use Alaress\Random;
 use Schoolbox\Application\CliTool;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 
 require __DIR__ . '/../../conf/core/require.php';
 
@@ -109,7 +111,13 @@ HELP;
         /** @var InstanceLockFactory $lockFactory */
         $lockFactory = $this->getDi()->get('lockFactory');
         $lock        = $lockFactory->createLock('kami_requeue_errors', $timeout);
-        if (!$lock->acquire()) {
+        try {
+            $acquired = $lock->acquire();
+        } catch (LockConflictedException|LockAcquiringException $e) {
+            // Could not acquire for some reason
+            $acquired = false;
+        }
+        if (!$acquired) {
             // The lock can no longer kill other processes, as they may be
             // running on other hosts.
             // Instead: assume this process is well-behaved enough to
