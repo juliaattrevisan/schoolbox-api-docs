@@ -151,11 +151,15 @@
                             <li class="actions-small-2" data-id="{{ comment.id }}">
                                 <div class="list-item">
                                     <div class="small-10 card">
-                                        <a href="/search/user/{{ comment.commenter.id }}" title="View Profile">
-                                            <img src="/portrait.php?userId={{ comment.commenter.externalId }}&size=square64" alt="{{ comment.commenter.fullName }}" />
+                                        {% if comment.commenter.deleted %}
                                             <p>{{ comment.commenter.fullName }}</p>
-                                        </a>
-                                        <p class="meta">{{ comment.commenter.role.name }}</p>
+                                        {% else %}
+                                            <a href="/search/user/{{ comment.commenter.id }}" title="View Profile">
+                                                <img src="/portrait.php?id={{ comment.commenter.id }}&size=square64" alt="{{ comment.commenter.fullName }}"/>
+                                                <p>{{ comment.commenter.fullName }}</p>
+                                            </a>
+                                        {% endif %}
+                                        <p class="meta">{{ comment.commenter.role.name ?? '' }}</p>
                                         <p class="meta"><time title="{{ comment.createdAt.long }}">{{ comment.createdAt.relativeTime }}</time></p>
                                     </div>
                                     <div class="small-2 column content">
