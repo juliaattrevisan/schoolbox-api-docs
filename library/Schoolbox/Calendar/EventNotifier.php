@@ -281,7 +281,7 @@ class EventNotifier extends AbstractModuleNotifier
             $bob->setTitle(':user renamed the event :old to :new')
                 ->setParams(
                     [
-                        'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                        'user' => new UserParam($effector),
                         'old'  => new Param($diff['title'][1]),
                         'new'  => new Param($event->getTitle(), sprintf(self::EVENT_DETAIL_URL, $event->getId())),
                     ]
@@ -309,7 +309,7 @@ class EventNotifier extends AbstractModuleNotifier
             $bob->setTitle(':user changed the start time of :name to :time')
                 ->setParams(
                     [
-                        'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                        'user' => new UserParam($effector),
                         'name' => new Param($event->getTitle(), sprintf(self::EVENT_DETAIL_URL, $event->getId())),
                         'time' => new Param($event->getStartDateTime()->getShort()),
                     ]
@@ -324,7 +324,7 @@ class EventNotifier extends AbstractModuleNotifier
             $bob->setTitle(':user updated the event :name')
                 ->setParams(
                     [
-                        'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                        'user' => new UserParam($effector),
                         'name' => new Param($event->getTitle(), sprintf(self::EVENT_DETAIL_URL, $event->getId())),
                     ]
                 );
@@ -502,7 +502,7 @@ class EventNotifier extends AbstractModuleNotifier
                     ->setTimestamp($event->getStartDateTime()->getUnixTimeStamp() - (60 * self::UPCOMING_WINDOW))
                     ->setParams(
                         [
-                            'user' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                            'user' => new UserParam($effector),
                             'name' => new Param($event->getTitle(), sprintf(self::EVENT_DETAIL_URL, $event->getId())),
                         ]);
 

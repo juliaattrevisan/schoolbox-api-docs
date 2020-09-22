@@ -37,7 +37,7 @@ class Decorator extends NotificationBundle
      */
     public function setNotification(Notification $notification): void
     {
-        $this->notifications = array();
+        $this->notifications = [];
         $this->appendNotification($notification);
     }
 
@@ -49,22 +49,22 @@ class Decorator extends NotificationBundle
      */
     protected function toArray(int $limit = 0, int $dir = SORT_DESC): array
     {
-        $array = array();
+        $array = [];
 
         foreach ($this->getNotifications($limit, $dir) as $notification) {
             $hash = $notification->getId();
 
-            $array[$hash] = array(
-                'title'     => array(
+            $array[$hash] = [
+                'title'     => [
                     'text'   => $notification->getTitle(),
                     'params' => $this->renderParametersAsArray($notification),
-                ),
+                ],
                 'namespace' => $notification->getNamespace(),
                 'icon'      => $notification->getIcon(),
                 'href'      => $notification->getHref(),
                 'meta'      => $notification->getMeta(),
-                'time'      => $notification->getTimestamp()
-            );
+                'time'      => $notification->getTimestamp(),
+            ];
         }
 
         return $array;
@@ -91,7 +91,7 @@ class Decorator extends NotificationBundle
                 $array[$n->getId()]['icon']  = $this->getUnprotectedIcon($n);
 
                 // force links to be fully qualified
-                foreach (array('icon', 'href') as $field) {
+                foreach (['icon', 'href'] as $field) {
                     $value = $array[$n->getId()][$field];
                     if (strlen($value) && $value[0] == '/') {
                         $array[$n->getId()][$field] = $fqdn . $value;
@@ -110,7 +110,7 @@ class Decorator extends NotificationBundle
             }
         }
 
-        $context = array();
+        $context = [];
 
         foreach ($array as $id => $msg) {
             // create data structure for emails
@@ -129,7 +129,7 @@ class Decorator extends NotificationBundle
 
             // for work, aggregate by day; everything else, one row per item
             if ($ns == 'work') {
-                $daystamp = (int)($msg['time'] / 86400);
+                $daystamp                                                   = (int)($msg['time'] / 86400);
                 $context['groups'][$ns]['rows'][$daystamp]['messages'][$id] = $msg;
             } else {
                 $context['groups'][$ns]['rows'][/* blank on purpose */]['messages'][$id] = $msg;
@@ -144,7 +144,7 @@ class Decorator extends NotificationBundle
         $headings = [
             'work'     => 'Schoolwork',
             'news'     => $rosettaStone->translate('news', true, true),
-            'activity' => 'Activity'
+            'activity' => 'Activity',
         ];
 
         foreach ($headings as $ns => $heading) {
@@ -211,11 +211,11 @@ class Decorator extends NotificationBundle
      */
     public function renderAsSocketArray(bool $asUnread = false, int $limit = 0, int $dir = SORT_DESC): array
     {
-        $result = array();
+        $result = [];
 
         foreach ($this->getNotifications($limit, $dir) as $notification) {
-            $id = $notification->getId();
-            $result[$id] = array(
+            $id          = $notification->getId();
+            $result[$id] = [
                 'id'        => $id,
                 'body'      => $notification->getTitle(),
                 'icon'      => $notification->getIcon(),
@@ -223,12 +223,12 @@ class Decorator extends NotificationBundle
                 'params'    => $this->renderParametersAsArray($notification),
                 'meta'      => $notification->getMeta(),
                 'timestamp' => $notification->getTimestamp(),
-                'status'    => $asUnread ? 'unread' : 'read'
-            );
+                'status'    => $asUnread ? 'unread' : 'read',
+            ];
 
             // if meta.body is set, convert it to plaintext and truncate it
             if (isset($result[$id]['meta']['body'])) {
-                $plain = new Html2Text($result[$id]['meta']['body']);
+                $plain                       = new Html2Text($result[$id]['meta']['body']);
                 $result[$id]['meta']['body'] = TextFormatter::cutSentence($plain->getText(), 48);
             }
         }
@@ -238,36 +238,33 @@ class Decorator extends NotificationBundle
 
 
     /**
+     * Renders de-duped parameter array.
      * @param Notification $notification
      * @return array
      */
     public function renderParametersAsArray(Notification $notification): array
     {
-        $array = array();
+        $array = [];
         foreach ($notification->getParameters() as $token => $timeParams) {
-            // perform deduping here: we only want the latest of each distinct param
-            $latest = array();
             // sort params by reverse timestamp to give precedence to most recent
             krsort($timeParams);
             /** @var ParameterInterface[] $params */
             foreach ($timeParams as $time => $params) {
                 foreach ($params as $param) {
-                    if ($param->getMode() === ParameterInterface::STACKING_APPEND) {
-                        $param->setTimestamp($time);
-                    }
+                    // contents of this parameter
                     $serial = $param->jsonSerialize();
-                    $hash   = sha1(json_encode($serial));
-
-                    if (!isset($latest[$hash]) || $time >= $latest[$hash]) {
-                        $latest[$hash]        = $time;
-                        $array[$token][$hash] = $serial;
+                    // this is to de-dupe parameters appear to be the same (i.e. no timestamp)
+                    $hash                 = $param->getHash();
+                    $array[$token][$hash] = $serial;
+                    if ($param->getMode() !== ParameterInterface::STACKING_APPEND) {
+                        // return whatever comes first, which should be the latest
+                        break 2;
                     }
                 }
             }
         }
         return $array;
     }
-
 
     /**
      * Translate a the :tokenised title of a notification into an HTML string
@@ -290,42 +287,20 @@ class Decorator extends NotificationBundle
             }
             // sort params by reverse timestamp to give precedence to most recent
             krsort($timeParams);
-
-            /** @var ParameterInterface[] $stack */
             $stack = [];
-            $subst = '';
-
             foreach ($timeParams as $time => $params) {
-                /** @var ParameterInterface[] $params */
-                // probably a bit of a code smell, but retrieves first value.
-                // equivalent to $timeParams[0][0] but where the keys are unknown
-                $subst = $this->param2html(reset($params), $fqdn);
-
+                /** @var ParameterInterface $param */
                 foreach ($params as $param) {
-                    switch ($param->getMode()) {
-                        case ParameterInterface::STACKING_REPLACE:
-                        case ParameterInterface::STACKING_REPLACE_NO_DECORATION:
-                            $subst = $this->param2html($param, $fqdn);
-                            break;
-                        case ParameterInterface::STACKING_APPEND:
-                            $param->setTimestamp($time);
-                            $stack[] = $param;
-                            break;
-                        case ParameterInterface::STACKING_IGNORE:
-                        default:
-                            // ignore? ok, ignored.
-                            break;
+                    // unset timestamp to remove duplicate
+                    $param->setTimestamp(0);
+                    if (in_array($param, $stack)) {
+                        continue;
                     }
+                    $stack[] = $param;
                 }
-
             }
-
-            // use the stack if it was populated
-            if (count($stack)) {
-                $subst = $this->stack2html($stack, $fqdn);
-            }
-
-            $text = str_replace(":$token", $subst, $text);
+            $subst = $this->stack2html($stack, $fqdn);
+            $text  = str_replace(":$token", $subst, $text);
         }
 
         return $text;
@@ -347,7 +322,7 @@ class Decorator extends NotificationBundle
      * Translate a parameter into an HTML anchor tag
      *
      * @param ParameterInterface $param
-     * @param string $fqdn
+     * @param string             $fqdn
      * @return string
      */
     protected function param2html(ParameterInterface $param, string $fqdn = ''): string
@@ -373,10 +348,10 @@ class Decorator extends NotificationBundle
      */
     protected function stack2html(array $params, string $fqdn): string
     {
-        $bits = array();
+        $bits = [];
 
-        /** @var ParameterInterface[] $params */
-        $params = array_unique($params, SORT_STRING);
+//        /** @var ParameterInterface[] $params */
+//        $params = array_unique($params, SORT_STRING);
 
         // take the first n params, and tuck the rest away
         for ($i = 0; $i < self::STACK_LIMIT - 1; ++$i) {
@@ -395,7 +370,7 @@ class Decorator extends NotificationBundle
                 break;
             default:
                 // if there's anything more left over, aggregate it
-                $others = array();
+                $others = [];
                 foreach ($params as $p) {
                     $others[] = $p->getText();
                 }
@@ -404,10 +379,10 @@ class Decorator extends NotificationBundle
         }
 
         if (count($bits) >= 2) {
-            $parts = array(
+            $parts = [
                 implode(', ', array_slice($bits, 0, count($bits) - 1)),
-                $bits[count($bits) - 1]
-            );
+                $bits[count($bits) - 1],
+            ];
         } else {
             $parts = $bits;
         }

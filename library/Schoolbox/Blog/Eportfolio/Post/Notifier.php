@@ -10,7 +10,6 @@ namespace Schoolbox\Blog\Eportfolio\Post;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
-use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Eportfolio\PageMapper;
 use Eportfolio\PermissionMapper;
 use Monolog\Logger;
@@ -191,7 +190,7 @@ class Notifier extends AbstractModuleNotifier
             }
 
             $params = [
-                'author' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                'author' => new UserParam($effector),
                 'title' => new Param($post->getHeading(), $this->buildBlogUrl($post)),
             ];
 
@@ -283,8 +282,8 @@ class Notifier extends AbstractModuleNotifier
             }
             // Just first name if advising parent of child's action
             $effectorParam = Role::PARENT === $roleType && $target->isParentOf($effector)
-                ? new ChildParam($effector, ParameterInterface::STACKING_REPLACE)
-                : new UserParam($effector, ParameterInterface::STACKING_REPLACE);
+                ? new ChildParam($effector)
+                : new UserParam($effector);
 
             // Adjust title for effector, owner and recipient role combinations
             if ((int)$owner->getId() === (int)$target->getId()) {
@@ -298,11 +297,11 @@ class Notifier extends AbstractModuleNotifier
             } elseif (Role::PARENT === $roleType && $target->isParentOf($owner)) {
                 // Are we sending to post owner's parents?
                 $ownerToken = ":student's";
-                $ownerParam = ['student' => new ChildParam($owner, ParameterInterface::STACKING_REPLACE)];
+                $ownerParam = ['student' => new ChildParam($owner)];
             } else {
                 // Effector is not the owner, target is not owner, target is not parent of owner
                 $ownerToken = ":student's";
-                $ownerParam = ['student' => new UserParam($owner, ParameterInterface::STACKING_REPLACE)];
+                $ownerParam = ['student' => new UserParam($owner)];
             }
             $params = [
                 'author' => $effectorParam,
@@ -327,7 +326,7 @@ class Notifier extends AbstractModuleNotifier
     private function createBuilder(Model $post, User $effector, string $trigger): Builder
     {
         $bob = new Builder();
-        $bob->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
+        $bob->setIcon($this->getUserIcon($effector))
             ->setHref($this->buildBlogUrl($post))
             ->setSeverity(Logger::INFO)
             ->setNamespace($this->getSlug())

@@ -1381,7 +1381,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $href = $this->buildParticipantRoute($assessment, $participant->getUser());
         return $bob
             ->setParam('assessment', new Param($assessment->getTitle(), $href))
-            ->setParam('child', new ChildParam($participant->getUser(), Param::STACKING_REPLACE))
+            ->setParam('child', new ChildParam($participant->getUser()))
             ->setHref($href);
     }
 

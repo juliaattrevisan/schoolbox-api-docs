@@ -69,16 +69,16 @@ class Notification
      */
     protected function initialise(Instance $instance): self
     {
-        // set comparison hash
+        // set comparison hash (message string and href)
         $this->hash = $instance->getBaseHash();
 
         // clear existing instances
-        $this->instances = array();
+        $this->instances = [];
 
-        // setup empty params array, indexed by token
-        $this->params = array();
+        // setup empty params array, indexed by token [token => value]
+        $this->params = [];
         foreach (array_keys($instance->getParameters()) as $token) {
-            $this->params[$token] = array();
+            $this->params[$token] = [];
         }
 
         return $this->appendInstance($instance);
@@ -111,33 +111,27 @@ class Notification
             $this->timestamp = $instance->getTime();
 
             // cache basic information
-            $array = $instance->jsonSerialize();
-            $this->info = array(
-                'title' => $array['title']['text'],
+            $array      = $instance->jsonSerialize();
+            $this->info = [
+                'title'     => $array['title']['text'],
                 'namespace' => $array['namespace'],
-                'icon' => $array['icon'],
-                'href' => $array['href'],
-                'meta' => $array['meta']
-            );
+                'icon'      => $array['icon'],
+                'href'      => $array['href'],
+                'meta'      => $array['meta'],
+            ];
         }
-
-        $this->timestamp = max($instance->getTime(), $this->timestamp);
-
 
         // collate params with existing
         foreach ($instance->getParameters() as $token => $param) {
             switch ($param->getMode()) {
-                // replace existing
                 case ParameterInterface::STACKING_REPLACE:
                 case ParameterInterface::STACKING_REPLACE_NO_DECORATION:
-                    $this->params[$token] = [$instance->getTime() => [$param]];
-                    break;
-
-                // append to existing, indexed by time
                 case ParameterInterface::STACKING_APPEND:
                     if (!\key_exists($instance->getTime(), $this->params[$token])) {
                         $this->params[$token][$instance->getTime()] = [];
                     }
+                    // set timestamp in param, which will be used in sorting params in instant notification
+                    $param->setTimestamp($instance->getTime());
                     $this->params[$token][$instance->getTime()][] = $param;
                     break;
 
@@ -210,7 +204,7 @@ class Notification
 
 
     /**
-     * @param string $field
+     * @param string|null $field
      * @return string|array
      */
     public function getMeta(?string $field = null)
@@ -264,4 +258,4 @@ class Notification
         );
     }
 
-} 
+}

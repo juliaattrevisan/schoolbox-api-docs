@@ -35,9 +35,9 @@ class Param implements ParameterInterface
     protected $timestamp = 0;
 
     /**
-     * @param string $text
-     * @param string $href
-     * @param int $stacking
+     * @param string      $text
+     * @param string|null $href
+     * @param int         $stacking
      */
     public function __construct($text, $href = null, $stacking = self::STACKING_REPLACE)
     {
@@ -84,12 +84,28 @@ class Param implements ParameterInterface
      */
     public function jsonSerialize()
     {
-        return array(
+        return [
             'text' => $this->text,
             'href' => $this->href,
             'mode' => $this->mode,
             'time' => $this->timestamp,
-        );
+        ];
+    }
+
+
+    /**
+     * Used as a key to this param, to remove duplicates
+     * @return string
+     */
+    public function getHash()
+    {
+        // do not include time
+        $serial = [
+            'text' => $this->text,
+            'href' => $this->href,
+            'mode' => $this->mode,
+        ];
+        return sha1(json_encode($serial));
     }
 
 

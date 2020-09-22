@@ -167,13 +167,15 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
             if ($resource !== null && $resource->getId()) {
                 switch ($log->getAction()) {
                     case LogMapper::ACTION_CREATE:
-                        $c = $c->merge(new Collection($this->notifyCreated($roletype, $resource, $user)->getAll($time)));
+                        $c = $c->merge(new Collection($this->notifyCreated($roletype, $resource, $user)->getAll($time, false)));
                         break;
                     case LogMapper::ACTION_UPDATE:
-                        $c = $c->merge(new Collection($this->notifyUpdated($roletype, $resource, $user)->getAll($time)));
+                        // do not index instances by destination, so that feeds of modifying the same resource
+                        // will stack properly in the notification class
+                        $c = $c->merge(new Collection($this->notifyUpdated($roletype, $resource, $user)->getAll($time, false)));
                         break;
                     case LogMapper::ACTION_DELETE:
-                        $c = $c->merge(new Collection($this->notifyDeleted($roletype, $resource, $user)->getAll($time)));
+                        $c = $c->merge(new Collection($this->notifyDeleted($roletype, $resource, $user)->getAll($time, false)));
                         break;
                 }
             }
@@ -218,7 +220,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
             ->setHref("/homepage/$categoryId#$kind")
             ->setTitle(":effector $action the $kind :resource in :category")
             ->setParams([
-                'effector' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
+                'effector' => new UserParam($effector),
                 'resource' => $param,
                 'category' => new CategoryParam($category),
             ])
@@ -339,7 +341,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
             ->addFilter('roletype', [$roleType])
             ->setTopics(["cms.$resourceKind.$resourceId.updated"]);
 
-        $userParam = new UserParam($effector, ParameterInterface::STACKING_REPLACE);
+        $userParam = new UserParam($effector);
         $catParam  = new CategoryParam($category);
 
         // if renamed...

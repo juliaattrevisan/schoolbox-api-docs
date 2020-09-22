@@ -329,14 +329,13 @@ class Notifier extends AbstractModuleNotifier
 
         $bob->setTitle(self::PATTERN_SUBMITTED_TITLE)
             ->setNamespace($this->getSlug())
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
+            ->setIcon($this->getUserIcon($effector))
             ->setSeverity(Logger::INFO)
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
             ->setParams([
-                'user'  => new UserParam($effector, Param::STACKING_REPLACE),
+                'user'  => new UserParam($effector),
                 'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()), Param::STACKING_APPEND),
             ])
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
             ->addTopic("news.{$article->getId()}." . self::TRIGGER_SUBMITTED);
 
         foreach ($recipients as $recipient) {
@@ -425,11 +424,11 @@ class Notifier extends AbstractModuleNotifier
         }
         $bob->setTitle(':user ' . $action . ' your article, :title')
             ->setNamespace($this->getSlug())
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
+            ->setIcon($this->getUserIcon($effector))
             ->setSeverity(Logger::INFO)
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
             ->setParams([
-                'user'  => new UserParam($effector, Param::STACKING_REPLACE),
+                'user'  => new UserParam($effector),
                 'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()), Param::STACKING_REPLACE),
             ])
             ->addTopic("news.{$article->getId()}." . self::TRIGGER_MODERATED);
@@ -539,7 +538,7 @@ class Notifier extends AbstractModuleNotifier
             $thumb = "/storage/image.php?hash=$hash&size=square200";
 
         } else {
-            $icon  = "/portrait.php?userId={$author->getExternalId()}&size={$this->iconSize}";
+            $icon  = $this->getUserIcon($author);
             $thumb = '/images/emails/spacer.gif';
         }
 
@@ -569,7 +568,7 @@ class Notifier extends AbstractModuleNotifier
 
         $bob->setTitle(self::PATTERN_POSTED_TITLE)
             ->setParams([
-                'user'  => new UserParam($author, Param::STACKING_REPLACE),
+                'user'  => new UserParam($author),
                 'title' => new Param($heading, sprintf(self::PATTERN_ARTICLE_HREF, $articleId), Param::STACKING_APPEND),
             ])
             ->setIcon($icon)
