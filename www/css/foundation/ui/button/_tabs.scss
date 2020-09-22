@@ -7,11 +7,11 @@ $tabs-navigation-bg-color: transparent;
 $tabs-navigation-active-bg-color: transparent;
 $tabs-navigation-font-color: $aluminum;
 $tabs-navigation-active-font-color: $body-font-color;
-$tabs-navigation-font-size: 14px;
+$tabs-navigation-font-size: $base-font-size;
 $tabs-content-padding: 0;
 
 // Schoolbox vars
-$tab-padding: 0.75rem 1rem; // Can't use the foundation one because it doesn't support x and y
+$tab-padding: 0.65rem 1rem; // Can't use the foundation one because it doesn't support x and y
 
 @import "../../../../javascript/components/foundation/scss/foundation/components/tabs";
 
