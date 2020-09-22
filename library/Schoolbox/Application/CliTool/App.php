@@ -151,7 +151,7 @@ abstract class App
     protected function setMaxExecutionTime(?float $timeout): void
     {
         if (isset($timeout)) {
-            ini_set('max_execution_time', $timeout);
+            ini_set('max_execution_time', (string)$timeout);
         }
     }
 
