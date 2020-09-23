@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Pastoral\Comment;
 
 use Alaress\Async\Notification\Instance\Builder;
-use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
@@ -19,7 +18,6 @@ use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
-use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -61,7 +59,7 @@ class Notifier extends AbstractModuleNotifier
     protected $l10n;
 
     /**
-     * @param array $dependencies
+     * @inheritDoc
      */
     public function loadDependencies($dependencies = null)
     {
@@ -115,19 +113,17 @@ class Notifier extends AbstractModuleNotifier
         }
 
         // Create the message
-        $timestamp = md5(date("YmdHis"));
-        $href = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}?ts={$timestamp}";
+        $href = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}";
 
         $builder = new Builder();
         $builder->setTitle("A :pastoralcare comment has been {$method}")
             ->setParam('pastoralcare', new Param($this->l10n->translate('pastoralCare'), $href))
-            ->setIcon("/portrait.php?size=square32&id={$owner->getId()}")
+            ->setIcon($this->getUserIcon($owner))
             ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::ERROR)
             ->addTopic("pastoral_comment.{$model->getId()}.{$method}");
 
-        /** @var Instance $message */
         $message = $builder->build();
 
         // Work out who to send the message to
@@ -167,7 +163,6 @@ class Notifier extends AbstractModuleNotifier
             } elseif ($pastoralAccess->getGroup()) {
                 // Sending to a pastoral group
                 try {
-                    /** @var PastoralGroup $pastoralGroup */
                     $pastoralGroup = $this->pastoralGroupMapper->findById($pastoralAccess->getGroup()->getId());
                 } catch (MapperException $e) {
                     // Log an error and move on so we don't break the rest of the notifications
