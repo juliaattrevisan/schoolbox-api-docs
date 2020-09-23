@@ -151,6 +151,10 @@ $app = new class extends CliTool\App{
             }
 
             // Refresh process lock, or break if it can't be refreshed
+            if ($lock->isExpired()) {
+                $log->warning('Lock expired during processing: aborting');
+                break;
+            }
             try {
                 $log->info('Refreshing process lock...');
                 $lock->refresh();
