@@ -16,6 +16,19 @@ use Symfony\Component\Lock\LockInterface;
  *
  * Wraps around a Symfony lock factory instance, and ensures that an instance ID
  * is applied to the lock key.
+ *
+ * Example lock usage:
+ * <code>
+ * $factory = new InstanceLockFactory($lockFactory, INSTANCE_ID);
+ * $lock    = $factory->createLock('lockName', 300);
+ * if ($lock->acquire()) {
+ *     // perform a process which requires a lock, and then:
+ *     $lock->release();
+ * }
+ * </code>
+ *
+ * @see https://symfony.com/doc/master/components/lock.html for further
+ *      documentation of how to use a lock.
  */
 class InstanceLockFactory
 {
