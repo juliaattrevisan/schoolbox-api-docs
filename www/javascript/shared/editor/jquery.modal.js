@@ -1,5 +1,3 @@
-
-
 /**
  * Mr Matt's Modal
  *
@@ -14,6 +12,9 @@
  * schoolboxMessage - the thing you chose is sent via postMessage() so the cke dialog can get it
  * schoolboxModalConfig - default configuration of the modal so it can interpret urls that you chose
  * schoolboxLink - the plugin you can use to spawn the modal, pick a link, and put it somewhere in th dom
+ *
+ * Note that the Filesystem options, aliased via 'allowedFilesystems' parameter, are found in the
+ * Resource\Attachment\Context\Factory so if you need to adjust the available options, do it there
  */
 (function() {
     var modalCache = {};

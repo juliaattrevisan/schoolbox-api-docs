@@ -23,9 +23,9 @@ trait TaskTrait
     protected $url;
 
     /**
-     * @var string
+     * @var array|string[]
      */
-    protected $attachedFile;
+    protected $attachedFiles;
 
     /**
      * @return boolean
@@ -62,23 +62,4 @@ trait TaskTrait
         $this->url = $url;
         return $this;
     }
-
-    /**
-     * @return string
-     */
-    public function getAttachedFile()
-    {
-        return $this->attachedFile;
-    }
-
-    /**
-     * @param string $attachedFile
-     * @return $this
-     */
-    public function setAttachedFile($attachedFile)
-    {
-        $this->attachedFile = $attachedFile;
-        return $this;
-    }
-
 }

@@ -32,7 +32,7 @@ class Factory
      */
     private const OPTIONS = [
 
-        /* Enable every accordion
+        /* Enable every filesystem option
          */
         'all' => [
             'upload'    => Filesystem\UploadController::class,
@@ -77,6 +77,18 @@ class Factory
             'google'    => Filesystem\GoogleController::class,
             'office'    => Filesystem\Office365Controller::class,
         ],
+
+        /* Learning/Tasks
+         * Tasks have a separate attachzone for uploading files, though they should retain
+         * other non-upload filesystems for adding Links to a Task.
+         */
+        'task' => [
+            'browse'    => Filesystem\BrowseController::class,
+            'teams'     => Filesystem\TeamsController::class,
+            'webdav'    => Filesystem\WebdavController::class,
+            'google'    => Filesystem\GoogleController::class,
+            'office'    => Filesystem\Office365Controller::class,
+        ]
     ];
 
 

@@ -13,8 +13,6 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Resource\Attachment\Zone;
-use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use \Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Factory for creating \Schoolbox\Resource\Attachment\Zone instances for an
@@ -51,38 +49,31 @@ class Factory
     /**
      * Build an attachzone with any Attached Files preloaded into the attachzone
      *
-     * @deprecated Tasks no longer have attachzones
-     *
      * @param Task $task
      * @return Zone
      */
     protected function buildForTask(Task $task)
     {
-        $zone = new Zone('files');
-        $zone->setMulti(false)->setAttachmentsLabel('');
-        $zone->setAttachPrompt('attach file');
+        $hashes = [];
 
-        /* Figure out what the hash is
-         * TODO: I'm sure there's a better way, but I can't remember it right now
+        /* Take advantage of a somewhat obscure implementation inside the Attachzone
+         * see Zone.php:99, where it will just use an IStorage instance with whatever its
+         * contents are. If you provide it a hash, it'll go to the storage table and extract
+         * the last known details about the file (including its latest name)
+         *
+         * If you give it the IStorage instance, it'll just blindly use that without visiting
+         * the storage table
+         *
+         * This seems really obscure, not sure if intentionally obscure? Anyway
          */
-        $foundHash = preg_match('/hash=([a-zA-Z0-9]+)/', $task->getUrl(), $matches);
-        $hash = $matches[1];
-
-        if ($foundHash) {
-            $zone->attachFiles([$hash]);
-
-            /* Ram in an actual file instance to the task
-             */
-            try {
-                $task->setAttachedFile(StorageMapper::getInstance()->findByHash($hash));
-            }
-            catch (MapperException $e) {
-                /* noop (pretend file didn't exist if it couldn't be findByHash()'d)
-                 */
-            }
+        foreach ($task->getAttachedFiles() as $file) {
+            $hashes[] = $file;
         }
 
-        return $zone;
+        return (new Zone('files'))
+             ->setMulti(true)
+             ->setAttachmentsLabel('')
+             ->attachFiles($hashes);
     }
 
     /**
@@ -110,7 +101,8 @@ class Factory
     public function buildForDueWorkResponse(Submission $response)
     {
         $zone = new Zone('files');
-        $zone->setMulti(true)->setAttachmentsLabel('');
+        $zone->setMulti(true)
+             ->setAttachmentsLabel('');
 
         $files = [];
         /* Sort files alphabetically
@@ -134,7 +126,7 @@ class Factory
     /**
      * Build an attachzone with $feedback's attached files preloaded.
      *
-     * @param Feedback $feedback If null, build an empty attachzone
+     * @param Feedback|null $feedback If null, build an empty attachzone
      * @return Zone
      */
     public function buildForDueWorkFeedback(Feedback $feedback = null)

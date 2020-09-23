@@ -2807,12 +2807,7 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getUrl\\(\\)\\.$#"
-			count: 3
-			path: library/Schoolbox/Learning/Assessment/Task/Controller.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:isSelfAssessable\\(\\)\\.$#"
-			count: 1
+			count: 2
 			path: library/Schoolbox/Learning/Assessment/Task/Controller.php
 
 		-
@@ -3944,3 +3939,23 @@ parameters:
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setUseMarkRange\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getAttachedFiles\\(\\)\\.$#"
+			count: 4
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setAttachedFiles\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getAttachments\\(\\)\\.$#"
+			count: 3
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setAttachments\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php

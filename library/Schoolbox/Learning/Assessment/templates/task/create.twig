@@ -64,7 +64,8 @@
             <script>
                 $(function() {
                     $('#modalLinkButton').schoolboxLink({
-                        allowedFilesystems: 'all',
+                        allowedFiles: false,
+                        allowedFilesystems: 'task',
                         onSelect: function(url, name, dialog) {
                             $('input[name="url"]').val(url);
                         }
@@ -75,6 +76,12 @@
                 <input name="url" type="text" size="40" maxlength="1024" placeholder="Destination URL" value="{{ assessment.url }}">
                 <a id="modalLinkButton" class="button icon-link">Browse</a>
             </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12 columns">
+            <label>Attach Files</label>
+            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
         </div>
     </div>
 </div>

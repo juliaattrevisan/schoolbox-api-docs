@@ -26,13 +26,13 @@ use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait;
 use \Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
 
-use \Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait as QuizTrait;
+use \Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait;
 use \Schoolbox\Learning\Assessment\Quiz\Decorator\Decorator as QuizDecorator;
 
-use \Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait as TaskTrait;
+use \Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
 use \Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 
-use \Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait as ProjectTrait;
+use \Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait;
 use \Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 
@@ -55,6 +55,7 @@ class Factory
     use QuizTrait;
     use TaskTrait;
     use ProjectTrait;
+    use AttachedFilesTrait;
 
     /**
      * Unique identifier
@@ -220,11 +221,6 @@ class Factory
          */
         $this->setHasSelfAssessed(trim($post['hasSelfAssessed']));
         $this->setUrl(trim($post['url']));
-        /* Set just a single attached file for task
-         */
-        if (is_array($post['attachment'])) {
-            $this->setAttachedFile(isset($this->getAttachedFiles()[0]) ? $this->getAttachedFiles()[0] : null);
-        }
 
         /* Quiz needs this to instantiate correctly
          */
@@ -331,7 +327,7 @@ class Factory
             $decorator = new TaskDecorator(
                 $this->getHasSelfAssessed(),
                 $this->getUrl(),
-                $this->getAttachedFile()
+                $this->getAttachedFiles()
             );
         } elseif ($assessment instanceof Quiz) {
             $decorator = new QuizDecorator(
