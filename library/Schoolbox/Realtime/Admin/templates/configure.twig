@@ -247,6 +247,7 @@
             {% endfor %}
         </ul>
 
+        {% if config|length  %}
         <div id="configurator">
             {% for namespace in config %}
                 {% if ns[namespace.id] %}
@@ -259,6 +260,11 @@
                 {% endif %}
             {% endfor %}
         </div>
+        {% else %}
+        <div class="empty-state">
+            <p>No roles exist with this role type</p>
+        </div>
+        {% endif %}
     </div>
 </div>
 
