@@ -65,10 +65,8 @@ class Year extends SimpleStrategy
               IF(lu_year_level.name REGEXP '^[0-9]+$', CONCAT('Year ', lu_year_level.name), lu_year_level.name) AS name,
               '{$entityType}' AS entity_type,
               null as entity_meta
-            FROM `user`
-            LEFT JOIN lu_year_level ON `user`.year_id = lu_year_level.id
-            WHERE `user`.deleted_at IS NULL
-            AND lu_year_level.deleted_AT IS NULL
+            FROM lu_year_level
+            WHERE lu_year_level.deleted_AT IS NULL
             AND lu_year_level.name IS NOT NULL
             {$keywordFilter}
         ";
@@ -82,7 +80,7 @@ class Year extends SimpleStrategy
     {
         $entityType = self::getEntityType();
 
-        $pb = (new Builder(new Quoter(), 'user'))
+        $pb = (new Builder(new Quoter(), 'lu_year_level'))
             ->setParamPrefix($entityType)
             ->in('lu_year_level.name', $entityValues);
 
@@ -91,8 +89,7 @@ class Year extends SimpleStrategy
                 '{$entityType}' entity_type,
                 lu_year_level.name AS entity_value,
                 IF(lu_year_level.name REGEXP '^[0-9]+$', CONCAT('Year ', lu_year_level.name), lu_year_level.name) name
-            FROM user
-            LEFT JOIN lu_year_level ON `user`.year_id = lu_year_level.id
+            FROM lu_year_level
             WHERE {$pb->getWhereIntersect()}
         ";
 
