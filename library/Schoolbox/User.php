@@ -397,12 +397,15 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         $metadata = '';
         $role     = $this->getRole()->getName();
 
-        /* This makes a massive assumption that everyone's year level
+        /* This made a massive assumption that everyone's year level
          * begins with "Year", which means anyone using "ELC" in lu_year_level.name
-         * will get metadata like "Year ELC"
+         * would get metadata like "Year ELC"
+         *
+         * See inside getLongName() which checks whether it's just an integer on its own
+         * before trying to prepend something
          */
         if (!empty($this->year)) {
-            $metadata .= 'Year ' . $this->year->getName();
+            $metadata .= $this->year->getLongName();
         }
         return "{$metadata} {$role}";
     }

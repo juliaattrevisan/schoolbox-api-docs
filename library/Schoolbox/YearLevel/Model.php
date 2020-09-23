@@ -94,6 +94,24 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
         return $this;
     }
 
+
+    /**
+     * If the year's name contains only an integer, presume the user wanted
+     * to prepend "Year " in front of it, because this is how it will
+     * manifest in a UI somewhere.
+     *
+     * @return string
+     */
+    public function getLongName(): string
+    {
+        if (preg_match('/^[0-9]+$/', $this->getName())) {
+            return "Year {$this->getName()}";
+        }
+
+        return $this->getName();
+    }
+
+
     /**
      * @return int|null
      */
