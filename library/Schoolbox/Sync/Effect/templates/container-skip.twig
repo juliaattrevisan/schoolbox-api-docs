@@ -1,4 +1,4 @@
-<div id="effect-{{ currentEffect.id }}" class="actions-small-1" data-effect data-locked="{{ meta.effect[currentEffect.id].lock.status }}">
+<div id="effect-{{ currentEffect.id }}" class="actions-small-1" data-effect data-locked="{{ meta.effect[currentEffect.id].lock.status ?? 0 }}">
     <input type="hidden" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][type]" value="3">
 
     <div class="list-item">
