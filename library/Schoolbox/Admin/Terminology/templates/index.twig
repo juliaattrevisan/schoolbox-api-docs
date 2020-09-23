@@ -32,44 +32,44 @@
     <div class="small-12 island">
         <form id="terminology-form" method="post" action="{{ routeLookup('adminTerminology.postUpdateTerms') }}">
             <section>
-                <ul class="information-list gridded-inputs">
-                    <li>
-                        <div class="list-item">
-                            <div class="small-3 column"><h3>Term</h3></div>
-                            <div class="small-3 column"><h3>Singular Form</h3></div>
-                            <div class="small-3 column"><h3>Plural Form</h3></div>
-                            <div class="small-1 column"><h3>Indefinite Article</h3></div>
-                            <div class="small-2 column"><h3>Capitalisation<span data-tooltip class="hint has-tip tip-left" data-width="200" title="Determines if the first letter can be capitalised">?</span></h3></div>
-                        </div>
-                    </li>
-                    {% for term in terms %}
-                        <li>
-                            <div>
-                                <div class="small-3 column">
-                                    {{ term.title }}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Term</th>
+                            <th>Singular Form</th>
+                            <th>Plural Form</th>
+                            <th>Indefinite Article</th>
+                            <th>Capitalisation<span data-tooltip class="hint has-tip tip-left" data-width="200" title="Determines if the first letter can be capitalised">?</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for term in terms %}
+                        <tr>
+                            <td>
+                                {{ term.title }}
+                            </td>
+                            <td>
+                                <input data-input required type="text" class="no-margin" name="singularForm[{{ term.term }}]" value="{{ term.singularForm }}">
+                            </td>
+                            <td>
+                                <input data-input required type="text" class="no-margin" name="pluralForm[{{ term.term }}]" value="{{ term.pluralForm }}">
+                            </td>
+                            <td>
+                                <input required type="text" class="no-margin" name="indefiniteArticle[{{ term.term }}]" value="{{ term.indefiniteArticle }}">
+                            </td>
+                            <td>
+                                <div class="switch no-margin">
+                                    <input id="capitaliseFirst-{{ term.term }}" name="capitaliseFirst[{{ term.term }}]" type="checkbox" {% if term.capitaliseFirst %}checked{% endif %} data-checkbox-group="capitaliseFirst-{{ term.term }}">
+                                    <label for="capitaliseFirst-{{ term.term }}">
+                                        <span>Yes</span>
+                                        <span>No</span>
+                                    </label>
                                 </div>
-                                <div class="small-3 column">
-                                    <input data-input required type="text" name="singularForm[{{ term.term }}]" value="{{ term.singularForm }}">
-                                </div>
-                                <div class="small-3 column">
-                                    <input data-input required type="text" name="pluralForm[{{ term.term }}]" value="{{ term.pluralForm }}">
-                                </div>
-                                <div class="small-1 column">
-                                    <input required type="text" name="indefiniteArticle[{{ term.term }}]" value="{{ term.indefiniteArticle }}">
-                                </div>
-                                <div class="small-2 column">
-                                    <div class="switch">
-                                        <input id="capitaliseFirst-{{ term.term }}" name="capitaliseFirst[{{ term.term }}]" type="checkbox" {% if term.capitaliseFirst %}checked{% endif %} data-checkbox-group="capitaliseFirst-{{ term.term }}">
-                                        <label for="capitaliseFirst-{{ term.term }}">
-                                            <span>Yes</span>
-                                            <span>No</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </section>
             <input type="submit" value="Save">
         </form>
