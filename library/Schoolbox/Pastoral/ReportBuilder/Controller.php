@@ -284,7 +284,7 @@ class Controller extends Base
 
         /* A stack of all YearLevel instances, ordered by sequence from the admin area
          */
-        $yearLevels = $this->yearLevelMapper->findAll()->sortBy('sequence', 'ASC');
+        $yearLevels = $this->yearLevelMapper->findAll();
 
         // And render this thing out
         $this->getResponse()->content->set(
