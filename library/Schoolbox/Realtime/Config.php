@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -24,7 +24,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use UnderflowException;
 
-class Config 
+class Config
 {
 
     /** @var RoleMapper */
@@ -174,6 +174,9 @@ class Config
      */
     public function find($roleIds, $sourceKey = null, $slug = null)
     {
+        if (!count((array)$roleIds)) {
+            return [];
+        }
         if (is_array($roleIds)) {
             $roleIds = implode(',', $roleIds);
         }
