@@ -628,7 +628,7 @@ class Controller extends Base
 
         if ('' !== $post['year_id']) {
             try {
-                $year = YearLevel\Mapper::getInstance()->findById($post['year_id']);
+                $year = $this->yearLevelMapper->findById($post['year_id']);
             } catch (\Schoolbox\Mapper\Exception $e) {
 
                 /* noop - went looking for a deleted or nonexistent year_id
