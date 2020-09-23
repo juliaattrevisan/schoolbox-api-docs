@@ -20,6 +20,8 @@ use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Video\Queue;
 use Schoolbox\Video\QueueMapper;
 use Schoolbox\Application\CliTool;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -146,6 +148,15 @@ $app = new class extends CliTool\App{
                     $log->info("    - Transcode completed successfully");
                     $success++;
                 }
+            }
+
+            // Refresh process lock, or break if it can't be refreshed
+            try {
+                $log->info('Refreshing process lock...');
+                $lock->refresh();
+            } catch (LockConflictedException|LockAcquiringException $e) {
+                $log->warning('Could not refresh lock: aborting');
+                break;
             }
         }
 
