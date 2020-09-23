@@ -14,16 +14,20 @@ echo "Checking for current PHP version: $phpversion";
 if [ "$phpversion" == "7.1" ];
 then
     update-alternatives --set php /usr/bin/php7.4
+    service php7.1-fpm          stop;
+    service php7.4-fpm          start;
     service schoolbox-scheduled restart;
-    service schoolbox-routed  restart;
+    service schoolbox-routed    restart;
     service schoolbox-socketd   restart;
     service schoolbox-digestd   restart;
     echo "Switched PHP version to: 7.4";
 elif [ "$phpversion" == "7.4" ];
 then
     update-alternatives --set php /usr/bin/php7.1
+    service php7.4-fpm          stop;
+    service php7.1-fpm          start;
     service schoolbox-scheduled restart;
-    service schoolbox-routed  restart;
+    service schoolbox-routed    restart;
     service schoolbox-socketd   restart;
     service schoolbox-digestd   restart;
     echo "Switched PHP version to: 7.1";
