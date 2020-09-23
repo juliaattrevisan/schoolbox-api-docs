@@ -62,7 +62,6 @@ else
   cp -rf $initialdir/configfiles/php/7.1/fpm/* /etc/php/7.1/fpm
 fi
 
-cp -rf $initialdir/configfiles/php/7.1/fpm/* /etc/php/7.1/fpm
 cp -f $initialdir/configfiles/redis/redis.conf /etc/redis/redis.conf
 cp -f $initialdir/configfiles/www-conf/conf.php /vagrant/www/conf/conf.php
 cp -rf $initialdir/data/* /vagrant/data
