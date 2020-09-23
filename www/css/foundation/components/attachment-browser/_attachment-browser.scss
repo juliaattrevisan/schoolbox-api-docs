@@ -57,8 +57,12 @@
     position: relative;
 
     .content {
-      padding: 1rem;
+      padding: 1rem 1rem 3.5rem 1rem;
+      margin-bottom: 2.5rem;
       height: 100%;
+      max-height: 515px;
+      min-height: 292px;
+      overflow-y: scroll;
 
       &.active {
         display: flex;
@@ -81,11 +85,14 @@
     }
   }
   .component-action {
-    display: flex;
     margin: auto -1rem -0.975rem;
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    width: 100%;
 
     section {
-      width: 100%;
+      margin-top: 0;
     }
   }
 }
