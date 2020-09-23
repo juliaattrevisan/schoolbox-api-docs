@@ -105,6 +105,10 @@ class QueueMapper extends Mapper {
      * Mark videos that have been processing for longer than $timeout seconds as
      * having timed out.
      *
+     * @deprecated Should not be necessary as `\Schoolbox\Video\Queue::process`
+     *             sets a time limit on the encoding process: if the time limit
+     *             is reached, the encoding is marked as failed.
+     *
      * @param  int $timeout
      * @return int How many videos were marked as timed out?
      */
