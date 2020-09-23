@@ -45,18 +45,6 @@
                 });
             }
         });
-
-
-        /* Selector Test
-         * You can try using jquery selectors to feed a
-         * jquery collection to targetElements.
-         *
-         * Each textarea or element must have an id or name
-         * attribute - it checks the id first, then the name
-         */
-        $.fn.alaressEditor({
-            targetElements: $('textarea[name=green]')
-        });
     });
 </script>
 
@@ -65,17 +53,18 @@
         <h1>Pantry - Editor</h1>
         <ul class="sub-nav">
             <li><a href="/pantry">Generic Content</a></li>
+            <li><a href="/pantry/cards">Cards</a></li>
             <li><a href="/pantry/buttons">Buttons</a></li>
+            <li><a href="/pantry/colours">Colours</a></li>
             <li><a href="/pantry/icons">Icons</a></li>
             <li><a href="/pantry/typography">Typography</a></li>
             <li class="active"><a href="/pantry/editor">Editor</a></li>
-            <li><a href="/pantry/layout">Layouts</a></li>
             <li><a href="/pantry/form">Form</a></li>
             <li><a href="/pantry/form-progressive">Form Progressive</a></li>
             <li><a href="/pantry/tables">Tables</a></li>
             <li><a href="/pantry/lists">Lists</a></li>
+            <li><a href="/pantry/feature-tour">Feature Tour</a></li>
             <li><a href="/pantry/reveal">Reveal</a></li>
-            <li><a href="/pantry/redux">Sample Entities</a></li>
             <li><a href="/pantry/reference">Visibility Classes</a></li>
         </ul>
     </div>
@@ -137,57 +126,6 @@
                     <div class="small-12 columns">
                         <label>
                             <textarea id='customPlugin' name='customPlugin' rows="10"></textarea>
-                        </label>
-                    </div>
-                </fieldset>
-            </section>
-        </form>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 columns">
-        <h2 class="subheader">Selector Test</h2>
-        <p class="meta">
-            CKEditors can be selected by their name or id. You can tinker with the javascript to see what effect
-            it has on this set of input fields.
-        </p>
-    </div>
-    <div class="small-12 island">
-        <form action="/test.php" method="post">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>
-                            id='cat', name='red'
-                            <textarea id='cat' name="red" rows="5"></textarea>
-                        </label>
-                    </div>
-                </fieldset>
-
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>
-                            id='dog', name='blue'
-                            <textarea id='dog' name="blue" rows="5"></textarea>
-                        </label>
-                    </div>
-                </fieldset>
-
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>
-                            id='horse', name='green'
-                            <textarea id='horse' name="green" rows="5"></textarea>
-                        </label>
-                    </div>
-                </fieldset>
-
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>
-                            id='komodo' name='gold'
-                            <textarea id="komodo" name="gold" rows="5"></textarea>
                         </label>
                     </div>
                 </fieldset>

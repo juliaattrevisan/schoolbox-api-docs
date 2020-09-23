@@ -24,19 +24,18 @@
     <div class="small-12 columns">
         <ul class="sub-nav">
             <li class="active"><a href="/pantry">Generic Content</a></li>
+            <li><a href="/pantry/cards">Cards</a></li>
             <li><a href="/pantry/buttons">Buttons</a></li>
             <li><a href="/pantry/colours">Colours</a></li>
             <li><a href="/pantry/icons">Icons</a></li>
             <li><a href="/pantry/typography">Typography</a></li>
             <li><a href="/pantry/editor">Editor</a></li>
-            <li><a href="/pantry/layout">Layouts</a></li>
             <li><a href="/pantry/form">Form</a></li>
             <li><a href="/pantry/form-progressive">Form Progressive</a></li>
             <li><a href="/pantry/tables">Tables</a></li>
             <li><a href="/pantry/lists">Lists</a></li>
             <li><a href="/pantry/feature-tour">Feature Tour</a></li>
             <li><a href="/pantry/reveal">Reveal</a></li>
-            <li><a href="/pantry/redux">Sample Entities</a></li>
             <li><a href="/pantry/reference">Visibility Classes</a></li>
         </ul>
     </div>
@@ -44,30 +43,6 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h2 class="subheader">Universal Card List</h2>
-        <ul class="meta">
-            <li class="icon-wolfram-alpha"><strong>Things to Note</strong>
-                <ul style="margin:0;text-indent:0;">
-                    <li>
-                        <code>.information-list > li</code> does not require <code>.row</code> on its list items.
-                    </li>
-                    <li>
-                        <code>.card</code> class extends <code>.column</code> so you don't need to wrap it
-                    </li>
-                    <li>
-                        List-item actions are contained by <code>&lt;nav/&gt;</code>. If you do include row actions,
-                        you need to indicate this on the <code>&lt;li/&gt;</code> with <code>.actions-{size}-{action-count}</code>
-                        . These stack in the same way as column sizings, so you can have different
-                        numbers of actions on different viewports.
-                    </li>
-                    <li>
-                        Component title bars inherit from Masonry configuration on all
-                        component-based pages (Dashboard, Homepage, ePortfolio)
-                        A colour has been hardcoded in the pantry to demonstrate usage.
-                    </li>
-                </ul>
-            </li>
-        </ul>
         <div class="component-titlebar" style='background-color:#ddd'>
             <div class="actions-small-3">
                 <div class="list-item">
@@ -80,457 +55,50 @@
                 </nav>
             </div>
         </div>
-        <div data-component>
-            <div class="row">
-                <div class="small-12 island">
-                    <section>
-                        <ul class="information-list threaded">
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <a href="#">
-                                            <img src="/portrait.php?userId=8&size=square64" />
-                                            <h3>Class Cancelled - 21st June</h3>
-                                        </a>
-                                        <p class="meta">
-                                            Posted by <a href="/search/user/3">Ms Celia Glenn</a> 2 days ago
-                                        </p>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a class="icon-modify no-text" href="#" title="Modify"></a>
-                                </nav>
-                                <article>
-                                    <p>Come and see why Schoolbox is more than a school.&nbsp;&nbsp;You can find out more about the broad range of learning experiences offered - from academia,
-                                        internationalism and earth studies, to sensational music, theatre and sport.&nbsp; Talk to students, staff&nbsp;and parents to learn more at Open Day.&nbsp;&nbsp;<br><br>Caulfield
-                                        Grammar's three metropolitan campuses -&nbsp;Schoolbox&nbsp;Campus, Mars Campus and Venus Campus will conduct Open Days on:</p>
-                                    <blockquote>
-                                        <ul>
-                                            <li><strong>Saturday 17 August, 11am - 3pm</strong></li>
-                                        </ul>
-                                    </blockquote>
-                                    <p>Of course tours are available at any time. Please&nbsp;<a href="http://www.schoolbox.com.au" target="_self">contact us</a>&nbsp;to arrange an appointment.</p>
-                                </article>
-                            </li>
-                            <li class="actions-small-4">
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <a href="#">
-                                            <img src="/portrait.php?userId=8&size=square64" />
-                                            <h3>Article content, lots of action buttons</h3>
-                                        </a>
-                                        <p class="meta">
-                                            Posted by <a href="/search/user/3">Ms Celia Glenn</a> 2 days ago
-                                        </p>
-                                        <p class="meta">
-                                            Some other meta information
-                                        </p>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a class="icon-modify no-text" href="#" title="Modify"></a>
-                                    <a class="icon-modify no-text" href="#" title="Modify"></a>
-                                    <a class="icon-modify no-text" href="#" title="Modify"></a>
-                                    <a class="icon-modify no-text" href="#" title="Modify"></a>
-                                </nav>
-                                <article>
-                                    <p>
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla dignissim magna sed sollicitudin semper. Morbi vitae efficitur turpis. Morbi at urna quis est sodales fringilla sit amet sed ante. Integer vitae nulla suscipit, tempor velit non, pharetra est. In condimentum augue sit amet ante pharetra consequat. Suspendisse tristique sem quis tortor laoreet egestas. Integer feugiat quam id efficitur lobortis. Sed pharetra sagittis maximus. Aliquam erat volutpat. Suspendisse potenti. Curabitur vitae nisl pretium, hendrerit odio at, finibus nisi. Donec ullamcorper mi mauris, id facilisis mauris commodo at. Curabitur semper lacinia ante. Vestibulum nisl elit, auctor non orci eu, cursus porta metus. Nunc dignissim lectus id mauris posuere laoreet.
-                                    </p>
-                                </article>
-                            </li>
-                            <li>
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <a href="#">
-                                            <img src="/portrait.php?userId=8&size=square64" />
-                                            <h3>Article content, no nav element</h3>
-                                        </a>
-                                        <p class="meta">
-                                            Posted by <a href="/search/user/3">Ms Celia Glenn</a> 2 days ago
-                                        </p>
-                                        <p class="meta">
-                                            Some other meta information
-                                        </p>
-                                    </div>
-                                </div>
-                                <article>
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla dignissim magna sed sollicitudin semper. Morbi vitae efficitur turpis.</p>
-                                    <p> Morbi at urna quis est sodales fringilla sit amet sed ante. Integer vitae nulla suscipit, tempor velit non, pharetra est. In condimentum augue sit amet ante pharetra consequat. Suspendisse tristique sem quis tortor laoreet egestas. Integer feugiat quam id efficitur lobortis. Sed pharetra sagittis maximus. Aliquam erat volutpat.</p>
-                                </article>
-                            </li>
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <a href='#'>
-                                            <img src="/portrait.php?userId=135&size=square64" width="48" />
-                                            <h3>Shakespeare IV</h3>
-                                        </a>
-                                        <p class="meta">
-                                            Posted by <a href="/search/user/3">Ms Celia Glenn</a> 3 years ago
-                                        </p>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a class="icon-modify no-text" href="#" title="Modify"></a>
-                                </nav>
-                            </li>
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <img src="/portrait.php?userId=137&size=square64" />
-                                        <h3>The Short Man (no link)</h3>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a class="icon-modify no-text" href="#" title="Modify"></a>
-                                </nav>
-                            </li>
-                            <li>
-                                <div class="card small-12">
-                                    <img src="/portrait.php?userId=0&size=square64" />
-                                    <textarea placeholder="Your comment...">Behold my acrid comment. Wither before my scorn!</textarea>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <img src="/portrait.php?userId=8&size=square64" width="48" />
-                                        <ul class="spaced">
-                                            <li><h3><a href="#">Piano</a></h3></li>
-                                            <li><h3><a href="#">Excursion 1</a></h3></li>
-                                            <li><h3><a href="#">Horse Riding</a></h3></li>
-                                            <li><h3><a href="#">3A Class Page</a></h3></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <a href='#'>
-                                            <img class="mime" src="/images/mime/application-msword.svg" height="60" width="60"/>
-                                            <h3>Shakespeare in Love</h3>
-                                        </a>
-                                        <p class="meta">
-                                            Posted by <a href="/search/user/3">Ms Celia Glenn</a> 3 years ago
-                                        </p>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a class="icon-modify no-text" href="#" title="Modify"></a>
-                                </nav>
-                            </li>
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="compact card small-12">
-                                        <a href='#'>
-                                            <div class="icon-home"></div>
-                                            <h3>Compact Icon - Shakespeare in Love</h3>
-                                        </a>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a class="icon-modify no-text" href="#" title="Modify"></a>
-                                </nav>
-                            </li>
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="compact card small-12">
-                                        <a href='#'>
-                                            <img class="mime" src="/images/mime/application-msword.svg" height="60" width="60"/>
-                                            <h3>Compact Mime - Shakespeare in Love</h3>
-                                        </a>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a class="icon-modify no-text" href="#" title="Modify"></a>
-                                </nav>
-                            </li>
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="compact card small-12">
-                                        <a href='#'>
-                                            <img src="/portrait.php?userId=8&amp;size=square64" />
-                                            <p>
-                                                Ms Celia Glenn
-                                                <span class="pipe meta">Replied 2 minutes ago</span>
-                                            </p>
-                                        </a>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a class="icon-modify no-text" href="#" title="Modify"></a>
-                                </nav>
-                            </li>
-                            <li>
-                                <div class="tiny card small-12">
-                                    <a href='#'>
-                                        <img src="/portrait.php?userId=8&amp;size=square64" />
-                                        <h3>Tiny Card</h3>
-                                    </a>
-                                </div>
-                            </li>
-                            <li class="actions-small-2">
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <a href="#">
-                                            <h3>Card with no img</h3>
-                                        </a>
-                                        <p class="meta">
-                                            Meta meta meta meta meta...
-                                        </p>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a href="#" class="icon-poll no-text" title="View Results"></a>
-                                    <a href="#" class="icon-modify no-text" title="Modify"></a>
-                                </nav>
-                                <article>
-                                    <p>
-                                        Four dollar toast migas quinoa roof party. Helvetica heirloom PBR&B bicycle rights.
-                                        Wayfarers skateboard biodiesel roof party letterpress. Food truck pickled direct
-                                        trade Portland. Hoodie mustache Carles cred, single-origin coffee asymmetrical beard
-                                        brunch. Freegan trust fund tote bag, skateboard keffiyeh hoodie art party pork belly
-                                        pop-up seitan cardigan ethical readymade. Seitan Bushwick dreamcatcher tofu.
-                                    </p>
-                                </article>
-                            </li>
-                            <li>
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <a href='#'>
-                                            <img src="/portrait.php?userId=8&size=square64" width="48" />
-                                            <h3>
-                                                Ms Celia Glenn
-                                            </h3>
-                                        </a>
-                                        <p class="meta">Senior Staff</p>
-                                    </div>
-                                    <div class="progress">
-                                        <span class="meter" style="width:70%"></span>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="card small-12">
-                                    <p class="meta title">The First Section of a Quiz/Survey</p>
-                                    <p class="meta"><span>13</span>% complete</p>
-                                </div>
-                                <div class="progress">
-                                    <span class="meter" style="width:13%"></span>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <a href="/search/user/243" title="View Profile">
-                                            <img src="/portrait.php?userId=306&amp;size=square64" alt="View Profile">
-                                            <h3>Bowman, Dana</h3>
-                                        </a>
-                                        <span class="label status neutral">Unsubmitted</span>
-                                    </div>
-                                </div>
-                            </li>
-                            <li class="actions-small-1 actions-medium-2 actions-large-3">
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <a href="#">
-                                            <div class="icon-quiz size-32"></div>
-                                            <h3>What did you learn from today's reading?</h3>
-                                            <p class="meta">Completed</p>
-                                        </a>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <span class="show-for-large-up">
-                                        <a href="#" class="icon-poll" title="View Results"></a>
-                                        <a href="#" class="icon-modify" title="Modify"></a>
-                                        <a href="#" class="icon-approve" title="Review"></a>
-                                    </span>
-
-                                    <span class="hide-for-large-up">
-                                        <a href="#" class="icon-overflow"></a>
-                                    </span>
-                                </nav>
-                            </li>
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <h3>ActiveInspire Flipchart</h3>
-
-                                        <div class="row">
-                                            <div class="small-12 medium-4 columns no-pad">
-                                                <span class="meta">application/Inspire</span>
-                                            </div>
-                                            <div class="small-12 medium-2 columns no-pad">
-                                                <span class="meta">500 MB</span>
-                                            </div>
-                                            <div class="small-12 medium-3 columns no-pad">
-                                                <span class="meta">External</span>
-                                            </div>
-                                            <div class="small-12 columns no-pad">
-                                                <span class="label status alert">Disabled</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="small-12 columns">
-                                                <div class="label-group">
-                                                    <span class="label neutral">flipchart</span>
-                                                    <span class="label neutral">flipchart</span>
-                                                    <span class="label neutral">flipchart</span>
-                                                    <span class="label neutral">flipchart</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a href="#" class="icon-modify" title="Modify"></a>
-                                </nav>
-                            </li>
-                            <li>
-                                <div class="card small-12">
-                                    <a href='#'>
-                                        <img src="/portrait.php?userId=8&size=square64" width="48" />
-                                    </a>
-                                    <h3>
-                                        Super-long content that will overflow with ellipses, because <a href="/search/user/3">Ms Celia Glenn</a> opened a Research Project <a href="/learning/assessments/310/status">Assessment out of Total</a> in a certain subject that we won't tell you about, because that would make it too easy. You'll have to go searching around your subjects instead to find out which one she posted it in. Don't blame us. We just like to keep things interesting.
-                                    </h3>
-                                    <p class="meta">
-                                        Four dollar toast migas quinoa roof party. Helvetica heirloom PBR&B bicycle rights.
-                                        Wayfarers skateboard biodiesel roof party letterpress. Food truck pickled direct
-                                        trade Portland. Hoodie mustache Carles cred, single-origin coffee asymmetrical beard
-                                        brunch. Freegan trust fund tote bag, skateboard keffiyeh hoodie art party pork belly
-                                        pop-up seitan cardigan ethical readymade. Seitan Bushwick dreamcatcher tofu.
-                                    </p>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="card wrap-down small-12">
-                                    <a href='#'>
-                                        <img src="/portrait.php?userId=8&size=square64" width="48" />
-                                    </a>
-                                    <p>
-                                        Super-long content that <strong>DOES NOT</strong> overflow, no matter how long the content gets. <a href="/search/user/3">Ms Celia Glenn</a> can open Research Projects all she likes, but the fact remains that this content will wrap down rather than overflow. Given how long the text is, you should be able to see that it keeps its alignment rather than falling under the image.
-                                    </p>
-                                    <p class="meta spaced">
-                                        Four dollar toast migas quinoa roof party. Helvetica heirloom PBR&B bicycle rights.
-                                        Wayfarers skateboard biodiesel roof party letterpress. Food truck pickled direct
-                                        trade Portland. Hoodie mustache Carles cred, single-origin coffee asymmetrical beard
-                                        brunch. Freegan trust fund tote bag, skateboard keffiyeh hoodie art party pork belly
-                                        pop-up seitan cardigan ethical readymade. Seitan Bushwick dreamcatcher tofu.
-                                    </p>
-                                </div>
-                            </li>
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="card wrap-down small-12">
-                                        <a href='#'>
-                                            <img src="/images/icon.php?icon=duework&size=64" width="64" />
-                                        </a>
-                                        <p>
-                                            This is an example notification that would appear in the sidebar. When it's too long, it will wrap down rather than overflow into ellipses, because the information is considered to be sufficiently important that you need to be able to read all of it all the time. Not this useless drivel, of course, but when it comes to actual content, you want to be able to read the entire message.
-                                        </p>
-                                        <p class="meta spaced">2 minutes ago</p>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a href="#" class="icon-approve no-text" title="Mark as Read"></a>
-                                </nav>
-                            </li>
-                            <li data-student="234">
-                                <div class="actions-small-1 actions-medium-2">
-                                    <div class="list-item">
-                                        <div class="card small-12">
-                                            <a href="#" title="View Profile">
-                                                <img src="/portrait.php?userId=135&amp;size=square64" alt="View Profile">
-                                                <p>Rhodes, David</p>
-                                            </a>
-                                            <span class="label status neutral">Complicated Example</span>
-                                        </div>
-                                    </div>
-                                    <article>
-                                        <select>
-                                            <option value="Absent" selected="selected">Absent</option>
-                                            <option value="Not Assessed">Not Assessed</option>
-                                            <option value="Not Submitted">Not Submitted</option>
-                                            <option value="Submitted">Submitted</option>
-                                            <option value="Pending">Pending</option>
-                                        </select>
-
-                                        <label>
-                                            <textarea class="comment valid no-margin" name="comment" rows="4">Student was not in attendance. Naughty, naughty student.</textarea>
-                                        </label>
-
-                                        <input type="hidden" class="uid" name="uid" value="234">
-                                        <input type="hidden" class="box_id" name="box_id" value="42">
-                                        <input type="hidden" class="mark-update" name="markUpdate" value="true">
-                                    </article>
-                                    <nav>
-                                        <span class="show-for-medium-up">
-                                            <a href="#" class="icon-view" title="View Submission"></a>
-                                            <a href="#" class="icon-history" title="View Submission History"></a>
-                                        </span>
-                                        <span class="show-for-small-only">
-                                            <a href="#" class="icon-more" data-dropdown="row-options-234" title="Actions"></a>
-                                        </span>
-                                    </nav>
-                                    <ul class="f-dropdown" data-dropdown-content="" id="row-options-234">
-                                        <li><a href="#" class="icon-view">View Submission</a></li>
-                                        <li><a href="#" class="icon-history">View History</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="card attachment small-12">
-                                    <a href="#">
-                                        <img src="/images/mime/application-text.svg" alt="Windows 95.exe" />
-                                        <p>windows-95.exe</p>
-                                    </a>
-                                </div>
-                                <article class="grade">
-                                    <span class="gradient-1">92%</span>
-                                    <p class="meta">Plagiarism Check</p>
-                                </article>
-                            </li>
-                            <li class="child">
-                                <div class="content">
-                                    <h3>This is a child element of a thread.</h3>
-                                    <p class="meta">This style is also used in replies of the <code>social-stream</code> class</p>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="card small-12 removed">
-                                    <img src="/portrait.php?userId=135&amp;size=square64" alt="View Profile">
-                                    <h3>This item has been removed, disabled, or archived</h3>
-                                    <p class="meta">Or some other kind of not-quite-deleted state</p>
-                                </div>
-                            </li>
-                            <li>
-                                <a class="link-row">
-                                    <div class="card small-12">
-                                        <img src="/portrait.php?userId=88&amp;size=square64" alt="View Profile">
-                                        <h3>This whole card is a clickable area</h3>
-                                        <p class="meta">meta</p>
-                                    </div>
+    </div>
+</div>
+<div data-component>
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                <ul class="information-list threaded">
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="card small-12">
+                                <a href="#">
+                                    <img src="/portrait.php?userId=8&size=square64" />
+                                    <h3>Class Cancelled - 21st June</h3>
                                 </a>
-                             </li>
-                        </ul>
-                        <div class="component-action">
-                            <section>
-                                <a class="button">Component Actions</a>
-                                <a class="button">Email all</a>
-                            </section>
+                                <p class="meta">
+                                    Posted by <a href="/search/user/3">Ms Celia Glenn</a> 2 days ago
+                                </p>
+                            </div>
                         </div>
+                        <nav>
+                            <a class="icon-modify no-text" href="#" title="Modify"></a>
+                        </nav>
+                        <article>
+                            <p>Come and see why Schoolbox is more than a school.&nbsp;&nbsp;You can find out more about the broad range of learning experiences offered - from academia,
+                                internationalism and earth studies, to sensational music, theatre and sport.&nbsp; Talk to students, staff&nbsp;and parents to learn more at Open Day.</p>
+                        </article>
+                    </li>
+                    <li class="child">
+                        <div class="content">
+                            <h3>This is a child element of a thread.</h3>
+                            <p class="meta">This style is also used in replies of the <code>social-stream</code> class</p>
+                        </div>
+                    </li>
+                </ul>
+                <div class="component-action">
+                    <section>
+                        <a class="button">Component Actions</a>
+                        <a class="button">View More</a>
                     </section>
                 </div>
-            </div>
+            </section>
         </div>
     </div>
 </div>
-
 <div class="row" data-equalizer>
     <div class="small-12 medium-6 island">
         <h2 class="subheader" id="labels">Labels</h2>
@@ -1130,11 +698,8 @@
         <h2 class="subheader" id="lightbox">Lightbox</h2>
         <section class="content">
             <ul class="inline-list img-gallery" data-image-gallery>
-                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/comet.jpg" title="Image 1" rel="lightbox-1"><img src="//foundation.zurb.com/docs/assets/img/examples/comet-th-sm.jpg" alt="Image 1"></a></li>
-                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/earth.jpg" title="Image 2" rel="lightbox-2"><img src="//foundation.zurb.com/docs/assets/img/examples/earth-th-sm.jpg" alt="Image 2"></a></li>
-                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/launch.jpg" title="Image 3" rel="lightbox-3"><img src="//foundation.zurb.com/docs/assets/img/examples/launch-th-sm.jpg" alt="Image 3"></a></li>
-                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/satelite.jpg" title="Image 4" rel="lightbox-4"><img src="//foundation.zurb.com/docs/assets/img/examples/satelite-th-sm.jpg" alt="Image 4"></a></li>
-                <li><a href="http://foundation.zurb.com/docs/assets/img/examples/space.jpg" title="Image 5" rel="lightbox-5"><img src="//foundation.zurb.com/docs/assets/img/examples/space-th-sm.jpg" alt="Image 5"></a></li>
+                <li><a href="/send.php?id=215" title="Image 1" rel="lightbox-1"><img src="/send.php?id=215" width="155" alt="Image 1"></a></li>
+                <li><a href="/send.php?id=216" title="Image 2" rel="lightbox-2"><img src="/send.php?id=216" width="150" alt="Image 2"></a></li>
             </ul>
         </section>
         <script type="text/javascript">

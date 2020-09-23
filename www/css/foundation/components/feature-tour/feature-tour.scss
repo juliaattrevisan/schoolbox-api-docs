@@ -176,6 +176,11 @@ $tooltip-padding: 1rem;
   flex: 1 auto;
 }
 
+.introjs-skipbutton,
+.introjs-prevbutton {
+  margin-right: 1px;
+}
+
 .introjs-donebutton {
   width: 100%;
   margin-right: 0;
@@ -195,12 +200,8 @@ $tooltip-padding: 1rem;
   }
 }
 
-.introjs-nextbutton {
-  margin-left: 1px;
-
-  &.introjs-fullbutton {
+.introjs-nextbutton.introjs-fullbutton {
     border-radius: 0;
-  }
 }
 
 .introjs-startbutton,
