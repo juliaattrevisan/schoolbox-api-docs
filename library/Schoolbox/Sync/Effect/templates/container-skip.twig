@@ -1,4 +1,4 @@
-<li id="effect-{{ currentEffect.id }}" class="actions-small-1 content" data-effect data-locked="{{ meta.effect[currentEffect.id].lock.status }}">
+<div id="effect-{{ currentEffect.id }}" class="actions-small-1" data-effect data-locked="{{ meta.effect[currentEffect.id].lock.status ?? 0 }}">
     <input type="hidden" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][type]" value="3">
 
     <div class="list-item">
@@ -9,18 +9,16 @@
 
             <div class="small-10 medium-11 large-11 columns">
                 Skip
-
                 <input type="hidden" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][userProperty]" value="" />
             </div>
+            {% set status = meta.effect[currentEffect.id].status ?? false %}
 
-            <div>
-                <div class="small-12 columns">
-                    <span id='effect-{{ currentEffect.id }}-status' data-label-status class="label highlight full-width {{ meta.effect[currentEffect.id].status ? '' : 'hide' }}">{{ meta.effect[currentEffect.id].status }}</span>
-                </div>
+            <div class="small-12 columns {{ status ? '' : 'hide' }}">
+                <div id='effect-{{ currentEffect.id }}-status' data-label-status class="label highlight full-width">{{ status }}</div>
             </div>
         </div>
     </div>
     <nav>
         <a href="/adminv2/ups/effect/delete/{{ currentEffect.id }}" class="icon-delete" title="Delete" data-effect-delete="{{ currentEffect.id }}"></a>
     </nav>
-</li>
+</div>
