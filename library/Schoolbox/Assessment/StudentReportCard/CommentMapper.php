@@ -75,7 +75,7 @@ class CommentMapper extends Mapper
             FROM {$this->getTable()} as `com`
             LEFT JOIN {$this->getJoinSql('category','com','cat')}
             LEFT JOIN {$this->getJoinSql('student','com','su')}
-            LEFT JOIN {$this->getJoinSql('commenter','com','cu')}
+            LEFT JOIN {$this->getJoinSql('commenter','com','cu', true)}
             LEFT JOIN {$commenterMapper->getJoinSql('role','cu','r')}
             WHERE com.student_id = ?
             AND com.category_id = ?
