@@ -10,9 +10,8 @@ namespace Schoolbox\Blog\Homepage\Post;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
-use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
-use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
+use Schoolbox\Blog\Homepage\Post\Model as BlogPost;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Feed\SourceInterface;
@@ -25,7 +24,6 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -68,7 +66,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return $c;
         }
 
-        /** @var BlogModel[]|Collection $blogs */
+        /** @var BlogPost[]|Collection $blogs */
         $blogs = $this->mapper->findForFeed($context, $limit, $offset);
 
         foreach ($blogs as $blog) {
@@ -101,39 +99,40 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     /* ASYNC NOTIFICATION METHODS */
 
     /**
-     * @param string    $roletype
-     * @param BlogModel $blog
-     * @param User      $author
+     * @param string   $roletype
+     * @param BlogPost $blog
+     * @param User     $author
      * @return Envelope
      */
-    protected function notifyPosted($roletype, $blog, $author)
+    protected function notifyPosted(string $roletype, BlogPost $blog, User $author): Envelope
     {
         $envelope = new Envelope();
 
         $blogId = $blog->getId();
 
-        $authorExtId = $author->getExternalId();
-
         $folderId = $blog->getFolder()->getId();
 
-        /** @var FolderModel $folder */
-        $folder = FolderMapper::getInstance()->findById($folderId);
+        try {
+            $folder = FolderMapper::getInstance()->findById($folderId);
+        } catch (BaseMapper\Exception $e) {
+            return $envelope;
+        }
 
         $bob = new Builder();
 
         $bob->setTitle(':author blogged about :title in :catname')
             ->setParams([
-                'author'  => new UserParam($author, ParameterInterface::STACKING_REPLACE),
+                'author'  => new UserParam($author),
                 'title'   => new Param($blog->getHeading(), "/blog/$blogId"),
                 'catname' => new CategoryParam($folder),
             ])
-            ->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
+            ->setIcon($this->getUserIcon($author))
             ->setHref("/blog/$blogId")
             ->setSeverity(Logger::INFO)
             ->setNamespace($this->getSlug())
             ->addTopic("{$this->getSlug()}.$blogId.posted")
             ->setTimestamp($blog->getCreatedAt()->getUnixTimeStamp())
-            ->addFilter('roletype', $roletype)
+            ->addFilter('roletype', [$roletype])
             ->setBody($blog->getBody());
 
         $envelope->broadcastToCategory($folderId, UserAccess::ACCESS_READ, $bob->build());
@@ -143,9 +142,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
-     * @param BlogModel $blog
-     * @param User      $author
-     * @param array     $diff
+     * @param BlogPost   $blog
+     * @param User       $author
+     * @param array|null $diff
      * @return Envelope
      */
     public function notifyStaffPosted($blog, $author, $diff = null)
@@ -155,9 +154,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
 
     /**
-     * @param BlogModel $blog
-     * @param User      $author
-     * @param array     $diff
+     * @param BlogPost   $blog
+     * @param User       $author
+     * @param array|null $diff
      * @return Envelope
      */
     public function notifyStudentPosted($blog, $author, $diff = null)
@@ -166,13 +165,13 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     }
 
     /**
-     * @param BlogModel $blog
-     * @param User      $author
-     * @param array     $diff
+     * @param BlogPost   $blog
+     * @param User       $author
+     * @param array|null $diff
      * @return Envelope
      */
     public function notifyParentPosted($blog, $author, $diff = null)
     {
         return $this->notifyPosted(Role::PARENT, $blog, $author);
     }
-} 
+}

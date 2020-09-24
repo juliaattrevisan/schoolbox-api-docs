@@ -18,7 +18,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
-use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
@@ -174,41 +173,39 @@ class CommentNotifier extends AbstractModuleNotifier
         $category->loadTeachers();
 
         $term = $this->termMapper->findForToday();
-        $href = sprintf("/learning/grades/%s/%s/%s", $student->getId(), $term->getCode(), $category->getId());
+        $href = sprintf("/learning/grades/%s/%s/%s#comments", $student->getId(), $term->getCode(), $category->getId());
 
         // create base essentials first
         $bob->setNamespace(NSMapper::NS_REPORT_CARD)
-            ->setIcon("/portrait.php?size={$this->iconSize}&userId=" . $author->getExternalId())
+            ->setIcon($this->getUserIcon($author))
             ->setHref($href)
             ->setBody($comment->getBody())
             ->setSeverity(Logger::WARNING)
             ->addTopic("report_card.{$category->getId()}.{$student->getId()}.commented")
             ->setParams([
                 'author'   => new UserParam($author),
-                'category' => new CategoryParam($category),
-                'grades'   => new Param('grades', $href),
+                'category' => new Param($category->getTitle(), $href, ParameterInterface::STACKING_APPEND),
             ]);
-
 
         // send to student (if relevant)
         if ($author->getId() != $student->getId() && $comment->getStudentVisibility()) {
-            $bob->setTitle(":author commented on your :grades in :category");
+            $bob->setTitle(":author commented on your grades in :category");
 
             $envelope->targetToUser($student->getId(), $bob->build());
         }
 
         // revise text...
-        $bob->setTitle(":author commented on :student's :grades in :category");
+        $bob->setTitle(":author commented on :student's grades in :category");
 
         // send to parents (if relevant)
         if ($comment->getParentVisibility()) {
             // parents don't need to see their child's surname in the message
-            $bob->setParam('student', new UserParam($student, ParameterInterface::STACKING_REPLACE, '{firstname}'));
+            $bob->setParam('student', new UserParam($student, ParameterInterface::STACKING_APPEND, '{firstname}'));
             $envelope->targetToParent($student->getId(), $bob->build());
         }
 
         // teachers do though
-        $bob->setParam('student', new UserParam($student, ParameterInterface::STACKING_REPLACE));
+        $bob->setParam('student', new UserParam($student));
 
         // and send to class teacher(s)
         foreach ($category->getTeachers() as $staff) {

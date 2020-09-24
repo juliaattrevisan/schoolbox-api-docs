@@ -100,18 +100,21 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param string     $body
      * @param string     $label
      * @param UserAccess $userAccess
-     * @param User       $effector
+     * @param User|null  $effector
      * @return Envelope
      */
-    protected function notifyAdmin($body, $label, $userAccess, $effector = null)
+    protected function notifyAdmin(string $body, string $label, UserAccess $userAccess, ?User $effector = null)
     {
         $envelope = new Envelope();
 
         $bob = new Builder();
 
-        $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
-
-        $user = UserMapper::getInstance()->findById($userAccess->getUser()->getId());
+        try {
+            $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
+            $user = UserMapper::getInstance()->findById($userAccess->getUser()->getId());
+        } catch (Exception $e) {
+            return $envelope;
+        }
 
         /** @var ParameterInterface[] $params */
         $params = [
@@ -120,12 +123,12 @@ class UserAccessNotifier extends AbstractModuleNotifier
         ];
 
         if ($effector) {
-            $params['effector'] = new UserParam($effector, ParameterInterface::STACKING_REPLACE);
+            $params['effector'] = new UserParam($effector);
         }
 
         $bob->setTitle($body)
             ->setHref("/group/modify/" . $cat->getId())
-            ->setIcon("/portrait.php?size={$this->iconSize}&userId=" . $user->getExternalId())
+            ->setIcon($this->getUserIcon($effector ?? $user))
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addTopic("group.{$cat->getId()}.$label")
@@ -142,8 +145,14 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param User       $user
      * @return Envelope
      */
-    protected function notifyJoined($userAccess, $user)
+    protected function notifyJoined(UserAccess $userAccess, User $user): Envelope
     {
+        try {
+            $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
+        } catch (Exception $e) {
+            return new Envelope();
+        }
+
         if ($userAccess->getUser()->getId() == $user->getId()) {
             $envelope = $this->notifyAdmin(':user joined :groupname', self::TRIGGER_JOINED, $userAccess);
         } else {
@@ -151,19 +160,16 @@ class UserAccessNotifier extends AbstractModuleNotifier
         }
 
         $bob = new Builder();
-        $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
-
         $bob->setTitle(':moderator has added you to :groupname')
             ->setSeverity(Logger::NOTICE)
             ->setHref('/')
-            ->setIcon("/portrait.php?size={$this->iconSize}&userId={$user->getExternalId()}")
+            ->setIcon($this->getUserIcon($user))
             ->setNamespace($this->getSlug())
             ->setParams([
                 'moderator' => new UserParam($user),
-                'groupname' => new CategoryParam($cat, Param::STACKING_REPLACE)
+                'groupname' => new CategoryParam($cat, Param::STACKING_APPEND),
             ])
-            ->addTopic("group.{$cat->getId()}.".self::TRIGGER_APPROVED)
-        ;
+            ->addTopic("group.{$cat->getId()}." . self::TRIGGER_APPROVED);
 
         $envelope->targetToUser($userAccess->getUser(), $bob->build());
 
@@ -209,8 +215,13 @@ class UserAccessNotifier extends AbstractModuleNotifier
      * @param User       $user
      * @return Envelope
      */
-    protected function notifyLeft($userAccess, $user)
+    protected function notifyLeft(UserAccess $userAccess, User $user): Envelope
     {
+        try {
+            $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
+        } catch (Exception $e) {
+            return new Envelope();
+        }
         if ($userAccess->getUser()->getId() == $user->getId()) {
             $envelope = $this->notifyAdmin(':user left :groupname', self::TRIGGER_LEFT, $userAccess);
         } else {
@@ -218,21 +229,19 @@ class UserAccessNotifier extends AbstractModuleNotifier
         }
 
         $bob = new Builder();
-        $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
 
         $bob->setTitle(':moderator has removed you from :groupname')
             ->setSeverity(Logger::NOTICE)
             ->setHref('/')
-            ->setIcon("/portrait.php?size={$this->iconSize}&userId={$user->getExternalId()}")
+            ->setIcon($this->getUserIcon($user))
             ->setNamespace($this->getSlug())
             ->setParams([
                 'moderator' => new UserParam($user),
-                'groupname' => new CategoryParam($cat, Param::STACKING_REPLACE)
+                'groupname' => new CategoryParam($cat, Param::STACKING_APPEND),
             ])
             // Adding information of the target user, so that it won't stack the same messages to the different members.
             ->putMeta('member', $userAccess->getUser()->getId())
-            ->addTopic("group.{$cat->getId()}.".self::TRIGGER_APPROVED)
-        ;
+            ->addTopic("group.{$cat->getId()}." . self::TRIGGER_APPROVED);
 
         $envelope->targetToUser($userAccess->getUser(), $bob->build());
 
@@ -321,10 +330,10 @@ class UserAccessNotifier extends AbstractModuleNotifier
     /**
      * @param UserAccess $userAccess
      * @param User       $user
-     * @param array      $diff
+     * @param array|null $diff
      * @return Envelope
      */
-    protected function notifyApproved($userAccess, $user, $diff = null)
+    protected function notifyApproved(UserAccess $userAccess, User $user, ?array $diff = null): Envelope
     {
         if ($userAccess->getUser()->getId() == $user->getId()) {
             $envelope = $this->notifyAdmin(':user joined :groupname', self::TRIGGER_JOINED, $userAccess);
@@ -342,8 +351,11 @@ class UserAccessNotifier extends AbstractModuleNotifier
 //		$newAccess = $diff['accessLevel'][0];
 //		$oldAccess = $diff['accessLevel'][1];
 
-        // no try-catch: mapper exceptions are caught by the worker
-        $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
+        try {
+            $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
+        } catch (Exception $e) {
+            return new Envelope();
+        }
 
         // Customize the approval message
         switch ($userAccess->getAccessLevel()) {
@@ -365,14 +377,14 @@ class UserAccessNotifier extends AbstractModuleNotifier
         }
 
         $bob = new Builder();
-        
+
         $bob->setTitle($messageText)
             ->setSeverity(Logger::NOTICE)
             ->setHref("/homepage/{$cat->getId()}")
-            ->setIcon("/portrait.php?size={$this->iconSize}&userId={$user->getExternalId()}")
+            ->setIcon($this->getUserIcon($user))
             ->setNamespace($this->getSlug())
             ->setParams([
-                'moderator' => new UserParam($user, Param::STACKING_REPLACE),
+                'moderator' => new UserParam($user),
                 'groupname' => new CategoryParam($cat)
             ])
             // Adding information of the target user, so that it won't stack the same messages to the different members.
@@ -389,7 +401,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
     /**
      * @param UserAccess $userAccess
      * @param User       $user
-     * @param array      $diff
+     * @param array|null $diff
      * @return Envelope
      */
     public function notifyStaffApproved($userAccess, $user, $diff = null)
@@ -401,7 +413,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
     /**
      * @param UserAccess $userAccess
      * @param User       $user
-     * @param array      $diff
+     * @param array|null $diff
      * @return Envelope
      */
     public function notifyStudentApproved($userAccess, $user, $diff = null)
@@ -413,7 +425,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
     /**
      * @param UserAccess $userAccess
      * @param User       $user
-     * @param array      $diff
+     * @param array|null $diff
      * @return Envelope
      */
     public function notifyParentApproved($userAccess, $user, $diff = null)

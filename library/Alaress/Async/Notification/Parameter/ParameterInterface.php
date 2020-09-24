@@ -62,4 +62,10 @@ interface ParameterInterface extends JsonSerializable
      */
     public function setTimestamp(int $timestamp): void;
 
+
+    /**
+     * Used as a key to this param, to remove duplicates
+     * @return string
+     */
+    public function getHash();
 }
