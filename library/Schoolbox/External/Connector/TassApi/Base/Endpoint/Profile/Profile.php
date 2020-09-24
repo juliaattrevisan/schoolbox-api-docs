@@ -454,11 +454,9 @@ class Profile implements IStrategy
         if (\count($emergencyContacts['commrules'])) {
             foreach ($emergencyContacts['commrules'][0]['addresses'] as $emergencyContact) {
 
-                /* Sigh mothers and fathers appear in the same record
-                 * To prevent duping, designate a key for them
+                /* Use addressee instead of m_ and f_ fields
                  */
-                $father = "{$emergencyContact['f_preferred_name']} {$emergencyContact['f_surname']}";
-                $mother = "{$emergencyContact['m_preferred_name']} {$emergencyContact['m_surname']}";
+                $name = $emergencyContact['addressee'];
 
                 /* + Assumption: Indeterminant phone numbers
                  * Phone numbers are indeterminant; we can't tell to whom they belong
@@ -471,17 +469,15 @@ class Profile implements IStrategy
                  */
                 $mobilePhone = array_values(array_filter([$emergencyContact['mobile_phone_1'], $emergencyContact['mobile_phone_2']]))[0] ?? '';
 
-                /* Father record seems to precede mother record...as per "traditional norms"
+                /* Dedupe anybody being listed twice with the same name
+                 * If you have two Tim Smiths who are different humans, they'll be deduped
+                 *
+                 * We can relax the deduping at the risk of showing the same guy twice,
+                 * if we want
                  */
-                $stack[$father] = [
-                    'name' => $father,
+                $stack[$name] = [
+                    'name' => $name,
                     'phone' => (string)$homePhone,
-                    'alt' => (string)$mobilePhone
-                ];
-
-                $stack[$mother] = [
-                    'name' => $mother,
-                    'phone' => (string)$emergencyContact['home_phone'],
                     'alt' => (string)$mobilePhone
                 ];
             }
