@@ -3,6 +3,8 @@
 ## Initial directory is where all the resources that are linked are included so save it for later use.
 initialdir=`pwd`;
 
+PHP_VERSION=$1
+
 ## Open up the datasets that we pulled in.
 tar xzf sales-dataset/sales.tar.gz
 tar xzf qa-container-config/qa-container-config.tar.gz
@@ -16,7 +18,14 @@ mkdir /var/lib/schoolbox
 ## Some installed things, can be moved out if we make a docker image of this
 apt update
 apt install git gzip -y
-apt install php7.1-fpm php7.1-pdo php7.1-mysql nginx -y
+
+if [ $PHP_VERSION == 'php7.4' ]
+then
+  apt install php7.4-fpm php7.4-pdo php7.4-mysql nginx -y
+else
+  apt install php7.1-fpm php7.1-pdo php7.1-mysql nginx -y
+fi
+
 apt install redis-server mysql-client grunt npm -y
 npm install grunt
 apt install mariadb-server -y
@@ -45,7 +54,14 @@ cp -rf $initialdir/schoolbox-develop/* /vagrant
 cp -f $initialdir/configfiles/dhparams.pem /etc/dhparams.pem
 cp -rf $initialdir/configfiles/nginx/* /etc/nginx
 cp -f $initialdir/configfiles/update-sql-no-prereq-test.sh /vagrant/tools/update-sql-nocheck.sh
-cp -rf $initialdir/configfiles/php/7.1/fpm/* /etc/php/7.1/fpm
+
+if [ $PHP_VERSION == 'php7.4' ]
+then
+  cp -rf $initialdir/configfiles/php/7.1/fpm/* /etc/php/7.4/fpm
+else
+  cp -rf $initialdir/configfiles/php/7.1/fpm/* /etc/php/7.1/fpm
+fi
+
 cp -f $initialdir/configfiles/redis/redis.conf /etc/redis/redis.conf
 cp -f $initialdir/configfiles/www-conf/conf.php /vagrant/www/conf/conf.php
 cp -rf $initialdir/data/* /vagrant/data
