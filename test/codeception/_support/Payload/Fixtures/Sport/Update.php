@@ -1,36 +1,4 @@
 <?php
-/*
- * https://vagrant.dev.schoolbox.cloud/fixtures/sports/4
- * 
- * 	Referer
-https://vagrant.dev.schoolbox.cloud/fixtures/sports/4/edit
-
-id	4
-name	Bam
-url	http://www.example.com
-positions[sportId][]	[…]
-0	4
-1	4
-2	4
-3	4
-4	4
-5	4
-positions[id][]	[…]
-0	13
-1	14
-2	15
-3	
-4	
-5	
-positions[name][]	[…]
-0	Hitter
-1	Runner
-2	Keeper
-3	Wow
-4	
-5	
- */
-
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
