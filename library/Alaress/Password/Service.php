@@ -27,7 +27,7 @@ class Service
     /**
      * Constructor
      *
-     * @param int $algorithm One of the PASSWORD_* constants
+     * @param string $algorithm One of the PASSWORD_* constants
      * @param int $cost      The algorithmic cost to use
      */
     public function __construct($algorithm = PASSWORD_DEFAULT, $cost = 10)
