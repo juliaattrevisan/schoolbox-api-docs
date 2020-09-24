@@ -71,7 +71,9 @@ class Module extends BaseModule
 
                                 /* Permission to NCEA Report and its button, controlled by STK
                                  */
-                                $availability = (new Availability($externalDb))->hasAccess((int)$student->getYear());
+                                $userYear = $student->getYear() ? $student->getYear()->getName() : '';
+
+                                $availability = (new Availability($externalDb))->hasAccess((int)$userYear);
 
                                 if (!$availability) {
                                     throw new Unauthorized('Unavailable for this student\'s year level due to OLE flag');

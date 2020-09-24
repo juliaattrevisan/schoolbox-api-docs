@@ -30,8 +30,10 @@ if (isset($_GET['query']) && strlen($_GET['query']) && isset($_GET['groupID']) &
         foreach($allStudents as $currentStudent) {
             $person = $currentStudent->getFullname() . ' - ';
 
-            if (is_numeric($currentStudent->getYear())) {
-                $person .= "Year {$currentStudent->getYear()}, ";
+            $userYear = $currentStudent->getYear() ? $currentStudent->getYear()->getName() : '';
+
+            if (is_numeric($userYear)) {
+                $person .= "{$currentStudent->getYear()->getLongName()}, ";
             }
 
             $person .= $currentStudent->getRole()->getName();

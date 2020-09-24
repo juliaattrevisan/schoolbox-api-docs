@@ -145,7 +145,7 @@ foreach ($userList as $user) {
                  */
                 $this->setVar([
                     'TIMETABLE_PERSON'  => $user->formatName(),
-                    'TIMETABLE_YEAR'    => $user->getYear() ? ', Year ' . $user->getYear() : '',
+                    'TIMETABLE_YEAR'    => $user->getYear() ? ', ' . $user->getYear()->getLongName() : '',
                     'TIMETABLE_USER_ID' => $user->getId(),
                     'CAMPUS_ID'         => $campus->getId(),
                     'CAMPUS_CODE'       => $campus->getExtTimetableCode(),

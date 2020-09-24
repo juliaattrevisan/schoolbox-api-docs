@@ -107,7 +107,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
              */
             $combined[$key]['user_id']              = $key;
             $combined[$key]['user_name']            = Scrub::smartQuotes($request->getUser()->formatName());
-            $combined[$key]['user_year']            = $request->getUser()->getYear();
+            $combined[$key]['user_year']            = $request->getUser()->getYear() ? $request->getUser()->getYear()->getName() : '';
             $combined[$key]['user_boarding_status'] = $request->getUser()->getAbbreviatedBoardingStatus();
 
             $combined[$key]['request_id'][$request->getId()]          = $request->getId();
