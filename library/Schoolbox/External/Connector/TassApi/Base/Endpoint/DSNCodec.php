@@ -46,7 +46,7 @@ class DSNCodec
      * followed by key-value pairs
      * separated by comma
      */
-    private const DSN_FORMAT = '/([a-zA-Z0-9]+):companycode=([A-Za-z0-9]+);appcode=([A-Za-z0-9]+);token=([A-Za-z0-9=]+)/';
+    private const DSN_FORMAT = '/([a-zA-Z0-9]+):companycode=([A-Za-z0-9]+);appcode=([A-Za-z0-9]+);token=([A-Za-z0-9=\/]+)/';
 
 
     /**

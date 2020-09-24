@@ -211,15 +211,15 @@ class Classes implements IStrategy
                          */
                         'teachers' => [
                             'externalId' => $subject['TCH_CODE'],
-                            'firstname' => $users[$externalId]['firstname'],
-                            'surname' => $users[$externalId]['lastname'],
+                            'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
+                            'surname' => $users[$externalId]['lastname'] ?? 'Unknown',
                         ],
 
                         'students' => [
                             [
                                 'externalId' => (string)$externalId,
-                                'firstname' => $users[$externalId]['firstname'],
-                                'surname' => $users[$externalId]['lastname'],
+                                'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
+                                'surname' => $users[$externalId]['lastname'] ?? 'Unknown',
                             ]
                         ],
                     ];
