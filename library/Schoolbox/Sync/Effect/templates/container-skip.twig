@@ -11,8 +11,10 @@
                 Skip
                 <input type="hidden" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][userProperty]" value="" />
             </div>
-            <div class="small-12 columns {{ meta.effect[currentEffect.id].status ? '' : 'hide' }}">
-                <div id='effect-{{ currentEffect.id }}-status' data-label-status class="label highlight full-width">{{ meta.effect[currentEffect.id].status }}</div>
+            {% set status = meta.effect[currentEffect.id].status ?? false %}
+
+            <div class="small-12 columns {{ status ? '' : 'hide' }}">
+                <div id='effect-{{ currentEffect.id }}-status' data-label-status class="label highlight full-width">{{ status }}</div>
             </div>
         </div>
     </div>
