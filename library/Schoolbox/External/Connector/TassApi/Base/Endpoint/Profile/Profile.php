@@ -469,7 +469,11 @@ class Profile implements IStrategy
                  */
                 $mobilePhone = array_values(array_filter([$emergencyContact['mobile_phone_1'], $emergencyContact['mobile_phone_2']]))[0] ?? '';
 
-                /* Father record seems to precede mother record...as per "traditional norms"
+                /* Dedupe anybody being listed twice with the same name
+                 * If you have two Tim Smiths who are different humans, they'll be deduped
+                 *
+                 * We can relax the deduping at the risk of showing the same guy twice,
+                 * if we want
                  */
                 $stack[$name] = [
                     'name' => $name,
