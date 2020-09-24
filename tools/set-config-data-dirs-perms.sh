@@ -53,6 +53,11 @@ function check_run_as_root(){
   fi
 }
 
+# Set PATH when invoked by cron
+function set_up_env(){
+  export PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games';
+}
+
 
 # Parse file system paths
 function parse_paths(){
@@ -248,6 +253,7 @@ function update_directories(){
 function main(){
   log "Updating data directory permissions";
   check_run_as_root
+  set_up_env
   parse_paths
   parse_available_data_dirs
   parse_cli_args "$@"
