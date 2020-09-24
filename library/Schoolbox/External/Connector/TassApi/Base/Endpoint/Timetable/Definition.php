@@ -374,7 +374,7 @@ class Definition implements IStrategy
 
         /* Explore all the Period data
          */
-        $days = range(1, $cycle['dayLength']);
+        $days = range(1, $cycle['cycleLength']);
         $periods = array_values($cycle['periods']);
 
         foreach ($days as $i => $dayIndex) {
