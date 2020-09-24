@@ -21,6 +21,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
+use function array_filter;
 use function array_key_exists;
 use function basename;
 use function closedir;
@@ -35,6 +36,7 @@ use function is_dir;
 use function is_resource;
 use function opendir;
 use function readdir;
+use function realpath;
 use function rmdir;
 use function shell_exec;
 use function sprintf;
@@ -129,9 +131,24 @@ class Migration extends CliTool\App
         $this->storageDir    = rtrim($this->getConfig()->get('storage_dir'), DIRECTORY_SEPARATOR);
         $this->byteFormat    = new Alaress_Byte_Format();
 
-        $this->fileSystemAwsS3 = $this->buildAwsS3FileSystem();
+        $this->fileSystemAwsS3 = $this->buildAwsS3FileSystemAndFetchS3Files();
 
         $this->migrateFiles();
+    }
+
+    /**
+     * Fetch the keys of all files found in the bucket in an array where the key is the element index
+     *
+     * @param S3Client $s3Client
+     * @param string   $bucketName
+     */
+    private function getFilesInS3(S3Client $s3Client, string $bucketName): void
+    {
+        $this->filesInS3  = [];
+        $this->getLogger()->notice("Fetching file list from S3, this may take a while on large datasets...");
+        foreach ($s3Client->getIterator('ListObjects', ['Bucket' => $bucketName, 'Prefix' => FilesystemFactory::PREFIX_STORAGE]) as $i => $object) {
+            $this->filesInS3[$object['Key']] = true;
+        }
     }
 
     /**
@@ -140,7 +157,7 @@ class Migration extends CliTool\App
      * @return Filesystem
      * @throws InvalidArgumentException
      */
-    private function buildAwsS3FileSystem(): Filesystem
+    private function buildAwsS3FileSystemAndFetchS3Files(): Filesystem
     {
         $s3AccessKey = trim($this->getConfig()->get('otfs_s3_cred_key') ?? "");
         $s3SecretKey = trim($this->getConfig()->get('otfs_s3_cred_secret') ?? "");
@@ -169,6 +186,8 @@ class Migration extends CliTool\App
             'version'     => $s3Version,
         ]);
 
+        $this->getFilesInS3($client, $s3Bucket);
+
         return new Filesystem(new AwsS3Adapter($client, $s3Bucket, FilesystemFactory::PREFIX_STORAGE));
     }
 
@@ -181,9 +200,9 @@ class Migration extends CliTool\App
         // Reset counts for logging
         $countFilesInS3        = $count = $this->countStorageFilesUploaded = $this->countTranscodeFilesUploaded = $this->countBytesUploaded = 0;
         $storageBeforeTransfer = $this->getDirectorySize($this->storageDir);
-        $this->filesInS3       = [];
 
         // Retrieve and iterate all files referenced by `storage` table in database
+        $this->getLogger()->notice("Fetching storage models from database, this may take a while on large datasets...");
         $files    = $this->storageMapper->findAll();
         $countAll = $files->count();
         foreach ($files as $file) {
@@ -212,6 +231,7 @@ class Migration extends CliTool\App
             $storageAfterTransfer = $this->getDirectorySize($this->storageDir);
         }
         $this->getLogger()->notice(sprintf("Files in storage table:     %d", $countAll));
+        $this->getLogger()->notice(sprintf("Files in s3 storage:        %d", count($this->filesInS3)));
         $this->getLogger()->notice(sprintf("Storage files uploaded:     %d", $this->countStorageFilesUploaded));
         $this->getLogger()->notice(sprintf("Transcode files uploaded:   %d", $this->countTranscodeFilesUploaded));
         $this->getLogger()->notice(sprintf("Data transferred:           %s", $this->byteFormat::bytesToString($this->countBytesUploaded)));
@@ -258,9 +278,12 @@ class Migration extends CliTool\App
     private function getRemainingFiles(): array
     {
         $remainingFiles      = [];
-        $filesInLocalStorage = explode(PHP_EOL, shell_exec("find {$this->storageDir} -type f") ?? '');
+        $filesInLocalStorage = array_filter(explode(PHP_EOL, shell_exec("find {$this->storageDir} -type f") ?? ''));
+        $localStorageDir     = realpath($this->getConfig()->get('storage_dir'));
+
         foreach ($filesInLocalStorage as $fileInLocalStorage) {
-            if (array_key_exists($fileInLocalStorage, $this->filesInS3) || $fileInLocalStorage === '') {
+            $path = str_replace($localStorageDir . '/', '', $fileInLocalStorage);
+            if (array_key_exists(FilesystemFactory::PREFIX_STORAGE . $path, $this->filesInS3)) {
                 continue;
             }
             $remainingFiles[] = $fileInLocalStorage;
@@ -294,7 +317,7 @@ class Migration extends CliTool\App
         $foundLocally = file_exists($filepath);
 
         // Does file already exist in S3?
-        $foundInS3 = $file->exists();
+        $foundInS3 = array_key_exists(FilesystemFactory::PREFIX_STORAGE . $file->getPath(), $this->filesInS3);
 
         // Handle each of four possible scenarios re: file's presence on local and S3 filesystems:
         if (!$foundLocally) {
@@ -314,10 +337,6 @@ class Migration extends CliTool\App
             if ($this->deleteLocalCopy && $this->perform()) {
                 unlink($filepath);
             }
-        }
-
-        if ($foundInS3) {
-            $this->filesInS3[$filepath] = true;
         }
 
         $this->moveTranscodeFilesToS3($filepath);
@@ -396,8 +415,8 @@ class Migration extends CliTool\App
             $filepath          = str_replace($this->storageDir . DIRECTORY_SEPARATOR, '', $transcodeFilePath);
             $transcodeFile     = new Flysystem\File($this->fileSystemAwsS3, $filepath);
 
-            if ($transcodeFile->exists()) {
-                $this->filesInS3[$transcodeFilePath] = true;
+            $foundInS3 = array_key_exists(FilesystemFactory::PREFIX_STORAGE . $transcodeFile->getPath(), $this->filesInS3);
+            if ($foundInS3) {
                 $this->getLogger()->info("Transcode file '$entry' found locally and in S3" . ($this->deleteLocalCopy ? ', deleting local copy' : ''));
 
                 if ($this->deleteLocalCopy && $this->perform()) {
@@ -407,7 +426,6 @@ class Migration extends CliTool\App
             }
             $this->getLogger()->info("Transcode file '$entry' found locally but not in S3, uploading...");
             if ($this->moveFileToS3($transcodeFilePath, $transcodeFile)) {
-                $this->filesInS3[$transcodeFilePath] = true;
                 $this->countTranscodeFilesUploaded++;
             }
         }
