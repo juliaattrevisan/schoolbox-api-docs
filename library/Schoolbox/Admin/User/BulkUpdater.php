@@ -65,7 +65,7 @@ class BulkUpdater
 
 
     /**
-     * @var string
+     * @var int
      */
     private $year;
 
@@ -132,7 +132,7 @@ class BulkUpdater
      * @param array          $userIds
      * @param array          $campusIds
      * @param int            $role
-     * @param string         $year
+     * @param int            $year
      * @param int            $eportfolioEnabled
      * @param int            $emailFromUsername
      * @param int            $externalMailClient
@@ -149,7 +149,7 @@ class BulkUpdater
         array $userIds,
         array $campusIds,
         int $role,
-        string $year,
+        int $year,
         int $eportfolioEnabled,
         int $emailFromUsername,
         int $externalMailClient,
@@ -176,7 +176,7 @@ class BulkUpdater
         /* Remember these scalars as they are
          */
         $this->role = $role;
-        $this->year = trim($year);
+        $this->year = $year;
         $this->eportfolioEnabled = $eportfolioEnabled;
         $this->emailFromUsername = $emailFromUsername;
         $this->externalMailClient = $externalMailClient;
@@ -403,9 +403,14 @@ class BulkUpdater
         $updatePlaceholder = [];
         $userUpdateParams = [];
 
-        if ('' !== $this->year) {
-            $updatePlaceholder[] = 'year = :year';
-            $userUpdateParams['year'] = $this->year;
+        if ($this->year !== self::UNCHANGED) {
+            $updatePlaceholder[] = 'year_id = :year';
+
+            if (0 === $this->year) {
+                $userUpdateParams['year'] = null;
+            } else {
+                $userUpdateParams['year'] = $this->year;
+            }
         }
 
         if ('' !== $this->position) {

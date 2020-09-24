@@ -15,6 +15,7 @@ use Schoolbox\Mapper\Traits\Model\HasSequence;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Sequential;
+use Schoolbox\ValueLabelInterface;
 
 /**
  * A 'YearLevel' is an educational stage, ie, a subdivision of formal learning,
@@ -25,7 +26,7 @@ use Schoolbox\Sequential;
  * These should be considered distinct, eg "Year 3/4" would generally be represented by some other entity
  * having relationships to both a "Year 3" and "Year 4" YearLevel/Model.
  */
-class Model implements ISoftDeletable, Sequential
+class Model implements ISoftDeletable, Sequential, ValueLabelInterface
 {
     use CreateCollection;
     use Id;
@@ -92,6 +93,24 @@ class Model implements ISoftDeletable, Sequential
         $this->name = $name;
         return $this;
     }
+
+
+    /**
+     * If the year's name contains only an integer, presume the user wanted
+     * to prepend "Year " in front of it, because this is how it will
+     * manifest in a UI somewhere.
+     *
+     * @return string
+     */
+    public function getLongName(): string
+    {
+        if (preg_match('/^[0-9]+$/', $this->getName())) {
+            return "Year {$this->getName()}";
+        }
+
+        return $this->getName();
+    }
+
 
     /**
      * @return int|null
@@ -235,5 +254,25 @@ class Model implements ISoftDeletable, Sequential
     {
         $this->showRubricPoints = $showRubricPoints;
         return $this;
+    }
+
+    /**
+     * Find a key/value representation of this model's data
+     * and return it as a 2D array of value (an identifier)
+     * and label (a human-readable description, usually)
+     *
+     * return [
+     *     'value' => ...
+     *     'label' => ...
+     * ];
+     *
+     * @return array
+     */
+    public function findValueLabelPair(): array
+    {
+        return [
+            'value' => $this->getId(),
+            'label' => $this->getName(),
+        ];
     }
 }

@@ -71,16 +71,21 @@ class ValidPAT
      */
     public function isSatisifiedBy(User $user, array $externalUser): bool
     {
+        /* Unknown year level; no access
+         */
+        if (null === $user->getYear()) {
+            return false;
+        }
 
         /* Years 3-10 always show the tab
          */
-        if (\in_array((int)$user->getYear(), [3,4,5,6,7,8,9,10], true) ) {
+        if (\in_array((int)$user->getYear()->getName(), [3,4,5,6,7,8,9,10], true) ) {
             return true;
         }
 
         /* 11-13 requires us to check constituent pieces - if any exist, the PAT tab exists
          */
-        if (\in_array((int)$user->getYear(), [11,12,13], true)) {
+        if (\in_array((int)$user->getYear()->getName(), [11,12,13], true)) {
 
             /* Minimise queries by testing in order until one return true
              */
@@ -111,7 +116,7 @@ class ValidPAT
              * Then test what we found
              */
             foreach ($registry as $piece) {
-                if ($piece['test']->isSatisfiedBy((int)$user->getYear(), $piece['data']->hasDataFromAnyYear())) {
+                if ($piece['test']->isSatisfiedBy((int)$user->getYear()->getName(), $piece['data']->hasDataFromAnyYear())) {
                     return true;
                 }
             }

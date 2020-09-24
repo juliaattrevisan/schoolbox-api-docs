@@ -188,7 +188,7 @@ class Controller extends Base
                     // Update values
                     $setter = $mapper->getSetMethodName($field);
 
-                    $model->$setter($value[$currentIndex]);
+                    $model->$setter(trim($value[$currentIndex]));
                 }
             }
 

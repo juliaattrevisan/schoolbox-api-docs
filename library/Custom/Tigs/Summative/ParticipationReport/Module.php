@@ -154,7 +154,7 @@ class Module extends Alaress\Module\Module
                     if (!$student->getRole()->isStudent()) {
                         throw new InvalidPath("User must be a student. Found '{$student->getRole()->getType()}'");
                     }
-                    $userYear = $student->getYear();
+                    $userYear = $student->getYear() ? $student->getYear()->getName() : null;
                     if (!\is_numeric($userYear) || $userYear < 7) {
                         throw new InvalidPath("User is not in years 7 or above, found '$userYear'");
                     }

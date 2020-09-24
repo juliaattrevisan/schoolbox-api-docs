@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -40,37 +40,50 @@ class Tokenizer extends Super {
         }));
 
         $this->addToken(new Token('year', "The user's year level", function ($user, $settings) {
+            $year = $user->getYear() ? $user->getYear()->getName() : '';
+
             /** @var User $user */
-            return $user->getYear();
+            return $year;
         }));
 
         $this->addToken(new Token('year|YY', "The user's year level cast to 2 digits", function ($user, $settings) {
+            $year = $user->getYear() ? $user->getYear()->getName() : '';
+
             /** @var User $user */
-            return str_pad($user->getYear(), 2, '0', STR_PAD_LEFT);
+            return str_pad($year, 2, '0', STR_PAD_LEFT);
         }));
 
         $this->addToken(new Token('yr12|YY', "The user's graduating year, cast to 2 digits", function ($user, $settings) {
+            $year = $user->getYear() ? $user->getYear()->getName() : '';
+
             /** @var User $user */
-            return 12 - $user->getYear() + date('y');
+            return 12 - (int)$year + (int)date('y');
         }));
 
         $this->addToken(new Token('yr12|YYYY', "The user's graduating year, cast to 4 digits", function ($user, $settings) {
+            $year = $user->getYear() ? $user->getYear()->getName() : '';
+
             /** @var User $user */
-            return 12 - $user->getYear() + date('Y');
+            return 12 - (int)$year + (int)date('Y');
         }));
 
         $this->addToken(new Token('yr7|YY', "The user's starting year, cast to 2 digits", function ($user, $settings) {
+            $year = $user->getYear() ? $user->getYear()->getName() : '';
+
             /** @var User $user */
-            return date('y') - ($user->getYear() - 7);
+            return (int)date('y') - ((int)$year - 7);
         }));
 
 
         $this->addToken(new Token('yr7|YY', "The user's starting year, cast to 4 digits", function ($user, $settings) {
+            $year = $user->getYear() ? $user->getYear()->getName() : '';
+
             /** @var User $user */
-            return date('Y') - ($user->getYear() - 7);
+            return (int)date('Y') - ((int)$year - 7);
         }));
 
         $this->addToken(new Token('uri', "The base URI defined for the user", function ($user, $settings) {
+
             /** @var User $user */
             return $settings['baseUri'];
         }));

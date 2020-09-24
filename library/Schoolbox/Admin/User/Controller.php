@@ -14,16 +14,14 @@ use Alaress\Web\Controller\Base;
 use HouseMapper;
 use HouseResidentialMapper;
 use Monolog\Logger;
-use Schoolbox\API\Token\Jwt;
-use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\Storage\IStorage;
 use Scrub;
 use UnexpectedValueException;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\NotFound as ExceptionNotFound;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
-use Schoolbox\Collection;
 use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
+use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -31,13 +29,16 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Alert\RedisPublisher;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
 use Schoolbox\User\Title\Mapper as UserTitleMapper;
+use Schoolbox\YearLevel;
 
 /**
  * Controller for managing school users through the admin section.
@@ -100,6 +101,12 @@ class Controller extends Base
      * @var CMSLogMapper;
      */
     protected $cmsLogMapper;
+
+
+    /**
+     * @var YearLevel\Mapper
+     */
+    protected $yearLevelMapper;
 
 
     /**
@@ -226,17 +233,20 @@ class Controller extends Base
 
     /**
      * Controller constructor.
-     * @param CMSLogMapper $cmsLogMapper
-     * @param UserLogMapper $userLogMapper
-     * @param FolderMapper $folderMapper
-     * @param UserMapper $userMapper
-     * @param ErrorMapper $errorMapper
-     * @param UserAccessMapper $userAccessMapper
-     * @param UserTitleMapper $userTitleMapper
-     * @param CampusMapper $campusMapper
-     * @param RoleMapper $roleMapper
+     *
+     * @param CMSLogMapper           $cmsLogMapper
+     * @param UserLogMapper          $userLogMapper
+     * @param FolderMapper           $folderMapper
+     * @param UserMapper             $userMapper
+     * @param ErrorMapper            $errorMapper
+     * @param UserAccessMapper       $userAccessMapper
+     * @param UserTitleMapper        $userTitleMapper
+     * @param CampusMapper           $campusMapper
+     * @param RoleMapper             $roleMapper
      * @param HouseResidentialMapper $houseResidentialMapper
-     * @param HouseMapper $houseMapper
+     * @param HouseMapper            $houseMapper
+     * @param Jwt                    $tokenBuilder
+     * @param YearLevel\Mapper       $yearLevelMapper
      */
     public function __construct(
         CMSLogMapper $cmsLogMapper,
@@ -250,7 +260,8 @@ class Controller extends Base
         RoleMapper $roleMapper,
         HouseResidentialMapper $houseResidentialMapper,
         HouseMapper $houseMapper,
-        Jwt $tokenBuilder
+        Jwt $tokenBuilder,
+        YearLevel\Mapper $yearLevelMapper
     ) {
         $this->cmsLogMapper = $cmsLogMapper;
         $this->userLogMapper = $userLogMapper;
@@ -264,6 +275,7 @@ class Controller extends Base
         $this->houseResidentialMapper = $houseResidentialMapper;
         $this->houseMapper = $houseMapper;
         $this->tokenBuilder = $tokenBuilder;
+        $this->yearLevelMapper = $yearLevelMapper;
     }
 
 
@@ -325,9 +337,9 @@ class Controller extends Base
                 'serviceMapping' => self::SERVICE_MAPPING,
                 'identifiers' => self::IDENTIFIERS,
                 'accessLevel' => self::ACCESS_LEVELS,
-
                 'pageCurrent' => 'user',
                 'method' => 'Update',
+                'yearLevels' => $this->yearLevelMapper->findAll(),
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
                 'externalDatabase' => ucfirst($this->getConfigLoader()->get('external_type')),
@@ -610,6 +622,21 @@ class Controller extends Base
             $resHouse = null;
         }
 
+        /* Update year level with lu_year_level option from the dropdown
+         */
+        $year = null;
+
+        if ('' !== $post['year_id']) {
+            try {
+                $year = $this->yearLevelMapper->findById($post['year_id']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+
+                /* noop - went looking for a deleted or nonexistent year_id
+                 * just use null
+                 */
+            }
+        }
+
         $user->setTitle($post['title']);
         $user->setFirstname($post['firstname']);
         $user->setLastname($post['lastname']);
@@ -617,7 +644,7 @@ class Controller extends Base
         $user->getRole()->setId($post['group']);
         $user->setPositionTitle($post['position_title']);
         $user->setAltEmail(trim($post['alt_email']) == '' ? null : trim($post['alt_email']));
-        $user->setYear($post['year'] == '' ? null : $post['year']);
+        $user->setYear($year);
         $user->setSchoolHouse($house);
         $user->setResidentialHouse($resHouse);
         $user->setEportfolioEnable(!empty($post['eportfolio']));

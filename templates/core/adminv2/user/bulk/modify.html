@@ -146,7 +146,14 @@
                     <div class="small-12 medium-6 large-2 columns">
                         <label>
                             Year
-                            <input name='search_year' type="text" value="{SEARCH_YEAR_SELECTED}" />
+                            <select name="search_year_id">
+                                <option value="-1">Any</option>
+                                <option value="">Not set</option>
+
+                                <!-- BEGIN search_year -->
+                                <option value="{SEARCH_YEAR_ID}" {SEARCH_YEAR_SELECTED}>{SEARCH_YEAR_NAME}</option>
+                                <!-- END search_year -->
+                            </select>
                         </label>
                     </div>
 
@@ -263,7 +270,14 @@
                             Year
                             <span data-tooltip class="hint has-tip tip-top" title="Leave blank if you don't want to update their year.">?</span>
                         </label>
-                        <input id="apply_year" name="apply_year" type="text" value="">
+                        <select name="apply_year_id">
+                            <option value="-1" selected="selected">Unchanged</option>
+                            <option value="">Not set</option>
+
+                            <!-- BEGIN apply_year -->
+                            <option value="{APPLY_YEAR_ID}">{APPLY_YEAR_NAME}</option>
+                            <!-- END apply_year -->
+                        </select>
                     </div>
 
                     <div class="small-12 medium-6 columns">

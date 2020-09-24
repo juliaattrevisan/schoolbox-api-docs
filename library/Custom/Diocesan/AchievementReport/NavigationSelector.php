@@ -8,7 +8,6 @@ namespace Custom\Diocesan\AchievementReport;
 
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
-use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Schoolbox\User;
 use MSSQL;
 
@@ -114,11 +113,19 @@ class NavigationSelector
     {
         $this->defaultReport = ['error' => 'Unknown default report.'];
 
-        if (($this->user->getYear() >= 1) && ($this->user->getYear() <= 6)) {
+        /* Unknown Year Level gets a default report
+         */
+        if (null === $this->user->getYear()) {
+            return;
+        }
+
+        /* Everyone else gets an evaluation based on the year string from lu_year_level
+         */
+        if (($this->user->getYear()->getName() >= 1) && ($this->user->getYear()->getName() <= 6)) {
             $this->defaultReport = self::STANDARDISEDTEST_KEY;
-        } elseif (($this->user->getYear() >= 7) && ($this->user->getYear() <= 10)) {
+        } elseif (($this->user->getYear()->getName() >= 7) && ($this->user->getYear()->getName() <= 10)) {
             $this->defaultReport = self::SCHOOLGRADES_KEY;
-        } elseif ($this->user->getYear() == 11) {
+        } elseif ($this->user->getYear()->getName() == 11) {
 
             /* NCEA for year 11 specifically
              */
@@ -127,7 +134,7 @@ class NavigationSelector
             } else {
                 $this->defaultReport = ['error' => 'Year 11 student not in NCEA.'];
             }
-        } elseif (($this->user->getYear() >= 12) && ($this->user->getYear() <= 13)) {
+        } elseif (($this->user->getYear()->getName() >= 12) && ($this->user->getYear()->getName() <= 13)) {
 
             /* Need to decide whether this is an IB or an NCEA student
              */

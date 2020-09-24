@@ -16,6 +16,7 @@ use Schoolbox\Role as RoleModel;
 use Schoolbox\RoleMapper;
 use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
+use Schoolbox\YearLevel;
 
 /**
  * Importer for users into the Schoolbox connector.
@@ -44,6 +45,11 @@ class User extends AbstractImporter
      * @var array|RoleModel[]
      */
     protected $roleList = [];
+
+    /**
+     * @var array|YearLevel\Model[]
+     */
+    protected $yearLevelList = [];
 
     /**
      * @var array|CampusModel[]
@@ -84,30 +90,30 @@ class User extends AbstractImporter
     public static function getFormat()
     {
         $format = [
-            "Delete?"                              => 'Is this user to be deleted?',
-            "Schoolbox User ID"                    => 'The user\'s internal Schoolbox ID number',
-            "Username"                             => 'The unique name the user uses to log in',
-            "External ID"                          => 'The user\'s ID number in your external system',
-            "Title"                                => '',
-            "First Name"                           => '',
-            "Surname"                              => '',
-            "Position Title"                       => 'The user\'s position title (e.g. Admissions Manager)',
-            "Role"                                 => 'The Schoolbox role for this user',
-            "Campus"                               => 'A comma-separated list of campus names for this user.',
-            "Password"                             => 'The user\'s password. If left blank, it will not be updated',
-            "Alt Email"                            => '',
-            "Year"                                 => '',
-            "House"                                => '',
-            "Residential House"                    => '',
-            "E-Portfolio?"                         => '',
-            "Hide Contact Details?"                => '',
-            "Hide Timetable?"                      => '',
-            "Email Address From Username?"         => '',
-            "Use External Mail Client?"            => '',
-            "Enable Webmail Tab?"                  => '',
+            'Delete?'                      => 'Is this user to be deleted?',
+            'Schoolbox User ID'                    => 'The user\'s internal Schoolbox ID number',
+            'Username'                             => 'The unique name the user uses to log in',
+            'External ID'                          => 'The user\'s ID number in your external system',
+            'Title'                                => '',
+            'First Name'                           => '',
+            'Surname'                              => '',
+            'Position Title'                       => 'The user\'s position title (e.g. Admissions Manager)',
+            'Role'                                 => 'The Schoolbox role for this user',
+            'Campus'                               => 'A comma-separated list of campus names for this user.',
+            'Password'                             => 'The user\'s password. If left blank, it will not be updated',
+            'Alt Email'                            => '',
+            'Year'                                 => '',
+            'House'                                => '',
+            'Residential House'                    => '',
+            'E-Portfolio?'                         => '',
+            'Hide Contact Details?'                => '',
+            'Hide Timetable?'                      => '',
+            'Email Address From Username?'         => '',
+            'Use External Mail Client?'            => '',
+            'Enable Webmail Tab?'                  => '',
             'Display Graph on Student Grade Card?' => '',
-            "Superuser?"                           => '',
-            "Account Enabled?"                     => '',
+            'Superuser?'                           => '',
+            'Account Enabled?'                     => '',
         ];
 
         return $format;
@@ -120,10 +126,17 @@ class User extends AbstractImporter
     {
         $this->passwordService    = new Service();
         $this->userMapper         = new UserMapper();
+
         // Role list
         foreach (RoleMapper::getInstance()->findAll() as $role) {
             /** @var RoleModel $role */
             $this->roleList[$role->getName()] = $role;
+        }
+
+        // Year Level list
+        foreach (YearLevel\Mapper::getInstance()->findAll() as $yearLevel) {
+            /** @var YearLevel\Model $yearLevel */
+            $this->yearLevelList[$yearLevel->getName()] = $yearLevel;
         }
 
         // Campus list
@@ -147,12 +160,13 @@ class User extends AbstractImporter
         // Identifiers
         $this->userIdentifiers[] = new User\Identifier\UserId($this->userMapper);
         $this->userIdentifiers[] = new User\Identifier\Username($this->userMapper);
-        $this->userIdentifiers[]  = new User\Identifier\ExternalId($this->userMapper, $this->roleList);
+        $this->userIdentifiers[] = new User\Identifier\ExternalId($this->userMapper, $this->roleList);
 
         // Hydrators
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Username', 'setUsername', true);
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('External ID', 'setExternalId', false);
         $this->userHydrators[] = new User\Hydrator\Lookup('Role', 'setRole', $this->roleList);
+        $this->userHydrators[] = new User\Hydrator\Lookup('Year', 'setYear', $this->yearLevelList);
         $this->userHydrators[] = new User\Hydrator\Password('Password', 'setPassword', $this->passwordService);
         $this->userHydrators[] = new User\Hydrator\FieldIgnoreEmpty('Password', 'setRetrievablePassword', false);
         $this->userHydrators[] = new User\Hydrator\ToggleField('E-Portfolio?', 'setEportfolioEnable');
@@ -172,7 +186,6 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\Field('Surname', 'setLastname', true);
         $this->userHydrators[] = new User\Hydrator\Field('Position Title', 'setPositionTitle', true);
         $this->userHydrators[] = new User\Hydrator\Field('Alt Email', 'setAltEmail', true);
-        $this->userHydrators[] = new User\Hydrator\Field('Year', 'setYear', true);
         $this->userHydrators[] = new User\Hydrator\Lookup('House', 'setSchoolHouse', $this->houseList);
         $this->userHydrators[] = new User\Hydrator\Lookup('Residential House', 'setResidentialHouse', $this->residentialHouseList);
     }

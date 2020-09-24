@@ -79,7 +79,7 @@ class User extends DeprecatedModel
 
     public function getByID($id)
     {
-        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, `key`, hash, eportfolio_enabled,
+        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, lu_year_level.name AS year, `key`, hash, eportfolio_enabled,
                         position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, webmail, userCampus.campus, luCampus.name as campusName,
                         IF(superusers.id, 1, 0) as su, house, residential_house_id as residential_house, mail_handler, enabled
                 FROM user
@@ -87,6 +87,7 @@ class User extends DeprecatedModel
                     LEFT JOIN userCampus ON user.id = userCampus.uid
                     LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
                     LEFT JOIN superusers ON user.id = superusers.id
+                    LEFT JOIN lu_year_level ON user.year_id = lu_year_level.id
                 WHERE user.id = '" . $this->db->quote($id) . "'
                 AND user.deleted_at IS NULL";
         return $this->db->getRow($query);
@@ -324,7 +325,7 @@ class User extends DeprecatedModel
     {
         //search for a user based on at least one of the above fields
         //assumes at least one contains something
-        $query = "
+        $query = '
             SELECT
                 user.id AS uid,
                 title,
@@ -332,15 +333,16 @@ class User extends DeprecatedModel
                 lastname,
                 username,
                 groups.name AS gname,
-                year,
+                lyl.name AS year,
                 local_email,
                 alt_email,
                 synergy_id
             FROM user
             LEFT JOIN groups ON user.group_id = groups.id
+            LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id
             WHERE user.deleted_at IS NULL
             AND
-        ";
+        ';
         if ($keyword != "") {
             if (is_numeric($keyword)) {
                 $param = $this->db->quote($keyword);

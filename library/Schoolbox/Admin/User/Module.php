@@ -8,23 +8,24 @@
 namespace Schoolbox\Admin\User;
 
 use Alaress\Authorizer\Authorizer;
-use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
+use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use HouseMapper;
 use HouseResidentialMapper;
+use Schoolbox\CampusMapper;
+use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\RoleMapper;
-use Schoolbox\UserMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\User\Title\Mapper as UserTitleMapper;
 use Schoolbox\User\Log\Mapper as UserLogMapper;
-use Schoolbox\CMS\Log\Mapper as CMSLogMapper;
-use Schoolbox\CampusMapper;
-use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\UserMapper;
+use Schoolbox\YearLevel;
 
 /**
  * The module for managing school users through the admin section.
@@ -122,6 +123,7 @@ class Module extends BaseModule
                     'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
                     'roleMapper' => $this->getMapperFactory()->getLazy(RoleMapper::class),
                     'tokenBuilder' => $injector->get('user.tokenBuilder'),
+                    'yearLevelMapper' => $this->getMapperFactory()->getLazy(YearLevel\Mapper::class),
                 ]
             )
         );

@@ -55,19 +55,19 @@ class Year extends SimpleStrategy
      */
     public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
     {
-        $keywordFilter = null === $searchPlaceholder ? '' : "AND year LIKE :{$searchPlaceholder}";
+        $keywordFilter = null === $searchPlaceholder ? '' : "AND lu_year_level.name LIKE :{$searchPlaceholder}";
 
         // If user.year is numeric, prefix 'Year ' to read like 'Year 9'
         $entityType = self::getEntityType();
         return "
             SELECT DISTINCT
-              year AS id,
-              IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) AS name,
+              lu_year_level.name AS id,
+              IF(lu_year_level.name REGEXP '^[0-9]+$', CONCAT('Year ', lu_year_level.name), lu_year_level.name) AS name,
               '{$entityType}' AS entity_type,
               null as entity_meta
-            FROM `user`
-            WHERE deleted_at IS NULL
-            AND year IS NOT NULL
+            FROM lu_year_level
+            WHERE lu_year_level.deleted_AT IS NULL
+            AND lu_year_level.name IS NOT NULL
             {$keywordFilter}
         ";
     }
@@ -80,16 +80,17 @@ class Year extends SimpleStrategy
     {
         $entityType = self::getEntityType();
 
-        $pb = (new Builder(new Quoter(), 'user'))
+        $pb = (new Builder(new Quoter(), 'lu_year_level'))
             ->setParamPrefix($entityType)
-            ->in('year', $entityValues);
+            ->in('lu_year_level.name', $entityValues);
 
-        $sql         = "
+        $sql = "
             SELECT
                 '{$entityType}' entity_type,
-                year entity_value,
-                IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) name
-            FROM user WHERE {$pb->getWhereIntersect()}
+                lu_year_level.name AS entity_value,
+                IF(lu_year_level.name REGEXP '^[0-9]+$', CONCAT('Year ', lu_year_level.name), lu_year_level.name) name
+            FROM lu_year_level
+            WHERE {$pb->getWhereIntersect()}
         ";
 
         return new TranslateSql(
@@ -122,7 +123,29 @@ class Year extends SimpleStrategy
      */
     public function getValues(GenericCollection $users): array
     {
-        $yearLevels = $users->getPropertyValues('year');
+        /* Users now come with a Year/Model instance inside
+         */
+        $userYears = $users->getPropertyValues('year');
+
+        /* We need to get the name out, because that's what it was using before
+         *
+         * Apparently NULL was an anticipated value with an optional via isValidNullEntityValue()
+         * but that's hardcoded to return false all the time, so god knows what this was
+         * meant to actually do (if anything) at all. Nevertheless, accommodate the original intent
+         */
+        $yearLevels = [];
+
+        foreach ($userYears as $userYear) {
+            if ($userYear instanceof \Schoolbox\YearLevel\Model) {
+                $yearLevels[] = $userYear->getName();
+            } else {
+                $yearLevels[] = null;
+            }
+        }
+
+        /* This is always going to execute, so whatever this was originally doing,
+         * it'll continue to do
+         */
         if (!self::isValidNullEntityValue()) {
             $yearLevels = array_filter($yearLevels, static function (?string $yearLevel): bool {
                 return $yearLevel !== null;

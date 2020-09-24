@@ -10,6 +10,9 @@ namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
+use HouseMapper;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -25,11 +28,10 @@ use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
-use HouseMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\YearLevel;
 use Schoolbox\UserMapper;
-use Schoolbox\Assessment\Term;
-use Aura\Router\Exception\RouteNotFound;
+
 
 class Controller extends Base
 {
@@ -69,6 +71,11 @@ class Controller extends Base
     /** @var Term\Mapper $termMapper */
     private $termMapper;
 
+    /**
+     * @var YearLevel\Mapper
+     */
+    private $yearLevelMapper;
+
     // Strings that can be converted to actual dates using strtotime
     private const THIS_YEAR = 'first day of january';
     private const THIS_TERM = 'this term'; // this is the only one that isn't a strtotime string
@@ -106,6 +113,7 @@ class Controller extends Base
      * @param PastoralReportMapper          $pastoralReportMapper
      * @param PastoralReportDashboardMapper $pastoralReportDashboardMapper
      * @param Term\Mapper                   $termMapper
+     * @param YearLevel\Mapper              $yearLevelMapper
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -119,20 +127,22 @@ class Controller extends Base
         PastoralGroupMapper $pastoralGroupMapper,
         PastoralReportMapper $pastoralReportMapper,
         PastoralReportDashboardMapper $pastoralReportDashboardMapper,
-        Term\Mapper $termMapper
+        Term\Mapper $termMapper,
+        YearLevel\Mapper $yearLevelMapper
     ) {
-        $this->errorMapper               = $errorMapper;
-        $this->pastoralDataSource        = $pastoralDataSource;
-        $this->pastoralTagMapper         = $pastoralTagMapper;
-        $this->pastoralTypeMapper        = $pastoralTypeMapper;
-        $this->pastoralSubTypeMapper     = $pastoralSubTypeMapper;
-        $this->pastoralSeverityMapper    = $pastoralSeverityMapper;
-        $this->userMapper                = $userMapper;
-        $this->houseMapper               = $houseMapper;
-        $this->pastoralGroupMapper       = $pastoralGroupMapper;
+        $this->errorMapper                   = $errorMapper;
+        $this->pastoralDataSource            = $pastoralDataSource;
+        $this->pastoralTagMapper             = $pastoralTagMapper;
+        $this->pastoralTypeMapper            = $pastoralTypeMapper;
+        $this->pastoralSubTypeMapper         = $pastoralSubTypeMapper;
+        $this->pastoralSeverityMapper        = $pastoralSeverityMapper;
+        $this->userMapper                    = $userMapper;
+        $this->houseMapper                   = $houseMapper;
+        $this->pastoralGroupMapper           = $pastoralGroupMapper;
         $this->pastoralReportMapper          = $pastoralReportMapper;
         $this->pastoralReportDashboardMapper = $pastoralReportDashboardMapper;
         $this->termMapper                    = $termMapper;
+        $this->yearLevelMapper               = $yearLevelMapper;
     }
 
     /**
@@ -197,9 +207,11 @@ class Controller extends Base
         $studentsSelected = [];
 
         foreach ($report->getStudents() as $student) {
+            $year = $student->getYear() ? $student->getYear()->getName() : 'unknown';
+
             $studentsSelected[] = [
                 'id'   => $student->getId(),
-                'name' => "{$student->getFullName()} - Year {$student->getYear()} {$student->getRole()->getName()} " .
+                'name' => "{$student->getFullName()} - Year {$year} {$student->getRole()->getName()} " .
                     "({$student->getExternalId()})",
             ];
         }
@@ -209,9 +221,11 @@ class Controller extends Base
         $authorsSelected = [];
 
         foreach ($report->getAuthors() as $author) {
+            $year = $author->getYear() ? $author->getYear()->getName() : 'unknown';
+
             $authorsSelected[] = [
                 'id'   => $author->getId(),
-                'name' => "{$author->getFullName()} - Year {$author->getYear()} {$author->getRole()->getName()} " .
+                'name' => "{$author->getFullName()} - Year {$year} {$author->getRole()->getName()} " .
                     "({$author->getExternalId()})",
             ];
         }
@@ -268,6 +282,10 @@ class Controller extends Base
         $report->setUsesRelativeDate($report->getUsesRelativeDate() ?? true);
         $report->setRelativeDateString($report->getRelativeDateString() ?? self::THIS_YEAR);
 
+        /* A stack of all YearLevel instances, ordered by sequence from the admin area
+         */
+        $yearLevels = $this->yearLevelMapper->findAll();
+
         // And render this thing out
         $this->getResponse()->content->set(
             [
@@ -277,7 +295,7 @@ class Controller extends Base
                             'service',
                             UserAccess::SERVICE_PASTORAL
                         )->count() > 0,
-                    'years'            => $this->userMapper->getYearLevels(),
+                    'years'            => $yearLevels,
                     'houses'           => $this->houseMapper->findAll()->sortBy('sequence', 'asc'),
                     'types'            => $this->pastoralTypeMapper->findAll(),
                     'subTypes'         => $this->pastoralSubTypeMapper->findAll(),

@@ -82,7 +82,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     private $retrievablePassword;
 
-    /** @var string */
+    /** @var YearLevel\Model|null */
     private $year;
 
     /** @var null|House */
@@ -396,8 +396,16 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
         $metadata = '';
         $role     = $this->getRole()->getName();
+
+        /* This made a massive assumption that everyone's year level
+         * begins with "Year", which means anyone using "ELC" in lu_year_level.name
+         * would get metadata like "Year ELC"
+         *
+         * See inside getLongName() which checks whether it's just an integer on its own
+         * before trying to prepend something
+         */
         if (!empty($this->year)) {
-            $metadata .= 'Year ' . $this->year;
+            $metadata .= $this->year->getLongName();
         }
         return "{$metadata} {$role}";
     }
@@ -844,10 +852,10 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * @param string $year
+     * @param YearLevel\Model|null $year
      * @return self
      */
-    public function setYear($year)
+    public function setYear(?YearLevel\Model $year)
     {
         $this->year = $year;
         return $this;
@@ -855,9 +863,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
-     * @return string
+     * @return YearLevel\Model|null
      */
-    public function getYear()
+    public function getYear(): ?YearLevel\Model
     {
         return $this->year;
     }

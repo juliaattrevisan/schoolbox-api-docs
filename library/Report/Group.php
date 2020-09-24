@@ -140,12 +140,14 @@ class Report_Group extends Report_Abstract implements Report_IReport
             GROUP_CONCAT(DISTINCT `c`.`name` ORDER BY `c`.`name` ASC SEPARATOR ', ') AS `campus`,
             `r`.`name` AS `role`,
             `h`.`house` AS `house`,
+            `lyl`.name AS `year`,
             `rh`.`name` AS `res_house`
             FROM `user` `u`
             LEFT JOIN `userCampus` `uc` ON `u`.`id`=`uc`.`uid`
             LEFT JOIN `luCampus` `c` ON `uc`.`campus`=`c`.`id`
             LEFT JOIN `groups` `r` ON `u`.`group_id`=`r`.`id`
             LEFT JOIN `house` `h` ON `u`.`house`=`h`.`id`
+            LEFT JOIN `lu_year_level` `lyl` ON `u`.`year_id`=`lyl`.`id`
             LEFT JOIN `luResidentialHouse` `rh` ON `u`.`residential_house_id`=`rh`.`id`
             WHERE `u`.`group_id` = '$filterString'
             AND   `u`.`deleted_at` IS NULL AND `c`.`deleted_at` IS NULL

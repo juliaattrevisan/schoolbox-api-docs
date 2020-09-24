@@ -3606,16 +3606,6 @@ parameters:
 			path: library/Schoolbox/WebDav/LegacyConfiguration/Factory.php
 
 		-
-			message: "#^Binary operation \"\\-\" between 12 and string results in an error\\.$#"
-			count: 2
-			path: library/Schoolbox/WebDav/Rules/Tokenizer.php
-
-		-
-			message: "#^Binary operation \"\\-\" between string and 7 results in an error\\.$#"
-			count: 2
-			path: library/Schoolbox/WebDav/Rules/Tokenizer.php
-
-		-
 			message: "#^Comparison operation \"\\<\" between \\(array\\|float\\|int\\) and int results in an error\\.$#"
 			count: 1
 			path: library/SitePage.php

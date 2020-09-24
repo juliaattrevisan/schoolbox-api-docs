@@ -49,7 +49,7 @@ if (isset($_POST['updateUsers'])) {
         $userIds,
         $_POST['apply_campus'],
         (int)$_POST['apply_role'],
-        $_POST['apply_year'],
+        (int)$_POST['apply_year_id'],
         (int)$_POST['apply_eportfolio'],
         (int)$_POST['apply_emailfromusername'],
         (int)$_POST['apply_externalmailclient'],

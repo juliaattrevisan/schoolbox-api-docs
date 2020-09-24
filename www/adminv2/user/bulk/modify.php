@@ -20,12 +20,14 @@ $this->setFile(TEMPLATE_content, 'adminv2/user/bulk/modify.html');
  */
 $this->setBlock(TEMPLATE_content, 'search_campus', 'search_campus_block');
 $this->setBlock(TEMPLATE_content, 'search_role', 'search_role_block');
+$this->setBlock(TEMPLATE_content, 'search_year', 'search_year_block');
 $this->setBlock(TEMPLATE_content, 'search_eportfolio', 'search_eportfolio_block');
 
 $this->setBlock(TEMPLATE_content, 'has_results', 'has_results_block');
 $this->setBlock('has_results', 'user', 'user_block');
 $this->setBlock('has_results', 'apply_campus', 'apply_campus_block');
 $this->setBlock('has_results', 'apply_role', 'apply_role_block');
+$this->setBlock('has_results', 'apply_year', 'apply_year_block');
 $this->setBlock('has_results', 'apply_eportfolio', 'apply_eportfolio_block');
 $this->setBlock('has_results', 'apply_webmail', 'apply_webmail_block');
 $this->setBlock('has_results', 'apply_accountenabled', 'apply_accountenabled_block');
@@ -72,8 +74,7 @@ foreach ($allRoles as $currentRole) {
         array(
             'SEARCH_ROLE_ID' => $currentRole->getId(),
             'SEARCH_ROLE_NAME' => $currentRole->getName(),
-            'SEARCH_ROLE_SELECTED' => ($currentRole->getId(
-                    ) == $_POST['search_role']) && isset($_POST['search_role']) ? 'selected="selected"' : '',
+            'SEARCH_ROLE_SELECTED' => ($currentRole->getId() == $_POST['search_role']) && isset($_POST['search_role']) ? 'selected="selected"' : '',
         )
     );
 
@@ -91,11 +92,24 @@ foreach ($allRoles as $currentRole) {
 
 /* Year
  */
-$this->setVar(
-    array(
-        'SEARCH_YEAR_SELECTED' => Scrub::html($_POST['search_year']),
-    )
-);
+$yearLevels = \Schoolbox\YearLevel\Mapper::getInstance()->findAll();
+
+foreach ($yearLevels as $yearLevel) {
+    $this->setVar([
+        'SEARCH_YEAR_ID' => $yearLevel->getId(),
+        'SEARCH_YEAR_NAME' => $yearLevel->getName(),
+        'SEARCH_YEAR_SELECTED' => $yearLevel->getId() === (int)$_POST['search_year_id'] ? 'selected="selected"' : '',
+    ]);
+
+    $this->parse('search_year_block', 'search_year', true);
+
+    $this->setVar([
+        'APPLY_YEAR_ID' => $yearLevel->getId(),
+        'APPLY_YEAR_NAME' => $yearLevel->getName(),
+    ]);
+
+    $this->parse('apply_year_block', 'apply_year', true);
+}
 
 /* Boolean options
  */
@@ -211,7 +225,7 @@ if (!empty($_POST)) {
         $_POST['search_campus'],
         $_POST['search_role'],
         $_POST['search_eportfolio'],
-        $_POST['search_year']
+        $_POST['search_year_id']
     );
 
     $this->setVar(array(
@@ -227,17 +241,15 @@ if (!empty($_POST)) {
                 $campusNames[] = $currentCampus->getName();
             }
 
-            $this->setVar(
-                array(
-                    'BULK_USER_ID' => $currentUser->getId(),
-                    'BULK_USER_FIRSTNAME' => $currentUser->getFirstname(),
-                    'BULK_USER_LASTNAME' => $currentUser->getLastname(),
-                    'BULK_USER_EXTERNAL_ID' => $currentUser->getExternalId(),
-                    'BULK_USER_CAMPUS' => implode(', ', $campusNames),
-                    'BULK_USER_GROUP' => $currentUser->getRole()->getName(),
-                    'BULK_USER_YEAR' => $currentUser->getYear(),
-                )
-            );
+            $this->setVar([
+                'BULK_USER_ID' => $currentUser->getId(),
+                'BULK_USER_FIRSTNAME' => $currentUser->getFirstname(),
+                'BULK_USER_LASTNAME' => $currentUser->getLastname(),
+                'BULK_USER_EXTERNAL_ID' => $currentUser->getExternalId(),
+                'BULK_USER_CAMPUS' => implode(', ', $campusNames),
+                'BULK_USER_GROUP' => $currentUser->getRole()->getName(),
+                'BULK_USER_YEAR' => $currentUser->getYear() ? $currentUser->getYear()->getName() : '',
+            ]);
 
             $this->parse('user_block', 'user', true);
         }

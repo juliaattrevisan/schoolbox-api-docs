@@ -99,7 +99,7 @@ class Query
             $result[$key]['lastname']       = $user->getLastname();
             $result[$key]['formattedName']  = $user->formatName();
             $result[$key]['metadata']       = $user->formatMetadata();
-            $result[$key]['year']           = $user->getYear();
+            $result[$key]['year']           = $user->getYear() ? $user->getYear()->getName() : '';
         }
 
         return $result;

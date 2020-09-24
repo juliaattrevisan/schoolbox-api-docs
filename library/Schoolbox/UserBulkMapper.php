@@ -53,10 +53,10 @@ class UserBulkMapper extends UserMapper
     /**
      * Cheesy query agglutination
      *
-     * @param int    $searchCampus
-     * @param int    $searchRole
-     * @param string $searchEportfolio
-     * @param string $searchYear
+     * @param int      $searchCampus
+     * @param int      $searchRole
+     * @param string   $searchEportfolio
+     * @param int|null $searchYear
      * @return \Schoolbox\Collection
      * @throws MapperException
      * @throws \PDOException
@@ -79,6 +79,7 @@ class UserBulkMapper extends UserMapper
             LEFT JOIN `groups` g ON u.`group_id` = g.`id`
             LEFT JOIN `userCampus` uc ON uc.`uid` = u.`id`
             LEFT JOIN luCampus c ON c.id = uc.`campus`
+            LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
         ";
 
         /* Augmented where
@@ -103,10 +104,14 @@ class UserBulkMapper extends UserMapper
             $params['searchEportfolio'] = $searchEportfolio;
         }
 
-        if (strlen(trim($searchYear))) {
-            $query .= ' AND u.year = :searchYear';
+        if ($searchYear != self::UNCHANGED) {
+            if ($searchYear) {
+                $query .= ' AND u.year_id = :searchYear';
 
-            $params['searchYear'] = $searchYear;
+                $params['searchYear'] = $searchYear;
+            } else {
+                $query .= ' AND u.year_id IS NULL';
+            }
         }
 
         /* Always order by lastname
@@ -140,175 +145,6 @@ class UserBulkMapper extends UserMapper
         }
 
         return $userCollection;
-    }
-
-
-    /**
-     * Update campus involvement for this user
-     *
-     * @param User  $user
-     * @param array $allCampusIds
-     * @throws MapperException
-     * @throws MapperException\Deleted
-     * @throws \UnexpectedValueException
-     */
-    private function assignCampuses(User $user, $allCampusIds)
-    {
-        /* Clear existing campus
-         */
-        $user->setCampusCollection(new GenericCollection(Campus::class));
-
-        /* Apply new choices (ignore Unchanged option)
-         */
-        foreach ($allCampusIds as $currentCampusId) {
-            if ($currentCampusId != self::UNCHANGED) {
-                $user->getCampusCollection()->add(CampusMapper::getInstance()->findById($currentCampusId));
-            }
-        }
-    }
-
-
-    /**
-     * Mass Modify 3
-     *
-     * @param User   $user
-     * @param array  $allCampusIds
-     * @param int    $roleId
-     * @param string $year
-     * @param string $eportfolioEnabled
-     * @param string $emailFromUsername
-     * @param string $externalMailClient
-     * @param string $webmail
-     * @param string $enabled
-     * @param string $hideContacts
-     * @param string $hideTimetable
-     * @param string $positionTitle
-     * @param string $displayGradeGraph
-     * @throws MapperException
-     * @throws MapperException\Deleted
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
-     */
-    public function bulkModifyUpdate(
-        User $user,
-        $allCampusIds,
-        $roleId,
-        $year,
-        $eportfolioEnabled,
-        $emailFromUsername,
-        $externalMailClient,
-        $webmail,
-        $enabled,
-        $hideContacts,
-        $hideTimetable,
-        $positionTitle,
-        $displayGradeGraph
-    ) {
-
-        /* Update group settings
-         */
-        if ($roleId != self::UNCHANGED) {
-            try {
-                /** @var Role $role */
-                $role = RoleMapper::getInstance()->findById($roleId);
-                $user->setRole($role);
-            } catch (MapperException $e) {
-                $message = "{$user->getFullName()} ({$user->getId()}) was skipped - unknown role";
-                $this->log($message);
-                return;
-            }
-        }
-
-        /* Update year settings
-         */
-        $newYear = trim($year);
-
-        if (strlen($newYear)) {
-            $user->setYear($newYear);
-        }
-
-        /* Update position title settings
-         */
-        $newPositionTitle = trim($positionTitle);
-
-        if (strlen($newPositionTitle)) {
-            $user->setPositionTitle($newPositionTitle);
-        }
-
-        /* TODO: Instead of comparing to an int self::UNCHANGED, these should compare against null
-         *  to avoid you having to mix data types in comparisons. In this old place everything came
-         *  from a form, which means their data types are typically strings, preventing you from
-         *  using typesafe comparisons.
-         */
-
-        /* Update eportfolio settings
-         */
-        if ($eportfolioEnabled != self::UNCHANGED) {
-            $user->setEportfolioEnable($eportfolioEnabled);
-        }
-
-        /* Update emailFromUsername settings
-         */
-        if ($emailFromUsername != self::UNCHANGED) {
-            $user->setLocalEmail($emailFromUsername);
-        }
-
-        /* Update externalMailClient settings
-         */
-        if ($externalMailClient != self::UNCHANGED) {
-            $user->setUseInternalMail($externalMailClient);
-        }
-
-        /* Update webmail settings
-         */
-        if ($webmail != self::UNCHANGED) {
-            $user->setWebmail($webmail);
-        }
-
-        /* Update enabled settings
-         */
-        if ($enabled != self::UNCHANGED) {
-            $user->setEnabled($enabled);
-        }
-
-        /* Update hide contacts settings
-         */
-        if ($hideContacts != self::UNCHANGED) {
-            $user->setHideContacts($hideContacts);
-        }
-
-        /* Update hide timetable settings
-         */
-        if ($hideTimetable != self::UNCHANGED) {
-            $user->setHideTimetable($hideTimetable);
-        }
-
-        /* Update display grade average settings
-         */
-        if ($displayGradeGraph != self::UNCHANGED) {
-            $user->setDisplayGradeGraph($displayGradeGraph);
-        }
-
-        /* Update campus settings
-         */
-        $campusInvolvementChanged = \is_array($allCampusIds)
-            && \count($allCampusIds)
-            && !\in_array(self::UNCHANGED, array_values($allCampusIds), false);
-
-        if ($campusInvolvementChanged) {
-            $this->assignCampuses($user, $allCampusIds);
-        }
-
-        try {
-            $this->save($user);
-            $message = "{$this->getSessionUser()->getFullName()} ({$this->getSessionUser()->getId()}) modified user {$user->getFullName()} ({$user->getId()})";
-        } catch (\UnexpectedValueException $e) {
-            $message = "{$this->getSessionUser()->getFullName()} ({$this->getSessionUser()->getId()}) failed to modified user {$user->getFullName()} ({$user->getId()}): {$e->getMessage()}";
-        } catch (Mapper\Exception $e) {
-            $message = "{$this->getSessionUser()->getFullName()} ({$this->getSessionUser()->getId()}) failed to modified user {$user->getFullName()} ({$user->getId()}): {$e->getMessage()}";
-        }
-
-        $this->log($message);
     }
 
 

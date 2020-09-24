@@ -127,7 +127,9 @@ class StudentAttributes
         $this->isHistorical   = $reportDate->lt($now);
         $this->reportDate     = $reportDate;
 
-        $this->calculateDerivedAttributes($config, (int)$user->getYear(), $reportDate, $now);
+        $userYear = $user->getYear() ? $user->getYear()->getName() : null;
+
+        $this->calculateDerivedAttributes($config, (int)$userYear, $reportDate, $now);
     }
 
 
@@ -366,7 +368,7 @@ class StudentAttributes
         }
 
         // Year level must be between
-        $userYear = $user->getYear();
+        $userYear = $user->getYear() ? $user->getYear()->getName() : null;
         if ('' === $userYear || null === $userYear) {
             throw new InvalidArgumentException("User must have a year level set");
         }
