@@ -116,15 +116,17 @@ This is handled by:
   # Dropping a column, part 1: deprecation
   ALTER TABLE blog CHANGE folder_id _folder_id INT(6) UNSIGNED NOT NULL;
   ```
-* no sooner than one major release after the deprecation has been released to
-  production instances:
-  * drop the deprecated table/column
-    ```sql
-    # Dropping a table, part 2: complete drop
-    DROP TABLE _blog;
-    # Dropping a column, part 2: complete drop
-    ALTER TABLE blog DROP COLUMN _folder_id;
-    ```
+* drop the deprecated table/column no sooner than one major release after the
+  deprecation has been released to production instances:
+  ```sql
+  # Dropping a table, part 2: complete drop
+  DROP TABLE _blog;
+  # Dropping a column, part 2: complete drop
+  ALTER TABLE blog DROP COLUMN _folder_id;
+  ```
+  * this means that (for example) if the deprecation occurred in the 20.1
+    development cycle, then the drop may happen no earlier than the 20.2
+    development cycle.
 
 
 ### Special rules for renaming tables or columns
@@ -132,17 +134,22 @@ This is handled by:
 Renaming a table or column is effectively the same as dropping it and creating a
 new one: this means that the table or column cannot be renamed directly.
 ```sql
-# incorrect
+# Incorrect
 ALTER TABLE link CHANGE category folder_id INT(5) UNSIGNED DEFAULT 0 NOT NULL;
 ```
 
 Instead: the old name should be deprecated, a new name added and data copied
 from old to new:
 ```sql
-# correct
+# Correct
+
+# Part 1: deprecation and migration
 ALTER TABLE link CHANGE category _category INT(5) UNSIGNED DEFAULT 0 NOT NULL;
 ALTER TABLE link ADD folder_id INT(5) UNSIGNED DEFAULT 0 NOT NULL;
 UPDATE link SET folder_id = _category;
+
+# Part 2: complete drop (in the next major version)
+ALTER TABLE link DROP COLUMN _category;
 ```
 
 
