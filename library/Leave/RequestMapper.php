@@ -260,13 +260,15 @@ class Leave_RequestMapper extends Schoolbox\Mapper
 				{$this->getJoinColumnString('author', 'a')},
 				{$this->getJoinColumnString('authorisationUser', 'au')},
 				{$this->getJoinColumnString('travelType', 'tt')},
-				{$this->getJoinColumnString('host_type', 'ht')}
+				{$this->getJoinColumnString('host_type', 'ht')},
+				lyl.name AS year
 			FROM `{$this->table}` lr
 			LEFT JOIN {$this->getJoinSql('user', 'lr', 'u')}
 			LEFT JOIN {$this->getJoinSql('author', 'lr', 'a')}
 			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
 			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
 			LEFT JOIN {$this->getJoinSql('host_type', 'lr', 'ht')}
+			LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
 		";
     }
 
@@ -331,7 +333,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
 			WHERE u.residential_house_id = :houseId
 			AND lr.created >= :limit
 			AND lr.status != :deleted
-			ORDER BY substr(lr.start, 1, 10), LENGTH(u.year), u.year, u.lastname
+			ORDER BY substr(lr.start, 1, 10), LENGTH(year), year, u.lastname
 		");
 
         $statement->execute(
@@ -372,7 +374,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
 			WHERE u.residential_house_id = :houseId
 			AND lr.status = :status
 			AND lr.created >= :limit
-			ORDER BY substr(lr.start, 1, 10), LENGTH(u.year), u.year, u.lastname
+			ORDER BY substr(lr.start, 1, 10), LENGTH(year), year, u.lastname
 		");
 
         $statement->execute(
@@ -483,7 +485,8 @@ class Leave_RequestMapper extends Schoolbox\Mapper
 				{$this->getUserMapper()->getColumnString('u')},
 				{$this->getUserMapper()->getColumnString('au')},
 				{$this->getJoinColumnString('travelType', 'tt')},
-				{$this->getJoinColumnString('host_type', 'ht')}
+				{$this->getJoinColumnString('host_type', 'ht')},
+				lyl.name AS year
 			FROM {$this->getTable()} `lr`
 			RIGHT JOIN {$this->getJoinSql('user', 'lr', 'u')}
 				AND CAST(lr.start AS DATE) <= :finish
@@ -492,9 +495,10 @@ class Leave_RequestMapper extends Schoolbox\Mapper
 			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
 			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
 			LEFT JOIN {$this->getJoinSql('host_type', 'lr', 'ht')}
+			LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
 			WHERE u.residential_house_id = :houseId
 			AND u.deleted_at IS NULL
-			ORDER BY LENGTH(u.year), u.year, u.lastname
+			ORDER BY LENGTH(year), year, u.lastname
 		");
 
         $args = [

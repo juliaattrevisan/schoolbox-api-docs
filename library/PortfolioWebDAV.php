@@ -166,17 +166,19 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 // {:username}         - Username
                 // --------------------------------------------------------------------------------------------------------
 
+                $userYear = $user->getYear() ? $user->getYear()->getName() : '';
+
                 $path = $dav->getPath();
                 $path = str_replace("{:username}", $user->getUsername(), $path);
-                $path = str_replace("{:yearlevel}", $user->getYear(), $path);
+                $path = str_replace("{:yearlevel}", $userYear, $path);
                 $path = str_replace("{:calendaryear}", (int) date("Y"), $path);
-                if(is_numeric($user->getYear())) {
-                    $path = str_replace("{:graduationyear7}", 7 - (int)$user->getYear() + (int)date("Y"), $path);
-                    $path = str_replace("{:graduationyear12}", 12 - (int)$user->getYear() + (int)date("Y"), $path);
-                    $path = str_replace("{:graduationyeartwodigit7}", 7 - (int)$user->getYear() + (int)date("y"), $path);
-                    $path = str_replace("{:graduationyeartwodigit12}", 12 - (int)$user->getYear() + (int)date("y"), $path);
-                    $path = str_replace("{:startyear7}", (int)date("Y") - ((int)$user->getYear() - 7), $path);
-                    $path = str_replace("{:startyear12}", (int)date("Y") - ((int)$user->getYear() - 12), $path);
+                if(is_numeric($userYear)) {
+                    $path = str_replace("{:graduationyear7}", 7 - (int)$userYear + (int)date("Y"), $path);
+                    $path = str_replace("{:graduationyear12}", 12 - (int)$userYear + (int)date("Y"), $path);
+                    $path = str_replace("{:graduationyeartwodigit7}", 7 - (int)$userYear + (int)date("y"), $path);
+                    $path = str_replace("{:graduationyeartwodigit12}", 12 - (int)$userYear + (int)date("y"), $path);
+                    $path = str_replace("{:startyear7}", (int)date("Y") - ((int)$userYear - 7), $path);
+                    $path = str_replace("{:startyear12}", (int)date("Y") - ((int)$userYear - 12), $path);
                 }
                 else {
                     $path = str_replace(["{:graduationyear7}", "{:graduationyear12}", "{:graduationyeartwodigit7}", "{:graduationyeartwodigit12}","{:startyear7}","{:startyear12}"],'', $path);

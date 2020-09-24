@@ -40,7 +40,7 @@
                         <div class="nav-wrapper">
                             <ul class="off-canvas-list">
                                 {% for child in children %}
-                                    <li><a href="/search/user/{{ child.id }}">{{ child.name }} ({{ child.year }})</a></li>
+                                    <li><a href="/search/user/{{ child.id }}">{{ child.name }} ({{ child.year ? child.year.name : '' }})</a></li>
                                 {% endfor %}
                             </ul>
                         </div>

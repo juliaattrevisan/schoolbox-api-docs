@@ -34,15 +34,19 @@ class IsYearLevel extends All
     }
 
     /**
-     * @param array $params
-     * @param User  $user
-     * @return bool
+     * @param array     $params
+     * @param User|null $user
+     * @return void
      * @throws Unauthorized
      */
     public function authorizeMethod(array $params = array(), User $user = null)
     {
-        if ($params['user'] instanceof User && $params['user']->getId() && \in_array($params['user']->getYear(), $this->years, false)) {
-            return;
+        if ($params['user'] instanceof User && $params['user']->getId()) {
+            $year = $params['user']->getYear() ? $params['user']->getYear()->getName() : '';
+
+            if (\in_array($year, $this->years, false)) {
+                return;
+            }
         }
 
         throw new Unauthorized();

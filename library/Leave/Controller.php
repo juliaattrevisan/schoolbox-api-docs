@@ -718,7 +718,7 @@ class Leave_Controller extends Controller
             'REQUEST_USER_ID' => $user->getId(),
             'REQUEST_USER_NAME' => $user->formatName(),
             'REQUEST_USER_EXTERNAL_ID' => $user->getExternalId(),
-            'REQUEST_USER_YEAR' => $user->getYear(),
+            'REQUEST_USER_YEAR' => $user->getYear() ? $user->getYear()->getName() : '',
             'REQUEST_USER_HOUSE' => Scrub::text($house->getHouse()),
             'REQUEST_USER_HOUSE_ID' => $house->getId(),
             'REQUEST_START_DATE' => $request->getStart()->getLocal(),
@@ -817,7 +817,7 @@ class Leave_Controller extends Controller
                     'AUTHOR_NAME' => $request->getAuthor()->formatName(),
                     'USER_NAME' => $request->getUser()->formatName(),
                     'USER_EXTERNAL_ID' => $user->getExternalId(),
-                    'USER_YEAR' => $user->getYear(),
+                    'USER_YEAR' => $user->getYear() ? $user->getYear()->getName() : '',
                     'USER_HOUSE' => Scrub::text($house->getHouse()),
                     'USER_HOUSE_ID' => $house->getId(),
                     'HOST_TYPE' => $this->getHostTypes()->getBy('id', $request->getHostType()->getId())->getName(),
@@ -995,7 +995,7 @@ class Leave_Controller extends Controller
                 $rowData[] = $request->getUser()->getFirstname();
                 $rowData[] = $request->getUser()->getLastname();
                 $rowData[] = $house->getHouse();
-                $rowData[] = $request->getUser()->getYear();
+                $rowData[] = $request->getUser()->getYear() ? $request->getUser()->getYear()->getName() : '';
                 $rowData[] = $request->getStart()->getLocal();
                 $rowData[] = $request->getFinish()->getLocal();
                 $rowData[] = $request->getHostType()->getName();
@@ -1068,7 +1068,7 @@ class Leave_Controller extends Controller
                 $this->getPage()->setVar(array(
                     'REQUEST_USER_ID' => $request->getUser()->getId(),
                     'REQUEST_USER_NAME' => $request->getUser()->formatName(),
-                    'REQUEST_USER_YEAR' => $request->getUser()->getYear(),
+                    'REQUEST_USER_YEAR' => $request->getUser()->getYear() ? $request->getUser()->getYear()->getName() : '',
                     'REQUEST_USER_BOARDING_STATUS' => $request->getUser()->getAbbreviatedBoardingStatus(),
                     'REQUEST_ID' => $request->getId(),
                     'REQUEST_START' => $request->getStart()->getLocal(),
@@ -1193,7 +1193,7 @@ class Leave_Controller extends Controller
                     $rowData = array();
                     $rowData[] = $request->getUser()->getId();
                     $rowData[] = $request->getUser()->formatName();
-                    $rowData[] = $request->getUser()->getYear();
+                    $rowData[] = $request->getUser()->getYear() ? $request->getUser()->getYear()->getName() : '';
                     $rowData[] = $request->getStart()->getLocal();
                     $rowData[] = $request->getFinish()->getLocal();
                     $rowData[] = $request->getHostType()->getName();
@@ -1281,7 +1281,7 @@ class Leave_Controller extends Controller
                         array(
                             'REQUEST_USER_ID' => $request->getUser()->getId(),
                             'REQUEST_USER_NAME' => $request->getUser()->formatName(),
-                            'REQUEST_USER_YEAR' => $request->getUser()->getYear(),
+                            'REQUEST_USER_YEAR' => $request->getUser()->getYear() ? $request->getUser()->getYear()->getName() : '',
                             'REQUEST_ID' => $request->getId(),
                             'REQUEST_START' => $request->getStart()->getLocal(),
                             'REQUEST_DURATION' => $request->getDuration(),

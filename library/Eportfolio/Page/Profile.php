@@ -483,7 +483,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
      */
     private function getUserYear()
     {
-        return $this->user->getYear();
+        return $this->user->getYear() ? $this->user->getYear()->getName() : '';
     }
 
     /**

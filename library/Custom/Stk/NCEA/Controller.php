@@ -68,7 +68,9 @@ class Controller extends Base
 
         /* Figure out the dynamic comment
          */
-        $aggregatedData['dynamicComment'] = (new Availability($externalDb))->findReportComment($user->getYear());
+        $userYear = $user->getYear() ? $user->getYear()->getName() : '';
+
+        $aggregatedData['dynamicComment'] = (new Availability($externalDb))->findReportComment($userYear);
 
         /* Pass to twig to render nicely
          */

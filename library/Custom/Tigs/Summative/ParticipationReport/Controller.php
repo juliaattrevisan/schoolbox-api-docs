@@ -201,7 +201,9 @@ class Controller extends Web\Controller\Base
             // The optimal solution would be to implement the yearLevel and tutor/mentor relationships in the
             // Schoolbox connector and populate the TIGS test dataset, but there's issues with their implementation,
             // and we don't have time to address them now. So we'll just hack in some dummy data for now.
-            switch ($user->getYear()) {
+            $userYear = $user->getYear() ? $user->getYear()->getName() : '';
+
+            switch ((int)$userYear) {
                 case 12:
                     $externalIdDean = '8';
                     $deanFullName   = 'Ms Celia Glenn';
