@@ -199,7 +199,10 @@ class Classes implements IStrategy
                             'end' => $finish
                         ],
                         'class' => [
-                            'code' => $subject['SUB_CODE'],
+
+                            /* This format mirrors the implementation in External/Tass/Timetable.php:239
+                             */
+                            'code' => "{$subject['YEAR_GRP']}-{$subject['SUB_CODE']}-{$subject['CLASS']}",
                             'name' => $subject['SUB_DESC'],
                         ],
                         'room' => [
