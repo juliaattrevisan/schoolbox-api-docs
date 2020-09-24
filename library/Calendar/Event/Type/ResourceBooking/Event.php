@@ -35,8 +35,19 @@ class Event extends Day\Event
         return $this->booking;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getTitle() {
         return $this->getBooking()->getName() ?: $this->getBooking()->getResource()->getName();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTitleForExport()
+    {
+        return $this->getTitle() . ($this->getBooking()->getStatus()->isPending() ? ' (Pending)' : '');
     }
 
     public function getLocation()

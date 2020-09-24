@@ -434,6 +434,15 @@ abstract class EventBase implements EventInterface
     }
 
     /**
+     * Get title for export
+     * @return string
+     */
+    public function getTitleForExport()
+    {
+        return $this->title;
+    }
+
+    /**
      * Set type
      *
      * @param int $typeID

@@ -100,6 +100,12 @@ interface EventInterface
     public function getTitle();
 
     /**
+     * Get title for export
+     * @return string
+     */
+    public function getTitleForExport();
+
+    /**
      * Set type
      *
      * @param string $type

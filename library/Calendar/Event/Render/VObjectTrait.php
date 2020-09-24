@@ -89,12 +89,15 @@ trait VObjectTrait
             $vEvent->add('DTEND', $end_time->format('Ymd'), ['VALUE' => 'DATE']);
         }
 
-        $vEvent->add('SUMMARY', $event->getTitle());
+        $vEvent->add('SUMMARY', $event->getTitleForExport());
 
         return $vEvent->serialize();
     }
 
 
+    /**
+     * @return string
+     */
     protected function getCategories(): string
     {
         /** @var EventInterface $event */

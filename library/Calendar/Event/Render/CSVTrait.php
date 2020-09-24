@@ -37,7 +37,7 @@ trait CSVTrait
             $event->getEndTime()->getLocalShort(),
             $event->getAllday() ? '' : $event->getEndTime()->getUsingFormat('H:i'),
             $event->getAllday() ? 1 : 0,
-            $event->getTitle(),
+            $event->getTitleForExport(),
             $event->getDetail() ? \Scrub::htmlAbsoluteUri($event->getDetail(), $this->baseUrl) : '',
             $event->getLocation(),
             $event->getType(),
