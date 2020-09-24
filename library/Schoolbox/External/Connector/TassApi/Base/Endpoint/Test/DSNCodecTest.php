@@ -31,18 +31,18 @@ class DSNCodecTest extends TestCase
     {
         return [
             'Valid DSN 1 (original order)' => [
-                'studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd',
+                'studentdetails:companycode=123;appcode=ADweh/189;token=923nAD/j\l35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj7///8fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd',
                 [
                     'studentdetails'=> [
                         'companycode' => 123,
-                        'appcode' => 'ADweh189',
-                        'token' => '923nADjl35h0sd7725=='
+                        'appcode' => 'ADweh/189',
+                        'token' => '923nAD/j\l35h0sd7725=='
                     ],
 
                     'identitymanagement' => [
                         'companycode' => 456,
                         'appcode' => 'xcjFh28',
-                        'token' => 'ckbj78fj1kdhg=',
+                        'token' => 'ckbj7///8fj1kdhg=',
                     ],
 
                     'lmsintegration' => [
@@ -205,6 +205,10 @@ class DSNCodecTest extends TestCase
 
             /* Add all possible permutations; there's probably more than 300 you could add
              */
+            'Invalid DSN 15 (separator chars in tokens)' => [
+                'student:details:appcode=ADweh;189;companycode=12;3;token=923nAD,jl35h0sd7725==,identitymanagement:appcode=werklj2i9jsdf;companycode=234xv;;token=ol2j5ljsdf89,lmsintegration:token=923nADjl35h0sd7725==;companycode=werwer;appcode=bdefgdf',
+                []
+            ],
         ];
     }
 
