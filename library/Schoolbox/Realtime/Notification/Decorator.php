@@ -291,15 +291,14 @@ class Decorator extends NotificationBundle
             foreach ($timeParams as $time => $params) {
                 /** @var ParameterInterface $param */
                 foreach ($params as $param) {
-                    // unset timestamp to remove duplicate
-                    $param->setTimestamp(0);
-                    if (in_array($param, $stack)) {
+                    // ignore timestamp when stacking
+                    if (key_exists($param->getHash(), $stack)) {
                         continue;
                     }
-                    $stack[] = $param;
+                    $stack[$param->getHash()] = $param;
                 }
             }
-            $subst = $this->stack2html($stack, $fqdn);
+            $subst = $this->stack2html(array_values($stack), $fqdn);
             $text  = str_replace(":$token", $subst, $text);
         }
 
