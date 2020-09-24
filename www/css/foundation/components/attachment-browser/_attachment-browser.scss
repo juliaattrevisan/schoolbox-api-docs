@@ -62,7 +62,11 @@
       height: 100%;
       max-height: 515px;
       min-height: 292px;
-      overflow-y: scroll;
+      overflow-y: auto;
+
+      @media #{$small-only} {
+        max-height: 450px;
+      }
 
       &.active {
         display: flex;
