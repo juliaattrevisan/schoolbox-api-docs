@@ -62,20 +62,8 @@
                 localDateTime:     "{{ config.date_local ~ ' ' ~ config.date_time }}",
                 calendarStartTime: "{{ config.calendar_start_time }}"
             };
-
-            // TODO consider expanding Schoolbox json-serialized user so these fields get output
-            var schoolboxUser            = {{ user.current | json_encode | raw }};
-            schoolboxUser.name           = "{{ user.current.formatName }}";
-            schoolboxUser.email          = "{{ user.current.email }}";
-            schoolboxUser.year           = "{{ user.current.year }}";
-            schoolboxUser.role           = {{ user.current.role | json_encode | raw }};
-            schoolboxUser.impersonated   = Boolean('{{ user.impersonated }}');
-            schoolboxUser.communityLogin = Boolean('{{ user.communityLogin }}');
         </script>
         {% endautoescape %}
-
-        {# Header JS: AFAICT used nowhere #}
-        {#<script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>#}
 
         {% if config.site_usage_tracking %}
         <!-- Global Site Tag (gtag.js) - Google Analytics -->
@@ -104,19 +92,14 @@
             gtag('event', 'site_school_code_dimension', {'site_school_code': '{{ config. site_school_code }}'});
             gtag('event', 'site_type_dimension', {'site_type': '{{ config.site_type }}'});
             gtag('event', 'site_version_dimension', {'site_version': '{{ config.site_version }}'});
-
-            if (schoolboxUser.id) {
-                gtag('event', 'role_name_dimension', {'role_name': schoolboxUser.role.name });
-                gtag('event', 'role_type_dimension', {'role_type': schoolboxUser.role.type });
-
-                if (schoolboxUser.role.student) {
-                    gtag('event', 'user_year_dimension', {'user_year': schoolboxUser.year});
-                }
-
-                if (schoolboxUser.impersonated) {
-                    gtag('event', 'impersonated_dimension', {'impersonated': 1});
-                }
-            }
+            {% if user.current.id %}
+            gtag('event', 'role_name_dimension', {'role_name': '{{ user.current.role.name }}'});
+            gtag('event', 'role_type_dimension', {'role_type': '{{ user.current.role.type }}' });
+            {% if user.current.role.isStudent %}
+            gtag('event', 'user_year_dimension', {'user_year': '{{ user.current.year.name ?? '' }}' });
+            {% endif %}
+            gtag('event', 'impersonated_dimension', {'impersonated': {{ user.impersonated ? 1 : 0 }}});
+            {% endif %}
         </script>
         {% endautoescape %}
 
