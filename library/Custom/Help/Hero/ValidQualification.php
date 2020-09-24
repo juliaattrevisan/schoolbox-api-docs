@@ -35,7 +35,6 @@ class ValidQualification
     public const MANDATORY_QUIZZES = [
         16058, // Unit 1, Project 2 Prove yourself as a Schoolbox Teacher Newbie
         15912, // Unit 2, Project 1 Review your knowledge of the calendar
-        55313, // Unit 2, Project 2 Verify your understanding of news
         15509, // Unit 3, Project 2 Verify your knowledge of page types and components
         15768, // Unit 6, Project 1 Prove your knowledge about submitting and marking
         16911, // Unit 7, Project 1 Test your knowledge of advanced component usage
