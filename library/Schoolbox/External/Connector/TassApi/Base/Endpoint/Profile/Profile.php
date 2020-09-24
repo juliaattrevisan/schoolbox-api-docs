@@ -241,7 +241,7 @@ class Profile implements IStrategy
             $lastname = trim((string)$student['general_details']['surname']);
             $medicalAlert = $this->findMedicalAlert($externalId);
             $mobile = trim((string)$student['general_details']['mobile_phone']);
-            $specialNeeds = trim((string)$student['other_school_details']['learning_support']) === self::SPECIAL_NEEDS;
+            $specialNeeds = trim($student['other_school_details']['learning_support'] ?? '') === self::SPECIAL_NEEDS;
             $studiesCode = $this->findStudiesCode($student);
             $title = '';
             $tutorGroup = trim((string)$student['school_details']['pc_tutor_group']);
