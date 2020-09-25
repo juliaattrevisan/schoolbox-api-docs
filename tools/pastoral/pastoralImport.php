@@ -12,6 +12,7 @@
  */
 declare(strict_types=1);
 
+use Alaress\Lock\InstanceLockFactory;
 use Schoolbox\Application\CliTool;
 use Schoolbox\UserMapper;
 
@@ -51,8 +52,8 @@ Usage: pastoralImport.php [--parent-access] [--add-records] [--add-attachments] 
     --delete-records:   if record exists, delete it and recreate. If not specified only non-existing records will be imported
     --user:             the user id of someone who should be associated with this import (typically a superuser)
     --default-owner:    the user id of someone who should be assigned as owner of pastoral records
-    
-    
+
+
 HELP;
 
             exit(0);
@@ -103,11 +104,9 @@ HELP;
             exit(0);
         }
 
-        $lock = new Alaress_Lock('pastoral_import.' . INSTANCE_ID . '.lock');
-
-        if (!$lock->acquire()) {
-            $log->critical('A pastoral import is currently in progress, exiting...');
-            exit(0);
+        $lock = $this->acquireLock('pastoral_import', null);
+        if (!$lock->isAcquired()) {
+            exit(1);
         }
 
         $log->info("Beginning import of pastoral records...");

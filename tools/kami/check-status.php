@@ -7,10 +7,12 @@
 declare(strict_types=1);
 
 use Alaress\Jitter\Jitter;
+use Alaress\Lock\InstanceLockFactory;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\MapperFactory;
 use Alaress\Random;
 use Schoolbox\Application\CliTool;
+use Symfony\Component\Lock\LockInterface;
 
 require __DIR__ . '/../../conf/core/require.php';
 
@@ -51,7 +53,11 @@ $app = new class extends CliTool\App
 
         $statusUpdater = $this->buildStatusUpdater($maxAttempts, $baseBackOff);
 
-        $lock = $this->acquireLock($timeout);
+        $lock = $this->acquireLock('kami_status_check', $timeout);
+        if (!$lock->isAcquired()) {
+            exit(1);
+        }
+        $this->setMaxExecutionTime($timeout);
 
         // Run the status checker
         $exitStatus = 0;
@@ -148,45 +154,6 @@ HELP;
 
         $jitter = new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff);
         return new Kami\StatusUpdater($connector, $kamiMapper, $jitter, $this->getLogger());
-    }
-
-
-    /**
-     * Acquires and returns a lock
-     *
-     * @param int $timeout
-     * @return Alaress_Lock
-     */
-    private function acquireLock(int $timeout): Alaress_Lock
-    {
-        // Ensure only one instance of checker is running at a time
-        $lockFile = "{$this->getConfig()->get('stream_dir')}/.kami_status_check_" . INSTANCE_ID . ".lock";
-        $lock     = new Alaress_Lock($lockFile);
-        if ($lock->acquire()) {
-            return $lock;
-        }
-        $this->getLogger()->warning('A status-checker is already running. Checking last mod time');
-        $lastModTime  = filemtime($lockFile);
-        $lastModDelta = time() - $lastModTime;
-
-        $kill = false;
-        if (!$lastModTime) {
-            $this->getLogger()->error('Unable to determine when lock file was last written');
-            $kill = true;
-        } elseif ($lastModDelta > $timeout) {
-            $this->getLogger()->error("Lock file last modified {$lastModDelta} seconds ago");
-            $kill = true;
-        }
-
-        if ($kill) {
-            $this->getLogger()->error('Assuming process has timed out and killing it');
-            $lock->killProcess();
-            $lock->acquire();
-        } else {
-            $this->getLogger()->info('No instance has yet timed out - exiting');
-            exit(1);
-        }
-        return $lock;
     }
 };
 

@@ -10,10 +10,13 @@
 declare(strict_types=1);
 
 use Alaress\Jitter\Jitter;
+use Alaress\Lock\InstanceLockFactory;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\MapperFactory;
 use Alaress\Random;
 use Schoolbox\Application\CliTool;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 
 require __DIR__ . '/../../conf/core/require.php';
 
@@ -101,31 +104,12 @@ HELP;
         $requeueErrors = new Kami\ReQueueErrors($connector, $kamiMapper, $jitter, $this->getLogger());
 
         // Ensure only one instance of tool is running at a time
-        $lockFile = "{$this->getConfig()->get('stream_dir')}/.kami_requeue_errors_".INSTANCE_ID.".lock";
-        $lock     = new Alaress_Lock($lockFile);
-        if (!$lock->acquire()) {
-            $this->getLogger()->warning('A errors-requeue instance is already running. Checking last mod time');
-            $lastModTime  = filemtime($lockFile);
-            $lastModDelta = time() - $lastModTime;
-
-            $kill = false;
-            if (!$lastModTime) {
-                $this->getLogger()->error('Unable to determine when lock file was last written');
-                $kill = true;
-            } elseif ($lastModDelta > $timeout) {
-                $this->getLogger()->error("Lock file last modified {$lastModDelta} seconds ago");
-                $kill = true;
-            }
-
-            if ($kill) {
-                $this->getLogger()->error('Assuming process has timed out and killing it');
-                $lock->killProcess();
-                $lock->acquire();
-            } else {
-                $this->getLogger()->info('No instance has yet timed out - exiting');
-                exit(1);
-            }
+        $lock = $this->acquireLock('kami_requeue_errors', $timeout);
+        if (!$lock->isAcquired()) {
+            exit(1);
         }
+
+        $this->setMaxExecutionTime($timeout);
 
         // Run the tool
         $exitStatus = 0;

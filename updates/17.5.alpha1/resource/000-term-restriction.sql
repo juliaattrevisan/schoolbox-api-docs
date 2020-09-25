@@ -1,1 +1,0 @@
-ALTER TABLE `resource` ADD COLUMN `current_term_restriction` TINYINT(1) NOT NULL DEFAULT 0 AFTER `max_reservation_time`;

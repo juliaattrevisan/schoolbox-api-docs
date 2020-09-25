@@ -11,6 +11,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Lock\InstanceLockFactory;
 use Aura\Di\Exception\ServiceNotFound ;
 use League\Flysystem\FileNotFoundException;
 use Schoolbox\GenericCollection;
@@ -19,6 +20,8 @@ use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Video\Queue;
 use Schoolbox\Video\QueueMapper;
 use Schoolbox\Application\CliTool;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -49,39 +52,12 @@ $app = new class extends CliTool\App{
         // ------------------------------------------------------------------------------------------------------------
         // Allow only a single migration at a time
         // ------------------------------------------------------------------------------------------------------------
-
-        $lock = new Alaress_Lock($configLoader->get('stream_dir') . '/.video_transcode_'.INSTANCE_ID.'.lock');
-
-        if (!$lock->acquire()) {
-            $log->warning("Video processor is already running, checking timeout...");
-
-            // Check timeout
-            $timeout = (int)$configLoader->get('video_processing_timeout');
-
-            if ($timeout <= 0) {
-                $log->alert("Unable to proceed, timeout of media processing is disabled");
-                exit(1);
-            }
-
-            // If videos exceeded the timeout, and we timed all videos out,
-            // kill the process (otherwise we are still processing videos)
-            $totalProcessing = $queueMapper->countByColumn('status', $queueMapper::STATUS_PROCESSING);
-            $numTimedOut     = $queueMapper->markAllProcessingAsTimedOut($timeout);
-            if ($numTimedOut > 0) {
-                $log->error("Error: {$numTimedOut} media item(s) timed out");
-                if (($totalProcessing - $numTimedOut) === 0) {
-                    $log->info("Existing transcode timed out and no further media item(s) processing: terminating existing processor");
-                    $lock->killProcess();
-                    $lock->acquire();
-                } else {
-                    $log->info("Unable to proceed, existing transcode running and still has media to process");
-                    exit(1);
-                }
-            } else {
-                $log->info("Unable to proceed, existing transcode running and no media item(s) timed out");
-                exit(1);
-            }
+        $timeout = (int)$configLoader->get('video_processing_timeout');
+        $lock    = $this->acquireLock('video_transcode', $timeout);
+        if (!$lock->isAcquired()) {
+            exit(1);
         }
+        $this->setMaxExecutionTime($timeout);
 
         // ------------------------------------------------------------------------------------------------------------
         // Check if there was anything to process
@@ -172,6 +148,19 @@ $app = new class extends CliTool\App{
                     $log->info("    - Transcode completed successfully");
                     $success++;
                 }
+            }
+
+            // Refresh process lock, or break if it can't be refreshed
+            if ($lock->isExpired()) {
+                $log->warning('Lock expired during processing: aborting');
+                break;
+            }
+            try {
+                $log->info('Refreshing process lock...');
+                $lock->refresh();
+            } catch (LockConflictedException|LockAcquiringException $e) {
+                $log->warning('Could not refresh lock: aborting');
+                break;
             }
         }
 

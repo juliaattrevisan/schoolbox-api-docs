@@ -12,6 +12,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Lock\InstanceLockFactory;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
@@ -68,10 +69,9 @@ HELP;
             $log->info('Pastoral external attachment upload is disabled: not uploading attachments');
         }
 
-        $lock = new Alaress_Lock('pastoral_export.' . INSTANCE_ID . '.lock');
-        if (!$lock->acquire()) {
-            $log->warning("A pastoral export is currently in progress, exiting...");
-            exit;
+        $lock = $this->acquireLock('pastoral_export', null);
+        if (!$lock->isAcquired()) {
+            exit(1);
         }
 
         // Retrieve all pastoral records and re-save
