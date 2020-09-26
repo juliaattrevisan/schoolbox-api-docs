@@ -18,16 +18,16 @@ namespace Payload\Fixtures\Division;
 use Payload\Request;
 use Payload\PostTrait;
 
-class setDivision extends Request
+class setPosition extends Request
 {
     use PostTrait;
     
-    private $division;
+    private $team;
     
-    public function __construct(\Schoolbox\Fixtures\Division\Model $division, \Schoolbox\Fixtures\Team\Model $team, \Schoolbox\User $user, \Schoolbox\Fixtures\Position\Model $position)
+    public function __construct(\Schoolbox\Fixtures\Team\Model $team, \Schoolbox\User $user, \Schoolbox\Fixtures\Position\Model $position)
     {
-        $this->division=$division;
-        $this->setReferer('/fixtures/divisions/' . $this->division->getId() . '/lobby');
+        $this->team=$team;
+        $this->setReferer('/fixtures/divisions/' . $this->team->getDivision()->getId() . '/lobby');
         
         $this->setFormParam('team_id', $team->getId());
         $this->setFormParam('user_id', $user->getId());
@@ -37,6 +37,6 @@ class setDivision extends Request
     
     public function getUrl():string
     {
-        return '/fixtures/divisions/' . $this->division->getId() . '/setPositions';
+        return '/fixtures/divisions/' . $this->team->getDivision()->getId() . '/setPositions';
     }
 }

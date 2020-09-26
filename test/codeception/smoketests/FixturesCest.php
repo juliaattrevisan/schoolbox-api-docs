@@ -12,6 +12,7 @@ namespace smoketests;
 
 use IntegrationTester;
 use Payload;
+use Schoolbox\Collection;
 #use React\Tests\Socket\IntegrationTest;
 
 class FixturesCest
@@ -415,5 +416,633 @@ class FixturesCest
         $i->sendRequest($deleteSport);
         
         $i->seeResponseCodeIs('204');
+    }
+    
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function createDivision(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'Autotest Create Division Sport ' . $timestamp;
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $sportMapper=\Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $sportModel=$sportMapper->findOneByColumn('name', $sportName);
+        
+        $seasonName= 'Autotest Create Division Season ' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        
+        $i->sendRequest($newSeason);
+        
+        $seasonMapper=\Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $seasonModel=$seasonMapper->findOneByColumn('name', $seasonName);
+
+        $divisionName= 'AutoTest Division Create ' . $timestamp;
+        
+        $newDivision = new Payload\Fixtures\Division\Create($divisionName, $sportModel, $seasonModel);
+        
+        $i->sendRequest($newDivision);
+        
+        $i->seeResponseCodeIs('303');
+    }
+    
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function addPlayerDivision(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'Autotest Add Player Division Sport ' . $timestamp;
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $sportMapper=\Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $sportModel=$sportMapper->findOneByColumn('name', $sportName);
+        
+        $seasonName= 'Autotest Add Player Division Season ' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        
+        $i->sendRequest($newSeason);
+        
+        $seasonMapper=\Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $seasonModel=$seasonMapper->findOneByColumn('name', $seasonName);
+        
+        $divisionName= 'AutoTest Division Add Player ' . $timestamp;
+        
+        $newDivision = new Payload\Fixtures\Division\Create($divisionName, $sportModel, $seasonModel);
+        
+        $i->sendRequest($newDivision);
+        
+        $divMapper=\Schoolbox\Fixtures\Division\Mapper::getInstance();
+        $divModel=$divMapper->findOneByColumn('name', $divisionName);
+        
+        $userMapper=\Schoolbox\UserMapper::getInstance();
+        $user=$userMapper->findOneByColumn('username', 'jreed');
+        
+        $collectionOfUsers = new \Schoolbox\Collection([$user]); 
+        
+        $addPlayer = new Payload\Fixtures\Division\AddPlayer($divModel, $collectionOfUsers);
+        
+        $i->sendRequest($addPlayer);
+        
+        $i->seeResponseCodeIs('303');
+    }
+    
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function removePlayerDivision(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'Autotest Remove Player Division Sport ' . $timestamp;
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $sportMapper=\Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $sportModel=$sportMapper->findOneByColumn('name', $sportName);
+        
+        $seasonName= 'Autotest Remove Player Division Season ' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        
+        $i->sendRequest($newSeason);
+        
+        $seasonMapper=\Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $seasonModel=$seasonMapper->findOneByColumn('name', $seasonName);
+        
+        $divisionName= 'AutoTest Division Remove Player ' . $timestamp;
+        
+        $newDivision = new Payload\Fixtures\Division\Create($divisionName, $sportModel, $seasonModel);
+        
+        $i->sendRequest($newDivision);
+        
+        $divMapper=\Schoolbox\Fixtures\Division\Mapper::getInstance();
+        $divModel=$divMapper->findOneByColumn('name', $divisionName);
+        
+        $userMapper=\Schoolbox\UserMapper::getInstance();
+        $user=$userMapper->findOneByColumn('username', 'jreed');
+        
+        $collectionOfUsers = new \Schoolbox\Collection([$user]);
+        
+        $addPlayer = new Payload\Fixtures\Division\AddPlayer($divModel, $collectionOfUsers);
+        
+        $i->sendRequest($addPlayer);
+        
+        $removePlayer = new Payload\Fixtures\Division\removePlayer($divModel, $user);
+        
+        $i->sendRequest($removePlayer);
+        
+        $i->seeResponseCodeIs('303');
+    }
+    
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function updateDivision(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'Autotest Update Division Sport ' . $timestamp;
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $sportMapper=\Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $sportModel=$sportMapper->findOneByColumn('name', $sportName);
+        
+        $seasonName= 'Autotest Update Division Season ' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        
+        $i->sendRequest($newSeason);
+        
+        $seasonMapper=\Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $seasonModel=$seasonMapper->findOneByColumn('name', $seasonName);
+        
+        $divisionName= 'AutoTest Division ChangeMe ' . $timestamp;
+        $updatedName= 'AutoTest Division Update ' . $timestamp;
+        
+        $newDivision = new Payload\Fixtures\Division\Create($divisionName, $sportModel, $seasonModel);
+        
+        $i->sendRequest($newDivision);
+        
+        $divMapper=\Schoolbox\Fixtures\Division\Mapper::getInstance();
+        $divModel=$divMapper->findOneByColumn('name', $divisionName);
+        
+        $updateDivision = new Payload\Fixtures\Division\Update($divModel);
+
+        $updateDivision->setFormParam('name', $updatedName);
+        
+        $i->sendRequest($updateDivision);
+        
+        $i->seeResponseCodeIs('303');
+    }
+    
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function deleteDivision(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'Autotest Delete Division Sport ' . $timestamp;
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $sportMapper=\Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $sportModel=$sportMapper->findOneByColumn('name', $sportName);
+        
+        $seasonName= 'Autotest Delete Division Season ' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        
+        $i->sendRequest($newSeason);
+        
+        $seasonMapper=\Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $seasonModel=$seasonMapper->findOneByColumn('name', $seasonName);
+        
+        $divisionName= 'AutoTest Division Shouldn\'t Exist ' . $timestamp;
+        
+        $newDivision = new Payload\Fixtures\Division\Create($divisionName, $sportModel, $seasonModel);
+        
+        $i->sendRequest($newDivision);
+        
+        $divMapper=\Schoolbox\Fixtures\Division\Mapper::getInstance();
+        $divModel=$divMapper->findOneByColumn('name', $divisionName);
+        
+        $deleteDivision = new Payload\Fixtures\Division\Delete($divModel);
+        
+        $i->sendRequest($deleteDivision);
+        
+        $i->seeResponseCodeIs('204');
+    }
+    
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function createTeam(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'Autotest Create Team Sport ' . $timestamp;
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $sportMapper=\Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $sportModel=$sportMapper->findOneByColumn('name', $sportName);
+        
+        $seasonName= 'Autotest Create Team Season ' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        
+        $i->sendRequest($newSeason);
+        
+        $seasonMapper=\Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $seasonModel=$seasonMapper->findOneByColumn('name', $seasonName);
+        
+        $divisionName= 'AutoTest Division Create Team ' . $timestamp;
+        
+        $newDivision = new Payload\Fixtures\Division\Create($divisionName, $sportModel, $seasonModel);
+        
+        $i->sendRequest($newDivision);
+        
+        $divMapper=\Schoolbox\Fixtures\Division\Mapper::getInstance();
+        $divModel=$divMapper->findOneByColumn('name', $divisionName);
+        
+        $teamName= 'AutoTest Team Create ' . $timestamp;
+        
+        $newTeam = new Payload\Fixtures\Team\Create($teamName, $divModel);
+        
+        $i->sendRequest($newTeam);
+        
+        $i->seeResponseCodeIs('303');
+    }
+    
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function updateTeam(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'Autotest Update Team Sport ' . $timestamp;
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $sportMapper=\Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $sportModel=$sportMapper->findOneByColumn('name', $sportName);
+        
+        $seasonName= 'Autotest Update Team Season ' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        
+        $i->sendRequest($newSeason);
+        
+        $seasonMapper=\Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $seasonModel=$seasonMapper->findOneByColumn('name', $seasonName);
+        
+        $divisionName= 'AutoTest Division Update Team ' . $timestamp;
+        
+        $newDivision = new Payload\Fixtures\Division\Create($divisionName, $sportModel, $seasonModel);
+        
+        $i->sendRequest($newDivision);
+        
+        $divMapper=\Schoolbox\Fixtures\Division\Mapper::getInstance();
+        $divModel=$divMapper->findOneByColumn('name', $divisionName);
+        
+        $teamName= 'AutoTest Team CangeMe ' . $timestamp;
+        $updateTeamName= 'AutoTest Team Update ' . $timestamp;
+        
+        $newTeam = new Payload\Fixtures\Team\Create($teamName, $divModel);
+        
+        $i->sendRequest($newTeam);
+        
+        $teamMapper=\Schoolbox\Fixtures\Team\Mapper::getInstance();
+        $teamModel=$teamMapper->findOneByColumn('name', $teamName);
+        
+        $updateTeam = new Payload\Fixtures\Team\Update($teamModel);
+        $updateTeam->setFormParam('name', $updateTeamName);
+        
+        $i->sendRequest($updateTeam);
+        
+        $i->seeResponseCodeIs('303');
+    }
+    
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function deleteTeam(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'Autotest Update Team Sport ' . $timestamp;
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $sportMapper=\Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $sportModel=$sportMapper->findOneByColumn('name', $sportName);
+        
+        $seasonName= 'Autotest Update Team Season ' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        
+        $i->sendRequest($newSeason);
+        
+        $seasonMapper=\Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $seasonModel=$seasonMapper->findOneByColumn('name', $seasonName);
+        
+        $divisionName= 'AutoTest Division Update Team ' . $timestamp;
+        
+        $newDivision = new Payload\Fixtures\Division\Create($divisionName, $sportModel, $seasonModel);
+        
+        $i->sendRequest($newDivision);
+        
+        $divMapper=\Schoolbox\Fixtures\Division\Mapper::getInstance();
+        $divModel=$divMapper->findOneByColumn('name', $divisionName);
+        
+        $teamName= 'AutoTest Team I should\'t exist ' . $timestamp;
+        
+        $newTeam = new Payload\Fixtures\Team\Create($teamName, $divModel);
+        
+        $i->sendRequest($newTeam);
+        
+        $teamMapper=\Schoolbox\Fixtures\Team\Mapper::getInstance();
+        $teamModel=$teamMapper->findOneByColumn('name', $teamName);
+        
+        $updateTeam = new Payload\Fixtures\Team\Delete($teamModel);
+        
+        $i->sendRequest($updateTeam);
+        
+        $i->seeResponseCodeIs('204');
+    }
+    
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function addPlayerTeam(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'Autotest Add Player Team Div Sport ' . $timestamp;
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $sportMapper=\Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $sportModel=$sportMapper->findOneByColumn('name', $sportName);
+        
+        $seasonName= 'Autotest Add Player Team Div Season ' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        
+        $i->sendRequest($newSeason);
+        
+        $seasonMapper=\Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $seasonModel=$seasonMapper->findOneByColumn('name', $seasonName);
+        
+        $divisionName= 'AutoTest Team Div Add Player ' . $timestamp;
+        
+        $newDivision = new Payload\Fixtures\Division\Create($divisionName, $sportModel, $seasonModel);
+        
+        $i->sendRequest($newDivision);
+        
+        $divMapper=\Schoolbox\Fixtures\Division\Mapper::getInstance();
+        $divModel=$divMapper->findOneByColumn('name', $divisionName);
+        
+        $teamName= 'AutoTest Team Div Add Player ' . $timestamp;
+        
+        $newTeam = new Payload\Fixtures\Team\Create($teamName, $divModel);
+        
+        $i->sendRequest($newTeam);
+        
+        $teamMapper=\Schoolbox\Fixtures\Team\Mapper::getInstance();
+        $teamModel=$teamMapper->findOneByColumn('name', $teamName);
+        
+        $userMapper=\Schoolbox\UserMapper::getInstance();
+        $user=$userMapper->findOneByColumn('username', 'jreed');
+        
+        $collectionOfUsers = new \Schoolbox\Collection([$user]);
+        
+        $addPlayer = new Payload\Fixtures\Division\AddPlayer($divModel, $collectionOfUsers);
+        
+        $i->sendRequest($addPlayer);
+        
+        $addPlayer = new Payload\Fixtures\Team\AddPlayer($teamModel, $user);
+        
+        $i->sendRequest($addPlayer);
+        
+        $i->seeResponseCodeIs('303');
+    }
+    
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function setPlayerPosition(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'Autotest Set Pos Team Div Sport ' . $timestamp;
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $sportMapper=\Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        /** @var \Schoolbox\Fixtures\Sport\Model $sportModel */
+        $sportModel=$sportMapper->findOneByColumn('name', $sportName);
+        
+        $positions=$sportModel->getPositions();
+        
+        $seasonName= 'Autotest Set Pos Team Div Season ' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        
+        $i->sendRequest($newSeason);
+        
+        $seasonMapper=\Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $seasonModel=$seasonMapper->findOneByColumn('name', $seasonName);
+        
+        $divisionName= 'AutoTest Team Div Set Pos ' . $timestamp;
+        
+        $newDivision = new Payload\Fixtures\Division\Create($divisionName, $sportModel, $seasonModel);
+        
+        $i->sendRequest($newDivision);
+        
+        $divMapper=\Schoolbox\Fixtures\Division\Mapper::getInstance();
+        $divModel=$divMapper->findOneByColumn('name', $divisionName);
+        
+        $teamName= 'AutoTest Team Div Set Pos ' . $timestamp;
+        
+        $newTeam = new Payload\Fixtures\Team\Create($teamName, $divModel);
+        
+        $i->sendRequest($newTeam);
+        
+        $teamMapper=\Schoolbox\Fixtures\Team\Mapper::getInstance();
+        $teamModel=$teamMapper->findOneByColumn('name', $teamName);
+        
+        $userMapper=\Schoolbox\UserMapper::getInstance();
+        $user=$userMapper->findOneByColumn('username', 'jreed');
+        
+        $collectionOfUsers = new \Schoolbox\Collection([$user]);
+        
+        $addPlayer = new Payload\Fixtures\Division\AddPlayer($divModel, $collectionOfUsers);
+        
+        $i->sendRequest($addPlayer);
+        
+        $addPlayer = new Payload\Fixtures\Team\AddPlayer($teamModel, $user);
+        
+        $i->sendRequest($addPlayer);
+        
+        /** @var \Schoolbox\Fixtures\Position\Model $onePosition **/
+        $onePosition = $positions->first();
+        
+        $setPosition = new Payload\Fixtures\Division\setPosition($teamModel, $user, $onePosition);
+        
+        $i->sendRequest($setPosition);
+        
+        $i->seeResponseCodeIs('303');
+    }
+    
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function reorderPlayers(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'Autotest reorder player Team Div Sport ' . $timestamp;
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $sportMapper=\Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $sportModel=$sportMapper->findOneByColumn('name', $sportName);
+        
+        $seasonName= 'Autotest reorder player Team Div Season ' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        
+        $i->sendRequest($newSeason);
+        
+        $seasonMapper=\Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $seasonModel=$seasonMapper->findOneByColumn('name', $seasonName);
+        
+        $divisionName= 'AutoTest Team Div reorder player ' . $timestamp;
+        
+        $newDivision = new Payload\Fixtures\Division\Create($divisionName, $sportModel, $seasonModel);
+        
+        $i->sendRequest($newDivision);
+        
+        $divMapper=\Schoolbox\Fixtures\Division\Mapper::getInstance();
+        $divModel=$divMapper->findOneByColumn('name', $divisionName);
+        
+        $teamName= 'AutoTest Team Div reorder player ' . $timestamp;
+        
+        $newTeam = new Payload\Fixtures\Team\Create($teamName, $divModel);
+        
+        $i->sendRequest($newTeam);
+        
+        $teamMapper=\Schoolbox\Fixtures\Team\Mapper::getInstance();
+        $teamModel=$teamMapper->findOneByColumn('name', $teamName);
+        
+        $userMapper=\Schoolbox\UserMapper::getInstance();
+        $user1=$userMapper->findOneByColumn('username', 'jreed');
+        $user2=$userMapper->findOneByColumn('username', 'lsmith');
+        
+        $collectionOfUsers = new \Schoolbox\Collection([$user1, $user2]);
+        
+        $addPlayer = new Payload\Fixtures\Division\AddPlayer($divModel, $collectionOfUsers);
+        
+        $i->sendRequest($addPlayer);
+        
+        $addPlayer = new Payload\Fixtures\Team\AddPlayer($teamModel, $user1);
+        
+        $i->sendRequest($addPlayer);
+        
+        $addPlayer = new Payload\Fixtures\Team\AddPlayer($teamModel, $user2);
+        
+        $i->sendRequest($addPlayer);
+        
+        $teamModel=$teamMapper->findOneByColumn('name', $teamName);
+        
+        //For some reason the Team model doesn't have the players even though they are there and exist on the system.
+        $reorderPlayers = new Payload\Fixtures\Team\reorderPlayers($teamModel);
+        
+        //So we have to do this manually.
+        $reorderPlayers->manuallyPopulatePlayer($user1, 0);
+        $reorderPlayers->manuallyPopulatePlayer($user2, 1);
+        
+        $reorderPlayers->swapPlayerAwithB(0,1);
+        
+        $i->sendRequest($reorderPlayers);
+        
+        $i->seeResponseCodeIs('303');
+    }
+    
+    
+    /**
+     * Request URL:
+     *
+     * @param IntegrationTester $i
+     */
+    public function removePlayerTeam(IntegrationTester $i): void
+    {
+        $timestamp=time();
+        $sportName= 'Autotest Remove Player Team Div Sport ' . $timestamp;
+        $newSport = new Payload\Fixtures\Sport\Create($sportName);
+        
+        $i->sendRequest($newSport);
+        
+        $sportMapper=\Schoolbox\Fixtures\Sport\Mapper::getInstance();
+        $sportModel=$sportMapper->findOneByColumn('name', $sportName);
+        
+        $seasonName= 'Autotest Remove Player Team Div Season ' . $timestamp;
+        $newSeason = new Payload\Fixtures\Seasons\Create($seasonName);
+        
+        $i->sendRequest($newSeason);
+        
+        $seasonMapper=\Schoolbox\Fixtures\Season\Mapper::getInstance();
+        $seasonModel=$seasonMapper->findOneByColumn('name', $seasonName);
+        
+        $divisionName= 'AutoTest Team Div Remove Player ' . $timestamp;
+        
+        $newDivision = new Payload\Fixtures\Division\Create($divisionName, $sportModel, $seasonModel);
+        
+        $i->sendRequest($newDivision);
+        
+        $divMapper=\Schoolbox\Fixtures\Division\Mapper::getInstance();
+        $divModel=$divMapper->findOneByColumn('name', $divisionName);
+        
+        $teamName= 'AutoTest Team Div Remove Player ' . $timestamp;
+        
+        $newTeam = new Payload\Fixtures\Team\Create($teamName, $divModel);
+        
+        $i->sendRequest($newTeam);
+        
+        $teamMapper=\Schoolbox\Fixtures\Team\Mapper::getInstance();
+        $teamModel=$teamMapper->findOneByColumn('name', $teamName);
+        
+        $userMapper=\Schoolbox\UserMapper::getInstance();
+        $user=$userMapper->findOneByColumn('username', 'jreed');
+        
+        $collectionOfUsers = new \Schoolbox\Collection([$user]);
+        
+        $addPlayer = new Payload\Fixtures\Division\AddPlayer($divModel, $collectionOfUsers);
+        
+        $i->sendRequest($addPlayer);
+        
+        $addPlayer = new Payload\Fixtures\Team\AddPlayer($teamModel, $user);
+        
+        $i->sendRequest($addPlayer);
+        
+        $removePlayer = new Payload\Fixtures\Team\removePlayer($teamModel, $user);
+        
+        $i->sendRequest($removePlayer);
+        
+        $i->seeResponseCodeIs('303');
     }
 }

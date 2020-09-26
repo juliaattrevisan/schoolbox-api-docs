@@ -21,7 +21,7 @@ class Delete extends Request
     
     private $team;
     
-    public function __construct(string $name, \Schoolbox\Fixtures\Team\Model $team, \Schoolbox\User $user)
+    public function __construct(\Schoolbox\Fixtures\Team\Model $team)
     {
         $this->team=$team;
         $this->setReferer('/fixtures/sports/' . $this->team->getDivision()->getSport()->getId());

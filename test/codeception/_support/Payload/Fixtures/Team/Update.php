@@ -16,7 +16,7 @@ Request URL: https://vagrant.dev.schoolbox.cloud/fixtures/teams/9
 Referer	https://vagrant.dev.schoolbox.cloud/fixtures/teams/9/edit
 */
  
-namespace Payload\Fixtures\Division;
+namespace Payload\Fixtures\Team;
 
 use Payload\Request;
 use Payload\PostTrait;
@@ -25,21 +25,21 @@ class Update extends Request
 {
     use PostTrait;
     
-    private $division;
+    private $team;
     
-    public function __construct(\Schoolbox\Fixtures\Division\Model $division)
+    public function __construct(\Schoolbox\Fixtures\Team\Model $team)
     {
-        $this->division=$division;
-        $this->setReferer('/fixtures/sports/' . $this->division->getSport()->getId() . '/divisions/new');
+        $this->team=$team;
+        $this->setReferer('/fixtures/teams/' . $this->team->getId() . '/edit');
         
-        $this->setFormParam('sportId', $this->division->getSport()->getId());
-        $this->setFormParam('divisionId', $this->division->getId());
-        $this->setFormParam('name', $this->division->getName());
-        $this->setFormParam('seasonId', $this->division->getSeason()->getId());
+        $this->setFormParam('teamId', $this->team->getId());
+        $this->setFormParam('divisionId', $this->team->getDivision()->getId());
+        $this->setFormParam('name', $this->team->getName());
+        #$this->setFormParam('coach[]', '');
     }
     
     public function getUrl():string
     {
-        return '/fixtures/divisions/';
+        return '/fixtures/teams/' . $this->team->getId();
     }
 }

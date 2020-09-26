@@ -13,12 +13,12 @@ Request URL:https://vagrant.dev.schoolbox.cloud/fixtures/teams/9/reorderPlayers
 https://vagrant.dev.schoolbox.cloud/fixtures/divisions/7/lobby
 */
 
-namespace Payload\Fixtures\Division;
+namespace Payload\Fixtures\Team;
 
 use Payload\Request;
 use Payload\PostTrait;
 
-class reorderPlayer extends Request
+class reorderPlayers extends Request
 {
     use PostTrait;
     
@@ -29,13 +29,19 @@ class reorderPlayer extends Request
         $this->team=$team;
         $this->setReferer('/fixtures/divisions/' . $this->team->getDivision()->getId() . '/lobby');
         
-        $count=0;
-        foreach ($team->getPlayers() as $user)
+        //As the team players are not set for some reason I will be skipping this part.
+        /*$count=0;
+        foreach ($this->team->getPlayers()->getAll() as $user)
         {
             $this->setFormParam('userId['.$count.']', $user->getId());
             $count++;
-        }
+        }*/
         
+    }
+    
+    public function manuallyPopulatePlayer(\Schoolbox\User $player, int $array_num)
+    {
+        $this->setFormParam('userId['.$array_num.']', $player->getId());
     }
     
     public function swapPlayerAwithB(int $order_posA, int $order_posB)
