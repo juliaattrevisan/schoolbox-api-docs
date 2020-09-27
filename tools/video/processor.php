@@ -27,6 +27,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App{
 
+    public const LOCK_NAME = 'video_transcode';
+
 
     /** @inheritDoc */
     public function run(): void
@@ -53,7 +55,7 @@ $app = new class extends CliTool\App{
         // Allow only a single migration at a time
         // ------------------------------------------------------------------------------------------------------------
         $timeout = (int)$configLoader->get('video_processing_timeout');
-        $lock    = $this->acquireLock('video_transcode', $timeout);
+        $lock    = $this->acquireLock(self::LOCK_NAME, $timeout);
         if (!$lock->isAcquired()) {
             exit(1);
         }

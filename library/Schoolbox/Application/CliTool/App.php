@@ -26,6 +26,13 @@ use UnexpectedValueException;
  */
 abstract class App
 {
+    /**
+     * The name of the lock that this job should acquire.
+     *
+     * @see `acquireLock`
+     */
+    public const LOCK_NAME = null;
+
     protected const COLOUR_GREEN = "\033[0;32m";
     protected const COLOUR_RED = "\033[0;31m";
     protected const COLOUR_GREY = "\033[0;37m";

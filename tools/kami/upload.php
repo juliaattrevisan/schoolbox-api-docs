@@ -23,6 +23,8 @@ require __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App{
 
+    public const LOCK_NAME = 'kami_upload';
+
     private const DEFAULT_BATCH_SIZE           = 100;
     private const DEFAULT_MAX_ATTEMPTS         = 3;
     private const DEFAULT_MAX_SKIPS            = 3;
@@ -107,7 +109,7 @@ $app = new class extends CliTool\App{
         );
 
 
-        $lock = $this->acquireLock('kami_upload', $timeout);
+        $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
         if (!$lock->isAcquired()) {
             exit(1);
         }

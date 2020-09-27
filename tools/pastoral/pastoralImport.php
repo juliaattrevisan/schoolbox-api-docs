@@ -20,6 +20,8 @@ require __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App{
 
+    public const LOCK_NAME = 'pastoral_import';
+
     /** @inheritDoc */
     public function getLongOpts(): array
     {
@@ -104,7 +106,7 @@ HELP;
             exit(0);
         }
 
-        $lock = $this->acquireLock('pastoral_import', null);
+        $lock = $this->acquireLock(self::LOCK_NAME, null);
         if (!$lock->isAcquired()) {
             exit(1);
         }

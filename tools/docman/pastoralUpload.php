@@ -23,6 +23,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
+    public const LOCK_NAME = 'pastoral_upload';
+
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
@@ -89,7 +91,7 @@ HELP;
     private function checkOverlappingExecution(): LockInterface
     {
         $timeout = (int)$this->getConfig()->get('pastoral_upload_timeout');
-        $lock    = $this->acquireLock('pastoral_upload', $timeout);
+        $lock    = $this->acquireLock(self::LOCK_NAME, $timeout);
         if ($lock->acquire()) {
             $this->setMaxExecutionTime($timeout);
             return $lock;

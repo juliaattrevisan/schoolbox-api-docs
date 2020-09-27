@@ -22,6 +22,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
 
+    public const LOCK_NAME = 'pastoral_export';
+
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
@@ -69,7 +71,7 @@ HELP;
             $log->info('Pastoral external attachment upload is disabled: not uploading attachments');
         }
 
-        $lock = $this->acquireLock('pastoral_export', null);
+        $lock = $this->acquireLock(self::LOCK_NAME, null);
         if (!$lock->isAcquired()) {
             exit(1);
         }

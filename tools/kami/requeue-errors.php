@@ -22,6 +22,8 @@ require __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App{
 
+    public const LOCK_NAME = 'kami_requeue_errors';
+
     /** @inheritDoc */
     public function getLongOpts(): array
     {
@@ -104,7 +106,7 @@ HELP;
         $requeueErrors = new Kami\ReQueueErrors($connector, $kamiMapper, $jitter, $this->getLogger());
 
         // Ensure only one instance of tool is running at a time
-        $lock = $this->acquireLock('kami_requeue_errors', $timeout);
+        $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
         if (!$lock->isAcquired()) {
             exit(1);
         }

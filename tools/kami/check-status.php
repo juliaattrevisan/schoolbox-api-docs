@@ -22,6 +22,7 @@ require __DIR__ . '/../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
+    public const LOCK_NAME = 'kami_status_check';
 
     /** @inheritDoc */
     public function getLongOpts(): array
@@ -53,7 +54,7 @@ $app = new class extends CliTool\App
 
         $statusUpdater = $this->buildStatusUpdater($maxAttempts, $baseBackOff);
 
-        $lock = $this->acquireLock('kami_status_check', $timeout);
+        $lock = $this->acquireLock(self::LOCK_NAME, $timeout);
         if (!$lock->isAcquired()) {
             exit(1);
         }
