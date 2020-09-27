@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Pastoral\UploadQueue\CommandLineTool;
+namespace Schoolbox\Pastoral\CommandLineTool;
 
 use Aura\Di;
 use Exception;
@@ -18,9 +18,10 @@ use Schoolbox\Pastoral;
 use Symfony\Component\Lock\LockInterface;
 
 /**
- * Synergetic DocMan file uploader.
+ * Pastoral attachment uploader: uploads files from Schoolbox to the SIS'
+ * pastoral document manager.
  */
-class Uploader extends CliTool\App
+class AttachmentUploader extends CliTool\App
 {
     public const LOCK_NAME = 'pastoral_upload';
 

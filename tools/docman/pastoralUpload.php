@@ -21,7 +21,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
  */
 
 $kernel = new CliTool\Kernel(
-    new Pastoral\UploadQueue\CommandLineTool\Uploader(),
+    new Pastoral\CommandLineTool\AttachmentUploader(),
     [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]
 );
 $kernel->runApp();
