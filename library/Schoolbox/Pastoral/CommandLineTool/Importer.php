@@ -21,9 +21,6 @@ use Schoolbox\UserMapper;
  */
 class Importer extends CliTool\App
 {
-
-    public const LOCK_NAME = 'pastoral_import';
-
     /** @inheritDoc */
     public function getLongOpts(): array
     {
@@ -108,16 +105,9 @@ HELP;
             exit(0);
         }
 
-        $lock = $this->acquireLock(self::LOCK_NAME, null);
-        if (!$lock->isAcquired()) {
-            exit(1);
-        }
-
         $log->info("Beginning import of pastoral records...");
 
         $pastoralExternal = new External_Pastoral();
         $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
-
-        $lock->release();
     }
 }

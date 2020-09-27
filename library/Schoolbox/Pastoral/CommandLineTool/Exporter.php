@@ -20,9 +20,6 @@ use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
  */
 class Exporter extends CliTool\App
 {
-
-    public const LOCK_NAME = 'pastoral_export';
-
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
@@ -70,11 +67,6 @@ HELP;
             $log->info('Pastoral external attachment upload is disabled: not uploading attachments');
         }
 
-        $lock = $this->acquireLock(self::LOCK_NAME, null);
-        if (!$lock->isAcquired()) {
-            exit(1);
-        }
-
         // Retrieve all pastoral records and re-save
         $log->info("Beginning export of pastoral records...");
         $pastoralRecords = $pastoralMapper->findAll();
@@ -115,6 +107,5 @@ HELP;
 
         // And done
         $log->info(sprintf("%s pastoral records exported", count($pastoralRecords)));
-        $lock->release();
     }
 }
