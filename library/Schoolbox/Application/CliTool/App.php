@@ -390,6 +390,18 @@ abstract class App
 
 
     /**
+     * Is the current CLI session interactive? (In other words, does it accept
+     * input from STDIN?)
+     *
+     * @return bool
+     */
+    protected function isInteractive(): bool
+    {
+        return \posix_isatty(STDIN);
+    }
+
+
+    /**
      * Reads a line of input from STDIN, prompting on STDERR
      *
      * @param string $prompt
@@ -413,7 +425,7 @@ abstract class App
      */
     protected function readPassword(string $prompt): string
     {
-        $isInteractive = \posix_isatty(STDIN);
+        $isInteractive = $this->isInteractive();
         \fwrite(STDERR, $prompt);
         if ($isInteractive) {
             \system('stty -echo');
