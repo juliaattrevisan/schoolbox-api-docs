@@ -138,7 +138,7 @@ class Classes implements IStrategy
          *
          * Cache a flat key-value array of (day, period)
          */
-        $users = $this->lookup->getUsers();
+        $users = $this->lookup->getStudents();
         $periods = $this->lookup->getPeriods();
 
         /* Get a list of all the timetables to process

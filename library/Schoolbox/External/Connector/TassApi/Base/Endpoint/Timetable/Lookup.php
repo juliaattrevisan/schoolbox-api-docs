@@ -35,6 +35,12 @@ class Lookup
     /**
      * @var array
      */
+    private $students;
+
+
+    /**
+     * @var array
+     */
     private $periods;
 
 
@@ -75,6 +81,30 @@ class Lookup
         }
 
         return $users;
+    }
+
+
+    /**
+     * Get a list of (external_id, sis_user_profile) tuples
+     *
+     * @return array
+     */
+    private function initStudentLookup(): array
+    {
+        $userStatement = $this->timetablePeriodMapper->getDatabase()->query('
+            SELECT external_id, firstname, lastname
+            FROM sis_user_profile sup
+            INNER JOIN sis_user_profile_student sups ON sup.id = sups.sis_user_profile_id
+            WHERE external_id IS NOT NULL
+        ');
+
+        $students = [];
+
+        foreach ($userStatement as $row) {
+            $students[$row['external_id']] = $row;
+        }
+
+        return $students;
     }
 
 
@@ -144,6 +174,7 @@ class Lookup
 
     /**
      * Initialise user lookup upon first use
+     * This is an index of all users with external ids
      *
      * @return array
      */
@@ -154,6 +185,22 @@ class Lookup
         }
 
         return $this->users;
+    }
+
+
+    /**
+     * Initialise user lookup upon first use
+     * This is an index of student users with external ids
+     *
+     * @return array
+     */
+    public function getStudents(): array
+    {
+        if (null === $this->students) {
+            $this->students = $this->initStudentLookup();
+        }
+
+        return $this->students;
     }
 
 
