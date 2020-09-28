@@ -103,8 +103,6 @@ class AdditionalSubjects implements IStrategy
          *
          * Cache a flat key-value array of (day, period)
          */
-        $this->lookup->init();
-
         $users = $this->lookup->getUsers();
         $involvements = $this->lookup->getInvolvements();
 

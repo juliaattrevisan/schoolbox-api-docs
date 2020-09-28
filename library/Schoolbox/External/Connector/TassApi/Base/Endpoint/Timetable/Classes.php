@@ -138,8 +138,6 @@ class Classes implements IStrategy
          *
          * Cache a flat key-value array of (day, period)
          */
-        $this->lookup->init();
-
         $users = $this->lookup->getUsers();
         $periods = $this->lookup->getPeriods();
 

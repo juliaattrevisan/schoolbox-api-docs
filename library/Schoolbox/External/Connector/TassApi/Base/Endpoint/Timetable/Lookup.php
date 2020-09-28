@@ -56,31 +56,6 @@ class Lookup
 
 
     /**
-     * Facade method
-     *
-     * If users and periods weren't previously fetched, get them
-     * Otherwise return whatever was previously found
-     *
-     * @return void
-     * @throws Exception
-     */
-    public function init(): void
-    {
-        if (null === $this->users) {
-            $this->users = $this->initUserLookup();
-        }
-
-        if (null === $this->periods) {
-            $this->periods = $this->initPeriodLookup();
-        }
-
-        if (null === $this->involvements) {
-            $this->involvements = $this->initClassInvolvementLookup();
-        }
-    }
-
-
-    /**
      * Get a list of (external_id, sis_user_profile) tuples
      *
      * @return array
@@ -168,28 +143,47 @@ class Lookup
 
 
     /**
+     * Initialise user lookup upon first use
+     *
      * @return array
      */
     public function getUsers(): array
     {
+        if (null === $this->users) {
+            $this->users = $this->initUserLookup();
+        }
+
         return $this->users;
     }
 
 
     /**
+     * Initialise period lookup upon first use
+     *
      * @return array
+     * @throws Exception
      */
     public function getPeriods(): array
     {
+        if (null === $this->periods) {
+            $this->periods = $this->initPeriodLookup();
+        }
+
         return $this->periods;
     }
 
 
     /**
+     * Initialise class involvement lookup upon first use
+     *
      * @return array
      */
     public function getInvolvements(): array
     {
+        if (null === $this->involvements) {
+            $this->involvements = $this->initClassInvolvementLookup();
+        }
+
         return $this->involvements;
     }
 }
