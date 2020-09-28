@@ -14,7 +14,6 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Profile;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Registry as ProfileRegistry;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable\Registry as TimetableRegistry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -240,10 +239,6 @@ class Factory
             $api[$module] = new Api($this->host, $this->key, $module);
         }
 
-        /* Profile Registry
-         */
-        $profileRegistry = new ProfileRegistry();
-
         /* Timetable Registry
          *
          * This registry contains all the timetables we iteratively shanked from an endpoint
@@ -286,7 +281,6 @@ class Factory
                 $this->spousePrefix,
                 $this->addnumFather,
                 $this->addnumMother,
-                $profileRegistry,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
@@ -297,7 +291,6 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
-                $profileRegistry,
                 $timetableRegistry,
                 $cycleRegistry,
                 $this->timetableCycleMapper,

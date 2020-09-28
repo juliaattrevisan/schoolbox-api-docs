@@ -13,7 +13,6 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Registry as ProfileRegistry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
@@ -59,12 +58,6 @@ class Definition implements IStrategy
 
 
     /**
-     * @var ProfileRegistry
-     */
-    private $profileRegistry;
-
-
-    /**
      * @var Registry
      */
     private $timetableRegistry;
@@ -94,7 +87,6 @@ class Definition implements IStrategy
      * @param LoggerInterface       $log
      * @param bool                  $perform
      * @param Api[]                 $api
-     * @param ProfileRegistry       $profileRegistry
      * @param Registry              $timetableRegistry
      * @param Registry              $cycleRegistry
      * @param TimetableCycleMapper  $timetableCycleMapper
@@ -104,7 +96,6 @@ class Definition implements IStrategy
         LoggerInterface $log,
         bool $perform,
         array $api,
-        ProfileRegistry $profileRegistry,
         Registry $timetableRegistry,
         Registry $cycleRegistry,
         TimetableCycleMapper $timetableCycleMapper,
@@ -113,7 +104,6 @@ class Definition implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
-        $this->profileRegistry = $profileRegistry;
 
         /* Store timetableCache and cycleCache in a registry object that its output
          * can be shared with the next Factory process
