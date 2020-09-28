@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Alaress\Lock\CommandLineTool;
 
 use Alaress\Lock\InstanceLockFactory;
+use Predis\ClientInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\ErrorRequeuer;
@@ -18,6 +19,8 @@ use Schoolbox\Pastoral\CommandLineTool\AttachmentUploader;
 use Schoolbox\Video\CommandLineTool\Processor;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\RedisStore;
 
 /**
  * Inspects the status of all locks within Schoolbox, and optionally allows them
@@ -34,6 +37,9 @@ class Inspector extends CliTool\App
     // -h, --help: print help
     private const OPT_SHORT_HELP = 'h';
     private const OPT_LONG_HELP = 'help';
+
+    // --instance: override instance ID
+    private const OPT_LONG_INSTANCE = 'instance:';
 
     private const LOCK_NAMES = [
         ErrorRequeuer::LOCK_NAME      => 'Kami Error Requeuer (./tools/kami/requeue-errors.php)',
@@ -58,7 +64,7 @@ class Inspector extends CliTool\App
      */
     public function getLongOpts(): array
     {
-        return [self::OPT_LONG_HELP,];
+        return [self::OPT_LONG_HELP, self::OPT_LONG_INSTANCE,];
     }
 
 
@@ -96,6 +102,9 @@ DESCRIPTION
         Answer N to all prompts to break a lock: the default behavior if the
         session is not interactive.
 
+    $yellow--instance=INSTANCE_ID$white
+        If provided, inspect locks for the given instance.
+
 ";
         \fwrite(STDOUT, $help);
     }
@@ -113,14 +122,21 @@ DESCRIPTION
         }
 
 
+        // You really want to bypass symfony-lock to get at the juicy Redis
+        // goodness within? Okay then
+        /** @var ClientInterface $redis */
+        $redis      = $this->getDi()->get('redis');
+        $instanceId = $this->getOpt(self::OPT_LONG_INSTANCE) ?? INSTANCE_ID;
+        $this->getLogger()->notice(sprintf('Running for instance "%s"', $instanceId));
+
+
         // otherwise, report on locks
         foreach (self::LOCK_NAMES as $lockName => $lockDescription) {
             $this->getLogger()->notice(sprintf('Testing lock: %s, script: %s', $lockName, $lockDescription));
 
-            /** @noinspection PhpUnhandledExceptionInspection */
-            /** @var InstanceLockFactory $lockFactory */
-            $lockFactory = $this->getDi()->get('lockFactory');
+            $lockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($redis)), $instanceId);
             $lock        = $lockFactory->createLock($lockName, 0);
+            $key         = $lockFactory->calculateKeyName($lockName);
 
             // Is this lock acquirable?
             $acquired = false;
@@ -140,7 +156,7 @@ DESCRIPTION
                 // only how long a currently acquired lock has held it.
                 // This means that it can't accurately report how long another
                 // script has been running. That would've been useful here!
-                $this->getLogger()->notice('... script is locked, and has been held for an unknown amount of time');
+                $this->getLogger()->notice('... script is locked, and will be held for at least %d seconds');
 
                 // What's the action?
                 // Report: only say that the script is locked

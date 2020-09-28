@@ -73,6 +73,18 @@ class InstanceLockFactory
      */
     public function createLock(string $resource, $ttl = 300.0, $autoRelease = true): LockInterface
     {
-        return $this->lockFactory->createLock($this->instanceId . '.' . $resource, $ttl, $autoRelease);
+        return $this->lockFactory->createLock($this->calculateKeyName($resource), $ttl, $autoRelease);
+    }
+
+
+    /**
+     * Determines the key name for the given resource name.
+     *
+     * @param string $resource The resource to determine the key name for
+     * @return string
+     */
+    public function calculateKeyName(string $resource): string
+    {
+        return $this->instanceId . '.' . $resource;
     }
 }
