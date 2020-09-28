@@ -179,7 +179,7 @@ class AdditionalSubjects implements IStrategy
                         "Additional subject %s (%s) added for %s (user %s)",
                         $additionalSubject['sub_long'],
                         $code,
-                        "{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}",
+                        trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
                         $externalId
                     ));
                 }
@@ -202,7 +202,7 @@ class AdditionalSubjects implements IStrategy
                         "Additional subject involvement in %s (%s) added for %s (user %s)",
                         $additionalSubject['sub_long'],
                         $code,
-                        "{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}",
+                        trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
                         $externalId
                     ));
                 }

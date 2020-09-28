@@ -164,10 +164,9 @@ class Definition implements IStrategy
 
             if (!(isset($data['student_timetable']) && \count($data['student_timetable']))) {
                 $this->log->warning(sprintf(
-                    'Student %s (%s %s) does not have a timetable.',
-                    $externalId,
-                    $person['firstname'],
-                    $person['lastname']
+                    'Timetable not found for %s (user %s).',
+                    trim("{$person['firstname']} {$person['lastname']}"),
+                    $externalId
                 ));
 
                 continue;
@@ -176,10 +175,9 @@ class Definition implements IStrategy
             /* Let us know so we can test with their id
              */
             $this->log->info(sprintf(
-                'Processing timetable for student %s (%s %s).',
-                $externalId,
-                $person['firstname'],
-                $person['lastname']
+                'Processing timetable definition for %s (user %s).',
+                trim("{$person['firstname']} {$person['lastname']}"),
+                $externalId
             ));
 
             /* Otherwise, continue on with the first timetable element
