@@ -30,17 +30,28 @@
        which cannot wait for all schools to upgrade to current master).
       * This PR will be based off the `$majorVersionNumber-STABLE` tag (e.g. `19.0-STABLE`).
 
-* A different developer reviews the PRs, static reviewing the code, and functional testing the area. In most cases there will be changes required, in which case the reviewer leaves comments on GitHub, and pushes the ticket back to 'In Progress' in Jira.
+* A different developer reviews the PRs, focusing on static review.
+  (See [review.md](./review.md) for further details on the review process.)
 
-  * If the reviewer finds issues with the PR (most cases) - that person will leave comments on the PR, and push the ticket back to 'In Progress' in Jira, for the original developer to fix up and put back into 'Awaiting Review'.
+  * If the reviewer finds issues with the PR (most cases) - that person will
+    leave comments on the PR, and push the ticket back to 'In Progress' in Jira,
+    for the original developer to fix up and put back into 'Awaiting Review'.
 
-  * If/once the reviewer is happy with the PRs - the reviewer will merge the PRs into the code base, pushing the ticket into 'Awaiting QA' and setting the fix version (next point release for master and develop fixes, or the next major release for develop only fixes).
+  * If/once the reviewer is happy with the PRs - the reviewer will merge the PRs
+    into the code base, pushing the ticket into 'Awaiting QA' and setting the
+    fix version (next point release for master and develop fixes, or the next
+    major release for develop only fixes).
 
-* Another member of the Product Team picks up the ticket for QA, focusing on functional testing the area that has been changed.
+* Another member of the Product Team picks up the ticket for QA,
+  focusing on functional testing of the area that has been changed.
+  (See [qa.md](./qa.md) for further details on the QA process.)
 
-  * If that person finds any issues that have been caused by the fixes for this ticket - they will 'QA Fail' the ticket, sending it back to Ready and back through the coding and review process.
+  * If that person finds any issues that have been caused by the fixes for this
+    ticket - they will 'QA Fail' the ticket, sending it back to Ready and back
+    through the coding and review process.
 
-  * If the person is happy with everything, they will 'QA Pass' the ticket and it will go into Ready, ready to deployed with the release.
+  * If the person is happy with everything, they will 'QA Pass' the ticket and
+   it will go into Done, ready to deployed with the release.
 
 ### Important Notes and Caveats
 * For the most part you should not be merging any code you have written that no one else has seen and approved.
@@ -71,65 +82,3 @@
 * Under Development: Exactly what it sounds like.
 * MVP Delivered: Minimum Viable Product has been delivered. Resolution should be MVP.
 * Closed: Resolution should be Done.
-
-# Development processes
-
-The review and QA standards are slightly different for core and for custom
-changes.
-
-## Core
-
-A core change is any change to Schoolbox which changes the functionality of
-Schoolbox for all instances.
-
-### Review
-- Statically review code for non-functional attributes, including but not
-  limited to:
-  - logical correctness
-  - efficiency
-  - performance
-  - adherence to best practices and conventions
-  - readability
-  - security
-- Consult with the author of the code, if necessary, to gain understanding of the changes made.
-- Functionally test all parts of the system that have been changed, and ensure they meet the Acceptance Criteria defined on the ticket.
-- Move the ticket back to "In Progress" if any problems are found, and leave comments on the PR outlining what needs to be changed.
-
-### QA
-- Check the `files` tab on the PR to see what parts of the system were changed.
-- Functionally test these parts of the system to ensure:
-    1. That they fulfill the Acceptance Criteria defined on the ticket
-    2. That all features available in these parts of the system otherwise behave the same as before.
-
-## Custom
-
-A custom change is any change to Schoolbox which is confined to a single
-instance.
-
-The standards for review and QA of custom changes is slightly lower than for
-core changes, due to:
-* Time constraints of Schoolbox staff
-* Time or budget constraints of the client
-* Schoolbox staff generally being unable to verify that a custom work displays
-  data known only to the client correctly
-
-Intricate custom jobs may require changes to core parts of Schoolbox: these
-changes must meet the Core standards for review and QA.
-
-### Review
-
-- Verify that there is no change to core in the code: if there is, this must be
-  reviewed and QA'd as a core change
-- If this is indeed a custom change, only need to:
-  statically review code for non-functional attributes (as with core work)
-
-### QA
-
-QA of custom changes should be a joint effort between:
-- the code's author
-- Schoolbox's project manager or client liaison for the custom job
-- a representative of the client
-
-The three representatives will communicate between each other to determine any
-changes which need to be made before the work passes QA, whilst minding the time
-and budget constraints of both the client and Schoolbox.

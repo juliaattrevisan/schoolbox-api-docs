@@ -1,5 +1,6 @@
 # Quality Assurance (QA)
 * [The Role of QA](#the-role-of-qa)
+* [Note for Custom Changes](#note-for-custom-changes)
 * [Areas to QA](#areas-to-qa)
 * [QA Check list](#qa-check-list)
 * [QA Data Migration](#qa-for-data-migration)
@@ -30,6 +31,23 @@ Note 2, PO can over ride our ideas of usability.
 QA is required to be done on each change in the code before it makes it to production. It is done directly after the code change has been merged into development codebase. It should be done with testing scope in mind, meaning that we should focus on what areas of the system are actually effected by the change. This should be facilitated and provided by the Change Impact field in the ticket. This may require consultation with other devs.
 There is an explanation of the QA step as it relates to the definition of done [here](./definition-of-done.md).
 
+
+## Note for Custom Changes
+
+Schoolbox staff are generally unable to verify that a custom work indeed
+functions to the expectations of the client, as generally only the client is
+certain of the contents of their data set.
+
+QA of custom changes should be a joint effort between:
+- the code's author
+- Schoolbox's project manager or client liaison for the custom job
+- a representative of the client
+
+The three representatives will communicate between each other to determine any
+changes which need to be made before the work passes QA, whilst minding the time
+and budget constraints of both the client and Schoolbox.
+
+
 ## Areas to QA
 
 Every PR has multiple areas to QA I group them into testing types or focuses.
@@ -43,7 +61,7 @@ Test Types:
 
 Does the code that was changed meet all the Acceptance criteria?
 
-This should be really covered by the review but it is a step that I still do, but can be skipped if our 
+This should be really covered by the review but it is a step that I still do, but can be skipped if our
 review process is robust enough.
 
 Does the Code handle strange situations and paths?
@@ -55,8 +73,8 @@ should be correct data. Basically try and break the code that has been changed.
 
 Was the section that was changed intuitive?
 
-This is a very subjective measure but you have to channel your inner incompetent user. 
-What does the user expect to see? Do we present something that they can understand? If they use standard 
+This is a very subjective measure but you have to channel your inner incompetent user.
+What does the user expect to see? Do we present something that they can understand? If they use standard
 behaviour to interact with the change does it react in an expected way?
 
 Was the section easy to use?
@@ -86,8 +104,8 @@ Has any data been compromised by the change in the code, can a user see somethin
 * Acceptance Criteria Met?
 * Is the feature easy to use?
     * Did you have to repeat steps because its unintuitive?
-    * Was the feature slow to load? 
-    * Hard to understand? 
+    * Was the feature slow to load?
+    * Hard to understand?
     * Instructions for user on how to use wrong?
 * Does the change effect the front end (styling, js ect.)?
     * If so does it work on Google Chrome, Firefox, IE 11 and mobile view-port?
@@ -95,7 +113,7 @@ Has any data been compromised by the change in the code, can a user see somethin
 * Strange user behaviour doesn't break the system?
     * Different language characters.
     * Null values, incorrect input.
-    * Incorrect work flow. eg. Setting a mark as one type in assessment, 
+    * Incorrect work flow. eg. Setting a mark as one type in assessment,
     submitting a draft, then changing the mark type.
 * Impact of Change field have any other areas been effected? Do they work?
     * If Impact of Change is empty, does the PR owner know of the impact of their code?
@@ -149,7 +167,7 @@ In the event we need to test further into the past because we need to update dat
 
 1. you should be on develop branch in vagrant with test completed. Ready to check status after migration.
 1. checks you will do are a combination of on vagrant (scripts), db (the data itself) and the app ui using a browser.
-1. run through [QA check list](#qa-check-list). 
+1. run through [QA check list](#qa-check-list).
 1. ensure changed data doesn't regress functionality and usability. (Mainly though app on a browser)
 1. check the actual changed data to see if it adheres to what we expect. (Database check)
 1. based on findings during observation pass or fail the migration test.
@@ -166,7 +184,7 @@ With that in mind currently it would be good if we saw testing reported to be sh
 Page or Area of system that was QA'ed
 * Functionality or action validated in testing.
      * Variations of that action tested.
-     
+
 **Example**
 
 Admin settings, weather API config.
@@ -211,12 +229,12 @@ There are quite a few tests available that can be done as part of the manual QA:
 
 **Acceptance Tests**
 
-These will become eventually the regression tests. The coverage will depend on critical bugs and generally 
+These will become eventually the regression tests. The coverage will depend on critical bugs and generally
 will be created as a reaction to these bugs to attempt to prevent them from re occurring in the future
 
 **Smoke Tests**
 
-Will be part of CI process on each pull request. Only tests for fatal failures. Useful for checking on 
+Will be part of CI process on each pull request. Only tests for fatal failures. Useful for checking on
 major regressions.
 
 **Behaviour Tests**
@@ -235,9 +253,9 @@ Not maintained or documented. Can revive the tests as they are right now broken.
 
 
 ## Maintenance of Automation
-  
-Automation for the process is progressing. Some of the tooling is in need of maintenance. Jira tickets to 
-clean up, create or fix tests in this area are welcome. TO DO, IN PROGRESS and REVIEW steps need to take 
+
+Automation for the process is progressing. Some of the tooling is in need of maintenance. Jira tickets to
+clean up, create or fix tests in this area are welcome. TO DO, IN PROGRESS and REVIEW steps need to take
 priority before these fixes and changes to not jeopardise sprint completion.
 
 So if you are looking to fix a test or to create one:
@@ -247,5 +265,5 @@ So if you are looking to fix a test or to create one:
 * Create a PR for the test fix.
 
 Its best to create a new Jira ticket when the Jira ticket that breaks the change is already closed/done.
-This is because the test fix can go into the current sprint for visibility. Review happens in the same way 
+This is because the test fix can go into the current sprint for visibility. Review happens in the same way
 as with any other ticket. Big focus is on maintainability.
