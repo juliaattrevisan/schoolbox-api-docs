@@ -200,7 +200,11 @@ class Classes implements IStrategy
 
                             /* This format mirrors the implementation in External/Tass/Timetable.php:239
                              */
-                            'code' => "{$subject['YEAR_GRP']}-{$subject['SUB_CODE']}-{$subject['CLASS']}",
+                            'code' => (new CodeCodec())->encode(
+                                (string)$subject['YEAR_GRP'],
+                                (string)$subject['SUB_CODE'],
+                                (string)$subject['CLASS']
+                            ),
                             'name' => $subject['SUB_DESC'],
                         ],
                         'room' => [
@@ -423,8 +427,8 @@ class Classes implements IStrategy
         /* Create new relation
          */
         $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
-                                                                  ->setExternalId($person['externalId'])
-                                                                  ->setClass($timetableClass);
+            ->setExternalId($person['externalId'])
+            ->setClass($timetableClass);
 
         $this->log->info(sprintf(
             'Creating class involvement %s %s for %s (user %s)',

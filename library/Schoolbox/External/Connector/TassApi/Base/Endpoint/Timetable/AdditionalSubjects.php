@@ -149,7 +149,11 @@ class AdditionalSubjects implements IStrategy
              * the student's timetable import
              */
             foreach ($data[$externalId] as $additionalSubject) {
-                $code = "{$additionalSubject['year_grp']}-{$additionalSubject['sub_code']}-{$additionalSubject['class']}";
+                $code = (new CodeCodec())->encode(
+                    (string)$additionalSubject['year_grp'],
+                    (string)$additionalSubject['sub_code'],
+                    (string)$additionalSubject['class']
+                );
 
                 /* If they're already involved, don't worry about it
                  *
