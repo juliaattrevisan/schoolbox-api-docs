@@ -60,20 +60,14 @@ echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
 phpversion=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
 echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion";
-if [ "$phpversion" != "7.1" ];
+if [ "$phpversion" != "7.4" ];
 then
-    /usr/bin/update-alternatives --set php /usr/bin/php7.1;
+    /usr/bin/update-alternatives --set php /usr/bin/php7.4;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
 find $cachedir -type f -empty -delete;
-
-
-# TODO remove this, add Composer to base box
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing Composer";
-apt-get install -y composer
-
 
 # Function to fetch value from .env file by key
 # Usage: value=$(read_var $key)
@@ -334,12 +328,12 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Applying data dir sql fixes (post version upgra
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox nginx vhost";
 chown -fR vagrant:vagrant /mnt/data/php_tmp;
-sed -i 's/php_flag\[display_startup_errors\]\ \=\ off/php_flag\[display_startup_errors\]\ \=\ on/g' /etc/php/7.1/fpm/pool.d/schoolbox*.conf;
-sed -i 's/php_flag\[display_errors\]\ \=\ off/php_flag\[display_errors\]\ \=\ on/g' /etc/php/7.1/fpm/pool.d/schoolbox*.conf;
-sed -i 's/php_flag\[html_errors\]\ \=\ off/php_flag\[html_errors\]\ \=\ on/g' /etc/php/7.1/fpm/pool.d/schoolbox*.conf;
+sed -i 's/php_flag\[display_startup_errors\]\ \=\ off/php_flag\[display_startup_errors\]\ \=\ on/g' /etc/php/*/fpm/pool.d/schoolbox*.conf;
+sed -i 's/php_flag\[display_errors\]\ \=\ off/php_flag\[display_errors\]\ \=\ on/g' /etc/php/*/fpm/pool.d/schoolbox*.conf;
+sed -i 's/php_flag\[html_errors\]\ \=\ off/php_flag\[html_errors\]\ \=\ on/g' /etc/php/*/fpm/pool.d/schoolbox*.conf;
 cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket.conf /etc/nginx/conf.d/;
 cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket-ssl.conf /etc/nginx/conf.d/;
-sed -i 's/www-data/vagrant/g' /etc/php/7.1/fpm/pool.d/schoolbox*;
+sed -i 's/www-data/vagrant/g' /etc/php/*/fpm/pool.d/schoolbox*;
 # disable nginx open file cache since not a production server
 sed -i '/open_file_cache/d' /etc/nginx/nginx.conf;
 cd $cachedir;
@@ -596,18 +590,18 @@ then
     if [ -f /vagrant/tools/xdebug.ini ];
     then
         echo "[SB][`date +%Y-%m-%d\ %X`] Using custom xdebug: tools/xdebug.ini";
-        cp -f /vagrant/tools/xdebug.ini /etc/php/7.1/mods-available/xdebug.ini;
+        cp -f /vagrant/tools/xdebug.ini /etc/php/7.4/mods-available/xdebug.ini;
     else
         echo "[SB][`date +%Y-%m-%d\ %X`] Using default xdebug: tools/xdebug.default.ini";
-        cp -f /vagrant/tools/xdebug.default.ini /etc/php/7.1/mods-available/xdebug.ini;
+        cp -f /vagrant/tools/xdebug.default.ini /etc/php/7.4/mods-available/xdebug.ini;
     fi
-    if [ -d /etc/php/7.1/fpm/conf.d ];
+    if [ -d /etc/php/7.4/fpm/conf.d ];
     then
-        ln -s /etc/php/7.1/mods-available/xdebug.ini /etc/php/7.1/fpm/conf.d/20-xdebug.ini >/dev/null 2>&1;
-        ln -s /etc/php/7.1/mods-available/tideways.ini /etc/php/7.1/fpm/conf.d/20-tideways.ini >/dev/null 2>&1;
+        ln -s /etc/php/7.4/mods-available/xdebug.ini /etc/php/7.4/fpm/conf.d/20-xdebug.ini >/dev/null 2>&1;
+        ln -s /etc/php/7.4/mods-available/tideways.ini /etc/php/7.4/fpm/conf.d/20-tideways.ini >/dev/null 2>&1;
     fi
-    ln -s /etc/php/7.1/mods-available/xdebug.ini /etc/php/7.1/cli/conf.d/20-xdebug.ini >/dev/null 2>&1;
-    ln -s /etc/php/7.1/mods-available/tideways.ini /etc/php/7.1/cli/conf.d/20-tideways.ini >/dev/null 2>&1;
+    ln -s /etc/php/7.4/mods-available/xdebug.ini /etc/php/7.4/cli/conf.d/20-xdebug.ini >/dev/null 2>&1;
+    ln -s /etc/php/7.4/mods-available/tideways.ini /etc/php/7.4/cli/conf.d/20-tideways.ini >/dev/null 2>&1;
 
     # If not yet configured, add XDEBUG_CONFIG and PHP_IDE_CONFIG environment vars for 'vagrant' and 'root' users
     for bashrcFile in /home/vagrant/.bashrc /root/.bashrc; do
@@ -637,15 +631,15 @@ then
 
 else
     echo "[SB][`date +%Y-%m-%d\ %X`] Disabling xdebug";
-    rm -f /etc/php/7.1/cli/conf.d/20-xdebug.ini;
-    rm -f /etc/php/7.1/cli/conf.d/20-tideways.ini;
-    rm -f /etc/php/7.1/fpm/conf.d/20-xdebug.ini;
-    rm -f /etc/php/7.1/fpm/conf.d/20-tideways.ini;
+    rm -f /etc/php/7.4/cli/conf.d/20-xdebug.ini;
+    rm -f /etc/php/7.4/cli/conf.d/20-tideways.ini;
+    rm -f /etc/php/7.4/fpm/conf.d/20-xdebug.ini;
+    rm -f /etc/php/7.4/fpm/conf.d/20-tideways.ini;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
 service schoolbox-epl restart > /dev/null 2>&1;
-service php7.1-fpm restart > /dev/null 2>&1;
+service php7.4-fpm restart > /dev/null 2>&1;
 service nginx restart > /dev/null 2>&1;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
