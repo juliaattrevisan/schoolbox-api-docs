@@ -1,6 +1,8 @@
 #!/bin/bash
 # Refresh a cloud instance using an S3 dataset
 #
+# This should only be invoked on the primary node in a cluster.
+#
 # Usage:
 #        INSTANCE_ID=[INSTANCE_ID] tools/cloud/data-refresh.sh \
 #         --dataset [sales.tar.gz] \
@@ -259,13 +261,39 @@ function upgrade_sql(){
 
 # Wipe messages from redis
 function empty_redis(){
-  echo "TODO empty redis"
-  #redis-cli KEYS "msg:$toInstance:*" | xargs redis-cli DEL;
+  local redis_url;
+  redis_url=$(echo "${config[redis_url]}" | sed -E "s/^[a-z]+:\/\///")
+  local redis_host;
+  local redis_port;
+  redis_host=$(echo "$redis_url" | cut -d ":" -f 1)
+  redis_port=$(echo "$redis_url" | cut -d ":" -f 2)
+  if [[ -z $redis_port ]]; then
+    redis_port=6379
+  fi
+  log "Resetting redis. Host: $redis_host, Port: $redis_port)"
+  redis-cli -h "$redis_host" -p $redis_port KEYS "*:$INSTANCE_ID:*" | xargs redis-cli -h "$redis_host" -p $redis_port DEL;
 }
 
 # Wipe rabbitmq for this instance
 function empty_rabbitmq(){
-  echo "TODO empty rabbitmq"
+  log "Resetting rabbitmq - TODO"
+  log "config[amqp_host]: ${config[amqp_host]}"
+  log "config[amqp_vhost]: ${config[amqp_vhost]}"
+  log "config[amqp_user]: ${config[amqp_user]}"
+  log "config[amqp_pass]: ${config[amqp_pass]}"
+  # TODO. This is tricky because we the rabbit server is remote
+  #       rabbitmqadmin is a python utility that uses the rabbitmq HTTPAPI, but has a subset of functions.
+  #       eg https://raw.githubusercontent.com/rabbitmq/rabbitmq-management/v3.8.8/bin/rabbitmqadmin
+  #       eg rabbitmqadmin -H SERVER-IP -u USER_NAME -p PASSWORD list vhosts
+  #
+  #       rabbitmqctl is full featured, but requires us to have rabbitmq-server installed locally.
+
+#  rabbitmqadmin -H SERVER-IP -u USER_NAME -p PASSWORD list vhosts
+#  rabbitmqctl delete_vhost sbc_"$INSTANCE_ID";
+#  rabbitmqctl add_vhost "${config[$key]}";
+#  rabbitmqctl add_user sbc_"$INSTANCE_ID" password;
+#  rabbitmqctl set_permissions -p sbc_"$INSTANCE_ID" sbc_"$INSTANCE_ID" ".*" ".*" ".*";
+#  rabbitmqctl set_permissions -p sbc_"$INSTANCE_ID" guest ".*" ".*" ".*";
 }
 
 
@@ -283,14 +311,23 @@ function main(){
   # fetch dataset from S3 into /tmp
   fetch_and_extract_dataset "$working_dir"
 
-  # Import dataset SQL
+  # Import dataset SQL and upgrade to current version
   empty_schema
   import_dataset "$working_dir"
   localise_database_config
   upgrade_sql
+
+  # Ensure data dirs exists with correct perms and ownership
   create_data_dirs
+
+  # Clear transient data
   empty_redis
   empty_rabbitmq
+
+  # Refresh daemons, cron jobs + notif bindings
+  schoolboxcloud-restart-daemons "$INSTANCE_ID";
+  schoolboxcloud-rebuild-cronjobs "$INSTANCE_ID";
+  php "$site_root"/tools/notif/route/refresh-binding-cache.php -vvv
   rm -fR "$working_dir"
 }
 
