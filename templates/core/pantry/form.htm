@@ -321,11 +321,17 @@
                         <p>May be used as an alternative to checkboxes: in particular, when the two available options do not map neatly to a boolean value.</p>
                         <div class="switch">
                             <input id="exampleCheckboxSwitch" type="checkbox">
-                            <label for="exampleCheckboxSwitch"></label>
+                            <label for="exampleCheckboxSwitch">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
                         </div>
                         <div class="switch">
-                            <input id="disbledCheckboxSwitch" type="checkbox" disabled>
-                            <label for="disbledCheckboxSwitch"></label>
+                            <input id="disbledCheckboxSwitch" type="checkbox" checked>
+                            <label for="disbledCheckboxSwitch">
+                                <span class="icon-approve"></span>
+                                <span class="icon-cancel"></span>
+                            </label>
                         </div>
                         <div class="long switch">
                             <input id="exampleCheckboxSwitchLong" type="checkbox" />
@@ -341,7 +347,6 @@
                                 <span>Disabled</span>
                             </label>
                         </div>
-
                         <div class="alert-box">
                             Radio groups which could be emptied once existed, and were represented by rounded switches.
                             Do not use these: instead, use a radio button group with a "None" option.
