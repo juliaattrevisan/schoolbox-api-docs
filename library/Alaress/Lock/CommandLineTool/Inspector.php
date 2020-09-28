@@ -155,7 +155,14 @@ DESCRIPTION
                 // only how long a currently acquired lock has held it.
                 // This means that it can't accurately report how long another
                 // script has been running. That would've been useful here!
-                $this->getLogger()->notice('... script is locked, and will be held for at least %d seconds');
+                // We have to reach into Redis to get that information.
+                $expiry = $redis->ttl($key);
+                $this->getLogger()->notice(
+                    sprintf(
+                        '... script is locked, and will be held for at least another %d seconds',
+                        $expiry
+                    )
+                );
 
                 // What's the action?
                 // Report: only say that the script is locked
@@ -185,7 +192,9 @@ DESCRIPTION
                 }
 
                 if ($unlock) {
-                    $lock->release();
+                    // Again, we can't actually tell the lock class to destroy
+                    // the lock: we have to reach into Redis to destroy it.
+                    $redis->del([$key]);
                 }
             }
         }
