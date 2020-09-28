@@ -20,17 +20,10 @@ use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 
 /**
- * Inspects the status of all locks within Schoolbox, and optionally allows them
- * to be forcibly unlocked.
+ * Inspects the status of all process locks within Schoolbox.
  */
 class Inspector extends CliTool\App
 {
-    // -y: answer "Y" to all prompts
-    private const OPT_SHORT_ANSWER_YES = 'y';
-
-    // -n: answer "N" to all prompts, the default if not interactive
-    private const OPT_SHORT_ANSWER_NO = 'n';
-
     // -h, --help: print help
     private const OPT_SHORT_HELP = 'h';
     private const OPT_LONG_HELP = 'help';
@@ -49,7 +42,7 @@ class Inspector extends CliTool\App
      */
     public function getShortOpts(): array
     {
-        return [self::OPT_SHORT_HELP, self::OPT_SHORT_ANSWER_YES, self::OPT_SHORT_ANSWER_NO,];
+        return [self::OPT_SHORT_HELP,];
     }
 
 
@@ -80,21 +73,14 @@ SYNOPSIS:
     $green{$file} {$yellow}[OPTION]...$white
 
 DESCRIPTION
-    Tool for inspecting and breaking process locks.
+    Tool for inspecting process locks.
 
-    By default, the inspector will prompt whether to break a lock if the session
-    is interactive: otherwise, it will simply report the status of locks.
-    Use the `$yellow-y$white` or `$yellow-n$white` options to override this behavior.
+    Due to limitations within the lock implementation, this tool cannot:
+    * report how long a lock has to run before it expires
+    * break a lock it could not acquire
 
     $yellow-h, --help$white
         Print this help and exit
-
-    $yellow-y$white
-        Answer Y to all prompts to break a lock.
-
-    $yellow-n$white
-        Answer N to all prompts to break a lock: the default behavior if the
-        session is not interactive.
 
 ";
         \fwrite(STDOUT, $help);
@@ -140,38 +126,11 @@ DESCRIPTION
                 // only how long a currently acquired lock has held it.
                 // This means that it can't accurately report how long another
                 // script has been running. That would've been useful here!
-                $this->getLogger()->notice('... script is locked, and has been held for an unknown amount of time');
+                $this->getLogger()->notice('... script is locked');
 
-                // What's the action?
-                // Report: only say that the script is locked
-                // Prompt: ask for user input before unlocking
-                // Unlock: forcibly unlock
-                $unlock = false;
-                if ($this->getOpt(self::OPT_SHORT_ANSWER_YES)) {
-                    $unlock = true;
-                } elseif ($this->getOpt(self::OPT_SHORT_ANSWER_NO)) {
-                    $unlock = false;
-                } elseif ($this->isInteractive()) {
-                    // Prompt for a yes/no
-                    while (true) {
-                        $answer = strtolower(trim($this->readLine('Unlock? [y/N]: ')));
-                        if ($answer === '') {
-                            $answer = 'n';
-                        }
-                        if ($answer === 'n') {
-                            $unlock = false;
-                            break;
-                        }
-                        if ($answer === 'y') {
-                            $unlock = true;
-                            break;
-                        }
-                    }
-                }
-
-                if ($unlock) {
-                    $lock->release();
-                }
+                // Also: the lock class can't break a lock it did not acquire.
+                // This is probably sensible behavior, but it does mean that we
+                // have to rely upon sensible settings being set for the lock.
             }
         }
     }

@@ -3,8 +3,7 @@
 /**
  * Lock inspector.
  *
- * Inspects the status of all locks within Schoolbox, and optionally allows them
- * to be forcibly unlocked.
+ * Inspects the status of all locks within Schoolbox.
  *
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
