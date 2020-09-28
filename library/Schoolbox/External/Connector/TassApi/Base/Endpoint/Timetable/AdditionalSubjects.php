@@ -29,6 +29,15 @@ class AdditionalSubjects implements IStrategy
 {
 
     /**
+     * This endpoint contains a list of subjects that a student/staff owns
+     * These subjects might not appear in the Timetable endpoints so
+     * have to superimpose or add them specifically in this way
+     */
+    private const ENDPOINT_STUDENTSUBJECTS = 'getStudentSubjects';
+    private const ENDPOINT_TEACHERSUBJECTS = 'getTeacherSubjects';
+
+
+    /**
      * @var LoggerInterface
      */
     private $log;
@@ -98,16 +107,35 @@ class AdditionalSubjects implements IStrategy
      */
     public function import(): void
     {
+        $this->importAdditionalSubjects($this->lookup->getStudents(), self::ENDPOINT_STUDENTSUBJECTS);
+        $this->importAdditionalSubjects($this->lookup->getStaff(), self::ENDPOINT_TEACHERSUBJECTS);
+    }
+
+
+    /**
+     * Additional Subjects are created for students and staff in a synonymous manner
+     *
+     * @param array  $users
+     * @param string $endpoint
+     * @return void
+     * @throws \DomainException
+     * @throws \PDOException
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function importAdditionalSubjects(array $users, string $endpoint): void
+    {
+
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
          *
          * Cache a flat key-value array of (day, period)
          */
-        $users = $this->lookup->getStudents();
         $involvements = $this->lookup->getInvolvements();
 
         foreach ($users as $externalId => $userData) {
-            $data = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudentSubjects', [
+            $data = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
                 'code' => $externalId
             ]);
 
