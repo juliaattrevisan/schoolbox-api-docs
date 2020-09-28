@@ -38,7 +38,7 @@ class CodeCodec
      * @param string $class
      * @return string
      */
-    public function encode(string $yearGroup, string $subjectCode, string $class)
+    public function encode(string $yearGroup, string $subjectCode, string $class): string
     {
         return "{$yearGroup}-{$subjectCode}-{$class}";
     }
