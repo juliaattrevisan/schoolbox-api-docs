@@ -127,136 +127,6 @@ class Definition implements IStrategy
 
 
     /**
-     * Get all the students' timetables, which we use to divine a schoolbox Timetable Definition
-     * In tass, students can have seemingly unique timetables with unique definitions (there isn't
-     * really an equivalent of Timetable Definition in tass) so we have to infer something similar
-     * as best we can
-     *
-     * @throws DomainException
-     * @throws RuntimeException
-     */
-    private function preloadAllTimetables(): void
-    {
-
-        /* Find all the student external ids
-         */
-        $externalIds = $this->profileRegistry->recallKeys();
-
-        /* Inspect every student's timetable to find the largest quantity of Periods per Day
-         * This will inform schoolbox's classic idea of a Timetable Definition which must be
-         * rectangular; every day will have the maximum number of periods in it, even if the
-         * student's timetable doesn't use it
-         */
-        foreach ($externalIds as $externalId) {
-
-            /* Hit That Api to find every student's timetable and cache it somewhere
-             * We'll need to operate on it all again later anyway
-             */
-            $data = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudentTimetable', [
-                'student_code' => $externalId
-            ]);
-
-            /* Check that the $externalId has an associated timetable
-             * If not, log that this student didn't have a timetable, then skip them
-             * There isn't anything we can do with them
-             */
-            $person = $this->profileRegistry->recall($externalId);
-
-            if (!(isset($data['student_timetable']) && \count($data['student_timetable']))) {
-                $this->log->warning(sprintf(
-                    'Timetable not found for %s (user %s).',
-                    trim("{$person['firstname']} {$person['lastname']}"),
-                    $externalId
-                ));
-
-                continue;
-            }
-
-            /* Let us know so we can test with their id
-             */
-            $this->log->info(sprintf(
-                'Processing timetable definition for %s (user %s).',
-                trim("{$person['firstname']} {$person['lastname']}"),
-                $externalId
-            ));
-
-            /* Otherwise, continue on with the first timetable element
-             * (Not sure how many they can actually have in production)
-             */
-            $timetable = $data['student_timetable'][0];
-
-            /* Remember each student's timetable (we'll come back to this later)
-             */
-            $this->timetableRegistry->remember((string)$externalId, $timetable);
-
-            /* Use the last known maxDays/maxPeriods info as a starting point
-             */
-            $ttid = (string)$timetable['TT_ID'];
-
-            $maxDays = $this->cycleRegistry->recall($ttid)['cycleLength'] ?? 0;
-            $maxPeriods = $this->cycleRegistry->recall($ttid)['dayLength'] ?? 0;
-
-            /* Remember the largest Day count (cycle length) for this TT_ID
-             */
-            if ($timetable['DAYMAX'] > $maxDays) {
-               $maxDays = $timetable['DAYMAX'];
-            }
-
-            /* Remember the largest Period count (day length) for this TT_ID
-             */
-            if ($timetable['PERIODMAX'] > $maxPeriods) {
-                $maxPeriods = $timetable['PERIODMAX'];
-            }
-
-            /* To find info about Period Times, you need to inspect each Cycle's STRDAYS element
-             * Each day has its own set of Period Names but we don't support that, so just
-             * get the longest day's Period setup and apply that scheme universally
-             */
-            $longestDay = $this->cycleRegistry->recall($ttid)['cycleLength'] ?? [];
-
-            foreach ($timetable['STRDAYS'] as $day => $periods) {
-                if (\count($periods['PERIODS']) >= \count($longestDay)) {
-
-                    /* + Assumption: Period naming
-                     * Rename periods, because their names can vary between students
-                     * and timetables; so give them something predictable
-                     */
-                    $temp = [];
-
-                    foreach ($periods['PERIODS'] as $i => $period) {
-                        $period['PRD_DESC'] = 'Period ' . $i;
-
-                        $temp[] = $period;
-                    }
-
-                    $longestDay = $temp;
-                }
-            }
-
-            /* Remember the cycle's info consisting of the last known maxDays and maxPeriods info
-             * as we investigate every data ever
-             */
-            $this->cycleRegistry->remember($ttid, [
-                'id' => $ttid,
-                'name' => $timetable['DESC_TEXT'],
-                'cycleLength' => $maxDays,
-                'dayLength' => $maxPeriods,
-
-                /* Period scheme that we assume can apply universally
-                 */
-                'periods' => $longestDay,
-
-                /* There doesn't appear to be any info about cycles starting/ending at a particular
-                 * datetime, so just presume the hardcoded defaults for now
-                 */
-                'start' => self::CYCLE_START,
-                'finish' => self::CYCLE_END
-            ]);
-        }
-    }
-
-
-    /**
      * Import data from xml into local schema
      */
     public function import(): void
@@ -344,6 +214,196 @@ class Definition implements IStrategy
                 }
             }
         }
+    }
+
+
+    /**
+     * Get all the students' timetables, which we use to divine a schoolbox Timetable Definition
+     * In tass, students can have seemingly unique timetables with unique definitions (there isn't
+     * really an equivalent of Timetable Definition in tass) so we have to infer something similar
+     * as best we can
+     *
+     * @throws DomainException
+     * @throws RuntimeException
+     */
+    private function preloadAllTimetables(): void
+    {
+        $lookup = new Lookup($this->timetablePeriodMapper);
+
+        /* Students
+         * Find all the external ids
+         */
+        $students = $lookup->getStudents();
+
+        /* Inspect every student's timetable to find the largest quantity of Periods per Day
+         * This will inform schoolbox's classic idea of a Timetable Definition which must be
+         * rectangular; every day will have the maximum number of periods in it, even if the
+         * student's timetable doesn't use it
+         */
+        foreach ($students as $externalId => $person) {
+
+            /* Hit That Api to find every student's timetable and cache it somewhere
+             * We'll need to operate on it all again later anyway
+             */
+            $data = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudentTimetable', [
+                'student_code' => $externalId
+            ]);
+
+            $this->preloadTimetable((string)$externalId, $person, $data,'student_timetable');
+        }
+
+        /* Staff
+         * Find all the external ids
+         */
+        $staff = $lookup->getStaff();
+
+        /* Make a naive guess as to what year and semester we are in
+         * The getTeacherTimtable endpoint is different to students' version
+         */
+        $year = date('Y');
+        $semester = (string)$this->getCurrentSemester();
+
+        /* Inspect every staff's timetable
+         */
+        foreach ($staff as $externalId => $person) {
+            $data = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeacherTimetable', [
+                'teacher_code' => $externalId,
+                'year_num' => $year,
+                'semester' => $semester
+            ]);
+
+            $this->preloadTimetable((string)$externalId, $person, $data,'teacher_timetable');
+        }
+    }
+
+
+    /**
+     * Returns 1 if we are currently in first semester, defined by being in January-June inclusive
+     * Otherwise semester 2
+     *
+     * @return int
+     */
+    private function getCurrentSemester(): int
+    {
+        return (int)date('n') <= 6 ? 1 : 2;
+    }
+
+
+    /**
+     * Fetch the timetable data for user $externalId
+     *
+     * This algorithm is the same for students and staff and the data structures are
+     * mostly synonymous, except for a $key name being different and the $data is
+     * fetched with some different params
+     *
+     * @param string $externalId
+     * @param array  $person
+     * @param array  $data
+     * @param string $key
+     */
+    private function preloadTimetable(string $externalId, array $person, array $data, string $key): void
+    {
+
+        /* Check that the given $externalId had any timetable data at all
+         */
+        if (!(isset($data[$key]) && \count($data[$key]))) {
+            $this->log->warning(sprintf(
+                'Timetable not found for %s (user %s).',
+                trim("{$person['firstname']} {$person['lastname']}"),
+                $externalId
+            ));
+
+            return;
+        }
+
+        /* Let us know so we can test with their id
+         */
+        $this->log->info(sprintf(
+            'Processing timetable definition for %s (user %s).',
+            trim("{$person['firstname']} {$person['lastname']}"),
+            $externalId
+        ));
+
+        /* Otherwise, continue on with the first timetable element
+         * (Not sure how many they can actually have in production)
+         */
+        $timetable = $data[$key][0];
+
+        /* Remember each student's timetable (we'll come back to this later)
+         */
+        $this->timetableRegistry->remember($externalId, $timetable);
+
+        /* Use the last known maxDays/maxPeriods info as a starting point
+         */
+        $ttid = (string)$timetable['TT_ID'];
+
+        $maxDays = $this->cycleRegistry->recall($ttid)['cycleLength'] ?? 0;
+        $maxPeriods = $this->cycleRegistry->recall($ttid)['dayLength'] ?? 0;
+
+        /* Remember the largest Day count (cycle length) for this TT_ID
+         */
+        if ($timetable['DAYMAX'] > $maxDays) {
+            $maxDays = $timetable['DAYMAX'];
+        }
+
+        /* Remember the largest Period count (day length) for this TT_ID
+         */
+        if ($timetable['PERIODMAX'] > $maxPeriods) {
+            $maxPeriods = $timetable['PERIODMAX'];
+        }
+
+        /* To find info about Period Times, you need to inspect each Cycle's STRDAYS element
+         * Each day has its own set of Period Names but we don't support that, so just
+         * get the longest day's Period setup and apply that scheme universally
+         */
+        $longestDay = $this->cycleRegistry->recall($ttid)['cycleLength'] ?? [];
+
+        foreach ($timetable['STRDAYS'] as $day => $periods) {
+            if (\count($periods['PERIODS']) >= \count($longestDay)) {
+
+                /* + Assumption: Period naming
+                 * Rename periods, because their names can vary between students
+                 * and timetables; so give them something predictable
+                 */
+                $temp = [];
+
+                foreach ($periods['PERIODS'] as $i => $period) {
+                    $period['PRD_DESC'] = 'Period ' . $i;
+
+                    $temp[] = $period;
+                }
+
+                $longestDay = $temp;
+            }
+        }
+
+        /* Remember the cycle's info consisting of the last known maxDays and maxPeriods info
+         * as we investigate every data ever
+         */
+        $this->cycleRegistry->remember($ttid, [
+            'id' => $ttid,
+            'name' => $timetable['DESC_TEXT'],
+            'cycleLength' => $maxDays,
+            'dayLength' => $maxPeriods,
+
+            /* Period scheme that we assume can apply universally
+             */
+            'periods' => $longestDay,
+
+            /* There doesn't appear to be any info about cycles starting/ending at a particular
+             * datetime, so just presume the hardcoded defaults for now
+             */
+            'start' => self::CYCLE_START,
+            'finish' => self::CYCLE_END
+        ]);
+
+        $this->log->debug(sprintf(
+            'Remembering %s (%s) had cycleLength %s days, dayLength %s periods',
+            $ttid,
+            $timetable['DESC_TEXT'],
+            $maxDays,
+            $maxPeriods
+        ));
     }
 
 
