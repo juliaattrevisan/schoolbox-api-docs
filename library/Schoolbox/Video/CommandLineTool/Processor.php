@@ -13,6 +13,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use Exception;
 use League\Flysystem\FileNotFoundException;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Storage\Model as Storage;
@@ -108,7 +109,7 @@ class Processor extends CliTool\App
 
                     $storage = $mediaCurrent->getStorage();
 
-                    $fileSystem = get_class($storage->getFilesystem()->getAdapter());
+                    $fileSystem = $this->getConfig()->get(ConfigMapper::NAME_OTFS_ADAPTER);
                     $fileName   = "{$storage->getFilename()}.{$storage->getExtension()}";
                     $filePath   = $storage->getPath();
 
