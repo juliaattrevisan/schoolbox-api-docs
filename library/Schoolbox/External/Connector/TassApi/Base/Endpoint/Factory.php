@@ -291,6 +291,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $lookup,
                 $timetableRegistry,
                 $cycleRegistry,
                 $this->timetableCycleMapper,

@@ -82,11 +82,18 @@ class Definition implements IStrategy
 
 
     /**
+     * @var Lookup
+     */
+    private $lookup;
+
+
+    /**
      * TimetableCycle constructor.
      *
      * @param LoggerInterface       $log
      * @param bool                  $perform
      * @param Api[]                 $api
+     * @param Lookup                $lookup
      * @param Registry              $timetableRegistry
      * @param Registry              $cycleRegistry
      * @param TimetableCycleMapper  $timetableCycleMapper
@@ -96,6 +103,7 @@ class Definition implements IStrategy
         LoggerInterface $log,
         bool $perform,
         array $api,
+        Lookup $lookup,
         Registry $timetableRegistry,
         Registry $cycleRegistry,
         TimetableCycleMapper $timetableCycleMapper,
@@ -104,6 +112,7 @@ class Definition implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+        $this->lookup = $lookup;
 
         /* Store timetableCache and cycleCache in a registry object that its output
          * can be shared with the next Factory process
@@ -218,12 +227,11 @@ class Definition implements IStrategy
      */
     private function preloadAllTimetables(): void
     {
-        $lookup = new Lookup($this->timetablePeriodMapper);
 
         /* Students
          * Find all the external ids
          */
-        $students = $lookup->getStudents();
+        $students = $this->lookup->getStudents();
 
         /* Inspect every student's timetable to find the largest quantity of Periods per Day
          * This will inform schoolbox's classic idea of a Timetable Definition which must be
@@ -245,7 +253,7 @@ class Definition implements IStrategy
         /* Staff
          * Find all the external ids
          */
-        $staff = $lookup->getStaff();
+        $staff = $this->lookup->getStaff();
 
         /* Make a naive guess as to what year and semester we are in
          * The getTeacherTimtable endpoint is different to students' version
