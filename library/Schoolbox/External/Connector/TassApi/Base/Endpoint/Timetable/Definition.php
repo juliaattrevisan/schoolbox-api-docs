@@ -256,7 +256,7 @@ class Definition implements IStrategy
         $staff = $this->lookup->getStaff();
 
         /* Make a naive guess as to what year and semester we are in
-         * The getTeacherTimtable endpoint is different to students' version
+         * The getTeacherTimetable endpoint is different to students' version
          */
         $year = date('Y');
         $semester = (string)$this->getCurrentSemester();
