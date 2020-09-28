@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Application\CliTool;
@@ -13,19 +15,27 @@ use Aura\Di;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
-use function floor;
-use function is_numeric;
 use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
+use UnexpectedValueException;
+
+use function floor;
+use function is_numeric;
 use function strrpos;
 use function substr;
-use UnexpectedValueException;
 
 /**
  * An App is a job/task/application that can be run by the CLI Kernel
  */
 abstract class App
 {
+    /**
+     * The name of the lock that this job should acquire.
+     *
+     * @see `acquireLock`
+     */
+    public const LOCK_NAME = null;
+
     protected const COLOUR_GREEN = "\033[0;32m";
     protected const COLOUR_RED = "\033[0;31m";
     protected const COLOUR_GREY = "\033[0;37m";
@@ -183,7 +193,7 @@ abstract class App
         $acquired = false;
         try {
             $acquired = $lock->acquire();
-        } catch (LockConflictedException|LockAcquiringException $e) {
+        } catch (LockConflictedException | LockAcquiringException $e) {
             // Couldn't acquire the lock: this is okay
             // The calling code will check if the lock is acquired
         }
@@ -221,8 +231,8 @@ abstract class App
             $output,
             $returnVar
         );
-        if($returnVar){
-            foreach($output as $line){
+        if ($returnVar) {
+            foreach ($output as $line) {
                 $this->getLogger()->error($line);
             }
         }
@@ -383,6 +393,18 @@ abstract class App
 
 
     /**
+     * Is the current CLI session interactive? (In other words, does it accept
+     * input from STDIN?)
+     *
+     * @return bool
+     */
+    protected function isInteractive(): bool
+    {
+        return \posix_isatty(STDIN);
+    }
+
+
+    /**
      * Reads a line of input from STDIN, prompting on STDERR
      *
      * @param string $prompt
@@ -406,7 +428,7 @@ abstract class App
      */
     protected function readPassword(string $prompt): string
     {
-        $isInteractive = \posix_isatty(STDIN);
+        $isInteractive = $this->isInteractive();
         \fwrite(STDERR, $prompt);
         if ($isInteractive) {
             \system('stty -echo');
