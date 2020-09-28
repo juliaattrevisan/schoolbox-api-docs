@@ -318,7 +318,8 @@ class Factory
                 $api,
                 $lookup,
                 $this->classEntryMapper,
-                $this->classInvolvementMapper
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper
             ))
             ->add(new Cleanup(
                 $this->log,

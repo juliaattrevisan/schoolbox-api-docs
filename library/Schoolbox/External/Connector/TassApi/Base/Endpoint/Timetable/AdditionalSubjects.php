@@ -70,6 +70,12 @@ class AdditionalSubjects implements IStrategy
 
 
     /**
+     * @var ClassPeriodMapper
+     */
+    private $classPeriodMapper;
+
+
+    /**
      * @var Lookup
      */
     private $lookup;
@@ -84,6 +90,7 @@ class AdditionalSubjects implements IStrategy
      * @param Lookup                 $lookup
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param ClassPeriodMapper      $classPeriodMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -91,7 +98,8 @@ class AdditionalSubjects implements IStrategy
         array $api,
         Lookup $lookup,
         ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper
+        ClassInvolvementMapper $classInvolvementMapper,
+        ClassPeriodMapper $classPeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -99,6 +107,7 @@ class AdditionalSubjects implements IStrategy
         $this->lookup = $lookup;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
+        $this->classPeriodMapper = $classPeriodMapper;
     }
 
 
@@ -196,19 +205,38 @@ class AdditionalSubjects implements IStrategy
                         'class_id'    => $class->getId()
                     ]);
                 } catch (\Schoolbox\Mapper\Exception $e) {
-                    $classInvolvement = $this->classInvolvementMapper->createModel()
-                        ->setExternalId((string)$externalId)
-                        ->setClass($class);
 
-                    $this->classInvolvementMapper->save($classInvolvement);
+                    /* Maybe this person is a teacher; check sis_class_period to see
+                     * If they are already a teacher, don't need to make an arbitrary involvement
+                     */
+                    try {
+                        $isTeacher = $this->classPeriodMapper->findOneByColumnList([
+                            'class_id' => $class->getId(),
+                            'teacher_external_id' => $externalId
+                        ]);
 
-                    $this->log->info(sprintf(
-                        "Additional subject involvement in %s (%s) added for %s (user %s)",
-                        $additionalSubject['sub_long'],
-                        $code,
-                        trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
-                        $externalId
-                    ));
+                        $this->log->info(sprintf(
+                            '%s (user %s) is already a teacher of class %s (%s) - no subject involvement change required',
+                            trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
+                            $externalId,
+                            $class->getId(),
+                            $class->getName()
+                        ));
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        $classInvolvement = $this->classInvolvementMapper->createModel()
+                            ->setExternalId((string)$externalId)
+                            ->setClass($class);
+
+                        $this->classInvolvementMapper->save($classInvolvement);
+
+                        $this->log->info(sprintf(
+                            "Additional subject involvement in %s (%s) added for %s (user %s)",
+                            $additionalSubject['sub_long'],
+                            $code,
+                            trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
+                            $externalId
+                        ));
+                    }
                 }
             }
         }
