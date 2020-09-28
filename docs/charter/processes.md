@@ -73,14 +73,63 @@
 * Closed: Resolution should be Done.
 
 # Development processes
-## Review
-- Statically review code for logical correctness, efficiency, adherence to best practices and conventions, readability, etc.
+
+The review and QA standards are slightly different for core and for custom
+changes.
+
+## Core
+
+A core change is any change to Schoolbox which changes the functionality of
+Schoolbox for all instances.
+
+### Review
+- Statically review code for non-functional attributes, including but not
+  limited to:
+  - logical correctness
+  - efficiency
+  - performance
+  - adherence to best practices and conventions
+  - readability
+  - security
 - Consult with the author of the code, if necessary, to gain understanding of the changes made.
 - Functionally test all parts of the system that have been changed, and ensure they meet the Acceptance Criteria defined on the ticket.
 - Move the ticket back to "In Progress" if any problems are found, and leave comments on the PR outlining what needs to be changed.
 
-## QA
+### QA
 - Check the `files` tab on the PR to see what parts of the system were changed.
 - Functionally test these parts of the system to ensure:
     1. That they fulfill the Acceptance Criteria defined on the ticket
     2. That all features available in these parts of the system otherwise behave the same as before.
+
+## Custom
+
+A custom change is any change to Schoolbox which is confined to a single
+instance.
+
+The standards for review and QA of custom changes is slightly lower than for
+core changes, due to:
+* Time constraints of Schoolbox staff
+* Time or budget constraints of the client
+* Schoolbox staff generally being unable to verify that a custom work displays
+  data known only to the client correctly
+
+Intricate custom jobs may require changes to core parts of Schoolbox: these
+changes must meet the Core standards for review and QA.
+
+### Review
+
+- Verify that there is no change to core in the code: if there is, this must be
+  reviewed and QA'd as a core change
+- If this is indeed a custom change, only need to:
+  statically review code for non-functional attributes (as with core work)
+
+### QA
+
+QA of custom changes should be a joint effort between:
+- the code's author
+- Schoolbox's project manager or client liaison for the custom job
+- a representative of the client
+
+The three representatives will communicate between each other to determine any
+changes which need to be made before the work passes QA, whilst minding the time
+and budget constraints of both the client and Schoolbox.
