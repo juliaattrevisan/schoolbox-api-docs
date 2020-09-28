@@ -15,17 +15,14 @@ use Aura\Di;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
+use Psr\Log\LoggerInterface;
+use Schoolbox\IConfigLoader;
+use UnexpectedValueException;
 
 use function floor;
 use function is_numeric;
-
-use Psr\Log\LoggerInterface;
-use Schoolbox\IConfigLoader;
-
 use function strrpos;
 use function substr;
-
-use UnexpectedValueException;
 
 /**
  * An App is a job/task/application that can be run by the CLI Kernel
