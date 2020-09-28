@@ -1,27 +1,46 @@
 <?php
-/*
- * https://vagrant.dev.schoolbox.cloud/fixtures/matches/6
- * Referer https://vagrant.dev.schoolbox.cloud/fixtures/matches/6/edit
- * 
-divisionId	21
-matchId	6
-name	Its+a+name+yes
-seasonId	29
-startAtDate	30/09/2020+8:17am
-venueId	11
-homeTeamId	school:8
-awayTeamId	school:14
-itinerary[matchId][]	[…]
-0	6
-1	6
-itinerary[itemId][]	[…]
-0	16
-1	
-itinerary[date][]	[…]
-0	29/09/2020+8:17am
-1	
-itinerary[description][]	[…]
-0	stuff
-1	
-notes	<p>afagagrargrag</p> 
+/**
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
+
+namespace Payload\Fixtures\Match;
+
+use Payload\Request;
+use Payload\PostTrait;
+
+class Update extends Request
+{
+    use PostTrait;
+    
+    var $match;
+    
+    public function __construct(\Schoolbox\Fixtures\Match\Model $match)
+    {
+        $this->match=$match;
+        
+        $this->setReferer('/fixtures/matches/' . $this->match->getId() . '/edit' );
+        
+        $itinerary = $this->match->getItinerary();
+        
+        $this->setFormParam('divisionId', $this->match->getDivision()->getId());
+        $this->setFormParam('matchId', $this->match->getId());
+        $this->setFormParam('seasonId', $this->match->getSeason()->getId());
+        $this->setFormParam('name', $this->match->getName());
+        $this->setFormParam('startAtDate', $this->match->getStartAt());
+        $this->setFormParam('venueId', $this->match->getVenue()->getId());
+        $this->setFormParam('homeTeamId', $this->match->getHomeTeam()->getId());
+        $this->setFormParam('awayTeamId', 'school:'. $this->match->getAwaySchool()->getId());
+        $this->setFormParam('itinerary[matchId][0]', $this->match->getId());
+        $this->setFormParam('itinerary[itemId][0]', $itinerary->first()->getId());
+        $this->setFormParam('itinerary[date][0]', $itinerary->first()->getStartAt());
+        $this->setFormParam('itinerary[description][0]', $itinerary->first()->getDescription());
+        $this->setFormParam('notes', $this->match->getNotes());
+        
+    }
+    
+    public function getUrl():string
+    {
+        return '/fixtures/matches/' . $this->match->getId();
+    }
+}

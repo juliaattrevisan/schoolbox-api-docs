@@ -4,11 +4,6 @@
  * @link      https://schoolbox.com.au/
  */
 
-/*
-https://vagrant.dev.schoolbox.cloud/fixtures/divisions/8/delete
-Referer: https://vagrant.dev.schoolbox.cloud/fixtures/sports/4
- */
-
 namespace Payload\Fixtures\Division;
 
 use Payload\Request;
