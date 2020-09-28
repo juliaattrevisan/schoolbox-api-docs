@@ -39,6 +39,12 @@ class Lookup
 
 
     /**
+     * @var array
+     */
+    private $involvements;
+
+
+    /**
      * Lookup constructor.
      *
      * @param TimetablePeriodMapper  $timetablePeriodMapper
@@ -66,6 +72,10 @@ class Lookup
 
         if (null === $this->periods) {
             $this->periods = $this->initPeriodLookup();
+        }
+
+        if (null === $this->involvements) {
+            $this->involvements = $this->initClassInvolvementLookup();
         }
     }
 
@@ -129,6 +139,35 @@ class Lookup
 
 
     /**
+     * Get a list of (external_id, code) tuples
+     *
+     * @return array
+     */
+    private function initClassInvolvementLookup(): array
+    {
+        $classInvolvementStatement = $this->timetablePeriodMapper->getDatabase()->query('
+            SELECT
+                scu.external_id,
+                sc.name, sc.code
+            FROM sis_class_user scu
+            INNER JOIN sis_class sc on scu.class_id = sc.id
+        ');
+
+        $involvements = [];
+
+        foreach ($classInvolvementStatement as $row) {
+            $externalId = $row['external_id'];
+            $code = $row['code'];
+            $name = $row['name'];
+
+            $involvements[$externalId][$code] = $name;
+        }
+
+        return $involvements;
+    }
+
+
+    /**
      * @return array
      */
     public function getUsers(): array
@@ -143,5 +182,14 @@ class Lookup
     public function getPeriods(): array
     {
         return $this->periods;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getInvolvements(): array
+    {
+        return $this->involvements;
     }
 }
