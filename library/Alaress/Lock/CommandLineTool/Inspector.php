@@ -141,7 +141,6 @@ DESCRIPTION
             // Is this lock acquirable?
             $acquired = false;
             try {
-                // TODO update to version 5.1 once PHP 7.4 is in use, then acquire read lock
                 $acquired = $lock->acquire();
             } catch (LockConflictedException|LockAcquiringException $e) {
                 // noop
