@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -163,7 +164,7 @@ class Processor extends CliTool\App
             try {
                 $log->info('Refreshing process lock...');
                 $lock->refresh();
-            } catch (LockConflictedException|LockAcquiringException $e) {
+            } catch (LockConflictedException | LockAcquiringException $e) {
                 $log->warning('Could not refresh lock: aborting');
                 break;
             }

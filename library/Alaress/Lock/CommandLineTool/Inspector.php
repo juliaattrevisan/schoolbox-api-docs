@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -142,7 +143,7 @@ DESCRIPTION
             $acquired = false;
             try {
                 $acquired = $lock->acquire();
-            } catch (LockConflictedException|LockAcquiringException $e) {
+            } catch (LockConflictedException | LockAcquiringException $e) {
                 // noop
             }
 

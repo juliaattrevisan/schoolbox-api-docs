@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Finds all docs with the a status of 'error' and optional 'error_message' and puts them back into the queue for re-uploading.
  *
@@ -7,6 +8,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;

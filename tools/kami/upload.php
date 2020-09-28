@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Uploads eligible documents from Schoolbox into Kami
  *

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Application\CliTool;
@@ -13,12 +15,16 @@ use Aura\Di;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
+
 use function floor;
 use function is_numeric;
+
 use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
+
 use function strrpos;
 use function substr;
+
 use UnexpectedValueException;
 
 /**
@@ -190,7 +196,7 @@ abstract class App
         $acquired = false;
         try {
             $acquired = $lock->acquire();
-        } catch (LockConflictedException|LockAcquiringException $e) {
+        } catch (LockConflictedException | LockAcquiringException $e) {
             // Couldn't acquire the lock: this is okay
             // The calling code will check if the lock is acquired
         }
@@ -228,8 +234,8 @@ abstract class App
             $output,
             $returnVar
         );
-        if($returnVar){
-            foreach($output as $line){
+        if ($returnVar) {
+            foreach ($output as $line) {
                 $this->getLogger()->error($line);
             }
         }
