@@ -312,6 +312,14 @@ class Factory
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
             ))
+            ->add(new Timetable\AdditionalSubjects(
+                $this->log,
+                $this->perform,
+                $api,
+                $lookup,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper
+            ))
             ->add(new Cleanup(
                 $this->log,
                 $this->perform,
