@@ -135,12 +135,12 @@ HELP;
      */
     private function buildStatusUpdater(int $maxAttempts, int $baseBackOff): Kami\StatusUpdater
     {
-        /** @var MapperFactory $mapperFactory */
         $config = $this->getConfig();
-        /** @var Kami\Mapper $kamiMapper */
+        /** @var MapperFactory $mapperFactory */
         $mapperFactory = $this->getDi()->get('mapperFactory');
-        $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
-        $connector     = new Kami\Connector(
+        /** @var Kami\Mapper $kamiMapper */
+        $kamiMapper = $mapperFactory->get(Kami\Mapper::class);
+        $connector  = new Kami\Connector(
             new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]),
             $config->get('kami_api_key'),
             $config->get('site_school_code')
