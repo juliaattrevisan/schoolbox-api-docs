@@ -3683,22 +3683,7 @@ parameters:
 		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
-			path: tools/kami/check-status.php
-
-		-
-			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
-			count: 1
 			path: tools/kami/re-upload-failed-kami-docs.php
-
-		-
-			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
-			count: 1
-			path: tools/kami/requeue-errors.php
-
-		-
-			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
-			count: 1
-			path: tools/kami/upload.php
 
 		-
 			message: "#^Function determineMapperType not found\\.$#"

@@ -8,17 +8,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami\CommandLineTool;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Http\UnreliableClient;
 use Alaress\Jitter\Jitter;
 use Alaress\Random;
 use GuzzleHttp;
 use Proxy;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\MapperFactory;
-use Schoolbox\Resource\Storage;
 use Throwable;
 
 /**
@@ -82,16 +79,11 @@ class Uploader extends CliTool\App
         $this->getLogger()->info(sprintf('Upload timeout: %d s', $timeout));
         $this->getLogger()->info(sprintf('Simulated network failure rate: %f', $failureRate));
 
-        /**
-         * @var IConnector        $db
-         * @var MapperFactory     $mapperFactory
-         * @var SingleFile\Mapper $submissionFileMapper
-         * @var Storage\Mapper    $storageMapper
-         * @var Kami\Mapper       $kamiMapper
-         */
+        /** @var MapperFactory $mapperFactory */
         $mapperFactory = $this->getDi()->get('mapperFactory');
-        $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
-        $client        = $failureRate === 0.0
+        /** @var Kami\Mapper $kamiMapper */
+        $kamiMapper = $mapperFactory->get(Kami\Mapper::class);
+        $client     = $failureRate === 0.0
             ? new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()])
             : new UnreliableClient($failureRate, new Random\FloatGenerator());
 

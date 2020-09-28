@@ -135,11 +135,9 @@ HELP;
      */
     private function buildStatusUpdater(int $maxAttempts, int $baseBackOff): Kami\StatusUpdater
     {
-        /**
-         * @var MapperFactory $mapperFactory
-         * @var Kami\Mapper   $kamiMapper
-         */
-        $config        = $this->getConfig();
+        /** @var MapperFactory $mapperFactory */
+        $config = $this->getConfig();
+        /** @var Kami\Mapper $kamiMapper */
         $mapperFactory = $this->getDi()->get('mapperFactory');
         $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
         $connector     = new Kami\Connector(

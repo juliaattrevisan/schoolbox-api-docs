@@ -86,13 +86,11 @@ HELP;
         $this->getLogger()->debug(sprintf('Base jitter back off: %d ms', $baseBackOff));
         $this->getLogger()->debug(sprintf('Timeout: %d ms', $timeout));
 
-        /**
-         * @var MapperFactory $mapperFactory
-         * @var Kami\Mapper   $kamiMapper
-         */
+        /** @var MapperFactory $mapperFactory */
         $mapperFactory = $this->getDi()->get('mapperFactory');
-        $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
-        $connector     = new Kami\Connector(
+        /** @var Kami\Mapper $kamiMapper */
+        $kamiMapper = $mapperFactory->get(Kami\Mapper::class);
+        $connector  = new Kami\Connector(
             new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]),
             $this->getConfig()->get('kami_api_key'),
             $this->getConfig()->get('site_school_code')
