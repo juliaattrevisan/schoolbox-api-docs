@@ -125,7 +125,7 @@ class Classes implements IStrategy
 
 
     /**
-     * Import data from xml into local schema
+     * Import data from api endpoints into local schema
      *
      * @throws RuntimeException
      * @throws Exception
