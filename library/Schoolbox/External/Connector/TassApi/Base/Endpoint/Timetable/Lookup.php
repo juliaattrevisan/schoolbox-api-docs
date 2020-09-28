@@ -27,30 +27,6 @@ class Lookup
 
 
     /**
-     * @var array
-     */
-    private $users;
-
-
-    /**
-     * @var array
-     */
-    private $students;
-
-
-    /**
-     * @var array
-     */
-    private $periods;
-
-
-    /**
-     * @var array
-     */
-    private $involvements;
-
-
-    /**
      * Lookup constructor.
      *
      * @param TimetablePeriodMapper  $timetablePeriodMapper
@@ -66,21 +42,22 @@ class Lookup
      *
      * @return array
      */
-    private function initUserLookup(): array
+    private function initStudentLookup(): array
     {
         $userStatement = $this->timetablePeriodMapper->getDatabase()->query('
             SELECT external_id, firstname, lastname
             FROM sis_user_profile sup
+            INNER JOIN sis_user_profile_student sups ON sup.id = sups.sis_user_profile_id
             WHERE external_id IS NOT NULL
         ');
 
-        $users = [];
+        $students = [];
 
         foreach ($userStatement as $row) {
-            $users[$row['external_id']] = $row;
+            $students[$row['external_id']] = $row;
         }
 
-        return $users;
+        return $students;
     }
 
 
@@ -89,12 +66,12 @@ class Lookup
      *
      * @return array
      */
-    private function initStudentLookup(): array
+    private function initStaffLookup(): array
     {
         $userStatement = $this->timetablePeriodMapper->getDatabase()->query('
             SELECT external_id, firstname, lastname
             FROM sis_user_profile sup
-            INNER JOIN sis_user_profile_student sups ON sup.id = sups.sis_user_profile_id
+            INNER JOIN sis_user_profile_staff sups ON sup.id = sups.sis_user_profile_id
             WHERE external_id IS NOT NULL
         ');
 
@@ -173,64 +150,48 @@ class Lookup
 
 
     /**
-     * Initialise user lookup upon first use
-     * This is an index of all users with external ids
-     *
-     * @return array
-     */
-    public function getUsers(): array
-    {
-        if (null === $this->users) {
-            $this->users = $this->initUserLookup();
-        }
-
-        return $this->users;
-    }
-
-
-    /**
-     * Initialise user lookup upon first use
+     * Reinitialise user lookup upon each use
      * This is an index of student users with external ids
      *
      * @return array
      */
     public function getStudents(): array
     {
-        if (null === $this->students) {
-            $this->students = $this->initStudentLookup();
-        }
-
-        return $this->students;
+        return $this->initStudentLookup();
     }
 
 
     /**
-     * Initialise period lookup upon first use
+     * Reinitialise user lookup upon each use
+     * This is an index of staff users with external ids
+     *
+     * @return array
+     */
+    public function getStaff(): array
+    {
+        return $this->initStaffLookup();
+    }
+
+
+    /**
+     * Reinitialise user lookup upon each use
      *
      * @return array
      * @throws Exception
      */
     public function getPeriods(): array
     {
-        if (null === $this->periods) {
-            $this->periods = $this->initPeriodLookup();
-        }
-
-        return $this->periods;
+        return $this->initPeriodLookup();
     }
 
 
     /**
-     * Initialise class involvement lookup upon first use
+     * Reinitialise user lookup upon each use
      *
      * @return array
      */
     public function getInvolvements(): array
     {
-        if (null === $this->involvements) {
-            $this->involvements = $this->initClassInvolvementLookup();
-        }
-
-        return $this->involvements;
+        return $this->initClassInvolvementLookup();
     }
 }
