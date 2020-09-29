@@ -66,6 +66,8 @@ class Factory
     /**
      * Create a DBLIB connector
      *
+     * @deprecated use the SQLSRV connector (via `createSqlsrv`) instead
+     *
      * @return Connector
      */
     public function createDblib()
