@@ -132,14 +132,29 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
-
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
          *
          * Cache a flat key-value array of (day, period)
          */
-        $users = $this->lookup->getStudents();
         $periods = $this->lookup->getPeriods();
+
+        $this->importTimetable($this->lookup->getStudents(), $periods);
+        $this->importTimetable($this->lookup->getStaff(), $periods);
+    }
+
+
+    /**
+     * Import timetables that belong to $users array
+     *
+     * @param array $users
+     * @param array $periods
+     * @throws Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function importTimetable(array $users, array $periods): void
+    {
 
         /* Get a list of all the timetables to process
          * These are indexed by (externalId => timetable) tuple
