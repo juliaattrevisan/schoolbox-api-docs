@@ -17,8 +17,9 @@ use Alaress\Database\Broker\Sqlsrv\Broker as SqlsrvBroker;
 use Alaress\Database\Connector\Base as Connector;
 use Alaress\Database\Transactor\Base as Transactor;
 use Alaress\Database\Transactor\Strategy;
-use function in_array;
 use InvalidArgumentException;
+
+use function in_array;
 
 class Factory
 {
