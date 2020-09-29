@@ -27,10 +27,10 @@ class Service
     /**
      * Constructor
      *
-     * @param string $algorithm One of the PASSWORD_* constants
+     * @param string|int $algorithm One of the PASSWORD_* constants
      * @param int $cost      The algorithmic cost to use
      */
-    public function __construct(string $algorithm = PASSWORD_DEFAULT, $cost = 10)
+    public function __construct($algorithm = PASSWORD_DEFAULT, $cost = 10)
     {
         $this->algorithm = $algorithm;
         $this->cost      = $cost;
