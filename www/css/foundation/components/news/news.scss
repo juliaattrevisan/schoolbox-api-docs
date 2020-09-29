@@ -10,6 +10,9 @@
         width: 6rem;
       }
     }
+    .thumbnail {
+      width: unset;
+    }
     &.reversed {
       img {
         float: right;
