@@ -157,7 +157,7 @@ class Factory
             case 'isams':
             case 'doublefirst':
             case 'schooledge':
-                $connectorExternal = $this->factory->createMssql($config->get(ConfigMapper::_EXTERNAL_MS_SQL_SERVER_DRIVER));
+                $connectorExternal = $this->factory->createSqlsrv();
                 break;
 
             // MySQL
