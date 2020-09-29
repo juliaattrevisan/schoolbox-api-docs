@@ -15,7 +15,12 @@ namespace Alaress\Password;
 class Service
 {
     /**
-     * @var int
+     * The hashing algorithm to use.
+     *
+     * This may be either a string or int, as it is one of the `PASSWORD_*`
+     * constants (which is an int in PHP <= 7.3, and a string in PHP >= 7.4)
+     *
+     * @var string|int
      */
     protected $algorithm;
 
@@ -27,8 +32,9 @@ class Service
     /**
      * Constructor
      *
-     * @param string $algorithm One of the PASSWORD_* constants
-     * @param int $cost      The algorithmic cost to use
+     * @param string|int $algorithm One of the PASSWORD_* constants
+     *                              (int in PHP <= 7.3, string in PHP >= 7.4)
+     * @param int        $cost      The algorithmic cost to use
      */
     public function __construct($algorithm = PASSWORD_DEFAULT, $cost = 10)
     {
