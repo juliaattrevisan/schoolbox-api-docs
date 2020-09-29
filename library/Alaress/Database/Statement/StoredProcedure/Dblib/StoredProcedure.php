@@ -22,6 +22,8 @@ use PDO;
  * not supporting true prepared statements or bound outputs; we work around the
  * limitation by extracting return/output vars from the last rowset of the
  * query, but to do this we need to skip any rowsets from the stored proc.
+ *
+ * @deprecated use the SQLSrv driver instead
  */
 class StoredProcedure extends Base
 {

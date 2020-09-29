@@ -1,8 +1,6 @@
 <?php
 
 /**
- * MSSQL Iterator
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -13,6 +11,11 @@ namespace Alaress\Database\Iterator\Dblib;
 use Alaress\Database\Iterator\Base;
 use PDOStatement;
 
+/**
+ * MSSQL Iterator for the DBLib driver
+ *
+ * @deprecated use the SQLSrv driver instead
+ */
 class Iterator extends Base
 {
     /**

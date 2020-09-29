@@ -1,11 +1,6 @@
 <?php
 
 /**
- * MSSQL Function call
- *
- * Important note: Function call parameters in T-SQL are strictly ordered- regardless of names used
- * to bind parameters, they must be bound in the correct order or execution will be unpredictable
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -15,6 +10,14 @@ namespace Alaress\Database\Statement\FunctionCall\Dblib;
 
 use Alaress\Database\Statement\FunctionCall\Base;
 
+/**
+ * MSSQL Function call
+ *
+ * Important note: Function call parameters in T-SQL are strictly ordered- regardless of names used
+ * to bind parameters, they must be bound in the correct order or execution will be unpredictable
+ *
+ * @deprecated use the SQLSrv driver instead
+ */
 class FunctionCall extends Base
 {
     /**

@@ -1,7 +1,5 @@
 <?php
 /**
- * MSSQL Query
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -14,6 +12,11 @@ use Alaress\Database\Statement\Query\Base;
 use PDOStatement;
 use PDO;
 
+/**
+ * MSSQL Query
+ *
+ * @deprecated use the SQLSrv driver instead
+ */
 class Query extends Base
 {
     /**

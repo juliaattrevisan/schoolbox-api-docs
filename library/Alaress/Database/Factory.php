@@ -43,6 +43,8 @@ class Factory
     /**
      * Create a MSSQL connector (SQLSRV, or DBLIB if that's not available)
      *
+     * @deprecated use the SQLSRV connector directly via `createSqlsrv` instead
+     *
      * @param string $preferredMsSqlServerDriver
      * @return Connector
      * @throws InvalidArgumentException

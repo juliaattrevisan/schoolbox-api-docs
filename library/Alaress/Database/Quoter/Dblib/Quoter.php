@@ -11,6 +11,8 @@ use Alaress\Database\Quoter\Base;
 
 /**
  * Class Quoter
+ *
+ * @deprecated use the SQLSrv driver instead
  */
 class Quoter extends Base
 {
