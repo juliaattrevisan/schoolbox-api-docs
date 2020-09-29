@@ -453,8 +453,12 @@ sourcep3=`echo $restore | cut -d',' -f5`;
 if [ "$sourcetype" == '[A]' ] && [ "$sourceloc" == '[R]' ]; then
   lmount=$(findmnt -n -o SOURCE --target $thisdatadir);
   localAvailableStorage=$(df | grep $lmount | awk -F " " '{print $2}');
+  localOtherStorage=$(du -sc $lmount --exclude $lmount/schoolbox | grep total | awk -F " " '{print $1}');
+  localAvailableStorage=$((localAvailableStorage-localOtherStorage));
   rmount=$(ssh $host findmnt -n -o SOURCE --target $sourcep3);
   remoteUsedStorage=$(ssh $host df | grep $rmount | awk -F " " '{print $3}');
+  remoteOtherStorage=$(ssh $host du -sc $rmount --exclude $rmount/schoolbox | grep total | awk -F " " '{print $1}');
+  remoteUsedStorage=$((remoteUsedStorage-remoteOtherStorage));
   if [ "$localAvailableStorage" == "" ] || [ "$remoteUsedStorage" == "" ]; then
     errmsg="Please check the datapool disk on both hosts, one or both are either full or not available";
     error;
