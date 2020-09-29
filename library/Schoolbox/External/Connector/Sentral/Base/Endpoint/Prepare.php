@@ -150,6 +150,21 @@ class Prepare implements IStrategy
             $this->staffProfileMapper->getDatabase()->query("UPDATE {$this->staffProfileMapper->getTable()} SET updated_at = NULL");
             $this->baseProfileMapper->getDatabase()->query("UPDATE {$this->baseProfileMapper->getTable()} SET updated_at = NULL");
 
+            /* Clear emergency contacts due the way we encounter them mixed up with regular parents
+             * If only this were normalised...
+             */
+            $this->studentProfileMapper->getDatabase()->query("UPDATE {$this->studentProfileMapper->getTable()} SET emergency_contact_name_1 = NULL");
+            $this->studentProfileMapper->getDatabase()->query("UPDATE {$this->studentProfileMapper->getTable()} SET emergency_contact_phone_1 = NULL");
+            $this->studentProfileMapper->getDatabase()->query("UPDATE {$this->studentProfileMapper->getTable()} SET emergency_contact_phone_alt_1 = NULL");
+
+            $this->studentProfileMapper->getDatabase()->query("UPDATE {$this->studentProfileMapper->getTable()} SET emergency_contact_name_2 = NULL");
+            $this->studentProfileMapper->getDatabase()->query("UPDATE {$this->studentProfileMapper->getTable()} SET emergency_contact_phone_2 = NULL");
+            $this->studentProfileMapper->getDatabase()->query("UPDATE {$this->studentProfileMapper->getTable()} SET emergency_contact_phone_alt_2 = NULL");
+
+            $this->studentProfileMapper->getDatabase()->query("UPDATE {$this->studentProfileMapper->getTable()} SET emergency_contact_name_3 = NULL");
+            $this->studentProfileMapper->getDatabase()->query("UPDATE {$this->studentProfileMapper->getTable()} SET emergency_contact_phone_3 = NULL");
+            $this->studentProfileMapper->getDatabase()->query("UPDATE {$this->studentProfileMapper->getTable()} SET emergency_contact_phone_alt_3 = NULL");
+
             /* Truncate other data entirely
              */
             $this->relationshipMapper->truncate();

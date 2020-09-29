@@ -255,7 +255,7 @@ class Profile implements IStrategy
 
                 /* Emergency Contacts
                  */
-                $emergencyContacts = $this->findEmergencyContacts();
+                $emergencyContacts = $this->findEmergencyContacts($studentPersonRelation);
 
                 /* Find out a staff member via their user code
                  */
@@ -330,23 +330,62 @@ class Profile implements IStrategy
                  * Emergency Contacts
                  * ...because we didn't normalise it, I'm hardcoding these
                  */
-                if (\count($emergencyContacts)) {
-                    if (isset($emergencyContacts[0])) {
-                        $studentProfile
-                            ->setEmergencyContactName1($emergencyContacts[0]['name'])
-                            ->setEmergencyContactPhone1($emergencyContacts[0]['phone']);
-                    }
+                if (null !== $emergencyContacts) {
 
-                    if (isset($emergencyContacts[1])) {
+                    /* The studentPersonRelation we are currently processing
+                     * contains an emergency contact; find the first available
+                     * slot, put them in there, then save it
+                     */
+                    if ('' === (string)$studentProfile->getEmergencyContactName1()) {
                         $studentProfile
-                            ->setEmergencyContactName2($emergencyContacts[1]['name'])
-                            ->setEmergencyContactPhone2($emergencyContacts[1]['phone']);
-                    }
+                            ->setEmergencyContactName1($emergencyContacts['name'])
+                            ->setEmergencyContactPhone1($emergencyContacts['phone']);
 
-                    if (isset($emergencyContacts[2])) {
+                        $this->log->debug(sprintf(
+                            '%s (user %s) received emergency contacts in slot 1: %s %s',
+                            trim("{$firstname} {$lastname}"),
+                            $externalId,
+                            $emergencyContacts['name'],
+                            $emergencyContacts['phone']
+                        ));
+
+                    } elseif ('' === (string)$studentProfile->getEmergencyContactName2()) {
                         $studentProfile
-                            ->setEmergencyContactName3($emergencyContacts[2]['name'])
-                            ->setEmergencyContactPhone3($emergencyContacts[2]['phone']);
+                            ->setEmergencyContactName2($emergencyContacts['name'])
+                            ->setEmergencyContactPhone2($emergencyContacts['phone']);
+
+                        $this->log->debug(sprintf(
+                            '%s (user %s) received emergency contacts in slot 2: %s %s',
+                            trim("{$firstname} {$lastname}"),
+                            $externalId,
+                            $emergencyContacts['name'],
+                            $emergencyContacts['phone']
+                        ));
+                    } elseif ('' === (string)$studentProfile->getEmergencyContactName3()) {
+                        $studentProfile
+                            ->setEmergencyContactName3($emergencyContacts['name'])
+                            ->setEmergencyContactPhone3($emergencyContacts['phone']);
+
+                        $this->log->debug(sprintf(
+                            '%s (user %s) received emergency contacts in slot 3: %s %s',
+                            trim("{$firstname} {$lastname}"),
+                            $externalId,
+                            $emergencyContacts['name'],
+                            $emergencyContacts['phone']
+                        ));
+                    } else {
+
+                        /* If they're all full, warn user - we hardcoded 3 spots
+                         * and can't just add more, like we would if we had taken
+                         * the time to normalise the data properly
+                         */
+                        $this->log->warning(sprintf(
+                            '%s (user %s) has too many emergency contacts to add: %s %s',
+                            trim("{$firstname} {$lastname}"),
+                            $externalId,
+                            $emergencyContacts['name'],
+                            $emergencyContacts['phone']
+                        ));
                     }
                 }
 
@@ -367,8 +406,13 @@ class Profile implements IStrategy
                  *
                  * Each studentPersonRelation comes with a student and one of their parents
                  * so we continually end up reprocessing data, but ok
+                 *
+                 * A studentPersonRelation may contain a parent or an emergency contact
+                 * We only need to add them in one way or the other, not both
                  */
-                $this->importParentsOfStudent($externalId, $studentBaseProfile, $studentPersonRelation);
+                if (null === $emergencyContacts) {
+                    $this->importParentsOfStudent($externalId, $studentBaseProfile, $studentPersonRelation);
+                }
             }
 
             /* Prepare for next page if it exists
@@ -422,45 +466,29 @@ class Profile implements IStrategy
     /**
      * Find all the meaningful emergency contacts for a student
      *
-     * @return array
+     * @param array $studentPersonRelation
+     * @return array|null
      */
-    public function findEmergencyContacts(): array
+    public function findEmergencyContacts(array $studentPersonRelation): ?array
     {
-        $emergencyContacts = [];
-        $contacts = [];
-        $n = 0;
 
-        foreach ($emergencyContacts as $emergencyContact) {
-            if ($n < self::MAX_EMERGENCY_CONTACTS) {
+        /* In $studentPersonRelation, an emergency contact has an attribute isEmergencyContact
+         * set to something other than an empty string or null
+         *
+         * You get one emergency contact per $studentPersonRelation, at most
+         */
+        if ('' !== (string)$studentPersonRelation['attributes']['isEmergencyContact']) {
+            $firstname = $studentPersonRelation['relationships']['person']['data']['attributes']['firstName'];
+            $lastname  = $studentPersonRelation['relationships']['person']['data']['attributes']['lastName'];
 
-                /* TODO Fill in these emergency contact vars
-                 */
-                $fullname = '';
-                $relation = '';
-                $phone = '';
-
-                /* Suffix the $relation if provided
-                 */
-                if ('' !== $relation) {
-                    $fullname .= " ({$relation})";
-                }
-
-                /* Aggregate them if we have a name
-                 */
-                if ('' !== $fullname) {
-                    $contacts[] = [
-                        'name' => $fullname,
-                        'phone' => $phone
-                    ];
-                }
-            }
-
-            $n++;
+            return [
+                'name'  => "{$firstname} {$lastname}",
+                'phone' => ''
+            ];
         }
 
-        return $contacts;
+        return null;
     }
-
 
     /**
      * Find a form teacher from their form code
