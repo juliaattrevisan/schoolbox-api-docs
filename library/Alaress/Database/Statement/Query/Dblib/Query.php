@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -39,7 +40,7 @@ class Query extends Base
                         $statement->bindValue($name, $input['value'], $input['type']);
                     }
                 } else {
-                    $statement->bindValue($name, $input['value'] );
+                    $statement->bindValue($name, $input['value']);
                 }
             }
         }
