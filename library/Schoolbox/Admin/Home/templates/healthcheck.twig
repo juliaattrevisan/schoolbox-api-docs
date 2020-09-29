@@ -2,9 +2,9 @@
 
 <sec class="row">
     <div class="small-12 island">
-        <h2 class="subheader">{{ output['externalType'] }} Database Health Check</h2>
+        <h2 class="subheader">{{ output['externalType'] ?? '' }} Database Health Check</h2>
 
-        {% if output['errors'] | length %}
+        {% if (output['errors'] ?? []) | length %}
             {% for error in output['errors'] %}
                 <div data-alert class="alert-box alert">
                     {{ error }}
@@ -16,7 +16,7 @@
             </div>
         {% endif %}
 
-        {% if output['log'] is not empty %}
+        {% if (output['log'] ?? null) is not empty %}
             <section class="content">
                 <pre>{{ output['log'] }}</pre>
             </section>
