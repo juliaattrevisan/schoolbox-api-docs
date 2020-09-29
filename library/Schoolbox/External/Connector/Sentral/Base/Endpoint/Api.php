@@ -147,27 +147,4 @@ class Api implements IApi
 
         return $decoded;
     }
-
-
-    /**
-     * Have a look around
-     *
-     * @throws InvalidArgumentException
-     */
-    public function schemaExplorer(): void
-    {
-        $schema = $this->retrieveDocument('sentral/schema');
-
-        foreach ($schema['paths'] as $path => $data) {
-            new \Alaress_Probe('<hr>');
-
-            $example = $data['get']['responses'][200]['content']['application/json']['examples']['validResponse']['value']['data'];
-
-            if (null === $example) {
-                new \Alaress_Probe($path, $data);
-            } else {
-                new \Alaress_Probe($path, $example);
-            }
-        }
-    }
 }
