@@ -64,6 +64,9 @@ INSERT INTO component_config_instance
     FROM component_config_definition ccd
              INNER JOIN component_definition cd ON ccd.component_definition_id = cd.id
              INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
+             INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
+                    AND cci.component_config_definition_id IN
+                        (SELECT id FROM component_config_definition WHERE `key` = 'compactMode')
     WHERE `key` = 'showComponentTitle' AND cd.module = 'homepage'
 );
 
@@ -114,6 +117,22 @@ SET cci1.`value` = IF(cci2.`value` = '1', '0', '1');
 
 -- Remove the compactMode instances from textbox/breadcrumb/tiles
 
+-- Back up data before actually deleting
+CREATE TABLE _deleted_component_config_instance
+SELECT cci.*
+FROM component_config_instance cci
+LEFT JOIN component_config_definition ccd ON ccd.id = cci.component_config_definition_id
+WHERE ccd.`key` = 'compactMode'
+  AND ccd.component_definition_id IN (
+    SELECT id
+    FROM component_definition
+    WHERE `class` IN (
+        'Component_Homepage_TextBoxController',
+        'Component_Homepage_BreadcrumbController',
+        'Schoolbox\\Tile\\Component\\HomepageTileController'
+    )
+);
+
 DELETE cci
 FROM component_config_instance cci
 LEFT JOIN component_config_definition ccd ON ccd.id = cci.component_config_definition_id
@@ -129,6 +148,16 @@ WHERE ccd.`key` = 'compactMode'
 );
 
 -- Remove the compactMode definitions from textbox/breadcrumb/tiles
+CREATE TABLE _deleted_component_config_definition
+SELECT ccd.*
+FROM component_config_definition ccd
+LEFT JOIN component_definition cd ON ccd.component_definition_id = cd.id
+WHERE ccd.`key` = 'compactMode'
+  AND cd.`class` IN (
+    'Component_Homepage_TextBoxController',
+    'Component_Homepage_BreadcrumbController',
+    'Schoolbox\\Tile\\Component\\HomepageTileController'
+);
 
 DELETE ccd
 FROM component_config_definition ccd
