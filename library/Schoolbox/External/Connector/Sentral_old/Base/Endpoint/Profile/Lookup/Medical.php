@@ -5,21 +5,21 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup;
+namespace Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Profile\Lookup;
 
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
+use Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Api;
 use UnexpectedValueException;
 
 /**
- * Class EmergencyContacts
+ * Class Medical
  *
- * Download a precompile emergency contacts for everyone
+ * Download a precompile a medical summary for everyone
  * Return it as a lookup struct without extra fluff
  *
  * FIXME Tell Sydney James?
- *  Emergency Contact data cannot not be sideloaded alongside student-contacts
+ *  Medical data cannot not be sideloaded alongside student-contacts
  */
-class EmergencyContacts
+class Medical
 {
 
     /**
@@ -54,7 +54,7 @@ class EmergencyContacts
 
 
     /**
-     * Compile a lookup of emergency contact
+     * Compile a lookup of medical data
      *
      * @return $this
      * @throws UnexpectedValueException
@@ -65,7 +65,7 @@ class EmergencyContacts
 
         /* Always process the first page
          */
-        $nextUrl = $this->processRecords('enrolments/emergency-contact-link?limit=200');
+        $nextUrl = $this->processRecords('enrolments/medical-condition?limit=200');
 
         /* If there are more pages, grab them too
          */
@@ -88,16 +88,10 @@ class EmergencyContacts
     {
         $data = $this->api->retrieveDocument($endpoint);
 
-        foreach ($data['data'] as $record) {
-            $studentPersonId = $record['relationships']['person']['data']['id'];
-            $contactPersonId = $record['relationships']['personToContact']['data']['id'];
+        foreach ($data['data'] as $medicalRecord) {
+            $personId = $medicalRecord['relationships']['person']['data']['id'];
 
-            $this->stack[$studentPersonId][] = [
-                'contactPersonId' => $contactPersonId,
-                'name' => $record['attributes']['name'],
-                'phone' => $record['attributes']['phone'] ?? $record['attributes']['altPhone'],
-                'relationship' => $record['attributes']['relationship'],
-            ];
+            $this->stack[$personId][] = $medicalRecord['attributes']['name'];
         }
 
         return $data['links']['next'] ?? null;

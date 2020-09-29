@@ -6,18 +6,18 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile;
+namespace Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Profile;
 
 use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup\EmergencyContacts;
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup\Enrolment;
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup\LearningPlans;
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup\Medical;
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup\Phone;
+use Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Api;
+use Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Profile\Lookup\EmergencyContacts;
+use Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Profile\Lookup\Enrolment;
+use Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Profile\Lookup\LearningPlans;
+use Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Profile\Lookup\Medical;
+use Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Profile\Lookup\Phone;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
@@ -29,7 +29,7 @@ use UnexpectedValueException;
  *
  * Imports sis_user_profile* data
  *
- * @package Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile
+ * @package Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Profile
  */
 class Profile implements IStrategy
 {

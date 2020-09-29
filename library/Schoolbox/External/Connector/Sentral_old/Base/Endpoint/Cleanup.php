@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
+namespace Schoolbox\External\Connector\Sentral_old\Base\Endpoint;
 
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -18,7 +18,7 @@ use Schoolbox\External\Profile as UserProfile;
  *
  * Remove any stale profiles
  *
- * @package Schoolbox\External\Connector\Sentral\Base\Endpoint
+ * @package Schoolbox\External\Connector\Sentral_old\Base\Endpoint
  */
 class Cleanup implements IStrategy
 {

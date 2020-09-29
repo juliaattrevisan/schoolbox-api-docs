@@ -6,7 +6,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable;
+namespace Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Timetable;
 
 use PDOException;
 use Psr\Log\LoggerInterface;
@@ -31,7 +31,7 @@ use Zend\Uri\Exception\InvalidUriPartException;
  *
  * Import all the classes and their involvements
  *
- * @package Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable
+ * @package Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Timetable
  */
 class Classes implements IStrategy
 {

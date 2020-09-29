@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
+namespace Schoolbox\External\Connector\Sentral_old\Base\Endpoint;
 
 use DomainException;
 use InvalidArgumentException;

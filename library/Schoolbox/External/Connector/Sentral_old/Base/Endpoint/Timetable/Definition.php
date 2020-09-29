@@ -6,7 +6,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable;
+namespace Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
@@ -22,7 +22,7 @@ use Schoolbox\Mapper\Exception;
  *
  * Timetable definition of days and periods
  *
- * @package Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable
+ * @package Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Timetable
  */
 class Definition implements IStrategy
 {
