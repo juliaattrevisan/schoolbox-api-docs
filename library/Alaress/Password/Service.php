@@ -15,7 +15,7 @@ namespace Alaress\Password;
 class Service
 {
     /**
-     * @var string
+     * @var string|int
      */
     protected $algorithm;
 
