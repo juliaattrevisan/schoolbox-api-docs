@@ -85,8 +85,8 @@ class Api implements IApi
         $this->host = $credentials['host'];
 
         $headers = array_combine(
-            ['X-API-KEY', 'X-API-TENANT'],
-            [$key, $credentials['tenant']]
+            ['X-API-KEY', 'X-API-TENANT', 'X-API-OPTIONS'],
+            [$key, $credentials['tenant'], 'map-include,inline-include']
         );
 
         return new Client([
