@@ -15,7 +15,7 @@ namespace Alaress\Password;
 class Service
 {
     /**
-     * @var int
+     * @var string
      */
     protected $algorithm;
 
@@ -30,7 +30,7 @@ class Service
      * @param string $algorithm One of the PASSWORD_* constants
      * @param int $cost      The algorithmic cost to use
      */
-    public function __construct($algorithm = PASSWORD_DEFAULT, $cost = 10)
+    public function __construct(string $algorithm = PASSWORD_DEFAULT, $cost = 10)
     {
         $this->algorithm = $algorithm;
         $this->cost      = $cost;
