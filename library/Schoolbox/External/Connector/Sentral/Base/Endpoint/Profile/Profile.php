@@ -273,7 +273,7 @@ class Profile implements IStrategy
 
                 /* Emergency Contacts
                  */
-                $emergencyContacts = $this->findEmergencyContacts($student['relationships']['contacts']['data']);
+                $emergencyContacts = $this->findEmergencyContacts($student);
 
                 /* Find out a staff member via their user code
                  */
@@ -474,17 +474,19 @@ class Profile implements IStrategy
     /**
      * Find all the meaningful emergency contacts for a student
      *
-     * @param array             $contacts
+     * @param array $student
      * @return array|null
      * @throws \InvalidArgumentException
      */
-    public function findEmergencyContacts(array $contacts): ?array
+    public function findEmergencyContacts(array $student): ?array
     {
 
         /* FIXME There's a sideload for emergencyContactLinks via Get Student Person
          *  ...but it doesn't give you any at all, it seems broken.
          *  http://development.sentral.com.au/#operation/getStudentPerson
          */
+
+        $contacts = $student['relationships']['contacts']['data'];
 
         $emergencyContacts = [];
 
