@@ -480,6 +480,12 @@ class Profile implements IStrategy
      */
     public function findEmergencyContacts(array $contacts): ?array
     {
+
+        /* FIXME There's a sideload for emergencyContactLinks via Get Student Person
+         *  ...but it doesn't give you any at all, it seems broken.
+         *  http://development.sentral.com.au/#operation/getStudentPerson
+         */
+
         $emergencyContacts = [];
 
         foreach ($contacts as $contact) {
