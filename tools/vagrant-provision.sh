@@ -59,10 +59,18 @@ echo "[SB][`date +%Y-%m-%d\ %X`] External DB Host: $external_db_host";
 echo "[SB][`date +%Y-%m-%d\ %X`] External DB Name: $external_db_db";
 
 phpversion=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;
-echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion";
-if [ "$phpversion" != "7.4" ];
+correctphpversion='7.1';
+echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $phpversion, expected: $correctphpversion";
+#if [ "$phpversion" != "7.4" ];
+#then
+#    /usr/bin/update-alternatives --set php /usr/bin/php7.4;
+#fi
+
+# Schoolbox <= 20.1 requires PHP 7.1: >= 20.2 requires PHP 7.4
+if [ "$phpversion" != "$correctphpversion" ];
 then
-    /usr/bin/update-alternatives --set php /usr/bin/php7.4;
+    echo "[SB][`date +%Y-%m-%d\ %X`] Current and expected PHP versions do not match: switching";
+    /vagrant/tools/switchPHP.sh;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
