@@ -3826,6 +3826,11 @@ parameters:
 			path: library/Alaress/Database/Broker/Sqlsrv/Broker.php
 
 		-
+			message: "#^Access to undefined constant PDO\\:\\:SQLSRV_ATTR_FETCHES_NUMERIC_TYPE\\.$#"
+			count: 1
+			path: library/Alaress/Database/Broker/Sqlsrv/Broker.php
+
+		-
 			message: "#^Access to undefined constant PDO\\:\\:SQLSRV_ENCODING_BINARY\\.$#"
 			count: 1
 			path: library/Alaress/Database/Statement/Query/Sqlsrv/Query.php
