@@ -55,18 +55,18 @@
     flex-grow: 1;
     padding: 0;
     position: relative;
+    max-height: 75vh;
+    min-height: 292px;
+    @media #{$small-only} {
+      min-height: 100vh;
+      max-height: 100vh;
+    }
 
     .content {
       padding: 1rem 1rem 3.5rem 1rem;
       margin-bottom: 2.5rem;
       height: 100%;
-      max-height: 500px;
-      min-height: 292px;
       overflow-y: auto;
-
-      @media #{$small-only} {
-        max-height: 450px;
-      }
 
       &.active {
         display: flex;
