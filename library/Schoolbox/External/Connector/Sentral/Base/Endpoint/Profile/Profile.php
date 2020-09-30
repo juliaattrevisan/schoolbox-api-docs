@@ -94,6 +94,18 @@ class Profile implements IStrategy
 
 
     /**
+     * A list of external ids that were seen at various endpoints
+     * importStudents() gets a list of relationships so we might
+     * end up encountering the same student multiple times
+     * but we don't need to reprocess their medical data etc.
+     *
+     * So only do that to people we haven't seen before
+     *
+     * @var array
+     */
+    private $encounters = [];
+
+    /**
      * Profile constructor.
      *
      * @param LoggerInterface                 $log
@@ -159,7 +171,7 @@ class Profile implements IStrategy
          * Process multiple pages until there are none remaining, or if something is really stuffed,
          * until MAX_CALLS is reached, to prevent infinite calls to a third party.
          */
-        $nextUrl = 'enrolments/student-contact?include=person,student,studentPerson&limit=10';
+        $nextUrl = 'enrolments/student-contact?include=person,student,studentPerson&limit=200';
 
         for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
             $payload = $this->api->retrieveDocument($nextUrl);
@@ -245,10 +257,6 @@ class Profile implements IStrategy
                  */
                 $alertLegal = $this->findLegal();
 
-                /* Fish out medical alerts
-                 */
-                $alertMedical = $this->findMedicalAlert();
-
                 /* Fish out campus name
                  */
                 $campusName = $this->findCampusName();
@@ -288,7 +296,6 @@ class Profile implements IStrategy
                     ->setUsername($username)
                     ->setAlertComment($alertComments)
                     ->setAlertLegal($alertLegal)
-                    ->setAlertMedical($alertMedical)
                     ->setAlertMessage($messages)
                     ->setCampusName($campusName)
                     ->setEmail($email)
@@ -318,6 +325,19 @@ class Profile implements IStrategy
                     ->setIb($ib)
                     ->setIndividualLearningPlans($ilp)
                     ->setSpecialNeeds($specialNeeds);
+
+                /* If this student was processed earlier, we don't need to do it again
+                 * These fetch data from specific endpoints so we can save ourselves some
+                 * api requests which result in the same outcome
+                 *
+                 * (the alternative is to build a lookup after downloading their db table...)
+                 */
+                if (!isset($this->encounters[$externalId])) {
+
+                    /* Fish out medical alerts
+                     */
+                    $studentProfile->setAlertMedical($this->findMedicalAlert($studentBaseProfile, $studentPersonRelation));
+                }
 
                 /* Date of birth requires special treatment as ADF doesn't deal with nulls well
                  */
@@ -413,6 +433,14 @@ class Profile implements IStrategy
                 if (null === $emergencyContacts) {
                     $this->importParentsOfStudent($externalId, $studentBaseProfile, $studentPersonRelation);
                 }
+
+                /* Remember we saw this guy and have processed his details
+                 * because we'll encounter a student multiple times when
+                 * we work with their studentPersonRelations
+                 *
+                 * We don't need to do it over and over again
+                 */
+                $this->encounters[$externalId] = true;
             }
 
             /* Prepare for next page if it exists
@@ -538,13 +566,44 @@ class Profile implements IStrategy
     /**
      * Find medical data for student
      *
+     * @param UserProfile\Model $studentBaseProfile
+     * @param array             $studentPersonRelation
      * @return string|null
+     * @throws \InvalidArgumentException
      */
-    private function findMedicalAlert(): ?string
+    private function findMedicalAlert(UserProfile\Model $studentBaseProfile, array $studentPersonRelation): ?string
     {
-        /* TODO Fill in these medical alert vars
+
+        /* Find another endpoint who can tell us the answer
          */
-        return null;
+        $endpoint = $studentPersonRelation['relationships']['studentPerson']['data']['links']['medicalConditions'];
+
+        /* No endpoint? No way to find out more
+         * Just exit, there's no link to medical conditions
+         */
+        if ('' === (string)$endpoint) {
+            return null;
+        }
+
+        /* Otherwise keep digging
+         */
+        $payload = $this->api->retrieveDocument($endpoint);
+
+        $numConditions = \count($payload['data']);
+
+        $this->log->debug(sprintf(
+            'Secondary api inspection at %s for medical conditions belonging to %s (user %s) - found %s',
+            $endpoint,
+            trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+            $studentBaseProfile->getExternalId(),
+            $numConditions
+        ));
+
+        if ($numConditions) {
+            return 'This student has medical conditions.';
+        }
+
+        return '';
     }
 
 
