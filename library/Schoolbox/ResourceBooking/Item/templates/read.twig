@@ -37,18 +37,12 @@
     </nav>
 </div>
 
-<div id="search-modal" class="reveal-modal" data-reveal>
-    <div class="row">
-        <div class="small-12 island">
-            <h2 class="subheader">Search Resources</h2>
-            <section>
-                <form action="{{ routeLookup('resourceItem.browse') }}" method="get">
-                    <input type="search" id="resource-search-term" placeholder="Search Resources" name="search" value="{{ search|default('') }}" />
-                    <input type="submit" id="resource-search" value="Search" class="expand" />
-                </form>
-            </section>
-        </div>
-    </div>
+<div id="search-modal" class="reveal-modal small" data-reveal>
+    <h2>Search Resources</h2>
+    <form action="{{ routeLookup('resourceItem.browse') }}" method="get">
+        <input type="search" id="resource-search-term" placeholder="Search Resources" name="search" value="{{ search|default('') }}" />
+        <input type="submit" id="resource-search" value="Search" class="expand" />
+    </form>
 
     <a class="close-reveal-modal">&#215;</a>
 </div>
@@ -118,31 +112,23 @@
 
 {# Dialog for showing description and rules #}
 <div class="reveal-modal" data-reveal aria-labelledby="dialog-description-title" aria-hidden="true" role="dialog" id="dialog-description">
+    <h2 id="dialog-description-title">{% include '@resourceItem/sub/itemName.twig' with {item: item} %}</h2>
     <div class="row">
-        <div class="small-12 island">
-            <div class="row">
-                <div class="small-12 columns">
-                    <h2 id="dialog-description-title">{% include '@resourceItem/sub/itemName.twig' with {item: item} %}</h2>
-                </div>
-            </div>
-            <div class="row">
-                <div class="small-12 medium-4 large-5 columns">
-                    <section class="content">
-                        {% if item.image.hash %}
-                            <img src="/storage/image.php?size=maxsize&hash={{ item.image.hash|e('url') }}" />
-                        {% endif %}
-                    </section>
-                </div>
-                <div class="small-12 medium-8 large-7 columns">
-                    <section class="content">
-                        {# Resource manager: could be set in the edit form, or the default resource manager #}
-                        <article>{{ item.description|purify }}</article>
+        <div class="small-12 medium-4 large-5 columns">
+            <section class="content">
+                {% if item.image.hash %}
+                    <img src="/storage/image.php?size=maxsize&hash={{ item.image.hash|e('url') }}" />
+                {% endif %}
+            </section>
+        </div>
+        <div class="small-12 medium-8 large-7 columns">
+            <section class="content">
+                {# Resource manager: could be set in the edit form, or the default resource manager #}
+                <article>{{ item.description|purify }}</article>
 
-                        <h3>Rules</h3>
-                        {% include '@resourceItem/sub/rules.twig' with {item: item} %}
-                    </section>
-                </div>
-            </div>
+                <h3>Rules</h3>
+                {% include '@resourceItem/sub/rules.twig' with {item: item} %}
+            </section>
         </div>
     </div>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
