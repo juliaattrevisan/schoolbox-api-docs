@@ -94,18 +94,6 @@ class Profile implements IStrategy
 
 
     /**
-     * A list of external ids that were seen at various endpoints
-     * importStudents() gets a list of relationships so we might
-     * end up encountering the same student multiple times
-     * but we don't need to reprocess their medical data etc.
-     *
-     * So only do that to people we haven't seen before
-     *
-     * @var array
-     */
-    private $encounters = [];
-
-    /**
      * Profile constructor.
      *
      * @param LoggerInterface                 $log
@@ -393,25 +381,11 @@ class Profile implements IStrategy
                     $this->studentProfileMapper->save($studentProfile);
                 }
 
-//                /* Add their parents' profile data
-//                 *
-//                 * Each studentPersonRelation comes with a student and one of their parents
-//                 * so we continually end up reprocessing data, but ok
-//                 *
-//                 * A studentPersonRelation may contain a parent or an emergency contact
-//                 * We only need to add them in one way or the other, not both
-//                 */
-//                if (null === $emergencyContacts) {
-//                    $this->importParentsOfStudent($externalId, $studentBaseProfile, $studentPersonRelation);
-//                }
-//
-//                /* Remember we saw this guy and have processed his details
-//                 * because we'll encounter a student multiple times when
-//                 * we work with their studentPersonRelations
-//                 *
-//                 * We don't need to do it over and over again
-//                 */
-//                $this->encounters[$externalId] = true;
+                /* Add their parents' profile data
+                 * This set is mixed with emergency contacts and other non-data, so
+                 * sift through it all manually for the gems you need
+                 */
+                $this->importParentsOfStudent($externalId, $studentBaseProfile, $student['relationships']['contacts']['data']);
             }
 
             /* Prepare for next page if it exists
@@ -486,6 +460,7 @@ class Profile implements IStrategy
     {
         return '' === trim((string)$contact['attributes']['isEmergencyContact']);
     }
+
 
     /**
      * Find all the meaningful emergency contacts for a student
@@ -687,102 +662,134 @@ class Profile implements IStrategy
      *
      * @param string            $studentExternalId
      * @param UserProfile\Model $studentBaseProfile
-     * @param array             $studentPersonRelation
+     * @param array             $contacts
      * @throws Exception
      * @throws Mapper\DefinitionException
      * @throws PDOException
      * @throws UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
-    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile, array $studentPersonRelation): void
+    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile, array $contacts): void
     {
-
-        /* For every associated parent, find out if they have a parent profile
-         * If one already exists, load it, update it, then save it
-         * Otherwise make a new one for the given id
+        /* Each student comes with a set of Contacts
+         * Some are Emergency Contacts, some are not
          */
-        $parent = $studentPersonRelation['relationships']['person']['data'];
+        foreach ($contacts as $contact) {
 
-        $externalId = (string)$parent['attributes']['externalId'];
-        $email = (string)$parent['attributes']['email'];
-        $firstname = (string)$parent['attributes']['firstName'];
-        $lastname = (string)$parent['attributes']['lastName'];
-        $phoneHome = '';
-        $phoneMobile = '';
-        $phoneWork = '';
-        $relationship = (string)$studentPersonRelation['attributes']['relationName'];
-        $title = (string)$parent['attributes']['title'];
-        $username = '';
+            /* Derived Ids have no chance of succeeding despite their api
+             * providing you links containing these ids (must be ints)
+             */
+            if ($this->isDerivedId($contact['id'])) {
+                continue;
+            }
 
-        try {
-            $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
-            $parentBaseProfile = $parentProfile->getBaseProfile();
-        } catch (Exception $e) {
-            $parentProfile = $this->parentProfileMapper->createModel();
-            $parentBaseProfile = $this->baseProfileMapper->createModel();
+            /* Check if this person has isEmergencyContact set
+             * If it does, it's an emergency contact and we don't need it
+             */
+            if (!$this->isParent($contact)) {
+                continue;
+            }
 
-            $parentProfile->setBaseProfile($parentBaseProfile);
-        }
+            /* Go digging in another endpoint for data
+             */
+            $endpoint = "enrolments/person/{$contact['attributes']['personId']}?include=phoneNumbers";
 
-        $parentBaseProfile
-            ->setExternalId($externalId)
-            ->setTitle($title)
-            ->setFirstname($firstname)
-            ->setLastname($lastname);
+            $parent = $this->api->retrieveDocument($endpoint);
 
-        /* Log it
-         */
-        $this->log->info(sprintf(
-            'Adding base profile for %s',
-            trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
-        ));
+            /* Catalog each of this guy's phone numbers so we can try and assign some
+             */
+            $numbers = [];
 
-        /* Then save it
-         */
-        if ($this->perform) {
-            $this->baseProfileMapper->save($parentBaseProfile);
-        }
+            foreach ($parent['data']['relationships']['phoneNumbers']['data'] as $phoneNumber) {
+                $numbers[$phoneNumber['attributes']['typeName']] = $phoneNumber['attributes']['number'];
+            }
 
-        $parentProfile
-            ->setPhoneHome($phoneHome)
-            ->setPhoneWork($phoneWork)
-            ->setMobile($phoneMobile)
-            ->setEmail($email)
-            ->setUsername($username);
+            /* For every associated parent, find out if they have a parent profile
+             * If one already exists, load it, update it, then save it
+             * Otherwise make a new one for the given id
+             */
+            $externalId = (string)$parent['data']['attributes']['externalId'];
+            $email = (string)$parent['data']['attributes']['email'];
+            $firstname = (string)$parent['data']['attributes']['firstName'];
+            $lastname = (string)$parent['data']['attributes']['lastName'];
+            $phoneHome = $numbers['Home Telephone Number'] ?? '';
+            $phoneMobile = $numbers['Mobile'] ?? '';
+            $phoneWork = $numbers['Work Telephone Number'] ?? '';
+            $relationship = $contact['attributes']['relationName'];
+            $title = (string)$parent['data']['attributes']['title'];
+            $username = '';
 
-        /* Log it
-         */
-        $this->log->info(sprintf(
-            'Adding parent profile for %s',
-            trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
-        ));
+            try {
+                $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
+                $parentBaseProfile = $parentProfile->getBaseProfile();
+            } catch (Exception $e) {
+                $parentProfile = $this->parentProfileMapper->createModel();
+                $parentBaseProfile = $this->baseProfileMapper->createModel();
 
-        /* Then save it
-         */
-        if ($this->perform) {
-            $this->parentProfileMapper->save($parentProfile);
-        }
+                $parentProfile->setBaseProfile($parentBaseProfile);
+            }
 
-        /* Manufacture relations
-         */
+            $parentBaseProfile
+                ->setExternalId($externalId)
+                ->setTitle($title)
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
 
-        /* Log it
-         */
-        $this->log->info(sprintf(
-            'Adding relation between %s, the %s of %s',
-            trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
-            trim($relationship),
-            trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
-        ));
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding base profile for %s',
+                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+            ));
 
-        /* Then save it
-         */
-        if ($this->perform) {
-            $relationship = $this->relationshipMapper->createModel()
-                ->setUserProfile($parentBaseProfile)
-                ->setChildProfile($studentBaseProfile)
-                ->setType($relationship);
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->baseProfileMapper->save($parentBaseProfile);
+            }
 
-            $this->relationshipMapper->save($relationship);
+            $parentProfile
+                ->setPhoneHome($phoneHome)
+                ->setPhoneWork($phoneWork)
+                ->setMobile($phoneMobile)
+                ->setEmail($email)
+                ->setUsername($username);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding parent profile for %s',
+                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->parentProfileMapper->save($parentProfile);
+            }
+
+            /* Manufacture relations
+             */
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding relation between %s, the %s of %s',
+                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                trim($relationship),
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $relationship = $this->relationshipMapper->createModel()
+                    ->setUserProfile($parentBaseProfile)
+                    ->setChildProfile($studentBaseProfile)
+                    ->setType($relationship);
+
+                $this->relationshipMapper->save($relationship);
+            }
         }
     }
 
