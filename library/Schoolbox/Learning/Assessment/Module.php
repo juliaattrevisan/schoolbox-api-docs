@@ -610,22 +610,25 @@ class Module extends BaseModule
     {
         return new Rule\All(
             new Rule\IsLoggedIn(),
-            new IsInstructor(
-                $this->getAccess(),
-                static function (array $params): FolderModel
-                {
-                    if (isset($params['assessment'])) {
-                        $ctx = $params['assessment']->getContext()->getFolder();
-                    } elseif (isset($params['participant'])) {
-                        $ctx = $params['participant']->getAssessable()->getContext()->getFolder();
-                    } elseif (isset($params['context'])) {
-                        $ctx = $params['context']->getFolder();
-                    } else {
-                        throw new NotFound('No assessment or context preloaded');
-                    }
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new IsInstructor(
+                    $this->getAccess(),
+                    static function (array $params): FolderModel
+                    {
+                        if (isset($params['assessment'])) {
+                            $ctx = $params['assessment']->getContext()->getFolder();
+                        } elseif (isset($params['participant'])) {
+                            $ctx = $params['participant']->getAssessable()->getContext()->getFolder();
+                        } elseif (isset($params['context'])) {
+                            $ctx = $params['context']->getFolder();
+                        } else {
+                            throw new NotFound('No assessment or context preloaded');
+                        }
 
-                    return $ctx;
-                }
+                        return $ctx;
+                    }
+                )
             )
         );
     }
