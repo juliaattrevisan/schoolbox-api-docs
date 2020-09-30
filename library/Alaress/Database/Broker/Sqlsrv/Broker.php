@@ -17,8 +17,9 @@ use Alaress\Database\Quoter\Sqlsrv\Quoter as SqlsrvQuoter;
 use Alaress\Database\Statement\Query\Sqlsrv\Query;
 use Alaress\Database\Statement\FunctionCall\Sqlsrv\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Sqlsrv\StoredProcedure;
-use function in_array;
 use PDO;
+
+use function in_array;
 
 class Broker extends Base
 {
