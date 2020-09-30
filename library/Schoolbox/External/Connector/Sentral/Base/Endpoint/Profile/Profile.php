@@ -529,7 +529,7 @@ class Profile implements IStrategy
              */
             $numbers = [];
 
-            if (isset($parent['data']['relationships']['phoneNumbers'])) {
+            if (isset($payload['data']['relationships']['phoneNumbers'])) {
                 foreach ($payload['data']['relationships']['phoneNumbers']['data'] as $phoneNumber) {
                     $numbers[$phoneNumber['attributes']['typeName']] = $phoneNumber['attributes']['number'];
                 }
