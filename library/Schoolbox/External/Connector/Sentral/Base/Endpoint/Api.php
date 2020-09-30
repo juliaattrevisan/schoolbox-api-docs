@@ -151,7 +151,8 @@ class Api implements IApi
              *   - The host should end with a trailing slash
              */
             throw new InvalidArgumentException(sprintf(
-                'Sentral Endpoint error: %s',
+                'Sentral Endpoint error at endpoint %s: %s',
+                $endpoint,
                 "{$decoded['errors'][0]['title']} - {$decoded['errors'][0]['detail']}"
             ));
         }
