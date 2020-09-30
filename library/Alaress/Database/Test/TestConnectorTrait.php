@@ -84,56 +84,6 @@ trait TestConnectorTrait
         );
     }
 
-//    /**
-//     * Connect to Synergetic V67 database
-//     */
-//    private function connectSynergetic67()
-//    {
-//        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
-//        // it tries to work out if we need to be in debug mode.
-//        //
-//        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
-//
-//        $database = Database::getInstance();
-//        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
-//
-//        $factory = new Factory();
-//        $this->synergetic67 = $factory->createMssql();
-//        $this->synergetic67->connect(
-//            '172.31.6.236',
-//            'SynergyOne',
-//            'sa',
-//            'Synergetic#1'
-//        );
-//    }
-
-    /**
-     * Connect to Synergetic V68 database
-     *
-     * @return bool Was connection successful?
-     * @throws InvalidArgumentException
-     */
-    private function connectSynergetic68()
-    {
-        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
-        // it tries to work out if we need to be in debug mode.
-        //
-        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
-
-        $database = Database::getInstance();
-        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
-
-        $factory = new Factory();
-
-        $this->synergetic68 = $factory->createMssql(Factory::PDO_DRIVER_DBLIB);
-        return $this->synergetic68->connect(
-            '172.31.15.10',
-            'Synergetic_AUVIC_ALARESS_PRD',
-            'sa',
-            'Synergetic#1'
-        );
-    }
-
     /**
      * Connect to MSSQL test database using Sqlsrv
      *

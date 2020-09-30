@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -94,7 +95,7 @@ class ConfigMapper extends Mapper
     public const _NEWS_EDIT_OTHERS               = 'news_edit_other';
     public const _BOARDER_LEAVE_ENABLED          = 'boarder_leave_enabled';
     public const _AUDIENCE_TO_FOLDER_TEACHERS    = 'audience_to_folder_users_teachers';
-    public const _EXTERNAL_MS_SQL_SERVER_DRIVER  = 'external_ms_sql_server_driver';
+//    public const _EXTERNAL_MS_SQL_SERVER_DRIVER  = 'external_ms_sql_server_driver';
     public const COMMS_COMMENTS_ENABLED          = 'comms_comments_enabled';
     public const NAME_EXTERNAL_TYPE              = 'external_type';
     public const NAME_ALLOW_STUDENT_CLASS_ACCESS = 'allow_student_class_access';

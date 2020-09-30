@@ -1,8 +1,6 @@
 <?php
 
 /**
- * FreeTDS/MSSQL Database connection broker
- *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -18,6 +16,11 @@ use Alaress\Database\Statement\Query\Dblib\Query;
 use Alaress\Database\Statement\StoredProcedure\Dblib\StoredProcedure;
 use PDO;
 
+/**
+ * FreeTDS/MSSQL Database connection broker
+ *
+ * @deprecated use the SQLSrv driver instead
+ */
 class Broker extends Base
 {
     // This extends the parent connect function with MSSQL specific connection attributes and

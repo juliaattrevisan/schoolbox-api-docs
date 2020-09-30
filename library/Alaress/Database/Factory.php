@@ -17,8 +17,9 @@ use Alaress\Database\Broker\Sqlsrv\Broker as SqlsrvBroker;
 use Alaress\Database\Connector\Base as Connector;
 use Alaress\Database\Transactor\Base as Transactor;
 use Alaress\Database\Transactor\Strategy;
-use function in_array;
 use InvalidArgumentException;
+
+use function in_array;
 
 class Factory
 {
@@ -41,6 +42,8 @@ class Factory
 
     /**
      * Create a MSSQL connector (SQLSRV, or DBLIB if that's not available)
+     *
+     * @deprecated use the SQLSRV connector directly via `createSqlsrv` instead
      *
      * @param string $preferredMsSqlServerDriver
      * @return Connector
@@ -65,6 +68,8 @@ class Factory
 
     /**
      * Create a DBLIB connector
+     *
+     * @deprecated use the SQLSRV connector (via `createSqlsrv`) instead
      *
      * @return Connector
      */

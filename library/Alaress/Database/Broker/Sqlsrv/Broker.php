@@ -17,8 +17,9 @@ use Alaress\Database\Quoter\Sqlsrv\Quoter as SqlsrvQuoter;
 use Alaress\Database\Statement\Query\Sqlsrv\Query;
 use Alaress\Database\Statement\FunctionCall\Sqlsrv\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Sqlsrv\StoredProcedure;
-use function in_array;
 use PDO;
+
+use function in_array;
 
 class Broker extends Base
 {
@@ -46,13 +47,14 @@ class Broker extends Base
      */
     public function connect($options = [])
     {
-        // Set MSSQL specific attributes
-
+        // Set MSSQL specific attributes:
+        // * UTF-8 Encode Query Responses
+        // * fetch numeric types as numbers, instead of as strings
+        // (PHPStan doesn't yet have PDO_SQLSRV, so disable inspection)
         /** @noinspection PhpUndefinedClassConstantInspection */
-
         $this->databaseAttributes = [
-            // UTF-8 Encode Query Responses
-            PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8,
+            PDO::SQLSRV_ATTR_ENCODING             => PDO::SQLSRV_ENCODING_UTF8,
+            PDO::SQLSRV_ATTR_FETCHES_NUMERIC_TYPE => true,
         ];
 
         // Set MSSQL specific post-connect queries

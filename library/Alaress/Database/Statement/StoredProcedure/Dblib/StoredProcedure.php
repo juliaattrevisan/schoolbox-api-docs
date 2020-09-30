@@ -22,6 +22,8 @@ use PDO;
  * not supporting true prepared statements or bound outputs; we work around the
  * limitation by extracting return/output vars from the last rowset of the
  * query, but to do this we need to skip any rowsets from the stored proc.
+ *
+ * @deprecated use the SQLSrv driver instead
  */
 class StoredProcedure extends Base
 {
@@ -97,7 +99,7 @@ class StoredProcedure extends Base
     {
         if (!empty($this->parameters['output']) || !empty($this->parameters['return'])) {
             throw new DomainException(
-                'DBLib cannot retrieve output or return values for iterated procedures; '.
+                'DBLib cannot retrieve output or return values for iterated procedures; ' .
                 'Use `execute()` instead, or remove output and return values.'
             );
         }
@@ -128,7 +130,7 @@ class StoredProcedure extends Base
 
         if (isset($this->parameters['output'])) {
             foreach ($this->parameters['output'] as $name => $parameter) {
-                $declarePlaceholders[] = $this->buildDeclare('Output'.$name, $parameter);
+                $declarePlaceholders[] = $this->buildDeclare('Output' . $name, $parameter);
                 if (!empty($parameterPlaceholders)) {
                     $parameterPlaceholders .= ", ";
                 }
@@ -156,7 +158,7 @@ class StoredProcedure extends Base
         // Add the function name and its parameter placeholders
         $declarePart = '';
         if (count($declarePlaceholders)) {
-            $declarePart = implode(";\n", $declarePlaceholders).";\n";
+            $declarePart = implode(";\n", $declarePlaceholders) . ";\n";
         }
 
         return "{$declarePart}{$prefix} {$this->name} {$parameterPlaceholders} {$outputSelectPart}";
@@ -193,17 +195,13 @@ class StoredProcedure extends Base
         // PDO::PARAM_* vars are NOT bitflags -_- so need to compare values directly
         if (($type & PDO::PARAM_BOOL) === PDO::PARAM_BOOL) {
             $sqlType = 'BIT';
-
         } elseif (($type & PDO::PARAM_STR) === PDO::PARAM_STR) {
             $sqlType = sprintf('VARCHAR(%d)', $size);
-
         } elseif (($type & PDO::PARAM_INT) === PDO::PARAM_INT) {
             $sqlType = 'BIGINT';
-
         } elseif (($type & PDO::PARAM_LOB) === PDO::PARAM_LOB) {
             // GET OUT
             throw new Exception('Invalid return type (PDO::PARAM_LOB)');
-
         } else {
             // ¯\_(ツ)_/¯
             throw new Exception('Unknown return type');

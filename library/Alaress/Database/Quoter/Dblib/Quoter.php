@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -11,6 +12,8 @@ use Alaress\Database\Quoter\Base;
 
 /**
  * Class Quoter
+ *
+ * @deprecated use the SQLSrv driver instead
  */
 class Quoter extends Base
 {
@@ -23,6 +26,6 @@ class Quoter extends Base
      */
     public function quoteIdentifier($string)
     {
-        return '['.strtr($string, ['[' => '[[', ']' => ']]',]).']';
+        return '[' . strtr($string, ['[' => '[[', ']' => ']]',]) . ']';
     }
 }
