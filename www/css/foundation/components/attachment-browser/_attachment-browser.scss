@@ -63,14 +63,14 @@
     }
 
     .content {
-      padding: 1rem 1rem 3.5rem 1rem;
-      margin-bottom: 2.5rem;
+      padding: 1rem 1rem 0 1rem;
       height: 100%;
       overflow-y: auto;
-
-      &.active {
-        display: flex;
-        flex-direction: column;
+      
+      // For Firefox - it ignores parents padding
+      .ab-pane {
+        display: block;
+        padding-bottom: 3.5rem;
       }
     }
     // Recording vertical centre
@@ -89,7 +89,7 @@
     }
   }
   .component-action {
-    margin: auto -1rem -0.985rem;
+    margin: auto -1rem -1rem;
     position: absolute;
     bottom: 1rem;
     right: 1rem;
