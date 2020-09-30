@@ -50,6 +50,8 @@ class Broker extends Base
         // Set MSSQL specific attributes:
         // * UTF-8 Encode Query Responses
         // * fetch numeric types as numbers, instead of as strings
+        // (PHPStan doesn't yet have PDO_SQLSRV, so disable inspection)
+        /** @noinspection PhpUndefinedClassConstantInspection */
         $this->databaseAttributes = [
             PDO::SQLSRV_ATTR_ENCODING             => PDO::SQLSRV_ENCODING_UTF8,
             PDO::SQLSRV_ATTR_FETCHES_NUMERIC_TYPE => true,
