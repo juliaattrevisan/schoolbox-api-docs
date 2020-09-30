@@ -726,6 +726,15 @@ class Profile implements IStrategy
             $title = (string)$parent['data']['attributes']['title'];
             $username = '';
 
+            if ('' === trim($externalId)) {
+                $this->log->warning(sprintf(
+                    'External Id for parent %s is empty; skipping',
+                    trim("{$firstname} {$lastname}")
+                ));
+
+                continue;
+            }
+
             try {
                 $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
                 $parentBaseProfile = $parentProfile->getBaseProfile();
