@@ -513,8 +513,10 @@ class Profile implements IStrategy
              */
             $numbers = [];
 
-            foreach ($payload['data']['relationships']['phoneNumbers']['data'] as $phoneNumber) {
-                $numbers[$phoneNumber['attributes']['typeName']] = $phoneNumber['attributes']['number'];
+            if (isset($parent['data']['relationships']['phoneNumbers'])) {
+                foreach ($payload['data']['relationships']['phoneNumbers']['data'] as $phoneNumber) {
+                    $numbers[$phoneNumber['attributes']['typeName']] = $phoneNumber['attributes']['number'];
+                }
             }
 
             /* Presume some implementation details about typeName being hardcoded
@@ -707,8 +709,10 @@ class Profile implements IStrategy
              */
             $numbers = [];
 
-            foreach ($parent['data']['relationships']['phoneNumbers']['data'] as $phoneNumber) {
-                $numbers[$phoneNumber['attributes']['typeName']] = $phoneNumber['attributes']['number'];
+            if (isset($parent['data']['relationships']['phoneNumbers'])) {
+                foreach ($parent['data']['relationships']['phoneNumbers']['data'] as $phoneNumber) {
+                    $numbers[$phoneNumber['attributes']['typeName']] = $phoneNumber['attributes']['number'];
+                }
             }
 
             /* For every associated parent, find out if they have a parent profile
