@@ -178,7 +178,7 @@ class Profile implements IStrategy
                 $dob = (string)$student['relationships']['person']['data']['attributes']['dateOfBirth'];
                 $email = (string)$student['relationships']['person']['data']['attributes']['email'];
                 $firstname = (string)$student['relationships']['person']['data']['attributes']['firstName'];
-                $form = '';
+                $form = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['rollClass'];
                 $gender = (string)$student['relationships']['person']['data']['attributes']['gender'];
                 $lastname = (string)$student['relationships']['person']['data']['attributes']['lastName'];
                 $legal = '';
