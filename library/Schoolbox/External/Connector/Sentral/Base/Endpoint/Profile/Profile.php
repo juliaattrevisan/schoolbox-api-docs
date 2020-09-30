@@ -172,7 +172,6 @@ class Profile implements IStrategy
 
             foreach ($payload['data'] as $student) {
                 $externalId = (string)$student['attributes']['studentCode'];
-                $academicHouse = '';
                 $boardingStatus = (bool)$student['relationships']['primaryEnrolment']['data']['attributes']['isBoarding'];
                 $campusName = '';
                 $comments = '';
@@ -240,6 +239,10 @@ class Profile implements IStrategy
                 /*  Maintain the methods' return signature for easiest resolution
                  *  though you are free to customise it as you see fit
                  */
+
+                /* Fish out a House
+                 */
+                $academicHouse = $this->findHouse($studentBaseProfile, $student);
 
                 /* Fish out alert comments
                  */
@@ -539,6 +542,36 @@ class Profile implements IStrategy
             'id' => null,
             'name' => null
         ];
+    }
+
+
+    /**
+     * Find a House name for this person
+     *
+     * @param UserProfile\Model $studentBaseProfile
+     * @param array             $student
+     * @return string|null
+     * @throws \InvalidArgumentException
+     */
+    private function findHouse(UserProfile\Model $studentBaseProfile, array $student): ?string
+    {
+        /* Find another endpoint who can tell us the answer
+         */
+        $endpoint = $student['relationships']['primaryEnrolment']['data']['relationships']['house']['links']['related'];
+
+        $payload = $this->api->retrieveDocument($endpoint);
+
+        $houseName = $payload['data']['attributes']['name'] ?? '';
+
+        $this->log->debug(sprintf(
+            'Secondary api inspection at %s for House belonging to %s (user %s) - found %s',
+            $endpoint,
+            trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+            $studentBaseProfile->getExternalId(),
+            $houseName
+        ));
+
+        return $houseName;
     }
 
 
