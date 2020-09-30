@@ -173,7 +173,7 @@ class Profile implements IStrategy
             foreach ($payload['data'] as $student) {
                 $externalId = (string)$student['attributes']['studentCode'];
                 $academicHouse = '';
-                $boardingStatus = false;
+                $boardingStatus = (bool)$student['relationships']['primaryEnrolment']['data']['attributes']['isBoarding'];
                 $campusName = '';
                 $comments = '';
                 $dob = (string)$student['relationships']['person']['data']['attributes']['dateOfBirth'];
