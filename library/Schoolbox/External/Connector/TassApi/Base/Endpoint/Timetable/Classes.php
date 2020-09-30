@@ -125,23 +125,36 @@ class Classes implements IStrategy
 
 
     /**
-     * Import data from xml into local schema
+     * Import data from api endpoints into local schema
      *
      * @throws RuntimeException
      * @throws Exception
      */
     public function import(): void
     {
-
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
          *
          * Cache a flat key-value array of (day, period)
          */
-        $this->lookup->init();
-
-        $users = $this->lookup->getUsers();
         $periods = $this->lookup->getPeriods();
+
+        $this->importTimetable($this->lookup->getStudents(), $periods);
+        $this->importTimetable($this->lookup->getStaff(), $periods);
+    }
+
+
+    /**
+     * Import timetables that belong to $users array
+     *
+     * @param array $users
+     * @param array $periods
+     * @throws Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function importTimetable(array $users, array $periods): void
+    {
 
         /* Get a list of all the timetables to process
          * These are indexed by (externalId => timetable) tuple
@@ -202,7 +215,11 @@ class Classes implements IStrategy
 
                             /* This format mirrors the implementation in External/Tass/Timetable.php:239
                              */
-                            'code' => "{$subject['YEAR_GRP']}-{$subject['SUB_CODE']}-{$subject['CLASS']}",
+                            'code' => (new CodeCodec())->encode(
+                                (string)$subject['YEAR_GRP'],
+                                (string)$subject['SUB_CODE'],
+                                (string)$subject['CLASS']
+                            ),
                             'name' => $subject['SUB_DESC'],
                         ],
                         'room' => [
@@ -425,8 +442,8 @@ class Classes implements IStrategy
         /* Create new relation
          */
         $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
-                                                                  ->setExternalId($person['externalId'])
-                                                                  ->setClass($timetableClass);
+            ->setExternalId($person['externalId'])
+            ->setClass($timetableClass);
 
         $this->log->info(sprintf(
             'Creating class involvement %s %s for %s (user %s)',

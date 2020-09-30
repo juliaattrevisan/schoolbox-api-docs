@@ -1,22 +1,19 @@
 <template>
     <reveal-modal ref="modal">
         <form @submit.prevent="applyFilters" action="#">
-            <section>
-                <fieldset class="checklist filter-list">
-                    <legend>Status</legend>
-                    <div class="small-12 columns">
-                        <template v-for="(option, index) in options">
-                            <input type="checkbox"
-                                   :id="option.toLowerCase().trim()"
-                                   @click="select"
-                                   :value="index"
-                                   v-model="selected"
-                            />
-                            <label :for="option.toLowerCase().trim()">{{ option }}</label>
-                        </template>
-                    </div>
-                </fieldset>
-            </section>
+            <div class="checklist filter-list">
+                <h2>Status</h2>
+                <template v-for="(option, index) in options">
+                    <input type="checkbox"
+                           :id="option.toLowerCase().trim()"
+                           @click="select"
+                           :value="index"
+                           v-model="selected"
+                    />
+                    <label :for="option.toLowerCase().trim()">{{ option }}</label>
+                </template>
+            </div>
+
             <input type="submit" value="Apply Filters" />
         </form>
     </reveal-modal>

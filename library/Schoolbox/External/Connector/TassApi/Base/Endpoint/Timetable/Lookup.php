@@ -27,18 +27,6 @@ class Lookup
 
 
     /**
-     * @var array
-     */
-    private $users;
-
-
-    /**
-     * @var array
-     */
-    private $periods;
-
-
-    /**
      * Lookup constructor.
      *
      * @param TimetablePeriodMapper  $timetablePeriodMapper
@@ -50,23 +38,26 @@ class Lookup
 
 
     /**
-     * Facade method
+     * Get a list of (external_id, sis_user_profile) tuples
      *
-     * If users and periods weren't previously fetched, get them
-     * Otherwise return whatever was previously found
-     *
-     * @return void
-     * @throws Exception
+     * @return array
      */
-    public function init(): void
+    private function initStudentLookup(): array
     {
-        if (null === $this->users) {
-            $this->users = $this->initUserLookup();
+        $userStatement = $this->timetablePeriodMapper->getDatabase()->query('
+            SELECT external_id, firstname, lastname
+            FROM sis_user_profile sup
+            INNER JOIN sis_user_profile_student sups ON sup.id = sups.sis_user_profile_id
+            WHERE external_id IS NOT NULL
+        ');
+
+        $students = [];
+
+        foreach ($userStatement as $row) {
+            $students[$row['external_id']] = $row;
         }
 
-        if (null === $this->periods) {
-            $this->periods = $this->initPeriodLookup();
-        }
+        return $students;
     }
 
 
@@ -75,21 +66,22 @@ class Lookup
      *
      * @return array
      */
-    private function initUserLookup(): array
+    private function initStaffLookup(): array
     {
         $userStatement = $this->timetablePeriodMapper->getDatabase()->query('
             SELECT external_id, firstname, lastname
             FROM sis_user_profile sup
+            INNER JOIN sis_user_profile_staff sups ON sup.id = sups.sis_user_profile_id
             WHERE external_id IS NOT NULL
         ');
 
-        $users = [];
+        $students = [];
 
         foreach ($userStatement as $row) {
-            $users[$row['external_id']] = $row;
+            $students[$row['external_id']] = $row;
         }
 
-        return $users;
+        return $students;
     }
 
 
@@ -129,19 +121,77 @@ class Lookup
 
 
     /**
+     * Get a list of (external_id, code) tuples
+     *
      * @return array
      */
-    public function getUsers(): array
+    private function initClassInvolvementLookup(): array
     {
-        return $this->users;
+        $classInvolvementStatement = $this->timetablePeriodMapper->getDatabase()->query('
+            SELECT
+                scu.external_id,
+                sc.name, sc.code
+            FROM sis_class_user scu
+            INNER JOIN sis_class sc on scu.class_id = sc.id
+        ');
+
+        $involvements = [];
+
+        foreach ($classInvolvementStatement as $row) {
+            $externalId = $row['external_id'];
+            $code = $row['code'];
+            $name = $row['name'];
+
+            $involvements[$externalId][$code] = $name;
+        }
+
+        return $involvements;
     }
 
 
     /**
+     * Reinitialise user lookup upon each use
+     * This is an index of student users with external ids
+     *
      * @return array
+     */
+    public function getStudents(): array
+    {
+        return $this->initStudentLookup();
+    }
+
+
+    /**
+     * Reinitialise user lookup upon each use
+     * This is an index of staff users with external ids
+     *
+     * @return array
+     */
+    public function getStaff(): array
+    {
+        return $this->initStaffLookup();
+    }
+
+
+    /**
+     * Reinitialise user lookup upon each use
+     *
+     * @return array
+     * @throws Exception
      */
     public function getPeriods(): array
     {
-        return $this->periods;
+        return $this->initPeriodLookup();
+    }
+
+
+    /**
+     * Reinitialise user lookup upon each use
+     *
+     * @return array
+     */
+    public function getInvolvements(): array
+    {
+        return $this->initClassInvolvementLookup();
     }
 }
