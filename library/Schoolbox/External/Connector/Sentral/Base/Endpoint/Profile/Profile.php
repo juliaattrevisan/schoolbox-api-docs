@@ -11,11 +11,9 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile;
 use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Normalise\User\Staff;
-use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
@@ -252,6 +250,10 @@ class Profile implements IStrategy
                  */
                 $alertLegal = $this->findLegal();
 
+                /* Fish out medical alerts
+                 */
+                $studentProfile->setAlertMedical($this->findMedicalAlert($studentBaseProfile, $student));
+
                 /* Fish out campus name
                  */
                 $campusName = $this->findCampusName();
@@ -320,19 +322,6 @@ class Profile implements IStrategy
                     ->setIb($ib)
                     ->setIndividualLearningPlans($ilp)
                     ->setSpecialNeeds($specialNeeds);
-
-//                /* If this student was processed earlier, we don't need to do it again
-//                 * These fetch data from specific endpoints so we can save ourselves some
-//                 * api requests which result in the same outcome
-//                 *
-//                 * (the alternative is to build a lookup after downloading their db table...)
-//                 */
-//                if (!isset($this->encounters[$externalId])) {
-//
-//                    /* Fish out medical alerts
-//                     */
-//                    $studentProfile->setAlertMedical($this->findMedicalAlert($studentBaseProfile, $studentPersonRelation));
-//                }
 
                 /* Date of birth requires special treatment as ADF doesn't deal with nulls well
                  */
@@ -509,6 +498,12 @@ class Profile implements IStrategy
             $firstname = $payload['data']['attributes']['firstName'];
             $lastname  = $payload['data']['attributes']['lastName'];
 
+            $this->log->debug(sprintf(
+                'Secondary api inspection at %s for emergency contact details belonging to %s',
+                $endpoint,
+                trim("{$firstname} {$lastname}")
+            ));
+
             /* Catalog each of this guy's phone numbers so we can try and assign some
              */
             $numbers = [];
@@ -581,26 +576,17 @@ class Profile implements IStrategy
      * Find medical data for student
      *
      * @param UserProfile\Model $studentBaseProfile
-     * @param array             $studentPersonRelation
+     * @param array             $student
      * @return string|null
      * @throws \InvalidArgumentException
      */
-    private function findMedicalAlert(UserProfile\Model $studentBaseProfile, array $studentPersonRelation): ?string
+    private function findMedicalAlert(UserProfile\Model $studentBaseProfile, array $student): ?string
     {
 
         /* Find another endpoint who can tell us the answer
          */
-        $endpoint = $studentPersonRelation['relationships']['studentPerson']['data']['links']['medicalConditions'];
+        $endpoint = $student['relationships']['person']['data']['relationships']['medicalConditions']['links']['related'];
 
-        /* No endpoint? No way to find out more
-         * Just exit, there's no link to medical conditions
-         */
-        if ('' === (string)$endpoint) {
-            return null;
-        }
-
-        /* Otherwise keep digging
-         */
         $payload = $this->api->retrieveDocument($endpoint);
 
         $numConditions = \count($payload['data']);
