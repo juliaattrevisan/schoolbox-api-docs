@@ -172,7 +172,6 @@ class Profile implements IStrategy
         for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
             $payload = $this->api->retrieveDocument($nextUrl);
 
-            /** @var Student $student */
             foreach ($payload['data'] as $student) {
                 $externalId = (string)$student['attributes']['studentCode'];
                 $academicHouse = '';
@@ -726,7 +725,7 @@ class Profile implements IStrategy
             $relationship = $contact['attributes']['relationName'];
             $title = (string)$parent['data']['attributes']['title'];
             $username = '';
-;
+
             try {
                 $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
                 $parentBaseProfile = $parentProfile->getBaseProfile();
