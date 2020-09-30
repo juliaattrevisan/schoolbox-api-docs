@@ -156,7 +156,6 @@ class Profile implements IStrategy
             $gender = '';
             $lastname = '';
             $legal = '';
-            $medicalAlert = '';
             $messages = '';
             $mobile = '';
             $studiesCode = '';

@@ -183,7 +183,6 @@ class Profile implements IStrategy
                 $gender = (string)$student['relationships']['person']['data']['attributes']['gender'];
                 $lastname = (string)$student['relationships']['person']['data']['attributes']['lastName'];
                 $legal = '';
-                $medicalAlert = '';
                 $messages = '';
                 $mobile = '';
                 $studiesCode = '';
