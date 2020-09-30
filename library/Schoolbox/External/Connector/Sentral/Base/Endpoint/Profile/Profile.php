@@ -171,39 +171,39 @@ class Profile implements IStrategy
          * Process multiple pages until there are none remaining, or if something is really stuffed,
          * until MAX_CALLS is reached, to prevent infinite calls to a third party.
          */
-        $nextUrl = 'enrolments/student-contact?include=person,student,studentPerson&limit=200';
+        $nextUrl = 'enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms';
 
         for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
             $payload = $this->api->retrieveDocument($nextUrl);
 
             /** @var Student $student */
-            foreach ($payload['data'] as $studentPersonRelation) {
-                $externalId = (string)$studentPersonRelation['relationships']['studentPerson']['data']['attributes']['externalId'];
+            foreach ($payload['data'] as $student) {
+                $externalId = (string)$student['attributes']['studentCode'];
                 $academicHouse = '';
                 $boardingStatus = false;
                 $campusName = '';
                 $comments = '';
-                $dob = (string)$studentPersonRelation['relationships']['studentPerson']['data']['attributes']['dateOfBirth'];
-                $email = (string)$studentPersonRelation['relationships']['studentPerson']['data']['attributes']['email'];
-                $firstname = (string)$studentPersonRelation['relationships']['studentPerson']['data']['attributes']['firstName'];
+                $dob = (string)$student['relationships']['person']['data']['attributes']['dateOfBirth'];
+                $email = (string)$student['relationships']['person']['data']['attributes']['email'];
+                $firstname = (string)$student['relationships']['person']['data']['attributes']['firstName'];
                 $form = '';
-                $gender = (string)$studentPersonRelation['relationships']['studentPerson']['data']['attributes']['gender'];
-                $lastname = (string)$studentPersonRelation['relationships']['studentPerson']['data']['attributes']['lastName'];
+                $gender = (string)$student['relationships']['person']['data']['attributes']['gender'];
+                $lastname = (string)$student['relationships']['person']['data']['attributes']['lastName'];
                 $legal = '';
                 $medicalAlert = '';
                 $messages = '';
                 $mobile = '';
                 $studiesCode = '';
-                $title = (string)$studentPersonRelation['relationships']['studentPerson']['data']['attributes']['title'];
+                $title = (string)$student['relationships']['person']['data']['attributes']['title'];
                 $tutor = '';
-                $tutorGroup = '';
+                $tutorGroup = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['tutorGroup'];
                 $username = '';
-                $yearLevel = '';
+                $yearLevel = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['schoolYear'];
 
                 /* Dates
                  */
-                $enrolmentDate = '';
-                $leavingDate = '';
+                $enrolmentDate = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['startDate'];
+                $leavingDate = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['endDate'];
 
                 /* Flags
                  */
@@ -263,7 +263,7 @@ class Profile implements IStrategy
 
                 /* Emergency Contacts
                  */
-                $emergencyContacts = $this->findEmergencyContacts($studentPersonRelation);
+                $emergencyContacts = $this->findEmergencyContacts($student['relationships']['contacts']['data']);
 
                 /* Find out a staff member via their user code
                  */
@@ -326,18 +326,18 @@ class Profile implements IStrategy
                     ->setIndividualLearningPlans($ilp)
                     ->setSpecialNeeds($specialNeeds);
 
-                /* If this student was processed earlier, we don't need to do it again
-                 * These fetch data from specific endpoints so we can save ourselves some
-                 * api requests which result in the same outcome
-                 *
-                 * (the alternative is to build a lookup after downloading their db table...)
-                 */
-                if (!isset($this->encounters[$externalId])) {
-
-                    /* Fish out medical alerts
-                     */
-                    $studentProfile->setAlertMedical($this->findMedicalAlert($studentBaseProfile, $studentPersonRelation));
-                }
+//                /* If this student was processed earlier, we don't need to do it again
+//                 * These fetch data from specific endpoints so we can save ourselves some
+//                 * api requests which result in the same outcome
+//                 *
+//                 * (the alternative is to build a lookup after downloading their db table...)
+//                 */
+//                if (!isset($this->encounters[$externalId])) {
+//
+//                    /* Fish out medical alerts
+//                     */
+//                    $studentProfile->setAlertMedical($this->findMedicalAlert($studentBaseProfile, $studentPersonRelation));
+//                }
 
                 /* Date of birth requires special treatment as ADF doesn't deal with nulls well
                  */
@@ -350,63 +350,34 @@ class Profile implements IStrategy
                  * Emergency Contacts
                  * ...because we didn't normalise it, I'm hardcoding these
                  */
-                if (null !== $emergencyContacts) {
-
-                    /* The studentPersonRelation we are currently processing
-                     * contains an emergency contact; find the first available
-                     * slot, put them in there, then save it
-                     */
-                    if ('' === (string)$studentProfile->getEmergencyContactName1()) {
+                if (\count($emergencyContacts)) {
+                    if (isset($emergencyContacts[0])) {
                         $studentProfile
-                            ->setEmergencyContactName1($emergencyContacts['name'])
-                            ->setEmergencyContactPhone1($emergencyContacts['phone']);
-
-                        $this->log->debug(sprintf(
-                            '%s (user %s) received emergency contacts in slot 1: %s %s',
-                            trim("{$firstname} {$lastname}"),
-                            $externalId,
-                            $emergencyContacts['name'],
-                            $emergencyContacts['phone']
-                        ));
-
-                    } elseif ('' === (string)$studentProfile->getEmergencyContactName2()) {
-                        $studentProfile
-                            ->setEmergencyContactName2($emergencyContacts['name'])
-                            ->setEmergencyContactPhone2($emergencyContacts['phone']);
-
-                        $this->log->debug(sprintf(
-                            '%s (user %s) received emergency contacts in slot 2: %s %s',
-                            trim("{$firstname} {$lastname}"),
-                            $externalId,
-                            $emergencyContacts['name'],
-                            $emergencyContacts['phone']
-                        ));
-                    } elseif ('' === (string)$studentProfile->getEmergencyContactName3()) {
-                        $studentProfile
-                            ->setEmergencyContactName3($emergencyContacts['name'])
-                            ->setEmergencyContactPhone3($emergencyContacts['phone']);
-
-                        $this->log->debug(sprintf(
-                            '%s (user %s) received emergency contacts in slot 3: %s %s',
-                            trim("{$firstname} {$lastname}"),
-                            $externalId,
-                            $emergencyContacts['name'],
-                            $emergencyContacts['phone']
-                        ));
-                    } else {
-
-                        /* If they're all full, warn user - we hardcoded 3 spots
-                         * and can't just add more, like we would if we had taken
-                         * the time to normalise the data properly
-                         */
-                        $this->log->warning(sprintf(
-                            '%s (user %s) has too many emergency contacts to add: %s %s',
-                            trim("{$firstname} {$lastname}"),
-                            $externalId,
-                            $emergencyContacts['name'],
-                            $emergencyContacts['phone']
-                        ));
+                            ->setEmergencyContactName1($emergencyContacts[0]['name'])
+                            ->setEmergencyContactPhone1($emergencyContacts[0]['phone'])
+                            ->setEmergencyContactPhoneAlt1($emergencyContacts[0]['phoneAlt']);
                     }
+
+                    if (isset($emergencyContacts[1])) {
+                        $studentProfile
+                            ->setEmergencyContactName2($emergencyContacts[1]['name'])
+                            ->setEmergencyContactPhone2($emergencyContacts[1]['phone'])
+                            ->setEmergencyContactPhoneAlt2($emergencyContacts[1]['phoneAlt']);
+                    }
+
+                    if (isset($emergencyContacts[2])) {
+                        $studentProfile
+                            ->setEmergencyContactName3($emergencyContacts[2]['name'])
+                            ->setEmergencyContactPhone3($emergencyContacts[2]['phone'])
+                            ->setEmergencyContactPhoneAlt3($emergencyContacts[2]['phoneAlt']);
+                    }
+
+                    $this->log->debug(sprintf(
+                        'Found %s emergency contacts for %s (user %s)',
+                        \count($emergencyContacts),
+                        trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                        $studentBaseProfile->getExternalId()
+                    ));
                 }
 
                 /* Log it
@@ -422,25 +393,25 @@ class Profile implements IStrategy
                     $this->studentProfileMapper->save($studentProfile);
                 }
 
-                /* Add their parents' profile data
-                 *
-                 * Each studentPersonRelation comes with a student and one of their parents
-                 * so we continually end up reprocessing data, but ok
-                 *
-                 * A studentPersonRelation may contain a parent or an emergency contact
-                 * We only need to add them in one way or the other, not both
-                 */
-                if (null === $emergencyContacts) {
-                    $this->importParentsOfStudent($externalId, $studentBaseProfile, $studentPersonRelation);
-                }
-
-                /* Remember we saw this guy and have processed his details
-                 * because we'll encounter a student multiple times when
-                 * we work with their studentPersonRelations
-                 *
-                 * We don't need to do it over and over again
-                 */
-                $this->encounters[$externalId] = true;
+//                /* Add their parents' profile data
+//                 *
+//                 * Each studentPersonRelation comes with a student and one of their parents
+//                 * so we continually end up reprocessing data, but ok
+//                 *
+//                 * A studentPersonRelation may contain a parent or an emergency contact
+//                 * We only need to add them in one way or the other, not both
+//                 */
+//                if (null === $emergencyContacts) {
+//                    $this->importParentsOfStudent($externalId, $studentBaseProfile, $studentPersonRelation);
+//                }
+//
+//                /* Remember we saw this guy and have processed his details
+//                 * because we'll encounter a student multiple times when
+//                 * we work with their studentPersonRelations
+//                 *
+//                 * We don't need to do it over and over again
+//                 */
+//                $this->encounters[$externalId] = true;
             }
 
             /* Prepare for next page if it exists
@@ -492,30 +463,89 @@ class Profile implements IStrategy
 
 
     /**
+     * Decide if $id is a derived (and non-followable) id
+     *
+     * @param string $id
+     * @return bool
+     */
+    private function isDerivedId(string $id): bool
+    {
+        return strpos($id, 'derived') !== false;
+    }
+
+
+    /**
+     * Decide if a record is a Parent, or an Emergency Contact
+     * They seem to arrive in one big pile so you have to sift
+     * through manually to separate Parents from Emergency Contacts
+     *
+     * @param array $contact
+     * @return bool
+     */
+    private function isParent(array $contact): bool
+    {
+        return '' === trim((string)$contact['attributes']['isEmergencyContact']);
+    }
+
+    /**
      * Find all the meaningful emergency contacts for a student
      *
-     * @param array $studentPersonRelation
+     * @param array             $contacts
      * @return array|null
+     * @throws \InvalidArgumentException
      */
-    public function findEmergencyContacts(array $studentPersonRelation): ?array
+    public function findEmergencyContacts(array $contacts): ?array
     {
+        $emergencyContacts = [];
 
-        /* In $studentPersonRelation, an emergency contact has an attribute isEmergencyContact
-         * set to something other than an empty string or null
-         *
-         * You get one emergency contact per $studentPersonRelation, at most
-         */
-        if ('' !== (string)$studentPersonRelation['attributes']['isEmergencyContact']) {
-            $firstname = $studentPersonRelation['relationships']['person']['data']['attributes']['firstName'];
-            $lastname  = $studentPersonRelation['relationships']['person']['data']['attributes']['lastName'];
+        foreach ($contacts as $contact) {
 
-            return [
-                'name'  => "{$firstname} {$lastname}",
-                'phone' => ''
+            /* Derived Ids have no chance of succeeding despite their api
+             * providing you links containing these ids (must be ints)
+             */
+            if ($this->isDerivedId($contact['id'])) {
+                continue;
+            }
+
+            /* Check if this person has isEmergencyContact set
+             * If it doesn't, it's not an emergency contact
+             */
+            if ($this->isParent($contact)) {
+                continue;
+            }
+
+            /* Otherwise this is an emergency contact so stack it up
+             *
+             * Go digging in another endpoint for names and numbers
+             * Construct the endpoint manually, because you can't trust the ids
+             * provided by the API (some are non-integers which die)
+             */
+            $endpoint = "enrolments/person/{$contact['attributes']['personId']}?include=phoneNumbers";
+
+            $payload = $this->api->retrieveDocument($endpoint);
+
+            $firstname = $payload['data']['attributes']['firstName'];
+            $lastname  = $payload['data']['attributes']['lastName'];
+
+            /* Catalog each of this guy's phone numbers so we can try and assign some
+             */
+            $numbers = [];
+
+            foreach ($payload['data']['relationships']['phoneNumbers']['data'] as $phoneNumber) {
+                $numbers[$phoneNumber['attributes']['typeName']] = $phoneNumber['attributes']['number'];
+            }
+
+            /* Presume some implementation details about typeName being hardcoded
+             * Find the first non-null value suitable for phone and phoneAlt fields
+             */
+            $emergencyContacts[] = [
+                'name'  => trim("{$firstname} {$lastname}"),
+                'phone' => $numbers['Mobile'] ?? $numbers['Home Telephone Number'] ?? '',
+                'phoneAlt' => $numbers['Work Telephone Number'] ?? ''
             ];
         }
 
-        return null;
+        return $emergencyContacts;
     }
 
     /**
