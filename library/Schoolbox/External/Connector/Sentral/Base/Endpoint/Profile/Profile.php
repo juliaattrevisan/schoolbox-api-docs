@@ -44,6 +44,14 @@ class Profile implements IStrategy
 
 
     /**
+     * Phone numbers exist inside these array keys
+     */
+    private const HOME_TELEPHONE_NUMBER = 'Home Telephone Number';
+    private const WORK_TELEPHONE_NUMBER = 'Work Telephone Number';
+    private const MOBILE_TELEPHONE_NUMBER = 'Mobile';
+
+
+    /**
      * @var LoggerInterface
      */
     private $log;
@@ -515,8 +523,8 @@ class Profile implements IStrategy
              */
             $emergencyContacts[] = [
                 'name'  => trim("{$firstname} {$lastname}"),
-                'phone' => $numbers['Mobile'] ?? $numbers['Home Telephone Number'] ?? '',
-                'phoneAlt' => $numbers['Work Telephone Number'] ?? ''
+                'phone' => $numbers[self::MOBILE_TELEPHONE_NUMBER] ?? $numbers[self::HOME_TELEPHONE_NUMBER] ?? '',
+                'phoneAlt' => $numbers[self::WORK_TELEPHONE_NUMBER] ?? ''
             ];
         }
 
@@ -712,13 +720,13 @@ class Profile implements IStrategy
             $email = (string)$parent['data']['attributes']['email'];
             $firstname = (string)$parent['data']['attributes']['firstName'];
             $lastname = (string)$parent['data']['attributes']['lastName'];
-            $phoneHome = $numbers['Home Telephone Number'] ?? '';
-            $phoneMobile = $numbers['Mobile'] ?? '';
-            $phoneWork = $numbers['Work Telephone Number'] ?? '';
+            $phoneHome = $numbers[self::HOME_TELEPHONE_NUMBER] ?? '';
+            $phoneMobile = $numbers[self::MOBILE_TELEPHONE_NUMBER] ?? '';
+            $phoneWork = $numbers[self::WORK_TELEPHONE_NUMBER] ?? '';
             $relationship = $contact['attributes']['relationName'];
             $title = (string)$parent['data']['attributes']['title'];
             $username = '';
-
+;
             try {
                 $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
                 $parentBaseProfile = $parentProfile->getBaseProfile();
