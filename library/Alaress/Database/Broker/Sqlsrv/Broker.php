@@ -46,13 +46,12 @@ class Broker extends Base
      */
     public function connect($options = [])
     {
-        // Set MSSQL specific attributes
-
-        /** @noinspection PhpUndefinedClassConstantInspection */
-
+        // Set MSSQL specific attributes:
+        // * UTF-8 Encode Query Responses
+        // * fetch numeric types as numbers, instead of as strings
         $this->databaseAttributes = [
-            // UTF-8 Encode Query Responses
-            PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8,
+            PDO::SQLSRV_ATTR_ENCODING             => PDO::SQLSRV_ENCODING_UTF8,
+            PDO::SQLSRV_ATTR_FETCHES_NUMERIC_TYPE => true,
         ];
 
         // Set MSSQL specific post-connect queries
