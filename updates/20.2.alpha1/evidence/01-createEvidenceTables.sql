@@ -14,6 +14,7 @@ CREATE TABLE `evidence`
     `user_id`              INT UNSIGNED NOT NULL,
     `created_by`           INT UNSIGNED NOT NULL,
     `created_at`           DATETIME     NOT NULL,
+    `updated_at`           DATETIME     NOT NULL,
     `deleted_at`           DATETIME     NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_evidence_discussion_thread_id_idx` (`discussion_thread_id` ASC),
@@ -68,8 +69,9 @@ CREATE TABLE `lu_evidence_tag`
 (
     `id`         INT UNSIGNED NOT NULL,
     `name`       VARCHAR(60)  NULL,
-    `updated_by` INT          NULL,
-    `created_at` DATETIME     NULL,
+    `updated_by` INT UNSIGNED NOT NULL,
+    `created_at` DATETIME     NOT NULL,
+    `updated_at` DATETIME     NOT NULL,
     `deleted_at` DATETIME     NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
