@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\Lists;
 use Alaress\Diff\Differ;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
+use Schoolbox\Learning\Moment\Evidence\Tag\Mapper as LearningMomentEvidenceTag;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
@@ -818,8 +819,24 @@ class Controller extends Base
             ],
         ];
 
+
+        $return['evidence-tag'] = [
+            'title'             => 'Learning Moment Evidence Tags',
+            'mapper'            => LearningMomentEvidenceTag::class,
+            'delete'            => true,
+            'fields'            => [
+                'name'          => [
+                    'caption'   => 'Name',
+                    'width'     => 12,
+                    'maxLength' => 60,
+                    'mandatory' => true,
+                ],
+            ]
+        ];
+
         return $return;
     }
+
 
     /**
      * Show options
