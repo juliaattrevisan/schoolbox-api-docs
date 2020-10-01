@@ -221,7 +221,7 @@ class Controller extends Base
 
         /* Campuses
          */
-        $selectedCampuses = [];
+        $selectedCampuses = $this->getUser()->getCampusCollection()->getPropertyValues('id');
 
         /* Folders that you can choose, plus their current selection states
          */
