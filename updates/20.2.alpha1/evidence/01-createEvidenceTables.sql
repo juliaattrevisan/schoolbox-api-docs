@@ -6,7 +6,7 @@
 -- * A discussion may be attached (discussion_thread_id)
 CREATE TABLE `evidence`
 (
-    `id`                   INT UNSIGNED NOT NULL,
+    `id`                   INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `hash`                 VARCHAR(100) CHARSET ASCII NULL,
     `filename`             VARCHAR(120) NULL,
     `body`                 MEDIUMTEXT   NULL,
@@ -67,7 +67,7 @@ CREATE TABLE `curriculum_evidence`
 -- It's likely these will be created only by superusers?
 CREATE TABLE `lu_evidence_tag`
 (
-    `id`         INT UNSIGNED NOT NULL,
+    `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name`       VARCHAR(60)  NULL,
     `updated_by` INT UNSIGNED NOT NULL,
     `created_at` DATETIME     NOT NULL,
