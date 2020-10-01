@@ -69,6 +69,7 @@ CREATE TABLE `lu_evidence_tag`
 (
     `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `name`       VARCHAR(60)  NULL,
+    `sequence`   INT UNSIGNED NOT NULL,
     `updated_by` INT UNSIGNED NOT NULL,
     `created_at` DATETIME     NOT NULL,
     `updated_at` DATETIME     NOT NULL,
