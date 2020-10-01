@@ -38,22 +38,27 @@
 
         <li v-bind:class="{sticky: article.sticky}" v-for="article in currentArticles">
             <div class="small-12 card reversed wrap-down">
-                <template v-if="!isCompactMode">
+                <template>
                     <template v-if="article.featureImage">
                         <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                            <img :src="article.featureImage._links.image.href + '&size=cardImageSmall'">
+                            <img v-if="isCompactMode" :src="article.featureImage._links.image.href + '&size=square64'" class="thumbnail">
+                            <img v-else :src="article.featureImage._links.image.href + '&size=cardImageSmall'">
                         </a>
                     </template>
                     <template v-else-if="fallbackImage === 'author'">
-                        <div class="card-feature-avatar">
+                        <div v-if="!isCompactMode" class="card-feature-avatar">
                             <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
                                 <img :src="article.author._links.avatar.href + '&size=square64'">
                             </a>
                         </div>
+                        <a v-if="isCompactMode" :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
+                            <img :src="article.author._links.avatar.href + '&size=square64'" class="thumbnail">
+                        </a>
                     </template>
                     <template v-else-if="fallbackImage === 'school-logo'">
                         <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                            <img :src="'/images/logo.php?logo=skin_logo_large&size=normal'">
+                            <img v-if="isCompactMode" :src="'/images/logo.php?logo=skin_logo_large&size=favicon'" class="thumbnail">
+                            <img v-else :src="'/images/logo.php?logo=skin_logo_large&size=normal'">
                         </a>
                     </template>
                 </template>
