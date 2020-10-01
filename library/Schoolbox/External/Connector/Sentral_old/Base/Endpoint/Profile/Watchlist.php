@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile;
+namespace Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Profile;
 
 use Psr\Log\LoggerInterface;
 
@@ -17,7 +17,7 @@ use Psr\Log\LoggerInterface;
  * Some people's records don't work correctly for some reason
  * This allows you to look out for specific people
  *
- * @package Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile
+ * @package Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Profile
  */
 class Watchlist
 {

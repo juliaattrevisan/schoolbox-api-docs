@@ -5,14 +5,14 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile;
+namespace Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Profile;
 
 use Iterator;
 
 /**
  * Class RelationshipIterator
  *
- * @package Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile
+ * @package Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Profile
  */
 class RelationshipIterator implements Iterator
 {

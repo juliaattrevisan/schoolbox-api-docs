@@ -7,11 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
-use DomainException;
-use InvalidArgumentException;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
-use UnexpectedValueException;
 
 /**
  * Class Status
@@ -32,8 +29,6 @@ class Status implements IStatus
      *
      * @param string $host
      * @param string $key
-     * @throws DomainException
-     * @throws InvalidArgumentException
      */
     public function __construct(string $host, string $key)
     {
@@ -45,35 +40,27 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return bool
-     * @throws UnexpectedValueException
      */
     public function isReachable(): bool
     {
-
-        /* There is a sentral/ping route, but it deliberately returns no data
-         * but the api connectivity doesn't recognise this as valid; instead
-         * of making it understand this scenario, pick a different one instead
-         */
-        return (bool)$this->api->retrieveDocument('sentral/status');
+        return false;
     }
 
 
     /**
      * @inheritDoc
      *
-     * @return array
+     * @return string
      */
     public function getReport(): array
     {
-        $specification = new Specification($this->api);
-
         try {
-            return $specification->check();
+            return '';
         } catch (\RuntimeException $e) {
             return [[
-                'message' => 'Cannot access api endpoint',
-                'reason' => $e->getMessage(),
-                'status' => ISpecification::STATUS_ERROR
+                 'message' => 'Cannot access api endpoint',
+                 'reason' => $e->getMessage(),
+                 'status' => ISpecification::STATUS_ERROR
             ]];
         }
     }

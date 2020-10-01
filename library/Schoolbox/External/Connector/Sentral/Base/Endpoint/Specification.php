@@ -7,8 +7,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
-use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
-use UnexpectedValueException;
+use Psr\Log\LoggerInterface;
+use Zend\Uri\Exception\InvalidArgumentException;
+use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Specification
@@ -17,23 +18,41 @@ use UnexpectedValueException;
  *
  * @package Schoolbox\External\Connector\Sentral\Base\Endpoint
  */
-class Specification implements ISpecification
+class Specification
 {
 
     /**
-     * @var Api
+     * Status text for existing nodes
      */
-    private $api;
+    private const STATUS_OK = 'OK';
+
+
+    /**
+     * Status text for missing nodes
+     */
+    private const STATUS_MISSING = 'MISSING';
+
+
+    /**
+     * Number of spaces for output formatting
+     */
+    private const PADDING = 20;
+
+
+    /**
+     * @var LoggerInterface
+     */
+    private $log;
 
 
     /**
      * Specification constructor.
      *
-     * @param Api $api
+     * @param LoggerInterface|null $log
      */
-    public function __construct(Api $api)
+    public function __construct(?LoggerInterface $log)
     {
-        $this->api = $api;
+        $this->log = $log;
     }
 
 
@@ -41,6 +60,10 @@ class Specification implements ISpecification
      * Get a list of nodes that did, or didn't, get configured properly
      *
      * @return array
+     *
+     * @throws \RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     public function check(): array
     {
@@ -49,13 +72,7 @@ class Specification implements ISpecification
             /**
              * Student Profile nodes
              */
-            'enrolments/student-contact?include=person,student,studentPerson&limit=1',
-            'enrolments/emergency-contact-link?limit=1',
-            'enrolments/enrolment?limit=1',
-            'plans/student-plan?limit=1',
-            'plans/student-plan-type?limit=1',
-            'enrolments/medical-condition?limit=1',
-            'enrolments/person-phone?limit=1',
+
 
             /**
              * Parent Profile nodes
@@ -65,7 +82,6 @@ class Specification implements ISpecification
             /**
              * Staff Profile nodes
              */
-            'enrolments/staff?include=person,qualifications&limit=1',
 
 
             /**
@@ -74,34 +90,30 @@ class Specification implements ISpecification
 
         ];
 
-        $endpoints = [];
+        $paddedLength = max(array_map('\strlen', $paths)) + self::PADDING;
+
+        $messages = [];
 
         foreach ($paths as $path) {
-            try {
-                $result = $this->api->retrieveDocument($path);
+            $paddedPath = str_pad($path, $paddedLength);
 
-                if (\count($result['data'])) {
-                    $endpoints[] = [
-                        'message' => $path,
-                        'reason' => '',
-                        'status' => ISpecification::STATUS_OK
-                    ];
-                } else {
-                    $endpoints[] = [
-                        'message' => $path,
-                        'reason' => '',
-                        'status' => ISpecification::STATUS_EMPTY
-                    ];
+            if ($this->batchxml->fetchXml($path)) {
+                $message = "{$paddedPath} " . self::STATUS_OK;
+
+                if ($this->log) {
+                    $this->log->info($message);
                 }
-            } catch (UnexpectedValueException $e) {
-                $endpoints[] = [
-                    'message' => $path,
-                    'reason' => '',
-                    'status' => ISpecification::STATUS_MISSING
-                ];
+            } else {
+                $message = "{$paddedPath} " . self::STATUS_MISSING;
+
+                if ($this->log) {
+                    $this->log->warning($message);
+                }
             }
+
+            $messages[] = $message;
         }
 
-        return $endpoints;
+        return $messages;
     }
 }

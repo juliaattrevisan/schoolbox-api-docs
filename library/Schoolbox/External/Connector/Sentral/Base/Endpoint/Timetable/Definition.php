@@ -102,10 +102,14 @@ class Definition implements IStrategy
          */
         $cycles = [];
 
-        /* TODO Normally each campus has its own cycle; amend accordingly
+        /* A key to identify this cycle and associate it with an luCampus record
          */
-        $campusIdentifier = '';
-        $campus = $this->campusMapper->findOneByColumn('ext_timetable_code', $campusIdentifier);
+        $ext = 'abc';
+
+        /* Find a campus record that could be associated with $ext
+         * You might do that via a lookup or other method than described here which is just an illustration
+         */
+        $campus = CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $ext);
 
         foreach ($cycles as $cycle) {
 
@@ -114,18 +118,25 @@ class Definition implements IStrategy
             $cycleName = '';
             $cycleLength = '';
             $dayLength = '';
+            $cycleStart = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_START);
+            $cycleEnd = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
             $dayStart = 1;
 
-            $dayData = $this->findDays($cycle);
+            /* Reuse existing cycle with the same identifier, if it exists, and update it
+             */
+            try {
+                $timetableCycle = $this->timetableCycleMapper->findOneByColumn('cycle_identifier', $ext);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $timetableCycle = $timetableCycle = $this->timetableCycleMapper->createModel();
+            }
 
-            /** @var TimetableCycle $timetableCycle */
-            $timetableCycle = $this->timetableCycleMapper->createModel()
-                ->setCycleIdentifier($campus->getExtTimetableCode())
+            $timetableCycle
+                ->setCycleIdentifier($ext)
                 ->setTitle($cycleName)
                 ->setCycleLength($cycleLength)
                 ->setDayLength($dayLength)
-                ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
-                ->setFinish(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_END))
+                ->setStart($cycleStart)
+                ->setFinish($cycleEnd)
                 ->setStartDay($dayStart);
 
             $this->log->info(sprintf(
@@ -148,6 +159,8 @@ class Definition implements IStrategy
 
             /* Save all the periods and associate them with a cycle
              */
+            $dayData = $this->findDays($cycle);
+
             /** @var array $days */
             $days = $dayData['days'];
 

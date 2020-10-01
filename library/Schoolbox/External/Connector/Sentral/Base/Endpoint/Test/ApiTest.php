@@ -53,6 +53,13 @@ class ApiTest extends TestCase
                     'tenant' => 'ABC12345abc'
                 ]
             ],
+            'Valid DSN 2' => [
+                'host=http://school-box.sentral.school/restapi/v1/;tenant=ABC12345abc',
+                [
+                    'host' => 'http://school-box.sentral.school/restapi/v1/',
+                    'tenant' => 'ABC12345abc'
+                ]
+            ],
         ];
     }
 

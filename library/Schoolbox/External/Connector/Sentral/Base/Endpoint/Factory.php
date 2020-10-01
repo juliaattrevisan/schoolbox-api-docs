@@ -7,8 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 
-use DomainException;
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
@@ -19,7 +17,6 @@ use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 /**
@@ -96,12 +93,6 @@ class Factory
 
 
     /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-
-    /**
      * @var TimetableCycleMapper
      */
     private $timetableCycleMapper;
@@ -144,7 +135,6 @@ class Factory
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      * @param CampusMapper                    $campusMapper
-     * @param UserMapper                      $userMapper
      * @param TimetableCycleMapper            $timetableCycleMapper
      * @param TimetablePeriodMapper           $timetablePeriodMapper
      * @param ClassEntryMapper                $classEntryMapper
@@ -168,7 +158,6 @@ class Factory
         /* Timetable pieces
          */
         CampusMapper $campusMapper,
-        UserMapper $userMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
@@ -191,7 +180,6 @@ class Factory
         /* Timetable pieces
          */
         $this->campusMapper = $campusMapper;
-        $this->userMapper = $userMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
@@ -203,12 +191,13 @@ class Factory
     /**
      * @return GenericCollection
      * @throws UnexpectedValueException
-     * @throws DomainException
-     * @throws InvalidArgumentException
      */
     public function produce(): GenericCollection
     {
-        $api = new Api($this->host, $this->key);
+        /* Cache a list of known users and periods
+         * Every student timetable processing uses info stored there
+         */
+        $lookup = new Timetable\Lookup($this->timetablePeriodMapper);
 
         return (new GenericCollection(IStrategy::class))
 
@@ -222,7 +211,6 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper,
-                $this->timetableCycleMapper,
                 $this->timetablePeriodMapper,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
@@ -231,22 +219,12 @@ class Factory
             ->add(new Profile\Profile(
                 $this->log,
                 $this->perform,
-                $api,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
              ))
-            ->add(new Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
             ->add(new Timetable\Definition(
                 $this->log,
                 $this->perform,
@@ -257,11 +235,19 @@ class Factory
             ->add(new Timetable\Classes(
                 $this->log,
                 $this->perform,
-                $this->timetablePeriodMapper,
+                $lookup,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
-                $this->classPeriodMapper,
-                $this->userMapper
+                $this->classPeriodMapper
+            ))
+            ->add(new Cleanup(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
             ));
     }
 }

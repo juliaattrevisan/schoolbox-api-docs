@@ -26,7 +26,7 @@ class DSNCodec
     /**
      * DSN format
      */
-    private const DSN_FORMAT = '/host=([A-Za-z0-9\/:\.]+);tenant=([A-Za-z0-9]+)/';
+    private const DSN_FORMAT = '/host=([A-Za-z0-9\/:\.-]+);tenant=([A-Za-z0-9]+)/';
 
 
     /**

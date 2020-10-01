@@ -5,9 +5,9 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup;
+namespace Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Profile\Lookup;
 
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
+use Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Api;
 use UnexpectedValueException;
 
 /**

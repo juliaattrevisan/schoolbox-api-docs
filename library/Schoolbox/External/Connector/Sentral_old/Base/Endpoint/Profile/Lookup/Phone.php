@@ -5,22 +5,20 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Lookup;
+namespace Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Profile\Lookup;
 
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
+use Schoolbox\External\Connector\Sentral_old\Base\Endpoint\Api;
 use UnexpectedValueException;
 
 /**
- * Class Enrolment
+ * Class Phone
  *
- * This happens to contain start/end dates for students,
- * in addition to their school year level and boarding status
- * Also tells you whether they're an active enrolment in the school
+ * Finds mobile phone numbers specifically
  *
  * FIXME Tell Sydney James?
- *  Enrolment data cannot not be sideloaded alongside student-contacts
+ *  Phone data cannot not be sideloaded alongside student-contacts
  */
-class Enrolment
+class Phone
 {
 
     /**
@@ -66,7 +64,7 @@ class Enrolment
 
         /* Always process the first page
          */
-        $nextUrl = $this->processRecords('enrolments/enrolment?limit=200');
+        $nextUrl = $this->processRecords('enrolments/person-phone?limit=200');
 
         /* If there are more pages, grab them too
          */
@@ -89,19 +87,23 @@ class Enrolment
     {
         $data = $this->api->retrieveDocument($endpoint);
 
+        /* Some mobiles might not be intended for contact
+         * If canContact != 1, then ignore it
+         */
         foreach ($data['data'] as $record) {
-            if (isset($record['relationships']['student'])) {
-                $studentId = $record['relationships']['student']['data']['id'];
+            if ((bool)$record['attributes']['canContact']) {
+                $personId = $record['relationships']['owner']['data']['id'];
 
-                /* TODO: There's a link to a House here
+                $type = trim(strtolower($record['attributes']['typeName'] ?? ''));
+
+                /* Only remember one of these numbers
                  */
-                $this->stack[$studentId] = [
-                    'startDate' => $record['attributes']['startDate'],
-                    'endDate' => $record['attributes']['endDate'],
-                    'year' => $record['attributes']['schoolYear'],
-                    'isBoarding' => $record['attributes']['isBoarding'],
-                    'isActive' => $record['attributes']['isActive'],
-                ];
+                if (!isset($this->stack[$personId][$type])) {
+                    $this->stack[$personId][$type] = trim(implode(' ', [
+                        trim((string)$record['attributes']['extension']),
+                        trim((string)$record['attributes']['number']),
+                    ]));
+                }
             }
         }
 

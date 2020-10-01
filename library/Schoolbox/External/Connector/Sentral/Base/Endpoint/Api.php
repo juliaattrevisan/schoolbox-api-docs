@@ -11,9 +11,6 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
 use DomainException;
 use GuzzleHttp\Client;
 use InvalidArgumentException;
-use UnexpectedValueException;
-use Zend\Uri\Exception;
-use Zend\Uri\Uri;
 
 /**
  * Class Api
@@ -50,20 +47,6 @@ class Api implements IApi
 
 
     /**
-     * The API key for this call, provided by the school
-     *
-     * @var string
-     */
-    private $apiKey;
-
-
-    /**
-     * @var Uri
-     */
-    private $url;
-
-
-    /**
      * @var Client
      */
     private $client;
@@ -79,9 +62,7 @@ class Api implements IApi
      */
     public function __construct(string $dsn, string $apiKey)
     {
-        $this->apiKey = $apiKey;
-
-        $this->client = $this->initClient($dsn, $this->apiKey, self::DEFAULT_TIMEOUT);
+        $this->client = $this->initClient($dsn, $apiKey, self::DEFAULT_TIMEOUT);
     }
 
 
@@ -165,28 +146,5 @@ class Api implements IApi
         }
 
         return $decoded;
-    }
-
-
-    /**
-     * Have a look around
-     *
-     * @throws InvalidArgumentException
-     */
-    public function schemaExplorer(): void
-    {
-        $schema = $this->retrieveDocument('sentral/schema');
-
-        foreach ($schema['paths'] as $path => $data) {
-            new \Alaress_Probe('<hr>');
-
-            $example = $data['get']['responses'][200]['content']['application/json']['examples']['validResponse']['value']['data'];
-
-            if (null === $example) {
-                new \Alaress_Probe($path, $data);
-            } else {
-                new \Alaress_Probe($path, $example);
-            }
-        }
     }
 }
