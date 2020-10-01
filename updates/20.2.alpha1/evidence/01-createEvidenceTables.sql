@@ -68,7 +68,7 @@ CREATE TABLE `lu_evidence_tag`
 (
     `id`         INT UNSIGNED NOT NULL,
     `name`       VARCHAR(60)  NULL,
-    `created_by` INT          NULL,
+    `updated_by` INT          NULL,
     `created_at` DATETIME     NULL,
     `deleted_at` DATETIME     NULL,
     PRIMARY KEY (`id`)
