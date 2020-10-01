@@ -90,7 +90,7 @@ CREATE TABLE `evidence_tag`
             ON UPDATE NO ACTION,
     CONSTRAINT `fk_evidence_tag_tag_id`
         FOREIGN KEY (`tag_id`)
-            REFERENCES `evidence_lu_tag` (`id`)
+            REFERENCES `lu_evidence_tag` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 ) ENGINE = InnoDB;
