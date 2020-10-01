@@ -1466,7 +1466,6 @@ $selector-width: 2.25rem;
 
 // Reveal
 .reveal-modal {
-    margin-top: 10vh !important; // override Foundation inline 100px
     min-height: auto;
 
     &:focus {

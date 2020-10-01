@@ -55,14 +55,22 @@
     flex-grow: 1;
     padding: 0;
     position: relative;
+    max-height: 75vh;
+    min-height: 292px;
+    @media #{$small-only} {
+      min-height: 100vh;
+      max-height: 100vh;
+    }
 
     .content {
-      padding: 1rem;
+      padding: 1rem 1rem 0 1rem;
       height: 100%;
-
-      &.active {
-        display: flex;
-        flex-direction: column;
+      overflow-y: auto;
+      
+      // For Firefox - it ignores parents padding
+      .ab-pane {
+        display: block;
+        padding-bottom: 3.5rem;
       }
     }
     // Recording vertical centre
@@ -81,11 +89,14 @@
     }
   }
   .component-action {
-    display: flex;
-    margin: auto -1rem -0.975rem;
+    margin: auto -1rem -1rem;
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    width: 100%;
 
     section {
-      width: 100%;
+      margin-top: 0;
     }
   }
 }
