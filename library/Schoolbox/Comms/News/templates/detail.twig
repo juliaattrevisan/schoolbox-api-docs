@@ -126,7 +126,7 @@ Data:
          # 'Reject' appears as a button when the article is awaiting moderation, and..
          # anything before awaiting moderation doesn't need a reject/unpublish button
          #}
-        {% if rejectRoute is defined and article.isApproved %}
+        {% if rejectRoute is defined and rejectRoute and article.isApproved %}
             <li><a class="icon-undo" id="unpublish-article" href="{{ rejectRoute }}{{ returnUrlQueryString }}" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
         {% endif %}
 
