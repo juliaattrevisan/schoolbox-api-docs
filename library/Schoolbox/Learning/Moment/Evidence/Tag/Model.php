@@ -29,9 +29,9 @@ class Model implements ISoftDeletable
     private $name;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
