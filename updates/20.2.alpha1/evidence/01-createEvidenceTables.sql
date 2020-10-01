@@ -64,7 +64,7 @@ CREATE TABLE `curriculum_evidence`
 
 -- Available tags for learning moments.
 -- It's likely these will be created only by superusers?
-CREATE TABLE `evidence_lu_tag`
+CREATE TABLE `lu_evidence_tag`
 (
     `id`         INT UNSIGNED NOT NULL,
     `name`       VARCHAR(60)  NULL,
