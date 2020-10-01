@@ -11,13 +11,15 @@ namespace Schoolbox\Learning\Moment\Evidence\Tag;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\Sequential;
 
 /**
  * Model for learning moment tags.
  */
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, Sequential
 {
     use ModelTrait\Id;
+    use ModelTrait\HasSequence;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
