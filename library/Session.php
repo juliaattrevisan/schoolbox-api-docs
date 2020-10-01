@@ -589,6 +589,22 @@ class Session
                             }
                         }
 
+                        // sorts in the same order as the profile and sidemenu, which is “Type”, “Class Name”, “Class Code”
+                        uasort(
+                            $subjects,
+                            static function (array $a, array $b): int {
+                                $type = strnatcasecmp($a['classType'], $b['classType']);
+                                if ($type === 0) {
+                                    $name = strnatcasecmp($a['name'], $b['name']);
+                                    if ($name === 0) {
+                                        return strnatcasecmp($a['code'], $b['code']);
+                                    }
+                                    return $name;
+                                }
+                                return $type;
+                            }
+                        );
+
                         $_SESSION['children'][] = array(
                             'id' => $childObject->getId(),
                             'sid' => $childObject->getExternalId(),
