@@ -33,4 +33,13 @@ class Mapper extends BaseMapper
 
         // No callbacks yet for when a tag is deleted
     }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
+    }
 }
