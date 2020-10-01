@@ -570,7 +570,6 @@ class Profile implements IStrategy
      * @param UserProfile\Model $studentBaseProfile
      * @param array             $student
      * @return string|null
-     * @throws \InvalidArgumentException
      */
     private function findHouse(UserProfile\Model $studentBaseProfile, array $student): ?string
     {
@@ -578,7 +577,19 @@ class Profile implements IStrategy
          */
         $endpoint = $student['relationships']['primaryEnrolment']['data']['relationships']['house']['links']['related'];
 
-        $payload = $this->api->retrieveDocument($endpoint);
+        /* Sentral provides endpoints that result in guaranteed failure
+         * ie. endpoints to ids that don't exist
+         *
+         * Instead of dying irrecoverably, alert with critical log that this record
+         * might be a bit broken; house can't be found, and will become null
+         */
+        try {
+            $payload = $this->api->retrieveDocument($endpoint);
+        } catch (\InvalidArgumentException $e) {
+            $this->log->critical($e->getMessage());
+
+            return null;
+        }
 
         $houseName = $payload['data']['attributes']['name'] ?? '';
 
@@ -590,7 +601,7 @@ class Profile implements IStrategy
             $houseName
         ));
 
-        return $houseName;
+        return (string)$houseName;
     }
 
 
