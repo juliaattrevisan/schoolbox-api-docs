@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Lists admin page
  *
@@ -86,7 +87,7 @@ class Controller extends Base
         $responseData = ['result' => $result];
 
         // Did deletion fail, and a message is defined to display on failure?
-        if(!$result && isset($tableData[$post['table']]['deleteFailMsg'])){
+        if (!$result && isset($tableData[$post['table']]['deleteFailMsg'])) {
             $responseData['message'] = $tableData[$post['table']]['deleteFailMsg'];
         }
 
@@ -106,7 +107,7 @@ class Controller extends Base
         $tableData       = $this->getTableData();
 
         // Check for incorrect URLs
-        if(!isset($tableData[$tableKey])){
+        if (!isset($tableData[$tableKey])) {
             $this->getResponse()->status->setCode(404);
             return;
         }
@@ -127,7 +128,6 @@ class Controller extends Base
         // Get the data into some sort of usable format
 
         foreach ($this->getRequest()->post as $field => $value) {
-
             if (substr($field, 0, 6) == "value-") {
                 $values[substr($field, 6)] = $value;
             } else if (substr($field, 0, 10) == "mandatory-") {
@@ -154,8 +154,7 @@ class Controller extends Base
             $sequence = $modelName::sequenceBase();
         }
 
-        foreach ($ids as $currentIndex => $id)
-        {
+        foreach ($ids as $currentIndex => $id) {
             // Negative ID numbers indicate new records
             if ($id > 0) {
                 // Lookup existing record
@@ -185,7 +184,6 @@ class Controller extends Base
                 }
                 $getter = $mapper->getGetMethodName($field);
                 if ($model->$getter() != $value[$currentIndex]) {
-
                     // Update values
                     $setter = $mapper->getSetMethodName($field);
 
@@ -855,15 +853,15 @@ class Controller extends Base
         $tables = $this->getTableData();
 
         // Check for incorrect URLs
-        if(!isset($tables[$table])){
+        if (!isset($tables[$table])) {
             $this->getResponse()->status->setCode(404);
             return;
         }
 
         /** @var Mapper $mapper */
-        $mapper     = new $tables[$table]['mapper'];
+        $mapper     = new $tables[$table]['mapper']();
         $model_name = $mapper->getModel();
-        $prototype  = new $model_name;
+        $prototype  = new $model_name();
 
         $reflect    = new ReflectionClass($prototype);
         $properties = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
@@ -887,19 +885,15 @@ class Controller extends Base
         }
 
         foreach ($rows as $row) {
-
             // Go through every property available
 
             foreach ($properties as $prop) {
-
                 // We only want to display fields that are listed in the 'fields' array
 
                 if (isset($tables[$table]['fields'][$prop->getName()])) {
-
                     // And they have to have a getId() column (or a manually defined getter function for the column)
 
-                    if ($reflect->hasMethod('getId') || isset($tables[$table]['fields']['id']['getter']))
-                    {
+                    if ($reflect->hasMethod('getId') || isset($tables[$table]['fields']['id']['getter'])) {
                         // And only if there is a mapper function to retrieve its value
 
                         if (isset($tables[$table]['fields'][$prop->getName()]['getter'])) {
@@ -909,7 +903,6 @@ class Controller extends Base
                         }
 
                         if ($reflect->hasMethod($getter)) {
-
                             if (isset($tables[$table]['fields']['id']['getter'])) {
                                 $idGetter = $tables[$table]['fields']['id']['getter'];
                             } else {
