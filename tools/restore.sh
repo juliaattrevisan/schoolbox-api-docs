@@ -449,24 +449,30 @@ sourcep1=`echo $restore | cut -d',' -f3`;
 sourcep2=`echo $restore | cut -d',' -f4`;
 sourcep3=`echo $restore | cut -d',' -f5`;
 
-# Check if a full restor can be done
+
+# Check if a full restore can be done
 if [ "$sourcetype" == '[A]' ] && [ "$sourceloc" == '[R]' ]; then
-  lmount=$(findmnt -n -o SOURCE --target $thisdatadir);
-  localAvailableStorage=$(df | grep $lmount | awk -F " " '{print $2}');
-  localOtherStorage=$(du -sc $lmount --exclude $lmount/schoolbox | grep total | awk -F " " '{print $1}');
-  localAvailableStorage=$((localAvailableStorage-localOtherStorage));
-  rmount=$(ssh $host findmnt -n -o SOURCE --target $sourcep3);
-  remoteUsedStorage=$(ssh $host df | grep $rmount | awk -F " " '{print $3}');
-  remoteOtherStorage=$(ssh $host du -sc $rmount --exclude $rmount/schoolbox | grep total | awk -F " " '{print $1}');
-  remoteUsedStorage=$((remoteUsedStorage-remoteOtherStorage));
+  local_mount=$(findmnt -n -o SOURCE --target "$thisdatadir");
+  local_mount_total=$(df -B1 | grep "$local_mount" | awk -F " " '{print $2}');
+  local_mount_dir=$(mount | grep "$local_mount" | awk -F " " '{print $3}');
+  local_non_sb_used=$(du -sh "$local_mount_dir" --exclude "$thisdatadir" -B1 | cut -f 1);
+  localAvailableStorage=$((local_mount_total - local_non_sb_used));
+  remote_mount=$(ssh "$host" findmnt -n -o SOURCE --target "$sourcep3");
+  remote_mount_used=$(ssh "$host" df -B1 | grep "$remote_mount" | awk -F " " '{print $3}');
+  remote_data_dir=${tempfiledir%/*};
+  remote_mount_dir=$(ssh "$host" mount | grep "$remote_mount" | awk -F " " '{print $3}');
+  remote_not_sb_used=$(ssh "$host" du -sh "$remote_mount_dir" --exclude "$remote_data_dir" -B1 2>/dev/null | cut -f 1);
+  remote_cache_used=$(ssh "$host" du -sh "$remote_data_dir/cache/zip" -B1 | cut -f 1);
+  remoteUsedStorage=$((remote_mount_used - remote_not_sb_used - remote_cache_used));
+
   if [ "$localAvailableStorage" == "" ] || [ "$remoteUsedStorage" == "" ]; then
     errmsg="Please check the datapool disk on both hosts, one or both are either full or not available";
     error;
   elif [ $localAvailableStorage -le $remoteUsedStorage ]; then
-    errmsg="You are trying to restore more data ($remoteUsedStorage 1K-blocks) than disk that is available ($localAvailableStorage 1K-blocks)";
+    errmsg="You are trying to restore more data ($remoteUsedStorage bytes) than disk that is available ($localAvailableStorage bytes)";
     error;
   fi
-  echo "Full sync space check passed: available - $localAvailableStorage 1K-blocks / needed - $remoteUsedStorage 1K-blocks";
+  echo "Full sync space check passed: available - $localAvailableStorage bytes / needed - $remoteUsedStorage bytes";
 fi
 
 # Sync the datafiles, with progress if possible
