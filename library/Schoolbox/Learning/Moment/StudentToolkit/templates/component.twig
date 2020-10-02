@@ -25,10 +25,15 @@
     <div class="student-toolkit">
         <img class="profile-image" alt="{{ user.fullName }}" src="/portrait.php?id={{ user.id }}&amp;size=profile" />
         <div class="buttons">
-            <a class="button" href="#">Share my work</a>
+            <a class="button" href="#" data-reveal-id="component{{ component.instance.id }}-shareWork">Share my work</a>
             <a class="button" href="#">Set my goals</a>
             <a class="button" href="#">My Achievements</a>
             <a class="button" href="#">My Activity</a>
         </div>
     </div>
+</div>
+
+<div data-reveal id="component{{ component.instance.id }}-shareWork" aria-hidden="true" class="reveal-modal">
+    <h2>My Work</h2>
+    <a class="close-reveal-modal" aria-label="Close">×</a>
 </div>
