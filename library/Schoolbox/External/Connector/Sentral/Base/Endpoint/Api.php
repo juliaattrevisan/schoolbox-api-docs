@@ -85,8 +85,8 @@ class Api implements IApi
         $this->host = $credentials['host'];
 
         $headers = array_combine(
-            ['X-API-KEY', 'X-API-TENANT'],
-            [$key, $credentials['tenant']]
+            ['X-API-KEY', 'X-API-TENANT', 'X-API-OPTIONS'],
+            [$key, $credentials['tenant'], 'map-include,inline-include']
         );
 
         return new Client([
@@ -108,24 +108,35 @@ class Api implements IApi
     public function retrieveDocument(string $endpoint): array
     {
 
-        /* Sentral's first/last/next pagination links are full urls containing the host
-         * but for brevity we've set base_uri to the host already so we need to replace it away
-         * every time we make a call to their pagination urls they provide to us ><
-         * FIXME Tell Sydney James?
+        /* Urls come in mixed formats; some have a version number,
+         * some have a host in front of it. Accessing endpoints in a
+         * consistent manner means removing all this junk.
+         *
+         * Remove the host prefix from the endpoint
+         * Remove the version number from the endpoint
          */
-        $response = $this->client->request('GET', str_replace($this->host, '', $endpoint));
+        $endpointFiltered = str_replace($this->host, '', $endpoint);
+        $endpointFiltered = preg_replace('#^\/v1\/#', '', $endpointFiltered);
+
+        $response = $this->client->request('GET', $endpointFiltered);
 
         try {
             $decoded = json_decode($response->getBody()->getContents(), true);
         } catch (\RuntimeException $e) {
-            throw new InvalidArgumentException('Sentral Endpoint error: could not json_decode payload; did something snap?');
+            throw new InvalidArgumentException(sprintf(
+                'Sentral Endpoint error: could not json_decode payload for endpoint %s; did something snap?',
+                $endpoint
+            ));
         }
 
         /* When you can't decode the json, sentral's given you something unexpected
          * like an error string, or lost in transmission, etc.
          */
         if ($decoded === null) {
-            throw new InvalidArgumentException('Sentral Endpoint error: could not json_decode payload - it is null; did something snap?');
+            throw new InvalidArgumentException(sprintf(
+                'Sentral Endpoint error: could not json_decode payload for endpoint %s - it is null; did something snap?',
+                $endpoint
+            ));
         }
 
         /* Check for error payload instead of data payload
@@ -140,7 +151,8 @@ class Api implements IApi
              *   - The host should end with a trailing slash
              */
             throw new InvalidArgumentException(sprintf(
-                'Sentral Endpoint error: %s',
+                'Sentral Endpoint error at endpoint %s: %s',
+                $endpoint,
                 "{$decoded['errors'][0]['title']} - {$decoded['errors'][0]['detail']}"
             ));
         }

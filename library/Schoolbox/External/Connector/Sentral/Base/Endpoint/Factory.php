@@ -191,6 +191,8 @@ class Factory
     /**
      * @return GenericCollection
      * @throws UnexpectedValueException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
     public function produce(): GenericCollection
     {
@@ -198,6 +200,8 @@ class Factory
          * Every student timetable processing uses info stored there
          */
         $lookup = new Timetable\Lookup($this->timetablePeriodMapper);
+
+        $api = new Api($this->host, $this->key);
 
         return (new GenericCollection(IStrategy::class))
 
@@ -219,27 +223,28 @@ class Factory
             ->add(new Profile\Profile(
                 $this->log,
                 $this->perform,
+                $api,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
              ))
-            ->add(new Timetable\Definition(
-                $this->log,
-                $this->perform,
-                $this->campusMapper,
-                $this->timetableCycleMapper,
-                $this->timetablePeriodMapper
-            ))
-            ->add(new Timetable\Classes(
-                $this->log,
-                $this->perform,
-                $lookup,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
-            ))
+//            ->add(new Timetable\Definition(
+//                $this->log,
+//                $this->perform,
+//                $this->campusMapper,
+//                $this->timetableCycleMapper,
+//                $this->timetablePeriodMapper
+//            ))
+//            ->add(new Timetable\Classes(
+//                $this->log,
+//                $this->perform,
+//                $lookup,
+//                $this->classEntryMapper,
+//                $this->classInvolvementMapper,
+//                $this->classPeriodMapper
+//            ))
             ->add(new Cleanup(
                 $this->log,
                 $this->perform,

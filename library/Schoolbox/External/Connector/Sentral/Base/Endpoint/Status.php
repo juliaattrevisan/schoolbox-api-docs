@@ -50,12 +50,12 @@ class Status implements IStatus
     /**
      * @inheritDoc
      *
-     * @return string
+     * @return array
      */
     public function getReport(): array
     {
         try {
-            return '';
+            return [];
         } catch (\RuntimeException $e) {
             return [[
                  'message' => 'Cannot access api endpoint',

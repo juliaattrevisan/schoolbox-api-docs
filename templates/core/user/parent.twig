@@ -150,7 +150,7 @@
                                 <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64"
                                      alt="View Profile">
                                 <a href="/search/user/{{ student.id }}"><p>{{ student.formatName }}</p></a>
-                                <span class="meta">Year {{ student.year }}</span>
+                                <span class="meta">Year {{ student.year ? student.year.name : '' }}</span>
                             </div>
                         </li>
                     {% endfor %}

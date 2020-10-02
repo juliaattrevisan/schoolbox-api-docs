@@ -13,8 +13,6 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\Normalise\User\Staff;
-use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
@@ -142,7 +140,6 @@ class Profile implements IStrategy
          */
         $students = [];
 
-        /** @var Student $student */
         foreach ($students as $student) {
 
             /* TODO Fill in these basic student vars
@@ -159,7 +156,6 @@ class Profile implements IStrategy
             $gender = '';
             $lastname = '';
             $legal = '';
-            $medicalAlert = '';
             $messages = '';
             $mobile = '';
             $studiesCode = '';
@@ -656,7 +652,6 @@ class Profile implements IStrategy
     {
         $staffs = [];
 
-        /** @var Staff $staff */
         foreach ($staffs as $staff) {
 
             /* TODO Fill in basic staff vars
