@@ -1,3 +1,30 @@
-<div class="small-12 columns no-pad">
-    Student Toolkit
+<style type="text/css">
+    .student-toolkit {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+    }
+    .student-toolkit .profile-image {
+        flex-grow: 0;
+    }
+    .student-toolkit .buttons {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+    }
+    .student-toolkit .buttons .button {
+        flex-grow: 1;
+    }
+</style>
+<div class="small-12 columns">
+    <div class="student-toolkit">
+        <img class="profile-image" alt="{{ user.fullName }}" src="/portrait.php?id={{ user.id }}&amp;size=profile" />
+        <div class="buttons">
+            <a class="button" href="#">Share my work</a>
+            <a class="button" href="#">Set my goals</a>
+            <a class="button" href="#">My Achievements</a>
+            <a class="button" href="#">My Activity</a>
+        </div>
+    </div>
 </div>

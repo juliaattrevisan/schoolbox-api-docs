@@ -33,7 +33,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learningMomentStudentToolkit/component.twig',
-            []
+            [
+                'user' => $this->getUser(),
+            ]
         );
     }
 }
