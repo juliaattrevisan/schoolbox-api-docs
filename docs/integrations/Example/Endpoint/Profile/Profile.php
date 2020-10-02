@@ -657,8 +657,7 @@ class Profile implements IStrategy
             /* TODO Fill in basic staff vars
              */
             $externalId = '';
-            $username = '';
-            $title = '';
+
             $firstname = '';
             $lastname = '';
             $building = '';
@@ -669,17 +668,8 @@ class Profile implements IStrategy
             $phone = '';
             $positionTitle = '';
             $room = '';
-
-            /* Staff without usernames are skipped
-             */
-            if ('' === $username) {
-                $this->log->warning(sprintf(
-                    'Skipping base profile for staff %s - no username detected',
-                    trim("{$firstname} {$lastname}")
-                ));
-
-                continue;
-            }
+            $title = '';
+            $username = '';
 
             /* Find out if this externalId already has a staff profile
              * If one already exists, load it, update it, then save it
