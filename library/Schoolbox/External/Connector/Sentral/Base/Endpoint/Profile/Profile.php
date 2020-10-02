@@ -13,7 +13,6 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
@@ -292,7 +291,7 @@ class Profile implements IStrategy
 
                 /* Fish out special needs
                  */
-                $specialNeeds = $this->findSpecialNeeds();
+                $specialNeeds = $this->findSpecialNeeds($externalId);
 
                 /* Fish out a staff member via their user code
                  */
@@ -401,7 +400,7 @@ class Profile implements IStrategy
                  * This set is mixed with emergency contacts and other non-data, so
                  * sift through it all manually for the gems you need
                  */
-                $this->importParentsOfStudent($externalId, $studentBaseProfile, $student['relationships']['contacts']['data']);
+                $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
             }
 
             /* Prepare for next page if it exists
@@ -679,12 +678,25 @@ class Profile implements IStrategy
     /**
      * Find out if this student has special needs
      *
+     * @param string $studentExternalId
      * @return bool
+     * @throws \InvalidArgumentException
      */
-    private function findSpecialNeeds(): bool
+    private function findSpecialNeeds(string $studentExternalId): bool
     {
-        /* TODO Fill in these special needs vars
+        /* Go digging in another endpoint for data
+         * http://development.sentral.com.au/#operation/getSpecialNeedsPrograms
          */
+        $endpoint = "enrolments/special-needs-program?studentIds={$studentExternalId}";
+
+        $payload = $this->api->retrieveDocument($endpoint);
+
+        if (\count($payload['data'])) {
+            print_r($payload);
+            die();
+
+        }
+
         return false;
     }
 
@@ -724,7 +736,6 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * @param string            $studentExternalId
      * @param UserProfile\Model $studentBaseProfile
      * @param array             $contacts
      * @throws Exception
@@ -733,7 +744,7 @@ class Profile implements IStrategy
      * @throws UnexpectedValueException
      * @throws \InvalidArgumentException
      */
-    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile, array $contacts): void
+    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $contacts): void
     {
         /* Each student comes with a set of Contacts
          * Some are Emergency Contacts, some are not
