@@ -94,11 +94,28 @@ INSERT INTO component_config_instance
 
 -- Perform actual inversion
 
+-- For text box, default value for compactMode = 0.
+-- As value can be NULL (which means default), if it's set to 1 change it to 0, otherwise default.
 UPDATE component_config_instance cci1
 INNER JOIN component_config_definition ccd1 ON cci1.component_config_definition_id = ccd1.id
     AND ccd1.`key` = 'showComponentTitle'
 INNER JOIN component_definition cd1 ON ccd1.component_definition_id = cd1.id AND cd1.`class` IN (
-    'Component_Homepage_TextBoxController',
+    'Component_Homepage_TextBoxController'
+)
+INNER JOIN component_config_instance cci2 ON cci1.component_instance_id = cci2.component_instance_id
+INNER JOIN component_config_definition ccd2 ON cci2.component_config_definition_id = ccd2.id
+    AND ccd2.`key` = 'compactMode'
+INNER JOIN component_definition cd2 ON ccd2.component_definition_id = cd2.id AND cd2.`class` IN (
+    'Component_Homepage_TextBoxController'
+)
+SET cci1.`value` = IF(cci2.`value` = '1', '0', '1');
+
+-- For tiles and breadcrumbs, default value for compactMode = 1.
+-- As value can be NULL (which means default), if it's set to 0 change it to 1, otherwise default.
+UPDATE component_config_instance cci1
+INNER JOIN component_config_definition ccd1 ON cci1.component_config_definition_id = ccd1.id
+    AND ccd1.`key` = 'showComponentTitle'
+INNER JOIN component_definition cd1 ON ccd1.component_definition_id = cd1.id AND cd1.`class` IN (
     'Schoolbox\\Tile\\Component\\HomepageTileController',
     'Component_Homepage_BreadcrumbController'
 )
@@ -106,11 +123,10 @@ INNER JOIN component_config_instance cci2 ON cci1.component_instance_id = cci2.c
 INNER JOIN component_config_definition ccd2 ON cci2.component_config_definition_id = ccd2.id
     AND ccd2.`key` = 'compactMode'
 INNER JOIN component_definition cd2 ON ccd2.component_definition_id = cd2.id AND cd2.`class` IN (
-    'Component_Homepage_TextBoxController',
     'Schoolbox\\Tile\\Component\\HomepageTileController',
     'Component_Homepage_BreadcrumbController'
 )
-SET cci1.`value` = IF(cci2.`value` = '1', '0', '1');
+SET cci1.`value` = IF(cci2.`value` = '0', '1', '0');
 
 -- Old "Hide Heading" homepage component configs no longer have any behaviours in components
 -- therefore they can be removed
