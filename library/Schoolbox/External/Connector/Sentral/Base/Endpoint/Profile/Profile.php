@@ -920,7 +920,6 @@ class Profile implements IStrategy
                 $department = '';
                 $email = (string)$staff['relationships']['person']['data']['attributes']['email'];
                 $lastname = (string)$staff['relationships']['person']['data']['attributes']['lastName'];
-                $phone = '';
                 $positionTitle = (string)$staff['attributes']['jobTitle'];
                 $room = '';
                 $title = (string)$staff['relationships']['person']['data']['attributes']['title'];
@@ -947,6 +946,35 @@ class Profile implements IStrategy
 
                     continue;
                 }
+
+                /* Go digging in another endpoint for names and numbers
+                 * Construct the endpoint manually, because you can't trust the ids
+                 * provided by the API (some are non-integers which die)
+                 */
+                $endpoint = "enrolments/person/{$staff['relationships']['person']['data']['id']}?include=phoneNumbers";
+
+                $payload = $this->api->retrieveDocument($endpoint);
+
+                $firstname = (string)$payload['data']['attributes']['firstName'];
+                $lastname = (string)$payload['data']['attributes']['lastName'];
+
+                $this->log->debug(sprintf(
+                    'Secondary api inspection at %s for phone numbers belonging to %s',
+                    $endpoint,
+                    trim("{$firstname} {$lastname}")
+                ));
+
+                /* Catalog each of this guy's phone numbers so we can try and assign some
+                 */
+                $numbers = [];
+
+                if (isset($payload['data']['relationships']['phoneNumbers'])) {
+                    foreach ($payload['data']['relationships']['phoneNumbers']['data'] as $phoneNumber) {
+                        $numbers[$phoneNumber['attributes']['typeName']] = $phoneNumber['attributes']['number'];
+                    }
+                }
+
+                $phone = $numbers[self::WORK_TELEPHONE_NUMBER] ?? '';
 
                 /* Find out if this externalId already has a staff profile
                  * If one already exists, load it, update it, then save it
@@ -1015,5 +1043,19 @@ class Profile implements IStrategy
              */
             $nextUrl =  $payload['links']['next'] ?? null;
         }
+    }
+
+
+    /**
+     * Find a phone number belonging to Person
+     *
+     * @param string $personId
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    private function findPersonPhone(string $personId): array
+    {
+
+
     }
 }
