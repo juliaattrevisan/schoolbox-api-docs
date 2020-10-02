@@ -918,7 +918,7 @@ class Profile implements IStrategy
                 $campusName = '';
                 $category = (string)$staff['attributes']['employmentClassification'];
                 $department = '';
-                $email = '';
+                $email = (string)$staff['relationships']['person']['data']['attributes']['email'];
                 $lastname = (string)$staff['relationships']['person']['data']['attributes']['lastName'];
                 $phone = '';
                 $positionTitle = (string)$staff['attributes']['jobTitle'];
