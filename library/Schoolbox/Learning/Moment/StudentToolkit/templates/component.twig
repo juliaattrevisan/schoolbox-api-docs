@@ -34,6 +34,40 @@
 </div>
 
 <div data-reveal id="component{{ component.instance.id }}-shareWork" aria-hidden="true" class="reveal-modal">
-    <h2>My Work</h2>
+    <h2>Share a Learning Moment</h2>
+    <form>
+        <input type="radio"
+               name="moment-type"
+               value="photo"
+               id="component{{ component.instance.id }}-momentType-photo">
+        <label for="component{{ component.instance.id }}-momentType-photo" class="block"><i class="icon-resource-booking"></i>Take a photo</label>
+
+        <input type="radio"
+               name="moment-type"
+               value="video"
+               id="component{{ component.instance.id }}-momentType-video">
+        <label for="component{{ component.instance.id }}-momentType-video" class="block"><i class="icon-video"></i>Record a video</label>
+
+        <input type="radio"
+               name="moment-type"
+               value="audio"
+               id="component{{ component.instance.id }}-momentType-audio">
+        <label for="component{{ component.instance.id }}-momentType-audio" class="block"><i class="icon-audio"></i>Record audio</label>
+
+        <input type="radio"
+               name="moment-type"
+               value="upload"
+               id="component{{ component.instance.id }}-momentType-upload">
+        <label for="component{{ component.instance.id }}-momentType-upload" class="block"><i class="icon-upload"></i>Upload image or video</label>
+
+        <input type="radio"
+               name="moment-type"
+               value="text"
+               id="component{{ component.instance.id }}-momentType-text">
+        <label for="component{{ component.instance.id }}-momentType-text" class="block"><i class="icon-textbox"></i>Write something</label>
+
+        <button type="submit">Continue</button>
+
+    </form>
     <a class="close-reveal-modal" aria-label="Close">×</a>
 </div>
