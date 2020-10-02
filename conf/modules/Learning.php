@@ -21,6 +21,7 @@ use Schoolbox\Learning\Grades;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Learning\Module as LearningModule;
+use Schoolbox\Learning\Moment\StudentToolkit\Module as StudentToolkitModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Upcoming;
 
@@ -51,6 +52,7 @@ class Learning extends ModuleLoader
         $this->loadModule($kernel, Upcoming\Module::class, "/{$namespace}/due");
         $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
         $this->loadModule($kernel, MarkScheme\Module::class, "/{$namespace}/markscheme");
+        $this->loadModule($kernel, StudentToolkitModule::class, "/{$namespace}/studentToolkit");
 
         /* Assessment Calendar is behind a feature flag
          */
