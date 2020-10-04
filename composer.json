@@ -38,7 +38,6 @@
         "league/flysystem": "~1.0.16",
         "league/flysystem-aws-s3-v3": "1.0.*",
         "php-amqplib/php-amqplib": "~2.7.0",
-        "mtdowling/cron-expression": "~2.0.0",
         "tijsverkoyen/css-to-inline-styles": "2.2.0",
         "html2text/html2text": "~4.1.0",
         "wolfcast/browser-detection": "~2.9.0",
@@ -79,7 +78,8 @@
         "ext-imagick": "*",
         "ext-json": "*",
         "ssnepenthe/color-utils": "^0.4.2",
-        "symfony/lock": "^4.4"
+        "symfony/lock": "^4.4",
+        "dragonmantank/cron-expression": "^3.0"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
