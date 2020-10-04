@@ -106,4 +106,31 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
             return $componentConfigDefinition->first()->getDefaultValue();
         }
     }
+
+    /**
+     * Injects default component config instance
+     * @param int $instanceId
+     * @param int $definitionId
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    function injectDefaultConfigCollection(int $instanceId, int $definitionId): void
+    {
+        $collection                 = $this->createCollection();
+        $componentConfigDefinitions = \Component_ConfigDefinitionMapper::getInstance()->findByColumn(
+            'component_definition_id', $definitionId
+        );
+
+        // Apply config
+        /** @var Component_ConfigDefinition $componentConfigDefinition */
+        foreach ($componentConfigDefinitions as $componentConfigDefinition) {
+            $conf = $this->createModel()
+                         ->setConfigDefinitionId($componentConfigDefinition->getId())
+                         ->setInstanceId($instanceId)
+                         ->setValue($componentConfigDefinition->getDefaultValue());
+            $collection->add($conf);
+        }
+
+        // Save the config
+        $this->save($collection);
+    }
 }
