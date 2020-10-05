@@ -1,25 +1,23 @@
 <?php
 /**
- * Model for submission box grade groups.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 
-use Schoolbox\Collection;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevelModel;
+use Schoolbox\Collection;
+use Schoolbox\Mapper\Traits\Model\Id;
 
+/**
+ * Model for due work grade groups.
+ */
 class Model
 {
-    /**
-     * Primary key
-     *
-     * @var int
-     */
-    protected $id;
+    use Id;
 
     /**
      * Name of this group
@@ -36,36 +34,18 @@ class Model
     protected $gradeLevels;
 
     /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param  int   $id
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     /**
-     * @param  string $name
+     * @param string $name
      * @return $this
      */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
         return $this;
@@ -74,26 +54,26 @@ class Model
     /**
      * @return GradeLevelModel[]|Collection
      */
-    public function getGradeLevels()
+    public function getGradeLevels(): Collection
     {
         return $this->gradeLevels;
     }
 
     /**
-     * @param  GradeLevelModel[]|Collection $gradeLevels
+     * @param GradeLevelModel[]|Collection $gradeLevels
      * @return $this
      */
-    public function setGradeLevels($gradeLevels)
+    public function setGradeLevels(Collection $gradeLevels): self
     {
         $this->gradeLevels = $gradeLevels;
         return $this;
     }
 
     /**
-     * @param  GradeLevelModel $level
+     * @param GradeLevelModel $level
      * @return $this
      */
-    public function addGradeLevel(GradeLevelModel $level)
+    public function addGradeLevel(GradeLevelModel $level): self
     {
         // Don't add more than once
         $this->getGradeLevels()->setOffset($level->getId(), $level);

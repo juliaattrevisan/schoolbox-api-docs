@@ -1,24 +1,23 @@
 <?php
 
 /**
- * Mapper for submission box grade groups.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeModel;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Collection;
 
 /**
- * Class Mapper
+ * Mapper for due work grade groups.
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group
  * @method Model findByIdWithFallback($identifierValue)
@@ -27,7 +26,7 @@ use Schoolbox\Collection;
 class Mapper extends BaseMapper
 {
     /** @var int Fake ids for non letter group */
-    public const GRADE_GROUP_ID_NONE = -1;
+    public const GRADE_GROUP_ID_NONE       = -1;
     public const GRADE_GROUP_ID_PERCENTAGE = -2;
 
     /**
@@ -37,31 +36,19 @@ class Mapper extends BaseMapper
     {
         $this->hasTable('submission_grade_group');
         $this->hasModel(Model::class);
-        $this->hasMap(
-            array(
-                'column'     => 'id',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true,
-            )
-        );
-        $this->hasMap(
-            array(
-                'column'   => 'name',
-                'property' => 'name',
-                'type'     => self::TYPE_STRING,
-            )
-        );
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('name', self::TYPE_STRING);
         $this->hasJoin(
             'levels',
-            array(
+            [
                 'mapper'    => GradeMapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'submission_grade_group_id',
                 'multiple'  => true,
-            )
+            ]
         );
     }
+
     /**
      * @return string
      */
@@ -107,6 +94,7 @@ class Mapper extends BaseMapper
         }
         return $this->createCollection(array_values($groups));
     }
+
     /**
      * Loads all groups, along with their constituent grade levels.
      *
@@ -125,7 +113,7 @@ class Mapper extends BaseMapper
      */
     public function findAllForAdminOption()
     {
-        $collection = self::createCollection();
+        $collection = $this->createCollection();
         $none       = (new Model())->setId(self::GRADE_GROUP_ID_NONE)->setName('None');
         $collection->add($none);
         $percentage = (new Model())->setId(self::GRADE_GROUP_ID_PERCENTAGE)->setName('Percentage');
