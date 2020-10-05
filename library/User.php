@@ -135,10 +135,11 @@ class User extends DeprecatedModel
     public function getBySynergy($sid)
     {
         $query = "SELECT user.id AS uid, title, firstname, lastname, username, groups.name AS gname, group_id,
-                        position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, userCampus.campus, year, eportfolio_enabled, house, enabled
+                        position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, userCampus.campus, lyl.name, eportfolio_enabled, house, enabled
                 FROM user
                     LEFT JOIN groups ON user.group_id = groups.id
                     LEFT JOIN userCampus ON user.id = userCampus.uid
+                    LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id
                 WHERE user.synergy_id = '$sid'
                 AND user.deleted_at IS NULL";
         return $this->db->getRow($query);
