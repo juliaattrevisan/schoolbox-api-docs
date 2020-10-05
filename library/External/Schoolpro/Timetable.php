@@ -34,6 +34,11 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      */
     protected $cycleLength = 4;
 
+    /**
+     * class code to teacher map
+     * @var array 
+     */
+    private $classTeachers = [];
 
     /**
      * @inheritDoc
@@ -269,7 +274,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
                         'code'        => $currentClass['ClassCode'],
                         'room'        => $currentClass['ClassRoom'],
                         'campus'      => $campus->getExtTimetableCode(),
-                        'staffID'     => $externalUserId,
+                        'staffID'     => $this->getClassTeacher($currentClass['ClassCode']),
                         'dayNumber'   => $currentClass['DayNumber'],
                     ];
 
@@ -281,6 +286,33 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
         return $timetable;
     }
 
+    /**
+     * Finds teacher id from class code
+     * @param string|null $classCode
+     * @return string|null
+     */
+    private function getClassTeacher(?string $classCode): ?string
+    {
+        if (key_exists($classCode, $this->classTeachers)) {
+            return $this->classTeachers[$classCode];
+        }
+        $vars = [
+            'sbGetTeacherName',
+            [
+                'pUserName' => 'alaress',
+                'pUserPass' => 'alaress',
+                'pClassID'  => $classCode,
+            ],
+        ];
+
+        $result = $this->getConnector()->getStoredProcedureIterator($vars[0], $vars[1]);
+        foreach ($result as $currentTeacher) {
+            $this->classTeachers[$classCode] = $currentTeacher['ID'];
+            return $this->classTeachers[$classCode];
+        }
+        $this->classTeachers[$classCode] = null;
+        return null;
+    }
 
     /**
      * @inheritDoc
