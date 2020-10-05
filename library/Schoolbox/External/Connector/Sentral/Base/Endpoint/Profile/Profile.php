@@ -1044,18 +1044,4 @@ class Profile implements IStrategy
             $nextUrl =  $payload['links']['next'] ?? null;
         }
     }
-
-
-    /**
-     * Find a phone number belonging to Person
-     *
-     * @param string $personId
-     * @return array
-     * @throws \InvalidArgumentException
-     */
-    private function findPersonPhone(string $personId): array
-    {
-
-
-    }
 }
