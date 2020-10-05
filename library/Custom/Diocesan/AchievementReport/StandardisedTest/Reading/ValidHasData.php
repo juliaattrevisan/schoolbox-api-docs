@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\Reading;
 
+use Schoolbox\YearLevel;
+
 /**
  * Class ValidHasData
  *
@@ -21,13 +23,21 @@ class ValidHasData
      * Certain year levels always display the graph.
      * Other year levels display the graph only if there is data there
      *
-     * @param int  $yearLevel
-     * @param bool $hasData
+     * @param YearLevel\Model|null $yearLevel
+     * @param bool                 $hasData
      *
      * @return bool
      */
-    public function isSatisfiedBy(int $yearLevel, bool $hasData): bool
+    public function isSatisfiedBy(?YearLevel\Model $yearLevel, bool $hasData): bool
     {
-        return \in_array($yearLevel, [1,2,3,4,5,6], true) || $hasData;
+        if ($hasData) {
+            return true;
+        }
+
+        if ($yearLevel && \in_array((int)$yearLevel->getName(), [1,2,3,4,5,6], true)) {
+            return true;
+        }
+
+        return false;
     }
 }

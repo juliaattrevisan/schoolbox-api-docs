@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\STAR\Table;
 
+use Schoolbox\YearLevel;
+
 /**
  * Class ValidHasData
  *
@@ -21,13 +23,21 @@ class ValidHasData
      * Certain year levels always display the table.
      * Other year levels display the table only if there is data there
      *
-     * @param int  $yearLevel
-     * @param bool $hasData
+     * @param YearLevel\Model|null $yearLevel
+     * @param bool                 $hasData
      *
      * @return bool
      */
-    public function isSatisfiedBy(int $yearLevel, bool $hasData): bool
+    public function isSatisfiedBy(?YearLevel\Model $yearLevel, bool $hasData): bool
     {
-        return 3 === $yearLevel || $hasData;
+        if ($hasData) {
+            return true;
+        }
+
+        if ($yearLevel && 3 === (int)$yearLevel->getName()) {
+            return true;
+        }
+
+        return false;
     }
 }

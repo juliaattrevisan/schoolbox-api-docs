@@ -26,15 +26,10 @@ class ValidHasLiteracyNumeracy
      */
     public function isSatisfiedBy(?YearLevel\Model $yearLevel): bool
     {
-        /* Unknown year level; no access
-         */
-        if (null === $yearLevel) {
-            return false;
-        }
 
         /* "Can you please hide the Literacy/Numeracy tab for all students in current years 0-6?"
          * https://lrs.zendesk.com/agent/tickets/76478
          */
-        return !\in_array($yearLevel, [0, 1, 2, 3, 4, 5, 6], true);
+        return $yearLevel && !\in_array($yearLevel->getName(), [0, 1, 2, 3, 4, 5, 6], true);
     }
 }
