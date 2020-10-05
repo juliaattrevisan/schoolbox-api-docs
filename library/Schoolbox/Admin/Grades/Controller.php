@@ -44,7 +44,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@adminGrades/index.twig', [
                     'pageCurrent' => self::PAGE_CURRENT,
-                    'gradeGroups' => $this->mapper->findAll(),
+                    'gradeGroups' => $this->mapper->findAll()->map(new Translator\GradeGroup()),
                 ]
             )
         );
