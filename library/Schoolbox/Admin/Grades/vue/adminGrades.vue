@@ -11,17 +11,6 @@ export default {
     },
     computed: {
         config: () => window.adminGradesConfig,
-        // urls() {
-        //     return {
-        //         createForm: URL_EVENT_CREATE_FORM,
-        //         modifyForm: URL_EVENT_MODIFY_FORM,
-        //         modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
-        //         delete: URL_EVENT_DELETE,
-        //         update: URL_EVENT_UPDATE,
-        //         attendanceList: URL_ATTENDANCE_LIST,
-        //         attendanceToggle: URL_ATTENDANCE_TOGGLE,
-        //     };
-        // },
     },
     methods: {
         addGroup() {
@@ -56,10 +45,26 @@ export default {
     <form method="POST" :action="config.postUrl">
         <section v-for="(group, groupIndex) in gradeGroups">
             <div class="content">
-                <label for="groupName">
+                <label :for="'groupName-' + String(groupIndex)">
                     Grade Group
-                    <input type="text" required id="groupName" v-model="group.name" placeholder="Grade Group"/>
                 </label>
+                <div class="actions-small-1">
+                    <div class="list-item">
+                        <input type="text"
+                               required
+                               :id="'groupName-' + String(groupIndex)"
+                               v-model="group.name"
+                               placeholder="Grade Group"
+                        />
+                    </div>
+                    <nav>
+                        <a v-if="group.id === null"
+                           href="#"
+                           title="Remove Grouping"
+                           class="icon-delete"
+                           @click.prevent="removeGroup(groupIndex)"></a>
+                    </nav>
+                </div>
             </div>
             <table>
                 <thead>
@@ -92,10 +97,21 @@ export default {
                         />
                     </td>
                     <td>
-                        <input type="text"
-                               required
-                               v-model="level.caption"
-                        />
+                        <div class="actions-small-1">
+                            <div class="list-item">
+                                <input type="text"
+                                       required
+                                       v-model="level.caption"
+                                />
+                            </div>
+                            <nav>
+                                <a v-if="level.id === null"
+                                   title="Remove Level"
+                                   href="#"
+                                   class="icon-delete"
+                                   @click.prevent="removeLevel(groupIndex, levelIndex)"></a>
+                            </nav>
+                        </div>
                     </td>
                 </tr>
                 <tr>
