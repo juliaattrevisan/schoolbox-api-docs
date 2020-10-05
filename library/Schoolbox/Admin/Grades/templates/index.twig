@@ -1,9 +1,43 @@
 {# Shared navigation menu #}
 {{ renderAdminNavigation(pageCurrent) }}
 
+{# Redo this in Vue #}
+
 <div class="row">
-    <div class="small-12 island">
-        Grade Levels
+    <div class="small-12 medium-6 island">
+        <h2 class="subheader">Guide</h2>
+        <section class="content">
+            <h3>Creating {{ locale.grades.properPlural }}</h3>
+            <p>
+                Type into empty fields to create a new {{ locale.grades }} grouping,
+                or a new grade level for an existing grouping.
+            </p>
+            <p>
+                Once {{ locale.grades.plural }} or groupings have been created, they cannot be removed;
+                they can be renamed, but ensure that if you do that you rename them to something semantically
+                equivalent, since it will affect all marks already given.
+            </p>
+        </section>
+    </div>
+    <div class="small-12 medium-6 island">
+        <h2 class="subheader">Glossary</h2>
+        <section class="content">
+            <h3>Lower Bound</h3>
+            <p>
+                This value is used for the purpose of displaying a {{ locale.grades }} average for a student or assessment.
+                The caption with the highest lower bound above the average {{ locale.grades }} will be displayed.
+            </p>
+
+            <h3>Normalised {{ locale.grades.proper }}</h3>
+            <p>
+                The value (out of 100) that will be used for {{ locale.grades }} average calculations
+                for an assessment that you give this {{ locale.grades }}.
+            </p>
+            <p>
+                This value should be greater than (not equal to) the lower bound, and less than
+                (not equal to) the next highest lower bound.
+            </p>
+        </section>
     </div>
 </div>
 <div id='toaster' class="toast" data-toast></div>
