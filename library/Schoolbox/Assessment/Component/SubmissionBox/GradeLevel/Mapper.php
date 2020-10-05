@@ -12,6 +12,8 @@ use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Mapper for due work grade levels.
+ *
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {

@@ -7,8 +7,8 @@
 namespace Schoolbox\Admin\Grades;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeLevelMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
+use Schoolbox\Collection;
 
 class Controller extends Base
 {
@@ -16,13 +16,13 @@ class Controller extends Base
 
 
     /**
-     * @var GradeLevelMapper
+     * @var GradeLevel\Mapper
      */
     private $gradeLevelMapper;
 
 
     /**
-     * @var GradeLevelGroupMapper
+     * @var GradeLevel\Group\Mapper
      */
     private $gradeLevelGroupMapper;
 
@@ -30,10 +30,10 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param GradeLevelMapper      $gradeLevelMapper
-     * @param GradeLevelGroupMapper $gradeLevelGroupMapper
+     * @param GradeLevel\Mapper       $gradeLevelMapper
+     * @param GradeLevel\Group\Mapper $gradeLevelGroupMapper
      */
-    public function __construct(GradeLevelMapper $gradeLevelMapper, GradeLevelGroupMapper $gradeLevelGroupMapper)
+    public function __construct(GradeLevel\Mapper $gradeLevelMapper, GradeLevel\Group\Mapper $gradeLevelGroupMapper)
     {
         $this->gradeLevelMapper      = $gradeLevelMapper;
         $this->gradeLevelGroupMapper = $gradeLevelGroupMapper;
@@ -53,7 +53,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@adminGrades/index.twig', [
                     'pageCurrent' => self::PAGE_CURRENT,
-                    'gradeGroups' => $this->gradeLevelGroupMapper->findAll()->map(new Translator\GradeGroup()),
+                    'gradeGroups' => $this->retrieveAllGradeGroups(),
                 ]
             )
         );
@@ -68,6 +68,54 @@ class Controller extends Base
      */
     public function postSaveGrades(): void
     {
-        // do something
+        // Ignore the return type: this is an array of stdclass objects
+        /** @var iterable&\stdClass[] $payload */
+        $payload          = $this->request->content->get();
+        $gradeLevelGroups = $this->gradeLevelGroupMapper->createCollection();
+
+        foreach ($payload as $gradeLevelGroupPayload) {
+            // Convert this to a grade group and its levels
+            $gradeLevelGroup = $this->gradeLevelGroupMapper
+                ->createModel()
+                ->setId($gradeLevelGroupPayload->id)
+                ->setName($gradeLevelGroupPayload->name)
+                ->setGradeLevels($this->gradeLevelMapper->createCollection());
+
+            foreach ($gradeLevelGroupPayload->levels as $gradeLevelPayload) {
+                $gradeLevel = $this->gradeLevelMapper
+                    ->createModel()
+                    ->setId($gradeLevelPayload->id)
+                    ->setGroup($gradeLevelGroup)
+                    ->setRawGrade((float)$gradeLevelPayload->rawGrade)
+                    ->setLowerBound((float)$gradeLevelPayload->lowerBound)
+                    ->setCaption($gradeLevelPayload->caption);
+                $gradeLevelGroup->getGradeLevels()->add($gradeLevel);
+            }
+
+            $gradeLevelGroups->add($gradeLevelGroup);
+        }
+
+        // Save all of the grade groups
+        foreach ($gradeLevelGroups as $gradeLevelGroup) {
+            /** @var GradeLevel\Group\Model $gradeLevelGroup */
+            $this->gradeLevelGroupMapper->save($gradeLevelGroup);
+            $this->gradeLevelMapper->save($gradeLevelGroup->getGradeLevels());
+        }
+
+        $this->response->content->set(
+            $this->buildJsonOutput($this->retrieveAllGradeGroups())
+        );
+    }
+
+
+    /**
+     * Helper method for returning all grade groups, and translating them to
+     * something that can be output in a JSON response.
+     *
+     * @return Collection|array[]
+     */
+    private function retrieveAllGradeGroups(): Collection
+    {
+        return $this->gradeLevelGroupMapper->findAll()->map(new Translator\GradeGroup());
     }
 }

@@ -1,5 +1,7 @@
 <script>
 
+import axios from 'axios'
+
 export default {
     data() {
         return {
@@ -35,7 +37,13 @@ export default {
             this.gradeGroups[groupIndex].levels = this.gradeGroups[groupIndex].levels.filter((g, i) => i !== levelIndex);
         },
         persist() {
-            // do nothing yet
+            // Post the grades
+
+            // Try to summon a toast as well
+
+            axios
+                .post(this.config.postUrl, this.gradeGroups)
+                .then(response => this.gradeGroups = response.data);
         }
     }
 }
