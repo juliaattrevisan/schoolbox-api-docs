@@ -1,11 +1,16 @@
 <script>
 
 import axios from 'axios'
+import Toast from "@schoolbox/toast";
 
 export default {
+    components: {
+        Toast,
+    },
     data() {
         return {
-            gradeGroups: []
+            gradeGroups:    [],
+            saveInProgress: false,
         }
     },
     created() {
@@ -40,10 +45,16 @@ export default {
             // Post the grades
 
             // Try to summon a toast as well
-
+            this.saveInProgress = true;
+            this.$refs.toast.activate('Saving...');
             axios
                 .post(this.config.postUrl, this.gradeGroups)
-                .then(response => this.gradeGroups = response.data);
+                .then(response => {
+                    this.gradeGroups = response.data
+                    this.$refs.toast.timeout('Saved', true, 2000);
+                })
+                .catch(() => this.$refs.toast.timeout('Save failed', false, 5000))
+                .finally(() => this.saveInProgress = false)
         }
     }
 }
@@ -60,6 +71,7 @@ export default {
                     <div class="list-item">
                         <input type="text"
                                required
+                               :disabled="saveInProgress"
                                :id="'groupName-' + String(groupIndex)"
                                v-model="group.name"
                                :placeholder="config.terms.grade.properSingular + ' Group'"
@@ -69,7 +81,7 @@ export default {
                         <a v-if="group.id === null"
                            href="#"
                            title="Remove Grouping"
-                           class="icon-delete"
+                           :class="{'icon-delete': true, disabled: saveInProgress}"
                            @click.prevent="removeGroup(groupIndex)"></a>
                     </nav>
                 </div>
@@ -90,6 +102,7 @@ export default {
                                max="100"
                                step="0.5"
                                required
+                               :disabled="saveInProgress"
                                v-model="level.lowerBound"
                                placeholder="Lower Bound"
                         />
@@ -100,6 +113,7 @@ export default {
                                max="100"
                                step="0.5"
                                required
+                               :disabled="saveInProgress"
                                v-model="level.rawGrade"
                                placeholder="Normalised Grade"
                         />
@@ -109,6 +123,7 @@ export default {
                             <div class="list-item">
                                 <input type="text"
                                        required
+                                       :disabled="saveInProgress"
                                        v-model="level.caption"
                                 />
                             </div>
@@ -116,7 +131,7 @@ export default {
                                 <a v-if="level.id === null"
                                    title="Remove Level"
                                    href="#"
-                                   class="icon-delete"
+                                   :class="{'icon-delete': true, disabled: saveInProgress}"
                                    @click.prevent="removeLevel(groupIndex, levelIndex)"></a>
                             </nav>
                         </div>
@@ -126,7 +141,9 @@ export default {
                     <td colspan="3">
                         <ul class="flex-list buttons">
                             <li>
-                                <a href="#" class="button" @click.prevent="addLevel(groupIndex)">Add Level</a>
+                                <a href="#"
+                                   :class="{button: true, disabled: saveInProgress}"
+                                   @click.prevent="addLevel(groupIndex)">Add Level</a>
                             </li>
                         </ul>
                     </td>
@@ -137,12 +154,18 @@ export default {
 
         <ul class="flex-list buttons">
             <li>
-                <a href="#" class="button" @click.prevent="addGroup()">Add Grouping</a>
+                <a href="#"
+                   :class="{button: true, disabled: saveInProgress}"
+                   @click.prevent="addGroup()">Add Grouping</a>
             </li>
             <li>
-                <input type="submit" @click.prevent="persist()" value="Save changes"/>
+                <input type="submit"
+                       :disabled="saveInProgress"
+                       @click.prevent="persist()"
+                       value="Save changes" />
             </li>
         </ul>
 
+        <toast ref="toast"></toast>
     </form>
 </template>
