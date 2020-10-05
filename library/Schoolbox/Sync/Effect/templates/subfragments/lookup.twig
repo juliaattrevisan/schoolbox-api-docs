@@ -1,5 +1,6 @@
 {% include 'sub/select.twig' with {
     name: dynamicInputName,
     options: allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData(),
-    preselected: preselected ?? 0
+    preselected: preselected ?? 0,
+    showPrompt: allEffectStructures.fragments[currentEffect.id].subfragments.fragment.prompt ?? false
 } %}

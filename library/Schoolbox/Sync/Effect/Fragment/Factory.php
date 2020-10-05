@@ -36,7 +36,7 @@ class Factory
      * This combines $allFieldKeys' data with its type, as derived
      * from the UserMapper definition
      */
-    private $allFields = [];
+    private $allFields;
 
 
     /**
@@ -102,7 +102,7 @@ class Factory
      *
      * @var string
      */
-    private $roleType = '';
+    private $roleType;
 
 
     /**
@@ -110,7 +110,7 @@ class Factory
      *
      * @var Lookup
      */
-    private $lookup = null;
+    private $lookup;
 
 
     /**
@@ -273,7 +273,15 @@ class Factory
         if ($this->isBoolean($userField)) {
             return new Fragment('@upsEffect/subfragments/boolean.twig');
         } elseif ($this->isLookup($userField)) {
-            return new Fragment('@upsEffect/subfragments/lookup.twig', $this->lookup->findData($userField, $this->roleType));
+            $fragment = new Fragment('@upsEffect/subfragments/lookup.twig', $this->lookup->findData($userField, $this->roleType));
+
+            /* Special case for 'year' - prompt user to choose from a lookup
+             */
+            if ('year' === $userField) {
+                $fragment->setPrompt(true);
+            }
+
+            return $fragment;
         } elseif ($this->isString($userField)) {
             return new Fragment('@upsEffect/subfragments/string.twig');
         } elseif ($this->isCollection($userField)) {
