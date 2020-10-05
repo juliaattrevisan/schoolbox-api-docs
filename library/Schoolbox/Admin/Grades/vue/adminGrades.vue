@@ -46,7 +46,7 @@ export default {
         <section v-for="(group, groupIndex) in gradeGroups">
             <div class="content">
                 <label :for="'groupName-' + String(groupIndex)">
-                    Grade Group
+                    {{ config.terms.grade.properSingular }} Group
                 </label>
                 <div class="actions-small-1">
                     <div class="list-item">
@@ -54,7 +54,7 @@ export default {
                                required
                                :id="'groupName-' + String(groupIndex)"
                                v-model="group.name"
-                               placeholder="Grade Group"
+                               :placeholder="config.terms.grade.properSingular + ' Group'"
                         />
                     </div>
                     <nav>
@@ -70,7 +70,7 @@ export default {
                 <thead>
                 <tr>
                     <th>Lower Bound</th>
-                    <th>Normalised Grade</th>
+                    <th>Normalised {{ config.terms.grade.properSingular }}</th>
                     <th>Caption</th>
                 </tr>
                 </thead>

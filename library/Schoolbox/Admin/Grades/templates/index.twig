@@ -6,6 +6,9 @@
         window.adminGradesConfig = {
             postUrl:     '{{ routeLookup('adminGrades.postSaveGrades') }}',
             gradeGroups: {{ gradeGroups | json_encode | raw }},
+            terms:       {
+                grade: {{ locale.grades.allForms | json_encode | raw }}
+            }
         };
     </script>
 {% endautoescape %}
@@ -20,7 +23,7 @@
                 levels and groupings.
             </p>
             <p>
-                Once {{ locale.grades.plural }} or groupings have been created, they cannot be removed;
+                Once levels or groupings have been saved, they cannot be removed;
                 they can be renamed, but ensure that if you do that you rename them to something semantically
                 equivalent, since it will affect all marks already given.
             </p>

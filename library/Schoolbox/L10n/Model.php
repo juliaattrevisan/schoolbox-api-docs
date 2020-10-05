@@ -202,4 +202,20 @@ class Model
     {
         return $this->translate(true, true);
     }
+
+
+    /**
+     * Convenience method for fetching all forms.
+     *
+     * @return array
+     */
+    public function allForms(): array
+    {
+        return [
+            'singular'       => $this->translate(false, false),
+            'plural'         => $this->translate(true, false),
+            'properSingular' => $this->translate(false, true),
+            'properPlural'   => $this->translate(true, true),
+        ];
+    }
 }
