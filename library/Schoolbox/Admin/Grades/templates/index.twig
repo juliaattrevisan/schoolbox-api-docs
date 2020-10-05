@@ -1,7 +1,14 @@
 {# Shared navigation menu #}
 {{ renderAdminNavigation(pageCurrent) }}
 
-{# Redo this in Vue #}
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        window.adminGradesConfig = {
+            postUrl:     '{{ routeLookup('adminGrades.postSaveGrades') }}',
+            gradeGroups: [],
+        };
+    </script>
+{% endautoescape %}
 
 <div class="row">
     <div class="small-12 medium-6 island">
@@ -38,6 +45,12 @@
                 (not equal to) the next highest lower bound.
             </p>
         </section>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        {# Vue component goes here #}
+        <div id="admin-grades"></div>
     </div>
 </div>
 <div id='toaster' class="toast" data-toast></div>
