@@ -59,13 +59,19 @@ $app = new class extends CliTool\App {
                 'id2' => $breadcrumbComponentDefinition,
             ]
         )->fetchColumnArray('id');
-        
+
         $showTitleConfigPredicate = PredicateBuilder::getArrayBindings($showComponentTitleConfigDefinitions, 'ccd');
 
         $this->getLogger()->debug('Update component_config_instance of component_config_definition_id:' . implode(',', $showComponentTitleConfigDefinitions));
         // find component config instance compact mode of the config instance
         foreach ($collapseNullComponents as $collapseNullComponent) {
-            $this->getLogger()->debug("Updating component_instance: {$collapseNullComponent}");
+            $originalValue = $this->getDatabaseInternal()->executeQuery(
+                "SELECT `value` FROM component_config_instance
+                 WHERE component_config_definition_id in ({$showTitleConfigPredicate['placeholders']})
+                 AND component_instance_id = :componentInstanceId",
+                array_merge($showTitleConfigPredicate['bindings'], ['componentInstanceId' => $collapseNullComponent])
+            )->fetchColumn();
+            $this->getLogger()->debug("Updating component_instance: {$collapseNullComponent}, original value: " . ($originalValue ?? 'NULL'));
             $this->getDatabaseInternal()->executeQuery(
                 "UPDATE component_config_instance SET value = 0 
                  WHERE component_config_definition_id in ({$showTitleConfigPredicate['placeholders']})

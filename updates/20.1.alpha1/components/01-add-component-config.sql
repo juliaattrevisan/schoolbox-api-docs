@@ -134,7 +134,7 @@ SET cci1.`value` = IF(cci2.`value` = '0', '1', '0');
 -- Remove the compactMode instances from textbox/breadcrumb/tiles
 
 -- Back up data before actually deleting
-CREATE TABLE _deleted_component_config_instance
+CREATE TABLE IF NOT EXISTS _deleted_component_config_instance
 SELECT cci.*
 FROM component_config_instance cci
 LEFT JOIN component_config_definition ccd ON ccd.id = cci.component_config_definition_id
@@ -164,7 +164,7 @@ WHERE ccd.`key` = 'compactMode'
 );
 
 -- Remove the compactMode definitions from textbox/breadcrumb/tiles
-CREATE TABLE _deleted_component_config_definition
+CREATE TABLE IF NOT EXISTS _deleted_component_config_definition
 SELECT ccd.*
 FROM component_config_definition ccd
 LEFT JOIN component_definition cd ON ccd.component_definition_id = cd.id
