@@ -228,6 +228,7 @@ class UserResolver implements IUserResolver
 
         $joins = [];
         $pb    = (new Predicate\Builder(new Quoter(), ''))->isNull("{$userTableAlias}.deleted_at");
+
         foreach ($dimensions as $idx => $dimension) {
             $strategy = $this->strategyFactory->makeSimpleStrategy($dimension->getType());
             $data     = $strategy->getUserResolutionSql($userTableAlias, "_{$subQueryId}_{$idx}", $dimension->getValues(), $excludeMuted);
@@ -239,9 +240,11 @@ class UserResolver implements IUserResolver
         $sql         = "
             SELECT {$userTableAlias}.id, '{$relationship}' relationship
             FROM user {$userTableAlias}
+            LEFT JOIN lu_year_level lyl ON {$userTableAlias}.year_id = lyl.id
             {$joinClause}
             WHERE {$pb->getWhereIntersect()}
         ";
+
         return [$sql, $pb->getParams()];
     }
 
@@ -314,6 +317,7 @@ class UserResolver implements IUserResolver
             ->setParamPrefix("_{$subQueryId}_x")
             ->in("{$userTableAlias}.id", $relatedUsers)
             ->isNull("{$userTableAlias}.deleted_at");
+
         $sql = "SELECT {$userTableAlias}.id, 'self' relationship FROM user {$userTableAlias} WHERE {$pb->getWhereIntersect()}";
 
         return [$sql, $pb->getParams()];

@@ -174,10 +174,10 @@ class Year extends SimpleStrategy
 
         $pb = $this->newPb($paramPrefix);
         if ($targetNull) {
-            $pb->isNull("$userTableAlias.year");
+            $pb->isNull("$userTableAlias.year_id");
         }
         if (count($filtered)) {
-            $pb->in("$userTableAlias.year", $filtered);
+            $pb->in("lyl.name", $filtered);
         }
         $pb = $this->newPb($paramPrefix)->any($pb);
 
