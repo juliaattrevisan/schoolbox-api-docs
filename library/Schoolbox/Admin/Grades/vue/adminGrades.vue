@@ -6,8 +6,10 @@ export default {
             gradeGroups: []
         }
     },
+    created() {
+        this.gradeGroups = this.config.gradeGroups;
+    },
     computed: {
-        // jQuery: () => window.jQuery,
         config: () => window.adminGradesConfig,
         // urls() {
         //     return {
