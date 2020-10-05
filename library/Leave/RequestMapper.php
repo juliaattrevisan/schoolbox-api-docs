@@ -8,14 +8,22 @@ class Leave_RequestMapper extends Schoolbox\Mapper
     protected $userMapper;
     protected $limit = null;
 
+    /**
+     * @var \Schoolbox\YearLevel\Mapper
+     */
+    protected $yearLevelMapper;
+
+
     protected function setup()
     {
         parent::setup();
+
         $this->setUserMapper(\Schoolbox\UserMapper::getInstance());
+        $this->yearLevelMapper = \Schoolbox\YearLevel\Mapper::getInstance();
 
         /* Set the threshold for displaying/using lists of requests.
-           * Only show the last 14 days' worth of info
-           */
+         * Only show the last 14 days' worth of info
+         */
         $this->setLimit(date('Y-m-d H:i:s', strtotime('-14 days')));
     }
 
@@ -253,6 +261,8 @@ class Leave_RequestMapper extends Schoolbox\Mapper
      */
     protected function getBaseQuery()
     {
+        $userMapper = \Schoolbox\UserMapper::getInstance();
+
         return "
 			SELECT
 				{$this->getColumnString('lr')},
@@ -261,6 +271,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
 				{$this->getJoinColumnString('authorisationUser', 'au')},
 				{$this->getJoinColumnString('travelType', 'tt')},
 				{$this->getJoinColumnString('host_type', 'ht')},
+				{$userMapper->getJoinColumnString('year', 'lyl')},
 				lyl.name AS year
 			FROM `{$this->table}` lr
 			LEFT JOIN {$this->getJoinSql('user', 'lr', 'u')}
@@ -268,7 +279,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
 			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
 			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
 			LEFT JOIN {$this->getJoinSql('host_type', 'lr', 'ht')}
-			LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
+			LEFT JOIN {$userMapper->getJoinSql('year', 'u', 'lyl')}
 		";
     }
 
@@ -656,7 +667,12 @@ class Leave_RequestMapper extends Schoolbox\Mapper
                     $request = $mapper->createModel();
                 }
                 if (!empty($row['u.id'])) {
-                    $request->setUser($mapper->getUserMapper()->hydrate($row, 'u'));
+                    $user = $mapper->getUserMapper()->hydrate($row, 'u');
+                    $year = $this->yearLevelMapper->hydrate($row, 'lyl');
+
+                    $user->setYear($year);
+
+                    $request->setUser($user);
                 }
                 if (!empty($row['a.id'])) {
                     $request->setAuthor($mapper->getUserMapper()->hydrate($row, 'a'));
