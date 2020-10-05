@@ -7,7 +7,8 @@
 namespace Schoolbox\Admin\Grades;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeLevelMapper;
 
 class Controller extends Base
 {
@@ -15,19 +16,27 @@ class Controller extends Base
 
 
     /**
-     * @var GradeGroupMapper
+     * @var GradeLevelMapper
      */
-    private $mapper;
+    private $gradeLevelMapper;
+
+
+    /**
+     * @var GradeLevelGroupMapper
+     */
+    private $gradeLevelGroupMapper;
 
 
     /**
      * Constructor
      *
-     * @param GradeGroupMapper $mapper
+     * @param GradeLevelMapper      $gradeLevelMapper
+     * @param GradeLevelGroupMapper $gradeLevelGroupMapper
      */
-    public function __construct(GradeGroupMapper $mapper)
+    public function __construct(GradeLevelMapper $gradeLevelMapper, GradeLevelGroupMapper $gradeLevelGroupMapper)
     {
-        $this->mapper = $mapper;
+        $this->gradeLevelMapper      = $gradeLevelMapper;
+        $this->gradeLevelGroupMapper = $gradeLevelGroupMapper;
     }
 
 
@@ -44,7 +53,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@adminGrades/index.twig', [
                     'pageCurrent' => self::PAGE_CURRENT,
-                    'gradeGroups' => $this->mapper->findAll()->map(new Translator\GradeGroup()),
+                    'gradeGroups' => $this->gradeLevelGroupMapper->findAll()->map(new Translator\GradeGroup()),
                 ]
             )
         );

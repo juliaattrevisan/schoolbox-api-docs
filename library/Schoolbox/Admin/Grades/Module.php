@@ -10,7 +10,8 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeLevelMapper;
 
 class Module extends BaseModule
 {
@@ -57,7 +58,8 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'gradeGroupMapper' => $this->getMapperFactory()->getLazy(GradeGroupMapper::class),
+                    'gradeLevelMapper'      => $this->getMapperFactory()->getLazy(GradeLevelMapper::class),
+                    'gradeLevelGroupMapper' => $this->getMapperFactory()->getLazy(GradeLevelGroupMapper::class),
                 ]
             )
         );
