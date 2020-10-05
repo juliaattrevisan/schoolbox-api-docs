@@ -7,6 +7,7 @@
 namespace Schoolbox\Admin\Grades;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 
 class Controller extends Base
 {
@@ -14,12 +15,27 @@ class Controller extends Base
 
 
     /**
+     * @var GradeGroupMapper
+     */
+    private $mapper;
+
+
+    /**
+     * Constructor
+     *
+     * @param GradeGroupMapper $mapper
+     */
+    public function __construct(GradeGroupMapper $mapper)
+    {
+        $this->mapper = $mapper;
+    }
+
+
+    /**
      * Get index for modify grades form.
      *
      * @api   GET /adminv2/grades
      * @since 20.2
-     *
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getIndex(): void
     {
@@ -28,6 +44,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@adminGrades/index.twig', [
                     'pageCurrent' => self::PAGE_CURRENT,
+                    'gradeGroups' => $this->mapper->findAll(),
                 ]
             )
         );

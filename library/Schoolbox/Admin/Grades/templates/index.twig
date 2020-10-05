@@ -5,7 +5,7 @@
     <script type="text/javascript">
         window.adminGradesConfig = {
             postUrl:     '{{ routeLookup('adminGrades.postSaveGrades') }}',
-            gradeGroups: [],
+            gradeGroups: {{ gradeGroups | json_encode | raw }},
         };
     </script>
 {% endautoescape %}
