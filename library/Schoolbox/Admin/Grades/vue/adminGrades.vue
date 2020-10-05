@@ -67,7 +67,6 @@ export default {
                     <th>Lower Bound</th>
                     <th>Normalised Grade</th>
                     <th>Caption</th>
-                    <th>&nbsp;</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -98,16 +97,12 @@ export default {
                                v-model="level.caption"
                         />
                     </td>
-                    <td><a href="#" class="button icon-delete no-text" @click.prevent="removeLevel(groupIndex, levelIndex)"></a></td>
                 </tr>
                 <tr>
-                    <td colspan="4">
+                    <td colspan="3">
                         <ul class="flex-list buttons">
                             <li>
                                 <a href="#" class="button" @click.prevent="addLevel(groupIndex)">Add Level</a>
-                            </li>
-                            <li>
-                                <a href="#" class="button" @click.prevent="removeGroup(groupIndex)">Remove Group</a>
                             </li>
                         </ul>
                     </td>
@@ -118,7 +113,7 @@ export default {
 
         <ul class="flex-list buttons">
             <li>
-                <a href="#" class="button" @click.prevent="addGroup()">Add Group</a>
+                <a href="#" class="button" @click.prevent="addGroup()">Add Grouping</a>
             </li>
             <li>
                 <input type="submit" @click.prevent="persist()" value="Save changes"/>
