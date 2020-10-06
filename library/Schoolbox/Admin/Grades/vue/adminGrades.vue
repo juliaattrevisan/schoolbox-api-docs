@@ -11,12 +11,17 @@ export default {
         return {
             gradeGroups:    [],
             saveInProgress: false,
+            validator:      null,
         }
     },
     created() {
         this.gradeGroups = this.config.gradeGroups;
     },
+    mounted() {
+        this.applyValidator();
+    },
     computed: {
+        jQuery: () => window.jQuery,
         config: () => window.adminGradesConfig,
     },
     methods: {
@@ -26,9 +31,11 @@ export default {
                 name: '',
                 levels: [],
             });
+            this.applyValidator();
         },
         removeGroup(groupIndex) {
             this.gradeGroups = this.gradeGroups.filter((g, i) => i !== groupIndex);
+            this.applyValidator();
         },
         addLevel(groupIndex) {
             this.gradeGroups[groupIndex].levels.push({
@@ -37,12 +44,27 @@ export default {
                 rawGrade: null,
                 caption: '',
             });
+            this.applyValidator();
         },
         removeLevel(groupIndex, levelIndex) {
             this.gradeGroups[groupIndex].levels = this.gradeGroups[groupIndex].levels.filter((g, i) => i !== levelIndex);
+            this.applyValidator();
+        },
+        applyValidator() {
+            if (this?.validator?.destroy) {
+                this.validator.destroy();
+            }
+            this.validator = this.jQuery(this.$refs.form).alaressValidate({
+                submitHandler(form, event) {
+                    event.preventDefault();
+                }
+            });
         },
         persist() {
             // Post the grades
+            if (!this.validator.form()) {
+                return;
+            }
 
             // Try to summon a toast as well
             this.saveInProgress = true;
@@ -61,7 +83,7 @@ export default {
 </script>
 
 <template>
-    <form method="POST" :action="config.postUrl">
+    <form method="POST" :action="config.postUrl" ref="form">
         <section v-for="(group, groupIndex) in gradeGroups">
             <div class="content">
                 <label :for="'groupName-' + String(groupIndex)">
@@ -69,7 +91,8 @@ export default {
                 </label>
                 <div class="actions-small-1">
                     <div class="list-item">
-                        <input type="text"
+                        <input :name="'group.' + String(groupIndex) + '.name'"
+                               type="text"
                                required
                                :disabled="saveInProgress"
                                :id="'groupName-' + String(groupIndex)"
@@ -97,7 +120,8 @@ export default {
                 <tbody>
                 <tr v-for="(level, levelIndex) in group.levels">
                     <td>
-                        <input type="number"
+                        <input :name="'group.' + String(groupIndex) + '.level.' + String(levelIndex) + '.lowerBound'"
+                               type="number"
                                min="0"
                                max="100"
                                step="0.5"
@@ -108,7 +132,8 @@ export default {
                         />
                     </td>
                     <td>
-                        <input type="number"
+                        <input :name="'group.' + String(groupIndex) + '.level.' + String(levelIndex) + '.rawGrade'"
+                               type="number"
                                min="0"
                                max="100"
                                step="0.5"
@@ -121,7 +146,8 @@ export default {
                     <td>
                         <div class="actions-small-1">
                             <div class="list-item">
-                                <input type="text"
+                                <input :name="'group.' + String(groupIndex) + '.level.' + String(levelIndex) + '.caption'"
+                                       type="text"
                                        required
                                        :disabled="saveInProgress"
                                        v-model="level.caption"
