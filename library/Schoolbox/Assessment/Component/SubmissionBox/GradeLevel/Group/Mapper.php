@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeModel;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use UnexpectedValueException;
 
 /**
  * Mapper for due work grade groups.
@@ -49,7 +50,26 @@ class Mapper extends BaseMapper
                 'multiple'  => true,
             ]
         );
+
+        // Validation
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assertValidName']);
     }
+
+
+    /**
+     * Pre-save validation for the name: it must be set and not empty.
+     *
+     * @param Model $model
+     * @return bool
+     */
+    public function assertValidName(Model $model): bool
+    {
+        if ($model->getName() === '') {
+            throw new UnexpectedValueException('Name must not be empty');
+        }
+        return true;
+    }
+
 
     /**
      * @return string
