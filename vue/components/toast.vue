@@ -37,10 +37,12 @@
              * @param fadeDuration How long to wait before the toast disappears?
              */
             timeout(text, successful, duration, fadeDuration) {
-                let self = this;
-                this.text         = text;
-                this.state        = successful ? STATE_DONE : STATE_FAILED;
-                this.fadeDuration = fadeDuration;
+                let self   = this;
+                this.text  = text;
+                this.state = successful ? STATE_DONE : STATE_FAILED;
+                if (fadeDuration) {
+                    this.fadeDuration = fadeDuration;
+                }
                 setTimeout(
                     function () {
                         self.state  = STATE_HIDDEN;
@@ -68,7 +70,7 @@
 </script>
 
 <template>
-    <transition name="fade" duration="{ enter: fadeDuration, leave: fadeDuration }">
+    <transition name="fade" :duration="{ enter: fadeDuration, leave: fadeDuration }">
         <div ref="toast" v-if="!isHidden" :class="{toast: true, alert: isFailed, success: isDone}" :style="{opacity: 1}">
             {{ text }}
         </div>
