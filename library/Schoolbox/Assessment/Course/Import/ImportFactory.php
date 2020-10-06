@@ -55,10 +55,11 @@ class ImportFactory
      * All AssessmentImpls will link to an AssessmentSpec
      *
      * @param UnitImplementation[]|GenericCollection $unitImpls Each UnitImpl links to a UnitSpec to get Assessments for
+     * @param string|null $defaultDueTime Adjust due date time to this, if set in H:i format
      * @return DataTransferObject
      * @throws InvalidDataStateException If broken data encountered
      */
-    public function buildForNewImport(GenericCollection $unitImpls)
+    public function buildForNewImport(GenericCollection $unitImpls, ?string $defaultDueTime = null)
     {
         /**
          * Extract all UnitSpecs into a cache, indexed by unitSpec.id
@@ -140,7 +141,7 @@ class ImportFactory
 
         // No AssessmentImpl to AssessmentSpec mapping (this is a new import)
         $assessmentSpecs = $this->loadProjectSpecAssessables($assessmentSpecs, []);
-        $dto = new DataTransferObject(false, [], $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs);
+        $dto = new DataTransferObject(false, [], $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs, $defaultDueTime);
 
         return $dto;
     }
@@ -153,10 +154,11 @@ class ImportFactory
      * UnitImpls will link to extant UnitSpecs
      *
      * @param UnitImplementation[]|GenericCollection $unitImpls
+     * @param string|null $defaultDueTime Adjust due date time to this, if set in H:i format
      * @return DataTransferObject
      * @throws InvalidDataStateException If broken course data detected
      */
-    public function buildForImportModify(GenericCollection $unitImpls)
+    public function buildForImportModify(GenericCollection $unitImpls, ?string $defaultDueTime)
     {
         /**
          * Not imported to the specified $unitImpls
@@ -167,16 +169,12 @@ class ImportFactory
 
         /**
          * Created inside the specified $unitImpls (not imported from Spec)
-         *
-         * @var GenericCollection $assessmentImpls
          */
         $assessmentImpls = new GenericCollection(GenericCollection::class);
 
 
         /**
          * Imported from a Spec to the specified $unitImpls
-         *
-         * @var GenericCollection $assessmentPairs
          */
         $assessmentPairs = new GenericCollection(GenericCollection::class);
 
@@ -366,7 +364,7 @@ class ImportFactory
         $assessmentSpecs = $this->loadProjectSpecAssessables($assessmentSpecs, $assessmentImplToSpecMap);
         $assessmentImpls = $this->loadProjectImplAssessables($assessmentImpls, $assessmentImplToSpecMap);
         $assessmentPairs = $this->loadProjectPairAssessables($assessmentPairs, $assessmentImplToSpecMap);
-        $dto = new DataTransferObject(true, $assessmentImplToSpecMap, $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs);
+        $dto = new DataTransferObject(true, $assessmentImplToSpecMap, $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs, $defaultDueTime);
         return $dto;
     }
 

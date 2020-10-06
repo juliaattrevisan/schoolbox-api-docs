@@ -364,6 +364,8 @@ class Controller extends BaseController
      */
     protected function buildImplementationsForSpecification(IAssessable $assessmentSpec, array $unitImplIds = null): GenericCollection
     {
+        $defaultDueTime   = $this->getConfigLoader()->get('lms_duetime_default');
+
         // if the assessment is in a project spec, get project impls of the project spec
         $projectImpls = $assessmentSpec->getContext() instanceof Project
             ? $this->assessmentDataSource->findAllImplementationsBySpecificationId($assessmentSpec->getContext()->getId())
@@ -410,7 +412,7 @@ class Controller extends BaseController
             $assessmentImpl->setContext($context ?? $unitImplementation);
             $assessmentImpl->setPublishAt($unitImplementation->getOpenDate());
             $assessmentImpl->setOpenAt($unitImplementation->getOpenDate());
-            $assessmentImpl->setDueAt($unitImplementation->getDueDate());
+            $assessmentImpl->setDueAt($unitImplementation->getDueDate()->setTimeFromString($defaultDueTime));
             $assessmentImpl->setCloseAt($unitImplementation->getDueDate());
             $assessmentImpls->add($assessmentImpl);
         }

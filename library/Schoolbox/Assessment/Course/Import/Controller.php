@@ -18,6 +18,7 @@ use Component_Definition;
 use Component_Instance;
 use Component_InstanceMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineComponentController;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
@@ -333,22 +334,30 @@ class Controller extends Base\Base
 
         // Hydrate + Validate dates
         $canReadUnitSpecs = $this->canReadUnitSpecs($courseSpec);
+        $defaultDueTime   = $this->getConfigLoader()->get('lms_duetime_default');
+        // Map of unitSpecId -> close date with default due time
+        // This is used on the UI to reset changed due date to unit default
+        $unitDefaultDueDates = new Collection();
+
         try {
             $countImportedUnits = 0;
 
             foreach ($units as $idx => $unit) {
                 if (isset($unit['import'])) {
                     $countImportedUnits++;
+                    $unitSpecId = $unit['unit_spec_id'];
+
                     $openDate  = \Alaress_Date_Format::newLocalShort($unit['open_date']);
                     $closeDate = \Alaress_Date_Format::newLocalShort($unit['close_date']);
+                    $dueDate = clone $closeDate;
+                    $dueDate->endOfDay();
+                    $unitDefaultDueDates->offsetSet($unitSpecId, $dueDate->setTimeFromString($defaultDueTime));
                     if ($openDate->gt($closeDate)) {
                         $this->sendError('The open date must be before the close date');
                         return;
                     }
                     $units[$idx]['open_date']  = $openDate;
                     $units[$idx]['close_date'] = $closeDate;
-
-                    $unitSpecId = $unit['unit_spec_id'];
 
                     // If modifying an already imported unit,
                     // and I can't read the original copy:
@@ -396,9 +405,9 @@ class Controller extends Base\Base
         try {
             // If not modifying any already imported Units, we can treat this modification merely as a fresh import.
             if ('import' === $action || !$countImportedUnits) {
-                $dto = $this->importFactory->buildForNewImport($unitImpls);
+                $dto = $this->importFactory->buildForNewImport($unitImpls, $defaultDueTime);
             } elseif ('modify' === $action) {
-                $dto = $this->importFactory->buildForImportModify($unitImpls);
+                $dto = $this->importFactory->buildForImportModify($unitImpls, $defaultDueTime);
             } else {
                 throw new \DomainException('Unable to determine if this is a new import or modification of prior import.');
             }
@@ -422,7 +431,7 @@ class Controller extends Base\Base
             'dto'               => $dto,
             'canReadCourseSpec' => $canReadCourseSpec,
             'canReadUnitSpecs'  => $canReadUnitSpecs,
-
+            'unitDefaultDueDates' => $unitDefaultDueDates,
         ]);
     }
 
@@ -597,7 +606,6 @@ class Controller extends Base\Base
 
                 default:
                     throw new \DomainException("Invalid date property: set{$property}At");
-                    break;
             }
         }
         return $assessment;
@@ -894,7 +902,7 @@ class Controller extends Base\Base
 
         // Delete any CourseOutline components that display this CourseImport
         try {
-            $module              = \Component_Definition::MODULE_HOMEPAGE;
+            $module              = Component_Definition::MODULE_HOMEPAGE;
             $folderId            = $courseImpl->getFolder()->getId();
             $class               = HomepageOutlineComponentController::class;
             $components          = $this->componentInstanceMapper->findByContextAndClass($module, $folderId, $class);
