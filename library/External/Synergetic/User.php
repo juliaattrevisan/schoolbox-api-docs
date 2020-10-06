@@ -751,7 +751,39 @@ class External_Synergetic_User implements External_UserInterface
          * This leads to a duped set of dudes, where Person A appears twice
          * and Person B appears twice
          */
-        foreach ($contacts as $contact) {
+        $contactKeys = [
+            'StudentContactID' => '',
+            'StudentContactTitle' => '',
+            'StudentContactPreferred' => '',
+            'StudentContactSurname' => '',
+            'StudentContactDefaultEmail' => '',
+            'StudentContactPhoneActual' => '',
+            'StudentContactSilentPhoneFlag' => '',
+            'StudentContactMobilePhone' => '',
+            'StudentContactOccupPhone' => '',
+            'StudentContactRelation' => '',
+            'StudentContactPrimaryOnlyFlag' => '',
+            'StudentContactType' => '',
+            'StudentContactUseEmail' => '',
+        ];
+
+        $spouseKeys = [
+            'StudentContactSpouseID' => '',
+            'StudentContactSpouseTitle' => '',
+            'StudentContactSpousePreferred' => '',
+            'StudentContactSpouseSurname' => '',
+            'StudentContactSpouseDefaultEmail' => '',
+            'StudentContactSpouseMobilePhone' => '',
+            'StudentContactSpouseOccupPhone' => '',
+            'StudentContactSpouseRelation' => '',
+            'StudentContactSpouseUseEmail' => '',
+
+            /* PhoneActual, SilentPhoneFlag, PrimaryOnlyFlag, ContactType
+             * fields don't manifest for speece
+             */
+        ];
+
+        foreach ($contacts as $contactTuple) {
 
             /* Get a contact tuple containing up to two people and bust it out
              * into individual data, where applicable
