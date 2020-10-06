@@ -789,22 +789,16 @@ class External_Synergetic_User implements External_UserInterface
          */
         foreach ($contacts as $contactTuple) {
 
-            /* If we haven't seen this contact's id before, stack 'em up
+            /* Find the main contact's fields
              */
-            $contact = array_intersect_key($contactTuple, $contactKeys);
-
-            if (!isset($contactIdList[$contact['StudentContactID']]) && '' !== trim($contact['StudentContactID'])) {
-                $contactReturn[] = $contact;
-
-                $contactIdList[$contact['StudentContactID']] = true;
-            }
+            $contact1 = array_intersect_key($contactTuple, $contactKeys);
 
             /* Convert speece into a contact format otherwise they won't appear in profile page
              * (speece must come with a contact) because speece are treated differently there
              */
             $spouse = array_intersect_key($contactTuple, $spouseKeys);
 
-            $contact = [
+            $contact2 = [
                 'StudentContactID'              => (string)$spouse['StudentContactSpouseID'],
                 'StudentContactTitle'           => $spouse['StudentContactSpouseTitle'],
                 'StudentContactPreferred'       => $spouse['StudentContactSpousePreferred'],
@@ -822,10 +816,12 @@ class External_Synergetic_User implements External_UserInterface
 
             /* If we haven't seen this contact's id before, stack 'em up
              */
-            if (!isset($contactIdList[$contact['StudentContactID']]) && '' !== trim($contact['StudentContactID'])) {
-                $contactReturn[] = $contact;
+            foreach ([$contact1, $contact2] as $contact) {
+                if (!isset($contactIdList[$contact['StudentContactID']]) && '' !== trim($contact['StudentContactID'])) {
+                    $contactReturn[] = $contact;
 
-                $contactIdList[$contact['StudentContactID']] = true;
+                    $contactIdList[$contact['StudentContactID']] = true;
+                }
             }
         }
 
