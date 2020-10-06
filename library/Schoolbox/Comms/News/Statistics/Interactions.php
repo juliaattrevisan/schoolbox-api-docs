@@ -153,7 +153,20 @@ class Interactions
          */
         $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $date, $roleType, $roleId, $referrer);
 
-        return $this->statisticsMapper->save($open->setOccursAt($date));
+        try {
+            return $this->statisticsMapper->save($open->setOccursAt($date));
+        } catch (\Throwable $e) {
+
+            /* noop
+             *
+             * A race condition occurs when multiple opens are made by the same user
+             * to the same article; in this case catch the fatal error caused by FK
+             * constraints and just carry on View logged, instead of trying to record
+             * both views SA-11038
+             */
+        }
+
+        return false;
     }
 
 
