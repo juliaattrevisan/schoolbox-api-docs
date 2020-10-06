@@ -742,17 +742,34 @@ class External_Synergetic_User implements External_UserInterface
         $contacts = $this->clearInvalidValues($statement->fetchAll());
         $contactIdList = [];
         $contactReturn = [];
-        //Dedupe contacts when mother and father are both contacts
+
+        /* In synergetic, contacts arrive with their speece in a tuple
+         *
+         * Contact Person A might have a spouse Person B,
+         * but Contact Person B might have their spouse Person A
+         *
+         * This leads to a duped set of dudes, where Person A appears twice
+         * and Person B appears twice
+         */
         foreach ($contacts as $contact) {
-            if (isset($contactIdList[$contact['StudentContactID']])) {
-                continue;
-            }
 
-            $contactReturn[] = $contact;
+            /* Get a contact tuple containing up to two people and bust it out
+             * into individual data, where applicable
+             */
 
-            if ($contact['StudentContactID']) {
-                $contactIdList[$contact['StudentContactID']] = true;
-            }
+            /* Pile each person into a stack if we've never seen their id before
+             */
+
+//
+//            if (isset($contactIdList[$contact['StudentContactID']])) {
+//                continue;
+//            }
+//
+//            $contactReturn[] = $contact;
+//
+//            if ($contact['StudentContactID']) {
+//                $contactIdList[$contact['StudentContactID']] = true;
+//            }
         }
 
         return $contactReturn;
