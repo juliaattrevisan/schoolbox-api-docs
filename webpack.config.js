@@ -17,7 +17,8 @@ module.exports = {
         eventDetails: "./library/Schoolbox/Calendar/Event/templates/vue/index.js",
         calendarComponent: "./library/Schoolbox/Calendar/vue/component.main.js",
         visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/visitation-list-full.js',
-        articleList: './library/Schoolbox/Comms/News/templates/vue/article-list.js'
+        articleList: './library/Schoolbox/Comms/News/templates/vue/article-list.js',
+        adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js'
     },
     output: {
         path: path.resolve(__dirname, "www/javascript/components"),

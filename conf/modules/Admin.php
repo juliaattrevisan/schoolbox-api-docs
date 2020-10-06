@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Damian SLoane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
@@ -92,5 +94,7 @@ class Admin implements ModuleConfigInterface
         // Restore (undelete) entities that have been recenetly deleted
         (new \Schoolbox\Admin\Restore\Module($di))->init('/adminv2/restore');
 
+        // Grades page
+        (new \Schoolbox\Admin\Grades\Module($di))->init('/adminv2/grades');
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -125,7 +126,11 @@ class LetterGrade extends AbstractMarkScheme
         $context['conf'] = [];
 
         foreach ($this->gradeGroup->getGradeLevels() as $gradeLevel) {
-            $context['conf'][$gradeLevel->getLowerBound()] = $gradeLevel->getCaption();
+            $context['conf'][] = [
+                'lowerBound' => $gradeLevel->getLowerBound(),
+                'rawGrade'   => $gradeLevel->getRawGrade(),
+                'caption'    => $gradeLevel->getCaption(),
+            ];
         }
         return $context;
     }

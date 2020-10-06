@@ -1,22 +1,22 @@
 <?php
+
 /**
- * Model for submission box grade levels.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 
+use Schoolbox\Mapper\Traits\Model\Id;
+
+/**
+ * Model for due work grade levels.
+ */
 class Model
 {
-    /**
-     * Primary key
-     *
-     * @var int
-     */
-    protected $id;
+    use Id;
 
     /**
      * Group this belongs to
@@ -27,21 +27,21 @@ class Model
 
     /**
      * Lower bound for grades.
+     *
      * If a submission return's normalized mark is >= this value, and < any
      * other mark in the same group, the return has this label.
      *
-     * @var int
+     * @var float
      */
     protected $lowerBound;
 
     /**
      * Raw grade (0-100) for this selected grade.
+     *
      * If a submission return is given this grade, it is treated as having this
      * grade for averaging purposes.
      *
-     * This, along with lower bounds
-     *
-     * @var int
+     * @var float
      */
     protected $rawGrade;
 
@@ -57,16 +57,16 @@ class Model
     /**
      * @return string
      */
-    public function getCaption()
+    public function getCaption(): string
     {
         return $this->caption;
     }
 
     /**
-     * @param  string $caption
+     * @param string $caption
      * @return $this
      */
-    public function setCaption($caption)
+    public function setCaption(string $caption): self
     {
         $this->caption = $caption;
         return $this;
@@ -75,70 +75,52 @@ class Model
     /**
      * @return Group\Model
      */
-    public function getGroup()
+    public function getGroup(): Group\Model
     {
         return $this->group;
     }
 
     /**
-     * @param  Group\Model $group
+     * @param Group\Model $group
      * @return $this
      */
-    public function setGroup($group)
+    public function setGroup(Group\Model $group): self
     {
         $this->group = $group;
         return $this;
     }
 
     /**
-     * @return int
+     * @return float
      */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param  int   $id
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLowerBound()
+    public function getLowerBound(): float
     {
         return $this->lowerBound;
     }
 
     /**
-     * @param  int   $lowerBound
+     * @param float $lowerBound
      * @return $this
      */
-    public function setLowerBound($lowerBound)
+    public function setLowerBound(float $lowerBound): self
     {
         $this->lowerBound = $lowerBound;
         return $this;
     }
 
     /**
-     * @return int
+     * @return float
      */
-    public function getRawGrade()
+    public function getRawGrade(): float
     {
         return $this->rawGrade;
     }
 
     /**
-     * @param  int   $rawGrade
+     * @param float $rawGrade
      * @return $this
      */
-    public function setRawGrade($rawGrade)
+    public function setRawGrade(float $rawGrade): self
     {
         $this->rawGrade = $rawGrade;
         return $this;

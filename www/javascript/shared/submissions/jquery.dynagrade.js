@@ -97,29 +97,26 @@
         var scaledMark = this.attr('data-scaled-mark'),
             max        = this.attr('data-max'),
             percentage = parseFloat(scaledMark / max * 100),
-            $el        = this,
-            rev        = [];
+            $el        = this;
 
         if (isNaN(percentage)) {
             percentage = 0;
         }
 
-        // iterate the config and push the data into a reversible array
-        $.each(conf, function (lowerBound, caption) {
+        // As of SA-11115 conf for letter grades is no longer key-value:
+        // it is now a list (with lowerBound and caption) and is actually in the
+        // correct order.
+        // Thus it no longer needs to be mapped to a list, and then reversed:
+        // we'll make sure it's correct though.
+        var sortedConf = Array.from(conf);
+        sortedConf.sort(function (a, b) {
+            return b.lowerBound - a.lowerBound;
+        })
 
-            // assumptions: the keys represent the lower-bound,
-            //              the values represent the caption,
-            //              jquery will have decided to iterate the keys in ASCENDING order
-            rev.push([lowerBound, caption]);
-        });
+        $.each(conf, function (k, v) {
 
-        rev.reverse();
-
-        // now we can iterate that list in reverse to map the percentage to a letter grade
-        $.each(rev, function (k, v) {
-
-            var lowerBound = Number(v[0]),
-                caption    = v[1];
+            var lowerBound = Number(v.lowerBound),
+                caption    = v.caption;
 
             // bound is too high, ignore this one
             if (percentage < lowerBound) {
