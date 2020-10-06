@@ -7,6 +7,7 @@
 namespace Schoolbox\Comms\News\Statistics;
 
 use Alaress\Database\Connector\IConnector;
+use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Statistics\Scale\Factory;
@@ -92,7 +93,7 @@ class Interactions
      * @param int                  $roleId
      * @param null|string          $referrer
      * @return bool|int[]
-     * @throws \PDOException
+     * @throws PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
@@ -122,7 +123,6 @@ class Interactions
          * We can't rely on the INSERT ON DUPLICATE idea because I also need to
          * increment cumulative total if (and only if) a unique Open was made
          */
-        /** @var News\Statistics\Model $open */
         try {
             $open = $this->statisticsMapper->findOneByColumnList([
                 'article_id' => $article->getId(),
@@ -154,7 +154,20 @@ class Interactions
          */
         $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $date, $roleType, $roleId, $referrer);
 
-        return $this->statisticsMapper->save($open->setOccursAt($date));
+        try {
+            return $this->statisticsMapper->save($open->setOccursAt($date));
+        } catch (PDOException $e) {
+
+            /* noop
+             *
+             * A race condition occurs when multiple opens are made by the same user
+             * to the same article; in this case catch the fatal error caused by FK
+             * constraints and just carry on View logged, instead of trying to record
+             * both views SA-11038
+             */
+        }
+
+        return false;
     }
 
 
