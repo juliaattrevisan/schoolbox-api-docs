@@ -7,6 +7,7 @@
 namespace Schoolbox\Comms\News\Statistics;
 
 use Alaress\Database\Connector\IConnector;
+use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Statistics\Scale\Factory;
@@ -92,7 +93,7 @@ class Interactions
      * @param int                  $roleId
      * @param null|string          $referrer
      * @return bool|int[]
-     * @throws \PDOException
+     * @throws PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
@@ -155,7 +156,7 @@ class Interactions
 
         try {
             return $this->statisticsMapper->save($open->setOccursAt($date));
-        } catch (\Throwable $e) {
+        } catch (PDOException $e) {
 
             /* noop
              *
