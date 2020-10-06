@@ -1,3 +1,9 @@
+-- Store the lower bound and raw grade old values, just in case
+ALTER TABLE submission_grade
+ADD COLUMN _lower_bound INT NOT NULL AFTER lower_bound,
+ADD COLUMN _raw_grade   INT NOT NULL AFTER raw_grade;
+UPDATE submission_grade SET _lower_bound = lower_bound, _raw_grade = raw_grade;
+
 -- The schema allows grade levels to be INT values: however they should be
 -- between 0 to 100. Clean that up here.
 UPDATE submission_grade SET lower_bound = 0   WHERE lower_bound < 0;
