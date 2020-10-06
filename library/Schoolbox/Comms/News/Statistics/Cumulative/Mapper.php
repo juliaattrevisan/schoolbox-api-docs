@@ -16,7 +16,7 @@ use Schoolbox\Comms\News\Statistics\Mapper as StatisticsMapper;
  * @package Schoolbox\Comms\News\Statistics
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
- * @method Collection|Model[] findByColumn($identifierValue)
+ * @method Collection|Model[] findByColumn($columnName, $columnValue, $options = array())
  */
 class Mapper extends \Schoolbox\Mapper
 {

@@ -122,7 +122,6 @@ class Interactions
          * We can't rely on the INSERT ON DUPLICATE idea because I also need to
          * increment cumulative total if (and only if) a unique Open was made
          */
-        /** @var News\Statistics\Model $open */
         try {
             $open = $this->statisticsMapper->findOneByColumnList([
                 'article_id' => $article->getId(),
