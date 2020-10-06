@@ -100,13 +100,15 @@
             <table>
                 <tbody>
                     {% for gradeLevel in gradeLevelsReversed %}
+
+
                         <tr>
                             <td>
                                 {{ gradeLevel.lowerBound }}{% spaceless %}
                                 {% if loop.index0 == 0 and gradeLevel.lowerBound != 100 %}
                                     +
-                                {% elseif gradeLevelsReversed[loop.index0 - 1].lowerBound - 1 > gradeLevel.lowerBound %}
-                                    -{{ gradeLevelsReversed[loop.index0 - 1].lowerBound - 1 }}
+                                {% elseif gradeLevelsReversed[loop.index0 - 1].lowerBound - 0.01 > gradeLevel.lowerBound %}
+                                    -{{ gradeLevelsReversed[loop.index0 - 1].lowerBound - 0.01 }}
                                 {% endif %}
                             {% endspaceless %}</td>
                             <td>{{ gradeLevel.caption }}</td>
