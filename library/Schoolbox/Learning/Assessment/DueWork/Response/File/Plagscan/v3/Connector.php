@@ -128,6 +128,16 @@ class Connector
             throw new \DomainException('File is too large');
         }
 
+        /* The actual file has to exist
+         *
+         * It might not exist if you're trying to submit stuff to plagscan, but you did a live-dev sync
+         * for database only. You'll have the records for the files, but not the data itself, in which
+         * case you have no hope of succeeding
+         */
+        if (!$submissionFile->exists()) {
+            throw new \DomainException('Error: File does not exist in storage.');
+        }
+
         $filename = $this->makeFileName($submissionFile, $filename);
 
         $postData = [
