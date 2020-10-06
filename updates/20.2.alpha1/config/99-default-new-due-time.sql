@@ -4,7 +4,7 @@ VALUES (
   null,
   'Default Time Activities are Due',
   'Set the time using a 24 hour format (hh:mm).',
-  (SELECT id FROM lu_config_field WHERE field = 'input'),
+  (SELECT id FROM lu_config_field WHERE field = 'timepicker'),
   '',
   (SELECT id FROM lu_config_type WHERE `type` = 'LMS Policy'),
   'true',
