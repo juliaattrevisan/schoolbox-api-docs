@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
+use Schoolbox\Assessment\Course\Import\DataTransferObject;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Collection;
@@ -432,8 +433,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         if (!$assessment->getId()) {
             // new assessment: set default values
+            $due = DataTransferObject::getDefaultDueDate(
+                new Alaress_Date_Format(new \DateTime("+1 day")),
+                $this->getConfigLoader()->get('lms_duetime_default')
+            );
             $assessment
-                ->setDueAt(new Alaress_Date_Format(new \DateTime('+1 day 23:59:59')))
+                ->setDueAt($due)
                 ->setCloseAt(new Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))
                 ->setWeight(0);
 

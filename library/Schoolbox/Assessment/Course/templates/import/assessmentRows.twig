@@ -157,7 +157,7 @@
                     {#due date is always relevant#}
                     {% include '@course/import/date.twig' with {
                         assessmentDate: assessment.dueAt,
-                        unitDate: unitImpl.dueDate.endOfDay,
+                        unitDate: defaultDueDate,
                         endOfDay: true,
                         inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
                         dateProperty: 'due',
@@ -197,7 +197,8 @@
                         hideRows:        not isChecked,
                         unitSpec:        unitSpec,
                         unitImpl:        unitImpl,
-                        canReadUnitSpec: canReadUnitSpec
+                        canReadUnitSpec: canReadUnitSpec,
+                        defaultDueDate:  defaultDueDate
                     } only %}
                 {% endif %}
             </li>
