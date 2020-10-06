@@ -819,7 +819,7 @@ class Controller extends Base
 
 
         $return['evidence-tag'] = [
-            'title'             => 'Learning Moment',
+            'title'             => 'Learning Moments',
             'mapper'            => LearningMomentEvidenceTag::class,
             'delete'            => true,
             'fields'            => [
