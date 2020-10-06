@@ -52,9 +52,11 @@ class Model
     }
 
     /**
-     * @return GradeLevelModel[]|Collection
+     * This may return null as gradeLevels may not have been initialized yet
+     *
+     * @return GradeLevelModel[]|Collection|null
      */
-    public function getGradeLevels(): Collection
+    public function getGradeLevels(): ?Collection
     {
         return $this->gradeLevels;
     }
