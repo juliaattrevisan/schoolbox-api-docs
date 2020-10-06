@@ -27,8 +27,9 @@ try {
         $basename = $resource->getBasename();
         $fileSystem = $resource->getFilesystem();
         $cacheControl = ($_GET['cache'] ?? '0') ? 'private' : 'no-store';
+        $bypassPresignedUrls = $resource->getMimetype()->getMime() === 'text/html' && !$attachmentType;
 
-        if ($fileSystem instanceof Flysystem\Filesystem && $fileSystem->getAdapter() instanceof Flysystem\AwsS3v3\AwsS3Adapter) {
+        if (!$bypassPresignedUrls && $fileSystem instanceof Flysystem\Filesystem && $fileSystem->getAdapter() instanceof Flysystem\AwsS3v3\AwsS3Adapter) {
             /** @var IConfigLoader $config */
             $config = $kernel->get('config');
 

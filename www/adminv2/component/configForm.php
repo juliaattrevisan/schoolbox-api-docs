@@ -87,9 +87,11 @@ if ($_POST['type'] == 'components') {
 } elseif (is_numeric($_POST['cid']) && (is_numeric($_POST['add']) || is_numeric($_POST['reload']))) {
     // POST new component to page and output render of component
     if (is_numeric($_POST['add'])) {
+        $componentDefinitionId = (int)$_POST['add'];
+
         $newComp = new Component_Instance();
         $newComp
-            ->setDefinitionId($_POST['add'])
+            ->setDefinitionId($componentDefinitionId)
             ->setIdentifier($_POST['cid'])
             ->setModule($_POST['context'])
             ->setSequence(0)
@@ -98,6 +100,7 @@ if ($_POST['type'] == 'components') {
         $ids        = $componentInstanceMapper->save($newComp);
         $instanceID = $ids[0];
 
+        $componentConfigInstanceMapper->injectDefaultConfigCollection($instanceID, $componentDefinitionId);
         $componentInstanceMapper->cascadeSequence($_POST['cid']);
     } else {
         $instanceID = $_POST['reload'];
