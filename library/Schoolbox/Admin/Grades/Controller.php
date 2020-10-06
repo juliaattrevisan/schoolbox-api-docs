@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -51,7 +52,8 @@ class Controller extends Base
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@adminGrades/index.twig', [
+                '@adminGrades/index.twig',
+                [
                     'pageCurrent' => self::PAGE_CURRENT,
                     'gradeGroups' => $this->retrieveAllGradeGroups(),
                 ]
