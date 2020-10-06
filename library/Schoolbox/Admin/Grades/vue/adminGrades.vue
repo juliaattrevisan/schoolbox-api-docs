@@ -159,7 +159,7 @@ export default {
                                type="number"
                                min="0"
                                max="100"
-                               step="0.5"
+                               step="0.01"
                                required
                                :disabled="saveInProgress"
                                v-model="level.lowerBound"
@@ -171,7 +171,7 @@ export default {
                                type="number"
                                min="0"
                                max="100"
-                               step="0.5"
+                               step="0.01"
                                required
                                :disabled="saveInProgress"
                                v-model="level.rawGrade"
