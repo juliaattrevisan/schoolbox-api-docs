@@ -1591,7 +1591,7 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
 
 		-
-			message: "#^Cannot call method offsetExists\\(\\) on array\\<Schoolbox\\\\Assessment\\\\Course\\\\Import\\\\AssessmentPair\\>\\.$#"
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getAssessables\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
 
