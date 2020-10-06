@@ -25,6 +25,9 @@ export default {
         config: () => window.adminGradesConfig,
     },
     methods: {
+        /**
+         * Add a new group to the list of grade groups.
+         */
         addGroup() {
             this.gradeGroups.push({
                 id: null,
@@ -33,10 +36,22 @@ export default {
             });
             this.applyValidator();
         },
+
+        /**
+         * Remove a given grade group from the list of grade groups.
+         *
+         * @param {Number} groupIndex The index of the group to remove
+         */
         removeGroup(groupIndex) {
             this.gradeGroups = this.gradeGroups.filter((g, i) => i !== groupIndex);
             this.applyValidator();
         },
+
+        /**
+         * Add a new level to a given grade group.
+         *
+         * @param {Number} groupIndex The index of the group to add to
+         */
         addLevel(groupIndex) {
             this.gradeGroups[groupIndex].levels.push({
                 id: null,
@@ -46,27 +61,47 @@ export default {
             });
             this.applyValidator();
         },
+
+        /**
+         * Remove a given level from a given grade group.
+         *
+         * @param {Number} groupIndex The index of the group to remove from
+         * @param {Number} levelIndex The index of the level to remove
+         */
         removeLevel(groupIndex, levelIndex) {
             this.gradeGroups[groupIndex].levels = this.gradeGroups[groupIndex].levels.filter((g, i) => i !== levelIndex);
             this.applyValidator();
         },
+
+        /**
+         * Apply the jQuery validator to the form inputs.
+         *
+         * This should be called every time the list of grade groups or levels
+         * changes, as jQuery validator is too old to know what's going on
+         * if it isn't told..
+         */
         applyValidator() {
+            // Is there one already? Destroy if so
             if (this?.validator?.destroy) {
                 this.validator.destroy();
             }
             this.validator = this.jQuery(this.$refs.form).alaressValidate({
                 submitHandler(form, event) {
+                    // Don't do anything in the submit handler:
+                    // allow Vue to handle saving.
                     event.preventDefault();
                 }
             });
         },
+
+        /**
+         * Persist the grades in the form, only if their values are valid.
+         */
         persist() {
-            // Post the grades
             if (!this.validator.form()) {
                 return;
             }
 
-            // Try to summon a toast as well
             this.saveInProgress = true;
             this.$refs.toast.activate('Saving...');
             axios
