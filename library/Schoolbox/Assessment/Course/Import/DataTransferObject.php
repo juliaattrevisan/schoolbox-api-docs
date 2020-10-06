@@ -340,7 +340,10 @@ class DataTransferObject
 
                 $spec->setPublishAt($start);
                 $spec->setOpenAt($start);
-                $spec->setDueAt(self::getDefaultDueDate($end, $this->defaultDueTime));
+                // generate default due date from unit close date
+                $due = clone $end;
+                $due->endOfDay();
+                $spec->setDueAt($due->setTimeFromString($this->defaultDueTime));
                 $spec->setCloseAt($end);
 
             } // Else this is an import-modify.
@@ -365,12 +368,18 @@ class DataTransferObject
                 if ($context instanceof UnitImplementation) {
                     $spec->setPublishAt($context->getOpenDate());
                     $spec->setOpenAt($context->getOpenDate());
-                    $spec->setDueAt(self::getDefaultDueDate($context->getDueDate(), $this->defaultDueTime));
+                    // generate default due date from context due date
+                    $due = clone $context->getDueDate();
+                    $due->endOfDay();
+                    $spec->setDueAt($due->setTimeFromString($this->defaultDueTime));
                     $spec->setCloseAt($context->getDueDate());
                 } elseif ($context instanceof Project) {
                     $spec->setPublishAt($context->getPublishAt());
                     $spec->setOpenAt($context->getOpenAt());
-                    $spec->setDueAt(self::getDefaultDueDate($context->getDueAt(), $this->defaultDueTime));
+                    // generate default due date from context due date
+                    $due = clone $context->getDueAt();
+                    $due->endOfDay();
+                    $spec->setDueAt($due->setTimeFromString($this->defaultDueTime));
                     $spec->setCloseAt($context->getCloseAt());
                 } else {
                     throw new \DomainException('Unknown assessment context: ' . get_class($context));
@@ -394,27 +403,6 @@ class DataTransferObject
         }
     }
 
-    /**
-     * Gets due date with default due time
-     * @param Alaress_Date_Format $date
-     * @param string|null         $defaultDueTime Adjust due date time to this, if set in H:i format
-     * @return Alaress_Date_Format
-     */
-    static public function getDefaultDueDate(Alaress_Date_Format $date, ?string $defaultDueTime): Alaress_Date_Format
-    {
-        $dueDate = clone $date;
-
-        if (!$defaultDueTime) {
-            return $dueDate->endOfDay();
-        }
-        try {
-            return new Alaress_Date_Format("{$dueDate->getDatabaseDate()} {$defaultDueTime}",
-                Alaress_Date_Format::DATABASE_DATE_FORMAT . ' H:i');
-        } catch (\Exception $e) {
-            // noop
-        }
-        return $dueDate->endOfDay();
-    }
 
     /**
      * Recursively examine a Project spec.

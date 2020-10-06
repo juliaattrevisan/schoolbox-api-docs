@@ -1977,4 +1977,25 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         ];
     }
 
+    /**
+     * Attempts to change time to the specified time (expecting H:i format)
+     * @param string|null $timeString
+     * @return $this
+     */
+    public function setTimeFromString(?string $timeString): self
+    {
+        if (empty($timeString)) {
+            return $this;
+        }
+        [$hour, $minute] = explode(':', $timeString);
+        if (!is_numeric($hour) || !is_numeric($minute)) {
+            return $this;
+        }
+        try {
+            $this->getDateTimeObject()->setTime((int)$hour, (int)$minute);
+        } catch (\Exception $e) {
+            // noop
+        }
+        return $this;
+    }
 }

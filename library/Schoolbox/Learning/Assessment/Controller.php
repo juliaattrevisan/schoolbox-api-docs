@@ -433,10 +433,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         if (!$assessment->getId()) {
             // new assessment: set default values
-            $due = DataTransferObject::getDefaultDueDate(
-                new Alaress_Date_Format(new \DateTime("+1 day")),
-                $this->getConfigLoader()->get('lms_duetime_default')
-            );
+            $due = new Alaress_Date_Format(new \DateTime("+1 day"));
+            $due->endOfDay();
+            $due->setTimeFromString($this->getConfigLoader()->get('lms_duetime_default'));
             $assessment
                 ->setDueAt($due)
                 ->setCloseAt(new Alaress_Date_Format(new \DateTime('+2 day 23:59:59')))

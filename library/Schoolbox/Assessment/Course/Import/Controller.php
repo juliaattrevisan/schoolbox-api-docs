@@ -349,7 +349,9 @@ class Controller extends Base\Base
 
                     $openDate  = \Alaress_Date_Format::newLocalShort($unit['open_date']);
                     $closeDate = \Alaress_Date_Format::newLocalShort($unit['close_date']);
-                    $unitDefaultDueDates->offsetSet($unitSpecId, DataTransferObject::getDefaultDueDate($closeDate, $defaultDueTime));
+                    $dueDate = clone $closeDate;
+                    $dueDate->endOfDay();
+                    $unitDefaultDueDates->offsetSet($unitSpecId, $dueDate->setTimeFromString($defaultDueTime));
                     if ($openDate->gt($closeDate)) {
                         $this->sendError('The open date must be before the close date');
                         return;
