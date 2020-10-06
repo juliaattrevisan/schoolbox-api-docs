@@ -116,6 +116,15 @@ class Controller extends Base
      */
     private function retrieveAllGradeGroups(): Collection
     {
-        return $this->gradeLevelGroupMapper->findAll()->map(new Translator\GradeGroup());
+        // Workaround for cache of both grade level group and grade level
+        $gradeLevelGroups = $this->gradeLevelGroupMapper->findAll(['cache' => false]);
+        foreach ($gradeLevelGroups as $gradeLevelGroup) {
+            $gradeLevelGroup->setGradeLevels(
+                $this->gradeLevelMapper
+                    ->findByColumn('submission_grade_group_id', $gradeLevelGroup->getId(), ['cache' => false])
+                    ->sortBy('lowerBound', 'asc')
+            );
+        }
+        return $gradeLevelGroups->map(new Translator\GradeGroup());
     }
 }
