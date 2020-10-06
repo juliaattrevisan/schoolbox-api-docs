@@ -404,3 +404,8 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-group;
   color: $icon-color-group;
 }
+
+.icon-masonry-Schoolbox_Learning_Moment_StudentToolkit_Component_Dashboard_Controller:before {
+  @extend .icon-favourite;
+  color: $icon-color-student-toolkit;
+}

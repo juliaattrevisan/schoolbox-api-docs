@@ -1,0 +1,42 @@
+<?php
+/**
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Learning\Moment\StudentToolkit\Component\Dashboard;
+
+use Component_Dashboard_ControllerAbstract;
+
+/**
+ * Student Toolkit dashboard component
+ */
+class Controller extends Component_Dashboard_ControllerAbstract
+{
+
+    /**
+     * @inheritDoc
+     */
+    public function execute(): bool
+    {
+        return true;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function renderTemplate($templateHandle): bool
+    {
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            '@learningMomentStudentToolkit/component.twig',
+            [
+                'user'      => $this->getUser(),
+                'component' => $this,
+            ]
+        );
+    }
+}
