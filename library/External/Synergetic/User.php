@@ -743,13 +743,8 @@ class External_Synergetic_User implements External_UserInterface
         $contactIdList = [];
         $contactReturn = [];
 
-        /* In synergetic, contacts arrive with their speece in a tuple
-         *
-         * Contact Person A might have a spouse Person B,
-         * but Contact Person B might have their spouse Person A
-         *
-         * This leads to a duped set of dudes, where Person A appears twice
-         * and Person B appears twice
+        /* Get a contact tuple containing up to two people and bust it out
+         * into individual data, where applicable
          */
         $contactKeys = [
             'StudentContactID' => '',
@@ -783,25 +778,55 @@ class External_Synergetic_User implements External_UserInterface
              */
         ];
 
+        /* In synergetic, contacts arrive with their speece in a tuple
+         *
+         * Contact Person A might have a spouse Person B,
+         * but Contact Person B might have their spouse Person A,
+         * and both sets are linked to a student
+         *
+         * This leads to a duped set of dudes, where Person A appears twice
+         * and Person B appears twice
+         */
         foreach ($contacts as $contactTuple) {
 
-            /* Get a contact tuple containing up to two people and bust it out
-             * into individual data, where applicable
+            /* If we haven't seen this contact's id before, stack 'em up
              */
+            $contact = array_intersect_key($contactTuple, $contactKeys);
 
-            /* Pile each person into a stack if we've never seen their id before
+            if (!isset($contactIdList[$contact['StudentContactID']]) && '' !== trim($contact['StudentContactID'])) {
+                $contactReturn[] = $contact;
+
+                $contactIdList[$contact['StudentContactID']] = true;
+            }
+
+            /* Convert speece into a contact format otherwise they won't appear in profile page
+             * (speece must come with a contact) because speece are treated differently there
              */
+            $spouse = array_intersect_key($contactTuple, $spouseKeys);
 
-//
-//            if (isset($contactIdList[$contact['StudentContactID']])) {
-//                continue;
-//            }
-//
-//            $contactReturn[] = $contact;
-//
-//            if ($contact['StudentContactID']) {
-//                $contactIdList[$contact['StudentContactID']] = true;
-//            }
+            $contact = [
+                'StudentContactID'              => (string)$spouse['StudentContactSpouseID'],
+                'StudentContactTitle'           => $spouse['StudentContactSpouseTitle'],
+                'StudentContactPreferred'       => $spouse['StudentContactSpousePreferred'],
+                'StudentContactSurname'         => $spouse['StudentContactSpouseSurname'],
+                'StudentContactDefaultEmail'    => $spouse['StudentContactSpouseDefaultEmail'],
+                'StudentContactPhoneActual'     => '',
+                'StudentContactSilentPhoneFlag' => '',
+                'StudentContactMobilePhone'     => $spouse['StudentContactSpouseMobilePhone'],
+                'StudentContactOccupPhone'      => $spouse['StudentContactSpouseOccupPhone'],
+                'StudentContactRelation'        => $spouse['StudentContactSpouseRelation'],
+                'StudentContactPrimaryOnlyFlag' => '',
+                'StudentContactType'            => '',
+                'StudentContactUseEmail'        => $spouse['StudentContactSpouseUseEmail'],
+            ];
+
+            /* If we haven't seen this contact's id before, stack 'em up
+             */
+            if (!isset($contactIdList[$contact['StudentContactID']]) && '' !== trim($contact['StudentContactID'])) {
+                $contactReturn[] = $contact;
+
+                $contactIdList[$contact['StudentContactID']] = true;
+            }
         }
 
         return $contactReturn;
