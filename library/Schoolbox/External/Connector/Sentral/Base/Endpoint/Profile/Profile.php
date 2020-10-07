@@ -487,9 +487,16 @@ class Profile implements IStrategy
     public function findEmergencyContacts(array $student): ?array
     {
 
-        /* FIXME There's a sideload for emergencyContactLinks via Get Student Person
+        /* There's a sideload for emergencyContactLinks via Get Student Person
          *  ...but it doesn't give you any at all, it seems broken.
          *  http://development.sentral.com.au/#operation/getStudentPerson
+         *
+         * The way it's implemented down here is the way it's supposed to be implemented
+         * EmergencyContactLinks isn't really a thing, it seems to be part of some other
+         * broken system they've tapped into. Presumably it just gave me all the contacts
+         * whose isEmergencyContact flag was set to 1, but it might not even do that.
+         *
+         * Anyway, I already can get this data, I don't need a special way
          */
 
         $contacts = $student['relationships']['contacts']['data'];
