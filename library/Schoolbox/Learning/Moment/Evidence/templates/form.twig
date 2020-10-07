@@ -5,24 +5,38 @@
 
 <div class="small-12 column">
     <h1>Share a Learning Moment</h1>
+    {##
+     # How does the "sharing on behalf of" metadata show?
+     # That depends on who the learning moment is being created for:
+     # * Only for myself: don't show at all
+     # * Only for others: "sharing on behalf of ..."
+     # * For both myself and others: "Sharing for myself, and also on behalf of ..."
+     # * For neither myself nor others: how did you even get here?
+     #}
+    {% if otherUsers is not empty %}
     <ul class="meta">
         <li>
             {# Display differently if showing to other users #}
-            Sharing on behalf of
+            {% if sharingForSelf %}
+                Sharing for myself, and also on behalf of
+            {% else %}
+                Sharing on behalf of
+            {% endif %}
 
             {##
-             # Presentation depends on how many students are being shared with.
+             # Presentation depends on how many others are being shared with.
              # 1-3: just show their names
              # 4+:  show the names of the first 3, and then "and x others"
              #}
-            {% set userHead = users[0:3] %}
-            {% set userTail = users[3:] %}
+            {% set userHead       = otherUsers[0:3] %}
+            {% set userTail       = otherUsers[3:] %}
+            {% set userTailLength = userTail|length %}
 
-            {% if userTail|length %}
+            {% if userTailLength %}
                 {%- for user in userHead -%}
                     {% if not loop.first %}, {% endif %}<a href="/search/user/{{ user.id }}">{{ user.fullName }}</a>
                 {%- endfor %}
-                and <a href="#" data-reveal-id="all-users">{{ userTail|length }} more</a>
+                and <a href="#" data-reveal-id="all-users">{{ userTailLength }} others</a>
 
                 <div data-reveal id="all-users" class="reveal-modal">
                     <h2>Sharing on behalf of {{ users|length }} users</h2>
@@ -42,11 +56,12 @@
                 </div>
             {% else %}
                 {%- for user in userHead -%}
-                    {% if not loop.first %}{{ loop.last ? 'and' : ',' }} {% endif %}<a href="/search/user/{{ user.id }}">{{ user.fullName }}</a>
+                    {% if not loop.first %}{{ loop.last ? ' and' : ',' }} {% endif %}<a href="/search/user/{{ user.id }}">{{ user.fullName }}</a>
                 {%- endfor -%}
             {% endif %}
         </li>
     </ul>
+    {% endif %}
 </div>
 
 

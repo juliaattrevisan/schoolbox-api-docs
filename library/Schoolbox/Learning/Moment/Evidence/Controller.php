@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment\Evidence;
 
 use Alaress\Web\Controller\Base;
-use ICollection;
+use Schoolbox\Collection;
 use Schoolbox\User;
 
 /**
@@ -40,15 +40,29 @@ class Controller extends Base
      * @api   GET /learning/evidence/user/{userIds}/create
      * @since 20.2
      *
-     * @param ICollection $users
+     * @param Collection|User[] $users
      */
-    public function getCreateForm(ICollection $users): void
+    public function getCreateForm(Collection $users): void
     {
+        // For ease of rendering: filter out users which are not myself
+        $sharingForSelf = false;
+        $otherUsers = $users->emptyClone();
+        $thisUserId = $this->getUser()->getId();
+        foreach ($users as $user) {
+            if ($user->getId() === $thisUserId) {
+                $sharingForSelf = true;
+            } else {
+                $otherUsers->add($user);
+            }
+        }
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningMomentEvidence/form.twig',
                 [
-                    'users' => $users,
+                    'users'          => $users,
+                    'otherUsers'     => $otherUsers,
+                    'sharingForSelf' => $sharingForSelf,
                 ]
             )
         );
