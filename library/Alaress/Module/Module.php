@@ -24,7 +24,15 @@ use Twig\Loader\FilesystemLoader;
 use Twig\Error\LoaderError;
 use function array_merge;
 
-class Module {
+class Module
+{
+    // HTTP methods
+    public const METHOD_GET = 'GET';
+    public const METHOD_POST = 'POST';
+    public const METHOD_PUT = 'PUT';
+    public const METHOD_PATCH = 'PATCH';
+    public const METHOD_DELETE = 'DELETE';
+
 
     /** @var RouteParser */
     private static $routeParser;
