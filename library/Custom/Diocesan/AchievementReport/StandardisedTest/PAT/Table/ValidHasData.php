@@ -30,6 +30,14 @@ class ValidHasData
      */
     public function isSatisfiedBy(?YearLevel\Model $yearLevel, bool $hasData): bool
     {
-        return $yearLevel && \in_array((int)$yearLevel->getName(), [7,8,9,10], true) && $hasData;
+        if ($hasData) {
+            return true;
+        }
+
+        if ($yearLevel && \in_array((int)$yearLevel->getName(), [7,8,9,10], true)) {
+            return true;
+        }
+
+        return false;
     }
 }
