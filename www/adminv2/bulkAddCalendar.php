@@ -17,6 +17,13 @@ $nav->parse($this, 'calendar');
  */
 if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name'] && (isset($_POST['userGroup']) && isset($_POST['campusList']))) {
 
+    /* Must have a .csv extension
+     */
+    if ('csv' !== pathinfo($_FILES['bulkadd']['name'], PATHINFO_EXTENSION)) {
+        error(2);
+        exit;
+    }
+
     if (isset($_POST['userid'])) {
         $ownerId = $_POST['userid'];
     } else {
