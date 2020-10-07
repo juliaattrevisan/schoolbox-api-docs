@@ -30,75 +30,83 @@ if ($groupHandler->getPermission($_POST['homepageId']) < UserAccess::ACCESS_WRIT
     try {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($_POST['homepageId']);
-
-        /* A file is mandatory
-         */
-        if (isset($_POST['attachment']) && null !== $_POST['attachment']) {
-            $factory = new CollectorFactory();
-
-            try {
-                /** @var Storage\Model $result */
-                $result = $factory->build($_POST['attachment'])->getFirst();
-            } catch (\Schoolbox\Resource\Exception $e) {
-                error(2);
-                exit;
-            }
-
-            // Ensure the file is available locally
-            $file = sb_tempnam('cal');
-            $fp   = fopen($file, 'wb');
-            stream_copy_to_stream($result->readStream(), $fp);
-            fclose($fp);
-
-            $factory = new \Calendar\Import\Factory($user, $author, $categoryList, $groupList, $campusList, \Schoolbox\Calendar\Event::ACCESS_GROUP, $file);
-            $strategy = $factory->build();
-            $strategy->load();
-
-            $allEvents = $strategy->getOutput();
-
-            $this->setFile(TEMPLATE_content, 'calendar/importForm.html');
-            $this->setBlock(TEMPLATE_content, 'event', 'event_block');
-
-            if ($allEvents && count($allEvents)) {
-                foreach ($allEvents as $currentEvent) {
-                    $this->setVar(
-                        array(
-                            'EVENT_NAME' => $currentEvent['name'],
-                            'EVENT_STATUS' => $currentEvent['status'],
-                            'EVENT_ERROR' => $currentEvent['error'],
-                        )
-                    );
-
-                    $this->parse('event_block', 'event', true);
-                }
-            } else {
-                $this->setVar('event_block', '');
-            }
-
-            $trail = new Breadcrumbs();
-            $trail->renderIntoSitePage($this, 'BREADCRUMB', [
-                [
-                    'text' => $folder->getName(),
-                    'href' => "/homepage/{$folder->getId()}",
-                    'class' => '',
-                ],
-                [
-                    'text' => 'Import Calendar',
-                    'href' => '',
-                    'class' => 'active',
-                ]
-            ]);
-
-            $this->setVar(
-                array(
-                    'HOMEPAGE_ID' => $folder->getId(),
-                    'HOMEPAGE_NAME' => $folder->getName()
-                )
-            );
-        } else {
-            error(2);
-        }
-    } catch (\Exception $e) {
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        echo $e->getMessage();
         error(13);
+    }
+
+    /* A file is mandatory
+     */
+    if (isset($_POST['attachment']) && null !== $_POST['attachment']) {
+        $factory = new CollectorFactory();
+
+        try {
+            /** @var Storage\Model $result */
+            $result = $factory->build($_POST['attachment'])->getFirst();
+        } catch (\Schoolbox\Resource\Exception $e) {
+            error(2);
+            exit;
+        }
+
+        /* Must have a .csv extension
+         */
+        if ('csv' !== $result->getExtension()) {
+            error(2);
+            exit;
+        }
+
+        // Ensure the file is available locally
+        $file = sb_tempnam('cal');
+        $fp   = fopen($file, 'wb');
+        stream_copy_to_stream($result->readStream(), $fp);
+        fclose($fp);
+
+        $factory = new \Calendar\Import\Factory($user, $author, $categoryList, $groupList, $campusList, \Schoolbox\Calendar\Event::ACCESS_GROUP, $file);
+        $strategy = $factory->build();
+        $strategy->load();
+
+        $allEvents = $strategy->getOutput();
+
+        $this->setFile(TEMPLATE_content, 'calendar/importForm.html');
+        $this->setBlock(TEMPLATE_content, 'event', 'event_block');
+
+        if ($allEvents && count($allEvents)) {
+            foreach ($allEvents as $currentEvent) {
+                $this->setVar(
+                    array(
+                        'EVENT_NAME' => $currentEvent['name'],
+                        'EVENT_STATUS' => $currentEvent['status'],
+                        'EVENT_ERROR' => $currentEvent['error'],
+                    )
+                );
+
+                $this->parse('event_block', 'event', true);
+            }
+        } else {
+            $this->setVar('event_block', '');
+        }
+
+        $trail = new Breadcrumbs();
+        $trail->renderIntoSitePage($this, 'BREADCRUMB', [
+            [
+                'text' => $folder->getName(),
+                'href' => "/homepage/{$folder->getId()}",
+                'class' => '',
+            ],
+            [
+                'text' => 'Import Calendar',
+                'href' => '',
+                'class' => 'active',
+            ]
+        ]);
+
+        $this->setVar(
+            array(
+                'HOMEPAGE_ID' => $folder->getId(),
+                'HOMEPAGE_NAME' => $folder->getName()
+            )
+        );
+    } else {
+        error(2);
     }
 }
