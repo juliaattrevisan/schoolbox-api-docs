@@ -84,7 +84,15 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+        $injector->set(
+            'controller:' . $this->basename,
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'mapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+                ]
+            )
+        );
     }
 
 
@@ -107,9 +115,11 @@ class Module extends BaseModule
      */
     private function preloadUser(array $params): array
     {
-        return ['users' => $this->getMapperFactory()
-                                ->get(UserMapper::class)
-                                ->findById($params['userId']),];
+        return [
+            'user' => $this->getMapperFactory()
+                           ->get(UserMapper::class)
+                           ->findById($params['userId']),
+        ];
     }
 
 

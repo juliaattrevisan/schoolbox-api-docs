@@ -15,6 +15,8 @@ use Schoolbox\UserMapper;
 
 /**
  * Mapper for learning moment evidence.
+ *
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {

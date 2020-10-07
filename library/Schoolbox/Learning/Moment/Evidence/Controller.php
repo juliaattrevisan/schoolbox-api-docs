@@ -18,6 +18,23 @@ use Schoolbox\User;
 class Controller extends Base
 {
     /**
+     * @var Mapper
+     */
+    private Mapper $mapper;
+
+
+    /**
+     * Constructor
+     *
+     * @param Mapper $mapper
+     */
+    public function __construct(Mapper $mapper)
+    {
+        $this->mapper = $mapper;
+    }
+
+
+    /**
      * Render a create form for a learning moment.
      *
      * @api   GET /learning/evidence/user/{userIds}/create
@@ -76,9 +93,23 @@ class Controller extends Base
      *
      * @api   POST /learning/evidence/user/{userId}
      * @since 20.2
+     *
+     * @param User $user
      */
     public function postMomentForUser(User $user): void
     {
+        $model = $this->mapper->createModel();
+        /** @var \stdClass $requestBody */
+        $requestBody = $this->request->content->get();
+        $model
+            ->setBody($requestBody->body)
+            ->setRecipient($user)
+            ->setCreator($this->getUser());
+        $this->mapper->save($model);
+        $requestBody->id = $model->getId();
+        $this->response->content->set(
+            $this->buildJsonOutput($requestBody)
+        );
     }
 
 

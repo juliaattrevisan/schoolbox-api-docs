@@ -30,7 +30,7 @@ class Model implements ISoftDeletable
      *
      * @var IStorage|null
      */
-    private ?IStorage $storage;
+    private ?IStorage $storage = null;
 
 
     /**
@@ -38,7 +38,7 @@ class Model implements ISoftDeletable
      *
      * @var string|null
      */
-    private ?string $filename;
+    private ?string $filename = null;
 
 
     /**
@@ -46,7 +46,7 @@ class Model implements ISoftDeletable
      *
      * @var string|null
      */
-    private ?string $body;
+    private ?string $body = null;
 
 
     /**
@@ -54,7 +54,7 @@ class Model implements ISoftDeletable
      *
      * @var ThreadModel|null
      */
-    private ?ThreadModel $discussionThread;
+    private ?ThreadModel $discussionThread = null;
 
 
     /**
@@ -134,19 +134,19 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return ThreadModel
+     * @return ThreadModel|null
      */
-    public function getDiscussionThread(): ThreadModel
+    public function getDiscussionThread(): ?ThreadModel
     {
         return $this->discussionThread;
     }
 
 
     /**
-     * @param ThreadModel $discussionThread
+     * @param ThreadModel|null $discussionThread
      * @return static
      */
-    public function setDiscussionThread(ThreadModel $discussionThread): self
+    public function setDiscussionThread(?ThreadModel $discussionThread): self
     {
         $this->discussionThread = $discussionThread;
         return $this;
