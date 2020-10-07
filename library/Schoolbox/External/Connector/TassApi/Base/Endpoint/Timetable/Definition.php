@@ -354,7 +354,7 @@ class Definition implements IStrategy
          * Each day has its own set of Period Names but we don't support that, so just
          * get the longest day's Period setup and apply that scheme universally
          */
-        $longestDay = $this->cycleRegistry->recall($ttid)['cycleLength'] ?? [];
+        $longestDay = $this->cycleRegistry->recall($ttid)['periods'] ?? [];
 
         foreach ($timetable['STRDAYS'] as $day => $periods) {
             if (\count($periods['PERIODS']) >= \count($longestDay)) {
@@ -363,15 +363,13 @@ class Definition implements IStrategy
                  * Rename periods, because their names can vary between students
                  * and timetables; so give them something predictable
                  */
-                $temp = [];
+                $longestDay = [];
 
                 foreach ($periods['PERIODS'] as $i => $period) {
                     $period['PRD_DESC'] = 'Period ' . $i;
 
-                    $temp[] = $period;
+                    $longestDay[] = $period;
                 }
-
-                $longestDay = $temp;
             }
         }
 
