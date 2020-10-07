@@ -247,7 +247,10 @@ function import_dataset(){
 }
 
 
-# Localise the database config table
+# Localise the database config table.
+# This needs to run:
+# 1. After initial data import to ensure update scripts can function in this environment
+# 2. After update scripts have finished to populate any new config that did not exist in an old dataset
 function localise_database_config(){
   for key in "${!config[@]}"; do
     if ! mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "UPDATE config SET value='${config[$key]}' WHERE name='$key'"; then
@@ -361,6 +364,7 @@ function main(){
   localise_database_config
   update_su_password
   upgrade_sql
+  localise_database_config
 
   # Ensure data dirs exists with correct perms and ownership
   create_data_dirs
