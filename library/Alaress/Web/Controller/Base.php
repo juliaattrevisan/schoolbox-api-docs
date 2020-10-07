@@ -347,6 +347,8 @@ abstract class Base {
      *
      * @param  mixed $data
      * @return Output\Json
+     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
+     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
      */
     protected function buildJsonOutput($data)
     {
@@ -361,6 +363,8 @@ abstract class Base {
      * @param  string $template A Twig template
      * @param  mixed  $data
      * @return Output\Html
+     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
+     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
      */
     protected function buildUnthemedHtmlOutput($template, $data)
     {
@@ -376,7 +380,8 @@ abstract class Base {
      * @param string $template
      * @param string|array $data
      * @return mixed
-     * @throws ServiceNotFound
+     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
+     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
      */
     protected function buildXmlOutput($template, $data)
     {
@@ -393,7 +398,8 @@ abstract class Base {
      * @param string  $title
      * @param string  $tab
      * @return Output\ThemedHtml
-     * @throws ServiceNotFound If unable to locate HTML web Output
+     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
+     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
      */
     protected function buildHtmlOutput($template, $data, $title = '', $tab = '')
     {
@@ -417,6 +423,8 @@ abstract class Base {
      *
      * @param  string $filename
      * @return Output\File
+     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
+     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
      */
     protected function buildFileOutputFromFilename($filename)
     {
@@ -430,6 +438,8 @@ abstract class Base {
      *
      * @param  string $fileContents
      * @return Output\File
+     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
+     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
      */
     protected function buildFileOutputFromString($fileContents)
     {
