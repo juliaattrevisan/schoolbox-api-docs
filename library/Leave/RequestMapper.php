@@ -261,7 +261,7 @@ class Leave_RequestMapper extends Schoolbox\Mapper
      */
     protected function getBaseQuery()
     {
-        $userMapper = \Schoolbox\UserMapper::getInstance();
+        $userMapper = $this->getUserMapper();
 
         return "
 			SELECT
