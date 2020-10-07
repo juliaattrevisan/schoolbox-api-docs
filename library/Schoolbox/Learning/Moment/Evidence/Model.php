@@ -28,37 +28,37 @@ class Model implements ISoftDeletable
     /**
      * @var IStorage|null
      */
-    private $storage;
+    private ?IStorage $storage;
 
 
     /**
      * @var string|null
      */
-    private $filename;
+    private ?string $filename;
 
 
     /**
      * @var string|null
      */
-    private $body;
+    private ?string $body;
 
 
     /**
-     * @var ThreadModel
+     * @var ThreadModel|null
      */
-    private $discussionThread;
-
-
-    /**
-     * @var User
-     */
-    private $recipient;
+    private ?ThreadModel $discussionThread;
 
 
     /**
      * @var User
      */
-    private $creator;
+    private User $recipient;
+
+
+    /**
+     * @var User
+     */
+    private User $creator;
 
 
     /**
