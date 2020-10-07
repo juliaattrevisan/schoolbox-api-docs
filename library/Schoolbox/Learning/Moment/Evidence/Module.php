@@ -13,7 +13,9 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Closure;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -37,13 +39,16 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
-            )
+                new Rule\LazyCallback(function () {
+                    return new Rule\Callback(Closure::fromCallable([$this, 'authorizeAllUsers']));
+                })
+            ),
         );
 
 
         // Preloaders:
-        // Assume userIds is a comma-separated list of users, kind of have to in
-        // order to assume I can create them
+        // convert userIds (a comma-separated list of users) into a user
+        // collection
         $viewCreateFormPreloader = Closure::fromCallable([$this, 'preloadUsers']);
 
 
@@ -85,10 +90,40 @@ class Module extends BaseModule
      */
     private function preloadUsers(array $params): array
     {
-        return [
-            'users' => $this->getMapperFactory()
-                            ->get(UserMapper::class)
-                            ->findByColumn('id', explode(',', $params['userIds'])),
-        ];
+        $userIds = array_unique(explode(',', $params['userIds']));
+        $users   = $this->getMapperFactory()
+                        ->get(UserMapper::class)
+                        ->findByColumn('id', $userIds);
+
+        // Not found if any of the users in the list were not found
+        if (count($users) !== count($userIds)) {
+            throw new NotFound();
+        }
+
+        return ['users' => $users,];
+    }
+
+
+    /**
+     * Authorizes that for ALL users in the URL that the current user is either:
+     * * that user
+     * * a parent of that user
+     *
+     * @param array $params
+     * @param User  $currentUser
+     */
+    private function authorizeAllUsers(array $params, User $currentUser): void
+    {
+        $isParentOrUserRule = new Rule\IsUserOrParentOfUser(
+            $this->getExternalUser(),
+            UserMapper::getInstance(),
+            'userId'
+        );
+
+        // Coalesce to empty list as the preloader may have returned not found,
+        // and thus not populated $params['users']
+        foreach ($params['users'] ?? [] as $user) {
+            $isParentOrUserRule->authorize(['userId' => $user->getId()], $currentUser);
+        }
     }
 }
