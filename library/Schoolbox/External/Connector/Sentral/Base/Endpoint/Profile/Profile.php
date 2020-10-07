@@ -687,16 +687,20 @@ class Profile implements IStrategy
         /* Go digging in another endpoint for data
          * http://development.sentral.com.au/#operation/getSpecialNeedsPrograms
          */
-        $endpoint = "enrolments/special-needs-program?studentIds={$studentExternalId}";
+//        $endpoint = "enrolments/special-needs-program?studentIds={$studentExternalId}";
+//
+//        $payload = $this->api->retrieveDocument($endpoint);
+//
+//        if (\count($payload['data'])) {
+//            print_r($payload);
+//            die();
+//
+//        }
 
-        $payload = $this->api->retrieveDocument($endpoint);
-
-        if (\count($payload['data'])) {
-            print_r($payload);
-            die();
-
-        }
-
+        /* Special Needs in sentral was a concept only, and partially implemented and documented
+         * Apparently no-one uses this notion and we are supposed to ignore its existence for now
+         * (weird bu ok, whatever)
+         */
         return false;
     }
 
