@@ -47,3 +47,32 @@
         </li>
     </ul>
 </div>
+
+
+<div class="row">
+    <div class="small-12 columns island">
+        <form action="#" method="post">
+            <section>
+                <fieldset>
+                    <label>
+                        Write something
+                        <textarea name="body" id="evidence-body"></textarea>
+                    </label>
+                </fieldset>
+            </section>
+        </form>
+        <input type="submit" value="Submit" />
+    </div>
+</div>
+
+
+{# Set up CKEditor #}
+<script src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script>
+    $(function () {
+        $.fn.alaressEditor({
+            targetElements: $('#evidence-body')
+        });
+    });
+</script>
