@@ -34,13 +34,21 @@ class Module extends BaseModule
         // Permissions:
         // Current user must have permission to post to ALL user IDs provided
         // (they must be a staff member, parent of or the user themselves)
+        $isParentOrUserRule = new Rule\IsUserOrParentOfUser(
+            $this->getExternalUser(),
+            UserMapper::getInstance(),
+            'userId'
+        );
+
         $viewCreateFormRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
-                new Rule\LazyCallback(function () {
-                    return new Rule\Callback(Closure::fromCallable([$this, 'authorizeAllUsers']));
+                new Rule\LazyCallback(function () use ($isParentOrUserRule) {
+                    return new Rule\Callback(function (array $params, User $user) use ($isParentOrUserRule) {
+                        $this->authorizeAllUsers($params, $user, $isParentOrUserRule);
+                    });
                 })
             ),
         );
@@ -55,10 +63,18 @@ class Module extends BaseModule
         // Routes to register:
         $this->register(
             self::METHOD_GET,
-            '/{userIds}/create',
+            '/user/{userIds}/create',
             'getCreateForm',
             $viewCreateFormRule,
             $viewCreateFormPreloader
+        );
+
+        $this->register(
+            self::METHOD_POST,
+            '/user/{userId}/create',
+            'postMomentForUser',
+            $isParentOrUserRule,
+            Closure::fromCallable([$this, 'preloadUser']),
         );
     }
 
@@ -78,6 +94,22 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+
+    /**
+     * Preload the requested student
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    private function preloadUser(array $params): array
+    {
+        return ['users' => $this->getMapperFactory()
+                                ->get(UserMapper::class)
+                                ->findById($params['userId']),];
     }
 
 
@@ -109,17 +141,12 @@ class Module extends BaseModule
      * * that user
      * * a parent of that user
      *
-     * @param array $params
-     * @param User  $currentUser
+     * @param array                   $params
+     * @param User                    $currentUser
+     * @param Rule\IAuthorizationRule $isParentOrUserRule The auth rule used to authorize the user
      */
-    private function authorizeAllUsers(array $params, User $currentUser): void
+    private function authorizeAllUsers(array $params, User $currentUser, Rule\IAuthorizationRule $isParentOrUserRule): void
     {
-        $isParentOrUserRule = new Rule\IsUserOrParentOfUser(
-            $this->getExternalUser(),
-            UserMapper::getInstance(),
-            'userId'
-        );
-
         // Coalesce to empty list as the preloader may have returned not found,
         // and thus not populated $params['users']
         foreach ($params['users'] ?? [] as $user) {

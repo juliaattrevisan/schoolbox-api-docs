@@ -20,7 +20,7 @@ class Controller extends Base
     /**
      * Render a create form for a learning moment.
      *
-     * @api   GET /learning/evidence/{userIds}/create
+     * @api   GET /learning/evidence/user/{userIds}/create
      * @since 20.2
      *
      * @param ICollection $users
