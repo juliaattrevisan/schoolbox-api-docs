@@ -61,6 +61,7 @@ class Controller extends Base
                 '@learningMomentEvidence/form.twig',
                 [
                     'users'          => $users,
+                    'userIds'        => $users->getPropertyValues('id'),
                     'otherUsers'     => $otherUsers,
                     'sharingForSelf' => $sharingForSelf,
                 ]
@@ -102,25 +103,54 @@ class Controller extends Base
     }
 
 
+//    /**
+//     * Post a JSON representation of a learning moment for a user.
+//     *
+//     * @api   POST /learning/evidence/user/{userId}
+//     * @since 20.2
+//     *
+//     * @param User $user
+//     */
+//    public function postMomentForUser(User $user): void
+//    {
+//        $model = $this->mapper->createModel();
+//        /** @var \stdClass $requestBody */
+//        $requestBody = $this->request->content->get();
+//        $model
+//            ->setBody($requestBody->body)
+//            ->setRecipient($user)
+//            ->setCreator($this->getUser());
+//        $this->mapper->save($model);
+//        $requestBody->id = $model->getId();
+//        $this->response->content->set(
+//            $this->buildJsonOutput($requestBody)
+//        );
+//    }
+
+
     /**
-     * Post a JSON representation of a learning moment for a user.
+     * Post the same learning moment to multiple users at once.
      *
-     * @api   POST /learning/evidence/user/{userId}
+     * @api   POST /learning/evidence/user/{userIds}/create
      * @since 20.2
      *
-     * @param User $user
+     * @param Collection|User[] $users
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function postMomentForUser(User $user): void
+    public function postMomentForUsers(Collection $users): void
     {
-        $model = $this->mapper->createModel();
         /** @var \stdClass $requestBody */
-        $requestBody = $this->request->content->get();
-        $model
-            ->setBody($requestBody->body)
-            ->setRecipient($user)
-            ->setCreator($this->getUser());
-        $this->mapper->save($model);
-        $requestBody->id = $model->getId();
+        $requestBody        = $this->request->content->get();
+        $evidenceCollection = $this->mapper->createCollection();
+        foreach ($users as $user) {
+            $evidenceCollection->add(
+                $this->mapper->createModel()
+                             ->setBody($requestBody->body)
+                             ->setRecipient($user)
+                             ->setCreator($this->getUser())
+            );
+        }
+        $this->mapper->save($evidenceCollection);
         $this->response->content->set(
             $this->buildJsonOutput($requestBody)
         );

@@ -64,7 +64,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form action="#" method="post" id="evidence-form">
+        <form action="{{ routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) }}" method="post" id="evidence-form">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -87,10 +87,10 @@
 {% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
-        let postUrlList = new Set();
-        {% for user in users %}
-        postUrlList.add('{{ routeLookup('learningMomentEvidence.postMomentForUser', {userId: user.id}) }}');
-        {% endfor %}
+        {#let postUrlList = new Set();#}
+        {#{% for user in users %}#}
+        {#postUrlList.add('{{ routeLookup('learningMomentEvidence.postMomentForUser', {userId: user.id}) }}');#}
+        {#{% endfor %}#}
 
 
         $.fn.alaressEditor({
@@ -109,7 +109,8 @@
 
                 // Toast then post
                 toast.toastActivate('Saving...')
-                Promise.all(Array.from(postUrlList).map(url => axios.post(url, payload)))
+                axios.post(form.action, payload)
+                // Promise.all(Array.from(postUrlList).map(url => axios.post(url, payload)))
                     .then(() => toast.toastTimeout({text: 'Saved'}))
                     .catch(() => toast.toastTimeout({text: 'Save failed', css: 'alert'}))
             }

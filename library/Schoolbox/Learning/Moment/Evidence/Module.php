@@ -71,11 +71,19 @@ class Module extends BaseModule
 
         $this->register(
             self::METHOD_POST,
-            '/user/{userId}/create',
-            'postMomentForUser',
-            $isParentOrUserRule,
-            Closure::fromCallable([$this, 'preloadUser']),
+            '/user/{userIds}/create',
+            'postMomentForUsers',
+            $viewCreateFormRule,
+            $viewCreateFormPreloader
         );
+
+//        $this->register(
+//            self::METHOD_POST,
+//            '/user/{userId}/create',
+//            'postMomentForUser',
+//            $isParentOrUserRule,
+//            Closure::fromCallable([$this, 'preloadUser']),
+//        );
     }
 
 
