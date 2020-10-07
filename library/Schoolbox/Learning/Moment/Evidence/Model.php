@@ -26,36 +26,48 @@ class Model implements ISoftDeletable
 
 
     /**
+     * The file content (if any) that was uploaded to the learning moment.
+     *
      * @var IStorage|null
      */
     private ?IStorage $storage;
 
 
     /**
+     * The filename (if any) that was uploaded to the learning moment.
+     *
      * @var string|null
      */
     private ?string $filename;
 
 
     /**
+     * The text box (if any) that was uploaded to the learning moment.
+     *
      * @var string|null
      */
     private ?string $body;
 
 
     /**
+     * The discussion thread for the learning moment, if it has one.
+     *
      * @var ThreadModel|null
      */
     private ?ThreadModel $discussionThread;
 
 
     /**
+     * The recipient of the learning moment.
+     *
      * @var User
      */
     private User $recipient;
 
 
     /**
+     * The user which created the learning moment.
+     *
      * @var User
      */
     private User $creator;
