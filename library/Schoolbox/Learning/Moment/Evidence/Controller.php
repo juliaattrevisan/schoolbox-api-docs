@@ -19,7 +19,7 @@ class Controller extends Base
     /**
      * @param ICollection $users
      */
-    public function getCreateForm(ICollection $users)
+    public function getCreateForm(ICollection $users): void
     {
         $this->response->content->set(
             $this->buildHtmlOutput(
