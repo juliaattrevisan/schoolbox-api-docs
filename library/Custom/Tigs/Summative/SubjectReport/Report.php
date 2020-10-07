@@ -433,7 +433,7 @@ class Report
             return [];
         }
 
-        $configName = Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_MATRIX;
+        $configName = Config::_TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK;
 
         try {
             $workTypeId = $this->checkWorkType(
