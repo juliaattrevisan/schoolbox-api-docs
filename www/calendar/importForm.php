@@ -50,7 +50,7 @@ if ($groupHandler->getPermission($_POST['homepageId']) < UserAccess::ACCESS_WRIT
 
         /* Must have a .csv extension
          */
-        if ('csv' !== $result->getExtension()) {
+        if ('csv' !== strtolower($result->getExtension())) {
             error(2);
             exit;
         }

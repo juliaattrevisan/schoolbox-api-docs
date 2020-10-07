@@ -19,7 +19,7 @@ if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name'] && (
 
     /* Must have a .csv extension
      */
-    if ('csv' !== pathinfo($_FILES['bulkadd']['name'], PATHINFO_EXTENSION)) {
+    if ('csv' !== strtolower(pathinfo($_FILES['bulkadd']['name'], PATHINFO_EXTENSION))) {
         error(2);
         exit;
     }
