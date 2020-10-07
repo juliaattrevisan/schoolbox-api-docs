@@ -1,21 +1,25 @@
 #!/bin/bash
-# Refresh a cloud instance using an S3 dataset
+# Refresh a instance using an S3 dataset
 #
 # This should only be invoked on the primary node in a cluster.
+#
+# If instance already exists, will re-use the existing superuser password,
+# else will generate a new password and request the IR to insert into LastPass
 #
 # Usage:
 #        INSTANCE_ID=[INSTANCE_ID] tools/cloud/data-refresh.sh \
 #         --dataset [sales.tar.gz] \
-#         --[CONFIG_NAME] [CONFIG_VALUE]
+#         --config [CONFIG_NAME] [CONFIG_VALUE]
 #         ...
 # Example:
 #       INSTANCE_ID=vagrantx /vagrant/tools/cloud/data-refresh.sh \
 #         --dataset initial.tar.gz \
-#         --site_hostname demo \
-#         --amqp_host primary.mq.service.consul \
-#         --redis_url tcp://primary.redis.service.consul:6379 \
-#         --site_domain schoolbox.com.au \
-#         --title 'Schoolbox Demo'
+#         --suppress-lastpass-insert \
+#         --config  site_hostname demo \
+#         --config  amqp_host     primary.mq.service.consul \
+#         --config  redis_url     tcp://primary.redis.service.consul:6379 \
+#         --config  site_domain   schoolbox.com.au \
+#         --config  title         'Schoolbox Demo'
 
 
 # Global const
@@ -23,31 +27,30 @@ readonly LOG=/usr/bin/alaress-logger
 readonly L_INFO=200;
 readonly L_ERROR=400;
 readonly ARG_DATASET='dataset'
+readonly ARG_CONFIG='config'
+readonly ARG_SUPPRESS_LASTPASS_INSERT='suppress-lastpass-insert'
 
 # Global vars and defaults
-declare dataset;     # eg 'initial.tar.gz'
+declare dataset;                        # eg 'initial.tar.gz'
 declare site_root;
 declare package;
 declare sql_user;
 declare sql_passwd;
 declare sql_host;
 declare sql_schema;
+declare su_password;
+declare su_password_hash;
+declare su_password_changed=0;
+declare suppress_lastpass_insert=0; # If TRUE, and we change superuser password for GUI, call IR to insert a record in LastPass
 declare -A config;
 
-# Config defaults. Empty values are required to be provided as CLI args
-config[site_hostname]=""
-config[site_domain]=""
-config[title]=""
-config[amqp_host]=""
+# Config defaults.
 config[amqp_vhost]=sbc_"$INSTANCE_ID"
 config[amqp_user]=sbc_"$INSTANCE_ID"
 config[amqp_pass]=password
-config[redis_url]=""
-config[mail_enable]=0
-config[mail_smtp_host]=127.0.0.1
-config[otfs_adapter]=awsS3
-config[otfs_s3_presigned_urls_enabled]=1
 
+# Assume these are always required. (if we wish to override this assumption, add a new flag to support that)
+declare required_config=(site_hostname site_domain title amqp_host redis_url site_school_code)
 
 function log(){
   $LOG $L_INFO "$1"
@@ -65,6 +68,8 @@ function check_run_as_root(){
   fi
 }
 
+
+# Ensure an INSTANCE_ID env var is available
 function check_instance_id(){
   if [[ -z "$INSTANCE_ID" ]]; then
     error "You must set an INSTANCE_ID as environment var"
@@ -92,27 +97,22 @@ function parse_args(){
   while [[ $# -gt 0 ]]; do
     case $1 in
       --$ARG_DATASET)
-      dataset="$2"
-      shift; # past argument
-      shift; # past value
-      ;;
+        dataset="$2"
+        shift; shift; # past argument, value
+        ;;
+      --$ARG_SUPPRESS_LASTPASS_INSERT)
+        suppress_lastpass_insert="1"
+        shift; # past argument
+        ;;
+      --$ARG_CONFIG)
+        config["$2"]="$3"
+        shift; shift; shift;# past argument, name, value
+        ;;
       *)
-      local recognised='0'
-      for key in "${!config[@]}"; do
-        if [[ "--$key" == "$1" ]]; then
-          config[$key]="$2"
-          recognised='1'
-          shift # past argument
-          shift # past value
-          break
-        fi
-      done
-      if [[ $recognised == '0' ]]; then
         error "Unrecognised option: '$1'"
         shift # past argument
         errors="1"
-      fi
-      ;;
+        ;;
     esac
   done
 
@@ -121,8 +121,8 @@ function parse_args(){
     errors="1"
   fi
 
-  for key in "${!config[@]}"; do
-    if [[ -z ${config[$key]} ]]; then
+  for key in "${required_config[@]}"; do
+    if [[ ! -v "config[$key]" ]]; then
       error "You must declare a config value using the --$key flag"
       errors="1"
     fi
@@ -157,11 +157,38 @@ function parse_args(){
 }
 
 
+# Fetch current SU password, or generate a new one if a new install
+function derive_su_password() {
+
+  # If a new install, this table won't exist.
+  local table_count;
+  table_count=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" -ss -e "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$sql_schema' AND TABLE_NAME = 'user'")
+
+  # If table exists, fetch password hash
+  if [[ $table_count == 1 ]]; then
+    su_password_hash=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e 'SELECT password FROM user WHERE username = "alaress" LIMIT 1')
+  fi
+
+  # If unable to fetch an existing password hash, generate new password and schedule a lastpass insert
+  if [[ -z $su_password_hash ]]; then
+    log "Unable to fetch existing SU password, generating new one and scheduling lastpass insert"
+    su_password=$(pwgen 16 1)
+    su_password_hash=$(php -r "echo password_hash('$su_password', PASSWORD_DEFAULT, ['cost' => 10]);")
+    su_password_changed=1
+  fi
+}
+
+
 # Output a usage help message
 function usage () {
   echo "
   Usage : INSTANCE_ID=<instance_id> $0 \
-            --$ARG_DATASET=<dataset_file>";
+            --$ARG_DATASET <dataset_file> \
+            --$ARG_SUPPRESS_LASTPASS_INSERT \
+            --$ARG_CONFIG <config_name> <config_value> \
+            --$ARG_CONFIG <config_name> <config_value> \
+            --$ARG_CONFIG <config_name> <config_value>
+            ";
 }
 
 
@@ -228,6 +255,21 @@ function localise_database_config(){
       exit 1;
     fi
   done
+}
+
+
+# If we reset the superuser password, need to update lastpass
+function update_su_password() {
+  if [[ $su_password_changed == '1' ]] && [[ $suppress_lastpass_insert == '0' ]]; then
+    # TODO convert this to an API call to the IR, eg:
+    #   curl https://manage.schoolbox.cloud/api/lastpass/instance/123 -h "AUTH: xxxx" --method POST --data "username=alaress, password: a1b2c3d435gf"
+    log "TODO: For now, please manually update the lastpass password for the alaress user to '$su_password'"
+  fi
+  if mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "UPDATE user SET password = '$su_password_hash' WHERE username = 'alaress'"; then
+    log "Password hash for 'alaress' user set to '$su_password_hash'"
+  else
+    error "Error. Unable to update alaress user password hash to '$su_password_hash'"
+  fi
 }
 
 
@@ -304,6 +346,8 @@ function main(){
   check_instance_id
   parse_args "$@"
 
+  derive_su_password
+
   # setup a working directory for our extracted dataset files
   local working_dir=/tmp/schoolbox-"$INSTANCE_ID"
   setup_working_dir "$working_dir"
@@ -315,6 +359,7 @@ function main(){
   empty_schema
   import_dataset "$working_dir"
   localise_database_config
+  update_su_password
   upgrade_sql
 
   # Ensure data dirs exists with correct perms and ownership
