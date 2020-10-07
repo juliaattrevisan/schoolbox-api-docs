@@ -518,16 +518,21 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
             $userMapper->loadJoinedModel('role', $allIndividuals);
 
             foreach ($allIndividuals as $currentIndividual) {
-                $person = $currentIndividual->getFullname() . ' - ';
+                $personData = [
+                    $currentIndividual->getFullname(),
+                    ' - ',
+                ];
 
-                if (is_numeric($currentIndividual->getYear())) {
-                    $person .= "Year {$currentIndividual->getYear()}, ";
+                if (null !== $currentIndividual->getYear()) {
+                    $personData[] = $currentIndividual->getYear()->getLongName();
+                    $personData[] = ', ';
                 }
 
-                $person           .= $currentIndividual->getRole()->getName();
+                $personData[] = $currentIndividual->getRole()->getName();
+
                 $individualList[] = [
                     'id'   => $currentIndividual->getId(),
-                    'name' => $person
+                    'name' => implode('', $personData)
                 ];
             }
         }

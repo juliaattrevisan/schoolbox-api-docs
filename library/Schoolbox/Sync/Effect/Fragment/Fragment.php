@@ -49,10 +49,18 @@ class Fragment
 
 
     /**
+     * Whether the dropdown should provide a 'please select' option
+     *
+     * @var bool
+     */
+    private $prompt = false;
+
+
+    /**
      * Constructor
      *
      * @param string $filename
-     * @param Collection $data
+     * @param Collection|null $data
      */
     public function __construct($filename, $data = null) {
         $this->filename = $filename;
@@ -109,5 +117,25 @@ class Fragment
     public function setAjaxUrl($ajaxUrl)
     {
         $this->ajaxUrl = $ajaxUrl;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function getPrompt(): bool
+    {
+        return $this->prompt;
+    }
+
+
+    /**
+     * @param bool $prompt
+     * @return $this
+     */
+    public function setPrompt(bool $prompt): self
+    {
+        $this->prompt = $prompt;
+        return $this;
     }
 }

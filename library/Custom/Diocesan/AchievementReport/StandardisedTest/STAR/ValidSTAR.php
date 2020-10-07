@@ -26,14 +26,8 @@ class ValidSTAR
      */
     public function isSatisifiedBy(User $user): bool
     {
-        /* Unknown year level; no access
-         */
-        if (null === $user->getYear()) {
-            return false;
-        }
-
         /* Only year 3 has this tab
          */
-        return 3 === (int)$user->getYear()->getName();
+        return $user->getYear() && 3 === (int)$user->getYear()->getName();
     }
 }

@@ -36,7 +36,7 @@ class Factory
      * This combines $allFieldKeys' data with its type, as derived
      * from the UserMapper definition
      */
-    private $allFields = [];
+    private $allFields;
 
 
     /**
@@ -102,7 +102,7 @@ class Factory
      *
      * @var string
      */
-    private $roleType = '';
+    private $roleType;
 
 
     /**
@@ -110,7 +110,7 @@ class Factory
      *
      * @var Lookup
      */
-    private $lookup = null;
+    private $lookup;
 
 
     /**
@@ -118,7 +118,7 @@ class Factory
      *
      * @param string $roleType
      */
-    public function __construct($roleType) {
+    public function __construct(string $roleType) {
 
         /* Determine if Groups perms are enabled before making them accessible
          */
@@ -145,7 +145,8 @@ class Factory
      *
      * @return array
      */
-    private function generateAllFields() {
+    private function generateAllFields(): array
+    {
         $allFields = [];
 
         $mapper = new UserMapper();
@@ -198,7 +199,7 @@ class Factory
                     /* At this stage, joins (such as UserAccess) would have been given
                      * self::TYPE_STRING. Check joins stack before assuming string
                      */
-                    if (in_array($key, array_keys($allJoins))) {
+                    if (array_key_exists($key, $allJoins)) {
                         $allFields[$key] = [
                             'type' => self::TYPE_COLLECTION,
                             'label' => $label
@@ -241,10 +242,13 @@ class Factory
      * @param int $mappingType
      * @return Fragment|null
      */
-    public function produce($mappingType) {
-        if ($mappingType == EffectTypeMapper::EFFECT_TYPE_LITERAL) {
+    public function produce(int $mappingType): ?Fragment
+    {
+        if ($mappingType === EffectTypeMapper::EFFECT_TYPE_LITERAL) {
             return new Fragment('@upsEffect/literal.twig');
-        } elseif ($mappingType == EffectTypeMapper::EFFECT_TYPE_MAP) {
+        }
+
+        if ($mappingType === EffectTypeMapper::EFFECT_TYPE_MAP) {
             return new Fragment('@upsEffect/map.twig');
         }
 
@@ -257,8 +261,11 @@ class Factory
     /**
      * Return empty Fragment, prompting the user to choose
      * a User field to modify and a Mapping Type
+     *
+     * @return Fragment
      */
-    public function produceEmpty() {
+    public function produceEmpty(): Fragment
+    {
         return new Fragment('@upsEffect/empty.twig');
     }
 
@@ -269,14 +276,29 @@ class Factory
      * @param string $userField
      * @return Fragment|null
      */
-    public function produceType($userField) {
+    public function produceType(string $userField): ?Fragment
+    {
         if ($this->isBoolean($userField)) {
             return new Fragment('@upsEffect/subfragments/boolean.twig');
-        } elseif ($this->isLookup($userField)) {
-            return new Fragment('@upsEffect/subfragments/lookup.twig', $this->lookup->findData($userField, $this->roleType));
-        } elseif ($this->isString($userField)) {
+        }
+
+        if ($this->isLookup($userField)) {
+            $fragment = new Fragment('@upsEffect/subfragments/lookup.twig', $this->lookup->findData($userField, $this->roleType));
+
+            /* Special case for 'year' - prompt user to choose from a lookup
+             */
+            if ('year' === $userField) {
+                $fragment->setPrompt(true);
+            }
+
+            return $fragment;
+        }
+
+        if ($this->isString($userField)) {
             return new Fragment('@upsEffect/subfragments/string.twig');
-        } elseif ($this->isCollection($userField)) {
+        }
+
+        if ($this->isCollection($userField)) {
             $fragment = new Fragment('@upsEffect/subfragments/collection.twig', $this->lookup->findData($userField));
             $fragment->setAjaxUrl($this->allAjaxUrls[$userField]);
 
@@ -295,8 +317,9 @@ class Factory
      * @param string $field
      * @return bool
      */
-    public function isBoolean($field) {
-        return $this->allFields[$field]['type'] == self::TYPE_BOOLEAN;
+    public function isBoolean(string $field): bool
+    {
+        return $this->allFields[$field]['type'] === self::TYPE_BOOLEAN;
     }
 
 
@@ -306,8 +329,9 @@ class Factory
      * @param string $field
      * @return bool
      */
-    public function isCollection($field) {
-        return $this->allFields[$field]['type'] == self::TYPE_COLLECTION;
+    public function isCollection(string $field): bool
+    {
+        return $this->allFields[$field]['type'] === self::TYPE_COLLECTION;
     }
 
 
@@ -317,8 +341,9 @@ class Factory
      * @param string $field
      * @return bool
      */
-    public function isLookup($field) {
-        return $this->allFields[$field]['type'] == self::TYPE_LOOKUP;
+    public function isLookup(string $field): bool
+    {
+        return $this->allFields[$field]['type'] === self::TYPE_LOOKUP;
     }
 
 
@@ -328,8 +353,9 @@ class Factory
      * @param string $field
      * @return bool
      */
-    public function isString($field) {
-        return $this->allFields[$field]['type'] == self::TYPE_STRING;
+    public function isString(string $field): bool
+    {
+        return $this->allFields[$field]['type'] === self::TYPE_STRING;
     }
 
 
@@ -338,7 +364,8 @@ class Factory
      *
      * @return array
      */
-    public function getAllFieldsKeyValue() {
+    public function getAllFieldsKeyValue(): array
+    {
         $allFields = $this->allFields;
 
         $stack = [];

@@ -533,15 +533,19 @@ class UserMapper extends Mapper
     {
         $collection = new Schoolbox\Collection();
         $roleMapper = new RoleMapper();
+        $userMapper = \Schoolbox\UserMapper::getInstance();
+        $yearLevelMapper = \Schoolbox\YearLevel\Mapper::getInstance();
 
         $permittedValuesSql = implode(',', $permittedValues);
 
         $query = "
             SELECT
                 {$this->getColumnString('u')},
-                {$roleMapper->getColumnString('g')}
+                {$roleMapper->getColumnString('g')},
+                {$userMapper->getJoinColumnString('year', 'lyl')}
             FROM `{$this->table}` u
             LEFT JOIN `groups` g ON group_id = g.`id`
+            LEFT JOIN {$userMapper->getJoinSql('year', 'u', 'lyl')}
             WHERE (firstname LIKE ? OR lastname LIKE ?)
             AND group_id IN ({$permittedValuesSql})
         ";
@@ -553,8 +557,10 @@ class UserMapper extends Mapper
         foreach ($statement as $row) {
             $user = $this->hydrate($row, 'u');
             $role = $roleMapper->hydrate($row, 'g');
+            $year = $yearLevelMapper->hydrate($row, 'lyl');
 
             $user->setRole($role);
+            $user->setYear($year);
 
             $collection->add($user);
         }

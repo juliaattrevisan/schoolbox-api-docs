@@ -95,12 +95,13 @@ class User extends DeprecatedModel
 
     public function getByUsername($username)
     {
-        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, year, eportfolio_enabled,`key`, hash,
+        $query = "SELECT user.id as uid, title, firstname, lastname, username, groups.name AS gname, group_id, lyl.name AS year, eportfolio_enabled,`key`, hash,
                         position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, webmail, userCampus.campus, IF(superusers.id, 1, 0) as su, house, mail_handler, calendar_view, enabled
                 FROM user
                     LEFT JOIN groups ON user.group_id = groups.id
                     LEFT JOIN userCampus ON user.id = userCampus.uid
                     LEFT JOIN superusers ON user.id = superusers.id
+                    LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id
                 WHERE user.username = " . $this->db->smartQuote($username) . "
                 AND user.deleted_at IS NULL";
         return $this->db->getRow($query);
@@ -135,10 +136,11 @@ class User extends DeprecatedModel
     public function getBySynergy($sid)
     {
         $query = "SELECT user.id AS uid, title, firstname, lastname, username, groups.name AS gname, group_id,
-                        position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, userCampus.campus, year, eportfolio_enabled, house, enabled
+                        position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, userCampus.campus, lyl.name, eportfolio_enabled, house, enabled
                 FROM user
                     LEFT JOIN groups ON user.group_id = groups.id
                     LEFT JOIN userCampus ON user.id = userCampus.uid
+                    LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id
                 WHERE user.synergy_id = '$sid'
                 AND user.deleted_at IS NULL";
         return $this->db->getRow($query);
