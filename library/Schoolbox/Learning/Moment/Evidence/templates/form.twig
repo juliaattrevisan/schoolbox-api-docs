@@ -75,7 +75,7 @@
                     </div>
                 </fieldset>
             </section>
-            <input type="submit" value="Submit" />
+            <input type="submit" id="evidence-submit" value="Submit" />
         </form>
     </div>
 </div>
@@ -87,32 +87,34 @@
 {% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
-        {#let postUrlList = new Set();#}
-        {#{% for user in users %}#}
-        {#postUrlList.add('{{ routeLookup('learningMomentEvidence.postMomentForUser', {userId: user.id}) }}');#}
-        {#{% endfor %}#}
-
-
+        let editorId = 'evidence-body';
         $.fn.alaressEditor({
-            targetElements: $('#evidence-body')
+            targetElements: $('#' + editorId)
         });
         $('#evidence-form').alaressValidate({
             submitHandler(form, event) {
                 event.preventDefault();
 
-                // Build a request for each user
+                // Update the editor's form input
+                CKEDITOR.instances[editorId].updateElement();
+
+                // Build a request to post the form
                 let formData = new FormData(form),
                     payload = {
                         body: formData.get('body'),
                     },
-                    toast = $('#toast');
+                    toast  = $('#toast'),
+                    submit = $('#evidence-submit');
 
                 // Toast then post
                 toast.toastActivate('Saving...')
+                submit.prop('disabled', true);
+
+                // Redirect to the return URL provided
                 axios.post(form.action, payload)
-                // Promise.all(Array.from(postUrlList).map(url => axios.post(url, payload)))
                     .then(() => toast.toastTimeout({text: 'Saved'}))
                     .catch(() => toast.toastTimeout({text: 'Save failed', css: 'alert'}))
+                    .finally(() => submit.prop('disabled', false));
             }
         })
     });
