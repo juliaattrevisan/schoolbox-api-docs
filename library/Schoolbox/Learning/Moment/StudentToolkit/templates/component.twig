@@ -35,10 +35,11 @@
         // Redirect to different places on submit of the share work form
         shareWorkForm.on('submit', function (event) {
             event.preventDefault();
-            let formData = new FormData(event.target);
+            let formData  = new FormData(event.target),
+                returnUrl = '{{ RETURN_URL.name }}={{ RETURN_URL.current }}'
             switch (formData.get('moment-type')) {
                 case 'text':
-                    window.location.href = '{{ routeLookup('learningMomentEvidence.getCreateForm', {userIds: user.id}) }}'
+                    window.location.href = '{{ routeLookup('learningMomentEvidence.getCreateForm', {userIds: user.id}) }}?' + returnUrl;
                     break;
 
                 default:

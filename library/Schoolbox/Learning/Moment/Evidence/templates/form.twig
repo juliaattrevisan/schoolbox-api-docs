@@ -112,7 +112,10 @@
 
                 // Redirect to the return URL provided
                 axios.post(form.action, payload)
-                    .then(() => toast.toastTimeout({text: 'Saved'}))
+                    .then(() => {
+                        toast.toastTimeout({text: 'Saved'});
+                        window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
+                    })
                     .catch(() => toast.toastTimeout({text: 'Save failed', css: 'alert'}))
                     .finally(() => submit.prop('disabled', false));
             }
