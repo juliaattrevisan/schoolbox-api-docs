@@ -7,6 +7,7 @@
     <h1>Share a Learning Moment</h1>
     <ul class="meta">
         <li>
+            {# Display differently if showing to other users #}
             Sharing on behalf of
 
             {##
@@ -50,18 +51,20 @@
 
 
 <div class="row">
-    <div class="small-12 columns island">
-        <form action="#" method="post">
+    <div class="small-12 island">
+        <form action="#" method="post" id="evidence-form">
             <section>
-                <fieldset>
-                    <label>
-                        Write something
-                        <textarea name="body" id="evidence-body"></textarea>
-                    </label>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label class="required" for="evidence-body">
+                            Write something
+                        </label>
+                        <textarea name="body" id="evidence-body" required></textarea>
+                    </div>
                 </fieldset>
             </section>
+            <input type="submit" value="Submit" />
         </form>
-        <input type="submit" value="Submit" />
     </div>
 </div>
 
@@ -69,10 +72,38 @@
 {# Set up CKEditor #}
 <script src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
-<script>
+{% autoescape 'js' %}
+<script type="text/javascript">
     $(function () {
+        let postUrlList = new Set();
+        {% for user in users %}
+        postUrlList.add('{{ routeLookup('learningMomentEvidence.postMomentForUser', {userId: user.id}) }}');
+        {% endfor %}
+
+
         $.fn.alaressEditor({
             targetElements: $('#evidence-body')
         });
+        $('#evidence-form').alaressValidate({
+            submitHandler(form, event) {
+                event.preventDefault();
+
+                // Build a request for each user
+                let formData = new FormData(form),
+                    payload = {
+                        body: formData.get('body'),
+                    },
+                    toast = $('#toast');
+
+                // Toast then post
+                toast.toastActivate('Saving...')
+                Promise.all(Array.from(postUrlList).map(url => axios.post(url, payload)))
+                    .then(() => toast.toastTimeout({text: 'Saved'}))
+                    .catch(() => toast.toastTimeout({text: 'Save failed', css: 'alert'}))
+            }
+        })
     });
 </script>
+{% endautoescape %}
+
+<div id="toast" class="toast"></div>
