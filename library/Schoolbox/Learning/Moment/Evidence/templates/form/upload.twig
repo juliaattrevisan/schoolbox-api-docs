@@ -1,1 +1,36 @@
 {% extends '@learningMomentEvidence/form.twig' %}
+
+{% block formInputs %}
+    <section>
+        <fieldset class="content">
+            <div class="small-12 columns">
+                {##
+                 # I can't label attachzones as I would standard file inputs.
+                 #
+                 # I don't think I can make them required either.
+                 #}
+                <label class="required">
+                    Upload File
+                </label>
+                {% include 'sub/attachzone.twig' with { attachzone: zone } %}
+            </div>
+        </fieldset>
+    </section>
+{% endblock formInputs %}
+
+{% block formJs %}
+    {% autoescape 'js' %}
+        <script type="text/javascript">
+            let buildPayload = function (form) {
+                let formData = new FormData(form);
+
+                // Extract actual hash and filename from storage.
+                return {
+                    storage: {
+                        hash: formData.get('storage'),
+                    },
+                };
+            }
+        </script>
+    {% endautoescape %}
+{% endblock formJs %}
