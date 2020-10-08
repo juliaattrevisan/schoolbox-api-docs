@@ -533,7 +533,13 @@
             elem.find('[data-dz-name]').html(file.name);
         }
         if (file.hash) {
-            elem.find('input[data-az-attachment]').val(file.hash);
+            var hash = file.hash;
+            // If there's a file name: append it to the hash
+            // (thus completing SA-10735)
+            if (file.name) {
+                hash = hash + ':' + file.name;
+            }
+            elem.find('input[data-az-attachment]').val(hash);
         }
         if (file.type) {
             elem.find('img[data-dz-thumbnail]').attr('src','/ajax/mime/' + file.type);
