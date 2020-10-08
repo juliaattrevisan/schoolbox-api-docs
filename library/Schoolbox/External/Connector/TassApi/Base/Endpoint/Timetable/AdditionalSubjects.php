@@ -116,31 +116,31 @@ class AdditionalSubjects implements IStrategy
      */
     public function import(): void
     {
-        $this->importAdditionalSubjects($this->lookup->getStudents(), self::ENDPOINT_STUDENTSUBJECTS);
-        $this->importAdditionalSubjects($this->lookup->getStaff(), self::ENDPOINT_TEACHERSUBJECTS);
+        $this->importStudentAdditionalSubjects();
+        $this->importStaffAdditionalSubjects();
     }
 
 
     /**
-     * Additional Subjects are created for students and staff in a synonymous manner
+     * Associate a student with additional subjects
+     * Students are assigned specifically to $code
      *
-     * @param array  $users
-     * @param string $endpoint
-     * @return void
      * @throws \DomainException
      * @throws \PDOException
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importAdditionalSubjects(array $users, string $endpoint): void
+    private function importStudentAdditionalSubjects(): void
     {
-
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
          *
          * Cache a flat key-value array of (day, period)
          */
+        $users = $this->lookup->getStudents();
+        $endpoint = self::ENDPOINT_STUDENTSUBJECTS;
+
         $involvements = $this->lookup->getInvolvements();
 
         foreach ($users as $externalId => $userData) {
@@ -205,37 +205,138 @@ class AdditionalSubjects implements IStrategy
                         'class_id'    => $class->getId()
                     ]);
                 } catch (\Schoolbox\Mapper\Exception $e) {
+                    $classInvolvement = $this->classInvolvementMapper->createModel()
+                        ->setExternalId((string)$externalId)
+                        ->setClass($class);
 
-                    /* Maybe this person is a teacher; check sis_class_period to see
-                     * If they are already a teacher, don't need to make an arbitrary involvement
+                    $this->classInvolvementMapper->save($classInvolvement);
+
+                    $this->log->info(sprintf(
+                        "Additional subject involvement in %s (%s) added for %s (user %s)",
+                        $additionalSubject['sub_long'],
+                        $code,
+                        trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
+                        $externalId
+                    ));
+                }
+            }
+        }
+    }
+
+    /**
+     * Associate a staff with additional subjects
+     *
+     * Staff are assigned to $code and also its non-unitised variant
+     *
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
+     * @throws \PDOException
+     * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function importStaffAdditionalSubjects(): void
+    {
+        /* Cache a flat key-value array of (user.id, user.synergy_id)
+         * The alternative would be to iterate findById() in a loop which probably costs more at scale
+         *
+         * Cache a flat key-value array of (day, period)
+         */
+        $users = $this->lookup->getStaff();
+        $endpoint = self::ENDPOINT_TEACHERSUBJECTS;
+
+        foreach ($users as $externalId => $userData) {
+            $data = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
+                'code' => $externalId
+            ]);
+
+            /* No additional subjects
+             */
+            if (!isset($data[$externalId])) {
+                continue;
+            }
+
+            /* Otherwise, add some more things that we didn't already have from
+             * the student's timetable import
+             */
+            foreach ($data[$externalId] as $additionalSubject) {
+                $code = (new CodeCodec())->encode(
+                    (string)$additionalSubject['year_grp'],
+                    (string)$additionalSubject['sub_code'],
+                    (string)$additionalSubject['class']
+                );
+
+                /* Also try to find the non-unitised version of the $code in addition
+                 *
+                 * e.g. search for -1011-A in addition to 10-1011-A since a teacher
+                 * is apparently associated with both possible outcomes; one or the
+                 * other might exist first
+                 */
+                $pb = ($this->classEntryMapper->getPredicateBuilder())
+                    ->like('code', "%{$code}");
+
+                $classes = $this->classEntryMapper->findByPredicates($pb);
+
+                if (!$classes->count()) {
+                    $nonUnitisedClass = $this->classEntryMapper->createModel()
+                        ->setName($additionalSubject['sub_long'])
+                        ->setCode($code);
+
+                    $this->classEntryMapper->save($nonUnitisedClass);
+
+                    $this->log->info(sprintf(
+                        "Additional subject %s (%s) added for %s (user %s)",
+                        $additionalSubject['sub_long'],
+                        $code,
+                        trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
+                        $externalId
+                    ));
+
+                    $classes->add($nonUnitisedClass);
+                }
+
+                foreach ($classes as $class) {
+
+                    /* Find out if there's already an involvement, adding it if necessary
                      */
                     try {
-                        $isTeacher = $this->classPeriodMapper->findOneByColumnList([
-                            'class_id' => $class->getId(),
-                            'teacher_external_id' => $externalId
+                        $classInvolvement = $this->classInvolvementMapper->findOneByColumnList([
+                            'external_id' => $externalId,
+                            'class_id'    => $class->getId()
                         ]);
-
-                        $this->log->info(sprintf(
-                            '%s (user %s) is already a teacher of class %s (%s) - no subject involvement change required',
-                            trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
-                            $externalId,
-                            $class->getId(),
-                            $class->getName()
-                        ));
                     } catch (\Schoolbox\Mapper\Exception $e) {
-                        $classInvolvement = $this->classInvolvementMapper->createModel()
-                            ->setExternalId((string)$externalId)
-                            ->setClass($class);
 
-                        $this->classInvolvementMapper->save($classInvolvement);
+                        /* Maybe this person is a teacher; check sis_class_period to see
+                         * If they are already a teacher, don't need to make an arbitrary involvement
+                         */
+                        try {
+                            $isTeacher = $this->classPeriodMapper->findOneByColumnList([
+                                'class_id'            => $class->getId(),
+                                'teacher_external_id' => $externalId
+                            ]);
 
-                        $this->log->info(sprintf(
-                            "Additional subject involvement in %s (%s) added for %s (user %s)",
-                            $additionalSubject['sub_long'],
-                            $code,
-                            trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
-                            $externalId
-                        ));
+                            $this->log->info(sprintf(
+                                '%s (user %s) is already a teacher of class %s (%s) - no subject involvement change required',
+                                trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
+                                $externalId,
+                                $class->getId(),
+                                $class->getName()
+                            ));
+                        } catch (\Schoolbox\Mapper\Exception $e) {
+                            $classInvolvement = $this->classInvolvementMapper->createModel()
+                                ->setExternalId((string)$externalId)
+                                ->setClass($class);
+
+                            $this->classInvolvementMapper->save($classInvolvement);
+
+                            $this->log->info(sprintf(
+                                "Additional subject involvement in %s (%s) added for %s (user %s)",
+                                $additionalSubject['sub_long'],
+                                $code,
+                                trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
+                                $externalId
+                            ));
+                        }
                     }
                 }
             }
