@@ -696,8 +696,9 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding base profile for %s',
-                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
+                'Adding base profile for %s (user %s)',
+                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}"),
+                $externalId
             ));
 
             /* Then save it
@@ -720,8 +721,9 @@ class Profile implements IStrategy
             /* Log it
              */
             $this->log->info(sprintf(
-                'Adding staff profile for %s',
-                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
+                'Adding staff profile for %s (user %s)',
+                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}"),
+                $externalId
             ));
 
             /* Then save it
