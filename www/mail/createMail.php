@@ -8,6 +8,7 @@
 
 use Alaress\Mail\AbstractMailer;
 use Alaress\Mail\Codec;
+use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\UserMapper;
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -95,6 +96,9 @@ if (Config::get('mail_enable') == 1) {
     foreach ($addressLists['replyto'] as $replyToKey => $replyTo) {
         $addressLists['replyto'][$replyToKey] = Codec::decode($replyTo);
     }
+
+    // clean up result email list, as connectors return email list in different format
+    $addressLists['bcc'] = (new TupleStack())->normaliseValues($addressLists['bcc']);
 
     $output = array(
         'SUBJECT' => $_REQUEST['subject'] ? Scrub::text($_REQUEST['subject']) : '',
