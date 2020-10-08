@@ -592,6 +592,7 @@
              */
             updateListViewDateRangeField(start, end = null)
             {
+                window.history.pushState('', '', '/calendar/' + this.toMoment(start).format(FORMAT_FORM_DATE) + '/' + this.config.userId);
                 this.listViewDateRange.start = this.toMoment(start).format(FORMAT_FLATPICKR_DATE);
                 this.listViewDateRange.end = this.toMoment(end || new Date()).add(this.duration, 'days').format(FORMAT_FLATPICKR_DATE);
 
