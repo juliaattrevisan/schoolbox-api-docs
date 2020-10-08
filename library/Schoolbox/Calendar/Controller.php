@@ -9,6 +9,8 @@ namespace Schoolbox\Calendar;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Config_Mapper;
 use Schoolbox\Calendar\Config\Campus;
@@ -19,8 +21,10 @@ use Schoolbox\Calendar\Config\SourceList;
 use Schoolbox\Calendar\Event\Attendance\ValidCanInvite;
 use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\CampusMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
@@ -55,6 +59,11 @@ class Controller extends Base
     private $eventMapper;
 
     /**
+     * @var UserMapper
+     */
+    private $userMapper;
+
+    /**
      * Controller constructor.
      * @param FolderMapper               $folderMapper
      * @param CampusMapper               $campusMapper
@@ -62,6 +71,7 @@ class Controller extends Base
      * @param Calendar_Api_Config_Mapper $calApiConfigMapper
      * @param ModuleChecker              $moduleChecker
      * @param EventMapper                $eventMapper
+     * @param UserMapper                 $userMapper
      */
     public function __construct(
         FolderMapper $folderMapper,
@@ -69,7 +79,8 @@ class Controller extends Base
         EventTypeMapper $eventTypeMapper,
         Calendar_Api_Config_Mapper $calApiConfigMapper,
         ModuleChecker $moduleChecker,
-        EventMapper $eventMapper
+        EventMapper $eventMapper,
+        UserMapper $userMapper
     ) {
         $this->folderMapper       = $folderMapper;
         $this->campusMapper       = $campusMapper;
@@ -77,12 +88,13 @@ class Controller extends Base
         $this->calApiConfigMapper = $calApiConfigMapper;
         $this->moduleChecker      = $moduleChecker;
         $this->eventMapper        = $eventMapper;
+        $this->userMapper         = $userMapper;
     }
 
     /**
      * @param string|null $selectedDate
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws ServiceNotFound
+     * @throws MapperException
      */
     public function getOwnCalendar(?string $selectedDate): void
     {
@@ -92,8 +104,8 @@ class Controller extends Base
     /**
      * @param string|null $selectedDate
      * @param User        $user
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws ServiceNotFound
+     * @throws MapperException
      */
     public function getCalendar(?string $selectedDate, User $user): void
     {
@@ -106,7 +118,7 @@ class Controller extends Base
      *
      * @param string|null $selectedDate
      * @param User        $user
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      */
     public function redirect(?string $selectedDate, User $user): void
     {
@@ -134,7 +146,7 @@ class Controller extends Base
     /**
      * @param User        $user
      * @param string|null $selectedDate
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws ServiceNotFound
      */
     private function buildResponse(User $user, ?string $selectedDate): void
     {
@@ -143,7 +155,8 @@ class Controller extends Base
         $eventType    = (new EventType($this->eventTypeMapper))->generate();
         $sourceList   = (new SourceList($this->calApiConfigMapper, $this->moduleChecker))->generate();
         $filters      = (new Filter($this->getSession()))->generate($campus->getData(), $groups->getData(), $eventType->getData(), $sourceList->getData());
-        $calendarView = ViewNameMapping::MAP_STORED_TO_FC[$this->getUser()->getCalendarView()]
+
+        $calendarView = ViewNameMapping::MAP_STORED_TO_FC[$this->userMapper->getCalendarView($this->getUser()->getId())]
             ?? ViewNameMapping::VIEW_MONTH_FC_NAME;
 
         $this->getResponse()->content->set(
@@ -167,7 +180,7 @@ class Controller extends Base
     /**
      * @param string|null $selectedDate
      * @return string|null
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     private function generateSelectedDate(?string $selectedDate): ?string
     {
@@ -180,5 +193,25 @@ class Controller extends Base
         }
 
         return $selectedDate;
+    }
+
+    /**
+     * Switch calendar view
+     * This was originally www/calendar/changeState.php
+     * @throws MapperException
+     */
+    public function changeState()
+    {
+        /* Must be one of these options (there might be consts somewhere else)
+        */
+        if (!\array_key_exists($_POST['calendarView'], ViewNameMapping::MAP_FC_TO_STORED)) {
+            return;
+        }
+        $storedView = ViewNameMapping::MAP_FC_TO_STORED[$_POST['calendarView']];
+        $this->getUser()->setCalendarView($storedView);
+        $this->userMapper->save($this->getUser());
+
+        // We no longer store calendarView in session, as it doesn't work as expected
+        $this->getResponse()->content->set($this->buildJsonOutput([]));
     }
 }

@@ -1024,4 +1024,16 @@ class UserMapper extends Mapper
     {
         return $this->findByColumn('username', $username, $options)->first();
     }
+
+    /**
+     * Gets calendar view for the user
+     *
+     * @param int $userId
+     * @return string
+     */
+    public function getCalendarView(int $userId): string
+    {
+        $query = "SELECT calendar_view FROM {$this->table} WHERE id = :userId";
+        return $this->database->query($query, ['userId' => $userId])->fetchColumn();
+    }
 }

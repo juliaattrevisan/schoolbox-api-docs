@@ -38,27 +38,17 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $selectedDateRegex = '([0][1-9]|[12][0-9]|3[01])(-)(((0)[0-9])|((1)[0-2]))(-)\d{4}';
-
-        $this->addGetRoute($router, 'getOwnCalendar', $basePath, "{/selectedDate}")->addTokens([
-            'selectedDate' => $selectedDateRegex,
-        ]);
-
-        // Supported selectedDate format DD-MM-YYYY
-        // userId is optional and must be integer
-        // Sample path: 23-08-2019 or 23-08-2019/230
-        // Selected date regex explanation here: https://regex101.com/r/X8zFce/3
+        $this->addGetRoute($router, 'getOwnCalendar', $basePath, "{/selectedDate}");
         $this->addGetRoute($router, 'getCalendar', $basePath, "/{selectedDate}/{userId}")->addTokens([
-            'selectedDate' => $selectedDateRegex,
-            'userId' => '\d+'
+            'userId' => '\d+',
         ]);
 
         // Redirect old paths
         $this->addGetRoute($router, 'redirect', $basePath, "/{format}{/selectedDate,userId}")->addTokens([
             'format' => 'week|month|full|week-list|month-list',
-            'selectedDate' => $selectedDateRegex,
-            'userId' => '\d+'
+            'userId' => '\d+',
         ]);
+        $this->addPostRoute($router, 'changeState', $basePath, '/changeState');
     }
 
     /**
@@ -70,15 +60,22 @@ class Module extends BaseModule
             $matcher,
             '.*',
             function ($params) {
-                if ($params['userId']) {
-                    return [
-                        'user' => $this->getUserMapper()->findById($params['userId']),
-                    ];
+                if (array_key_exists('userId', $params)) {
+                    $params['user'] = $this->getUserMapper()->findById($params['userId']);
                 }
-
-                return [
-                    'user' => $this->getUserMapper()->createModel(),
-                ];
+                if (array_key_exists('selectedDate', $params) && $params['selectedDate'] !== ''
+                    && !in_array($params['selectedDate'], ['week', 'month', 'full', 'week-list', 'month-list'])) {
+                    $selectedDate = new \Alaress_Date_Format();
+                    try {
+                        $selectedDate->setFromFormat($params['selectedDate'], \Alaress_Date_Format::URL_FORMAT);
+                        $params['selectedDate'] = $selectedDate->getDatabaseDate();
+                    } catch (\Exception $e) {
+                        $params['selectedDate'] = null;
+                    }
+                } else {
+                    $params['selectedDate'] = null;
+                }
+                return $params;
             }
         );
     }
@@ -138,14 +135,15 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'folderMapper'      => $this->getMapperFactory()->getLazy(Mapper::class),
-            'campusMapper'      => $this->getMapperFactory()->getLazy(CampusMapper::class),
-            'eventTypeMapper'   => $this->getMapperFactory()->getLazy(EventTypeMapper::class),
-            'calApiConfigMapper'=> $this->getMapperFactory()->getLazy(\Calendar_Api_Config_Mapper::class),
-            'moduleChecker'     => $injector->lazyNew(ModuleChecker::class, [
-                'config'        => $injector->lazyGet('config'),
+            'folderMapper'       => $this->getMapperFactory()->getLazy(Mapper::class),
+            'campusMapper'       => $this->getMapperFactory()->getLazy(CampusMapper::class),
+            'eventTypeMapper'    => $this->getMapperFactory()->getLazy(EventTypeMapper::class),
+            'calApiConfigMapper' => $this->getMapperFactory()->getLazy(\Calendar_Api_Config_Mapper::class),
+            'moduleChecker'      => $injector->lazyNew(ModuleChecker::class, [
+                'config' => $injector->lazyGet('config'),
             ]),
-            'eventMapper'       => $this->getMapperFactory()->getLazy(EventMapper::class),
+            'eventMapper'        => $this->getMapperFactory()->getLazy(EventMapper::class),
+            'userMapper'         => $this->getMapperFactory()->getLazy(UserMapper::class),
         ];
     }
 
