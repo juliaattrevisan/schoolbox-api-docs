@@ -1029,7 +1029,7 @@ class UserMapper extends Mapper
      * Gets calendar view for the user
      *
      * @param int $userId
-     * @return mixed
+     * @return string
      */
     public function getCalendarView(int $userId): string
     {
