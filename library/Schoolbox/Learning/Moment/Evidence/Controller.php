@@ -170,10 +170,11 @@ class Controller extends Base
      */
     public function postMomentForUsers(Collection $users): void
     {
-        /** @var \stdClass $requestBody */
-        $requestBody        = $this->request->content->get();
+        // requestBody is a stdclass from JSON, I'd rather work with arrays:
+        // encode then decode
+        $requestBody        = json_decode(json_encode($this->request->content->get()), true);
         $evidenceCollection = $this->mapper->createCollection();
-        $baseModel          = (new Translator\ArrayToModel())((array)$requestBody)
+        $baseModel          = (new Translator\ArrayToModel())($requestBody)
             ->setCreator($this->getUser());
         foreach ($users as $user) {
             $evidenceCollection->add(
