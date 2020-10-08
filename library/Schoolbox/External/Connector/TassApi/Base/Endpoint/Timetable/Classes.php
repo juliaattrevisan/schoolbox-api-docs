@@ -216,7 +216,7 @@ class Classes implements IStrategy
                             /* This format mirrors the implementation in External/Tass/Timetable.php:239
                              */
                             'code' => (new CodeCodec())->encode(
-                                (string)$subject['YEAR_GRP'],
+                                '' !== (string)$subject['YEAR_GRP'] ? (string)$subject['YEAR_GRP'] : (string)$subject['SUBTAB_YEAR_GRP'],
                                 (string)$subject['SUB_CODE'],
                                 (string)$subject['CLASS']
                             ),
