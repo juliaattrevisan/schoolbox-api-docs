@@ -27,19 +27,15 @@
     $(function () {
         let shareWorkForm = $("#component{{ component.instance.id }}-shareWork-form");
 
-        {#// Allow submit only when a moment type is selected#}
-        {#shareWorkForm.on('change', 'input[name="moment-type"]', function () {#}
-        {#    shareWorkForm.find('#component{{ component.instance.id }}-shareWork-submit').prop('disabled', false);#}
-        {#});#}
-
         // Redirect to different places on submit of the share work form
         shareWorkForm.on('submit', function (event) {
             event.preventDefault();
-            let formData  = new FormData(event.target),
-                returnUrl = '{{ RETURN_URL.name }}={{ RETURN_URL.current }}'
-            switch (formData.get('moment-type')) {
+            let formData    = new FormData(event.target),
+                queryString = new URLSearchParams(formData);
+            switch (formData.get('momentType')) {
                 case 'text':
-                    window.location.href = '{{ routeLookup('learningMomentEvidence.getCreateForm', {userIds: user.id}) }}?' + returnUrl;
+                case 'upload':
+                    window.location.href = '{{ routeLookup('learningMomentEvidence.getCreateForm', {userIds: user.id}) }}?' + queryString.toString();
                     break;
 
                 default:
@@ -65,32 +61,33 @@
 <div data-reveal id="component{{ component.instance.id }}-shareWork" aria-hidden="true" class="reveal-modal">
     <h2>Share a Learning Moment</h2>
     <form id="component{{ component.instance.id }}-shareWork-form">
+        <input name="{{ RETURN_URL.name }}" value="{{ RETURN_URL.current }}" type="hidden" />
         <input type="radio"
-               name="moment-type"
+               name="momentType"
                value="photo"
                id="component{{ component.instance.id }}-momentType-photo">
         <label for="component{{ component.instance.id }}-momentType-photo" class="block"><i class="icon-resource-booking"></i>Take a photo</label>
 
         <input type="radio"
-               name="moment-type"
+               name="momentType"
                value="video"
                id="component{{ component.instance.id }}-momentType-video">
         <label for="component{{ component.instance.id }}-momentType-video" class="block"><i class="icon-video"></i>Record a video</label>
 
         <input type="radio"
-               name="moment-type"
+               name="momentType"
                value="audio"
                id="component{{ component.instance.id }}-momentType-audio">
         <label for="component{{ component.instance.id }}-momentType-audio" class="block"><i class="icon-audio"></i>Record audio</label>
 
         <input type="radio"
-               name="moment-type"
+               name="momentType"
                value="upload"
                id="component{{ component.instance.id }}-momentType-upload">
         <label for="component{{ component.instance.id }}-momentType-upload" class="block"><i class="icon-upload"></i>Upload image or video</label>
 
         <input type="radio"
-               name="moment-type"
+               name="momentType"
                value="text"
                id="component{{ component.instance.id }}-momentType-text">
         <label for="component{{ component.instance.id }}-momentType-text" class="block"><i class="icon-textbox"></i>Write something</label>

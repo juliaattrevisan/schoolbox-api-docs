@@ -58,6 +58,10 @@ class Controller extends Base
             }
         }
 
+        // Which variant is being shown?
+        // * write
+        // * upload
+        $this->request->query->get('momentType');
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningMomentEvidence/form.twig',
