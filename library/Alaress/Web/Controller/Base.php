@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class description here
  *
@@ -24,7 +25,8 @@ use Schoolbox\User;
 use Sentry\State\HubInterface;
 use Throwable;
 
-abstract class Base {
+abstract class Base
+{
     /**
      * @var Request
      */
@@ -87,7 +89,8 @@ abstract class Base {
      * @param  Request $request
      * @return $this
      */
-    public function setRequest($request) {
+    public function setRequest($request)
+    {
         $this->request = $request;
         return $this;
     }
@@ -95,7 +98,8 @@ abstract class Base {
     /**
      * @return Request
      */
-    public function getRequest() {
+    public function getRequest()
+    {
         return $this->request;
     }
 
@@ -103,7 +107,8 @@ abstract class Base {
      * @param bool $value
      * @return $this
      */
-    public function setAllowBackToTheFuture($value) {
+    public function setAllowBackToTheFuture($value)
+    {
         $this->allowBackToTheFuture = $value;
         return $this;
     }
@@ -111,7 +116,8 @@ abstract class Base {
     /**
      * @return bool
      */
-    public function getAllowBackToTheFuture() {
+    public function getAllowBackToTheFuture()
+    {
         return $this->allowBackToTheFuture;
     }
 
@@ -119,7 +125,8 @@ abstract class Base {
      * @param  Response $response
      * @return $this
      */
-    public function setResponse($response) {
+    public function setResponse($response)
+    {
         $this->response = $response;
         return $this;
     }
@@ -127,7 +134,8 @@ abstract class Base {
     /**
      * @return Response
      */
-    public function getResponse() {
+    public function getResponse()
+    {
         return $this->response;
     }
 
@@ -135,7 +143,8 @@ abstract class Base {
      * @param  Di\Container $di
      * @return $this
      */
-    public function setDi($di) {
+    public function setDi($di)
+    {
         $this->di = $di;
         return $this;
     }
@@ -145,7 +154,8 @@ abstract class Base {
      *
      * @return Di\Container
      */
-    public function getDi() {
+    public function getDi()
+    {
         return $this->di;
     }
 
@@ -153,7 +163,8 @@ abstract class Base {
      * @param  Router $router
      * @return $this
      */
-    public function setRouter($router) {
+    public function setRouter($router)
+    {
         $this->router = $router;
         return $this;
     }
@@ -161,7 +172,8 @@ abstract class Base {
     /**
      * @return Router
      */
-    public function getRouter() {
+    public function getRouter()
+    {
         return $this->router;
     }
 
@@ -169,7 +181,8 @@ abstract class Base {
      * @param  Session $session
      * @return $this
      */
-    public function setSession($session) {
+    public function setSession($session)
+    {
         $this->session = $session;
         return $this;
     }
@@ -177,7 +190,8 @@ abstract class Base {
     /**
      * @return Session
      */
-    public function getSession() {
+    public function getSession()
+    {
         return $this->session;
     }
 
@@ -185,7 +199,8 @@ abstract class Base {
      * @param  Authorizer $authorizer
      * @return $this
      */
-    public function setAuthorizer($authorizer) {
+    public function setAuthorizer($authorizer)
+    {
         $this->authorizer = $authorizer;
         return $this;
     }
@@ -193,7 +208,8 @@ abstract class Base {
     /**
      * @return Authorizer
      */
-    public function getAuthorizer() {
+    public function getAuthorizer()
+    {
         return $this->authorizer;
     }
 
@@ -291,7 +307,8 @@ abstract class Base {
      * @return string|bool    The URL for the route if authorized, false if not.
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function getRouteIfAuthorized($name, array $params = array(), User $user = null) {
+    public function getRouteIfAuthorized($name, array $params = array(), User $user = null)
+    {
         if (!($user instanceof User)) {
             $user = $this->getUser();
         }
@@ -320,7 +337,6 @@ abstract class Base {
         /** @var self $controller */
         try {
             $controller = $this->getDi()->get("controller:$name");
-
         } catch (ServiceNotFound $e) {
             // the controller isn't registered... hawkward. Let's remedy that
 
@@ -347,6 +363,8 @@ abstract class Base {
      *
      * @param  mixed $data
      * @return Output\Json
+     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
+     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
      */
     protected function buildJsonOutput($data)
     {
@@ -361,6 +379,8 @@ abstract class Base {
      * @param  string $template A Twig template
      * @param  mixed  $data
      * @return Output\Html
+     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
+     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
      */
     protected function buildUnthemedHtmlOutput($template, $data)
     {
@@ -376,7 +396,8 @@ abstract class Base {
      * @param string $template
      * @param string|array $data
      * @return mixed
-     * @throws ServiceNotFound
+     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
+     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
      */
     protected function buildXmlOutput($template, $data)
     {
@@ -393,7 +414,8 @@ abstract class Base {
      * @param string  $title
      * @param string  $tab
      * @return Output\ThemedHtml
-     * @throws ServiceNotFound If unable to locate HTML web Output
+     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
+     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
      */
     protected function buildHtmlOutput($template, $data, $title = '', $tab = '')
     {
@@ -417,6 +439,8 @@ abstract class Base {
      *
      * @param  string $filename
      * @return Output\File
+     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
+     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
      */
     protected function buildFileOutputFromFilename($filename)
     {
@@ -430,6 +454,8 @@ abstract class Base {
      *
      * @param  string $fileContents
      * @return Output\File
+     * @noinspection PhpDocMissingThrowsInspection The output object is always in DI
+     * @noinspection PhpUnhandledExceptionInspection The output object is always in DI
      */
     protected function buildFileOutputFromString($fileContents)
     {
@@ -528,7 +554,8 @@ abstract class Base {
      * @param int             $httpStatusCode
      * @return \Exception
      */
-    protected function generateException( ?int $errorCode, Throwable $previous = null, string $additionalInfo = '', int $httpStatusCode = 400) {
+    protected function generateException(?int $errorCode, Throwable $previous = null, string $additionalInfo = '', int $httpStatusCode = 400)
+    {
         return $this->eg->generateException($errorCode, $previous, $additionalInfo, $httpStatusCode);
     }
 

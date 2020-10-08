@@ -21,6 +21,35 @@
         /*flex-grow: 1;*/
     }
 </style>
+
+{% autoescape 'js' %}
+<script type="text/javascript">
+    $(function () {
+        let shareWorkForm = $("#component{{ component.instance.id }}-shareWork-form");
+
+        {#// Allow submit only when a moment type is selected#}
+        {#shareWorkForm.on('change', 'input[name="moment-type"]', function () {#}
+        {#    shareWorkForm.find('#component{{ component.instance.id }}-shareWork-submit').prop('disabled', false);#}
+        {#});#}
+
+        // Redirect to different places on submit of the share work form
+        shareWorkForm.on('submit', function (event) {
+            event.preventDefault();
+            let formData  = new FormData(event.target),
+                returnUrl = '{{ RETURN_URL.name }}={{ RETURN_URL.current }}'
+            switch (formData.get('moment-type')) {
+                case 'text':
+                    window.location.href = '{{ routeLookup('learningMomentEvidence.getCreateForm', {userIds: user.id}) }}?' + returnUrl;
+                    break;
+
+                default:
+                    break;
+            }
+        })
+    });
+</script>
+{% endautoescape %}
+
 <div class="small-12 columns no-pad">
     <div class="student-toolkit">
         <img class="profile-image" alt="{{ user.fullName }}" src="/portrait.php?id={{ user.id }}&amp;size=profile" />
@@ -35,7 +64,7 @@
 
 <div data-reveal id="component{{ component.instance.id }}-shareWork" aria-hidden="true" class="reveal-modal">
     <h2>Share a Learning Moment</h2>
-    <form>
+    <form id="component{{ component.instance.id }}-shareWork-form">
         <input type="radio"
                name="moment-type"
                value="photo"
@@ -66,7 +95,7 @@
                id="component{{ component.instance.id }}-momentType-text">
         <label for="component{{ component.instance.id }}-momentType-text" class="block"><i class="icon-textbox"></i>Write something</label>
 
-        <button type="submit">Continue</button>
+        <button id="component{{ component.instance.id }}-shareWork-submit" type="submit">Continue</button>
 
     </form>
     <a class="close-reveal-modal" aria-label="Close">×</a>

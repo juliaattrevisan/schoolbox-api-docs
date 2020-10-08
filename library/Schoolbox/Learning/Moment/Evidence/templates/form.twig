@@ -1,0 +1,136 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Share Work' ]
+) }}
+
+<div class="small-12 column">
+    <h1>Share a Learning Moment</h1>
+    {##
+     # How does the "sharing on behalf of" metadata show?
+     # That depends on who the learning moment is being created for:
+     # * Only for myself: don't show at all
+     # * Only for others: "sharing on behalf of ..."
+     # * For both myself and others: "Sharing for myself, and also on behalf of ..."
+     # * For neither myself nor others: how did you even get here?
+     #}
+    {% if otherUsers is not empty %}
+    <ul class="meta">
+        <li>
+            {# Display differently if showing to other users #}
+            {% if sharingForSelf %}
+                Sharing for myself, and also on behalf of
+            {% else %}
+                Sharing on behalf of
+            {% endif %}
+
+            {##
+             # Presentation depends on how many others are being shared with.
+             # 1-3: just show their names
+             # 4+:  show the names of the first 3, and then "and x others"
+             #}
+            {% set otherUsersLength = otherUsers|length %}
+            {% if otherUsersLength <= 3 %}
+                {% for user in otherUsers -%}
+                    {% if not loop.first %}{{ loop.last ? ' and' : ',' }} {% endif %}<a href="/search/user/{{ user.id }}">{{ user.fullName }}</a>
+                {%- endfor %}
+            {% else %}
+                {%- for user in otherUsers[0:2] -%}
+                    {% if not loop.first %}, {% endif %}<a href="/search/user/{{ user.id }}">{{ user.fullName }}</a>
+                {%- endfor %}
+                and <a href="#" data-reveal-id="all-users">{{ otherUsersLength - 2 }} others</a>
+
+                <div data-reveal id="all-users" class="reveal-modal">
+                    <h2>Sharing on behalf of {{ users|length }} users</h2>
+                    <ul class="information-list">
+                        {% for user in users %}
+                            <li>
+                                <div class="compact card">
+                                    <a href="/search/user/{{ user.id }}">
+                                        <img src="/portrait.php?id={{ user.id }}&amp;size=square64">
+                                        <p>{{ user.fullName }}</p>
+                                    </a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <a class="close-reveal-modal" aria-label="Close">×</a>
+                </div>
+            {% endif %}
+        </li>
+    </ul>
+    {% endif %}
+</div>
+
+
+<div class="row">
+    <div class="small-12 island">
+        <form action="{{ routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) }}" method="post" id="evidence-form">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label class="required" for="evidence-body">
+                            Write something
+                        </label>
+                        <textarea name="body" id="evidence-body" required></textarea>
+                    </div>
+                </fieldset>
+            </section>
+            <input type="submit" id="evidence-submit" value="Submit" />
+        </form>
+    </div>
+</div>
+
+
+{# Set up CKEditor #}
+<script src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+{% autoescape 'js' %}
+<script type="text/javascript">
+    $(function () {
+        let editorId = 'evidence-body';
+        $.fn.alaressEditor({
+            targetElements: $('#' + editorId)
+        });
+
+        // Update the editor's form input on change
+        CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
+
+        $('#evidence-form').alaressValidate({
+            rules: {
+                body: {
+                    required: true,
+                },
+            },
+            submitHandler(form, event) {
+                event.preventDefault();
+
+                // Update the editor's form input
+                CKEDITOR.instances[editorId].updateElement();
+
+                // Build a request to post the form
+                let formData = new FormData(form),
+                    payload = {
+                        body: formData.get('body'),
+                    },
+                    toast  = $('#toast'),
+                    submit = $('#evidence-submit');
+
+                // Toast then post
+                toast.toastActivate('Saving...')
+                submit.prop('disabled', true);
+
+                // Redirect to the return URL provided
+                axios.post(form.action, payload)
+                    .then(() => {
+                        toast.toastTimeout({text: 'Saved'});
+                        window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
+                    })
+                    .catch(() => toast.toastTimeout({text: 'Save failed', css: 'alert'}))
+                    .finally(() => submit.prop('disabled', false));
+            }
+        })
+    });
+</script>
+{% endautoescape %}
+
+<div id="toast" class="toast"></div>
