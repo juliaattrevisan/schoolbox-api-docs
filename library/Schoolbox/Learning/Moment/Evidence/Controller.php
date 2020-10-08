@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Moment\Evidence;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
 use Schoolbox\User;
 
 /**
@@ -152,7 +153,7 @@ class Controller extends Base
         }
         $this->mapper->save($evidenceCollection);
         $this->response->content->set(
-            $this->buildJsonOutput($requestBody)
+            $this->buildJsonOutput($evidenceCollection->map(new ModelToArray()))
         );
     }
 
