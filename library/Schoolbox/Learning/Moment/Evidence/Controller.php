@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\Moment\Evidence;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
-use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
+use Schoolbox\Learning\Moment\Evidence\Translator;
 use Schoolbox\User;
 
 /**
@@ -143,17 +143,16 @@ class Controller extends Base
         /** @var \stdClass $requestBody */
         $requestBody        = $this->request->content->get();
         $evidenceCollection = $this->mapper->createCollection();
+        $baseModel          = (new Translator\ArrayToModel())((array)$requestBody)
+            ->setCreator($this->getUser());
         foreach ($users as $user) {
             $evidenceCollection->add(
-                $this->mapper->createModel()
-                             ->setBody($requestBody->body)
-                             ->setRecipient($user)
-                             ->setCreator($this->getUser())
+                (clone $baseModel)->setRecipient($user)
             );
         }
         $this->mapper->save($evidenceCollection);
         $this->response->content->set(
-            $this->buildJsonOutput($evidenceCollection->map(new ModelToArray()))
+            $this->buildJsonOutput($evidenceCollection->map(new Translator\ModelToArray()))
         );
     }
 
