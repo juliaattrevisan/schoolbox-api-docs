@@ -71,26 +71,26 @@ class Controller extends Base
     }
 
 
-    /**
-     * Retrieve a JSON representation of a single learning moment.
-     *
-     * @api   GET /learning/evidence/{id}
-     * @since 20.2
-     */
-    public function getMoment(): void
-    {
-    }
-
-
-    /**
-     * Retrieve a user's learning moments.
-     *
-     * @api   GET /learning/evidence/user/{userId}
-     * @since 20.2
-     */
-    public function getMomentsForUser(User $user): void
-    {
-    }
+//    /**
+//     * Retrieve a JSON representation of a single learning moment.
+//     *
+//     * @api   GET /learning/evidence/{id}
+//     * @since 20.2
+//     */
+//    public function getMoment(): void
+//    {
+//    }
+//
+//
+//    /**
+//     * Retrieve a user's learning moments.
+//     *
+//     * @api   GET /learning/evidence/user/{userId}
+//     * @since 20.2
+//     */
+//    public function getMomentsForUser(User $user): void
+//    {
+//    }
 
 
     /**
@@ -157,13 +157,13 @@ class Controller extends Base
     }
 
 
-    /**
-     * Delete a single moment.
-     *
-     * @api   DELETE /learning/evidence/{id}
-     * @since 20.2
-     */
-    public function deleteMoment(): void
-    {
-    }
+//    /**
+//     * Delete a single moment.
+//     *
+//     * @api   DELETE /learning/evidence/{id}
+//     * @since 20.2
+//     */
+//    public function deleteMoment(): void
+//    {
+//    }
 }

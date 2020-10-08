@@ -113,22 +113,22 @@ class Module extends BaseModule
     }
 
 
-    /**
-     * Preload the requested student
-     *
-     * @param array $params
-     * @return array
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     */
-    private function preloadUser(array $params): array
-    {
-        return [
-            'user' => $this->getMapperFactory()
-                           ->get(UserMapper::class)
-                           ->findById($params['userId']),
-        ];
-    }
+//    /**
+//     * Preload the requested student
+//     *
+//     * @param array $params
+//     * @return array
+//     * @throws \Schoolbox\Mapper\Exception
+//     * @throws \Schoolbox\Mapper\Exception\Deleted
+//     */
+//    private function preloadUser(array $params): array
+//    {
+//        return [
+//            'user' => $this->getMapperFactory()
+//                           ->get(UserMapper::class)
+//                           ->findById($params['userId']),
+//        ];
+//    }
 
 
     /**
