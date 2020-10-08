@@ -19,6 +19,10 @@ use Schoolbox\User;
  */
 class Controller extends Base
 {
+    private const MOMENT_TYPE_TEXT   = 'text';
+    private const MOMENT_TYPE_UPLOAD = 'upload';
+
+
     /**
      * @var Mapper
      */
@@ -59,12 +63,23 @@ class Controller extends Base
         }
 
         // Which variant is being shown?
-        // * write
+        // * text
         // * upload
-        $this->request->query->get('momentType');
+        $momentType = $this->request->query->get('momentType');
+        $template   = '@learningMomentEvidence/form/text.twig';
+        switch ($momentType) {
+            case self::MOMENT_TYPE_UPLOAD:
+                $template = '@learningMomentEvidence/form/upload.twig';
+                break;
+
+            case self::MOMENT_TYPE_TEXT:
+            default:
+                break;
+        }
+
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@learningMomentEvidence/form.twig',
+                $template,
                 [
                     'users'          => $users,
                     'userIds'        => $users->getPropertyValues('id'),
