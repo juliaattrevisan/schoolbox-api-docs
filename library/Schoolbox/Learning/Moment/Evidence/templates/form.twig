@@ -91,7 +91,16 @@
         $.fn.alaressEditor({
             targetElements: $('#' + editorId)
         });
+
+        // Update the editor's form input on change
+        CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
+
         $('#evidence-form').alaressValidate({
+            rules: {
+                body: {
+                    required: true,
+                },
+            },
             submitHandler(form, event) {
                 event.preventDefault();
 
