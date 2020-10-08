@@ -297,20 +297,20 @@ class Factory
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper
             ))
-            ->add(new Timetable\Classes(
-                $this->log,
-                $this->perform,
-                $lookup,
-                $timetableRegistry,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
-            ))
             ->add(new Timetable\AdditionalSubjects(
                 $this->log,
                 $this->perform,
                 $api,
                 $lookup,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper
+            ))
+            ->add(new Timetable\Classes(
+                $this->log,
+                $this->perform,
+                $lookup,
+                $timetableRegistry,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
