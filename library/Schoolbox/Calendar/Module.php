@@ -38,15 +38,20 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
+        // need this to navigate /event route
+        $selectedDateRegex = '([0][1-9]|[12][0-9]|3[01])(-)(((0)[0-9])|((1)[0-2]))(-)\d{4}';
+
         $this->addGetRoute($router, 'getOwnCalendar', $basePath, "{/selectedDate}");
         $this->addGetRoute($router, 'getCalendar', $basePath, "/{selectedDate}/{userId}")->addTokens([
-            'userId' => '\d+',
+            'selectedDate' => $selectedDateRegex,
+            'userId'       => '\d+',
         ]);
 
         // Redirect old paths
         $this->addGetRoute($router, 'redirect', $basePath, "/{format}{/selectedDate,userId}")->addTokens([
-            'format' => 'week|month|full|week-list|month-list',
-            'userId' => '\d+',
+            'format'       => 'week|month|full|week-list|month-list',
+            'selectedDate' => $selectedDateRegex,
+            'userId'       => '\d+',
         ]);
         $this->addPostRoute($router, 'changeState', $basePath, '/changeState');
     }
