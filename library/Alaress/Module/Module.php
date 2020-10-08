@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Catch-all class for defining modules.
  *
@@ -22,6 +23,7 @@ use Schoolbox\MapperFactory;
 use Alaress\Twig\Loader\IChainLoader;
 use Twig\Loader\FilesystemLoader;
 use Twig\Error\LoaderError;
+
 use function array_merge;
 
 class Module
@@ -108,7 +110,8 @@ class Module
      * @param ContainerInterface $injector
      * @param string             $basename
      */
-    public function __construct(ContainerInterface $injector, $basename = '') {
+    public function __construct(ContainerInterface $injector, $basename = '')
+    {
         $this->setInjector($injector);
         if ($basename) {
             $this->setBasename($basename);
@@ -284,7 +287,7 @@ class Module
         if (!$this->basename) {
             throw new LogicException(sprintf('Module class "%s" has no basename set', get_class($this)));
         }
-        $key = 'module:'.$this->basename;
+        $key = 'module:' . $this->basename;
         if (!$override && $injector->has($key)) {
             $other = $injector->get($key);
             if (get_class($other) != get_class($this)) {
@@ -377,7 +380,9 @@ class Module
      * @param Router $router
      * @param string $basePath The base route for this module
      */
-    public function initRoutes(Router $router, $basePath) {}
+    public function initRoutes(Router $router, $basePath)
+    {
+    }
 
     /**
      * Helper for calling $router->add() for this component's basename.
@@ -396,7 +401,7 @@ class Module
      */
     protected function addRoute(Router $router, $alias, $basePath, $path)
     {
-        return $router->getRoutes()->add($this->basename.'.'.$alias, $basePath.$path);
+        return $router->getRoutes()->add($this->basename . '.' . $alias, $basePath . $path);
     }
 
     /**
@@ -416,7 +421,7 @@ class Module
      */
     protected function addGetRoute(Router $router, $alias, $basePath, $path)
     {
-        return $router->getRoutes()->addGet($this->basename.'.'.$alias, $basePath.$path);
+        return $router->getRoutes()->addGet($this->basename . '.' . $alias, $basePath . $path);
     }
 
     /**
@@ -436,7 +441,7 @@ class Module
      */
     protected function addPostRoute(Router $router, $alias, $basePath, $path)
     {
-        return $router->getRoutes()->addPost($this->basename.'.'.$alias, $basePath.$path);
+        return $router->getRoutes()->addPost($this->basename . '.' . $alias, $basePath . $path);
     }
 
     /**
@@ -481,7 +486,7 @@ class Module
     protected function initDependingModules()
     {
         foreach ($this->moduleDependencies as $dependency) {
-            $dependingModule = $this->getInjector()->get('module:'.$dependency);
+            $dependingModule = $this->getInjector()->get('module:' . $dependency);
             if (!$dependingModule instanceof Module) {
                 throw new LogicException(sprintf('Module "%s" does not exist', $dependency));
             }
@@ -498,7 +503,9 @@ class Module
      *
      * @param PathMatcher $matcher
      */
-    public function initRoutePreloads(PathMatcher $matcher) {}
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+    }
 
     /**
      * Helper method for adding a route preload for this component's basename.
@@ -524,7 +531,9 @@ class Module
      *
      * @param Authorizer $authorizer
      */
-    public function initRoutePermissions(Authorizer $authorizer) {}
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+    }
 
     /**
      * Helper method for adding a route permission for this component's basename.
@@ -551,7 +560,9 @@ class Module
      * @param IChainLoader $templateLoader
      * @throws LoaderError if the directory does not exist
      */
-    public function initTemplatePaths(IChainLoader $templateLoader) {}
+    public function initTemplatePaths(IChainLoader $templateLoader)
+    {
+    }
 
 
     /**
@@ -684,13 +695,16 @@ class Module
      *
      * @param ContainerInterface $injector The dependency injection container.
      */
-    public function initControllers(ContainerInterface $injector) {}
+    public function initControllers(ContainerInterface $injector)
+    {
+    }
 
     /**
      * @param  ContainerInterface $injector
      * @return $this
      */
-    public function setInjector(ContainerInterface $injector) {
+    public function setInjector(ContainerInterface $injector)
+    {
         $this->injector = $injector;
         return $this;
     }
@@ -698,7 +712,8 @@ class Module
     /**
      * @return ContainerInterface
      */
-    public function getInjector() {
+    public function getInjector()
+    {
         return $this->injector;
     }
 
