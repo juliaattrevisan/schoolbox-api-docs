@@ -541,21 +541,19 @@ class Profile implements IStrategy
          * Otherwise the student doesn't have any parents in tass, for whatever reason
          */
         if (isset($families['lookup'][$studentId])) {
-            foreach ($families['lookup'][$studentId] as $externalId) {
+            foreach ($families['lookup'][$studentId] as $externalId => $parent) {
                 $this->log->info("Adding parent {$externalId} for student {$studentId} {$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}");
-
-                $parent = $families['index'][$externalId];
 
                 /* Each parent in the family
                  */
-                $email = trim((string)$parent['e_mail']);
-                $firstname = trim((string)$parent['preferred_name']);
+                $email = trim((string)$parent['email']);
+                $firstname = trim((string)$parent['firstname']);
                 $lastname = trim((string)$parent['surname']);
-                $phoneHome = trim((string)($parent['phone']['home'] ?? ''));
-                $phoneMobile = trim((string)($parent['phone']['mobile'] ?? ''));
-                $phoneWork = trim((string)($parent['phone']['work'] ?? ''));
-                $relationship = trim((string)$parent['description']);
-                $title = trim((string)$parent['title']);
+                $phoneHome = trim((string)$parent['home']);
+                $phoneMobile = trim((string)$parent['mobile']);
+                $phoneWork = trim((string)$parent['work']);
+                $relationship = trim((string)$parent['relationship']);
+                $title = '';
 
                 /* $username is the result of that $externalId calculation
                  * but you can override this in UPS anyway

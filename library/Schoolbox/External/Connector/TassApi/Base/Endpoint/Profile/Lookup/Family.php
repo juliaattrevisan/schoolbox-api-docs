@@ -21,6 +21,18 @@ class Family
 {
 
     /**
+     * The node corresponding to a father's data in a Family record.
+     *
+     * I have a fear that this will be different per tass implementation somewhere but, for now,
+     * presume that 'person2' is (and always is) the papa
+     *
+     * + Assumption: person2 represents the primary parent (typically Father)
+     */
+    public CONST FATHER_NODE = 'person2';
+    public const MOTHER_NODE = 'person1';
+
+
+    /**
      * Default spouse prefix
      *
      * @var string
@@ -35,25 +47,6 @@ class Family
      * These two nodes have the following keys and we use them to identify father and mother details.
      */
     private const PARENT_PERSON_NODES = ['person2', 'person1'];
-
-
-    /**
-     * The node corresponding to a father's data in a Family record.
-     *
-     * I have a fear that this will be different per tass implementation somewhere but, for now,
-     * presume that 'person2' is (and always is) the papa
-     *
-     * + Assumption: person2 represents the primary parent (typically Father)
-     *
-     * @var string
-     */
-    private $fatherNode = 'person2';
-
-
-    /**
-     * @var string
-     */
-    private $motherNode = 'person1';
 
 
     /**
@@ -162,7 +155,7 @@ class Family
     {
         /* Do some funny prefix stuff for parents
          */
-        if ($this->fatherNode === $node) {
+        if (self::FATHER_NODE === $node) {
             $externalId = "P{$identifier}";
         } else {
             $externalId = "{$this->spousePrefix}{$identifier}";
@@ -324,10 +317,10 @@ class Family
                             /* Anyway, once you identify fathers, construct a parent using their node
                              * which is apparently person2.
                              */
-                            $personExternalId = $this->deriveExternalId($this->fatherNode, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
+                            $personExternalId = $this->deriveExternalId(self::FATHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
                             $this->index[$personExternalId] = $this->processSplitParentNode(
-                                $this->fatherNode,
+                                self::FATHER_NODE,
                                 $personExternalId,
                                 $subfamily,
                                 $this->addnumFather
@@ -337,10 +330,10 @@ class Family
                             /* Once you identify mothers, construct a parent using their node
                              * which is apparently person1.
                              */
-                            $personExternalId = $this->deriveExternalId($this->motherNode, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
+                            $personExternalId = $this->deriveExternalId(self::MOTHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
                             $this->index[$personExternalId] = $this->processSplitParentNode(
-                                $this->motherNode,
+                                self::MOTHER_NODE,
                                 $personExternalId,
                                 $subfamily,
                                 $this->addnumMother
@@ -389,6 +382,9 @@ class Family
     {
         $person = $this->processParentNode($node, $externalId, $family);
 
+        /* TODO Align split fams with their itemised variant in processParentNode
+         */
+
         /* Rearrange contents of $person['address'] to find their first non-null email address
          */
         $person['e_mail'] = array_values(array_filter([
@@ -414,7 +410,18 @@ class Family
      */
     private function processParentNode(string $node, string $externalId, array $family): array
     {
-        $person = $family[$node];
+        $person = $this->phones[$family['user_code']][$node] ?? [
+            'firstname' => '',
+            'surname' => '',
+            'mobile' => '',
+            'home' => '',
+            'work' => '',
+            'email' => '',
+            'relationship' => '',
+        ];
+
+        /* Assign an externalId to this person
+         */
         $person['externalId'] = $externalId;
 
         /* Assign studentIds to each of their externalIds, as per the
@@ -422,15 +429,10 @@ class Family
          */
         $person['students'] = $family['students'];
 
-        /* Merge phone numbers from another lookup which extracted data
-         * from some other endpoint
-         */
-        $person['phone'] = $this->phones[$family['user_code']] ?? null;
-
         /* Index each parent by their externalId
          */
-        foreach($person['students'] as $student) {
-            $this->lookup[$student][] = $person['externalId'];
+        foreach($person['students'] as $studentExternalId) {
+            $this->lookup[$studentExternalId][$externalId] = $person;
         }
 
         return $person;
