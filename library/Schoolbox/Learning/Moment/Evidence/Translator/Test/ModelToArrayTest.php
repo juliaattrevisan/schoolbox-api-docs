@@ -33,54 +33,43 @@ class ModelToArrayTest extends TestCase
      */
     public function getTestInvokeData(): iterable
     {
-        yield 'empty' => [new Model(), []];
-
-        yield 'id + body' => [
-            (new Model())->setId(3)->setBody('something'),
+        yield 'empty fields' => [
+            new Model(),
             [
-                'id'   => 3,
-                'body' => 'something',
+                'id'               => null,
+                'body'             => null,
+                'createdAt'        => null,
+                'updatedAt'        => null,
+                'storage'          => null,
+                'filename'         => null,
+                'creator'          => null,
+                'recipient'        => null,
+                'discussionThread' => null,
             ],
         ];
 
         $timezone = new DateTimeZone('+00:00');
-        yield 'dates - deleted at not included' => [
+        yield 'populated fields' => [
             (new Model())
+                ->setId(3)
+                ->setBody('something')
                 ->setCreatedAt(new Alaress_Date_Format('2020-01-01T00:00:00+00:00', DATE_ATOM, $timezone))
-                ->setUpdatedAt(new Alaress_Date_Format('2020-02-01T00:00:00+00:00', DATE_ATOM, $timezone)),
-            [
-                'createdAt' => '2020-01-01T00:00:00+00:00',
-                'updatedAt' => '2020-02-01T00:00:00+00:00',
-                'deletedAt' => '2020-03-01T00:00:00+00:00',
-            ],
-        ];
-
-        yield 'storage' => [
-            (new Model())
+                ->setUpdatedAt(new Alaress_Date_Format('2020-02-01T00:00:00+00:00', DATE_ATOM, $timezone))
+                ->setDeletedAt(new Alaress_Date_Format('2020-03-01T00:00:00+00:00', DATE_ATOM, $timezone))
                 ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
-                ->setFilename('test.gif'),
-            [
-                'storage'  => [
-                    'hash' => '1234567890123456789012345678901234567890',
-                ],
-                'filename' => 'test.gif',
-            ],
-        ];
-
-        yield 'users' => [
-            (new Model())
+                ->setFilename('test.gif')
                 ->setCreator((new User())->setId(55))
-                ->setRecipient((new User())->setId(193)),
-            [
-                'creator'   => ['id' => 55],
-                'recipient' => ['id' => 193],
-            ],
-        ];
-
-        yield 'discussion thread' => [
-            (new Model())
+                ->setRecipient((new User())->setId(193))
                 ->setDiscussionThread((new DiscussionThread())->setId(14)),
             [
+                'id'               => 3,
+                'body'             => 'something',
+                'createdAt'        => '2020-01-01T00:00:00+00:00',
+                'updatedAt'        => '2020-02-01T00:00:00+00:00',
+                'storage'          => ['hash' => '1234567890123456789012345678901234567890',],
+                'filename'         => 'test.gif',
+                'creator'          => ['id' => 55],
+                'recipient'        => ['id' => 193],
                 'discussionThread' => ['id' => 14],
             ],
         ];
