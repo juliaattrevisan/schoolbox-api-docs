@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Moment\Evidence;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Moment\Evidence\Translator;
+use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\User;
 
 /**
@@ -52,8 +53,8 @@ class Controller extends Base
     {
         // For ease of rendering: filter out users which are not myself
         $sharingForSelf = false;
-        $otherUsers = $users->emptyClone();
-        $thisUserId = $this->getUser()->getId();
+        $otherUsers     = $users->emptyClone();
+        $thisUserId     = $this->getUser()->getId();
         foreach ($users as $user) {
             if ($user->getId() === $thisUserId) {
                 $sharingForSelf = true;
@@ -67,9 +68,26 @@ class Controller extends Base
         // * upload
         $momentType = $this->request->query->get('momentType');
         $template   = '@learningMomentEvidence/form/text.twig';
+        $params     = [
+            'users'          => $users,
+            'userIds'        => $users->getPropertyValues('id'),
+            'otherUsers'     => $otherUsers,
+            'sharingForSelf' => $sharingForSelf,
+        ];
         switch ($momentType) {
             case self::MOMENT_TYPE_UPLOAD:
                 $template = '@learningMomentEvidence/form/upload.twig';
+
+                // Also shovel in an attachzone
+                $zone = new GenericZone('storage', \Schoolbox\Resource\Storage\Mapper::getInstance());
+                $zone->setAttachmentsLabel('')
+                     ->setAttachPrompt('upload files to this location')
+                     ->setMimeFilter('*/*')
+                     ->setFileVar('storage')
+                     ->setMulti(false)
+                     ->setThumbnailSize(64)
+                     ->setModalTitle('Select file');
+                $params['zone'] = $zone->getTwigContext();
                 break;
 
             case self::MOMENT_TYPE_TEXT:
@@ -78,15 +96,7 @@ class Controller extends Base
         }
 
         $this->response->content->set(
-            $this->buildHtmlOutput(
-                $template,
-                [
-                    'users'          => $users,
-                    'userIds'        => $users->getPropertyValues('id'),
-                    'otherUsers'     => $otherUsers,
-                    'sharingForSelf' => $sharingForSelf,
-                ]
-            )
+            $this->buildHtmlOutput($template, $params)
         );
     }
 
