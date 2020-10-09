@@ -129,7 +129,7 @@
                         rolesCount  = this.event.audiences.roles.length;
 
                 if (this.isPersonalEvent) return 'Personal';
-                if (this.isGroupEvent) return '<a href="/homepage/'+ this.event.audiences.folders[0].id +'">' + this.event.audiences.folders[0].name  + '</a>';
+                if (this.isGroupEvent) return '<a href="/homepage/'+ this.event.audiences.folders[0]?.id +'">' + this.event.audiences.folders[0]?.name  + '</a>';
 
                 if (campusCount) {
                     let suffix = (campusCount > 1) ? ' Campuses' : ' Campus';

@@ -70,6 +70,10 @@ class Access
             return true;
         }
 
+        if ($effector->getId() === $event->getOwner()->getId()) {
+            return true;
+        }
+
         // Split groups into an array of ints, if there are any
         if ($event->getFolderCollection()) {
             $groups = $event->getFolderCollection()->getPropertyValues('id');

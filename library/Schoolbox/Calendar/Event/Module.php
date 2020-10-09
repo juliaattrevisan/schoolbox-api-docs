@@ -65,6 +65,10 @@ class Module extends BaseModule
                         $event = $params['event'];
 
                         $loggedInUser = $this->getAuthorizer()->getUser();
+                        // owner should be able to see the page
+                        if ($event->getAuthor()->getId() === $loggedInUser->getId()) {
+                            return true;
+                        }
 
                         /**
                          * Personal Event: owner, parent of owner, staff, or invited guest, can see event
@@ -73,7 +77,6 @@ class Module extends BaseModule
                          */
                         if ($event->isPersonalLevel()) {
                             $isStaff        = $loggedInUser->getRole()->isStaff();
-                            $isOwner        = $event->getAuthor()->getId() === $loggedInUser->getId();
                             $isParentOfUser = $loggedInUser->isParentOf($event->getAuthor()->loadParents());
 
                             /* I suppose if you're on the invited list,
@@ -84,7 +87,7 @@ class Module extends BaseModule
                                 'user_id' => $loggedInUser->getId()
                             ]);
 
-                            if ($isOwner || $isStaff || $isParentOfUser || $isAttendee) {
+                            if ($isStaff || $isParentOfUser || $isAttendee) {
                                 return true;
                             }
                         } elseif ($event->isGroupLevel()) {
