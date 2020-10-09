@@ -7,11 +7,15 @@
                 {##
                  # I can't label attachzones as I would standard file inputs.
                  #
-                 # I don't think I can make them required either.
+                 # I don't think I can make them required either, thus the
+                 # existence of this dummy input with a required rule attached.
+                 # (This input will only fail validation if there's no files
+                 # attached)
                  #}
-                <label class="required">
+                <label class="required" for="evidence-filename">
                     Upload File
                 </label>
+                <input type="hidden" name="filename" required />
                 {% include 'sub/attachzone.twig' with { attachzone: zone } %}
             </div>
         </fieldset>

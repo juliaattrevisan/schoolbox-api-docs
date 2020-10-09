@@ -94,8 +94,14 @@
                 body: {
                     required: true,
                 },
-                storage: {
-                    required: true,
+                filename: {
+                    required: {
+                        depends: function () {
+                            // This input will never be filled, and will only
+                            // fail validation if there's no storage items
+                            return $('#evidence-form [name="storage"]').length === 0;
+                        }
+                    }
                 },
             },
             submitHandler(form, event) {
