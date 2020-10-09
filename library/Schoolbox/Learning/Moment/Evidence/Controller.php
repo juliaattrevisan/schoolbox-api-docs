@@ -83,7 +83,7 @@ class Controller extends Base
                 $zone->setAttachmentsLabel('')
                      ->setAttachPrompt('upload files to this location')
                      ->setMimeFilter('*/*')
-                     ->setFileVar('storage')
+                     ->setFileVar('file')
                      ->setMulti(false)
                      ->setThumbnailSize(64)
                      ->setModalTitle('Select file');
