@@ -79,6 +79,9 @@
 {% block formJs %}
     {% autoescape 'js' %}
         <script type="text/javascript">
+            let buildValidationRules = function () {
+                return {};
+            }
             let buildPayload = function (form) {
                 return {};
             }
@@ -90,20 +93,7 @@
 <script type="text/javascript">
     $(function () {
         $('#evidence-form').alaressValidate({
-            rules: {
-                body: {
-                    required: true,
-                },
-                filename: {
-                    required: {
-                        depends: function () {
-                            // This input will never be filled, and will only
-                            // fail validation if there's no storage items
-                            return $('#evidence-form [name="storage"]').length === 0;
-                        }
-                    }
-                },
-            },
+            rules: buildValidationRules(),
             submitHandler(form, event) {
                 event.preventDefault();
 

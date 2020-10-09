@@ -25,6 +25,20 @@
 {% block formJs %}
     {% autoescape 'js' %}
         <script type="text/javascript">
+            let buildValidationRules = function () {
+                return {
+                    filename: {
+                        required: {
+                            depends: function () {
+                                // This input will never be filled, and will only
+                                // fail validation if there's no storage items
+                                return $('#evidence-form [name="storage"]').length === 0;
+                            }
+                        }
+                    },
+                }
+            };
+
             let buildPayload = function (form) {
                 let formData = new FormData(form),
                     storage  = formData.get('storage'),
@@ -49,7 +63,7 @@
                     },
                     filename: filename,
                 };
-            }
+            };
         </script>
     {% endautoescape %}
 {% endblock formJs %}

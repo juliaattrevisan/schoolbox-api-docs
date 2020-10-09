@@ -26,12 +26,20 @@
                 CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
             });
 
+            let buildValidationRules = function () {
+                return {
+                    body: {
+                        required: true,
+                    },
+                };
+            };
+
             let buildPayload = function (form) {
                 let formData = new FormData(form);
                 return {
                     body: formData.get('body'),
                 };
-            }
+            };
         </script>
     {% endautoescape %}
 {% endblock formJs %}
