@@ -266,11 +266,11 @@ class AdditionalSubjects implements IStrategy
                     (string)$additionalSubject['class']
                 );
 
-                /* Also try to find the non-unitised version of the $code in addition
+                /* Also try to find the unitised version of the $code in addition
                  *
-                 * e.g. search for -1011-A in addition to 10-1011-A since a teacher
-                 * is apparently associated with both possible outcomes; one or the
-                 * other might exist first
+                 * e.g. search for -1011-A (unitised) in addition to 10-1011-A (non-unitised)
+                 * since a teacher is apparently associated with both possible outcomes;
+                 * one or the other might exist first
                  */
                 $pb = ($this->classEntryMapper->getPredicateBuilder())
                     ->like('code', "%{$code}");
