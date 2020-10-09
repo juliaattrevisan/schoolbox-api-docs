@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Moment\Evidence;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Moment\Evidence\Translator;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\User;
 
@@ -172,7 +173,21 @@ class Controller extends Base
     {
         // requestBody is a stdclass from JSON, I'd rather work with arrays:
         // encode then decode
-        $requestBody        = json_decode(json_encode($this->request->content->get()), true);
+        $requestBody = json_decode(json_encode($this->request->content->get()), true);
+
+
+        // Check for a file upload: if there is one put it in the evidence
+        if (isset($requestBody['file'])) {
+            $factory = new CollectorFactory();
+            $file    = $factory->build([$requestBody['file']])->getFirst();
+            if ($file) {
+                $requestBody['storage']['hash'] = $file->getHash();
+                $requestBody['filename']        = $file->getBasename();
+            }
+        }
+
+
+        // Save the evidence
         $evidenceCollection = $this->mapper->createCollection();
         $baseModel          = (new Translator\ArrayToModel())($requestBody)
             ->setCreator($this->getUser());
