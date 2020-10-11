@@ -116,8 +116,17 @@ HELP;
                         } else {
                             $log->warning("{$prefix}: transmission did not return a plagscanId for submission file {$currentDocument->getStudentSubmissionFileId()}");
                         }
-                    }
-                    catch (Exception $e) {
+                    } catch (\RuntimeException|\InvalidArgumentException $e) {
+
+                        /* Transient errors can get logged; transmit() retry is allowed later
+                         *
+                         * These are fixable things like plagscan being unavailable temporarily,
+                         * or their api signature(s) have changed, etc. without having to ban the
+                         * plagscan document entirely
+                         *
+                         * DomainExceptions are not going to so readily change;
+                         * such as filesize limits, filetypes, files not existing, other unrecoverables
+                         */
                         $log->error($e->getMessage());
                     }
 
