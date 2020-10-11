@@ -11,8 +11,8 @@
         "options" : {
             "allDay": event.allDay,
             "type"  : {
-                "name": event.type.type,
-                "color": event.type.color,
+                "name": event.type.type ?? '',
+                "color": event.type.color ?? 'unset',
             }
         },
         "dates"   : {

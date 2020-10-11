@@ -165,11 +165,11 @@
                             {% if eventTypes|length %}
                                 <select name="type">
                                     {% for eventType in eventTypes %}
-                                        <option value="{{ eventType.id }}" {{ eventType.id == event.type.id ? 'selected="selected"' : '' }}>{{ eventType.type }}</option>
+                                        <option value="{{ eventType.id }}" {{ eventType.id == (event.type ? event.type.id : 0) ? 'selected="selected"' : '' }}>{{ eventType.type }}</option>
                                     {% endfor %}
                                 </select>
                             {% else %}
-                                <input type="hidden" name="type" value="{{ event.type.id }}" />
+                                <input type="hidden" name="type" value="{{ event.type.id ?? '' }}" />
                             {% endif %}
                         </label>
                     </div>
