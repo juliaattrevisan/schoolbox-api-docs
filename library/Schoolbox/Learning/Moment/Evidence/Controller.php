@@ -176,20 +176,9 @@ class Controller extends Base
         $requestBody = json_decode(json_encode($this->request->content->get()), true);
 
 
-        // Check for a file upload: if there is one put it in the evidence
-        if (isset($requestBody['file'])) {
-            $factory = new CollectorFactory();
-            $file    = $factory->build([$requestBody['file']])->getFirst();
-            if ($file) {
-                $requestBody['storage']['hash'] = $file->getHash();
-                $requestBody['filename']        = $file->getBasename();
-            }
-        }
-
-
         // Save the evidence
         $evidenceCollection = $this->mapper->createCollection();
-        $baseModel          = (new Translator\ArrayToModel())($requestBody)
+        $baseModel          = (new Translator\ArrayToModel(new CollectorFactory()))($requestBody)
             ->setCreator($this->getUser());
         foreach ($users as $user) {
             $evidenceCollection->add(

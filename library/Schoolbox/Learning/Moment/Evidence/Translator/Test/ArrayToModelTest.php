@@ -11,10 +11,13 @@ namespace Schoolbox\Learning\Moment\Evidence\Translator\Test;
 
 use Alaress_Date_Format;
 use DateTimeZone;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\Learning\Moment\Evidence\Model;
 use Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel;
+use Schoolbox\Resource\Attachment\Collector\Collector;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 
@@ -84,6 +87,27 @@ class ArrayToModelTest extends TestCase
             (new Model())
                 ->setDiscussionThread((new DiscussionThread())->setId(14)),
         ];
+
+        // Storage file upload: require a mock here
+        $storage = (new Storage())
+            ->setHash('1234567890123456789012345678901234567890')
+            ->setBasename('test.gif');
+        $collectorMock = $this->createMock(Collector::class);
+        $collectorMock->method('getFirst')->willReturn($storage);
+
+        /** @var CollectorFactory|MockObject $collectorFactoryMock */
+        $collectorFactoryMock = $this->createMock(CollectorFactory::class);
+        $collectorFactoryMock->method('build')->willReturn($collectorMock);
+
+        yield 'file upload' => [
+            [
+                'file' => 'file:1234567890123456789012345678901234567890:test.gif',
+            ],
+            (new Model())
+                ->setStorage($storage)
+                ->setFilename('test.gif'),
+            new ArrayToModel($collectorFactoryMock),
+        ];
     }
 
 
@@ -91,11 +115,21 @@ class ArrayToModelTest extends TestCase
      * @dataProvider getTestInvokeData
      * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel::__invoke
      *
-     * @param array $input
-     * @param Model $expected
+     * @param array             $input
+     * @param Model             $expected
+     * @param ArrayToModel|null $converter
+     *
+     * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
-    public function testInvoke(array $input, Model $expected): void
+    public function testInvoke(array $input, Model $expected, ArrayToModel $converter = null): void
     {
-        self::assertEquals($expected, (new ArrayToModel())($input));
+        if (!$converter) {
+            /** @var CollectorFactory|MockObject $collectorFactoryMock */
+            $collectorFactoryMock = $this->createMock(CollectorFactory::class);
+            $converter ??= new ArrayToModel($collectorFactoryMock);
+        }
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        self::assertEquals($expected, $converter($input));
     }
 }
