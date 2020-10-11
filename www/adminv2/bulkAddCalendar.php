@@ -5,6 +5,7 @@ if (!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
 
+
 $this->setTitle('Admin - Bulk Add Calendar Events');
 $this->setFile(TEMPLATE_content, 'adminv2/bulkAddCalendar.html');
 $this->setBlock(TEMPLATE_content, 'event', 'event_block');
@@ -17,11 +18,11 @@ $nav->parse($this, 'calendar');
  */
 if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name'] && (isset($_POST['userGroup']) && isset($_POST['campusList']))) {
 
-    /* Must have a .csv extension
+    $extension = strtolower(pathinfo($_FILES['bulkadd']['name'], PATHINFO_EXTENSION));
+    /* Must have the correct .csv or .ics extension
      */
-    if ('csv' !== strtolower(pathinfo($_FILES['bulkadd']['name'], PATHINFO_EXTENSION))) {
-        error(2);
-        exit;
+    if (!('csv' === $extension || 'ics' === $extension)) {
+        $this->error(\Schoolbox\Error\Mapper::ERROR_CALENDAR_IMPORT_FILE_REQUIRED);
     }
 
     if (isset($_POST['userid'])) {
@@ -35,11 +36,11 @@ if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name'] && (
 
     if ($allEvents && count($allEvents)) {
         foreach ($allEvents as $currentEvent) {
-            $this->setVar(array(
+            $this->setVar([
                 'EVENT_NAME' => $currentEvent['name'],
                 'EVENT_STATUS' => $currentEvent['status'],
                 'EVENT_ERROR' => $currentEvent['error'],
-            ));
+            ]);
 
             $this->parse('event_block', 'event', true);
         }
@@ -47,5 +48,5 @@ if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name'] && (
         $this->setVar('event_block', '');
     }
 } else {
-    error(2);
+    $this->error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 }

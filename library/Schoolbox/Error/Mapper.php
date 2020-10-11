@@ -198,6 +198,8 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     public const ERROR_FORUM_FIRST_POST_CANNOT_BE_DELETED = 226;
 
     public const ERROR_EVENT_ATTENDANCE_MAX_REACHED = 227;
+    public const ERROR_CALENDAR_IMPORT_FILE_REQUIRED = 228;
+
 
     /**
      * Setup mapping
