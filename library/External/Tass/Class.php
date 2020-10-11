@@ -77,6 +77,8 @@ class External_Tass_Class implements External_ClassInterface {
                 AND next_yr_ind != 'F'
                 AND student.doe <= GETDATE()
                 AND (student.dol IS NULL OR student.dol >= GETDATE())
+                AND (studsub.from_date IS NULL OR studsub.from_date <= GETDATE())
+                AND (studsub.to_date IS NULL OR studsub.to_date >= GETDATE())
                 AND ( $classQuery )
             ORDER BY lastname, firstname";
 
