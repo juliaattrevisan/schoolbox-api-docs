@@ -435,7 +435,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             if (strcasecmp($spRow['TimetableGroup'], $campusString) === 0) {
                 // There is a SeqLinkedTo field, which is only set for linked classes.
                 $sequenceId            = $spRow['SeqLinkedTo'] ?? null;
-                $multiPeriodAttendance = (bool)($spRow['MultiPeriodAttendanceMode'] ?? false);
+                // 'Always', 'Never', 'Prompt'
+                $multiPeriodAttendance = $spRow['MultiPeriodAttendanceMode'] ? $spRow['MultiPeriodAttendanceMode'] === 'Always' : false;
 
                 if (isset($sequenceId) && $multiPeriodAttendance) {
                     $periodsForSequenceIds[$sequenceId][] = $spRow['Period'];
