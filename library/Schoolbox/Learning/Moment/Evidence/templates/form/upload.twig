@@ -10,12 +10,12 @@
                  # I don't think I can make them required either, thus the
                  # existence of this dummy input with a required rule attached.
                  # (This input will only fail validation if there's no files
-                 # attached)
+                 #  attached)
                  #}
                 <label class="required" for="evidence-filename">
                     Upload File
                 </label>
-                <input type="hidden" name="filename" required />
+                <input type="hidden" name="filename" id="evidence-filename" required />
                 {% include 'sub/attachzone.twig' with { attachzone: zone } %}
             </div>
         </fieldset>
@@ -28,13 +28,7 @@
             let buildValidationRules = function () {
                 return {
                     filename: {
-                        required: {
-                            depends: function () {
-                                // This input will never be filled, and will only
-                                // fail validation if there's no storage items
-                                return $('#evidence-form [name="file"]').length === 0;
-                            }
-                        }
+                        required: true,
                     },
                 }
             };
@@ -45,6 +39,16 @@
                     file: formData.get('file'),
                 };
             };
+
+            // Fill/clear filename input
+            $(function () {
+                let dropzoneInstance = Dropzone.instances.find(v => v.element.id === 'storage-zone');
+                if (dropzoneInstance) {
+                    let filenameInput = document.getElementById('evidence-filename');
+                    dropzoneInstance.on('addedfile', file => filenameInput.value = file.name);
+                    dropzoneInstance.on('removedfile', () => filenameInput.value = '');
+                }
+            });
         </script>
     {% endautoescape %}
 {% endblock formJs %}
