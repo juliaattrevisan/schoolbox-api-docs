@@ -77,7 +77,7 @@ class Factory
         'eportfolioEnable' => 'E-Portfolio Enabled',
         'hideContacts' => 'Hide Contact Details',
         'hideTimetable' => 'Hide Timetable',
-        'displayGradeGraph' => 'Display Graph on Student Grade Card',
+        'displayGradeGraph' => 'Display Comparative Graph on Grades',
     ];
 
 

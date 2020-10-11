@@ -266,7 +266,7 @@
                 <div class="row content">
                     <div class="small-12 medium-4 columns">
                         <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {% if user.eportfolioEnable %}checked{% endif %} />
-                        <label for="eportfolio" class="checkbox-label">E-Portfolio</label>
+                        <label for="eportfolio" class="checkbox-label">Enable E-Portfolio</label>
 
                         <input id="hide_contacts" type="checkbox" name="hide_contacts" value="1" {% if user.hideContacts %}checked{% endif %} />
                         <label for="hide_contacts" class="checkbox-label">Hide Contact Details</label>
@@ -287,7 +287,7 @@
 
                     <div class="small-12 medium-4 columns">
                         <input id="display_grade_graph" type="checkbox" name="display_grade_graph" value="1" {% if user.displayGradeGraph %}checked{% endif %} />
-                        <label for="display_grade_graph" class="checkbox-label">Display Graph on Student Grade Card</label>
+                        <label for="display_grade_graph" class="checkbox-label">Display Comparative Graph on Grades</label>
 
                         {% if isSchoolboxAdmin %}
                             {% if user.isSuperuser %}

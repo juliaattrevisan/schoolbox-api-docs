@@ -35,7 +35,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
         'local_email'         => 'Email Address From Username?',
         'mail_handler'        => 'Use External Mail Client?',
         'webmail'             => 'Enable Webmail Tab?',
-        'display_grade_graph' => 'Display Graph on Student Grade Card?',
+        'display_grade_graph' => 'Display Comparative Graph on Grades?',
         'enabled'             => 'Account Enabled?',
         // Skip superuser field
     ];

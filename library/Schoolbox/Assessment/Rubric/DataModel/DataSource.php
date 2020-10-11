@@ -1149,7 +1149,7 @@ class DataSource
      * @throws \PDOException
      * @throws \RangeException
      */
-    public function getLongitudinal(GenericCollection $dueWorks, User $student): array
+    public function getLongitudinal(GenericCollection $dueWorks, User $student, bool $includeComparison): array
     {
         if (0 === $dueWorks->count()) {
             return [];
@@ -1248,9 +1248,18 @@ class DataSource
                     'max_value'                  => $row['max_value'],
                     'value'                      => $row['value'],
                 ];
+
+                $assessmentList[$row['assessment_id']]['name']                             = $row['assessment_title'];
+                $assessmentList[$row['assessment_id']]['rubric_capability_mark_type_id']   = $row['rubric_capability_mark_type_id'];
             }
+            $longitude['assessments'] = $assessmentList;
 
             unset($pb);
+
+            // Return immediately if we do not required comparison data for box and whisker
+            if(!$includeComparison) {
+                return $longitude;
+            }
 
             // Find the most recent feedback for all students for the given assessments
             $pb = new Builder($this->database, '');
@@ -1263,15 +1272,15 @@ class DataSource
             $where = implode(' AND ', $pb->getWhere());
 
             $allFeedbackStatement = $this->database->prepare("
-                SELECT
-                    sr.id AS feedbackId,
-                    a.id  AS assessmentId
-                FROM submission_return sr
-                INNER JOIN submission_box sb ON sr.box_id = sb.id
-                INNER JOIN assessment      a ON sb.assessment_id = a.id
-                WHERE {$where}
-                ORDER BY sr.published_at ASC
-            ");
+            SELECT
+                sr.id AS feedbackId,
+                a.id  AS assessmentId
+            FROM submission_return sr
+            INNER JOIN submission_box sb ON sr.box_id = sb.id
+            INNER JOIN assessment      a ON sb.assessment_id = a.id
+            WHERE {$where}
+            ORDER BY sr.published_at ASC
+        ");
 
             $allFeedbackStatement->execute($pb->getParams());
 
@@ -1291,23 +1300,23 @@ class DataSource
 
                 $where            = implode(' AND ', $pb->getWhere());
                 $averageStatement = $this->database->prepare("
-                    SELECT
-                        rc.id AS capability_id,
-                        ri.id AS indicator_id,
-                        a.id AS assessment_id,
-                        a.due_date,
-                        rim.value
-                    FROM       rubric_indicator_mark  rim
-                    INNER JOIN rubric_capability_mark rcm ON rim.rubric_capability_mark_id = rcm.id
-                    INNER JOIN rubric_capability       rc ON rcm.rubric_capability_id = rc.id
-                    INNER JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
-                    INNER JOIN rubric_indicator        ri ON rd.rubric_indicator_id = ri.id
-                    INNER JOIN submission_return       sr ON rcm.return_id = sr.id
-                    INNER JOIN submission_box          sb ON sr.box_id = sb.id
-                    INNER JOIN assessment               a ON sb.assessment_id = a.id
-                    WHERE {$where}
-                    ORDER BY a.due_date ASC;
-                ");
+                SELECT
+                    rc.id AS capability_id,
+                    ri.id AS indicator_id,
+                    a.id AS assessment_id,
+                    a.due_date,
+                    rim.value
+                FROM       rubric_indicator_mark  rim
+                INNER JOIN rubric_capability_mark rcm ON rim.rubric_capability_mark_id = rcm.id
+                INNER JOIN rubric_capability       rc ON rcm.rubric_capability_id = rc.id
+                INNER JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
+                INNER JOIN rubric_indicator        ri ON rd.rubric_indicator_id = ri.id
+                INNER JOIN submission_return       sr ON rcm.return_id = sr.id
+                INNER JOIN submission_box          sb ON sr.box_id = sb.id
+                INNER JOIN assessment               a ON sb.assessment_id = a.id
+                WHERE {$where}
+                ORDER BY a.due_date ASC;
+            ");
                 $averageStatement->execute($pb->getParams());
 
                 while ($row = $averageStatement->fetch(\PDO::FETCH_ASSOC)) {
@@ -1317,19 +1326,14 @@ class DataSource
 
             $assessmentList = [];
             //Insert the statistical summary data collated from all students results across all indicators in all activities
-            foreach($allResults as $assessmentId => $assessment) {
-                foreach($assessment as $capabilityId => $capability) {
-                    foreach($capability as $indicatorId => $indicator) {
-                        $boxPlot = new Summary($indicator);
+            foreach ($allResults as $assessmentId => $assessment) {
+                foreach ($assessment as $capabilityId => $capability) {
+                    foreach ($capability as $indicatorId => $indicator) {
+                        $boxPlot                                                                                         = new Summary($indicator);
                         $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['statistics'] = $boxPlot->getSummary();
-                        $assessmentList[$assessmentId]['name'] = $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['name'];
-                        $assessmentList[$assessmentId]['rubric_capability_mark_type_id'] = $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['rubric_capability_mark_type_id'];
                     }
                 }
             }
-
-            //A list of all assessments that we found to contain marked rubrics to make iterating the set easier
-            $longitude['assessments'] = $assessmentList;
 
             return $longitude;
         }

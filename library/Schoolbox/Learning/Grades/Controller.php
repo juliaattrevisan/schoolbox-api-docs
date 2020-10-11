@@ -518,7 +518,8 @@ class Controller extends Base
         $longitudinalRubric   = [];
         $rubricAssessmentList = [];
         if ($canSeeRubricGrade || $canSeeCapabilityGrade || $canSeeProgression) {
-            $longitudinalRubric   = $this->getLongitudinalRubricData($assessments, $viewee);
+            $includeComparison = $this->getUser()->getRole()->isStaff() || $viewee->getDisplayGradeGraph();
+            $longitudinalRubric   = $this->getLongitudinalRubricData($assessments, $viewee, $includeComparison);
             $rubricAssessmentList = $longitudinalRubric['assessments'];
             unset($longitudinalRubric['assessments']);
         }
@@ -758,7 +759,7 @@ class Controller extends Base
      * @param User                            $student
      * @return array
      */
-    private function getLongitudinalRubricData(GenericCollection $assessments, User $student): array
+    private function getLongitudinalRubricData(GenericCollection $assessments, User $student, bool $includeComparison): array
     {
         // Filter to dueWork with marks visible to current user
         $user = $this->getUser();
@@ -766,7 +767,7 @@ class Controller extends Base
             return $assessment instanceof DueWork\Model && $assessment->isFeedbackVisibleToUser($user);
         });
 
-        return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student);
+        return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student, $includeComparison);
     }
 
 
