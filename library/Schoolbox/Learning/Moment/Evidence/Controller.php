@@ -111,17 +111,36 @@ class Controller extends Base
 //    public function getMoment(): void
 //    {
 //    }
-//
-//
-//    /**
-//     * Retrieve a user's learning moments.
-//     *
-//     * @api   GET /learning/evidence/user/{userId}
-//     * @since 20.2
-//     */
-//    public function getMomentsForUser(User $user): void
-//    {
-//    }
+
+
+    /**
+     * Retrieve a user's learning moments.
+     *
+     * @api   GET /learning/evidence/user/{userId}
+     * @since 20.2
+     *
+     * @param User $user
+     */
+    public function getMomentsForUser(User $user): void
+    {
+        // TODO add cursor for moments
+        $data = $this->mapper->findByColumnList(
+            ['user_id' => $user->getId(),],
+            ['order'   => ['created_at' => Mapper::SORT_ORDER_DESC]],
+        );
+        $this->response->content->set(
+            $this->buildJsonOutput([
+                'data'     => $data,
+                'metadata' => [
+                    'count' => count($data),
+                    'cursor' => [
+                        'current' => null,
+                        'next'    => null,
+                    ],
+                ],
+            ])
+        );
+    }
 
 
     /**

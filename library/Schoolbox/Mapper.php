@@ -129,6 +129,10 @@ abstract class Mapper implements IMapper, Serializable
     const COLUMN_IDENTIFIER_UUID   = 128;
     public const COLUMN_ENUM       = 256;  // May only be persisted as one of a set of declared values
 
+    // Sort ordering
+    public const SORT_ORDER_ASC  = 'asc';
+    public const SORT_ORDER_DESC = 'desc';
+
     /**
      * @var IDatabase|IQuoter
      */
