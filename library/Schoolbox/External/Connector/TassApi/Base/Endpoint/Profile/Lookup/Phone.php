@@ -56,7 +56,7 @@ class Phone
          */
         $addresses = $this->api->retrieveDocument('getCommunicationRulesDetails', [
             'currentstatus' => 'current',
-            'commtype' => 'lw'
+            'commtype' => 'gen'
         ]);
 
         /* Inspect each element from the returned data. Family code is stored in
@@ -70,7 +70,10 @@ class Phone
                  * mobile_phone_1, mobile_phone_2, business_phone, home_phone
                  *
                  * Look in each and use the first non-empty mobile number
-                 * Look in each and use the first non-empty work and home phone number
+                 * Look in each and use the first non-empty home phone number
+                 *
+                 * Work phone can't be determined from these fields, we can't tell which parent
+                 * owns that number due to the nature of the data struct
                  *
                  * Note that '' !== null
                  *
@@ -79,16 +82,24 @@ class Phone
                  * number(s) belong to each parent. This could be a significant hazard
                  * for split families.
                  */
-                $mobile = array_values(array_filter([$address['mobile_phone_1'], $address['mobile_phone_2']]))[0] ?? '';
-                $home = $address['home_phone'];
-                $work = $address['business_phone'];
+                $stack[$address['parent_code']][Family::MOTHER_NODE] = [
+                    'firstname' => trim((string)$address['m_preferred_name']),
+                    'surname' => trim((string)$address['m_surname']),
+                    'mobile' => trim((string)$address['mobile_phone_1']),
+                    'home' => trim((string)$address['home_phone']),
+                    'work' => '',
+                    'email' => trim((string)$address['email']),
+                    'relationship' => trim((string)$address['m_description']),
+                ];
 
-                /* Stack it up for quick reference later
-                 */
-                $stack[$address['parent_code']] = [
-                    'mobile' => trim((string)$mobile),
-                    'home' => trim((string)$home),
-                    'work' => trim((string)$work)
+                $stack[$address['parent_code']][Family::FATHER_NODE] = [
+                    'firstname' => trim((string)$address['f_preferred_name']),
+                    'surname' => trim((string)$address['f_surname']),
+                    'mobile' => trim((string)$address['mobile_phone_2']),
+                    'home' => trim((string)$address['home_phone']),
+                    'work' => '',
+                    'email' => trim((string)$address['email_2']),
+                    'relationship' => trim((string)$address['f_description']),
                 ];
             }
         }

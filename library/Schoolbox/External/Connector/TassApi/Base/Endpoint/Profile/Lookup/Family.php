@@ -21,6 +21,18 @@ class Family
 {
 
     /**
+     * The node corresponding to a father's data in a Family record.
+     *
+     * I have a fear that this will be different per tass implementation somewhere but, for now,
+     * presume that 'person2' is (and always is) the papa
+     *
+     * + Assumption: person2 represents the primary parent (typically Father)
+     */
+    public CONST FATHER_NODE = 'person2';
+    public const MOTHER_NODE = 'person1';
+
+
+    /**
      * Default spouse prefix
      *
      * @var string
@@ -35,25 +47,6 @@ class Family
      * These two nodes have the following keys and we use them to identify father and mother details.
      */
     private const PARENT_PERSON_NODES = ['person2', 'person1'];
-
-
-    /**
-     * The node corresponding to a father's data in a Family record.
-     *
-     * I have a fear that this will be different per tass implementation somewhere but, for now,
-     * presume that 'person2' is (and always is) the papa
-     *
-     * + Assumption: person2 represents the primary parent (typically Father)
-     *
-     * @var string
-     */
-    private $fatherNode = 'person2';
-
-
-    /**
-     * @var string
-     */
-    private $motherNode = 'person1';
 
 
     /**
@@ -106,14 +99,6 @@ class Family
 
 
     /**
-     * A list of (parentExternalId, parentData) tuples
-     *
-     * @var array
-     */
-    private $index = [];
-
-
-    /**
      * Family constructor.
      *
      * $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
@@ -162,7 +147,7 @@ class Family
     {
         /* Do some funny prefix stuff for parents
          */
-        if ($this->fatherNode === $node) {
+        if (self::FATHER_NODE === $node) {
             $externalId = "P{$identifier}";
         } else {
             $externalId = "{$this->spousePrefix}{$identifier}";
@@ -286,9 +271,7 @@ class Family
                     foreach (self::PARENT_PERSON_NODES as $node) {
                         $personExternalId = $this->deriveExternalId($node, (string)$family['user_code'], '');
 
-                        $person = $this->processParentNode($node, $personExternalId, $family);
-
-                        $this->index[$person['externalId']] = $person;
+                        $this->processParentNode($node, $personExternalId, $family);
                     }
 
                     $nuclear++;
@@ -319,40 +302,42 @@ class Family
                          * and secondary parents to father. We aren't doing that here.
                          * Subclass this lookup if you want to do crazy things like that.
                          */
+
+                        /* Unknown parent type; skip this for now since we can't tell
+                         * whether this is a father or a mother
+                         */
+                        if (!isset($subfamily['address'][$this->addnumFather]) && !isset($subfamily['address'][$this->addnumMother])) {
+                            $unknown[] = $subfamily['user_code'];
+
+                            continue;
+                        }
+
+                        /* Once you identify fathers, construct a parent using their node
+                         * which is apparently person2.
+                         */
                         if (isset($subfamily['address'][$this->addnumFather])) {
+                            $personExternalId = $this->deriveExternalId(self::FATHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
-                            /* Anyway, once you identify fathers, construct a parent using their node
-                             * which is apparently person2.
-                             */
-                            $personExternalId = $this->deriveExternalId($this->fatherNode, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
-
-                            $this->index[$personExternalId] = $this->processSplitParentNode(
-                                $this->fatherNode,
+                            $this->processSplitParentNode(
+                                self::FATHER_NODE,
                                 $personExternalId,
                                 $subfamily,
                                 $this->addnumFather
                             );
-                        } elseif (isset($subfamily['address'][$this->addnumMother])) {
+                        }
 
-                            /* Once you identify mothers, construct a parent using their node
-                             * which is apparently person1.
-                             */
-                            $personExternalId = $this->deriveExternalId($this->motherNode, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
+                        /* Once you identify mothers, construct a parent using their node
+                         * which is apparently person1.
+                         */
+                        if (isset($subfamily['address'][$this->addnumMother])) {
+                            $personExternalId = $this->deriveExternalId(self::MOTHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
-                            $this->index[$personExternalId] = $this->processSplitParentNode(
-                                $this->motherNode,
+                            $this->processSplitParentNode(
+                                self::MOTHER_NODE,
                                 $personExternalId,
                                 $subfamily,
                                 $this->addnumMother
                             );
-                        } else {
-
-                            /* Unknown parent type; skip this for now since we can't tell
-                             * whether this is a father or a mother
-                             */
-                            $unknown[] = $subfamily['user_code'];
-
-                            continue;
                         }
                     }
 
@@ -365,7 +350,6 @@ class Family
          */
         return [
             'lookup' => $this->lookup,
-            'index' => $this->index,
             'unknown' => $unknown,
             'count' => [
                 'nuclear' => $nuclear,
@@ -387,18 +371,43 @@ class Family
      */
     private function processSplitParentNode(string $node, string $externalId, array $family, int $addnum): array
     {
-        $person = $this->processParentNode($node, $externalId, $family);
+        $person = $this->phones[$family['user_code']][$node] ?? [
+            'firstname' => $family[$node]['preferred_name'],
+            'surname' => $family[$node]['surname'],
+            'mobile' => '',
+            'home' => '',
+            'work' => '',
+            'email' => '',
+            'relationship' => $family[$node]['description'],
+        ];
 
-        /* Rearrange contents of $person['address'] to find their first non-null email address
+        /* Find the first non-empty email address from the two possibilities
+         *
+         * Not entirely certain if these are two emails that you can attribute to a single person,
+         * or whether this is actually a person's email (email1) and their spouse's email (email2)
+         * or whether it's a mother's email (email1) and a father's email (email2)
+         *
+         * Could be anything.
          */
-        $person['e_mail'] = array_values(array_filter([
+        $person['email'] = array_values(array_filter([
             $family['address'][$addnum]['email1'] ?? '',
-            $family['address'][$addnum]['email2'] ?? ''
+            $family['address'][$addnum]['email2'] ?? '',
         ]))[0] ?? '';
 
-        /* FIXME $person['phone'] currently contains information shared between both split fam parents
-         * It should probably be cleared to prevent info leaking out to the other split fam parent(s)
+        /* Assign an externalId to this person
          */
+        $person['externalId'] = $externalId;
+
+        /* Assign studentIds to each of their externalIds, as per the
+         * $family['students'] node
+         */
+        $person['students'] = $family['students'];
+
+        /* Index each parent by their externalId
+         */
+        foreach($person['students'] as $studentExternalId) {
+            $this->lookup[$studentExternalId][$externalId] = $person;
+        }
 
         return $person;
     }
@@ -414,7 +423,18 @@ class Family
      */
     private function processParentNode(string $node, string $externalId, array $family): array
     {
-        $person = $family[$node];
+        $person = $this->phones[$family['user_code']][$node] ?? [
+            'firstname' => $family[$node]['preferred_name'],
+            'surname' => $family[$node]['surname'],
+            'mobile' => '',
+            'home' => '',
+            'work' => '',
+            'email' => '',
+            'relationship' => $family[$node]['description'],
+        ];
+
+        /* Assign an externalId to this person
+         */
         $person['externalId'] = $externalId;
 
         /* Assign studentIds to each of their externalIds, as per the
@@ -422,15 +442,10 @@ class Family
          */
         $person['students'] = $family['students'];
 
-        /* Merge phone numbers from another lookup which extracted data
-         * from some other endpoint
-         */
-        $person['phone'] = $this->phones[$family['user_code']] ?? null;
-
         /* Index each parent by their externalId
          */
-        foreach($person['students'] as $student) {
-            $this->lookup[$student][] = $person['externalId'];
+        foreach($person['students'] as $studentExternalId) {
+            $this->lookup[$studentExternalId][$externalId] = $person;
         }
 
         return $person;

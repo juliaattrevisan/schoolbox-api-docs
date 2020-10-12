@@ -216,7 +216,7 @@ class Classes implements IStrategy
                             /* This format mirrors the implementation in External/Tass/Timetable.php:239
                              */
                             'code' => (new CodeCodec())->encode(
-                                (string)$subject['YEAR_GRP'],
+                                '' !== (string)$subject['YEAR_GRP'] ? (string)$subject['YEAR_GRP'] : (string)$subject['SUBTAB_YEAR_GRP'],
                                 (string)$subject['SUB_CODE'],
                                 (string)$subject['CLASS']
                             ),
@@ -243,6 +243,14 @@ class Classes implements IStrategy
                             ]
                         ],
                     ];
+
+                    $this->log->debug(sprintf(
+                        '%s %s (user %s) is the teacher of subject %s',
+                        $class['teachers']['firstname'],
+                        $class['teachers']['surname'],
+                        $class['teachers']['externalId'],
+                        $class['class']['code']
+                    ));
 
                     /* Look up the period instance by (name, day)
                      *
