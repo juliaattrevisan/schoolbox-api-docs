@@ -86,6 +86,25 @@ class Module extends BaseModule
             $viewCreateFormPreloader
         );
 
+        // Rule for viewing a user's moments:
+        // * Staff and superusers may view anyone's
+        // * Students may view their own
+        // * Parents may view their own and their kid's
+        $this->register(
+            self::METHOD_GET,
+            '/user/{userId}',
+            'getMomentsForUser',
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF),
+                    $isParentOrUserRule,
+                ),
+            ),
+            Closure::fromCallable([$this, 'preloadUser']),
+        );
+
 //        $this->register(
 //            self::METHOD_POST,
 //            '/user/{userId}/create',
@@ -122,22 +141,21 @@ class Module extends BaseModule
     }
 
 
-//    /**
-//     * Preload the requested student
-//     *
-//     * @param array $params
-//     * @return array
-//     * @throws \Schoolbox\Mapper\Exception
-//     * @throws \Schoolbox\Mapper\Exception\Deleted
-//     */
-//    private function preloadUser(array $params): array
-//    {
-//        return [
-//            'user' => $this->getMapperFactory()
-//                           ->get(UserMapper::class)
-//                           ->findById($params['userId']),
-//        ];
-//    }
+    /**
+     * Preload the requested student
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function preloadUser(array $params): array
+    {
+        return [
+            'user' => $this->getMapperFactory()
+                           ->get(UserMapper::class)
+                           ->findById($params['userId']),
+        ];
+    }
 
 
     /**
