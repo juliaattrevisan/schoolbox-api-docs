@@ -426,14 +426,12 @@ $menu-slide: "transform 500ms ease" !default;
     // MENU BUTTON
     // This is a little bonus. You don't need it for off canvas to work. Mixins to be written in the future.
     .tab-bar .menu-icon {
-      color: $tabbar-menu-icon-color;
       display: block;
       height: $tabbar-menu-icon-height;
-      padding: $tabbar-menu-icon-padding;
       position: relative;
-      text-indent: $tabbar-menu-icon-text-indent;
+      text-align: center;
       transform: translate3d(0,0,0);
-      width: $tabbar-menu-icon-width;
+      width: $tabbar-height;
 
       // @include for the hamburger menu-icon
       //
