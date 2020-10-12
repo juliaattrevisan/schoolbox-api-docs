@@ -13,7 +13,6 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
@@ -292,7 +291,7 @@ class Profile implements IStrategy
 
                 /* Fish out special needs
                  */
-                $specialNeeds = $this->findSpecialNeeds();
+                $specialNeeds = $this->findSpecialNeeds($externalId);
 
                 /* Fish out a staff member via their user code
                  */
@@ -401,7 +400,7 @@ class Profile implements IStrategy
                  * This set is mixed with emergency contacts and other non-data, so
                  * sift through it all manually for the gems you need
                  */
-                $this->importParentsOfStudent($externalId, $studentBaseProfile, $student['relationships']['contacts']['data']);
+                $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
             }
 
             /* Prepare for next page if it exists
@@ -488,9 +487,16 @@ class Profile implements IStrategy
     public function findEmergencyContacts(array $student): ?array
     {
 
-        /* FIXME There's a sideload for emergencyContactLinks via Get Student Person
+        /* There's a sideload for emergencyContactLinks via Get Student Person
          *  ...but it doesn't give you any at all, it seems broken.
          *  http://development.sentral.com.au/#operation/getStudentPerson
+         *
+         * The way it's implemented down here is the way it's supposed to be implemented
+         * EmergencyContactLinks isn't really a thing, it seems to be part of some other
+         * broken system they've tapped into. Presumably it just gave me all the contacts
+         * whose isEmergencyContact flag was set to 1, but it might not even do that.
+         *
+         * Anyway, I already can get this data, I don't need a special way
          */
 
         $contacts = $student['relationships']['contacts']['data'];
@@ -679,11 +685,28 @@ class Profile implements IStrategy
     /**
      * Find out if this student has special needs
      *
+     * @param string $studentExternalId
      * @return bool
+     * @throws \InvalidArgumentException
      */
-    private function findSpecialNeeds(): bool
+    private function findSpecialNeeds(string $studentExternalId): bool
     {
-        /* TODO Fill in these special needs vars
+        /* Go digging in another endpoint for data
+         * http://development.sentral.com.au/#operation/getSpecialNeedsPrograms
+         */
+//        $endpoint = "enrolments/special-needs-program?studentIds={$studentExternalId}";
+//
+//        $payload = $this->api->retrieveDocument($endpoint);
+//
+//        if (\count($payload['data'])) {
+//            print_r($payload);
+//            die();
+//
+//        }
+
+        /* Special Needs in sentral was a concept only, and partially implemented and documented
+         * Apparently no-one uses this notion and we are supposed to ignore its existence for now
+         * (weird bu ok, whatever)
          */
         return false;
     }
@@ -724,7 +747,6 @@ class Profile implements IStrategy
     /**
      * Import parent profile data for a given student
      *
-     * @param string            $studentExternalId
      * @param UserProfile\Model $studentBaseProfile
      * @param array             $contacts
      * @throws Exception
@@ -733,7 +755,7 @@ class Profile implements IStrategy
      * @throws UnexpectedValueException
      * @throws \InvalidArgumentException
      */
-    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile, array $contacts): void
+    private function importParentsOfStudent(UserProfile\Model $studentBaseProfile, array $contacts): void
     {
         /* Each student comes with a set of Contacts
          * Some are Emergency Contacts, some are not
@@ -907,9 +929,8 @@ class Profile implements IStrategy
                 $campusName = '';
                 $category = (string)$staff['attributes']['employmentClassification'];
                 $department = '';
-                $email = '';
+                $email = (string)$staff['relationships']['person']['data']['attributes']['email'];
                 $lastname = (string)$staff['relationships']['person']['data']['attributes']['lastName'];
-                $phone = '';
                 $positionTitle = (string)$staff['attributes']['jobTitle'];
                 $room = '';
                 $title = (string)$staff['relationships']['person']['data']['attributes']['title'];
@@ -936,6 +957,35 @@ class Profile implements IStrategy
 
                     continue;
                 }
+
+                /* Go digging in another endpoint for names and numbers
+                 * Construct the endpoint manually, because you can't trust the ids
+                 * provided by the API (some are non-integers which die)
+                 */
+                $endpoint = "enrolments/person/{$staff['relationships']['person']['data']['id']}?include=phoneNumbers";
+
+                $payload = $this->api->retrieveDocument($endpoint);
+
+                $firstname = (string)$payload['data']['attributes']['firstName'];
+                $lastname = (string)$payload['data']['attributes']['lastName'];
+
+                $this->log->debug(sprintf(
+                    'Secondary api inspection at %s for phone numbers belonging to %s',
+                    $endpoint,
+                    trim("{$firstname} {$lastname}")
+                ));
+
+                /* Catalog each of this guy's phone numbers so we can try and assign some
+                 */
+                $numbers = [];
+
+                if (isset($payload['data']['relationships']['phoneNumbers'])) {
+                    foreach ($payload['data']['relationships']['phoneNumbers']['data'] as $phoneNumber) {
+                        $numbers[$phoneNumber['attributes']['typeName']] = $phoneNumber['attributes']['number'];
+                    }
+                }
+
+                $phone = $numbers[self::WORK_TELEPHONE_NUMBER] ?? '';
 
                 /* Find out if this externalId already has a staff profile
                  * If one already exists, load it, update it, then save it
