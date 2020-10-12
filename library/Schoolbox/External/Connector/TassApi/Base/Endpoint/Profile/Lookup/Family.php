@@ -381,6 +381,14 @@ class Family
             'relationship' => $family[$node]['description'],
         ];
 
+        /* Find the first non-empty email address from the two possibilities
+         *
+         * Not entirely certain if these are two emails that you can attribute to a single person,
+         * or whether this is actually a person's email (email1) and their spouse's email (email2)
+         * or whether it's a mother's email (email1) and a father's email (email2)
+         *
+         * Could be anything.
+         */
         $person['email'] = array_values(array_filter([
             $family['address'][$addnum]['email1'] ?? '',
             $family['address'][$addnum]['email2'] ?? '',
