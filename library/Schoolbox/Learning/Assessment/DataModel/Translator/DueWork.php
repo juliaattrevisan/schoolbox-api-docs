@@ -123,7 +123,20 @@ class DueWork implements IAssessmentTypeTranslator
         // Translate files
         if ($domainObject->getAttachedFiles() !== null) {
             $dataModel->setAttachments(new GenericCollection(SubmissionBox\SingleFile\Model::class));
+
+            $seen = [];
+
             foreach ($domainObject->getAttachedFiles() as $file) {
+
+                /* Skip hashes we've already seen
+                 * Won't take into account same file with different filename
+                 */
+                if (isset($seen[$file->getHash()])) {
+                    continue;
+                }
+
+                /* Otherwise add to stack and remember we saw this hash before
+                 */
                 $dataModel->addAttachment(
                     (new DueWorkFileModel())
                         ->setId($file->getId())
@@ -131,6 +144,8 @@ class DueWork implements IAssessmentTypeTranslator
                         ->setStorage($file->getStorage())
                         ->setBasename($file->getBasename())
                 );
+
+                $seen[$file->getHash()] = $file->getHash();
             }
         }
         $dataModel->setExternalId($domainObject->getExternalId());
