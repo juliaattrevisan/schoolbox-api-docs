@@ -745,40 +745,9 @@ class External_Synergetic_User implements External_UserInterface
 
         /* Get a contact tuple containing up to two people and bust it out
          * into individual data, where applicable
-         */
-        $contactKeys = [
-            'StudentContactID' => '',
-            'StudentContactTitle' => '',
-            'StudentContactPreferred' => '',
-            'StudentContactSurname' => '',
-            'StudentContactDefaultEmail' => '',
-            'StudentContactPhoneActual' => '',
-            'StudentContactSilentPhoneFlag' => '',
-            'StudentContactMobilePhone' => '',
-            'StudentContactOccupPhone' => '',
-            'StudentContactRelation' => '',
-            'StudentContactPrimaryOnlyFlag' => '',
-            'StudentContactType' => '',
-            'StudentContactUseEmail' => '',
-        ];
-
-        $spouseKeys = [
-            'StudentContactSpouseID' => '',
-            'StudentContactSpouseTitle' => '',
-            'StudentContactSpousePreferred' => '',
-            'StudentContactSpouseSurname' => '',
-            'StudentContactSpouseDefaultEmail' => '',
-            'StudentContactSpouseMobilePhone' => '',
-            'StudentContactSpouseOccupPhone' => '',
-            'StudentContactSpouseRelation' => '',
-            'StudentContactSpouseUseEmail' => '',
-
-            /* PhoneActual, SilentPhoneFlag, PrimaryOnlyFlag, ContactType
-             * fields don't manifest for speece
-             */
-        ];
-
-        /* In synergetic, contacts arrive with their speece in a tuple
+         *
+         * Each person has their own set of array keys because
+         * in synergetic, contacts arrive with their speece in a tuple
          *
          * Contact Person A might have a spouse Person B,
          * but Contact Person B might have their spouse Person A,
@@ -791,27 +760,47 @@ class External_Synergetic_User implements External_UserInterface
 
             /* Find the main contact's fields
              */
-            $contact1 = array_intersect_key($contactTuple, $contactKeys);
+            $contact1 = [
+                'StudentContactID'              => (string)$contactTuple['StudentContactSpouseID'],
+                'StudentContactTitle'           => $contactTuple['StudentContactSpouseTitle'],
+                'StudentContactPreferred'       => $contactTuple['StudentContactSpousePreferred'],
+                'StudentContactSurname'         => $contactTuple['StudentContactSpouseSurname'],
+                'StudentContactDefaultEmail'    => $contactTuple['StudentContactSpouseDefaultEmail'],
+                'StudentContactMobilePhone'     => $contactTuple['StudentContactSpouseMobilePhone'],
+                'StudentContactOccupPhone'      => $contactTuple['StudentContactSpouseOccupPhone'],
+                'StudentContactRelation'        => $contactTuple['StudentContactSpouseRelation'],
+                'StudentContactUseEmail'        => $contactTuple['StudentContactSpouseUseEmail'],
+
+                /* PhoneActual, SilentPhoneFlag, PrimaryOnlyFlag, ContactType
+                 * fields don't manifest for speece
+                 */
+                'StudentContactPhoneActual'     => $contactTuple['StudentContactPhoneActual'],
+                'StudentContactPrimaryOnlyFlag' => $contactTuple['StudentContactPrimaryOnlyFlag'],
+                'StudentContactSilentPhoneFlag' => $contactTuple['StudentContactSilentPhoneFlag'],
+                'StudentContactType'            => $contactTuple['StudentContactType'],
+            ];
 
             /* Convert speece into a contact format otherwise they won't appear in profile page
              * (speece must come with a contact) because speece are treated differently there
              */
-            $spouse = array_intersect_key($contactTuple, $spouseKeys);
-
             $contact2 = [
-                'StudentContactID'              => (string)$spouse['StudentContactSpouseID'],
-                'StudentContactTitle'           => $spouse['StudentContactSpouseTitle'],
-                'StudentContactPreferred'       => $spouse['StudentContactSpousePreferred'],
-                'StudentContactSurname'         => $spouse['StudentContactSpouseSurname'],
-                'StudentContactDefaultEmail'    => $spouse['StudentContactSpouseDefaultEmail'],
+                'StudentContactID'              => (string)$contactTuple['StudentContactSpouseID'],
+                'StudentContactTitle'           => $contactTuple['StudentContactSpouseTitle'],
+                'StudentContactPreferred'       => $contactTuple['StudentContactSpousePreferred'],
+                'StudentContactSurname'         => $contactTuple['StudentContactSpouseSurname'],
+                'StudentContactDefaultEmail'    => $contactTuple['StudentContactSpouseDefaultEmail'],
+                'StudentContactMobilePhone'     => $contactTuple['StudentContactSpouseMobilePhone'],
+                'StudentContactOccupPhone'      => $contactTuple['StudentContactSpouseOccupPhone'],
+                'StudentContactRelation'        => $contactTuple['StudentContactSpouseRelation'],
+                'StudentContactUseEmail'        => $contactTuple['StudentContactSpouseUseEmail'],
+
+                /* PhoneActual, SilentPhoneFlag, PrimaryOnlyFlag, ContactType
+                 * fields don't manifest for speece
+                 */
                 'StudentContactPhoneActual'     => '',
                 'StudentContactSilentPhoneFlag' => '',
-                'StudentContactMobilePhone'     => $spouse['StudentContactSpouseMobilePhone'],
-                'StudentContactOccupPhone'      => $spouse['StudentContactSpouseOccupPhone'],
-                'StudentContactRelation'        => $spouse['StudentContactSpouseRelation'],
                 'StudentContactPrimaryOnlyFlag' => '',
                 'StudentContactType'            => '',
-                'StudentContactUseEmail'        => $spouse['StudentContactSpouseUseEmail'],
             ];
 
             /* If we haven't seen this contact's id before, stack 'em up
