@@ -11,7 +11,7 @@ namespace Schoolbox\Learning\Moment\Evidence\Translator\Test;
 
 use Alaress_Date_Format;
 use DateTimeZone;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit_Framework_MockObject_MockObject as MockObject;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\Learning\Moment\Evidence\Model;
