@@ -4,12 +4,13 @@
  */
 ;(function ($, Dropzone, window, document, undefined) {
 
-    var pluginName     = 'resourceAttach',
+    var pluginName = 'resourceAttach',
         singletonModal = null,
-        modalCache     = {},
-        noop           = function () {},
-        listening      = false,
-        defaults       = {
+        modalCache = {},
+        noop = function () {
+        },
+        listening = false,
+        defaults = {
 
             // our options
             trigger: null,
@@ -46,18 +47,19 @@
             // callbacks
             onSelect: noop,
             onDetach: noop
-        };
+    };
 
 
-    function ResourceAttach(element, options) {
+    function ResourceAttach(element, options)
+    {
         var self, opt, azone, dzone, prompt = '';
 
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
-        this.tpl     = this.options.tplOverride || $(this.element).find('[data-template]').detach();
+        this.tpl = this.options.tplOverride || $(this.element).find('[data-template]').detach();
 
-        self  = this;
-        opt   = self.options;
+        self = this;
+        opt = self.options;
         azone = $(this.element);
         dzone = azone.find(opt.dropzoneSelector).html('');
 
@@ -97,7 +99,7 @@
             previewTemplate: this.tpl.html(),
 
             fallback: function () {
-                var mk  = opt.fallbackButtonMarkup || '<a href="#" data-attach-fallback class="button icon-attach">' + opt.dictDefaultMessage + '</a>',
+                var mk = opt.fallbackButtonMarkup || '<a href="#" data-attach-fallback class="button icon-attach">' + opt.dictDefaultMessage + '</a>',
                     btn = $(mk);
 
                 // mimic dropzone behaviour
@@ -120,7 +122,7 @@
                         previewElement: file.previewElement,
                         type: file.type
                     });
-                    azone.trigger('addedfile.attachzone', [ file ]);
+                    azone.trigger('addedfile.attachzone', [file]);
                 });
 
                 this.on('success', function (file, response) {
@@ -128,8 +130,7 @@
 
                     try {
                         data = JSON.parse(response);
-                    }
-                    catch (err) {
+                    } catch (err) {
                         data = response;
                     }
 
@@ -146,12 +147,12 @@
                     self.attach(data);
 
 
-                    azone.trigger('success.attachzone', [ data ]);
+                    azone.trigger('success.attachzone', [data]);
                 });
 
                 this.on('error', function (file, errMsg, xhr) {
                     self.rejectFile(file, errMsg, this);
-                    azone.trigger('error.attachzone', [ file, errMsg ]);
+                    azone.trigger('error.attachzone', [file, errMsg]);
                 });
 
                 // Disable form submission while uploading a file
@@ -168,22 +169,22 @@
             removedfile: function (file) {
                 self.detach(
                     file.previewElement,
-                    function() {
-                        azone.trigger('removedfile.attachzone', [ file ]);
+                    function () {
+                        azone.trigger('removedfile.attachzone', [file]);
                     }
                 );
             },
 
             maxfilesexceeded: function (file) {
                 this.removeFile(file);
-                azone.trigger('maxfilesexceeded.attachzone', [ file ]);
+                azone.trigger('maxfilesexceeded.attachzone', [file]);
             },
 
             accept: function (file, done) {
                 // no hash yet: treat as normal dz upload
-                if(file.hash === undefined) {
+                if (file.hash === undefined) {
                     done();
-                    azone.trigger('accept.attachzone', [ file ]);
+                    azone.trigger('accept.attachzone', [file]);
                     return;
                 }
 
@@ -192,16 +193,16 @@
 
                 // trick dropzone into treating this file as though it were successfully uploaded
                 file.accepted = true;
-                file.status   = Dropzone.SUCCESS;
+                file.status = Dropzone.SUCCESS;
 
                 this._updateMaxFilesReachedClass();
-                azone.trigger('accept.attachzone', [ file ]);
+                azone.trigger('accept.attachzone', [file]);
             }
         });
 
 
         // check for existing attachments and push them into the dropzone's list
-        azone.find(opt.previewsContainerSelector).find(opt.attachmentTag).each(function() {
+        azone.find(opt.previewsContainerSelector).find(opt.attachmentTag).each(function () {
             var elem = $(this),
                 hash = elem.find('[data-az-attachment]').val(),
                 name = elem.find('[data-dz-name]').text(),
@@ -212,7 +213,7 @@
                     previewElement: this,
                     name: name,
                     hash: hash
-                };
+            };
 
             if (self.dropzone) {
                 self.dropzone.files.push(file);
@@ -233,8 +234,7 @@
 
         if (this.dropzone) {
             this.dropzone._updateMaxFilesReachedClass();
-        }
-        else {
+        } else {
             this.fallbackMaxFilesReached();
         }
 
@@ -307,7 +307,7 @@
 
     ResourceAttach.prototype.cacheModal = function (callback) {
 
-        var key  = this.getCacheKey(),
+        var key = this.getCacheKey(),
             self = this;
 
         if ('undefined' == typeof modalCache[key]) {
@@ -359,7 +359,7 @@
 
 
         singletonModal.on('click', '.cancel[role=button]', function (e) {
-            window.top.postMessage(JSON.stringify({ data: [] }), location.origin);
+            window.top.postMessage(JSON.stringify({data: []}), location.origin);
         });
     };
 
@@ -379,7 +379,6 @@
                     .on('closed.fndtn.reveal.attach', self.reopenParentReveal.bind(self));
             });
         } else {
-
             // ensure the return points to the right element
             singletonModal
                 .data('rtn', this)
@@ -393,8 +392,8 @@
 
         $(window).unbind('message').on('message', function (e) {
             var message,
-                modal    = singletonModal,
-                self     = modal.data('rtn'),
+                modal = singletonModal,
+                self = modal.data('rtn'),
                 explorer = modal.find('li.browsing').find('div.explorer');
 
             try {
@@ -408,10 +407,12 @@
             } else if (message.data) {
                 explorer.removeAttr('data-text');
                 var elems = self.attach(message.data);
-                $(elems).each(function() { this.addClass('dz-success') });
+                $(elems).each(function () {
+                    this.addClass('dz-success')
+                });
 
                 // Trigger attachzone success event
-                $(self.element).trigger('success.attachzone', [ message ]);
+                $(self.element).trigger('success.attachzone', [message]);
             }
         });
     };
@@ -422,7 +423,7 @@
      *
      * @param event
      */
-    ResourceAttach.prototype.reopenParentReveal = function(event) {
+    ResourceAttach.prototype.reopenParentReveal = function (event) {
         // compensate for event double-fire: see https://github.com/zurb/foundation/issues/5482
         if (event) {
             if (event.namespace !== 'fndtn.reveal' || $('[data-reveal].open').length > 0) {
@@ -466,8 +467,7 @@
             if (this.dropzone) {
                 this.dropzone.addFile(data);
                 elems.push($(data.previewElement));
-            }
-            else {
+            } else {
                 data.previewElement = $(this.tpl.html());
 
                 this.renderFile(data);
@@ -522,7 +522,7 @@
     ResourceAttach.prototype.renderFile = function (file) {
         var elem;
 
-        if(!file.previewElement) {
+        if (!file.previewElement) {
             return;
         }
 
@@ -533,10 +533,16 @@
             elem.find('[data-dz-name]').html(file.name);
         }
         if (file.hash) {
-            elem.find('input[data-az-attachment]').val(file.hash);
+            var hash = file.hash;
+            // If there's a file name: append it to the hash
+            // (thus completing SA-10735)
+            if (file.name) {
+                hash = hash + ':' + file.name;
+            }
+            elem.find('input[data-az-attachment]').val(hash);
         }
         if (file.type) {
-            elem.find('img[data-dz-thumbnail]').attr('src','/ajax/mime/' + file.type);
+            elem.find('img[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
         }
     };
 

@@ -12,6 +12,8 @@ namespace Schoolbox\Learning\Moment\Evidence\Translator;
 use Alaress_Date_Format;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\Learning\Moment\Evidence;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
 
@@ -25,8 +27,27 @@ use Schoolbox\User;
 class ArrayToModel
 {
     /**
+     * @var CollectorFactory
+     */
+    private $collectorFactory;
+
+
+    /**
+     * Constructor
+     *
+     * @param CollectorFactory $collectorFactory
+     */
+    public function __construct(CollectorFactory $collectorFactory)
+    {
+        $this->collectorFactory = $collectorFactory;
+    }
+
+
+    /**
      * @param array $json
      * @return Evidence\Model
+     * @throws ResourceException if the collector factory can't find the file
+     *                           that was uploaded
      */
     public function __invoke(array $json): Evidence\Model
     {
@@ -65,17 +86,33 @@ class ArrayToModel
             // Expect a discussion thread
             $model->setDiscussionThread((new DiscussionThread())->setId($json['discussionThread']['id']));
         }
-        if (isset($json['filename'])) {
-            $model->setFilename($json['filename']);
-        }
         if (isset($json['recipient']['id'])) {
             // Expect a user object
             $model->setRecipient((new User())->setId($json['recipient']['id']));
         }
+
+
+        // File upload may be either:
+        // * an extant storage hash
+        // * a triplet passed from a resource attacher, to be transformed into a
+        //   storage hash by the collector factory
+        if (isset($json['file'])) {
+            $file = $this->collectorFactory->build([$json['file']])->getFirst();
+            if ($file) {
+                $model
+                    ->setFilename($file->getBasename())
+                    ->setStorage($file);
+            }
+        }
+
+
         if (isset($json['storage']['hash'])) {
             // Expect a hash? Not sure how storage files should be represented
             // in API requests/responses yet
             $model->setStorage((new StorageModel())->setHash($json['storage']['hash']));
+        }
+        if (isset($json['filename'])) {
+            $model->setFilename($json['filename']);
         }
 
         return $model;

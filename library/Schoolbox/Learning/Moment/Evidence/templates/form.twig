@@ -65,16 +65,8 @@
 <div class="row">
     <div class="small-12 island">
         <form action="{{ routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) }}" method="post" id="evidence-form">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label class="required" for="evidence-body">
-                            Write something
-                        </label>
-                        <textarea name="body" id="evidence-body" required></textarea>
-                    </div>
-                </fieldset>
-            </section>
+            {% block formInputs %}
+            {% endblock formInputs %}
             <input type="submit" id="evidence-submit" value="Submit" />
         </form>
     </div>
@@ -84,36 +76,31 @@
 {# Set up CKEditor #}
 <script src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+{% block formJs %}
+    {% autoescape 'js' %}
+        <script type="text/javascript">
+            let buildValidationRules = function () {
+                return {};
+            }
+            let buildPayload = function (form) {
+                return {};
+            }
+        </script>
+    {% endautoescape %}
+{% endblock formJs %}
+
 {% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
-        let editorId = 'evidence-body';
-        $.fn.alaressEditor({
-            targetElements: $('#' + editorId)
-        });
-
-        // Update the editor's form input on change
-        CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
-
         $('#evidence-form').alaressValidate({
-            rules: {
-                body: {
-                    required: true,
-                },
-            },
+            rules: buildValidationRules(),
             submitHandler(form, event) {
                 event.preventDefault();
 
-                // Update the editor's form input
-                CKEDITOR.instances[editorId].updateElement();
-
                 // Build a request to post the form
-                let formData = new FormData(form),
-                    payload = {
-                        body: formData.get('body'),
-                    },
-                    toast  = $('#toast'),
-                    submit = $('#evidence-submit');
+                let payload = buildPayload(form),
+                    toast   = $('#toast'),
+                    submit  = $('#evidence-submit');
 
                 // Toast then post
                 toast.toastActivate('Saving...')
@@ -125,8 +112,10 @@
                         toast.toastTimeout({text: 'Saved'});
                         window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
                     })
-                    .catch(() => toast.toastTimeout({text: 'Save failed', css: 'alert'}))
-                    .finally(() => submit.prop('disabled', false));
+                    .catch(() => {
+                        toast.toastTimeout({text: 'Save failed', css: 'alert'});
+                        submit.prop('disabled', false);
+                    });
             }
         })
     });
