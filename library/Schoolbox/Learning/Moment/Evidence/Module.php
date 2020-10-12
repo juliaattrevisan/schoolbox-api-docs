@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence;
 
+use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -41,6 +42,12 @@ class Module extends BaseModule
             'userId'
         );
 
+        // In addition: if posting a moment for someone else,
+        // that someone else must be a student
+        $isTargetUserSelfOrStudentRule = new Rule\Callback(function (array $params, User $user) {
+            $this->authorizeAllUsersAreSelfOrStudent($params, $user);
+        });
+
         $viewCreateFormRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
@@ -48,10 +55,11 @@ class Module extends BaseModule
                 new Rule\HasRole(Role::STAFF),
                 new Rule\LazyCallback(function () use ($isParentOrUserRule) {
                     return new Rule\Callback(function (array $params, User $user) use ($isParentOrUserRule) {
-                        $this->authorizeAllUsers($params, $user, $isParentOrUserRule);
+                        $this->authorizeAllUsersAreSelfOrParentOfSelf($params, $user, $isParentOrUserRule);
                     });
                 })
             ),
+            $isTargetUserSelfOrStudentRule,
         );
 
 
@@ -164,12 +172,41 @@ class Module extends BaseModule
      * @param User                    $currentUser
      * @param Rule\IAuthorizationRule $isParentOrUserRule The auth rule used to authorize the user
      */
-    private function authorizeAllUsers(array $params, User $currentUser, Rule\IAuthorizationRule $isParentOrUserRule): void
-    {
+    private function authorizeAllUsersAreSelfOrParentOfSelf(
+        array $params,
+        User $currentUser,
+        Rule\IAuthorizationRule $isParentOrUserRule
+    ): void {
         // Coalesce to empty list as the preloader may have returned not found,
         // and thus not populated $params['users']
         foreach ($params['users'] ?? [] as $user) {
             $isParentOrUserRule->authorize(['userId' => $user->getId()], $currentUser);
+        }
+    }
+
+
+    /**
+     * Authorizes that ALL users in the URL are either:
+     * * the current user
+     * * a student
+     *
+     * @param array $params
+     * @param User  $currentUser
+     * @throws Forbidden if any user in URL isn't the current user or a student
+     */
+    private function authorizeAllUsersAreSelfOrStudent(array $params, User $currentUser): void
+    {
+        foreach ($params['users'] ?? [] as $user) {
+            if (!$user instanceof User) {
+                continue;
+            }
+            if ($currentUser->getId() === $user->getId()) {
+                continue;
+            }
+            if ($user->getRole()->isStudent()) {
+                continue;
+            }
+            throw new Forbidden();
         }
     }
 }
