@@ -144,8 +144,7 @@ body.login input[type=checkbox]:not(.plain):checked + label:after {
   font-size: 0.75rem;
 }
 .e-report dl dt {
-  /* Make them the same color as headings too */
-  color: var(--body-foreground);
+  color: #222;
   font-size: 0.8rem;
   font-weight: bold;
 }
