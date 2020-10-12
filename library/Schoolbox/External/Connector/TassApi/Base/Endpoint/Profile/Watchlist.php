@@ -106,6 +106,8 @@ class Watchlist
             }
         }
 
+        /* Toggle between raw payload data and filtered watchlist data
+         */
 //         new \Alaress_Probe($parents, $commRules);
         new \Alaress_Probe($family, $addresses);
     }
