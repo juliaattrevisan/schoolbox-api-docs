@@ -56,7 +56,7 @@ class Phone
          */
         $addresses = $this->api->retrieveDocument('getCommunicationRulesDetails', [
             'currentstatus' => 'current',
-            'commtype' => 'lw'
+            'commtype' => 'gen'
         ]);
 
         /* Inspect each element from the returned data. Family code is stored in
