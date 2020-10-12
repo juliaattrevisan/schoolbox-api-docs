@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence;
 
+use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -191,7 +192,7 @@ class Module extends BaseModule
      *
      * @param array $params
      * @param User  $currentUser
-     * @throws NotFound
+     * @throws Forbidden if any user in URL isn't the current user or a student
      */
     private function authorizeAllUsersAreSelfOrStudent(array $params, User $currentUser): void
     {
@@ -205,7 +206,7 @@ class Module extends BaseModule
             if ($user->getRole()->isStudent()) {
                 continue;
             }
-            throw new NotFound();
+            throw new Forbidden();
         }
     }
 }
