@@ -416,13 +416,13 @@ class Family
     private function processParentNode(string $node, string $externalId, array $family): array
     {
         $person = $this->phones[$family['user_code']][$node] ?? [
-            'firstname' => '',
-            'surname' => '',
+            'firstname' => $family[$node]['preferred_name'],
+            'surname' => $family[$node]['surname'],
             'mobile' => '',
             'home' => '',
             'work' => '',
             'email' => '',
-            'relationship' => '',
+            'relationship' => $family[$node]['description'],
         ];
 
         /* Assign an externalId to this person
