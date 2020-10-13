@@ -61,9 +61,10 @@ BASESHA=$(cat .git/resource/metadata.json | jq -r ' .[] | select(.name=="base_sh
 
 echo "Base sha = $BASESHA"
 
-CHANGED_FILES=$(git diff "$BASESHA" --name-only)
+# Exclude deleted files from the list of files to check
+CHANGED_FILES=$(git diff "$BASESHA" --name-only --diff-filter=d)
 
-echo "Files canged = $CHANGED_FILES"
+echo "Files changed = $CHANGED_FILES"
 
 echo "Running php code sniffer checks"
 
