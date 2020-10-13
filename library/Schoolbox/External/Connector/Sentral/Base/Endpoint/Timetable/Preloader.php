@@ -76,28 +76,69 @@ class Preloader implements IStrategy
     public function import(): void
     {
 
-        /* Iterate through all the students we saw
-         */
-        $ids = $this->registry->keys();
-
         /* Use timetable-lessons endpoint with appropriate dates for the Monday of this week
          * to the Friday of this week inclusive
-         */
-        
-
-        /* Some endpoint accesses result in an endpoint saying you didn't provide a thing
-         * called a "timeview", i.e. "Missing timeview student information for the given student"
          *
-         * This means they don't have any timetable data, but it results in a endpoint error
-         * from sentral and an exception being thrown by us. There's no api docs about it,
-         * I had to figure it out the hard way
-         *
-         * We can't process any timetables in those cases, so log it and continue
+         * May or may not be buggy
+         * https://stackoverflow.com/questions/1431631/get-date-for-monday-and-friday-for-the-current-week-php
          */
+        $monday = date('Y-m-d', strtotime('monday this week'));
+        $friday = date('Y-m-d', strtotime('friday this week'));
 
-        /* Otherwise, remember it in the Registry instance because we left ourselves
-         * a nice spot for it to fit
+        /* Iterate through all the people we saw previously, in profile import
          */
+        foreach ($this->registry->recallAll() as $id => $data) {
+            $name = $data['name'];
 
+            $endpoint = "timetables/student/{$id}/timetable-lessons?fromDate={$monday}&toDate={$friday}";
+
+            $this->log->debug(sprintf(
+                'Accessing endpoint %s',
+                $endpoint
+            ));
+
+            /* Some endpoint accesses result in an endpoint saying you didn't provide a thing
+             * called a "timeview", i.e. "Missing timeview student information for the given student"
+             *
+             * This means they don't have any timetable data, but it results in a endpoint error
+             * from sentral and an exception being thrown by us. There's no api docs about it,
+             * I had to figure it out the hard way
+             */
+            try {
+                $payload = $this->api->retrieveDocument($endpoint);
+
+                $numRecords = \count($payload['data']);
+
+                if ($numRecords) {
+                    $this->log->debug(sprintf(
+                        'Found %s timetableLesson instances for %s (sentral id %s)',
+                        $numRecords,
+                        $name,
+                        $id
+                    ));
+                }
+            } catch(\InvalidArgumentException $e) {
+
+                /* We can't process any timetables in those cases, so log it and continue
+                 */
+                $this->log->warning(sprintf(
+                    'Could not obtain timetable for %s (sentral id %s); they might not have a timetable in sentral.',
+                    $name,
+                    $id
+                ));
+
+                $this->log->warning($e->getMessage());
+
+                continue;
+            }
+
+            /* Otherwise, remember it in the Registry instance because we left ourselves
+             * a nice spot for it to fit
+             */
+            $this->registry->remember((string)$id, [
+                'name' => $name,
+                'timetable' => $payload['data']
+            ]);
+        }
     }
 }
