@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @deprecated No components use this configuration anymore
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,8 +9,7 @@
 
 use Schoolbox\IConfigLoader;
 
-
-if(!isset($this)) {
+if (!isset($this)) {
     require_once __DIR__ . '/../../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     SitePage::localRedir('/adminv2/messages');
@@ -22,8 +22,8 @@ if (!$_SESSION['user']->isSuperuser()) {
 
 /** @var SitePage $this */
 
-if(in_array($this->arg[0], array('enable','disable'))) {
-    $this->localRedir('/adminv2/messages/indexForm.php?enabled='.$this->arg[0]);
+if (in_array($this->arg[0], array('enable','disable'))) {
+    $this->localRedir('/adminv2/messages/indexForm.php?enabled=' . $this->arg[0]);
 }
 
 $this->setFile(TEMPLATE_content, '/adminv2/messages/index.html');
@@ -57,7 +57,7 @@ $config  = $this->getDi()->get('config');
 $enabled = $config->get('messaging_enabled');
 $pushing = $config->get('push_notifications_enabled');
 
-if($enabled) {
+if ($enabled) {
     $this->setVar(array(
         'MSG_SYS_ENABLED' => 'ENABLED',
         'MSG_SYS_TOGGLE'  => 'disable',
@@ -66,14 +66,14 @@ if($enabled) {
     // compile a week to test against
     /** @var DateTime[] $dayTests */
     $dayTests = array();
-    for($i = 0; $i < 7; ++$i) {
+    for ($i = 0; $i < 7; ++$i) {
         $d = new DateTime("+$i day");
         $dayTests[$d->format('w')] = $d;
     }
     // aaaand put 0 at the start
     ksort($dayTests);
 
-    foreach(\Schoolbox\RoleMapper::getInstance()->findAll() as $role) {
+    foreach (\Schoolbox\RoleMapper::getInstance()->findAll() as $role) {
 
         /** @var \Schoolbox\Role $role */
 
@@ -99,17 +99,17 @@ if($enabled) {
                 ->setPart(\Cron\CronExpression::DAY, '*')
                 ->setPart(\Cron\CronExpression::MONTH, '*')
                 ->setPart(\Cron\CronExpression::WEEKDAY, '*');
-        } catch(InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             // no schedule for group
         }
 
-        foreach($dayTests as $i => $date) {
+        foreach ($dayTests as $i => $date) {
             $checked = false;
             try {
                 if ($datecron instanceof \Cron\CronExpression) {
                     $checked = $datecron->isDue($date);
                 }
-            } catch(RuntimeException $e) {
+            } catch (RuntimeException $e) {
                 $checked = false;
             }
             $dayName = $date->format('l');
@@ -135,7 +135,7 @@ if($enabled) {
                 $mi = $nextTime->format('i');
                 $valid = true;
             }
-        } catch(RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $valid = false;
         }
 
@@ -150,7 +150,6 @@ if($enabled) {
     if ($pushing) {
         $this->parse('push_online_block', 'push_online');
         $this->setVar('push_offline_block', '');
-
     } else {
         // messaging online, but push offline:
         $this->setVar('push_online_block', '');

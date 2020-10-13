@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Allows the updating of attendance records in synergetic.  This page is used to display the input form with a
  * list of students, options for attendance storing
@@ -91,7 +92,7 @@ $externalUserHandler = new External_User();
 
 /* Manufacture a specific class construct
  */
-$class= [
+$class = [
     'FileType' => $fileType,
     'ClassCampus' => $classCampus,
     'ClassCode' => $classCode,
@@ -172,7 +173,6 @@ $periodNames = array_unique([$definition['desc'][$firstPeriodNumber], $definitio
 
 
 if ($class) {
-
     // Set up attendance time steps
     // Steps: 5min
     $inputTimeFormat  = 'g:ia';
@@ -214,7 +214,6 @@ if ($class) {
     $allStudents = [];
 
     try {
-
         // Glue the records for all periods together.
         // TODO make External_Synergetic_Attendance accept multiple periods
         $allStudents = [];
@@ -253,7 +252,6 @@ if ($class) {
                 }
             }
         }
-
     } catch (ExternalException $e) {
         error(ErrorMapper::ERROR_ATTENDANCE_LIST);
     } catch (SchoolboxException $e) {
@@ -266,7 +264,6 @@ if ($class) {
     $attendanceTotal = 0;
 
     if (is_array($allStudents) && count($allStudents)) {
-
         $attendanceCount = $attendanceTotal = count($allStudents);
         $userHandler = new User();
 
@@ -287,10 +284,9 @@ if ($class) {
         ];
 
         foreach ($reasonDropdownOptions as $reason) {
-
             /* Figure out where it should be stacked
              */
-            $type = trim($reason['AbsenceTypeCode']) !== '' ? trim($reason['AbsenceTypeCode']): INDEX_ALL;
+            $type = trim($reason['AbsenceTypeCode']) !== '' ? trim($reason['AbsenceTypeCode']) : INDEX_ALL;
 
             /* If we haven't seen this type code before, init an array
              */
@@ -316,7 +312,6 @@ if ($class) {
         // Iterate each student
 
         foreach ($allStudents as $currentStudent) {
-
             $user = $userHandler->getBySynergy($currentStudent['ID']);
 
             $pattern = '/((?:[0-2])?[0-9]:[0-5][0-9]):[0-5][0-9](?:\.|:)000(AM|PM)?/i';
@@ -350,7 +345,10 @@ if ($class) {
             $abscenceCode = $currentStudent['ActualAbsenceTypeCode'] && $currentStudent['ActualAbsenceTypeCode'] != '?' ? $currentStudent['ActualAbsenceTypeCode'] : $currentStudent['PossibleAbsenceCode'];
 
             $this->dropDown(
-                'absence_options', $absenceDropdownOptions, $abscenceCode, 'student',
+                'absence_options',
+                $absenceDropdownOptions,
+                $abscenceCode,
+                'student',
                 array('Code' => 'ABSENCE_OPTIONS_VALUE', 'Description' => 'ABSENCE_OPTIONS_DESCRIPTION')
             );
 
@@ -360,7 +358,10 @@ if ($class) {
             /* Set default dropdown appearance on load
              */
             $this->dropDown(
-                'reason_options', array_merge($reasonStack[$abscenceCode] ?: [], $reasonStack[INDEX_ALL]), $reasonCode, 'student',
+                'reason_options',
+                array_merge($reasonStack[$abscenceCode] ?: [], $reasonStack[INDEX_ALL]),
+                $reasonCode,
+                'student',
                 array('Code' => 'REASON_OPTIONS_VALUE', 'AbsenceTypeCode' => 'REASON_OPTIONS_TYPE', 'Description' => 'REASON_OPTIONS_DESCRIPTION')
             );
 
@@ -368,37 +369,37 @@ if ($class) {
                 //Let's render out some flags
                 //Only the flags defined in the keys will be rendered
                 $flags = [
-                    'MedicalAlertFlag'=> [
+                    'MedicalAlertFlag' => [
                         'icon' => 'alert',
                         'descriptionField' => 'MedicalAlert',
                         'defaultDescription' => 'Medical Alert'
                     ],
-                    'SpecialNeedsFlag'=> [
+                    'SpecialNeedsFlag' => [
                         'icon' => 'info',
                         'descriptionField' => 'SpecialNeedsDescription',
                         'defaultDescription' => $localeSpecialNeeds,
                     ],
-                    'CommentWarningFlag'=> [
+                    'CommentWarningFlag' => [
                         'icon' => 'comment',
                         'descriptionField' => 'CommentDescription',
                         'defaultDescription' => 'Comment'
                     ],
-                    'ParentsSeparatedFlag'=> [
+                    'ParentsSeparatedFlag' => [
                         'icon' => 'staff',
                         'descriptionField' => 'ParentsSeparatedDescription',
                         'defaultDescription' => 'Parents Separated'
                     ],
-                    'CourtOrderFlag'=> [
+                    'CourtOrderFlag' => [
                         'icon' => 'forms',
                         'descriptionField' => 'CourtOrderDescription',
                         'defaultDescription' => 'Court Order'
                     ],
-                    'IndividualPlanFlag'=> [
+                    'IndividualPlanFlag' => [
                         'icon' => 'staff-students',
                         'descriptionField' => 'IndividualPlanDescription',
                         'defaultDescription' => 'Individual Plan'
                     ],
-                    'AnaphylaxisFlag'=> [
+                    'AnaphylaxisFlag' => [
                         'icon' => 'danger',
                         'descriptionField' => 'AnaphylaxisDescription',
                         'defaultDescription' => 'Anaphylaxis'
@@ -406,10 +407,10 @@ if ($class) {
                 ];
 
                 foreach ($flags as $key => $value) {
-                    if(isset($currentStudent[$key]) && $currentStudent[$key]){
+                    if (isset($currentStudent[$key]) && $currentStudent[$key]) {
                         $this->setVar('ICON', $flags[$key]['icon']);
 
-                        if(!empty($currentStudent[$flags[$key]['descriptionField']])) {
+                        if (!empty($currentStudent[$flags[$key]['descriptionField']])) {
                             $this->setVar('DESCRIPTION', $currentStudent[$flags[$key]['descriptionField']]);
                         } else {
                             $this->setVar('DESCRIPTION', $flags[$key]['defaultDescription']);
@@ -438,7 +439,6 @@ if ($class) {
         } else {
             $this->setVar('class_list_link_block', '');
         }
-
     } else {
         $this->setVar('student_block', '');
         $this->setVar('class_list_link_block', '');
@@ -446,7 +446,6 @@ if ($class) {
 
     $this->setVar('ATTENDANCE_COUNT', $attendanceCount);
     $this->setVar('ATTENDANCE_TOTAL', $attendanceTotal);
-
 } else {
     error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
 }
