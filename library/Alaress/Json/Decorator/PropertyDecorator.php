@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -10,7 +11,6 @@ namespace Alaress\Json\Decorator;
 
 use Alaress\Json\Serializable;
 use ReflectionObject;
-
 
 /**
  * The base decorator. According to the $map given at construction time, decorate the model given with properties
@@ -33,10 +33,10 @@ class PropertyDecorator implements IDecorator
 
 
     /**
-     * @param array        $map
-     * @param IDecorator[] $decorators
+     * @param array|null $map
+     * @param IDecorator ...$decorators
      */
-    public function __construct(array $map = null, IDecorator... $decorators)
+    public function __construct(array $map = null, IDecorator ...$decorators)
     {
         $this->map = $map;
         $this->decorators = $decorators;
@@ -98,11 +98,9 @@ class PropertyDecorator implements IDecorator
                 foreach ($this->decorators as $extraDecoration) {
                     $json[$field] = $extraDecoration->decorate($json[$field], $result);
                 }
-
             } elseif ($result instanceof \JsonSerializable) {
                 // do a vanilla json-serialize
                 $json[$field] = $result->jsonSerialize();
-
             } else {
                 // not something we know how to serialize? ok, just return as-is and let json_encode handle it
                 $json[$field] = $result;
@@ -116,5 +114,4 @@ class PropertyDecorator implements IDecorator
 
         return $json;
     }
-
 }

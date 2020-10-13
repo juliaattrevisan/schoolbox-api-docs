@@ -232,13 +232,13 @@ class Controller extends Base
      */
     private function assertValidYearForReport($year, User $student): void
     {
-        $thisYear  = date('Y');
-        $startYear = $thisYear + 7 - $student->getYear();
+        $thisYear  = (int)date('Y');
+        $startYear = $thisYear + 7 - (int)$student->getYear()->getName();
         if ($startYear < 2015) {
             throw new \RangeException("Reports are only for students who started year 7 in 2015 or later for now");
         }
 
-        $reportYearLevel = $student->getYear() - ($thisYear - $year);
+        $reportYearLevel = ((int)$student->getYear()->getName()) - ($thisYear - $year);
         if ($reportYearLevel >= 10) {
             throw new \RangeException("Reports are only for years 7, 8 and 9 for now");
         }

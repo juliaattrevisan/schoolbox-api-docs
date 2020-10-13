@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\WebDav\FileServer;
 
 use Sabre\DAV;
@@ -125,8 +127,7 @@ class File extends DAV\File
         if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), $this->getFolder()->getId()) >= UserAccess::ACCESS_WRITE) {
             $this->getFile()->setFilename(pathinfo($newName, PATHINFO_FILENAME));
             $this->getFileMapper()->save($this->getFile());
-        }
-        else {
+        } else {
             throw new DAV\Exception\Forbidden('Permission denied to modify file');
         }
     }
@@ -154,7 +155,6 @@ class File extends DAV\File
     public function put($data)
     {
         if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), $this->getFolder()->getId()) >= UserAccess::ACCESS_WRITE) {
-
             try {
                 // accept the data as a new storage
                 $storage = $this->getStorageMapper()->acceptStream(
@@ -166,14 +166,14 @@ class File extends DAV\File
                 // point this file to the new content
                 $this->getFile()->setStorage($storage);
                 $this->getFileMapper()->save($this->getFile());
-
             } catch (FileException $e) {
                 // ...? noop? throw?
             }
-        }
-        else {
+        } else {
             throw new DAV\Exception\Forbidden('Permission denied to modify file');
         }
+
+        return null;
     }
 
 
@@ -207,8 +207,7 @@ class File extends DAV\File
     {
         if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), $this->getFolder()->getId()) >= UserAccess::ACCESS_WRITE) {
             $this->getFileMapper()->delete($this->getFile());
-        }
-        else {
+        } else {
             throw new DAV\Exception\Forbidden('Permission denied to delete file');
         }
     }

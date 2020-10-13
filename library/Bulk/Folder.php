@@ -438,7 +438,7 @@ class Bulk_Folder
     /**
      * Assert that there are no duplicate values across a set of arrays
      *
-     * @param mixed $columnIndexes
+     * @param array $columnIndexes
      * @throws UnexpectedValueException
      */
     private function assertColumnIndexesAreUnique(array ...$columnIndexes): void

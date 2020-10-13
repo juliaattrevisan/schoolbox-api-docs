@@ -158,7 +158,7 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
         $data['created_at'] = 'NOW()';
         $data['updated_at'] = 'NOW()';
 
-        parent::create($data);
+        return parent::create($data);
     }
 
     /**
@@ -170,7 +170,7 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
     {
         $data['deleted_at'] = 'NOW()';
 
-        parent::update($data);
+        return parent::update($data);
     }
 
     /* Getters/Setters

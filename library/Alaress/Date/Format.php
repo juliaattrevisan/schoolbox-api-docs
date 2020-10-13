@@ -11,9 +11,10 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Alaress\Date\IClock;
 use Alaress\Json\SerializeTrait;
-use Jenssegers\Date\Date as LaravelDate;
+use Carbon\Carbon;
 
 class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, IComparable, \Alaress\Json\Serializable
 {
@@ -22,10 +23,10 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * @var static
      */
-    static private $now;
+    private static $now;
 
     /**
-     * @var LaravelDate
+     * @var Carbon
      */
     protected $datetime;
 
@@ -39,7 +40,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * The default/system timezone for dates
      * @var DateTimeZone
      */
-    static private $defaultTimezone;
+    private static $defaultTimezone;
 
     /**
      * Any warnings that might have been raised in creation of this object.
@@ -88,10 +89,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
 
         // down here, cache the clock at time of request
         if (!self::$now instanceof static) {
-
             if (isset($_SERVER['REQUEST_TIME'])) {
                 $time = $_SERVER['REQUEST_TIME'];
-
             } else {
                 // @codeCoverageIgnoreStart
                 $time = time();
@@ -150,7 +149,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             // @codeCoverageIgnoreEnd
         }
         // Zero out unset parts - IMO that's the least surprising behavior
-        return new static($dateTime, $locale->localFormat().'|', $timezone, $locale);
+        return new static($dateTime, $locale->localFormat() . '|', $timezone, $locale);
     }
 
     /**
@@ -176,7 +175,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         }
         // Zero out unset parts - IMO that's the least surprising behavior.
         // If I create a date with no time, I'd expect its time to be 00:00:00
-        return new static($dateTime, $locale->localShortFormat().'|', $timezone, $locale);
+        return new static($dateTime, $locale->localShortFormat() . '|', $timezone, $locale);
     }
 
     /**
@@ -200,7 +199,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             // @codeCoverageIgnoreEnd
         }
         // Zero out unset parts - IMO that's the least surprising behavior.
-        return new static($dateTime, static::URL_FORMAT.'|', $timezone, $locale);
+        return new static($dateTime, static::URL_FORMAT . '|', $timezone, $locale);
     }
 
     /**
@@ -232,13 +231,12 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             // Example: '2017-03-10 17:53:50.000'
             $format = static::DATABASE_FORMAT_MS;
         } else {
-
             // Example: '2017-03-10 17:53:50'
             $format = static::DATABASE_FORMAT;
         }
 
         // Zero out unset parts - IMO that's the least surprising behavior.
-        return new static($dateTime, $format.'|', $timezone, $locale);
+        return new static($dateTime, $format . '|', $timezone, $locale);
     }
 
 
@@ -257,8 +255,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
 
         if (!$datetime) {
             try {
-                $datetime = new DateTime(str_replace('/','-', $parseable));
-
+                $datetime = new DateTime(str_replace('/', '-', $parseable));
             } catch (Exception $e) {
                 throw new InvalidArgumentException("Could not parse '$naturalLanguage' into a datetime", $e->getCode(), $e);
             }
@@ -311,10 +308,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     public function __construct($dateTime = null, $dateFormat = null, DateTimeZone $timezone = null, $locale = null)
     {
-        if($locale instanceof Alaress_Date_Locale_Interface) {
+        if ($locale instanceof Alaress_Date_Locale_Interface) {
             $this->setLocale($locale);
-        }
-        else {
+        } else {
             $this->setLocale(new Alaress_Date_Locale_Config());
         }
 
@@ -330,7 +326,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     protected function getDefaultTimezone()
     {
-        if(is_null(self::$defaultTimezone)) {
+        if (is_null(self::$defaultTimezone)) {
             self::$defaultTimezone = new DateTimeZone(date_default_timezone_get());
         }
         return self::$defaultTimezone;
@@ -346,13 +342,13 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * @param mixed        $dateTime
      * @param DateTimeZone $timezone The timezone of the date, or null to use default
      *
-     * @return LaravelDate|null
+     * @return Carbon|null
      */
     protected function buildLaravelDate($dateTime = null, DateTimeZone $timezone = null)
     {
         if (!isset($dateTime)) {
             // Nothing set? set it to now
-            return LaravelDate::now($timezone ?: $this->getDefaultTimezone());
+            return Carbon::now($timezone ?: $this->getDefaultTimezone());
         }
 
         if ($dateTime instanceof DateTimeInterface) {
@@ -362,15 +358,15 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             }
 
             // Build out of timestamp and timezone
-            if(!is_null($timezone)) {
+            if (!is_null($timezone)) {
                 $dateTime->setTimezone($timezone);
             }
-            return LaravelDate::instance($dateTime);
+            return Carbon::instance($dateTime);
         }
 
         if ($dateTime instanceof Alaress_Date_Format) {
             // Build out of date object's timestamp/timezone
-            return LaravelDate::createFromTimestamp(
+            return Carbon::createFromTimestamp(
                 $dateTime->getDateTimeObject()->getTimestamp(),
                 $timezone ?: clone $dateTime->getDateTimeObject()->getTimezone()
             );
@@ -431,7 +427,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             if ($inputDateFormat === 'U') {
                 // Timestamp special case handling - make it work with negative datetimes
                 if (is_numeric($dateTime)) {
-                    $laravelDate = LaravelDate::createFromTimestamp($dateTime, $newTimezone);
+                    $laravelDate = Carbon::createFromTimestamp($dateTime, $newTimezone);
                 } else {
                     throw new InvalidArgumentException(
                         '$dateTime must be numeric if $inputDateFormat is timestamp format'
@@ -439,14 +435,14 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                 }
             } else {
                 try {
-                    $laravelDate = LaravelDate::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
+                    $laravelDate = Carbon::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
                 } catch (InvalidArgumentException $e) {
                     // I don't have a datetime, try again with trailing data allowed
                     // This can also throw an InvalidArgumentException - allow that to fall on carpet
-                    $laravelDate = LaravelDate::createFromFormat($inputDateFormat . '+', $dateTime, $newTimezone);
+                    $laravelDate = Carbon::createFromFormat($inputDateFormat . '+', $dateTime, $newTimezone);
                 }
 
-                $errors = LaravelDate::getLastErrors();
+                $errors = Carbon::getLastErrors();
                 if ($errors['warning_count']) {
                     // I have a datetime, but it's not what I expected. Warn the user.
                     // This date will also fail isValid()
@@ -850,7 +846,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function toRfc850String()
     {
         return $this->getDateTimeObject()->toRfc850String();
-
     }
 
     /**
@@ -861,7 +856,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function toRfc1036String()
     {
         return $this->getDateTimeObject()->toRfc1036String();
-
     }
 
     /**
@@ -872,7 +866,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function toRfc1123String()
     {
         return $this->getDateTimeObject()->toRfc1123String();
-
     }
 
     /**
@@ -894,7 +887,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     {
         //
         return $this->getDateTimeObject()->toRfc3339String();
-
     }
 
     /**
@@ -905,7 +897,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function toRssString()
     {
         return $this->getDateTimeObject()->toRssString();
-
     }
 
     /**
@@ -916,7 +907,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function toW3cString()
     {
         return $this->getDateTimeObject()->toW3cString();
-
     }
 
 
@@ -953,7 +943,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     {
         $this->getDateTimeObject()->startOfMonth();
         return $this;
-
     }
 
     /**
@@ -965,7 +954,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     {
         $this->getDateTimeObject()->endOfMonth();
         return $this;
-
     }
 
     /**
@@ -977,7 +965,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     {
         $this->getDateTimeObject()->startOfYear();
         return $this;
-
     }
 
     /**
@@ -989,7 +976,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     {
         $this->getDateTimeObject()->endOfYear();
         return $this;
-
     }
 
     /**
@@ -1001,7 +987,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     {
         $this->getDateTimeObject()->startOfWeek();
         return $this;
-
     }
 
     /**
@@ -1013,7 +998,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     {
         $this->getDateTimeObject()->endOfWeek();
         return $this;
-
     }
 
     /**
@@ -1029,7 +1013,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     {
         $this->getDateTimeObject()->next($dayOfWeek);
         return $this;
-
     }
 
     /**
@@ -1198,7 +1181,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * Format used when passing dates around on the URL
      * @return string
      */
-    public function getURLDate(){
+    public function getURLDate()
+    {
         return $this->getUsingFormat(self::URL_FORMAT);
     }
 
@@ -1454,7 +1438,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Gets datetime object out of this wrapper
      *
-     * @return LaravelDate
+     * @return Carbon
      */
     public function getDateTimeObject()
     {
@@ -1464,7 +1448,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Sets the datetime object in this wrapper
      *
-     * @param LaravelDate $dateObject
+     * @param Carbon $dateObject
      */
     protected function setDateTimeObject($dateObject)
     {
@@ -1510,7 +1494,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function ne($second)
     {
         return $this->getDateTimeObject()->ne($second->getDateTimeObject());
-
     }
 
     /**
@@ -1520,7 +1503,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function gt($second)
     {
         return $this->getDateTimeObject()->gt($second->getDateTimeObject());
-
     }
 
     /**
@@ -1530,7 +1512,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function gte($second)
     {
         return $this->getDateTimeObject()->gte($second->getDateTimeObject());
-
     }
 
     /**
@@ -1540,7 +1521,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function lt($second)
     {
         return $this->getDateTimeObject()->lt($second->getDateTimeObject());
-
     }
 
     /**
@@ -1550,7 +1530,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function lte($second)
     {
         return $this->getDateTimeObject()->lte($second->getDateTimeObject());
-
     }
 
     /**
@@ -1562,7 +1541,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function between($first, $second, $equal = true)
     {
         return $this->getDateTimeObject()->between($first->getDateTimeObject(), $second->getDateTimeObject(), $equal);
-
     }
 
 
@@ -1600,7 +1578,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function isToday()
     {
         return $this->getDateTimeObject()->isToday();
-
     }
 
     /**
@@ -1609,7 +1586,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function isTomorrow()
     {
         return $this->getDateTimeObject()->isTomorrow();
-
     }
 
     /**
@@ -1618,7 +1594,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function isFuture()
     {
         return $this->getDateTimeObject()->isFuture();
-
     }
 
     /**
@@ -1640,7 +1615,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function isPast()
     {
         return $this->getDateTimeObject()->isPast();
-
     }
 
     /**
@@ -1662,7 +1636,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function isLeapYear()
     {
         return $this->getDateTimeObject()->isLeapYear();
-
     }
 
     /**
@@ -1672,7 +1645,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function isSameDay($date)
     {
         return $this->getDateTimeObject()->isSameDay($date->getDateTimeObject());
-
     }
 
 
@@ -1871,7 +1843,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function diffInSeconds(Alaress_Date_Format $diff, $absolute = true)
     {
         return $this->getDateTimeObject()->diffInSeconds($diff->getDateTimeObject(), $absolute);
-
     }
 
 
@@ -1920,7 +1891,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         } elseif ($this->isYesterday()) {
             $relativeTime = 'yesterday';
         } elseif ($diffInDays < 7) {
-
             $relativeTime = '';
 
             if ($this->isPast()) {
@@ -1928,7 +1898,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             }
 
             $relativeTime .= $this->getUsingFormat('l');
-
         } else {
             // TODO: Use getDateOnly here and only include year when not the current year
             $relativeTime = $this->getShortDateOnly();
@@ -1959,7 +1928,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Implements the clone method for this object, by cloning internal datetime object aswell
      */
-    public function __clone() {
+    public function __clone()
+    {
         $this->datetime = clone $this->datetime;
     }
 

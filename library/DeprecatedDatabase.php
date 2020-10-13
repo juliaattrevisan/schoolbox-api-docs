@@ -214,11 +214,11 @@ class DeprecatedDatabase implements Serializable
      *
      * @deprecated
      *
-     * @param PDOStatement $result
+     * @param PDOStatement|null $result
      *
      * @return array|bool|null
      */
-    function getNextArray($result = 0)
+    function getNextArray($result = null)
     {
         if ($result instanceof PDOStatement) {
             $return_array = $result->fetch(PDO::FETCH_ASSOC);
@@ -235,11 +235,11 @@ class DeprecatedDatabase implements Serializable
      *
      * @deprecated
      *
-     * @param PDOStatement $result
+     * @param PDOStatement|null $result
      *
      * @return bool|int
      */
-    function countRows($result = 0)
+    function countRows($result = null)
     {
         if ($result instanceof PDOStatement) {
             $return_count = $result->rowCount();
@@ -436,11 +436,11 @@ class DeprecatedDatabase implements Serializable
      *
      * @deprecated
      *
-     * @param PDOStatement $result
+     * @param PDOStatement|null $result
      *
      * @return bool
      */
-    function endQuery($result = 0)
+    function endQuery($result = null)
     {
         return true;
     }

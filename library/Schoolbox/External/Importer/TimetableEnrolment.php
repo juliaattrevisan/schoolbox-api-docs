@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\External\Importer;
 
 use Alaress\Database\Connector\IConnector;
@@ -109,7 +111,7 @@ class TimetableEnrolment extends AbstractImporter
             // Load student and class from DB
             /** @var ClassEntry $class */
             try {
-                $class = $this->classMapper->findOneByColumn('code', $classCode, ['cache'=>false]);
+                $class = $this->classMapper->findOneByColumn('code', $classCode, ['cache' => false]);
             } catch (Mapper\Exception $e) {
                 $this->log->warning(sprintf('Class "%s" not found: creating a new class', $classCode));
 
@@ -147,7 +149,8 @@ class TimetableEnrolment extends AbstractImporter
         // * Enrolment: delete all existing and re-insert
         $result         = $this->parse();
         $createdClasses = [];
-
+        $enrolmentItems = [];
+        
         foreach ($result as $enrolment) {
             $class = $enrolment->getClass();
 
@@ -156,7 +159,7 @@ class TimetableEnrolment extends AbstractImporter
                     // This same class might have been created in an earlier enrolment update.
                     // I still need the ID regardless.
                     try {
-                        $class = $this->classMapper->findOneByColumn('code', $class->getCode(), ['cache'=>false]);
+                        $class = $this->classMapper->findOneByColumn('code', $class->getCode(), ['cache' => false]);
                     } catch (Mapper\Exception $e) {
                         $createdClasses[$class->getCode()] = true;
                         $this->log->info(sprintf('Creating class "%s"', $class->getCode()));
@@ -166,7 +169,7 @@ class TimetableEnrolment extends AbstractImporter
                 }
 
                 $externalId = $enrolment->getExternalId();
-                $enrolmentItems[] = "(NULL, '".$class->getId()."', '".$externalId."')";
+                $enrolmentItems[] = "(NULL, '" . $class->getId() . "', '" . $externalId . "')";
             } elseif (!$class->getId() && !isset($createdClasses[$class->getCode()])) {
                 $createdClasses[$class->getCode()] = true;
             }
