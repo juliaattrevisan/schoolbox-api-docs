@@ -249,23 +249,23 @@ class Factory
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper
             ))
-//            ->add(new Timetable\Classes(
-//                $this->log,
-//                $this->perform,
-//                $lookup,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//                $this->classPeriodMapper
-//            ))
-//            ->add(new Cleanup(
-//                $this->log,
-//                $this->perform,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//            ))
-              ;
+            ->add(new Timetable\Classes(
+                $this->log,
+                $this->perform,
+                $lookup,
+                $registry,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper
+            ))
+            ->add(new Cleanup(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ));
     }
 }
