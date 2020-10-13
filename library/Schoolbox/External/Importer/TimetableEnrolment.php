@@ -147,7 +147,8 @@ class TimetableEnrolment extends AbstractImporter
         // * Enrolment: delete all existing and re-insert
         $result         = $this->parse();
         $createdClasses = [];
-
+        $enrolmentItems = [];
+        
         foreach ($result as $enrolment) {
             $class = $enrolment->getClass();
 

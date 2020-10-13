@@ -391,11 +391,8 @@ class DataTransferObject
             if ($spec && $spec instanceof Project) {
                 $nextAvailable = clone $spec->getOpenAt();
                 $nextAvailable = $nextAvailable->startOfDay();
+                /* @var Project $impl */
                 $impl          = $pair->getImplementation();
-                /**
-                 * @var Project $impl
-                 * @var Project $spec
-                 */
                 // Prefer Impl if it's available
                 $subContext = $impl ?: $spec;
                 $this->addAssessmentSpecDatesRecursive($subContext, $pair->getSubPairs(), $nextAvailable, $unitClose);

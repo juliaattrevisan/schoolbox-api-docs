@@ -118,7 +118,6 @@ class Handler
 
                 //if ($fuzzy) {
                     // if we're doing a fuzzy lookup, search by `year`
-                    /** @var string[][] $map */
                     //$map = json_decode(file_get_contents(__DIR__ . '/code-map.json'), true);
 
                     //if (empty($map[$schoolCode])) {

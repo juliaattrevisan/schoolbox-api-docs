@@ -451,12 +451,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         $access  = Access::getInstance();
         $mutator = new Participant\AssessmentListMutator($user, new Visibility($access), $now, true);
 
-        /** @var IAssessable[] $assessments */
         // Write-users see all participants, others see only themselves
         $contextUser = $user;
         if ($access->getFolderAccess($user, (int)$context) >= UserAccess::ACCESS_WRITE) {
             $contextUser = null;
         }
+
         $assessments = $this->assessmentDataSource->findAllByFolderIdForReview($context, $contextUser)
             ->map([$mutator, 'map'])
             ->filter([$mutator, 'filter']);

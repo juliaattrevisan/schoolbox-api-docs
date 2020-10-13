@@ -1015,10 +1015,10 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * Specify data which should be serialized to JSON. Currently, attempts to
      * serialize all items within the stack.
      *
-     * @param IDecorator[] $decorators
+     * @param IDecorator ...$decorators
      * @return array
      */
-    public function jsonSerialize(IDecorator... $decorators)
+    public function jsonSerialize(IDecorator ...$decorators)
     {
         if (\count($decorators) === 0) {
             return $this->getStack();

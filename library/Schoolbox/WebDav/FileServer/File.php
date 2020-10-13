@@ -174,6 +174,8 @@ class File extends DAV\File
         else {
             throw new DAV\Exception\Forbidden('Permission denied to modify file');
         }
+
+        return null;
     }
 
 

@@ -31,11 +31,6 @@ parameters:
 			path: library/Alaress/Cache/Abstract.php
 
 		-
-			message: "#^Variable \\$rawValue in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Codec/Integer/Base64.php
-
-		-
 			message: "#^PHPDoc tag @throws with type Alaress\\\\Database\\\\Broker\\\\Mysql\\\\PDOException is not subtype of Throwable$#"
 			count: 1
 			path: library/Alaress/Database/Broker/Mysql/Broker.php
@@ -101,11 +96,6 @@ parameters:
 			path: library/Alaress/Image/Implementation/Imagine/Processor/Strategy/Factory.php
 
 		-
-			message: "#^PHPDoc tag @param for parameter \\$decorators with type array\\<Alaress\\\\Json\\\\Decorator\\\\IDecorator\\> is not subtype of native type array\\<int, Alaress\\\\Json\\\\Decorator\\\\IDecorator\\>\\.$#"
-			count: 1
-			path: library/Alaress/Json/Decorator/PropertyDecorator.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$json with type mixed is not subtype of native type array\\.$#"
 			count: 1
 			path: library/Alaress/Json/Decorator/PropertyDecorator.php
@@ -129,11 +119,6 @@ parameters:
 			message: "#^Variable \\$context in isset\\(\\) is never defined\\.$#"
 			count: 1
 			path: library/Alaress/Lumberjack/CliFormatter.php
-
-		-
-			message: "#^Default value of the parameter \\#1 \\$outStream \\(mixed\\) of method Alaress\\\\Lumberjack\\\\Logger\\:\\:__construct\\(\\) is incompatible with type resource\\.$#"
-			count: 1
-			path: library/Alaress/Lumberjack/Logger.php
 
 		-
 			message: "#^Constructor of class Alaress\\\\Mail\\\\AbstractMailer has an unused parameter \\$host\\.$#"
@@ -167,11 +152,6 @@ parameters:
 
 		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
-			count: 1
-			path: library/Alaress/Redis.php
-
-		-
-			message: "#^Variable \\$result in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Alaress/Redis.php
 
@@ -231,19 +211,9 @@ parameters:
 			path: library/Alaress/Session/BaseSessionSegment.php
 
 		-
-			message: "#^Variable \\$_SESSION in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Session/BaseSessionSegment.php
-
-		-
 			message: "#^Method Alaress\\\\Session\\\\BaseSessionSegment\\:\\:clear\\(\\) should return null but return statement is missing\\.$#"
 			count: 1
 			path: library/Alaress/Session/BaseSessionSegment.php
-
-		-
-			message: "#^Variable \\$_SESSION in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Session/Segment.php
 
 		-
 			message: "#^Variable \\$name in isset\\(\\) always exists and is not nullable\\.$#"
@@ -331,11 +301,6 @@ parameters:
 			path: library/Assess/Import/Xml.php
 
 		-
-			message: "#^PHPDoc tag @param for parameter \\$columnIndexes with type mixed is not subtype of native type array\\<int, array\\>\\.$#"
-			count: 1
-			path: library/Bulk/Folder.php
-
-		-
 			message: "#^Variable \\$campusList might not be defined\\.$#"
 			count: 1
 			path: library/Calendar.php
@@ -357,16 +322,6 @@ parameters:
 
 		-
 			message: "#^Variable \\$monthList might not be defined\\.$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
-			message: "#^Binary operation \"\\+\" between string and 1 results in an error\\.$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
-			message: "#^Binary operation \"\\-\" between string and 2 results in an error\\.$#"
 			count: 1
 			path: library/Calendar.php
 
@@ -491,26 +446,6 @@ parameters:
 			path: library/Component/ControllerAbstract.php
 
 		-
-			message: "#^Method Component\\\\Eportfolio\\\\AdvancedListMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Component/Eportfolio/AdvancedListMapper.php
-
-		-
-			message: "#^Method Component\\\\Eportfolio\\\\BasicListMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Component/Eportfolio/BasicListMapper.php
-
-		-
-			message: "#^Method Component\\\\Eportfolio\\\\FileListMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Component/Eportfolio/FileListMapper.php
-
-		-
-			message: "#^Method Component\\\\Eportfolio\\\\LinkListMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Component/Eportfolio/LinkListMapper.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForFolders\\(\\)\\.$#"
 			count: 1
 			path: library/Component/Homepage/ImageController.php
@@ -601,11 +536,6 @@ parameters:
 			path: library/Component/Instance.php
 
 		-
-			message: "#^Return typehint of method Component_InstanceMapper\\:\\:save\\(\\) has invalid type int\\.$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findByExternalId\\(\\)\\.$#"
 			count: 1
 			path: library/Custom/Diocesan/AchievementReport/Module.php
@@ -664,16 +594,6 @@ parameters:
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Custom/Help/Nesa/Module.php
-
-		-
-			message: "#^Binary operation \"\\+\" between string and 7 results in an error\\.$#"
-			count: 1
-			path: library/Custom/Meriden/Pastoral/Controller.php
-
-		-
-			message: "#^Binary operation \"\\-\" between string and int results in an error\\.$#"
-			count: 1
-			path: library/Custom/Meriden/Pastoral/Controller.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
@@ -766,16 +686,6 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/Report.php
 
 		-
-			message: "#^Method DailyQuote\\\\ConfigMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/DailyQuote/ConfigMapper.php
-
-		-
-			message: "#^Method DailyQuote\\\\QuoteMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/DailyQuote/QuoteMapper.php
-
-		-
 			message: "#^Constructor of class DeprecatedDatabase has an unused parameter \\$db\\.$#"
 			count: 1
 			path: library/DeprecatedDatabase.php
@@ -817,16 +727,6 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$sql_q\\)\\: Unexpected token \"\\$sql_q\", expected type at offset 135$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Default value of the parameter \\#1 \\$result \\(0\\) of method DeprecatedDatabase\\:\\:getNextArray\\(\\) is incompatible with type PDOStatement\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Default value of the parameter \\#1 \\$result \\(0\\) of method DeprecatedDatabase\\:\\:countRows\\(\\) is incompatible with type PDOStatement\\.$#"
 			count: 1
 			path: library/DeprecatedDatabase.php
 
@@ -877,11 +777,6 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$value\\)\\: Unexpected token \"\\$value\", expected type at offset 123$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Default value of the parameter \\#1 \\$result \\(0\\) of method DeprecatedDatabase\\:\\:endQuery\\(\\) is incompatible with type PDOStatement\\.$#"
 			count: 1
 			path: library/DeprecatedDatabase.php
 
@@ -1016,11 +911,6 @@ parameters:
 			path: library/Eportfolio/Authenticator.php
 
 		-
-			message: "#^Method Eportfolio\\\\CoverPhotoMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Eportfolio/CoverPhotoMapper.php
-
-		-
 			message: "#^Variable \\$tabList in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Eportfolio/Page/Instance.php
@@ -1029,26 +919,6 @@ parameters:
 			message: "#^PHPDoc tag @return with type array\\|null is not subtype of native type array.#"
 			count: 1
 			path: library/Custom/Tigs/Summative/SubjectReport/Components/AcademicAchievementSummary.php
-
-		-
-			message: "#^Method Eportfolio\\\\PageMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Eportfolio/PageMapper.php
-
-		-
-			message: "#^Method Eportfolio\\\\PermissionMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Eportfolio/PermissionMapper.php
-
-		-
-			message: "#^Method Eportfolio\\\\TemplateMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Eportfolio/TemplateMapper.php
-
-		-
-			message: "#^Method Etherpad\\\\PadMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Etherpad/PadMapper.php
 
 		-
 			message: "#^Variable \\$allAnswers might not be defined\\.$#"
@@ -1221,11 +1091,6 @@ parameters:
 			path: library/External/Isams/Batch/Reader/Iterator/Timetable/Map.php
 
 		-
-			message: "#^Binary operation \"\\+\" between string and 1 results in an error\\.$#"
-			count: 2
-			path: library/External/Isams/Timetable.php
-
-		-
 			message: "#^Call to an undefined method Alaress\\\\Database\\\\Predicate\\\\IBuilder\\:\\:in\\(\\)\\.$#"
 			count: 1
 			path: library/External/Isams/User.php
@@ -1319,11 +1184,6 @@ parameters:
 			message: "#^Variable \\$totals might not be defined\\.$#"
 			count: 2
 			path: library/Leave/Core/Report/House/HTML.php
-
-		-
-			message: "#^Method Leave\\\\HostTypeMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Leave/HostTypeMapper.php
 
 		-
 			message: "#^Constructor of class MSSQL has an unused parameter \\$db\\.$#"
@@ -1476,11 +1336,6 @@ parameters:
 			path: library/Schoolbox/Application/BasicRequest/Kernel.php
 
 		-
-			message: "#^Variable \\$_SESSION in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Application/BasicRequest/Kernel.php
-
-		-
 			message: "#^Variable \\$e might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/Application/CliTool/Composite.php
@@ -1504,11 +1359,6 @@ parameters:
 			message: "#^Variable \\$message might not be defined\\.$#"
 			count: 2
 			path: library/Schoolbox/Application/Login/Controller.php
-
-		-
-			message: "#^Variable \\$_SESSION in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Application/WebRequest/Kernel.php
 
 		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
@@ -1712,11 +1562,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\$callback of method Schoolbox\\\\Collection\\:\\:filter\\(\\) has invalid typehint type Schoolbox\\\\callback\\.$#"
-			count: 1
-			path: library/Schoolbox/Collection.php
-
-		-
-			message: "#^PHPDoc tag @param for parameter \\$decorators with type array\\<Alaress\\\\Json\\\\Decorator\\\\IDecorator\\> is not subtype of native type array\\<int, Alaress\\\\Json\\\\Decorator\\\\IDecorator\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Collection.php
 
@@ -2051,11 +1896,6 @@ parameters:
 			path: library/Schoolbox/External/Importer/TimetableEnrolment.php
 
 		-
-			message: "#^Variable \\$enrolmentItems might not be defined\\.$#"
-			count: 2
-			path: library/Schoolbox/External/Importer/TimetableEnrolment.php
-
-		-
 			message: "#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Importer/User/Hydrator/ToggleField.php
@@ -2074,11 +1914,6 @@ parameters:
 			message: "#^Call to an undefined method External_UserInterface\\:\\:getStudentBoarderContactListExtended\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^Method Schoolbox\\\\File\\\\ExtensionMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/File/ExtensionMapper.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForPageAndEntity\\(\\)\\.$#"
@@ -2209,16 +2044,6 @@ parameters:
 			message: "#^Variable \\$path might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Breadcrumb/Factory.php
-
-		-
-			message: "#^Variable \\$end in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Calendar/Events/Controller.php
-
-		-
-			message: "#^Variable \\$start in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Calendar/Events/Controller.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
@@ -2781,16 +2606,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Quiz/Feedback/MapperProxy.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IResponse\\:\\:getMarksAvailable\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Model.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IResponse\\:\\:getMarksGiven\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Model.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getUrl\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Learning/Assessment/Task/Controller.php
@@ -2916,16 +2731,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Section/Question/Model.php
 
 		-
-			message: "#^Variable \\$end in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Upcoming/Controller.php
-
-		-
-			message: "#^Variable \\$start in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Upcoming/Controller.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:generateException\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Upcoming/Module.php
@@ -2937,11 +2742,6 @@ parameters:
 
 		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^Variable \\$_SESSION in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
 
@@ -3161,16 +2961,6 @@ parameters:
 			path: library/Schoolbox/ProfessionalDevelopment/Module.php
 
 		-
-			message: "#^Undefined variable\\: \\$this$#"
-			count: 2
-			path: library/Schoolbox/Profile/Test/Generator.php
-
-		-
-			message: "#^Using \\$this outside a class\\.$#"
-			count: 2
-			path: library/Schoolbox/Profile/Test/Generator.php
-
-		-
 			message: "#^Method Schoolbox\\\\Profile\\\\ValidDetailsVisible\\:\\:isSatisfiedBy\\(\\) invoked with 4 parameters, 2 required\\.$#"
 			count: 1
 			path: library/Schoolbox/Profile/Test/Generator.php
@@ -3364,11 +3154,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Resource\\\\Test\\\\CategoryMapperTest\\:\\:\\$object has unknown class Schoolbox\\\\Resource\\\\Test\\\\FileMapper as its type\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Test/CategoryMapperTest.php
-
-		-
-			message: "#^Method Schoolbox\\\\Resource\\\\Textbox\\\\Mapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Textbox/Mapper.php
 
 		-
 			message: "#^Call to method getBooking\\(\\) on an unknown class Calendar_Event_Type_ResourceBooking\\.$#"
@@ -3576,21 +3361,6 @@ parameters:
 			path: library/Schoolbox/Weather/WeatherstackClient.php
 
 		-
-			message: "#^Binary operation \"\\+\" between \\(float\\|int\\) and string results in an error\\.$#"
-			count: 1
-			path: library/Schoolbox/Weather/WeatherstackClient.php
-
-		-
-			message: "#^Binary operation \"\\+\" between \\(float\\|int\\) and string results in an error\\.$#"
-			count: 11
-			path: library/Schoolbox/WebDav/LegacyConfiguration/Factory.php
-
-		-
-			message: "#^Binary operation \"\\-\" between string and \\(float\\|int\\) results in an error\\.$#"
-			count: 1
-			path: library/Schoolbox/WebDav/LegacyConfiguration/Factory.php
-
-		-
 			message: "#^Comparison operation \"\\<\" between \\(array\\|float\\|int\\) and int results in an error\\.$#"
 			count: 1
 			path: library/SitePage.php
@@ -3611,11 +3381,6 @@ parameters:
 			path: library/SocialStream/Post/Factory/Creational.php
 
 		-
-			message: "#^Method SocialStream\\\\PostMapper\\:\\:mapping\\(\\) should return bool\\|void but return statement is missing\\.$#"
-			count: 1
-			path: library/SocialStream/PostMapper.php
-
-		-
 			message: "#^Variable \\$existingAnswer might not be defined\\.$#"
 			count: 1
 			path: library/Survey/Answer/Radio.php
@@ -3631,11 +3396,6 @@ parameters:
 			path: library/Survey/Import/Xml.php
 
 		-
-			message: "#^Variable \\$_SESSION in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 2
-			path: library/User.php
-
-		-
 			message: "#^Variable \\$coreData might not be defined\\.$#"
 			count: 1
 			path: library/Wiki.php
@@ -3646,73 +3406,13 @@ parameters:
 			path: tools/assessment/csv.php
 
 		-
-			message: "#^Function getEntriesFromFolder not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
-			count: 1
-			path: tools/dev-tools-har-to-url-csv.php
-
-		-
-			message: "#^Function jsonHarFileToUrlRequestedArray not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
-			count: 1
-			path: tools/dev-tools-har-to-url-csv.php
-
-		-
-			message: "#^Function getEntriesFromFolder not found\\.$#"
-			count: 2
-			path: tools/dev-tools-har-to-url-csv.php
-
-		-
-			message: "#^Function jsonHarFileToUrlRequestedArray not found\\.$#"
-			count: 3
-			path: tools/dev-tools-har-to-url-csv.php
-
-		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
 			count: 1
 			path: tools/kami/re-upload-failed-kami-docs.php
 
 		-
-			message: "#^Function determineMapperType not found\\.$#"
-			count: 1
-			path: tools/mapper-template.php
-
-		-
-			message: "#^Function determineModelType not found\\.$#"
-			count: 1
-			path: tools/mapper-template.php
-
-		-
-			message: "#^Function determineMapperType not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
-			count: 1
-			path: tools/mapper-template.php
-
-		-
-			message: "#^Function determineModelType not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
-			count: 1
-			path: tools/mapper-template.php
-
-		-
-			message: "#^Function traverse not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
-			count: 1
-			path: tools/markbook/sync.php
-
-		-
-			message: "#^Function traverse not found\\.$#"
-			count: 2
-			path: tools/markbook/sync.php
-
-		-
-			message: "#^Function help not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
-			count: 1
-			path: tools/markbook/sync.php
-
-		-
 			message: "#^Variable \\$addParamsShort might not be defined\\.$#"
 			count: 1
-			path: tools/markbook/sync.php
-
-		-
-			message: "#^Function help not found\\.$#"
-			count: 2
 			path: tools/markbook/sync.php
 
 		-
@@ -3721,54 +3421,9 @@ parameters:
 			path: tools/mq/diagnose-pqueue.php
 
 		-
-			message: "#^Function interrogate not found\\.$#"
-			count: 2
-			path: tools/mq/schedule-safe-restart.php
-
-		-
-			message: "#^Function extractEvent not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
-			count: 1
-			path: tools/mq/schedule-safe-restart.php
-
-		-
-			message: "#^Function verifyFrameTrigger not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
-			count: 1
-			path: tools/mq/schedule-safe-restart.php
-
-		-
-			message: "#^Function frame2trigger not found\\.$#"
-			count: 1
-			path: tools/mq/schedule-safe-restart.php
-
-		-
-			message: "#^Function interrogate not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
-			count: 1
-			path: tools/mq/schedule-safe-restart.php
-
-		-
-			message: "#^Function extractEvent not found\\.$#"
-			count: 1
-			path: tools/mq/schedule-safe-restart.php
-
-		-
-			message: "#^Function verifyFrameTrigger not found\\.$#"
-			count: 1
-			path: tools/mq/schedule-safe-restart.php
-
-		-
-			message: "#^Function frame2trigger not found while trying to analyse it \\- autoloading is probably not configured properly\\.$#"
-			count: 1
-			path: tools/mq/schedule-safe-restart.php
-
-		-
 			message: "#^Anonymous function has an unused use \\$opts\\.$#"
 			count: 1
 			path: tools/notif/route/routed.php
-
-		-
-			message: "#^Constant HALP not found\\.$#"
-			count: 1
-			path: tools/notif/subscriptions.php
 
 		-
 			message: "#^Variable \\$d might not be defined\\.$#"
@@ -3799,51 +3454,6 @@ parameters:
 			message: "#^Binary operation \"\\+\" between array\\('Using strategy\\:'\\) and array\\|string results in an error\\.$#"
 			count: 1
 			path: tools/socket/socketd.php
-
-		-
-			message: "#^Access to undefined constant PDO\\:\\:SQLSRV_ATTR_ENCODING\\.$#"
-			count: 1
-			path: library/Alaress/Database/Broker/Sqlsrv/Broker.php
-
-		-
-			message: "#^Access to undefined constant PDO\\:\\:SQLSRV_ENCODING_UTF8\\.$#"
-			count: 1
-			path: library/Alaress/Database/Broker/Sqlsrv/Broker.php
-
-		-
-			message: "#^Access to undefined constant PDO\\:\\:SQLSRV_ATTR_FETCHES_NUMERIC_TYPE\\.$#"
-			count: 1
-			path: library/Alaress/Database/Broker/Sqlsrv/Broker.php
-
-		-
-			message: "#^Access to undefined constant PDO\\:\\:SQLSRV_ENCODING_BINARY\\.$#"
-			count: 1
-			path: library/Alaress/Database/Statement/Query/Sqlsrv/Query.php
-
-		-
-			message: "#^Constant DB2_AUTOCOMMIT_OFF not found\\.$#"
-			count: 1
-			path: library/Alaress/Database/Wrapper/Db2/PDO.php
-
-		-
-			message: "#^Constant DB2_SCROLLABLE not found\\.$#"
-			count: 2
-			path: library/Alaress/Database/Wrapper/Db2/PDO.php
-
-		-
-			message: "#^Constant DB2_SCROLLABLE not found\\.$#"
-			count: 1
-			path: library/Alaress/Database/Wrapper/Db2/PDOStatement.php
-
-		-
-			message: "#^Constant DB2_PARAM_INOUT not found\\.$#"
-			count: 1
-			path: library/Alaress/Database/Wrapper/Db2/PDOStatement.php
-
-		-
-			message: "#^Constant DB2_PARAM_IN not found\\.$#"
-			count: 2
-			path: library/Alaress/Database/Wrapper/Db2/PDOStatement.php
 
 		-
 			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\MyfileController has an unused parameter \\$useFolder\\.$#"

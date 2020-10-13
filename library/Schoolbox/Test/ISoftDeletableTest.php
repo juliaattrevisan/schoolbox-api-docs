@@ -63,6 +63,8 @@ class ISoftDeletableTest extends TestCase
         $mappers = [];
 
         foreach (get_declared_classes() as $className) {
+            /* @var \Schoolbox\Mapper $className */
+
             // Is the class not a mapper?
             if (!$this->isValidMapperClass($className)) {
                 continue;
@@ -77,7 +79,6 @@ class ISoftDeletableTest extends TestCase
                 continue;
             }
             /**
-             * @var \Schoolbox\Mapper $className
              * @var \Schoolbox\Mapper $mapper
              */
             // use 'new' instead of 'getInstance()' to avoid the postSetup() hook
