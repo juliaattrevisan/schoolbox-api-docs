@@ -20,14 +20,14 @@ class Freeform extends Standard
      *
      * @var string
      */
-    protected $transform_key = 'Constrain';
+    private $transform_key = 'Constrain';
 
     /**
      * @param  string $transform_key
      *
      * @return $this
      */
-    public function setTransformKey($transform_key)
+    public function setTransformKey(string $transform_key): self
     {
         $this->transform_key = $transform_key;
         return $this;
@@ -38,7 +38,7 @@ class Freeform extends Standard
      *
      * @return string
      */
-    protected function getTransformKey()
+    protected function getTransformKey(): string
     {
         return $this->transform_key;
     }

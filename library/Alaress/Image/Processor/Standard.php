@@ -11,14 +11,63 @@ namespace Alaress\Image\Processor;
 
 use Alaress\Image\Cache\CacheInterface;
 use Alaress\Image\Filetype;
+use Imagine\Image\ImageInterface;
 use Schoolbox\Resource\Storage;
 use Alaress\Image\Transformation\Transformation;
 use BadMethodCallException;
 use League\Flysystem;
 use Schoolbox\Resource\Storage\Transform\Mapper;
 
-class Standard extends BaseProcessor
+class Standard
 {
+    /**
+     * Cache class to use
+     *
+     * @var CacheInterface
+     */
+    private $cache;
+
+    /**
+     * A factory for building processors, replaces $processorStrategyPrefix.
+     *
+     * @var Strategy\FactoryInterface
+     */
+    private $processorFactory;
+
+    /**
+     * @var Strategy\StrategyInterface
+     */
+    private $processorStrategy;
+
+    /**
+     * A factory for building file types, replaces $filetypeStrategyPrefix.
+     *
+     * @var Filetype\FactoryInterface
+     */
+    private $filetypeFactory;
+
+    /**
+     * @var Filetype\FiletypeInterface
+     */
+    private $filetypeStrategy;
+
+    /**
+     * Image being manipulated
+     *
+     * @var ImageInterface
+     */
+    private $image;
+
+    /**
+     * A list of all the transformations
+     *
+     * @var Transformation
+     */
+    private $transformations;
+
+    /* I never ask those questions; I make those decisions. --Ryan
+	 */
+
     /** @var Flysystem\File */
     private $file;
 
@@ -36,10 +85,10 @@ class Standard extends BaseProcessor
         Filetype\FactoryInterface $filetypeFactory,
         Strategy\FactoryInterface $processorFactory
     ) {
-        $this->setCache($cache);
-        $this->setTransformations($transformations);
-        $this->setFiletypeFactory($filetypeFactory);
-        $this->setProcessorFactory($processorFactory);
+        $this->cache = $cache;
+        $this->transformations = $transformations;
+        $this->filetypeFactory = $filetypeFactory;
+        $this->processorFactory = $processorFactory;
     }
 
     /**
@@ -52,32 +101,25 @@ class Standard extends BaseProcessor
      */
     public function load()
     {
-        $this->file = $file = $this->getCache()->load();
+        $this->file = $this->cache->load();
 
         // Die extremely early if this is corrupted or giant
         // Figure out an image size in megapixels
-        list($w, $h) = getimagesizefromstring($file->read());
+        [$w, $h] = getimagesizefromstring($this->file->read());
         $megapixelSize = ($w * $h) / 1000000;
         if ($megapixelSize >= 50) {
             // error out
             throw new \OverflowException('File is over 50MP large - aborting');
         }
 
-        $mime = $file->getMimetype();
-
-        $filetypeStrat = $this->getFiletypeFactory()->build([
-            'mime' => "$mime" // ensure this is actually a string (it may have been a mimetype object)
+        $this->filetypeStrategy = $this->filetypeFactory->build([
+            'mime' => (string)$this->file->getMimetype() // ensure this is actually a string (it may have been a mimetype object)
         ]);
 
-        $this->setFiletypeStrategy($filetypeStrat);
-
-        $image = $this->getFiletypeStrategy()
-                      ->loadImageResource($file);
-
-        $this->setImage($image);
+        $this->image = $this->filetypeStrategy->loadImageResource($this->file);
 
         // Prepare an image resource for chained manipulation
-        if (!$this->getCache()->isLoadedFromCache()) {
+        if (!$this->cache->isLoadedFromCache()) {
             $this->transformAll();
         }
 
@@ -90,18 +132,17 @@ class Standard extends BaseProcessor
      * Supports chained methods
      *
      * @param string $strategy
-     * @param array  $args
+     * @param array|null  $args
      *
      * @return static
      */
-    private function loadProcessorStrategy($strategy, $args = null)
+    private function loadProcessorStrategy(string $strategy, ?array $args = null)
     {
-        $processor = $this->getProcessorFactory()->build(
+        $this->processorStrategy = $this->processorFactory->build(
             $strategy,
             $args,
-            $this->getFiletypeStrategy()
+            $this->filetypeStrategy
         );
-        $this->setProcessorStrategy($processor);
         return $this;
     }
 
@@ -113,11 +154,9 @@ class Standard extends BaseProcessor
      *
      * @return static
      */
-    private function manipulate()
+    private function manipulate(): self
     {
-        $manipulatedImage = $this->getProcessorStrategy()->manipulate($this->getImage());
-
-        $this->setImage($manipulatedImage);
+        $this->image = $this->processorStrategy->manipulate($this->image);
 
         return $this;
     }
@@ -129,7 +168,7 @@ class Standard extends BaseProcessor
      *
      * @return static
      */
-    public function transformAll()
+    public function transformAll(): self
     {
 
         /* Retrieve the list of transformations and do 'em, if we haven't already
@@ -147,7 +186,7 @@ class Standard extends BaseProcessor
         try {
             $allTransformations = array_merge(
                 $allTransformations,
-                $this->getTransformations()->retrieve(
+                $this->transformations->retrieve(
                     $this->getTransformKey()
                 )
             );
@@ -167,9 +206,9 @@ class Standard extends BaseProcessor
     /**
      * @return string
      */
-    protected function getTransformKey()
+    protected function getTransformKey(): string
     {
-        return $this->getCache()->getKey();
+        return $this->cache->getKey();
     }
 
     /**
@@ -183,7 +222,7 @@ class Standard extends BaseProcessor
      *
      * @return static
      */
-    public function transform($strategy, $args = null)
+    public function transform(string $strategy, $args = null): self
     {
         $this->loadProcessorStrategy($strategy, $args);
         $this->manipulate();
@@ -195,7 +234,7 @@ class Standard extends BaseProcessor
      * Delegate method
      * Cache then stream the manipulated image
      */
-    public function stream()
+    public function stream(): void
     {
         // Add cache header for logging when a cached transform is used
         if (!$this->isCached()) {
@@ -206,7 +245,7 @@ class Standard extends BaseProcessor
 
         $this->save();
 
-        $this->getFiletypeStrategy()->stream($this->getImage());
+        $this->filetypeStrategy->stream($this->image);
         // will exit
     }
 
@@ -221,7 +260,7 @@ class Standard extends BaseProcessor
     public function save()
     {
         if (!$this->isCached() && $this->cache->getKey()) {
-            $this->filetypeStrategy->save($this->getImage(), $this->cache->loadCache());
+            $this->filetypeStrategy->save($this->image, $this->cache->loadCache());
         }
 
         if ($this->cache->getKey()) {
@@ -240,8 +279,8 @@ class Standard extends BaseProcessor
     /**
      * @return bool
      */
-    public function isCached()
+    public function isCached(): bool
     {
-        return $this->getCache()->isLoadedFromCache();
+        return $this->cache->isLoadedFromCache();
     }
 }
