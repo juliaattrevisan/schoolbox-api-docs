@@ -598,18 +598,21 @@ then
     if [ -f /vagrant/tools/xdebug.ini ];
     then
         echo "[SB][`date +%Y-%m-%d\ %X`] Using custom xdebug: tools/xdebug.ini";
+        cp -f /vagrant/tools/xdebug.ini /etc/php/7.1/mods-available/xdebug.ini;
         cp -f /vagrant/tools/xdebug.ini /etc/php/7.4/mods-available/xdebug.ini;
     else
         echo "[SB][`date +%Y-%m-%d\ %X`] Using default xdebug: tools/xdebug.default.ini";
+        cp -f /vagrant/tools/xdebug.default.ini /etc/php/7.1/mods-available/xdebug.ini;
         cp -f /vagrant/tools/xdebug.default.ini /etc/php/7.4/mods-available/xdebug.ini;
     fi
-    if [ -d /etc/php/7.4/fpm/conf.d ];
-    then
-        ln -s /etc/php/7.4/mods-available/xdebug.ini /etc/php/7.4/fpm/conf.d/20-xdebug.ini >/dev/null 2>&1;
-        ln -s /etc/php/7.4/mods-available/tideways.ini /etc/php/7.4/fpm/conf.d/20-tideways.ini >/dev/null 2>&1;
-    fi
-    ln -s /etc/php/7.4/mods-available/xdebug.ini /etc/php/7.4/cli/conf.d/20-xdebug.ini >/dev/null 2>&1;
-    ln -s /etc/php/7.4/mods-available/tideways.ini /etc/php/7.4/cli/conf.d/20-tideways.ini >/dev/null 2>&1;
+    for php_major_version in "7.1 7.4"; do
+      if [ -d /etc/php/"$php_major_version"/fpm/conf.d ]; then
+          ln -s /etc/php/"$php_major_version"/mods-available/xdebug.ini /etc/php/"$php_major_version"/fpm/conf.d/20-xdebug.ini >/dev/null 2>&1;
+          ln -s /etc/php/"$php_major_version"/mods-available/tideways.ini /etc/php/"$php_major_version"/fpm/conf.d/20-tideways.ini >/dev/null 2>&1;
+      fi
+      ln -s /etc/php/"$php_major_version"/mods-available/xdebug.ini /etc/php/"$php_major_version"/cli/conf.d/20-xdebug.ini >/dev/null 2>&1;
+      ln -s /etc/php/"$php_major_version"/mods-available/tideways.ini /etc/php/"$php_major_version"/cli/conf.d/20-tideways.ini >/dev/null 2>&1;
+    done
 
     # If not yet configured, add XDEBUG_CONFIG and PHP_IDE_CONFIG environment vars for 'vagrant' and 'root' users
     for bashrcFile in /home/vagrant/.bashrc /root/.bashrc; do
