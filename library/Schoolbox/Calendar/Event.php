@@ -769,12 +769,11 @@ class Event implements ISoftDeletable
 
     /**
      * Set type
-     * This can be null, when an attached event type has been deleted
      *
-     * @param EventType|null $type
+     * @param EventType $type
      * @return $this
      */
-    public function setType(?EventType $type): self
+    public function setType(EventType $type): self
     {
         $this->type = $type;
         return $this;
@@ -783,9 +782,9 @@ class Event implements ISoftDeletable
     /**
      * Get type
      *
-     * @return EventType|null
+     * @return EventType
      */
-    public function getType(): ?EventType
+    public function getType(): EventType
     {
         return $this->type;
     }

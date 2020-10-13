@@ -185,7 +185,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             LEFT JOIN {$this->getJoinSql('owner.role','o', 'ro')}
             LEFT JOIN {$this->getJoinSql('author', '', 'a', true)}
             LEFT JOIN {$this->getJoinSql('author.role', 'a', 'ra')}
-            LEFT JOIN {$this->getJoinSql('eventType', '', 't')}
+            LEFT JOIN {$this->getJoinSql('eventType', '', 't', true)}
             LEFT JOIN {$this->getJoinSql('personal', '', 'p')}
             LEFT JOIN {$this->getJoinSql('event_folder', '', 'f')}
             LEFT JOIN {$this->getJoinSql('event_campus', '', 'ca')}
