@@ -50,9 +50,9 @@ export default {
         load() {
             axios.get(URL_LEARNING_MOMENT_SOURCE + String(this.config.studentId))
                 .then(response => {
-                    this.data            = response.data.data            ?? [];
-                    this.metadata.count  = response.data.metadata.count  ?? 0;
-                    this.metadata.cursor = response.data.metadata.cursor ?? null;
+                    this.data            = response?.data?.data             ? response.data.data            : [];
+                    this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
+                    this.metadata.cursor = response?.data?.metadata?.cursor ? response.data.metadata.cursor : null;
                 })
                 .finally(() => this.showSkeletonLoader = false);
         },
@@ -65,13 +65,15 @@ export default {
         <div v-for="moments in groupedMoments">
         </div>
 
-        <div v-if="showSkeletonLoader" v-for="n in 3" class="list-item">
-            <div class="small-12 card skeleton">
-                <div class="img"></div>
-                <h3></h3>
-                <p class="meta"></p>
+        <section v-if="showSkeletonLoader">
+            <div v-for="n in 3" class="list-item">
+                <div class="small-12 card skeleton">
+                    <div class="img"></div>
+                    <h3></h3>
+                    <p class="meta"></p>
+                </div>
             </div>
-        </div>
+        </section>
     </div>
 
 </template>
