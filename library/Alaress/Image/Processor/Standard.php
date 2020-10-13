@@ -116,9 +116,11 @@ class Standard
             'mime' => (string)$this->file->getMimetype() // ensure this is actually a string (it may have been a mimetype object)
         ]);
 
+        # TODO this is the key line, it is creating image magick temp fiels
         $this->image = $this->filetypeStrategy->loadImageResource($this->file);
 
         // Prepare an image resource for chained manipulation
+
         if (!$this->cache->isLoadedFromCache()) {
             $this->transformAll();
         }
