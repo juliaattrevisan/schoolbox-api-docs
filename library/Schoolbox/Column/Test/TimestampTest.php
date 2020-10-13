@@ -42,7 +42,7 @@ class TimestampTest extends DatetimeTest {
 			array(0, true),
 			array(1, true),
 			array(-1, true),
-			array(PHP_INT_MAX, true),
+			array(PHP_INT_MAX, false),
 			array(123456789, true),
 		);
 	}

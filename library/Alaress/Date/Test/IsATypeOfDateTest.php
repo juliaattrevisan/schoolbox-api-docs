@@ -117,11 +117,11 @@ class IsATypeOfDateTest extends TestCase
 
         // Compare with another date
         $this->assertTrue($date->isSameDay($now));
-        $this->assertTrue($date->eq($now));
-        $this->assertFalse($date->ne($now));
+        $this->assertFalse($date->eq($now)); // Because of millisecond precision
+        $this->assertTrue($date->ne($now));
         $this->assertFalse($date->gt($now));
-        $this->assertTrue($date->gte($now));
-        $this->assertFalse($date->lt($now));
+        $this->assertFalse($date->gte($now));
+        $this->assertTrue($date->lt($now));
         $this->assertTrue($date->lte($now));
 
         $date = Alaress_Date_Format::now();

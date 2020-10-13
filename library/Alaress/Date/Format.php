@@ -13,7 +13,7 @@
  */
 use Alaress\Date\IClock;
 use Alaress\Json\SerializeTrait;
-use Jenssegers\Date\Date as LaravelDate;
+use Carbon\Carbon;
 
 class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, IComparable, \Alaress\Json\Serializable
 {
@@ -25,7 +25,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     static private $now;
 
     /**
-     * @var LaravelDate
+     * @var Carbon
      */
     protected $datetime;
 
@@ -346,13 +346,13 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * @param mixed        $dateTime
      * @param DateTimeZone $timezone The timezone of the date, or null to use default
      *
-     * @return LaravelDate|null
+     * @return Carbon|null
      */
     protected function buildLaravelDate($dateTime = null, DateTimeZone $timezone = null)
     {
         if (!isset($dateTime)) {
             // Nothing set? set it to now
-            return LaravelDate::now($timezone ?: $this->getDefaultTimezone());
+            return Carbon::now($timezone ?: $this->getDefaultTimezone());
         }
 
         if ($dateTime instanceof DateTimeInterface) {
@@ -365,12 +365,12 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             if(!is_null($timezone)) {
                 $dateTime->setTimezone($timezone);
             }
-            return LaravelDate::instance($dateTime);
+            return Carbon::instance($dateTime);
         }
 
         if ($dateTime instanceof Alaress_Date_Format) {
             // Build out of date object's timestamp/timezone
-            return LaravelDate::createFromTimestamp(
+            return Carbon::createFromTimestamp(
                 $dateTime->getDateTimeObject()->getTimestamp(),
                 $timezone ?: clone $dateTime->getDateTimeObject()->getTimezone()
             );
@@ -431,7 +431,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             if ($inputDateFormat === 'U') {
                 // Timestamp special case handling - make it work with negative datetimes
                 if (is_numeric($dateTime)) {
-                    $laravelDate = LaravelDate::createFromTimestamp($dateTime, $newTimezone);
+                    $laravelDate = Carbon::createFromTimestamp($dateTime, $newTimezone);
                 } else {
                     throw new InvalidArgumentException(
                         '$dateTime must be numeric if $inputDateFormat is timestamp format'
@@ -439,14 +439,14 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                 }
             } else {
                 try {
-                    $laravelDate = LaravelDate::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
+                    $laravelDate = Carbon::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
                 } catch (InvalidArgumentException $e) {
                     // I don't have a datetime, try again with trailing data allowed
                     // This can also throw an InvalidArgumentException - allow that to fall on carpet
-                    $laravelDate = LaravelDate::createFromFormat($inputDateFormat . '+', $dateTime, $newTimezone);
+                    $laravelDate = Carbon::createFromFormat($inputDateFormat . '+', $dateTime, $newTimezone);
                 }
 
-                $errors = LaravelDate::getLastErrors();
+                $errors = Carbon::getLastErrors();
                 if ($errors['warning_count']) {
                     // I have a datetime, but it's not what I expected. Warn the user.
                     // This date will also fail isValid()
@@ -1454,7 +1454,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Gets datetime object out of this wrapper
      *
-     * @return LaravelDate
+     * @return Carbon
      */
     public function getDateTimeObject()
     {
@@ -1464,7 +1464,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Sets the datetime object in this wrapper
      *
-     * @param LaravelDate $dateObject
+     * @param Carbon $dateObject
      */
     protected function setDateTimeObject($dateObject)
     {
