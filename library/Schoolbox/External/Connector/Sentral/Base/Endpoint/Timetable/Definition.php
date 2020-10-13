@@ -29,6 +29,12 @@ class Definition implements IStrategy
 {
 
     /**
+     * No obvious names found; I just made one up
+     */
+    public const CYCLE_IDENTIFIER = 'Sentral Timetable';
+
+
+    /**
      * Temporarily here to denote the start and end of cycles
      * There appears to be no equivalent concept
      *
@@ -37,12 +43,6 @@ class Definition implements IStrategy
      */
     private const CYCLE_START = '2000-01-01 00:00:00';
     private const CYCLE_END = '2999-01-01 00:00:00';
-
-
-    /**
-     * No obvious names found; I just made one up
-     */
-    private const CYCLE_IDENTIFIER = 'Sentral Timetable';
 
 
     /**
