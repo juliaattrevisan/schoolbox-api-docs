@@ -10,10 +10,16 @@ namespace Alaress\Image\Implementation\Imagine\Filetype;
 
 class Jpg extends BaseFiletype
 {
-    protected $format = 'jpg';
-
     protected function outputSpecificHeaders()
     {
         header('Content-type: image/jpeg');
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormat(): string
+    {
+        return 'jpg';
     }
 }

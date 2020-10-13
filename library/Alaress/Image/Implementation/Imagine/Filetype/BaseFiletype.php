@@ -83,9 +83,7 @@ abstract class BaseFiletype implements FiletypeInterface
     /**
      * Outputs headers that are specific to a particular file type.
      */
-    protected function outputSpecificHeaders()
-    {
-    }
+    abstract protected function outputSpecificHeaders();
 
     /**
      * Stream image to browser directly
@@ -113,33 +111,9 @@ abstract class BaseFiletype implements FiletypeInterface
         return $this->imageManager;
     }
 
-    /**
-     * @param  ImagineInterface $imageManager
-     *
-     * @return $this
-     */
-    public function setImageManager($imageManager)
-    {
-        $this->imageManager = $imageManager;
-        return $this;
-    }
 
     /**
      * @return string
      */
-    public function getFormat()
-    {
-        return $this->format;
-    }
-
-    /**
-     * @param  string $format
-     *
-     * @return $this
-     */
-    public function setFormat($format)
-    {
-        $this->format = $format;
-        return $this;
-    }
+    abstract public function getFormat(): string;
 }

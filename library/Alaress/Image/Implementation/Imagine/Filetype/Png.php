@@ -11,10 +11,16 @@ namespace Alaress\Image\Implementation\Imagine\Filetype;
 
 class Png extends BaseFiletype
 {
-    protected $format = 'png';
-
     protected function outputSpecificHeaders()
     {
         header('Content-type: image/png');
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormat(): string
+    {
+        return 'png';
     }
 }
