@@ -51,6 +51,12 @@ class Classes implements IStrategy
 
 
     /**
+     * @var Lookup
+     */
+    private $lookup;
+
+
+    /**
      * @var ClassEntryMapper
      */
     private $classEntryMapper;
@@ -66,12 +72,6 @@ class Classes implements IStrategy
      * @var ClassPeriodMapper
      */
     private $classPeriodMapper;
-
-
-    /**
-     * @var Lookup
-     */
-    private $lookup;
 
 
     /**
@@ -98,24 +98,6 @@ class Classes implements IStrategy
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
-    }
-
-
-    /**
-     * Find the period instance corresponding to $day, $periodName
-     *
-     * The timetable data in the feed may try to reference periods
-     * that don't exist in Timetable Structure for some reason
-     *
-     * @param string $ext
-     * @param array  $periods
-     * @param string $day
-     * @param string $periodName
-     * @return TimetablePeriod|null
-     */
-    private function findPeriod(string $ext, array $periods, string $day, string $periodName): ?TimetablePeriod
-    {
-        return $periods['ext'][$ext]['day'][$day]['period'][$periodName] ?? null;
     }
 
 
@@ -186,7 +168,7 @@ class Classes implements IStrategy
                                 'firstname' => '',
                                 'surname' => '',
                             ]
-                        ]
+                        ],
                         'student' => [
                             [
                                 'externalId' => '',
@@ -249,6 +231,24 @@ class Classes implements IStrategy
                 }
             }
         }
+    }
+
+
+    /**
+     * Find the period instance corresponding to $day, $periodName
+     *
+     * The timetable data in the feed may try to reference periods
+     * that don't exist in Timetable Structure for some reason
+     *
+     * @param string $ext
+     * @param array  $periods
+     * @param string $day
+     * @param string $periodName
+     * @return TimetablePeriod|null
+     */
+    private function findPeriod(string $ext, array $periods, string $day, string $periodName): ?TimetablePeriod
+    {
+        return $periods['ext'][$ext]['day'][$day]['period'][$periodName] ?? null;
     }
 
 
