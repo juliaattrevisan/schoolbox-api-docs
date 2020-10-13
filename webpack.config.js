@@ -18,7 +18,8 @@ module.exports = {
         calendarComponent: "./library/Schoolbox/Calendar/vue/component.main.js",
         visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/visitation-list-full.js',
         articleList: './library/Schoolbox/Comms/News/templates/vue/article-list.js',
-        adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js'
+        adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js',
+        learningMomentsFeed: './library/Schoolbox/Learning/Moment/Evidence/vue/feed.main.js',
     },
     output: {
         path: path.resolve(__dirname, "www/javascript/components"),

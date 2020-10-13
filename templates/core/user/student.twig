@@ -409,8 +409,17 @@
         </dl>
 
         <div class="tabs-content content no-margin">
-            <div class="content active" id="activity-feed">
-                <h2 class="subheader">Activity Feed</h2>
+            <div class="content active" id="activity">
+                {# Vue component goes here #}
+                <div id="activity-feed"></div>
+                {% autoescape 'js' %}
+                    <script type="text/javascript">
+                        let learningMomentsFeedConfig = {
+                            studentId: Number('{{ user.id }}'),
+                        };
+                    </script>
+                {% endautoescape %}
+                <script type="text/javascript" src="/javascript/components/learningMomentsFeed.bundle.js"></script>
             </div>
 
             <div class="content" id="achievements">
