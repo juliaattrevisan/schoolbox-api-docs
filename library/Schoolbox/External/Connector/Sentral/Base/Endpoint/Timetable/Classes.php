@@ -181,9 +181,9 @@ class Classes implements IStrategy
                             'name' => $period['subject']['room']
                         ],
                         'teachers' => [
-                            'externalId' => '',
-                            'firstname' => $period['subject']['teachers']['name'],
-                            'surname' => '',
+                            'externalId' => $period['subject']['teachers']['externalId'],
+                            'firstname' => $period['subject']['teachers']['firstname'],
+                            'surname' => $period['subject']['teachers']['surname'],
                         ],
                         'students' => [
                             [

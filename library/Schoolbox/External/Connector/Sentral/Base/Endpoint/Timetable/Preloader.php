@@ -148,6 +148,50 @@ class Preloader implements IStrategy
             $timetable = [];
 
             foreach ($payload['data'] as $timetableLesson) {
+
+                /* Go digging in another endpoint for names and identifier
+                 */
+                $teacher = [
+                    'externalId' => '',
+                    'firstname' => '',
+                    'surname' => '',
+                    'id' => '',
+                ];
+
+                if ($timetableLesson['attributes']['teacherIds'][0]) {
+                    $endpoint = "enrolments/person/{$timetableLesson['attributes']['teacherIds'][0]}";
+
+                    try {
+                        $teacherPayload = $this->api->retrieveDocument($endpoint);
+
+                        $teacher = [
+                            'externalId' => $teacherPayload['data']['attributes']['externalId'],
+                            'firstname' => $teacherPayload['data']['attributes']['firstName'],
+                            'surname' => $teacherPayload['data']['attributes']['lastName'],
+                            'id' => $timetableLesson['attributes']['teacherIds'][0],
+                        ];
+                    } catch (\InvalidArgumentException $e) {
+                        $this->log->warning(sprintf(
+                            'Unknown teacher id %s (%s); using null identifier for now.',
+                            $timetableLesson['attributes']['teacherIds'][0],
+                            $timetableLesson['attributes']['teacherName']
+                        ));
+                    }
+                } else {
+                    $this->log->warning(sprintf(
+                        'No teachers set for class %s %s; using null identifier for now.',
+                        $timetableLesson['attributes']['subject'],
+                        $timetableLesson['attributes']['className']
+                    ));
+
+                    $teacher = [
+                        'externalId' => '',
+                        'firstname' => '',
+                        'surname' => '',
+                        'id' => $timetableLesson['attributes']['teacherIds'][0],
+                    ];
+                }
+
                 $timetable[$timetableLesson['attributes']['dayName']][$timetableLesson['attributes']['periodOrder']] = [
                     'day'      => $timetableLesson['attributes']['dayName'],
                     'name'     => "Period {$timetableLesson['attributes']['periodName']}",
@@ -158,11 +202,7 @@ class Preloader implements IStrategy
                         'name'     => $timetableLesson['attributes']['subject'],
                         'code'     => $timetableLesson['attributes']['className'],
                         'room'     => $timetableLesson['attributes']['roomName'],
-                        'teachers' => [
-                            'externalId' => null,  // TODO find
-                            'name' => $timetableLesson['attributes']['teacherName'],
-                            'id'   => $timetableLesson['attributes']['teacherIds'][0] ?? null
-                        ]
+                        'teachers' => $teacher
                     ]
                 ];
             }
