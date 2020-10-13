@@ -990,10 +990,10 @@ class Profile implements IStrategy
                  */
                 $endpoint = "enrolments/person/{$staff['relationships']['person']['data']['id']}?include=phoneNumbers";
 
-                $payload = $this->api->retrieveDocument($endpoint);
+                $staffPayload = $this->api->retrieveDocument($endpoint);
 
-                $firstname = (string)$payload['data']['attributes']['firstName'];
-                $lastname = (string)$payload['data']['attributes']['lastName'];
+                $firstname = (string)$staffPayload['data']['attributes']['firstName'];
+                $lastname = (string)$staffPayload['data']['attributes']['lastName'];
 
                 $this->log->debug(sprintf(
                     'Secondary api inspection at %s for phone numbers belonging to %s',
@@ -1005,8 +1005,8 @@ class Profile implements IStrategy
                  */
                 $numbers = [];
 
-                if (isset($payload['data']['relationships']['phoneNumbers'])) {
-                    foreach ($payload['data']['relationships']['phoneNumbers']['data'] as $phoneNumber) {
+                if (isset($staffPayload['data']['relationships']['phoneNumbers'])) {
+                    foreach ($staffPayload['data']['relationships']['phoneNumbers']['data'] as $phoneNumber) {
                         $numbers[$phoneNumber['attributes']['typeName']] = $phoneNumber['attributes']['number'];
                     }
                 }
