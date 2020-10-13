@@ -269,7 +269,8 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
                         'code'        => $currentClass['ClassCode'],
                         'room'        => $currentClass['ClassRoom'],
                         'campus'      => $campus->getExtTimetableCode(),
-                        'staffID'     => $externalUserId,
+                        //not displaying teacher, as we have to call the procedure number of classes to find teachers
+                        'staffID'     => null,
                         'dayNumber'   => $currentClass['DayNumber'],
                     ];
 
