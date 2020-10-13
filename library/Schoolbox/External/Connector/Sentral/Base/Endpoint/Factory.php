@@ -204,8 +204,6 @@ class Factory
         /* A list of student ids that we previously imported
          */
         $registry = new Registry();
-        $registry->remember('56', ['name' => 'john', 'timetable' => []]);
-        $registry->remember('1', ['name' => 'jack', 'timetable' => []]);
 
         $api = new Api($this->host, $this->key);
 
@@ -243,13 +241,14 @@ class Factory
                 $api,
                 $registry
             ))
-//            ->add(new Timetable\Definition(
-//                $this->log,
-//                $this->perform,
-//                $this->campusMapper,
-//                $this->timetableCycleMapper,
-//                $this->timetablePeriodMapper
-//            ))
+            ->add(new Timetable\Definition(
+                $this->log,
+                $this->perform,
+                $registry,
+                $this->campusMapper,
+                $this->timetableCycleMapper,
+                $this->timetablePeriodMapper
+            ))
 //            ->add(new Timetable\Classes(
 //                $this->log,
 //                $this->perform,

@@ -10,6 +10,7 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
@@ -31,10 +32,24 @@ class Definition implements IStrategy
      * Temporarily here to denote the start and end of cycles
      * There appears to be no equivalent concept
      *
-     * TODO Decide if you can find these elsewhere, or just use these defaults
+     * I don't think these come out int he API anywhere even if they are vaguely mentioned here:
+     * https://int-dev.sentral.school/s-3kYwLp/timetables/setup/start_weeks
      */
     private const CYCLE_START = '2000-01-01 00:00:00';
     private const CYCLE_END = '2999-01-01 00:00:00';
+
+    /**
+     * Currently hardcoded to obtain mon-fri of the current week
+     */
+    private const CYCLE_LENGTH = 5;
+
+    /**
+     * Sentral seem to have an 11-period day hardcoded in their system
+     * https://int-dev.sentral.school/s-3kYwLp/timetables/setup/period_times
+     *
+     * I can't find a place where you can edit those
+     */
+    private const DAY_LENGTH = 11;
 
 
     /**
@@ -49,6 +64,12 @@ class Definition implements IStrategy
      * @var bool
      */
     private $perform;
+
+
+    /**
+     * @var Registry
+     */
+    private $registry;
 
 
     /**
@@ -74,6 +95,7 @@ class Definition implements IStrategy
      *
      * @param LoggerInterface       $log
      * @param bool                  $perform
+     * @param Registry              $registry
      * @param CampusMapper          $campusMapper
      * @param TimetableCycleMapper  $timetableCycleMapper
      * @param TimetablePeriodMapper $timetablePeriodMapper
@@ -81,15 +103,70 @@ class Definition implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
+        Registry $registry,
         CampusMapper $campusMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
+        $this->registry = $registry;
         $this->campusMapper = $campusMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
+    }
+
+
+    /**
+     * Rearrange the data structure into something sensible
+     */
+    private function reforge(): array {
+        $timetables = [];
+        $definition = [];
+
+        /* Map a flat stack of timetableLesson instances into a hierarchical data struct
+         *
+         * $studentId => [
+         *      dayName => [
+         *          periodNumber => [
+         *              details about the subject in this period for this person
+         *          ]
+         *      ]
+         * ]
+         */
+        foreach ($this->registry->recallAll() as $studentId => $timetableLessons) {
+            foreach ($timetableLessons as $timetableLesson) {
+                $timetables[$studentId][$timetableLesson['attributes']['dayName']][$timetableLesson['attributes']['periodOrder']] = [
+                    'day' => $timetableLesson['attributes']['dayName'],
+                    'name' => "Period {$timetableLesson['attributes']['periodName']}",
+                    'start' => $timetableLesson['attributes']['startTime'],
+                    'finish' => $timetableLesson['attributes']['endTime'],
+                    'subject' => [
+                        'name' => $timetableLesson['attributes']['subject'],
+                        'code' => $timetableLesson['attributes']['className'],
+                        'room' => $timetableLesson['attributes']['roomName'],
+                        'teachers' => $timetableLesson['attributes']['teacherIds'][0] ?? null
+                    ]
+                ];
+
+                /* Collate a cumulative definition as we preprocess
+                 *
+                 * As we process everyone's timetable we should have the maximum definition
+                 * for this week across all student timetables which for now, I have presumed
+                 * to be rectangular and consistent
+                 */
+                $definition[$timetableLesson['attributes']['periodOrder']] = [
+                    'name' => "Period {$timetableLesson['attributes']['periodName']}",
+                    'start' => $timetableLesson['attributes']['startTime'],
+                    'finish' => $timetableLesson['attributes']['endTime'],
+                ];
+            }
+        }
+
+        return [
+            'definition' => $definition,
+            'timetables' => $timetables
+        ];
     }
 
 
