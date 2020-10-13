@@ -1,13 +1,11 @@
+<div class="v-card-list">
 {% for class in classList %}
-    <div class="columns small-12 medium-6 large-4 left">
-        <div class="row">
-            {% include 'sub/classTile.twig' with {
-                'term':        term,
-                'class':       class,
-                'classType':   classTypes[class.id],
-                'courses':     courses[class.id],
-                'homepageUrl': homepageUrls[class.id],
-            } only %}
-        </div>
-    </div>
+    {% include 'sub/classTile.twig' with {
+        'term':        term,
+        'class':       class,
+        'classType':   classTypes[class.id],
+        'courses':     courses[class.id],
+        'homepageUrl': homepageUrls[class.id],
+    } only %}
 {% endfor %}
+</div>
