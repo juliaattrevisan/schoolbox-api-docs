@@ -29,6 +29,11 @@
         or externalUser.StudentEmergency3Name is defined
     )
 %}
+{% set showContactsTab =
+    (showContacts and contacts|length > 0)
+    or showContactsAlert
+    or showEmergencyContacts
+%}
 {% set showSubjects = showDetails %}
 {% set showGroups = showDetails %}
 {% set showClasses = showClasses and showDetails %}
@@ -393,12 +398,12 @@
 <div class="row">
     <div class="small-12 island">
         <dl class="tabs" data-tab>
-            <dd class="active"><a href="#activity-feed">Activity Feed</a></dd>
+            <dd class="active"><a href="#activity">Activity Feed</a></dd>
             <dd><a href="#achievements">Achievements</a></dd>
             {% if showClasses %}
             <dd><a href="#classes">Groups &amp; Classes</a></dd>
             {% endif %}
-            {% if showContacts and contacts|length > 0 %}
+            {% if showContactsTab %}
             <dd><a href="#contacts">Contacts</a></dd>
             {% endif %}
         </dl>
@@ -407,6 +412,7 @@
             <div class="content active" id="activity-feed">
                 <h2 class="subheader">Activity Feed</h2>
             </div>
+
             <div class="content" id="achievements">
                 <h2 class="subheader">Achievements</h2>
             </div>
@@ -549,6 +555,7 @@
             </div>
             {% endif %}
 
+            {% if showContactsTab %}
             <div class="content" id="contacts">
 
                 {% block contacts_island %}
@@ -714,7 +721,7 @@
                                 {% endfor %}
                             </ul>
                         </section>
-        {% endblock contacts %}
+                    {% endblock contacts %}
                 {% endblock contacts_island %}
 
                 {% block emergencyContacts_island %}
@@ -772,6 +779,7 @@
                 {% endblock emergencyContacts_island %}
 
             </div>
+            {% endif %}
         </div>
     </div>
 </div>
