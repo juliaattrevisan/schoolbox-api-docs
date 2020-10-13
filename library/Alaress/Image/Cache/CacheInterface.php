@@ -18,7 +18,7 @@ interface CacheInterface
      *
      * @return Fly\File
      */
-    public function load();
+    public function load(): Fly\File;
 
 
     /**
@@ -26,20 +26,19 @@ interface CacheInterface
      *
      * @return Fly\File
      */
-    public function loadCache();
+    public function loadCache(): Fly\File;
 
     /**
      * Find out whether we loaded from cache or not
      *
      * @return bool
      */
-    public function isLoadedFromCache();
+    public function isLoadedFromCache(): bool;
 
     /**
      * Get cache key for this item.
      *
      * @return string
      */
-    public function getKey();
-
+    public function getKey(): string;
 }
