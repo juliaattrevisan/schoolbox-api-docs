@@ -19,7 +19,7 @@ export default {
     computed: {
         config: () => window.learningMomentsFeedConfig,
     },
-    created() {
+    mounted() {
         this.load();
     },
     methods: {
