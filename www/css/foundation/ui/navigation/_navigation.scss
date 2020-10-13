@@ -162,11 +162,8 @@ $allow-sidebar-stash: $large-up;
     width: $tabbar-height;
     z-index: 1001;
 
-    .menu-icon {
-      width: $tabbar-height;
-      span::after {
-        left: 1.75rem;
-      }
+    svg {
+      fill: $navigation-foreground;
     }
   }
 
