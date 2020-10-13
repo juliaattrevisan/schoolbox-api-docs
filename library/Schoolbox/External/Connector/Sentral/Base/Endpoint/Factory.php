@@ -201,6 +201,10 @@ class Factory
          */
         $lookup = new Timetable\Lookup($this->timetablePeriodMapper);
 
+        /* A list of student ids that we previously imported
+         */
+        $registry = new Registry();
+
         $api = new Api($this->host, $this->key);
 
         return (new GenericCollection(IStrategy::class))
@@ -224,6 +228,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $registry,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,

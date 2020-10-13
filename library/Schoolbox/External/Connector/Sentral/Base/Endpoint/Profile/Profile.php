@@ -12,6 +12,7 @@ use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
@@ -76,6 +77,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var Registry
+     */
+    private $registry;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private $baseProfileMapper;
@@ -111,6 +118,7 @@ class Profile implements IStrategy
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param Api                             $api
+     * @param Registry                        $registry
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -121,6 +129,7 @@ class Profile implements IStrategy
         LoggerInterface $log,
         bool $perform,
         Api $api,
+        Registry $registry,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -130,6 +139,7 @@ class Profile implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+        $this->registry = $registry;
 
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
@@ -401,6 +411,14 @@ class Profile implements IStrategy
                  * sift through it all manually for the gems you need
                  */
                 $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
+
+                /* Remember that we saw a particular student id
+                 * (-not- their externalId, the primary key in sentral for ths student)
+                 *
+                 * We need to get each dude's timetable separately via some other api endpoint
+                 * and we won't encounter this id again unless we remember it here
+                 */
+                $this->registry->remember($student['id'], []);
             }
 
             /* Prepare for next page if it exists
