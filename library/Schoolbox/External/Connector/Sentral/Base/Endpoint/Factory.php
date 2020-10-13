@@ -204,6 +204,8 @@ class Factory
         /* A list of student ids that we previously imported
          */
         $registry = new Registry();
+        $registry->remember('56', ['name' => 'john', 'timetable' => []]);
+        $registry->remember('1', ['name' => 'jack', 'timetable' => []]);
 
         $api = new Api($this->host, $this->key);
 
@@ -211,30 +213,30 @@ class Factory
 
             /* Purge previously-imported profile relationships and classes
              */
-            ->add(new Prepare(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper,
-                $this->timetablePeriodMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
-            ))
-            ->add(new Profile\Profile(
-                $this->log,
-                $this->perform,
-                $api,
-                $registry,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-             ))
+//            ->add(new Prepare(
+//                $this->log,
+//                $this->perform,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper,
+//                $this->timetablePeriodMapper,
+//                $this->classEntryMapper,
+//                $this->classInvolvementMapper,
+//                $this->classPeriodMapper
+//            ))
+//            ->add(new Profile\Profile(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $registry,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//             ))
             ->add(new Timetable\Preloader(
                 $this->log,
                 $this->perform,
@@ -256,14 +258,15 @@ class Factory
 //                $this->classInvolvementMapper,
 //                $this->classPeriodMapper
 //            ))
-            ->add(new Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ));
+//            ->add(new Cleanup(
+//                $this->log,
+//                $this->perform,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
+              ;
     }
 }
