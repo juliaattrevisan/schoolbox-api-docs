@@ -757,6 +757,7 @@ class Controller extends Base
     /**
      * @param GenericCollection|IAssessable[] $assessments
      * @param User                            $student
+     * @param bool                            $includeComparison Include other students results for comparison
      * @return array
      */
     private function getLongitudinalRubricData(GenericCollection $assessments, User $student, bool $includeComparison): array

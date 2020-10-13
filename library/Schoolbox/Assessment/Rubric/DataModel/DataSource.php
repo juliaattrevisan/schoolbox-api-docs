@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -77,7 +78,7 @@ class DataSource
      *
      * @var self[]
      */
-    static protected $instance;
+    protected static $instance;
 
     /**
      * Retrieves the singleton instance of this class.
@@ -872,7 +873,8 @@ class DataSource
         // Which feedbacks are getting checked?
         $feedbackIds = [];
         foreach ($participant->getAllFeedbacks() as $feedback) {
-            if ($feedback instanceof DueWorkFeedbackModel
+            if (
+                $feedback instanceof DueWorkFeedbackModel
                 && \in_array($feedback->getReviewRoute(), $feedbackTypes, true)
             ) {
                 $feedbackIds[] = $feedback->getId();
@@ -1061,7 +1063,6 @@ class DataSource
         $destinationReturn          = SubmissionBox\ReturnedWorkMapper::getInstance()->createModel($destinationReturnId);
 
         foreach ($sourceDescriptorMarks as $sourceDescriptor) {
-
             // Is this capability marks set?
             $sourceCapabilityMark = $sourceDescriptor->getCapabilityMark();
             $capability           = $sourceCapabilityMark->getCapability();
@@ -1078,7 +1079,7 @@ class DataSource
                 $descriptorMarkMapper->createModel()
                     ->setCapabilityMark($destinationCapabilityMarks[$capabilityId])
                     ->setDescriptor($sourceDescriptor->getDescriptor())
-//                    ->setSubmissionReturn($destinationReturn)
+                //                    ->setSubmissionReturn($destinationReturn)
                     ->setValue($sourceDescriptor->getValue())
                     ->setValid($sourceDescriptor->isValid())
             );
@@ -1141,13 +1142,9 @@ class DataSource
      *
      * @param GenericCollection|DueWorkModel[] $dueWorks
      * @param User                             $student
+     * @param bool                             $includeComparison Include other students results for comparison
      *
      * @return array $longitude
-     * @throws UnderflowException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DomainException
-     * @throws \PDOException
-     * @throws \RangeException
      */
     public function getLongitudinal(GenericCollection $dueWorks, User $student, bool $includeComparison): array
     {
@@ -1224,6 +1221,7 @@ class DataSource
 
             // Collate the selected descriptor values into longitudinal array
             $longitude = [];
+            $assessmentList = [];
             $markSchemeFactory = new MarkSchemeFactory();
 
             while ($row = $descriptorStatement->fetch(\PDO::FETCH_ASSOC)) {
@@ -1233,9 +1231,10 @@ class DataSource
                 $longitude[$row['capability_id']]['max_value'][$row['assessment_id']] = $row['capability_max_value'];
 
                 // Create the cap mark
-                if (!isset($longitude[$row['capability_id']]['mark'][$row['assessment_id']]) && $row['capability_max_value'] > 0 && isset($dueWorks[$row['assessment_id']]) ) {
+                if (!isset($longitude[$row['capability_id']]['mark'][$row['assessment_id']]) && $row['capability_max_value'] > 0 && isset($dueWorks[$row['assessment_id']])) {
                     $longitude[$row['capability_id']]['mark'][$row['assessment_id']] = $markSchemeFactory->spawnForCapability(
-                        $dueWorks[$row['assessment_id']], $row['capability_max_value']
+                        $dueWorks[$row['assessment_id']],
+                        $row['capability_max_value']
                     )->getHumanReadableMark(($row['capability_value'] / $row['capability_max_value']) * 100);
                 }
 
@@ -1257,7 +1256,7 @@ class DataSource
             unset($pb);
 
             // Return immediately if we do not required comparison data for box and whisker
-            if(!$includeComparison) {
+            if (!$includeComparison) {
                 return $longitude;
             }
 
@@ -1453,7 +1452,6 @@ class DataSource
 
         // Build new Rubric for destination box
         foreach ($srcDescriptors as $srcDescriptor) {
-
             // Copy source capability, or reuse existing
             $srcCapabilityId = $srcDescriptor->getIndicator()->getCapability()->getId();
             if (!$srcCapabilities->getOffset($srcCapabilityId)) {
