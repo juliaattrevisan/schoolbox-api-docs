@@ -177,7 +177,7 @@
                                 </nav>
                                 <article>
                                     <p>
-                                        {{ comment.body | purify }}
+                                        {{ comment.body | linkify | nl2br }}
                                     </p>
                                 </article>
                             </li>
