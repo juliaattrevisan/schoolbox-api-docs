@@ -211,30 +211,30 @@ class Factory
 
             /* Purge previously-imported profile relationships and classes
              */
-//            ->add(new Prepare(
-//                $this->log,
-//                $this->perform,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper,
-//                $this->timetablePeriodMapper,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//                $this->classPeriodMapper
-//            ))
-//            ->add(new Profile\Profile(
-//                $this->log,
-//                $this->perform,
-//                $api,
-//                $registry,
-//                $this->baseProfileMapper,
-//                $this->studentProfileMapper,
-//                $this->parentProfileMapper,
-//                $this->staffProfileMapper,
-//                $this->relationshipMapper
-//             ))
+            ->add(new Prepare(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper,
+                $this->timetablePeriodMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper
+            ))
+            ->add(new Profile\Profile(
+                $this->log,
+                $this->perform,
+                $api,
+                $registry,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+             ))
             ->add(new Timetable\Preloader(
                 $this->log,
                 $this->perform,
