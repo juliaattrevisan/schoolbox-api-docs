@@ -37,7 +37,7 @@ export default {
                 groupedMoments[key].moments.push(v);
             });
             return Object.values(groupedMoments).sort(
-                (a, b) => b.date.isBefore(a.date) ? 1 : -1
+                (a, b) => a.date.isBefore(b.date) ? 1 : -1
             );
         }
     },
