@@ -24,17 +24,20 @@ export default {
             let groupedMoments = {};
             this.data.forEach(v => {
                 let createdAt = moment(v.createdAt),
+                    updatedAt = moment(v.updatedAt),
                     key       = createdAt.format('YYYYMMDD');
                 if (!(key in groupedMoments)) {
                     groupedMoments[key] = {
-                        date:    v.createdAt,
+                        date:    createdAt,
                         moments: []
                     }
                 }
+                v.createdAt = createdAt;
+                v.updatedAt = updatedAt;
                 groupedMoments[key].moments.push(v);
             });
             return Object.values(groupedMoments).sort(
-                (a, b) => Number(a.date) - Number(b.date)
+                (a, b) => b.date.isBefore(a.date) ? 1 : -1
             );
         }
     },
@@ -62,7 +65,20 @@ export default {
 
 <template>
     <div>
-        <div v-for="moments in groupedMoments">
+        <div v-for="momentGroup in groupedMoments">
+            <h2 class="subheader">{{ momentGroup.date.fromNow() }}</h2>
+
+            <section>
+                <div v-for="moment in momentGroup.moments" class="list-item">
+                    <div class="card small-12">
+                        <a href="#" title="View Profile">
+                            <img :src="'/portrait.php?id=' + Number(moment.creator.id) + '&amp;size=square64'" alt="View Profile">
+                        </a>
+                        | {{ moment.createdAt.fromNow() }}
+                    </div>
+                </div>
+
+            </section>
         </div>
 
         <section v-if="showSkeletonLoader">
@@ -73,6 +89,9 @@ export default {
                     <p class="meta"></p>
                 </div>
             </div>
+        </section>
+        <section v-else>
+            Displaying {{ metadata.count }} learning moments.
         </section>
     </div>
 
