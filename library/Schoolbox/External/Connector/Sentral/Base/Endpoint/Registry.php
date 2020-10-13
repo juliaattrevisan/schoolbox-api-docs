@@ -56,4 +56,15 @@ class Registry
     {
         return $this->registry;
     }
+
+
+    /**
+     * Just call the Captain Keyes that you remembered in this instance
+     *
+     * @return array
+     */
+    public function keys(): array
+    {
+        return array_keys($this->registry);
+    }
 }

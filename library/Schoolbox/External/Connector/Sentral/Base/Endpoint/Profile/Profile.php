@@ -418,12 +418,12 @@ class Profile implements IStrategy
                  * We need to get each dude's timetable separately via some other api endpoint
                  * and we won't encounter this id again unless we remember it here
                  */
-                $this->registry->remember($student['id'], []);
+                $this->registry->remember($student['id'], ['timetable goes here']);
             }
 
             /* Prepare for next page if it exists
              */
-            $nextUrl =  $payload['links']['next'] ?? null;
+            $nextUrl = $payload['links']['next'] ?? null;
         }
     }
 

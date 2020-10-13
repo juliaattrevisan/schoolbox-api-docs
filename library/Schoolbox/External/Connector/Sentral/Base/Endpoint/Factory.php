@@ -235,6 +235,12 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
              ))
+            ->add(new Timetable\Preloader(
+                $this->log,
+                $this->perform,
+                $api,
+                $registry
+            ))
 //            ->add(new Timetable\Definition(
 //                $this->log,
 //                $this->perform,
