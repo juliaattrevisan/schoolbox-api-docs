@@ -88,7 +88,7 @@ class Preloader implements IStrategy
         /* Iterate through all the people we saw previously, in profile import
          */
         foreach ($this->registry->recallAll() as $id => $data) {
-            $name = $data['name'];
+            $name = trim("{$data['student']['firstname']} {$data['student']['lastname']}");
 
             $endpoint = "timetables/student/{$id}/timetable-lessons?fromDate={$monday}&toDate={$friday}";
 
@@ -111,10 +111,11 @@ class Preloader implements IStrategy
 
                 if ($numRecords) {
                     $this->log->debug(sprintf(
-                        'Found %s timetableLesson instances for %s (sentral id %s)',
+                        'Found %s timetableLesson instances for %s (sentral id %s, externalId %s)',
                         $numRecords,
                         $name,
-                        $id
+                        $id,
+                        $data['student']['externalId']
                     ));
                 }
             } catch(\InvalidArgumentException $e) {
@@ -122,9 +123,10 @@ class Preloader implements IStrategy
                 /* We can't process any timetables in those cases, so log it and continue
                  */
                 $this->log->warning(sprintf(
-                    'Could not obtain timetable for %s (sentral id %s); they might not have a timetable in sentral.',
+                    'Could not obtain timetable for %s (sentral id %s, externalId %s); they might not have a timetable in sentral.',
                     $name,
-                    $id
+                    $id,
+                    $data['student']['externalId']
                 ));
 
                 $this->log->warning($e->getMessage());
@@ -168,7 +170,7 @@ class Preloader implements IStrategy
              * a nice spot for it to fit
              */
             $this->registry->remember((string)$id, [
-                'name' => $name,
+                'student' => $data['student'],
                 'timetable' => $timetable
             ]);
         }

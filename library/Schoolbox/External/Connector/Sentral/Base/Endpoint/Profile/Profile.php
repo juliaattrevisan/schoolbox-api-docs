@@ -419,7 +419,11 @@ class Profile implements IStrategy
                  * and we won't encounter this id again unless we remember it here
                  */
                 $this->registry->remember($student['id'], [
-                    'name' => trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
+                    'student' => [
+                        'externalId' => $externalId,
+                        'firstname' => $studentBaseProfile->getFirstname(),
+                        'lastname' => $studentBaseProfile->getLastname()
+                    ],
                     'timetable' => null
                 ]);
             }
