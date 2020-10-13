@@ -132,12 +132,44 @@ class Preloader implements IStrategy
                 continue;
             }
 
-            /* Otherwise, remember it in the Registry instance because we left ourselves
+            /* Map a flat stack of timetableLesson instances into a hierarchical data struct
+             * Then remember (and use) this structure when creating Definition
+             *
+             * $studentId => [
+             *      dayName => [
+             *          periodNumber => [
+             *              details about the subject in this period for this person
+             *          ]
+             *      ]
+             * ]
+             */
+            $timetable = [];
+
+            foreach ($payload['data'] as $timetableLesson) {
+                $timetable[$timetableLesson['attributes']['dayName']][$timetableLesson['attributes']['periodOrder']] = [
+                    'day'      => $timetableLesson['attributes']['dayName'],
+                    'name'     => "Period {$timetableLesson['attributes']['periodName']}",
+                    'start'    => $timetableLesson['attributes']['startTime'],
+                    'finish'   => $timetableLesson['attributes']['endTime'],
+                    'sequence' => $timetableLesson['attributes']['periodOrder'],
+                    'subject'  => [
+                        'name'     => $timetableLesson['attributes']['subject'],
+                        'code'     => $timetableLesson['attributes']['className'],
+                        'room'     => $timetableLesson['attributes']['roomName'],
+                        'teachers' => [
+                            'name' => $timetableLesson['attributes']['teacherName'],
+                            'id'   => $timetableLesson['attributes']['teacherIds'][0] ?? null
+                        ]
+                    ]
+                ];
+            }
+
+            /* Remember it in the Registry instance because we left ourselves
              * a nice spot for it to fit
              */
             $this->registry->remember((string)$id, [
                 'name' => $name,
-                'timetable' => $payload['data']
+                'timetable' => $timetable
             ]);
         }
     }

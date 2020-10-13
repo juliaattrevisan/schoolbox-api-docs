@@ -130,7 +130,7 @@ class Definition implements IStrategy
      */
     public function import(): void
     {
-        $data = $this->reforge();
+        $periodsInDays = $this->findPeriodsInDays();
 
         /* $ext is a key to identify this cycle and associate it with an luCampus record
          */
@@ -140,7 +140,7 @@ class Definition implements IStrategy
          */
         $cycleName = self::CYCLE_IDENTIFIER;
         $cycleLength = self::CYCLE_LENGTH;
-        $dayLength = \count($data['periodsInDays']);
+        $dayLength = \count($periodsInDays);
         $cycleStart = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_START);
         $cycleEnd = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
         $dayStart = 1;
@@ -175,7 +175,7 @@ class Definition implements IStrategy
 
         /* Save all the periods and associate them with a cycle
          */
-        $dayData = $this->findDays($data['periodsInDays']);
+        $dayData = $this->findDays($periodsInDays);
 
         /** @var array $days */
         $days = $dayData['days'];
@@ -208,11 +208,11 @@ class Definition implements IStrategy
     /**
      * Find all the Days in a given $cycle and the longest Day of them all
      *
-     * @param array $periodsInDay
+     * @param array $periodsInDays
      * @return array
      * @throws Exception
      */
-    private function findDays(array $periodsInDay): array
+    private function findDays(array $periodsInDays): array
     {
         $struct = [
 
@@ -221,7 +221,7 @@ class Definition implements IStrategy
              * Find the day with the most number of periods and assume that to be canonical
              * (some days have no period data)
              */
-            'maxPeriods' => \count($periodsInDay),
+            'maxPeriods' => \count($periodsInDays),
 
             /* Store all the periods here, indexed by Day
               */
@@ -230,7 +230,7 @@ class Definition implements IStrategy
 
         /* Explore all the Period data
          */
-        $periods = array_values($periodsInDay);
+        $periods = array_values($periodsInDays);
 
         for ($i = 0; $i < self::CYCLE_LENGTH; $i++) {
             $dayIndex = $i+1;
@@ -291,20 +291,9 @@ class Definition implements IStrategy
     /**
      * Rearrange the data structure into something sensible
      */
-    private function reforge(): array {
-        $timetables = [];
+    private function findPeriodsInDays(): array {
         $periodsInDays = [];
 
-        /* Map a flat stack of timetableLesson instances into a hierarchical data struct
-         *
-         * $studentId => [
-         *      dayName => [
-         *          periodNumber => [
-         *              details about the subject in this period for this person
-         *          ]
-         *      ]
-         * ]
-         */
         foreach ($this->registry->recallAll() as $studentId => $data) {
 
             /* No timetable found for this person
@@ -316,41 +305,25 @@ class Definition implements IStrategy
 
             /* Otherwise process them as usual
              */
-            foreach ($data['timetable'] as $timetableLesson) {
-                $timetables[$studentId][$timetableLesson['attributes']['dayName']][$timetableLesson['attributes']['periodOrder']] = [
-                    'day' => $timetableLesson['attributes']['dayName'],
-                    'name' => "Period {$timetableLesson['attributes']['periodName']}",
-                    'start' => $timetableLesson['attributes']['startTime'],
-                    'finish' => $timetableLesson['attributes']['endTime'],
-                    'subject' => [
-                        'name' => $timetableLesson['attributes']['subject'],
-                        'code' => $timetableLesson['attributes']['className'],
-                        'room' => $timetableLesson['attributes']['roomName'],
-                        'teachers' => [
-                            'name' => $timetableLesson['attributes']['teacherName'],
-                            'id' => $timetableLesson['attributes']['teacherIds'][0] ?? null
-                        ]
-                    ]
-                ];
+            foreach ($data['timetable'] as $day => $periods) {
+                foreach ($periods as $period) {
 
-                /* Collate a cumulative definition as we preprocess
-                 *
-                 * As we process everyone's timetable we should have the maximum definition
-                 * for this week across all student timetables which for now, I have presumed
-                 * to be rectangular and consistent
-                 */
-                $periodsInDays[$timetableLesson['attributes']['periodOrder']] = [
-                    'name' => "Period {$timetableLesson['attributes']['periodName']}",
-                    'sequence' => $timetableLesson['attributes']['periodOrder'],
-                    'start' => $timetableLesson['attributes']['startTime'],
-                    'finish' => $timetableLesson['attributes']['endTime'],
-                ];
+                    /* Collate a cumulative definition as we preprocess
+                     *
+                     * As we process everyone's timetable we should have the maximum definition
+                     * for this week across all student timetables which for now, I have presumed
+                     * to be rectangular and consistent
+                     */
+                    $periodsInDays[$period['sequence']] = [
+                        'name' => $period['name'],
+                        'sequence' => $period['sequence'],
+                        'start' => $period['start'],
+                        'finish' => $period['finish'],
+                    ];
+                }
             }
         }
 
-        return [
-            'periodsInDays' => $periodsInDays,
-            'timetables' => $timetables
-        ];
+        return $periodsInDays;
     }
 }
