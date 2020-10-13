@@ -159,6 +159,7 @@ class Preloader implements IStrategy
                         'code'     => $timetableLesson['attributes']['className'],
                         'room'     => $timetableLesson['attributes']['roomName'],
                         'teachers' => [
+                            'externalId' => null,  // TODO find
                             'name' => $timetableLesson['attributes']['teacherName'],
                             'id'   => $timetableLesson['attributes']['teacherIds'][0] ?? null
                         ]
