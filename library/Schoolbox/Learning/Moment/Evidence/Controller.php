@@ -124,10 +124,12 @@ class Controller extends Base
     public function getMomentsForUser(User $user): void
     {
         // TODO add cursor for moments
-        $data = $this->mapper->findByColumnList(
-            ['user_id' => $user->getId(),],
-            ['order'   => ['created_at' => Mapper::SORT_ORDER_DESC]],
-        );
+        $data = $this->mapper
+            ->findByColumnList(
+                ['user_id' => $user->getId(),],
+                ['order'   => ['created_at' => Mapper::SORT_ORDER_DESC]],
+            )
+            ->map(new Translator\ModelToArray());
         $this->response->content->set(
             $this->buildJsonOutput([
                 'data'     => $data,
