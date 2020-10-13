@@ -61,18 +61,9 @@ class Flysystem implements CacheInterface
     {
         $this->resource = $resource;
         $this->cacheFs  = $cacheFs;
-        $this->setKey($key);
+        $this->key      = $key;
     }
 
-    /**
-     * Set key
-     *
-     * @param string $key
-     */
-    protected function setKey($key)
-    {
-        $this->key = $key;
-    }
 
     /**
      * Get key
@@ -84,20 +75,6 @@ class Flysystem implements CacheInterface
         return $this->key;
     }
 
-    /**
-     * Set loaded from cache
-     * Enforce boolean
-     *
-     * @param bool $loadedFromCache
-     */
-    protected function setLoadedFromCache($loadedFromCache)
-    {
-        if ($loadedFromCache === false) {
-            $this->loadedFromCache = $loadedFromCache;
-        } else {
-            $this->loadedFromCache = true;
-        }
-    }
 
     /**
      * Find out whether we loaded from cache or not
@@ -126,7 +103,7 @@ class Flysystem implements CacheInterface
          */
         if ($cached->exists()) {
             // flag that this is an already-cached file
-            $this->setLoadedFromCache(true);
+            $this->loadedFromCache = true;
             return $cached;
         }
 
