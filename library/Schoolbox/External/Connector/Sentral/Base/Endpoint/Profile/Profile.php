@@ -166,7 +166,7 @@ class Profile implements IStrategy
          */
         $this->log->info('Processing staff.');
 
-//        $this->importStaff();
+        $this->importStaff();
     }
 
 
