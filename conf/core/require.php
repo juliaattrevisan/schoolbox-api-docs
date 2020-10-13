@@ -1,10 +1,12 @@
 <?php
+
 /**
  * Schoolbox global dependencies
  *
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 // TODO move this block to 'www/conf/conf.php'
 if (PHP_SAPI === 'cli') {
     // Was an instance id specified as a CLI option? Check this before calling core require.
