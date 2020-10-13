@@ -6,6 +6,7 @@
 declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\External\Normalise\TupleStack;
 
 class External_Tass_V53_User extends External_Tass_User
 {
@@ -91,7 +92,7 @@ class External_Tass_V53_User extends External_Tass_User
                 $emailList[trim($row['par_code']) . '-' . trim($row['add_num'] . '-' . $i++)] = $email;
             }
         }
-        return $emailList;
+        return (new TupleStack())->normaliseValues($emailList, ';');
     }
 
 
