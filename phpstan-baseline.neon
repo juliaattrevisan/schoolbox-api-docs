@@ -71,6 +71,26 @@ parameters:
 			path: library/Alaress/Date/Interval.php
 
 		-
+			message: "#^Function mssql_query not found\\.$#"
+			count: 1
+			path: library/Alaress/DebugBar/DataCollector/MssqlDatabaseCollector.php
+
+		-
+			message: "#^Function mssql_rows_affected not found\\.$#"
+			count: 1
+			path: library/Alaress/DebugBar/DataCollector/MssqlDatabaseCollector.php
+
+		-
+			message: "#^Function mssql_num_rows not found\\.$#"
+			count: 1
+			path: library/Alaress/DebugBar/DataCollector/MssqlDatabaseCollector.php
+
+		-
+			message: "#^Function mssql_get_last_message not found\\.$#"
+			count: 1
+			path: library/Alaress/DebugBar/DataCollector/MssqlDatabaseCollector.php
+
+		-
 			message: "#^Constant TIDEWAYS_XHPROF_FLAGS_CPU not found\\.$#"
 			count: 1
 			path: library/Alaress/DebugBar/DataCollector/TidewaysCollector.php
@@ -646,6 +666,11 @@ parameters:
 			path: library/Custom/Tigs/Summative/ParticipationReport/Module.php
 
 		-
+			message: "#^PHPDoc tag @return with type array\\|null is not subtype of native type array\\.$#"
+			count: 1
+			path: library/Custom/Tigs/Summative/SubjectReport/Components/AcademicAchievementSummary.php
+
+		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/SubjectReport/Module.php
@@ -916,11 +941,6 @@ parameters:
 			path: library/Eportfolio/Page/Instance.php
 
 		-
-			message: "#^PHPDoc tag @return with type array\\|null is not subtype of native type array.#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/Components/AcademicAchievementSummary.php
-
-		-
 			message: "#^Variable \\$allAnswers might not be defined\\.$#"
 			count: 1
 			path: library/Evaluation/Answer/MultiOther.php
@@ -993,6 +1013,36 @@ parameters:
 		-
 			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
 			count: 1
+			path: library/External/Canvas/Sync/ImportStage/CourseAssessmentAbstract.php
+
+		-
+			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/CourseAssessmentAbstract.php
+
+		-
+			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
+
+		-
+			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
+
+		-
+			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
+
+		-
+			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
+			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
+
+		-
+			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
+			count: 1
 			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
 
 		-
@@ -1029,36 +1079,6 @@ parameters:
 			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/Submission.php
-
-		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssessmentAbstract.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssessmentAbstract.php
-
-		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
-
-		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
 
 		-
 			message: "#^Anonymous function has an unused use \\$db\\.$#"
@@ -1194,6 +1214,21 @@ parameters:
 			message: "#^Constructor of class MSSQL has an unused parameter \\$optionalConfig\\.$#"
 			count: 1
 			path: library/MSSQL.php
+
+		-
+			message: "#^Function mssql_num_rows not found\\.$#"
+			count: 2
+			path: library/MssqlResultIterator.php
+
+		-
+			message: "#^Function mssql_data_seek not found\\.$#"
+			count: 2
+			path: library/MssqlResultIterator.php
+
+		-
+			message: "#^Function mssql_fetch_assoc not found\\.$#"
+			count: 1
+			path: library/MssqlResultIterator.php
 
 		-
 			message: "#^Constructor of class Page has an unused parameter \\$error\\.$#"
@@ -1406,17 +1441,17 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/Controller.php
 
 		-
-			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getFolder\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:setUnits\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/Controller.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getUnits\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Assessment/Course/Import/Controller.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getFolder\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/Controller.php
 
@@ -1534,6 +1569,11 @@ parameters:
 			message: "#^PHPDoc tag @throws with type Schoolbox\\\\Blog\\\\Homepage\\\\Post\\\\DefinitionException is not subtype of Throwable$#"
 			count: 2
 			path: library/Schoolbox/Blog/Homepage/Post/Mapper.php
+
+		-
+			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
+			count: 1
+			path: library/Schoolbox/Calendar/Event/Attendance/Module.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
@@ -2126,6 +2166,11 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setOwner\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setAcceptMultiple\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
@@ -2146,6 +2191,26 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setCapabilityMarkType\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getCapabilityMarkType\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setCapabilityGradeGroup\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getCapabilityGradeGroup\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setMarkedUsingRange\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
@@ -2153,11 +2218,6 @@ parameters:
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getUseMarkRange\\(\\)\\.$#"
 			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setOwner\\(\\)\\.$#"
-			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
@@ -2296,8 +2356,33 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getCapabilityMarkType\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setCapabilityMarkType\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getCapabilityGradeGroup\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setCapabilityGradeGroup\\(\\)\\.$#"
+			count: 2
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:isMarkedUsingRange\\(\\)\\.$#"
 			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setUseMarkRange\\(\\)\\.$#"
+			count: 2
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
@@ -2461,6 +2546,21 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
 
 		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getAttachedFiles\\(\\)\\.$#"
+			count: 4
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setAttachments\\(\\)\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getAttachments\\(\\)\\.$#"
+			count: 3
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
+
+		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setUrl\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
@@ -2478,6 +2578,11 @@ parameters:
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getRequiresConfirmation\\(\\)\\.$#"
 			count: 1
+			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
+
+		-
+			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setAttachedFiles\\(\\)\\.$#"
+			count: 2
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
 
 		-
@@ -2961,6 +3066,11 @@ parameters:
 			path: library/Schoolbox/ProfessionalDevelopment/Module.php
 
 		-
+			message: "#^Variable \\$this might not be defined\\.$#"
+			count: 2
+			path: library/Schoolbox/Profile/Test/Generator.php
+
+		-
 			message: "#^Method Schoolbox\\\\Profile\\\\ValidDetailsVisible\\:\\:isSatisfiedBy\\(\\) invoked with 4 parameters, 2 required\\.$#"
 			count: 1
 			path: library/Schoolbox/Profile/Test/Generator.php
@@ -3041,14 +3151,9 @@ parameters:
 			path: library/Schoolbox/Resource/Attachment/AbstractController.php
 
 		-
-			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\NavigatorController has an unused parameter \\$conf\\.$#"
+			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\MyfileController has an unused parameter \\$useFolder\\.$#"
 			count: 1
-			path: library/Schoolbox/Resource/Attachment/NavigatorController.php
-
-		-
-			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\NavigatorController has an unused parameter \\$rosetta\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/NavigatorController.php
+			path: library/Schoolbox/Resource/Attachment/Filesystem/MyfileController.php
 
 		-
 			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\TeamsController has an unused parameter \\$defaultFolderId\\.$#"
@@ -3064,6 +3169,16 @@ parameters:
 			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\TeamsController has an unused parameter \\$useFolder\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Attachment/Filesystem/TeamsController.php
+
+		-
+			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\NavigatorController has an unused parameter \\$conf\\.$#"
+			count: 1
+			path: library/Schoolbox/Resource/Attachment/NavigatorController.php
+
+		-
+			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\NavigatorController has an unused parameter \\$rosetta\\.$#"
+			count: 1
+			path: library/Schoolbox/Resource/Attachment/NavigatorController.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Resource\\\\File\\\\IFile\\:\\:getFolder\\(\\)\\.$#"
@@ -3421,6 +3536,11 @@ parameters:
 			path: tools/mq/diagnose-pqueue.php
 
 		-
+			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
+			count: 1
+			path: tools/mq/schedule-cache-restore.php
+
+		-
 			message: "#^Anonymous function has an unused use \\$opts\\.$#"
 			count: 1
 			path: tools/notif/route/routed.php
@@ -3455,77 +3575,3 @@ parameters:
 			count: 1
 			path: tools/socket/socketd.php
 
-		-
-			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\MyfileController has an unused parameter \\$useFolder\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Filesystem/MyfileController.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event/Attendance/Module.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setCapabilityMarkType\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getCapabilityMarkType\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setCapabilityGradeGroup\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getCapabilityGradeGroup\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setCapabilityMarkType\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getCapabilityMarkType\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setCapabilityGradeGroup\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getCapabilityGradeGroup\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setUseMarkRange\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getAttachedFiles\\(\\)\\.$#"
-			count: 4
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:setAttachedFiles\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getAttachments\\(\\)\\.$#"
-			count: 3
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:setAttachments\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php

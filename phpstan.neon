@@ -1,10 +1,6 @@
 parameters:
-    autoload_directories:
-        - %rootDir%/../../../conf
-        - %rootDir%/../../../test/codeception
-        - %rootDir%/../../../test/behavior/bootstrap
-        - %rootDir%/../../../test/notif/tests
-    bootstrap: %rootDir%/../../../conf/core/require.php
+    bootstrapFiles:
+        - %rootDir%/../../../conf/core/require.php
     level: 2
     paths:
         - conf
@@ -13,8 +9,10 @@ parameters:
         - tools
     inferPrivatePropertyTypeFromConstructor: true
     excludes_analyse:
-        - library/Alaress/Twitter/Loader/oauth/TwitterOAuth.php
-        - library/Alaress/Twitter/Loader/oauth/OAuth.php
-        - library/Alaress/Twitter/Loader/Test/ValidOAuthTest.php
+        - library/Schoolbox/Sync/Iterator/StackableTrait.php
+        - library/Schoolbox/Sync/Iterator/Guardian.php
+        - library/Schoolbox/Sync/Iterator/Staff.php
+        - library/Schoolbox/Sync/Iterator/Student.php
+
 includes:
 	- phpstan-baseline.neon
