@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -41,6 +42,7 @@ use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\User;
+
 use function array_intersect;
 use function array_keys;
 use function array_key_exists;
@@ -311,9 +313,11 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
          * Changed to isStaffOrInstructorVisibleOnly
          */
         $isPreviousHidden = false;
-        if ($method === Mapper::METHOD_UPDATE
+        if (
+            $method === Mapper::METHOD_UPDATE
             && array_key_exists('assessment', $diff)
-            && array_key_exists('workType', $diff['assessment'])) {
+            && array_key_exists('workType', $diff['assessment'])
+        ) {
             try {
                 $isPreviousHidden = $diff['assessment']['workType'][1] === null ? false :
                     $this->workTypeMapper->findById($diff['assessment']['workType'][1])->isStaffOrInstructorVisibleOnly();
@@ -595,7 +599,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $topicSuffix = "open";
         } elseif ($assessment instanceof Quiz) {
             $topicSuffix = "upcoming";
-        }  else {
+        } else {
             return $envelope;
         }
 
@@ -1068,7 +1072,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                         $this->internalNotifyStudentOpen($envelope, $participant, $topicStub);
                     }
                 }
-
             } elseif (!empty($participantDiff['dueDate'])) {
                 [$newStamp, $oldStamp] = $participantDiff['dueDate'];
                 if ($newStamp) {
@@ -1081,7 +1084,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
                     $dateformat = $participant->getDueDate()->getLongDateOnly();
                     if (!$participant->getDueDate()->isAtEndOfDay()) {
-                        $dateformat = $participant->getDueDate()->getTimeOnly() .' on '. $dateformat;
+                        $dateformat = $participant->getDueDate()->getTimeOnly() . ' on ' . $dateformat;
                     }
 
                     // Students
@@ -1190,7 +1193,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param User        $student
      * @return string
      */
-    private function buildParticipantRoute(IAssessable $assessment, User $student) :string
+    private function buildParticipantRoute(IAssessable $assessment, User $student): string
     {
         return sprintf('/learning/assessments/%s/%s', $assessment->getId(), $student->getId());
     }
@@ -1254,7 +1257,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @param Alaress_Date_Format[]|null[] ...$dates
      * @return Alaress_Date_Format|null
      */
-    private function coalesceDates(?Alaress_Date_Format... $dates): ?Alaress_Date_Format
+    private function coalesceDates(?Alaress_Date_Format ...$dates): ?Alaress_Date_Format
     {
         foreach ($dates as $date) {
             if ($date instanceof Alaress_Date_Format && !$date->isNull()) {

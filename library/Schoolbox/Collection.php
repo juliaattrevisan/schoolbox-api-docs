@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base collection of model objects.
  *
@@ -400,7 +401,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @param string|string[]     $field                    The name of the field[s] to sort by.
      * @param string|string[]     $direction                The order[s] to sort by - 'asc' or 'desc'
-     * @param callable|callable[] $compareFunction          If set, use this callable[s] as the comparison.
+     * @param callable|callable[]|null $compareFunction     If set, use this callable[s] as the comparison.
      *                                                      Only applied if values aren't directly comparable.
      * @param bool                $maintainIndexAssociation Should we preserve key association?
      *
@@ -506,7 +507,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     public function sortByCallback($callback, $maintainIndexAssociation = false)
     {
         $stack = $this->getStack();
-        if($maintainIndexAssociation){
+        if ($maintainIndexAssociation) {
             uasort($stack, $callback);
         } else {
             usort($stack, $callback);
@@ -596,7 +597,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
             foreach ($other as $item) {
                 $value = $item->$getColumn();
 
-                if(is_object($value) ){
+                if (is_object($value)) {
                     throw new \UnexpectedValueException('Cannot compare objects');
                 }
 
@@ -606,7 +607,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
             }
         } else {
             foreach ($other as $item) {
-                if(is_object($item) ){
+                if (is_object($item)) {
                     throw new \UnexpectedValueException('Cannot compare objects');
                 }
 
@@ -829,7 +830,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     public function concat()
     {
         return $this->reduce(
-            function(Collection $return, Collection $item) {
+            function (Collection $return, Collection $item) {
                 return $return->merge($item);
             },
             new Collection()
@@ -931,7 +932,8 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
 
     /**
      * Indexes the collection by the given column.
-     * Be careful! The property indicated by $column should contain unique values. If not, earlier values will be overwritten.
+     * Be careful! The property indicated by $column should contain unique values.
+     * If not, earlier values will be overwritten.
      *
      * @param string $column
      * @return $this
@@ -957,7 +959,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     public function indexByCallback(callable $callback)
     {
         $new = [];
-        foreach($this->stack as $key => $item){
+        foreach ($this->stack as $key => $item) {
             $newKey = call_user_func($callback, $item, $key);
             $new[$newKey] = $item;
         }
@@ -994,7 +996,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     public function shallowClone()
     {
         $newCollection = $this->emptyClone();
-        foreach($this->stack as $idx => $item){
+        foreach ($this->stack as $idx => $item) {
             $newCollection->stack[$idx] = $item;
         }
         return $newCollection;
@@ -1031,12 +1033,10 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
         foreach ($this as $value) {
             foreach ($decorators as $decorator) {
                 $json[$i] = $decorator->decorate($json[$i] ?: [], $value);
-
             }
             $i++;
         }
 
         return $json;
     }
-
 }

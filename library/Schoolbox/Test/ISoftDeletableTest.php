@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Test;
@@ -46,8 +48,8 @@ class ISoftDeletableTest extends TestCase
         $reflectionMethod = $reflection->getMethod('isSoftDeletable');
         $isModelSoftDeletable       = $model instanceof ISoftDeletable;
         $isMapperSoftDeleteColumn   = (bool)$reflectionMethod->invoke($mapper);
-        $message               = "'{$className}' model is" . ($isModelSoftDeletable ? '' : ' not') . ' soft-deletable but mapper is ' .
-            ($isMapperSoftDeleteColumn ? '' : 'not ') . 'soft-deletable';
+        $message               = "'{$className}' model is" . ($isModelSoftDeletable ? '' : ' not') .
+            ' soft-deletable but mapper is ' . ($isMapperSoftDeleteColumn ? '' : 'not ') . 'soft-deletable';
         $this->assertEquals($isModelSoftDeletable, $isMapperSoftDeleteColumn, $message);
     }
 
@@ -63,8 +65,6 @@ class ISoftDeletableTest extends TestCase
         $mappers = [];
 
         foreach (get_declared_classes() as $className) {
-            /* @var \Schoolbox\Mapper $className */
-
             // Is the class not a mapper?
             if (!$this->isValidMapperClass($className)) {
                 continue;
@@ -92,7 +92,6 @@ class ISoftDeletableTest extends TestCase
 
             // Special case for resource mappers that depend on the storage mapper
             if ($mapper instanceof Resource\AbstractFileMapper) {
-                /** @noinspection PhpParamsInspection */
                 $mapper->setStorageMapper(new class extends Resource\Storage\Mapper
                 {
 
@@ -172,9 +171,11 @@ class ISoftDeletableTest extends TestCase
     private function loadAllMapperClasses(): void
     {
         // Attempt to load and therefore parse every single PHP class in /library
-        foreach (new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator(__DIR__ . '/../../../library/', RecursiveDirectoryIterator::SKIP_DOTS)
-        ) as $item) {
+        foreach (
+            new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator(__DIR__ . '/../../../library/', RecursiveDirectoryIterator::SKIP_DOTS)
+            ) as $item
+        ) {
             /** @var SplFileInfo $item */
             if (!$item->isFile()) {
                 continue;
