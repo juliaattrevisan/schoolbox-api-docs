@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -9,25 +8,26 @@
 namespace Alaress\Image\Cache;
 
 use League\Flysystem as Fly;
+use LogicException;
+use Schoolbox\File;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Mapper;
 use Schoolbox\Resource;
 
 /**
- * Class BrokenFS
- *
- * @deprecated anything that implements this won't be expected to work in Cloud
- * @package Alaress\Image\Cache
+ * Hardcoded to use the local file system, regardless of system's configured storage implementation
  */
-class BrokenFS extends Storage
+class LocalFS extends Storage
 {
-
     /**
      * @param string $dir
      * @param string $filename
      * @param string $key
-     * @throws \Schoolbox\File\Exception
+     * @throws File\Exception
+     * @throws LogicException
+     * @throws Mapper\Exception
      */
-    public function __construct($dir, $filename, $key)
+    public function __construct(string $dir, string $filename, string $key)
     {
         $fs = new Fly\Filesystem(new Fly\Adapter\Local($dir));
 
@@ -41,5 +41,4 @@ class BrokenFS extends Storage
 
         parent::__construct($file, $key);
     }
-
 }
