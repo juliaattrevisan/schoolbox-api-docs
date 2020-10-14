@@ -46,7 +46,6 @@ class Explorer
     /**
      * Explorer constructor.
      *
-     * @throws \DebugBar\DebugBarException
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
