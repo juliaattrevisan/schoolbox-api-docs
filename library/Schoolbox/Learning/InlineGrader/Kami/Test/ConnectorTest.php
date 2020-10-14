@@ -150,10 +150,11 @@ class ConnectorTest extends TestCase
     /**
      * Test not finding a document from the Mock API after I upload it.
      *
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     *
      */
     public function testUploadNotFound(): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound::class);
         $response = new Response(
             404,
             [],
@@ -167,10 +168,11 @@ class ConnectorTest extends TestCase
     /**
      * Test upload of a document from the Mock API, and then do something if its status is bad.
      *
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException
+     *
      */
     public function testUploadInvalidStatus(): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException::class);
         $response = new Response(
             201,
             [],
@@ -191,12 +193,13 @@ class ConnectorTest extends TestCase
      * Test upload of a document from the Mock API, if the response is bad.
      *
      * @dataProvider providerUploadBadResponse
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException
+     *
      *
      * @param ResponseInterface $response
      */
     public function testUploadBadResponse(ResponseInterface $response): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException::class);
         $connector = new MockConnector($this->getMockClient($response));
         $connector->uploadDocument($this->getMockStorage());
     }
@@ -205,10 +208,11 @@ class ConnectorTest extends TestCase
     /**
      * Test upload of a document from the Mock API, if the response body is bad.
      *
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException
+     *
      */
     public function testUploadBadResponseBody(): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException::class);
         $response  = new Response(201, [], 'LOL');
         $connector = new MockConnector($this->getMockClient($response));
         $connector->uploadDocument($this->getMockStorage());
@@ -282,7 +286,7 @@ class ConnectorTest extends TestCase
      * Test getting a document when Kami's not enabled
      *
      * @dataProvider providerDisabledConnector
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\EmptyApiKeyException
+     *
      *
      * @param null|string $apiKey
      * @throws \InvalidArgumentException
@@ -294,6 +298,7 @@ class ConnectorTest extends TestCase
      */
     public function testGetDocumentNotEnabled(?string $apiKey): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\EmptyApiKeyException::class);
         // This method must not hit Kami API
         $connector = new Connector($this->getMockClientWithConnectException(), $apiKey, 'TESTING');
         $connector->getDocument('asdfghjkl');
@@ -303,10 +308,11 @@ class ConnectorTest extends TestCase
     /**
      * Test not finding a document from the Mock API.
      *
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     *
      */
     public function testGetDocumentNotFound(): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound::class);
         $response = new Response(
             404,
             [],
@@ -320,10 +326,11 @@ class ConnectorTest extends TestCase
     /**
      * Test getting a document from the Mock API, if its status is bad.
      *
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException
+     *
      */
     public function testGetDocumentInvalidStatus(): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException::class);
         $response = new Response(
             200,
             [],
@@ -344,12 +351,13 @@ class ConnectorTest extends TestCase
      * Test getting a document from the Mock API, if the response is bad.
      *
      * @dataProvider providerGetDocumentBadResponse
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException
+     *
      *
      * @param ResponseInterface $response
      */
     public function testGetDocumentBadResponse(ResponseInterface $response): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException::class);
         $connector = new MockConnector($this->getMockClient($response));
         $connector->getDocument('2kmcksmndlkansdlk');
     }
@@ -358,10 +366,11 @@ class ConnectorTest extends TestCase
     /**
      * Test getting a document from the Mock API, if the response body is bad.
      *
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException
+     *
      */
     public function testGetDocumentBadResponseBody(): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ResponseDecodeException::class);
         $response  = new Response(200, [], 'LOL');
         $connector = new MockConnector($this->getMockClient($response));
         $connector->getDocument('2kmcksmndlkansdlk');
@@ -385,10 +394,11 @@ class ConnectorTest extends TestCase
     /**
      * Test deleting a document that wasn't found
      *
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     *
      */
     public function testDeleteDocumentNotFound(): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound::class);
         $response = new Response(
             404,
             [],
@@ -403,12 +413,13 @@ class ConnectorTest extends TestCase
      * Test deleting a document from the Mock API, if the response is bad.
      *
      * @dataProvider providerDeleteDocumentBadResponse
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException
+     *
      *
      * @param ResponseInterface $response
      */
     public function testDeleteDocumentBadResponse(ResponseInterface $response): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException::class);
         $connector = new MockConnector($this->getMockClient($response));
         $connector->deleteDocument('asdfghjkl');
     }
@@ -450,10 +461,11 @@ class ConnectorTest extends TestCase
     /**
      * Test getting a view session for a document that wasn't found
      *
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     *
      */
     public function testViewSessionNotFound(): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound::class);
         $response = new Response(
             404,
             [],
@@ -468,12 +480,13 @@ class ConnectorTest extends TestCase
      * Test bad response from view session request
      *
      * @dataProvider providerViewSessionBadResponse
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException
+     *
      *
      * @param ResponseInterface $response
      */
     public function testViewSessionBadResponse(ResponseInterface $response): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException::class);
         $connector = new MockConnector($this->getMockClient($response));
         $connector->viewSession('asdfghjkl', new User());
     }
@@ -540,10 +553,11 @@ class ConnectorTest extends TestCase
     /**
      * Test creating an export for a document that wasn't found
      *
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     *
      */
     public function testCreateInlineExportNotFound(): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound::class);
         $response = new Response(
             404,
             [],
@@ -586,10 +600,11 @@ class ConnectorTest extends TestCase
     /**
      * Test creating an export for a document that wasn't found
      *
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     *
      */
     public function testCreateAnnotatedExportNotFound(): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound::class);
         $response = new Response(
             404,
             [],
@@ -603,10 +618,11 @@ class ConnectorTest extends TestCase
     /**
      * Test get export of a document that wasn't found
      *
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound
+     *
      */
     public function testGetExportNotFound(): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\NotFound::class);
         $response = new Response(
             404,
             [],
@@ -621,12 +637,13 @@ class ConnectorTest extends TestCase
      * Test exporting a document from the Mock API, if the response is bad.
      *
      * @dataProvider providerGetExportBadResponse
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException
+     *
      *
      * @param ResponseInterface $response
      */
     public function testGetExportBadResponse(ResponseInterface $response): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException::class);
         $connector = new MockConnector($this->getMockClient($response));
         $connector->getExport('asdfghjkl');
     }
@@ -635,10 +652,11 @@ class ConnectorTest extends TestCase
     /**
      * Test exporting a document from the Mock API, if its status is bad.
      *
-     * @expectedException \Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException
+     *
      */
     public function testGetExportInvalidStatus(): void
     {
+        $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\InvalidStatusException::class);
         $response = new Response(
             200,
             [],

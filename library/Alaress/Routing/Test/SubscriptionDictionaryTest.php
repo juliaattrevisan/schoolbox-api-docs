@@ -30,12 +30,13 @@ class SubscriptionDictionaryTest extends TestCase
     /**
      * Test that a router cannot be constructed without a delimiter
      *
-     * @expectedException InvalidArgumentException
+     *
      * @dataProvider dataInvalidConstruction
      * @param string $delim
      */
     public function testInvalidConstruction($delim)
     {
+        $this->expectException(InvalidArgumentException::class);
         new SubscriptionDictionary($delim);
     }
 

@@ -239,10 +239,11 @@ class AccessTest extends TestCase
      * @throws Mapper\Exception
      * @throws ReflectionException
      * @throws UnexpectedValueException
-     * @expectedException InvalidArgumentException
+     *
      */
     public function testGetAccessLevelInvalid(): void
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->newAccess()->getAccessLevel(new User(), UserAccess::SERVICE_CMS, 4);
     }
 
@@ -283,10 +284,11 @@ class AccessTest extends TestCase
      * @throws Mapper\Exception
      * @throws ReflectionException
      * @throws UnexpectedValueException
-     * @expectedException InvalidArgumentException
+     *
      */
     public function testGetMinFolderAccessInvalid(): void
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->newAccess()->getMinFolderAccess(new User(), []);
     }
 
@@ -401,10 +403,11 @@ class AccessTest extends TestCase
      * @throws LogicException
      * @throws ReflectionException
      * @throws UnexpectedValueException
-     * @expectedException Error
+     *
      */
     public function testCannotConnectToExternalUser(): void
     {
+        $this->expectException(Error::class);
         $access = $this->newAccess();
         $reflection = new ReflectionClass($access);
         $instance   = $reflection->getProperty('externalUser');

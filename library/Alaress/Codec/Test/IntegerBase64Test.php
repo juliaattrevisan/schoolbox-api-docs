@@ -159,12 +159,13 @@ class IntegerBase64Test extends TestCase
      * Test that attempting to decode a non-string raises an error.
      *
      * @covers            \Alaress\Codec\Integer\Base64::decode
-     * @expectedException \TypeError
+     *
      * @dataProvider      getTestInvalidEncodedValueData
      * @param mixed $encodedValue
      */
     public function testInvalidEncodedValue($encodedValue): void
     {
+        $this->expectException(\TypeError::class);
         $codec = new Base64();
         $codec->decode($encodedValue);
     }
@@ -175,12 +176,13 @@ class IntegerBase64Test extends TestCase
      * raises an error.
      *
      * @covers            \Alaress\Codec\Integer\Base64::decode
-     * @expectedException \UnexpectedValueException
+     *
      * @dataProvider      getTestEncodedValueDecodesToNonIntegerErrorData
      * @param mixed $encodedValue
      */
     public function testEncodedValueDecodesToNonIntegerError($encodedValue): void
     {
+        $this->expectException(\UnexpectedValueException::class);
         $codec = new Base64();
         $codec->decode($encodedValue);
     }

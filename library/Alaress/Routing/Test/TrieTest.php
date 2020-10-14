@@ -28,10 +28,11 @@ class TrieTest extends TestCase
     /**
      * Test that attempting to retrieve a subordinate key from an empty Trie throws an exception
      *
-     * @expectedException \InvalidArgumentException
+     *
      */
     public function testGetEmpty()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $trie = $this->newTrie('nothingSpecial');
         $trie->get('nonexistentSubordinateKey');
     }
@@ -102,10 +103,11 @@ class TrieTest extends TestCase
     /**
      * Test that attempting to retrieve a non-existent subordinate key throws an exception
      *
-     * @expectedException \InvalidArgumentException
+     *
      */
     public function testInvalidGet()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $trie = $this->newTrie('nothingSpecial');
         $trie->put('subordinateKey');
 
@@ -194,10 +196,11 @@ class TrieTest extends TestCase
     /**
      * Test that an attempt to retrieve an invalid payload throws an exception
      *
-     * @expectedException \InvalidArgumentException
+     *
      */
     public function testFailedFetch()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $trie = $this->newTrie('nothingSpecial');
         $trie->set([2, 4, 6], 'keykey', 'valval');
 

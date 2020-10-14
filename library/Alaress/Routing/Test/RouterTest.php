@@ -159,13 +159,14 @@ class RouterTest extends TestCase
 
 
     /**
-     * @expectedException InvalidArgumentException
+     *
      *
      * @throws InvalidArgumentException
      * @throws OutOfBoundsException
      */
     public function testLocking()
     {
+        $this->expectException(InvalidArgumentException::class);
         // don't use the global router, we need to mutate this one
         $router = static::newRouter(':', true);
 

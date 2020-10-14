@@ -292,11 +292,9 @@ class MeridiemTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testInvalidIsMeridiem()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->assertTrue($this->buildDateObject()->isMeridiem('cm'));
     }
 }

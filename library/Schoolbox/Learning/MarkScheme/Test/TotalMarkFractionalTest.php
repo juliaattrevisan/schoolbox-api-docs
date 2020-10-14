@@ -23,10 +23,11 @@ class TotalMarkFractionalTest extends TestCase
     /**
      * An attempt is now required when retrieving a human-readable mark.
      *
-     * @expectedException \DomainException
+     *
      */
     public function test_getHumanReadable_WithoutAttempt()
     {
+        $this->expectException(\DomainException::class);
         $markScheme = new TotalMarkFractional(null);
         $markScheme->getHumanReadableMark(40);
     }
@@ -34,10 +35,11 @@ class TotalMarkFractionalTest extends TestCase
     /**
      * An attempt is now required when retrieving a human-readable mark.
      *
-     * @expectedException \DomainException
+     *
      */
     public function test_getNormalised_WithoutAttempt()
     {
+        $this->expectException(\DomainException::class);
         $markScheme = new TotalMarkFractional(null);
         $markScheme->getNormalisedMark(40);
     }
@@ -67,33 +69,27 @@ class TotalMarkFractionalTest extends TestCase
 //        $markScheme->getHumanReadableMark($normalised, $this->getDummyQuizAttempt($totalMark));
 //    }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function test_getNormalised_Null()
     {
+        $this->expectException(InvalidArgumentException::class);
         $humanReadable = null;
         $totalMark = 50.0;
         $markScheme = new TotalMarkFractional(null);
         $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function test_getNormalised_Empty()
     {
+        $this->expectException(InvalidArgumentException::class);
         $humanReadable = '';
         $totalMark = 50.0;
         $markScheme = new TotalMarkFractional(null);
         $markScheme->getNormalisedMark($humanReadable, $this->getDummyQuizAttempt($totalMark));
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function test_getNormalised_Invalid()
     {
+        $this->expectException(InvalidArgumentException::class);
         $humanReadable = 'ten';
         $totalMark = 50.0;
         $markScheme = new TotalMarkFractional(null);

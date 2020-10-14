@@ -57,10 +57,11 @@ class ColorTest extends TestCase
 
     /**
      * @dataProvider getAssertColorFailureData
-     * @expectedException \InvalidArgumentException
+     *
      */
     public function testAssertColorFailure($value)
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->color->setGreen($value);
     }
 
@@ -94,10 +95,11 @@ class ColorTest extends TestCase
 
     /**
      * @dataProvider getAssertAlphaFailureData
-     * @expectedException \InvalidArgumentException
+     *
      */
     public function testAssertAlphaFailure($value)
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->color->setAlpha($value);
     }
 

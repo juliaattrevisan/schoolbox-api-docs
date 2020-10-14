@@ -492,10 +492,11 @@ class ReaderTest extends TestCase
      * Most apps won't generate this situation, but if you're manually crafting csv data
      * you might misplace a comma or two and you'll no longer have meaningfully formatted data
      *
-     * @expectedException \InvalidArgumentException
+     *
      */
     public function testValidTooManyColumns()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $expectedColumns = ['External ID', 'Firstname', 'Lastname', 'Address', 'Phone'];
 
         $reader = (new Reader(__DIR__ . '/tooManyColumns.csv', true, true))
@@ -514,10 +515,11 @@ class ReaderTest extends TestCase
      * Most apps won't generate this situation, but if you're manually crafting csv data
      * you might misplace a comma or two and you'll no longer have meaningfully formatted data
      *
-     * @expectedException \InvalidArgumentException
+     *
      */
     public function testValidNotEnoughColumns()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $expectedColumns = ['External ID', 'Firstname', 'Lastname', 'Address', 'Phone'];
 
         $reader = (new Reader(__DIR__ . '/notEnoughColumns.csv', true, true))
@@ -538,10 +540,11 @@ class ReaderTest extends TestCase
      *
      * Blank rows can be caused by end-of-file shenanigans with too many newlines added
      *
-     * @expectedException \InvalidArgumentException
+     *
      */
     public function testValidBlankLines()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $expectedColumns = ['External ID', 'Firstname', 'Lastname', 'Address', 'Phone'];
 
         $reader = (new Reader(__DIR__ . '/blankLines.csv', true, true))

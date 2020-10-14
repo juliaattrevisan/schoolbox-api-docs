@@ -134,10 +134,11 @@ class ObjectReaderTest extends TestCase
      *
      * @dataProvider stringCoercionDataInvalid
      * @param mixed $input
-     * @expectedException DomainException
+     *
      */
     public function testCoerceToStringInvalid($input)
     {
+        $this->expectException(DomainException::class);
         $reader = new ObjectReader();
         $reader->coerce($input);
     }
@@ -230,10 +231,11 @@ class ObjectReaderTest extends TestCase
     /**
      * Test that a non-existent property throws a domain exception
      *
-     * @expectedException DomainException
+     *
      */
     public function testReadNonexistentCollectionValue()
     {
+        $this->expectException(DomainException::class);
         $reader = new ObjectReader();
 
         // will throw

@@ -64,10 +64,11 @@ class NNIANTest extends TestCase
      * @throws Mapper\Exception\NotFound
      * @throws ReflectionException
      * @throws UnexpectedValueException
-     * @expectedException InsufficientHydrationException
+     *
      */
     public function testInsufficientHydration(): void
     {
+        $this->expectException(InsufficientHydrationException::class);
         $this->expectException(InsufficientHydrationException::class);
         $this->newNnian()->findNearestNonInheritingAncestralNode(new Folder\Model());
     }
@@ -84,10 +85,11 @@ class NNIANTest extends TestCase
      * @throws ReflectionException
      * @throws UnexpectedValueException
      * @throws InsufficientHydrationException
-     * @expectedException InvalidArgumentException
+     *
      */
     public function testFindNearestNonInheritingAncestralNodeRoot(): void
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->expectException(InvalidArgumentException::class);
         $this->newNnian()->findNearestNonInheritingAncestralNode((new Folder\Model())->setId(Folder\Model::ROOT_ID));
     }
@@ -104,10 +106,11 @@ class NNIANTest extends TestCase
      * @throws ReflectionException
      * @throws UnexpectedValueException
      * @throws InsufficientHydrationException
-     * @expectedException InvalidArgumentException
+     *
      */
     public function testGetNnianAncestorsRoot(): void
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->expectException(InvalidArgumentException::class);
         $this->newNnian()->getNnianAncestors((new Folder\Model())->setId(Folder\Model::ROOT_ID));
     }
@@ -122,10 +125,11 @@ class NNIANTest extends TestCase
      * @throws UnexpectedValueException
      * @throws InsufficientHydrationException
      * @throws InvalidArgumentException
-     * @expectedException Mapper\Exception
+     *
      */
     public function testGetNnianAncestorsTopLevelInherit(): void
     {
+        $this->expectException(Mapper\Exception::class);
         $folderData = [[1, Folder\Model::ROOT_ID, true]];
         $folders    = $this->getFolders($folderData);
 
@@ -146,10 +150,11 @@ class NNIANTest extends TestCase
      * @throws UnexpectedValueException
      * @throws InsufficientHydrationException
      * @throws InvalidArgumentException
-     * @expectedException Mapper\Exception
+     *
      */
     public function testGetNnianAncestorsCircular(): void
     {
+        $this->expectException(Mapper\Exception::class);
         $folderData = [
             [2, 3, true],
             [3, 2, true],
@@ -252,10 +257,11 @@ class NNIANTest extends TestCase
      * @throws Mapper\DefinitionException
      * @throws ReflectionException
      * @throws UnexpectedValueException
-     * @expectedException MapperException
+     *
      */
     public function testDetectCycle(bool $beforeCycle, int $n): void
     {
+        $this->expectException(MapperException::class);
         $this->expectException(MapperException::class);
 
         // Create a loop of N folders, eg, 1 > N > 4 > 3 > 2 ... N

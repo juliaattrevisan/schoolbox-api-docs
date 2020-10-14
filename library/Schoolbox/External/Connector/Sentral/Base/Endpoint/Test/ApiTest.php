@@ -70,10 +70,11 @@ class ApiTest extends TestCase
      * @dataProvider provider_invalidDSNDecode
      * @param string $dsn
      * @throws DomainException
-     * @expectedException DomainException
+     *
      */
     public function testInvalidDSNDecode(string $dsn): void
     {
+        $this->expectException(DomainException::class);
         $codec = new DSNCodec();
         $codec->decode($dsn);
     }

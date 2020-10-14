@@ -119,11 +119,13 @@ class ColorFactoryTest extends TestCase
 
     /**
      * @dataProvider getInvalidFormatData
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /does not match expected format/
+     *
+     *
      */
     public function testInvalidFormat($colorString)
     {
+        $this->expectExceptionMessageMatches("/does not match expected format/");
+        $this->expectException(\InvalidArgumentException::class);
         $this->colorFactory->build($colorString);
     }
 }

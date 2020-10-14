@@ -247,10 +247,11 @@ class TransactorTest extends TestCase
     /**
      * Test that `commit` outside a transaction throws an error.
      *
-     * @expectedException RuntimeException
+     *
      */
     public function testExceptionOnCommitOutsideTransaction(): void
     {
+        $this->expectException(RuntimeException::class);
         $this->transactor->commit();
     }
 
@@ -258,10 +259,11 @@ class TransactorTest extends TestCase
     /**
      * Test that `rollback` outside a transaction throws an error.
      *
-     * @expectedException RuntimeException
+     *
      */
     public function testExceptionOnRollbackOutsideTransaction(): void
     {
+        $this->expectException(RuntimeException::class);
         $this->transactor->rollback();
     }
 
@@ -270,10 +272,11 @@ class TransactorTest extends TestCase
      * Test that an exception occurs when attempting to commit after an
      * unexpected commit occurs elsewhere.
      *
-     * @expectedException RuntimeException
+     *
      */
     public function testExceptionOnUnexpectedImplicitCommit(): void
     {
+        $this->expectException(RuntimeException::class);
         $this->transactor->transact(function () {
             $this->transactor->implicitCommit();
         });

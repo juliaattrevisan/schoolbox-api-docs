@@ -102,13 +102,14 @@ class RouteTest extends TestCase
      * Test that, for a given Trie hierarchy, invalid routes cannot be constructed
      *
      * @dataProvider dataInvalidConstruction
-     * @expectedException \InvalidArgumentException
+     *
      *
      * @param string $path
      * @param string $delim
      */
     public function testInvalidPathConstruction($path, $delim)
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->route($path, $delim);
     }
 
@@ -156,13 +157,14 @@ class RouteTest extends TestCase
      * Test that, for a given Trie hierarchy, attempting to retrieve a payload from a path
      * which IS a valid pattern but does NOT contain a payload throws an exception
      *
-     * @expectedException \InvalidArgumentException
+     *
      * @dataProvider dataInvalidDataFetch
      *
      * @param string $path
      */
     public function testInvalidDataFetch($path)
     {
+        $this->expectException(\InvalidArgumentException::class);
         $route = $this->route($path, ':');
         $route->data();
     }
