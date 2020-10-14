@@ -276,6 +276,10 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
+            ))
+            ->add(new ApiStatistics(
+                $this->log,
+                $api
             ));
     }
 }

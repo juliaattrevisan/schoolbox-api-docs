@@ -22,4 +22,10 @@ interface IApi
      * @return array
      */
     public function retrieveDocument(string $endpoint): array;
+
+
+    /**
+     * @return ApiUsage
+     */
+    public function getUsage(): ApiUsage;
 }
