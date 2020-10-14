@@ -12,6 +12,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable\DefinitionCompiler;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable\Preloader;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -208,11 +209,19 @@ class Factory
          */
         $registry = new Registry();
 
-        /* A Timetable compiler
-         */
         $monday = date('Y-m-d', strtotime('monday this week'));
         $friday = date('Y-m-d', strtotime('friday this week'));
 
+        /* A Definition Compiler
+         */
+        $definitionCompiler = new DefinitionCompiler(
+            $api,
+            $monday,
+            $friday
+        );
+
+        /* A Timetable compiler
+         */
         $preloader = new Preloader(
             $this->log,
             $this->perform,
@@ -253,8 +262,7 @@ class Factory
             ->add(new Timetable\Definition(
                 $this->log,
                 $this->perform,
-                $api,
-                $this->campusMapper,
+                $definitionCompiler,
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper
             ))

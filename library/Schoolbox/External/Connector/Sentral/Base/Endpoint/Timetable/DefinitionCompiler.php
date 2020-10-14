@@ -43,13 +43,13 @@ class DefinitionCompiler
     /**
      * @var false|string
      */
-    private $monday;
+    private $from;
 
 
     /**
      * @var false|string
      */
-    private $friday;
+    private $to;
 
 
     /**
@@ -61,12 +61,14 @@ class DefinitionCompiler
     /**
      * DefinitionCompiler constructor.
      *
-     * @param IApi $api
+     * @param IApi   $api
+     * @param string $from
+     * @param string $to
      */
-    public function __construct(IApi $api)
+    public function __construct(IApi $api, string $from, string $to)
     {
-        $this->monday = date('Y-m-d', strtotime('monday this week'));
-        $this->friday = date('Y-m-d', strtotime('friday this week'));
+        $this->from = $from;
+        $this->to = $to;
 
         $this->api = $api;
     }
@@ -93,7 +95,7 @@ class DefinitionCompiler
          * Process multiple pages until there are none remaining, or if something is really stuffed,
          * until MAX_CALLS is reached, to prevent infinite calls to a third party.
          */
-        $nextUrl = "timetables/timetable-calendar-date?from={$this->monday}&to={$this->friday}";
+        $nextUrl = "timetables/timetable-calendar-date?from={$this->from}&to={$this->to}";
 
         $struct = [];
 

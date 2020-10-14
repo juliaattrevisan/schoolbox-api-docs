@@ -9,10 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\CampusMapper;
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\IApi;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -52,15 +49,6 @@ class Definition implements IStrategy
 
 
     /**
-     * Sentral seem to have an 11-period day hardcoded in their system
-     * https://int-dev.sentral.school/s-3kYwLp/timetables/setup/period_times
-     *
-     * I can't find a place where you can edit those
-     */
-    private const DAY_LENGTH = 11;
-
-
-    /**
      * @var LoggerInterface
      */
     private $log;
@@ -75,15 +63,9 @@ class Definition implements IStrategy
 
 
     /**
-     * @var IApi
+     * @var DefinitionCompiler
      */
-    private $api;
-
-
-    /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
+    private $definitionCompiler;
 
 
     /**
@@ -103,23 +85,20 @@ class Definition implements IStrategy
      *
      * @param LoggerInterface       $log
      * @param bool                  $perform
-     * @param IApi                  $api
-     * @param CampusMapper          $campusMapper
+     * @param DefinitionCompiler    $definitionCompiler
      * @param TimetableCycleMapper  $timetableCycleMapper
      * @param TimetablePeriodMapper $timetablePeriodMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        IApi $api,
-        CampusMapper $campusMapper,
+        DefinitionCompiler $definitionCompiler,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->api = $api;
-        $this->campusMapper = $campusMapper;
+        $this->definitionCompiler = $definitionCompiler;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
     }
@@ -145,7 +124,7 @@ class Definition implements IStrategy
 
         /* Find the longest day (might be excessive, can't tell yet)
          */
-        $periodsInDays = (new DefinitionCompiler($this->api))->compile();
+        $periodsInDays = $this->definitionCompiler->compile();
         $dayLength = 0;
 
         foreach ($periodsInDays as $date => $periods) {
