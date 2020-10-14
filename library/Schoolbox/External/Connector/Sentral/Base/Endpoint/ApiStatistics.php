@@ -52,6 +52,7 @@ class ApiStatistics implements IStrategy
     {
         $this->log->info('');
         $this->log->info('API Endpoint Usage');
+        $this->log->info('(Note that each endpoint can configure page size...)');
 
         $apiUsage = $this->api->getUsage()->retrieve();
 
