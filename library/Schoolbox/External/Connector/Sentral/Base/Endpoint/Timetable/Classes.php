@@ -20,12 +20,8 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
-use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\UserMapper;
 use UnexpectedValueException;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Classes
@@ -36,6 +32,17 @@ use Zend\Uri\Exception\InvalidUriPartException;
  */
 class Classes implements IStrategy
 {
+
+    /* A short lookup for converting sentral dayName to an int because sentral
+     */
+    private const DAY_LOOKUP = [
+        'Mon' => '1',
+        'Tue' => '2',
+        'Wed' => '3',
+        'Thu' => '4',
+        'Fri' => '5'
+    ];
+
 
     /**
      * @var LoggerInterface
@@ -64,6 +71,12 @@ class Classes implements IStrategy
 
 
     /**
+     * @var Preloader
+     */
+    private $preloader;
+
+
+    /**
      * @var ClassEntryMapper
      */
     private $classEntryMapper;
@@ -88,6 +101,7 @@ class Classes implements IStrategy
      * @param bool                   $perform
      * @param Lookup                 $lookup
      * @param Registry               $registry
+     * @param Preloader              $preloader
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
@@ -97,6 +111,7 @@ class Classes implements IStrategy
         bool $perform,
         Lookup $lookup,
         Registry $registry,
+        Preloader $preloader,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper
@@ -105,6 +120,7 @@ class Classes implements IStrategy
         $this->perform = $perform;
         $this->lookup = $lookup;
         $this->registry = $registry;
+        $this->preloader = $preloader;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
@@ -120,6 +136,10 @@ class Classes implements IStrategy
     public function import(): void
     {
 
+        /* External Timetable Code (Cycle Identifier)
+         */
+        $ext = Definition::CYCLE_IDENTIFIER;
+
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
          *
@@ -130,26 +150,12 @@ class Classes implements IStrategy
         $users = $this->lookup->getUsers();
         $periods = $this->lookup->getPeriods();
 
-        /* Get a list of all the timetables to process
+        /* Get a list of all the students whose timetables we must process
          */
         $timetables = $this->registry->recallAll();
 
-        /* A short lookup for converting sentral dayName to an int because sentral
-         */
-        $dayLookup = [
-            'Mon' => '1',
-            'Tue' => '2',
-            'Wed' => '3',
-            'Thu' => '4',
-            'Fri' => '5'
-        ];
-
         foreach ($timetables as $studentId => $data) {
-            $timetable = $data['timetable'];
-
-            /* External Timetable Code (Cycle Identifier)
-             */
-            $ext = Definition::CYCLE_IDENTIFIER;
+            $timetable = $this->preloader->compile((string)$studentId);
 
             /* No timetable = no trabajo
              */
@@ -167,9 +173,9 @@ class Classes implements IStrategy
                 foreach ($dayPeriods as $periodSequence => $period) {
                     $class = [
                         'period' => [
-                            'day' => $dayLookup[$day],
+                            'day' => self::DAY_LOOKUP[$day],
                             'name' => $period['name'],
-                            'sequence' => $periodSequence,
+                            'sequence' => $period['sequence'],
                             'start' => $period['start'],
                             'end' => $period['finish']
                         ],

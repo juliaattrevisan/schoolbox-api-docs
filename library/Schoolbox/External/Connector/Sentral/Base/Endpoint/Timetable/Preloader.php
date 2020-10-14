@@ -10,17 +10,18 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
-use Schoolbox\External\Importer\Endpoint\IStrategy;
 
 /**
  * Class Preloader
  *
  * When we imported Students we remembered their ids so we can fetch their
- * individual timetables here
+ * individual timetables here. Each student timetable needs some more info
+ * compiled into it, such as teacher names etc. so we can do it here and
+ * save ourselves some hassle elsewhere
  *
  * @package Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable
  */
-class Preloader implements IStrategy
+class Preloader
 {
     /**
      * @var LoggerInterface
@@ -49,31 +50,57 @@ class Preloader implements IStrategy
 
 
     /**
+     * A date string in the format Y-m-d e.g. 2020-10-12
+     *
+     * @var string
+     */
+    private $fromDate;
+
+
+    /**
+     * A date string in the format Y-m-d e.g. 2020-10-12
+     *
+     * @var string
+     */
+    private $toDate;
+
+
+    /**
      * Preloader constructor.
      *
      * @param LoggerInterface $log
      * @param bool            $perform
      * @param Api             $api
      * @param Registry        $registry
+     * @param string          $fromDate
+     * @param string          $toDate
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         Api $api,
-        Registry $registry
+        Registry $registry,
+        string $fromDate,
+        string $toDate
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
         $this->registry = $registry;
+
+        $this->fromDate = $fromDate;
+        $this->toDate = $toDate;
     }
 
 
     /**
      * For every student we encountered, get their timetable
      * for the current week, Mon-Fri inclusive
+     *
+     * @param string $id
+     * @return array|null
      */
-    public function import(): void
+    public function compile(string $id): ?array
     {
 
         /* Use timetable-lessons endpoint with appropriate dates for the Monday of this week
@@ -82,106 +109,95 @@ class Preloader implements IStrategy
          * May or may not be buggy
          * https://stackoverflow.com/questions/1431631/get-date-for-monday-and-friday-for-the-current-week-php
          */
-        $monday = date('Y-m-d', strtotime('monday this week'));
-        $friday = date('Y-m-d', strtotime('friday this week'));
 
         /* Iterate through all the people we saw previously, in profile import
          */
-        foreach ($this->registry->recallAll() as $id => $data) {
-            $name = trim("{$data['student']['firstname']} {$data['student']['lastname']}");
+        $data = $this->registry->recall($id);
 
-            $endpoint = "timetables/student/{$id}/timetable-lessons?fromDate={$monday}&toDate={$friday}";
+        $name = trim("{$data['student']['firstname']} {$data['student']['lastname']}");
 
-            $this->log->debug(sprintf(
-                'Accessing endpoint %s',
-                $endpoint
-            ));
+        $endpoint = "timetables/student/{$id}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}";
 
-            /* Some endpoint accesses result in an endpoint saying you didn't provide a thing
-             * called a "timeview", i.e. "Missing timeview student information for the given student"
-             *
-             * This means they don't have any timetable data, but it results in a endpoint error
-             * from sentral and an exception being thrown by us. There's no api docs about it,
-             * I had to figure it out the hard way
-             */
-            try {
-                $payload = $this->api->retrieveDocument($endpoint);
+        $this->log->debug(sprintf(
+            'Accessing endpoint %s',
+            $endpoint
+        ));
 
-                $numRecords = \count($payload['data']);
+        /* Some endpoint accesses result in an endpoint saying you didn't provide a thing
+         * called a "timeview", i.e. "Missing timeview student information for the given student"
+         *
+         * This means they don't have any timetable data, but it results in a endpoint error
+         * from sentral and an exception being thrown by us. There's no api docs about it,
+         * I had to figure it out the hard way
+         */
+        try {
+            $payload = $this->api->retrieveDocument($endpoint);
 
-                if ($numRecords) {
-                    $this->log->debug(sprintf(
-                        'Found %s timetableLesson instances for %s (sentral id %s, externalId %s)',
-                        $numRecords,
-                        $name,
-                        $id,
-                        $data['student']['externalId']
-                    ));
-                }
-            } catch(\InvalidArgumentException $e) {
+            $numRecords = \count($payload['data']);
 
-                /* We can't process any timetables in those cases, so log it and continue
-                 */
-                $this->log->warning(sprintf(
-                    'Could not obtain timetable for %s (sentral id %s, externalId %s); they might not have a timetable in sentral.',
+            if ($numRecords) {
+                $this->log->debug(sprintf(
+                    'Found %s timetableLesson instances for %s (sentral id %s, externalId %s)',
+                    $numRecords,
                     $name,
                     $id,
                     $data['student']['externalId']
                 ));
-
-                $this->log->warning($e->getMessage());
-
-                continue;
             }
+        } catch(\InvalidArgumentException $e) {
 
-            /* Map a flat stack of timetableLesson instances into a hierarchical data struct
-             * Then remember (and use) this structure when creating Definition
-             *
-             * $studentId => [
-             *      dayName => [
-             *          periodNumber => [
-             *              details about the subject in this period for this person
-             *          ]
-             *      ]
-             * ]
+            /* We can't process any timetables in those cases, so log it and continue
              */
-            $timetable = [];
+            $this->log->warning(sprintf(
+                'Could not obtain timetable for %s (sentral id %s, externalId %s); they might not have a timetable in sentral.',
+                $name,
+                $id,
+                $data['student']['externalId']
+            ));
 
-            foreach ($payload['data'] as $timetableLesson) {
+            $this->log->warning($e->getMessage());
 
-                /* Go digging in another endpoint for names and identifier
-                 */
-                $teacher = [
-                    'externalId' => '',
-                    'firstname' => '',
-                    'surname' => '',
-                    'id' => '',
-                ];
+            return null;
+        }
 
-                if ($timetableLesson['attributes']['teacherIds'][0]) {
-                    $endpoint = "enrolments/person/{$timetableLesson['attributes']['teacherIds'][0]}";
+        /* Map a flat stack of timetableLesson instances into a hierarchical data struct
+         *
+         *      dayName => [
+         *          periodNumber => [
+         *              period attributes
+         *              (details about the subject in this period for this person)
+         *          ]
+         *      ]
+         */
+        $timetable = [];
 
-                    try {
-                        $teacherPayload = $this->api->retrieveDocument($endpoint);
+        foreach ($payload['data'] as $timetableLesson) {
+            $teacher = [
+                'externalId' => '',
+                'firstname' => '',
+                'surname' => '',
+                'id' => '',
+            ];
 
-                        $teacher = [
-                            'externalId' => $teacherPayload['data']['attributes']['externalId'],
-                            'firstname' => $teacherPayload['data']['attributes']['firstName'],
-                            'surname' => $teacherPayload['data']['attributes']['lastName'],
-                            'id' => $timetableLesson['attributes']['teacherIds'][0],
-                        ];
-                    } catch (\InvalidArgumentException $e) {
-                        $this->log->warning(sprintf(
-                            'Unknown teacher id %s (%s); using null identifier for now.',
-                            $timetableLesson['attributes']['teacherIds'][0],
-                            $timetableLesson['attributes']['teacherName']
-                        ));
-                    }
-                } else {
+            /* Go digging in another endpoint for names and identifier
+             */
+            if ('' !== (string)$timetableLesson['attributes']['teacherIds'][0]) {
+                $endpoint = "enrolments/person/{$timetableLesson['attributes']['teacherIds'][0]}";
+
+                try {
+                    $teacherPayload = $this->api->retrieveDocument($endpoint);
+
+                    $teacher = [
+                        'externalId' => $teacherPayload['data']['attributes']['externalId'],
+                        'firstname' => $teacherPayload['data']['attributes']['firstName'],
+                        'surname' => $teacherPayload['data']['attributes']['lastName'],
+                        'id' => $timetableLesson['attributes']['teacherIds'][0],
+                    ];
+                } catch (\InvalidArgumentException $e) {
                     $this->log->warning(sprintf(
-                        'No teachers set for class %s %s; using null identifier for now.',
-                        $timetableLesson['attributes']['subject'],
-                        $timetableLesson['attributes']['className']
+                        'Unknown teacher id %s (%s) in sentral; using empty identifier for now.',
+                        $timetableLesson['attributes']['teacherIds'][0],
+                        $timetableLesson['attributes']['teacherName']
                     ));
 
                     $teacher = [
@@ -191,29 +207,29 @@ class Preloader implements IStrategy
                         'id' => $timetableLesson['attributes']['teacherIds'][0],
                     ];
                 }
-
-                $timetable[$timetableLesson['attributes']['dayName']][$timetableLesson['attributes']['periodOrder']] = [
-                    'day'      => $timetableLesson['attributes']['dayName'],
-                    'name'     => "Period {$timetableLesson['attributes']['periodName']}",
-                    'start'    => $timetableLesson['attributes']['startTime'],
-                    'finish'   => $timetableLesson['attributes']['endTime'],
-                    'sequence' => $timetableLesson['attributes']['periodOrder'],
-                    'subject'  => [
-                        'name'     => $timetableLesson['attributes']['subject'],
-                        'code'     => $timetableLesson['attributes']['className'],
-                        'room'     => $timetableLesson['attributes']['roomName'],
-                        'teachers' => $teacher
-                    ]
-                ];
+            } else {
+                $this->log->warning(sprintf(
+                    'No teachers set for class %s %s; using empty identifier for now.',
+                    $timetableLesson['attributes']['subject'],
+                    $timetableLesson['attributes']['className']
+                ));
             }
 
-            /* Remember it in the Registry instance because we left ourselves
-             * a nice spot for it to fit
-             */
-            $this->registry->remember((string)$id, [
-                'student' => $data['student'],
-                'timetable' => $timetable
-            ]);
+            $timetable[$timetableLesson['attributes']['dayName']][$timetableLesson['attributes']['periodOrder']] = [
+                'day'      => $timetableLesson['attributes']['dayName'],
+                'name'     => "Period {$timetableLesson['attributes']['periodName']}",
+                'start'    => $timetableLesson['attributes']['startTime'],
+                'finish'   => $timetableLesson['attributes']['endTime'],
+                'sequence' => $timetableLesson['attributes']['periodOrder'],
+                'subject'  => [
+                    'name'     => $timetableLesson['attributes']['subject'],
+                    'code'     => $timetableLesson['attributes']['className'],
+                    'room'     => $timetableLesson['attributes']['roomName'],
+                    'teachers' => $teacher
+                ]
+            ];
         }
+
+        return $timetable;
     }
 }

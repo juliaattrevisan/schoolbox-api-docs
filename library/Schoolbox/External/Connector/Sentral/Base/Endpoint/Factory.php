@@ -12,6 +12,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable\Preloader;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
@@ -196,6 +197,8 @@ class Factory
      */
     public function produce(): GenericCollection
     {
+        $api = new Api($this->host, $this->key);
+
         /* Cache a list of known users and periods
          * Every student timetable processing uses info stored there
          */
@@ -205,7 +208,19 @@ class Factory
          */
         $registry = new Registry();
 
-        $api = new Api($this->host, $this->key);
+        /* A Timetable compiler
+         */
+        $monday = date('Y-m-d', strtotime('monday this week'));
+        $friday = date('Y-m-d', strtotime('friday this week'));
+
+        $preloader = new Preloader(
+            $this->log,
+            $this->perform,
+            $api,
+            $registry,
+            $monday,
+            $friday
+        );
 
         return (new GenericCollection(IStrategy::class))
 
@@ -235,12 +250,6 @@ class Factory
                 $this->staffProfileMapper,
                 $this->relationshipMapper
              ))
-            ->add(new Timetable\Preloader(
-                $this->log,
-                $this->perform,
-                $api,
-                $registry
-            ))
             ->add(new Timetable\Definition(
                 $this->log,
                 $this->perform,
@@ -254,6 +263,7 @@ class Factory
                 $this->perform,
                 $lookup,
                 $registry,
+                $preloader,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
