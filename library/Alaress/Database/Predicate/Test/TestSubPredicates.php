@@ -130,7 +130,7 @@ class TestSubPredicates extends TestCase
         // Each should be present in the WHERE clause
         $where = implode(' AND ', $pb->getWhere());
         foreach (array_keys($pb->getParams()) as $placeholder) {
-            $this->assertContains($placeholder, $where);
+            $this->assertStringContainsString($placeholder, $where);
         }
     }
 }

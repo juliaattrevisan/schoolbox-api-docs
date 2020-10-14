@@ -119,7 +119,6 @@ class TranslatorTest extends TestCase
     /**
      * Test translation of data model with no assessment.
      *
-     *
      */
     public function testTranslateEmptyAssessmentToDomainModel()
     {

@@ -110,7 +110,7 @@ class ObjectReaderTest extends TestCase
     {
         $reader = new ObjectReader();
         $value = $reader->coerce($input);
-        $this->assertInternalType('string', $value);
+        $this->assertIsString($value);
         $this->assertEquals($expected, $value);
     }
 

@@ -377,7 +377,8 @@ class SummatorTest extends TestCase
          *      = 2338 / 29
          *      = 80.620689655
          */
-        $this->assertEquals(80.620689655, $project->getNormalisedMark($project->getParticipant($this->hodes), false), '', $this->delta);
+        $value = $project->getNormalisedMark($project->getParticipant($this->hodes), false);
+        $this->assertEqualsWithDelta(80.620689655, $value, $this->delta);
     }
 
 
@@ -408,7 +409,8 @@ class SummatorTest extends TestCase
          *      = 980 / 13
          *      = 75.38461538462
          */
-        $this->assertEquals(75.38461538462, $project->getNormalisedMark($project->getParticipant($this->hodes), true), '', $this->delta);
+        $value = $project->getNormalisedMark($project->getParticipant($this->hodes), true);
+        $this->assertEqualsWithDelta(75.38461538462, $value, $this->delta);
 
         /* Most Recent Weighted Average is
          *      = [(100*5) + ((100 * 12/20)*8)] / 13
@@ -416,7 +418,8 @@ class SummatorTest extends TestCase
          *      = 980 / 13
          *      = 75.38461538462
          */
-        $this->assertEquals(75.38461538462, $project->getNormalisedMark($project->getParticipant($this->hodes), false), '', $this->delta);
+        $value = $project->getNormalisedMark($project->getParticipant($this->hodes), false);
+        $this->assertEqualsWithDelta(75.38461538462, $value, $this->delta);
     }
 
 
@@ -538,8 +541,10 @@ class SummatorTest extends TestCase
         *       = 3866/58
         *       = 66.655172414
         */
-        $this->assertEquals(65.962962963, $project->getNormalisedMark($project->getParticipant($this->hodes), true), '', $this->delta);
-        $this->assertEquals(66.655172414, $project->getNormalisedMark($project->getParticipant($this->hodes), false), '', $this->delta);
+        $value = $project->getNormalisedMark($project->getParticipant($this->hodes), true);
+        $this->assertEqualsWithDelta(65.962962963, $value, $this->delta);
+        $value = $project->getNormalisedMark($project->getParticipant($this->hodes), false);
+        $this->assertEqualsWithDelta(66.655172414, $value, $this->delta);
     }
 
 

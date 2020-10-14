@@ -20,8 +20,8 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use InvalidArgumentException;
 use PHPUnit;
-use PHPUnit_Framework_MockObject_MockObject;
-use PHPUnit_Framework_MockObject_RuntimeException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\RuntimeException;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Resource\Folder;
 
@@ -540,14 +540,14 @@ class VisibilityTests extends TestCase
     /**
      * Builds a mock of the Access dependency
      *
-     * @return Access|PHPUnit_Framework_MockObject_MockObject
+     * @return Access|MockObject
      * @throws PHPUnit\Framework\Exception
-     * @throws PHPUnit_Framework_MockObject_RuntimeException
+     * @throws RuntimeException
      * @see $this->buildUsers()
      */
-    private function getMockAccess(): PHPUnit_Framework_MockObject_MockObject
+    private function getMockAccess(): MockObject
     {
-        /** @var Access|PHPUnit_Framework_MockObject_MockObject $mockAccess */
+        /** @var Access|MockObject $mockAccess */
         $mockAccess = $this->createMock(Access::class);
         $mockAccess
             ->expects($this->any())

@@ -59,7 +59,7 @@ class ExceptionFilterTest extends TestCase
 
         $event  = $this->buildEvent(InvalidArgumentException::class, OutOfBoundsException::class);
         $filter = $this->buildFilter(InvalidArgumentException::class, OutOfBoundsException::class);
-        yield 'multi-class event matches multi-class filter' => [$event, $filter, true];
+        yield 'multi-class event matches multi-class filter2' => [$event, $filter, true];
         unset($event, $filter);
 
 
@@ -71,7 +71,7 @@ class ExceptionFilterTest extends TestCase
 
         $event  = $this->buildEvent(LengthException::class);
         $filter = $this->buildFilter(InvalidArgumentException::class, OutOfBoundsException::class);
-        yield 'single-class event does not match multi-class filter' => [$event, $filter, false];
+        yield 'single-class event does not match multi-class filter2' => [$event, $filter, false];
         unset($event, $filter);
 
         $event  = $this->buildEvent(LengthException::class, OutOfBoundsException::class);
@@ -81,7 +81,7 @@ class ExceptionFilterTest extends TestCase
 
         $event  = $this->buildEvent(LengthException::class, OverflowException::class);
         $filter = $this->buildFilter(InvalidArgumentException::class, OutOfBoundsException::class);
-        yield 'multi-class event does not match multi-class filter' => [$event, $filter, false];
+        yield 'multi-class event does not match multi-class filter2' => [$event, $filter, false];
         unset($event, $filter);
 
 
