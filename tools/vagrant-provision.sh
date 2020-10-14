@@ -309,7 +309,7 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Removing cache directories";
 /vagrant/tools/clean-cache-dir.sh;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating composer autoload";
-composer dump-autoload -o --no-interaction -vvv;
+composer dump-autoload -o --no-interaction;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building SQL updates";
 cd tools;
