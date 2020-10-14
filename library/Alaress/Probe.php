@@ -40,7 +40,7 @@ class Alaress_Probe
             $height = '';
 
             if ($numArgs > 1) {
-                $height = 'height:100%;';
+                $height = 'max-height:100%;';
             }
 
             for ($i = 0; $i < $numArgs; $i++) {
