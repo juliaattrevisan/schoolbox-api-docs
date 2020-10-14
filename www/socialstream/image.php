@@ -11,7 +11,6 @@
 namespace SocialStream;
 
 use Alaress\Image;
-use Alaress\Image\Implementation\Imagine;
 use Alaress_Date_Format;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\FilesystemInterface;
@@ -76,7 +75,7 @@ try {
     ) {
         $preSignedUrlService = new PreSignedUrlService($config);
         $resourcePath = $storage->getPath();
-        
+
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storage,
             Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
@@ -86,13 +85,7 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $cache     = new Image\Cache\Storage($storage, $size);
-    $processor = new Image\Processor\Standard(
-        $cache,
-        new Image\Transformation\Storage(),
-        new Imagine\Filetype\Factory(),
-        new Imagine\Processor\Strategy\Factory()
-    );
+    $processor = new Image\Processor($storage, $size, (new Image\Transformation\Storage())->retrieve($size));
     $processor->load()->stream();
 } catch (\Throwable $e) {
     \SitePage::redirectToBrokenImageWithTransform('storage', $size);

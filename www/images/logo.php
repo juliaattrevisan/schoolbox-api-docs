@@ -7,9 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Image\Cache;
-use Alaress\Image\Implementation\Imagine;
-use Alaress\Image\Processor\Freeform;
+use Alaress\Image;
 use Alaress\Image\Transformation;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
@@ -92,12 +90,8 @@ try {
 
     /* Process and stream image
      */
-    $imageProcessor = new Freeform(
-        new Cache\Storage($resource, $key),
-        new Transformation\MyImage($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]),
-        new Imagine\Filetype\Factory(),
-        new Imagine\Processor\Strategy\Factory()
-    );
+    $transform      = (new Transformation\MyImage())->retrieve($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]);
+    $imageProcessor = new Image\Processor($resource, $key, $transform);
     $imageProcessor->load()->stream();
 } catch (Exception $e) {
     $placeHolderFile = __DIR__ . $logoSizes[$logo][$size][2];

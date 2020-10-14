@@ -27,16 +27,16 @@ class Placement extends HasDimensions
     /**
      * Positioning of the image within the canvas, eg 'topleft'
      *
-     * @var null|string
+     * @var string
      */
     private $position;
 
     /**
      * @param int         $width
      * @param int         $height
-     * @param string|null $position TODO review usages of this and consider tightening interface
+     * @param string|null $position
      */
-    public function __construct(int $width, int $height, ?string $position)
+    public function __construct(int $width, int $height, string $position = 'topleft')
     {
         parent::__construct($width, $height);
         $this->position = $position;
@@ -84,7 +84,7 @@ class Placement extends HasDimensions
     private function getImageBoxPoint(
         BoxInterface $canvasBox,
         BoxInterface $imageBox,
-        $alignment = 'center'
+        string $alignment = 'center'
     ) {
         $xLeft   = 0;
         $xRight  = $canvasBox->getWidth() - $imageBox->getWidth();

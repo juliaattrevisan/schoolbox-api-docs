@@ -14,6 +14,7 @@ use League\Flysystem\FilesystemInterface;
 use League\Flysystem\MountManager;
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\Mimetype;
+use function sprintf;
 
 /**
  * Class Manager
@@ -99,7 +100,30 @@ class Manager
      */
     public function calcPath(IStorage $storage)
     {
-        return sprintf("%s%s", chunk_split($storage->getHash(), 5, '/'), $storage->getHash());
+        return self::getPathFromHash($storage->getHash());
+    }
+
+    /**
+     * Returns a relative path for the specified hash
+     *
+     * @param string $hash
+     * @return string
+     */
+    public static function getPathFromHash(string $hash): string
+    {
+        return sprintf("%s%s", chunk_split($hash, 5, '/'), $hash);
+    }
+
+    /**
+     * Returns a relative path for the specified hash + cacheKey
+     *
+     * @param string $hash
+     * @param string $cacheKey
+     * @return string
+     */
+    public static function getTransformPath(string $hash, string $cacheKey): string
+    {
+        return sprintf('%s-%s', self::getPathFromHash($hash), $cacheKey);
     }
 
     /**

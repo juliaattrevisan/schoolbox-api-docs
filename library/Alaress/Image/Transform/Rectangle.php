@@ -31,7 +31,7 @@ class Rectangle extends HasDimensions
     public function __construct(int $width, int $height)
     {
         parent::__construct($width, $height);
-        $this->placementTransform = new Placement($width, $height, null);
+        $this->placementTransform = new Placement($width, $height);
     }
 
     /**

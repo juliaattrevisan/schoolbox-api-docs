@@ -7,10 +7,13 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Image;
+use Alaress\Image\Transformation;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -42,13 +45,8 @@ try {
             }
         }
 
-        $image = new Alaress\Image\Storage(
-            $resource,
-            $size,
-            new \Alaress\Image\Transformation\Storage()
-        );
-
-        $image->stream();
+        $imageProcessor = new Image\Processor($resource, $size, (new Transformation\Storage())->retrieve($size));
+        $imageProcessor->load()->stream();
         exit;
     }
 } catch (Exception $e) {

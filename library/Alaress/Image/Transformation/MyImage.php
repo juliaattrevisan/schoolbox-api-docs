@@ -7,37 +7,21 @@
 
 namespace Alaress\Image\Transformation;
 
+use Alaress\Image\ITransform;
 use Alaress\Image\Transform\Constrain;
-use OutOfBoundsException;
 
 /**
  * Accepts dynamic url parameters to create a dynamic transformation list
  */
-class MyImage implements ITransformation
+class MyImage
 {
-    /** @var int */
-    private $width;
-    /** @var int */
-    private $height;
-
     /**
-     * Accept arguments in transformation list
-     *
      * @param int $width
      * @param int $height
+     * @return ITransform
      */
-    public function __construct(int $width, int $height)
+    public function retrieve(int $width, int $height): ITransform
     {
-        $this->width  = $width;
-        $this->height = $height;
-    }
-
-    /** @inheritDoc */
-    public function retrieve(string $key): array
-    {
-        if ($key === 'Constrain') {
-            return [new Constrain($this->width, $this->height)];
-        }
-        throw new OutOfBoundsException('Could not load transformation list.');
+        return new Constrain($width, $height);
     }
 }

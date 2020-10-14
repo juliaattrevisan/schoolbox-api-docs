@@ -7,15 +7,18 @@
 
 namespace Alaress\Image\Transformation;
 
+use Alaress\Image\ITransform;
 use Alaress\Image\Transform\Crop;
+use Alaress\Image\Transform\Sequence;
 use Alaress\Image\Transform\Square;
 use InvalidArgumentException;
-use OutOfBoundsException;
 use Schoolbox\Realtime\Message\NSMapper;
+use function array_flip;
 use function array_key_exists;
+use function count;
 use function in_array;
 
-class Icon implements ITransformation
+class Icon
 {
     // map namespaces to appropriate icons
     private const NAMESPACE_MAP = [
@@ -66,26 +69,18 @@ class Icon implements ITransformation
         'sports',
     ];
 
-    /** @var int */
-    private $top;
-    /** @var int */
-    private $bottom;
-    /** @var int */
-    private $size;
 
     /**
-     * Create the list of valid transforms
-     *
      * @param string $icon
      * @param int    $size
-     * @throws InvalidArgumentException If icon is unrecognised or size is invalid
+     * @return ITransform
+     * @throws InvalidArgumentException
      */
-    public function __construct(string $icon, int $size = 64)
+    public function retrieve(string $icon, int $size = 64): ITransform
     {
         if (!in_array($size, self::VALID_SIZES, true)) {
             throw new InvalidArgumentException("Invalid size given: $size");
         }
-        $this->size = $size;
 
         // ensure this list accurately reflects the sprite file!
         $crops = array_flip(self::VALID_CROPS);
@@ -102,17 +97,9 @@ class Icon implements ITransformation
         $step  = 100 / $count;
 
         // Coords are percentages
-        $this->top    = (int)($index * $step);
-        $this->bottom = (int)(($index + 1) * $step);
-        $this->size   = $size;
-    }
+        $top    = (int)($index * $step);
+        $bottom = (int)(($index + 1) * $step);
 
-    /** @inheritDoc */
-    public function retrieve(string $key): array
-    {
-        if ($key === 'Icon') {
-            return [new Crop(0, $this->top, 100, $this->bottom), new Square($this->size)];
-        }
-        throw new OutOfBoundsException('Could not load transformation list.');
+        return new Sequence(new Crop(0, $top, 100, $bottom), new Square($size));
     }
 }

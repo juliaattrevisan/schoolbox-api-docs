@@ -8,8 +8,7 @@
  */
 
 use Alaress\Image\Cache;
-use Alaress\Image\Implementation\Imagine;
-use Alaress\Image\Processor\Freeform;
+use Alaress\Image;
 use Schoolbox\Config\ConfigMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -52,29 +51,28 @@ switch ($code) {
 //
 // Build the transformation.
 // If there's no valid transformation, then transform to a given size.
-$transform     = null;
-$transform_key = null;
-$cache_key     = '';
+$transform = null;
+$cache_key = null;
 switch ($_GET['transform_type']) {
     case 'portrait':
         $path          = '/images/core/placeholder.png';
-        $transform     = new \Alaress\Image\Transformation\Portrait();
+        $transforms     = new Image\Transformation\Portrait();
         $transform_key = $_GET['transform'];
         try {
-            $transform->retrieve($transform_key);
+            $transform = $transforms->retrieve($transform_key ?? '');
         } catch (\OutOfBoundsException $e) {
-            $transform_key = 'profile';
+            $transform = $transforms->retrieve('profile');
         }
         $cache_key = "portrait-$transform_key";
         break;
 
     case 'storage':
-        $transform     = new \Alaress\Image\Transformation\Storage();
+        $transforms     = new Image\Transformation\Storage();
         $transform_key = $_GET['transform'];
         try {
-            $transform->retrieve($transform_key);
+            $transform = $transforms->retrieve($transform_key ?? '');
         } catch (\OutOfBoundsException $e) {
-            $transform_key = 'maxsize';
+            $transform = $transforms->retrieve('maxsize');
         }
         $cache_key = "storage-$transform_key";
         break;
@@ -82,22 +80,14 @@ switch ($_GET['transform_type']) {
     default:
         $width     = intval($_GET['width']) ?: 100;
         $height    = intval($_GET['height']) ?: 100;
-        $transform = new \Alaress\Image\Transformation\MyImage($width, $height);
+        $transform = (new Image\Transformation\MyImage())->retrieve($width, $height);
         $cache_key = "{$width}x{$height}";
         break;
 }
 
 // Try to output the fail image. If even THAT fails, just redirect to the image.
 try {
-    $imageProcessor = new Freeform(
-        new Cache\BrokenFS(WEB_root, $path, $cache_key),
-        $transform,
-        new Imagine\Filetype\Factory(),
-        new Imagine\Processor\Strategy\Factory()
-    );
-    if (isset($transform_key)) {
-        $imageProcessor->setTransformKey($transform_key);
-    }
+    $imageProcessor = new Image\Processor(Cache\LocalFS::getStorageModel(WEB_root, $path), $cache_key, $transform);
     $imageProcessor->load()->stream();
 } catch (Exception $e) {
     SitePage::localRedir($path);

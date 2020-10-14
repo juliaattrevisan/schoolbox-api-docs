@@ -7,38 +7,37 @@
 
 namespace Alaress\Image\Cache;
 
-use League\Flysystem as Fly;
+use League\Flysystem;
 use LogicException;
 use Schoolbox\File;
-use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Resource;
+use Schoolbox\Resource\Storage;
 
 /**
  * Hardcoded to use the local file system, regardless of system's configured storage implementation
  */
-class LocalFS extends Storage
+class LocalFS
 {
     /**
      * @param string $dir
      * @param string $filename
-     * @param string $key
-     * @throws File\Exception
+     * @return Storage\Model
      * @throws LogicException
+     * @throws File\Exception
      * @throws Mapper\Exception
      */
-    public function __construct(string $dir, string $filename, string $key)
+    public static function getStorageModel(string $dir, string $filename): Storage\Model
     {
-        $fs = new Fly\Filesystem(new Fly\Adapter\Local($dir));
+        $fs = new Flysystem\Filesystem(new Flysystem\Adapter\Local($dir));
 
         // setup an object to work with so it can get into cache
         $file = Resource\Storage\Mapper::getInstance()->createModel();
         $file->setFilesystem($fs)
              ->setPath($filename)
-             ->setMimetype(MimetypeMapper::getInstance()->getByFilename($filename))
+             ->setMimetype(File\MimetypeMapper::getInstance()->getByFilename($filename))
              ->setHash(null)
              ->getHash();
-
-        parent::__construct($file, $key);
+        return $file;
     }
 }

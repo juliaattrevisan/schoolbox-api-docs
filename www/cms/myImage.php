@@ -7,10 +7,10 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Image\Cache;
-use Alaress\Image\Processor;
+use Alaress\Image;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Resource\Storage;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -32,23 +32,21 @@ try {
 }
 
 if (isset($_GET['key'])) {
-    $key       = $_GET['key'];
-    $transform = new \Alaress\Image\Transformation\Storage();
-
+    $cacheKey   = $_GET['key'];
+    $transform = (new Image\Transformation\Storage())->retrieve($cacheKey);
 } elseif (isset($_GET['width']) && isset($_GET['height'])) {
-    $key       = $_GET['width'] . 'x' . $_GET['height'];
-    $transform = new \Alaress\Image\Transformation\MyImage($_GET['width'], $_GET['height']);
-
+    $cacheKey   = $_GET['width'] . 'x' . $_GET['height'];
+    $transform = (new Image\Transformation\MyImage())->retrieve((int)$_GET['width'], (int)$_GET['height']);
 } else {
     redirectToBroken(400);
     exit;
 }
 
+/** @var Storage\Model $storageModel */
+$storageModel = $image->getStorage();
+$processor    = new Image\Processor($storageModel, $cacheKey, $transform);
 try {
-    /** @var Schoolbox\Resource\My\File\Model $image */
-    $cache = new Cache\Storage($image->getStorage(), $key);
-    createProcessor($cache, $transform)->load()->stream();
-
+    $processor->load()->stream();
 } catch (SchoolboxNotFoundException $e) {
     redirectToBroken(404);
 
@@ -67,22 +65,5 @@ function redirectToBroken($code = 500)
         SitePage::redirectToBrokenImageWithTransform('storage', $_GET['key'], $code);
     } elseif (isset($_GET['width'])) {
         SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height '] ?: $_GET['width'], $code);
-    }
-}
-
-/**
- * @param $cache
- * @param $transform
- * @return Processor\Standard
- */
-function createProcessor($cache, $transform)
-{
-    $ftFactory    = new \Alaress\Image\Implementation\Imagine\Filetype\Factory();
-    $stratFactory = new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory();
-
-    if (isset($_GET['key'])) {
-        return new Processor\Standard($cache, $transform, $ftFactory, $stratFactory);
-    } else {
-        return new Processor\Freeform($cache, $transform, $ftFactory, $stratFactory);
     }
 }

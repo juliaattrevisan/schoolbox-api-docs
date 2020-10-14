@@ -20,10 +20,10 @@ class Mapper extends \Schoolbox\Mapper
 {
 
     // Table definition
-    public const TABLE_NAME       = 'storage_transform';
-    public const FIELD_HASH       = 'hash';
-    public const FIELD_TRANSFORM  = 'transform';
-    public const FIELD_SIZE       = 'size';
+    public const TABLE_NAME      = 'storage_transform';
+    public const FIELD_HASH      = 'hash';
+    public const FIELD_CACHE_KEY = 'transform';
+    public const FIELD_SIZE      = 'size';
 
     /**
      * @inheritdoc
@@ -33,21 +33,21 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable(self::TABLE_NAME);
         $this->hasModel(Model::class);
         $this->uses(self::FIELD_HASH, self::TYPE_STRING);
-        $this->uses(self::FIELD_TRANSFORM, self::TYPE_STRING, null, 'cacheKey');
+        $this->uses(self::FIELD_CACHE_KEY, self::TYPE_STRING, null, 'cacheKey');
         $this->uses(self::FIELD_SIZE, self::TYPE_INTEGER);
     }
 
     /**
      * @param string $hash
-     * @param string $transform
+     * @param string $cacheKey
      *
      * @return bool
      */
-    public function checkIfRecordExists(string $hash, string $transform): bool
+    public function checkIfRecordExists(string $hash, string $cacheKey): bool
     {
         $columnLists = [
             self::FIELD_HASH        => $hash,
-            self::FIELD_TRANSFORM   => $transform
+            self::FIELD_CACHE_KEY => $cacheKey
         ];
 
         if ($this->countByColumnList($columnLists)) {
@@ -74,5 +74,20 @@ class Mapper extends \Schoolbox\Mapper
                                     ->setCacheKey($cacheKey)
                                     ->setSize($size);
         $this->save($imageTransformation);
+    }
+
+    /**
+     * Returns the model for the specified hash + cache key, if found
+     *
+     * @param string $hash
+     * @param string $cacheKey
+     * @return Model|null
+     */
+    public function findByHashAndCacheKey(string $hash, string $cacheKey): ?Model
+    {
+        return $this->findByColumnList([
+            self::FIELD_HASH => $hash,
+            self::FIELD_CACHE_KEY=> $cacheKey,
+        ])->first();
     }
 }

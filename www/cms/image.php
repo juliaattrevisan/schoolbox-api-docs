@@ -7,9 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Image\Cache;
-use Alaress\Image\Implementation\Imagine;
-use Alaress\Image\Processor\Freeform;
+use Alaress\Image\Processor;
 use Alaress\Image\Transformation;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
@@ -30,7 +28,7 @@ session_start();
 
 /* Choose a caching method to use
  */
-$key = $_GET['width'] . 'x' . $_GET['height'];
+$cacheKey = $_GET['width'] . 'x' . $_GET['height'];
 
 try {
     $file = Schoolbox\Resource\File\Mapper::getInstance()->findById($_GET['id']);
@@ -67,18 +65,14 @@ try {
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $resource,
             Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
-            ($key && strpos($resourcePath, '-') === false) ? $resourcePath . '-' . $key : $resourcePath
+            ($cacheKey && strpos($resourcePath, '-') === false) ? $resourcePath . '-' . $cacheKey : $resourcePath
         );
 
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $imageProcessor = new Freeform(
-        new Cache\Storage($resource, $key),
-        new Transformation\MyImage($_GET['width'], $_GET['height']),
-        new Imagine\Filetype\Factory(),
-        new Imagine\Processor\Strategy\Factory()
-    );
+    $transform      = (new Transformation\MyImage())->retrieve((int)$_GET['width'], (int)$_GET['height']);
+    $imageProcessor = new Processor($resource, $cacheKey, $transform);
     $imageProcessor->load()->stream();
 } catch (SchoolboxNotFoundException $e) {
     SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
