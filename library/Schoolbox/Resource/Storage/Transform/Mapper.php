@@ -33,7 +33,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable(self::TABLE_NAME);
         $this->hasModel(Model::class);
         $this->uses(self::FIELD_HASH, self::TYPE_STRING);
-        $this->uses(self::FIELD_TRANSFORM, self::TYPE_STRING);
+        $this->uses(self::FIELD_TRANSFORM, self::TYPE_STRING, null, 'cacheKey');
         $this->uses(self::FIELD_SIZE, self::TYPE_INTEGER);
     }
 
@@ -61,17 +61,17 @@ class Mapper extends \Schoolbox\Mapper
      * Creates a new Transform record in database
      *
      * @param string $hash
-     * @param string $transform
+     * @param string $cacheKey
      * @param int    $size
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function createRecord(string $hash, string $transform, int $size): void
+    public function createRecord(string $hash, string $cacheKey, int $size): void
     {
         $imageTransformation = $this->createModel()
                                     ->setHash($hash)
-                                    ->setTransform($transform)
+                                    ->setCacheKey($cacheKey)
                                     ->setSize($size);
         $this->save($imageTransformation);
     }

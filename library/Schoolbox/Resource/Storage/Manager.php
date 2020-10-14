@@ -93,11 +93,11 @@ class Manager
      * 5 hex digits = 16^5 = 1,048,576 <= the maximum number of inodes that would exist in any one directory,
      * which is well within the acceptable limits of filesystems we use.
      *
-     * @param Model $storage
+     * @param IStorage $storage
      *
      * @return string
      */
-    public function calcPath(Model $storage)
+    public function calcPath(IStorage $storage)
     {
         return sprintf("%s%s", chunk_split($storage->getHash(), 5, '/'), $storage->getHash());
     }

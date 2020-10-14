@@ -19,9 +19,15 @@ class Model
     private $hash;
 
     /**
+     * The cacheKey does not always equal the transformation name.
+     *
+     * This is the latter fragment of the fileName, eg "[hash]-[cacheKey]"
+     * The transformKey is just a name of some transformation, but that transformation may have
+     * different parameters, and hence a single transform key can generate many cache keys.
+     *
      * @var string
      */
-    private $transform;
+    private $cacheKey;
 
     /**
      * @var integer
@@ -41,13 +47,13 @@ class Model
     }
 
     /**
-     * @param string $transform
+     * @param string $cacheKey
      *
      * @return $this
      */
-    public function setTransform(string $transform): self
+    public function setCacheKey(string $cacheKey): self
     {
-        $this->transform = $transform;
+        $this->cacheKey = $cacheKey;
 
         return $this;
     }
@@ -75,9 +81,9 @@ class Model
     /**
      * @return string
      */
-    public function getTransform(): ?string
+    public function getCacheKey(): ?string
     {
-        return $this->transform;
+        return $this->cacheKey;
     }
 
     /**
