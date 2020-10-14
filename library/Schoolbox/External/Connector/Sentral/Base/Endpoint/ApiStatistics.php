@@ -27,7 +27,7 @@ class ApiStatistics implements IStrategy
 
 
     /**
-     * @var IApi[]
+     * @var IApi
      */
     private $api;
 
