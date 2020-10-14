@@ -21,24 +21,7 @@ export default {
     computed: {
         config: () => window.learningMomentsFeedConfig,
         groupedMoments() {
-            let groupedMoments = {};
-            this.data.forEach(v => {
-                let createdAt = moment(v.createdAt),
-                    updatedAt = moment(v.updatedAt),
-                    key       = createdAt.format('YYYYMMDD');
-                if (!(key in groupedMoments)) {
-                    groupedMoments[key] = {
-                        date:    moment(createdAt).startOf('d'),
-                        moments: []
-                    }
-                }
-                v.createdAt = createdAt;
-                v.updatedAt = updatedAt;
-                groupedMoments[key].moments.push(v);
-            });
-            return Object.values(groupedMoments).sort(
-                (a, b) => a.date.isBefore(b.date) ? 1 : -1
-            );
+            return this.groupMoments(this.data);
         }
     },
     mounted() {
@@ -59,6 +42,45 @@ export default {
                 })
                 .finally(() => this.showSkeletonLoader = false);
         },
+
+        /**
+         * Groups the learning moments by the date which they were posted.
+         *
+         * @param {Array} moments
+         * @return Array
+         */
+        groupMoments(moments) {
+            let groupedMomentsByDate = {};
+            moments.forEach(v => {
+                let createdAt = moment(v.createdAt),
+                        updatedAt = moment(v.updatedAt),
+                        key       = createdAt.format('YYYYMMDD');
+                if (!(key in groupedMomentsByDate)) {
+                    groupedMomentsByDate[key] = {
+                        date:    moment(createdAt).startOf('d'),
+                        moments: []
+                    }
+                }
+                v.createdAt = createdAt;
+                v.updatedAt = updatedAt;
+                groupedMomentsByDate[key].moments.push(v);
+            });
+
+            // Flatten grouped moments into an array
+            let groupedMoments = Object.values(groupedMomentsByDate).sort(
+                (a, b) => a.date.isBefore(b.date) ? 1 : -1
+            );
+
+            // Ensure that each moment within the group is sorted
+            groupedMoments.forEach(v => {
+                v.moments.sort(
+                    (a, b) => a.createdAt.isBefore(b.createdAt) ? 1 : -1
+                )
+            });
+
+            return groupedMoments;
+        },
+
         /**
          * Renders the created-at time as a string.
          * *
