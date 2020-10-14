@@ -20,6 +20,7 @@ export default {
     },
     computed: {
         config: () => window.learningEvidenceFeedConfig,
+        dateDisplayFormats: () => window.dateDisplayFormats,
         groupedEvidence() {
             return this.groupEvidence(this.data);
         }
@@ -116,7 +117,7 @@ export default {
                         <a href="#" title="View Profile">
                             <img :src="'/portrait.php?id=' + Number(evidence.creator.id) + '&amp;size=square64'" alt="View Profile">
                         </a>
-                        | {{ evidence.createdAt.format('h:mma') }}
+                        | {{ evidence.createdAt.format(dateDisplayFormats.momentJsTime) }}
                     </div>
                 </div>
 
