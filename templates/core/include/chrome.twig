@@ -30,7 +30,7 @@
         <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/datepicker.css?v={{ config.site_version }}" />
         <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css?v={{ config.site_version }}" />
         <link rel="Shortcut Icon" href="/images/logo.php?logo=skin_logo_square&size=favicon" type="image/x-icon" />
-        {% if tour.data and not user.impersonated %}
+        {% if tour.data is defined and not user.impersonated %}
         {% autoescape 'js' %}
         <script type="text/javascript">
             window.tourData = {{ tour.data|json_encode|raw }};
