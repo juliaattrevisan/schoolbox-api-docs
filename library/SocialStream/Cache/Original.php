@@ -180,9 +180,9 @@ class Original extends \Alaress_Cache_Abstract
     /**
      * Get the storage instance representing this file
      *
-     * @return Storage\IStorage
+     * @return null|Storage\IStorage
      */
-    public function getFile(): Storage\IStorage
+    public function getFile(): ?Storage\IStorage
     {
         return $this->file;
     }
