@@ -28,7 +28,7 @@ export default {
                     key       = createdAt.format('YYYYMMDD');
                 if (!(key in groupedMoments)) {
                     groupedMoments[key] = {
-                        date:    createdAt,
+                        date:    moment(createdAt).startOf('d'),
                         moments: []
                     }
                 }
@@ -66,8 +66,8 @@ export default {
          * @param {Moment} createdAt
          */
         renderCreatedAt(createdAt) {
-            let now     = moment(),
-                dayDiff = now.diff(createdAt, 'd');
+            let now     = moment().startOf('d'),
+                dayDiff = createdAt.diff(now, 'd');
             if (dayDiff === 0) {
                 return 'today';
             }
@@ -111,7 +111,13 @@ export default {
             </div>
         </section>
         <section v-else>
-            Displaying {{ metadata.count }} learning moments.
+            <template v-if="metadata.count === 0">
+                No learning moments yet.
+            </template>
+            <template v-else>
+                <!-- TODO get the student's name in -->
+                Student has {{ metadata.count }} learning moments.
+            </template>
         </section>
     </div>
 
