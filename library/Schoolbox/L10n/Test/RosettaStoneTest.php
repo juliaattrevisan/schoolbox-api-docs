@@ -21,7 +21,7 @@ class RosettaStoneTest extends TestCase
     /**
      * Build a stone
      */
-    public function setup()
+    public function setUp(): void
     {
         $this->stone = (new RosettaStone())
             ->addTerm($this->buildTerm('ca', 'Calendar', 'calendar', 'calendars', 'a', true))

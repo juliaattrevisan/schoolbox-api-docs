@@ -52,7 +52,7 @@ class VisibilityTests extends TestCase
      * @throws PHPUnit\Framework\Exception
      * @throws PHPUnit_Framework_MockObject_RuntimeException
      */
-    public function __construct(?string $name = null, array $data = [], string $dataName = '')
+    public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
         $this->visibility = new Visibility($this->getMockAccess());

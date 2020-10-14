@@ -34,7 +34,7 @@ abstract class AbstractTestConnector extends TestCase
     /**
      * Skip if SQLSrv driver is not available
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->skipIfDriverNotAvailable();
     }

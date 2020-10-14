@@ -21,7 +21,7 @@ class PopulateTimestamps extends \PHPUnit\Framework\TestCase
     /**
      * @inheritdoc
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->blogMapper = $this->getBlogMapper();
     }

@@ -37,7 +37,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected $mock_config;
 
-    public function setUp()
+    public function setUp(): void
     {
         unset($this->object);
 

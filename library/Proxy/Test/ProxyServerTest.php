@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -36,12 +37,12 @@ class ProxyServerTest extends TestCase
      */
     protected $proxyServer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->markTestSkipped('Proxy Server tests are currently skipped due to external dependencies');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         // destroy the object so another test can't accidentally use it
@@ -54,8 +55,12 @@ class ProxyServerTest extends TestCase
      */
     public function testDependencyInjection()
     {
-        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader('proxy.alaress.com.au', '8080',
-            'matt.day', 'l4mp'));
+        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(
+            'proxy.alaress.com.au',
+            '8080',
+            'matt.day',
+            'l4mp'
+        ));
 
         $this->assertEquals('proxy.alaress.com.au:8080', $this->proxyServer->getURI());
         $this->assertEquals(base64_encode('matt.day:l4mp'), $this->proxyServer->getUserPwd(true));
@@ -93,10 +98,13 @@ class ProxyServerTest extends TestCase
      */
     public function testIsAuthenticated()
     {
-        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER,
-            self::PASS));
+        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(
+            self::HOST,
+            self::PORT,
+            self::USER,
+            self::PASS
+        ));
         $this->assertTrue($this->proxyServer->isAuthenticated());
-
     }
 
 
@@ -295,8 +303,12 @@ class ProxyServerTest extends TestCase
      */
     public function testAuthorizedHttpCurl()
     {
-        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER,
-            self::PASS));
+        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(
+            self::HOST,
+            self::PORT,
+            self::USER,
+            self::PASS
+        ));
         $data = $this->curl(false);
 
         $this->assertEquals(self::HTTP_OK, $data['code']);
@@ -308,8 +320,12 @@ class ProxyServerTest extends TestCase
      */
     public function testAuthorizedHttpFopen()
     {
-        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER,
-            self::PASS));
+        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(
+            self::HOST,
+            self::PORT,
+            self::USER,
+            self::PASS
+        ));
         $data = $this->fopen(false);
 
         $this->assertEquals(self::HTTP_OK, $data['code']);
@@ -321,8 +337,12 @@ class ProxyServerTest extends TestCase
      */
     public function testAuthorizedHttpsCurl()
     {
-        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER,
-            self::PASS));
+        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(
+            self::HOST,
+            self::PORT,
+            self::USER,
+            self::PASS
+        ));
         $data = $this->curl(true);
 
         $this->assertEquals(self::HTTP_OK, $data['code']);
@@ -334,8 +354,12 @@ class ProxyServerTest extends TestCase
      */
     public function testAuthorizedHttpsFopen()
     {
-        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(self::HOST, self::PORT, self::USER,
-            self::PASS));
+        $this->proxyServer = new \Proxy\Server(new ProxyServerTestConfigLoader(
+            self::HOST,
+            self::PORT,
+            self::USER,
+            self::PASS
+        ));
         $data = $this->fopen(true);
 
         $this->assertEquals(self::HTTP_OK, $data['code']);
@@ -381,6 +405,5 @@ class ProxyServerTest extends TestCase
             'code'     => (int)$code,
             'response' => $response,
         ];
-
     }
 }

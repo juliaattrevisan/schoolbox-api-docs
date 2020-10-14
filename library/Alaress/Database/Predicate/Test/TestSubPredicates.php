@@ -27,14 +27,14 @@ class TestSubPredicates extends TestCase
     /**
      * @inheritdoc
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->mySqlQuoter = new Mysql\Quoter();
     }
 
 
-    public function testBuildSubBuilder()
+    public function testBuildSubBuilder(): void
     {
         $pb    = new TestableBuilder($this->mySqlQuoter, 'table');
         $subPb = $pb->emptyClone();

@@ -30,7 +30,7 @@ class ObjectReaderTest extends TestCase
      * This method is called before a test is executed.
      *
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $campus1 = new Campus();
         $campus1->setName('Apple');

@@ -144,12 +144,12 @@ class IntegerBase64Test extends TestCase
      * Test that attempting to encode a non-integer raises an error.
      *
      * @covers            \Alaress\Codec\Integer\Base64::encode
-     * @expectedException \TypeError
      * @dataProvider      getTestInvalidRawValueData
      * @param mixed $rawValue
      */
     public function testInvalidRawValue($rawValue): void
     {
+        $this->expectException(\TypeError::class);
         $codec = new Base64();
         $codec->encode($rawValue);
     }

@@ -32,7 +32,7 @@ class ResolverTest extends TestCase
      *
      * @since Method available since Release 3.4.0
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$routerFromFile = self::newRealWorldRouter();
         self::$routerFromFile->lock();

@@ -24,7 +24,7 @@ class UserTest extends TestCase
         ['mail_address', 'localhost'],
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->object = new User();

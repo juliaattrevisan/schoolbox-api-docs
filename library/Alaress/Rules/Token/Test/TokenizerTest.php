@@ -26,7 +26,7 @@ class TokenizerTest extends TestCase
      * This method is called before a test is executed.
      *
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenizer = new MockTokenizer([
             'foo'             => 'The foo',

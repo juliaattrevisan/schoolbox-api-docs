@@ -24,7 +24,7 @@ class TestStatement extends TestCase
     /**
      * Connect to database, begin transaction
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->connectDb2Test();
         $this->db2Test->beginTransaction();

@@ -36,7 +36,7 @@ class DueWorkTest extends TestCase
     /**
      * Test translation to due work
      */
-    public function testTranslateToDataModel()
+    public function testTranslateToDataModel(): void
     {
         $storage1 = new StorageModel();
         $storage1->setFilename('a file');

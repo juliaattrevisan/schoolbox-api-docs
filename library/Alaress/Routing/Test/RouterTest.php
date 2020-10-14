@@ -55,7 +55,7 @@ class RouterTest extends TestCase
      *
      * @since Method available since Release 3.4.0
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         // preload a router for use in pattern match tests
         self::$testGet = $r = self::newRouter(':', false);

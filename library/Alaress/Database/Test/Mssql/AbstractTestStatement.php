@@ -36,7 +36,7 @@ abstract class AbstractTestStatement extends TestCase
      * * Skip if SQLSrv driver is not available
      * * Connect to database, begin transaction
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->skipIfDriverNotAvailable();
         $this->connect();

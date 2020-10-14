@@ -21,7 +21,7 @@ class DifferTest extends TestCase
     /**
      * Build differ in setup
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->differ = new Differ();
     }

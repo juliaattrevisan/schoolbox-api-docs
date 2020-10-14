@@ -25,7 +25,7 @@ class TimelineTest extends TestCase
     /** @var ParticipantLinker */
     private $linker;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->linker = new ParticipantLinker();
     }

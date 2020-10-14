@@ -25,7 +25,7 @@ class FolderTest extends TestCase
     protected $object;
 
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->object = new Folder\Model();

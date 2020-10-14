@@ -72,7 +72,7 @@ class AssessableTest extends TestCase
      * @param array       $data
      * @param string      $dataName
      */
-    public function __construct(?string $name = null, array $data = [], string $dataName = '')
+    public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
         $this->linker = new ParticipantLinker();

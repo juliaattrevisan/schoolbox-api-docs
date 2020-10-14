@@ -37,7 +37,7 @@ class AssessmentListMutatorTest extends TestCase
     /**
      * Set up student, parent, user methods
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->student = (new User())->setId(9)->setChildren(new GenericCollection(User::class));
         $this->parent  = (new User())->setId(10)->setChildren(new GenericCollection(User::class));

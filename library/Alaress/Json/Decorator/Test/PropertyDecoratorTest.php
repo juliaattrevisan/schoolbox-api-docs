@@ -25,7 +25,7 @@ class PropertyDecoratorTest extends TestCase
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->model = new class(2) implements Serializable {
             use SerializeTrait;

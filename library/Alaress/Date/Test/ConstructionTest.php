@@ -21,7 +21,7 @@ class ConstructionTest extends TestCase
 {
     use MockDateObject;
 
-    public function setup()
+    public function setup(): void
     {
         if (!isset($_SERVER['REQUEST_TIME'])) {
             $this->markTestSkipped('No $_SERVER[REQUEST_TIME], cannot accurately test Alaress_Date_Format builders');

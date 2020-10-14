@@ -10,7 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
-use \Schoolbox\User;
+use Schoolbox\User;
 
 trait Defaults
 {
@@ -100,17 +100,17 @@ trait Defaults
     /**
      * The Bestiary
      */
-    protected function setup()
+    protected function setup(): void
     {
         /* Dudes
          */
-        $this->hodes = (new User)->setId(230)->setFirstname('David')->setLastname('Rhodes');
-        $this->sberryhill = (new User)->setId(15)->setFirstname('Scott')->setLastname('Berryhill');
-        $this->slucier = (new User)->setId(16)->setFirstname('Sam')->setLastname('Lucier');
-        $this->bsalem = (new User)->setId(32)->setFirstname('Bobby')->setLastname('Salem');
-        $this->asaxon = (new User)->setId(17)->setFirstname('Anita')->setLastname('Saxon');
-        $this->celia = (new User)->setId(3)->setFirstname('Celia')->setLastname('Glenn');
-        $this->somodio = (new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio');
+        $this->hodes = (new User())->setId(230)->setFirstname('David')->setLastname('Rhodes');
+        $this->sberryhill = (new User())->setId(15)->setFirstname('Scott')->setLastname('Berryhill');
+        $this->slucier = (new User())->setId(16)->setFirstname('Sam')->setLastname('Lucier');
+        $this->bsalem = (new User())->setId(32)->setFirstname('Bobby')->setLastname('Salem');
+        $this->asaxon = (new User())->setId(17)->setFirstname('Anita')->setLastname('Saxon');
+        $this->celia = (new User())->setId(3)->setFirstname('Celia')->setLastname('Glenn');
+        $this->somodio = (new User())->setId(150)->setFirstname('Anelie')->setLastname('Somodio');
 
         /* Times
          */
@@ -138,5 +138,4 @@ trait Defaults
     {
         return $this->linker;
     }
-
 }

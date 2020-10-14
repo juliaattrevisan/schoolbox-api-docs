@@ -20,12 +20,12 @@ class ColorFactoryTest extends TestCase
      */
     protected $colorFactory;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->colorFactory = new ColorFactory();
     }
 
-    public function getCreateHexData()
+    public function getCreateHexData(): array
     {
         return array(
             array('#123456', new Color(0x12, 0x34, 0x56)),
@@ -36,7 +36,7 @@ class ColorFactoryTest extends TestCase
     /**
      * @dataProvider getCreateHexData
      */
-    public function testCreateHex($colorString, Color $expectedColor)
+    public function testCreateHex($colorString, Color $expectedColor): void
     {
         $actualColor = $this->colorFactory->build($colorString);
         $this->assertEquals($expectedColor->getRed(), $actualColor->getRed());

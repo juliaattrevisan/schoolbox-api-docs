@@ -33,7 +33,7 @@ abstract class AbstractTestPostProcessor extends TestCase
     /**
      * Skip if SQLSrv driver is not available
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->skipIfDriverNotAvailable();
         $this->connect();
@@ -70,15 +70,15 @@ abstract class AbstractTestPostProcessor extends TestCase
         // ----------------------------------------------------------------------------------------------------------------
 
         $statement = $this->mssqlTest->executeQuery("
-            SELECT '     douglas' AS name UNION 
-            SELECT '  damian' AS name UNION 
-            SELECT '  doctor    ' AS name UNION 
-            SELECT '  steve' AS name UNION 
-            SELECT ' andy    ' AS name UNION 
-            SELECT ' nat    ' AS name UNION 
-            SELECT 'amri    ' AS name UNION 
+            SELECT '     douglas' AS name UNION
+            SELECT '  damian' AS name UNION
+            SELECT '  doctor    ' AS name UNION
+            SELECT '  steve' AS name UNION
+            SELECT ' andy    ' AS name UNION
+            SELECT ' nat    ' AS name UNION
+            SELECT 'amri    ' AS name UNION
             SELECT 'stu ' AS name UNION
-            SELECT 'zfuturedevs' AS name 
+            SELECT 'zfuturedevs' AS name
         ");
 
         $count = 0;
