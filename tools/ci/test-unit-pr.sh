@@ -39,8 +39,9 @@ then
 			exit 1;
 		fi
 	else
-		echo "Vendor checksum matches, using tarball as vendor source";
+		echo "Vendor checksum matches, using tarball as vendor source and dumping autoload";
 		mv $initialdir/vendor $instdir/vendor;
+		composer dump-autoload -o;
 	fi
 else
 	echo "No prebuilt vendor tarball supplied, rebuilding vendor php from composer";

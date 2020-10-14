@@ -1,10 +1,12 @@
 <?php
+
 /**
  * Schoolbox global dependencies
  *
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 // TODO move this block to 'www/conf/conf.php'
 if (PHP_SAPI === 'cli') {
     // Was an instance id specified as a CLI option? Check this before calling core require.
@@ -25,10 +27,11 @@ if (!defined('INSTANCE_ID') || trim((string)INSTANCE_ID) === '') {
     }
 }
 
-// Class auto-loading
+// I'm not sure what this does anymore?
 \set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . \get_include_path());
-require_once __DIR__ . '/../../library/Autoloader.php';
-Autoloader::initialise();
+
+// Configure autoloading with Composer
+require __DIR__ . '/../../vendor/autoload.php';
 
 // Global functions and constants
 require_once __DIR__ . '/../../www/include/stdfuncs.php';
