@@ -10,7 +10,7 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\IApi;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
@@ -75,9 +75,9 @@ class Definition implements IStrategy
 
 
     /**
-     * @var Registry
+     * @var IApi
      */
-    private $registry;
+    private $api;
 
 
     /**
@@ -103,7 +103,7 @@ class Definition implements IStrategy
      *
      * @param LoggerInterface       $log
      * @param bool                  $perform
-     * @param Registry              $registry
+     * @param IApi                  $api
      * @param CampusMapper          $campusMapper
      * @param TimetableCycleMapper  $timetableCycleMapper
      * @param TimetablePeriodMapper $timetablePeriodMapper
@@ -111,14 +111,14 @@ class Definition implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Registry $registry,
+        IApi $api,
         CampusMapper $campusMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->registry = $registry;
+        $this->api = $api;
         $this->campusMapper = $campusMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
@@ -130,7 +130,6 @@ class Definition implements IStrategy
      */
     public function import(): void
     {
-        $periodsInDays = $this->findPeriodsInDays();
 
         /* $ext is a key to identify this cycle and associate it with an luCampus record
          */
@@ -140,10 +139,22 @@ class Definition implements IStrategy
          */
         $cycleName = self::CYCLE_IDENTIFIER;
         $cycleLength = self::CYCLE_LENGTH;
-        $dayLength = \count($periodsInDays);
         $cycleStart = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_START);
         $cycleEnd = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
         $dayStart = 1;
+
+        /* Find the longest day (might be excessive, can't tell yet)
+         */
+        $periodsInDays = (new DefinitionCompiler($this->api))->compile();
+        $dayLength = 0;
+
+        foreach ($periodsInDays as $date => $periods) {
+            $currentLength = \count($periods);
+
+            if ($dayLength < $currentLength) {
+                $dayLength = $currentLength;
+            }
+        }
 
         /* Reuse existing cycle with the same identifier, if it exists, and update it
          */
@@ -175,7 +186,7 @@ class Definition implements IStrategy
 
         /* Save all the periods and associate them with a cycle
          */
-        $dayData = $this->findDays($periodsInDays);
+        $dayData = $this->findDays($dayLength, $periodsInDays);
 
         /** @var array $days */
         $days = $dayData['days'];
@@ -208,11 +219,12 @@ class Definition implements IStrategy
     /**
      * Find all the Days in a given $cycle and the longest Day of them all
      *
+     * @param int   $dayLength
      * @param array $periodsInDays
      * @return array
      * @throws Exception
      */
-    private function findDays(array $periodsInDays): array
+    private function findDays(int $dayLength, array $periodsInDays): array
     {
         $struct = [
 
@@ -221,7 +233,7 @@ class Definition implements IStrategy
              * Find the day with the most number of periods and assume that to be canonical
              * (some days have no period data)
              */
-            'maxPeriods' => \count($periodsInDays),
+            'maxPeriods' => $dayLength,
 
             /* Store all the periods here, indexed by Day
               */
@@ -229,8 +241,11 @@ class Definition implements IStrategy
         ];
 
         /* Explore all the Period data
+         *
+         * $periodsInDays is in an chronologically-ordered list;
+         * it seems I can take advantage of that
          */
-        $periods = array_values($periodsInDays);
+        $periods = array_values($periodsInDays)[0];
 
         for ($i = 0; $i < self::CYCLE_LENGTH; $i++) {
             $dayIndex = $i+1;
@@ -252,12 +267,28 @@ class Definition implements IStrategy
                 ]
             ]
              */
-            /** @var TimetablePeriod $period */
-            foreach ($periods as $period) {
-                $periodName = $period['name'];
-                $sequence = $period['sequence'];
-                $start = $period['start'];
-                $finish = $period['finish'];
+
+            /* Each $period is an array of [name, order, startTime, endTime, isActive]
+             */
+            for ($j = 0; $j < $dayLength; $j++) {
+                $period = $periods[$j];
+
+                /* Assumption: assign arbitrary name since each $period has a different
+                 * name on each day, e.g. "Mon0", "MonHome room" (yes I know), "MonRecess",
+                 * "Tue0", "TueHome room" (yes I know), etc. This seems dumb but I can ditch
+                 * the first three chars for now
+                 */
+                $periodName = substr($period['name'], 3);
+
+                /* Append a "Period" prefix if numeric, so they're not just called "1"
+                 */
+                if (is_numeric($periodName)) {
+                    $periodName = "Period {$periodName}";
+                }
+
+                $sequence = $period['order'];
+                $start = $period['startTime'];
+                $finish = $period['endTime'];
 
                 $timetablePeriod = $this->timetablePeriodMapper->createModel()
                     ->setTitle($periodName)
@@ -285,45 +316,5 @@ class Definition implements IStrategy
         }
 
         return $struct;
-    }
-
-
-    /**
-     * Rearrange the data structure into something sensible
-     */
-    private function findPeriodsInDays(): array {
-        $periodsInDays = [];
-
-        foreach ($this->registry->recallAll() as $studentId => $data) {
-
-            /* No timetable found for this person
-             * Skip them
-             */
-            if (null === $data['timetable']) {
-                continue;
-            }
-
-            /* Otherwise process them as usual
-             */
-            foreach ($data['timetable'] as $day => $periods) {
-                foreach ($periods as $period) {
-
-                    /* Collate a cumulative definition as we preprocess
-                     *
-                     * As we process everyone's timetable we should have the maximum definition
-                     * for this week across all student timetables which for now, I have presumed
-                     * to be rectangular and consistent
-                     */
-                    $periodsInDays[$period['sequence']] = [
-                        'name' => $period['name'],
-                        'sequence' => $period['sequence'],
-                        'start' => $period['start'],
-                        'finish' => $period['finish'],
-                    ];
-                }
-            }
-        }
-
-        return $periodsInDays;
     }
 }
