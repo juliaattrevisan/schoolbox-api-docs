@@ -35,7 +35,7 @@ export default {
          * Once received, group them by date.
          */
         load() {
-            axios.get(URL_LEARNING_EVIDENCE_SOURCE + String(this.config.studentId))
+            axios.get(URL_LEARNING_EVIDENCE_SOURCE + String(this.config.student.id))
                 .then(response => {
                     this.data            = response?.data?.data             ? response.data.data            : [];
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
@@ -120,7 +120,6 @@ export default {
                         | {{ evidence.createdAt.format(dateDisplayFormats.momentJsTime) }}
                     </div>
                 </div>
-
             </section>
         </div>
 
@@ -135,11 +134,10 @@ export default {
         </section>
         <section v-else>
             <template v-if="metadata.count === 0">
-                No learning moments yet.
+                {{ config.student.firstname }} has no learning moments yet.
             </template>
             <template v-else>
-                <!-- TODO get the student's name in -->
-                Student has {{ metadata.count }} learning moments.
+                {{ config.student.firstname }} has {{ metadata.count }} learning moments.
             </template>
         </section>
     </div>

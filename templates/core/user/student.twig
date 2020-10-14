@@ -414,7 +414,7 @@
                 {% autoescape 'js' %}
                     <script type="text/javascript">
                         window.learningEvidenceFeedConfig = {
-                            studentId: Number('{{ user.id }}'),
+                            student: {{ user | json_encode | raw }}
                         };
                     </script>
                 {% endautoescape %}
