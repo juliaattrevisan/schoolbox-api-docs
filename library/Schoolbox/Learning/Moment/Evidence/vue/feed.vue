@@ -59,6 +59,26 @@ export default {
                 })
                 .finally(() => this.showSkeletonLoader = false);
         },
+        /**
+         * Renders the created-at time as a string.
+         * *
+         *
+         * @param {Moment} createdAt
+         */
+        renderCreatedAt(createdAt) {
+            let now     = moment(),
+                dayDiff = now.diff(createdAt, 'd');
+            if (dayDiff === 0) {
+                return 'today';
+            }
+            if (dayDiff === -1) {
+                return 'yesterday';
+            }
+            if (dayDiff === 1) {
+                return 'tomorrow';
+            }
+            return moment.duration(dayDiff, 'd').humanize(true);
+        },
     }
 }
 </script>
@@ -66,7 +86,7 @@ export default {
 <template>
     <div>
         <div v-for="momentGroup in groupedMoments">
-            <h2 class="subheader">{{ momentGroup.date.fromNow() }}</h2>
+            <h2 class="subheader">{{ renderCreatedAt(momentGroup.date) }}</h2>
 
             <section>
                 <div v-for="moment in momentGroup.moments" class="list-item">
@@ -74,7 +94,7 @@ export default {
                         <a href="#" title="View Profile">
                             <img :src="'/portrait.php?id=' + Number(moment.creator.id) + '&amp;size=square64'" alt="View Profile">
                         </a>
-                        | {{ moment.createdAt.fromNow() }}
+                        | {{ moment.createdAt.format('h:mma') }}
                     </div>
                 </div>
 
