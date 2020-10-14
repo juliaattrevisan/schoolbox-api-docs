@@ -506,10 +506,24 @@
 }
 
 // Dashboard specific for v-cards
+.column-full .v-card {
+  flex: 0 0 25%;
+  padding: 0;
+  min-width: 25%;
+
+  @media #{$medium-only} {
+    flex: 0 0 33.33%;
+    min-width: 33.33%;
+  }
+  @media #{$small-only} {
+    flex: 0 0 50%;
+  }
+}
 .column-left .v-card {
   flex: 0 0 33.33%;
   padding: 0;
   min-width: 33.33%;
+
   @media #{$small-only} {
     flex: 0 0 50%;
   }
