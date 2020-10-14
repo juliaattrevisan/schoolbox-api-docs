@@ -3,7 +3,7 @@
 import axios  from 'axios';
 import moment from 'moment';
 
-const URL_LEARNING_MOMENT_SOURCE = '/learning/evidence/user/';
+const URL_LEARNING_EVIDENCE_SOURCE = '/learning/evidence/user/';
 
 export default {
     components: {
@@ -19,9 +19,9 @@ export default {
         }
     },
     computed: {
-        config: () => window.learningMomentsFeedConfig,
-        groupedMoments() {
-            return this.groupMoments(this.data);
+        config: () => window.learningEvidenceFeedConfig,
+        groupedEvidence() {
+            return this.groupEvidence(this.data);
         }
     },
     mounted() {
@@ -29,12 +29,12 @@ export default {
     },
     methods: {
         /**
-         * Load the list of learning moments.
+         * Load learning evidence for the student in question.
          *
          * Once received, group them by date.
          */
         load() {
-            axios.get(URL_LEARNING_MOMENT_SOURCE + String(this.config.studentId))
+            axios.get(URL_LEARNING_EVIDENCE_SOURCE + String(this.config.studentId))
                 .then(response => {
                     this.data            = response?.data?.data             ? response.data.data            : [];
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
@@ -44,41 +44,41 @@ export default {
         },
 
         /**
-         * Groups the learning moments by the date which they were posted.
+         * Groups learning evidence by the date which it was posted.
          *
-         * @param {Array} moments
+         * @param {Array} evidence
          * @return Array
          */
-        groupMoments(moments) {
-            let groupedMomentsByDate = {};
-            moments.forEach(v => {
+        groupEvidence(evidence) {
+            let groupedEvidenceByDate = {};
+            evidence.forEach(v => {
                 let createdAt = moment(v.createdAt),
-                        updatedAt = moment(v.updatedAt),
-                        key       = createdAt.format('YYYYMMDD');
-                if (!(key in groupedMomentsByDate)) {
-                    groupedMomentsByDate[key] = {
-                        date:    moment(createdAt).startOf('d'),
-                        moments: []
+                    updatedAt = moment(v.updatedAt),
+                    key       = createdAt.format('YYYYMMDD');
+                if (!(key in groupedEvidenceByDate)) {
+                    groupedEvidenceByDate[key] = {
+                        date:     moment(createdAt).startOf('d'),
+                        evidence: []
                     }
                 }
                 v.createdAt = createdAt;
                 v.updatedAt = updatedAt;
-                groupedMomentsByDate[key].moments.push(v);
+                groupedEvidenceByDate[key].evidence.push(v);
             });
 
-            // Flatten grouped moments into an array
-            let groupedMoments = Object.values(groupedMomentsByDate).sort(
+            // Flatten grouped evidence into an array
+            let groupedEvidence = Object.values(groupedEvidenceByDate).sort(
                 (a, b) => a.date.isBefore(b.date) ? 1 : -1
             );
 
-            // Ensure that each moment within the group is sorted
-            groupedMoments.forEach(v => {
-                v.moments.sort(
+            // Ensure that each evidence within the group is sorted
+            groupedEvidence.forEach(v => {
+                v.evidence.sort(
                     (a, b) => a.createdAt.isBefore(b.createdAt) ? 1 : -1
                 )
             });
 
-            return groupedMoments;
+            return groupedEvidence;
         },
 
         /**
@@ -107,16 +107,16 @@ export default {
 
 <template>
     <div>
-        <div v-for="momentGroup in groupedMoments">
-            <h2 class="subheader">{{ renderCreatedAt(momentGroup.date) }}</h2>
+        <div v-for="evidenceGroup in groupedEvidence">
+            <h2 class="subheader">{{ renderCreatedAt(evidenceGroup.date) }}</h2>
 
             <section>
-                <div v-for="moment in momentGroup.moments" class="list-item">
+                <div v-for="evidence in evidenceGroup.evidence" class="list-item">
                     <div class="card small-12">
                         <a href="#" title="View Profile">
-                            <img :src="'/portrait.php?id=' + Number(moment.creator.id) + '&amp;size=square64'" alt="View Profile">
+                            <img :src="'/portrait.php?id=' + Number(evidence.creator.id) + '&amp;size=square64'" alt="View Profile">
                         </a>
-                        | {{ moment.createdAt.format('h:mma') }}
+                        | {{ evidence.createdAt.format('h:mma') }}
                     </div>
                 </div>
 
