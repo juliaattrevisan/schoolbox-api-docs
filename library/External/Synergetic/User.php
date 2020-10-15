@@ -742,16 +742,75 @@ class External_Synergetic_User implements External_UserInterface
         $contacts = $this->clearInvalidValues($statement->fetchAll());
         $contactIdList = [];
         $contactReturn = [];
-        //Dedupe contacts when mother and father are both contacts
-        foreach ($contacts as $contact) {
-            if (isset($contactIdList[$contact['StudentContactID']])) {
-                continue;
-            }
 
-            $contactReturn[] = $contact;
+        /* Get a contact tuple containing up to two people and bust it out
+         * into individual data, where applicable
+         *
+         * Each person has their own set of array keys because
+         * in synergetic, contacts arrive with their speece in a tuple
+         *
+         * Contact Person A might have a spouse Person B,
+         * but Contact Person B might have their spouse Person A,
+         * and both sets are linked to a student
+         *
+         * This leads to a duped set of dudes, where Person A appears twice
+         * and Person B appears twice
+         */
+        foreach ($contacts as $contactTuple) {
 
-            if ($contact['StudentContactID']) {
-                $contactIdList[$contact['StudentContactID']] = true;
+            /* Find the main contact's fields
+             */
+            $contact1 = [
+                'StudentContactID'              => (string)$contactTuple['StudentContactSpouseID'],
+                'StudentContactTitle'           => $contactTuple['StudentContactSpouseTitle'],
+                'StudentContactPreferred'       => $contactTuple['StudentContactSpousePreferred'],
+                'StudentContactSurname'         => $contactTuple['StudentContactSpouseSurname'],
+                'StudentContactDefaultEmail'    => $contactTuple['StudentContactSpouseDefaultEmail'],
+                'StudentContactMobilePhone'     => $contactTuple['StudentContactSpouseMobilePhone'],
+                'StudentContactOccupPhone'      => $contactTuple['StudentContactSpouseOccupPhone'],
+                'StudentContactRelation'        => $contactTuple['StudentContactSpouseRelation'],
+                'StudentContactUseEmail'        => $contactTuple['StudentContactSpouseUseEmail'],
+
+                /* PhoneActual, SilentPhoneFlag, PrimaryOnlyFlag, ContactType
+                 * fields don't manifest for speece
+                 */
+                'StudentContactPhoneActual'     => $contactTuple['StudentContactPhoneActual'],
+                'StudentContactPrimaryOnlyFlag' => $contactTuple['StudentContactPrimaryOnlyFlag'],
+                'StudentContactSilentPhoneFlag' => $contactTuple['StudentContactSilentPhoneFlag'],
+                'StudentContactType'            => $contactTuple['StudentContactType'],
+            ];
+
+            /* Convert speece into a contact format otherwise they won't appear in profile page
+             * (speece must come with a contact) because speece are treated differently there
+             */
+            $contact2 = [
+                'StudentContactID'              => (string)$contactTuple['StudentContactSpouseID'],
+                'StudentContactTitle'           => $contactTuple['StudentContactSpouseTitle'],
+                'StudentContactPreferred'       => $contactTuple['StudentContactSpousePreferred'],
+                'StudentContactSurname'         => $contactTuple['StudentContactSpouseSurname'],
+                'StudentContactDefaultEmail'    => $contactTuple['StudentContactSpouseDefaultEmail'],
+                'StudentContactMobilePhone'     => $contactTuple['StudentContactSpouseMobilePhone'],
+                'StudentContactOccupPhone'      => $contactTuple['StudentContactSpouseOccupPhone'],
+                'StudentContactRelation'        => $contactTuple['StudentContactSpouseRelation'],
+                'StudentContactUseEmail'        => $contactTuple['StudentContactSpouseUseEmail'],
+
+                /* PhoneActual, SilentPhoneFlag, PrimaryOnlyFlag, ContactType
+                 * fields don't manifest for speece
+                 */
+                'StudentContactPhoneActual'     => '',
+                'StudentContactSilentPhoneFlag' => '',
+                'StudentContactPrimaryOnlyFlag' => '',
+                'StudentContactType'            => '',
+            ];
+
+            /* If we haven't seen this contact's id before, stack 'em up
+             */
+            foreach ([$contact1, $contact2] as $contact) {
+                if (!isset($contactIdList[$contact['StudentContactID']]) && '' !== trim($contact['StudentContactID'])) {
+                    $contactReturn[] = $contact;
+
+                    $contactIdList[$contact['StudentContactID']] = true;
+                }
             }
         }
 
