@@ -4,14 +4,14 @@ import axios  from 'axios';
 import moment from 'moment';
 
 import MediaArticle from '@schoolbox/media-article';
-import MediaElement from '@schoolbox/media-element';
+import Storage from '@schoolbox/storage';
 
 const URL_LEARNING_EVIDENCE_SOURCE = '/learning/evidence/user/';
 
 export default {
     components: {
         MediaArticle,
-        MediaElement,
+        Storage,
     },
     data() {
         return {
@@ -146,7 +146,7 @@ export default {
 
                         <!-- Is there an attachment? Display it appropriately -->
                         <article v-if="evidence.filename && evidence.storage">
-                            <media-element :storage="evidence.storage" :filename="filename"></media-element>
+                            <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
                         </article>
                     </li>
                 </ul>
