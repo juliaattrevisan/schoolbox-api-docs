@@ -93,7 +93,7 @@ class ModelToArrayTest extends TestCase
         };
         $storageTranslator = static function (?Storage $storage) {
             return $storage
-                ? ['id' => $storage->getHash(),]
+                ? ['hash' => $storage->getHash(),]
                 : null;
         };
         self::assertEquals($expected, (new ModelToArray($userTranslator, $storageTranslator))($input));
