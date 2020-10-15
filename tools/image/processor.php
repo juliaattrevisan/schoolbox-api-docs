@@ -207,7 +207,7 @@ $app = new class ($workerPids, $workerIdx, $limit) extends CliTool\App {
         $processor = new Image\Processor($hashObject, $cacheKey, $transform);
 
         try {
-            $transformFile = $processor->load();
+            $transformFile = $processor->load(3);
             if (!$transformFile->isCacheHit()) {
                 $this->getLogger()->info(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $cacheKey, 'success'));
             } else {

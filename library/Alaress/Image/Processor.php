@@ -12,6 +12,7 @@ use Alaress_Byte_Format;
 use DomainException;
 use Imagine\Exception as ImagineException;
 use Alaress\Image\Transform\RotateOrientation;
+use Imagine\Image\ImageInterface;
 use Imagine\Image\Metadata\ExifMetadataReader;
 use Imagine\Imagick\Imagine;
 use League\Flysystem;
@@ -71,18 +72,19 @@ class Processor
      * If the transform does not yet exist, it is generated using the supplied transforms
      * and saved to disk and the database.
      *
+     * @param int $maxAttempts
      * @return StreamableFile
+     * @throws DomainException
      * @throws Flysystem\FileNotFoundException
      * @throws Flysystem\FilesystemNotFoundException
-     * @throws DomainException
      * @throws ImagineException\OutOfBoundsException
      * @throws ImagineException\RuntimeException
+     * @throws Mapper\Exception
      * @throws OverflowException if file's too big
      * @throws PDOException
-     * @throws Mapper\Exception
      * @throws UnexpectedValueException
      */
-    public function load(): StreamableFile
+    public function load(int $maxAttempts = 1): StreamableFile
     {
         // TODO SA-8354 inject dependencies
         $mountManager   = (new FilesystemFactory())->build((new Loader())->get('storage_dir'));
@@ -106,18 +108,7 @@ class Processor
             return new StreamableFile(true, (string)$this->file->getMimetype(), $transformSize, $fileSystem->readStream($transformPath));
         }
 
-        // Transform does not yet exist. Generate and save it to disk and database
-        // Die extremely early if this is corrupted or giant
-        // Figure out an image size in megapixels
-        [$w, $h] = getimagesizefromstring($this->file->read());
-        $megapixelSize = ($w * $h) / 1000000;
-        if ($megapixelSize >= 50) {
-            // error out
-            throw new OverflowException('File is over 50MP large - aborting');
-        }
-
-        $imagine = (new Imagine())->setMetadataReader(new ExifMetadataReader());
-        $image = $imagine->read($this->file->readStream());
+        $image = $this->loadImageFromFile($maxAttempts);
 
         $image = (new RotateOrientation())->manipulate($image);
         $image = $this->transform->manipulate($image);
@@ -150,6 +141,46 @@ class Processor
 
         return new StreamableFile(false, (string)$this->file->getMimetype(), $transformSize, $fileSystem->readStream($transformPath));
     }
+
+
+    /**
+     * Attempt to load an image from a file resource
+     *
+     * Testing indicates this operation suffers from transient failures, so support retries
+     *
+     * @param int $maxAttempts
+     * @return ImageInterface
+     * @throws OverflowException If file contents are too big
+     * @throws ImagineException\RuntimeException If cannot read file into an image
+     */
+    private function loadImageFromFile(int $maxAttempts): ImageInterface
+    {
+        // Transform does not yet exist. Generate and save it to disk and database
+        // Die extremely early if this is corrupted or giant
+        // Figure out an image size in megapixels
+        [$w, $h] = getimagesizefromstring($this->file->read());
+        $megapixelSize = ($w * $h) / 1000000;
+        if ($megapixelSize >= 50) {
+            // error out
+            throw new OverflowException('File is over 50MP large - aborting');
+        }
+
+        $imagine  = (new Imagine())->setMetadataReader(new ExifMetadataReader());
+        $image    = null;
+        $attempts = 0;
+        while (!$image) {
+            try {
+                $attempts++;
+                $image = $imagine->read($this->file->readStream());
+            } catch (ImagineException\RuntimeException $e) {
+                if ($attempts > $maxAttempts) {
+                    throw $e;
+                }
+            }
+        }
+        return $image;
+    }
+
 
     /**
      * Get an image format from mime
