@@ -518,26 +518,29 @@ class Importer
              */
             try {
                 $staffProfile = $this->staffProfileMapper->findByExternalId($row['External ID']);
+                $staffBaseProfile = $staffProfile->getBaseProfile();
 
                 $create = false;
             } catch (Exception $e) {
                 $staffProfile = $this->staffProfileMapper->createModel();
-            }
 
-            /* Try to find a baseProfile that matches the externalId
-             * If one already exists, use it; otherwise spawn a new one
-             */
-            try {
-                $baseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $row['External ID']);
-            } catch (Exception $e) {
-                $baseProfile = $this->baseProfileMapper->createModel();
+                /* Try to find a baseProfile that matches the externalId
+                 * If one already exists, use it; otherwise spawn a new one
+                 */
+                try {
+                    $staffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $row['External ID']);
+                } catch (Exception $e) {
+                    $staffBaseProfile = $this->baseProfileMapper->createModel();
+                }
+
+                $staffProfile->setBaseProfile($staffBaseProfile);
             }
 
             /* Note that baseProfiles can be shared among multiple role types
              * A baseProfile might exist already, but for a different role type
              * Therefore you must check these separately and assemble accordingly
              */
-            $baseProfile
+            $staffBaseProfile
                 ->setExternalId($row['External ID'])
                 ->setTitle($row['Title'])
                 ->setFirstname($row['Firstname'])
@@ -553,7 +556,7 @@ class Importer
                 ->setRoom($row['Room'])
                 ->setBuilding($row['Building'])
                 ->setCampusName($row['Campus'])
-                ->setBaseProfile($baseProfile);
+                ->setBaseProfile($staffBaseProfile);
 
             if ($create) {
                 $this->log("Creating new staff profile for {$row['Firstname']} {$row['Surname']}", self::LOG_OK);
@@ -562,14 +565,14 @@ class Importer
             }
 
             if ($this->perform) {
-                $this->baseProfileMapper->save($baseProfile);
+                $this->baseProfileMapper->save($staffBaseProfile);
                 $this->staffProfileMapper->save($staffProfile);
             }
 
             /* Remember the ids that were affected; we remove everyone that wasn't added/updated
              * Do this outside $this->perform for Dry Run logging purposes
              */
-            $affectedProfileIds[] = $baseProfile->getId();
+            $affectedProfileIds[] = $staffBaseProfile->getId();
         }
 
         /* Delete everyone we didn't created/update
