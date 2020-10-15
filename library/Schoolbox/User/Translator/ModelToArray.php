@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\User\Translator;
 
+use Closure;
 use House;
 use HouseResidential;
 use Schoolbox\Campus;
@@ -29,7 +30,7 @@ class ModelToArray
     {
         return [
             'id'     => $user->getId(),
-            'campus' => $user->getCampusCollection()->map([$this, 'convertCampus']),
+            'campus' => $user->getCampusCollection()->map(Closure::fromCallable([$this, 'convertCampus'])),
             'role'   => $this->convertRole($user->getRole()),
 
             // Null for now, may hydrate later or make nullable in API
