@@ -14,6 +14,7 @@ use Alaress\Image\Transform\RotateOrientation;
 use Imagine\Image\Metadata\ExifMetadataReader;
 use Imagine\Imagick\Imagine;
 use League\Flysystem;
+use League\Flysystem\FileExistsException;
 use OverflowException;
 use PDOException;
 use Schoolbox\Config\Loader;
@@ -67,7 +68,6 @@ class Processor
      * and saved to disk and the database.
      *
      * @return StreamableFile
-     * @throws Flysystem\FileExistsException
      * @throws Flysystem\FileNotFoundException
      * @throws Flysystem\FilesystemNotFoundException
      * @throws DomainException
@@ -128,7 +128,14 @@ class Processor
         }
         $imageContents = $image->get($fileFormat, $options);
 
-        $fileSystem->write($transformPath, $imageContents);
+        try{
+            // TODO This occurs because we can have multiple processes simultaneously doing the same  transform.
+            // TODO We will add a mutex to fix this.
+            // @see https://schoolbox.atlassian.net/browse/SA-11227
+            $fileSystem->write($transformPath, $imageContents);
+        } catch (FileExistsException $e){
+            // Just ignore for now.
+        }
 
         $transformSize = strlen($imageContents);
         $transformMapper->createRecord(
