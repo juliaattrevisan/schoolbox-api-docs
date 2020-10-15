@@ -217,20 +217,27 @@ class Seeder extends App
        if ($this->perform()) {
            $this->getLogger()->info('Running in perform mode (-p): new records will be inserted in the storage_transform table (IF ANY)');
 
-           $insertQuery = $this->getDatabaseInternal()->prepareQuery(
-               "INSERT INTO `storage_transform` (`hash`, `transform`, `size`) VALUES (:hash, :transform, :size)"
-           );
+           $insertQuery = $this->getDatabaseInternal()->prepareQuery("
+                INSERT INTO `storage_transform` (`hash`, `transform`, `size`)
+                VALUES (:hash_1, :transform_1, :size_1)
+                ON DUPLICATE KEY UPDATE
+                    hash =:hash_2,
+                    transform = :transform_2,
+                    size = :size_2
+            ");
 
            foreach ($this->transcodeImages as $key => $image) {
-               if (!$this->checkIfRecordExists($image['hash'], $image['transform'])) {
-                   $insertQuery->execute([
-                       'hash' => $image['hash'],
-                       'transform' => $image['transform'],
-                       'size' => $image['size'],
-                   ]);
+               $verb = $this->checkIfRecordExists($image['hash'], $image['transform']) ? "Updating" : "Inserting";
+               $this->getLogger()->info("$verb image transform. Hash: {$image['hash']}, cacheKey: {$image['transform']}, size: {$image['size']}");
 
-                   $this->getLogger()->info('Added image transforms for: ' . $image['hash'] . ' in storage_transform table');
-               }
+               $insertQuery->execute([
+                   'hash_1'      => $image['hash'],
+                   'transform_1' => $image['transform'],
+                   'size_1'      => $image['size'],
+                   'hash_2'      => $image['hash'],
+                   'transform_2' => $image['transform'],
+                   'size_2'      => $image['size'],
+               ]);
            }
 
        } else {
