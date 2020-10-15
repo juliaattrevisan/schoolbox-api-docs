@@ -146,11 +146,7 @@ export default {
 
                         <!-- Is there an attachment? Display it appropriately -->
                         <article v-if="evidence.filename && evidence.storage">
-                            <template v-if="evidence.storage.type === 'image'">
-                                <img :src="evidence.storage._links.image" :alt="evidence.filename" />
-                            </template>
-                            <media-element v-if="evidence.storage.type === 'video' || evidence.storage.type === 'audio'"
-                                           :storage="evidence.storage"></media-element>
+                            <media-element :storage="evidence.storage" :filename="filename"></media-element>
                         </article>
                     </li>
                 </ul>

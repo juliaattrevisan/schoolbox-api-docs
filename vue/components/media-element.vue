@@ -8,14 +8,24 @@ export default {
     props: {
         storage: {
             type: Object,
-            validator: (value) => value.hash && (value.type === 'video' || value.type === 'audio')
+        },
+        filename: {
+            type: String,
         },
     },
     computed: {
         jQuery: () => window.jQuery,
     },
     mounted() {
-        this.jQuery(this.$el).mediaelementplayer();
+        switch (this.storage.type === 'video') {
+            case 'audio':
+            case 'video':
+                this.jQuery(this.$el).mediaelementplayer();
+                break;
+
+            default:
+                break;
+        }
     },
 }
 </script>
@@ -27,5 +37,8 @@ export default {
     <audio v-else-if="storage.type === 'audio'" controls preload="none">
         <source type="audio/mpeg" :src="storage._links.stream">
     </audio>
-    <span v-else></span>
+    <img v-else-if="storage.type === 'image'" :src="storage._links.image" :alt="filename" />
+    <span v-else>
+        <a :href="storage._links.fetch">{{ filename }}</a>
+    </span>
 </template>
