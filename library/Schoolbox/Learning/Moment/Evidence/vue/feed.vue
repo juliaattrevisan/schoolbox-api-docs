@@ -116,7 +116,7 @@ export default {
 
 <template>
     <div>
-        <template v-for="evidenceGroup in groupedEvidence">
+        <div class="content" v-for="evidenceGroup in groupedEvidence">
             <h2 class="subheader">
                 <time :datetime="evidenceGroup.date.format('YYYY-MM-DD')"
                       :title="evidenceGroup.date.format(dateDisplayFormats.momentJsDateLong)"
@@ -151,7 +151,7 @@ export default {
                     </li>
                 </ul>
             </section>
-        </template>
+        </div>
 
         <section v-if="showSkeletonLoader">
             <div v-for="n in 3" class="list-item">
