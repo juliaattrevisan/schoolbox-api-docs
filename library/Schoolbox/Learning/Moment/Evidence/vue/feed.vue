@@ -135,9 +135,17 @@ export default {
                             </a>
                         </div>
 
+
+                        <!-- Display evidence body, with media players initialised -->
                         <media-article v-if="evidence.body">
-                                <div v-html="evidence.body" />
+                            <div v-html="evidence.body" />
                         </media-article>
+
+
+                        <!-- Is there an attachment? Display it appropriately -->
+                        <template v-if="evidence.filename && evidence.storage">
+                            {{ evidence.filename }}| {{ evidence.storage.hash }}
+                        </template>
                     </li>
                 </ul>
             </section>
