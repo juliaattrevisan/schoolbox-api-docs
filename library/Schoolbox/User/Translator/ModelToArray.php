@@ -30,7 +30,9 @@ class ModelToArray
     {
         return [
             'id'     => $user->getId(),
-            'campus' => $user->getCampusCollection()->map(Closure::fromCallable([$this, 'convertCampus'])),
+            'campus' => $user->getCampusCollection()
+                ? $user->getCampusCollection()->map(Closure::fromCallable([$this, 'convertCampus']))
+                : null,
             'role'   => $this->convertRole($user->getRole()),
 
             // Null for now, may hydrate later or make nullable in API
