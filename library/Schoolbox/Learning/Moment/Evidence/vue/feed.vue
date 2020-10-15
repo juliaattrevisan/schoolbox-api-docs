@@ -4,12 +4,14 @@ import axios  from 'axios';
 import moment from 'moment';
 
 import MediaArticle from '@schoolbox/media-article';
+import MediaElement from '@schoolbox/media-element';
 
 const URL_LEARNING_EVIDENCE_SOURCE = '/learning/evidence/user/';
 
 export default {
     components: {
         MediaArticle,
+        MediaElement,
     },
     data() {
         return {
@@ -143,21 +145,13 @@ export default {
 
 
                         <!-- Is there an attachment? Display it appropriately -->
-                        <template v-if="evidence.filename && evidence.storage">
+                        <article v-if="evidence.filename && evidence.storage">
                             <template v-if="evidence.storage.type === 'image'">
                                 <img :src="evidence.storage._links.image" :alt="evidence.filename" />
                             </template>
-                            <template v-if="evidence.storage.type === 'video'">
-                                <video controls :poster="evidence.storage._links.poster">
-                                    <source :type="evidence.storage.mime" :src="evidence.storage._links.stream">
-                                </video>
-                            </template>
-                            <template v-if="evidence.storage.type === 'audio'">
-                                <audio controls>
-                                    <source :type="evidence.storage.mime" :src="evidence.storage._links.stream">
-                                </audio>
-                            </template>
-                        </template>
+                            <media-element v-if="evidence.storage.type === 'video' || evidence.storage.type === 'audio'"
+                                           :storage="evidence.storage"></media-element>
+                        </article>
                     </li>
                 </ul>
             </section>
