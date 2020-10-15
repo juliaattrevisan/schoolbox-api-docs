@@ -24,12 +24,12 @@ abstract class NavigatorController extends AbstractController
     protected $template;
 
     /**
-     * @param bool             $multi
-     * @param string|bool|null $mimeFilter
-     * @param IConfigLoader    $conf
-     * @param RosettaStone     $rosetta
-     * @param bool             $useFolder
-     * @param int              $defaultFolderId
+     * @param bool               $multi
+     * @param string|bool|null   $mimeFilter
+     * @param IConfigLoader|null $conf
+     * @param RosettaStone|null  $rosetta
+     * @param bool               $useFolder
+     * @param int                $defaultFolderId
      */
     public function __construct($multi, $mimeFilter = null, $conf = null, $rosetta = null, $useFolder = true, $defaultFolderId = 0)
     {
@@ -60,6 +60,19 @@ abstract class NavigatorController extends AbstractController
             $mimeFilter = 'false';
         } else {
             $mimeFilter = "'" . urldecode($this->mimeFilter) . "'";
+        }
+
+        /* Enable a Use This Folder button in the component action bar, but only
+         * if we wanted it on; parse it away otherwise
+         */
+        $page->setBlock(TEMPLATE_content, 'use_this_folder_component_action', 'use_this_folder_component_action_block');
+
+        if ($this->useFolder) {
+            $page->parse('use_this_folder_component_action_block', 'use_this_folder_component_action');
+        } else {
+            $page->setVar([
+                'use_this_folder_component_action_block' => ''
+            ]);
         }
 
         $page->setVar([
