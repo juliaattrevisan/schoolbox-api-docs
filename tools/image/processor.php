@@ -241,6 +241,7 @@ $app = new class ($workerPids, $workerIdx, $limit) extends CliTool\App {
                 ON afe.fileTypeID = aft.fileTypeID
                 AND aft.mime LIKE 'image%'
                 AND aft.mime NOT LIKE 'image%svg%'
+                AND aft.mime NOT LIKE 'image%webp%'
             WHERE s.uploaded_on >= (NOW() - INTERVAL {$timeInterval} MINUTE)
             ORDER BY s.uploaded_on
             LIMIT 0, {$limit}";
