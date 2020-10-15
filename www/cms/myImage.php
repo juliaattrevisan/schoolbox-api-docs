@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -49,7 +50,6 @@ try {
     $processor->load()->stream();
 } catch (SchoolboxNotFoundException $e) {
     redirectToBroken(404);
-
 } catch (Exception $e) {
     redirectToBroken(500);
 }

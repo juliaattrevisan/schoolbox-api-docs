@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Outputs a fail image at a given size, or with a given transform.
  *

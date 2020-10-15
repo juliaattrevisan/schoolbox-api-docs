@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Transform;
@@ -12,7 +14,6 @@ use Schoolbox\Application\CliTool\App;
 use Schoolbox\Application\CliTool\Kernel;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\FilesystemFactory;
-
 
 class Seeder extends App
 {

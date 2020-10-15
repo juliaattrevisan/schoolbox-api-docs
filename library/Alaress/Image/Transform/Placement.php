@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Alaress\Image\Transform;
@@ -13,7 +15,6 @@ use Imagine\Image\BoxInterface;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\Point;
 use Imagine\Image\PointInterface;
-
 
 /**
  * Place an image on a canvas at one of the nine cardinal locations. Defaults to 'topleft'

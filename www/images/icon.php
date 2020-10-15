@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Outputs an icon from a spritesheet at a given size, or with a given transform
  *
@@ -30,6 +31,6 @@ try {
     $imageProcessor = new Image\Processor(LocalFS::getStorageModel(WEB_root, $path), $cache_key, $transform);
     $imageProcessor->load()->stream();
 } catch (Exception $e) {
-//	echo $e;
+//  echo $e;
     SitePage::redirectToBrokenImage();
 }

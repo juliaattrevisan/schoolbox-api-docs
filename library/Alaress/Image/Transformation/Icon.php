@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -13,6 +14,7 @@ use Alaress\Image\Transform\Sequence;
 use Alaress\Image\Transform\Square;
 use InvalidArgumentException;
 use Schoolbox\Realtime\Message\NSMapper;
+
 use function array_flip;
 use function array_key_exists;
 use function count;

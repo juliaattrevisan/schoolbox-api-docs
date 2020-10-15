@@ -61,7 +61,7 @@ if ($urlDetect->isStorageUrl()) {
     }
 } else {
     $storage = $cache->getFile();
-    if(!$storage){
+    if (!$storage) {
         \SitePage::redirectToBrokenImageWithTransform('storage', $size);
     }
 }

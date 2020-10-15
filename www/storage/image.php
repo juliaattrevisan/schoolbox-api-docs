@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Handles image resizing and caching on images from storage engine
  *
@@ -13,7 +14,6 @@ use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
-
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';

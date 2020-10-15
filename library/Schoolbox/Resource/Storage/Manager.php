@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -14,6 +15,7 @@ use League\Flysystem\FilesystemInterface;
 use League\Flysystem\MountManager;
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\Mimetype;
+
 use function sprintf;
 
 /**

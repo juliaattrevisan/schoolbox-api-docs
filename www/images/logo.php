@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Outputs an icon from a spritesheet at a given size, or with a given transform
  *
@@ -100,7 +101,6 @@ try {
         header('Content-type: image/png');
         readfile($placeHolderFile);
         exit;
-
     } else {
         SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
     }

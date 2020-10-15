@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @author      Sam Bailey <sam.bailey@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
