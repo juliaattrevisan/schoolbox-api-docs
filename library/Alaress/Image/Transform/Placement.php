@@ -32,9 +32,9 @@ class Placement extends HasDimensions
     private $position;
 
     /**
-     * @param int         $width
-     * @param int         $height
-     * @param string|null $position
+     * @param int    $width
+     * @param int    $height
+     * @param string $position
      */
     public function __construct(int $width, int $height, string $position = 'topleft')
     {
