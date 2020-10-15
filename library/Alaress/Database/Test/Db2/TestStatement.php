@@ -33,7 +33,7 @@ class TestStatement extends TestCase
     /**
      * Roll back when done
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->db2Test->rollBack();
     }

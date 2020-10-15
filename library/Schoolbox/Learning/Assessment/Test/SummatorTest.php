@@ -780,7 +780,7 @@ class SummatorTest extends TestCase
 
         /* Most Recent Maximum
          */
-        $this->assertEquals(100, $project->getNormalisedMark($project->getParticipant($this->hodes), false), '', $this->delta);
+        $this->assertEqualsWithDelta(100, $project->getNormalisedMark($project->getParticipant($this->hodes), false), $this->delta);
     }
 
 
@@ -807,11 +807,11 @@ class SummatorTest extends TestCase
 
         /* Most Recent Published Maximum
          */
-        $this->assertEquals(77, $project->getNormalisedMark($project->getParticipant($this->hodes), true), '', $this->delta);
+        $this->assertEqualsWithDelta(77, $project->getNormalisedMark($project->getParticipant($this->hodes), true), $this->delta);
 
         /* Most Recent Maximum
          */
-        $this->assertEquals(77, $project->getNormalisedMark($project->getParticipant($this->hodes), false), '', $this->delta);
+        $this->assertEqualsWithDelta(77, $project->getNormalisedMark($project->getParticipant($this->hodes), false), $this->delta);
     }
 
 
@@ -1380,7 +1380,7 @@ class SummatorTest extends TestCase
         /* Most Recent Minimum
          * Minimum of (98, null, 77, 100, 60)
          */
-        $this->assertEquals(60, $project->getNormalisedMark($project->getParticipant($this->hodes), false), '', $this->delta);
+        $this->assertEqualsWithDelta(60, $project->getNormalisedMark($project->getParticipant($this->hodes), false), $this->delta);
     }
 
 
@@ -1405,13 +1405,13 @@ class SummatorTest extends TestCase
          *      12/20 = 60 (Quiz 99762)
          *      77 (Due Work 7889)
          */
-        $this->assertEquals(60, $project->getNormalisedMark($project->getParticipant($this->hodes), true), '', $this->delta);
+        $this->assertEqualsWithDelta(60, $project->getNormalisedMark($project->getParticipant($this->hodes), true), $this->delta);
 
         /* Most Recent Minimum
          *      12/20 = 60 (Quiz 99762)
          *      77 (Due Work 7889)
          */
-        $this->assertEquals(60, $project->getNormalisedMark($project->getParticipant($this->hodes), false), '', $this->delta);
+        $this->assertEqualsWithDelta(60, $project->getNormalisedMark($project->getParticipant($this->hodes), false), $this->delta);
     }
 
 

@@ -50,7 +50,7 @@ class VisibilityTests extends TestCase
     /**
      * @inheritdoc
      * @throws PHPUnit\Framework\Exception
-     * @throws PHPUnit_Framework_MockObject_RuntimeException
+     * @throws PHPUnit\Framework\MockObject\RuntimeException
      */
     public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
@@ -540,7 +540,7 @@ class VisibilityTests extends TestCase
     /**
      * Builds a mock of the Access dependency
      *
-     * @return Access|MockObject
+     * @return MockObject
      * @throws PHPUnit\Framework\Exception
      * @throws RuntimeException
      * @see $this->buildUsers()

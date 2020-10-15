@@ -9,8 +9,8 @@ namespace Schoolbox\Resource\Folder\Test;
 
 use InvalidArgumentException;
 use PHPUnit\Framework;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use ReflectionClass;
 use ReflectionException;
 use Schoolbox\GenericCollection;
@@ -426,7 +426,7 @@ class NNIANTest extends TestCase
      */
     private function getMockFolderMapper(GenericCollection $folders, bool $isCacheEnabled): Folder\Mapper
     {
-        /** @var PHPUnit_Framework_MockObject_MockObject|Folder\Mapper $folderMapper */
+        /** @var MockObject|Folder\Mapper $folderMapper */
         $folderMapper = $this->createMock(Folder\Mapper::class);
 
         /** @see \Schoolbox\Resource\Folder\Mapper::findCheaplyById */

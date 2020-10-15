@@ -7,8 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings\FieldType\SelectLookup\Test;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use Schoolbox\Admin\Settings\Exceptions\FieldTypeMismatchException;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\FieldType;
@@ -189,7 +189,7 @@ class RendererTest extends TestCase
      */
     protected function buildFieldStrategyFactory(): FieldStrategyFactory
     {
-        /** @var MapperFactory|PHPUnit_Framework_MockObject_MockObject $mockMapperFactory */
+        /** @var MapperFactory|MockObject $mockMapperFactory */
         $mockMapperFactory = $this->createMock(MapperFactory::class);
 
         $mockGradeMapper = $this->buildMockGradeMapper();
@@ -260,7 +260,7 @@ class RendererTest extends TestCase
             $groupModels[$groupId]->setGradeLevels(new GenericCollection(GradeLevel\Model::class, $gradeModels));
         }
 
-        /** @var Group\Mapper|PHPUnit_Framework_MockObject_MockObject $mockGradeMapper */
+        /** @var Group\Mapper|MockObject $mockGradeMapper */
         $mockGradeMapper = $this->createMock(Group\Mapper::class);
         $mockGradeMapper
             ->method('findAll')

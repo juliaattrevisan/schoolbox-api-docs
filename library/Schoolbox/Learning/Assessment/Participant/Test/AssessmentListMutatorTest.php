@@ -6,8 +6,8 @@
 
 namespace Schoolbox\Learning\Assessment\Participant\Test;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -69,13 +69,12 @@ class AssessmentListMutatorTest extends TestCase
     /**
      * Test list mutator as a participant.
      *
-     * @throws \PHPUnit_Framework_MockObject_RuntimeException
      * @throws \PHPUnit\Framework\Exception
      */
     public function testUser(): void
     {
         // mock of visibility: pretend 1 visible, 2 not
-        /** @var Visibility|PHPUnit_Framework_MockObject_MockObject $mockVisibility */
+        /** @var Visibility|MockObject $mockVisibility */
         $mockVisibility = $this->createMock(Visibility::class);
         $mockVisibility
             ->expects($this->any())
@@ -103,13 +102,12 @@ class AssessmentListMutatorTest extends TestCase
     /**
      * Test list mutator as the parent of a participant.
      *
-     * @throws \PHPUnit_Framework_MockObject_RuntimeException
      * @throws \PHPUnit\Framework\Exception
      */
     public function testParentOfUser(): void
     {
         // mock of visibility: pretend 2 visible, 1 not
-        /** @var Visibility|PHPUnit_Framework_MockObject_MockObject $mockVisibility */
+        /** @var Visibility|MockObject $mockVisibility */
         $mockVisibility = $this->createMock(Visibility::class);
         $mockVisibility
             ->expects($this->any())

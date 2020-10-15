@@ -85,7 +85,7 @@ class HumanReadableTest extends TestCase
         $expected = $callable();
 
         // allow up to 5 seconds of variance between expected and actual
-        $this->assertEquals($expected->getUnixTimeStamp(), $adf->getUnixTimeStamp(), '', 5);
+        $this->assertEqualsWithDelta($expected->getUnixTimeStamp(), $adf->getUnixTimeStamp(), 5);
     }
 
 }

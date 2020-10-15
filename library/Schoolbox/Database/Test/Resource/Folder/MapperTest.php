@@ -93,7 +93,7 @@ class MapperTest extends TestCase
     /**
      * Load a known dataset into the DB
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->connectSchoolbox();
         $this->database = \Database::getInstance();
@@ -107,7 +107,7 @@ class MapperTest extends TestCase
     /**
      * Roll back any changes we made
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->database->rollback();
     }

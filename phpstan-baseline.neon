@@ -2731,11 +2731,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Test/DataModel/TranslatorTest.php
 
 		-
-			message: "#^PHPDoc tag @return with type PHPUnit_Framework_MockObject_MockObject\\|Schoolbox\\\\Permission\\\\Access\\\\Access is not subtype of native type PHPUnit_Framework_MockObject_MockObject\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Test/VisibilityTests.php
-
-		-
 			message: "#^Variable \\$currentResponse might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Timeline/Full.php
@@ -3419,11 +3414,6 @@ parameters:
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getName\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Test/SoftDeleteTest.php
-
-		-
-			message: "#^Call to an undefined method PHPUnit_Framework_MockObject_MockObject\\:\\:get\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Test/UserTest.php
 
 		-
 			message: "#^Method Schoolbox\\\\Tile\\\\Layout\\\\Mapper\\:\\:findById\\(\\) invoked with 2 parameters, 1 required\\.$#"

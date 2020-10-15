@@ -48,7 +48,7 @@ abstract class AbstractTestStatement extends TestCase
     /**
      * Roll back when done
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($this->mssqlTest instanceof IConnector) {
             $this->mssqlTest->rollBack();

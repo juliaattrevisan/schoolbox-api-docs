@@ -56,7 +56,7 @@ class UnreliableClient extends Client
     {
         // Possibly simulate a network failure
         if (0.0 !== $this->failureRate && $this->generator->generate() <= $this->failureRate) {
-            throw new SimulatedNetworkFailureException('Simulated network failure', $request);
+            throw new SimulatedNetworkFailureException('Simulated network failure', $request, new \GuzzleHttp\Psr7\Response());
         }
         return parent::send($request, $options);
     }

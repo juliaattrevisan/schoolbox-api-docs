@@ -13,6 +13,7 @@ namespace Schoolbox\Test;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Schoolbox\Config\Loader;
+use PHPUnit\Framework\MockObject\MockObject;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -33,7 +34,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Mock object of ConfigLoader
      *
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var Loader|MockObject
      */
     protected $mock_config;
 

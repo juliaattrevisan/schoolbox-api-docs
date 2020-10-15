@@ -80,7 +80,7 @@ class ColorTest extends TestCase
     public function testAssertAlphaSuccess($value, $expectedValue)
     {
         $this->color->setAlpha($value);
-        $this->assertEquals($expectedValue, $this->color->getAlpha(), '', 0.01);
+        $this->assertEqualsWithDelta($expectedValue, $this->color->getAlpha(), 0.01);
     }
 
     public function getAssertAlphaFailureData()

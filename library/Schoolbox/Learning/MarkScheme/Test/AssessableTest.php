@@ -383,7 +383,7 @@ class AssessableTest extends TestCase
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
-        $this->assertEquals($expected, $actual, $message, 0.1);
+        $this->assertEqualsWithDelta($expected, $actual, 0.1, $message);
     }
 
 
@@ -402,7 +402,7 @@ class AssessableTest extends TestCase
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
-        $this->assertEquals($expected, $actual, $message, 0.1);
+        $this->assertEqualsWithDelta($expected, $actual, 0.1, $message);
     }
 
 
