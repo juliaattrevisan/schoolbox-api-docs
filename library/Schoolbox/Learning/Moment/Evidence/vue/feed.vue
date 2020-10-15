@@ -128,6 +128,10 @@ export default {
                                 >{{ evidence.createdAt.format(dateDisplayFormats.momentJsTime) }}</time>
                             </a>
                         </div>
+
+                        <article>
+                            <div v-html="evidence.body" />
+                        </article>
                     </li>
                 </ul>
             </section>
