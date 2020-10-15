@@ -86,8 +86,8 @@ class Mapper extends \Schoolbox\Mapper
     public function findByHashAndCacheKey(string $hash, string $cacheKey): ?Model
     {
         return $this->findByColumnList([
-            self::FIELD_HASH => $hash,
-            self::FIELD_CACHE_KEY=> $cacheKey,
+            self::FIELD_HASH      => $hash,
+            self::FIELD_CACHE_KEY => $cacheKey,
         ])->first();
     }
 }

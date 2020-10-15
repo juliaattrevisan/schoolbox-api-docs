@@ -102,7 +102,6 @@ class Portrait
         $users = $userMapper->findByColumn('synergy_id', $externalId);
 
         foreach ($users as $currentUser) {
-
             /* Everyone can always see their own face
              */
             $userId = $currentUser->getId();

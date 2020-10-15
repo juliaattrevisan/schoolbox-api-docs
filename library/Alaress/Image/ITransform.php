@@ -14,7 +14,7 @@ interface ITransform
     /**
      * Manipulate image.
      *
-     * @param  ImageInterface $image
+     * @param ImageInterface $image
      * @return ImageInterface The manipulated image
      */
     public function manipulate(ImageInterface $image): ImageInterface;

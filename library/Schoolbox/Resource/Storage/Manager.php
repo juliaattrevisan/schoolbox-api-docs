@@ -197,5 +197,4 @@ class Manager
     {
         return $this->mountManager->getFilesystem($prefix);
     }
-
 }

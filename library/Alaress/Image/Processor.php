@@ -128,12 +128,12 @@ class Processor
         }
         $imageContents = $image->get($fileFormat, $options);
 
-        try{
+        try {
             // TODO This occurs because we can have multiple processes simultaneously doing the same  transform.
             // TODO We will add a mutex to fix this.
             // @see https://schoolbox.atlassian.net/browse/SA-11227
             $fileSystem->write($transformPath, $imageContents);
-        } catch (FileExistsException $e){
+        } catch (FileExistsException $e) {
             // Just ignore for now.
         }
 

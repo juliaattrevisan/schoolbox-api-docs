@@ -109,7 +109,6 @@ class Original extends \Alaress_Cache_Abstract
         // run cache detection
         if ($this->post->getCacheHash()) {
             $this->file = Storage\Mapper::getInstance()->findByHash($this->post->getCacheHash());
-
         } else {
             $this->newCacheUpdate();
         }

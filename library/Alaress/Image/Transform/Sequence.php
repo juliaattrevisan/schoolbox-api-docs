@@ -21,14 +21,15 @@ class Sequence implements ITransform
     /**
      * @param ITransform ...$transforms
      */
-    public function __construct(ITransform... $transforms){
+    public function __construct(ITransform...$transforms)
+    {
         $this->transforms = $transforms;
     }
 
     /** @inheritDoc */
     public function manipulate(ImageInterface $image): ImageInterface
     {
-        foreach($this->transforms as $transform){
+        foreach ($this->transforms as $transform) {
             $image = $transform->manipulate($image);
         }
         return $image;

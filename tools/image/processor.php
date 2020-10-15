@@ -45,7 +45,7 @@ for ($i = 0; $i < $workerCount; $i++) {
 /**
  * CLI tool for pre-converting images to the most common formats
  */
-$app = new class($workerPids, $workerIdx, $limit) extends CliTool\App {
+$app = new class ($workerPids, $workerIdx, $limit) extends CliTool\App {
     private const TIME_INTERVAL = 15;                   // default time period in minutes to look up images for processing
 
     // --help: print help
@@ -278,4 +278,3 @@ HELP;
 $logLevel = (int)getenv('LOG_LEVEL', true) ?: Monolog\Logger::INFO;
 $kernel   = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => $logLevel]);
 $kernel->runApp();
-
