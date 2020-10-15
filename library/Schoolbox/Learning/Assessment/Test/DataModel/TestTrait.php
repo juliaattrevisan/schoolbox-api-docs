@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -45,7 +46,7 @@ trait TestTrait
     /**
      * Set up
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = new Translator(
             new MarkSchemeFactory(),

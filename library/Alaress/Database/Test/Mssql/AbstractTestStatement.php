@@ -36,7 +36,7 @@ abstract class AbstractTestStatement extends TestCase
      * * Skip if SQLSrv driver is not available
      * * Connect to database, begin transaction
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->skipIfDriverNotAvailable();
         $this->connect();
@@ -48,7 +48,7 @@ abstract class AbstractTestStatement extends TestCase
     /**
      * Roll back when done
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($this->mssqlTest instanceof IConnector) {
             $this->mssqlTest->rollBack();

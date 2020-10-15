@@ -95,14 +95,16 @@ class ValidationTest extends TestCase
 
     /**
      * You should also test for error states that your code may raise.
-     * Use the `@expectedException` annotation to verify which exception class
+     * Use the `
      * you expect your code to raise.
      *
      * @dataProvider getTestErrorRaisedData
-     * @expectedException \TypeError
+     *
      */
     public function testErrorRaised($input): void
     {
+        $this->expectException(\TypeError::class);
+        $this->expectException(`::class);//  annotation to verify which exception class
         // Substitute this with the method call that is supposed to fail.
         $test = function (int $b) { return $b + 1; };
         $test($input);

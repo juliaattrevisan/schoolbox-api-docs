@@ -157,10 +157,11 @@ class CollectionMethodsTest extends TestCase
      *
      * @dataProvider provider_merge_unique_objects
      * @param Collection[] $inputs
-     * @expectedException UnexpectedValueException
+     *
      */
     public function test_merge_unique_objects($inputs)
     {
+        $this->expectException(UnexpectedValueException::class);
         $actual = new Collection();
         foreach ($inputs as $input) {
             $actual = $actual->mergeUnique($input);

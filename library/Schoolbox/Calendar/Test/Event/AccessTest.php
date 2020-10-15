@@ -8,8 +8,8 @@
 
 namespace Schoolbox\Calendar\Test\Event;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use Schoolbox\Campus;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -66,7 +66,7 @@ class AccessTest extends TestCase
                 // Set an empty access list by default on every user, this is to avoid hitting the database on
                 // User::getAccessList() when access list is not set
 
-                /** @var User|PHPUnit_Framework_MockObject_MockObject $mockUser */
+                /** @var User|MockObject $mockUser */
                 $mockUser = $this->getMockBuilder(User::class)->setMethods($overload)->getMock();
                 $mockUser->setId($id);
                 $mockUser->setAccessList(new GenericCollection(UserAccess::class));

@@ -17,8 +17,8 @@ use External_UserInterface;
 use InvalidArgumentException;
 use LogicException;
 use PHPUnit\Framework;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use ReflectionClass;
 use ReflectionException;
 use Schoolbox\Config\ConfigMapper;
@@ -239,10 +239,11 @@ class AccessTest extends TestCase
      * @throws Mapper\Exception
      * @throws ReflectionException
      * @throws UnexpectedValueException
-     * @expectedException InvalidArgumentException
+     *
      */
     public function testGetAccessLevelInvalid(): void
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->newAccess()->getAccessLevel(new User(), UserAccess::SERVICE_CMS, 4);
     }
 
@@ -283,10 +284,11 @@ class AccessTest extends TestCase
      * @throws Mapper\Exception
      * @throws ReflectionException
      * @throws UnexpectedValueException
-     * @expectedException InvalidArgumentException
+     *
      */
     public function testGetMinFolderAccessInvalid(): void
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->newAccess()->getMinFolderAccess(new User(), []);
     }
 
@@ -401,10 +403,11 @@ class AccessTest extends TestCase
      * @throws LogicException
      * @throws ReflectionException
      * @throws UnexpectedValueException
-     * @expectedException Error
+     *
      */
     public function testCannotConnectToExternalUser(): void
     {
+        $this->expectException(Error::class);
         $access = $this->newAccess();
         $reflection = new ReflectionClass($access);
         $instance   = $reflection->getProperty('externalUser');
@@ -1226,7 +1229,7 @@ class AccessTest extends TestCase
      */
     private function getMockUserAccessMapper(GenericCollection $users, ?array $userAccessData): UserAccessMapper
     {
-        /** @var PHPUnit_Framework_MockObject_MockObject|UserAccessMapper $userAccessMapper */
+        /** @var MockObject|UserAccessMapper $userAccessMapper */
         $userAccessMapper = $this->createMock(UserAccessMapper::class);
 
         /** @var UserAccess[][][][] $allUserAccess */
@@ -1286,7 +1289,7 @@ class AccessTest extends TestCase
      */
     private function getMockFolderMapper(ObjectTree $folderTree): Folder\Mapper
     {
-        /** @var PHPUnit_Framework_MockObject_MockObject|Folder\Mapper $folderMapper */
+        /** @var MockObject|Folder\Mapper $folderMapper */
         $folderMapper = $this->createMock(Folder\Mapper::class);
 
         /** @see \Schoolbox\Resource\Folder\Mapper::findCheaplyById */
@@ -1317,7 +1320,7 @@ class AccessTest extends TestCase
      */
     private function getMockFolderCodeMapper(ObjectTree $folderTree, array $folderCodeData): Folder\Code\Mapper
     {
-        /** @var PHPUnit_Framework_MockObject_MockObject|Folder\Code\Mapper $folderCodeMapper */
+        /** @var MockObject|Folder\Code\Mapper $folderCodeMapper */
         $folderCodeMapper = $this->createMock(Folder\Code\Mapper::class);
 
         /** @var Folder\Model $folder */
@@ -1354,7 +1357,7 @@ class AccessTest extends TestCase
      */
     private function getMockExternalUserInterface(array $externalUserData): External_UserInterface
     {
-        /** @var PHPUnit_Framework_MockObject_MockObject|External_UserInterface $externalUserInterface */
+        /** @var MockObject|External_UserInterface $externalUserInterface */
         $externalUserInterface = $this->createMock(External_UserInterface::class);
 
         $subjectLists = [];
@@ -1398,7 +1401,7 @@ class AccessTest extends TestCase
      */
     private function getMockRoleAccessMapper(ObjectTree $folderTree, GenericCollection $roles, array $roleAccessData): RoleAccessMapper
     {
-        /** @var PHPUnit_Framework_MockObject_MockObject|RoleAccessMapper $roleAccessMapper */
+        /** @var MockObject|RoleAccessMapper $roleAccessMapper */
         $roleAccessMapper = $this->createMock(RoleAccessMapper::class);
 
         /**

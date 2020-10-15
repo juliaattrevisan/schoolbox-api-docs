@@ -26,7 +26,7 @@ class FloatGeneratorTest extends TestCase
         $rng = new FloatGenerator(1234567);
         foreach (range(1, 1000) as $i) {
             $random = $rng->generate();
-            $this->assertInternalType('float', $random);
+            $this->assertIsFloat($random);
             $this->assertGreaterThanOrEqual(0, $random);
             $this->assertLessThanOrEqual(1, $random);
         }

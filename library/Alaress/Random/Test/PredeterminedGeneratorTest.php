@@ -19,10 +19,11 @@ class PredeterminedGeneratorTest extends TestCase
     /**
      * Test that I can't create a generator with no predetermined values.
      *
-     * @expectedException LengthException
+     *
      */
     public function testGenerationWithEmptyGenerator()
     {
+        $this->expectException(LengthException::class);
         new PredeterminedGenerator([]);
     }
 

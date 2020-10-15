@@ -20,12 +20,12 @@ class ColorFactoryTest extends TestCase
      */
     protected $colorFactory;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->colorFactory = new ColorFactory();
     }
 
-    public function getCreateHexData()
+    public function getCreateHexData(): array
     {
         return array(
             array('#123456', new Color(0x12, 0x34, 0x56)),
@@ -36,7 +36,7 @@ class ColorFactoryTest extends TestCase
     /**
      * @dataProvider getCreateHexData
      */
-    public function testCreateHex($colorString, Color $expectedColor)
+    public function testCreateHex($colorString, Color $expectedColor): void
     {
         $actualColor = $this->colorFactory->build($colorString);
         $this->assertEquals($expectedColor->getRed(), $actualColor->getRed());
@@ -63,7 +63,7 @@ class ColorFactoryTest extends TestCase
         $this->assertEquals($expectedColor->getGreen(), $actualColor->getGreen());
         $this->assertEquals($expectedColor->getBlue(), $actualColor->getBlue());
         // Working with floats for alpha channel, expect precisional issues
-        $this->assertEquals($expectedColor->getAlpha(), $actualColor->getAlpha(), '', 0.01);
+        $this->assertEqualsWithDelta($expectedColor->getAlpha(), $actualColor->getAlpha(), 0.01);
     }
 
     public function getCreateRgbData()
@@ -103,7 +103,7 @@ class ColorFactoryTest extends TestCase
         $this->assertEquals($expectedColor->getGreen(), $actualColor->getGreen());
         $this->assertEquals($expectedColor->getBlue(), $actualColor->getBlue());
         // Working with floats for alpha channel, expect precisional issues
-        $this->assertEquals($expectedColor->getAlpha(), $actualColor->getAlpha(), '', 0.01);
+        $this->assertEqualsWithDelta($expectedColor->getAlpha(), $actualColor->getAlpha(), 0.01);
     }
 
     public function getInvalidFormatData()
@@ -119,11 +119,13 @@ class ColorFactoryTest extends TestCase
 
     /**
      * @dataProvider getInvalidFormatData
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /does not match expected format/
+     *
+     *
      */
     public function testInvalidFormat($colorString)
     {
+        $this->expectExceptionMessageMatches("/does not match expected format/");
+        $this->expectException(\InvalidArgumentException::class);
         $this->colorFactory->build($colorString);
     }
 }

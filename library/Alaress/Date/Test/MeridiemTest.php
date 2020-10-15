@@ -12,7 +12,6 @@ namespace Alaress\Date\Test;
 use Alaress\Test\Date\MockDateObject;
 use Alaress_Date_Format;
 use InvalidArgumentException;
-use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
 
 class MeridiemTest extends TestCase
@@ -92,7 +91,7 @@ class MeridiemTest extends TestCase
      */
     public function testSetInvalid12Hour($hour, $meridiem)
     {
-        $this->expectException(Warning::class);
+        $this->expectWarning();
         $date = $this->buildDateObject();
         $date->set12Hour($hour, $meridiem);
     }
@@ -208,7 +207,7 @@ class MeridiemTest extends TestCase
      */
     public function testSetInvalid12HourTime($hour, $minute, $second, $meridiem)
     {
-        $this->expectException(Warning::class);
+        $this->expectWarning();
         $date = $this->buildDateObject();
         $date->set12HourTime($hour, $minute, $second, $meridiem);
     }
@@ -292,11 +291,9 @@ class MeridiemTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testInvalidIsMeridiem()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->assertTrue($this->buildDateObject()->isMeridiem('cm'));
     }
 }

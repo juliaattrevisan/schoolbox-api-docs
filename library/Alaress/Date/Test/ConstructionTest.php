@@ -21,7 +21,7 @@ class ConstructionTest extends TestCase
 {
     use MockDateObject;
 
-    public function setup()
+    public function setup(): void
     {
         if (!isset($_SERVER['REQUEST_TIME'])) {
             $this->markTestSkipped('No $_SERVER[REQUEST_TIME], cannot accurately test Alaress_Date_Format builders');
@@ -44,11 +44,9 @@ class ConstructionTest extends TestCase
         $this->assertEquals($copiedDate->getDatabase(), $date->getDatabase());
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testInvalidCreate()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->buildDateObject('2015-03-25');
     }
 
@@ -133,10 +131,11 @@ class ConstructionTest extends TestCase
     /**
      * Ensures that a date errors out if no format matches.
      *
-     * @expectedException InvalidArgumentException
+     *
      */
     public function testMultipleDateFormatsNoneMatches()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->buildDateObject('2015-03-25', ['d/m/Y', 'Ymd']);
     }
 

@@ -63,11 +63,9 @@ class NotificationTest extends TestCase
     }
 
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testAppendInvalidInstance()
     {
+        $this->expectException(InvalidArgumentException::class);
         new \Alaress\Async\Notification\Notification([
             $this->newInstance('foobar'),
             $this->newInstance('globber'),

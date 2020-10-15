@@ -32,7 +32,7 @@ class ResolverTest extends TestCase
      *
      * @since Method available since Release 3.4.0
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$routerFromFile = self::newRealWorldRouter();
         self::$routerFromFile->lock();
@@ -128,7 +128,7 @@ class ResolverTest extends TestCase
         $fp = fopen(__DIR__ . '/bind.list', 'rb');
 
         while ($line = trim(fgets($fp))) {
-            list($exchange, $route) = explode("\t", $line, 2);
+            [$exchange, $route] = explode("\t", $line, 2);
 
             if (strpos($route, 'notify') === false) {
                 // exclude all deprecated route types
@@ -211,10 +211,10 @@ class ResolverTest extends TestCase
     /**
      * Test that a topic redirecting onto itself triggers a recursion
      *
-     * @expectedException OverflowException
+     *
      */
     public function testBasicSelfRecursion()
-    {
+    {$this->expectException(OverflowException::class);
         $topic = 'foo.bar';
 
         $resolver = $this->newResolver(
@@ -229,10 +229,11 @@ class ResolverTest extends TestCase
     /**
      * Test that a string of multiple connected redirecting in a circle triggers a recursion
      *
-     * @expectedException OverflowException
+     *
      */
     public function testExtendedRecursion()
     {
+        $this->expectException(OverflowException::class);
         $stack = [
             'i.j.foo.bar',
             'i.j.bar.baz',

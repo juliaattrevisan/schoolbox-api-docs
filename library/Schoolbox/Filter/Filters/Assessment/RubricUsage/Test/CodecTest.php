@@ -29,7 +29,7 @@ class CodecTest extends TestCase
     /**
      * This method is called before the first test of this test class is run.
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$codec = new Codec();
     }
@@ -40,10 +40,11 @@ class CodecTest extends TestCase
     /**
      * @param CapabilityModel $capability
      * @dataProvider providerEncodeInvalidCapability
-     * @expectedException InvalidArgumentException
+     *
      */
     public function testEncodeInvalidCapability(CapabilityModel $capability): void
     {
+        $this->expectException(InvalidArgumentException::class);
         self::$codec->encodeCapability($capability);
     }
 
@@ -63,10 +64,11 @@ class CodecTest extends TestCase
     /**
      * @param IndicatorModel $indicator
      * @dataProvider providerEncodeInvalidIndicator
-     * @expectedException InvalidArgumentException
+     *
      */
     public function testEncodeInvalidIndicator(IndicatorModel $indicator): void
     {
+        $this->expectException(InvalidArgumentException::class);
         self::$codec->encodeIndicator($indicator);
     }
 
@@ -86,10 +88,11 @@ class CodecTest extends TestCase
     /**
      * @param string $key
      * @dataProvider providerInvalidDecode
-     * @expectedException UnexpectedValueException
+     *
      */
     public function testInvalidDecode(string $key): void
     {
+        $this->expectException(UnexpectedValueException::class);
         self::$codec->decode($key);
     }
 

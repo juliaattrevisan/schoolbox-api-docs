@@ -30,7 +30,7 @@ class ObjectReaderTest extends TestCase
      * This method is called before a test is executed.
      *
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $campus1 = new Campus();
         $campus1->setName('Apple');
@@ -110,7 +110,7 @@ class ObjectReaderTest extends TestCase
     {
         $reader = new ObjectReader();
         $value = $reader->coerce($input);
-        $this->assertInternalType('string', $value);
+        $this->assertIsString($value);
         $this->assertEquals($expected, $value);
     }
 
@@ -134,10 +134,11 @@ class ObjectReaderTest extends TestCase
      *
      * @dataProvider stringCoercionDataInvalid
      * @param mixed $input
-     * @expectedException DomainException
+     *
      */
     public function testCoerceToStringInvalid($input)
     {
+        $this->expectException(DomainException::class);
         $reader = new ObjectReader();
         $reader->coerce($input);
     }
@@ -230,10 +231,11 @@ class ObjectReaderTest extends TestCase
     /**
      * Test that a non-existent property throws a domain exception
      *
-     * @expectedException DomainException
+     *
      */
     public function testReadNonexistentCollectionValue()
     {
+        $this->expectException(DomainException::class);
         $reader = new ObjectReader();
 
         // will throw

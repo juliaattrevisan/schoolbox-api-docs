@@ -86,10 +86,11 @@ class NullDateTest extends TestCase
     /**
      * Test that comparisons on null datetimes don't work
      *
-     * @expectedException BadMethodCallException
+     *
      */
     public function testComparison()
     {
+        $this->expectException(BadMethodCallException::class);
         $nullDate = new Alaress_Date_NullDate();
         $nullDate->eq($this->buildDateObject('2014-03-13', Alaress_Date_NullDate::DATABASE_DATE_FORMAT));
     }

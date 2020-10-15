@@ -53,7 +53,7 @@ class DehydratorTest extends TestCase
     /**
      * Setup stuff
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->dehydrator = new Dehydrator();
         $this->linker     = new ParticipantLinker();

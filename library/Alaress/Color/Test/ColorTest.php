@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests for the color class
  *
@@ -19,12 +20,12 @@ class ColorTest extends TestCase
      */
     protected $color;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->color = new Color(0, 0, 0);
     }
 
-    public function getAssertColorSuccessData()
+    public function getAssertColorSuccessData(): array
     {
         return array(
             array(0, 0),
@@ -37,7 +38,7 @@ class ColorTest extends TestCase
     /**
      * @dataProvider getAssertColorSuccessData
      */
-    public function testAssertColorSuccess($value, $expectedValue)
+    public function testAssertColorSuccess($value, $expectedValue): void
     {
         $this->color->setGreen($value);
         $this->assertEquals($expectedValue, $this->color->getGreen());
@@ -56,10 +57,11 @@ class ColorTest extends TestCase
 
     /**
      * @dataProvider getAssertColorFailureData
-     * @expectedException \InvalidArgumentException
+     *
      */
     public function testAssertColorFailure($value)
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->color->setGreen($value);
     }
 
@@ -78,7 +80,7 @@ class ColorTest extends TestCase
     public function testAssertAlphaSuccess($value, $expectedValue)
     {
         $this->color->setAlpha($value);
-        $this->assertEquals($expectedValue, $this->color->getAlpha(), '', 0.01);
+        $this->assertEqualsWithDelta($expectedValue, $this->color->getAlpha(), 0.01);
     }
 
     public function getAssertAlphaFailureData()
@@ -93,10 +95,11 @@ class ColorTest extends TestCase
 
     /**
      * @dataProvider getAssertAlphaFailureData
-     * @expectedException \InvalidArgumentException
+     *
      */
     public function testAssertAlphaFailure($value)
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->color->setAlpha($value);
     }
 

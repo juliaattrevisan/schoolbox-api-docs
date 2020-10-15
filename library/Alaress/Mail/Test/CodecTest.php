@@ -37,10 +37,11 @@ class CodecTest extends TestCase
      * @param string $input
      * @param string $expected
      *
-     * @expectedException \TypeError
+     *
      */
     public function testInvalidDecodeData($input, $expected)
     {
+        $this->expectException(\TypeError::class);
         $this->assertEquals($expected, Codec::decode($input));
     }
 
@@ -49,10 +50,11 @@ class CodecTest extends TestCase
      * @param string $input
      * @param string $expected
      *
-     * @expectedException \TypeError
+     *
      */
     public function testInvalidEncodeData($input, $expected)
     {
+        $this->expectException(\TypeError::class);
         $this->assertEquals($expected, Codec::encode($input));
     }
 

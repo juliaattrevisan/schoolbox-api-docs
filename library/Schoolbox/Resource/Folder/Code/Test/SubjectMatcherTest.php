@@ -20,7 +20,7 @@ class SubjectMatcherTest extends TestCase
 {
     private static $factory;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
         self::$factory = new SubjectCodeMatchFactory();

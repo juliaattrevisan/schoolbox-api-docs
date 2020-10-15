@@ -38,7 +38,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
      * @throws \UnexpectedValueException
      * @throws PHPUnit\Framework\Exception
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

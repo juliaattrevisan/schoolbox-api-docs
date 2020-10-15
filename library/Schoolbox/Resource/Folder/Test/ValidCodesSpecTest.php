@@ -7,8 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Folder\Test;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder\ValidCodesSpec;
@@ -208,7 +208,7 @@ class ValidCodesSpecTest extends TestCase
      */
     private function createSpec(int $countDbMatches): ValidCodesSpec
     {
-        /** @var Folder\Code\Mapper|PHPUnit_Framework_MockObject_MockObject $folderCodeMapper */
+        /** @var Folder\Code\Mapper|MockObject $folderCodeMapper */
         $folderCodeMapper = $this->createMock(Folder\Code\Mapper::class);
 
         $mockDatabase = $this->createMock(MockDatabase::class);

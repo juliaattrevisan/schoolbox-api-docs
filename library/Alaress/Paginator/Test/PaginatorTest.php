@@ -117,27 +117,30 @@ class PaginatorTest extends TestCase {
     /**
      * Tests that zero pagesize is invalid.
      *
-     * @expectedException OutOfRangeException
+     *
      */
     public function testZeroPagesize() {
+        $this->expectException(OutOfRangeException::class);
         $this->buildPaginator(0, 0);
     }
 
     /**
      * Tests that negative pagesize is invalid.
      *
-     * @expectedException OutOfRangeException
+     *
      */
     public function testNegativePagesize() {
+        $this->expectException(OutOfRangeException::class);
         $this->buildPaginator(-1, 0);
     }
 
     /**
      * Tests for zero total - any method that expects a page number should fail.
      *
-     * @expectedException OutOfRangeException
+     *
      */
     public function testZeroTotalOffset() {
+        $this->expectException(OutOfRangeException::class);
         $paginator = $this->buildPaginator(10, 0);
         $paginator->getOffset(1);
     }
@@ -145,9 +148,10 @@ class PaginatorTest extends TestCase {
     /**
      * Tests for zero total - any method that expects a page number should fail.
      *
-     * @expectedException OutOfRangeException
+     *
      */
     public function testZeroTotalFirstOnPage() {
+        $this->expectException(OutOfRangeException::class);
         $paginator = $this->buildPaginator(10, 0);
         $paginator->getFirstOnPage(1);
     }
@@ -155,9 +159,10 @@ class PaginatorTest extends TestCase {
     /**
      * Tests for zero total - any method that expects a page number should fail.
      *
-     * @expectedException OutOfRangeException
+     *
      */
     public function testZeroTotalLastOnPage() {
+        $this->expectException(OutOfRangeException::class);
         $paginator = $this->buildPaginator(10, 0);
         $paginator->getLastOnPage(1);
     }
@@ -165,9 +170,10 @@ class PaginatorTest extends TestCase {
     /**
      * Tests that negative total is invalid.
      *
-     * @expectedException OutOfRangeException
+     *
      */
     public function testNegativeTotal() {
+        $this->expectException(OutOfRangeException::class);
         $this->buildPaginator(10, -1);
     }
 
@@ -195,9 +201,10 @@ class PaginatorTest extends TestCase {
      * Tests that requesting a page number below the minimum range is invalid.
      *
      * @dataProvider      getTestPageNumberLowerBoundData
-     * @expectedException OutOfRangeException
+     *
      */
     public function testPageNumberLowerBound(Paginator $paginator, $pageNumber) {
+        $this->expectException(OutOfRangeException::class);
         $paginator->getFirstOnPage($pageNumber);
     }
 
@@ -224,9 +231,10 @@ class PaginatorTest extends TestCase {
      * Tests that requesting a page number above the minimum range is invalid.
      *
      * @dataProvider      getTestPageNumberUpperBoundData
-     * @expectedException OutOfRangeException
+     *
      */
     public function testPageNumberUpperBound(Paginator $paginator, $pageNumber) {
+        $this->expectException(OutOfRangeException::class);
         $paginator->getFirstOnPage($pageNumber);
     }
 }

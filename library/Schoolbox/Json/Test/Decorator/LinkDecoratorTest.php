@@ -32,7 +32,7 @@ class LinkDecoratorTest extends TestCase
     /**
      * This method is called before the first test of this test class is run.
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->router = $this->getMockBuilder(Router::class)
             ->disableOriginalConstructor()

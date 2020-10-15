@@ -15,12 +15,13 @@ class InvalidAlaressDateFormatTest extends TestCase
      * Empty string input
      * Returns empty string
      *
-     * @expectedException InvalidArgumentException
+     *
      *
      * @return void
      */
     public function testEmptyString()
     {
+        $this->expectException(InvalidArgumentException::class);
         $input = '';
         $date = $this->buildDateObject($input, 'Y-m-d H:i:s');
         $this->assertFalse($date->isValid());
@@ -30,12 +31,13 @@ class InvalidAlaressDateFormatTest extends TestCase
      * Random text string input
      * Returns empty string
      *
-     * @expectedException InvalidArgumentException
+     *
      *
      * @return void
      */
     public function testString()
     {
+        $this->expectException(InvalidArgumentException::class);
         $input = 'gronk de la guber';
         $date = $this->buildDateObject($input, 'Y-m-d H:i:s');
         $this->assertFalse($date->isValid());
@@ -73,12 +75,13 @@ class InvalidAlaressDateFormatTest extends TestCase
      *
      * This isn't a valid date format at all.
      *
-     * @expectedException InvalidArgumentException
+     *
      *
      * @return void
      */
     public function testInvalidDate3()
     {
+        $this->expectException(InvalidArgumentException::class);
         $input = '4333/6735/34508';
         $date = $this->buildDateObject($input, 'd/m/Y');
         $this->assertFalse($date->isValid());
@@ -88,12 +91,13 @@ class InvalidAlaressDateFormatTest extends TestCase
      * Random but illegal digits in a date format
      * Returns empty string
      *
-     * @expectedException InvalidArgumentException
+     *
      *
      * @return void
      */
     public function testInvalidDate4()
     {
+        $this->expectException(InvalidArgumentException::class);
         $input = '234/82354';
         $date = $this->buildDateObject($input, 'd/m/Y');
         $this->assertFalse($date->isValid());
@@ -103,12 +107,13 @@ class InvalidAlaressDateFormatTest extends TestCase
      * Random but illegal digits in a partial date format
      * Returns empty string
      *
-     * @expectedException InvalidArgumentException
+     *
      *
      * @return void
      */
     public function testPartialDate1()
     {
+        $this->expectException(InvalidArgumentException::class);
         $input = '12/02';
         $date = $this->buildDateObject($input, 'd/m/Y');
         $this->assertFalse($date->isValid());
@@ -118,12 +123,13 @@ class InvalidAlaressDateFormatTest extends TestCase
      * Random but illegal digits in a partial date format
      * Returns empty string
      *
-     * @expectedException InvalidArgumentException
+     *
      *
      * @return void
      */
     public function testPartialDate2()
     {
+        $this->expectException(InvalidArgumentException::class);
         $input = '02-02';
         $date = $this->buildDateObject($input, 'd/m/Y');
         $this->assertFalse($date->isValid());
@@ -133,12 +139,13 @@ class InvalidAlaressDateFormatTest extends TestCase
      * Random but illegal digits in a partial date format
      * Returns empty string
      *
-     * @expectedException InvalidArgumentException
+     *
      *
      * @return void
      */
     public function testPartialDate3()
     {
+        $this->expectException(InvalidArgumentException::class);
         $input = '02-2001';
         $date = $this->buildDateObject($input, 'd/m/Y');
         $this->assertFalse($date->isValid());

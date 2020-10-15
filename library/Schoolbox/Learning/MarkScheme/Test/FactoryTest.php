@@ -41,12 +41,13 @@ class FactoryTest extends TestCase
     /**
      * @dataProvider provider_task_markTypeInvalid
      * @param Task $task
-     * @expectedException DomainException
+     *
      * @throws InvalidArgumentException If assessment class not registered
      * @throws DomainException
      */
     public function test_task_markTypeInvalid(Task $task)
     {
+        $this->expectException(DomainException::class);
         $factory = new MarkSchemeFactory();
         $factory->spawnMarkSchemeFor($task);
     }
@@ -71,12 +72,13 @@ class FactoryTest extends TestCase
     /**
      * @dataProvider provider_quiz_markTypeInvalid
      * @param Quiz $quiz
-     * @expectedException DomainException
+     *
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
     public function test_quiz_markTypeInvalid(Quiz $quiz)
     {
+        $this->expectException(DomainException::class);
         $factory = new MarkSchemeFactory();
         $factory->spawnMarkSchemeFor($quiz);
     }
@@ -101,12 +103,13 @@ class FactoryTest extends TestCase
     /**
      * @dataProvider provider_dueWOrk_markTypeInvalid
      * @param DueWork $dueWork
-     * @expectedException DomainException
+     *
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
     public function test_dueWork_markTypeInvalid(DueWork $dueWork)
     {
+        $this->expectException(DomainException::class);
         $factory = new MarkSchemeFactory();
         $factory->spawnMarkSchemeFor($dueWork);
     }
@@ -131,12 +134,13 @@ class FactoryTest extends TestCase
     /**
      * @dataProvider provider_project_markTypeInvalid
      * @param Project $project
-     * @expectedException DomainException
+     *
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
     public function test_project_markTypeInvalid($project)
     {
+        $this->expectException(DomainException::class);
         $factory = new MarkSchemeFactory();
         $factory->spawnMarkSchemeFor($project);
     }

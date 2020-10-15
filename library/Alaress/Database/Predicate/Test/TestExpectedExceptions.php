@@ -34,7 +34,7 @@ class TestExpectedExceptions extends TestCase
     /**
      * @inheritdoc
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->mySqlQuoter = new Mysql\Quoter();
@@ -49,7 +49,7 @@ class TestExpectedExceptions extends TestCase
      * @throws PHPUnit\Framework\Exception
      * @throws UnderflowException
      */
-    public function test_addColumnList(string $invalidColumnName, $value)
+    public function test_addColumnList(string $invalidColumnName, $value): void
     {
         $this->expectException(InvalidColumnException::class);
         $pb = new Builder($this->mySqlQuoter, 'table');

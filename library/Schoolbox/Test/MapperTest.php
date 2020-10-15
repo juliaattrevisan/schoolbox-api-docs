@@ -31,7 +31,7 @@ class MapperTest extends TestCase
     protected $db;
 
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->object = new TestMapper($this);

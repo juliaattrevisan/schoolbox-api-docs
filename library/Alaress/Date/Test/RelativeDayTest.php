@@ -23,7 +23,7 @@ class RelativeDayTest extends TestCase
     /**
      * Set up a mock config object.
      */
-    public function setup()
+    public function setup(): void
     {
         $mockConfig = $this->createMock(Loader::class);
         $mockConfig

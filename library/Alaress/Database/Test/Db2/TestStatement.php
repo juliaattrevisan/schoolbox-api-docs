@@ -24,7 +24,7 @@ class TestStatement extends TestCase
     /**
      * Connect to database, begin transaction
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->connectDb2Test();
         $this->db2Test->beginTransaction();
@@ -33,7 +33,7 @@ class TestStatement extends TestCase
     /**
      * Roll back when done
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->db2Test->rollBack();
     }

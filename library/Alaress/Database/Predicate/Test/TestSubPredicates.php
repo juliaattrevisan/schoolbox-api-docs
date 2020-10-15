@@ -27,14 +27,14 @@ class TestSubPredicates extends TestCase
     /**
      * @inheritdoc
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->mySqlQuoter = new Mysql\Quoter();
     }
 
 
-    public function testBuildSubBuilder()
+    public function testBuildSubBuilder(): void
     {
         $pb    = new TestableBuilder($this->mySqlQuoter, 'table');
         $subPb = $pb->emptyClone();
@@ -130,7 +130,7 @@ class TestSubPredicates extends TestCase
         // Each should be present in the WHERE clause
         $where = implode(' AND ', $pb->getWhere());
         foreach (array_keys($pb->getParams()) as $placeholder) {
-            $this->assertContains($placeholder, $where);
+            $this->assertStringContainsString($placeholder, $where);
         }
     }
 }

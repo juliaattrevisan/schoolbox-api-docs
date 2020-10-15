@@ -221,10 +221,11 @@ class DSNCodecTest extends TestCase
      * @param array  $expected
      * @throws DomainException
      *
-     * @expectedException DomainException
+     *
      */
     public function testInvalidDSNDecode(string $dsn, $expected): void
     {
+        $this->expectException(DomainException::class);
 
         /* Invalid DSNs are the exact opposite of the one and only Valid DSN format which
          * requires you to provide the three Tass Product Modules and three credential tuples

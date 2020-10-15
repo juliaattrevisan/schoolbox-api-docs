@@ -46,22 +46,18 @@ class PercentageTest extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
-    /**
-     * @expectedException RangeException
-     */
     public function test_getNormalised_TooLow()
     {
+        $this->expectException(RangeException::class);
         $humanReadable = '-0.0001 %';
         $markScheme = new Percentage();
         $markScheme->getNormalisedMark($humanReadable);
     }
 
 
-    /**
-     * @expectedException RangeException
-     */
     public function test_getNormalised_TooHigh()
     {
+        $this->expectException(RangeException::class);
         $humanReadable = '100.0000001 %';
         $markScheme = new Percentage();
         $markScheme->getNormalisedMark($humanReadable);

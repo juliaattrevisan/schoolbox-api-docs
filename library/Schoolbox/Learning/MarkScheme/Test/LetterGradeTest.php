@@ -18,11 +18,9 @@ use \InvalidArgumentException;
 class LetterGradeTest extends TestCase
 {
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function test_Unknown_Caption()
     {
+        $this->expectException(InvalidArgumentException::class);
         $humanReadable = 'Some Unknown Captions';
         $gradeGroup = $this->getDummyLetterGradeGroup();
         $markScheme = new LetterGrade($gradeGroup);

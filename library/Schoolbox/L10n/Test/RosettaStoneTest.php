@@ -21,7 +21,7 @@ class RosettaStoneTest extends TestCase
     /**
      * Build a stone
      */
-    public function setup()
+    public function setUp(): void
     {
         $this->stone = (new RosettaStone())
             ->addTerm($this->buildTerm('ca', 'Calendar', 'calendar', 'calendars', 'a', true))
@@ -134,10 +134,11 @@ class RosettaStoneTest extends TestCase
 
     /**
      * @dataProvider getTestTranslateUnknownTermData
-     * @expectedException \OutOfBoundsException
+     *
      */
     public function testTranslateUnknownTerm($term)
     {
+        $this->expectException(\OutOfBoundsException::class);
         $this->stone->translate($term, false, false);
     }
 
@@ -151,10 +152,11 @@ class RosettaStoneTest extends TestCase
 
     /**
      * @dataProvider getTestTranslateUnknownTermData
-     * @expectedException \OutOfBoundsException
+     *
      */
     public function testTranslateIndefiniteArticleUnknownTerm($term)
     {
+        $this->expectException(\OutOfBoundsException::class);
         $this->stone->indefiniteArticle($term, false);
     }
 

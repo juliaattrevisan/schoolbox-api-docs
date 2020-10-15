@@ -42,10 +42,11 @@ class RelativeUrlTest extends TestCase
     /**
      * @dataProvider provider_invalidUrlType
      * @param mixed $url
-     * @expectedException InvalidArgumentException
+     *
      */
     public function test_constructor_invalidUrlType($url)
     {
+        $this->expectException(InvalidArgumentException::class);
         $siteHost = 'www.example.com';
         new Url($url, $siteHost);
     }
@@ -176,11 +177,12 @@ class RelativeUrlTest extends TestCase
 
     /**
      * @dataProvider provider_notParsable
-     * @expectedException InvalidArgumentException
+     *
      * @string $url
      */
     public function test_normalise_unParsable($url)
     {
+        $this->expectException(InvalidArgumentException::class);
         $urlFormatter = new Url($url, false);
         $urlFormatter->normalise();
     }

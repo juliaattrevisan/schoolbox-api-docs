@@ -19,7 +19,7 @@ use Alaress\Database\Quoter\IQuoter;
 use Alaress\IDatabase;
 use PDO;
 use PDOStatement;
-use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Traversable;
 
@@ -36,7 +36,7 @@ class MockDatabase implements IDatabase, IQuoter
     /**
      * The mock statement
      *
-     * @var PHPUnit_Framework_MockObject_MockObject|PDOStatement
+     * @var MockObject|PDOStatement
      */
     protected $mock_statement;
 
@@ -124,7 +124,7 @@ class MockDatabase implements IDatabase, IQuoter
      * @param string $query Ignored
      * @param array  $args  Ignored
      *
-     * @return PDOStatement|PHPUnit_Framework_MockObject_MockObject
+     * @return PDOStatement|MockObject
      */
     public function prepare($query, array $args = [])
     {

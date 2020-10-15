@@ -29,10 +29,11 @@ class StudentAttributesTest extends TestCase
      *
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @expectedException InvalidArgumentException
+     *
      */
     public function testDeletedUser(): void
     {
+        $this->expectException(InvalidArgumentException::class);
         $user = (new User())
             ->setYear(10)
             ->setDeletedAt(new Alaress_Date_Format('2010-01-01', Alaress_Date_Format::DATABASE_DATE_FORMAT));
@@ -45,11 +46,12 @@ class StudentAttributesTest extends TestCase
      *
      * @dataProvider providerInvalidTermDates
      * @param array $invalidTermDates
-     * @expectedException InvalidArgumentException
+     *
      * @throws UnexpectedValueException
      */
     public function testInvalidTermDates(array $invalidTermDates): void
     {
+        $this->expectException(InvalidArgumentException::class);
         $user = (new User())->setYear(10);
         new StudentAttributes(new TestLoader($invalidTermDates), $user);
     }
@@ -58,10 +60,11 @@ class StudentAttributesTest extends TestCase
     /**
      * Test we don't attempt to produce a report for a student too far in the past
      *
-     * @expectedException InvalidArgumentException
+     *
      */
     public function testInvalidHistoricalReport(): void
     {
+        $this->expectException(InvalidArgumentException::class);
         $user = (new User())->setYear(7);
         new StudentAttributes($this->getConfigLoader(), $user, null, '2010-02-15', '2011-02-15');
     }
@@ -114,10 +117,11 @@ class StudentAttributesTest extends TestCase
      * @param string $invalidYear
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @expectedException InvalidArgumentException
+     *
      */
     public function testInvalidYearLevel($invalidYear): void
     {
+        $this->expectException(InvalidArgumentException::class);
         $user = (new User())->setYear($invalidYear);
         new StudentAttributes($this->getConfigLoader(), $user);
     }
@@ -131,10 +135,11 @@ class StudentAttributesTest extends TestCase
      * @param string $nowDate
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @expectedException InvalidArgumentException
+     *
      */
     public function testInvalidFutureReport(string $reportDate, string $nowDate): void
     {
+        $this->expectException(InvalidArgumentException::class);
         $user = (new User())->setYear(10);
         new StudentAttributes($this->getConfigLoader(), $user, null, $reportDate, $nowDate);
     }

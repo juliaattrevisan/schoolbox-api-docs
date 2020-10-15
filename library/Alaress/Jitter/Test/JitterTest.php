@@ -69,10 +69,11 @@ class JitterTest extends TestCase
     /**
      * Test jitter object when max attempts is exceeded
      *
-     * @expectedException \Alaress\Jitter\MaxAttemptsExceededException
+     *
      */
     public function testJitterMaxAttempts()
     {
+        $this->expectException(\Alaress\Jitter\MaxAttemptsExceededException::class);
         $jitter = new Jitter(new PredeterminedGenerator([0.3, 0.1, 0.5, 0.7, 0.9]), 5, 100);
 
         $jitter->calculateJitter(5);

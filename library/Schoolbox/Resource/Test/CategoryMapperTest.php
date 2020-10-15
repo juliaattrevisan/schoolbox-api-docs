@@ -24,7 +24,7 @@ class CategoryMapperTest extends TestCase
         ['storage_dir', '/tmp/storage'],
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         //
         // Move to setupObject instead

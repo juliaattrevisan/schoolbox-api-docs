@@ -157,10 +157,11 @@ class ProjectTest extends TestCase
     /**
      * Test translation of projects which contain projects, greater than permitted level
      *
-     * @expectedException \UnexpectedValueException
+     *
      */
     public function testTranslateWithinProjectToDataModel()
     {
+        $this->expectException(\UnexpectedValueException::class);
         $this->translator->setMaxProjectLevels(1);
 
         $project = (new Project(new Average()))
@@ -372,10 +373,11 @@ class ProjectTest extends TestCase
     /**
      * Test translation of projects which contain projects.
      *
-     * @expectedException \UnexpectedValueException
+     *
      */
     public function testTranslateWithinProjectToDomainModel()
     {
+        $this->expectException(\UnexpectedValueException::class);
         $projectModel = (new ProjectModel())
             ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
             ->setAssessmentModel(
@@ -823,10 +825,11 @@ class ProjectTest extends TestCase
     /**
      * Verify that a project tree with a cyclic reference cannot be translated.
      *
-     * @expectedException \LogicException
+     *
      */
     public function testDataProjectTreeCyclicReference()
     {
+        $this->expectException(\LogicException::class);
         $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
         $p1->getAssessmentModel()->setSubObject($p1);
 
@@ -845,10 +848,11 @@ class ProjectTest extends TestCase
     /**
      * Verify that a project tree that is too deep cannot be translated.
      *
-     * @expectedException \UnexpectedValueException
+     *
      */
     public function testDataProjectTreeExceedingMaxDepth()
     {
+        $this->expectException(\UnexpectedValueException::class);
         $this->translator->setMaxProjectLevels(1);
 
         $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
@@ -866,10 +870,11 @@ class ProjectTest extends TestCase
     /**
      * Verify that a project tree cannot contain a project at its bottom level.
      *
-     * @expectedException \UnexpectedValueException
+     *
      */
     public function testDataProjectTreeDisallowsBottomLevelProject()
     {
+        $this->expectException(\UnexpectedValueException::class);
         $this->translator->setMaxProjectLevels(2);
 
         $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))->setAssessments(new GenericCollection(AssessmentModel::class));
@@ -973,10 +978,11 @@ class ProjectTest extends TestCase
     /**
      * Verify that a project tree with a cyclic reference cannot be translated.
      *
-     * @expectedException \LogicException
+     *
      */
     public function testDomainProjectTreeCyclicReference()
     {
+        $this->expectException(\LogicException::class);
         $p1 = (new Project())->setId(1);
         $p2 = (new Project())->setId(2);
 
@@ -994,10 +1000,11 @@ class ProjectTest extends TestCase
     /**
      * Verify that a project tree that is too deep cannot be translated.
      *
-     * @expectedException \UnexpectedValueException
+     *
      */
     public function testDomainProjectTreeExceedingMaxDepth()
     {
+        $this->expectException(\UnexpectedValueException::class);
         $this->translator->setMaxProjectLevels(1);
 
         $p1 = (new Project())->setId(1);
@@ -1013,10 +1020,11 @@ class ProjectTest extends TestCase
     /**
      * Verify that a project tree cannot contain a project at its bottom level.
      *
-     * @expectedException \UnexpectedValueException
+     *
      */
     public function testDomainProjectTreeDisallowsBottomLevelProject()
     {
+        $this->expectException(\UnexpectedValueException::class);
         $this->translator->setMaxProjectLevels(2);
 
         $p1 = (new Project())->setId(1);

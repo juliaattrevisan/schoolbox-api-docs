@@ -7,8 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings\FieldType\SelectKey\Test;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use Schoolbox\Admin\Settings\Exceptions\FieldTypeMismatchException;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\FieldType;
@@ -181,7 +181,7 @@ class RendererTest extends TestCase
      */
     protected function buildFieldStrategyFactory(): FieldStrategyFactory
     {
-        /** @var MapperFactory|PHPUnit_Framework_MockObject_MockObject $mockMapperFactory */
+        /** @var MapperFactory|MockObject $mockMapperFactory */
         $mockMapperFactory = $this->createMock(MapperFactory::class);
         return new FieldStrategyFactory($mockMapperFactory, new CollectorFactory());
     }

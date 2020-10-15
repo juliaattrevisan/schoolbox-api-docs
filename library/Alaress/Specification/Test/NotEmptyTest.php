@@ -67,12 +67,13 @@ class NotEmptyTest extends TestCase
      *
      * @covers            \Alaress\Specification\NotEmpty::isSatisfiedBy
      * @dataProvider      getTestIsSatisfiedByInvalidCandidateData
-     * @expectedException TypeError
+     *
      *
      * @param mixed $candidate
      */
     public function testIsSatisfiedByInvalidCandidate($candidate): void
     {
+        $this->expectException(TypeError::class);
         (new NotEmpty())->isSatisfiedBy($candidate);
     }
 }

@@ -119,10 +119,10 @@ class TranslatorTest extends TestCase
     /**
      * Test translation of data model with no assessment.
      *
-     * @expectedException \UnexpectedValueException
      */
     public function testTranslateEmptyAssessmentToDomainModel()
     {
+        $this->expectException(\UnexpectedValueException::class);
         $dataModel = (new TaskModel())->setId(15);
         $this->translator->translateToDomainModel($dataModel);
     }
