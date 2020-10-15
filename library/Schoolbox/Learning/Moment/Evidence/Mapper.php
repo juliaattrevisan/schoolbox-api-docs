@@ -11,9 +11,11 @@ namespace Schoolbox\Learning\Moment\Evidence;
 
 use PDOStatement;
 use Schoolbox\Discussion\Thread\Mapper as ThreadMapper;
+use Schoolbox\File\Mimetype;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -32,7 +34,7 @@ class Mapper extends BaseMapper
         $this->hasTable('evidence');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
+        $this->joins('hash', Storage\Mapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('filename', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
         $this->joins('discussion_thread_id', ThreadMapper::class, 'id', null, null, 'discussionThread');
@@ -55,6 +57,7 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('storage', 'storage')},
+                {$this->getJoinColumnString('storage.allowedFileExtension', 'mimetype')},
                 {$this->getJoinColumnString('recipient', 'recipient')},
                 {$this->getJoinColumnString('creator', 'creator')}
         ";
@@ -71,6 +74,7 @@ class Mapper extends BaseMapper
         return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('storage', '', 'storage')}
+            LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'storage', 'mimetype')}
             LEFT JOIN {$this->getJoinSql('recipient', '', 'recipient', true)}
             LEFT JOIN {$this->getJoinSql('creator', '', 'creator', true)}
         ";
@@ -94,9 +98,26 @@ class Mapper extends BaseMapper
         foreach ($statement as $row) {
             /** @noinspection PhpUnhandledExceptionInspection */
             $model = $this->hydrate($row);
-            $model->setStorage($this->hydrateJoin($row, 'storage', 'storage'));
-            $model->setRecipient($this->hydrateJoin($row, 'recipient', 'recipient'));
-            $model->setCreator($this->hydrateJoin($row, 'creator', 'creator'));
+
+            /** @var Storage\Model|null $storage */
+            $storage = $this->hydrateJoin($row, 'storage', 'storage');
+            if ($storage) {
+                /** @var Mimetype|null $mimetype */
+                $mimetype = $this->hydrateJoin($row, 'storage.allowedFileExtension', 'mimetype');
+                if ($mimetype) {
+                    $storage->setMimetype($mimetype);
+                }
+            }
+            $model->setStorage($storage);
+
+            /** @var User|null $recipient */
+            $recipient = $this->hydrateJoin($row, 'recipient', 'recipient');
+            $model->setRecipient($recipient);
+
+            /** @var User|null $creator */
+            $creator = $this->hydrateJoin($row, 'creator', 'creator');
+            $model->setCreator($creator);
+
             $collection[$model->getId()] = $model;
         }
         return $collection;
