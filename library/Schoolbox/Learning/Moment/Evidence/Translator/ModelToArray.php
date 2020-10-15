@@ -21,6 +21,27 @@ use Schoolbox\Learning\Moment\Evidence;
 class ModelToArray
 {
     /**
+     * Translator for converting a user within the evidence model.
+     *
+     * (callable isn't a valid typedef)
+     *
+     * @var callable
+     */
+    private $userTranslator;
+
+
+    /**
+     * Constructor
+     *
+     * @param callable $userTranslator
+     */
+    public function __construct(callable $userTranslator)
+    {
+        $this->userTranslator = $userTranslator;
+    }
+
+
+    /**
      * @param Evidence\Model $model
      * @return array
      */
@@ -29,12 +50,12 @@ class ModelToArray
         // Creator and recipient cannot be null in persisted entities.
         // Allow them to be null when translating though?
         try {
-            $creator = ['id' => $model->getCreator()->getId(),];
+            $creator = call_user_func($this->userTranslator, $model->getCreator());
         } catch (Error $e) {
             $creator = null;
         }
         try {
-            $recipient = ['id' => $model->getRecipient()->getId(),];
+            $recipient = call_user_func($this->userTranslator, $model->getRecipient());
         } catch (Error $e) {
             $recipient = null;
         }

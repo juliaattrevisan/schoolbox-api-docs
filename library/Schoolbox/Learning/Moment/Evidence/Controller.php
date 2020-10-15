@@ -129,7 +129,7 @@ class Controller extends Base
                 ['user_id' => $user->getId(),],
                 ['order'   => ['created_at' => Mapper::SORT_ORDER_DESC]],
             )
-            ->map(new Translator\ModelToArray())
+            ->map(new Translator\ModelToArray(new User\Translator\ModelToArray()))
             ->reindex();
         $this->response->content->set(
             $this->buildJsonOutput([
@@ -209,7 +209,13 @@ class Controller extends Base
         }
         $this->mapper->save($evidenceCollection);
         $this->response->content->set(
-            $this->buildJsonOutput($evidenceCollection->map(new Translator\ModelToArray()))
+            $this->buildJsonOutput(
+                $evidenceCollection->map(
+                    new Translator\ModelToArray(
+                        new User\Translator\ModelToArray()
+                    )
+                )
+            )
         );
     }
 
