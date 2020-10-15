@@ -35,8 +35,11 @@ class Processor
 
     /**
      * The $key is a way to uniquely associate a cached image with a particular
-     * series of transformations applied to it. In this caching implementation,
-     * it's the file hash concatenated with the name of the transformation applied.
+     * series of transformations applied to it.
+     *
+     * It is used as the latter part of the transform's filename, eg "[hash]-[cacheKey]".
+     * It is NOT the same as the transform name. A transform can take parameters and thus a single
+     * transform can map to multiple cacheKeys.
      *
      * e.g. e2685ab-square64
      *
