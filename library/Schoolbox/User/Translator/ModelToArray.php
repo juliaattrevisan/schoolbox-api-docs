@@ -50,7 +50,7 @@ class ModelToArray
             'email'          => $user->getEmail(),
             '_links'         => [
                 'profile' => '/search/user/' . $user->getId(),
-                'avatar'  => '/profile.php?id=' . $user->getId(),
+                'avatar'  => '/portrait.php?id=' . $user->getId(),
             ],
             'externalId'     => $user->getExternalId(),
             'username'       => $user->getUsername(),

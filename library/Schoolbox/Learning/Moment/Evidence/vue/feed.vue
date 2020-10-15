@@ -125,8 +125,8 @@ export default {
                 <ul class="information-list">
                     <li v-for="evidence in evidenceGroup.evidence">
                         <div class="card small-12 compact">
-                            <a href="#" title="View Profile">
-                                <img :src="'/portrait.php?id=' + Number(evidence.creator.id) + '&amp;size=square64'" alt="View Profile">
+                            <a :href="evidence.creator._links.profile" title="View Profile">
+                                <img :src="evidence.creator._links.avatar + '&amp;size=square64'" alt="View Profile">
                                 <p>{{ evidence.creator.fullName }}</p>
                                 <time class="pipe meta"
                                       :datetime="evidence.createdAt.format()"
