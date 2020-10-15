@@ -59,6 +59,7 @@ class ModelToArray
             'title'          => $user->getTitle(),
             'firstName'      => $user->getFirstname(),
             'lastName'       => $user->getLastname(),
+            'fullName'       => $user->getFullName(),
             'isEmailDerived' => $user->getLocalEmail(),
             'altEmail'       => $user->getAltEmail(),
             'positionTitle'  => $user->getPositionTitle(),

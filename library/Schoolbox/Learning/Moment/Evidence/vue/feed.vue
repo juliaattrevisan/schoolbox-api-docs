@@ -109,17 +109,27 @@ export default {
 <template>
     <div>
         <div v-for="evidenceGroup in groupedEvidence">
-            <h2 class="subheader">{{ renderCreatedAt(evidenceGroup.date) }}</h2>
+            <h2 class="subheader">
+                <time :datetime="evidenceGroup.date.format('YYYY-MM-DD')"
+                      :title="evidenceGroup.date.format(dateDisplayFormats.momentJsDateLong)"
+                >{{ renderCreatedAt(evidenceGroup.date) }}</time>
+            </h2>
 
             <section>
-                <div v-for="evidence in evidenceGroup.evidence" class="list-item">
-                    <div class="card small-12">
-                        <a href="#" title="View Profile">
-                            <img :src="'/portrait.php?id=' + Number(evidence.creator.id) + '&amp;size=square64'" alt="View Profile">
-                        </a>
-                        | {{ evidence.createdAt.format(dateDisplayFormats.momentJsTime) }}
-                    </div>
-                </div>
+                <ul class="information-list">
+                    <li v-for="evidence in evidenceGroup.evidence">
+                        <div class="card small-12 compact">
+                            <a href="#" title="View Profile">
+                                <img :src="'/portrait.php?id=' + Number(evidence.creator.id) + '&amp;size=square64'" alt="View Profile">
+                                <p>{{ evidence.creator.fullName }}</p>
+                                <time class="pipe meta"
+                                      :datetime="evidence.createdAt.format()"
+                                      :title="evidence.createdAt.format(dateDisplayFormats.momentJsDatetime)"
+                                >{{ evidence.createdAt.format(dateDisplayFormats.momentJsTime) }}</time>
+                            </a>
+                        </div>
+                    </li>
+                </ul>
             </section>
         </div>
 
