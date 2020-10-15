@@ -31,13 +31,25 @@ class ModelToArray
 
 
     /**
+     * Translator for converting a storage object.
+     *
+     * (callable isn't a valid typedef)
+     *
+     * @var callable
+     */
+    private $storageTranslator;
+
+
+    /**
      * Constructor
      *
      * @param callable $userTranslator
+     * @param callable $storageTranslator
      */
-    public function __construct(callable $userTranslator)
+    public function __construct(callable $userTranslator, callable $storageTranslator)
     {
-        $this->userTranslator = $userTranslator;
+        $this->userTranslator    = $userTranslator;
+        $this->storageTranslator = $storageTranslator;
     }
 
 
@@ -73,7 +85,7 @@ class ModelToArray
             'filename'         => $model->getFilename(),
             'recipient'        => $recipient,
             'storage'          => $model->getStorage()
-                ? ['hash' => $model->getStorage()->getHash(),]
+                ? call_user_func($this->storageTranslator, $model->getStorage())
                 : null,
         ];
     }

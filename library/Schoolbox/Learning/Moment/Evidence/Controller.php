@@ -14,6 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Moment\Evidence\Translator;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Scrub;
 
@@ -130,7 +131,12 @@ class Controller extends Base
                 ['user_id' => $user->getId(),],
                 ['order'   => ['created_at' => Mapper::SORT_ORDER_DESC]],
             )
-            ->map(new Translator\ModelToArray(new User\Translator\ModelToArray()))
+            ->map(
+                new Translator\ModelToArray(
+                    new User\Translator\ModelToArray(),
+                    new Storage\Translator\ModelToArray(),
+                ),
+            )
             ->reindex()
             ->map(
                 // Scrub body HTML, as there's no guarantee it has been scrubbed
@@ -221,8 +227,9 @@ class Controller extends Base
             $this->buildJsonOutput(
                 $evidenceCollection->map(
                     new Translator\ModelToArray(
-                        new User\Translator\ModelToArray()
-                    )
+                        new User\Translator\ModelToArray(),
+                        new Storage\Translator\ModelToArray(),
+                    ),
                 )
             )
         );
