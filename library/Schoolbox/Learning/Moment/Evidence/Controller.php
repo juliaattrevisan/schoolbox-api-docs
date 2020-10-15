@@ -129,7 +129,8 @@ class Controller extends Base
                 ['user_id' => $user->getId(),],
                 ['order'   => ['created_at' => Mapper::SORT_ORDER_DESC]],
             )
-            ->map(new Translator\ModelToArray());
+            ->map(new Translator\ModelToArray())
+            ->reindex();
         $this->response->content->set(
             $this->buildJsonOutput([
                 'data'     => $data,
