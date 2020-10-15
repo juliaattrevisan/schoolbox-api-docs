@@ -23,7 +23,10 @@ export default {
         dateDisplayFormats: () => window.dateDisplayFormats,
         groupedEvidence() {
             return this.groupEvidence(this.data);
-        }
+        },
+        currentCount () {
+            return data.length;
+        },
     },
     mounted() {
         this.load();
