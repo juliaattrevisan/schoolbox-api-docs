@@ -302,6 +302,16 @@ class Mimetype implements ISoftDeletable
     }
 
 
+    /**
+     * Is this file streamable? (Audio and video are streamable, others are not)
+     *
+     * @return bool
+     */
+    public function isStreamable(): bool
+    {
+        return $this->isAudio() || $this->isVideo();
+    }
+
 
     /**
      * Determine if a file is audio
