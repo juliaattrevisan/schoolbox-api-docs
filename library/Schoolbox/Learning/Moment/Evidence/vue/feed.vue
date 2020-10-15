@@ -144,7 +144,19 @@ export default {
 
                         <!-- Is there an attachment? Display it appropriately -->
                         <template v-if="evidence.filename && evidence.storage">
-                            {{ evidence.filename }}| {{ evidence.storage.hash }}
+                            <template v-if="evidence.storage.type === 'image'">
+                                <img :src="evidence.storage._links.image" :alt="evidence.filename" />
+                            </template>
+                            <template v-if="evidence.storage.type === 'video'">
+                                <video controls :poster="evidence.storage._links.poster">
+                                    <source :type="evidence.storage.mime" :src="evidence.storage._links.stream">
+                                </video>
+                            </template>
+                            <template v-if="evidence.storage.type === 'audio'">
+                                <audio controls>
+                                    <source :type="evidence.storage.mime" :src="evidence.storage._links.stream">
+                                </audio>
+                            </template>
                         </template>
                     </li>
                 </ul>

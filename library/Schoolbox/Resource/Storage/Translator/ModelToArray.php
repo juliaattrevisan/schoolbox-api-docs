@@ -34,7 +34,7 @@ class ModelToArray
             $links['stream'] = "/cms/sendVideo.php?id={$storage->getHash()}&type=storage";
         }
         if ($storage->getMimetype()->isVideo()) {
-            $links['thumbnail'] = "/cms/videoThumb.php?size=poster&id={$storage->getHash()}&type=storage";
+            $links['poster'] = "/cms/videoThumb.php?size=poster&id={$storage->getHash()}&type=storage";
         }
 
         try {
@@ -45,7 +45,7 @@ class ModelToArray
         return [
             'hash'   => $storage->getHash(),
             'mime'   => $storage->getMime(),
-            'type'   => $storage->getType(),
+            'type'   => $storage->getMimetype()->getType(),
             'size'   => $size,
             '_links' => $links,
         ];
