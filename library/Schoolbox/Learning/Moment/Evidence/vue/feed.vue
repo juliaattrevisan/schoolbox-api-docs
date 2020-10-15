@@ -116,7 +116,7 @@ export default {
 
 <template>
     <div>
-        <div v-for="evidenceGroup in groupedEvidence">
+        <template v-for="evidenceGroup in groupedEvidence">
             <h2 class="subheader">
                 <time :datetime="evidenceGroup.date.format('YYYY-MM-DD')"
                       :title="evidenceGroup.date.format(dateDisplayFormats.momentJsDateLong)"
@@ -151,7 +151,7 @@ export default {
                     </li>
                 </ul>
             </section>
-        </div>
+        </template>
 
         <section v-if="showSkeletonLoader">
             <div v-for="n in 3" class="list-item">
@@ -162,14 +162,18 @@ export default {
                 </div>
             </div>
         </section>
-        <section v-else>
-            <template v-if="metadata.count === 0">
-                {{ config.student.firstname }} has no learning moments yet.
-            </template>
-            <template v-else>
-                {{ config.student.firstname }} has {{ metadata.count }} learning moments.
-            </template>
-        </section>
+
+        <div class="row" v-else>
+            <div class="small-12 island">
+                <div v-if="metadata.count === 0" class="empty-state">
+                    <i class="icon-favourite"></i>
+                    <p>{{ config.student.firstname }} has no learning moments yet.</p>
+                </div>
+                <div v-else>
+                    {{ config.student.firstname }} has {{ metadata.count }} learning moments.
+                </div>
+            </div>
+        </div>
     </div>
 
 </template>
