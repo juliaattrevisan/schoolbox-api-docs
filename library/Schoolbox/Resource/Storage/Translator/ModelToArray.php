@@ -45,6 +45,7 @@ class ModelToArray
         return [
             'hash'   => $storage->getHash(),
             'mime'   => $storage->getMime(),
+            'type'   => $storage->getType(),
             'size'   => $size,
             '_links' => $links,
         ];
