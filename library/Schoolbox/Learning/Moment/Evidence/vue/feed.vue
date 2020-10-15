@@ -3,10 +3,13 @@
 import axios  from 'axios';
 import moment from 'moment';
 
+import MediaArticle from '@schoolbox/media-article';
+
 const URL_LEARNING_EVIDENCE_SOURCE = '/learning/evidence/user/';
 
 export default {
     components: {
+        MediaArticle,
     },
     data() {
         return {
@@ -132,9 +135,9 @@ export default {
                             </a>
                         </div>
 
-                        <article>
-                            <div v-html="evidence.body" />
-                        </article>
+                        <media-article v-if="evidence.body">
+                                <div v-html="evidence.body" />
+                        </media-article>
                     </li>
                 </ul>
             </section>
