@@ -214,8 +214,12 @@ $app = new class ($workerPids, $workerIdx, $limit) extends CliTool\App {
                 $this->getLogger()->debug(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $cacheKey, 'already cached'));
             }
         } catch (Exception $e) {
-            $this->getLogger()->error(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $cacheKey, $e->getMessage()));
-            $this->getLogger()->error(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $cacheKey, $e->getTraceAsString()));
+            // Print all exceptions in chain
+            while ($e) {
+                $this->getLogger()->error(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $cacheKey, $e->getMessage()));
+                $this->getLogger()->error(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $cacheKey, $e->getTraceAsString()));
+                $e = $e->getPrevious();
+            }
         }
     }
 
