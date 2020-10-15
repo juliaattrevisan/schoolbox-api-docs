@@ -15,6 +15,7 @@ use Schoolbox\Learning\Moment\Evidence\Translator;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\User;
+use Scrub;
 
 /**
  * Controller for learning moments.
@@ -130,7 +131,15 @@ class Controller extends Base
                 ['order'   => ['created_at' => Mapper::SORT_ORDER_DESC]],
             )
             ->map(new Translator\ModelToArray(new User\Translator\ModelToArray()))
-            ->reindex();
+            ->reindex()
+            ->map(
+                // Scrub body HTML, as there's no guarantee it has been scrubbed
+                // elsewhere (and Vue can't do it)
+                static function (array $item): array {
+                    $item['body'] = Scrub::html($item['body']);
+                    return $item;
+                }
+            );
         $this->response->content->set(
             $this->buildJsonOutput([
                 'data'     => $data,
