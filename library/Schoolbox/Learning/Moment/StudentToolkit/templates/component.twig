@@ -24,7 +24,9 @@
 
 <div class="small-12 columns no-pad">
     <div class="student-toolkit">
-        <img class="profile-image" alt="{{ user.fullName }}" src="/portrait.php?id={{ user.id }}&amp;size=square64" />
+        <div class="profile-image">
+            <img alt="{{ user.fullName }}" src="/portrait.php?id={{ user.id }}&amp;size=square64" />
+        </div>
         <div class="buttons">
             <a class="button icon-trophy" href="#" data-reveal-id="component{{ component.instance.id }}-shareWork">Share my work</a>
             <a class="button icon-trophy" href="#">Set my goals</a>
