@@ -155,14 +155,31 @@ class Processor
      */
     private function loadImageFromFile(int $maxAttempts): ImageInterface
     {
-        // Transform does not yet exist. Generate and save it to disk and database
         // Die extremely early if this is corrupted or giant
-        // Figure out an image size in megapixels
-        [$w, $h] = getimagesizefromstring($this->file->read());
-        $megapixelSize = ($w * $h) / 1000000;
-        if ($megapixelSize >= 50) {
-            // error out
-            throw new OverflowException('File is over 50MP large - aborting');
+        //
+        // It is important to check this here prior to attempting to read the file with ImageMagick because
+        // that can segfault and not throw an exception, leading to difficult to debug errors.
+        // We need to read the file into memory as it may not be local.
+        [$width, $height] = getimagesizefromstring($this->file->read());
+
+        // Check host's image magick limits (these are controlled by Puppet)
+        $resourceLimitMap = $this->parseImageMagickResourceLimits();
+
+        foreach ($resourceLimitMap as $name => $value){
+            switch($name){
+                case 'width':
+                    $widthLimit = Alaress_Byte_Format::stringToBytes(rtrim($value, 'P'), false);
+                    if($width > $widthLimit){
+                        throw new OverflowException("File width ($width) > limit ($widthLimit) - aborting");
+                    }
+                    break;
+                case 'height':
+                    $heightLimit = Alaress_Byte_Format::stringToBytes(rtrim($value, 'P'), false);
+                    if($height > $heightLimit){
+                        throw new OverflowException("File height ($height) > limit ($heightLimit) - aborting");
+                    }
+                    break;
+            }
         }
 
         $imagine  = (new Imagine())->setMetadataReader(new ExifMetadataReader());
@@ -179,6 +196,37 @@ class Processor
             }
         }
         return $image;
+    }
+
+    /**
+     * Parse ImageMagick's policy XML file for resource limits
+     *
+     * @return string[]
+     */
+    private function parseImageMagickResourceLimits(): array
+    {
+        // Map resource limits (domain="resource") from name to value
+        $resourceLimitMap  = [];
+        $imageMagickConfig = simplexml_load_string(file_get_contents("/etc/ImageMagick-6/policy.xml"));
+        foreach ($imageMagickConfig->xpath('policy') as $policyTag) {
+            $policyTagAttributes = $policyTag->attributes();
+            $isResourcePolicyTag = false;
+            $name                = $value = null;
+            foreach ($policyTagAttributes as $attributeName => $attributeValue) {
+                if ($attributeName === 'domain' && (string)$attributeValue === 'resource') {
+                    $isResourcePolicyTag = true;
+                } elseif ($attributeName === 'name') {
+                    $name = (string)$attributeValue;
+                } elseif ($attributeName === 'value') {
+                    $value = (string)$attributeValue;
+                }
+            }
+            if ($isResourcePolicyTag) {
+                $resourceLimitMap[$name] = $value;
+            }
+
+        }
+        return $resourceLimitMap;
     }
 
 
