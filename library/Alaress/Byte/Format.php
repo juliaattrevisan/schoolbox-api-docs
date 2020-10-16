@@ -1,12 +1,19 @@
 <?php
 /**
- * Alaress library for working with computer storage sizes commonly called bytes.  Can be used for converting from and to bytes
  * User: jleckie
  * Date: 9/19/11
  * Time: 8:10 PM
  * To change this template use File | Settings | File Templates.
  */
 
+/**
+ * Alaress library for working with computer storage sizes commonly called bytes.  Can be used for converting from and to bytes
+ *
+ * By default we interpret the prefix as 2^10=1024 rather than 10^3=1000.
+ * Technically, the Ui form (eg Mi) always refers to 2^X but the U form (eg M) may mean 2^X or 10^X depending on context.
+ *
+ * @see https://en.wikipedia.org/wiki/Binary_prefix
+ */
 class Alaress_Byte_Format {
 
 	/**
@@ -46,19 +53,19 @@ class Alaress_Byte_Format {
             $bytes = $match[1];
         }
 
-		elseif (preg_match('/([0-9\.]+)\s?((KB)|(K))/i', $trimmed, $match)) {
+		elseif (preg_match('/([0-9\.]+)\s?((KB)|(K)|KiB)/i', $trimmed, $match)) {
 			$bytes = $match[1] * 1024;
 		}
 
-		elseif (preg_match('/([0-9\.]+)\s?((MB)|(M))/i', $trimmed, $match)) {
+		elseif (preg_match('/([0-9\.]+)\s?((MB)|(M)|MiB)/i', $trimmed, $match)) {
 			$bytes = $match[1] * 1024 * 1024;
 		}
 
-        elseif (preg_match('/([0-9\.]+)\s?((GB)|(G))/i', $trimmed, $match)) {
+        elseif (preg_match('/([0-9\.]+)\s?((GB)|(G)|GiB)/i', $trimmed, $match)) {
 			$bytes = $match[1] * 1024 * 1024 * 1024;
 		}
 
-        elseif (preg_match('/([0-9\.]+)\s?((TB)|(T))/i', $trimmed, $match)) {
+        elseif (preg_match('/([0-9\.]+)\s?((TB)|(T)|TiB)/i', $trimmed, $match)) {
 			$bytes = $match[1] * 1024 * 1024 * 1024 * 1024;
 		}
 
