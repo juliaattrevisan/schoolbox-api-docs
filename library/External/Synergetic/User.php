@@ -761,15 +761,15 @@ class External_Synergetic_User implements External_UserInterface
             /* Find the main contact's fields
              */
             $contact1 = [
-                'StudentContactID'              => (string)$contactTuple['StudentContactSpouseID'],
-                'StudentContactTitle'           => $contactTuple['StudentContactSpouseTitle'],
-                'StudentContactPreferred'       => $contactTuple['StudentContactSpousePreferred'],
-                'StudentContactSurname'         => $contactTuple['StudentContactSpouseSurname'],
-                'StudentContactDefaultEmail'    => $contactTuple['StudentContactSpouseDefaultEmail'],
-                'StudentContactMobilePhone'     => $contactTuple['StudentContactSpouseMobilePhone'],
-                'StudentContactOccupPhone'      => $contactTuple['StudentContactSpouseOccupPhone'],
-                'StudentContactRelation'        => $contactTuple['StudentContactSpouseRelation'],
-                'StudentContactUseEmail'        => $contactTuple['StudentContactSpouseUseEmail'],
+                'StudentContactID'              => (string)$contactTuple['StudentContactID'],
+                'StudentContactTitle'           => $contactTuple['StudentContactTitle'],
+                'StudentContactPreferred'       => $contactTuple['StudentContactPreferred'],
+                'StudentContactSurname'         => $contactTuple['StudentContactSurname'],
+                'StudentContactDefaultEmail'    => $contactTuple['StudentContactDefaultEmail'],
+                'StudentContactMobilePhone'     => $contactTuple['StudentContactMobilePhone'],
+                'StudentContactOccupPhone'      => $contactTuple['StudentContactOccupPhone'],
+                'StudentContactRelation'        => $contactTuple['StudentContactRelation'],
+                'StudentContactUseEmail'        => $contactTuple['StudentContactUseEmail'],
 
                 /* PhoneActual, SilentPhoneFlag, PrimaryOnlyFlag, ContactType
                  * fields don't manifest for speece
