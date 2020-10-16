@@ -46,8 +46,8 @@ for ($i = 0; $i < $workerCount; $i++) {
 /**
  * CLI tool for pre-converting images to the most common formats
  */
-$app = new class ($workerPids, $workerIdx, $limit) extends CliTool\App {
-    private const TIME_INTERVAL = 15;                   // default time period in minutes to look up images for processing
+$app = new class ($workerPids, $workerIdx, $limit, $workerCount) extends CliTool\App {
+    private const TIME_INTERVAL = 60;                   // default time period in minutes to look up images for processing
 
     // --help: print help
     private const OPT_LONG_HELP = 'help';
@@ -70,7 +70,7 @@ $app = new class ($workerPids, $workerIdx, $limit) extends CliTool\App {
     private $workerPids;
 
     /**
-     * This worker's index, null if the manager
+     * This worker's 0-based index, null if the manager
      * @var int|null
      */
     private $workerIdx;
@@ -81,17 +81,22 @@ $app = new class ($workerPids, $workerIdx, $limit) extends CliTool\App {
      */
     private $limit;
 
+    /** @var int */
+    private $workerCount;
+
 
     /**
      * @param array|null $workerPids
      * @param int|null   $workerIdx
      * @param int        $limit
+     * @param int        $workerCount
      */
-    public function __construct(?array $workerPids, ?int $workerIdx, int $limit)
+    public function __construct(?array $workerPids, ?int $workerIdx, int $limit, int $workerCount)
     {
-        $this->workerPids = $workerPids;
-        $this->workerIdx  = $workerIdx;
-        $this->limit      = $limit;
+        $this->workerPids  = $workerPids;
+        $this->workerIdx   = $workerIdx;
+        $this->limit       = $limit;
+        $this->workerCount = $workerCount;
     }
 
 
@@ -249,9 +254,9 @@ $app = new class ($workerPids, $workerIdx, $limit) extends CliTool\App {
             LIMIT 0, {$limit}";
 
         $hashList = $this->getDatabaseInternal()->executeQuery($query)->fetchAll(PDO::FETCH_COLUMN);
-        $hashList = array_filter($hashList, static function (string $hash) use ($workerIdx): bool {
+        $hashList = array_filter($hashList, function (string $hash) use ($workerIdx): bool {
             // Select a subset of results to be processed by this worker
-            return (int)substr(base_convert($hash, 16, 10), 0, 6) % ($workerIdx + 1) === 0;
+            return (int)substr(base_convert($hash, 16, 10), 0, 6) % $this->workerCount === $workerIdx;
         });
         if (!count($hashList)) {
             $this->getLogger()->info(sprintf('[%s] No images found for processing', posix_getpid()));
