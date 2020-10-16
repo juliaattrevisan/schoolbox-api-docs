@@ -762,22 +762,22 @@ class External_Synergetic_User implements External_UserInterface
              */
             $contact1 = [
                 'StudentContactID'              => (string)$contactTuple['StudentContactID'],
-                'StudentContactTitle'           => $contactTuple['StudentContactTitle'],
-                'StudentContactPreferred'       => $contactTuple['StudentContactPreferred'],
-                'StudentContactSurname'         => $contactTuple['StudentContactSurname'],
-                'StudentContactDefaultEmail'    => $contactTuple['StudentContactDefaultEmail'],
-                'StudentContactMobilePhone'     => $contactTuple['StudentContactMobilePhone'],
-                'StudentContactOccupPhone'      => $contactTuple['StudentContactOccupPhone'],
-                'StudentContactRelation'        => $contactTuple['StudentContactRelation'],
-                'StudentContactUseEmail'        => $contactTuple['StudentContactUseEmail'],
+                'StudentContactTitle'           => (string)$contactTuple['StudentContactTitle'],
+                'StudentContactPreferred'       => (string)$contactTuple['StudentContactPreferred'],
+                'StudentContactSurname'         => (string)$contactTuple['StudentContactSurname'],
+                'StudentContactDefaultEmail'    => (string)$contactTuple['StudentContactDefaultEmail'],
+                'StudentContactMobilePhone'     => (string)$contactTuple['StudentContactMobilePhone'],
+                'StudentContactOccupPhone'      => (string)$contactTuple['StudentContactOccupPhone'],
+                'StudentContactRelation'        => (string)$contactTuple['StudentContactRelation'],
+                'StudentContactUseEmail'        => (string)$contactTuple['StudentContactUseEmail'],
 
                 /* PhoneActual, SilentPhoneFlag, PrimaryOnlyFlag, ContactType
                  * fields don't manifest for speece
                  */
-                'StudentContactPhoneActual'     => $contactTuple['StudentContactPhoneActual'],
-                'StudentContactPrimaryOnlyFlag' => $contactTuple['StudentContactPrimaryOnlyFlag'],
-                'StudentContactSilentPhoneFlag' => $contactTuple['StudentContactSilentPhoneFlag'],
-                'StudentContactType'            => $contactTuple['StudentContactType'],
+                'StudentContactPhoneActual'     => (string)$contactTuple['StudentContactPhoneActual'],
+                'StudentContactPrimaryOnlyFlag' => (string)$contactTuple['StudentContactPrimaryOnlyFlag'],
+                'StudentContactSilentPhoneFlag' => (string)$contactTuple['StudentContactSilentPhoneFlag'],
+                'StudentContactType'            => (string)$contactTuple['StudentContactType'],
             ];
 
             /* Convert speece into a contact format otherwise they won't appear in profile page
@@ -785,14 +785,14 @@ class External_Synergetic_User implements External_UserInterface
              */
             $contact2 = [
                 'StudentContactID'              => (string)$contactTuple['StudentContactSpouseID'],
-                'StudentContactTitle'           => $contactTuple['StudentContactSpouseTitle'],
-                'StudentContactPreferred'       => $contactTuple['StudentContactSpousePreferred'],
-                'StudentContactSurname'         => $contactTuple['StudentContactSpouseSurname'],
-                'StudentContactDefaultEmail'    => $contactTuple['StudentContactSpouseDefaultEmail'],
-                'StudentContactMobilePhone'     => $contactTuple['StudentContactSpouseMobilePhone'],
-                'StudentContactOccupPhone'      => $contactTuple['StudentContactSpouseOccupPhone'],
-                'StudentContactRelation'        => $contactTuple['StudentContactSpouseRelation'],
-                'StudentContactUseEmail'        => $contactTuple['StudentContactSpouseUseEmail'],
+                'StudentContactTitle'           => (string)$contactTuple['StudentContactSpouseTitle'],
+                'StudentContactPreferred'       => (string)$contactTuple['StudentContactSpousePreferred'],
+                'StudentContactSurname'         => (string)$contactTuple['StudentContactSpouseSurname'],
+                'StudentContactDefaultEmail'    => (string)$contactTuple['StudentContactSpouseDefaultEmail'],
+                'StudentContactMobilePhone'     => (string)$contactTuple['StudentContactSpouseMobilePhone'],
+                'StudentContactOccupPhone'      => (string)$contactTuple['StudentContactSpouseOccupPhone'],
+                'StudentContactRelation'        => (string)$contactTuple['StudentContactSpouseRelation'],
+                'StudentContactUseEmail'        => (string)$contactTuple['StudentContactSpouseUseEmail'],
 
                 /* PhoneActual, SilentPhoneFlag, PrimaryOnlyFlag, ContactType
                  * fields don't manifest for speece
