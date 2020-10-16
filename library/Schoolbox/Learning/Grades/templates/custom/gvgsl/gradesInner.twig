@@ -1,0 +1,6 @@
+{% extends '@learningGrades/coreGradesInner.twig' %}
+{% block graphs %}
+    {% if not USER.role.isStudent %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
