@@ -67,16 +67,14 @@ class Alaress_Rss_Stream
      */
     public function setup()
     {
-        if ($this->getSource() != null) {
-
+        if ($this->getSource() !== null) {
             /* The Xml class already uses caching
              */
             $this->setInput(new Xml($this->getSource()));
 
             /* If there was data, try to interpret it
              */
-            if (count($this->getInput()->xml)) {
-
+            if (isset($this->getInput()->xml) && count($this->getInput()->xml)) {
                 /* Decide if the feed is an ATOM feed or a regular RSS 2.0
                  */
                 if ($this->isInputAtom()) {
