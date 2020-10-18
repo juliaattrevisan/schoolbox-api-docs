@@ -149,8 +149,6 @@ class External_Schoolbox_User implements External_UserInterface
                             '' AS StudentContactSpouseTitle,
                             '' AS StudentContactSpousePreferred,
                             '' AS StudentContactSpouseSurname,
-                            '' AS StudentContactSpousePreferred,
-                            '' AS StudentContactSpouseSurname,
                             '' AS StudentContactSpouseDefaultEmail,
                             '' AS StudentContactSpousePhoneActual,
                             '' AS StudentContactSpouseMobilePhone,

@@ -771,6 +771,16 @@ class External_Synergetic_User implements External_UserInterface
                 'StudentContactRelation'        => (string)$contactTuple['StudentContactRelation'],
                 'StudentContactUseEmail'        => (string)$contactTuple['StudentContactUseEmail'],
 
+                //When we deprecate spouse from the API this can be removed
+                'StudentContactSpouseID'            => '',
+                'StudentContactSpouseTitle'         => '',
+                'StudentContactSpousePreferred'     => '',
+                'StudentContactSpouseSurname'       => '',
+                'StudentContactSpouseDefaultEmail'  => '',
+                'StudentContactSpousePhoneActual'   => '',
+                'StudentContactSpouseMobilePhone'   => '',
+                'StudentContactSpouseOccupPhone'    => '',
+
                 /* PhoneActual, SilentPhoneFlag, PrimaryOnlyFlag, ContactType
                  * fields don't manifest for speece
                  */
@@ -794,12 +804,22 @@ class External_Synergetic_User implements External_UserInterface
                 'StudentContactRelation'        => (string)$contactTuple['StudentContactSpouseRelation'],
                 'StudentContactUseEmail'        => (string)$contactTuple['StudentContactSpouseUseEmail'],
 
+                //When we deprecate spouse from the API this can be removed
+                'StudentContactSpouseID'            => '',
+                'StudentContactSpouseTitle'         => '',
+                'StudentContactSpousePreferred'     => '',
+                'StudentContactSpouseSurname'       => '',
+                'StudentContactSpouseDefaultEmail'  => '',
+                'StudentContactSpousePhoneActual'   => '',
+                'StudentContactSpouseMobilePhone'   => '',
+                'StudentContactSpouseOccupPhone'    => '',
+
                 /* PhoneActual, SilentPhoneFlag, PrimaryOnlyFlag, ContactType
                  * fields don't manifest for speece
                  */
                 'StudentContactPhoneActual'     => '',
-                'StudentContactSilentPhoneFlag' => '',
                 'StudentContactPrimaryOnlyFlag' => '',
+                'StudentContactSilentPhoneFlag' => (string)$contactTuple['StudentContactSilentPhoneFlag'],
                 'StudentContactType'            => '',
             ];
 
