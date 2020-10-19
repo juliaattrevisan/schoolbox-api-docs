@@ -1323,7 +1323,6 @@ class DataSource
                 }
             }
 
-            $assessmentList = [];
             //Insert the statistical summary data collated from all students results across all indicators in all activities
             foreach ($allResults as $assessmentId => $assessment) {
                 foreach ($assessment as $capabilityId => $capability) {
