@@ -43,7 +43,7 @@
                         <template v-if="article.featureImage">
                             <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
                                 <img v-if="isCompactMode" :src="article.featureImage._links.image.href + '&size=square64'" class="thumbnail">
-                                <img v-else :src="article.featureImage._links.image.href + '&size=cardImageSmall'">
+                                <img v-else :src="article.featureImage._links.image.href + '&size=constrain200'">
                             </a>
                         </template>
                         <template v-else-if="fallbackImage === 'author'">
