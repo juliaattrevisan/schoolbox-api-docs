@@ -189,7 +189,7 @@ class Profile implements IStrategy
          * Process multiple pages until there are none remaining, or if something is really stuffed,
          * until MAX_CALLS is reached, to prevent infinite calls to a third party.
          */
-        $nextUrl = 'enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms';
+        $nextUrl = 'enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&limit=200';
 
         for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
             $payload = $this->api->retrieveDocument($nextUrl);
@@ -953,7 +953,7 @@ class Profile implements IStrategy
          * Process multiple pages until there are none remaining, or if something is really stuffed,
          * until MAX_CALLS is reached, to prevent infinite calls to a third party.
          */
-        $nextUrl = 'enrolments/staff?include=person,qualifications,employments';
+        $nextUrl = 'enrolments/staff?include=person,qualifications,employments&limit=200';
 
         for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
             $payload = $this->api->retrieveDocument($nextUrl);

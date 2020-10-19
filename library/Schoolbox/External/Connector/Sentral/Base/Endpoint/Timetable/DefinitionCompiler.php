@@ -95,7 +95,7 @@ class DefinitionCompiler
          * Process multiple pages until there are none remaining, or if something is really stuffed,
          * until MAX_CALLS is reached, to prevent infinite calls to a third party.
          */
-        $nextUrl = "timetables/timetable-calendar-date?from={$this->from}&to={$this->to}";
+        $nextUrl = "timetables/timetable-calendar-date?from={$this->from}&to={$this->to}&limit=200";
 
         $struct = [];
 
