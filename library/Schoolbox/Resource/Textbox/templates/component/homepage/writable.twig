@@ -87,6 +87,7 @@
                 addTextboxModal       = $('#addTextboxModal-{{ component.instance.id }}'),
                 addTextboxForm        = $('#addTextboxModal-{{ component.instance.id }}-form'),
                 toast                 = $('#toast-{{ component.instance.id }}'),
+                editorInline          = false,
                 editorInstanceOptions = $.alaressEditorConfig({
                     // Always start file browser from current folder, instead of the alt source
                     file_browser_category_id: Number("{{ context.id }}"),
@@ -94,16 +95,19 @@
                 },
             );
 
-            // Remove wordcount as it looks awkward in the inline editor
-            if (!editorInstanceOptions.removePlugins) {
-                editorInstanceOptions.removePlugins = 'wordcount';
-            } else {
-                editorInstanceOptions.removePlugins += ',wordcount';
-            }
+            // If using the inline version of the editor:
+            // Remove wordcount as it looks awkward
+            if (editorInline) {
+                if (!editorInstanceOptions.removePlugins) {
+                    editorInstanceOptions.removePlugins = 'wordcount';
+                } else {
+                    editorInstanceOptions.removePlugins += ',wordcount';
+                }
 
-            // Restore source dialog plugin
-            if (editorInstanceOptions.removeButtons) {
-                editorInstanceOptions.removeButtons = editorInstanceOptions.removeButtons.replace(/sourcedialog/i, '');
+                // Restore source dialog plugin
+                if (editorInstanceOptions.removeButtons) {
+                    editorInstanceOptions.removeButtons = editorInstanceOptions.removeButtons.replace(/sourcedialog/i, '');
+                }
             }
 
             component
@@ -113,6 +117,7 @@
                     saveButton:            '[data-action="save"]',
                     editorInstance:        '[data-content]',
                     editorInstanceOptions: editorInstanceOptions,
+                    editorInline:          editorInline,
                 })
                 // Before creating an editor: restore any placeholders, so that
                 // the editor doesn't let you edit the mediaelement player
