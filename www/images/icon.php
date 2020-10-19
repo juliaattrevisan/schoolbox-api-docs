@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Outputs an icon from a spritesheet at a given size, or with a given transform
  *
@@ -7,8 +8,8 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Image\Cache\BrokenFS;
-use Alaress\Image\Processor\Freeform;
+use Alaress\Image\Cache\LocalFS;
+use Alaress\Image;
 use Schoolbox\Config\ConfigMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -25,23 +26,11 @@ $size = str_replace('square', '', $size);
 
 // Try to output the fail image. If even THAT fails, just redirect to the image.
 try {
-    $transform = new \Alaress\Image\Transformation\Icon($icon, $size);
-    $transform_key = "Icon";
-    $cache_key = "$icon-$size";
-
-    $imageProcessor = new Freeform(
-        new BrokenFS(WEB_root, $path, $cache_key),
-        $transform,
-        new \Alaress\Image\Implementation\Imagine\Filetype\Factory(),
-        new \Alaress\Image\Implementation\Imagine\Processor\Strategy\Factory()
-    );
-
-    if (isset($transform_key)) {
-        $imageProcessor->setTransformKey($transform_key);
-    }
-
+    $transform      = (new Image\Transformation\Icon())->retrieve($icon, $size);
+    $cache_key      = "$icon-$size";
+    $imageProcessor = new Image\Processor(LocalFS::getStorageModel(WEB_root, $path), $cache_key, $transform);
     $imageProcessor->load()->stream();
 } catch (Exception $e) {
-//	echo $e;
+//  echo $e;
     SitePage::redirectToBrokenImage();
 }

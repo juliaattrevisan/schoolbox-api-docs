@@ -12,7 +12,6 @@
  */
 
 use Alaress\Image;
-use Alaress\Image\Implementation\Imagine;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
 use Schoolbox\Config\ConfigMapper;
@@ -47,16 +46,15 @@ try {
 }
 
 try {
-    $portrait = new Image\Cache\Portrait(
+    $storageModel = Image\Cache\Portrait::getStorageModel(
         $user,
-        $_GET['size'],
         $_SESSION['user'],
         (bool)$config->get('photo_sis_import'),
         (bool)$config->get('protect_student_photo'),
         (int)$config->get('protect_teacher_photo')
     );
 
-    $fileSystem = $portrait->load()->getFilesystem();
+    $fileSystem = $storageModel->getFilesystem();
 
     if (
         $fileSystem instanceof Filesystem &&
@@ -65,11 +63,11 @@ try {
     ) {
         $preSignedUrlService = new PreSignedUrlService($config);
 
-        $portraitPath = $portrait->load()->getPath();
+        $portraitPath = $storageModel->getPath();
         $size = $_GET['size'] ?? null;
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
-            $portrait->load(),
+            $storageModel,
             Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
             ($size && strpos($portraitPath, '-') === false) ? $portraitPath . '-' . $size : $portraitPath
         );
@@ -77,12 +75,8 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $image = new Image\Processor\Standard(
-        $portrait,
-        new Image\Transformation\Portrait(),
-        new Imagine\Filetype\Factory(),
-        new Imagine\Processor\Strategy\Factory()
-    );
+    $transform = (new Image\Transformation\Portrait())->retrieve($_GET['size']);
+    $image = new Image\Processor($storageModel, $_GET['size'], $transform);
 
     $image->load()->stream();
 } catch (\RuntimeException $e) {

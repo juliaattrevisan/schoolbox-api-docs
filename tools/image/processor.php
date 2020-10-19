@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @author      Sam Bailey <sam.bailey@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -7,8 +8,6 @@
  */
 
 use Alaress\Image;
-use Alaress\Image\Implementation\Imagine;
-use Alaress\Image\Transformation;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Resource\Storage;
 
@@ -47,23 +46,21 @@ for ($i = 0; $i < $workerCount; $i++) {
 /**
  * CLI tool for pre-converting images to the most common formats
  */
-$app = new class($workerPids, $workerIdx, $limit) extends CliTool\App {
-    private const TIME_INTERVAL = 15;                   // default time period in minutes to look up images for processing
+$app = new class ($workerPids, $workerIdx, $limit, $workerCount) extends CliTool\App {
+    private const TIME_INTERVAL = 60;                   // default time period in minutes to look up images for processing
 
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
-    // List of expected transformations that we expect for each image
-    private const EXPECTED_TRANSFORMS = [
-        'custom' => [
-            'maxsize',
-            'square64',
-            'square128',
-        ],
-        'WxH'    => [
-            [100, 100],
-            [2048, 2048],
-        ],
+    // List of transformations that we will generate for each image
+    private const CUSTOM_TRANSFORMS = [
+        [100, 100],
+        [2048, 2048],
+    ];
+    private const STORAGE_TRANSFORMS = [
+        'maxsize',
+        'square64',
+        'square128',
     ];
 
     /**
@@ -73,7 +70,7 @@ $app = new class($workerPids, $workerIdx, $limit) extends CliTool\App {
     private $workerPids;
 
     /**
-     * This worker's index, null if the manager
+     * This worker's 0-based index, null if the manager
      * @var int|null
      */
     private $workerIdx;
@@ -84,17 +81,22 @@ $app = new class($workerPids, $workerIdx, $limit) extends CliTool\App {
      */
     private $limit;
 
+    /** @var int */
+    private $workerCount;
+
 
     /**
      * @param array|null $workerPids
      * @param int|null   $workerIdx
      * @param int        $limit
+     * @param int        $workerCount
      */
-    public function __construct(?array $workerPids, ?int $workerIdx, int $limit)
+    public function __construct(?array $workerPids, ?int $workerIdx, int $limit, int $workerCount)
     {
-        $this->workerPids = $workerPids;
-        $this->workerIdx  = $workerIdx;
-        $this->limit      = $limit;
+        $this->workerPids  = $workerPids;
+        $this->workerIdx   = $workerIdx;
+        $this->limit       = $limit;
+        $this->workerCount = $workerCount;
     }
 
 
@@ -179,44 +181,51 @@ $app = new class($workerPids, $workerIdx, $limit) extends CliTool\App {
         $hash = $hashObject->getHash();
         $this->getLogger()->debug(sprintf("[%d] Processing: %s", posix_getpid(), $hash));
 
-        // Check if each transformation size exists cached for this image, otherwise create it
-        foreach (self::EXPECTED_TRANSFORMS as $transformListType => $transformList) {
-            foreach ($transformList as $transformSize) {
-                try {
-                    if ($transformListType === 'WxH') {
-                        // Random Width x Height transformations
-                        $transform     = new Transformation\MyImage((int)$transformSize[0], (int)$transformSize[1]);
-                        $transformSize = implode('x', $transformSize);
-                        $cache         = new Image\Cache\Storage($hashObject, $transformSize);
-                        $image         = new Image\Processor\Freeform(
-                            $cache,
-                            $transform,
-                            new Imagine\Filetype\Factory(),
-                            new Imagine\Processor\Strategy\Factory()
-                        );
-                    } else {
-                        // Preset transformations
-                        $transform = new Image\Transformation\Storage();
-                        $cache     = new Image\Cache\Storage($hashObject, $transformSize);
-                        $image     = new Image\Processor\Standard(
-                            $cache,
-                            $transform,
-                            new Imagine\Filetype\Factory(),
-                            new Imagine\Processor\Strategy\Factory()
-                        );
-                    }
-                    $image->load();
+        // Random Width x Height transformations
+        $myImageTransforms = new Image\Transformation\MyImage();
+        foreach (self::CUSTOM_TRANSFORMS as $widthAndHeight) {
+            [$width, $height] = $widthAndHeight;
+            $cacheKey  = "{$width}x{$height}";
+            $transform = $myImageTransforms->retrieve($width, $height);
+            $this->generateTransform($hashObject, $cacheKey, $transform);
+        }
 
-                    if (!$image->isCached()) {
-                        $image->save();
-                        $this->getLogger()->info(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $transformSize, 'success'));
-                    } else {
-                        $this->getLogger()->debug(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $transformSize, 'already cached'));
-                    }
-                } catch (Exception $e) {
-                    $this->getLogger()->error(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $transformSize, $e->getMessage()));
-                    $this->getLogger()->error(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $transformSize, $e->getTraceAsString()));
-                }
+        // Preset transformations
+        $storageTransforms = new Image\Transformation\Storage();
+        foreach (self::STORAGE_TRANSFORMS as $transformName) {
+            $cacheKey  = $transformName;
+            $transform = $storageTransforms->retrieve($transformName);
+            $this->generateTransform($hashObject, $cacheKey, $transform);
+        }
+    }
+
+    /**
+     * Apply the specified transform to the storage object and save it using specified cache key
+     *
+     * @param Storage\Model    $hashObject
+     * @param string           $cacheKey
+     * @param Image\ITransform $transform
+     */
+    private function generateTransform(Storage\Model $hashObject, string $cacheKey, Image\ITransform $transform): void
+    {
+        $hash      = $hashObject->getHash();
+        $processor = new Image\Processor($hashObject, $cacheKey, $transform);
+
+        try {
+            $transformFile = $processor->load(3);
+            if (!$transformFile->isCacheHit()) {
+                $this->getLogger()->info(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $cacheKey, 'success'));
+            } else {
+                $this->getLogger()->debug(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $cacheKey, 'already cached'));
+            }
+        } catch (Exception $e) {
+            // Send this exception to Sentry
+            $this->captureException($e);
+            // Print all exceptions in chain
+            while ($e) {
+                $this->getLogger()->error(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $cacheKey, $e->getMessage()));
+                $this->getLogger()->error(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $cacheKey, $e->getTraceAsString()));
+                $e = $e->getPrevious();
             }
         }
     }
@@ -239,14 +248,15 @@ $app = new class($workerPids, $workerIdx, $limit) extends CliTool\App {
                 ON afe.fileTypeID = aft.fileTypeID
                 AND aft.mime LIKE 'image%'
                 AND aft.mime NOT LIKE 'image%svg%'
+                AND aft.mime NOT LIKE 'image%webp%'
             WHERE s.uploaded_on >= (NOW() - INTERVAL {$timeInterval} MINUTE)
             ORDER BY s.uploaded_on
             LIMIT 0, {$limit}";
 
         $hashList = $this->getDatabaseInternal()->executeQuery($query)->fetchAll(PDO::FETCH_COLUMN);
-        $hashList = array_filter($hashList, static function (string $hash) use ($workerIdx): bool {
+        $hashList = array_filter($hashList, function (string $hash) use ($workerIdx): bool {
             // Select a subset of results to be processed by this worker
-            return (int)substr(base_convert($hash, 16, 10), 0, 6) % ($workerIdx + 1) === 0;
+            return (int)substr(base_convert($hash, 16, 10), 0, 6) % $this->workerCount === $workerIdx;
         });
         if (!count($hashList)) {
             $this->getLogger()->info(sprintf('[%s] No images found for processing', posix_getpid()));
@@ -281,4 +291,3 @@ HELP;
 $logLevel = (int)getenv('LOG_LEVEL', true) ?: Monolog\Logger::INFO;
 $kernel   = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => $logLevel]);
 $kernel->runApp();
-

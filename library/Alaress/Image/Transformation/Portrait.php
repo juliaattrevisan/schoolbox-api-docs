@@ -1,9 +1,6 @@
 <?php
+
 /**
- * Alaress_Image_Transformation_Schoolbox
- *
- * A list of all the transformations used throughout the site
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -11,106 +8,48 @@
 
 namespace Alaress\Image\Transformation;
 
-class Portrait extends BaseTransformation
+use Alaress\Image\ITransform;
+use Alaress\Image\Transform\Constrain;
+use Alaress\Image\Transform\Rectangle;
+use Alaress\Image\Transform\Square;
+use OutOfBoundsException;
+
+/**
+ * A list of all the transformations used throughout the site
+ */
+class Portrait
 {
-    /** @var array $allTransformations */
-    protected $allTransformations = [
-        'square32' => [
-            [
-                'method' => 'Square',
-                'args' => [
-                    'width' => 32,
-                ]
-            ]
-        ],
-        'square48' => [
-            [
-                'method' => 'Square',
-                'args' => [
-                    'width' => 48,
-                ]
-            ]
-        ],
-        'square64' => [
-            [
-                'method' => 'Square',
-                'args' => [
-                    'width' => 64,
-                ]
-            ]
-        ],
-
-        /* Used exclusively in the top bar
-         */
-        'square72' => [
-            [
-                'method' => 'Square',
-                'args' => [
-                    'width' => 72,
-                ]
-            ]
-        ],
-
-        'square80' => [
-            [
-                'method' => 'Square',
-                'args' => [
-                    'width' => 80,
-                ]
-            ]
-        ],
-        'constrain128' => [
-            [
-                'method' => 'Constrain',
-                'args' => [
-                    'width' => 128,
-                    'height' => 400
-                ]
-            ]
-        ],
-        'square200' => [
-            [
-                'method' => 'Square',
-                'args' => [
-                    'width' => 200,
-                ]
-            ]
-        ],
-        'constrain200' => [
-            [
-                'method' => 'Constrain',
-                'args' => [
-                    'width' => 200,
-                    'height' => 300
-                ]
-            ]
-        ],
-        'constrain64' => [
-            [
-                'method' => 'Constrain',
-                'args' => [
-                    'width' => 64,
-                    'height' => 96
-                ]
-            ]
-        ],
-        'profile' => [
-            [
-                'method' => 'Constrain',
-                'args' => [
-                    'width' => 250,
-                    'height' => 300
-                ]
-            ]
-        ],
-        'rectangle' => [
-            [
-                'method' => 'Rectangle',
-                'args' => [
-                    'width' => 140,
-                    'height' => 50
-                ]
-            ]
-        ],
-    ];
+    /**
+     * @param string $key
+     * @return ITransform
+     * @throws OutOfBoundsException
+     */
+    public function retrieve(string $key): ITransform
+    {
+        switch ($key) {
+            case 'square32':
+                return new Square(32);
+            case 'square48':
+                return new Square(48);
+            case 'square64':
+                return new Square(64);
+            case 'square72':
+                return new Square(72);
+            case 'square80':
+                return new Square(80);
+            case 'square200':
+                return new Square(200);
+            case 'constrain64':
+                return new Constrain(64, 96);
+            case 'constrain128':
+                return new Constrain(128, 400);
+            case 'constrain200':
+                return new Constrain(200, 300);
+            case 'profile':
+                return new Constrain(250, 300);
+            case 'rectangle':
+                return new Rectangle(140, 50);
+        }
+        throw new OutOfBoundsException('Could not load transformation list.');
+    }
 }

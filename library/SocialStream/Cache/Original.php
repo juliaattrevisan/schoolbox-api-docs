@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream\Cache;
 
 use Schoolbox\Resource\Storage;
@@ -109,7 +111,6 @@ class Original extends \Alaress_Cache_Abstract
         // run cache detection
         if ($this->post->getCacheHash()) {
             $this->file = Storage\Mapper::getInstance()->findByHash($this->post->getCacheHash());
-
         } else {
             $this->newCacheUpdate();
         }
@@ -180,9 +181,9 @@ class Original extends \Alaress_Cache_Abstract
     /**
      * Get the storage instance representing this file
      *
-     * @return Storage\IStorage
+     * @return null|Storage\IStorage
      */
-    public function getFile(): Storage\IStorage
+    public function getFile(): ?Storage\IStorage
     {
         return $this->file;
     }

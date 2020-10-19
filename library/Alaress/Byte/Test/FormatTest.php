@@ -101,4 +101,37 @@ class FormatTest extends TestCase
 
         $this->assertEquals($expected, Alaress_Byte_Format::stringToBytes($input));
     }
+
+    public function testKiBToBytes(): void
+    {
+        $input = '2KiB';
+        $expected = 2048;
+
+        self::assertSame($expected, Alaress_Byte_Format::stringToBytes($input));
+    }
+
+    public function testMiBToBytes(): void
+    {
+        $input = '2MiB';
+        $expected = 2097152;
+
+        self::assertSame($expected, Alaress_Byte_Format::stringToBytes($input));
+    }
+
+    public function testGiBToBytes(): void
+    {
+        $input = '2GiB';
+        $expected = 2147483648;
+
+        self::assertSame($expected, Alaress_Byte_Format::stringToBytes($input));
+    }
+
+    public function testTiBToBytes(): void
+    {
+        $input = '2TiB';
+        $expected = 2199023255552;
+
+        self::assertSame($expected, Alaress_Byte_Format::stringToBytes($input));
+    }
+
 }

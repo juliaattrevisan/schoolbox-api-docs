@@ -1,34 +1,33 @@
 <?php
+
 /**
- * Alaress_Image_Processor_Strategy_RotateOrientation
- *
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Alaress\Image\Transform;
+
+use Alaress\Image\ITransform;
+use Imagine\Exception as ImagineException;
+use Imagine\Image\ImageInterface;
+
+/**
  * Images from iphones/ipads and some cameras have rotation information in the exif data
  * This transformation makes sure that the image is rotated to the correct orientation
  * before any other transformations take place.
- *
- * @author      James Leckie <james.leckie@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
  */
-
-namespace Alaress\Image\Implementation\Imagine\Processor\Strategy;
-
-use Imagine\Filter\Basic\Autorotate;
-use Imagine\Image\ImageInterface;
-
-class RotateOrientation extends BaseStrategy
+class RotateOrientation implements ITransform
 {
     /**
-     * {@inheritdoc}
-     *
-     * @var ImageInterface $image
+     * @inheritDoc
+     * @throws ImagineException\RuntimeException
      */
-    public function manipulate($image)
+    public function manipulate(ImageInterface $image): ImageInterface
     {
         $metadata = $image->metadata();
-        switch (isset($metadata['ifd0.Orientation']) ? $metadata['ifd0.Orientation'] : null) {
-            case 1:
-                break;
+        switch ($metadata['ifd0.Orientation'] ?? null) {
             case 2:
                 $image->flipHorizontally();
                 break;
@@ -50,6 +49,7 @@ class RotateOrientation extends BaseStrategy
             case 8:
                 $image->rotate(-90);
                 break;
+            case 1:
             default:
                 break;
         }

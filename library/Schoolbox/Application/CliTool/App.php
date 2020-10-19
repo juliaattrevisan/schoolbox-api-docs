@@ -12,6 +12,8 @@ namespace Schoolbox\Application\CliTool;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Lock\InstanceLockFactory;
 use Aura\Di;
+use Sentry\State\HubInterface;
+use Throwable;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
@@ -406,5 +408,25 @@ abstract class App
         // add a new line since the users CR didn't echo
         \fwrite(STDERR, "\n");
         return $password;
+    }
+
+    /**
+     * Captures an exception event and sends it to Sentry.
+     *
+     * Returns the eventId if captured, or null otherwise
+     *
+     * @param Throwable $e
+     * @return string|null
+     * @throws Di\Exception\ServiceNotFound
+     */
+    protected function captureException(Throwable $e): ?string
+    {
+        if (!$this->di->has('sentry')) {
+            return null;
+
+        }
+        /** @var HubInterface $sentry */
+        $sentry = $this->di->get('sentry');
+        return $sentry->captureException($e);
     }
 }

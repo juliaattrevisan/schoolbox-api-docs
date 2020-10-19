@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Alaress\Image\Cache\Portrait
  *
@@ -13,55 +14,36 @@ namespace Alaress\Image\Cache;
 
 use External_User;
 use Group;
+use InvalidArgumentException;
+use RuntimeException;
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class Portrait extends Storage
+class Portrait
 {
     private const PROTECT_TEACHER_PHOTOS_FROM_NONE     = 0;
     private const PROTECT_TEACHER_PHOTOS_FROM_ALL      = 1;
     private const PROTECT_TEACHER_PHOTOS_FROM_STUDENTS = 2;
 
-    /** @var UserMapper */
-    private $userMapper;
-
-    /** @var User */
-    private $sessionUser;
-
     /**
-     * @var bool
+     * @param User $user
+     * @param User $sessionUser
+     * @param bool $loadPhotosFromSis
+     * @param bool $protectStudentPhotos
+     * @param int  $protectTeacherPhotos
+     * @return Storage\Model
+     * @throws InvalidArgumentException If user does not have a portrait
+     * @throws RuntimeException  If session user is not permitted to view portrait
      */
-    private $protectStudentPhotos;
-
-    /**
-     * @var int
-     */
-    private $protectTeacherPhotos;
-
-    /**
-     * Constructor
-     *
-     * @param User   $user
-     * @param string $key
-     * @param User   $sessionUser
-     * @param bool   $loadPhotosFromSis
-     * @param bool   $protectStudentPhotos
-     * @param int    $protectTeacherPhotos
-     */
-    public function __construct(
+    public static function getStorageModel(
         User $user,
-        string $key,
         User $sessionUser,
         bool $loadPhotosFromSis,
         bool $protectStudentPhotos,
         int $protectTeacherPhotos
-    ) {
+    ): Storage\Model {
         // TODO inject user mapper and external user
-        $this->sessionUser          = $sessionUser;
-        $this->userMapper           = UserMapper::getInstance();
-        $this->protectStudentPhotos = $protectStudentPhotos;
-        $this->protectTeacherPhotos = $protectTeacherPhotos;
-
         $externalHandler = new External_User();
 
         /* If Load Photos From SIS is on, yank down the latest version, then cache it in brownhole
@@ -77,31 +59,34 @@ class Portrait extends Storage
          * Remove it in schoolbox too, by displaying the Grey Man
          */
         if (null === $portrait) {
-            throw new \RuntimeException('No portrait image selected');
+            throw new InvalidArgumentException('No portrait image selected');
         }
 
-        /* Otherwise load it from this cache in the normal way
-         */
-        try {
-            parent::__construct($portrait, $key);
-        } catch (\League\Flysystem\FilesystemNotFoundException $e) {
-            throw new \InvalidArgumentException('Portrait not found');
+        if (!self::canViewImage($sessionUser, $user, UserMapper::getInstance(), $protectStudentPhotos, $protectTeacherPhotos)) {
+            throw new RuntimeException('Cannot view image');
         }
 
-        if (!$this->canViewImage($user)) {
-            throw new \RuntimeException('Cannot view image');
-        }
+        return $portrait;
     }
 
 
     /**
      * Determine whether a portrait can be seen or not
      *
-     * @param User $user
+     * @param User       $sessionUser
+     * @param User       $user
+     * @param UserMapper $userMapper
+     * @param bool       $protectStudentPhotos
+     * @param int        $protectTeacherPhotos
      * @return bool
      */
-    private function canViewImage(User $user): bool
-    {
+    private static function canViewImage(
+        User $sessionUser,
+        User $user,
+        UserMapper $userMapper,
+        bool $protectStudentPhotos,
+        int $protectTeacherPhotos
+    ): bool {
         $externalId = $user->getExternalId();
 
         // TODO kill it! kill it with fire!
@@ -109,21 +94,20 @@ class Portrait extends Storage
 
         /* Staff members can always see all portraits
          */
-        if ($this->sessionUser->getRole()->isStaff()) {
+        if ($sessionUser->getRole()->isStaff()) {
             return true;
         }
 
         // Get all users with a synergy ID, and test them against policy.
 
-        $users = $this->userMapper->findByColumn('synergy_id', $externalId);
+        $users = $userMapper->findByColumn('synergy_id', $externalId);
 
         foreach ($users as $currentUser) {
-
             /* Everyone can always see their own face
              */
             $userId = $currentUser->getId();
 
-            if ($this->sessionUser->getId() === $userId) {
+            if ($sessionUser->getId() === $userId) {
                 return true;
             }
 
@@ -134,7 +118,7 @@ class Portrait extends Storage
                 return true;
             }
 
-            if (!$this->protectStudentPhotos && $group->isStudent($userId) && $this->sessionUser->getRole()->isStudent()) {
+            if (!$protectStudentPhotos && $group->isStudent($userId) && $sessionUser->getRole()->isStudent()) {
                 return true;
             }
 
@@ -148,11 +132,11 @@ class Portrait extends Storage
                  *  PROTECT_TEACHER_PHOTOS_FROM_ALL      => No one can see photo
                  *  PROTECT_TEACHER_PHOTOS_FROM_STUDENTS => Staff and Parents can see photo
                  */
-                switch ($this->protectTeacherPhotos) {
+                switch ($protectTeacherPhotos) {
                     case self::PROTECT_TEACHER_PHOTOS_FROM_NONE:
-                        return $this->sessionUser->getRole()->isStudent() || $this->sessionUser->getRole()->isParent();
+                        return $sessionUser->getRole()->isStudent() || $sessionUser->getRole()->isParent();
                     case self::PROTECT_TEACHER_PHOTOS_FROM_STUDENTS:
-                        return $this->sessionUser->getRole()->isParent();
+                        return $sessionUser->getRole()->isParent();
                     case self::PROTECT_TEACHER_PHOTOS_FROM_ALL:
                     default:
                         return false;
