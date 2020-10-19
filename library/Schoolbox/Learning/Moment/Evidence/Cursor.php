@@ -139,7 +139,7 @@ class Cursor
         // Ascending:  id - 1
         // Descending: id + 1
         $cursorParts          = [
-            'created_at' => $firstRecord->getCreatedAt(),
+            'created_at' => $firstRecord->getCreatedAt()->getDatabase(),
         ];
         $previousPageCursorId = $firstRecord->getId();
         if ($this->order === Mapper::SORT_ORDER_ASC) {
@@ -167,7 +167,7 @@ class Cursor
 
         // The next cursor points to the last record.
         return $this->codec->encode([
-            'created_at' => $lastRecord->getCreatedAt(),
+            'created_at' => $lastRecord->getCreatedAt()->getDatabase(),
             'id'         => $lastRecord->getId(),
         ]);
     }
@@ -215,7 +215,6 @@ class Cursor
                                     ->lessThan('id', $decoded['id'])
                             )
                     );
-                    $builder->lessThan($this->mapper->getIdentifierColumn(), $decoded);
                 }
             }
         }

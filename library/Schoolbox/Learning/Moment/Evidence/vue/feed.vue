@@ -43,9 +43,22 @@ export default {
          * Once received, group them by date.
          */
         load() {
-            axios.get(URL_LEARNING_EVIDENCE_SOURCE + String(this.config.student.id))
+            this.data = [];
+            this.append(null);
+        },
+
+        /**
+         * Appends learning evidence to the data list.
+         */
+        append(cursor) {
+            let params = {};
+            if (cursor) {
+                params.cursor = cursor;
+            }
+            axios
+                .get(URL_LEARNING_EVIDENCE_SOURCE + String(this.config.student.id), {params})
                 .then(response => {
-                    this.data            = response?.data?.data             ? response.data.data            : [];
+                    this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
                     this.metadata.cursor = response?.data?.metadata?.cursor ? response.data.metadata.cursor : null;
                 })
@@ -169,9 +182,9 @@ export default {
                     <i class="icon-favourite"></i>
                     <p>{{ config.student.firstname }} has no learning moments yet.</p>
                 </div>
-                <div v-else>
-                    {{ config.student.firstname }} has {{ metadata.count }} learning moments.
-                </div>
+                <button v-else-if="metadata.cursor.next" class="expand" @click.prevent="append(metadata.cursor.next)">
+                    Load more
+                </button>
             </div>
         </div>
     </div>

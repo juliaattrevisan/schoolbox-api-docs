@@ -125,10 +125,9 @@ class Controller extends Base
      */
     public function getMomentsForUser(User $user): void
     {
-        // TODO add cursor for moments
         $encodedCursor = $this->request->query->get('cursor');
         $cursor        = new Cursor($this->mapper, $user);
-        $data          = $cursor->retrieveResults(null);
+        $data          = $cursor->retrieveResults($encodedCursor);
         $mappedData    = $data
             ->map(
                 new Translator\ModelToArray(
