@@ -56,14 +56,9 @@ class Storage
             case 'eportfolioImageGalleryThumbnail':
                 // ePortfolio Image Gallery list needs to be a square
                 return new Rectangle(80, 80);
-            case 'vcardImageLarge':
-                // Vertical style card image
-                return new Rectangle(300, 150);
             case 'cardImageLarge':
                 // Card images are 2:1 ratio.  So this is used on class card
                 return new Rectangle(800, 400);
-            case 'cardImageSmall':
-                return new Rectangle(200, 100);
             case 'cacheTest':
                 // Test to find out whether Constrain skipped canvas creation
                 // when resultant image dimension was the same as the original
