@@ -2,12 +2,13 @@
     /**
      * Inline textbox editor constructor.
      *
-     * @param {jQuery} element
-     * @param {jQuery} editorInstance
-     * @param {jQuery} modifyButton
-     * @param {jQuery} saveButton
-     * @param {jQuery} deleteButton
-     * @param {Object} editorInstanceOptions
+     * @param {jQuery}  element
+     * @param {jQuery}  editorInstance
+     * @param {jQuery}  modifyButton
+     * @param {jQuery}  saveButton
+     * @param {jQuery}  deleteButton
+     * @param {Object}  editorInstanceOptions
+     * @param {Boolean} editorInline
      * @constructor
      */
     var InlineTextboxEditor = function (
@@ -16,7 +17,8 @@
         modifyButton,
         saveButton,
         deleteButton,
-        editorInstanceOptions
+        editorInstanceOptions,
+        editorInline
     ) {
         var self = this;
         self.states = {
@@ -34,6 +36,7 @@
         self.saveButton            = saveButton;
         self.deleteButton          = deleteButton;
         self.editorInstanceOptions = editorInstanceOptions;
+        self.editorInline          = editorInline;
         self.editor                = null;
 
 
@@ -160,10 +163,9 @@
             window.CKEDITOR.instances[editorInstanceId].focus();
         } else {
             self.element.trigger('inlineTextboxEditor.preEditorCreate', [self]);
-            self.editor = window.CKEDITOR.inline(
-                editorInstanceId,
-                self.editorInstanceOptions
-            );
+            self.editor = self.editorInline
+                ? window.CKEDITOR.inline(editorInstanceId, self.editorInstanceOptions)
+                : window.CKEDITOR.replace(editorInstanceId, self.editorInstanceOptions);
             self.editor.on('instanceReady', function (event) {
                 // Focus on the editor
                 event.editor.setReadOnly(false);
@@ -254,6 +256,7 @@
             saveButton:            '[data-action="save"]',
             content:               '[data-content]',
             editorInstanceOptions: {},
+            editorInline:          true,
         };
         var derivedOptions = $.extend(true, {}, defaults, options);
         this.each(function () {
@@ -268,7 +271,8 @@
                     $modifyButton,
                     $saveButton,
                     $deleteButton,
-                    derivedOptions.editorInstanceOptions
+                    derivedOptions.editorInstanceOptions,
+                    derivedOptions.editorInline
                 );
             $this.data('inlineTextboxEditor', inlineTextboxEditor);
         });
