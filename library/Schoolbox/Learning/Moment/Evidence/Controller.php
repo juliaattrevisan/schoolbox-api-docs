@@ -126,11 +126,10 @@ class Controller extends Base
     public function getMomentsForUser(User $user): void
     {
         // TODO add cursor for moments
-        $data = $this->mapper
-            ->findByColumnList(
-                ['user_id' => $user->getId(),],
-                ['order'   => ['created_at' => Mapper::SORT_ORDER_DESC]],
-            )
+        $encodedCursor = $this->request->query->get('cursor');
+        $cursor        = new Cursor($this->mapper, $user);
+        $data          = $cursor->retrieveResults(null);
+        $mappedData    = $data
             ->map(
                 new Translator\ModelToArray(
                     new User\Translator\ModelToArray(),
@@ -148,12 +147,12 @@ class Controller extends Base
             );
         $this->response->content->set(
             $this->buildJsonOutput([
-                'data'     => $data,
+                'data'     => $mappedData,
                 'metadata' => [
-                    'count' => count($data),
+                    'count' => $cursor->retrieveResultCount(),
                     'cursor' => [
-                        'current' => null,
-                        'next'    => null,
+                        'current' => $encodedCursor ?? $cursor->current($data),
+                        'next'    => $cursor->next($data),
                     ],
                 ],
             ])

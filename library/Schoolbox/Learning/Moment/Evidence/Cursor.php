@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment\Evidence;
 
 use Alaress\Codec\ICodec;
-use Alaress\Codec\Integer\Base64;
+use Alaress\Codec\Json\Base64;
 use Alaress\Database\Predicate\Builder;
 use InvalidArgumentException;
 use Schoolbox\GenericCollection;
