@@ -66,7 +66,7 @@ class Cursor
      * @param string $order
      * @throws InvalidArgumentException if $order isn't one of this class' ORDER_* constants
      */
-    public function __construct(Mapper $mapper, User $user, string $order = Mapper::SORT_ORDER_ASC)
+    public function __construct(Mapper $mapper, User $user, string $order = Mapper::SORT_ORDER_DESC)
     {
         $this->mapper = $mapper;
         $this->user   = $user;
