@@ -30,6 +30,14 @@ class Profile implements IStrategy
 {
 
     /**
+     * These consts, used to denote what type of person we're processing,
+     * also help us decide which timetable-lessons endpoint to access later
+     */
+    public const TYPE_STUDENT = 'student';
+    public const TYPE_STAFF = 'staff';
+
+
+    /**
      * Maximum number of emergency contacts we've permitted (3 by default)
      */
     private const MAX_EMERGENCY_CONTACTS = 3;
@@ -413,13 +421,15 @@ class Profile implements IStrategy
                 $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
 
                 /* Remember that we saw a particular student id
-                 * (-not- their externalId, the primary key in sentral for ths student)
+                 * (-not- their externalId, the primary key in sentral for this student)
                  *
                  * We need to get each dude's timetable separately via some other api endpoint
                  * and we won't encounter this id again unless we remember it here
                  */
-                $this->registry->remember($student['id'], [
-                    'student' => [
+                $this->registry->remember($externalId, [
+                    'person' => [
+                        'id' => $student['id'],
+                        'type' => self::TYPE_STUDENT,
                         'externalId' => $externalId,
                         'firstname' => $studentBaseProfile->getFirstname(),
                         'lastname' => $studentBaseProfile->getLastname()
@@ -1074,6 +1084,23 @@ class Profile implements IStrategy
                 if ($this->perform) {
                     $this->staffProfileMapper->save($staffProfile);
                 }
+
+                /* Remember that we saw a particular staff id
+                 * (-not- their externalId, the primary key in sentral for this student)
+                 *
+                 * We need to get each dude's timetable separately via some other api endpoint
+                 * and we won't encounter this id again unless we remember it here
+                 */
+                $this->registry->remember($externalId, [
+                    'person' => [
+                        'id' => $staff['id'],
+                        'type' => self::TYPE_STAFF,
+                        'externalId' => $externalId,
+                        'firstname' => $staffBaseProfile->getFirstname(),
+                        'lastname' => $staffBaseProfile->getLastname()
+                    ],
+                    'timetable' => null
+                ]);
             }
 
             /* Prepare for next page if it exists

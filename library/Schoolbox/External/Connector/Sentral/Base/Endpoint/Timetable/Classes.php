@@ -154,8 +154,8 @@ class Classes implements IStrategy
          */
         $timetables = $this->registry->recallAll();
 
-        foreach ($timetables as $studentId => $data) {
-            $timetable = $this->preloader->compile((string)$studentId);
+        foreach ($timetables as $externalId => $data) {
+            $timetable = $this->preloader->compile((string)$externalId);
 
             /* No timetable = no trabajo
              */
@@ -193,9 +193,9 @@ class Classes implements IStrategy
                         ],
                         'students' => [
                             [
-                                'externalId' => $data['student']['externalId'],
-                                'firstname' => $data['student']['firstname'],
-                                'surname' => $data['student']['lastname'],
+                                'externalId' => $data['person']['externalId'],
+                                'firstname' => $data['person']['firstname'],
+                                'surname' => $data['person']['lastname'],
                             ]
                         ]
                     ];
