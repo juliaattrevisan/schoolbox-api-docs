@@ -100,6 +100,19 @@ class Mapper extends BaseMapper
             $statement->execute(array_merge($bindings['bindings'], [
                 'reportId' => $model->getId(),
             ]));
+
+            // Delete existing pastoral groups from the report that are given access, to remove duplicates
+            $sql = "
+                DELETE FROM `pastoral_report_groups`
+                WHERE       `report_id` = :reportId AND
+                            `group_id` IN ({$bindings['placeholders']})
+            ";
+
+            $statement = $this->getDatabase()->prepare($sql);
+            $statement->execute(array_merge($bindings['bindings'], [
+                'reportId' => $model->getId(),
+            ]));
+
         } else {
             $statement = $this->getDatabase()->prepare("
                 UPDATE      `pastoral_report_groups`
@@ -120,14 +133,15 @@ class Mapper extends BaseMapper
                     group_id,
                     created_at
                 )
-                SELECT :reportId, :groupId, NOW()
-                WHERE (
-                  SELECT    COUNT(*)
+                SELECT * FROM (
+                  SELECT :reportId AS report_id, :groupId AS group_id, NOW()
+                ) t
+                WHERE NOT EXISTS (
+                  SELECT    *
                   FROM      `pastoral_report_groups`
                   WHERE     `report_id` = :reportIdCount AND
-                            `group_id` = :groupIdCount AND
-                            `deleted_at` IS NULL
-                ) = 0
+                            `group_id` = :groupIdCount
+                )
             ";
 
             $statement = $this->getDatabase()->prepare($sql);
