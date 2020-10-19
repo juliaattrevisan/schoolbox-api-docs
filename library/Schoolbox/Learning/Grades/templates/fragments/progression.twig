@@ -113,7 +113,7 @@
                         var ranges = [
                             {% for activity_id, activity in rubricAssessmentList %}
                             {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}
-                            {% if activity.max_value ?? 0 > 0  %}
+                            {% if activity.max_value ?? 0 > 0 and activity.statistics is defined %}
                             ["{{ activity.name  }}",{{ (activity.statistics.min / activity.max_value) * 100 }}, {{ (activity.statistics.quartile1 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile2 / activity.max_value) * 100 }}, {{ (activity.statistics.quartile3 / activity.max_value) * 100 }}, {{ (activity.statistics.max / activity.max_value) * 100 }}],
                             {% else %}
                             '',
@@ -146,7 +146,8 @@
                                 marker: {
                                     enabled: false
                                 }
-                            }]
+                            }
+                            ]
                         })
                     });
                 </script>
