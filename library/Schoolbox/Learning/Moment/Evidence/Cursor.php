@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\Moment\Evidence;
 use Alaress\Codec\ICodec;
 use Alaress\Codec\Integer\Base64;
 use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Predicate\InvalidColumnException;
 use InvalidArgumentException;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
@@ -110,7 +109,8 @@ class Cursor
             [
                 'limit' => self::RESULTS_PER_REQUEST,
                 'order' => [
-                    $this->mapper->getIdentifierColumn() => $this->order,
+                    'created_at' => $this->order,
+                    'id'         => $this->order,
                 ],
             ]
         )->reindex();
@@ -128,25 +128,27 @@ class Cursor
      */
     public function current(GenericCollection $collection): ?string
     {
-        $currentCursor = null;
-        $firstRecord   = $collection->first();
-        $getIdMethod   = $this->mapper->getGetIdentifierMethodName();
+        $firstRecord = $collection->first();
+        if (!$firstRecord instanceof Model) {
+            return null;
+        }
 
         // The current cursor points to one record before the first item in
         // the record set.
         // In other words, the next cursor for the previous record set.
         // Ascending:  id - 1
         // Descending: id + 1
-        if ($firstRecord && method_exists($firstRecord, $getIdMethod)) {
-            $previousPageCursorId = $firstRecord->$getIdMethod();
-            if ($this->order === Mapper::SORT_ORDER_ASC) {
-                $previousPageCursorId--;
-            } elseif ($this->order === Mapper::SORT_ORDER_DESC) {
-                $previousPageCursorId++;
-            }
-            $currentCursor = $this->codec->encode($previousPageCursorId);
+        $cursorParts          = [
+            'created_at' => $firstRecord->getCreatedAt(),
+        ];
+        $previousPageCursorId = $firstRecord->getId();
+        if ($this->order === Mapper::SORT_ORDER_ASC) {
+            $previousPageCursorId--;
+        } elseif ($this->order === Mapper::SORT_ORDER_DESC) {
+            $previousPageCursorId++;
         }
-        return $currentCursor;
+        $cursorParts['id'] = $previousPageCursorId;
+        return $this->codec->encode($cursorParts);
     }
 
 
@@ -158,16 +160,16 @@ class Cursor
      */
     public function next(GenericCollection $collection): ?string
     {
-        $nextCursor  = null;
-        $lastRecord  = $collection->last();
-        $getIdMethod = $this->mapper->getGetIdentifierMethodName();
+        $lastRecord = $collection->last();
+        if (!$lastRecord instanceof Model) {
+            return null;
+        }
 
         // The next cursor points to the last record.
-        if ($lastRecord && method_exists($lastRecord, $getIdMethod)) {
-            $nextCursor = $this->codec->encode($lastRecord->$getIdMethod());
-        }
-        return $nextCursor;
-
+        return $this->codec->encode([
+            'created_at' => $lastRecord->getCreatedAt(),
+            'id'         => $lastRecord->getId(),
+        ]);
     }
 
 
@@ -177,19 +179,43 @@ class Cursor
      * @param Builder     $builder
      * @param string|null $cursor
      * @return Builder
-     * @throws InvalidColumnException if somehow the query built references a column that doesn't exist
      */
     private function applyCursor(Builder $builder, ?string $cursor): Builder
     {
         if (isset($cursor) && $cursor !== '') {
-            $lastId = $this->codec->decode($cursor);
-            if (isset($lastId) && $lastId > 0) {
+            $decoded = $this->codec->decode($cursor);
+            if (isset($decoded)) {
                 if ($this->order === Mapper::SORT_ORDER_ASC) {
-                    // Ascending: get only items greater than last ID
-                    $builder->greaterThan($this->mapper->getIdentifierColumn(), $lastId);
+                    // Ascending:
+                    // Get items greater than last date, or:
+                    // equal to last date and greater than last ID
+                    $builder->any(
+                        $builder
+                            ->emptyClone()
+                            ->greaterThan('created_at', $decoded['created_at'])
+                            ->all(
+                                $builder
+                                    ->emptyClone()
+                                    ->equals('created_at', $decoded['created_at'])
+                                    ->greaterThan('id', $decoded['id'])
+                            )
+                    );
                 } elseif ($this->order === Mapper::SORT_ORDER_DESC) {
-                    // Descending: get only items less than last ID
-                    $builder->lessThan($this->mapper->getIdentifierColumn(), $lastId);
+                    // Descending:
+                    // Get items less than last date, or:
+                    // equal to last date and less than last ID
+                    $builder->any(
+                        $builder
+                            ->emptyClone()
+                            ->lessThan('created_at', $decoded['created_at'])
+                            ->all(
+                                $builder
+                                    ->emptyClone()
+                                    ->equals('created_at', $decoded['created_at'])
+                                    ->lessThan('id', $decoded['id'])
+                            )
+                    );
+                    $builder->lessThan($this->mapper->getIdentifierColumn(), $decoded);
                 }
             }
         }
