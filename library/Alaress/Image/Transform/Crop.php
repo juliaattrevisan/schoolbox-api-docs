@@ -22,9 +22,9 @@ use Imagine\Image\Point;
  * x0,y0 are the top-left coordinates of an image expressed as percentages
  * x1,y1 are the bottom-right coordinates of an image expressed as percentages
  *
- * e.g. (5,10) and (66,75) will crop from 5%,10% to 66%,75%
+ * e.g. (5.0,10.0) and (66.0,75.0) will crop from 5%,10% to 66%,75%
  *
- * The percentage conversion is done internally, so you can just put in values between 0 and 100
+ * The percentage conversion is done internally, so you can just put in values between 0.0 and 100.0
  */
 class Crop implements ITransform
 {
@@ -38,12 +38,12 @@ class Crop implements ITransform
     private $y1;
 
     /**
-     * @param int $x0
-     * @param int $y0
-     * @param int $x1
-     * @param int $y1
+     * @param float $x0
+     * @param float $y0
+     * @param float $x1
+     * @param float $y1
      */
-    public function __construct(int $x0, int $y0, int $x1, int $y1)
+    public function __construct(float $x0, float $y0, float $x1, float $y1)
     {
         $this->x0 = $x0 * 0.01;
         $this->y0 = $y0 * 0.01;

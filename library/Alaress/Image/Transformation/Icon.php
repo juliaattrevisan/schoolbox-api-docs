@@ -99,8 +99,8 @@ class Icon
         $step  = 100 / $count;
 
         // Coords are percentages
-        $top    = (int)($index * $step);
-        $bottom = (int)(($index + 1) * $step);
+        $top    = ($index * $step);
+        $bottom = (($index + 1) * $step);
 
         return new Sequence(new Crop(0, $top, 100, $bottom), new Square($size));
     }
