@@ -50,7 +50,7 @@ class Original extends \Alaress_Cache_Abstract
      * These aren't stored in the filesystem like other cached items
      * such as tweeter streams, etc. they're stored in brownhole
      *
-     * @var Storage\IStorage
+     * @var Storage\IStorage|null
      */
     private $file;
 
@@ -181,7 +181,7 @@ class Original extends \Alaress_Cache_Abstract
     /**
      * Get the storage instance representing this file
      *
-     * @return null|Storage\IStorage
+     * @return Storage\IStorage|null
      */
     public function getFile(): ?Storage\IStorage
     {
