@@ -45,6 +45,19 @@ class Mapper extends BaseMapper
         $this->uses('display_finish', $endOfDay);
         $this->uses('actual_finish', $endOfDay);
         $this->uses('archived', self::TYPE_BOOLEAN);
+
+        $this->joinsVia(
+            'term_year_level',
+            \Schoolbox\YearLevel\Mapper::class,
+            'id',
+            'year_level_id',
+            'term_id',
+            null,
+            null,
+            null,
+            'yearLevels'
+        );
+
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyTitle']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyCode']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyDates']);
@@ -210,6 +223,14 @@ class Mapper extends BaseMapper
      */
     public function verifyNoOverlap(Model $model)
     {
+
+        /* Bypass validation checks if you associated it with year levels
+         * This creates an extraordinary Term, beyond the normal sequence of Terms.
+         */
+        if ($model->getYearLevels() && $model->getYearLevels()->count()) {
+            return true;
+        }
+
         // if any term that isn't this one:
         // * overlaps (finish <= this start)
         // * overlaps (start >= this finish)

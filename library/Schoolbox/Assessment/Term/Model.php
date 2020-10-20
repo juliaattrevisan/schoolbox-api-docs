@@ -8,10 +8,13 @@
 namespace Schoolbox\Assessment\Term;
 
 use Alaress_Date_Format;
+use Schoolbox\GenericCollection;
 use Schoolbox\IModel;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
+use Schoolbox\YearLevel;
+
 
 /**
  * Representation of a user-defined school term.
@@ -65,6 +68,13 @@ class Model implements \IComparable, IModel
      * @var bool
      */
     protected $archived;
+
+
+    /**
+     * @var \Schoolbox\YearLevel\Model[]|null
+     */
+    private $yearLevels;
+
 
     /**
      * Constructor - ensures this object is in a usable state.
@@ -259,6 +269,30 @@ class Model implements \IComparable, IModel
         $this->archived = $archived;
         return $this;
     }
+
+
+    /**
+     * @return GenericCollection|YearLevel\Model[]|null
+     */
+    public function getYearLevels(): ?GenericCollection
+    {
+        return $this->yearLevels;
+    }
+
+
+    /**
+     * @param GenericCollection|YearLevel\Model[]|null $yearLevels
+     * @return Model
+     */
+    public function setYearLevels(GenericCollection $yearLevels): self
+    {
+        $yearLevels->assertCollectionOf(YearLevel\Model::class);
+
+        $this->yearLevels = $yearLevels;
+
+        return $this;
+    }
+
 
     /**
      * Orders Terms by:
