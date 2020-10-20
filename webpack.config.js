@@ -46,7 +46,7 @@ module.exports = {
                                     },
                                     useBuiltIns: 'usage',
                                     corejs: 3
-                                }
+                        }
                             ]
                         ],
                         plugins: [
@@ -56,18 +56,18 @@ module.exports = {
                         ]
                     }
                 }
-            },
+        },
             {
                 test: /\.vue$/,
                 loader: 'vue-loader',
                 options: {
                     appendTsSuffixTo: [/\.vue$/]
                 }
-            },
+        },
             {
                 test: /\.css$/,
                 use: ['vue-style-loader', 'css-loader']
-            },
+        },
             {
                 test: /\.scss$/,
                 use: [
@@ -75,12 +75,12 @@ module.exports = {
                     'css-loader',
                     'sass-loader'
                 ]
-            },
+        },
             {
                 enforce: "pre",
                 test: /\.js$/,
                 loader: "source-map-loader"
-            }
+        }
         ]
     },
     resolve: {
