@@ -9,6 +9,7 @@ namespace Schoolbox\Assessment\Term;
 
 use Alaress_Date_Format;
 use PDOException;
+use PDOStatement;
 use RangeException;
 use Schoolbox\Column\Date;
 use Schoolbox\GenericCollection;
@@ -65,6 +66,83 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateActualFinishDates']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'updateActualFinishDates']);
     }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        $yearLevelMapper = \Schoolbox\YearLevel\Mapper::getInstance();
+
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$yearLevelMapper->getColumnString('lyl')}
+        ";
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @return string
+     * @throws BaseMapper\DefinitionException
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('term_year_level', '', 'lyl')}
+        ";
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @param PDOStatement $statement
+     * @return GenericCollection|void
+     * @throws BaseMapper\DefinitionException
+     * @throws Exception
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        /** @var \Schoolbox\YearLevel\Mapper $yearLevelMapper */
+        $yearLevelMapper = $this->getJoinMapper('term_year_level');
+
+        /**
+         * Light-weight cache for efficiency, indexed by YearLevel.id
+         * @var \Schoolbox\YearLevel\Model[] $yearLevelCache
+         */
+        $yearLevelCache = [];
+
+        $terms = $this->createCollection();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $termId = (int)$row['id'];
+
+            if (!$terms->offsetExists($termId)) {
+                $terms[$termId] = $this->hydrate($row);
+                $terms[$termId]->setYearLevels($yearLevelMapper->createCollection());
+            }
+
+            $yearLevelId = $row['lyl.' . \Schoolbox\YearLevel\Mapper::COL_ID];
+
+            if ($yearLevelId) {
+                if (!array_key_exists($yearLevelId, $yearLevelCache)) {
+                    $yearLevelCache[$yearLevelId] = $yearLevelMapper->hydrate($row, 'lyl');
+                }
+
+                $terms[$termId]->getYearLevels()->setOffset($yearLevelId, $yearLevelCache[$yearLevelId]);
+            }
+        }
+
+        return $terms;
+    }
+
 
     /**
      * Find the oldest term known
