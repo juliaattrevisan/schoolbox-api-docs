@@ -65,17 +65,19 @@
             </label>
         </div>
 
-        {# TODO Supply in controller #}
-        {% set yearLevelValues = [] %}
-
         <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
         <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 
+        {% set prefilledValues = [] %}
+
+        {% if term is defined %}
+            {% set prefilledValues = yearLevelValues[term.id] ?? [] %}
+        {% endif %}
         <script>
             $(function() {
                 $('#yearLevels-{{ term.id ?? 0 }}').selectizeSelector({
                     multiple: true,
-                    value: {{ yearLevelValues|json_encode|raw }},
+                    value: {{ prefilledValues|json_encode|raw }},
                     selectize: {
                         load: null,
                         options: {{ yearLevelOptions|json_encode|raw }},

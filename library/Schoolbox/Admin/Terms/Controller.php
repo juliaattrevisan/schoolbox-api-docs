@@ -52,17 +52,40 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
+        /* All available terms, sorted
+         */
+        $terms = $this->termMapper->findAll(['order' => ['start' => 'desc']]);
+
+        /* Options for prefilling the selectize
+         * Indexed by term.id
+         */
+        $yearLevelValues = [];
+
+        foreach ($terms as $term) {
+            foreach ($term->getYearLevels() as $yearLevel) {
+                $yearLevelValues[$term->getId()][] = [
+                    'id' => $yearLevel->getId(),
+                    'name' => $yearLevel->getName()
+                ];
+            }
+        }
+
+        /* Options to choose in the selectize
+        */
+        $yearLevelOptions = $this->yearLevelMapper->findAll()->map(static function (YearLevel\Model $yearLevel) {
+            return [
+                'id'   => $yearLevel->getId(),
+                'name' => $yearLevel->getName(),
+            ];
+        })->getAll();
+
         $this->getResponse()->content->set([
             'template' => '@adminTerms/index.twig',
             'data'     => [
                 'pageCurrent'      => basename($this->getRequest()->query->get('page')),
-                'terms'            => $this->termMapper->findAll(['order' => ['start' => 'desc']]),
-                'yearLevelOptions' => $this->yearLevelMapper->findAll()->map(static function (YearLevel\Model $yearLevel) {
-                    return [
-                        'id'   => $yearLevel->getId(),
-                        'name' => $yearLevel->getName(),
-                    ];
-                })->getAll(),
+                'terms'            => $terms,
+                'yearLevelValues'  => $yearLevelValues,
+                'yearLevelOptions' => $yearLevelOptions,
             ],
             'title' => 'Admin - Terms'
         ]);
