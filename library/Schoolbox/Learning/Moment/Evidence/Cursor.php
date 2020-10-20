@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -232,5 +233,4 @@ class Cursor
         return $this->mapper->getPredicateBuilder()
                             ->equals('user_id', $this->user->getId());
     }
-
 }
