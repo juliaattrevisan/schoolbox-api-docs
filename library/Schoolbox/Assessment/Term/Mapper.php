@@ -218,19 +218,6 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Find the oldest term known
-     * @return Model
-     */
-    public function findOldest()
-    {
-        $allTerms = $this->findAll();
-
-        $allTerms->sortBy('start', 'ASC');
-
-        return $allTerms->first();
-    }
-
-    /**
      * Finds whichever term is the current one.
      *
      * @return Model
@@ -276,35 +263,6 @@ class Mapper extends BaseMapper
         }
     }
 
-
-    /**
-     * Retrieves whichever term is the next term opening after this one.
-     *
-     * @param Model $term
-     * @return Model
-     */
-    public function findNext(Model $term)
-    {
-        $endDate = $term->getDisplayFinish();
-        if ($endDate instanceof Alaress_Date_Format && !$endDate->isNull()) {
-            $query = "
-                SELECT   {$this->getColumnString()}
-                FROM     {$this->getTable()}
-                WHERE    `start` > :date
-                ORDER BY `start` ASC
-                LIMIT 1
-            ";
-            $statement = $this->getDatabase()->prepare($query);
-            $statement->execute(['date' => $endDate->getDatabaseDate(),]);
-            $result = $statement->fetch();
-            if ($result) {
-                /** @var Model $model */
-                $model = $this->hydrate($result);
-                return $model;
-            }
-        }
-        return $this->createModel();
-    }
 
     /**
      * Verifies this term's title is unique and not empty.
