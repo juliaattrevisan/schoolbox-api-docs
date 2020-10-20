@@ -62,12 +62,21 @@ class Model implements \IComparable, IModel
      */
     protected $actualFinish;
 
+
     /**
      * If a term is archived, it should be de-emphasized in term selectors.
      *
      * @var bool
      */
     protected $archived;
+
+
+    /**
+     * Extraordinary Terms are those who have exactly one YearLevel relation
+     *
+     * @var bool
+     */
+    private $extraordinary;
 
 
     /**
@@ -267,6 +276,25 @@ class Model implements \IComparable, IModel
     public function setArchived($archived)
     {
         $this->archived = $archived;
+        return $this;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function getExtraordinary(): bool
+    {
+        return $this->extraordinary;
+    }
+
+    /**
+     * @param bool $extraordinary
+     * @return $this
+     */
+    public function setExtraordinary(bool $extraordinary): self
+    {
+        $this->extraordinary = $extraordinary;
         return $this;
     }
 

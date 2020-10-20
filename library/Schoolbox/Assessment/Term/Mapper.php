@@ -47,6 +47,7 @@ class Mapper extends BaseMapper
         $this->uses('display_finish', $endOfDay);
         $this->uses('actual_finish', $endOfDay);
         $this->uses('archived', self::TYPE_BOOLEAN);
+        $this->uses('extraordinary', self::TYPE_BOOLEAN);
 
         $this->joinsVia(
             'term_year_level',

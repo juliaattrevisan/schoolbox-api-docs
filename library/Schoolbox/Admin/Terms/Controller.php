@@ -135,7 +135,7 @@ class Controller extends Base
      * @return Term\Model
      * @throws \Exception if dates aren't valid
      */
-    protected function populateModelFromPostData(Term\Model $term, Request\Values $postdata): \Schoolbox\Assessment\Term\Model
+    protected function populateModelFromPostData(Term\Model $term, Request\Values $postdata): Term\Model
     {
         $term->setTitle($postdata->get('title'));
         $term->setCode($postdata->get('code'));
@@ -145,6 +145,14 @@ class Controller extends Base
         $yearLevelIds = array_values(array_filter(explode(',', $postdata['yearLevelIds'])));
 
         $term->setYearLevels($this->yearLevelMapper->findByColumn('id', $yearLevelIds));
+
+        /* Remember how extraordinary this was
+         */
+        if ($term->getYearLevels()->count() === 1) {
+            $term->setExtraordinary(true);
+        } else {
+            $term->setExtraordinary(false);
+        }
 
         try {
             $term->setStart(Alaress_Date_Format::newLocalShort($postdata->get('start')));
