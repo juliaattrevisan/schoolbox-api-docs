@@ -248,13 +248,26 @@ class Mapper extends BaseMapper
      *
      * @return Model
      * @throws BaseMapper\Exception
-     * @throws PDOException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function findForDate(Alaress_Date_Format $date): Model
     {
-        $pb = $this->getPredicateBuilder();
+        $pb = $this->getPredicateBuilder()
+
+            /* Term must have started already
+             */
+            ->lessThanOrEqualTo('start', $date->getDatabaseDate())
+
+            /* Ignore Extraordinary Terms
+             */
+            ->equals('extraordinary', 0);
+
+            /* TODO Why isn't Archived one of the settings here?
+             *  Surely a current term must not be archived?
+             */
+
         try {
-            return $this->findOneByPredicates($pb->lessThanOrEqualTo('start', $date->getDatabaseDate()), [
+            return $this->findOneByPredicates($pb, [
                 'order' => ['start' => 'DESC'],
                 'limit' => 1
             ]);
