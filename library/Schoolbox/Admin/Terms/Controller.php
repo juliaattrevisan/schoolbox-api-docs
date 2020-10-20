@@ -52,8 +52,6 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-
-        // TODO make this use the new way of creating responses
         $this->getResponse()->content->set([
             'template' => '@adminTerms/index.twig',
             'data'     => [
