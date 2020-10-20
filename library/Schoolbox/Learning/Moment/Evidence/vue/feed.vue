@@ -179,7 +179,7 @@ export default {
                     <i class="icon-favourite"></i>
                     <p>{{ config.student.firstname }} has no learning moments yet.</p>
                 </div>
-                <button v-else-if="metadata.cursor.next" class="expand" @click.prevent="append(metadata.cursor.next)">
+                <button v-else-if="metadata.cursor.next && metadata.count > data.length" class="expand" @click.prevent="append(metadata.cursor.next)">
                     Load more
                 </button>
             </div>
