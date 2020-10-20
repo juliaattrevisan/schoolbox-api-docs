@@ -38,6 +38,8 @@ class Storage
                 return new Square(200);
             case 'constrain200':
                 return new Constrain(200, 300);
+            case 'constrain300':
+                return new Constrain(300, 450);
             case 'rectangle':
                 return new Rectangle(140, 50);
             case 'maxsize':

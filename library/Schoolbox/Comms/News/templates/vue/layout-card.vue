@@ -41,7 +41,7 @@
                 <template v-if="article.featureImage">
                     <div class="card-feature-image">
                         <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">
-                            <img :src="article.featureImage._links.image.href + '&size=constrain200'">
+                            <img :src="article.featureImage._links.image.href + '&size=constrain300'">
                         </a>
                     </div>
                 </template>
