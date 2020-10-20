@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Web\Request;
 use Schoolbox\Assessment\Term;
+use Schoolbox\YearLevel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
 /**
@@ -20,36 +21,55 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  */
 class Controller extends Base
 {
+
     /**
      * @var Term\Mapper
      */
-    protected $termMapper;
+    private $termMapper;
+
+
+    /**
+     * @var YearLevel\Mapper
+     */
+    private $yearLevelMapper;
+
 
     /**
      * Constructor
      *
      * @param Term\Mapper $termMapper
+     * @param YearLevel\Mapper $yearLevelMapper
      */
-    public function __construct(Term\Mapper $termMapper)
+    public function __construct(Term\Mapper $termMapper, YearLevel\Mapper $yearLevelMapper)
     {
         $this->termMapper = $termMapper;
+        $this->yearLevelMapper = $yearLevelMapper;
     }
+
 
     /**
      * GET action for viewing list of terms
      */
-    public function getIndex()
+    public function getIndex(): void
     {
+
         // TODO make this use the new way of creating responses
         $this->getResponse()->content->set([
             'template' => '@adminTerms/index.twig',
             'data'     => [
-                'pageCurrent' => basename($this->getRequest()->query->get('page')),
-                'terms'       => $this->termMapper->findAll(['order' => ['start' => 'desc']]),
+                'pageCurrent'      => basename($this->getRequest()->query->get('page')),
+                'terms'            => $this->termMapper->findAll(['order' => ['start' => 'desc']]),
+                'yearLevelOptions' => $this->yearLevelMapper->findAll()->map(static function (YearLevel\Model $yearLevel) {
+                    return [
+                        'id'   => $yearLevel->getId(),
+                        'name' => $yearLevel->getName(),
+                    ];
+                })->getAll(),
             ],
             'title' => 'Admin - Terms'
         ]);
     }
+
 
     /**
      * POST action for creating a new term

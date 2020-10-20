@@ -1,3 +1,17 @@
+{##
+ # Form
+ #
+ # Create/Edit the Term's settings. There's a Year Level relationship (optional)
+ # that can be configured by a school to take a Term out of the normally-mandated
+ # sequence where they aren't allowed to overlap. Making an Extraordinary Term is
+ # required in some schools who need to disobey our sequencing.
+ #
+ # This fragment manifets in a Modal in the Terms admin area.
+ #
+ # @param array $yearLevelOptions  a set of YearLevel\Model instances to choose
+ #}
+
+
 {% if term.getId() ?? false %}
     {% set saveRoute = routeLookup('adminTerms.postUpdateTerm', {id: term.getId()}) %}
     {% set saveValue = 'Update Term' %}
@@ -53,14 +67,13 @@
 
         {# TODO Supply in controller #}
         {% set yearLevelValues = [] %}
-        {% set yearLevelOptions = [] %}
 
         <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
         <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 
         <script>
             $(function() {
-                $('#yearLevels').selectizeSelector({
+                $('#yearLevels-{{ term is defined ? term.id : 0 }}').selectizeSelector({
                     multiple: true,
                     value: {{ yearLevelValues|json_encode|raw }},
                     selectize: {
@@ -75,7 +88,7 @@
             <label>Year Levels</label>
             <span class="hint has-tip tip-top" title="Associate a year level to take this Term out of sequence" data-tooltip="">?</span>
 
-            <input title="Year Levels" id="yearLevels" name="yearLevelIds" placeholder="Select year levels" tabindex="-1" class="selectized" type="text" />
+            <input title="Year Levels" id="yearLevels-{{ term is defined ? term.id : 0 }}" name="yearLevelIds" placeholder="Select year levels" tabindex="-1" class="selectized" type="text" />
         </div>
 
         <input type="submit" class="expand" value="{{ saveValue }}" data-mage-working="Saving..." data-mage-reset="{{ saveValue }}" />
