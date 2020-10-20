@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Codec\Json;
 
 use Alaress\Codec\ICodec;
+use TypeError;
 
 /**
  * A codec for encoding and decoding any JSON-encodable value into an obfuscated
@@ -34,14 +35,12 @@ class Base64 implements ICodec
      *
      * @param string $encodedValue
      * @return mixed
-     * @throws \TypeError                if $encodedValue isn't a string or null
-     * @throws \UnexpectedValueException if $encodedValue is a string, but
-     *                                   decodes to a non-integer
+     * @throws TypeError if $encodedValue isn't a string or null
      */
     public function decode($encodedValue)
     {
         if (!is_string($encodedValue)) {
-            throw new \TypeError('Only string values may be decoded by this codec');
+            throw new TypeError('Only string values may be decoded by this codec');
         }
         return json_decode(base64_decode($encodedValue), true);
     }
