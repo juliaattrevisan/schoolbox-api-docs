@@ -50,6 +50,34 @@
                        data-datepicker />
             </label>
         </div>
+
+        {# TODO Supply in controller #}
+        {% set yearLevelValues = [] %}
+        {% set yearLevelOptions = [] %}
+
+        <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+        <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+
+        <script>
+            $(function() {
+                $('#yearLevels').selectizeSelector({
+                    multiple: true,
+                    value: {{ yearLevelValues|json_encode|raw }},
+                    selectize: {
+                        load: null,
+                        options: {{ yearLevelOptions|json_encode|raw }},
+                        hideSelected: true
+                    }
+                });
+            });
+        </script>
+        <div class="small-12 columns">
+            <label>Year Levels</label>
+            <span class="hint has-tip tip-top" title="Associate a year level to take this Term out of sequence" data-tooltip="">?</span>
+
+            <input title="Year Levels" id="yearLevels" name="yearLevelIds" placeholder="Select year levels" tabindex="-1" class="selectized" type="text" />
+        </div>
+
         <input type="submit" class="expand" value="{{ saveValue }}" data-mage-working="Saving..." data-mage-reset="{{ saveValue }}" />
         <!-- Don't delete the inline style, it's needed -->
         <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
