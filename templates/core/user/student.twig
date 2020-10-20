@@ -414,7 +414,17 @@
                 {% autoescape 'js' %}
                     <script type="text/javascript">
                         window.learningEvidenceFeedConfig = {
-                            student: {{ user | json_encode | raw }}
+                            student: {{ user | json_encode | raw }},
+                            routes: {
+                                getEvidence: '{{ routeLookupIfAuthorized(
+                                    'learningMomentEvidence.getMomentsForUser',
+                                    {user: user, userId: user.id}
+                                ) }}',
+                                getCreateEvidenceForm: '{{ routeLookupIfAuthorized(
+                                    'learningMomentEvidence.getCreateForm',
+                                    {users: [user], userIds: user.id}
+                                ) }}',
+                            },
                         };
                     </script>
                 {% endautoescape %}

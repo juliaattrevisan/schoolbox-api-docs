@@ -6,8 +6,6 @@ import moment from 'moment';
 import MediaArticle from '@schoolbox/media-article';
 import Storage from '@schoolbox/storage';
 
-const URL_LEARNING_EVIDENCE_SOURCE = '/learning/evidence/user/';
-
 export default {
     components: {
         MediaArticle,
@@ -56,7 +54,7 @@ export default {
                 params.cursor = cursor;
             }
             axios
-                .get(URL_LEARNING_EVIDENCE_SOURCE + String(this.config.student.id), {params})
+                .get(this.config.routes.getEvidence, {params})
                 .then(response => {
                     this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
@@ -105,7 +103,6 @@ export default {
 
         /**
          * Renders the created-at time as a string.
-         * *
          *
          * @param {Moment} createdAt
          */
