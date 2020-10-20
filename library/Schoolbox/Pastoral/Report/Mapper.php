@@ -88,12 +88,9 @@ class Mapper extends BaseMapper
             // Delete any existing pastoral groups from the report that are no longer to be given access
 
             $sql = "
-
-                UPDATE      `pastoral_report_groups`
-                SET         `deleted_at` = NOW()
+                DELETE FROM `pastoral_report_groups`
                 WHERE       `report_id` = :reportId AND
-                            `group_id` NOT IN ({$bindings['placeholders']}) AND
-                            `deleted_at` IS NULL
+                            `group_id` NOT IN ({$bindings['placeholders']})
             ";
 
             $statement = $this->getDatabase()->prepare($sql);
@@ -102,10 +99,8 @@ class Mapper extends BaseMapper
             ]));
         } else {
             $statement = $this->getDatabase()->prepare("
-                UPDATE      `pastoral_report_groups`
-                SET         `deleted_at` = NOW()
-                WHERE       `report_id` = :reportId AND
-                            `deleted_at` IS NULL
+                DELETE FROM `pastoral_report_groups`
+                WHERE       `report_id` = :reportId
             ");
 
             $statement->execute(['reportId' => $model->getId()]);
@@ -115,27 +110,20 @@ class Mapper extends BaseMapper
 
         foreach ($groupIds as $groupId) {
             $sql = "
-                INSERT INTO `pastoral_report_groups` (
+                INSERT IGNORE INTO `pastoral_report_groups` (
                     report_id,
-                    group_id,
-                    created_at
+                    group_id
                 )
-                SELECT :reportId, :groupId, NOW()
-                WHERE (
-                  SELECT    COUNT(*)
-                  FROM      `pastoral_report_groups`
-                  WHERE     `report_id` = :reportIdCount AND
-                            `group_id` = :groupIdCount AND
-                            `deleted_at` IS NULL
-                ) = 0
+                VALUES (
+                  :reportId,
+                  :groupId
+                )
             ";
 
             $statement = $this->getDatabase()->prepare($sql);
             $statement->execute([
                 'reportId'      => $model->getId(),
-                'reportIdCount' => $model->getId(),
                 'groupId'       => $groupId,
-                'groupIdCount'  => $groupId,
             ]);
         }
     }
@@ -205,13 +193,12 @@ class Mapper extends BaseMapper
                         GROUP_CONCAT(`pastoral_report_groups`.`group_id`) as `groups`
             FROM        {$this->getTable()}
             LEFT JOIN   `pastoral_report_groups` ON
-                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id` AND
-                            `pastoral_report_groups`.`deleted_at` IS NULL
+                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id`
         ";
     }
 
     /**
-     * Retreive all report definitions the user has access to
+     * Retrieve all report definitions the user has access to
      *
      * @param User $user
      *
@@ -234,7 +221,7 @@ class Mapper extends BaseMapper
         $bindings = PredicateBuilder::getArrayBindings($groupIds, 'group');
 
         if (!empty($bindings['placeholders'])) {
-            $groupSql = "`group_id` IN ({$bindings['placeholders']}) AND";
+            $groupSql = "`group_id` IN ({$bindings['placeholders']}) ";
         }
 
         $sql = "
@@ -244,8 +231,7 @@ class Mapper extends BaseMapper
                         `pastoral_report_dashboard`.`id` as `dashboard_id`
             FROM        {$this->getTable()}
             LEFT JOIN   `pastoral_report_groups` ON
-                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id` AND
-                            `pastoral_report_groups`.`deleted_at` IS NULL
+                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id`
             LEFT JOIN   `pastoral_report_dashboard` ON
                             `pastoral_report_dashboard`.`report_id` = `pastoral_report`.`id` AND
                             `pastoral_report_dashboard`.`user_id` = {$userId} AND
@@ -255,7 +241,6 @@ class Mapper extends BaseMapper
                                 SELECT    `report_id`
                                 FROM      `pastoral_report_groups`
                                 WHERE     {$groupSql}
-                                          `deleted_at` IS NULL
                             )
                         )) AND
                         `pastoral_report`.`deleted_at` IS NULL
@@ -271,7 +256,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Retreive all report definitions that should display on users dashboard
+     * Retrieve all report definitions that should display on users dashboard
      *
      * @param User $user
      *
@@ -294,7 +279,7 @@ class Mapper extends BaseMapper
         $bindings = PredicateBuilder::getArrayBindings($groupIds, 'group');
 
         if (!empty($bindings['placeholders'])) {
-            $groupSql = "`group_id` IN ({$bindings['placeholders']}) AND";
+            $groupSql = "`group_id` IN ({$bindings['placeholders']}) ";
         }
 
         $sql = "
@@ -303,8 +288,7 @@ class Mapper extends BaseMapper
                         GROUP_CONCAT(`pastoral_report_groups`.`group_id`) as `groups`
             FROM        {$this->getTable()}
             LEFT JOIN   `pastoral_report_groups` ON
-                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id` AND
-                            `pastoral_report_groups`.`deleted_at` IS NULL
+                            `pastoral_report_groups`.`report_id` = `pastoral_report`.`id`
             JOIN        `pastoral_report_dashboard` ON
                             `pastoral_report_dashboard`.`report_id` = `pastoral_report`.`id` AND
                             `pastoral_report_dashboard`.`user_id` = {$userId} AND
@@ -315,7 +299,6 @@ class Mapper extends BaseMapper
                                 SELECT    `report_id`
                                 FROM      `pastoral_report_groups`
                                 WHERE     {$groupSql}
-                                          `deleted_at` IS NULL
                             )
                         ))
             GROUP BY    `pastoral_report`.`id`
