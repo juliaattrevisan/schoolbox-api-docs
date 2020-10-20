@@ -12,8 +12,8 @@
  #}
 
 
-{% if term.getId() ?? false %}
-    {% set saveRoute = routeLookup('adminTerms.postUpdateTerm', {id: term.getId()}) %}
+{% if term.id ?? false %}
+    {% set saveRoute = routeLookup('adminTerms.postUpdateTerm', {id: term.id}) %}
     {% set saveValue = 'Update Term' %}
     {% set saveType  = 'update' %}
 {% else %}
@@ -29,7 +29,7 @@
                 Title
                 <input type="text"
                        name="title"
-                       value="{{ term.getTitle() ?? '' }}"
+                       value="{{ term.title ?? '' }}"
                        required
                        maxlength="100" />
             </label>
@@ -39,7 +39,7 @@
                 Code
                 <input type="text"
                        name="code"
-                       value="{{ term.getCode() ?? '' }}"
+                       value="{{ term.code ?? '' }}"
                        required
                        maxlength="16" />
             </label>
@@ -49,7 +49,7 @@
                 Start
                 <input type="text"
                        name="start"
-                       value="{{ term.getStart().getLocalShort() ?? '' }}"
+                       value="{{ term.start.localShort ?? '' }}"
                        required
                        data-datepicker />
             </label>
@@ -59,7 +59,7 @@
                 Finish
                 <input type="text"
                        name="finish"
-                       value="{{ term.getDisplayFinish().getLocalShort() ?? '' }}"
+                       value="{{ term.displayFinish.localShort ?? '' }}"
                        required
                        data-datepicker />
             </label>
@@ -73,7 +73,7 @@
 
         <script>
             $(function() {
-                $('#yearLevels-{{ term is defined ? term.id : 0 }}').selectizeSelector({
+                $('#yearLevels-{{ term.id ?? 0 }}').selectizeSelector({
                     multiple: true,
                     value: {{ yearLevelValues|json_encode|raw }},
                     selectize: {
@@ -88,7 +88,7 @@
             <label>Year Levels</label>
             <span class="hint has-tip tip-top" title="Associate a year level to take this Term out of sequence" data-tooltip="">?</span>
 
-            <input title="Year Levels" id="yearLevels-{{ term is defined ? term.id : 0 }}" name="yearLevelIds" placeholder="Select year levels" tabindex="-1" class="selectized" type="text" />
+            <input title="Year Levels" id="yearLevels-{{ term.id ?? 0 }}" name="yearLevelIds" placeholder="Select year levels" tabindex="-1" class="selectized" type="text" />
         </div>
 
         <input type="submit" class="expand" value="{{ saveValue }}" data-mage-working="Saving..." data-mage-reset="{{ saveValue }}" />
