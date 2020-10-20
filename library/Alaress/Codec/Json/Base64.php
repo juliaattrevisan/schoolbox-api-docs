@@ -15,6 +15,11 @@ use TypeError;
 /**
  * A codec for encoding and decoding any JSON-encodable value into an obfuscated
  * base64 string value.
+ *
+ * The codec is expected to be lossless so long as the raw value can be decoded
+ * and encoded losslessly by `json_encode`/`json_decode`. This means that
+ * objects (or an array containing objects) should not be encoded with this
+ * codec, but the codec will not stop you from attempting.
  */
 class Base64 implements ICodec
 {
