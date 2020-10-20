@@ -72,28 +72,32 @@ class Controller extends Base
     /**
      * POST action for creating a new term
      */
-    public function postCreateTerm()
+    public function postCreateTerm(): void
     {
         $term = $this->termMapper->createModel();
         try {
             $term = $this->populateModelFromPostData($term, $this->getRequest()->post);
             $this->termMapper->save($term);
+
             $this->outputPostSuccess($term);
         } catch (\Exception $e) {
             $this->outputPostError($term, $e);
         }
     }
 
+
     /**
      * POST action for updating an existing term
      *
      * @param Term\Model $term
+     * @throws \Exception
      */
-    public function postUpdateTerm(Term\Model $term)
+    public function postUpdateTerm(Term\Model $term): void
     {
         try {
             $term = $this->populateModelFromPostData($term, $this->getRequest()->post);
             $this->termMapper->save($term);
+
             $this->outputPostSuccess($term);
         } catch (\Exception $e) {
             $this->outputPostError($term, $e);
@@ -108,20 +112,29 @@ class Controller extends Base
      * @return Term\Model
      * @throws \Exception if dates aren't valid
      */
-    protected function populateModelFromPostData(Term\Model $term, Request\Values $postdata)
+    protected function populateModelFromPostData(Term\Model $term, Request\Values $postdata): \Schoolbox\Assessment\Term\Model
     {
         $term->setTitle($postdata->get('title'));
         $term->setCode($postdata->get('code'));
+
+        /* Refresh YearLevel relations
+         */
+        $yearLevelIds = array_values(array_filter(explode(',', $postdata['yearLevelIds'])));
+
+        $term->setYearLevels($this->yearLevelMapper->findByColumn('id', $yearLevelIds));
+
         try {
             $term->setStart(Alaress_Date_Format::newLocalShort($postdata->get('start')));
         } catch (\Exception $e) {
             throw new \Exception('Start date is not a valid date.');
         }
+
         try {
             $term->setDisplayFinish(Alaress_Date_Format::newLocalShort($postdata->get('finish')));
         } catch (\Exception $e) {
             throw new \Exception('Finish date is not a valid date.');
         }
+
         return $term;
     }
 
