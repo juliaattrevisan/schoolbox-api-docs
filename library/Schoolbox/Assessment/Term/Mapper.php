@@ -15,6 +15,7 @@ use Schoolbox\Column\Date;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\YearLevel;
 use UnexpectedValueException;
 
 /**
@@ -49,7 +50,7 @@ class Mapper extends BaseMapper
 
         $this->joinsVia(
             'term_year_level',
-            \Schoolbox\YearLevel\Mapper::class,
+            YearLevel\Mapper::class,
             'id',
             'year_level_id',
             'term_id',
@@ -75,7 +76,7 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString()
     {
-        $yearLevelMapper = \Schoolbox\YearLevel\Mapper::getInstance();
+        $yearLevelMapper = YearLevel\Mapper::getInstance();
 
         return "
             SELECT
@@ -110,12 +111,12 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var \Schoolbox\YearLevel\Mapper $yearLevelMapper */
+        /** @var YearLevel\Mapper $yearLevelMapper */
         $yearLevelMapper = $this->getJoinMapper('term_year_level');
 
         /**
          * Light-weight cache for efficiency, indexed by YearLevel.id
-         * @var \Schoolbox\YearLevel\Model[] $yearLevelCache
+         * @var YearLevel\Model[] $yearLevelCache
          */
         $yearLevelCache = [];
 
@@ -129,7 +130,7 @@ class Mapper extends BaseMapper
                 $terms[$termId]->setYearLevels($yearLevelMapper->createCollection());
             }
 
-            $yearLevelId = $row['lyl.' . \Schoolbox\YearLevel\Mapper::COL_ID];
+            $yearLevelId = $row['lyl.' . YearLevel\Mapper::COL_ID];
 
             if ($yearLevelId) {
                 if (!array_key_exists($yearLevelId, $yearLevelCache)) {
@@ -141,6 +142,77 @@ class Mapper extends BaseMapper
         }
 
         return $terms;
+    }
+
+
+    /**
+     * Find the first extraordinary Term associated with $yearLevels instances,
+     * whose $date is in between the start and display_finish values, and is not
+     * archived (therefore the extraordinary Term is currently in progress)
+     *
+     * Extraordinary Terms are only associated with one Year Level
+     * Any other configuration of relations (0 or 2+) results in default behaviour
+     * (find the first non-extraordinary Term)
+     *
+     * @param Alaress_Date_Format                      $date
+     * @param GenericCollection|YearLevel\Model[]|null $yearLevels
+     * @return Model
+     * @throws BaseMapper\DefinitionException
+     * @throws Exception
+     * @throws PDOException
+     */
+    public function findForDateAndYearLevel(Alaress_Date_Format $date, ?GenericCollection $yearLevels): Model
+    {
+
+        /* Not an Extraordinary Term; do the usual default behaviour
+         */
+        if (null === $yearLevels) {
+            return $this->findForDate($date);
+        }
+
+        /* Indeterminate quantity of yearLevel instances; do the usual default behaviour
+         */
+        if ($yearLevels && $yearLevels->count() !== 1) {
+            return $this->findForDate($date);
+        }
+
+        /* Only seek one determinate Extraordinary Term
+         *
+         * Any other configuration leads to default findForDate() as we can't conclude
+         * which extraordinary Term should be returned...
+         */
+        $query = "
+            SELECT {$this->getColumnString()}
+            FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('term_year_level', '', 'lyl')}
+            WHERE lyl.id = :yearLevelId
+            AND start <= :date
+            AND display_finish > :date
+            AND archived = 0
+            ORDER BY start DESC
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+
+        $statement->execute([
+            'yearLevelId' => $yearLevels->first()->getId(),
+            'date' => $date->getDatabaseDate()
+        ]);
+
+        $term = $this->hydrateSelect($statement)->first();
+
+        /* The first outcome:
+         * Found an extraordinary Term for the Year Level specified
+         * It's already begun, it hasn't already finished, it's not archived,
+         * Therefore applicable
+         *
+         * The second outcome:
+         * Year Level specified, but we didn't find any non-archived extraordinary Terms
+         * for the date provided, in any of the Terms that exist with Year Level relations
+         * An extraordinary Term might not have begun, or has already ended
+         * Use the default behaviour
+         */
+        return $term ?? $this->findForDate($date);
     }
 
 
