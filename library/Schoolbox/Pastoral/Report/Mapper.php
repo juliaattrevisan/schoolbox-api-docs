@@ -208,7 +208,6 @@ class Mapper extends BaseMapper
     {
         $userId = $this->getDatabase()->quote($user->getId());
 
-        $groupSql         = '';
         $groupsMembership = PastoralGroupMemberMapper::getInstance()->findByColumn('user_id', $user->getId());
 
         $groupIds = [];
@@ -222,6 +221,9 @@ class Mapper extends BaseMapper
 
         if (!empty($bindings['placeholders'])) {
             $groupSql = "`group_id` IN ({$bindings['placeholders']}) ";
+        } else {
+            // match no reports by group
+            $groupSql = 'TRUE = FALSE';
         }
 
         $sql = "
@@ -266,7 +268,6 @@ class Mapper extends BaseMapper
     {
         $userId = $this->getDatabase()->quote($user->getId());
 
-        $groupSql         = '';
         $groupsMembership = PastoralGroupMemberMapper::getInstance()->findByColumn('user_id', $user->getId());
 
         $groupIds = [];
@@ -280,6 +281,9 @@ class Mapper extends BaseMapper
 
         if (!empty($bindings['placeholders'])) {
             $groupSql = "`group_id` IN ({$bindings['placeholders']}) ";
+        } else {
+            // match no reports by group
+            $groupSql = 'TRUE = FALSE';
         }
 
         $sql = "
