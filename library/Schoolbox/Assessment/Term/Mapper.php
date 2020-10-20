@@ -349,7 +349,7 @@ class Mapper extends BaseMapper
         /* Bypass validation checks if you associated it with year levels
          * This creates an extraordinary Term, beyond the normal sequence of Terms.
          */
-        if ($model->getYearLevels() && $model->getYearLevels()->count()) {
+        if ($model->getYearLevels() && $model->getYearLevels()->count() === 1) {
             return true;
         }
 
