@@ -31,10 +31,4 @@
         <!--        See https://github.com/paratestphp/paratest/issues/282 -->
         <listener class="Alaress\Test\MakeWarningErrorAgainTestListener"></listener>
     </listeners>
-  <filter>
-      <whitelist>
-          <directory suffix=".php">./library/</directory>
-      </whitelist>
-  </filter>
-
 </phpunit>
