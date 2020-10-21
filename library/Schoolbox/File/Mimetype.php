@@ -93,10 +93,12 @@ class Mimetype implements ISoftDeletable
      * Set description
      *
      * @param string $description
+     * @return $this
      */
-    public function setDescription($description)
+    public function setDescription($description): self
     {
         $this->description = $description;
+        return $this;
     }
 
     /**
@@ -113,11 +115,12 @@ class Mimetype implements ISoftDeletable
      * Set enable
      *
      * @param bool $enable
-     * @return void
+     * @return $this
      */
-    public function setEnable($enable)
+    public function setEnable($enable): self
     {
         $this->enable = $enable;
+        return $this;
     }
 
     /**
@@ -134,11 +137,12 @@ class Mimetype implements ISoftDeletable
      * Set file type id
      *
      * @param int $fileTypeID
-     * @return void
+     * @return $this
      */
-    public function setFileTypeID($fileTypeID)
+    public function setFileTypeID($fileTypeID): self
     {
         $this->fileTypeID = $fileTypeID;
+        return $this;
     }
 
     /**
@@ -155,11 +159,12 @@ class Mimetype implements ISoftDeletable
      * Alias method
      *
      * @param int $id
-     * @return void
+     * @return $this
      */
-    public function setId($id)
+    public function setId($id): self
     {
         $this->setFileTypeID($id);
+        return $this;
     }
 
     /**
@@ -176,10 +181,12 @@ class Mimetype implements ISoftDeletable
      * Set icon file
      *
      * @param string $iconFile
+     * @return $this
      */
-    public function setIconFile($iconFile)
+    public function setIconFile($iconFile): self
     {
         $this->iconFile = $iconFile;
+        return $this;
     }
 
     /**
@@ -209,10 +216,12 @@ class Mimetype implements ISoftDeletable
      * Set inline
      *
      * @param bool $inline
+     * @return $this
      */
-    public function setInline($inline)
+    public function setInline($inline): self
     {
         $this->inline = $inline;
+        return $this;
     }
 
     /**
@@ -229,10 +238,12 @@ class Mimetype implements ISoftDeletable
      * Set mime type
      *
      * @param string $mime
+     * @return $this
      */
-    public function setMime($mime)
+    public function setMime($mime): self
     {
         $this->mime = $mime;
+        return $this;
     }
 
     /**
@@ -252,7 +263,7 @@ class Mimetype implements ISoftDeletable
      * @param int $maxFileSize
      * @return $this
      */
-    public function setMaxFileSize($maxFileSize)
+    public function setMaxFileSize($maxFileSize): self
     {
         $this->maxFileSize = $maxFileSize;
         return $this;
@@ -314,9 +325,9 @@ class Mimetype implements ISoftDeletable
 
     /**
      * @param boolean $deleted
-     * @return static
+     * @return $this
      */
-    public function setDeleted($deleted)
+    public function setDeleted($deleted): self
     {
         $this->deleted = $deleted;
         return $this;
