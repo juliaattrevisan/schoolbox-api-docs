@@ -67,7 +67,7 @@ class External_Schooledge_User implements External_UserInterface
             // 2nd part: non-blocked classes
             $query = "
                 SELECT DISTINCT
-                    tc.Name     AS code,
+                    COALESCE(tc.Name, '') AS code,
                     ts.Name     AS name,
                     t.ShortName AS campusCode,
                     ''          AS classType
@@ -86,7 +86,7 @@ class External_Schooledge_User implements External_UserInterface
                 UNION
 
                 SELECT DISTINCT
-                    tc.Name     AS code,
+                    COALESCE(tc.Name, '') AS code,
                     ts.Name     AS name,
                     t.ShortName AS campusCode,
                     ''          AS classType
@@ -112,7 +112,7 @@ class External_Schooledge_User implements External_UserInterface
             // Use use replacement staff if it's found
             $query = "
                 SELECT DISTINCT
-                    tc.Name     AS code,
+                    COALESCE(tc.Name, '') AS code,
                     ts.Name     AS name,
                     t.ShortName AS campusCode,
                     ''          AS classType
