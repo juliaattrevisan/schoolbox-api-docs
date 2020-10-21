@@ -1,0 +1,60 @@
+.student-toolkit {
+  display: flex;
+
+  .profile-image img {
+    border-radius: 50%;
+  }
+}
+
+.column-full, .column-left {
+  .student-toolkit {
+    .profile-image img {
+      position: absolute;
+      left: calc(50% - 38px);
+      top: calc(50% - 38px);
+      border: 6px solid white;
+      z-index: 1;
+    }
+    .buttons {
+      flex-grow: 1;
+      display: grid;
+      gap: 1px;
+      grid-template-columns: 1fr 1fr;
+    }
+    .button {
+      margin: 0;
+      padding: .75rem;
+
+      &:before {
+        @extend .size-32;
+        display: block;
+        padding: 0;
+      }
+    }
+  }
+}
+
+.column-right {
+  .student-toolkit {
+    flex-direction: column;
+
+    .profile-image {
+      background-color: $gainsboro;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: .5rem;
+      margin-bottom: 1px;
+    }
+
+    .button {
+      display: block;
+      margin-bottom: 1px;
+      width: 100%;
+
+      &:last-child{
+        margin-bottom: 0;
+      }
+    }
+  }
+}
