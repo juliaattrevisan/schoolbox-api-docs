@@ -83,6 +83,7 @@ class ProjectTest extends TestCase
             ->setTitle('Mr Test Project ништа')
             ->setDescription('A description сплат')
             ->setWeight(13)
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
             ->setAssessables(new GenericCollection(IAssessable::class));
 
         // Add sub-assessables
@@ -137,7 +138,7 @@ class ProjectTest extends TestCase
         $projectDomainModel = (new Project())
             ->setId(908)
             ->setContext((new Folder())->setId(1))
-        ;
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
 
         $projectDataModel               = $this->translator->translateToDataModel($projectDomainModel);
         $retranslatedProjectDomainModel = $this->translator->translateToDomainModel($projectDataModel);
@@ -149,7 +150,7 @@ class ProjectTest extends TestCase
      */
     public function testTranslateNullDomainModelToDataModel()
     {
-        $nullProjectDomainModel = (new Project())->setId(null);
+        $nullProjectDomainModel = (new Project())->setId(null)->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $nullProjectDataModel   = $this->translator->translateToDataModel($nullProjectDomainModel);
         $this->assertNull($nullProjectDataModel->getId());
     }
@@ -167,8 +168,10 @@ class ProjectTest extends TestCase
         $project = (new Project(new Average()))
             ->setContext((new Folder())->setId(1))
             ->setId(12)
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
             ->setCreator($this->teacher1);
-        $project->getAssessables()->add((new Project(new Minimum()))->setCreator($this->teacher1));
+        $project->getAssessables()->add((new Project(new Minimum()))->setCreator($this->teacher1)->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
+        );
         $this->translator->translateToDataModel($project);
     }
 
@@ -183,25 +186,29 @@ class ProjectTest extends TestCase
             [
                 (new Project(new WeightedAverage()))
                     ->setContext($context)
-                    ->setCreator($user),
+                    ->setCreator($user)
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 ProjectModel::SUMMATOR_WEIGHTED_AVERAGE,
             ],
             [
                 (new Project(new Average()))
                     ->setContext($context)
-                    ->setCreator($user),
+                    ->setCreator($user)
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 ProjectModel::SUMMATOR_AVERAGE,
             ],
             [
                 (new Project(new Minimum()))
                     ->setContext($context)
-                    ->setCreator($user),
+                    ->setCreator($user)
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 ProjectModel::SUMMATOR_MINIMUM,
             ],
             [
                 (new Project(new Maximum()))
                     ->setContext($context)
-                    ->setCreator($user),
+                    ->setCreator($user)
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 ProjectModel::SUMMATOR_MAXIMUM,
             ],
         ];
@@ -239,7 +246,8 @@ class ProjectTest extends TestCase
                 (new Project(new WeightedAverage()))
                     ->setContext($context)
                     ->setCreator($user)
-                    ->setMarkScheme(new None()),
+                    ->setMarkScheme(new None())
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 DueWorkModel\MarkType::TYPE_NONE,
                 null,
             ],
@@ -247,7 +255,8 @@ class ProjectTest extends TestCase
                 (new Project(new WeightedAverage()))
                     ->setContext($context)
                     ->setCreator($user)
-                    ->setMarkScheme(new Percentage()),
+                    ->setMarkScheme(new Percentage())
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 DueWorkModel\MarkType::TYPE_PERCENT,
                 null,
             ],
@@ -255,6 +264,7 @@ class ProjectTest extends TestCase
                 (new Project(new WeightedAverage()))
                     ->setContext($context)
                     ->setCreator($user)
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
                     ->setMarkScheme(new LetterGrade((new DueWorkModel\GradeLevel\Group\Model())->setId(7)->setGradeLevels(
                         new GenericCollection(DueWorkModel\GradeLevel\Model::class, [new DueWorkModel\GradeLevel\Model()])
                     ))),
@@ -300,6 +310,7 @@ class ProjectTest extends TestCase
                     ->setId(4)
                     ->setAssessmentContext((new Folder())->setId(1))
             )
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
             ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE));
 
         $subTask = (new TaskModel())
@@ -349,6 +360,7 @@ class ProjectTest extends TestCase
     {
         $projectDataModel = (new ProjectModel())
             ->setId(6789)
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
             ->setAssessmentModel(
                 (new AssessmentModel())
                     ->setAssessmentContext((new Folder())->setId(1))
@@ -365,7 +377,7 @@ class ProjectTest extends TestCase
      */
     public function testTranslateNullDataModelToDomainModel()
     {
-        $nullProjectDataModel   = (new ProjectModel())->setId(null)->setAssessmentModel(new AssessmentModel());
+        $nullProjectDataModel = (new ProjectModel())->setId(null)->setAssessmentModel(new AssessmentModel())->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $nullProjectDomainModel = $this->translator->translateToDomainModel($nullProjectDataModel);
         $this->assertNull($nullProjectDomainModel->getId());
     }
@@ -385,11 +397,13 @@ class ProjectTest extends TestCase
                     ->setId(4)
                     ->setAssessmentContext((new Folder())->setId(1))
             )
-            ->setAssessments(new GenericCollection(AssessmentModel::class));
+            ->setAssessments(new GenericCollection(AssessmentModel::class))
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $projectModel->getAssessments()
             ->add((new ProjectModel())
                 ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
                 ->setAssessmentModel((new AssessmentModel())->setId(1))
+                ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
             );
 
         $this->translator->translateToDomainModel($projectModel);
@@ -408,28 +422,32 @@ class ProjectTest extends TestCase
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_WEIGHTED_AVERAGE)
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType()),
+                    ->setMarkType($this->buildMarkType())
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 WeightedAverage::class,
             ],
             [
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType()),
+                    ->setMarkType($this->buildMarkType())
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 Average::class,
             ],
             [
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_MINIMUM)
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType()),
+                    ->setMarkType($this->buildMarkType())
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 Minimum::class,
             ],
             [
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_MAXIMUM)
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType()),
+                    ->setMarkType($this->buildMarkType())
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 Maximum::class,
             ],
         ];
@@ -469,7 +487,8 @@ class ProjectTest extends TestCase
                     ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType())
-                    ->setGradeGroup((new GradeGroup())),
+                    ->setGradeGroup((new GradeGroup()))
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 None::class,
                 null
             ],
@@ -478,7 +497,8 @@ class ProjectTest extends TestCase
                     ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
-                    ->setGradeGroup((new GradeGroup())),
+                    ->setGradeGroup((new GradeGroup()))
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
                 Percentage::class,
                 null
             ],
@@ -487,6 +507,7 @@ class ProjectTest extends TestCase
                     ->setSummator(ProjectModel::SUMMATOR_MINIMUM)
                     ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
                     ->setGradeGroup((new GradeGroup())->setId(1)->setGradeLevels(
                         new GenericCollection(DueWorkModel\GradeLevel\Model::class, [new DueWorkModel\GradeLevel\Model()])
                     )),
@@ -531,7 +552,7 @@ class ProjectTest extends TestCase
         $unitSpecModel = (new UnitSpecification())
             ->setId(2)
             ->setCourse((new CourseSpecification())->setId(3));
-        $projectModel  = (new ProjectModel())
+        $projectModel = (new ProjectModel())
             ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
             ->setAssessmentModel(
                 (new AssessmentModel())
@@ -546,10 +567,12 @@ class ProjectTest extends TestCase
                                     ->setId(4)
                                     ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
                                     ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE))
+                                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
                             )
                     )
             )
-            ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE));
+            ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE))
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
 
         // Project activities may have a specification, even though they're in the context of a project
         $subTask = (new TaskModel())
@@ -647,11 +670,13 @@ class ProjectTest extends TestCase
             ->setTitle('Mr Test Project ништа')
             ->setDescription('A description сплат')
             ->setWeight(13)
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
             ->setSpecificationAssessment(
                 (new Project(new WeightedAverage()))
                     ->setContext($unitSpec)
                     ->setId(4)
                     ->setCreator($this->teacher1)
+                    ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
             );
 
         // Add sub-assessables
@@ -761,7 +786,8 @@ class ProjectTest extends TestCase
     {
         $this->translator->setMaxProjectLevels(2);
 
-        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p1->getAssessmentModel()->setSubObject($p1);
 
         $q1 = (new QuizModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(2));
@@ -780,11 +806,14 @@ class ProjectTest extends TestCase
     public function testDataProjectTreeAssessmentInMultipleProjects()
     {
         // Create three projects: p1, p2, p3
-        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))->setAssessments(new GenericCollection(AssessmentModel::class));
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p1->getAssessmentModel()->setSubObject($p1);
-        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2))->setAssessments(new GenericCollection(AssessmentModel::class));
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2))->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p2->getAssessmentModel()->setSubObject($p2);
-        $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3))->setAssessments(new GenericCollection(AssessmentModel::class));
+        $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3))->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p3->getAssessmentModel()->setSubObject($p3);
 
         // Put p2 and p3 in p1
@@ -830,10 +859,12 @@ class ProjectTest extends TestCase
     public function testDataProjectTreeCyclicReference()
     {
         $this->expectException(\LogicException::class);
-        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p1->getAssessmentModel()->setSubObject($p1);
 
-        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2))
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p2->getAssessmentModel()->setSubObject($p2);
         $p2->getAssessmentModel()->setContextProject($p1);
         $p1->getAssessments()[2] = $p2->getAssessmentModel();
@@ -855,10 +886,12 @@ class ProjectTest extends TestCase
         $this->expectException(\UnexpectedValueException::class);
         $this->translator->setMaxProjectLevels(1);
 
-        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1));
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p1->getAssessmentModel()->setSubObject($p1);
 
-        $q1 = (new QuizModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(2));
+        $q1 = (new QuizModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(2))
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $q1->getAssessmentModel()->setSubObject($q1);
         $q1->getAssessmentModel()->setContextProject($p1);
         $p1->getAssessments()[2] = $q1->getAssessmentModel();
@@ -877,10 +910,12 @@ class ProjectTest extends TestCase
         $this->expectException(\UnexpectedValueException::class);
         $this->translator->setMaxProjectLevels(2);
 
-        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))->setAssessments(new GenericCollection(AssessmentModel::class));
+        $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p1->getAssessmentModel()->setSubObject($p1);
 
-        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2))->setAssessments(new GenericCollection(AssessmentModel::class));
+        $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2))->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p2->getAssessmentModel()->setSubObject($p2);
         $p2->getAssessmentModel()->setContextProject($p1);
         $p1->getAssessments()[2] = $p2->getAssessmentModel();
@@ -965,7 +1000,8 @@ class ProjectTest extends TestCase
     {
         $this->translator->setMaxProjectLevels(2);
 
-        $p1 = (new Project())->setId(1);
+        $p1 = (new Project())->setId(1)
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $q2 = (new Quiz())->setId(2);
 
         $p1->getAssessables()[2] = $q2;
@@ -983,8 +1019,11 @@ class ProjectTest extends TestCase
     public function testDomainProjectTreeCyclicReference()
     {
         $this->expectException(\LogicException::class);
-        $p1 = (new Project())->setId(1);
-        $p2 = (new Project())->setId(2);
+        $p1 = (new Project())->setId(1)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
+
+        $p2 = (new Project())->setId(2)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
 
         $p1->getAssessables()[2] = $p2;
         $p2->setContext($p1);
@@ -1007,7 +1046,8 @@ class ProjectTest extends TestCase
         $this->expectException(\UnexpectedValueException::class);
         $this->translator->setMaxProjectLevels(1);
 
-        $p1 = (new Project())->setId(1);
+        $p1 = (new Project())->setId(1)
+            ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $q2 = (new Quiz())->setId(2);
 
         $p1->getAssessables()[2] = $q2;
@@ -1027,8 +1067,10 @@ class ProjectTest extends TestCase
         $this->expectException(\UnexpectedValueException::class);
         $this->translator->setMaxProjectLevels(2);
 
-        $p1 = (new Project())->setId(1);
-        $p2 = (new Project())->setId(2);
+        $p1 = (new Project())->setId(1)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
+        $p2 = (new Project())->setId(2)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
 
         $p1->getAssessables()[2] = $p2;
         $p2->setContext($p1);
@@ -1044,9 +1086,12 @@ class ProjectTest extends TestCase
     public function testDomainProjectTreeAssessmentInMultipleProjects()
     {
         // Create three projects: p1, p2, p3
-        $p1 = (new Project())->setId(1);
-        $p2 = (new Project())->setId(2);
-        $p3 = (new Project())->setId(3);
+        $p1 = (new Project())->setId(1)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
+        $p2 = (new Project())->setId(2)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
+        $p3 = (new Project())->setId(3)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
 
         // Put p2 and p3 in p1
         $p1->getAssessables()[2] = $p2;
@@ -1164,29 +1209,34 @@ class ProjectTest extends TestCase
     public function provider_linear_data_project_tree(): array
     {
         $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))
-                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
+                                  ->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p1->getAssessmentModel()->setSubObject($p1);
 
         $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2))
-                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
+                                  ->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p2->getAssessmentModel()->setSubObject($p2);
         $p2->getAssessmentModel()->setContextProject($p1);
         $p1->getAssessments()[2] = $p2->getAssessmentModel();
 
         $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3))
-                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
+                                  ->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p3->getAssessmentModel()->setSubObject($p3);
         $p3->getAssessmentModel()->setContextProject($p2);
         $p2->getAssessments()[3] = $p3->getAssessmentModel();
 
         $p4 = (new ProjectModel())->setId(4)->setAssessmentModel((new AssessmentModel())->setId(4))
-                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
+                                  ->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p4->getAssessmentModel()->setSubObject($p4);
         $p4->getAssessmentModel()->setContextProject($p3);
         $p3->getAssessments()[4] = $p4->getAssessmentModel();
 
         $p5 = (new ProjectModel())->setId(5)->setAssessmentModel((new AssessmentModel())->setId(5))
-                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
+                                  ->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p5->getAssessmentModel()->setSubObject($p5);
         $p5->getAssessmentModel()->setContextProject($p4);
         $p4->getAssessments()[5] = $p5->getAssessmentModel();
@@ -1209,19 +1259,24 @@ class ProjectTest extends TestCase
     public function provider_branched_data_project_tree(): array
     {
         $p1 = (new ProjectModel())->setId(1)->setAssessmentModel((new AssessmentModel())->setId(1))
-                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
+                                  ->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p1->getAssessmentModel()->setSubObject($p1);
         $p2 = (new ProjectModel())->setId(2)->setAssessmentModel((new AssessmentModel())->setId(2))
-                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
+                                  ->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p2->getAssessmentModel()->setSubObject($p2);
         $p3 = (new ProjectModel())->setId(3)->setAssessmentModel((new AssessmentModel())->setId(3))
-                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
+                                  ->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p3->getAssessmentModel()->setSubObject($p3);
         $p4 = (new ProjectModel())->setId(4)->setAssessmentModel((new AssessmentModel())->setId(4))
-                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
+                                  ->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p4->getAssessmentModel()->setSubObject($p4);
         $p5 = (new ProjectModel())->setId(5)->setAssessmentModel((new AssessmentModel())->setId(5))
-                                            ->setAssessments(new GenericCollection(AssessmentModel::class));
+                                  ->setAssessments(new GenericCollection(AssessmentModel::class))
+                                  ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $p5->getAssessmentModel()->setSubObject($p5);
 
         // #2 and #3 are children of #1
@@ -1254,11 +1309,16 @@ class ProjectTest extends TestCase
      */
     public function provider_linear_domain_project_tree(): array
     {
-        $p1 = (new Project())->setId(1);
-        $p2 = (new Project())->setId(2);
-        $p3 = (new Project())->setId(3);
-        $p4 = (new Project())->setId(4);
-        $p5 = (new Project())->setId(5);
+        $p1 = (new Project())->setId(1)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
+        $p2 = (new Project())->setId(2)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
+        $p3 = (new Project())->setId(3)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
+        $p4 = (new Project())->setId(4)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
+        $p5 = (new Project())->setId(5)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
 
         $p1->getAssessables()[2] = $p2;
         $p2->setContext($p1);
@@ -1290,11 +1350,16 @@ class ProjectTest extends TestCase
      */
     public function provider_branched_domain_project_tree(): array
     {
-        $p1 = (new Project())->setId(1);
-        $p2 = (new Project())->setId(2);
-        $p3 = (new Project())->setId(3);
-        $p4 = (new Project())->setId(4);
-        $p5 = (new Project())->setId(5);
+        $p1 = (new Project())->setId(1)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
+        $p2 = (new Project())->setId(2)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
+        $p3 = (new Project())->setId(3)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
+        $p4 = (new Project())->setId(4)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
+        $p5 = (new Project())->setId(5)
+                             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
 
         // #2 and #3 are children of #1
         $p1->getAssessables()[2] = $p2;

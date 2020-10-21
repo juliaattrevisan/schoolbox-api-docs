@@ -104,6 +104,7 @@ class Project implements IAssessmentTypeTranslator
             $dataModel->setOwner($domainObject->getCreator());
         }
         if (null !== $domainObject->getMarkVisibility()) {
+            /** @var ProjectModel $dataModel */
             $dataModel->setMarkVisibility($domainObject->getMarkVisibility());
         }
 
@@ -153,6 +154,7 @@ class Project implements IAssessmentTypeTranslator
         if ($dataModel->getGradeGroup() instanceof GradeGroup) {
             $domainObject->setGradeGroup($dataModel->getGradeGroup());
         }
+        /** @var ProjectModel $dataModel */
         if (null !== $dataModel->getMarkVisibility()) {
             $domainObject->setMarkVisibility($dataModel->getMarkVisibility());
         }
