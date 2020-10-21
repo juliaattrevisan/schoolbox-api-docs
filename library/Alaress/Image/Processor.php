@@ -86,6 +86,19 @@ class Processor
      */
     public function load(int $maxAttempts = 1): StreamableFile
     {
+        // ensure file format is actually a string (it may have been a mimetype object)
+        $fileFormat = $this->getFormatFromMime((string)$this->file->getMimetype());
+
+        // Is this a SVG? just stream it if so, don't even attempt to transform
+        if ($fileFormat === 'svg') {
+            return new StreamableFile(
+                true,
+                (string)$this->file->getMimetype(),
+                $this->file->getSize(),
+                $this->file->readStream()
+            );
+        }
+
         // TODO SA-8354 inject dependencies
         $mountManager   = (new FilesystemFactory())->build((new Loader())->get('storage_dir'));
         $fileSystem     = $mountManager->getFilesystem(Storage\Manager::FS_STORAGE);
@@ -112,9 +125,6 @@ class Processor
 
         $image = (new RotateOrientation())->manipulate($image);
         $image = $this->transform->manipulate($image);
-
-        // ensure this is actually a string (it may have been a mimetype object)
-        $fileFormat = $this->getFormatFromMime((string)$this->file->getMimetype());
 
         $options = [];
         if ($image->layers()->count() > 1) {
@@ -248,6 +258,8 @@ class Processor
             case 'image/png':
             case 'image/x-png':
                 return 'png';
+            case 'image/svg+xml':
+                return 'svg';
             default:
                 throw new DomainException("Unknown image type '$mime'");
         }
