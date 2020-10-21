@@ -86,6 +86,16 @@ abstract class Factory extends AbstractFactory
     {
         $now = Alaress_Date_Format::now();
         foreach ($terms as $term) {
+
+            /* Skip Extraordinary Terms
+             */
+            if ($term->getExtraordinary()) {
+                continue;
+            }
+
+            /* Extraordinary Terms aren't part of the normal sequence of Terms
+             * Disregard their presence in this list
+             */
             if ($term->contains($now)) {
                 return $term;
             }
@@ -109,6 +119,13 @@ abstract class Factory extends AbstractFactory
         if (!$currentTerm) {
             // Get the most recent term that finished in the past
             foreach ($terms as $term) {
+
+                /* Skip Extraordinary Terms
+                 */
+                if ($term->getExtraordinary()) {
+                    continue;
+                }
+
                 $termFinish = $term->getActualFinish();
                 if (!$termFinish->isNull() && $termFinish->isPast()) {
                     return $term;
@@ -120,6 +137,13 @@ abstract class Factory extends AbstractFactory
         // Loop a single index back past the current term
         $currentFound = false;
         foreach ($terms as $term) {
+
+            /* Skip Extraordinary Terms
+             */
+            if ($term->getExtraordinary()) {
+                continue;
+            }
+
             if ($currentFound) {
                 return $term;
             }
