@@ -103,6 +103,9 @@ class Project implements IAssessmentTypeTranslator
         if (null !== $domainObject->getCreator()) {
             $dataModel->setOwner($domainObject->getCreator());
         }
+        if (null !== $domainObject->getMarkVisibility()) {
+            $dataModel->setMarkVisibility($domainObject->getMarkVisibility());
+        }
 
         // Translate summator
         if ($domainObject->getSummator() instanceof Average) {
@@ -149,6 +152,9 @@ class Project implements IAssessmentTypeTranslator
         }
         if ($dataModel->getGradeGroup() instanceof GradeGroup) {
             $domainObject->setGradeGroup($dataModel->getGradeGroup());
+        }
+        if (null !== $dataModel->getMarkVisibility()) {
+            $domainObject->setMarkVisibility($dataModel->getMarkVisibility());
         }
     }
 

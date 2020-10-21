@@ -81,6 +81,12 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     protected $markType;
 
     /**
+     * The mark visibility
+     * @var int
+     */
+    protected $markVisibility;
+
+    /**
      * The grade group this project uses (only if $this->markType is letter grade)
      *
      * @var GradeGroup
@@ -218,5 +224,23 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     public function isImplementationContext()
     {
         return $this->getAssessmentModel()->getAssessmentContext()->isImplementationContext();
+    }
+
+    /**
+     * @param int $markVisibility
+     * @return $this
+     */
+    public function setMarkVisibility($markVisibility): self
+    {
+        $this->markVisibility = $markVisibility;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMarkVisibility(): int
+    {
+        return $this->markVisibility;
     }
 }
