@@ -309,7 +309,7 @@ class Model implements \IComparable, IModel
 
 
     /**
-     * @param GenericCollection|YearLevel\Model[]|null $yearLevels
+     * @param GenericCollection|YearLevel\Model[] $yearLevels
      * @return Model
      */
     public function setYearLevels(GenericCollection $yearLevels): self
