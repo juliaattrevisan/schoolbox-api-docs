@@ -1286,9 +1286,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /**
      * Get hide notifications tray
      *
-     * @return boolean
+     * @return boolean|null
      */
-    public function getHideNotificationsTray()
+    public function getHideNotificationsTray(): ?bool
     {
         return $this->hideNotificationsTray;
     }
@@ -1298,9 +1298,10 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      *
      * @param boolean $hideNotificationsTray
      */
-    public function setHideNotificationsTray($hideNotificationsTray)
+    public function setHideNotificationsTray($hideNotificationsTray): self
     {
         $this->hideNotificationsTray = $hideNotificationsTray;
+        return $this;
     }
 
 

@@ -19,9 +19,10 @@ class House implements ValueLabelInterface, ISoftDeletable, Sequential
 
     protected $house;
 
-    public function setHouse($house)
+    public function setHouse($house): self
     {
         $this->house = $house;
+        return $this;
     }
 
     public function getHouse()
@@ -29,9 +30,10 @@ class House implements ValueLabelInterface, ISoftDeletable, Sequential
         return $this->house;
     }
 
-    public function setId($id)
+    public function setId($id): self
     {
         $this->id = $id;
+        return $this;
     }
 
     public function getId()
