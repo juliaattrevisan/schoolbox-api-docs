@@ -49,10 +49,7 @@ class ModelToArray
             'impersonableUser' => null,
 
             'email'          => $user->getEmail(),
-            '_links'         => [
-                'profile' => '/search/user/' . $user->getId(),
-                'avatar'  => '/portrait.php?id=' . $user->getId(),
-            ],
+            '_links'         => $this->deriveLinks($user),
             'externalId'     => $user->getExternalId(),
             'username'       => $user->getUsername(),
             'superuser'      => $user->isSuperuser(),
@@ -60,7 +57,8 @@ class ModelToArray
             'title'          => $user->getTitle(),
             'firstName'      => $user->getFirstname(),
             'lastName'       => $user->getLastname(),
-            'fullName'       => $user->getFullName(),
+            // Bypass `$user->getFullName` as it currently touches configuration
+            'fullName'       => $this->deriveFullName($user),
             'isEmailDerived' => $user->getLocalEmail(),
             'altEmail'       => $user->getAltEmail(),
             'positionTitle'  => $user->getPositionTitle(),
@@ -104,15 +102,17 @@ class ModelToArray
      * Helper for converting a role into an array.
      *
      * @param Role $role
-     * @return array
+     * @return array|null
      */
-    private function convertRole(Role $role): array
+    private function convertRole(Role $role): ?array
     {
-        return [
-            'id'   => $role->getId(),
-            'name' => $role->getName(),
-            'type' => $role->getType(),
-        ];
+        return $role->getId()
+            ? [
+                'id'   => $role->getId(),
+                'name' => $role->getName(),
+                'type' => $role->getType(),
+            ]
+            : null;
     }
 
 
@@ -164,5 +164,40 @@ class ModelToArray
                 'name' => $yearLevel->getName(),
             ]
             : null;
+    }
+
+
+    /**
+     * Derive links for this user.
+     *
+     * @param User $user
+     * @return string[]
+     */
+    private function deriveLinks(User $user): array
+    {
+        return $user->getId()
+            ? [
+                'profile' => '/search/user/' . $user->getId(),
+                'avatar'  => '/portrait.php?id=' . $user->getId(),
+            ]
+            : [];
+    }
+
+
+    /**
+     * Derive a full name from the user's name.
+     * * "Unknown User" if they have no title, firstname or lastname
+     * * otherwise, join their title, firstname and lastname together
+     *
+     * @param User $user
+     * @return string|null
+     */
+    private function deriveFullName(User $user): ?string
+    {
+        $parts = array_filter([$user->getTitle(), $user->getFirstname(), $user->getLastname(),], 'strlen');
+        if (empty($parts)) {
+            return 'Unknown User';
+        }
+        return implode(' ', $parts);
     }
 }
