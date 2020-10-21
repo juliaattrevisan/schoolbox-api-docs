@@ -57,8 +57,7 @@ class ModelToArray
             'title'          => $user->getTitle(),
             'firstName'      => $user->getFirstname(),
             'lastName'       => $user->getLastname(),
-            // Bypass `$user->getFullName` as it currently touches configuration
-            'fullName'       => $this->deriveFullName($user),
+            'fullName'       => $user->getFullName(),
             'isEmailDerived' => $user->getLocalEmail(),
             'altEmail'       => $user->getAltEmail(),
             'positionTitle'  => $user->getPositionTitle(),
