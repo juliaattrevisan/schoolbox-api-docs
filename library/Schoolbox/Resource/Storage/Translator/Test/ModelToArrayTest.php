@@ -13,6 +13,7 @@ use RuntimeException;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\File\Mimetype;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\Resource\Storage\Translator\ModelToArray;
 
@@ -36,23 +37,98 @@ class ModelToArrayTest extends TestCase
              ->method('getSize')
              ->willThrowException(new RuntimeException());
 
-        $emptyResponse = [
-            'hash'   => null,
-            'mime'   => '',
-            'type'   => null,
-            'size'   => null,
-            '_links' => [],
-        ];
         yield 'empty fields' => [
             (new Model())
                 ->setFilesystem($filesystem),
-            $emptyResponse,
+            [
+                'hash'   => null,
+                'mime'   => '',
+                'type'   => null,
+                'size'   => null,
+                '_links' => [],
+            ],
         ];
 
-        // test with:
-        // audio
-        // video
-        // image
+        yield 'document' => [
+            (new Model)
+                ->setMimetype(
+                    (new Mimetype())
+                        ->setMime('document/ms-word')
+                )
+                ->setHash('1234567890')
+                ->setSize(12345),
+            [
+                'hash'   => '1234567890',
+                'mime'   => 'document/ms-word',
+                'type'   => null,
+                'size'   => 12345,
+                '_links' => [
+                    'fetch' => '/storage/fetch.php?hash=1234567890',
+                ],
+            ]
+        ];
+
+        yield 'image' => [
+            (new Model)
+                ->setMimetype(
+                    (new Mimetype())
+                        ->setMime('image/png')
+                )
+                ->setHash('999000')
+                ->setSize(432166),
+            [
+                'hash'   => '999000',
+                'mime'   => 'image/png',
+                'type'   => 'image',
+                'size'   => 432166,
+                '_links' => [
+                    'fetch' => '/storage/fetch.php?hash=999000',
+                    'image' => '/storage/image.php?hash=999000',
+                ],
+            ]
+        ];
+
+        yield 'audio' => [
+            (new Model)
+                ->setMimetype(
+                    (new Mimetype())
+                        ->setMime('audio/mp4')
+                )
+                ->setHash('54321')
+                ->setSize(1_000_000),
+            [
+                'hash'   => '54321',
+                'mime'   => 'audio/mp4',
+                'type'   => 'audio',
+                'size'   => 1_000_000,
+                '_links' => [
+                    'fetch'  => '/storage/fetch.php?hash=54321',
+                    'stream' => '/cms/sendVideo.php?id=54321&type=storage',
+                ],
+            ]
+        ];
+
+        yield 'video' => [
+            (new Model)
+                ->setMimetype(
+                    (new Mimetype())
+                        ->setMime('video/mp4')
+                )
+                ->setHash('333')
+                ->setSize(2_000_000),
+            [
+                'hash'   => '333',
+                'mime'   => 'video/mp4',
+                'type'   => 'video',
+                'size'   => 2_000_000,
+                '_links' => [
+                    'fetch'  => '/storage/fetch.php?hash=333',
+                    'stream' => '/cms/sendVideo.php?id=333&type=storage',
+                    'poster' => '/cms/videoThumb.php?size=poster&id=333&type=storage',
+                ],
+            ]
+        ];
+
     }
 
 
