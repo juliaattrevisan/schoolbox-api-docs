@@ -526,6 +526,28 @@ class Gateway
             },
             []
         );
+
+        // Figure out which student's class has a modified class.
+        // (only identifiable by the suffix "Modified", possibly in parentheses)
+        // Remove the original if there is one
+        $modifiedClasses = [];
+        foreach ($result as $i => $row) {
+            $className = strtolower(trim($row['sub_desc']));
+            if (preg_match('/^(?P<baseName>.*?)\\(?modified\\)?$/i', $className, $matches)) {
+                $modifiedClasses[] = strtolower(trim($matches['baseName']));
+            }
+        }
+
+        // And filter out any classes which have a modified version
+        $result = array_values(
+            array_filter(
+                $result,
+                static function ($row) use ($modifiedClasses) {
+                    return !in_array(strtolower(trim($row['sub_desc'])), $modifiedClasses, true);
+                }
+            )
+        );
+
         return $result;
     }
 
