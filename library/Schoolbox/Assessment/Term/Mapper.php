@@ -371,6 +371,7 @@ class Mapper extends BaseMapper
                 OR
                 (`start` >= CAST(:thisStart AS DATE) AND `display_finish` <= CAST(:thisFinish AS DATE))
             )
+            AND extraordinary = 0
         ";
         $params = [
             'thisStart'  => $model->getStart()->getDatabaseDate(),
