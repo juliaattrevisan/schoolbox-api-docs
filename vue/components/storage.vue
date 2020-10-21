@@ -44,5 +44,7 @@ export default {
         <source type="audio/mpeg" :src="storage._links.stream">
     </audio>
     <img v-else-if="storage.type === 'image'" :src="storage._links.image" :alt="filename" />
-    <a v-else :href="storage._links.fetch">{{ filename }}</a>
+    <a v-else :href="storage._links.fetch">
+        <img :src="storage._links.icon" :alt="filename" /> {{ filename }}
+    </a>
 </template>
