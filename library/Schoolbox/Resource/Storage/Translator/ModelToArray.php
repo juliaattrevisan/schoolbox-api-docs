@@ -25,28 +25,36 @@ class ModelToArray
     public function __invoke(Model $storage): array
     {
         // This may have different links depending on what kind of file it is
-        $links = [
-            'fetch' => "/storage/fetch.php?hash={$storage->getHash()}",
-        ];
-        if ($storage->getMimetype()->isImage()) {
-            $links['image'] = "/storage/image.php?hash={$storage->getHash()}";
+        $type  = null;
+        $links = [];
+
+        if ($storage->getHash()) {
+            $links['fetch'] = "/storage/fetch.php?hash={$storage->getHash()}";
         }
-        if ($storage->getMimetype()->isStreamable()) {
-            $links['stream'] = "/cms/sendVideo.php?id={$storage->getHash()}&type=storage";
-        }
-        if ($storage->getMimetype()->isVideo()) {
-            $links['poster'] = "/cms/videoThumb.php?size=poster&id={$storage->getHash()}&type=storage";
+
+        if ($storage->getMimetype()) {
+            $type = $storage->getMimetype()->getType();
+            if ($storage->getMimetype()->isImage()) {
+                $links['image'] = "/storage/image.php?hash={$storage->getHash()}";
+            }
+            if ($storage->getMimetype()->isStreamable()) {
+                $links['stream'] = "/cms/sendVideo.php?id={$storage->getHash()}&type=storage";
+            }
+            if ($storage->getMimetype()->isVideo()) {
+                $links['poster'] = "/cms/videoThumb.php?size=poster&id={$storage->getHash()}&type=storage";
+            }
         }
 
         try {
             $size = $storage->getSize();
         } catch (FileNotFoundException $e) {
+            // There might not be a file attached
             $size = null;
         }
         return [
             'hash'   => $storage->getHash(),
             'mime'   => $storage->getMime(),
-            'type'   => $storage->getMimetype()->getType(),
+            'type'   => $type,
             'size'   => $size,
             '_links' => $links,
         ];
