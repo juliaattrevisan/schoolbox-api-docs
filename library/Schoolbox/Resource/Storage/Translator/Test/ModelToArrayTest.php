@@ -1,0 +1,153 @@
+<?php
+
+/**
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Resource\Storage\Translator\Test;
+
+use PHPUnit\Framework\MockObject\MockObject;
+use RuntimeException;
+use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemInterface;
+use PHPUnit\Framework\TestCase;
+use Schoolbox\File\Mimetype;
+use Schoolbox\Resource\Storage\Model;
+use Schoolbox\Resource\Storage\Translator\ModelToArray;
+
+/**
+ * @covers \Schoolbox\Resource\Storage\Translator\ModelToArray
+ */
+class ModelToArrayTest extends TestCase
+{
+    /**
+     * Data provider for `testInvoke`.
+     *
+     * @return iterable
+     */
+    public function getTestInvokeData(): iterable
+    {
+        // Mock filesystem: throws an exception on asking for file's size
+        // This will be caught and cause getSize to return null
+        /** @var Filesystem|MockObject $filesystem */
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem
+             ->method('getSize')
+             ->willThrowException(new RuntimeException());
+
+        yield 'empty fields' => [
+            (new Model())
+                ->setFilesystem($filesystem),
+            [
+                'hash'   => null,
+                'mime'   => '',
+                'type'   => null,
+                'size'   => null,
+                '_links' => [],
+            ],
+        ];
+
+        yield 'document' => [
+            (new Model())
+                ->setMimetype(
+                    (new Mimetype())
+                        ->setMime('document/ms-word')
+                        ->setIconFile('ms-word.svg')
+                )
+                ->setHash('1234567890')
+                ->setSize(12345),
+            [
+                'hash'   => '1234567890',
+                'mime'   => 'document/ms-word',
+                'type'   => null,
+                'size'   => 12345,
+                '_links' => [
+                    'fetch' => '/storage/fetch.php?hash=1234567890',
+                    'icon'  => '/images/mime/ms-word.svg',
+                ],
+            ]
+        ];
+
+        yield 'image' => [
+            (new Model())
+                ->setMimetype(
+                    (new Mimetype())
+                        ->setMime('image/png')
+                        ->setIconFile('image-png.svg')
+                )
+                ->setHash('999000')
+                ->setSize(432166),
+            [
+                'hash'   => '999000',
+                'mime'   => 'image/png',
+                'type'   => 'image',
+                'size'   => 432166,
+                '_links' => [
+                    'fetch' => '/storage/fetch.php?hash=999000',
+                    'icon'  => '/images/mime/image-png.svg',
+                    'image' => '/storage/image.php?hash=999000',
+                ],
+            ]
+        ];
+
+        yield 'audio' => [
+            (new Model())
+                ->setMimetype(
+                    (new Mimetype())
+                        ->setMime('audio/mp4')
+                        ->setIconFile('audio-mp4.svg')
+                )
+                ->setHash('54321')
+                ->setSize(1_000_000),
+            [
+                'hash'   => '54321',
+                'mime'   => 'audio/mp4',
+                'type'   => 'audio',
+                'size'   => 1_000_000,
+                '_links' => [
+                    'fetch'  => '/storage/fetch.php?hash=54321',
+                    'icon'   => '/images/mime/audio-mp4.svg',
+                    'stream' => '/cms/sendVideo.php?id=54321&type=storage',
+                ],
+            ]
+        ];
+
+        yield 'video' => [
+            (new Model())
+                ->setMimetype(
+                    (new Mimetype())
+                        ->setMime('video/mp4')
+                        ->setIconFile('video-mp4.svg')
+                )
+                ->setHash('333')
+                ->setSize(2_000_000),
+            [
+                'hash'   => '333',
+                'mime'   => 'video/mp4',
+                'type'   => 'video',
+                'size'   => 2_000_000,
+                '_links' => [
+                    'fetch'  => '/storage/fetch.php?hash=333',
+                    'icon'   => '/images/mime/video-mp4.svg',
+                    'stream' => '/cms/sendVideo.php?id=333&type=storage',
+                    'poster' => '/cms/videoThumb.php?size=poster&id=333&type=storage',
+                ],
+            ]
+        ];
+    }
+
+
+    /**
+     * @dataProvider getTestInvokeData
+     * @covers       \Schoolbox\Resource\Storage\Translator\ModelToArray::__invoke
+     * @param Model $input
+     * @param array $expected
+     */
+    public function testInvoke(Model $input, array $expected): void
+    {
+        self::assertSame($expected, (new ModelToArray())($input));
+    }
+}

@@ -21,6 +21,39 @@ use Schoolbox\Learning\Moment\Evidence;
 class ModelToArray
 {
     /**
+     * Translator for converting a user within the evidence model.
+     *
+     * (callable isn't a valid typedef)
+     *
+     * @var callable
+     */
+    private $userTranslator;
+
+
+    /**
+     * Translator for converting a storage object.
+     *
+     * (callable isn't a valid typedef)
+     *
+     * @var callable
+     */
+    private $storageTranslator;
+
+
+    /**
+     * Constructor
+     *
+     * @param callable $userTranslator
+     * @param callable $storageTranslator
+     */
+    public function __construct(callable $userTranslator, callable $storageTranslator)
+    {
+        $this->userTranslator    = $userTranslator;
+        $this->storageTranslator = $storageTranslator;
+    }
+
+
+    /**
      * @param Evidence\Model $model
      * @return array
      */
@@ -29,12 +62,12 @@ class ModelToArray
         // Creator and recipient cannot be null in persisted entities.
         // Allow them to be null when translating though?
         try {
-            $creator = ['id' => $model->getCreator()->getId(),];
+            $creator = call_user_func($this->userTranslator, $model->getCreator());
         } catch (Error $e) {
             $creator = null;
         }
         try {
-            $recipient = ['id' => $model->getRecipient()->getId(),];
+            $recipient = call_user_func($this->userTranslator, $model->getRecipient());
         } catch (Error $e) {
             $recipient = null;
         }
@@ -52,7 +85,7 @@ class ModelToArray
             'filename'         => $model->getFilename(),
             'recipient'        => $recipient,
             'storage'          => $model->getStorage()
-                ? ['hash' => $model->getStorage()->getHash(),]
+                ? call_user_func($this->storageTranslator, $model->getStorage())
                 : null,
         ];
     }

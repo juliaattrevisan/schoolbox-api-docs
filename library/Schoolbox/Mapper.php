@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base mapper
  *
@@ -44,6 +45,7 @@ use Traversable;
 use TypeError;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function array_key_exists;
 use function array_keys;
 use function array_map;
@@ -129,6 +131,10 @@ abstract class Mapper implements IMapper, Serializable
     const COLUMN_IDENTIFIER_UUID   = 128;
     public const COLUMN_ENUM       = 256;  // May only be persisted as one of a set of declared values
 
+    // Sort ordering
+    public const SORT_ORDER_ASC  = 'asc';
+    public const SORT_ORDER_DESC = 'desc';
+
     /**
      * @var IDatabase|IQuoter
      */
@@ -209,7 +215,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @var static[]
      */
-    static protected $instance;
+    protected static $instance;
 
     /** @var IFactory */
     protected static $columnFactory;
@@ -297,7 +303,6 @@ abstract class Mapper implements IMapper, Serializable
             ? new DevMonitor(DebugBar::getInstance())
             : new LiveMonitor()
         ;
-
     }
 
 
@@ -478,7 +483,6 @@ abstract class Mapper implements IMapper, Serializable
                 /** @var Mapper $mapper */
                 $mapper = call_user_func(array($mapperClass, 'getInstance'));
                 $mapper->setConfigLoader($this->getConfigLoader());
-
             } else {
                 $mapper = $this->joins[$basename]['mapper'];
             }
@@ -681,9 +685,11 @@ abstract class Mapper implements IMapper, Serializable
                 // We don't have a propagator setup, lets connect to the rabbit
                 try {
                     self::$prop = $this->getDi()->newInstance(
-                        Propagator::class, [
+                        Propagator::class,
+                        [
                             'splitter'   => $this->getDi()->lazyNew(
-                                Splitter::class, [
+                                Splitter::class,
+                                [
                                     'inflector' => $this->getDi()->lazyNew(NotifierInflector::class, [
                                         'configurator' => $this->getDi()->lazyNew(Configurator::class, [
                                             'di' => $this->getDi()
@@ -694,7 +700,8 @@ abstract class Mapper implements IMapper, Serializable
                             ),
                             'redis'      => $this->getDi()->lazyGet('redis'),
                             'broker'     => $this->getDi()->lazyNew(
-                                Broker::class, [
+                                Broker::class,
+                                [
                                     'instanceId' => INSTANCE_ID,
                                     'amqp'       => $this->getDi()->lazyGet('amqp'),
                                     'redis'      => $this->getDi()->lazyGet('redis'),
@@ -704,7 +711,6 @@ abstract class Mapper implements IMapper, Serializable
                             'instanceId' => INSTANCE_ID,
                         ]
                     );
-
                 } catch (Di\Exception\ServiceNotFound $e) {
                     // in PHPUnit land, we do not have external services.
                     // this catch is merely to accommodate that case, it should not be
@@ -839,11 +845,13 @@ abstract class Mapper implements IMapper, Serializable
         if (!empty($parentIds)) {
             // Load all parents of $collection in one query
             $parents = [];
-            foreach ($this->loadAncestors(
-                $this->findByColumn($this->getIdentifierColumn(), $parentIds),
-                $parentField,
-                $currentDepth+1
-            ) as $parent) {
+            foreach (
+                $this->loadAncestors(
+                    $this->findByColumn($this->getIdentifierColumn(), $parentIds),
+                    $parentField,
+                    $currentDepth + 1
+                ) as $parent
+            ) {
                 $parents[$parent->$getId()] = $parent;
             }
             // and add them as the parent of each item in $collection.
@@ -897,12 +905,14 @@ abstract class Mapper implements IMapper, Serializable
         if (!empty($ids)) {
             // Load all children of $collection in one query
             $children = [];
-            foreach ($this->loadDescendants(
-                $this->findByColumn($this->getMap()->getOffset($parentField)['column'], $ids),
-                $parentField,
-                $childField,
-                $currentDepth+1
-            ) as $child) {
+            foreach (
+                $this->loadDescendants(
+                    $this->findByColumn($this->getMap()->getOffset($parentField)['column'], $ids),
+                    $parentField,
+                    $childField,
+                    $currentDepth + 1
+                ) as $child
+            ) {
                 $children[$child->$getParent()->$getId()][] = $child;
             }
             // and add them as the children of each item in $collection.
@@ -989,7 +999,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getPropertyFromColumn($column)
     {
-        foreach($this->map as $map) {
+        foreach ($this->map as $map) {
             if (array_key_exists('column', $map) && $map['column'] === $column) {
                 return $map['property'];
             }
@@ -1260,7 +1270,6 @@ abstract class Mapper implements IMapper, Serializable
 
         if (empty($map['hydrator'])) {
             $map['hydrator'] = $this->column_factory->build($map['type']);
-
         } elseif (empty($map['type'])) {
             // hydrator specified, but no type: assume model
             $map['type'] = self::TYPE_MODEL;
@@ -1447,7 +1456,7 @@ abstract class Mapper implements IMapper, Serializable
         $this->database->beginTransaction();
         foreach ($this->buildPredicateBuildersForCollection($collection) as $pb) {
             // Build query
-            $query     = "DELETE FROM `{$this->getTable()}` WHERE ".implode(' AND ', $pb->getWhere());
+            $query     = "DELETE FROM `{$this->getTable()}` WHERE " . implode(' AND ', $pb->getWhere());
             $statement = $this->database->prepare($query);
             foreach ($pb->getParams() as $key => $id) {
                 $statement->bindValue($key, $id);
@@ -1504,7 +1513,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function deleteByColumnList($columnList, array $options = [])
     {
-        return $this->executeDelete($this->getDeleteString(), new Builder($this->getDatabase(), $this->getTable()), $columnList,  $options);
+        return $this->executeDelete($this->getDeleteString(), new Builder($this->getDatabase(), $this->getTable()), $columnList, $options);
     }
 
 
@@ -1657,7 +1666,7 @@ abstract class Mapper implements IMapper, Serializable
         foreach ($pbs as $pb) {
             // Build query
 
-            $query     = "UPDATE `{$this->getTable()}` SET {$this->database->quoteIdentifier($field)} = :value WHERE ".implode(' AND ', $pb->getWhere());
+            $query     = "UPDATE `{$this->getTable()}` SET {$this->database->quoteIdentifier($field)} = :value WHERE " . implode(' AND ', $pb->getWhere());
             $statement = $this->database->prepare($query);
             $statement->bindValue('value', $value);
             foreach ($pb->getParams() as $key => $id) {
@@ -1719,7 +1728,6 @@ abstract class Mapper implements IMapper, Serializable
                 $idValues[] = $this->getModelProperty($model, $this->getIdentifierProperty());
             }
             $pbs[] = $this->getPredicateBuilder()->in($this->getIdentifierColumn(), $idValues);
-
         } else {
             // Building the query is hard - all I can do is compare against each property of each model.
             foreach ($collection as $i => $model) {
@@ -2141,13 +2149,13 @@ abstract class Mapper implements IMapper, Serializable
             if ($bypassCache) {
                 // cache bypass is EXPLICITLY defined
                 $c = $this->selectCache->fetch([ $statement, true ]);
-
             } else {
                 $params = $predicate->getParams();
                 ksort($params);
 
                 // the query itself gets cached by the DB class, but we also want to cache the params
-                $hash = sha1(sprintf('%s[%s][%s]',
+                $hash = sha1(sprintf(
+                    '%s[%s][%s]',
                     $statement->queryString,
                     implode(',', $params),
                     \serialize($options)
@@ -2160,7 +2168,6 @@ abstract class Mapper implements IMapper, Serializable
 
             // Ensure collection objects are distinct while containing references to unique model instances
             return $c instanceof Collection ? $c->shallowClone() : $c;
-
         } catch (UnderflowException $e) {
             return $this->hydrateList([]);
         }
@@ -2201,7 +2208,6 @@ abstract class Mapper implements IMapper, Serializable
             } else {
                 $predicate->equals($this->soft_delete_column, $this->soft_delete_undeleted_value);
             }
-
         }
 
         // If this underflows, someone passed an empty column value - return an empty set.
@@ -2882,10 +2888,12 @@ abstract class Mapper implements IMapper, Serializable
             );
 
             if (count($collectionIds)) {
-                foreach ($this->findByColumn($idColumn, $collectionIds, [
+                foreach (
+                    $this->findByColumn($idColumn, $collectionIds, [
                     'deleted' => true,
                     'cache'   => false,
-                ]) as $obj) {
+                    ]) as $obj
+                ) {
                     // index by ID
                     $existingObjects[$this->getModelProperty($obj, $idProperty)] = $obj;
                 }
@@ -2896,7 +2904,6 @@ abstract class Mapper implements IMapper, Serializable
 
         try {
             foreach ($collection as $i => $model) {
-
                 // Use the insert if the record has no ID: otherwise the replace
                 // (Need to use replace rather than update to handle tables with
                 //  a non-auto-incrementing primary key, i.e. storage.hash)
@@ -2933,7 +2940,6 @@ abstract class Mapper implements IMapper, Serializable
                         $this->database->rollBack();
                         return false;
                     }
-
                 } else {
                     $this->database->rollBack();
                     return false;
@@ -2945,7 +2951,6 @@ abstract class Mapper implements IMapper, Serializable
         }
         $this->database->commit();
         foreach ($collection as $i => $model) {
-
             $previous = null;
 
             if ($idProperty) {
@@ -2956,7 +2961,6 @@ abstract class Mapper implements IMapper, Serializable
                     $previous = array_key_exists($id, $existingObjects) ? $existingObjects[$id] : null;
                     $this->triggerCallbacks(self::CALLBACK_POSTSAVE, $model, $previous);
                 }
-
             } else {
                 // this mapper does not define primary key: we cannot supply a diff, but we *can* still call the POSTSAVE hook
                 $this->triggerCallbacks(self::CALLBACK_POSTSAVE, $model);
@@ -3028,7 +3032,6 @@ abstract class Mapper implements IMapper, Serializable
                 $otherModelExample = $otherMapper->createModel();
 
                 foreach ($propertyValue as $value) {
-
                     $otherKey = $value;
 
                     // Is $otherKey a model? If so I need its identifier.
@@ -3079,7 +3082,7 @@ abstract class Mapper implements IMapper, Serializable
      * Setup method. Implementing classes to define their SQL map here.
      * @return void
      */
-    protected abstract function mapping();
+    abstract protected function mapping();
 
 
     /**
@@ -3262,7 +3265,7 @@ abstract class Mapper implements IMapper, Serializable
         if (!$joinDeleted) {
             $filterSoftDeleteSql = $other_mapper->getSoftDeleteFilterSql($other_alias);
             if (isset($filterSoftDeleteSql)) {
-                $join_sql .= ' AND '.$filterSoftDeleteSql;
+                $join_sql .= ' AND ' . $filterSoftDeleteSql;
             }
         }
         if (isset($join['extra']) && strlen($join['extra']) > 0) {
@@ -3287,7 +3290,7 @@ abstract class Mapper implements IMapper, Serializable
         $modelList = $this->createCollection();
         foreach ($rowList as $row) {
             $model = $this->hydrate($row, $alias, $callback);
-            if($model){
+            if ($model) {
                 $modelList->add($model);
             }
         }
@@ -3330,7 +3333,6 @@ abstract class Mapper implements IMapper, Serializable
                 if (!$aliasFound) {
                     throw new Exception(sprintf('Alias "%s" not found in row - are you hydrating the correct alias?', $alias));
                 }
-
             } else {
                 // Search for rows without an alias
                 $aliasFound = false;
@@ -3402,7 +3404,6 @@ abstract class Mapper implements IMapper, Serializable
         if (!$mapper->isCacheEnabled() || $mapper->localBodyCacheBypass) {
             // fetch direct
             $model = $cache->fetch([ $mapper, $row, $alias ]);
-
         } else {
             // use cached value if available
             $model = $cache->get($this->getLocalObjectCacheKey($mapper, $row, $alias), [ $mapper, $row, $alias ]);
@@ -3431,21 +3432,18 @@ abstract class Mapper implements IMapper, Serializable
             // this occurs on things that fundamentally are join tables, so lack a single primary key
             // unfortunately not much we can do but use the whole row as the cache key
             $key = json_encode($row);
-
         } else {
             $idKey = trim("$alias.$idCol", '.');
 
             if (array_key_exists($idKey, $row)) {
                 $key = $row[$idKey];
             } else {
-
                 // this is non-fatal; use the whole role as the cache-key (inherently meaning "no cache")
                 $key = json_encode($row);
 
                 // we still want to know in development, though.
                 $this->monitor->error("Key '$idKey' not defined in row$key; cannot obtain cache key");
             }
-
         }
 
         return $this->getLocalKeyString($mapper, $key);
@@ -3457,8 +3455,9 @@ abstract class Mapper implements IMapper, Serializable
      * @param string|int $key
      * @return string
      */
-    protected function getLocalKeyString($mapper, $key): string {
-        return get_class($mapper).".$key";
+    protected function getLocalKeyString($mapper, $key): string
+    {
+        return get_class($mapper) . ".$key";
     }
 
     /**
@@ -3574,7 +3573,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // create a new, blank model
-        return new $this->model;
+        return new $this->model();
     }
 
     /**
@@ -3718,7 +3717,6 @@ abstract class Mapper implements IMapper, Serializable
     {
         $result = array();
         foreach ($this->map as $map) {
-
             // If there's a join on this property, we need to know about it
             $join = null;
             if (isset($map['join'])) {
@@ -3976,10 +3974,8 @@ abstract class Mapper implements IMapper, Serializable
         foreach ($map as $field) {
             if (isset($field['column'])) {
                 $mappedFields[$field['column']] = true;
-
             } elseif (isset($field['join']) && isset($joins[$field['join']])) {
                 $mappedFields[$joins[$field['join']]['this_key']] = true;
-
             } elseif (isset($field['join_def'])) {
                 $mappedFields[$field['join_def']['this_key']] = true;
             }
@@ -3996,7 +3992,7 @@ abstract class Mapper implements IMapper, Serializable
         $db = $this->getDatabase();
 
         if (!$db instanceof \Database) {
-            throw new Exception("No db in ".get_class($this));
+            throw new Exception("No db in " . get_class($this));
         }
 
         $stmt = $db->query("SHOW COLUMNS FROM {$this->table}");

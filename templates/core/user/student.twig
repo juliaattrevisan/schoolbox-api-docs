@@ -20,6 +20,20 @@
 {# Should a student see their own contact details? I think so #}
 {% set showContacts = (isStaff or isParentOfStudent) and not hideContacts %}
 {% set showContactsAlert = config.synergetic_community_alerts and showContacts and isStaff %}
+{% set showEmergencyContacts =
+    (isPrimaryCarer or isStaff)
+    and not hideContacts
+    and (
+        externalUser.StudentEmergencyName is defined
+        or externalUser.StudentEmergency2Name is defined
+        or externalUser.StudentEmergency3Name is defined
+    )
+%}
+{% set showContactsTab =
+    (showContacts and contacts|length > 0)
+    or showContactsAlert
+    or showEmergencyContacts
+%}
 {% set showSubjects = showDetails %}
 {% set showGroups = showDetails %}
 {% set showClasses = showClasses and showDetails %}
@@ -379,25 +393,195 @@
     </div>
 </div>
 
-{% block pd %}
-{% endblock pd %}
 
-{# TODO: Where to pus this?
- # https://stackoverflow.com/questions/23569705/zurb-foundation-prevent-empty-column-collapsing-to-zero-width
- # https://foundation.zurb.com/forum/posts/22995-empty-column
- #}
-<style type="text/css">
-    .columns, .column {
-        min-height: 1px;
-    }
-</style>
-
+{# Tabs #}
 <div class="row">
-    <div class="small-12 {% if showClasses %}medium-6 medium-push-6{% else %}large-reset-order{% endif %} columns">
-        {% if showContacts and contacts|length > 0 %}
-            <div class="row">
-                {% block contacts_island %}
-                    <div class="small-12 island">
+    <div class="small-12 island">
+        <dl class="tabs" data-tab>
+            <dd class="active"><a href="#activity">Activity Feed</a></dd>
+            <dd><a href="#achievements">Achievements</a></dd>
+            {% if showClasses %}
+            <dd><a href="#classes">Groups &amp; Classes</a></dd>
+            {% endif %}
+            {% if showContactsTab %}
+            <dd><a href="#contacts">Contacts</a></dd>
+            {% endif %}
+        </dl>
+
+        <div class="tabs-content content no-margin no-pad">
+            <div class="content active" id="activity">
+                {# Vue component goes here #}
+                {% autoescape 'js' %}
+                    <script type="text/javascript">
+                        window.learningEvidenceFeedConfig = {
+                            student: {{ user | json_encode | raw }},
+                            routes: {
+                                getEvidence: '{{ routeLookupIfAuthorized(
+                                    'learningMomentEvidence.getMomentsForUser',
+                                    {user: user, userId: user.id}
+                                ) }}',
+                                getCreateEvidenceForm: '{{ routeLookupIfAuthorized(
+                                    'learningMomentEvidence.getCreateForm',
+                                    {users: [user], userIds: user.id}
+                                ) }}',
+                            },
+                        };
+                    </script>
+                {% endautoescape %}
+                <div id="activity-feed"></div>
+                <script type="text/javascript" src="/javascript/components/learningMomentsFeed.bundle.js"></script>
+            </div>
+
+            <div class="content" id="achievements">
+                <div class="content">
+                    <h2 class="subheader">Achievements</h2>
+                </div>
+            </div>
+
+            {% if showClasses %}
+            <div class="content" id="classes">
+                <div class="content">
+                    {% if showSubjects %}
+                    {% for group, subjectGroup in subjects %}
+                        {# Keep a running total of all teachers emails in this group #}
+                        {% set teacherEmails = [] %}
+                        <div class="row">
+                            <div class="small-12 island">
+                                <h2 class="subheader">{{ group }}</h2>
+                                <section>
+                                    {% for subject in subjectGroup %}
+                                        <ul class="subject-list group">
+                                            <li class="subject-group {% block folderListItemClasses %}{% endblock %}">
+                                                <div class="content small-12">
+                                                    {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
+                                                    {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
+                                                        <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
+                                                            <h3 class="no-margin">{{ subject.name }} <span class="meta">({{ subjectCode }})</span></h3>
+                                                        </a>
+                                                    {% else %}
+                                                        <h3 class="no-margin">{{ subject.name }} <span class="meta">({{ subjectCode }})</span></h3>
+                                                    {% endif %}
+                                                </div>
+                                                {% block folderListItemActions %}{% endblock %}
+                                            </li>
+                                            {% for teacher in subject.teachers %}
+                                                {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
+                                                {% set teacherEmails = teacherEmails|merge([email]) %}
+                                                <li class="actions-small-1">
+                                                    <div class="list-item">
+                                                        <div class="compact card small-12">
+                                                            <a href="/search/user/{{ teacher.id }}">
+                                                                <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" />
+                                                                <p>
+                                                                    {{ teacher.formatName }}
+                                                                    <span class="pipe meta">
+                                                            {% if teacher.positionTitle is empty %}
+                                                                {{ teacher.role.name }}
+                                                            {% else %}
+                                                                {{ teacher.positionTitle }}
+                                                            {% endif %}
+                                                        </span>
+                                                                </p>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <nav>
+
+                                                        {% if not teacher.email is empty %}
+                                                            {% set replyTo = teacher.getFormattedEmailDisplay %}
+                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
+                                                        {% endif %}
+                                                    </nav>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endfor %}
+                                    {% if session.user.role.staff and config.email_all_staff and config.mail_enable %}
+                                        {% set teacherEmails = teacherEmails|join(emailSeparator)  %}
+                                        {% set replyTo = session.user.getFormattedEmailDisplay %}
+                                        <div class="component-action">
+                                            <section>
+                                                <form action="/mail/createMail.php" method="post">
+                                                    <div class="row">
+                                                        <div class="small-12 columns">
+                                                            <input type="hidden" name="replyto" value="{{ replyTo }}"/>
+                                                            <input type="hidden" name="cc" value="{{ teacherEmails }}"/>
+                                                            <button type="submit" class="button">Email All {{ group }} Teachers</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </section>
+                                        </div>
+                                    {% endif %}
+                                </section>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if showGroups and groups is not empty %}
+                        <div class="row">
+                            <div class="small-12 island">
+                                <h2 class="subheader">Groups</h2>
+                                <section>
+                                    {% for group in groups %}
+                                        <ul class="subject-list group">
+                                            <li class="subject-group">
+                                                <div class="list-item">
+                                                    <div class="content small-12 ">
+                                                        {% if group.perms > 0 %}
+                                                            <a href="/homepage/{{ group.id }}">
+                                                                <h3 class="no-margin">{{ group.name }}</h3>
+                                                            </a>
+                                                        {% else %}
+                                                            <h3 class="no-margin">{{ group.name }}</h3>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            {% if group.owners is defined %}
+                                                {% for owner in group.owners %}
+                                                    <li class="actions-small-1">
+                                                        <div class="list-item">
+                                                            <div class="compact card small-12">
+                                                                <a href="/search/user/{{ owner.id }}">
+                                                                    <img src="/portrait.php?userId={{ owner.externalId }}&amp;size=square64" />
+                                                                    <p>
+                                                                        {{ owner.formatName }}
+                                                                        <span class="pipe meta">
+                                                                {% if owner.positionTitle is empty %}
+                                                                    {{ owner.role.name }}
+                                                                {% else %}
+                                                                    {{ owner.positionTitle }}
+                                                                {% endif %}
+                                                            </span>
+                                                                    </p>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                        <nav>
+                                                            {% if not owner.email is empty %}
+                                                                {% set replyTo = owner.getFormattedEmailDisplay %}
+                                                                <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
+                                                            {% endif %}
+                                                        </nav>
+                                                    </li>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </ul>
+                                    {% endfor %}
+                                </section>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if showContactsTab %}
+            <div class="content" id="contacts">
+                <div class="content">
+                    {% block contacts_island %}
                         {% block contacts %}
                             <h2 class="subheader">Contact Information</h2>
 
@@ -486,280 +670,153 @@
                                             </li>
 
                                             {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
-                                            <li class="small-12">
+                                                <li class="small-12">
 
-                                                <!-- Expander -->
-                                                <div class="list-item">
-                                                    <div class="expander" data-collapser="collap-spouse-{{ loop.index }}"></div>
-                                                    <div class="compact card small-12">
-                                                        {# need to know user's schoolbox info here #}
-                                                        {% if contact.spouse %}
-                                                            <a href="/search/user/{{ contact.spouse.id }}">
+                                                    <!-- Expander -->
+                                                    <div class="list-item">
+                                                        <div class="expander" data-collapser="collap-spouse-{{ loop.index }}"></div>
+                                                        <div class="compact card small-12">
+                                                            {# need to know user's schoolbox info here #}
+                                                            {% if contact.spouse %}
+                                                                <a href="/search/user/{{ contact.spouse.id }}">
+                                                                    <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
+                                                                    <p>
+                                                                        {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
+                                                                        <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>
+                                                                    </p>
+                                                                </a>
+                                                            {% else %}
                                                                 <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
                                                                 <p>
                                                                     {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
                                                                     <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>
                                                                 </p>
-                                                            </a>
-                                                        {% else %}
-                                                            <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
-                                                            <p>
-                                                                {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
-                                                                <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>
-                                                            </p>
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-
-                                                {% if (contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag) or contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
-                                                    <!-- Collapsable content -->
-                                                    <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
-                                                        <div class="list-item">
-                                                            <div class="small-12">
-
-                                                                {% if contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag %}
-                                                                    <div class="row">
-                                                                        <div class="column small-12 medium-5"><strong>Home Phone: </strong></div>
-                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a></div>
-                                                                    </div>
-                                                                {% endif %}
-
-                                                                {% if contact.StudentContactSpouseMobilePhone %}
-                                                                    <div class="row">
-                                                                        <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
-                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseMobilePhone }}" title="Call {{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a></div>
-                                                                    </div>
-                                                                {% endif %}
-
-                                                                {% if contact.StudentContactSpouseOccupPhone %}
-                                                                    <div class="row">
-                                                                        <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
-                                                                        <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseOccupPhone }}" title="Call {{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a></div>
-                                                                    </div>
-                                                                {% endif %}
-
-                                                                {% if contact.StudentContactSpouseDefaultEmail %}
-                                                                    <div class="row">
-                                                                        <div class="column small-12 medium-5"><strong>Email: </strong></div>
-                                                                            <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a></div>
-                                                                    </div>
-                                                                {% endif %}
-                                                            </div>
+                                                            {% endif %}
                                                         </div>
                                                     </div>
-                                                {% else %}
-                                                <div class="hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
-                                                    <div class="empty-state small-12">
-                                                        <p>No contact details found.</p>
-                                                    </div>
-                                                </div>
-                                                {% endif %}
-                                            </li>
+
+                                                    {% if (contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag) or contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
+                                                        <!-- Collapsable content -->
+                                                        <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
+                                                            <div class="list-item">
+                                                                <div class="small-12">
+
+                                                                    {% if contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag %}
+                                                                        <div class="row">
+                                                                            <div class="column small-12 medium-5"><strong>Home Phone: </strong></div>
+                                                                            <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a></div>
+                                                                        </div>
+                                                                    {% endif %}
+
+                                                                    {% if contact.StudentContactSpouseMobilePhone %}
+                                                                        <div class="row">
+                                                                            <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
+                                                                            <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseMobilePhone }}" title="Call {{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a></div>
+                                                                        </div>
+                                                                    {% endif %}
+
+                                                                    {% if contact.StudentContactSpouseOccupPhone %}
+                                                                        <div class="row">
+                                                                            <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
+                                                                            <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseOccupPhone }}" title="Call {{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a></div>
+                                                                        </div>
+                                                                    {% endif %}
+
+                                                                    {% if contact.StudentContactSpouseDefaultEmail %}
+                                                                        <div class="row">
+                                                                            <div class="column small-12 medium-5"><strong>Email: </strong></div>
+                                                                            <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a></div>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
+                                                            <div class="empty-state small-12">
+                                                                <p>No contact details found.</p>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                </li>
                                             {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 </ul>
                             </section>
                         {% endblock contacts %}
-                    </div>
-                {% endblock contacts_island %}
-            </div>
-        {% endif %}
-        {% block emergencyContacts_island %}
-        <div class="row">
-            <div class="small-12 island">
-                {% block emergencyContacts %}
-                    {# up to 3 emergency contact blocks
-                     # show no header if no emergencies
-                     #}
-                    {%  if isPrimaryCarer or isStaff %}
-                        {% if not hideContacts  and (externalUser.StudentEmergencyName is defined
-                        or externalUser.StudentEmergency2Name is defined
-                        or externalUser.StudentEmergency3Name is defined)
-                        %}
-                            <h2 class="subheader">Emergency Contact Information</h2>
-                            <section>
-                                <ul class="information-list expandable-card">
-                                    {% for i in 1..3 %}
-                                        {% set index = (i == 1 ? '' : i) %}
-                                        {% if externalUser["StudentEmergency#{index}Name"] %}
-                                            <li>
-                                                <!-- Expander -->
-                                                <div>
-                                                    <div class="expander" data-collapser="collap-emergency-{{ i }}"></div>
-                                                    <div class="content small-12">
-                                                        {{ externalUser["StudentEmergency#{index}Name"] }}
-                                                    </div>
-                                                </div>
+                    {% endblock contacts_island %}
 
-                                                <!-- Collapseable content -->
-                                                <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-emergency-{{ i }}">
-                                                    <div class="row">
-                                                        <div class="column small-12 medium-5"><strong>Primary Phone: </strong></div>
-                                                        <div class="column small-12 medium-7">
-                                                            <a href="tel:{{ externalUser["StudentEmergency#{index}Phone"] }}">
-                                                                {{ externalUser["StudentEmergency#{index}Phone"] }}
-                                                            </a>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="column small-12 medium-5"><strong>Alternate Phone: </strong></div>
-                                                        <div class="column small-12 medium-7">
-                                                            <a href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
-                                                                {{ externalUser["StudentEmergency#{index}PhoneAlt"] }}
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        {% endif %}
-                                    {% endfor %}
-                                </ul>
-                            </section>
-                        {% endif %}
-                    {% endif %}
-                {% endblock emergencyContacts %}
-            </div>
-        </div>
-        {% endblock emergencyContacts_island %}
-    </div>
-
-    <div class="small-12 {% if showContacts %}medium-6 medium-pull-6{% else %}large-reset-order{% endif %} columns">
-        {% if showClasses %}
-            {% if showSubjects %}
-                {% for group, subjectGroup in subjects %}
-                    {# Keep a running total of all teachers emails in this group #}
-                    {% set teacherEmails = [] %}
-                    <div class="row">
-                        <div class="small-12 island">
-                            <h2 class="subheader">{{ group }}</h2>
-                            <section>
-                                {% for subject in subjectGroup %}
-                                <ul class="subject-list group">
-                                    <li class="subject-group {% block folderListItemClasses %}{% endblock %}">
-                                        <div class="content small-12">
-                                            {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
-                                            {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
-                                            <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
-                                                <h3 class="no-margin">{{ subject.name }} <span class="meta">({{ subjectCode }})</span></h3>
-                                            </a>
-                                            {% else %}
-                                            <h3 class="no-margin">{{ subject.name }} <span class="meta">({{ subjectCode }})</span></h3>
-                                            {% endif %}
-                                        </div>
-                                        {% block folderListItemActions %}{% endblock %}
-                                    </li>
-                                    {% for teacher in subject.teachers %}
-                                        {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
-                                        {% set teacherEmails = teacherEmails|merge([email]) %}
-                                        <li class="actions-small-1">
-                                            <div class="list-item">
-                                                <div class="compact card small-12">
-                                                    <a href="/search/user/{{ teacher.id }}">
-                                                        <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" />
-                                                        <p>
-                                                            {{ teacher.formatName }}
-                                                            <span class="pipe meta">
-                                                                {% if teacher.positionTitle is empty %}
-                                                                    {{ teacher.role.name }}
-                                                                {% else %}
-                                                                    {{ teacher.positionTitle }}
-                                                                {% endif %}
-                                                            </span>
-                                                        </p>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            <nav>
-
-                                                {% if not teacher.email is empty %}
-                                                    {% set replyTo = teacher.getFormattedEmailDisplay %}
-                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
-                                                {% endif %}
-                                            </nav>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
-                                {% endfor %}
-                                {% if session.user.role.staff and config.email_all_staff and config.mail_enable %}
-                                    {% set teacherEmails = teacherEmails|join(emailSeparator)  %}
-                                    {% set replyTo = session.user.getFormattedEmailDisplay %}
-                                    <div class="component-action">
+                    {% block emergencyContacts_island %}
+                        <div class="row">
+                            <div class="small-12 island">
+                                {% block emergencyContacts %}
+                                    {# up to 3 emergency contact blocks
+                                     # show no header if no emergencies
+                                    #}
+                                    {% if showEmergencyContacts %}
+                                        <h2 class="subheader">Emergency Contact Information</h2>
                                         <section>
-                                            <form action="/mail/createMail.php" method="post">
-                                                <div class="row">
-                                                    <div class="small-12 columns">
-                                                        <input type="hidden" name="replyto" value="{{ replyTo }}"/>
-                                                        <input type="hidden" name="cc" value="{{ teacherEmails }}"/>
-                                                        <button type="submit" class="button">Email All {{ group }} Teachers</button>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </section>
-                                    </div>
-                                {% endif %}
-                            </section>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% endif %}
+                                            <ul class="information-list expandable-card">
+                                                {% for i in 1..3 %}
+                                                    {% set index = (i == 1 ? '' : i) %}
+                                                    {% if externalUser["StudentEmergency#{index}Name"] %}
+                                                        <li>
+                                                            <!-- Expander -->
+                                                            <div>
+                                                                <div class="expander" data-collapser="collap-emergency-{{ i }}"></div>
+                                                                <div class="content small-12">
+                                                                    {{ externalUser["StudentEmergency#{index}Name"] }}
+                                                                </div>
+                                                            </div>
 
-            {% if showGroups and groups is not empty %}
-                <div class="row">
-                    <div class="small-12 island">
-                        <h2 class="subheader">Groups</h2>
-                        <section>
-                            {% for group in groups %}
-                            <ul class="subject-list group">
-                                <li class="subject-group">
-                                    <div class="list-item">
-                                        <div class="content small-12 ">
-                                            {% if group.perms > 0 %}
-                                                <a href="/homepage/{{ group.id }}">
-                                                    <h3 class="no-margin">{{ group.name }}</h3>
-                                                </a>
-                                            {% else %}
-                                                <h3 class="no-margin">{{ group.name }}</h3>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </li>
-                                {% if group.owners is defined %}
-                                    {% for owner in group.owners %}
-                                        <li class="actions-small-1">
-                                            <div class="list-item">
-                                                <div class="compact card small-12">
-                                                    <a href="/search/user/{{ owner.id }}">
-                                                        <img src="/portrait.php?userId={{ owner.externalId }}&amp;size=square64" />
-                                                        <p>
-                                                            {{ owner.formatName }}
-                                                            <span class="pipe meta">
-                                                                {% if owner.positionTitle is empty %}
-                                                                    {{ owner.role.name }}
-                                                                {% else %}
-                                                                    {{ owner.positionTitle }}
-                                                                {% endif %}
-                                                            </span>
-                                                        </p>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                            <nav>
-                                                {% if not owner.email is empty %}
-                                                    {% set replyTo = owner.getFormattedEmailDisplay %}
-                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
-                                                {% endif %}
-                                            </nav>
-                                        </li>
-                                    {% endfor %}
-                                {% endif %}
-                            </ul>
-                            {% endfor %}
-                        </section>
-                    </div>
+                                                            <!-- Collapseable content -->
+                                                            <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-emergency-{{ i }}">
+                                                                <div class="row">
+                                                                    <div class="column small-12 medium-5"><strong>Primary Phone: </strong></div>
+                                                                    <div class="column small-12 medium-7">
+                                                                        <a href="tel:{{ externalUser["StudentEmergency#{index}Phone"] }}">
+                                                                            {{ externalUser["StudentEmergency#{index}Phone"] }}
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="row">
+                                                                    <div class="column small-12 medium-5"><strong>Alternate Phone: </strong></div>
+                                                                    <div class="column small-12 medium-7">
+                                                                        <a href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
+                                                                            {{ externalUser["StudentEmergency#{index}PhoneAlt"] }}
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        </section>
+                                    {% endif %}
+                                {% endblock emergencyContacts %}
+                            </div>
+                        </div>
+                    {% endblock emergencyContacts_island %}
                 </div>
+            </div>
             {% endif %}
-        {% endif %}
+        </div>
     </div>
 </div>
+
+
+{% block pd %}
+{% endblock pd %}
+
+{# TODO: Where to pus this?
+ # https://stackoverflow.com/questions/23569705/zurb-foundation-prevent-empty-column-collapsing-to-zero-width
+ # https://foundation.zurb.com/forum/posts/22995-empty-column
+ #}
+<style type="text/css">
+    .columns, .column {
+        min-height: 1px;
+    }
+</style>

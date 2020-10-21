@@ -14,7 +14,9 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Moment\Evidence\Translator;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
+use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use Scrub;
 
 /**
  * Controller for learning moments.
@@ -111,17 +113,50 @@ class Controller extends Base
 //    public function getMoment(): void
 //    {
 //    }
-//
-//
-//    /**
-//     * Retrieve a user's learning moments.
-//     *
-//     * @api   GET /learning/evidence/user/{userId}
-//     * @since 20.2
-//     */
-//    public function getMomentsForUser(User $user): void
-//    {
-//    }
+
+
+    /**
+     * Retrieve a user's learning moments.
+     *
+     * @api   GET /learning/evidence/user/{userId}
+     * @since 20.2
+     *
+     * @param User $user
+     */
+    public function getMomentsForUser(User $user): void
+    {
+        $encodedCursor = $this->request->query->get('cursor');
+        $cursor        = new Cursor($this->mapper, $user);
+        $data          = $cursor->retrieveResults($encodedCursor);
+        $mappedData    = $data
+            ->map(
+                new Translator\ModelToArray(
+                    new User\Translator\ModelToArray(),
+                    new Storage\Translator\ModelToArray(),
+                ),
+            )
+            ->reindex()
+            ->map(
+                // Scrub body HTML, as there's no guarantee it has been scrubbed
+                // elsewhere (and Vue can't do it)
+                static function (array $item): array {
+                    $item['body'] = Scrub::html($item['body']);
+                    return $item;
+                }
+            );
+        $this->response->content->set(
+            $this->buildJsonOutput([
+                'data'     => $mappedData,
+                'metadata' => [
+                    'count' => $cursor->retrieveResultCount(),
+                    'cursor' => [
+                        'current' => $encodedCursor ?? $cursor->current($data),
+                        'next'    => $cursor->next($data),
+                    ],
+                ],
+            ])
+        );
+    }
 
 
     /**
@@ -187,7 +222,14 @@ class Controller extends Base
         }
         $this->mapper->save($evidenceCollection);
         $this->response->content->set(
-            $this->buildJsonOutput($evidenceCollection->map(new Translator\ModelToArray()))
+            $this->buildJsonOutput(
+                $evidenceCollection->map(
+                    new Translator\ModelToArray(
+                        new User\Translator\ModelToArray(),
+                        new Storage\Translator\ModelToArray(),
+                    ),
+                )
+            )
         );
     }
 

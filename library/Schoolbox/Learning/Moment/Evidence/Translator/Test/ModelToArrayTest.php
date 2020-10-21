@@ -85,6 +85,17 @@ class ModelToArrayTest extends TestCase
      */
     public function testInvoke(Model $input, array $expected): void
     {
-        self::assertEquals($expected, (new ModelToArray())($input));
+        // Test with a stripped-down user and storage translator
+        $userTranslator = static function (?User $user) {
+            return $user
+                ? ['id' => $user->getId(),]
+                : null;
+        };
+        $storageTranslator = static function (?Storage $storage) {
+            return $storage
+                ? ['hash' => $storage->getHash(),]
+                : null;
+        };
+        self::assertEquals($expected, (new ModelToArray($userTranslator, $storageTranslator))($input));
     }
 }
