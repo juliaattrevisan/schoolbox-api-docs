@@ -381,13 +381,25 @@ class Controller extends Base
             }
         );
 
+        /* A list of Terms to choose from
+         *
+         * If we're in an extraordinary Term right now, provide that as an option
+         * in addition to the ordinary Terms
+         */
+        $terms = $this->termMapper->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc');
+        $term = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $subject->getYearLevels());
+
+        if ($term->getExtraordinary()) {
+            $terms->prepend($term);
+        }
+
         $yearUrl = $this->getYearUrl($viewee->getId());
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learningGrades/gradesOuter.twig', [
                 'student'            => $viewee,
                 'filterPanel'        => $filterPanel,
                 'term'               => $term,
-                'terms'              => $this->termMapper->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc'),
+                'terms'              => $terms,
                 'subject'            => $subject,
                 'folders'            => $folders,
                 'markbook'           => $markbook,
