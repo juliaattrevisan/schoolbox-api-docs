@@ -9,9 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Example\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\CampusMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -52,12 +50,6 @@ class Definition implements IStrategy
 
 
     /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
-
-
-    /**
      * @var TimetableCycleMapper
      */
     private $timetableCycleMapper;
@@ -74,20 +66,17 @@ class Definition implements IStrategy
      *
      * @param LoggerInterface       $log
      * @param bool                  $perform
-     * @param CampusMapper          $campusMapper
      * @param TimetableCycleMapper  $timetableCycleMapper
      * @param TimetablePeriodMapper $timetablePeriodMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        CampusMapper $campusMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->campusMapper = $campusMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
     }
@@ -102,14 +91,9 @@ class Definition implements IStrategy
          */
         $cycles = [];
 
-        /* A key to identify this cycle and associate it with an luCampus record
+        /* TODO $ext is a key to identify this cycle and associate it with an luCampus record
          */
         $ext = 'abc';
-
-        /* Find a campus record that could be associated with $ext
-         * You might do that via a lookup or other method than described here which is just an illustration
-         */
-        $campus = CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $ext);
 
         foreach ($cycles as $cycle) {
 
@@ -150,13 +134,6 @@ class Definition implements IStrategy
                 $this->timetableCycleMapper->save($timetableCycle);
             }
 
-            $this->log->info(sprintf(
-                'Associating timetable cycle %s (%s) with campus %s',
-                $timetableCycle->getId(),
-                $timetableCycle->getTitle(),
-                $campus->getName()
-            ));
-
             /* Save all the periods and associate them with a cycle
              */
             $dayData = $this->findDays($cycle);
@@ -173,13 +150,12 @@ class Definition implements IStrategy
                     $period->setCycle($timetableCycle);
 
                     $this->log->info(sprintf(
-                        'Creating period %s (%s-%s) in timetable cycle %s (%s) for campus %s',
+                        'Creating period %s (%s-%s) in timetable cycle %s (%s)',
                         $period->getTitle(),
                         $period->getStart(),
                         $period->getFinish(),
                         $timetableCycle->getId(),
-                        $timetableCycle->getTitle(),
-                        $campus->getName()
+                        $timetableCycle->getTitle()
                     ));
 
                     if ($this->perform) {

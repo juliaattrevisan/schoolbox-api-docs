@@ -12,6 +12,7 @@ use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Api;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
@@ -27,6 +28,14 @@ use UnexpectedValueException;
  */
 class Profile implements IStrategy
 {
+
+    /**
+     * These consts, used to denote what type of person we're processing,
+     * also help us decide which timetable-lessons endpoint to access later
+     */
+    public const TYPE_STUDENT = 'student';
+    public const TYPE_STAFF = 'staff';
+
 
     /**
      * Maximum number of emergency contacts we've permitted (3 by default)
@@ -76,6 +85,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var Registry
+     */
+    private $registry;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private $baseProfileMapper;
@@ -111,6 +126,7 @@ class Profile implements IStrategy
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param Api                             $api
+     * @param Registry                        $registry
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -121,6 +137,7 @@ class Profile implements IStrategy
         LoggerInterface $log,
         bool $perform,
         Api $api,
+        Registry $registry,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -130,6 +147,7 @@ class Profile implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+        $this->registry = $registry;
 
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
@@ -171,7 +189,7 @@ class Profile implements IStrategy
          * Process multiple pages until there are none remaining, or if something is really stuffed,
          * until MAX_CALLS is reached, to prevent infinite calls to a third party.
          */
-        $nextUrl = 'enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms';
+        $nextUrl = 'enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&limit=200';
 
         for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
             $payload = $this->api->retrieveDocument($nextUrl);
@@ -401,11 +419,29 @@ class Profile implements IStrategy
                  * sift through it all manually for the gems you need
                  */
                 $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
+
+                /* Remember that we saw a particular student id
+                 * (-not- their externalId, the primary key in sentral for this student)
+                 *
+                 * We need to get each dude's timetable separately via some other api endpoint
+                 * and we won't encounter this id again unless we remember it here
+                 */
+                $this->registry->remember($externalId, [
+                    'person' => [
+                        'id' => $student['id'],
+                        'type' => self::TYPE_STUDENT,
+                        'externalId' => $externalId,
+                        'firstname' => $studentBaseProfile->getFirstname(),
+                        'lastname' => $studentBaseProfile->getLastname()
+                    ],
+                    'timetable' => null
+                ]);
             }
+
 
             /* Prepare for next page if it exists
              */
-            $nextUrl =  $payload['links']['next'] ?? null;
+            $nextUrl = $payload['links']['next'] ?? null;
         }
     }
 
@@ -917,7 +953,7 @@ class Profile implements IStrategy
          * Process multiple pages until there are none remaining, or if something is really stuffed,
          * until MAX_CALLS is reached, to prevent infinite calls to a third party.
          */
-        $nextUrl = 'enrolments/staff?include=person,qualifications,employments';
+        $nextUrl = 'enrolments/staff?include=person,qualifications,employments&limit=200';
 
         for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
             $payload = $this->api->retrieveDocument($nextUrl);
@@ -964,10 +1000,10 @@ class Profile implements IStrategy
                  */
                 $endpoint = "enrolments/person/{$staff['relationships']['person']['data']['id']}?include=phoneNumbers";
 
-                $payload = $this->api->retrieveDocument($endpoint);
+                $staffPayload = $this->api->retrieveDocument($endpoint);
 
-                $firstname = (string)$payload['data']['attributes']['firstName'];
-                $lastname = (string)$payload['data']['attributes']['lastName'];
+                $firstname = (string)$staffPayload['data']['attributes']['firstName'];
+                $lastname = (string)$staffPayload['data']['attributes']['lastName'];
 
                 $this->log->debug(sprintf(
                     'Secondary api inspection at %s for phone numbers belonging to %s',
@@ -979,8 +1015,8 @@ class Profile implements IStrategy
                  */
                 $numbers = [];
 
-                if (isset($payload['data']['relationships']['phoneNumbers'])) {
-                    foreach ($payload['data']['relationships']['phoneNumbers']['data'] as $phoneNumber) {
+                if (isset($staffPayload['data']['relationships']['phoneNumbers'])) {
+                    foreach ($staffPayload['data']['relationships']['phoneNumbers']['data'] as $phoneNumber) {
                         $numbers[$phoneNumber['attributes']['typeName']] = $phoneNumber['attributes']['number'];
                     }
                 }
@@ -1048,11 +1084,28 @@ class Profile implements IStrategy
                 if ($this->perform) {
                     $this->staffProfileMapper->save($staffProfile);
                 }
+
+                /* Remember that we saw a particular staff id
+                 * (-not- their externalId, the primary key in sentral for this student)
+                 *
+                 * We need to get each dude's timetable separately via some other api endpoint
+                 * and we won't encounter this id again unless we remember it here
+                 */
+                $this->registry->remember($externalId, [
+                    'person' => [
+                        'id' => $staff['id'],
+                        'type' => self::TYPE_STAFF,
+                        'externalId' => $externalId,
+                        'firstname' => $staffBaseProfile->getFirstname(),
+                        'lastname' => $staffBaseProfile->getLastname()
+                    ],
+                    'timetable' => null
+                ]);
             }
 
             /* Prepare for next page if it exists
              */
-            $nextUrl =  $payload['links']['next'] ?? null;
+            $nextUrl = $payload['links']['next'] ?? null;
         }
     }
 }

@@ -53,6 +53,12 @@ class Api implements IApi
 
 
     /**
+     * @var ApiUsage
+     */
+    private $apiUsage;
+
+
+    /**
      * Constructor
      *
      * @param string $dsn
@@ -63,6 +69,11 @@ class Api implements IApi
     public function __construct(string $dsn, string $apiKey)
     {
         $this->client = $this->initClient($dsn, $apiKey, self::DEFAULT_TIMEOUT);
+
+        /* Record some stats about api usage
+         * Turn this into an Observer pattern if you want to record more details
+         */
+        $this->apiUsage = new ApiUsage();
     }
 
 
@@ -118,6 +129,10 @@ class Api implements IApi
         $endpointFiltered = str_replace($this->host, '', $endpoint);
         $endpointFiltered = preg_replace('#^\/v1\/#', '', $endpointFiltered);
 
+        /* Record endpoint usage
+         */
+        $this->apiUsage->record($endpointFiltered);
+
         $response = $this->client->request('GET', $endpointFiltered);
 
         try {
@@ -158,5 +173,14 @@ class Api implements IApi
         }
 
         return $decoded;
+    }
+
+
+    /**
+     * @return ApiUsage
+     */
+    public function getUsage(): ApiUsage
+    {
+        return $this->apiUsage;
     }
 }

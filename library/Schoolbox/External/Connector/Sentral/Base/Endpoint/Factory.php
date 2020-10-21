@@ -12,6 +12,8 @@ use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable\DefinitionCompiler;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable\Preloader;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
@@ -196,12 +198,38 @@ class Factory
      */
     public function produce(): GenericCollection
     {
+        $api = new Api($this->host, $this->key);
+
         /* Cache a list of known users and periods
          * Every student timetable processing uses info stored there
          */
         $lookup = new Timetable\Lookup($this->timetablePeriodMapper);
 
-        $api = new Api($this->host, $this->key);
+        /* A list of student ids that we previously imported
+         */
+        $registry = new Registry();
+
+        $monday = date('Y-m-d', strtotime('monday this week'));
+        $friday = date('Y-m-d', strtotime('friday this week'));
+
+        /* A Definition Compiler
+         */
+        $definitionCompiler = new DefinitionCompiler(
+            $api,
+            $monday,
+            $friday
+        );
+
+        /* A Timetable compiler
+         */
+        $preloader = new Preloader(
+            $this->log,
+            $this->perform,
+            $api,
+            $registry,
+            $monday,
+            $friday
+        );
 
         return (new GenericCollection(IStrategy::class))
 
@@ -224,27 +252,30 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $registry,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
              ))
-//            ->add(new Timetable\Definition(
-//                $this->log,
-//                $this->perform,
-//                $this->campusMapper,
-//                $this->timetableCycleMapper,
-//                $this->timetablePeriodMapper
-//            ))
-//            ->add(new Timetable\Classes(
-//                $this->log,
-//                $this->perform,
-//                $lookup,
-//                $this->classEntryMapper,
-//                $this->classInvolvementMapper,
-//                $this->classPeriodMapper
-//            ))
+            ->add(new Timetable\Definition(
+                $this->log,
+                $this->perform,
+                $definitionCompiler,
+                $this->timetableCycleMapper,
+                $this->timetablePeriodMapper
+            ))
+            ->add(new Timetable\Classes(
+                $this->log,
+                $this->perform,
+                $lookup,
+                $registry,
+                $preloader,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper
+            ))
             ->add(new Cleanup(
                 $this->log,
                 $this->perform,
@@ -253,6 +284,10 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
+            ))
+            ->add(new ApiStatistics(
+                $this->log,
+                $api
             ));
     }
 }

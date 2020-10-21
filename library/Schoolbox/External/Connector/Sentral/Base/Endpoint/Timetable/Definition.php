@@ -9,9 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\CampusMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
@@ -28,13 +26,26 @@ class Definition implements IStrategy
 {
 
     /**
+     * No obvious names found; I just made one up
+     */
+    public const CYCLE_IDENTIFIER = 'Sentral Timetable';
+
+
+    /**
      * Temporarily here to denote the start and end of cycles
      * There appears to be no equivalent concept
      *
-     * TODO Decide if you can find these elsewhere, or just use these defaults
+     * I don't think these come out int he API anywhere even if they are vaguely mentioned here:
+     * https://int-dev.sentral.school/s-3kYwLp/timetables/setup/start_weeks
      */
     private const CYCLE_START = '2000-01-01 00:00:00';
     private const CYCLE_END = '2999-01-01 00:00:00';
+
+
+    /**
+     * Currently hardcoded to obtain mon-fri of the current week
+     */
+    private const CYCLE_LENGTH = 5;
 
 
     /**
@@ -52,9 +63,9 @@ class Definition implements IStrategy
 
 
     /**
-     * @var CampusMapper
+     * @var DefinitionCompiler
      */
-    private $campusMapper;
+    private $definitionCompiler;
 
 
     /**
@@ -74,20 +85,20 @@ class Definition implements IStrategy
      *
      * @param LoggerInterface       $log
      * @param bool                  $perform
-     * @param CampusMapper          $campusMapper
+     * @param DefinitionCompiler    $definitionCompiler
      * @param TimetableCycleMapper  $timetableCycleMapper
      * @param TimetablePeriodMapper $timetablePeriodMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        CampusMapper $campusMapper,
+        DefinitionCompiler $definitionCompiler,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->campusMapper = $campusMapper;
+        $this->definitionCompiler = $definitionCompiler;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
     }
@@ -98,93 +109,86 @@ class Definition implements IStrategy
      */
     public function import(): void
     {
-        /* TODO Collection of timetable cycle equivalents from the endpoint
+
+        /* $ext is a key to identify this cycle and associate it with an luCampus record
          */
-        $cycles = [];
+        $ext = self::CYCLE_IDENTIFIER;
 
-        /* A key to identify this cycle and associate it with an luCampus record
+        /* I've only seen one cycle so far
          */
-        $ext = 'abc';
+        $cycleName = self::CYCLE_IDENTIFIER;
+        $cycleLength = self::CYCLE_LENGTH;
+        $cycleStart = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_START);
+        $cycleEnd = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
+        $dayStart = 1;
 
-        /* Find a campus record that could be associated with $ext
-         * You might do that via a lookup or other method than described here which is just an illustration
+        /* Find the longest day (might be excessive, can't tell yet)
          */
-        $campus = CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $ext);
+        $periodsInDays = $this->definitionCompiler->compile();
+        $dayLength = 0;
 
-        foreach ($cycles as $cycle) {
+        foreach ($periodsInDays as $date => $periods) {
+            $currentLength = \count($periods);
 
-            /* TODO Fill in these cycle vars
-             */
-            $cycleName = '';
-            $cycleLength = '';
-            $dayLength = '';
-            $cycleStart = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_START);
-            $cycleEnd = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
-            $dayStart = 1;
-
-            /* Reuse existing cycle with the same identifier, if it exists, and update it
-             */
-            try {
-                $timetableCycle = $this->timetableCycleMapper->findOneByColumn('cycle_identifier', $ext);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $timetableCycle = $timetableCycle = $this->timetableCycleMapper->createModel();
+            if ($dayLength < $currentLength) {
+                $dayLength = $currentLength;
             }
+        }
 
-            $timetableCycle
-                ->setCycleIdentifier($ext)
-                ->setTitle($cycleName)
-                ->setCycleLength($cycleLength)
-                ->setDayLength($dayLength)
-                ->setStart($cycleStart)
-                ->setFinish($cycleEnd)
-                ->setStartDay($dayStart);
+        /* Reuse existing cycle with the same identifier, if it exists, and update it
+         */
+        try {
+            $timetableCycle = $this->timetableCycleMapper->findOneByColumn('cycle_identifier', $ext);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $timetableCycle = $timetableCycle = $this->timetableCycleMapper->createModel();
+        }
 
-            $this->log->info(sprintf(
-                'Creating timetable cycle %s (%s) with day length %s',
-                $timetableCycle->getId(),
-                $timetableCycle->getTitle(),
-                $timetableCycle->getDayLength()
-            ));
+        $timetableCycle
+            ->setCycleIdentifier($ext)
+            ->setTitle($cycleName)
+            ->setCycleLength($cycleLength)
+            ->setDayLength($dayLength)
+            ->setStart($cycleStart)
+            ->setFinish($cycleEnd)
+            ->setStartDay($dayStart);
 
-            if ($this->perform) {
-                $this->timetableCycleMapper->save($timetableCycle);
-            }
+        $this->log->info(sprintf(
+            'Creating timetable cycle %s (%s) with day length %s',
+            $timetableCycle->getId(),
+            $timetableCycle->getTitle(),
+            $timetableCycle->getDayLength()
+        ));
 
-            $this->log->info(sprintf(
-                'Associating timetable cycle %s (%s) with campus %s',
-                $timetableCycle->getId(),
-                $timetableCycle->getTitle(),
-                $campus->getName()
-            ));
+        if ($this->perform) {
+            $this->timetableCycleMapper->save($timetableCycle);
+        }
 
-            /* Save all the periods and associate them with a cycle
-             */
-            $dayData = $this->findDays($cycle);
+        /* Save all the periods and associate them with a cycle
+         */
+        $dayData = $this->findDays($dayLength, $periodsInDays);
 
-            /** @var array $days */
-            $days = $dayData['days'];
+        /** @var array $days */
+        $days = $dayData['days'];
 
-            /** @var array $periods */
-            foreach ($days as $day => $periods) {
+        /** @var array $periods */
+        foreach ($days as $day => $periods) {
 
-                /** @var TimetablePeriod $period */
-                foreach ($periods as $period) {
-                    $period->setDay($day);
-                    $period->setCycle($timetableCycle);
+            /** @var TimetablePeriod $period */
+            foreach ($periods as $period) {
+                $period->setDay($day);
+                $period->setCycle($timetableCycle);
 
-                    $this->log->info(sprintf(
-                        'Creating period %s (%s-%s) in timetable cycle %s (%s) for campus %s',
-                        $period->getTitle(),
-                        $period->getStart(),
-                        $period->getFinish(),
-                        $timetableCycle->getId(),
-                        $timetableCycle->getTitle(),
-                        $campus->getName()
-                    ));
+                $this->log->info(sprintf(
+                    'Creating period %s (%s-%s) in timetable cycle %s (%s)',
+                    $period->getTitle(),
+                    $period->getStart(),
+                    $period->getFinish(),
+                    $timetableCycle->getId(),
+                    $timetableCycle->getTitle()
+                ));
 
-                    if ($this->perform) {
-                        $this->timetablePeriodMapper->save($period);
-                    }
+                if ($this->perform) {
+                    $this->timetablePeriodMapper->save($period);
                 }
             }
         }
@@ -194,11 +198,12 @@ class Definition implements IStrategy
     /**
      * Find all the Days in a given $cycle and the longest Day of them all
      *
-     * @param mixed $cycle
+     * @param int   $dayLength
+     * @param array $periodsInDays
      * @return array
      * @throws Exception
      */
-    private function findDays($cycle): array
+    private function findDays(int $dayLength, array $periodsInDays): array
     {
         $struct = [
 
@@ -207,9 +212,7 @@ class Definition implements IStrategy
              * Find the day with the most number of periods and assume that to be canonical
              * (some days have no period data)
              */
-            /* TODO Find out how many periods per day there are (maximum)
-             */
-            'maxPeriods' => 0,
+            'maxPeriods' => $dayLength,
 
             /* Store all the periods here, indexed by Day
               */
@@ -217,33 +220,18 @@ class Definition implements IStrategy
         ];
 
         /* Explore all the Period data
+         *
+         * $periodsInDays is in an chronologically-ordered list;
+         * it seems I can take advantage of that
          */
-        /* TODO Get a list of days from endpoint data
-         */
-        $days = [];
+        $periods = array_values($periodsInDays)[0];
 
-        foreach ($days as $day) {
-
-            /* TODO Get a list of periods from endpoint data
-             */
-            $periods = [];
-
-            /* TODO Decide what day it currently is
-             */
-            $dayIndex = '';
-
-            /* Figure out which day has the most periods
-             * Consider this value and scheme canonical
-             */
-            $numPeriods = \count($periods);
-
-            if ($numPeriods > $struct['maxPeriods']) {
-                $struct['maxPeriods'] = $numPeriods;
-            }
+        for ($i = 0; $i < self::CYCLE_LENGTH; $i++) {
+            $dayIndex = $i+1;
 
             $struct['days'][$dayIndex] = [];
 
-            /* TODO Build a list of periods in a day
+            /* Build a list of periods in a day
 
             $struct['days'][
                 1 => [
@@ -258,15 +246,28 @@ class Definition implements IStrategy
                 ]
             ]
              */
-            /** @var TimetablePeriod $period */
-            foreach ($periods as $period) {
 
-                /* TODO Fill in these period vars
+            /* Each $period is an array of [name, order, startTime, endTime, isActive]
+             */
+            for ($j = 0; $j < $dayLength; $j++) {
+                $period = $periods[$j];
+
+                /* Assumption: assign arbitrary name since each $period has a different
+                 * name on each day, e.g. "Mon0", "MonHome room" (yes I know), "MonRecess",
+                 * "Tue0", "TueHome room" (yes I know), etc. This seems dumb but I can ditch
+                 * the first three chars for now
                  */
-                $periodName = '';
-                $sequence = '';
-                $start = '';
-                $finish = '';
+                $periodName = substr($period['name'], 3);
+
+                /* Append a "Period" prefix if numeric, so they're not just called "1"
+                 */
+                if (is_numeric($periodName)) {
+                    $periodName = "Period {$periodName}";
+                }
+
+                $sequence = $period['order'];
+                $start = $period['startTime'];
+                $finish = $period['endTime'];
 
                 $timetablePeriod = $this->timetablePeriodMapper->createModel()
                     ->setTitle($periodName)
@@ -281,11 +282,8 @@ class Definition implements IStrategy
             /* Do a quick analysis in case there might be something amiss
              */
             if (!\count($struct['days'][$dayIndex])) {
-
-                /* TODO Fill in these vars
-                 */
-                $cycleId = '';
-                $cycleName = '';
+                $cycleId = self::CYCLE_IDENTIFIER;
+                $cycleName = self::CYCLE_IDENTIFIER;
 
                 $this->log->warning(sprintf(
                     'Cycle %s (%s), Day %s has no periods.',
