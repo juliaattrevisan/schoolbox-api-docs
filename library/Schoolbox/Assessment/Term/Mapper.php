@@ -161,6 +161,7 @@ class Mapper extends BaseMapper
      * @throws BaseMapper\DefinitionException
      * @throws Exception
      * @throws PDOException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
     public function findForDateAndYearLevel(Alaress_Date_Format $date, ?GenericCollection $yearLevels): Model
     {
