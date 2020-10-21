@@ -36,7 +36,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
             [
                 'user'      => $this->getUser(),
                 'component' => $this,
-            ]
+            ],
+            false
         );
     }
 }
