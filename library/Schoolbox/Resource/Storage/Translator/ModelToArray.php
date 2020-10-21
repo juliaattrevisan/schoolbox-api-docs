@@ -34,6 +34,7 @@ class ModelToArray
 
         if ($storage->getMimetype()) {
             $type = $storage->getMimetype()->getType();
+            $links['icon'] = '/images/mime/' . $storage->getMimetype()->getIconFile();
             if ($storage->getMimetype()->isImage()) {
                 $links['image'] = "/storage/image.php?hash={$storage->getHash()}";
             }

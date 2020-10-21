@@ -55,6 +55,7 @@ class ModelToArrayTest extends TestCase
                 ->setMimetype(
                     (new Mimetype())
                         ->setMime('document/ms-word')
+                        ->setIconFile('ms-word.svg')
                 )
                 ->setHash('1234567890')
                 ->setSize(12345),
@@ -65,6 +66,7 @@ class ModelToArrayTest extends TestCase
                 'size'   => 12345,
                 '_links' => [
                     'fetch' => '/storage/fetch.php?hash=1234567890',
+                    'icon'  => '/images/mime/ms-word.svg',
                 ],
             ]
         ];
@@ -74,6 +76,7 @@ class ModelToArrayTest extends TestCase
                 ->setMimetype(
                     (new Mimetype())
                         ->setMime('image/png')
+                        ->setIconFile('image-png.svg')
                 )
                 ->setHash('999000')
                 ->setSize(432166),
@@ -84,6 +87,7 @@ class ModelToArrayTest extends TestCase
                 'size'   => 432166,
                 '_links' => [
                     'fetch' => '/storage/fetch.php?hash=999000',
+                    'icon'  => '/images/mime/image-png.svg',
                     'image' => '/storage/image.php?hash=999000',
                 ],
             ]
@@ -94,6 +98,7 @@ class ModelToArrayTest extends TestCase
                 ->setMimetype(
                     (new Mimetype())
                         ->setMime('audio/mp4')
+                        ->setIconFile('audio-mp4.svg')
                 )
                 ->setHash('54321')
                 ->setSize(1_000_000),
@@ -104,6 +109,7 @@ class ModelToArrayTest extends TestCase
                 'size'   => 1_000_000,
                 '_links' => [
                     'fetch'  => '/storage/fetch.php?hash=54321',
+                    'icon'   => '/images/mime/audio-mp4.svg',
                     'stream' => '/cms/sendVideo.php?id=54321&type=storage',
                 ],
             ]
@@ -114,6 +120,7 @@ class ModelToArrayTest extends TestCase
                 ->setMimetype(
                     (new Mimetype())
                         ->setMime('video/mp4')
+                        ->setIconFile('video-mp4.svg')
                 )
                 ->setHash('333')
                 ->setSize(2_000_000),
@@ -124,6 +131,7 @@ class ModelToArrayTest extends TestCase
                 'size'   => 2_000_000,
                 '_links' => [
                     'fetch'  => '/storage/fetch.php?hash=333',
+                    'icon'   => '/images/mime/video-mp4.svg',
                     'stream' => '/cms/sendVideo.php?id=333&type=storage',
                     'poster' => '/cms/videoThumb.php?size=poster&id=333&type=storage',
                 ],
