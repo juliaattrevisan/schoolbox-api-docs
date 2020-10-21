@@ -12,6 +12,7 @@ use House;
 use HouseResidential;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Campus;
+use Schoolbox\Config\TestLoader;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -31,48 +32,56 @@ class ModelToArrayTest extends TestCase
      */
     public function getTestInvokeData(): iterable
     {
-        yield 'empty fields' => [
-            new User(),
-            [
-                'id'               => null,
-                'campus'           => null,
-                'role'             => null,
-                'groups'           => null,
-                'schoolHouse'      => null,
-                'residentialHouse' => null,
-                'guardians'        => null,
-                'students'         => null,
-                'impersonableUser' => null,
-                'email'            => null,
-                '_links'           => [],
-                'externalId'       => null,
-                'username'         => null,
-                'superuser'        => null,
-                'enabled'          => false,
-                'title'            => null,
-                'firstName'        => null,
-                'lastName'         => null,
-                'fullName'         => 'Unknown User',
-                'isEmailDerived'   => null,
-                'altEmail'         => null,
-                'positionTitle'    => null,
-                'yearLevel'        => null,
-                'isBoarder'        => false,
-                'flags'            => [
-                    'showWebmailTab'         => null,
-                    'showContacts'           => true,
-                    'enableTimetable'        => true,
-                    'showSideNav'            => true,
-                    'showNotificationsPanel' => true,
-                    'showGradeGraph'         => null,
-                    'enableEportfolio'       => null,
-                    'useInternalMail'        => null,
-                    'calendarView'           => 'month',
-                ],
+        $configLoader = new TestLoader([
+            'mail_address' => 'test.schoolbox.com.au',
+            'name_format'  => '{title} {firstname} {lastname}',
+        ]);
+
+        $emptyResponse = [
+            'id'               => null,
+            'campus'           => null,
+            'role'             => null,
+            'groups'           => null,
+            'schoolHouse'      => null,
+            'residentialHouse' => null,
+            'guardians'        => null,
+            'students'         => null,
+            'impersonableUser' => null,
+            'email'            => null,
+            '_links'           => [],
+            'externalId'       => null,
+            'username'         => null,
+            'superuser'        => null,
+            'enabled'          => false,
+            'title'            => null,
+            'firstName'        => null,
+            'lastName'         => null,
+            'fullName'         => 'Unknown User',
+            'isEmailDerived'   => null,
+            'altEmail'         => null,
+            'positionTitle'    => null,
+            'yearLevel'        => null,
+            'isBoarder'        => false,
+            'flags'            => [
+                'showWebmailTab'         => null,
+                'showContacts'           => true,
+                'enableTimetable'        => true,
+                'showSideNav'            => true,
+                'showNotificationsPanel' => true,
+                'showGradeGraph'         => null,
+                'enableEportfolio'       => null,
+                'useInternalMail'        => null,
+                'calendarView'           => 'month',
             ],
+        ];
+        yield 'empty fields' => [
+            (new User())
+                ->setConfigLoader($configLoader),
+            $emptyResponse,
         ];
 
         $populatedUser = (new User())
+            ->setConfigLoader($configLoader)
             ->setId(1)
             ->setCampusCollection(
                 (new GenericCollection(Campus::class))
@@ -119,33 +128,32 @@ class ModelToArrayTest extends TestCase
             ->setDisplayGradeGraph(false)
             ->setEportfolioEnable(false)
             ->setUseInternalMail(false)
-            ->setCalendarView('week')
-        ;
+            ->setCalendarView('week');
         yield 'populated fields' => [
             $populatedUser,
             [
                 'id'               => 1,
                 'campus'           => [
                     [
-                        'id' => 1,
+                        'id'   => 1,
                         'name' => 'B',
                         'code' => 'C',
                         'days' => 5,
-                    ]
+                    ],
                 ],
                 'role'             => [
-                    'id' => 3,
+                    'id'   => 3,
                     'name' => 'Admin',
                     'type' => Role::STAFF,
                 ],
                 'groups'           => null,
                 'schoolHouse'      => [
-                    'id' => 1,
-                    'name' => 'School House'
+                    'id'   => 1,
+                    'name' => 'School House',
                 ],
                 'residentialHouse' => [
-                    'id' => 1,
-                    'name' => 'Res House'
+                    'id'   => 1,
+                    'name' => 'Res House',
                 ],
                 'guardians'        => null,
                 'students'         => null,
@@ -183,6 +191,59 @@ class ModelToArrayTest extends TestCase
                     'calendarView'           => 'week',
                 ],
             ],
+        ];
+
+        // Test some individual fields
+        $inverseFlags          = $emptyResponse;
+        $inverseFlags['flags'] = [
+            'showWebmailTab'         => true,
+            'showContacts'           => true,
+            'enableTimetable'        => true,
+            'showSideNav'            => true,
+            'showNotificationsPanel' => true,
+            'showGradeGraph'         => true,
+            'enableEportfolio'       => true,
+            'useInternalMail'        => true,
+            'calendarView'           => 'month',
+        ];
+        yield 'inverse flags' => [
+            (new User())
+                ->setConfigLoader($configLoader)
+                ->setWebmail(true)
+                ->setHideContacts(false)
+                ->setHideTimetable(false)
+                ->setHideSidenav(false)
+                ->setHideNotificationsTray(false)
+                ->setDisplayGradeGraph(true)
+                ->setEportfolioEnable(true)
+                ->setUseInternalMail(true),
+            $inverseFlags,
+        ];
+
+
+        $superuser = $emptyResponse;
+        $superuser['superuser'] = true;
+        yield 'superuser' => [
+            (new User())
+                ->setConfigLoader($configLoader)
+                ->setSuperuser(true),
+            $superuser,
+        ];
+
+
+        $derivedEmail = $emptyResponse;
+        $derivedEmail['username']       = 'test';
+        $derivedEmail['isEmailDerived'] = true;
+        $derivedEmail['email']          = 'test@test.schoolbox.com.au';
+
+        // This relies upon the user's config loader.
+        // Unlike with the username I can't really fake this
+        yield 'derived email' => [
+            (new User())
+                ->setConfigLoader($configLoader)
+                ->setUsername('test')
+                ->setLocalEmail(true),
+            $derivedEmail,
         ];
     }
 
