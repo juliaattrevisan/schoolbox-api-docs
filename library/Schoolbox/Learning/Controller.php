@@ -390,7 +390,7 @@ class Controller extends Base
 
         $gridData = array_merge($gridData, [
             'now'           => $now,
-            'terms'         => $this->termMapper->findAll()->sortBy('start', 'desc'),
+            'terms'         => $this->termMapper->findAll()->filterBy('extraordinary', 0)->sortBy('start', 'desc'),
             'hideTimetable' => $hideTimetable,
         ]);
 
