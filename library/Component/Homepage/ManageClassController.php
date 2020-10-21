@@ -58,9 +58,15 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      *
      * @param String $templateHandle
      * @return boolean
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws PDOException
      * @throws RuntimeException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function renderTemplate($templateHandle)
     {
@@ -106,7 +112,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'assessment_calendar_link', 'assessment_calendar_link_block');
 
         // Determine the term for the grades link
-        $currentTerm = $this->termMapper->findForToday();
+        $currentTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $this->getContext()->getYearLevels());
 
         // Show markbook link to staff on class or group pages
         $this->setVar('markbook_link_block');
