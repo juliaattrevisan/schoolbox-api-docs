@@ -8,8 +8,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\User\Translator\Test;
 
+use House;
+use HouseResidential;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Campus;
+use Schoolbox\GenericCollection;
+use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\YearLevel\Model as YearLevel;
 
 /**
  * Test for the user model to array translator.
@@ -62,6 +68,119 @@ class ModelToArrayTest extends TestCase
                     'enableEportfolio'       => null,
                     'useInternalMail'        => null,
                     'calendarView'           => 'month',
+                ],
+            ],
+        ];
+
+        $populatedUser = (new User())
+            ->setId(1)
+            ->setCampusCollection(
+                (new GenericCollection(Campus::class))
+                    ->add((new Campus())
+                        ->setId(1)
+                        ->setName('B')
+                        ->setExtTimetableCode('C')
+                        ->setTimetableDay(5)
+                    )
+            )
+            ->setRole((new Role())
+                ->setId(3)
+                ->setName('Admin')
+                ->setType(Role::STAFF)
+            )
+            ->setSchoolHouse((new House())
+                ->setId(1)
+                ->setHouse('School House')
+            )
+            ->setResidentialHouse((new HouseResidential())
+                ->setId(1)
+                ->setHouse('Res House')
+            )
+            ->setExternalId('7')
+            ->setUsername('test')
+            ->setSuperuser(false)
+            ->setEnabled(true)
+            ->setTitle('Mr')
+            ->setFirstname('John')
+            ->setLastname('Doe')
+            ->setLocalEmail(false)
+            ->setAltEmail('mrjohndoe@mail.com')
+            ->setPositionTitle('Tester')
+            ->setYear((new YearLevel())
+                ->setId(1)
+                ->setName('Year 12')
+            )
+            ->setBoardingStatus('Y')
+            ->setWebmail(false)
+            ->setHideContacts(true)
+            ->setHideTimetable(true)
+            ->setHideSidenav(true)
+            ->setHideNotificationsTray(true)
+            ->setDisplayGradeGraph(false)
+            ->setEportfolioEnable(false)
+            ->setUseInternalMail(false)
+            ->setCalendarView('week')
+        ;
+        yield 'populated fields' => [
+            $populatedUser,
+            [
+                'id'               => 1,
+                'campus'           => [
+                    [
+                        'id' => 1,
+                        'name' => 'B',
+                        'code' => 'C',
+                        'days' => 5,
+                    ]
+                ],
+                'role'             => [
+                    'id' => 3,
+                    'name' => 'Admin',
+                    'type' => Role::STAFF,
+                ],
+                'groups'           => null,
+                'schoolHouse'      => [
+                    'id' => 1,
+                    'name' => 'School House'
+                ],
+                'residentialHouse' => [
+                    'id' => 1,
+                    'name' => 'Res House'
+                ],
+                'guardians'        => null,
+                'students'         => null,
+                'impersonableUser' => null,
+                'email'            => 'mrjohndoe@mail.com',
+                '_links'           => [
+                    'profile' => '/search/user/1',
+                    'avatar'  => '/portrait.php?id=1',
+                ],
+                'externalId'       => '7',
+                'username'         => 'test',
+                'superuser'        => false,
+                'enabled'          => true,
+                'title'            => 'Mr',
+                'firstName'        => 'John',
+                'lastName'         => 'Doe',
+                'fullName'         => 'Mr John Doe',
+                'isEmailDerived'   => false,
+                'altEmail'         => 'mrjohndoe@mail.com',
+                'positionTitle'    => 'Tester',
+                'yearLevel'        => [
+                    'id'   => 1,
+                    'name' => 'Year 12',
+                ],
+                'isBoarder'        => true,
+                'flags'            => [
+                    'showWebmailTab'         => false,
+                    'showContacts'           => false,
+                    'enableTimetable'        => false,
+                    'showSideNav'            => false,
+                    'showNotificationsPanel' => false,
+                    'showGradeGraph'         => false,
+                    'enableEportfolio'       => false,
+                    'useInternalMail'        => false,
+                    'calendarView'           => 'week',
                 ],
             ],
         ];
