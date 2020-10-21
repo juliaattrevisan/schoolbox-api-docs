@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -50,7 +51,7 @@ class ModelToArrayTest extends TestCase
         ];
 
         yield 'document' => [
-            (new Model)
+            (new Model())
                 ->setMimetype(
                     (new Mimetype())
                         ->setMime('document/ms-word')
@@ -69,7 +70,7 @@ class ModelToArrayTest extends TestCase
         ];
 
         yield 'image' => [
-            (new Model)
+            (new Model())
                 ->setMimetype(
                     (new Mimetype())
                         ->setMime('image/png')
@@ -89,7 +90,7 @@ class ModelToArrayTest extends TestCase
         ];
 
         yield 'audio' => [
-            (new Model)
+            (new Model())
                 ->setMimetype(
                     (new Mimetype())
                         ->setMime('audio/mp4')
@@ -109,7 +110,7 @@ class ModelToArrayTest extends TestCase
         ];
 
         yield 'video' => [
-            (new Model)
+            (new Model())
                 ->setMimetype(
                     (new Mimetype())
                         ->setMime('video/mp4')
@@ -128,7 +129,6 @@ class ModelToArrayTest extends TestCase
                 ],
             ]
         ];
-
     }
 
 

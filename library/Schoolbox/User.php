@@ -31,14 +31,14 @@ use Schoolbox\Pastoral;
 
 class User implements Serializable, Linkable, ISoftDeletable, IModel
 {
-    // Username of the accounts used by Schoolbox staff
-    public const USERNAME_SCHOOLBOX_ADMIN = 'alaress';
-
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
     use SerializeTrait;
     use CreateCollection;
+
+    // Username of the accounts used by Schoolbox staff
+    public const USERNAME_SCHOOLBOX_ADMIN = 'alaress';
 
     /** @var int */
     private $id;
@@ -460,14 +460,13 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      * This should be used on user cards to show their role in the school
      * @return string
      */
-    public function getPreferredTitle(){
-        if($this->hasPositionTitle()) {
+    public function getPreferredTitle()
+    {
+        if ($this->hasPositionTitle()) {
             return $this->getPositionTitle();
-        }
-        else if($this->getRole() instanceof Role) {
+        } else if ($this->getRole() instanceof Role) {
             return $this->getRole()->getName();
-        }
-        else {
+        } else {
             return '';
         }
     }
@@ -1096,7 +1095,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     public function loadTeachers()
     {
-        if(!$this->teachersLoaded) {
+        if (!$this->teachersLoaded) {
             $teacherCollection = new Collection();
 
             // TODO remove handler dependency
@@ -1111,18 +1110,14 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
             // Iterate and find teachers associated with each subject
             $codeMatcher = (new SubjectCodeMatchFactory())->build(\Config::get('external_type'));
 
-            if (is_array($subjects))
-            {
-                foreach ($subjects as $subject)
-                {
+            if (is_array($subjects)) {
+                foreach ($subjects as $subject) {
                     $teachers = $externalClass->getTeachers($codeMatcher->generateFolderCode($subject['campusCode'], $subject['code']));
 
-                    foreach ($teachers as $teacher)
-                    {
+                    foreach ($teachers as $teacher) {
                         // If we haven't already, add this teacher to their collection
 
-                        if (!isset($found[$teacher]))
-                        {
+                        if (!isset($found[$teacher])) {
                             try {
                                 $teacherCollection->add(
                                     UserMapper::getInstance()->findByExternalId($teacher, Role::STAFF)
@@ -1174,7 +1169,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
             /* Add speece
              */
             if (!empty($currentParent['StudentContactSpouseID'])) {
-
                 try {
                     $spouse = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactSpouseID'], Role::PARENT);
                     $this->parents->add($spouse);
@@ -1351,7 +1345,8 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /**
      * @return Collection
      */
-    public function getTeacherCollection() {
+    public function getTeacherCollection()
+    {
         return $this->teacherCollection;
     }
 
@@ -1359,7 +1354,8 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      * @param Collection $teacherCollection
      * @return $this
      */
-    public function setTeacherCollection($teacherCollection) {
+    public function setTeacherCollection($teacherCollection)
+    {
         $this->teacherCollection = $teacherCollection;
         return $this;
     }
@@ -1424,7 +1420,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      * Returns formatted email display e.g: "Alaress Admin" <alaress@alaress.com.au>
      * @return string
      */
-    public function getFormattedEmailDisplay() :string
+    public function getFormattedEmailDisplay(): string
     {
         return '"' . $this->formatName() . '" <' . $this->getEmail() . '>';
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -89,22 +90,18 @@ class ModelToArrayTest extends TestCase
                         ->setId(1)
                         ->setName('B')
                         ->setExtTimetableCode('C')
-                        ->setTimetableDay(5)
-                    )
+                        ->setTimetableDay(5))
             )
             ->setRole((new Role())
                 ->setId(3)
                 ->setName('Admin')
-                ->setType(Role::STAFF)
-            )
+                ->setType(Role::STAFF))
             ->setSchoolHouse((new House())
                 ->setId(1)
-                ->setHouse('School House')
-            )
+                ->setHouse('School House'))
             ->setResidentialHouse((new HouseResidential())
                 ->setId(1)
-                ->setHouse('Res House')
-            )
+                ->setHouse('Res House'))
             ->setExternalId('7')
             ->setUsername('test')
             ->setSuperuser(false)
@@ -117,8 +114,7 @@ class ModelToArrayTest extends TestCase
             ->setPositionTitle('Tester')
             ->setYear((new YearLevel())
                 ->setId(1)
-                ->setName('Year 12')
-            )
+                ->setName('Year 12'))
             ->setBoardingStatus('Y')
             ->setWebmail(false)
             ->setHideContacts(true)

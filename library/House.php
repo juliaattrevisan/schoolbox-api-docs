@@ -7,7 +7,6 @@ use Schoolbox\ValueLabelInterface;
 
 class House implements ValueLabelInterface, ISoftDeletable, Sequential
 {
-
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
