@@ -223,6 +223,7 @@ class Mapper extends BaseMapper
      *
      * @param Model $term
      * @return array
+     * @throws PDOException
      */
     public function findFolderIdsForTerm(Model $term): array
     {
