@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\Filter\Selection as FilterSelection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
@@ -104,7 +105,18 @@ class Module extends BaseModule
 
         $loadTerm = function ($params) {
             if (null === $params['termCode']) {
-                return ['term' => $this->getTermMapper()->findForToday()];
+                $user = $this->getUserMapper()->findById($params['userId']);
+
+                if ($user->getYear()) {
+                    $term = $this->getTermMapper()->findForDateAndYearLevel(
+                        \Alaress_Date_Format::now(),
+                        (new GenericCollection(\Schoolbox\YearLevel\Model::class))->add($user->getYear())
+                    );
+                } else {
+                    $term = $this->getTermMapper()->findForToday();
+                }
+
+                return ['term' => $term];
             }
             try {
                 return ['term' => $this->getTermMapper()->findOneByColumn('code', $params['termCode'])];

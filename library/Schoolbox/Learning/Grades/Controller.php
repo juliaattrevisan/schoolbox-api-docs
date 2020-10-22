@@ -123,11 +123,23 @@ class Controller extends Base
      */
     public function getGradesForCurrentUser(): void
     {
+        /* For this student, find out (from their Year Level relationship) if they're in any folders
+         * which might be inside an Extraordinary Term
+         */
+        if ($this->getUser()->getYear()) {
+            $termCode = $this->termMapper->findForDateAndYearLevel(
+                \Alaress_Date_Format::now(),
+                (new GenericCollection(\Schoolbox\YearLevel\Model::class))->add($this->getUser()->getYear())
+            )->getCode();
+        } else {
+            $termCode = $this->getTermMapper()->findForToday()->getCode();
+        }
+
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate(
                 'learningGrades.getGrades', [
                     'userId'   => $this->getUser()->getId(),
-                    'termCode' => $this->getTermMapper()->findForToday()->getCode()
+                    'termCode' => $termCode
                 ]
             )
         );
@@ -161,7 +173,6 @@ class Controller extends Base
 
         // Add folders with response or feedback
         $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($viewee, $term);
-        $displayFolderIds = $this->folderMapper->filterIdsForGradePage($folders->getPropertyValues('id'));
 
         // Get all assessments for this user in the specified term, grouped by folder
         $assessmentsPerFolder = $this->assessmentMapperProxy
@@ -172,6 +183,14 @@ class Controller extends Base
             ->groupByCallback(function (IAssessable $assessment) {
                 return $assessment->getBaseContext()->getFolder()->getId();
             });
+
+        /* For a given (Folder, Year Level) relationship, Grades Pages can be optionally available
+         * This is specified in adminv2/lists/year-levels
+         *
+         * It's kind of inefficient because we just hydrated a bunch of interactions + folders
+         * which might potentially be discarded entirely
+         */
+        $displayFolderIds = $this->folderMapper->filterIdsForGradePage($folders->getPropertyValues('id'));
 
         /** @var GenericCollection|Folder\Model[] $folders */
         $folders = $folders->filter(
@@ -387,10 +406,10 @@ class Controller extends Base
          * in addition to the ordinary Terms
          */
         $terms = $this->termMapper->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc');
-        $term = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $subject->getYearLevels());
+        $extraordinaryTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $subject->getYearLevels());
 
-        if ($term->getExtraordinary()) {
-            $terms->prepend($term);
+        if ($extraordinaryTerm->getExtraordinary()) {
+            $terms->prepend($extraordinaryTerm);
         }
 
         $yearUrl = $this->getYearUrl($viewee->getId());
