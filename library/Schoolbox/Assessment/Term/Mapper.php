@@ -219,6 +219,38 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Find all the active folder ids related to $term
+     *
+     * @param Model $term
+     * @return array
+     */
+    public function findFolderIdsForTerm(Model $term): array
+    {
+        $query = "
+            SELECT folder_id
+            FROM folder_year_level fyl
+            INNER JOIN term_year_level tyl ON fyl.year_level_id = tyl.year_level_id
+            INNER JOIN {$this->getTable()} ON tyl.term_id = {$this->getTable()}.{$this->getIdentifierColumn()}
+            WHERE {$this->getTable()}.{$this->getIdentifierColumn()} = :termId
+            AND archived = 0
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'termId' => $term->getId()
+        ]);
+
+        $folderIds = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $folderIds[$row['folder_id']] = $row['folder_id'];
+        }
+
+        return $folderIds;
+    }
+
+
+    /**
      * Finds whichever term is the current one.
      *
      * @return Model

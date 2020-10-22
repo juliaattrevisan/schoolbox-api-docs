@@ -199,6 +199,19 @@ class Controller extends Base
                     && in_array($folder->getId(), $displayFolderIds);
             })->indexBy('id');
 
+        /* If we're in an Extraordinary Term, limit the list of $folders to those which occur
+         * as being related to the Extraordinary Term.
+         */
+        if ($term->getExtraordinary()) {
+            $extraordinaryFolders = $this->termMapper->findFolderIdsForTerm($term);
+
+            $folders = $folders->filter(
+                static function (Folder\Model $folder) use ($extraordinaryFolders) {
+                    return isset($extraordinaryFolders[$folder->getId()]);
+                }
+            );
+        }
+
         // Load Teachers
         foreach ($folders as $folder) {
             $folder->loadTeachers();
