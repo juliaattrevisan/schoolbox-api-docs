@@ -162,6 +162,10 @@ class Controller extends Base
      */
     public function getGrades(User $viewee, Term\Model $term): void
     {
+        /* A list of all the terms a user could choose
+         */
+        $terms = $this->termMapper->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc');
+
         $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
 
         if (\count($filteredWorkTypes)) {
@@ -210,6 +214,10 @@ class Controller extends Base
                     return isset($extraordinaryFolders[$folder->getId()]);
                 }
             );
+
+            /* Prepend it to the list of Terms, because it's special
+             */
+            $terms->prepend($term);
         }
 
         // Load Teachers
@@ -238,7 +246,7 @@ class Controller extends Base
             'student'          => $viewee,
             'term'             => $term,
             'year'             => null,
-            'terms'            => $this->termMapper->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc'),
+            'terms'            => $terms,
             'folders'          => $folders,
             'markbooks'        => $markbooks,
             'mailHandle'       => $this->getSession()->get('mailhandle'),
