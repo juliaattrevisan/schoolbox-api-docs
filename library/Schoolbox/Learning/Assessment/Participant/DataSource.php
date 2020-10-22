@@ -451,7 +451,7 @@ class DataSource
         // Use cached list of users for a folder
         if (!isset($this->cacheForFolder[$folder->getId()])) {
             // Cache isn't set - populate
-            if(count($folder->getCodes()) > 0) {
+            if ($folder->getCodes() && count($folder->getCodes()) > 0) {
                 // Class members: convert to list of users
                 $classCodes = $this->externalDb->getStudents($folder->getCodeString());
                 if (!empty($classCodes)) {
