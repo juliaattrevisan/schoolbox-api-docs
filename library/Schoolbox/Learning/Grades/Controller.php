@@ -339,11 +339,23 @@ class Controller extends Base
         $yearUrl = $this->getYearUrl($viewee->getId());
         // Squish this mess out
 
+        /* A list of Terms to choose from
+         *
+         * If we're in an extraordinary Term right now, provide that as an option
+         * in addition to the ordinary Terms
+         */
+        $terms = $this->termMapper->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc');
+        $extraordinaryTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), (new GenericCollection(\Schoolbox\YearLevel\Model::class))->add($viewee->getYear()));
+
+        if ($extraordinaryTerm->getExtraordinary()) {
+            $terms->prepend($extraordinaryTerm);
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'         => $viewee,
             'term'            => $term,
             'year'            => $year,
-            'terms'           => $this->getTermMapper()->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc'),
+            'terms'           => $terms,
             'folders'         => $folders,
             'assessmentTasks' => $assessmentTasks,
             'markbooks'       => $markbooks,
