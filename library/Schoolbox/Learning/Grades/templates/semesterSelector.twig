@@ -41,7 +41,9 @@ Usage: include 'sub/semesterSelector.twig
     {% if year is not empty %}
         <a data-semester-switch="previous" href="#"></a>
     {% else %}
-        <a data-semester-switch="previous" href="#" {% if currentTerm.code == terms[terms | length - 1].code %}disabled{% endif %}></a>
+        {% if terms and terms|length %}
+            <a data-semester-switch="previous" href="#" {% if currentTerm.code == terms[terms | length - 1].code %}disabled{% endif %}></a>
+        {% endif %}
     {% endif %}
 </nav>
 <div class="semester">
@@ -70,6 +72,8 @@ Usage: include 'sub/semesterSelector.twig
     {% if year is not empty %}
         <a data-semester-switch="next" href="#"></a>
     {% else %}
-        <a data-semester-switch="next" href="#" {% if currentTerm.code == terms[0].code %}disabled{% endif %}></a>
+        {% if terms and terms|length %}
+            <a data-semester-switch="next" href="#" {% if currentTerm.code == terms[0].code %}disabled{% endif %}></a>
+        {% endif %}
     {% endif %}
 </nav>

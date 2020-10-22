@@ -296,7 +296,7 @@ class Mapper extends BaseMapper
                 'limit' => 1
             ]);
         } catch (Exception $e) {
-            return $this->createModel();
+            return $this->createModel()->setExtraordinary(false);
         }
     }
 
