@@ -413,7 +413,7 @@ class CliImporter extends CliTool\App
             $tableDataFile = fopen(($this->perform() || !file_exists($fileName)) ? $fileName  : '/dev/null', 'wb');
             try {
                 $this->getLogger()->debug("Downloading $tableName to $fileName");
-                $client->get($tableFile['url'], ['save_to' => $tableDataFile]);
+                $client->get($tableFile['url'], ['sink' => $tableDataFile]);
             } catch (GuzzleException $e) {
                 $this->getLogger()->warning("Failed to download $fileName: {$e->getMessage()}");
             }

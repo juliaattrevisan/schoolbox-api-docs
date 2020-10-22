@@ -245,7 +245,7 @@ abstract class Alaress_Cache_Abstract
             if (count($this->headers)) {
                 $headers = array_merge($this->headers, $headers);
             }
-            $httpClient->get($url, ['headers' => $headers, 'save_to' => $this->cachedFile]);
+            $httpClient->get($url, ['headers' => $headers, 'sink' => $this->cachedFile]);
         } catch (RequestException $e) {
             return false;
         }

@@ -54,6 +54,7 @@
     });
 </script>
 
+
 <!-- END custom_head -->
 <div class="row">
     <div class="small-12 columns">
@@ -173,16 +174,34 @@
         <!-- END no_recent_blog -->
 
         <!-- BEGIN has_recent_photo -->
+        <script src="/javascript/components/swiper/dist/js/swiper.min.js"></script>
+        <script src="/javascript/jquery.alaressSlider.js"></script>
+        <script>
+            $(function() {
+                $('#profile-imageslider').alaressSlider({
+                    navigation: {
+                        nextEl: '#image-slider-button-next',
+                        prevEl: '#image-slider-button-prev'
+                    }
+                });
+            });
+        </script>
         <div class="row">
             <div class="small-12 island">
                 <h2 class="subheader">Recent Photos</h2>
-                <section>
-                    <!-- BEGIN recent_photo -->
-                    <a href="/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioImageGalleryLarge" title="{RECENT_PHOTO_FILE_DESC}" rel="lightbox-eportfolio">
-                        <img alt="{RECENT_PHOTO_FILE_DESC}" src='/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioRecentPhoto' />
-                    </a>
+                <div class="swiper-container" id="profile-imageslider">
+                    <div class="swiper-wrapper">
+                    <!-- BEGIN recent_photo -->'
+                        <div class="swiper-slide">
+                            <img alt="{RECENT_PHOTO_FILE_DESC}" src='/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioRecentPhoto'  class="swiper-lazy" />
+                            <div class="loader"></div>
+                        </div>
                     <!-- END recent_photo -->
-                </section>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-next" id="image-slider-button-next"></div>
+                    <div class="swiper-button-prev" id="image-slider-button-prev"></div>
+                </div>
             </div>
         </div>
         <!-- END has_recent_photo -->
