@@ -230,9 +230,11 @@ class Mapper extends BaseMapper
             SELECT folder_id
             FROM folder_year_level fyl
             INNER JOIN term_year_level tyl ON fyl.year_level_id = tyl.year_level_id
-            INNER JOIN {$this->getTable()} ON tyl.term_id = {$this->getTable()}.{$this->getIdentifierColumn()}
-            WHERE {$this->getTable()}.{$this->getIdentifierColumn()} = :termId
-            AND archived = 0
+            INNER JOIN {$this->getTable()} t ON tyl.term_id = t.{$this->getIdentifierColumn()}
+            INNER JOIN folder ON fyl.folder_id = folder.id
+            WHERE t.{$this->getIdentifierColumn()} = :termId
+            AND t.archived = 0
+            AND folder.deleted_at IS NULL
         ";
 
         $statement = $this->getDatabase()->prepare($query);
