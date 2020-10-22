@@ -108,10 +108,7 @@ class Module extends BaseModule
                 $user = $this->getUserMapper()->findById($params['userId']);
 
                 if ($user->getYear()) {
-                    $term = $this->getTermMapper()->findForDateAndYearLevel(
-                        \Alaress_Date_Format::now(),
-                        (new GenericCollection(\Schoolbox\YearLevel\Model::class))->add($user->getYear())
-                    );
+                    $term = $this->getTermMapper()->findForDateAndYearLevel(\Alaress_Date_Format::now(), $user->getYear());
                 } else {
                     $term = $this->getTermMapper()->findForToday();
                 }

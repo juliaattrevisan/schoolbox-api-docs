@@ -112,7 +112,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'assessment_calendar_link', 'assessment_calendar_link_block');
 
         // Determine the term for the grades link
-        $currentTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $this->getContext()->getYearLevels());
+        $currentTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $this->getContext()->getYearLevels()->first());
 
         // Show markbook link to staff on class or group pages
         $this->setVar('markbook_link_block');

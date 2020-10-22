@@ -156,26 +156,20 @@ class Mapper extends BaseMapper
      * Any other configuration of relations (0 or 2+) results in default behaviour
      * (find the first non-extraordinary Term)
      *
-     * @param Alaress_Date_Format                      $date
-     * @param GenericCollection|YearLevel\Model[]|null $yearLevels
+     * @param Alaress_Date_Format  $date
+     * @param YearLevel\Model|null $yearLevel
      * @return Model
      * @throws BaseMapper\DefinitionException
      * @throws Exception
      * @throws PDOException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function findForDateAndYearLevel(Alaress_Date_Format $date, ?GenericCollection $yearLevels): Model
+    public function findForDateAndYearLevel(Alaress_Date_Format $date, ?\Schoolbox\YearLevel\Model $yearLevel): Model
     {
 
-        /* Not an Extraordinary Term; do the usual default behaviour
+        /* No associated Year Levels; do the usual default behaviour
          */
-        if (null === $yearLevels) {
-            return $this->findForDate($date);
-        }
-
-        /* Indeterminate quantity of yearLevel instances; do the usual default behaviour
-         */
-        if ($yearLevels && $yearLevels->count() !== 1) {
+        if (null === $yearLevel) {
             return $this->findForDate($date);
         }
 
@@ -198,7 +192,7 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($query);
 
         $statement->execute([
-            'yearLevelId' => $yearLevels->first()->getId(),
+            'yearLevelId' => $yearLevel->getId(),
             'date' => $date->getDatabaseDate()
         ]);
 

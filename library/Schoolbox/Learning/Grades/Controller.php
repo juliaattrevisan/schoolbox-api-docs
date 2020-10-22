@@ -127,10 +127,7 @@ class Controller extends Base
          * which might be inside an Extraordinary Term
          */
         if ($this->getUser()->getYear()) {
-            $termCode = $this->termMapper->findForDateAndYearLevel(
-                \Alaress_Date_Format::now(),
-                (new GenericCollection(\Schoolbox\YearLevel\Model::class))->add($this->getUser()->getYear())
-            )->getCode();
+            $termCode = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $this->getUser()->getYear())->getCode();
         } else {
             $termCode = $this->getTermMapper()->findForToday()->getCode();
         }
@@ -345,7 +342,7 @@ class Controller extends Base
          * in addition to the ordinary Terms
          */
         $terms = $this->termMapper->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc');
-        $extraordinaryTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), (new GenericCollection(\Schoolbox\YearLevel\Model::class))->add($viewee->getYear()));
+        $extraordinaryTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $viewee->getYear());
 
         if ($extraordinaryTerm->getExtraordinary()) {
             $terms->prepend($extraordinaryTerm);
@@ -439,7 +436,7 @@ class Controller extends Base
          * in addition to the ordinary Terms
          */
         $terms = $this->termMapper->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc');
-        $extraordinaryTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $subject->getYearLevels());
+        $extraordinaryTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $subject->getYearLevels()->first());
 
         if ($extraordinaryTerm->getExtraordinary()) {
             $terms->prepend($extraordinaryTerm);
