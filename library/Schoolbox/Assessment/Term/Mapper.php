@@ -249,6 +249,33 @@ class Mapper extends BaseMapper
 
 
     /**
+     * A list of Terms to choose from
+     *
+     * If we're in an extraordinary Term right now, provide that as an option in
+     * addition to the ordinary Terms by prepending it to the returned collection
+     *
+     * @param YearLevel\Model|null $yearLevel
+     * @return GenericCollection
+     * @throws BaseMapper\DefinitionException
+     * @throws Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    public function findAllWithExtraordinary(?\Schoolbox\YearLevel\Model $yearLevel): GenericCollection
+    {
+        $terms = $this->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc');
+        $extraordinaryTerm = $this->findForDateAndYearLevel(\Alaress_Date_Format::now(), $yearLevel);
+
+        if ($extraordinaryTerm->getExtraordinary()) {
+            $terms->prepend($extraordinaryTerm);
+        }
+
+        return $terms;
+    }
+
+
+    /**
      * Finds whichever term is the current one.
      *
      * @return Model

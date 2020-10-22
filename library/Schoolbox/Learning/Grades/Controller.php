@@ -341,12 +341,7 @@ class Controller extends Base
          * If we're in an extraordinary Term right now, provide that as an option
          * in addition to the ordinary Terms
          */
-        $terms = $this->termMapper->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc');
-        $extraordinaryTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $viewee->getYear());
-
-        if ($extraordinaryTerm->getExtraordinary()) {
-            $terms->prepend($extraordinaryTerm);
-        }
+        $terms = $this->termMapper->findAllWithExtraordinary($viewee->getYear());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'         => $viewee,
@@ -435,12 +430,7 @@ class Controller extends Base
          * If we're in an extraordinary Term right now, provide that as an option
          * in addition to the ordinary Terms
          */
-        $terms = $this->termMapper->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc');
-        $extraordinaryTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $subject->getYearLevels()->first());
-
-        if ($extraordinaryTerm->getExtraordinary()) {
-            $terms->prepend($extraordinaryTerm);
-        }
+        $terms = $this->termMapper->findAllWithExtraordinary($viewee->getYear());
 
         $yearUrl = $this->getYearUrl($viewee->getId());
         $this->getResponse()->content->set(
