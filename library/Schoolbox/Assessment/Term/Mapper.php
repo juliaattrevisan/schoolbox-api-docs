@@ -66,6 +66,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyDates']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyNoOverlap']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateActualFinishDates']);
+        $this->registerCallback(self::CALLBACK_PREDELETE, [$this, 'deleteRelations']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'updateActualFinishDates']);
     }
 
@@ -451,5 +452,25 @@ class Mapper extends BaseMapper
                 'actual_finish' => $row['actual_finish'],
             ]);
         }
+    }
+
+
+    /**
+     * Delete relations for the Term, then delete the Term itself
+     *
+     * @param Model $model
+     * @throws PDOException
+     */
+    public function deleteRelations(Model $model): void
+    {
+        $query = "
+            DELETE FROM term_year_level
+            WHERE term_id = :termId
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'termId' => $model->getId()
+        ]);
     }
 }
