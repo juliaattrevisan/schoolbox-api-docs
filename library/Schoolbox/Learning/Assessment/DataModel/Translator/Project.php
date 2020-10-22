@@ -100,11 +100,11 @@ class Project implements IAssessmentTypeTranslator
      */
     public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
     {
+        /** @var ProjectModel $dataModel */
         if (null !== $domainObject->getCreator()) {
             $dataModel->setOwner($domainObject->getCreator());
         }
         if (null !== $domainObject->getMarkVisibility()) {
-            /** @var ProjectModel $dataModel */
             $dataModel->setMarkVisibility($domainObject->getMarkVisibility());
         }
 
@@ -143,6 +143,7 @@ class Project implements IAssessmentTypeTranslator
         // Project-specific fields
 
         // Figure out which summator to make
+        /** @var ProjectModel $dataModel */
         $domainObject->setSummator($this->getSummator($dataModel));
         null === $dataModel->getOwner() || $domainObject->setCreator($dataModel->getOwner());
 
@@ -154,7 +155,6 @@ class Project implements IAssessmentTypeTranslator
         if ($dataModel->getGradeGroup() instanceof GradeGroup) {
             $domainObject->setGradeGroup($dataModel->getGradeGroup());
         }
-        /** @var ProjectModel $dataModel */
         if (null !== $dataModel->getMarkVisibility()) {
             $domainObject->setMarkVisibility($dataModel->getMarkVisibility());
         }
