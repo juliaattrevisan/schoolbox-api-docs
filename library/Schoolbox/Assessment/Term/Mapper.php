@@ -383,10 +383,10 @@ class Mapper extends BaseMapper
     public function verifyNoOverlap(Model $model)
     {
 
-        /* Bypass validation checks if you associated it with year levels
+        /* Bypass validation checks if you associated it with n Year levels
          * This creates an extraordinary Term, beyond the normal sequence of Terms.
          */
-        if ($model->getYearLevels() && $model->getYearLevels()->count() === 1) {
+        if ($model->getYearLevels() && $model->getYearLevels()->count()) {
             return true;
         }
 

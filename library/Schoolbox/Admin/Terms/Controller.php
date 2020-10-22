@@ -148,7 +148,7 @@ class Controller extends Base
 
         /* Remember how extraordinary this was
          */
-        if ($term->getYearLevels()->count() === 1) {
+        if ($term->getYearLevels() && $term->getYearLevels()->count()) {
             $term->setExtraordinary(true);
         } else {
             $term->setExtraordinary(false);
