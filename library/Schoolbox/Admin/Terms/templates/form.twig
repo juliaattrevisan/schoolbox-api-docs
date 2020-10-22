@@ -73,6 +73,10 @@
         {% if term is defined %}
             {% set prefilledValues = yearLevelValues[term.id] ?? [] %}
         {% endif %}
+
+        {# yearLevelOptions may or may not be populated #}
+        {% set yearLevelOptions = yearLevelOptions ?? [] %}
+
         <script>
             $(function() {
                 $('#yearLevels-{{ term.id ?? 0 }}').selectizeSelector({
