@@ -455,6 +455,10 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function isFeedbackVisibleToRoleType(string $roleType): bool
     {
+        if (!parent::isFeedbackVisibleToRoleType($roleType)) {
+            return false;
+        }
+
         // Does user lack visibility to any sub-assessment's feedback ?
         foreach ($this->assessables as $subAssessable) {
             if (!$subAssessable->isFeedbackVisibleToRoleType($roleType)) {
@@ -511,6 +515,7 @@ class Project extends AbstractAssessment implements AssessmentContext
     {
         /** @var Project $clone */
         $clone = parent::cloneForCopy();
+        $clone->setMarkVisibility($this->getMarkVisibility());
         $clone->assessables = new GenericCollection(IAssessable::class);
         return $clone;
     }

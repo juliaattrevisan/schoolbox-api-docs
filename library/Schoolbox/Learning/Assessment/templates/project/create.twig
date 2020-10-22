@@ -19,7 +19,17 @@
     <textarea name="description">{{ assessment.description }}</textarea>
 </label>
 
-{% include '@learningAssessment/fragments/weight.twig' %}
+{# ----------------------------------------------------------- #}
+{# Grading #}
+{# ----------------------------------------------------------- #}
+<fieldset>
+    <legend>{{ locale.grading.proper }}</legend>
+
+    {% include '@learningAssessment/fragments/weight.twig' %}
+
+    {% import 'sub/visibility.twig' as visibility %}
+    {{ visibility.dropdown(markVisibility, availableVisibilities) }}
+</fieldset>
 
 {% if context.baseContext is not unitSpecification %}
     {% include '@learningAssessment/fragments/dates.twig' %}

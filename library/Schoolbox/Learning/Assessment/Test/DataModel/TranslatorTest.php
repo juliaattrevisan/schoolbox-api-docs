@@ -602,7 +602,8 @@ class TranslatorTest extends TestCase
         $userMapper->setConfigLoader(new TestLoader());
 
         // Set owner to original and test
-        $projectObject = (new Project())->setCreator($userMapper->createModel($ownerOriginal));
+        $projectObject = (new Project())->setCreator($userMapper->createModel($ownerOriginal))
+                                        ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         /** @var ProjectModel $projectModel */
         $projectModel       = $this->translator->translateToDataModel($projectObject);
         $this->assertEquals($ownerOriginal, $projectModel->getOwner()->getId());
@@ -650,7 +651,7 @@ class TranslatorTest extends TestCase
             new Task(),
             new Quiz(),
             new DueWork(),
-            new Project(),
+            (new Project())->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT),
         ];
     }
 
@@ -666,7 +667,8 @@ class TranslatorTest extends TestCase
         $task = (new TaskModel())->setAssessmentModel($assessmentMapper->createModel());
         $quiz = (new QuizModel())->setAssessmentModel($assessmentMapper->createModel());
         $dueWork = (new SubmissionBox())->setAssessmentModel($assessmentMapper->createModel());
-        $project = (new ProjectModel())->setAssessmentModel($assessmentMapper->createModel());
+        $project = (new ProjectModel())->setAssessmentModel($assessmentMapper->createModel())
+                                       ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
 
         return[
             $task->getAssessmentModel()->setSubObject($task)->getSubObject(),
