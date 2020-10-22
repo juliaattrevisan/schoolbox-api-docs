@@ -159,9 +159,6 @@ class Controller extends Base
      */
     public function getGrades(User $viewee, Term\Model $term): void
     {
-        /* A list of all the terms a user could choose
-         */
-        $terms = $this->termMapper->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc');
 
         $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
 
@@ -203,8 +200,11 @@ class Controller extends Base
         /* If we're in an Extraordinary Term, limit the list of $folders to those which occur
          * as being related to the Extraordinary Term.
          */
-        if ($term->getExtraordinary()) {
-            $extraordinaryFolders = $this->termMapper->findFolderIdsForTerm($term);
+        $terms = $this->termMapper->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc');
+        $extraordinaryTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $viewee->getYear());
+
+        if ($extraordinaryTerm->getExtraordinary()) {
+            $extraordinaryFolders = $this->termMapper->findFolderIdsForTerm($extraordinaryTerm);
 
             $folders = $folders->filter(
                 static function (Folder\Model $folder) use ($extraordinaryFolders) {
@@ -214,7 +214,7 @@ class Controller extends Base
 
             /* Prepend it to the list of Terms, because it's special
              */
-            $terms->prepend($term);
+            $terms->prepend($extraordinaryTerm);
         }
 
         // Load Teachers
