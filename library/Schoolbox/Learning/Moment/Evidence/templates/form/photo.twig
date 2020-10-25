@@ -1,0 +1,45 @@
+{% extends '@learningMomentEvidence/form.twig' %}
+
+{% block formInputs %}
+    <section>
+        <fieldset class="content">
+            <div class="small-12 columns">
+                <label class="required" for="evidence-storage">
+                    Take a picture
+                </label>
+                <input type="file"
+                       name="storage"
+                       id="evidence-storage"
+                       accept="image/*" capture />
+                <img id="evidence-storage-preview" class="hide" src="" alt=""/>
+            </div>
+        </fieldset>
+    </section>
+{% endblock formInputs %}
+
+{% block formJs %}
+    {% autoescape 'js' %}
+        <script type="text/javascript">
+            $(function () {
+                $('#evidence-storage').change(function () {
+                    let reader   = new FileReader(),
+                        $preview = $('#evidence-storage-preview');
+                    reader.addEventListener('load', () => {
+                        $preview
+                            .removeClass('hide')
+                            .attr('src', reader.result);
+                    });
+                    reader.readAsDataURL(this.files[0]);
+                });
+            });
+
+            let buildValidationRules = function () {
+                return {};
+            };
+
+            let buildPayload = function (form) {
+                return {};
+            };
+        </script>
+    {% endautoescape %}
+{% endblock formJs %}

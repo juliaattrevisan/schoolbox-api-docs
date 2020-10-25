@@ -25,6 +25,9 @@ class Controller extends Base
 {
     private const MOMENT_TYPE_TEXT   = 'text';
     private const MOMENT_TYPE_UPLOAD = 'upload';
+    private const MOMENT_TYPE_PHOTO  = 'photo';
+    private const MOMENT_TYPE_AUDIO  = 'audio';
+    private const MOMENT_TYPE_VIDEO  = 'video';
 
 
     /**
@@ -78,6 +81,19 @@ class Controller extends Base
             'sharingForSelf' => $sharingForSelf,
         ];
         switch ($momentType) {
+
+            case self::MOMENT_TYPE_PHOTO:
+                $template = '@learningMomentEvidence/form/photo.twig';
+                break;
+
+            case self::MOMENT_TYPE_AUDIO:
+                $template = '@learningMomentEvidence/form/audio.twig';
+                break;
+
+            case self::MOMENT_TYPE_VIDEO:
+                $template = '@learningMomentEvidence/form/video.twig';
+                break;
+
             case self::MOMENT_TYPE_UPLOAD:
                 $template = '@learningMomentEvidence/form/upload.twig';
 

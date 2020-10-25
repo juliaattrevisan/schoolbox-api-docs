@@ -11,6 +11,9 @@
             switch (formData.get('momentType')) {
                 case 'text':
                 case 'upload':
+                case 'audio':
+                case 'video':
+                case 'photo':
                     window.location.href = '{{ routeLookup('learningMomentEvidence.getCreateForm', {userIds: user.id}) }}?' + queryString.toString();
                     break;
 
