@@ -24,13 +24,12 @@
         <script type="text/javascript">
             $(function () {
                 $('#evidence-storage').change(function () {
-                    let reader   = new FileReader(),
-                        $preview = $('#evidence-storage-preview');
+                    let reader  = new FileReader(),
+                        preview = document.getElementById('evidence-storage-preview');
                     reader.addEventListener('load', () => {
-                        $preview
-                            .removeClass('hide')
-                            .empty()
-                            .append($('<source>').attr('src', reader.result));
+                        preview.classList.remove('hide');
+                        preview.querySelector('source').src = reader.result;
+                        preview.load();
                     });
                     reader.readAsDataURL(this.files[0]);
                 });
