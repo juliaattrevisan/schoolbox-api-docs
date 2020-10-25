@@ -87,9 +87,10 @@ class Notifier extends AbstractModuleNotifier
      * @param Model  $model
      * @param string $method
      *
+     * @param User   $effector
      * @return Envelope
      */
-    protected function buildMessage(Model $model, string $method): Envelope
+    protected function buildMessage(Model $model, string $method, User $effector): Envelope
     {
         $envelope = new Envelope();
 
@@ -105,10 +106,7 @@ class Notifier extends AbstractModuleNotifier
 
         // Get the kids teachers
         // Create the message
-
-        $timestamp = md5(date("YmdHis"));
-
-        $href = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}?ts={$timestamp}";
+        $href = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}";
         $severity = $pastoral->getSeverity()
             ? sprintf('%s %s', strtolower($pastoral->getSeverity()->getName()), $this->l10n->translate('severity'))
             : '';
@@ -117,7 +115,7 @@ class Notifier extends AbstractModuleNotifier
         $builder = new Builder();
         $builder->setTitle("A :pastoralcare record has been {$method}")
                 ->setParam('pastoralcare', new Param("{$severity} {$type}", $href))
-                ->setIcon("/portrait.php?size=square32&id={$pastoral->getOwner()->getId()}")
+                ->setIcon($this->getUserIcon($effector))
                 ->setHref($href)
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::ERROR)
@@ -240,7 +238,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyCreated(Model $model, User $effector, $diff = [])
     {
-        return $this->buildMessage($model, self::TRIGGER_CREATED);
+        return $this->buildMessage($model, self::TRIGGER_CREATED, $effector);
     }
 
     /**
@@ -252,7 +250,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyUpdated(Model $model, User $effector, $diff = [])
     {
-        return $this->buildMessage($model, self::TRIGGER_UPDATED);
+        return $this->buildMessage($model, self::TRIGGER_UPDATED, $effector);
     }
 
     /**
