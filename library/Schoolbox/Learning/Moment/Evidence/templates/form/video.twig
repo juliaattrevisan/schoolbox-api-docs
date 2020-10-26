@@ -7,13 +7,15 @@
                 <label class="required" for="evidence-recording">
                     Record something
                 </label>
-                <input type="file"
-                       name="storage"
-                       id="evidence-storage"
-                       accept="video/*" capture />
-                <video id="evidence-storage-preview" class="hide" controls>
-                    <source src="#">
-                </video>
+                <input type="hidden" name="filename" id="evidence-filename" required />
+                {% include 'sub/attachzone.twig' with { attachzone: zone } %}
+{#                <input type="file"#}
+{#                       name="storage"#}
+{#                       id="evidence-storage"#}
+{#                       accept="video/*" capture />#}
+{#                <video id="evidence-storage-preview" class="hide" controls>#}
+{#                    <source src="#">#}
+{#                </video>#}
             </div>
         </fieldset>
     </section>
