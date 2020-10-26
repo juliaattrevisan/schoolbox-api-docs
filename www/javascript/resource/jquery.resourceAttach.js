@@ -250,15 +250,12 @@
         // cache the content for this reveal modal
         this.cacheModal();
 
-        $(this.element).on('click', this.options.trigger, function (e) {
-            e.preventDefault();
-
-            if (opt.modal) {
+        if (opt.modal) {
+            $(this.element).on('click', this.options.trigger, function (e) {
+                e.preventDefault();
                 self.open();
-            } else {
-                azone.trigger('click');
-            }
-        });
+            });
+        }
     }
 
 
