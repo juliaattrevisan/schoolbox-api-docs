@@ -4,53 +4,30 @@
 Record something
 {% endblock fileUploadLabel %}
 
-{#{% block formInputs %}#}
-{#<section>#}
-{#    <fieldset class="content">#}
-{#        <div class="small-12 columns">#}
-{#            <label class="required" for="evidence-recording">#}
-{#                Record something#}
-{#            </label>#}
-{#            <input type="hidden" name="filename" id="evidence-filename" required />#}
-{#            <input type="file"#}
-{#                   name="storage"#}
-{#                   id="evidence-storage"#}
-{#                   accept="video/*" capture />#}
-{#            <video id="evidence-storage-preview" class="hide" controls>#}
-{#                <source src="#">#}
-{#            </video>#}
-{#        </div>#}
-{#    </fieldset>#}
-{#</section>#}
-{#{% endblock formInputs %}#}
+{% block fileUploadPreview %}
+    <video id="evidence-storage-preview" class="hide" controls>
+        <source src="#">
+    </video>
 
-{#{% block formJs %}#}
-{#    {% autoescape 'js' %}#}
-{#        <script type="text/javascript">#}
-{#            $(function () {#}
-{#                $('#evidence-storage').change(function () {#}
-{#                    let preview = document.getElementById('evidence-storage-preview');#}
-{#                    if (this.files.length > 0) {#}
-{#                        let reader  = new FileReader();#}
-{#                        reader.addEventListener('load', () => {#}
-{#                            preview.classList.remove('hide');#}
-{#                            preview.querySelector('source').src = reader.result;#}
-{#                            preview.load();#}
-{#                        });#}
-{#                        reader.readAsDataURL(this.files[0]);#}
-{#                    } else {#}
-{#                        preview.classList.add('hide');#}
-{#                    }#}
-{#                });#}
-{#            });#}
-
-{#            let buildValidationRules = function () {#}
-{#                return {};#}
-{#            };#}
-
-{#            let buildPayload = function (form) {#}
-{#                return {};#}
-{#            };#}
-{#        </script>#}
-{#    {% endautoescape %}#}
-{#{% endblock formJs %}#}
+    {% autoescape 'js' %}
+        <script type="text/javascript">
+            // Fill/clear preview
+            $(function () {
+                let dropzoneInstance = Dropzone.instances.find(v => v.element.id === 'storage-zone');
+                if (dropzoneInstance) {
+                    let preview = document.getElementById('evidence-storage-preview');
+                    dropzoneInstance.on('success', (file) => {
+                        let reader  = new FileReader();
+                        reader.addEventListener('load', () => {
+                            preview.classList.remove('hide');
+                            preview.querySelector('source').src = reader.result;
+                            preview.load();
+                        });
+                        reader.readAsDataURL(file);
+                    });
+                    dropzoneInstance.on('removedfile', () => preview.classList.add('hide'));
+                }
+            });
+        </script>
+    {% endautoescape %}
+{% endblock fileUploadPreview %}

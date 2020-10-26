@@ -3,3 +3,31 @@
 {% block fileUploadLabel %}
 Say something
 {% endblock fileUploadLabel %}
+
+{% block fileUploadPreview %}
+    <audio id="evidence-storage-preview" class="hide" controls>
+        <source src="#">
+    </audio>
+
+    {% autoescape 'js' %}
+        <script type="text/javascript">
+            // Fill/clear preview
+            $(function () {
+                let dropzoneInstance = Dropzone.instances.find(v => v.element.id === 'storage-zone');
+                if (dropzoneInstance) {
+                    let preview = document.getElementById('evidence-storage-preview');
+                    dropzoneInstance.on('success', (file) => {
+                        let reader  = new FileReader();
+                        reader.addEventListener('load', () => {
+                            preview.classList.remove('hide');
+                            preview.querySelector('source').src = reader.result;
+                            preview.load();
+                        });
+                        reader.readAsDataURL(file);
+                    });
+                    dropzoneInstance.on('removedfile', () => preview.classList.add('hide'));
+                }
+            });
+        </script>
+    {% endautoescape %}
+{% endblock fileUploadPreview %}
