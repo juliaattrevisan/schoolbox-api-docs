@@ -129,9 +129,9 @@ class Preloader
          * should theoretically obtain staff classes that don't involve students...
          */
         if (Profile::TYPE_STUDENT === $data['person']['type']) {
-            $endpoint = "timetables/student/{$data['person']['id']}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}&limit=200";
+            $endpoint = "timetables/student/{$data['person']['id']}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}";
         } elseif (Profile::TYPE_STAFF === $data['person']['type']) {
-            $endpoint = "timetables/staff/{$data['person']['id']}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}&limit=200";
+            $endpoint = "timetables/staff/{$data['person']['id']}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}";
         } else {
             $this->log->warning(sprintf(
                 'Unknown profile type for %s; skipping timetable preload.',
