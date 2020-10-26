@@ -217,7 +217,7 @@ class ModelToArrayTest extends TestCase
         ];
 
 
-        $superuser = $emptyResponse;
+        $superuser              = $emptyResponse;
         $superuser['superuser'] = true;
         yield 'superuser' => [
             (new User())
@@ -227,7 +227,7 @@ class ModelToArrayTest extends TestCase
         ];
 
 
-        $derivedEmail = $emptyResponse;
+        $derivedEmail                   = $emptyResponse;
         $derivedEmail['username']       = 'test';
         $derivedEmail['isEmailDerived'] = true;
         $derivedEmail['email']          = 'test@test.schoolbox.com.au';
