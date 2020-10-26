@@ -5,9 +5,7 @@ Record something
 {% endblock fileUploadLabel %}
 
 {% block fileUploadPreview %}
-    <video id="evidence-storage-preview" class="hide" controls>
-        <source src="#">
-    </video>
+    <video id="evidence-storage-preview" class="hide" controls src="#"></video>
 
     {% autoescape 'js' %}
         <script type="text/javascript">
@@ -20,7 +18,7 @@ Record something
                         let reader  = new FileReader();
                         reader.addEventListener('load', () => {
                             preview.classList.remove('hide');
-                            preview.querySelector('source').src = reader.result;
+                            preview.src = reader.result;
                             preview.load();
                         });
                         reader.readAsDataURL(file);

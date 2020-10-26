@@ -5,9 +5,7 @@ Say something
 {% endblock fileUploadLabel %}
 
 {% block fileUploadPreview %}
-    <audio id="evidence-storage-preview" class="hide" controls>
-        <source src="#">
-    </audio>
+    <audio id="evidence-storage-preview" class="hide" controls src="#"></audio>
 
     {% autoescape 'js' %}
         <script type="text/javascript">
@@ -20,7 +18,7 @@ Say something
                         let reader  = new FileReader();
                         reader.addEventListener('load', () => {
                             preview.classList.remove('hide');
-                            preview.querySelector('source').src = reader.result;
+                            preview.src = reader.result;
                             preview.load();
                         });
                         reader.readAsDataURL(file);
