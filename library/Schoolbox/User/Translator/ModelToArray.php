@@ -172,7 +172,7 @@ class ModelToArray
      * @param User $user
      * @return string[]
      */
-    private function deriveLinks(User $user): array
+    protected function deriveLinks(User $user): array
     {
         return $user->getId()
             ? [

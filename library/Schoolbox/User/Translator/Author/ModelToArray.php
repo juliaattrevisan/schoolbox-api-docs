@@ -18,7 +18,7 @@ use Schoolbox\User;
  * This variant translates only the subset of fields that are relevant for
  * conveying that the user is the author of content.
  */
-class ModelToArray
+class ModelToArray extends User\Translator\ModelToArray
 {
     /**
      * @param User $user
@@ -34,22 +34,5 @@ class ModelToArray
             'lastName'  => $user->getLastname(),
             'fullName'  => $user->getFullName(),
         ];
-    }
-
-
-    /**
-     * Derive links for this user.
-     *
-     * @param User $user
-     * @return string[]
-     */
-    private function deriveLinks(User $user): array
-    {
-        return $user->getId()
-            ? [
-                'profile' => '/search/user/' . $user->getId(),
-                'avatar'  => '/portrait.php?id=' . $user->getId(),
-            ]
-            : [];
     }
 }
