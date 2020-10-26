@@ -119,6 +119,13 @@
     font-family: $font-family-icon;
 }
 
+// Camera icon: the same as resource booking for now.
+// This icon always bothered me.
+.icon-camera:before {
+  content: '\e65c';
+  font-family: $font-family-icon;
+}
+
 .icon-chat:before {
     content: '\e60a';
     font-family: $font-family-icon;

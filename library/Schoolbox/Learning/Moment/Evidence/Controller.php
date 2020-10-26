@@ -86,7 +86,7 @@ class Controller extends Base
                 $template       = '@learningMomentEvidence/form/photo.twig';
                 $params['zone'] = $this->buildAttachzone()
                                        ->setAttachPrompt('take a picture')
-                                       ->setIconClass('icon-image')
+                                       ->setIconClass('icon-camera')
                                        ->setUseModal(false)
                                        ->setCapture(true)
                                        ->setMimeFilter('image/*')
