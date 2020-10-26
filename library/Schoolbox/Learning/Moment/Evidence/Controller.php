@@ -85,6 +85,7 @@ class Controller extends Base
             case self::MOMENT_TYPE_PHOTO:
                 $template       = '@learningMomentEvidence/form/photo.twig';
                 $params['zone'] = $this->buildAttachzone()
+                                       ->setAttachPrompt('take a picture')
                                        ->setUseModal(false)
                                        ->setCapture(true)
                                        ->setMimeFilter('image/*')
@@ -94,6 +95,7 @@ class Controller extends Base
             case self::MOMENT_TYPE_AUDIO:
                 $template       = '@learningMomentEvidence/form/audio.twig';
                 $params['zone'] = $this->buildAttachzone()
+                                       ->setAttachPrompt('record audio')
                                        ->setUseModal(false)
                                        ->setCapture(true)
                                        ->setMimeFilter('audio/*')
@@ -103,6 +105,7 @@ class Controller extends Base
             case self::MOMENT_TYPE_VIDEO:
                 $template       = '@learningMomentEvidence/form/video.twig';
                 $params['zone'] = $this->buildAttachzone()
+                                       ->setAttachPrompt('record video')
                                        ->setUseModal(false)
                                        ->setCapture(true)
                                        ->setMimeFilter('video/*')
