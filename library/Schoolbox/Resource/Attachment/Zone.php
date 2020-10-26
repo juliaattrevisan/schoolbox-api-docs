@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Resource\Attachment;
-
 
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper;
@@ -25,7 +25,8 @@ use UnexpectedValueException;
  *
  * @package Schoolbox\Resource\Attachment
  */
-class Zone {
+class Zone
+{
 
     const TPL = 'azTpl';
 
@@ -231,7 +232,8 @@ class Zone {
      * @param bool $readOnly
      * @return $this
      */
-    public function setReadOnly($readOnly) {
+    public function setReadOnly($readOnly)
+    {
         $this->readOnly = $readOnly;
         return $this;
     }
@@ -275,7 +277,8 @@ class Zone {
      *
      * @return array
      */
-    public function getTwigContext() {
+    public function getTwigContext()
+    {
 
         // wrap in quotes
         $filter = "'$this->mimeFilter'";
@@ -305,7 +308,6 @@ class Zone {
         );
 
         foreach ($this->attachments as $storage) {
-
             $vars = $this->deriveSitePageVars($storage);
 
             $context['attachments'][] = array(
@@ -356,7 +358,6 @@ class Zone {
             'AZ_FILE_PREVIEW'  => $href,
             'AZ_FILE_IS_IMAGE' => $isImage,
         ];
-
     }
 
 
@@ -383,5 +384,4 @@ class Zone {
         $this->buttonMode = $bool;
         return $this;
     }
-
 }
