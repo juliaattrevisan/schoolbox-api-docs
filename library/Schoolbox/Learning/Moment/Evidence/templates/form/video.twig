@@ -13,17 +13,29 @@ Record something
             $(function () {
                 let dropzoneInstance = Dropzone.instances.find(v => v.element.id === 'storage-zone');
                 if (dropzoneInstance) {
-                    let preview = document.getElementById('evidence-storage-preview');
+                    let previewId = 'evidence-storage-preview',
+                        player    = null;
                     dropzoneInstance.on('success', (file) => {
-                        let reader  = new FileReader();
+                        let reader = new FileReader();
                         reader.addEventListener('load', () => {
+                            let preview = document.getElementById(previewId);
                             preview.classList.remove('hide');
                             preview.src = reader.result;
-                            preview.load();
+                            player = new MediaElementPlayer(previewId);
+                            player.load();
                         });
                         reader.readAsDataURL(file);
                     });
-                    dropzoneInstance.on('removedfile', () => preview.classList.add('hide'));
+                    dropzoneInstance.on('removedfile', () => {
+                        if (player) {
+                            if (!player.paused) {
+                                player.pause();
+                            }
+                            player.remove();
+                            player = null;
+                        }
+                        document.getElementById(previewId).classList.add('hide');
+                    });
                 }
             });
         </script>
