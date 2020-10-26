@@ -67,6 +67,12 @@ class Zone {
      */
     private bool $capture = false;
 
+    /**
+     * This attachzone's icon class: if left empty, the attachzone will
+     * determine a default.
+     */
+    private ?string $iconClass = null;
+
     /** @var StorageMapper */
     protected $mapper;
 
@@ -254,6 +260,17 @@ class Zone {
 
 
     /**
+     * @param string|null $iconClass
+     * @return static
+     */
+    public function setIconClass(?string $iconClass): self
+    {
+        $this->iconClass = $iconClass;
+        return $this;
+    }
+
+
+    /**
      * Return an array that represents a context that can be passed into Twig
      *
      * @return array
@@ -271,19 +288,20 @@ class Zone {
 
 
         $context = array(
-            'title'    => $this->text['modalTitle'],
-            'id'       => $this->id,
-            'camelId'  => $this->delim2camel($this->id),
-            'label'    => count($this->attachments) ? $this->text['attachmentsLabel'] : '',
-            'prompt'   => $this->text['attachPrompt'],
-            'fileVar'  => $this->text['fileVar'],
-            'mime'     => $filter,
-            'readonly' => $this->readOnly,
-            'multi'    => $this->multi,
-            'mode'     => $this->buttonMode ? 'button' : 'normal',
-            'size'     => $this->size,
-            'useModal' => $this->useModal,
-            'capture'  => $this->capture,
+            'title'     => $this->text['modalTitle'],
+            'id'        => $this->id,
+            'camelId'   => $this->delim2camel($this->id),
+            'label'     => count($this->attachments) ? $this->text['attachmentsLabel'] : '',
+            'prompt'    => $this->text['attachPrompt'],
+            'fileVar'   => $this->text['fileVar'],
+            'mime'      => $filter,
+            'readonly'  => $this->readOnly,
+            'multi'     => $this->multi,
+            'mode'      => $this->buttonMode ? 'button' : 'normal',
+            'size'      => $this->size,
+            'useModal'  => $this->useModal,
+            'capture'   => $this->capture,
+            'iconClass' => $this->iconClass,
         );
 
         foreach ($this->attachments as $storage) {

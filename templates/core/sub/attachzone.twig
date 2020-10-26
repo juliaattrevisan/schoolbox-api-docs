@@ -11,6 +11,9 @@ $data = {
     multi: (bool),
     size: (int),
     mode: (string),
+    modal: (bool),
+    capture: (bool),
+    iconClass: (?string),
     attachments: [{
         name: (string),
         hash: (string),
@@ -81,6 +84,7 @@ $data = {
                     useFolder: false,
                     modal: {{ attachzone.useModal ? 'true' : 'false' }},
                     capture: {{ attachzone.capture ? 'true' : 'false' }},
+                    {% if attachzone.iconClass is defined and attachzone.iconClass is not null %}iconClass: '{{ attachzone.iconClass }}',{% endif %}
                 });
             });
         </script>

@@ -86,6 +86,7 @@ class Controller extends Base
                 $template       = '@learningMomentEvidence/form/photo.twig';
                 $params['zone'] = $this->buildAttachzone()
                                        ->setAttachPrompt('take a picture')
+                                       ->setIconClass('icon-image')
                                        ->setUseModal(false)
                                        ->setCapture(true)
                                        ->setMimeFilter('image/*')
@@ -96,6 +97,7 @@ class Controller extends Base
                 $template       = '@learningMomentEvidence/form/audio.twig';
                 $params['zone'] = $this->buildAttachzone()
                                        ->setAttachPrompt('record audio')
+                                       ->setIconClass('icon-audio')
                                        ->setUseModal(false)
                                        ->setCapture(true)
                                        ->setMimeFilter('audio/*')
@@ -106,6 +108,7 @@ class Controller extends Base
                 $template       = '@learningMomentEvidence/form/video.twig';
                 $params['zone'] = $this->buildAttachzone()
                                        ->setAttachPrompt('record video')
+                                       ->setIconClass('icon-video')
                                        ->setUseModal(false)
                                        ->setCapture(true)
                                        ->setMimeFilter('video/*')
