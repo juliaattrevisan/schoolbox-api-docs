@@ -56,6 +56,11 @@ class Zone {
     /** @var bool */
     protected $buttonMode;
 
+    /**
+     * Does this attachzone use the modal?
+     */
+    private bool $useModal = true;
+
     /** @var StorageMapper */
     protected $mapper;
 
@@ -221,6 +226,17 @@ class Zone {
 
 
     /**
+     * @param bool $useModal
+     * @return static
+     */
+    public function setUseModal(bool $useModal): self
+    {
+        $this->useModal = $useModal;
+        return $this;
+    }
+
+
+    /**
      * Return an array that represents a context that can be passed into Twig
      *
      * @return array
@@ -248,7 +264,8 @@ class Zone {
             'readonly' => $this->readOnly,
             'multi'    => $this->multi,
             'mode'     => $this->buttonMode ? 'button' : 'normal',
-            'size'     => $this->size
+            'size'     => $this->size,
+            'useModal' => $this->useModal,
         );
 
         foreach ($this->attachments as $storage) {
