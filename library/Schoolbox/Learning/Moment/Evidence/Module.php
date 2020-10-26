@@ -62,6 +62,14 @@ class Module extends BaseModule
             $isTargetUserSelfOrStudentRule,
         );
 
+        /* Superusers, Staff, Parents of Evidence Recipient and Evidence Recipients
+         * can view the detail screen
+         */
+        $viewEvidenceDetailRule = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasRole(Role::STAFF),
+            $isParentOrUserRule
+        );
 
         // Preloaders:
         // convert userIds (a comma-separated list of users) into a user
@@ -111,12 +119,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{evidenceId}',
             'getEvidenceDetail',
-            new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\IsSuperuser()
-                )
-            ),
+            $viewEvidenceDetailRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
@@ -180,13 +183,17 @@ class Module extends BaseModule
      * @param array $params
      * @return array
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \InvalidArgumentException
      */
     private function preloadEvidence(array $params): array
     {
+        $evidence = $this->getMapperFactory()
+             ->get(Mapper::class)
+             ->findById($params['evidenceId']);
+
         return [
-            'evidence' => $this->getMapperFactory()
-                           ->get(Mapper::class)
-                           ->findById($params['evidenceId']),
+            'userId' => $evidence->getRecipient()->getId(),
+            'evidence' => $evidence
         ];
     }
 

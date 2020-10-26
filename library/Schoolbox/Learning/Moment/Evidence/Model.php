@@ -61,6 +61,8 @@ class Model implements ISoftDeletable
     /**
      * The recipient of the learning moment.
      *
+     * (the Evidence being obtained is about the Recipient)
+     *
      * @var User
      */
     private User $recipient;
