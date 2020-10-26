@@ -38,6 +38,7 @@
             thumbnailSize: 64,
             tplOverride: null,
             maxFilesize: 2048,
+            capture: false,
 
             // pass through to various implementations
             allowedFiles: null,
@@ -88,7 +89,8 @@
         azone.dropzone({
             url: opt.url,
             paramName: opt.paramName,
-            clickable: false,
+            // The dropzone is clickable if the modal is disabled
+            clickable: !opt.modal,
             maxFiles: opt.multi ? null : 1,
             maxFilesize: opt.maxFilesize,
             acceptedFiles: opt.allowedFiles === '*/*' ? null : opt.allowedFiles,
@@ -97,6 +99,7 @@
             dictDefaultMessage: prompt,
             previewsContainer: $(this.element).find(opt.previewsContainerSelector)[0],
             previewTemplate: this.tpl.html(),
+            capture: opt.capture,
 
             fallback: function () {
                 var mk = opt.fallbackButtonMarkup || '<a href="#" data-attach-fallback class="button icon-attach">' + opt.dictDefaultMessage + '</a>',
@@ -243,7 +246,12 @@
 
         $(this.element).on('click', this.options.trigger, function (e) {
             e.preventDefault();
-            self.open();
+
+            if (opt.modal) {
+                self.open();
+            } else {
+                azone.trigger('click');
+            }
         });
     }
 
