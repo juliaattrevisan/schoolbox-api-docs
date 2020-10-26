@@ -20,6 +20,7 @@ module.exports = {
         articleList: './library/Schoolbox/Comms/News/templates/vue/article-list.js',
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js',
         learningMomentsFeed: './library/Schoolbox/Learning/Moment/Evidence/vue/feed.main.js',
+        learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/evidence-detail.js'
     },
     output: {
         path: path.resolve(__dirname, "www/javascript/components"),
