@@ -20,6 +20,7 @@
             attachmentTag: 'li',
             fallbackButtonMarkup: null,
             fallbackButtonSelector: '[data-attach-fallback]',
+            iconClass: 'icon-attach',
 
             // modal options
             title: null,
@@ -62,7 +63,7 @@
         self = this;
         opt = self.options;
         azone = $(this.element);
-        dzone = azone.find(opt.dropzoneSelector).html('');
+        dzone = azone.find(opt.dropzoneSelector).html('').addClass(opt.iconClass);
 
         if (opt.title == null) {
             opt.title = 'Select file' + (opt.multi ? 's' : '') + ' to attach';
@@ -81,7 +82,12 @@
         });
 
         if (opt.dictDefaultMessage) {
-            prompt = 'Click or drag here to ' + opt.dictDefaultMessage.trim().charAt(0).toLowerCase() + opt.dictDefaultMessage.substr(1);
+            // Is this a touch screen? Show a different prefix
+            // (This is the same test Modernizr uses)
+            var prefix = 'ontouchstart' in window
+                ? 'Tap here to '
+                : 'Click or drag here to ';
+            prompt = prefix + opt.dictDefaultMessage.trim().charAt(0).toLowerCase() + opt.dictDefaultMessage.substr(1);
         }
 
 
