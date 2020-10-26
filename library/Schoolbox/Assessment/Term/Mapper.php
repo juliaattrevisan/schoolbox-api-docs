@@ -216,11 +216,12 @@ class Mapper extends BaseMapper
     /**
      * Find all the active folder ids related to $term
      *
-     * @param Model $term
+     * @param Model                $term
+     * @param YearLevel\Model|null $yearLevel
      * @return array
      * @throws PDOException
      */
-    public function findFolderIdsForTerm(Model $term): array
+    public function findFolderIdsForTerm(Model $term, ?YearLevel\Model $yearLevel): array
     {
         $query = "
             SELECT folder_id
@@ -233,10 +234,22 @@ class Mapper extends BaseMapper
             AND folder.deleted_at IS NULL
         ";
 
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute([
+        $params = [
             'termId' => $term->getId()
-        ]);
+        ];
+
+        /* If you specified a YearLevel instance, limit the query to that year level's relations
+         * This prevents a user in Year 9 seeing folders in Year 4 simply because an Extraordinary
+         * Term was related to multiple year levels
+         */
+        if (null !== $yearLevel) {
+            $query .= "AND fyl.year_level_id = :yearLevelId";
+
+            $params['yearLevelId'] = $yearLevel->getId();
+        }
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($params);
 
         $folderIds = [];
 
