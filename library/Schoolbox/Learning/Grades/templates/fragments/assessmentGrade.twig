@@ -24,8 +24,7 @@
                 <span class="{{ icon.renderClass(assessment) }}"></span>
                 <p>{{ assessment.title }}
                     {% if participant and USER.role.isStaff and not participant.plan.isDynamic %}
-                        <span class="individualisation has-tip tip-top" data-tooltip
-                              title="Customisation: {{ participant.plan.name }}">i</span>
+                        <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name}} ({{ participant.plan.duedate.short}})">i</span>
                     {% endif %}
                 </p>
             </a>
