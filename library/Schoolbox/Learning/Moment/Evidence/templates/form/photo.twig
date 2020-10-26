@@ -1,7 +1,7 @@
 {% extends '@learningMomentEvidence/form/upload.twig' %}
 
 {% block fileUploadLabel %}
-Take a picture
+    Take a picture
 {% endblock fileUploadLabel %}
 
 {% block fileUploadPreview %}
@@ -15,7 +15,7 @@ Take a picture
                 if (dropzoneInstance) {
                     let preview = document.getElementById('evidence-storage-preview');
                     dropzoneInstance.on('success', (file) => {
-                        let reader  = new FileReader();
+                        let reader = new FileReader();
                         reader.addEventListener('load', () => {
                             preview.classList.remove('hide');
                             preview.src = reader.result;
