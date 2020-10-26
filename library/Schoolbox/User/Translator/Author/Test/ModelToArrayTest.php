@@ -40,12 +40,12 @@ class ModelToArrayTest extends TestCase
         ]);
 
         $emptyResponse = [
-            'id'               => null,
-            '_links'           => [],
-            'title'            => null,
-            'firstName'        => null,
-            'lastName'         => null,
-            'fullName'         => 'Unknown User',
+            'id'        => null,
+            '_links'    => [],
+            'title'     => null,
+            'firstName' => null,
+            'lastName'  => null,
+            'fullName'  => 'Unknown User',
         ];
         yield 'empty fields' => [
             (new User())
@@ -100,15 +100,15 @@ class ModelToArrayTest extends TestCase
         yield 'populated fields' => [
             $populatedUser,
             [
-                'id'               => 1,
-                '_links'           => [
+                'id'        => 1,
+                '_links'    => [
                     'profile' => '/search/user/1',
                     'avatar'  => '/portrait.php?id=1',
                 ],
-                'title'            => 'Mr',
-                'firstName'        => 'John',
-                'lastName'         => 'Doe',
-                'fullName'         => 'Mr John Doe',
+                'title'     => 'Mr',
+                'firstName' => 'John',
+                'lastName'  => 'Doe',
+                'fullName'  => 'Mr John Doe',
             ],
         ];
     }
