@@ -13,7 +13,9 @@
                  #  attached)
                  #}
                 <label class="required" for="evidence-filename">
-                    Upload File
+                    {% block fileUploadLabel %}
+                        Upload File
+                    {% endblock fileUploadLabel %}
                 </label>
                 <input type="hidden" name="filename" id="evidence-filename" required />
                 {% include 'sub/attachzone.twig' with { attachzone: zone } %}
