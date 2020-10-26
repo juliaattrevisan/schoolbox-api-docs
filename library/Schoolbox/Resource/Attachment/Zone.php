@@ -61,6 +61,12 @@ class Zone {
      */
     private bool $useModal = true;
 
+    /**
+     * Does this attachzone's file upload have the capture attribute
+     * (for photo/video/audio capture)?
+     */
+    private bool $capture = false;
+
     /** @var StorageMapper */
     protected $mapper;
 
@@ -237,6 +243,17 @@ class Zone {
 
 
     /**
+     * @param bool $capture
+     * @return static
+     */
+    public function setCapture(bool $capture): self
+    {
+        $this->capture = $capture;
+        return $this;
+    }
+
+
+    /**
      * Return an array that represents a context that can be passed into Twig
      *
      * @return array
@@ -266,6 +283,7 @@ class Zone {
             'mode'     => $this->buttonMode ? 'button' : 'normal',
             'size'     => $this->size,
             'useModal' => $this->useModal,
+            'capture'  => $this->capture,
         );
 
         foreach ($this->attachments as $storage) {

@@ -79,7 +79,8 @@ $data = {
                     previewsContainerSelector: '[data-dz-previews]',
                     onDetach: {{ onDetach is defined and onDetach ? onDetach|raw : 'null' }},
                     useFolder: false,
-                    modal: Boolean('{{ useModal }}'),
+                    modal: {{ attachzone.useModal ? 'true' : 'false' }},
+                    capture: {{ attachzone.capture ? 'true' : 'false' }},
                 });
             });
         </script>

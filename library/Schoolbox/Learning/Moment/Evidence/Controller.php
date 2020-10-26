@@ -15,6 +15,7 @@ use Schoolbox\Learning\Moment\Evidence\Translator;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 use Scrub;
 
@@ -81,32 +82,37 @@ class Controller extends Base
             'sharingForSelf' => $sharingForSelf,
         ];
         switch ($momentType) {
-
             case self::MOMENT_TYPE_PHOTO:
-                $template = '@learningMomentEvidence/form/photo.twig';
+                $template       = '@learningMomentEvidence/form/photo.twig';
+                $params['zone'] = $this->buildAttachzone()
+                                       ->setUseModal(false)
+                                       ->setCapture(true)
+                                       ->setMimeFilter('image/*')
+                                       ->getTwigContext();
                 break;
 
             case self::MOMENT_TYPE_AUDIO:
-                $template = '@learningMomentEvidence/form/audio.twig';
+                $template       = '@learningMomentEvidence/form/audio.twig';
+                $params['zone'] = $this->buildAttachzone()
+                                       ->setUseModal(false)
+                                       ->setCapture(true)
+                                       ->setMimeFilter('audio/*')
+                                       ->getTwigContext();
                 break;
 
             case self::MOMENT_TYPE_VIDEO:
-                $template = '@learningMomentEvidence/form/video.twig';
+                $template       = '@learningMomentEvidence/form/video.twig';
+                $params['zone'] = $this->buildAttachzone()
+                                       ->setUseModal(false)
+                                       ->setCapture(true)
+                                       ->setMimeFilter('video/*')
+                                       ->getTwigContext();
                 break;
 
             case self::MOMENT_TYPE_UPLOAD:
-                $template = '@learningMomentEvidence/form/upload.twig';
-
-                // Also shovel in an attachzone
-                $zone = new GenericZone('storage', \Schoolbox\Resource\Storage\Mapper::getInstance());
-                $zone->setAttachmentsLabel('')
-                     ->setAttachPrompt('upload files to this location')
-                     ->setMimeFilter('*/*')
-                     ->setFileVar('file')
-                     ->setMulti(false)
-                     ->setThumbnailSize(64)
-                     ->setModalTitle('Select file');
-                $params['zone'] = $zone->getTwigContext();
+                $template       = '@learningMomentEvidence/form/upload.twig';
+                $params['zone'] = $this->buildAttachzone()
+                                       ->getTwigContext();
                 break;
 
             case self::MOMENT_TYPE_TEXT:
@@ -296,6 +302,25 @@ class Controller extends Base
     public function deleteEvidence(Model $evidence): void
     {
         $this->mapper->delete($evidence);
+    }
+
+
+    /**
+     * Helper for building an attachzone for this controller.
+     *
+     * @return GenericZone
+     */
+    private function buildAttachzone(): GenericZone
+    {
+        $zone = new GenericZone('storage', StorageMapper::getInstance());
+        $zone->setAttachmentsLabel('')
+             ->setAttachPrompt('upload files to this location')
+             ->setMimeFilter('*/*')
+             ->setFileVar('file')
+             ->setMulti(false)
+             ->setThumbnailSize(64)
+             ->setModalTitle('Select file');
+        return $zone;
     }
 
 
