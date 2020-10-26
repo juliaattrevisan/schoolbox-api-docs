@@ -166,14 +166,34 @@ class Prepare implements IStrategy
             $this->studentProfileMapper->getDatabase()->query("UPDATE {$this->studentProfileMapper->getTable()} SET emergency_contact_phone_alt_3 = NULL");
 
             /* Truncate other data entirely
+             *
+             * For some reason this truncate() doesn't always execute for all the tables
+             * This leaves stuff in a broken state which you have to manually clear
+             *
+             * It manifests as a FK issue where it tries to insert duplicate relations
+             * that were supposed to have been deleted prior
              */
+            sleep(1);
             $this->relationshipMapper->truncate();
-            $this->classEntryMapper->truncate();
-            $this->classInvolvementMapper->truncate();
-            $this->classPeriodMapper->truncate();
-            $this->periodMapper->truncate();
+            $this->log->debug('Purged profile relations');
 
-            $this->log->info('Purged existing profile relations, classEntry, classInvolvement, classPeriod data');
+            sleep(1);
+            $this->classInvolvementMapper->truncate();
+            $this->log->debug('Purged classInvolvement relations');
+
+            sleep(1);
+            $this->classPeriodMapper->truncate();
+            $this->log->debug('Purged classPeriod relations');
+
+            sleep(1);
+            $this->classEntryMapper->truncate();
+            $this->log->debug('Purged classEntry');
+
+            sleep(1);
+            $this->periodMapper->truncate();
+            $this->log->debug('Purged classPeriod');
+
+            $this->log->info('Purged existing profile relations, classInvolvement, classPeriod, classEntry data');
         }
     }
 }

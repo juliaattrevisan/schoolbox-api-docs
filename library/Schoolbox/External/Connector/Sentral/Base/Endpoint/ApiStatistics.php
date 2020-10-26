@@ -53,10 +53,9 @@ class ApiStatistics implements IStrategy
         $this->log->info('');
         $this->log->info('API Endpoint Usage');
         $this->log->info('(Note that each endpoint can configure page size...)');
+        $this->log->info('');
 
         $apiUsage = $this->api->getUsage()->retrieve();
-
-        $this->log->info('');
 
         foreach ($apiUsage as $endpoint => $num) {
             $this->log->info(sprintf(
@@ -65,6 +64,13 @@ class ApiStatistics implements IStrategy
                 $num
             ));
         }
+
+        $this->log->info('');
+
+        $this->log->info(sprintf(
+            '    Total %s',
+            array_sum(array_values($apiUsage))
+        ));
 
         $this->log->info('');
     }
