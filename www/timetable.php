@@ -8,6 +8,7 @@
 
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Role;
 
 if (!isset($this)) {
     require_once __DIR__ . '/../conf/core/require.php';
@@ -236,7 +237,7 @@ foreach ($userList as $user) {
                                     if (!isset($staffIdNameMap[$class['staffID']])) {
                                         $name = '';
                                         try {
-                                            $classStaff = $userMapper->findByExternalId($class['staffID']);
+                                            $classStaff = $userMapper->findByExternalId($class['staffID'], Role::STAFF);
                                             $name       = $classStaff->getFullName();
                                         } catch (\Schoolbox\Mapper\Exception $e) {
                                         }
