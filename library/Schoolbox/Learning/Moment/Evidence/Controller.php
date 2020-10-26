@@ -191,9 +191,9 @@ class Controller extends Base
             )
             ->reindex()
             ->map(
-                // Scrub body HTML, as there's no guarantee it has been scrubbed
-                // elsewhere (and Vue can't do it)
                 static function (array $item): array {
+                    // Scrub body HTML, as there's no guarantee it has been
+                    // scrubbed elsewhere (and Vue can't do it)
                     $item['body'] = Scrub::html($item['body']);
                     return $item;
                 }
@@ -211,7 +211,7 @@ class Controller extends Base
             $this->buildJsonOutput([
                 'data'     => $mappedData,
                 'metadata' => [
-                    'count' => $cursor->retrieveResultCount(),
+                    'count'  => $cursor->retrieveResultCount(),
                     'cursor' => [
                         'current' => $encodedCursor ?? $cursor->current($data),
                         'next'    => $cursor->next($data),
