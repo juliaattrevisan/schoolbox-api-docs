@@ -131,7 +131,7 @@ class Controller extends Base
         $mappedData    = $data
             ->map(
                 new Translator\ModelToArray(
-                    new User\Translator\ModelToArray(),
+                    new User\Translator\Author\ModelToArray(),
                     new Storage\Translator\ModelToArray(),
                 ),
             )
@@ -225,7 +225,7 @@ class Controller extends Base
             $this->buildJsonOutput(
                 $evidenceCollection->map(
                     new Translator\ModelToArray(
-                        new User\Translator\ModelToArray(),
+                        new User\Translator\Author\ModelToArray(),
                         new Storage\Translator\ModelToArray(),
                     ),
                 )
