@@ -5,7 +5,9 @@ Say something
 {% endblock fileUploadLabel %}
 
 {% block fileUploadPreview %}
-    <audio id="evidence-storage-preview" class="hide" controls src="#" width="100%"></audio>
+    <section class="no-margin">
+        <audio id="evidence-storage-preview" class="hide" controls src="#" width="100%"></audio>
+    </section>
 
     {% autoescape 'js' %}
         <script type="text/javascript">

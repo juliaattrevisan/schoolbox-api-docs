@@ -5,7 +5,9 @@ Record something
 {% endblock fileUploadLabel %}
 
 {% block fileUploadPreview %}
-    <video id="evidence-storage-preview" class="hide" controls src="#" height="100%" width="100%"></video>
+    <section class="no-margin">
+        <video id="evidence-storage-preview" class="hide" controls src="#" height="100%" width="100%"></video>
+    </section>
 
     {% autoescape 'js' %}
         <script type="text/javascript">
