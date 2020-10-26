@@ -21,6 +21,7 @@ export default {
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
     props: [
+        'evidence'
     ],
 
     /**
@@ -67,7 +68,13 @@ export default {
 }
 </script>
 <template>
-    <div>
-        Vue components must have exactly one node directly inside the <em>template</em> node itself.
+    <div class="row">
+        <div class="small-12 columns">
+            <ul>
+                <li>{{ this.evidence.id }}</li>
+                <li>By {{ this.evidence.recipient.firstname }} {{ this.evidence.recipient.lastname }}&mdash;{{ this.evidence.updatedAt }}</li>
+                <li>{{ this.evidence.body }}</li>
+            </ul>
+        </div>
     </div>
 </template>

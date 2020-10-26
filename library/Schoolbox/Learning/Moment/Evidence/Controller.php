@@ -111,7 +111,9 @@ class Controller extends Base
      */
     public function getEvidenceDetail(Model $evidence): void
     {
-        $this->response->content->set($this->buildHtmlOutput('@learningMomentEvidence/detail.twig', []));
+        $this->response->content->set($this->buildHtmlOutput('@learningMomentEvidence/detail.twig', [
+            'evidence' => $evidence
+        ]));
     }
 
 

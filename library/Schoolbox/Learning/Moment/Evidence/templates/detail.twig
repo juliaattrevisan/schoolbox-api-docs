@@ -1,4 +1,15 @@
 <div id="evidence-detail-container">
-    <evidence-detail></evidence-detail>
+    {% set evidenceData = {
+        'id': evidence.id,
+        'body': evidence.body,
+        'recipient': {
+            'id': evidence.recipient.id,
+            'firstname': evidence.recipient.firstname,
+            'lastname': evidence.recipient.lastname
+        },
+        'updatedAt': evidence.updatedAt.localShort
+    } %}
+
+    <evidence-detail :evidence="{{ evidenceData|json_encode }}"></evidence-detail>
 </div>
 <script src="/javascript/components/learningMomentsEvidenceDetail.bundle.js"></script>
