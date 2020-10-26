@@ -35,6 +35,11 @@ Record something
                             player = null;
                         }
                         document.getElementById(previewId).classList.add('hide');
+
+                        // Clear width and height too, so that the media player
+                        // is properly sized
+                        document.getElementById(previewId).style.width  = '';
+                        document.getElementById(previewId).style.height = '';
                     });
                 }
             });
