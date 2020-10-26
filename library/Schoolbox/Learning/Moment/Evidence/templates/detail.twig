@@ -2,12 +2,12 @@
     {% set evidenceData = {
         'id': evidence.id,
         'body': evidence.body,
+        'createdAt': evidence.createdAt.short,
         'recipient': {
             'id': evidence.recipient.id,
             'firstname': evidence.recipient.firstname,
             'lastname': evidence.recipient.lastname
         },
-        'updatedAt': evidence.updatedAt.localShort
     } %}
 
     <evidence-detail :evidence="{{ evidenceData|json_encode }}"></evidence-detail>

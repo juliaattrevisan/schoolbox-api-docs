@@ -1,4 +1,8 @@
 <script>
+import moment       from "moment";
+import MediaArticle from '@schoolbox/media-article';
+import Storage      from '@schoolbox/storage';
+
 export default {
     /**
      * Name.
@@ -30,6 +34,8 @@ export default {
      * at the top of the file.
      */
     components: {
+        MediaArticle,
+        Storage
     },
 
     /**
@@ -68,13 +74,31 @@ export default {
 }
 </script>
 <template>
-    <div class="row">
-        <div class="small-12 columns">
-            <ul>
-                <li>{{ this.evidence.id }}</li>
-                <li>By {{ this.evidence.recipient.firstname }} {{ this.evidence.recipient.lastname }}&mdash;{{ this.evidence.updatedAt }}</li>
-                <li>{{ this.evidence.body }}</li>
-            </ul>
+    <div class="news-post row">
+        <div class="small-12 island">
+            <section>
+                <div class="row">
+                    <div class="small-12 island">
+                        <section class="detail content">
+                            <p class="meta">By
+                                {{ this.evidence.recipient.firstname }} {{ this.evidence.recipient.lastname }}
+                                &mdash;
+                                <time>{{ this.evidence.createdAt }}</time>
+                            </p>
+
+                            <!-- Display evidence body, with media players initialised -->
+                            <media-article v-if="this.evidence.body">
+                                <div v-html="this.evidence.body" />
+                            </media-article>
+
+                            <!-- Is there an attachment? Display it appropriately -->
+                            <article v-if="this.evidence.filename && this.evidence.storage">
+                                <storage :storage="this.evidence.storage" :filename="this.evidence.filename"></storage>
+                            </article>
+                        </section>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 </template>
