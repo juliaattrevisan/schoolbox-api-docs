@@ -4,7 +4,8 @@ import axios  from 'axios';
 import moment from 'moment';
 
 import MediaArticle from '@schoolbox/media-article';
-import Storage from '@schoolbox/storage';
+import Storage      from '@schoolbox/storage';
+import {ENDPOINTS}  from '@schoolboxLearningMomentEvidence/endpoints';
 
 export default {
     components: {
@@ -20,6 +21,9 @@ export default {
             },
             showSkeletonLoader: true,
         }
+    },
+    created() {
+        this.ENDPOINTS = ENDPOINTS;
     },
     computed: {
         config: () => window.learningEvidenceFeedConfig,
@@ -147,7 +151,6 @@ export default {
                             </a>
                         </div>
 
-
                         <!-- Display evidence body, with media players initialised -->
                         <media-article v-if="evidence.body">
                             <div v-html="evidence.body" />
@@ -158,6 +161,10 @@ export default {
                         <article v-if="evidence.filename && evidence.storage">
                             <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
                         </article>
+
+                        <div class="content">
+                            <p><a :href="ENDPOINTS.momentEvidenceDetailPath(evidence.id)">More Detail</a></p>
+                        </div>
                     </li>
                 </ul>
             </section>

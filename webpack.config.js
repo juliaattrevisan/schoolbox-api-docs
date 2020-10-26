@@ -88,7 +88,8 @@ module.exports = {
             'vue$': 'vue/dist/vue.esm.js',
             '@schoolbox': path.resolve(__dirname, "vue/components"),
             '@schoolboxCalendarEvent': path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue"),
-            '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News')
+            '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
+            '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue')
         },
         extensions: ['*', '.js', '.vue', '.json']
     },

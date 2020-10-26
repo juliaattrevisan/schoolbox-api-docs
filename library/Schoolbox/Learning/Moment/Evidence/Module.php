@@ -105,6 +105,22 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadUser']),
         );
 
+        /* Evidence Detail screen
+         */
+        $this->register(
+            self::METHOD_GET,
+            '/{evidenceId}',
+            'getEvidenceDetail',
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser()
+                )
+            ),
+            Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+
 //        $this->register(
 //            self::METHOD_POST,
 //            '/user/{userId}/create',
@@ -154,6 +170,23 @@ class Module extends BaseModule
             'user' => $this->getMapperFactory()
                            ->get(UserMapper::class)
                            ->findById($params['userId']),
+        ];
+    }
+
+
+    /**
+     * Preload the requested moment evidence
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function preloadEvidence(array $params): array
+    {
+        return [
+            'evidence' => $this->getMapperFactory()
+                           ->get(Mapper::class)
+                           ->findById($params['evidenceId']),
         ];
     }
 

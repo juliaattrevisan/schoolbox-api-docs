@@ -104,6 +104,18 @@ class Controller extends Base
     }
 
 
+    /**
+     * Set up the detail page for a particular Evidence instance
+     *
+     * @param Model $evidence
+     */
+    public function getEvidenceDetail(Model $evidence): void
+    {
+        $this->response->content->set($this->buildHtmlOutput('@learningMomentEvidence/detail.twig', []));
+    }
+
+
+
 //    /**
 //     * Retrieve a JSON representation of a single learning moment.
 //     *
@@ -113,6 +125,7 @@ class Controller extends Base
 //    public function getMoment(): void
 //    {
 //    }
+
 
 
     /**
