@@ -1073,7 +1073,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     /**
      * @inheritDoc
      */
-    public function getCommentNotifier(): string
+    public function getCommentNotifier(): ?string
     {
         return Discussion\Comment\Notifier::class;
     }

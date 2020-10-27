@@ -47,7 +47,8 @@ interface IThreadLocation
     /**
      * Gets notifier class name for this thread comments
      *
-     * @return string
+     * @return string|null The fully qualified class name, or null if this has
+     *                     no notifier.
      */
-    public function getCommentNotifier(): string;
+    public function getCommentNotifier(): ?string;
 }
