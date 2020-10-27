@@ -98,7 +98,7 @@
 
                             {# Display links to students parents #}
 
-                            {% for parent in student.parents %}
+                            {% for parent in student.parents if not student.hideContacts %}
                                 <dt class="small-12 medium-3">
                                     {% if loop.first %}
                                         Parents
