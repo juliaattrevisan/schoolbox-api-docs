@@ -387,10 +387,9 @@ class Controller extends Base
             $gridData  = $classList->getClassList($term, $now);
         }
 
-
         $gridData = array_merge($gridData, [
             'now'           => $now,
-            'terms'         => $this->termMapper->findAll()->filterBy('extraordinary', 0)->sortBy('start', 'desc'),
+            'terms'         => $this->termMapper->findAllNonExtraordinary(),
             'hideTimetable' => $hideTimetable,
         ]);
 

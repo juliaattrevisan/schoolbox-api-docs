@@ -200,7 +200,7 @@ class Controller extends Base
         /* If we're in an Extraordinary Term, limit the list of $folders to those which occur
          * as being related to the Extraordinary Term.
          */
-        $terms = $this->termMapper->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc');
+        $terms = $this->termMapper->findAllNonExtraordinary();
         $extraordinaryTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $viewee->getYear());
 
         if ($extraordinaryTerm->getExtraordinary()) {

@@ -277,7 +277,7 @@ class Mapper extends BaseMapper
      */
     public function findAllWithExtraordinary(?\Schoolbox\YearLevel\Model $yearLevel): GenericCollection
     {
-        $terms = $this->findAll()->filterBy('extraordinary', '0')->sortBy('start', 'desc');
+        $terms = $this->findAllNonExtraordinary();
         $extraordinaryTerm = $this->findForDateAndYearLevel(\Alaress_Date_Format::now(), $yearLevel);
 
         if ($extraordinaryTerm->getExtraordinary()) {
@@ -285,6 +285,20 @@ class Mapper extends BaseMapper
         }
 
         return $terms;
+    }
+
+
+    /**
+     * Find all the non-extraordinary Terms, ordered by start date
+     *
+     * @return GenericCollection
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    public function findAllNonExtraordinary(): GenericCollection
+    {
+        $pb = $this->getPredicateBuilder()->equals('extraordinary', 0);
+
+        return $this->findByPredicates($pb)->sortBy('start', 'desc');
     }
 
 
