@@ -11,7 +11,7 @@ $data = {
     multi: (bool),
     size: (int),
     mode: (string),
-    modal: (bool),
+    useModal: (bool),
     capture: (bool),
     iconClass: (?string),
     attachments: [{
@@ -82,7 +82,7 @@ $data = {
                     previewsContainerSelector: '[data-dz-previews]',
                     onDetach: {{ onDetach is defined and onDetach ? onDetach|raw : 'null' }},
                     useFolder: false,
-                    modal: {{ attachzone.useModal ? 'true' : 'false' }},
+                    useModal: {{ attachzone.useModal ? 'true' : 'false' }},
                     capture: {{ attachzone.capture ? 'true' : 'false' }},
                     {% if attachzone.iconClass is defined and attachzone.iconClass is not null %}iconClass: '{{ attachzone.iconClass }}',{% endif %}
                 });

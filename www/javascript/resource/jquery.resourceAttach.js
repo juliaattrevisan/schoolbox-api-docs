@@ -28,6 +28,7 @@
             height: 600,
             resizable: false,
             modal: true,
+            useModal: true,
             source: '/resources/attachment',
 
             // dropzone options
@@ -96,7 +97,7 @@
             url: opt.url,
             paramName: opt.paramName,
             // The dropzone is clickable if the modal is disabled
-            clickable: !opt.modal,
+            clickable: !opt.useModal,
             maxFiles: opt.multi ? null : 1,
             maxFilesize: opt.maxFilesize,
             acceptedFiles: opt.allowedFiles === '*/*' ? null : opt.allowedFiles,
@@ -250,7 +251,7 @@
         // cache the content for this reveal modal
         this.cacheModal();
 
-        if (opt.modal) {
+        if (opt.useModal) {
             $(this.element).on('click', this.options.trigger, function (e) {
                 e.preventDefault();
                 self.open();
