@@ -68,13 +68,37 @@ abstract class Factory extends AbstractFactory
 
 
     /**
+     * Gets a list of all the Terms, both ordinary and extraordinary
+     *
+     * This is used in the Admin->Filters section to provide a list of all the Terms a super
+     * can make available on certain pages. Extraordinary Terms, while they appear in this list,
+     * should not be included in the Current Term and Previous Term derivation
+     *
      * @return GenericCollection|Term\Model[]
      */
-    protected function getSortedTerms(): GenericCollection
+    protected function getAllSortedTerms(): GenericCollection
     {
         /** @var GenericCollection|Term\Model[] $terms */
         $terms = $this->termMapper->findAll(['order' => ['start' => 'DESC']])->indexBy('id');
         return $terms;
+    }
+
+
+    /**
+     * Gets a list of all the ordinary Terms, sorted by start date desc
+     *
+     * This is used in the Admin->Filters section to calculate the Current and Previous Term
+     * values programmatically in the list of available Terms to show on certain pages
+     *
+     * @return GenericCollection|Term\Model[]
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    protected function getNonExtraordinarySortedTerms(): GenericCollection
+    {
+        /* Only include the non-extraordinary Term instances
+         * These are already sorted by start date desc
+         */
+        return $this->termMapper->findAllNonExtraordinary()->indexBy('id');
     }
 
 
@@ -85,17 +109,11 @@ abstract class Factory extends AbstractFactory
     protected function getCurrentTerm(GenericCollection $terms): ?Term\Model
     {
         $now = Alaress_Date_Format::now();
+
+        /* Extraordinary Terms aren't part of the normal sequence of Terms
+         * Disregard their presence in this list
+         */
         foreach ($terms as $term) {
-
-            /* Skip Extraordinary Terms
-             */
-            if ($term->getExtraordinary()) {
-                continue;
-            }
-
-            /* Extraordinary Terms aren't part of the normal sequence of Terms
-             * Disregard their presence in this list
-             */
             if ($term->contains($now)) {
                 return $term;
             }
@@ -119,13 +137,6 @@ abstract class Factory extends AbstractFactory
         if (!$currentTerm) {
             // Get the most recent term that finished in the past
             foreach ($terms as $term) {
-
-                /* Skip Extraordinary Terms
-                 */
-                if ($term->getExtraordinary()) {
-                    continue;
-                }
-
                 $termFinish = $term->getActualFinish();
                 if (!$termFinish->isNull() && $termFinish->isPast()) {
                     return $term;
@@ -136,14 +147,11 @@ abstract class Factory extends AbstractFactory
 
         // Loop a single index back past the current term
         $currentFound = false;
+
+        /* Extraordinary Terms aren't part of the normal sequence of Terms
+         * Disregard their presence in this list
+         */
         foreach ($terms as $term) {
-
-            /* Skip Extraordinary Terms
-             */
-            if ($term->getExtraordinary()) {
-                continue;
-            }
-
             if ($currentFound) {
                 return $term;
             }
