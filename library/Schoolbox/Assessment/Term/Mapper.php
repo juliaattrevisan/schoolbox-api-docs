@@ -185,7 +185,6 @@ class Mapper extends BaseMapper
             WHERE lyl.id = :yearLevelId
             AND start <= :date
             AND display_finish > :date
-            AND archived = 0
             ORDER BY start DESC
         ";
 
