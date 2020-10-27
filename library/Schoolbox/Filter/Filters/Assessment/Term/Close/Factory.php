@@ -24,15 +24,16 @@ class Factory extends AssessmentTermFilter\Factory
      */
     public function buildDefinition(Filter\Model $filter): Filter\IDefinition
     {
-        $sortedTerms = $this->getSortedTerms();
+        $nonExtraordinarySortedTerms = $this->getNonExtraordinarySortedTerms();
+        $allTerms = $this->getAllSortedTerms();
 
         return new Definition(
             $filter,
             $this->getOptionMapper(),
             $this->getDefaultsMapper(),
-            $sortedTerms,
-            $this->getCurrentTerm($sortedTerms),
-            $this->getPreviousTerm($sortedTerms)
+            $allTerms,
+            $this->getCurrentTerm($nonExtraordinarySortedTerms),
+            $this->getPreviousTerm($nonExtraordinarySortedTerms)
         );
     }
 
@@ -44,6 +45,6 @@ class Factory extends AssessmentTermFilter\Factory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        return new KeyConverter($filter, new Collection($this->getSortedTerms()->getColumnValues('id')));
+        return new KeyConverter($filter, new Collection($this->getAllSortedTerms()->getColumnValues('id')));
     }
 }
