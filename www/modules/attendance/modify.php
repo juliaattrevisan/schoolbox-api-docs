@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Allows the updating of attendance records in synergetic.  This page is used to display the input form with a
  * list of students, options for attendance storing
@@ -19,10 +20,11 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 /**
  * Parse date/time strings to get the time only
  *
- * @param string $input
+ * @param string $input  The input date
+ * @param string $format The format to get the time in
  * @return string
  */
-function parseDateTimeString($input)
+function parseDateTimeString($input, $format)
 {
     if (empty(trim($input))) {
         return '';
@@ -31,10 +33,12 @@ function parseDateTimeString($input)
     $timestamp = strtotime($input);
 
     if (!empty($timestamp)) {
-        return date("g:ia", $timestamp);
+        return date($format, $timestamp);
     }
 
-    error(ErrorMapper::ERROR_DATE_FORMAT);
+    // This shouldn't be a fatal error: just output empty?
+    return '';
+//    error(ErrorMapper::ERROR_DATE_FORMAT);
 }
 
 // Redir if $this doesn't exist (a.k.a this was accessed with a .php extension)
@@ -69,6 +73,7 @@ $classCampus = empty($classCampus) ? null : $classCampus;
 $this->setTitle('Student Attendance');
 $this->setFile(TEMPLATE_content, 'modules/attendance/modify.html');
 $this->setBlock(TEMPLATE_content, 'student', 'student_block');
+$this->setBlock(TEMPLATE_content, 'attendance_time_step', 'attendance_time_step_block');
 $this->setBlock(TEMPLATE_content, 'attendance_period', 'attendance_period_block');
 $this->setBlock(TEMPLATE_content, 'class_list_link', 'class_list_link_block');
 
@@ -87,7 +92,7 @@ $externalUserHandler = new External_User();
 
 /* Manufacture a specific class construct
  */
-$class= [
+$class = [
     'FileType' => $fileType,
     'ClassCampus' => $classCampus,
     'ClassCode' => $classCode,
@@ -165,15 +170,32 @@ $startTime   = $definition['start'][$firstPeriodNumber];
 $endTime     = $definition['end'][$lastPeriodNumber];
 $periodNames = array_unique([$definition['desc'][$firstPeriodNumber], $definition['desc'][$lastPeriodNumber]]);
 
+
+
 if ($class) {
+    // Set up attendance time steps
+    // Steps: 5min
+    $inputTimeFormat  = 'g:ia';
+    $outputTimeFormat = 'H:i';
+    $timeStep         = 5;
+    $startTimeObject  = new Alaress_Date_Format($startTime, $inputTimeFormat);
+    $timeObject       = clone $startTimeObject;
+    $endTimeObject    = new Alaress_Date_Format($endTime, $inputTimeFormat);
+    while ($timeObject->lte($endTimeObject)) {
+        $this->setVar('TIME_STEP', $timeObject->getUsingFormat($outputTimeFormat));
+        $this->parse('attendance_time_step_block', 'attendance_time_step', true);
+        $timeObject = $timeObject->addMinutes($timeStep);
+    }
+
 
     // Cosmetic makeup for the masses
-
     $this->setVar([
         'FILETYPE' => $fileType,
         'CLASS_CODE' => $class['ClassCampus'] ? $class['ClassCampus'] . '/' . $class['ClassCode'] : $class['ClassCode'],
         'ATTENDANCE_START' => $startTime,
         'ATTENDANCE_END' => $endTime,
+        'ATTENDANCE_START_FORM_VALUE' => $startTimeObject->getUsingFormat($outputTimeFormat),
+        'ATTENDANCE_END_FORM_VALUE' => $endTimeObject->getUsingFormat($outputTimeFormat),
         'ATTENDANCE_DATE' => $attendanceDate->getDatabaseDate(),
         'ATTENDANCE_DAY' => $timetableDay,
         'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getLongDateOnly(),
@@ -192,7 +214,6 @@ if ($class) {
     $allStudents = [];
 
     try {
-
         // Glue the records for all periods together.
         // TODO make External_Synergetic_Attendance accept multiple periods
         $allStudents = [];
@@ -231,7 +252,6 @@ if ($class) {
                 }
             }
         }
-
     } catch (ExternalException $e) {
         error(ErrorMapper::ERROR_ATTENDANCE_LIST);
     } catch (SchoolboxException $e) {
@@ -244,7 +264,6 @@ if ($class) {
     $attendanceTotal = 0;
 
     if (is_array($allStudents) && count($allStudents)) {
-
         $attendanceCount = $attendanceTotal = count($allStudents);
         $userHandler = new User();
 
@@ -265,10 +284,9 @@ if ($class) {
         ];
 
         foreach ($reasonDropdownOptions as $reason) {
-
             /* Figure out where it should be stacked
              */
-            $type = trim($reason['AbsenceTypeCode']) !== '' ? trim($reason['AbsenceTypeCode']): INDEX_ALL;
+            $type = trim($reason['AbsenceTypeCode']) !== '' ? trim($reason['AbsenceTypeCode']) : INDEX_ALL;
 
             /* If we haven't seen this type code before, init an array
              */
@@ -294,7 +312,6 @@ if ($class) {
         // Iterate each student
 
         foreach ($allStudents as $currentStudent) {
-
             $user = $userHandler->getBySynergy($currentStudent['ID']);
 
             $pattern = '/((?:[0-2])?[0-9]:[0-5][0-9]):[0-5][0-9](?:\.|:)000(AM|PM)?/i';
@@ -314,8 +331,8 @@ if ($class) {
                 'STUDENT_REASON_DESCRIPTION' => Scrub::text($currentStudent['ActualEventComment'] ? $currentStudent['ActualEventComment'] : $currentStudent['PossibleDescription']),
                 'STUDENT_ATTENDANCESTRING' => Scrub::text($currentStudent['TodaysAttendanceString']),
                 'STUDENT_NONATTENDREASON' => Scrub::text($currentStudent['PossibleNonAttendReason']),
-                'STUDENT_ARRIVAL_TIME' => parseDateTimeString($currentStudent['LateArrivalTime']),
-                'STUDENT_DEPT_TIME' => parseDateTimeString($currentStudent['EarlyDepartureTime']),
+                'STUDENT_ARRIVAL_TIME' => parseDateTimeString($currentStudent['LateArrivalTime'], $outputTimeFormat),
+                'STUDENT_DEPT_TIME' => parseDateTimeString($currentStudent['EarlyDepartureTime'], $outputTimeFormat),
                 'IS_ABSENT' => $isAbsent ? 'checked="checked"' : '',
             ]);
 
@@ -328,7 +345,10 @@ if ($class) {
             $abscenceCode = $currentStudent['ActualAbsenceTypeCode'] && $currentStudent['ActualAbsenceTypeCode'] != '?' ? $currentStudent['ActualAbsenceTypeCode'] : $currentStudent['PossibleAbsenceCode'];
 
             $this->dropDown(
-                'absence_options', $absenceDropdownOptions, $abscenceCode, 'student',
+                'absence_options',
+                $absenceDropdownOptions,
+                $abscenceCode,
+                'student',
                 array('Code' => 'ABSENCE_OPTIONS_VALUE', 'Description' => 'ABSENCE_OPTIONS_DESCRIPTION')
             );
 
@@ -338,7 +358,10 @@ if ($class) {
             /* Set default dropdown appearance on load
              */
             $this->dropDown(
-                'reason_options', array_merge($reasonStack[$abscenceCode] ?: [], $reasonStack[INDEX_ALL]), $reasonCode, 'student',
+                'reason_options',
+                array_merge($reasonStack[$abscenceCode] ?: [], $reasonStack[INDEX_ALL]),
+                $reasonCode,
+                'student',
                 array('Code' => 'REASON_OPTIONS_VALUE', 'AbsenceTypeCode' => 'REASON_OPTIONS_TYPE', 'Description' => 'REASON_OPTIONS_DESCRIPTION')
             );
 
@@ -346,37 +369,37 @@ if ($class) {
                 //Let's render out some flags
                 //Only the flags defined in the keys will be rendered
                 $flags = [
-                    'MedicalAlertFlag'=> [
+                    'MedicalAlertFlag' => [
                         'icon' => 'alert',
                         'descriptionField' => 'MedicalAlert',
                         'defaultDescription' => 'Medical Alert'
                     ],
-                    'SpecialNeedsFlag'=> [
+                    'SpecialNeedsFlag' => [
                         'icon' => 'info',
                         'descriptionField' => 'SpecialNeedsDescription',
                         'defaultDescription' => $localeSpecialNeeds,
                     ],
-                    'CommentWarningFlag'=> [
+                    'CommentWarningFlag' => [
                         'icon' => 'comment',
                         'descriptionField' => 'CommentDescription',
                         'defaultDescription' => 'Comment'
                     ],
-                    'ParentsSeparatedFlag'=> [
+                    'ParentsSeparatedFlag' => [
                         'icon' => 'staff',
                         'descriptionField' => 'ParentsSeparatedDescription',
                         'defaultDescription' => 'Parents Separated'
                     ],
-                    'CourtOrderFlag'=> [
+                    'CourtOrderFlag' => [
                         'icon' => 'forms',
                         'descriptionField' => 'CourtOrderDescription',
                         'defaultDescription' => 'Court Order'
                     ],
-                    'IndividualPlanFlag'=> [
+                    'IndividualPlanFlag' => [
                         'icon' => 'staff-students',
                         'descriptionField' => 'IndividualPlanDescription',
                         'defaultDescription' => 'Individual Plan'
                     ],
-                    'AnaphylaxisFlag'=> [
+                    'AnaphylaxisFlag' => [
                         'icon' => 'danger',
                         'descriptionField' => 'AnaphylaxisDescription',
                         'defaultDescription' => 'Anaphylaxis'
@@ -384,10 +407,10 @@ if ($class) {
                 ];
 
                 foreach ($flags as $key => $value) {
-                    if(isset($currentStudent[$key]) && $currentStudent[$key]){
+                    if (isset($currentStudent[$key]) && $currentStudent[$key]) {
                         $this->setVar('ICON', $flags[$key]['icon']);
 
-                        if(!empty($currentStudent[$flags[$key]['descriptionField']])) {
+                        if (!empty($currentStudent[$flags[$key]['descriptionField']])) {
                             $this->setVar('DESCRIPTION', $currentStudent[$flags[$key]['descriptionField']]);
                         } else {
                             $this->setVar('DESCRIPTION', $flags[$key]['defaultDescription']);
@@ -416,7 +439,6 @@ if ($class) {
         } else {
             $this->setVar('class_list_link_block', '');
         }
-
     } else {
         $this->setVar('student_block', '');
         $this->setVar('class_list_link_block', '');
@@ -424,7 +446,6 @@ if ($class) {
 
     $this->setVar('ATTENDANCE_COUNT', $attendanceCount);
     $this->setVar('ATTENDANCE_TOTAL', $attendanceTotal);
-
 } else {
     error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
 }

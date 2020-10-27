@@ -10,11 +10,10 @@ $(function () {
     $('#infoPanel').find('a[data-menu]').flyout();
     $('#nav').touchMenu()
         .scrollToTop({
-                cancel: function () {
-                    return !$(this).parent().hasClass('has-submenu');
-                }
+            cancel: function () {
+                return !$(this).parent().hasClass('has-submenu');
             }
-        );
+            });
 
     var s = $('#search');
     s.on('click', '[data-jsubmit]', function () {
@@ -28,7 +27,7 @@ $(function () {
     $.fn.schoolboxResource_ProxyReplacement('#content');
 
     // Notifications dock/undock
-    $('#right-menu-dock').on('click', function() {
+    $('#right-menu-dock').on('click', function () {
         var dockState = $(this).data('dock-state');
 
         // Adjust classes
@@ -55,7 +54,7 @@ $(function () {
     });
 
     // Left menu dock/undock
-    $('#left-menu-dock').on('click', function() {
+    $('#left-menu-dock').on('click', function () {
         var dockState = $(this).data('dock-state');
 
         // Adjust classes
@@ -87,12 +86,12 @@ $(function () {
      */
     var accountMenu = $('#account-content');
 
-    $('#profile-drop').on('click', function(e){
+    $('#profile-drop').on('click', function (e) {
         e.stopPropagation();
         accountMenu.toggleClass('open');
     });
 
-    $('#off-canvas-wrap').on('click', function(){
+    $('#off-canvas-wrap').on('click', function () {
         accountMenu.removeClass('open');
     });
 
@@ -103,7 +102,7 @@ $(function () {
      *
      * Also, arbitrary 6.25rem padding at top (in the design)
      */
-    var modalTop = 6.25*16;
+    var modalTop = 6.25 * 16;
 
     $(document).on('open.fndtn.reveal', '[data-reveal]', function () {
         $(this).css({'top': $(window).scrollTop() + modalTop + 'px'});
@@ -114,7 +113,7 @@ $(function () {
     });
 
     var splash, d, x, y, splashTimeout;
-    $(document).on('click', ".button, button, .sub-nav a, .pagination a, .flex-list a, [data-component-palette]", function(e) {
+    $(document).on('click', ".button, button, .sub-nav a, .pagination a, .flex-list a, [data-component-palette]", function (e) {
 
         splash = $(this).find(".splash");
         splash.removeClass('animate');
@@ -129,21 +128,16 @@ $(function () {
             splash.css({height: d, width: d});
         }
 
-        x = e.pageX - $(this).offset().left - splash.width()/2;
-        y = e.pageY - $(this).offset().top - splash.height()/2;
+        x = e.pageX - $(this).offset().left - splash.width() / 2;
+        y = e.pageY - $(this).offset().top - splash.height() / 2;
 
-        splash.css({top: y+'px', left: x+'px'}).addClass("animate");
+        splash.css({top: y + 'px', left: x + 'px'}).addClass("animate");
 
         // Remove the animation after a bit of time, otherwise this animation will happen every time the element hides and becomes visible again
-        splashTimeout = setTimeout(function() {
+        splashTimeout = setTimeout(function () {
             splash.removeClass('animate');
         }, 300);
     });
-
-    /**
-     * Autoclear the main site search field (works without polyfill in all but IE9)
-     */
-    $('#search-field').placeholder();
 
     // Set up lightboxes globally, group galleries by lightbox relation.
     var lightboxGroups = {};
@@ -199,7 +193,8 @@ $(function () {
     /**
      * Show/hide top nav items based on space available
      */
-    function updateTopNavItems() {
+    function updateTopNavItems()
+    {
         var topMenuItemWidth = $('#top-menu > li').width();
 
         // All the possible things to remove from the #top-menu width
@@ -212,7 +207,7 @@ $(function () {
         // Store the width left in top nav after subtracting
         var spaceLeft = $('#top-menu').width() - extraWidth;
 
-        $('#top-menu > li').each(function(index) {
+        $('#top-menu > li').each(function (index) {
             // Always show the first 4 on the top nav
             if (index < 4) {
                 toggleTopNavItem(true, $(this));
@@ -240,7 +235,8 @@ $(function () {
      * @param {boolean} show
      * @param {Object} $item
      */
-    function toggleTopNavItem(show, $item) {
+    function toggleTopNavItem(show, $item)
+    {
         var itemId = $item.data('id');
 
         // Show top nav
@@ -257,7 +253,7 @@ $(function () {
     // Listen for changes to window size and run the top nav update
     // Apply a timeout so that the function doesn't run a million times while resizing
     var resizeTimeout;
-    $(window).resize(function() {
+    $(window).resize(function () {
         this.clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(updateTopNavItems, 100);
     });

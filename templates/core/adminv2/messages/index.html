@@ -1,5 +1,4 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script type="text/javascript">
     $(function() {
         $('[data-preview]').click(function(event) {
@@ -7,16 +6,15 @@
 
             window.open($(this).attr('href'),'1396330261396','width=720,height=500,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=0,left=0,top=0');
         });
-
-        $('[data-timepicker]').timepicker({
-            timeFormat: 'H:i',
-            appendTo: function ($input) {
-                return $input.closest('.timepick');
-            }
-        });
     });
 </script>
 <!-- END custom_head -->
+
+<datalist id="digest-time-steps">
+    <!-- BEGIN digest_time_step -->
+    <option value="{TIME_STEP}">{TIME_STEP}</option>
+    <!-- END digest_time_step -->
+</datalist>
 
 {ADMIN_NAV}
 
@@ -113,9 +111,12 @@
                             </div>
                         </div>
                         <div class="small-12 large-4 columns">
-                            <div class="timepick">
-                                <input name="role[{ROLE_ID}][time]" type="text" autocomplete="off" placeholder="{TIME_VALUE}" value="{TIME_VALUE}" data-timepicker />
-                            </div>
+                            <input name="role[{ROLE_ID}][time]"
+                                   type="time"
+                                   list="digest-time-steps"
+                                   placeholder="{TIME_VALUE}"
+                                   value="{TIME_VALUE}"
+                            />
                         </div>
                     </li>
                     <!-- END role_digest -->

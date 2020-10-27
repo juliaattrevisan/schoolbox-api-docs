@@ -13,9 +13,6 @@ const jsSrc = {
         // jQuery
         'www/javascript/components/jquery/dist/jquery.js',
 
-        // jQuery placeholder shim
-        'www/javascript/components/jquery-placeholder/jquery.placeholder.js',
-
         // jQuery Validation
         'www/javascript/components/jquery-validation/dist/jquery.validate.js',
         'www/javascript/jquery.alaressValidate.js',
@@ -70,7 +67,7 @@ const jsSrc = {
         'www/javascript/components/mediaelement/build/mediaelement-and-player.min.js',
 
         // DateTime
-        'www/javascript/components/moment/moment.js',
+        'node_modules/moment/moment.js',
 
         // Files And Resource Browser
         'www/socialstream/browser/browser.js',
@@ -168,7 +165,7 @@ const jsDest = {
     vue: 'www/javascript/components/<%= pkg.name %>-vue.min.js'
 };
 
-module.exports = function(grunt) {
+module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
