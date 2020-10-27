@@ -82,14 +82,23 @@ class Module extends Comment\Module
      * Builds an authorization rule for whether a user has permission to delete
      * comments.
      *
-     * For now, the rules for deleting are the same as those for reading:
-     * @see buildGetCommentsAuthorizationRule
+     * Any user who may read comments may delete comments, except for the
+     * recipient's parents.
      *
      * @return Auth\Rule\IAuthorizationRule
      * @throws InvalidArgumentException
      */
     protected function buildDeleteCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
     {
-        return $this->buildGetCommentsAuthorizationRule();
+        return new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new Auth\Rule\HasRole(Role::STAFF),
+            new Auth\Rule\IsUser(
+                static function (array $params) {
+                    $evidence = $params['context'];
+                    return $evidence->getRecipient()->getId();
+                },
+            ),
+        );
     }
 }
