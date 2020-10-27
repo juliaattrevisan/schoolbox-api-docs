@@ -216,39 +216,25 @@ class Mapper extends BaseMapper
      * Find all the active folder ids related to $term
      *
      * @param Model                $term
-     * @param YearLevel\Model|null $yearLevel
      * @return array
      * @throws PDOException
      */
-    public function findFolderIdsForTerm(Model $term, ?YearLevel\Model $yearLevel): array
+    public function findFolderIdsForTerm(Model $term): array
     {
         $query = "
-            SELECT folder_id
+            SELECT DISTINCT folder_id
             FROM folder_year_level fyl
             INNER JOIN term_year_level tyl ON fyl.year_level_id = tyl.year_level_id
             INNER JOIN {$this->getTable()} t ON tyl.term_id = t.{$this->getIdentifierColumn()}
             INNER JOIN folder ON fyl.folder_id = folder.id
             WHERE t.{$this->getIdentifierColumn()} = :termId
-            AND t.archived = 0
             AND folder.deleted_at IS NULL
         ";
 
-        $params = [
-            'termId' => $term->getId()
-        ];
-
-        /* If you specified a YearLevel instance, limit the query to that year level's relations
-         * This prevents a user in Year 9 seeing folders in Year 4 simply because an Extraordinary
-         * Term was related to multiple year levels
-         */
-        if (null !== $yearLevel) {
-            $query .= "AND fyl.year_level_id = :yearLevelId";
-
-            $params['yearLevelId'] = $yearLevel->getId();
-        }
-
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute($params);
+        $statement->execute([
+            'termId' => $term->getId()
+        ]);
 
         $folderIds = [];
 

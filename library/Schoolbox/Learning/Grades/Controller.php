@@ -204,7 +204,7 @@ class Controller extends Base
         $extraordinaryTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $viewee->getYear());
 
         if ($extraordinaryTerm->getExtraordinary()) {
-            $extraordinaryFolders = $this->termMapper->findFolderIdsForTerm($extraordinaryTerm, $viewee->getYear());
+            $extraordinaryFolders = $this->termMapper->findFolderIdsForTerm($extraordinaryTerm);
 
             $folders = $folders->filter(
                 static function (Folder\Model $folder) use ($extraordinaryFolders) {
