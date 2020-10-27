@@ -1,5 +1,4 @@
 <script>
-import moment       from "moment";
 import MediaArticle from '@schoolbox/media-article';
 import Storage      from '@schoolbox/storage';
 
