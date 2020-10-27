@@ -1,7 +1,7 @@
 <script>
-import moment       from "moment";
 import MediaArticle from '@schoolbox/media-article';
 import Storage      from '@schoolbox/storage';
+import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 
 export default {
     /**
@@ -35,7 +35,8 @@ export default {
      */
     components: {
         MediaArticle,
-        Storage
+        Storage,
+        RelativeTime
     },
 
     /**
@@ -46,7 +47,6 @@ export default {
      */
     data() {
         return {
-            createdAt: null
         }
     },
 
@@ -56,7 +56,6 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
-        this.createdAt = this.renderCreatedAt(this.evidence.createdAt);
     },
 
     /**
@@ -64,7 +63,6 @@ export default {
      * Access the results of a function as if they were a property of an object.
      */
     computed: {
-        dateDisplayFormats: () => window.dateDisplayFormats
     },
 
     /**
@@ -73,33 +71,6 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
-        /**
-         * Renders the created-at time as a string.
-         *
-         * @param {Moment} createdAt
-         */
-        renderCreatedAt(createdAt) {
-            let now = moment().startOf('d'),
-                dayDiff = moment(createdAt).diff(now, 'd');
-
-            let struct = {
-                'absolute': moment(createdAt).format(dateDisplayFormats.momentJsDatetime),
-                'relative': null
-            };
-
-            if (dayDiff === 0) {
-                struct.relative = 'today';
-            } else if (dayDiff === -1) {
-                struct.relative = 'yesterday';
-            } else if (dayDiff === 1) {
-                struct.relative = 'tomorrow';
-            } else {
-                struct.relative = moment.duration(dayDiff, 'd').humanize(true);
-            }
-
-            return struct;
-        }
     }
 }
 </script>
@@ -113,9 +84,7 @@ export default {
                             <p class="meta">By
                                 {{ this.evidence.recipient.fullName }}
                                 &mdash;
-                                <time :title="this.createdAt.absolute">
-                                    {{ this.createdAt.relative }}
-                                </time>
+                                <relative-time :date="this.evidence.createdAt"></relative-time>
                             </p>
 
                             <!-- Display evidence body, with media players initialised -->
