@@ -11,7 +11,8 @@ namespace Schoolbox\Learning\Moment\Evidence;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
-use Schoolbox\Learning\Moment\Evidence\Translator;
+use Schoolbox\Discussion\Comment;
+use Schoolbox\Discussion\Thread;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
@@ -206,6 +207,39 @@ class Controller extends Base
                     return $this->generateLinks($item);
                 }
             );
+
+
+        // Include some of the discussion thread's comments in this return.
+        // (Say, the first two?)
+        // The translator will need to know how to translate discussion threads.
+        $commentMapper = Comment\Mapper::getInstance();
+        $mappedData    = $mappedData->map(static function (array $item) use ($commentMapper) {
+            $discussionThreadId = $item['discussionThread']['id'] ?? null;
+            if ($discussionThreadId) {
+                $evidence         = (new Model())->setId($item['id']);
+                $discussionThread = (new Thread\Model())->setId($discussionThreadId);
+                $commentCursor    = new Comment\Cursor($commentMapper, $discussionThread);
+
+                $results        = $commentCursor->retrieveResults(null);
+                $encodedResults = $results->map(function (Comment\Model $comment) use ($evidence) {
+                    return new Discussion\Comment\ModelDecorator\Decorator($comment, $evidence);
+                });
+
+                // Each results list will contain the data and metadata
+                $item['discussionThread']['comments'] = [
+                    'data'     => $encodedResults,
+                    'metadata' => [
+                        'count'  => $commentCursor->retrieveResultCount(),
+                        'cursor' => [
+                            'current' => $commentCursor->current($results),
+                            'next'    => $commentCursor->next($results),
+                        ],
+                    ],
+                ];
+            }
+            return $item;
+        });
+
 
         $this->response->content->set(
             $this->buildJsonOutput([
