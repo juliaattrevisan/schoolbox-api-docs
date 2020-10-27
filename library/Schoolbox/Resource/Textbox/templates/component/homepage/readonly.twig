@@ -10,12 +10,11 @@
 
 {% if textboxExists and textbox.body is defined and textbox.body != '' %}
     {% if component.config('showComponentTitle') %}
-    <script type="text/javascript">
-        $(function () {
-            console.log($('#component{{ component.instance.id }} .component-titlebar'));
-            $('#component{{ component.instance.id }} .component-titlebar').attr('id', 'textbox{{ textbox.id }}');
-        });
-    </script>
+        <script type="text/javascript">
+            $(function () {
+                $('#component{{ component.instance.id }} .component-titlebar').attr('id', 'textbox{{ textbox.id }}');
+            });
+        </script>
     {% else %}
         <a id="textbox{{ textbox.id }}"></a>
     {% endif %}
