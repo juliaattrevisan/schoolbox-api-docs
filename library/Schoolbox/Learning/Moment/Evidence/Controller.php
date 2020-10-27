@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence;
 
+use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread;
+use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
@@ -213,17 +215,21 @@ class Controller extends Base
         // (Say, the first two?)
         // The translator will need to know how to translate discussion threads.
         $commentMapper = Comment\Mapper::getInstance();
-        $mappedData    = $mappedData->map(static function (array $item) use ($commentMapper) {
+        $linkDecorator = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
+        $jsonDecorator = new PropertyDecorator(null, $linkDecorator);
+        $mappedData    = $mappedData->map(static function (array $item) use ($commentMapper, $linkDecorator, $jsonDecorator) {
             $discussionThreadId = $item['discussionThread']['id'] ?? null;
             if ($discussionThreadId) {
-                $evidence         = (new Model())->setId($item['id']);
                 $discussionThread = (new Thread\Model())->setId($discussionThreadId);
+                $evidence         = (new Model())->setId($item['id'])->setDiscussionThread($discussionThread);
                 $commentCursor    = new Comment\Cursor($commentMapper, $discussionThread);
-
-                $results        = $commentCursor->retrieveResults(null);
-                $encodedResults = $results->map(function (Comment\Model $comment) use ($evidence) {
-                    return new Discussion\Comment\ModelDecorator\Decorator($comment, $evidence);
-                });
+                $results          = $commentCursor->retrieveResults(null);
+                $encodedResults   = $results
+                    ->map(static function (Comment\Model $comment) use ($evidence) {
+                        return new Discussion\Comment\ModelDecorator\Decorator($comment, $evidence);
+                    });
+                $encodedResults   = $encodedResults
+                    ->jsonSerialize($jsonDecorator, $linkDecorator);
 
                 // Each results list will contain the data and metadata
                 $item['discussionThread']['comments'] = [
