@@ -56,7 +56,7 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
-        this.formattedDate = this.renderCreatedAt(this.datetime);
+        this.formattedDate = this.renderFormattedDatetimes(this.datetime);
     },
 
     /**
@@ -79,7 +79,7 @@ export default {
          *
          * @param {Moment} datetime
          */
-        renderCreatedAt(datetime) {
+        renderFormattedDatetimes(datetime) {
             let now = moment().startOf('d'),
                 date = moment(datetime),
                 dayDiff = date.diff(now, 'd');
