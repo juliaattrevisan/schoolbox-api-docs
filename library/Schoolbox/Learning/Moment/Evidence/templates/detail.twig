@@ -1,3 +1,10 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbs(
+    [evidence.recipient.fullname, '/search/user/' ~ evidence.recipient.id],
+    ['Learning Moment']
+) }}
+
 <div id="evidence-detail-container">
     {% set evidenceData = {
         'id': evidence.id,
