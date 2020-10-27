@@ -86,7 +86,7 @@ export default {
 
             let struct = {
                 'absolute': date.format(dateDisplayFormats.momentJsDatetime),
-                'relative': null
+                'relative': ''
             };
 
             /* We determine a relative time equivalence based on how different
