@@ -231,8 +231,12 @@ class Controller extends Base
                 $encodedResults   = $encodedResults
                     ->jsonSerialize($jsonDecorator, $linkDecorator);
 
-                // Each results list will contain the data and metadata
-                $item['discussionThread']['comments'] = [
+                // Serialize the discussion thread using its decorator
+                $item['discussionThread'] = (new Discussion\Thread\ModelDecorator\Decorator($discussionThread, $evidence))
+                    ->jsonSerialize($jsonDecorator, $linkDecorator);
+
+                // Serialize the thread's comments as well
+                $item['discussionThread']['children'] = [
                     'data'     => $encodedResults,
                     'metadata' => [
                         'count'  => $commentCursor->retrieveResultCount(),
