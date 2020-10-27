@@ -24,7 +24,7 @@ export default {
      * These are the hypen-separated vars which are magically computed into camelcase elsewhere.
      */
     props: [
-        'date'
+        'datetime'
     ],
 
     /**
@@ -43,7 +43,10 @@ export default {
      */
     data() {
         return {
-            formattedDate: null
+            formattedDate: {
+                'absolute': '',
+                'relative': ''
+            }
         }
     },
 
@@ -53,7 +56,7 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
-        this.formattedDate = this.renderCreatedAt(this.date);
+        this.formattedDate = this.renderCreatedAt(this.datetime);
     },
 
     /**
@@ -78,10 +81,11 @@ export default {
          */
         renderCreatedAt(datetime) {
             let now = moment().startOf('d'),
-                    dayDiff = moment(datetime).diff(now, 'd');
+                date = moment(datetime),
+                dayDiff = date.diff(now, 'd');
 
             let struct = {
-                'absolute': moment(datetime).format(dateDisplayFormats.momentJsDatetime),
+                'absolute': date.format(dateDisplayFormats.momentJsDatetime),
                 'relative': null
             };
 

@@ -84,7 +84,7 @@ export default {
                             <p class="meta">By
                                 {{ this.evidence.recipient.fullName }}
                                 &mdash;
-                                <relative-time :date="this.evidence.createdAt"></relative-time>
+                                <relative-time :datetime="this.evidence.createdAt"></relative-time>
                             </p>
 
                             <!-- Display evidence body, with media players initialised -->
