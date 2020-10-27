@@ -172,7 +172,7 @@ class ModelToArray
      * @param User $user
      * @return string[]
      */
-    private function deriveLinks(User $user): array
+    protected function deriveLinks(User $user): array
     {
         return $user->getId()
             ? [
@@ -180,23 +180,5 @@ class ModelToArray
                 'avatar'  => '/portrait.php?id=' . $user->getId(),
             ]
             : [];
-    }
-
-
-    /**
-     * Derive a full name from the user's name.
-     * * "Unknown User" if they have no title, firstname or lastname
-     * * otherwise, join their title, firstname and lastname together
-     *
-     * @param User $user
-     * @return string|null
-     */
-    private function deriveFullName(User $user): ?string
-    {
-        $parts = array_filter([$user->getTitle(), $user->getFirstname(), $user->getLastname(),], 'strlen');
-        if (empty($parts)) {
-            return 'Unknown User';
-        }
-        return implode(' ', $parts);
     }
 }
