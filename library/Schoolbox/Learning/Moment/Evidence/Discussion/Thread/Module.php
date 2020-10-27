@@ -17,6 +17,7 @@ use Schoolbox\Discussion\Thread;
 use Schoolbox\Learning\Moment\Evidence;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
+use Schoolbox\UserMapper;
 
 /**
  * Evidence-specific module for discussion threads.
@@ -26,7 +27,7 @@ class Module extends Thread\Module
     /**
      * @var string
      */
-    protected $basename = 'learningMomentEvidenceDiscussionThreads';
+    protected $basename = 'evidenceDiscussionThreads';
 
 
     /**
@@ -110,16 +111,19 @@ class Module extends Thread\Module
      */
     protected function buildGetCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
     {
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getMapperFactory()->get(UserMapper::class);
         return new Auth\Rule\Any(
-            new Auth\Rule\HasRole(Role::STAFF),
             new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () {
-                /** @var Auth\Authorizer $authorizer */
-                $authorizer = $this->getInjector()->get('authorizer');
-                return new Thread\Authorizer\CanActUponContext(
-                    new News\Discussion\Permission\CanGetComments($authorizer)
-                );
-            })
+            new Auth\Rule\HasRole(Role::STAFF),
+            new Auth\Rule\IsUserOrParentOfUser(
+                $this->getExternalUser(),
+                $userMapper,
+                static function (array $params) {
+                    $evidence = $params['context'];
+                    return $evidence->getRecipient()->getId();
+                },
+            ),
         );
     }
 
