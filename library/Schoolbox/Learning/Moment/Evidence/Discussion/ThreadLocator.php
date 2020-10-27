@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
