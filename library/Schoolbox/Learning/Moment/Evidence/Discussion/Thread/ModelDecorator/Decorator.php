@@ -32,8 +32,8 @@ class Decorator extends BaseDecorator
             'contextId' => $this->context->getId(),
         ];
         return [
-            'getComments'   => new AuraLink('learningMomentEvidenceDiscussionThreads.getCommentsByThread', $params),
-            'createComment' => new AuraLink('learningMomentEvidenceDiscussionThreads.createCommentInThread', $params),
+            'getComments'   => new AuraLink('evidenceDiscussionThreads.getCommentsByThread', $params),
+            'createComment' => new AuraLink('evidenceDiscussionThreads.createCommentInThread', $params),
         ];
     }
 }
