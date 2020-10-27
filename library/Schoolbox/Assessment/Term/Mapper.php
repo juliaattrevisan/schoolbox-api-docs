@@ -47,7 +47,6 @@ class Mapper extends BaseMapper
         $this->uses('display_finish', $endOfDay);
         $this->uses('actual_finish', $endOfDay);
         $this->uses('archived', self::TYPE_BOOLEAN);
-        $this->uses('extraordinary', self::TYPE_BOOLEAN);
 
         $this->joinsVia(
             'term_year_level',
@@ -281,9 +280,9 @@ class Mapper extends BaseMapper
      */
     public function findAllNonExtraordinary(): GenericCollection
     {
-        $pb = $this->getPredicateBuilder()->equals('extraordinary', 0);
-
-        return $this->findByPredicates($pb)->sortBy('start', 'desc');
+        return $this->findAll()->filter(static function(Model $model) {
+            return !$model->getExtraordinary();
+        })->sortBy('start', 'desc');
     }
 
 
@@ -313,24 +312,23 @@ class Mapper extends BaseMapper
 
             /* Term must have started already
              */
-            ->lessThanOrEqualTo('start', $date->getDatabaseDate())
+            ->lessThanOrEqualTo('start', $date->getDatabaseDate());
 
-            /* Ignore Extraordinary Terms
-             */
-            ->equals('extraordinary', 0);
-
-            /* TODO Why isn't Archived one of the settings here?
-             *  Surely a current term must not be archived?
+            /* Why isn't Archived one of the settings here?
+             *
+             * because: an Archived Term is still functional and still relevant, you just don't
+             * add or do anything with them other than see what happened previously
              */
 
-        try {
-            return $this->findOneByPredicates($pb, [
-                'order' => ['start' => 'DESC'],
-                'limit' => 1
-            ]);
-        } catch (Exception $e) {
-            return $this->createModel()->setExtraordinary(false);
-        }
+        /* Find the first ordinary Term
+         */
+        $term = $this->findByPredicates($pb, [
+            'order' => ['start' => 'DESC']
+        ])->filter(static function(Model $model) {
+            return !$model->getExtraordinary();
+        })->first();
+
+        return $term ?? $this->createModel();
     }
 
 

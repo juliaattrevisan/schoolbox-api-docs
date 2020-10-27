@@ -72,14 +72,6 @@ class Model implements \IComparable, IModel
 
 
     /**
-     * Extraordinary Terms are those who have exactly one YearLevel relation
-     *
-     * @var bool
-     */
-    private $extraordinary;
-
-
-    /**
      * @var \Schoolbox\YearLevel\Model[]|null
      */
     private $yearLevels;
@@ -285,17 +277,16 @@ class Model implements \IComparable, IModel
      */
     public function getExtraordinary(): bool
     {
-        return $this->extraordinary;
-    }
+        /* Unspecified year level relations: not definitively extraordinary
+         */
+        if (null === $this->getYearLevels()) {
+            return false;
+        }
 
-    /**
-     * @param bool $extraordinary
-     * @return $this
-     */
-    public function setExtraordinary(bool $extraordinary): self
-    {
-        $this->extraordinary = $extraordinary;
-        return $this;
+        /* Otherwise, find out how many year level relations were given to this Term
+         * Any quantity of year level relations makes an Extraordinary Term
+         */
+        return $this->getYearLevels()->count() > 0;
     }
 
 

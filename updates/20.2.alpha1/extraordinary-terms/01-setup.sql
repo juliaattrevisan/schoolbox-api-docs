@@ -7,7 +7,3 @@ CONSTRAINT `fk_term_year_level_term_id` FOREIGN KEY (term_id) REFERENCES term (i
 CONSTRAINT `fk_term_year_level_year_level_id` FOREIGN KEY (year_level_id) REFERENCES lu_year_level (id) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- A field to remember when a Term is considered Extraordinary
-
-ALTER TABLE `term`
-    ADD COLUMN `extraordinary` TINYINT(1) NOT NULL DEFAULT '0' AFTER `archived`;

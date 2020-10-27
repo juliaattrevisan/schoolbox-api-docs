@@ -146,14 +146,6 @@ class Controller extends Base
 
         $term->setYearLevels($this->yearLevelMapper->findByColumn('id', $yearLevelIds));
 
-        /* Remember how extraordinary this was
-         */
-        if ($term->getYearLevels() && $term->getYearLevels()->count()) {
-            $term->setExtraordinary(true);
-        } else {
-            $term->setExtraordinary(false);
-        }
-
         try {
             $term->setStart(Alaress_Date_Format::newLocalShort($postdata->get('start')));
         } catch (\Exception $e) {
