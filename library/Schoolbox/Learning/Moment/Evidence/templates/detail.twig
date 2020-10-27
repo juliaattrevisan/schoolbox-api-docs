@@ -1,22 +1,11 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 
 {{ bread.crumbs(
-    [evidence.recipient.fullname, '/search/user/' ~ evidence.recipient.id],
+    [evidence.recipient.fullName, '/search/user/' ~ evidence.recipient.id],
     ['Learning Moment']
 ) }}
 
 <div id="evidence-detail-container">
-    {% set evidenceData = {
-        'id': evidence.id,
-        'body': evidence.body,
-        'createdAt': evidence.createdAt.short,
-        'recipient': {
-            'id': evidence.recipient.id,
-            'firstname': evidence.recipient.firstname,
-            'lastname': evidence.recipient.lastname
-        },
-    } %}
-
-    <evidence-detail :evidence="{{ evidenceData|json_encode }}"></evidence-detail>
+    <evidence-detail :evidence="{{ evidence|json_encode }}"></evidence-detail>
 </div>
 <script src="/javascript/components/learningMomentsEvidenceDetail.bundle.js"></script>

@@ -111,11 +111,21 @@ class Controller extends Base
      */
     public function getEvidenceDetail(Model $evidence): void
     {
+        $translator = new Translator\ModelToArray(
+            new User\Translator\ModelToArray(),
+            new Storage\Translator\ModelToArray(),
+        );
+
+        $item = $translator($evidence);
+
+        /* TODO: Why wouldn't you just scrub this in ModelToArray
+         */
+        $item['body'] = Scrub::html($item['body']);
+
         $this->response->content->set($this->buildHtmlOutput('@learningMomentEvidence/detail.twig', [
-            'evidence' => $evidence
+            'evidence' => $item
         ]));
     }
-
 
 
 //    /**
