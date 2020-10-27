@@ -431,6 +431,7 @@ class Mapper extends BaseMapper
         // error out
         $query = "
             SELECT * FROM {$this->getTable()}
+            LEFT JOIN term_year_level tyl ON term.id = tyl.term_id
             WHERE (
                 (`start`          BETWEEN CAST(:thisStart AS DATE) AND CAST(:thisFinish AS DATE))
                 OR
@@ -440,12 +441,13 @@ class Mapper extends BaseMapper
                 OR
                 (`start` >= CAST(:thisStart AS DATE) AND `display_finish` <= CAST(:thisFinish AS DATE))
             )
-            AND extraordinary = 0
+            AND term_id IS NULL
         ";
         $params = [
             'thisStart'  => $model->getStart()->getDatabaseDate(),
             'thisFinish' => $model->getDisplayFinish()->getDatabaseDate(),
         ];
+
         if ($model->getId()) {
             $query .= ' AND id != :id';
             $params['id'] = $model->getId();
