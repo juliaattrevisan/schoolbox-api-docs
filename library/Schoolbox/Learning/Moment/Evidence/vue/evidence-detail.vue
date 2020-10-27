@@ -80,7 +80,7 @@ export default {
                     <div class="small-12 island">
                         <section class="detail content">
                             <p class="meta">By
-                                {{ this.evidence.recipient.firstname }} {{ this.evidence.recipient.lastname }}
+                                {{ this.evidence.recipient.fullName }}
                                 &mdash;
                                 <time>{{ this.evidence.createdAt }}</time>
                             </p>
