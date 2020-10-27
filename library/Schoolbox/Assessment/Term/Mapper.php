@@ -178,7 +178,9 @@ class Mapper extends BaseMapper
          * which extraordinary Term should be returned...
          */
         $query = "
-            SELECT {$this->getColumnString()}
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('term_year_level', 'lyl')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('term_year_level', '', 'lyl')}
             WHERE lyl.id = :yearLevelId
