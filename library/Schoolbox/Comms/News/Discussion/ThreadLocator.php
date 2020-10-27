@@ -18,6 +18,12 @@ use Schoolbox\Mapper\Exception;
  */
 class ThreadLocator implements IThreadLocator
 {
+    /**
+     * The type for this object.
+     *
+     * @deprecated This was once used in an identifier somewhere: it is used
+     *             no longer
+     */
     public const TYPE = 'comms';
 
 
@@ -47,7 +53,7 @@ class ThreadLocator implements IThreadLocator
 
 
     /**
-     * @inheritDoc
+     * @deprecated I don't think this is used anymore
      *
      * @param string $contextType
      * @return bool

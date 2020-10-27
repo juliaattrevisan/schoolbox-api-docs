@@ -19,9 +19,6 @@ use Schoolbox\Mapper\Exception;
  */
 class ThreadLocator implements IThreadLocator
 {
-    public const TYPE = 'evidence';
-
-
     /**
      * @var News\Mapper
      */
@@ -44,16 +41,6 @@ class ThreadLocator implements IThreadLocator
     {
         $this->threadMapper = $threadMapper;
         $this->mapper       = $mapper;
-    }
-
-
-    /**
-     * @param string $contextType
-     * @return bool
-     */
-    public function isContextFor(string $contextType): bool
-    {
-        return $contextType === self::TYPE;
     }
 
 
