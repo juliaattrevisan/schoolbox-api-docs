@@ -22,6 +22,8 @@ use Schoolbox\Learning\Grades;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Learning\Module as LearningModule;
+use Schoolbox\Learning\Moment\Evidence\Discussion\Comment\Module as EvidenceCommentModule;
+use Schoolbox\Learning\Moment\Evidence\Discussion\Thread\Module as EvidenceThreadModule;
 use Schoolbox\Learning\Moment\Evidence\Module as EvidenceModule;
 use Schoolbox\Learning\Moment\StudentToolkit\Module as StudentToolkitModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
@@ -69,5 +71,9 @@ class Learning extends ModuleLoader
                 "/{$namespace}/assessment/calendar/events"
             );
         }
+
+        // Learning moments discussions
+        $this->loadModule($kernel, EvidenceThreadModule::class, "/discussion/evidence/{contextId}/threads");
+        $this->loadModule($kernel, EvidenceCommentModule::class, "/discussion/evidence/{contextId}/comments");
     }
 }
