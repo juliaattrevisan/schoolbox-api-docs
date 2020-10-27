@@ -18,11 +18,12 @@ use Schoolbox\UserMapper;
 class IsParentOfUser implements IAuthorizationRule
 {
     /**
-     * The array key in $params that contains the user ID.
+     * The array key in $params that contains the user ID (if a string), or a
+     * callable which can retrieve the ID.
      *
      * @var string
      */
-    protected $paramsKey = 'id';
+    protected $userIdSource = 'id';
 
     /**
      * The external user interface
@@ -43,28 +44,32 @@ class IsParentOfUser implements IAuthorizationRule
      *
      * @param External_UserInterface $externalDb
      * @param UserMapper             $userMapper
-     * @param string                 $paramsKey
+     * @param string|callable        $userIdSource
      */
     public function __construct(
         External_UserInterface $externalDb,
         UserMapper $userMapper,
-        $paramsKey = 'id'
+        $userIdSource = 'id'
     ) {
-        $this->externalDb = $externalDb;
-        $this->userMapper = $userMapper;
-        $this->paramsKey = $paramsKey;
+        $this->externalDb   = $externalDb;
+        $this->userMapper   = $userMapper;
+        $this->userIdSource = $userIdSource;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = [], User $user = null)
     {
-        // You misconfigured or misapplied your route
-        if (!array_key_exists($this->paramsKey, $params)) {
-            throw new Base(sprintf('Key "%s" not in route params', $this->paramsKey));
+        if (is_callable($this->userIdSource)) {
+            $userId = call_user_func($this->userIdSource, $params, $user);
+        } else {
+            // You misconfigured or misapplied your route
+            if (!array_key_exists($this->userIdSource, $params)) {
+                throw new Base(sprintf('Key "%s" not in route params', $this->userIdSource));
+            }
+            $userId = $params[$this->userIdSource];
         }
-        $userId = $params[$this->paramsKey];
         $child = $this->userMapper->findById($userId);
         $child->loadParents();
 
