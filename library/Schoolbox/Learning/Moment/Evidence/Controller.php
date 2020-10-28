@@ -454,6 +454,14 @@ class Controller extends Base
         $result = (new Discussion\Thread\ModelDecorator\Decorator($discussionThread, $evidence))
             ->jsonSerialize($jsonDecorator, $linkDecorator);
 
+
+        // Scrub each result's comment
+        foreach ($encodedResults as &$encodedResult) {
+            $encodedResult['content'] = Scrub::html($encodedResult['content']);
+        }
+        unset($encodedResult);
+
+
         // Serialize the thread's comments as well
         $result['children'] = [
             'data'     => $encodedResults,
