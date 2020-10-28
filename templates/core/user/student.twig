@@ -59,6 +59,10 @@
     });
 </script>
 
+{# Include the editor and its configurator #}
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+
 <div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
     <div class="list-item">
         <div class="small-12 column">
