@@ -124,13 +124,7 @@ class Controller extends Base
 
         $this->response->content->set($this->buildHtmlOutput('@learningMomentEvidence/detail.twig', [
             'evidence' => $item,
-            'routes' => [
-                'modify' => null,
-                'delete' => $this->getRouteIfAuthorized('learningMomentEvidence.deleteEvidence', [
-                    'evidenceId' => $evidence->getId(),
-                    'creatorId' => $evidence->getCreator()->getId()
-                ])
-            ]
+            'routes' => $this->generateLinks($evidence)
         ]));
     }
 
@@ -276,5 +270,32 @@ class Controller extends Base
     public function deleteEvidence(Model $evidence): void
     {
         $this->mapper->delete($evidence);
+    }
+
+
+    /**
+     * Generate a set of links relevant to $model
+     *
+     * This uses the router's getRouteIfAuthorized() method and some controller parts
+     * to figure out which links are available and which aren't. We shouldn't provide
+     * links that a person can't visit.
+     *
+     * The router and its mechanics are pretty solidly tied to controllers and I don't
+     * necessarily want to inject an entire controller instance into the Translator
+     * classes and assorted places like that
+     *
+     * @param Model $evidence
+     * @return array
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    private function generateLinks(Model $evidence): array
+    {
+        return [
+            'modify' => null,
+            'delete' => $this->getRouteIfAuthorized('learningMomentEvidence.deleteEvidence', [
+                'evidenceId' => $evidence->getId(),
+                'creatorId' => $evidence->getCreator()->getId()
+            ])
+        ];
     }
 }

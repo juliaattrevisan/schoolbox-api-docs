@@ -87,6 +87,7 @@ class ModelToArray
             'storage'          => $model->getStorage()
                 ? call_user_func($this->storageTranslator, $model->getStorage())
                 : null,
+            '_links'           => []
         ];
     }
 }
