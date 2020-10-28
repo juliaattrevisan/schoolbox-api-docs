@@ -8,10 +8,13 @@
 namespace Schoolbox\Assessment\Term;
 
 use Alaress_Date_Format;
+use Schoolbox\GenericCollection;
 use Schoolbox\IModel;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
+use Schoolbox\YearLevel;
+
 
 /**
  * Representation of a user-defined school term.
@@ -59,12 +62,20 @@ class Model implements \IComparable, IModel
      */
     protected $actualFinish;
 
+
     /**
      * If a term is archived, it should be de-emphasized in term selectors.
      *
      * @var bool
      */
     protected $archived;
+
+
+    /**
+     * @var \Schoolbox\YearLevel\Model[]|null
+     */
+    private $yearLevels;
+
 
     /**
      * Constructor - ensures this object is in a usable state.
@@ -259,6 +270,48 @@ class Model implements \IComparable, IModel
         $this->archived = $archived;
         return $this;
     }
+
+
+    /**
+     * @return bool
+     */
+    public function getExtraordinary(): bool
+    {
+        /* Unspecified year level relations: not definitively extraordinary
+         */
+        if (null === $this->getYearLevels()) {
+            return false;
+        }
+
+        /* Otherwise, find out how many year level relations were given to this Term
+         * Any quantity of year level relations makes an Extraordinary Term
+         */
+        return $this->getYearLevels()->count() > 0;
+    }
+
+
+    /**
+     * @return GenericCollection|YearLevel\Model[]|null
+     */
+    public function getYearLevels(): ?GenericCollection
+    {
+        return $this->yearLevels;
+    }
+
+
+    /**
+     * @param GenericCollection|YearLevel\Model[] $yearLevels
+     * @return Model
+     */
+    public function setYearLevels(GenericCollection $yearLevels): self
+    {
+        $yearLevels->assertCollectionOf(YearLevel\Model::class);
+
+        $this->yearLevels = $yearLevels;
+
+        return $this;
+    }
+
 
     /**
      * Orders Terms by:

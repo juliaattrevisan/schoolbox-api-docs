@@ -123,11 +123,20 @@ class Controller extends Base
      */
     public function getGradesForCurrentUser(): void
     {
+        /* For this student, find out (from their Year Level relationship) if they're in any folders
+         * which might be inside an Extraordinary Term
+         */
+        if ($this->getUser()->getYear()) {
+            $termCode = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $this->getUser()->getYear())->getCode();
+        } else {
+            $termCode = $this->getTermMapper()->findForToday()->getCode();
+        }
+
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate(
                 'learningGrades.getGrades', [
                     'userId'   => $this->getUser()->getId(),
-                    'termCode' => $this->getTermMapper()->findForToday()->getCode()
+                    'termCode' => $termCode
                 ]
             )
         );
@@ -150,6 +159,7 @@ class Controller extends Base
      */
     public function getGrades(User $viewee, Term\Model $term): void
     {
+
         $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
 
         if (\count($filteredWorkTypes)) {
@@ -161,7 +171,6 @@ class Controller extends Base
 
         // Add folders with response or feedback
         $folders = $this->folderMapper->findFoldersWithInteractionsForStudent($viewee, $term);
-        $displayFolderIds = $this->folderMapper->filterIdsForGradePage($folders->getPropertyValues('id'));
 
         // Get all assessments for this user in the specified term, grouped by folder
         $assessmentsPerFolder = $this->assessmentMapperProxy
@@ -173,12 +182,40 @@ class Controller extends Base
                 return $assessment->getBaseContext()->getFolder()->getId();
             });
 
+        /* For a given (Folder, Year Level) relationship, Grades Pages can be optionally available
+         * This is specified in adminv2/lists/year-levels
+         *
+         * It's kind of inefficient because we just hydrated a bunch of interactions + folders
+         * which might potentially be discarded entirely
+         */
+        $displayFolderIds = $this->folderMapper->filterIdsForGradePage($folders->getPropertyValues('id'));
+
         /** @var GenericCollection|Folder\Model[] $folders */
         $folders = $folders->filter(
             static function (Folder\Model $folder) use ($assessmentsPerFolder, $displayFolderIds) {
                 return $assessmentsPerFolder->keyExists($folder->getId())
                     && in_array($folder->getId(), $displayFolderIds);
             })->indexBy('id');
+
+        /* If we're in an Extraordinary Term, limit the list of $folders to those which occur
+         * as being related to the Extraordinary Term.
+         */
+        $terms = $this->termMapper->findAllNonExtraordinary();
+        $extraordinaryTerm = $this->termMapper->findForDateAndYearLevel(\Alaress_Date_Format::now(), $viewee->getYear());
+
+        if ($extraordinaryTerm->getExtraordinary()) {
+            $extraordinaryFolders = $this->termMapper->findFolderIdsForTerm($extraordinaryTerm);
+
+            $folders = $folders->filter(
+                static function (Folder\Model $folder) use ($extraordinaryFolders) {
+                    return isset($extraordinaryFolders[$folder->getId()]);
+                }
+            );
+
+            /* Prepend it to the list of Terms, because it's special
+             */
+            $terms->prepend($extraordinaryTerm);
+        }
 
         // Load Teachers
         foreach ($folders as $folder) {
@@ -206,7 +243,7 @@ class Controller extends Base
             'student'          => $viewee,
             'term'             => $term,
             'year'             => null,
-            'terms'            => $this->termMapper->findAll()->sortBy('start', 'desc'),
+            'terms'            => $terms,
             'folders'          => $folders,
             'markbooks'        => $markbooks,
             'mailHandle'       => $this->getSession()->get('mailhandle'),
@@ -299,11 +336,18 @@ class Controller extends Base
         $yearUrl = $this->getYearUrl($viewee->getId());
         // Squish this mess out
 
+        /* A list of Terms to choose from
+         *
+         * If we're in an extraordinary Term right now, provide that as an option
+         * in addition to the ordinary Terms
+         */
+        $terms = $this->termMapper->findAllWithExtraordinary($viewee->getYear());
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'         => $viewee,
             'term'            => $term,
             'year'            => $year,
-            'terms'           => $this->getTermMapper()->findAll()->sortBy('start', 'desc'),
+            'terms'           => $terms,
             'folders'         => $folders,
             'assessmentTasks' => $assessmentTasks,
             'markbooks'       => $markbooks,
@@ -381,13 +425,20 @@ class Controller extends Base
             }
         );
 
+        /* A list of Terms to choose from
+         *
+         * If we're in an extraordinary Term right now, provide that as an option
+         * in addition to the ordinary Terms
+         */
+        $terms = $this->termMapper->findAllWithExtraordinary($viewee->getYear());
+
         $yearUrl = $this->getYearUrl($viewee->getId());
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learningGrades/gradesOuter.twig', [
                 'student'            => $viewee,
                 'filterPanel'        => $filterPanel,
                 'term'               => $term,
-                'terms'              => $this->termMapper->findAll()->sortBy('start', 'desc'),
+                'terms'              => $terms,
                 'subject'            => $subject,
                 'folders'            => $folders,
                 'markbook'           => $markbook,

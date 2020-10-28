@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Web\Request;
 use Schoolbox\Assessment\Term;
+use Schoolbox\YearLevel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
 /**
@@ -20,62 +21,106 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  */
 class Controller extends Base
 {
+
     /**
      * @var Term\Mapper
      */
-    protected $termMapper;
+    private $termMapper;
+
+
+    /**
+     * @var YearLevel\Mapper
+     */
+    private $yearLevelMapper;
+
 
     /**
      * Constructor
      *
      * @param Term\Mapper $termMapper
+     * @param YearLevel\Mapper $yearLevelMapper
      */
-    public function __construct(Term\Mapper $termMapper)
+    public function __construct(Term\Mapper $termMapper, YearLevel\Mapper $yearLevelMapper)
     {
         $this->termMapper = $termMapper;
+        $this->yearLevelMapper = $yearLevelMapper;
     }
+
 
     /**
      * GET action for viewing list of terms
      */
-    public function getIndex()
+    public function getIndex(): void
     {
-        // TODO make this use the new way of creating responses
+        /* All available terms, sorted
+         */
+        $terms = $this->termMapper->findAll(['order' => ['start' => 'desc']]);
+
+        /* Options for prefilling the selectize
+         * Indexed by term.id
+         */
+        $yearLevelValues = [];
+
+        foreach ($terms as $term) {
+            foreach ($term->getYearLevels() as $yearLevel) {
+                $yearLevelValues[$term->getId()][] = [
+                    'id' => $yearLevel->getId(),
+                    'name' => $yearLevel->getName()
+                ];
+            }
+        }
+
+        /* Options to choose in the selectize
+        */
+        $yearLevelOptions = $this->yearLevelMapper->findAll()->map(static function (YearLevel\Model $yearLevel) {
+            return [
+                'id'   => $yearLevel->getId(),
+                'name' => $yearLevel->getName(),
+            ];
+        })->getAll();
+
         $this->getResponse()->content->set([
             'template' => '@adminTerms/index.twig',
             'data'     => [
-                'pageCurrent' => basename($this->getRequest()->query->get('page')),
-                'terms'       => $this->termMapper->findAll(['order' => ['start' => 'desc']]),
+                'pageCurrent'      => basename($this->getRequest()->query->get('page')),
+                'terms'            => $terms,
+                'yearLevelValues'  => $yearLevelValues,
+                'yearLevelOptions' => $yearLevelOptions,
             ],
             'title' => 'Admin - Terms'
         ]);
     }
 
+
     /**
      * POST action for creating a new term
      */
-    public function postCreateTerm()
+    public function postCreateTerm(): void
     {
         $term = $this->termMapper->createModel();
         try {
             $term = $this->populateModelFromPostData($term, $this->getRequest()->post);
             $this->termMapper->save($term);
+
             $this->outputPostSuccess($term);
         } catch (\Exception $e) {
             $this->outputPostError($term, $e);
         }
     }
 
+
     /**
      * POST action for updating an existing term
      *
      * @param Term\Model $term
+     * @throws \Exception
      */
-    public function postUpdateTerm(Term\Model $term)
+    public function postUpdateTerm(Term\Model $term): void
     {
         try {
             $term = $this->populateModelFromPostData($term, $this->getRequest()->post);
             $this->termMapper->save($term);
+
             $this->outputPostSuccess($term);
         } catch (\Exception $e) {
             $this->outputPostError($term, $e);
@@ -90,20 +135,29 @@ class Controller extends Base
      * @return Term\Model
      * @throws \Exception if dates aren't valid
      */
-    protected function populateModelFromPostData(Term\Model $term, Request\Values $postdata)
+    protected function populateModelFromPostData(Term\Model $term, Request\Values $postdata): Term\Model
     {
         $term->setTitle($postdata->get('title'));
         $term->setCode($postdata->get('code'));
+
+        /* Refresh YearLevel relations
+         */
+        $yearLevelIds = array_values(array_filter(explode(',', $postdata['yearLevelIds'])));
+
+        $term->setYearLevels($this->yearLevelMapper->findByColumn('id', $yearLevelIds));
+
         try {
             $term->setStart(Alaress_Date_Format::newLocalShort($postdata->get('start')));
         } catch (\Exception $e) {
             throw new \Exception('Start date is not a valid date.');
         }
+
         try {
             $term->setDisplayFinish(Alaress_Date_Format::newLocalShort($postdata->get('finish')));
         } catch (\Exception $e) {
             throw new \Exception('Finish date is not a valid date.');
         }
+
         return $term;
     }
 
