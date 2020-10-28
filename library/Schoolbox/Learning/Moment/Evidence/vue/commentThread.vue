@@ -12,7 +12,7 @@ export default {
         Storage,
     },
     props: {
-        commentThread: {
+        thread: {
             type: Object,
             default: {
                 children: {
@@ -24,10 +24,15 @@ export default {
                 }
             },
         },
+        createThreadEndpoint: {
+            type: String,
+        }
     },
     data() {
         return {
+            commentThread: this.thread,
             showSkeletonLoader: false,
+            pendingComment: '',
         }
     },
     computed: {
@@ -46,6 +51,22 @@ export default {
                 ],
             });
         },
+
+        /**
+         * Does this thread exist yet? If not, it will have to be created before
+         * creating any posts.
+         *
+         * @returns {Boolean}
+         */
+        hasThread() {
+            return this?.commentThread?.id;
+        },
+
+        /**
+         * Does this thread have any comments?
+         *
+         * @returns {Boolean}
+         */
         hasComments() {
             return this.commentTotalCount > 0;
         },
@@ -53,7 +74,7 @@ export default {
         /**
          * How many comments are currently loaded in this thread?
          *
-         * @returns {number}
+         * @returns {Number}
          */
         commentLoadedCount() {
             let count = Number(this.commentThread?.children?.data?.length);
@@ -64,7 +85,7 @@ export default {
          * How many total comments (beyond the amount currently in the list)
          * are there in this thread?
          *
-         * @returns {number}
+         * @returns {Number}
          */
         commentTotalCount() {
             let count = Number(this.commentThread?.children?.metadata?.count);
@@ -75,13 +96,15 @@ export default {
          * How many total comments (beyond the amount currently in the list)
          * are there in this thread?
          *
-         * @returns {boolean}
+         * @returns {Boolean}
          */
         allCommentsLoaded() {
             return this.commentTotalCount === this.commentLoadedCount;
         },
 
         /**
+         * Retrieve a list of comments, even if no thread exists yet.
+         *
          * @returns {Array}
          */
         comments() {
@@ -94,8 +117,32 @@ export default {
     //     this.load();
     // },
     methods: {
-        loadMoreComments(discussionThread) {
-            //
+        loadMoreComments() {
+            // hit the cursor, then append to the list of comments
+        },
+
+        postComment() {
+            // maybe there's not a thread at all. If not: create one, then post
+            let prePromise = Promise.resolve(),
+                self       = this;
+            if (!this.hasThread) {
+                prePromise = axios
+                    .post(this.createThreadEndpoint, {open: true})
+                    .then((response) => self.commentThread = response.data)
+            }
+            prePromise
+                .then(() => axios.post(self.commentThread._links.createComment.href, {content: self.pendingComment}))
+                .then((response) => {
+                    // let newChildren =
+                    self.commentThread.children.data.unshift(response.data);
+                    // self.commentThread = Object.assign(
+                    //     {},
+                    //     self.commentThread,
+                    //     {
+                    //         children: self.commentThread.children.unshift(response.data)
+                    //     }
+                    // )
+                })
         },
     },
     filters: {
@@ -149,5 +196,11 @@ export default {
                 -->
             </ul>
         </template>
+
+        <!-- Comment: This Vue instance has included the CKEditor plugin, so the ckeditor tag exists -->
+        <ckeditor v-model="pendingComment" :config="ckeditorConfig"></ckeditor>
+        <a class="button submit"
+           @click="postComment"
+           :disabled="pendingComment.trim() === ''">Post Comment</a>
     </div>
 </template>

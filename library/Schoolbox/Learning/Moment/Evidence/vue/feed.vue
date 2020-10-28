@@ -138,54 +138,6 @@ export default {
             }
             return moment.duration(dayDiff, 'd').humanize(true);
         },
-
-        /**
-         * How many comments are currently loaded in this thread?
-         *
-         * @param discussionThread
-         * @returns {number}
-         */
-        commentLoadedCount(discussionThread) {
-            let count = Number(discussionThread?.children?.data?.length);
-            return isNaN(count) ? 0 : count;
-        },
-
-        /**
-         * How many total comments (beyond the amount currently in the list)
-         * are there in this thread?
-         *
-         * @param discussionThread
-         * @returns {number}
-         */
-        commentTotalCount(discussionThread) {
-            let count = Number(discussionThread?.children?.metadata?.count);
-            return isNaN(count) ? 0 : count;
-        },
-
-        /**
-         * How many total comments (beyond the amount currently in the list)
-         * are there in this thread?
-         *
-         * @param discussionThread
-         * @returns {boolean}
-         */
-        allCommentsLoaded(discussionThread) {
-            return this.commentTotalCount(discussionThread) === this.commentLoadedCount(discussionThread);
-        },
-
-        /**
-         *
-         * @param discussionThread
-         * @returns {Array}
-         */
-        comments(discussionThread) {
-            let comments = discussionThread?.children?.data;
-            return comments === null ? [] : comments;
-        },
-
-        loadMoreComments(discussionThread) {
-            //
-        },
     },
     filters: {
         dateFormat: (date, format) => moment(date).format(format),
@@ -198,8 +150,8 @@ export default {
     <div>
         <div class="content" v-for="evidenceGroup in groupedEvidence">
             <h2 class="subheader">
-                <time :datetime="evidenceGroup.date.format('YYYY-MM-DD')"
-                      :title="evidenceGroup.date.format(dateDisplayFormats.momentJsDateLong)"
+                <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
+                      :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
                 >{{ renderCreatedAt(evidenceGroup.date) }}</time>
             </h2>
 
@@ -231,10 +183,9 @@ export default {
                         </div>
 
                         <div class="small-12 large-6 column">
-                            <comment-thread :comment-thread="evidence.discussionThread" />
-
-                            <!-- Comment: This Vue instance has included the CKEditor plugin, so the ckeditor tag exists -->
-                            <ckeditor v-model="evidence.pendingComment" :config="ckeditorConfig"></ckeditor>
+                            <comment-thread :thread="evidence.discussionThread"
+                                            :create-thread-endpoint="evidence._links.createThread"
+                            />
                         </div>
 
                         <div class="content">
