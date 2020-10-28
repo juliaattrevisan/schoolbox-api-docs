@@ -160,6 +160,9 @@ export default {
                             <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
                         </article>
 
+                        <!-- Comment: This Vue instance has included the CKEditor plugin, so the ckeditor tag exists -->
+                        <ckeditor v-model="evidence.comment"></ckeditor>
+
                         <div class="content">
                             <p><a :href="evidence._links.detail">More Detail</a></p>
                         </div>
