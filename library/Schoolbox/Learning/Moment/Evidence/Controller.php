@@ -108,6 +108,7 @@ class Controller extends Base
      * Set up the detail page for a particular Evidence instance
      *
      * @param Model $evidence
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function getEvidenceDetail(Model $evidence): void
     {
@@ -117,6 +118,7 @@ class Controller extends Base
         );
 
         $item = $translator($evidence);
+        $item = $this->generateLinks($item);
 
         /* TODO: Why wouldn't you just scrub this in ModelToArray
          */
@@ -124,7 +126,6 @@ class Controller extends Base
 
         $this->response->content->set($this->buildHtmlOutput('@learningMomentEvidence/detail.twig', [
             'evidence' => $item,
-            'routes' => $this->generateLinks($evidence)
         ]));
     }
 
@@ -169,6 +170,7 @@ class Controller extends Base
                     return $item;
                 }
             );
+
         $this->response->content->set(
             $this->buildJsonOutput([
                 'data'     => $mappedData,
@@ -284,18 +286,25 @@ class Controller extends Base
      * necessarily want to inject an entire controller instance into the Translator
      * classes and assorted places like that
      *
-     * @param Model $evidence
+     * @param array $evidence
      * @return array
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    private function generateLinks(Model $evidence): array
+    private function generateLinks(array $evidence): array
     {
-        return [
+        $evidence['_links'] = [
+
+            /* TODO Figure out what the modify perms will be
+             *  I added this here, it was in there SA-11246 screenshot.
+             */
             'modify' => null,
+
             'delete' => $this->getRouteIfAuthorized('learningMomentEvidence.deleteEvidence', [
-                'evidenceId' => $evidence->getId(),
-                'creatorId' => $evidence->getCreator()->getId()
+                'evidenceId' => $evidence['id'],
+                'creatorId' => $evidence['creator']['id']
             ])
         ];
+
+        return $evidence;
     }
 }

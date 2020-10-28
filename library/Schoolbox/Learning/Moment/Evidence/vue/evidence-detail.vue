@@ -25,8 +25,7 @@ export default {
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
     props: [
-        'evidence',
-        'routes'
+        'evidence'
     ],
 
     /**
@@ -82,7 +81,7 @@ export default {
             /* For now there are only two options, so tot is fairly
              * straightforward to calculate this way
              */
-            return this.routes.modify || this.routes.delete;
+            return this.evidence._links.modify || this.evidence._links.delete;
         }
     }
 }
@@ -94,13 +93,13 @@ export default {
                 <div class="small-12 columns">
                     <div class="actions-small-1">
                         <nav>
-                            <template v-if="this.routes.delete">
+                            <template v-if="this.evidence._links.delete">
                                 <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
                             </template>
                         </nav>
                         <ul id="header-options" class="f-dropdown" data-dropdown-content>
-                            <template v-if="this.routes.delete">
-                                <li><a class="icon-delete" :href="this.routes.delete" data-delete>Delete</a></li>
+                            <template v-if="this.evidence._links.delete">
+                                <li><a class="icon-delete" :href="this.evidence._links.delete" data-delete>Delete</a></li>
                             </template>
                         </ul>
                     </div>
