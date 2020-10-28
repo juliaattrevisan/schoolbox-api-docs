@@ -272,6 +272,8 @@ class Controller extends BaseController
     /**
      * Retrieve a list of comments as an array for later output.
      *
+     * TODO extract this to another class, so that other methods may use it
+     *
      * @param Model       $thread
      * @param IThreadLocation $context
      * @param string|null $encodedCursor
