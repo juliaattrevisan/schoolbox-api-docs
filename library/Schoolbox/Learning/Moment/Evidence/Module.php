@@ -62,6 +62,23 @@ class Module extends BaseModule
             $isTargetUserSelfOrStudentRule,
         );
 
+        /* Superusers, Staff, Parents of Evidence Recipient and Evidence Recipients
+         * can view the detail screen
+         */
+        $viewEvidenceDetailRule = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasRole(Role::STAFF),
+            $isParentOrUserRule
+        );
+
+        /* Superusers, Staff and Evidence Creators can delete an Evidence instance
+         */
+        $deleteEvidenceRule = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasRole(Role::STAFF),
+            new Rule\IsUser('creatorId')
+        );
+
 
         // Preloaders:
         // convert userIds (a comma-separated list of users) into a user
@@ -104,6 +121,27 @@ class Module extends BaseModule
             ),
             Closure::fromCallable([$this, 'preloadUser']),
         );
+
+        /* Evidence Detail screen
+         */
+        $this->register(
+            self::METHOD_GET,
+            '/{evidenceId}',
+            'getEvidenceDetail',
+            $viewEvidenceDetailRule,
+            Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+        /* Evidence Delete
+         */
+        $this->register(
+            self::METHOD_DELETE,
+            '/{evidenceId}',
+            'deleteEvidence',
+            $deleteEvidenceRule,
+            Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
 
 //        $this->register(
 //            self::METHOD_POST,
@@ -154,6 +192,28 @@ class Module extends BaseModule
             'user' => $this->getMapperFactory()
                            ->get(UserMapper::class)
                            ->findById($params['userId']),
+        ];
+    }
+
+
+    /**
+     * Preload the requested moment evidence
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \InvalidArgumentException
+     */
+    private function preloadEvidence(array $params): array
+    {
+        $evidence = $this->getMapperFactory()
+             ->get(Mapper::class)
+             ->findById($params['evidenceId']);
+
+        return [
+            'userId' => $evidence->getRecipient()->getId(),
+            'creatorId' => $evidence->getCreator()->getId(),
+            'evidence' => $evidence
         ];
     }
 

@@ -61,6 +61,7 @@ Add `library/Schoolbox/Greenhouse/templates/user-list.vue` and paste this massiv
 ```js
 <script>
     export default {
+
         /**
          * Name.
          * The name of the component that we have here. This name will be used in the container

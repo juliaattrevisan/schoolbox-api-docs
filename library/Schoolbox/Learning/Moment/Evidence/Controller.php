@@ -104,6 +104,32 @@ class Controller extends Base
     }
 
 
+    /**
+     * Set up the detail page for a particular Evidence instance
+     *
+     * @param Model $evidence
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function getEvidenceDetail(Model $evidence): void
+    {
+        $translator = new Translator\ModelToArray(
+            new User\Translator\ModelToArray(),
+            new Storage\Translator\ModelToArray(),
+        );
+
+        $item = $translator($evidence);
+        $item = $this->generateLinks($item);
+
+        /* TODO: Why wouldn't you just scrub this in ModelToArray
+         */
+        $item['body'] = Scrub::html($item['body']);
+
+        $this->response->content->set($this->buildHtmlOutput('@learningMomentEvidence/detail.twig', [
+            'evidence' => $item,
+        ]));
+    }
+
+
 //    /**
 //     * Retrieve a JSON representation of a single learning moment.
 //     *
@@ -143,7 +169,16 @@ class Controller extends Base
                     $item['body'] = Scrub::html($item['body']);
                     return $item;
                 }
+            )
+            ->map(
+
+                /* Add router-generated urls to every Evidence array
+                 */
+                function (array $item): array {
+                    return $this->generateLinks($item);
+                }
             );
+
         $this->response->content->set(
             $this->buildJsonOutput([
                 'data'     => $mappedData,
@@ -234,13 +269,54 @@ class Controller extends Base
     }
 
 
-//    /**
-//     * Delete a single moment.
-//     *
-//     * @api   DELETE /learning/evidence/{id}
-//     * @since 20.2
-//     */
-//    public function deleteMoment(): void
-//    {
-//    }
+    /**
+     * Delete a single moment.
+     *
+     * @api   DELETE /learning/evidence/{id}
+     * @since 20.2
+     * @param Model $evidence
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function deleteEvidence(Model $evidence): void
+    {
+        $this->mapper->delete($evidence);
+    }
+
+
+    /**
+     * Generate a set of links relevant to $model
+     *
+     * This uses the router's getRouteIfAuthorized() method and some controller parts
+     * to figure out which links are available and which aren't. We shouldn't provide
+     * links that a person can't visit.
+     *
+     * The router and its mechanics are pretty solidly tied to controllers and I don't
+     * necessarily want to inject an entire controller instance into the Translator
+     * classes and assorted places like that
+     *
+     * @param array $evidence
+     * @return array
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    private function generateLinks(array $evidence): array
+    {
+        $evidence['_links'] = [
+            'detail' => $this->getRouteIfAuthorized('learningMomentEvidence.getEvidenceDetail', [
+                'evidenceId' => $evidence['id'],
+                'userId' => $evidence['recipient']['id']
+            ]),
+
+            /* TODO Figure out what the modify perms will be
+             *  I added this here, it was in there SA-11246 screenshot.
+             */
+            'modify' => null,
+
+            'delete' => $this->getRouteIfAuthorized('learningMomentEvidence.deleteEvidence', [
+                'evidenceId' => $evidence['id'],
+                'creatorId' => $evidence['creator']['id']
+            ])
+        ];
+
+        return $evidence;
+    }
 }

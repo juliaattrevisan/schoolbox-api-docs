@@ -20,7 +20,7 @@ This will call a controller's `getContainer` method; as usual, add that to the c
 
 ```php
 /**
- * Load vue container for our new VUe app
+ * Load vue container for our new Vue app
  *
  * @throws \Aura\Di\Exception\ServiceNotFound
  */

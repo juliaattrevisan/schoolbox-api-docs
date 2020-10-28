@@ -20,6 +20,7 @@ module.exports = {
         articleList: './library/Schoolbox/Comms/News/templates/vue/article-list.js',
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js',
         learningMomentsFeed: './library/Schoolbox/Learning/Moment/Evidence/vue/feed.main.js',
+        learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/evidence-detail.js'
     },
     output: {
         path: path.resolve(__dirname, "www/javascript/components"),
@@ -88,7 +89,8 @@ module.exports = {
             'vue$': 'vue/dist/vue.esm.js',
             '@schoolbox': path.resolve(__dirname, "vue/components"),
             '@schoolboxCalendarEvent': path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue"),
-            '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News')
+            '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
+            '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue')
         },
         extensions: ['*', '.js', '.vue', '.json']
     },
