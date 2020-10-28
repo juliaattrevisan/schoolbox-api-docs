@@ -27,17 +27,17 @@
             let toast = $('[data-toast]');
 
             $(this).confirmDialog({
-                text: 'Are you sure you want to delete this Learning Moment?',
+                text: 'Are you sure you want to delete this item?',
                 confirmEvent: function() {
                     toast.toastActivate({
-                        'text': 'Deleting this Learning Moment...'
+                        'text': 'Deleting this item...'
                     });
 
                     $.ajax({
                         url: element.attr('href'),
                         type: 'DELETE',
                         success: function(result) {
-                            toast.toastTimeout({text: 'Learning Moment deleted', css: 'success'});
+                            toast.toastTimeout({text: 'Item deleted', css: 'success'});
 
                             /* Redirect to dashboard, I guess
                              */
