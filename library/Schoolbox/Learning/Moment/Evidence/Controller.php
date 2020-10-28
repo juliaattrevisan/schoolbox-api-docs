@@ -217,21 +217,25 @@ class Controller extends Base
         $commentMapper = Comment\Mapper::getInstance();
         $linkDecorator = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
         $jsonDecorator = new PropertyDecorator(null, $linkDecorator);
-        $mappedData    = $mappedData->map(static function (array $item) use ($commentMapper, $linkDecorator, $jsonDecorator) {
+        $mappedData    = $mappedData->map(function (array $item) use ($commentMapper, $linkDecorator, $jsonDecorator) {
+            $item['_links']     = [];
+            $evidence           = (new Model())->setId($item['id']);
             $discussionThreadId = $item['discussionThread']['id'] ?? null;
             if ($discussionThreadId) {
                 $discussionThread = (new Thread\Model())->setId($discussionThreadId);
-                $evidence         = (new Model())->setId($item['id'])->setDiscussionThread($discussionThread);
-                $commentCursor    = new Comment\Cursor($commentMapper, $discussionThread);
-                $results          = $commentCursor->retrieveResults(null);
-                $encodedResults   = $results
+                $evidence->setDiscussionThread($discussionThread);
+
+                $commentCursor  = new Comment\Cursor($commentMapper, $discussionThread);
+                $results        = $commentCursor->retrieveResults(null);
+                $encodedResults = $results
                     ->map(static function (Comment\Model $comment) use ($evidence) {
                         return new Discussion\Comment\ModelDecorator\Decorator($comment, $evidence);
                     });
-                $encodedResults   = $encodedResults
+                $encodedResults = $encodedResults
                     ->jsonSerialize($jsonDecorator, $linkDecorator);
 
                 // Serialize the discussion thread using its decorator
+                // TODO consider moving the links into the base data, as there should be a create thread link
                 $item['discussionThread'] = (new Discussion\Thread\ModelDecorator\Decorator($discussionThread, $evidence))
                     ->jsonSerialize($jsonDecorator, $linkDecorator);
 
@@ -246,6 +250,23 @@ class Controller extends Base
                         ],
                     ],
                 ];
+            } else {
+                // Output the create thread link.
+                // TBD: is it output as a simple link, or a href/auth object?
+                // The old Aura link outputs the object, newer links are output
+                // as simple values (and are not output at all if permission denied)
+                $routeParams = [
+                    'contextType' => 'evidence',
+                    'context'     => $evidence,
+                    'contextId'   => $evidence->getId(),
+                ];
+                $createThreadLink = $this->getRouteIfAuthorized(
+                    'evidenceDiscussionThreads.createThread',
+                    $routeParams
+                );
+                if ($createThreadLink) {
+                    $item['_links']['createThread'] = $createThreadLink;
+                }
             }
             return $item;
         });
