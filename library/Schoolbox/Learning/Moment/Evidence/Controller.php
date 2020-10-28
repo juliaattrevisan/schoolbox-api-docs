@@ -225,7 +225,7 @@ class Controller extends Base
                 $discussionThread = (new Thread\Model())->setId($discussionThreadId);
                 $evidence->setDiscussionThread($discussionThread);
 
-                $commentCursor  = new Comment\Cursor($commentMapper, $discussionThread);
+                $commentCursor  = new Comment\Cursor($commentMapper, $discussionThread, Comment\Cursor::ORDER_DESC);
                 $results        = $commentCursor->retrieveResults(null);
                 $encodedResults = $results
                     ->map(static function (Comment\Model $comment) use ($evidence) {
