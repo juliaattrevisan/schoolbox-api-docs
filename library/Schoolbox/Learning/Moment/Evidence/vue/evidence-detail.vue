@@ -72,23 +72,41 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
+
+        /**
+         * Decide whether to show the tot menu - only provide when it has at least one
+         * accessible route
+         */
+        hasRoutes: function() {
+
+            /* For now there are only two options, so tot is fairly
+             * straightforward to calculate this way
+             */
+            return this.routes.modify || this.routes.delete;
+        }
     }
 }
 </script>
 <template>
     <div>
-        <div class="row">
-            <div class="small-12 columns">
-                <div class="actions-small-1">
-                    <nav>
-                        <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
-                    </nav>
-                    <ul id="header-options" class="f-dropdown" data-dropdown-content>
-                        <li><a class="icon-delete" :href="this.routes.delete">Delete</a></li>
-                    </ul>
+        <template v-if="this.hasRoutes()">
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="actions-small-1">
+                        <nav>
+                            <template v-if="this.routes.delete">
+                                <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+                            </template>
+                        </nav>
+                        <ul id="header-options" class="f-dropdown" data-dropdown-content>
+                            <template v-if="this.routes.delete">
+                                <li><a class="icon-delete" :href="this.routes.delete">Delete</a></li>
+                            </template>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
+        </template>
         <div class="news-post row">
             <div class="small-12 island">
                 <section>
