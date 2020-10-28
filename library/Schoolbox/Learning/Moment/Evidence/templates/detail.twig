@@ -1,3 +1,12 @@
+{##
+ # Evidence Detail Container
+ #
+ # Launches the detail screen so you can see the fullness of an Evidence,
+ # in addition to other parts such as Discussion etc.
+ #
+ # @param array $evidence  An array, representing a translated Evidene instance
+ # @param array $routes    A set of routes for modifying, deleting etc. this Evidence
+ #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
 {{ bread.crumbs(
@@ -6,6 +15,6 @@
 ) }}
 
 <div id="evidence-detail-container">
-    <evidence-detail :evidence="{{ evidence|json_encode }}"></evidence-detail>
+    <evidence-detail :evidence="{{ evidence|json_encode }}" :routes="{{ routes|json_encode }}"></evidence-detail>
 </div>
 <script src="/javascript/components/learningMomentsEvidenceDetail.bundle.js"></script>

@@ -71,6 +71,15 @@ class Module extends BaseModule
             $isParentOrUserRule
         );
 
+        /* Superusers, Staff and Evidence Creators can delete an Evidence instance
+         */
+        $deleteEvidenceRule = new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\HasRole(Role::STAFF),
+            new Rule\IsUser('creatorId')
+        );
+
+
         // Preloaders:
         // convert userIds (a comma-separated list of users) into a user
         // collection
@@ -120,6 +129,16 @@ class Module extends BaseModule
             '/{evidenceId}',
             'getEvidenceDetail',
             $viewEvidenceDetailRule,
+            Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+        /* Evidence Delete
+         */
+        $this->register(
+            self::METHOD_DELETE,
+            '/{evidenceId}',
+            'deleteEvidence',
+            $deleteEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
@@ -193,6 +212,7 @@ class Module extends BaseModule
 
         return [
             'userId' => $evidence->getRecipient()->getId(),
+            'creatorId' => $evidence->getCreator()->getId(),
             'evidence' => $evidence
         ];
     }

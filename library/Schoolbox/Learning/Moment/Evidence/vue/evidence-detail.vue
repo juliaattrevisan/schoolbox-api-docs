@@ -25,7 +25,8 @@ export default {
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
     props: [
-        'evidence'
+        'evidence',
+        'routes'
     ],
 
     /**

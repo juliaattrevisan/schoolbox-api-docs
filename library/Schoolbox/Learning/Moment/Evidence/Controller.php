@@ -123,7 +123,14 @@ class Controller extends Base
         $item['body'] = Scrub::html($item['body']);
 
         $this->response->content->set($this->buildHtmlOutput('@learningMomentEvidence/detail.twig', [
-            'evidence' => $item
+            'evidence' => $item,
+            'routes' => [
+                'modify' => null,
+                'delete' => $this->getRouteIfAuthorized('learningMomentEvidence.deleteEvidence', [
+                    'evidenceId' => $evidence->getId(),
+                    'creatorId' => $evidence->getCreator()->getId()
+                ])
+            ]
         ]));
     }
 
@@ -137,7 +144,6 @@ class Controller extends Base
 //    public function getMoment(): void
 //    {
 //    }
-
 
 
     /**
@@ -259,13 +265,14 @@ class Controller extends Base
     }
 
 
-//    /**
-//     * Delete a single moment.
-//     *
-//     * @api   DELETE /learning/evidence/{id}
-//     * @since 20.2
-//     */
-//    public function deleteMoment(): void
-//    {
-//    }
+    /**
+     * Delete a single moment.
+     *
+     * @api   DELETE /learning/evidence/{id}
+     * @since 20.2
+     */
+    public function deleteMoment(): void
+    {
+        echo 'test';
+    }
 }
