@@ -100,7 +100,7 @@ export default {
                         </nav>
                         <ul id="header-options" class="f-dropdown" data-dropdown-content>
                             <template v-if="this.routes.delete">
-                                <li><a class="icon-delete" :href="this.routes.delete">Delete</a></li>
+                                <li><a class="icon-delete" :href="this.routes.delete" data-delete>Delete</a></li>
                             </template>
                         </ul>
                     </div>

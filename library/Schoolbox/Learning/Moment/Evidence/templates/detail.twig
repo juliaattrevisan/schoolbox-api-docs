@@ -18,3 +18,26 @@
     <evidence-detail :evidence="{{ evidence|json_encode }}" :routes="{{ routes|json_encode }}"></evidence-detail>
 </div>
 <script src="/javascript/components/learningMomentsEvidenceDetail.bundle.js"></script>
+
+<script>
+    $(function() {
+        $('#container').on('click', 'a[data-delete]', function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this Learning Moment?',
+                confirmEvent: function() {
+                    $.ajax({
+                        url: element.attr('href'),
+                        type: 'DELETE',
+                        success: function(result) {
+
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>

@@ -271,7 +271,7 @@ class Controller extends Base
      * @api   DELETE /learning/evidence/{id}
      * @since 20.2
      */
-    public function deleteMoment(): void
+    public function deleteEvidence(): void
     {
         echo 'test';
     }
