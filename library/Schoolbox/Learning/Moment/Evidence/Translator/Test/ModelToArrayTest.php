@@ -45,6 +45,7 @@ class ModelToArrayTest extends TestCase
                 'creator'          => null,
                 'recipient'        => null,
                 'discussionThread' => null,
+                '_links'           => []
             ],
         ];
 
@@ -71,6 +72,7 @@ class ModelToArrayTest extends TestCase
                 'creator'          => ['id' => 55],
                 'recipient'        => ['id' => 193],
                 'discussionThread' => ['id' => 14],
+                '_links'           => []
             ],
         ];
     }
