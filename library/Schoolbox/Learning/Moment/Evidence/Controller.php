@@ -13,8 +13,8 @@ use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Discussion\Comment;
-use Schoolbox\Discussion\Thread;
 use Schoolbox\Json\Decorator\LinkDecorator;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
@@ -186,21 +186,10 @@ class Controller extends Base
         $cursor        = new Cursor($this->mapper, $user);
         $data          = $cursor->retrieveResults($encodedCursor);
         $mappedData    = $data
-            ->map(
-                new Translator\ModelToArray(
-                    new User\Translator\Author\ModelToArray(),
-                    new Storage\Translator\ModelToArray(),
-                ),
-            )
+            ->map(function (Model $model) {
+                return $this->translateEvidence($model);
+            })
             ->reindex()
-            ->map(
-                static function (array $item): array {
-                    // Scrub body HTML, as there's no guarantee it has been
-                    // scrubbed elsewhere (and Vue can't do it)
-                    $item['body'] = Scrub::html($item['body']);
-                    return $item;
-                }
-            )
             ->map(
 
                 /* Add router-generated urls to every Evidence array
@@ -209,68 +198,6 @@ class Controller extends Base
                     return $this->generateLinks($item);
                 }
             );
-
-
-        // Include some of the discussion thread's comments in this return.
-        // (Say, the first two?)
-        // The translator will need to know how to translate discussion threads.
-        $commentMapper = Comment\Mapper::getInstance();
-        $linkDecorator = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
-        $jsonDecorator = new PropertyDecorator(null, $linkDecorator);
-        $mappedData    = $mappedData->map(function (array $item) use ($commentMapper, $linkDecorator, $jsonDecorator) {
-            $item['_links']     = [];
-            $evidence           = (new Model())->setId($item['id']);
-            $discussionThreadId = $item['discussionThread']['id'] ?? null;
-            if ($discussionThreadId) {
-                $discussionThread = (new Thread\Model())->setId($discussionThreadId);
-                $evidence->setDiscussionThread($discussionThread);
-
-                $commentCursor  = new Comment\Cursor($commentMapper, $discussionThread, Comment\Cursor::ORDER_DESC);
-                $results        = $commentCursor->retrieveResults(null);
-                $encodedResults = $results
-                    ->map(static function (Comment\Model $comment) use ($evidence) {
-                        return new Discussion\Comment\ModelDecorator\Decorator($comment, $evidence);
-                    });
-                $encodedResults = $encodedResults
-                    ->jsonSerialize($jsonDecorator, $linkDecorator);
-
-                // Serialize the discussion thread using its decorator
-                // TODO consider moving the links into the base data, as there should be a create thread link
-                $item['discussionThread'] = (new Discussion\Thread\ModelDecorator\Decorator($discussionThread, $evidence))
-                    ->jsonSerialize($jsonDecorator, $linkDecorator);
-
-                // Serialize the thread's comments as well
-                $item['discussionThread']['children'] = [
-                    'data'     => $encodedResults,
-                    'metadata' => [
-                        'count'  => $commentCursor->retrieveResultCount(),
-                        'cursor' => [
-                            'current' => $commentCursor->current($results),
-                            'next'    => $commentCursor->next($results),
-                        ],
-                    ],
-                ];
-            } else {
-                // Output the create thread link.
-                // TBD: is it output as a simple link, or a href/auth object?
-                // The old Aura link outputs the object, newer links are output
-                // as simple values (and are not output at all if permission denied)
-                $routeParams = [
-                    'contextType' => 'evidence',
-                    'context'     => $evidence,
-                    'contextId'   => $evidence->getId(),
-                ];
-                $createThreadLink = $this->getRouteIfAuthorized(
-                    'evidenceDiscussionThreads.createThread',
-                    $routeParams
-                );
-                if ($createThreadLink) {
-                    $item['_links']['createThread'] = $createThreadLink;
-                }
-            }
-            return $item;
-        });
-
 
         $this->response->content->set(
             $this->buildJsonOutput([
@@ -330,7 +257,7 @@ class Controller extends Base
      * @since 20.2
      *
      * @param Collection|User[] $users
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function postMomentForUsers(Collection $users): void
     {
@@ -430,5 +357,115 @@ class Controller extends Base
         ];
 
         return $evidence;
+    }
+
+
+    /**
+     * Helper method for translating evidence to an array structure.
+     *
+     * This uses the model-to-array translator, and also:
+     * * runs the evidence body through HTMLPurifier
+     * * loads and translates the evidence's discussion thread and comments
+     *   (if the thread exists)
+     * * injects a link to create a discussion thread (if it doesn't exist)
+     *
+     * @param Model $evidence
+     * @return array
+     * @throws MapperException if a query error occurs when retrieving or
+     *                         counting comments
+     * @noinspection PhpDocMissingThrowsInspection This will never throw a route
+     *               missing exception
+     */
+    private function translateEvidence(Model $evidence): array
+    {
+        // Basic translation with the model-to-array translator
+        $translator = new Translator\ModelToArray(
+            new User\Translator\Author\ModelToArray(),
+            new Storage\Translator\ModelToArray(),
+        );
+        $translation = $translator($evidence);
+
+
+        // Scrub body HTML, as there's no guarantee it has been scrubbed
+        // elsewhere (and Vue can't do it)
+        $translation['body']   = Scrub::html($translation['body']);
+        $translation['_links'] = [];
+
+
+        // Does this evidence have a discussion thread?
+        // If so: load and translate it, and inject it into the evidence
+        // If not: create a link to create a thread.
+        if ($evidence->getDiscussionThread()) {
+            $translation['discussionThread'] = $this->loadAndTranslateCommentsInDiscussionThread($evidence);
+        } else {
+            // Output the create thread link.
+            // TBD: is it output as a simple link, or a href/auth object?
+            // The old Aura link outputs the object, newer links are output
+            // as simple values (and are not output at all if permission denied)
+            $routeParams = [
+                'context'   => $evidence,
+                'contextId' => $evidence->getId(),
+            ];
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $createThreadLink = $this->getRouteIfAuthorized(
+                'evidenceDiscussionThreads.createThread',
+                $routeParams
+            );
+            if ($createThreadLink) {
+                $translation['_links']['createThread'] = $createThreadLink;
+            }
+        }
+
+        return $translation;
+    }
+
+
+    /**
+     * Helper method for loading the comments that are a part of the evidence's
+     * discussion thread, and then translating them into the discussion thread's
+     * JSON schema structure.
+     *
+     * @param Model $evidence
+     * @return array
+     * @throws MapperException if a query error occurs when retrieving or
+     *                         counting comments
+     */
+    private function loadAndTranslateCommentsInDiscussionThread(Model $evidence): array
+    {
+        // TODO put the required mappers and decorators somewhere else if possible?
+        $commentMapper  = Comment\Mapper::getInstance();
+        $linkDecorator  = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
+        $jsonDecorator  = new PropertyDecorator(null, $linkDecorator);
+
+        $discussionThread = $evidence->getDiscussionThread();
+
+        // TODO this should fetch less comments: perhaps only two?
+        $commentCursor  = new Comment\Cursor($commentMapper, $discussionThread, Comment\Cursor::ORDER_DESC);
+        $results        = $commentCursor->retrieveResults(null);
+        $encodedResults = $results
+            ->map(static function (Comment\Model $comment) use ($evidence) {
+                return new Discussion\Comment\ModelDecorator\Decorator($comment, $evidence);
+            });
+        $encodedResults = $encodedResults
+            ->jsonSerialize($jsonDecorator, $linkDecorator);
+
+        // Serialize the discussion thread using its decorator
+        // TODO consider moving the links into the base data, as there should be a create thread link
+        $result = (new Discussion\Thread\ModelDecorator\Decorator($discussionThread, $evidence))
+            ->jsonSerialize($jsonDecorator, $linkDecorator);
+
+        // Serialize the thread's comments as well
+        $result['children'] = [
+            'data'     => $encodedResults,
+            'metadata' => [
+                'count'  => $commentCursor->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $commentCursor->current($results),
+                    'next'    => $commentCursor->next($results),
+                ],
+            ],
+        ];
+
+        return $result;
     }
 }
