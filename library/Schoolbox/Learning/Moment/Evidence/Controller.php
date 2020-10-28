@@ -293,6 +293,10 @@ class Controller extends Base
     private function generateLinks(array $evidence): array
     {
         $evidence['_links'] = [
+            'detail' => $this->getRouteIfAuthorized('learningMomentEvidence.getEvidenceDetail', [
+                'evidenceId' => $evidence['id'],
+                'userId' => $evidence['recipient']['id']
+            ]),
 
             /* TODO Figure out what the modify perms will be
              *  I added this here, it was in there SA-11246 screenshot.
