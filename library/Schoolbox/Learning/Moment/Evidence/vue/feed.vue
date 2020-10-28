@@ -5,11 +5,13 @@ import moment from 'moment';
 
 import MediaArticle from '@schoolbox/media-article';
 import Storage      from '@schoolbox/storage';
+import CommentThread from './commentThread';
 
 export default {
     components: {
         MediaArticle,
         Storage,
+        CommentThread,
     },
     data() {
         return {
@@ -229,50 +231,7 @@ export default {
                         </div>
 
                         <div class="small-12 large-6 column">
-                            <!-- Comments -->
-                            <span v-if="commentTotalCount(evidence.discussionThread) === 0">
-                                No comments yet.
-                            </span>
-                            <span v-else>
-                                {{ commentTotalCount(evidence.discussionThread) }} comments
-                                <template v-if="!allCommentsLoaded(evidence.discussionThread)">
-                                    (<a @click.prevent="loadMoreComments(evidence.discussionThread)">Load more</a>)
-                                </template>
-                            </span>
-
-
-                            <ul class="information-list social-stream">
-                                <li class="actions-small-0" v-for="(comment, index) in comments(evidence.discussionThread)">
-                                    <div class="list-item">
-                                        <div class="card small-12 compact">
-                                            <a :href="evidence.creator._links.profile.href" title="View Profile">
-                                                <img :src="comment.author._links.avatar.href" alt="View Profile" />
-                                                <p>{{ comment.author.firstname }} {{ comment.author.lastname }}</p>
-                                                <time class="pipe meta"
-                                                      :datetime="comment.createdAt.json | dateFormat"
-                                                      :title="comment.createdAt.json | dateFormat(dateDisplayFormats.momentJsDatetime)"
-                                                >{{ comment.createdAt.json | fromNow }}</time>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <nav>
-<!--                                        <a href="#" class="icon-delete no-text" data-reveal-id="confirm-delete" title="Delete comment" v-if="comment._links.delete.auth" v-on:click="deleteComment(comment.id, index)"></a>-->
-<!--                                        {#<a href="#" class="icon-reply no-text" title="Add Reply"></a>#}-->
-                                    </nav>
-                                    <article v-html="comment.content"></article>
-                                </li>
-                                <!--
-                                <li class="actions-small-1" v-if="showSkeletonLoader" v-for="n in 3">
-                                    <div class="list-item">
-                                        <div class="small-12 card skeleton">
-                                            <div class="img"></div>
-                                            <h3></h3>
-                                            <p class="meta"></p>
-                                        </div>
-                                    </div>
-                                </li>
-                                -->
-                            </ul>
+                            <comment-thread :comment-thread="evidence.discussionThread" />
 
                             <!-- Comment: This Vue instance has included the CKEditor plugin, so the ckeditor tag exists -->
                             <ckeditor v-model="evidence.pendingComment" :config="ckeditorConfig"></ckeditor>
