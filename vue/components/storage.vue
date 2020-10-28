@@ -8,7 +8,7 @@
  */
 
 export default {
-    name: "media-element",
+    name: "storage",
     props: {
         storage: {
             type: Object,
