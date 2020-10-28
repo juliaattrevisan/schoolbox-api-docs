@@ -33,7 +33,8 @@ export default {
             return data.length;
         },
         ckeditorConfig () {
-            return {
+            // Use the same config as the editor in the news does
+            return window.jQuery.alaressEditorConfig({
                 removePlugins: 'uploadimage,link,schoolboxanchor',
                 removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
                 toolbarGroups: [
@@ -43,7 +44,7 @@ export default {
                     {name: 'insert', groups: ['insert']},
                     {name: 'schoolbox', groups: ['schoolboxlink']},
                 ],
-            }
+            });
         },
     },
     mounted() {
