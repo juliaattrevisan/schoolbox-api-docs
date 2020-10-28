@@ -270,9 +270,11 @@ class Controller extends Base
      *
      * @api   DELETE /learning/evidence/{id}
      * @since 20.2
+     * @param Model $evidence
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function deleteEvidence(): void
+    public function deleteEvidence(Model $evidence): void
     {
-        echo 'test';
+        $this->mapper->delete($evidence);
     }
 }
