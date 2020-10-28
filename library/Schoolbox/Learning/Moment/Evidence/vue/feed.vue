@@ -32,6 +32,19 @@ export default {
         currentCount () {
             return data.length;
         },
+        ckeditorConfig () {
+            return {
+                removePlugins: 'uploadimage,link,schoolboxanchor',
+                removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+                toolbarGroups: [
+                    {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                    {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
+                    {name: 'links', groups: ['links']},
+                    {name: 'insert', groups: ['insert']},
+                    {name: 'schoolbox', groups: ['schoolboxlink']},
+                ],
+            }
+        },
     },
     mounted() {
         this.load();
@@ -161,7 +174,7 @@ export default {
                         </article>
 
                         <!-- Comment: This Vue instance has included the CKEditor plugin, so the ckeditor tag exists -->
-                        <ckeditor v-model="evidence.comment"></ckeditor>
+                        <ckeditor v-model="evidence.pendingComment" :config="ckeditorConfig"></ckeditor>
 
                         <div class="content">
                             <p><a :href="evidence._links.detail">More Detail</a></p>
