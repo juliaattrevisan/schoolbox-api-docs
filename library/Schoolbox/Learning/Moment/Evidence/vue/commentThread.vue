@@ -14,8 +14,21 @@ export default {
     props: {
         commentThread: {
             type: Object,
-            default: {},
+            default: {
+                children: {
+                    data: [],
+                    metadata: {
+                        count: null,
+                        cursor: null,
+                    }
+                }
+            },
         },
+    },
+    data() {
+        return {
+            showSkeletonLoader: false,
+        }
     },
     computed: {
         dateDisplayFormats: () => window.dateDisplayFormats,
@@ -97,45 +110,44 @@ export default {
         <span v-if="!hasComments">
             No comments yet.
         </span>
-        <span v-else>
-            {{ commentTotalCount }} comments
-            <template v-if="!allCommentsLoaded">
-                (<a @click.prevent="loadMoreComments">Load more</a>)
-            </template>
-        </span>
-
-
-        <ul class="information-list social-stream">
-            <li class="actions-small-0" v-for="(comment, index) in comments">
-                <div class="list-item">
-                    <div class="card small-12 compact">
-                        <a :href="comment.author._links.profile.href" title="View Profile">
-                            <img :src="comment.author._links.avatar.href" alt="View Profile" />
-                            <p>{{ comment.author.firstname }} {{ comment.author.lastname }}</p>
-                            <time class="pipe meta"
-                                  :datetime="comment.createdAt.json | dateFormat"
-                                  :title="comment.createdAt.json | dateFormat(dateDisplayFormats.momentJsDatetime)"
-                            >{{ comment.createdAt.json | fromNow }}</time>
-                        </a>
+        <template v-else>
+            <span>
+                {{ commentTotalCount }} comments
+                <template v-if="!allCommentsLoaded">
+                    (<a @click.prevent="loadMoreComments">Load more</a>)
+                </template>
+            </span>
+            <ul class="information-list social-stream">
+                <li class="actions-small-0" v-for="(comment, index) in comments">
+                    <div class="list-item">
+                        <div class="card small-12 compact">
+                            <a :href="comment.author._links.profile.href" title="View Profile">
+                                <img :src="comment.author._links.avatar.href" alt="View Profile" />
+                                <p>{{ comment.author.firstname }} {{ comment.author.lastname }}</p>
+                                <time class="pipe meta"
+                                      :datetime="comment.createdAt.json | dateFormat"
+                                      :title="comment.createdAt.json | dateFormat(dateDisplayFormats.momentJsDatetime)"
+                                >{{ comment.createdAt.json | fromNow }}</time>
+                            </a>
+                        </div>
                     </div>
-                </div>
-                <nav>
-<!--                                        <a href="#" class="icon-delete no-text" data-reveal-id="confirm-delete" title="Delete comment" v-if="comment._links.delete.auth" v-on:click="deleteComment(comment.id, index)"></a>-->
-<!--                                        {#<a href="#" class="icon-reply no-text" title="Add Reply"></a>#}-->
-                </nav>
-                <media-article v-html="comment.content"></media-article>
-            </li>
-            <!--
-            <li class="actions-small-1" v-if="showSkeletonLoader" v-for="n in 3">
-                <div class="list-item">
-                    <div class="small-12 card skeleton">
-                        <div class="img"></div>
-                        <h3></h3>
-                        <p class="meta"></p>
+                    <nav>
+                        <!-- Delete will go here -->
+                    </nav>
+                    <media-article v-html="comment.content"></media-article>
+                </li>
+                <!--
+                <li class="actions-small-1" v-if="showSkeletonLoader" v-for="n in 3">
+                    <div class="list-item">
+                        <div class="small-12 card skeleton">
+                            <div class="img"></div>
+                            <h3></h3>
+                            <p class="meta"></p>
+                        </div>
                     </div>
-                </div>
-            </li>
-            -->
-        </ul>
+                </li>
+                -->
+            </ul>
+        </template>
     </div>
 </template>
