@@ -242,15 +242,15 @@ export default {
                             <ul class="information-list social-stream">
                                 <li class="actions-small-0" v-for="(comment, index) in comments(evidence.discussionThread)">
                                     <div class="list-item">
-                                        <div class="card small-12">
-                                                <a :href="evidence.creator._links.profile.href" title="View Profile">
-                                                    <img :src="comment.author._links.avatar.href + '&amp;size=square64'" alt="View Profile" />
-                                                    <p>{{ comment.author.firstname }} {{ comment.author.lastname }}</p>
-                                                    <time class="pipe meta"
-                                                          :datetime="comment.createdAt | dateFormat"
-                                                          :title="comment.createdAt  | dateFormat(dateDisplayFormats.momentJsDatetime)"
-                                                    >{{ comment.createdAt | fromNow }}</time>
-                                                </a>
+                                        <div class="card small-12 compact">
+                                            <a :href="evidence.creator._links.profile.href" title="View Profile">
+                                                <img :src="comment.author._links.avatar.href" alt="View Profile" />
+                                                <p>{{ comment.author.firstname }} {{ comment.author.lastname }}</p>
+                                                <time class="pipe meta"
+                                                      :datetime="comment.createdAt.json | dateFormat"
+                                                      :title="comment.createdAt.json | dateFormat(dateDisplayFormats.momentJsDatetime)"
+                                                >{{ comment.createdAt.json | fromNow }}</time>
+                                            </a>
                                         </div>
                                     </div>
                                     <nav>
@@ -259,6 +259,7 @@ export default {
                                     </nav>
                                     <article v-html="comment.content"></article>
                                 </li>
+                                <!--
                                 <li class="actions-small-1" v-if="showSkeletonLoader" v-for="n in 3">
                                     <div class="list-item">
                                         <div class="small-12 card skeleton">
@@ -268,6 +269,7 @@ export default {
                                         </div>
                                     </div>
                                 </li>
+                                -->
                             </ul>
 
                             <!-- Comment: This Vue instance has included the CKEditor plugin, so the ckeditor tag exists -->
