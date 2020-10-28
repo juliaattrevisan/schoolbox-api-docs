@@ -76,31 +76,45 @@ export default {
 }
 </script>
 <template>
-    <div class="news-post row">
-        <div class="small-12 island">
-            <section>
-                <div class="row">
-                    <div class="small-12 island">
-                        <section class="detail content">
-                            <p class="meta">By
-                                {{ this.evidence.recipient.fullName }}
-                                &mdash;
-                                <relative-time :datetime="this.evidence.createdAt"></relative-time>
-                            </p>
-
-                            <!-- Display evidence body, with media players initialised -->
-                            <media-article v-if="this.evidence.body">
-                                <div v-html="this.evidence.body" />
-                            </media-article>
-
-                            <!-- Is there an attachment? Display it appropriately -->
-                            <article v-if="this.evidence.filename && this.evidence.storage">
-                                <storage :storage="this.evidence.storage" :filename="this.evidence.filename"></storage>
-                            </article>
-                        </section>
-                    </div>
+    <div>
+        <div class="row">
+            <div class="small-12 columns">
+                <div class="actions-small-1">
+                    <nav>
+                        <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+                    </nav>
+                    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+                        <li><a class="icon-delete" :href="this.routes.delete">Delete</a></li>
+                    </ul>
                 </div>
-            </section>
+            </div>
+        </div>
+        <div class="news-post row">
+            <div class="small-12 island">
+                <section>
+                    <div class="row">
+                        <div class="small-12 island">
+                            <section class="detail content">
+                                <p class="meta">By
+                                    {{ this.evidence.recipient.fullName }}
+                                    &mdash;
+                                    <relative-time :datetime="this.evidence.createdAt"></relative-time>
+                                </p>
+
+                                <!-- Display evidence body, with media players initialised -->
+                                <media-article v-if="this.evidence.body">
+                                    <div v-html="this.evidence.body" />
+                                </media-article>
+
+                                <!-- Is there an attachment? Display it appropriately -->
+                                <article v-if="this.evidence.filename && this.evidence.storage">
+                                    <storage :storage="this.evidence.storage" :filename="this.evidence.filename"></storage>
+                                </article>
+                            </section>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </div>
     </div>
 </template>
