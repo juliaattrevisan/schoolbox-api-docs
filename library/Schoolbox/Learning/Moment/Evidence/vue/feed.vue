@@ -136,7 +136,59 @@ export default {
             }
             return moment.duration(dayDiff, 'd').humanize(true);
         },
-    }
+
+        /**
+         * How many comments are currently loaded in this thread?
+         *
+         * @param discussionThread
+         * @returns {number}
+         */
+        commentLoadedCount(discussionThread) {
+            let count = Number(discussionThread?.children?.data?.length);
+            return isNaN(count) ? 0 : count;
+        },
+
+        /**
+         * How many total comments (beyond the amount currently in the list)
+         * are there in this thread?
+         *
+         * @param discussionThread
+         * @returns {number}
+         */
+        commentTotalCount(discussionThread) {
+            let count = Number(discussionThread?.children?.metadata?.count);
+            return isNaN(count) ? 0 : count;
+        },
+
+        /**
+         * How many total comments (beyond the amount currently in the list)
+         * are there in this thread?
+         *
+         * @param discussionThread
+         * @returns {boolean}
+         */
+        allCommentsLoaded(discussionThread) {
+            return this.commentTotalCount(discussionThread) === this.commentLoadedCount(discussionThread);
+        },
+
+        /**
+         *
+         * @param discussionThread
+         * @returns {Array}
+         */
+        comments(discussionThread) {
+            let comments = discussionThread?.children?.data;
+            return comments === null ? [] : comments;
+        },
+
+        loadMoreComments(discussionThread) {
+            //
+        },
+    },
+    filters: {
+        dateFormat: (date, format) => moment(date).format(format),
+        fromNow:    (date)         => moment(date).fromNow(),
+    },
 }
 </script>
 
@@ -154,28 +206,73 @@ export default {
                     <li v-for="evidence in evidenceGroup.evidence">
                         <div class="card small-12 compact">
                             <a :href="evidence.creator._links.profile" title="View Profile">
-                                <img :src="evidence.creator._links.avatar + '&amp;size=square64'" alt="View Profile">
+                                <img :src="evidence.creator._links.avatar" alt="View Profile">
                                 <p>{{ evidence.creator.fullName }}</p>
                                 <time class="pipe meta"
-                                      :datetime="evidence.createdAt.format()"
-                                      :title="evidence.createdAt.format(dateDisplayFormats.momentJsDatetime)"
-                                >{{ evidence.createdAt.format(dateDisplayFormats.momentJsTime) }}</time>
+                                      :datetime="evidence.createdAt | dateFormat"
+                                      :title="evidence.createdAt  | dateFormat(dateDisplayFormats.momentJsDatetime)"
+                                >{{ evidence.createdAt | dateFormat(dateDisplayFormats.momentJsTime) }}</time>
                             </a>
                         </div>
 
-                        <!-- Display evidence body, with media players initialised -->
-                        <media-article v-if="evidence.body">
-                            <div v-html="evidence.body" />
-                        </media-article>
+                        <div class="small-12 large-6 column">
+                            <!-- Display evidence body, with media players initialised -->
+                            <media-article v-if="evidence.body">
+                                <div v-html="evidence.body" />
+                            </media-article>
 
 
-                        <!-- Is there an attachment? Display it appropriately -->
-                        <article v-if="evidence.filename && evidence.storage">
-                            <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
-                        </article>
+                            <!-- Is there an attachment? Display it appropriately -->
+                            <article v-if="evidence.filename && evidence.storage">
+                                <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
+                            </article>
+                        </div>
 
-                        <!-- Comment: This Vue instance has included the CKEditor plugin, so the ckeditor tag exists -->
-                        <ckeditor v-model="evidence.pendingComment" :config="ckeditorConfig"></ckeditor>
+                        <div class="small-12 large-6 column">
+                            <!-- Comments -->
+                            <span v-if="commentTotalCount(evidence.discussionThread) === 0">
+                                No comments yet.
+                            </span>
+                            <span v-else>
+                                {{ commentTotalCount(evidence.discussionThread) }} comments
+                                (<a @click.prevent="loadMoreComments(evidence.discussionThread)">Load more</a>)
+                            </span>
+
+
+                            <ul class="information-list social-stream">
+                                <li class="actions-small-0" v-for="(comment, index) in comments(evidence.discussionThread)">
+                                    <div class="list-item">
+                                        <div class="card small-12">
+                                                <a :href="evidence.creator._links.profile.href" title="View Profile">
+                                                    <img :src="comment.author._links.avatar.href + '&amp;size=square64'" alt="View Profile" />
+                                                    <p>{{ comment.author.firstname }} {{ comment.author.lastname }}</p>
+                                                    <time class="pipe meta"
+                                                          :datetime="comment.createdAt | dateFormat"
+                                                          :title="comment.createdAt  | dateFormat(dateDisplayFormats.momentJsDatetime)"
+                                                    >{{ comment.createdAt | fromNow }}</time>
+                                                </a>
+                                        </div>
+                                    </div>
+                                    <nav>
+<!--                                        <a href="#" class="icon-delete no-text" data-reveal-id="confirm-delete" title="Delete comment" v-if="comment._links.delete.auth" v-on:click="deleteComment(comment.id, index)"></a>-->
+<!--                                        {#<a href="#" class="icon-reply no-text" title="Add Reply"></a>#}-->
+                                    </nav>
+                                    <article v-html="comment.content"></article>
+                                </li>
+                                <li class="actions-small-1" v-if="showSkeletonLoader" v-for="n in 3">
+                                    <div class="list-item">
+                                        <div class="small-12 card skeleton">
+                                            <div class="img"></div>
+                                            <h3></h3>
+                                            <p class="meta"></p>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <!-- Comment: This Vue instance has included the CKEditor plugin, so the ckeditor tag exists -->
+                            <ckeditor v-model="evidence.pendingComment" :config="ckeditorConfig"></ckeditor>
+                        </div>
 
                         <div class="content">
                             <p><a :href="evidence._links.detail">More Detail</a></p>
