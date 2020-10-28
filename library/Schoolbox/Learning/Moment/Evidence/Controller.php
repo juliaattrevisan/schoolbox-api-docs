@@ -169,6 +169,14 @@ class Controller extends Base
                     $item['body'] = Scrub::html($item['body']);
                     return $item;
                 }
+            )
+            ->map(
+
+                /* Add router-generated urls to every Evidence array
+                 */
+                function (array $item): array {
+                    return $this->generateLinks($item);
+                }
             );
 
         $this->response->content->set(

@@ -5,7 +5,6 @@ import moment from 'moment';
 
 import MediaArticle from '@schoolbox/media-article';
 import Storage      from '@schoolbox/storage';
-import {ENDPOINTS}  from '@schoolboxLearningMomentEvidence/endpoints';
 
 export default {
     components: {
@@ -23,7 +22,6 @@ export default {
         }
     },
     created() {
-        this.ENDPOINTS = ENDPOINTS;
     },
     computed: {
         config: () => window.learningEvidenceFeedConfig,
@@ -163,7 +161,7 @@ export default {
                         </article>
 
                         <div class="content">
-                            <p><a :href="ENDPOINTS.momentEvidenceDetailPath(evidence.id)">More Detail</a></p>
+                            <p><a :href="evidence._links.detail">More Detail</a></p>
                         </div>
                     </li>
                 </ul>
