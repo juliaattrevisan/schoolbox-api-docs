@@ -235,7 +235,9 @@ export default {
                             </span>
                             <span v-else>
                                 {{ commentTotalCount(evidence.discussionThread) }} comments
-                                (<a @click.prevent="loadMoreComments(evidence.discussionThread)">Load more</a>)
+                                <template v-if="!allCommentsLoaded(evidence.discussionThread)">
+                                    (<a @click.prevent="loadMoreComments(evidence.discussionThread)">Load more</a>)
+                                </template>
                             </span>
 
 
