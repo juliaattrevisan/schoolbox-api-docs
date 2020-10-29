@@ -63,18 +63,6 @@ abstract class BaseThreadLocator implements IThreadLocator
     }
 
 
-//    /**
-//     * @inheritDoc
-//     *
-//     * @param string $contextType
-//     * @return bool
-//     */
-//    public function isContextFor(string $contextType): bool
-//    {
-//        return $contextType === self::TYPE;
-//    }
-
-
     /**
      * @inheritDoc
      *
