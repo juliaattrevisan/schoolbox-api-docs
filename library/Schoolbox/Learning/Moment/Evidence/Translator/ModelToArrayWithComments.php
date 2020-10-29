@@ -142,7 +142,7 @@ class ModelToArrayWithComments
                 'contextId' => $evidence->getId(),
             ];
             $createThreadRoute = 'evidenceDiscussionThreads.createThread';
-            if ($this->authorizer->authorizePathForUser($createThreadRoute, $routeParams, $this->currentUser)) {
+            if ($this->authorizer->isPathAuthorizedForUser($createThreadRoute, $routeParams, $this->currentUser)) {
                 $translation['_links']['createThread'] = $this->router->generate($createThreadRoute, $routeParams);
             }
         }
