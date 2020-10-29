@@ -16,3 +16,27 @@
     }
   }
 }
+
+/* Blind Mode for obfuscating marking
+ */
+.avatar-switch {
+  .blind-container {
+    float: left;
+    margin: -0.5rem 0 0 -1rem;
+    overflow: hidden;
+    width: 64px;
+
+    @media #{$small-only} {
+      width: 48px;
+    }
+  }
+
+  img.blind {
+    filter: blur(10px);
+    margin: 0;
+  }
+
+  p.blind {
+    filter: blur(5px);
+  }
+}
