@@ -60,6 +60,12 @@ class StudentCarousel
 
 
     /**
+     * @var bool
+     */
+    private $blindMode;
+
+
+    /**
      * @var string
      */
     private $blindModeParams = '';
@@ -78,14 +84,7 @@ class StudentCarousel
         $this->router     = $router;
         $this->student    = $student;
         $this->assessment = $assessment;
-
-        /* Decide whether we need to work with Blind Mode querystring params
-         */
-        if ((bool)$blindMode) {
-            $this->blindModeParams = '?' . http_build_query([
-                self::QUERYSTRING_BLIND_MARKING => 1
-            ]);
-        }
+        $this->blindMode  = (bool)$blindMode;
     }
 
 
@@ -98,6 +97,14 @@ class StudentCarousel
      */
     public function produce(): array
     {
+        /* Decide whether we need to work with Blind Mode querystring params
+         */
+        if ($this->blindMode) {
+            $this->blindModeParams = '?' . http_build_query([
+                self::QUERYSTRING_BLIND_MARKING => 1
+            ]);
+        }
+
         return [
             'currentPerson' => $this->getCurrentPerson(),
             'allPeople' => $this->getAllPeople(),
@@ -187,15 +194,23 @@ class StudentCarousel
     /**
      * Get the url corresponding to this person, to preselect selectize
      *
-     * @return false|string
+     * @return string
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    private function getCurrentPerson()
+    private function getCurrentPerson(): string
     {
-        return $this->router->generate('learningDueWorkResponse.getParticularResponse', [
+        $url = $this->router->generate('learningDueWorkResponse.getParticularResponse', [
             'assessmentId' => $this->assessment->getId(),
             'studentId'    => $this->student->getId(),
             'assessment'   => $this->assessment
-        ]) . $this->blindModeParams;
+        ]);
+
+        if ($url) {
+            $url .= $this->blindModeParams;
+
+            return $url;
+        }
+
+        return '';
     }
 }
