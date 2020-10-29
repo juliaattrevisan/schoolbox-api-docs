@@ -168,6 +168,7 @@ class StudentCarousel
             ]);
 
             /* Decide if we need an obfuscating class for Blind Mode
+             * This keeps the image blur from expanding beyond the dimensions we wanted
              */
             if ($this->blindMode) {
                 $html = "
