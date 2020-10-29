@@ -29,27 +29,12 @@
     <li>
         <a id="blind-review" class="icon-upload">Blind Review</a>
 
+        <script src="/javascript/shared/submissions/jquery.blind-review.js"></script>
         <script>
             $(function() {
-
-                /* Start from a random place
-                 */
-                function blindReview() {
-                    let pendingResponses = $('[data-assessment-status-light="pending"]');
-                    let selected = Math.floor(Math.random() * pendingResponses.length);
-                    let url = $(pendingResponses[selected]).parents('[data-participant]').find('[data-inline-grader]').attr('href');
-                    let blindUrl = url + '{{ blindModeParams ?? '' }}';
-
-                    /* Nobody has any pending responses; disable button
-                     */
-                    if (url === undefined) {
-                        $('#blind-review').remove();
-                    } else {
-                        $('#blind-review').attr('href', blindUrl);
-                    }
-                }
-
-                blindReview();
+                $('#blind-review').blindReview({
+                    params: '{{ blindModeParams ?? '' }}'
+                });
             });
         </script>
     </li>
@@ -542,6 +527,10 @@
                                     response.submittedLate,
                                     $toast
                                 )
+
+                                $('#blind-review').blindReview({
+                                    params: '{{ blindModeParams ?? '' }}'
+                                });
                             })
                             .fail(function () {
                                 soboFailure($button, buttonText, $toast);
@@ -580,6 +569,7 @@
                         $statusIcon.addClass('{{ statusPending }}');
                         $statusLabel.html('Submitted in person ' + (submittedLate ? 'late' : 'on time'));
                         $statusIcon.attr('title', '{{ labelPending }}');
+                        $statusIcon.attr('data-assessment-status-light', 'pending');
                         $('#filters').find('[data-status="pending"]').prop('checked', true);
                     }
 
