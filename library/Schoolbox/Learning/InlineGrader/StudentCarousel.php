@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\InlineGrader;
 use Aura\Router\Router;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 
 /**
@@ -119,7 +120,25 @@ class StudentCarousel
     {
         $allPeople = [];
 
-        foreach ($this->assessment->getAllParticipants() as $currentParticipant) {
+        $allParticipants = $this->assessment->getAllParticipants();
+
+        /* Decide if we need to change the ordering around some more, for Blind Mode
+         */
+        if ($this->blindMode) {
+            $allParticipants = $allParticipants->sortByCallback(function (Participant $p1, Participant $p2) {
+
+                /* You could probably throw in some more obfuscating ideas
+                 * like salting the comparison with today's date, such that
+                 * revisiting Blind Mode tomorrow gives you a different order
+                 *
+                 * This sorts by user id reversed, to make the marking user
+                 * do more mental gymnastics if they want to guess identities
+                 */
+                return $p1->getUser()->getId() >= $p2->getUser()->getId();
+            });
+        }
+
+        foreach ($allParticipants as $currentParticipant) {
             // Skip, if excluded from the assessment
             if ($currentParticipant->isExcluded()) {
                 continue;
