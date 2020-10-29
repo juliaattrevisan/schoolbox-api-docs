@@ -14,6 +14,7 @@ Usage:
     selectedFileHash  string
     markSchemeName    string
     carousel          StudentCarousel
+    blindMode         bool
     responseList      Collection|DueWork\Submission
     file              null|File\Model
     subfragment       null|string[]
@@ -266,10 +267,11 @@ Usage:
                     {% block comment %}
                         <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                             {% include '@learningAssessment/dueWork/comment.twig' with {
-                            participant: participant,
-                            feedback: feedback,
-                            tabIndex: 2,
-                            readonly: readonly
+                                participant: participant,
+                                feedback: feedback,
+                                tabIndex: 2,
+                                readonly: readonly,
+                                blindMode: blindMode ?? false
                             } only %}
 
                             {# Resubmission required checkbox #}

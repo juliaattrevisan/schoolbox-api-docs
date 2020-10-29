@@ -301,6 +301,11 @@ class Controller extends Base
                 $this->getRequest()->query[StudentCarousel::QUERYSTRING_BLIND_MARKING]
             ))->produce(),
 
+            /* This is passed through standard.twig into comment.twig, where a placeholder text
+             * identifies the current guy you're marking
+             */
+            'blindMode' => $this->getRequest()->query[StudentCarousel::QUERYSTRING_BLIND_MARKING],
+
             /* A list of all the Responses that the participant has spawned
              */
             'responseList' => (new ResponsesOnly($participant))->getForTeacher(),
