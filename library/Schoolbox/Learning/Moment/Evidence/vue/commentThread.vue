@@ -30,7 +30,6 @@ export default {
     },
     data() {
         return {
-            commentThread: this.thread,
             showSkeletonLoader: false,
             pendingComment: '',
         }
@@ -59,7 +58,7 @@ export default {
          * @returns {Boolean}
          */
         hasThread() {
-            return this?.commentThread?.id;
+            return this?.thread?.id;
         },
 
         /**
@@ -77,7 +76,7 @@ export default {
          * @returns {Number}
          */
         commentLoadedCount() {
-            let count = Number(this.commentThread?.children?.data?.length);
+            let count = Number(this.thread?.children?.data?.length);
             return isNaN(count) ? 0 : count;
         },
 
@@ -88,7 +87,7 @@ export default {
          * @returns {Number}
          */
         commentTotalCount() {
-            let count = Number(this.commentThread?.children?.metadata?.count);
+            let count = Number(this.thread?.children?.metadata?.count);
             return isNaN(count) ? 0 : count;
         },
 
@@ -108,7 +107,7 @@ export default {
          * @returns {Array}
          */
         comments() {
-            let comments = this.commentThread?.children?.data;
+            let comments = this.thread?.children?.data;
             return comments === null ? [] : comments;
         },
 
@@ -118,7 +117,18 @@ export default {
     // },
     methods: {
         loadMoreComments() {
-            // hit the cursor, then append to the list of comments
+            // What's the cursor?
+            let cursor = this.thread?.children?.metadata?.cursor?.next,
+                getUrl = this.thread?._links?.getComments?.href,
+                self   = this;
+            if (getUrl && cursor) {
+                axios
+                    .get(getUrl, {cursor: cursor})
+                    .then((response) => {
+                        self.thread.children.data = self.thread.children.data.concat(response.data.data);
+                        self.thread.children.metadata.cursor.next = response.data.metadata.cursor.next;
+                    })
+            }
         },
 
         postComment() {
@@ -128,20 +138,12 @@ export default {
             if (!this.hasThread) {
                 prePromise = axios
                     .post(this.createThreadEndpoint, {open: true})
-                    .then((response) => self.commentThread = response.data)
+                    .then((response) => self.thread = response.data)
             }
             prePromise
-                .then(() => axios.post(self.commentThread._links.createComment.href, {content: self.pendingComment}))
+                .then(() => axios.post(self.thread._links.createComment.href, {content: self.pendingComment}))
                 .then((response) => {
-                    // let newChildren =
-                    self.commentThread.children.data.unshift(response.data);
-                    // self.commentThread = Object.assign(
-                    //     {},
-                    //     self.commentThread,
-                    //     {
-                    //         children: self.commentThread.children.unshift(response.data)
-                    //     }
-                    // )
+                    self.thread.children.data.unshift(response.data);
                 })
         },
     },
@@ -165,7 +167,7 @@ export default {
                 </template>
             </span>
             <ul class="information-list social-stream">
-                <li class="actions-small-0" v-for="(comment, index) in comments">
+                <li class="actions-small-0" v-for="comment in comments">
                     <div class="list-item">
                         <div class="card small-12 compact">
                             <a :href="comment.author._links.profile.href" title="View Profile">
