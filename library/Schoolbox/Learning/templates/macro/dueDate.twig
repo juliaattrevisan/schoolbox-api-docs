@@ -39,17 +39,17 @@
  # Helper macro to render due date for a participant's plan.
  #}
 {% macro forParticipant(participant) %}
-    {% spaceless %}
-        {# cache this for performance #}
-        {% set participantDueDate = participant.dueDate %}
-        {% import '@learning/macro/urgency.twig' as urgency %}
-        <span class="{{ urgency.datetime(participant) }}" title="{{ participantDueDate.long }}">Due
-            <time datetime="{{ participantDueDate }}">{{ participantDueDate.relativeDay|replace({' at 11:59pm': ''}) }}</time>
-            {% if participantDueDate.isFuture and participantDueDate.diffInDays(NOW) < 7 %}
-                (<time datetime="{{ participantDueDate }}">{{ participantDueDate.relativeTime(null, true) }} remaining</time>)
-            {% endif %}
-        </span>
-    {% endspaceless %}
+{% spaceless %}
+    {# cache this for performance #}
+    {% set participantDueDate = participant.dueDate %}
+    {% import '@learning/macro/urgency.twig' as urgency %}
+    <span class="{{ urgency.datetime(participant) }}" title="{{ participantDueDate.long }}">Due
+        <time datetime="{{ participantDueDate }}">{{ participantDueDate.relativeDay|replace({' at 11:59pm': ''}) }}</time>
+        {% if participantDueDate.isFuture and participantDueDate.diffInDays(NOW) < 7 %}
+            (<time datetime="{{ participantDueDate }}">{{ participantDueDate.relativeTime(null, true) }} remaining</time>)
+        {% endif %}
+    </span>
+{% endspaceless %}
 {% endmacro %}
 
 
@@ -57,15 +57,15 @@
  # Helper macro to render an assessment's default (not participant-specific) due date.
  #}
 {% macro forAssessment(assessment) %}
-    {% spaceless %}
-        {% set dueAt = assessment.dueAt %}
-        {% if dueAt is not null and not dueAt.isNull %}
-            <span title="{{ dueAt.long }}">Due
-                <time datetime="{{ dueAt }}">{{ dueAt.relativeDay|replace({' at 11:59pm': ''}) }}</time>
-                {% if dueAt.isFuture and dueAt.diffInDays(NOW) < 7 %}
-                    (<time datetime="{{ dueAt }}">{{ dueAt.relativeTime(null, true) }} remaining</time>)
-                {% endif %}
-            </span>
-        {% endif %}
-    {% endspaceless %}
+{% spaceless %}
+    {% set dueAt = assessment.dueAt %}
+    {% if dueAt is not null and not dueAt.isNull %}
+        <span title="{{ dueAt.long }}">Due
+            <time datetime="{{ dueAt }}">{{ dueAt.relativeDay|replace({' at 11:59pm': ''}) }}</time>
+            {% if dueAt.isFuture and dueAt.diffInDays(NOW) < 7 %}
+                (<time datetime="{{ dueAt }}">{{ dueAt.relativeTime(null, true) }} remaining</time>)
+            {% endif %}
+        </span>
+    {% endif %}
+{% endspaceless %}
 {% endmacro %}
