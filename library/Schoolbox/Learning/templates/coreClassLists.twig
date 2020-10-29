@@ -54,9 +54,9 @@ Data:
                 <template v-if="studentLists.length > 0">
                     <tr v-for="student in studentLists">
                         <td v-if="mailEnabled">
-                            <input type="checkbox" name="students[]" :id="'id-' + student.synergy_id" :value="student.synergy_id"
+                            <input type="checkbox" name="students[]" :id="'id-' + student.id" :value="student.id"
                                    @click="select"/>
-                            <label :for="'id-' + student.synergy_id" class="checkbox-label"></label>
+                            <label :for="'id-' + student.id" class="checkbox-label"></label>
                         </td>
                         <td>
                             <img :src="'/portrait.php?id=' + student.id + '&size=square64'"
@@ -124,7 +124,7 @@ Data:
             <span class="right">
                 <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent class="class-list-form">
                     <input type="hidden" name="replyto" :value="replyTo"/>
-                    <input type="hidden" id="selectedIds" name="selectedIds" v-model="selectedStudentIds" />
+                    <input type="hidden" id="selectedIds" name="selectedIds" v-model="selectedStudentExternalIds" />
                     <input type="hidden" id="selectedGroups" name="selectedGroups" v-model="selectedGroups" />
                     <button type="submit" class="button icon-email" :disabled="! enableSendEmailButton" @click="sendEmail">${ sendEmailButtonText }</button>
                 </form>
@@ -173,6 +173,7 @@ Data:
             showSkeletonLoader: true,
             isAllSelected: false,
             selectedStudentIds: [],
+            selectedStudentExternalIds: [],
             studentsCheckboxElements: undefined,
             groups: {{ emailGroups | raw }},
             groupsCheckboxElements: [],
@@ -244,6 +245,7 @@ Data:
                     }
                 });
 
+                self.updateSelectedExternalIds();
                 self.updateSendEmailButtonState();
 
                 self.isAllSelected = isChecked;
@@ -265,6 +267,7 @@ Data:
                     self.isAllSelected = true;
                 }
 
+                self.updateSelectedExternalIds();
                 self.updateSendEmailButtonState();
             },
             sendEmail: function(event) {
@@ -274,6 +277,20 @@ Data:
                 self.enableSendEmailButton = false;
                 self.sendEmailButtonText = self.loadingText;
                 this.$refs.form.submit();
+            },
+
+            /**
+             * Convert selected Schoolbox IDs to external IDs
+             */
+            updateSelectedExternalIds: function () {
+                let self = this;
+                self.selectedStudentExternalIds = [];
+                this.studentLists.forEach(function (v) {
+                    let internalId = v.id;
+                    if (self.selectedStudentIds.indexOf(String(internalId)) >= 0) {
+                        self.selectedStudentExternalIds.push(v.synergy_id);
+                    }
+                });
             },
             updateSelectedGroups: function(event)
             {
@@ -295,7 +312,7 @@ Data:
             {
                 var self = this;
 
-                self.enableSendEmailButton = self.selectedStudentIds.length > 0 && self.selectedGroups.length > 0;
+                self.enableSendEmailButton = self.selectedStudentExternalIds.length > 0 && self.selectedGroups.length > 0;
             },
             openShareLearningMomentDialog: function() {
                 // Set the form's target to the selected users
