@@ -26,7 +26,7 @@
     overflow: hidden;
     width: 64px;
 
-    @media #{$small-only} {
+    @media #{$medium-down} {
       width: 48px;
     }
   }
@@ -38,11 +38,24 @@
 
   .student {
     .selectize-control {
-      .selectize-input, .selectize-dropdown-content {
+      .selectize-input {
         .card {
           p.blind {
             filter: blur(5px);
             margin: 0 0 0 1rem;
+          }
+        }
+      }
+
+      .selectize-dropdown-content {
+        .card {
+          p.blind {
+            filter: blur(5px);
+            margin: 0 0 0 4rem;
+
+            @media #{$medium-down} {
+              margin: 0 0 0 3rem;
+            }
           }
         }
       }
