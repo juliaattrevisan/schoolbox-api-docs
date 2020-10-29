@@ -5,11 +5,13 @@ import moment from 'moment';
 
 import MediaArticle from '@schoolbox/media-article';
 import Storage from '@schoolbox/storage';
+import Toast from '@schoolbox/toast';
 
 export default {
     components: {
         MediaArticle,
         Storage,
+        Toast,
     },
     props: {
         thread: {
@@ -31,8 +33,8 @@ export default {
     data() {
         return {
             commentThread: this.thread,
-            showSkeletonLoader: false,
             pendingComment: '',
+            saveInProgress: false,
         }
     },
     computed: {
@@ -123,12 +125,15 @@ export default {
                 getUrl = this.commentThread?._links?.getComments?.href,
                 self   = this;
             if (getUrl && cursor) {
+                self.$refs.toast.activate('Loading...');
                 axios
                     .get(getUrl, {params: {cursor: cursor}})
                     .then((response) => {
                         self.commentThread.children.data = self.commentThread.children.data.concat(response.data.data);
                         self.commentThread.children.metadata.cursor.next = response.data.metadata.cursor.next;
+                        this.$refs.toast.timeout('Loaded', true, 2000);
                     })
+                    .catch(() => self.$refs.toast.timeout('Loading failed', false, 5000))
             }
         },
 
@@ -136,6 +141,10 @@ export default {
             // maybe there's not a thread at all. If not: create one, then post
             let prePromise = Promise.resolve(),
                 self       = this;
+
+            self.saveInProgress = true;
+            self.$refs.toast.activate('Saving...');
+
             if (!this.hasThread) {
                 prePromise = axios
                     .post(this.createThreadEndpoint, {open: true})
@@ -158,9 +167,15 @@ export default {
             prePromise
                 .then(() => axios.post(self.commentThread._links.createComment.href, {content: self.pendingComment}))
                 .then((response) => {
+                    // Update the comment count, add the new comment to the
+                    // thread, clear the pending comment box
                     self.commentThread.children.metadata.count += 1;
                     self.commentThread.children.data.unshift(response.data);
+                    self.$refs.toast.timeout('Saved', true, 2000);
+                    self.pendingComment = '';
                 })
+                .catch(() => self.$refs.toast.timeout('Save failed', false, 5000))
+                .finally(() => self.saveInProgress = false)
         },
     },
     filters: {
@@ -201,24 +216,15 @@ export default {
                     </nav>
                     <media-article v-html="comment.content"></media-article>
                 </li>
-                <!--
-                <li class="actions-small-1" v-if="showSkeletonLoader" v-for="n in 3">
-                    <div class="list-item">
-                        <div class="small-12 card skeleton">
-                            <div class="img"></div>
-                            <h3></h3>
-                            <p class="meta"></p>
-                        </div>
-                    </div>
-                </li>
-                -->
             </ul>
         </template>
 
-        <!-- Comment: This Vue instance has included the CKEditor plugin, so the ckeditor tag exists -->
-        <ckeditor v-model="pendingComment" :config="ckeditorConfig"></ckeditor>
+        <!-- This Vue instance has included the CKEditor plugin, therefore the ckeditor tag exists -->
+        <ckeditor v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
         <a class="button submit"
            @click="postComment"
-           :disabled="pendingComment.trim() === ''">Post Comment</a>
+           :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
+
+        <toast ref="toast"></toast>
     </div>
 </template>
