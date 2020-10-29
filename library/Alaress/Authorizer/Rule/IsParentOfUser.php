@@ -19,12 +19,14 @@ use Schoolbox\UserMapper;
 class IsParentOfUser implements IAuthorizationRule
 {
     /**
-     * The array key in $params that contains the user ID (if a string), or a
-     * callable which can retrieve the ID.
+     * The source for the value within `$params` which is used to determine the
+     * user to compare to the current user.
+     *
+     * @see IsUser::$paramSource
      *
      * @var string|callable
      */
-    protected $userIdSource = 'id';
+    protected $paramSource = 'id';
 
     /**
      * The external user interface
@@ -61,8 +63,8 @@ class IsParentOfUser implements IAuthorizationRule
     ) {
         $this->externalDb     = $externalDb;
         $this->userMapper     = $userMapper;
-        $this->userIdSource   = $userIdSource;
-        $this->userAuthorizer = new IsUser($this->userIdSource);
+        $this->paramSource    = $userIdSource;
+        $this->userAuthorizer = new IsUser($this->paramSource);
     }
 
     /**
