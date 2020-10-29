@@ -42,13 +42,6 @@ class StudentCarousel
 
 
     /**
-     * A css class which obfuscates rendering for the user
-     * so you can't tell what you're looking at
-     */
-    private const BLIND_MODE_CSS = 'blind';
-
-
-    /**
      * @var Router
      */
     private $router;
@@ -176,20 +169,34 @@ class StudentCarousel
 
             /* Decide if we need an obfuscating class for Blind Mode
              */
-            $blindModeCss = $this->blindMode ? self::BLIND_MODE_CSS : '';
+            if ($this->blindMode) {
+                $html = "
+                    <div class=\"row\">
+                        <div class=\"card small-10\">
+                            <div class='blind-container'>
+                                <img src=\"/portrait.php?userId={$currentParticipant->getUser()->getExternalId()}&size=square64\" class=\"blind\" alt=\"View Profile\" />
+                            </div>
+                            <p class=\"blind\" >{$currentParticipant->getUser()->getFullName()}</p>
+                            <span class=\"label status {$css}\">{$label}</span>
+                        </div>
+                    </div>
+                ";
+            } else {
+                $html = "
+                    <div class=\"row\">
+                        <div class=\"card small-10\">
+                            <img src=\"/portrait.php?userId={$currentParticipant->getUser()->getExternalId()}&size=square64\" alt=\"View Profile\" />
+                            <p>{$currentParticipant->getUser()->getFullName()}</p>
+                            <span class=\"label status {$css}\">{$label}</span>
+                        </div>
+                    </div>
+                ";
+            }
 
             $person = [
                 'text' => $currentParticipant->getUser()->getFullname(),
                 'value' => "{$urlValue}{$this->blindModeParams}",
-                'html' => "
-                    <div class=\"row\">
-                        <div class=\"card small-10\">
-                            <img src=\"/portrait.php?userId={$currentParticipant->getUser()->getExternalId()}&size=square64\" class=\"{$blindModeCss}\" alt=\"View Profile\" />
-                            <p class=\"{$blindModeCss}\" >{$currentParticipant->getUser()->getFullName()}</p>
-                            <span class=\"label status {$css}\">{$label}</span>
-                        </div>
-                    </div>
-                ",
+                'html' => $html,
                 'submitted' => $currentParticipant->isFeedbackRequired(),
             ];
 
