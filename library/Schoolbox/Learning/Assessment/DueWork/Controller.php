@@ -55,6 +55,7 @@ use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -206,14 +207,22 @@ class Controller extends Assessment\Controller
         // Only display download link if there are actually files to download
 
         $twigData = [
-            'errors'         => StateMapper::getInstance()->listDisplayValues(),
-            'type'           => Assessment\AssessmentType::objectToString($assessment),
-            'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
-            'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
-            'assessment'     => $assessment,
-            'download'       => $this->hasDownloadableSubmissionFiles($assessment),
-            'rubricMarks'    => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
+            'errors'            => StateMapper::getInstance()->listDisplayValues(),
+            'type'              => Assessment\AssessmentType::objectToString($assessment),
+            'markSchemeName'    => $this->deriveSchemeName($assessment->getMarkScheme()),
+            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
+            'assessment'        => $assessment,
+            'download'          => $this->hasDownloadableSubmissionFiles($assessment),
+            'rubricMarks'       => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
             'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
+
+            /* This is appended to a random url determined in javascript
+             * This url belongs to random person who's got a pending response
+             * It's the starting point in the carousel when you first click Blind Review
+             */
+            'blindModeParams' => '?' . http_build_query([
+                StudentCarousel::QUERYSTRING_BLIND_MARKING => 1
+            ]),
         ];
 
         $this->getResponse()->content->set(

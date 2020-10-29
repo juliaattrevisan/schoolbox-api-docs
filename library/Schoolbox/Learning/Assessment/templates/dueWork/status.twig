@@ -10,6 +10,7 @@
      - markSchemeName:   string    filename of markScheme template fragment
      - rubricMarks:       bool[]  Whether the student's instructor-given feedback exists and has rubric marks, indexed by user.id
      - interactionLocked: bool Is the assessment locked for interactions because it is due in an archived term?
+     - blindModeParams:  array
 #}
 {% extends '@learningAssessment/status.twig' %}
 
@@ -24,6 +25,26 @@
 {% block headerOptions %}
     <li>
         <a id="import-feedback" data-reveal-id="importFeedbackModal" class="icon-upload">Import Feedback</a>
+    </li>
+    <li>
+        <a id="blind-review" class="icon-upload">Blind Review</a>
+
+        <script>
+            $(function() {
+
+                /* Start from a random place
+                 */
+                function blindReview() {
+                    let pendingResponses = $('[data-assessment-status-light="pending"]');
+                    let selected = Math.floor(Math.random() * pendingResponses.length);
+                    let url = $(pendingResponses[selected]).parents('[data-participant]').find('[data-inline-grader]').attr('href');
+
+                    $('#blind-review').attr('href', url + '{{ blindModeParams ?? '' }}');
+                }
+
+                blindReview();
+            });
+        </script>
     </li>
 
     {% if download %}
@@ -115,7 +136,7 @@
                     <ul id="feedback-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
                         {%- spaceless %}
                             {% if pActionResponses %}
-                                <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}">View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
+                                <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}" data-inline-grader>View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
                             {% endif %}
                             {% if pActionSummary %}
                                 <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">{{ responseHistory }}</a></li>
