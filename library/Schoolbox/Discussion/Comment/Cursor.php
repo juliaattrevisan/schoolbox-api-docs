@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -189,7 +190,6 @@ class Cursor
             $nextCursor = $this->codec->encode($lastRecord->$getIdMethod());
         }
         return $nextCursor;
-
     }
 
 
@@ -240,5 +240,4 @@ class Cursor
         }
         return $pb;
     }
-
 }

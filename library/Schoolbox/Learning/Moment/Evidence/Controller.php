@@ -205,7 +205,6 @@ class Controller extends Base
             )
             ->reindex()
             ->map(
-
                 /* Add router-generated urls to every Evidence array
                  */
                 function (array $item): array {

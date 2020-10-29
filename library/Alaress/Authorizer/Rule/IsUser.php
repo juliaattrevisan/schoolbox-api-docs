@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Validates whether the user is the given ID.
  *
@@ -15,6 +16,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\User;
+
 use function is_scalar;
 
 class IsUser implements IAuthorizationRule

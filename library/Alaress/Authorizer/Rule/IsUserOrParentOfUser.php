@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Validates whether the user is either the given user, or their parent.
  *
