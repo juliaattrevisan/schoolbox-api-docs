@@ -353,22 +353,23 @@ class Controller extends Base
      */
     private function generateLinks(array $evidence): array
     {
-        $evidence['_links'] = [
-            'detail' => $this->getRouteIfAuthorized('learningMomentEvidence.getEvidenceDetail', [
-                'evidenceId' => $evidence['id'],
-                'userId' => $evidence['recipient']['id']
-            ]),
+        if (!array_key_exists('_links', $evidence)) {
+            $evidence['_links'] = [];
+        }
+        $evidence['_links']['detail'] = $this->getRouteIfAuthorized('learningMomentEvidence.getEvidenceDetail', [
+            'evidenceId' => $evidence['id'],
+            'userId' => $evidence['recipient']['id']
+        ]);
 
-            /* TODO Figure out what the modify perms will be
-             *  I added this here, it was in there SA-11246 screenshot.
-             */
-            'modify' => null,
+        /* TODO Figure out what the modify perms will be
+         *  I added this here, it was in there SA-11246 screenshot.
+         */
+        $evidence['_links']['modify'] = null;
 
-            'delete' => $this->getRouteIfAuthorized('learningMomentEvidence.deleteEvidence', [
-                'evidenceId' => $evidence['id'],
-                'creatorId' => $evidence['creator']['id']
-            ])
-        ];
+        $evidence['_links']['delete'] = $this->getRouteIfAuthorized('learningMomentEvidence.deleteEvidence', [
+            'evidenceId' => $evidence['id'],
+            'creatorId' => $evidence['creator']['id']
+        ]);
 
         return $evidence;
     }
