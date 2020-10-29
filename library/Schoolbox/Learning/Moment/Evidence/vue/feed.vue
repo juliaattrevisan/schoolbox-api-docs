@@ -160,7 +160,7 @@ export default {
                     <li v-for="evidence in evidenceGroup.evidence">
                         <div class="card small-12 compact">
                             <a :href="evidence.creator._links.profile" title="View Profile">
-                                <img :src="evidence.creator._links.avatar" alt="View Profile">
+                                <img :src="evidence.creator._links.avatar + '&amp;size=square64'" alt="View Profile">
                                 <p>{{ evidence.creator.fullName }}</p>
                                 <time class="pipe meta"
                                       :datetime="evidence.createdAt | dateFormat"
