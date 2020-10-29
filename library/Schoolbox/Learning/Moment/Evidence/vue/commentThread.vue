@@ -202,7 +202,7 @@ export default {
                     <div class="list-item">
                         <div class="card small-12 compact">
                             <a :href="comment.author._links.profile.href" title="View Profile">
-                                <img :src="comment.author._links.avatar.href + '&amp;size=square64'" alt="View Profile" />
+                                <img :src="comment.author._links.avatar.href" alt="View Profile" />
                                 <p>{{ comment.author.firstname }} {{ comment.author.lastname }}</p>
                                 <time class="pipe meta"
                                       :datetime="comment.createdAt.json | dateFormat"

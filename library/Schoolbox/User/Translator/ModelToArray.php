@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\User\Translator;
 
+use Alaress\Image\Transformation\Storage;
 use Closure;
 use House;
 use HouseResidential;
@@ -174,10 +175,16 @@ class ModelToArray
      */
     protected function deriveLinks(User $user): array
     {
+        // TODO consider providing default sizes
         return $user->getId()
             ? [
                 'profile' => '/search/user/' . $user->getId(),
-                'avatar'  => '/portrait.php?id=' . $user->getId(),
+                'avatar'  =>
+                    sprintf(
+                        '/portrait?id=%d&size=%s',
+                        $user->getId(),
+                        urlencode(Storage::TRANSFORM_SQUARE64)
+                    ),
             ]
             : [];
     }
