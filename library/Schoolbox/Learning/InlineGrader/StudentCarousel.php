@@ -96,7 +96,7 @@ class StudentCarousel
      * @return array
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function produce()
+    public function produce(): array
     {
         return [
             'currentPerson' => $this->getCurrentPerson(),
@@ -108,7 +108,7 @@ class StudentCarousel
     /**
      * Get a list of possible participants and whether they've submitted stuff
      */
-    private function getAllPeople()
+    private function getAllPeople(): array
     {
         $allPeople = [];
 
