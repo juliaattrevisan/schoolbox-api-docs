@@ -50,6 +50,9 @@
     $(function () {
         $('[data-collapser]').collapsable();
     });
+    $(function() {
+        $('#email-contacts-form').alaressValidate();
+    });
 </script>
 
 <div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
@@ -744,6 +747,16 @@
                                     {% endfor %}
                                 </ul>
                             </section>
+                            <form action="/mail/createMail.php" method="post" class="no-margin" id="email-contacts-form">
+                                <div class="row">
+                                    <div class="small-12 columns">
+                                        <input type="hidden" name="replyto" value="<{{USER.email}}>"/>
+                                        <input type="hidden" name="selectedIds" value="{{ user.externalId }}"/>
+                                        <input type="hidden" name="selectedGroups" value="parents"/>
+                                        <button type="submit" class="button">Email Contacts</button>
+                                    </div>
+                                </div>
+                            </form>
                         {% endblock contacts %}
                     {% endblock contacts_island %}
 
