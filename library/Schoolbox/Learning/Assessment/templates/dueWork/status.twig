@@ -166,7 +166,8 @@
                             feedback:    participant.findMostRecentInstructorGivenFeedback,
                             participant: participant,
                             tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
-                            readonly:    readonly
+                            readonly:    readonly,
+                            blindMode:   false
                         } only %}
                         {% set inputNo = inputNo + 1 %}
                         {% if 'none' == markSchemeName | lower %}

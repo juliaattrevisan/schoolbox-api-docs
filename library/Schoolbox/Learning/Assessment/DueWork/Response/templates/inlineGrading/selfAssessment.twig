@@ -112,11 +112,12 @@
 {% block comment %}
     <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
         {% include '@learningAssessment/dueWork/comment.twig' with {
-        tabIndex: 2,
-        readonly: readonly,
-        selfAssessment: true,
-        participant: participant,
-        feedback: feedback
+            tabIndex: 2,
+            readonly: readonly,
+            selfAssessment: true,
+            participant: participant,
+            feedback: feedback,
+            blindMode: false
         } only %}
     </div>
 {% endblock %}
