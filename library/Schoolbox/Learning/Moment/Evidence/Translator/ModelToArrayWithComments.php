@@ -59,26 +59,46 @@ class ModelToArrayWithComments
 
 
     /**
+     * A decorator passed to the loaded discussion thread's `jsonSerialize`
+     * method: used to create links.
+     */
+    private LinkDecorator $linkDecorator;
+
+
+    /**
+     * A decorator passed to the loaded discussion thread's `jsonSerialize`
+     * method: used to translate properties to array values.
+     */
+    private PropertyDecorator $propertyDecorator;
+
+
+    /**
      * Constructor
      *
-     * @param ModelToArray   $baseTranslator
-     * @param Router         $router
-     * @param Authorizer     $authorizer
-     * @param User           $currentUser
-     * @param Comment\Mapper $commentMapper
+     * @param ModelToArray      $baseTranslator
+     * @param Router            $router
+     * @param Authorizer        $authorizer
+     * @param User              $currentUser
+     * @param Comment\Mapper    $commentMapper
+     * @param LinkDecorator     $linkDecorator
+     * @param PropertyDecorator $propertyDecorator
      */
     public function __construct(
         ModelToArray $baseTranslator,
         Router $router,
         Authorizer $authorizer,
         User $currentUser,
-        Comment\Mapper $commentMapper
+        Comment\Mapper $commentMapper,
+        LinkDecorator $linkDecorator,
+        PropertyDecorator $propertyDecorator
     ) {
-        $this->baseTranslator = $baseTranslator;
-        $this->router         = $router;
-        $this->authorizer     = $authorizer;
-        $this->currentUser    = $currentUser;
-        $this->commentMapper  = $commentMapper;
+        $this->baseTranslator    = $baseTranslator;
+        $this->router            = $router;
+        $this->authorizer        = $authorizer;
+        $this->currentUser       = $currentUser;
+        $this->commentMapper     = $commentMapper;
+        $this->linkDecorator     = $linkDecorator;
+        $this->propertyDecorator = $propertyDecorator;
     }
 
 
@@ -133,12 +153,6 @@ class ModelToArrayWithComments
      */
     private function loadAndTranslateCommentsInDiscussionThread(Evidence\Model $evidence): array
     {
-        // The discussion threads use the older-style decorated jsonSerialize
-        // methods for converting a model to an array:
-        // that's why all these decorators are required.
-        $linkDecorator = new LinkDecorator($this->router, $this->authorizer, $this->currentUser);
-        $jsonDecorator = new PropertyDecorator(null, $linkDecorator);
-
         // TODO this should fetch less comments: perhaps only two?
         $commentCursor  = new Comment\Cursor(
             $this->commentMapper,
@@ -151,12 +165,12 @@ class ModelToArrayWithComments
                 return new Discussion\Comment\ModelDecorator\Decorator($comment, $evidence);
             });
         $encodedResults = $encodedResults
-            ->jsonSerialize($jsonDecorator, $linkDecorator);
+            ->jsonSerialize($this->propertyDecorator, $this->linkDecorator);
 
 
         // Serialize the discussion thread using its decorator
         $result = (new Discussion\Thread\ModelDecorator\Decorator($evidence->getDiscussionThread(), $evidence))
-            ->jsonSerialize($jsonDecorator, $linkDecorator);
+            ->jsonSerialize($this->propertyDecorator, $this->linkDecorator);
 
 
         // Scrub each result's comment

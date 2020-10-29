@@ -9,9 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence;
 
+use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Discussion\Comment;
+use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
@@ -179,10 +181,12 @@ class Controller extends Base
      */
     public function getMomentsForUser(User $user): void
     {
-        $encodedCursor = $this->request->query->get('cursor');
-        $cursor        = new Cursor($this->mapper, $user);
-        $data          = $cursor->retrieveResults($encodedCursor);
-        $mappedData    = $data
+        $encodedCursor     = $this->request->query->get('cursor');
+        $cursor            = new Cursor($this->mapper, $user);
+        $data              = $cursor->retrieveResults($encodedCursor);
+        $linkDecorator     = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
+        $propertyDecorator = new PropertyDecorator(null, $linkDecorator);
+        $mappedData        = $data
             ->map(
                 new Translator\ModelToArrayWithComments(
                     new Translator\ModelToArray(
@@ -192,7 +196,9 @@ class Controller extends Base
                     $this->router,
                     $this->authorizer,
                     $this->getUser(),
-                    Comment\Mapper::getInstance()
+                    Comment\Mapper::getInstance(),
+                    $linkDecorator,
+                    $propertyDecorator,
                 )
             )
             ->reindex()
