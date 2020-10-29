@@ -10,7 +10,6 @@
 
 namespace Alaress\Authorizer\Rule;
 
-use Alaress\Authorizer\Failure\Base;
 use Alaress\Authorizer\Failure\Unauthorized;
 use External_UserInterface;
 use Schoolbox\User;
@@ -22,7 +21,7 @@ class IsParentOfUser implements IAuthorizationRule
      * The array key in $params that contains the user ID (if a string), or a
      * callable which can retrieve the ID.
      *
-     * @var string
+     * @var string|callable
      */
     protected $userIdSource = 'id';
 
@@ -40,6 +39,14 @@ class IsParentOfUser implements IAuthorizationRule
      */
     protected $userMapper;
 
+
+    /**
+     * An internal user authorizer that this authorizer uses to determine that
+     * the current user is a parent of the user found by `$this->userIdSource`.
+     */
+    private IsUser $userAuthorizer;
+
+
     /**
      * Constructor (obviously)
      *
@@ -52,9 +59,10 @@ class IsParentOfUser implements IAuthorizationRule
         UserMapper $userMapper,
         $userIdSource = 'id'
     ) {
-        $this->externalDb   = $externalDb;
-        $this->userMapper   = $userMapper;
-        $this->userIdSource = $userIdSource;
+        $this->externalDb     = $externalDb;
+        $this->userMapper     = $userMapper;
+        $this->userIdSource   = $userIdSource;
+        $this->userAuthorizer = new IsUser($this->userIdSource);
     }
 
     /**
@@ -62,23 +70,17 @@ class IsParentOfUser implements IAuthorizationRule
      */
     public function authorize(array $params = [], User $user = null)
     {
-        if (is_callable($this->userIdSource)) {
-            $userId = call_user_func($this->userIdSource, $params, $user);
-        } else {
-            // You misconfigured or misapplied your route
-            if (!array_key_exists($this->userIdSource, $params)) {
-                throw new Base(sprintf('Key "%s" not in route params', $this->userIdSource));
+        if ($user) {
+            foreach ($user->getChildren() as $child) {
+                try {
+                    $this->userAuthorizer->authorize($params, $child);
+                    return true;
+                } catch (Unauthorized $e) {
+                    // continue
+                }
             }
-            $userId = $params[$this->userIdSource];
         }
-        $child = $this->userMapper->findById($userId);
-        $child->loadParents();
 
-        if ($user instanceof User) {
-            if ($user->isParentOf($child)) {
-                return true;
-            }
-        }
         throw new Unauthorized();
     }
 }
