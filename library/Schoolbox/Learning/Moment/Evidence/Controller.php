@@ -200,6 +200,7 @@ class Controller extends Base
                     Comment\Mapper::getInstance(),
                     $linkDecorator,
                     $propertyDecorator,
+                    2,
                 )
             )
             ->reindex()

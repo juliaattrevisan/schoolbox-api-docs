@@ -73,6 +73,13 @@ class ModelToArrayWithComments
 
 
     /**
+     * The max number of comments to initially load for each evidence's
+     * discussion thread. (More comments will be available in the cursor.)
+     */
+    private int $commentLimit;
+
+
+    /**
      * Constructor
      *
      * @param ModelToArray      $baseTranslator
@@ -82,6 +89,7 @@ class ModelToArrayWithComments
      * @param Comment\Mapper    $commentMapper
      * @param LinkDecorator     $linkDecorator
      * @param PropertyDecorator $propertyDecorator
+     * @param int               $commentLimit
      */
     public function __construct(
         ModelToArray $baseTranslator,
@@ -90,7 +98,8 @@ class ModelToArrayWithComments
         User $currentUser,
         Comment\Mapper $commentMapper,
         LinkDecorator $linkDecorator,
-        PropertyDecorator $propertyDecorator
+        PropertyDecorator $propertyDecorator,
+        int $commentLimit
     ) {
         $this->baseTranslator    = $baseTranslator;
         $this->router            = $router;
@@ -99,6 +108,7 @@ class ModelToArrayWithComments
         $this->commentMapper     = $commentMapper;
         $this->linkDecorator     = $linkDecorator;
         $this->propertyDecorator = $propertyDecorator;
+        $this->commentLimit      = $commentLimit;
     }
 
 
@@ -153,11 +163,11 @@ class ModelToArrayWithComments
      */
     private function loadAndTranslateCommentsInDiscussionThread(Evidence\Model $evidence): array
     {
-        // TODO this should fetch less comments: perhaps only two?
         $commentCursor  = new Comment\Cursor(
             $this->commentMapper,
             $evidence->getDiscussionThread(),
-            Comment\Cursor::ORDER_DESC
+            Comment\Cursor::ORDER_DESC,
+            $this->commentLimit,
         );
         $results        = $commentCursor->retrieveResults(null);
         $encodedResults = $results
