@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,9 +9,8 @@
 
 namespace Schoolbox\Resource\Attachment;
 
-
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -25,7 +25,8 @@ use UnexpectedValueException;
  *
  * @package Schoolbox\Resource\Attachment
  */
-class Zone {
+class Zone
+{
 
     const TPL = 'azTpl';
 
@@ -56,6 +57,23 @@ class Zone {
     /** @var bool */
     protected $buttonMode;
 
+    /**
+     * Does this attachzone use the modal?
+     */
+    private bool $useModal = true;
+
+    /**
+     * Does this attachzone's file upload have the capture attribute
+     * (for photo/video/audio capture)?
+     */
+    private bool $capture = false;
+
+    /**
+     * This attachzone's icon class: if left empty, the attachzone will
+     * determine a default.
+     */
+    private ?string $iconClass = null;
+
     /** @var StorageMapper */
     protected $mapper;
 
@@ -67,19 +85,19 @@ class Zone {
      */
     public function __construct($zoneId, $mapper = null)
     {
-        $this->id       = $zoneId;
-        $this->size     = 64;
-        $this->multi    = false;
-        $this->text     = array(
+        $this->id    = $zoneId;
+        $this->size  = 64;
+        $this->multi = false;
+        $this->text  = [
             'attachPrompt'     => 'Attach files',
             'attachmentsLabel' => 'Attachments',
             'modalTitle'       => 'Select files',
-            'fileVar'          => 'attachment[]'
-        );
+            'fileVar'          => 'attachment[]',
+        ];
 
         $this->mapper      = $mapper ?: StorageMapper::getInstance();
         $this->mimeFilter  = '';
-        $this->attachments = array();
+        $this->attachments = [];
         $this->readOnly    = false;
         $this->buttonMode  = false;
     }
@@ -214,8 +232,42 @@ class Zone {
      * @param bool $readOnly
      * @return $this
      */
-    public function setReadOnly($readOnly) {
+    public function setReadOnly($readOnly)
+    {
         $this->readOnly = $readOnly;
+        return $this;
+    }
+
+
+    /**
+     * @param bool $useModal
+     * @return static
+     */
+    public function setUseModal(bool $useModal): self
+    {
+        $this->useModal = $useModal;
+        return $this;
+    }
+
+
+    /**
+     * @param bool $capture
+     * @return static
+     */
+    public function setCapture(bool $capture): self
+    {
+        $this->capture = $capture;
+        return $this;
+    }
+
+
+    /**
+     * @param string|null $iconClass
+     * @return static
+     */
+    public function setIconClass(?string $iconClass): self
+    {
+        $this->iconClass = $iconClass;
         return $this;
     }
 
@@ -225,7 +277,8 @@ class Zone {
      *
      * @return array
      */
-    public function getTwigContext() {
+    public function getTwigContext()
+    {
 
         // wrap in quotes
         $filter = "'$this->mimeFilter'";
@@ -237,30 +290,32 @@ class Zone {
         }
 
 
-        $context = array(
-            'title'    => $this->text['modalTitle'],
-            'id'       => $this->id,
-            'camelId'  => $this->delim2camel($this->id),
-            'label'    => count($this->attachments) ? $this->text['attachmentsLabel'] : '',
-            'prompt'   => $this->text['attachPrompt'],
-            'fileVar'  => $this->text['fileVar'],
-            'mime'     => $filter,
-            'readonly' => $this->readOnly,
-            'multi'    => $this->multi,
-            'mode'     => $this->buttonMode ? 'button' : 'normal',
-            'size'     => $this->size
-        );
+        $context = [
+            'title'     => $this->text['modalTitle'],
+            'id'        => $this->id,
+            'camelId'   => $this->delim2camel($this->id),
+            'label'     => count($this->attachments) ? $this->text['attachmentsLabel'] : '',
+            'prompt'    => $this->text['attachPrompt'],
+            'fileVar'   => $this->text['fileVar'],
+            'mime'      => $filter,
+            'readonly'  => $this->readOnly,
+            'multi'     => $this->multi,
+            'mode'      => $this->buttonMode ? 'button' : 'normal',
+            'size'      => $this->size,
+            'useModal'  => $this->useModal,
+            'capture'   => $this->capture,
+            'iconClass' => $this->iconClass,
+        ];
 
         foreach ($this->attachments as $storage) {
-
             $vars = $this->deriveSitePageVars($storage);
 
-            $context['attachments'][] = array(
+            $context['attachments'][] = [
                 'name'    => $vars['AZ_FILE_NAME'],
                 'hash'    => $vars['AZ_FILE_HASH'],
                 'preview' => $vars['AZ_FILE_PREVIEW'],
                 'isImage' => $vars['AZ_FILE_IS_IMAGE'],
-            );
+            ];
         }
 
         return $context;
@@ -271,12 +326,12 @@ class Zone {
      * Twig it into SitePage
      *
      * @param \SitePage $page
-     * @param string $varname
+     * @param string    $varname
      */
     public function renderIntoSitePage(\SitePage $page, $varname)
     {
         // this is now just a twig shim
-        $page->setVar($varname, $page->getTwig()->render('sub/attachzone.twig', [ 'attachzone' => $this->getTwigContext() ]));
+        $page->setVar($varname, $page->getTwig()->render('sub/attachzone.twig', ['attachzone' => $this->getTwigContext()]));
     }
 
 
@@ -290,10 +345,10 @@ class Zone {
     {
         // if it's an image, render it out, otherwise use its mime thumbnail
         if ($file->getMimetype()->isImage()) {
-            $href = "/storage/image.php?hash={$file->getHash()}&size=square{$this->size}";
+            $href    = "/storage/image.php?hash={$file->getHash()}&size=square{$this->size}";
             $isImage = true;
         } else {
-            $href = '/ajax/mime/' . $file->getMime();
+            $href    = '/ajax/mime/' . $file->getMime();
             $isImage = false;
         }
 
@@ -303,7 +358,6 @@ class Zone {
             'AZ_FILE_PREVIEW'  => $href,
             'AZ_FILE_IS_IMAGE' => $isImage,
         ];
-
     }
 
 
@@ -330,5 +384,4 @@ class Zone {
         $this->buttonMode = $bool;
         return $this;
     }
-
 }

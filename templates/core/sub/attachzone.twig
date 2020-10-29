@@ -11,6 +11,9 @@ $data = {
     multi: (bool),
     size: (int),
     mode: (string),
+    useModal: (bool),
+    capture: (bool),
+    iconClass: (?string),
     attachments: [{
         name: (string),
         hash: (string),
@@ -60,26 +63,31 @@ $data = {
         </ul>
     </div>
     <ul class="az-error-list"></ul>
-    <script type="text/javascript">
-        $(function () {
-            $('#{{ attachzone.id }}-zone').resourceAttach({
-                url: '/storage/asyncUpload',
-                paramName: 'upload',
-                trigger: 'div.dzone',
-                detachSelector: '[data-dz-remove]',
-                dropzoneSelector: 'div.dzone',
-                dictDefaultMessage: {{ (attachzone.mode == 'button' ? 'null' : (attachzone.prompt|json_encode|raw)) }},
-                {# raw HTML reluctantly sanctioned - this should be passed to template as raw, then json_encode|raw #}
-                allowedFiles: {{ attachzone.mime|raw ?: 'null' }},
-                multi: {{ attachzone.multi ? 'true' : 'false' }},
-                title: '{{ attachzone.title }}',
-                thumbnailSize: '{{ attachzone.size }}',
-                fallbackButtonSelector: 'a[data-attach-fallback]',
-                previewsContainerSelector: '[data-dz-previews]',
-                onDetach: {{ onDetach is defined and onDetach ? onDetach|raw : 'null' }},
-                useFolder: false
+        {% autoescape 'js' %}
+        <script type="text/javascript">
+            $(function () {
+                $('#{{ attachzone.id }}-zone').resourceAttach({
+                    url: '/storage/asyncUpload',
+                    paramName: 'upload',
+                    trigger: 'div.dzone',
+                    detachSelector: '[data-dz-remove]',
+                    dropzoneSelector: 'div.dzone',
+                    dictDefaultMessage: {{ (attachzone.mode == 'button' ? 'null' : (attachzone.prompt|json_encode|raw)) }},
+                    {# raw HTML reluctantly sanctioned - this should be passed to template as raw, then json_encode|raw #}
+                    allowedFiles: {{ attachzone.mime|raw ?: 'null' }},
+                    multi: {{ attachzone.multi ? 'true' : 'false' }},
+                    title: '{{ attachzone.title }}',
+                    thumbnailSize: '{{ attachzone.size }}',
+                    fallbackButtonSelector: 'a[data-attach-fallback]',
+                    previewsContainerSelector: '[data-dz-previews]',
+                    onDetach: {{ onDetach is defined and onDetach ? onDetach|raw : 'null' }},
+                    useFolder: false,
+                    useModal: {{ attachzone.useModal ? 'true' : 'false' }},
+                    capture: {{ attachzone.capture ? 'true' : 'false' }},
+                    {% if attachzone.iconClass is defined and attachzone.iconClass is not null %}iconClass: '{{ attachzone.iconClass }}',{% endif %}
+                });
             });
-        });
-    </script>
+        </script>
+        {% endautoescape %}
     {% endif %}
 </div>

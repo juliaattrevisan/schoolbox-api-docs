@@ -248,7 +248,7 @@ ul.az-error-list {
 /* 64px version */
 .s64 {
     .dzone {
-        @extend .icon-attach;
+        //@extend .icon-attach;
         &:before {
             position: absolute;
             font-weight: $font-weight-normal;
@@ -307,7 +307,7 @@ ul.az-error-list {
         }
     }
     .dzone {
-        @extend .icon-attach;
+        //@extend .icon-attach;
         background-position: 0.875rem;
         background-size: 1rem;
         margin-bottom: $form-spacing;

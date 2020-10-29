@@ -20,6 +20,7 @@
             attachmentTag: 'li',
             fallbackButtonMarkup: null,
             fallbackButtonSelector: '[data-attach-fallback]',
+            iconClass: 'icon-attach',
 
             // modal options
             title: null,
@@ -27,6 +28,7 @@
             height: 600,
             resizable: false,
             modal: true,
+            useModal: true,
             source: '/resources/attachment',
 
             // dropzone options
@@ -38,6 +40,7 @@
             thumbnailSize: 64,
             tplOverride: null,
             maxFilesize: 2048,
+            capture: false,
 
             // pass through to various implementations
             allowedFiles: null,
@@ -61,7 +64,7 @@
         self = this;
         opt = self.options;
         azone = $(this.element);
-        dzone = azone.find(opt.dropzoneSelector).html('');
+        dzone = azone.find(opt.dropzoneSelector).html('').addClass(opt.iconClass);
 
         if (opt.title == null) {
             opt.title = 'Select file' + (opt.multi ? 's' : '') + ' to attach';
@@ -80,7 +83,12 @@
         });
 
         if (opt.dictDefaultMessage) {
-            prompt = 'Click or drag here to ' + opt.dictDefaultMessage.trim().charAt(0).toLowerCase() + opt.dictDefaultMessage.substr(1);
+            // Is this a touch screen? Show a different prefix
+            // (This is the same test Modernizr uses)
+            var prefix = 'ontouchstart' in window
+                ? 'Tap here to '
+                : 'Click or drag here to ';
+            prompt = prefix + opt.dictDefaultMessage.trim().charAt(0).toLowerCase() + opt.dictDefaultMessage.substr(1);
         }
 
 
@@ -88,7 +96,8 @@
         azone.dropzone({
             url: opt.url,
             paramName: opt.paramName,
-            clickable: false,
+            // The dropzone is clickable if the modal is disabled
+            clickable: !opt.useModal,
             maxFiles: opt.multi ? null : 1,
             maxFilesize: opt.maxFilesize,
             acceptedFiles: opt.allowedFiles === '*/*' ? null : opt.allowedFiles,
@@ -97,6 +106,7 @@
             dictDefaultMessage: prompt,
             previewsContainer: $(this.element).find(opt.previewsContainerSelector)[0],
             previewTemplate: this.tpl.html(),
+            capture: opt.capture,
 
             fallback: function () {
                 var mk = opt.fallbackButtonMarkup || '<a href="#" data-attach-fallback class="button icon-attach">' + opt.dictDefaultMessage + '</a>',
@@ -243,7 +253,12 @@
 
         $(this.element).on('click', this.options.trigger, function (e) {
             e.preventDefault();
-            self.open();
+
+            if (opt.useModal) {
+                self.open();
+            } else {
+                azone.trigger('click');
+            }
         });
     }
 
