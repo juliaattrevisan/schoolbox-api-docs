@@ -81,6 +81,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     private $resultTypeCache = [];
 
     /**
+     * A cache of assessments in the synergetic markbook
+     * Is keyed with FileYear, FileSemester, FolderCodes, AssessmentCode
+     */
+    private $synMarkbook = [];
+
+    /**
      * The type of mark to sync, normal or human readable
      * @var int
      */
@@ -941,6 +947,10 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return [];
         }
 
+        if(isset($this->synMarkbook[$fileYear][$fileSemester][implode(';',$folderCodes)][$markbookId])) {
+            return $this->synMarkbook[$fileYear][$fileSemester][implode(';',$folderCodes)][$markbookId];
+        }
+
         $folderCodeBindings = Predicate\Builder::getBindings($folderCodes, 'code');
 
         $sql = "
@@ -970,7 +980,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'fileSemester'       => $fileSemester,
         ], $folderCodeBindings->getParams());
 
-        return $this->getConnector()->executeQuery($sql, $params)->fetchAll();
+        $result = $this->getConnector()->executeQuery($sql, $params)->fetchAll();
+        $this->synMarkbook[$fileYear][$fileSemester][implode(';',$folderCodes)][$markbookId] = $result;
+        return $result;
     }
 
 

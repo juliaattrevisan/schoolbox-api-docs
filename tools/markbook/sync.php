@@ -310,7 +310,14 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
 
                 if (!$dryRun) {
                     if ($feedback) {
-                        $markbookExternal->syncFeedback($participant->findMostRecentInstructorGivenFeedback());
+                        if(!$markbookExternal->syncFeedback($feedback)) {
+                            $log->warning(
+                                sprintf(
+                                    "        %s%s",
+                                    str_pad("{$student->getFirstname()} {$student->getLastname()} ({$student->getExternalId()}):", 26, " "),
+                                    "- Failed"
+                            ));
+                        }
 //                    } else {
 //                        $markbookExternal->deleteFeedback($assessment, $student);
                     }
