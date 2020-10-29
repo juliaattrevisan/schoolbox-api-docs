@@ -38,8 +38,15 @@
                     let pendingResponses = $('[data-assessment-status-light="pending"]');
                     let selected = Math.floor(Math.random() * pendingResponses.length);
                     let url = $(pendingResponses[selected]).parents('[data-participant]').find('[data-inline-grader]').attr('href');
+                    let blindUrl = url + '{{ blindModeParams ?? '' }}';
 
-                    $('#blind-review').attr('href', url + '{{ blindModeParams ?? '' }}');
+                    /* Nobody has any pending responses; disable button
+                     */
+                    if (url === undefined) {
+                        $('#blind-review').remove();
+                    } else {
+                        $('#blind-review').attr('href', blindUrl);
+                    }
                 }
 
                 blindReview();
