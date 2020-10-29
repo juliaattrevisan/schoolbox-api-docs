@@ -197,7 +197,6 @@ class Controller extends Assessment\Controller
      *
      * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
-     * @throws ServiceNotFound
      * @throws InvalidArgumentException If assessment due date is null.
      * @throws PDOException
      * @throws UnexpectedValueException
@@ -243,7 +242,6 @@ class Controller extends Assessment\Controller
      * @throws MapperException
      * @throws PDOException
      * @throws RouteNotFound
-     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      */
     public function getSummary(IAssessable $assessment, User $student): void
