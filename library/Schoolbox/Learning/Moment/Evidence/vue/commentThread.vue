@@ -30,6 +30,7 @@ export default {
     },
     data() {
         return {
+            commentThread: this.thread,
             showSkeletonLoader: false,
             pendingComment: '',
         }
@@ -58,7 +59,7 @@ export default {
          * @returns {Boolean}
          */
         hasThread() {
-            return this?.thread?.id;
+            return this?.commentThread?.id;
         },
 
         /**
@@ -76,7 +77,7 @@ export default {
          * @returns {Number}
          */
         commentLoadedCount() {
-            let count = Number(this.thread?.children?.data?.length);
+            let count = Number(this.commentThread?.children?.data?.length);
             return isNaN(count) ? 0 : count;
         },
 
@@ -87,7 +88,7 @@ export default {
          * @returns {Number}
          */
         commentTotalCount() {
-            let count = Number(this.thread?.children?.metadata?.count);
+            let count = Number(this.commentThread?.children?.metadata?.count);
             return isNaN(count) ? 0 : count;
         },
 
@@ -107,7 +108,7 @@ export default {
          * @returns {Array}
          */
         comments() {
-            let comments = this.thread?.children?.data;
+            let comments = this.commentThread?.children?.data;
             return comments === null ? [] : comments;
         },
 
@@ -118,16 +119,15 @@ export default {
     methods: {
         loadMoreComments() {
             // What's the cursor?
-            let cursor = this.thread?.children?.metadata?.cursor?.next,
-                getUrl = this.thread?._links?.getComments?.href,
+            let cursor = this.commentThread?.children?.metadata?.cursor?.next,
+                getUrl = this.commentThread?._links?.getComments?.href,
                 self   = this;
             if (getUrl && cursor) {
                 axios
                     .get(getUrl, {params: {cursor: cursor}})
                     .then((response) => {
-                        self.thread.children.data = self.thread.children.data.concat(response.data.data);
-                        self.thread.children.metadata.cursor.next = response.data.metadata.cursor.next;
-                        // self.$forceUpdate();
+                        self.commentThread.children.data = self.commentThread.children.data.concat(response.data.data);
+                        self.commentThread.children.metadata.cursor.next = response.data.metadata.cursor.next;
                     })
             }
         },
@@ -139,14 +139,27 @@ export default {
             if (!this.hasThread) {
                 prePromise = axios
                     .post(this.createThreadEndpoint, {open: true})
-                    .then((response) => self.thread = response.data)
+                    .then((response) => {
+                        // Set the comment thread to the one just created,
+                        // and forge an empty set of comments
+                        self.commentThread = response.data;
+                        self.commentThread.children = {
+                            data: [],
+                            metadata: {
+                                count: 0,
+                                cursor: {
+                                    current: null,
+                                    next: null,
+                                }
+                            }
+                        };
+                    })
             }
             prePromise
-                .then(() => axios.post(self.thread._links.createComment.href, {content: self.pendingComment}))
+                .then(() => axios.post(self.commentThread._links.createComment.href, {content: self.pendingComment}))
                 .then((response) => {
-                    self.thread.children.metadata.count += 1;
-                    self.thread.children.data.unshift(response.data);
-                    // self.$forceUpdate();
+                    self.commentThread.children.metadata.count += 1;
+                    self.commentThread.children.data.unshift(response.data);
                 })
         },
     },
@@ -164,8 +177,8 @@ export default {
         </span>
         <template v-else>
             <span>
-                {{ thread.children.metadata.count }} comments
-                <template v-if="thread.children.metadata.count > thread.children.data.length && thread.children.metadata.cursor.next">
+                {{ commentThread.children.metadata.count }} comments
+                <template v-if="commentThread.children.metadata.count > commentThread.children.data.length && commentThread.children.metadata.cursor.next">
                     (<a @click.prevent="loadMoreComments">Load more</a>)
                 </template>
             </span>
