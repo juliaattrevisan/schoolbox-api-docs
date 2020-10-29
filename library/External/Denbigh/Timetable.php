@@ -189,7 +189,24 @@ class External_Denbigh_Timetable implements External_TimetableInterface
      */
     public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
-        return $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
+        $timetableDef = [];
+
+        $timetableDefinition = $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
+
+        $periods = $this->externalDatabase->executeQuery(
+            'SELECT period, startTime, endTime FROM Lessons WHERE day = 1 GROUP BY period ORDER BY period'
+        )->fetchAll();
+
+        foreach ($periods as $period) {
+            $timetableDef['desc'][]     = sprintf('Period %s', $period['period']);
+            $timetableDef['start'][]    = $period['startTime'];
+            $timetableDef['end'][]      = $period['endTime'];
+            $timetableDef['sequence'][] = $period['period'];
+        }
+
+        $timetableDef['dayCount'] = $timetableDefinition['cycle_length'];
+
+        return $timetableDef;
     }
 
 
