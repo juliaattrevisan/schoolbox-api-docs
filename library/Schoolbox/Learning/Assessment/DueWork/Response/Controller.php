@@ -38,13 +38,6 @@ class Controller extends Base
 {
 
     /**
-     * The querystring parameter corresponding to Blind Marking
-     * If it's set, presume that Blind Marking was desired; starts the
-     * Student Carousel in a special way if set int he url
-     */
-    private const QUERYSTRING_BLIND_MARKING = 'b';
-
-    /**
      * @var ErrorMapper
      */
     protected $errorMapper;
@@ -305,7 +298,7 @@ class Controller extends Base
                 $this->getRouter(),
                 $participant->getUser(),
                 $assessment,
-                $this->getRequest()->query[self::QUERYSTRING_BLIND_MARKING]
+                $this->getRequest()->query[StudentCarousel::QUERYSTRING_BLIND_MARKING]
             ))->produce(),
 
             /* A list of all the Responses that the participant has spawned

@@ -34,6 +34,14 @@ class StudentCarousel
 {
 
     /**
+     * The querystring parameter corresponding to Blind Marking
+     * If it's set, presume that Blind Marking was desired; starts the
+     * Student Carousel in a special way if set int he url
+     */
+    public const QUERYSTRING_BLIND_MARKING = 'b';
+
+
+    /**
      * @var Router
      */
     private $router;
@@ -52,9 +60,9 @@ class StudentCarousel
 
 
     /**
-     * @var bool
+     * @var string
      */
-    private $blindMode = false;
+    private $blindModeParams = '';
 
 
     /**
@@ -70,14 +78,23 @@ class StudentCarousel
         $this->router     = $router;
         $this->student    = $student;
         $this->assessment = $assessment;
-        $this->blindMode  = (bool)$blindMode;
+
+        /* Decide whether we need to work with Blind Mode querystring params
+         */
+        if ((bool)$blindMode) {
+            $this->blindModeParams = '?' . http_build_query([
+                self::QUERYSTRING_BLIND_MARKING => 1
+            ]);
+        }
     }
+
 
     /**
      * Produce a (currentPerson, allPeople) tuple to populate the
      * student selector carousel on getParticularResponse
      *
      * @return array
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function produce()
     {
@@ -86,6 +103,7 @@ class StudentCarousel
             'allPeople' => $this->getAllPeople(),
         ];
     }
+
 
     /**
      * Get a list of possible participants and whether they've submitted stuff
@@ -146,7 +164,7 @@ class StudentCarousel
 
             $person = [
                 'text' => $currentParticipant->getUser()->getFullname(),
-                'value' => $urlValue,
+                'value' => "{$urlValue}{$this->blindModeParams}",
                 'html' => "
                     <div class=\"row\">
                         <div class=\"card small-10\">
@@ -165,10 +183,12 @@ class StudentCarousel
         return $allPeople;
     }
 
+
     /**
      * Get the url corresponding to this person, to preselect selectize
      *
      * @return false|string
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function getCurrentPerson()
     {
@@ -176,6 +196,6 @@ class StudentCarousel
             'assessmentId' => $this->assessment->getId(),
             'studentId'    => $this->student->getId(),
             'assessment'   => $this->assessment
-        ]);
+        ]) . $this->blindModeParams;
     }
 }
