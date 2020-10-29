@@ -63,7 +63,8 @@ class IsUser implements IAuthorizationRule
 
 
         // Extract the param from the param source
-        if ((is_string($this->paramSource) || is_int($this->paramSource))
+        if (
+            (is_string($this->paramSource) || is_int($this->paramSource))
             && array_key_exists($this->paramSource, $params)
         ) {
             $param = $params[$this->paramSource];
