@@ -1,7 +1,5 @@
 <?php
 /**
- * StudentCarousel
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -13,35 +11,66 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\User;
 
+/**
+ * Class StudentCarousel
+ *
+ * A cyclic selectize element that appears at the top of Inline Grading
+ * Allows you to load a student's response, mark it, then visit the next
+ * (or previous) guy in the list
+ *
+ * There is a Blind Mode option that obfuscates identifying features for
+ * each student, and changes their order to something not otherwise seen
+ * in the Status screen to help mentally disconnect the marker from the
+ * student whom they are marking but if you're familiar with the student's
+ * work you'll probably recognise them regardless.
+ *
+ * To mix the order up we just order by id. I did consider randomising
+ * with shuffle() or something, but it has to persist between next/prev
+ * selections, and that's annoying
+ *
+ * @package Schoolbox\Learning\InlineGrader
+ */
 class StudentCarousel
 {
+
     /**
      * @var Router
      */
     private $router;
+
 
     /**
      * @var User
      */
     private $student;
 
+
     /**
      * @var DueWork
      */
     private $assessment;
 
+
+    /**
+     * @var bool
+     */
+    private $blindMode = false;
+
+
     /**
      * StudentCarousel constructor.
      *
-     * @param Router $router
-     * @param User $student
-     * @param DueWork $assessment
+     * @param Router      $router
+     * @param User        $student
+     * @param DueWork     $assessment
+     * @param string|null $blindMode
      */
-    public function __construct(Router $router, User $student, DueWork $assessment)
+    public function __construct(Router $router, User $student, DueWork $assessment, ?string $blindMode)
     {
         $this->router     = $router;
         $this->student    = $student;
         $this->assessment = $assessment;
+        $this->blindMode  = (bool)$blindMode;
     }
 
     /**
