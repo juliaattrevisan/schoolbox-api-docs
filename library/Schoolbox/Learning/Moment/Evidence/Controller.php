@@ -20,6 +20,7 @@ use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
+use Scrub;
 
 /**
  * Controller for learning moments.
