@@ -77,6 +77,7 @@ class ModelToArray
             'createdAt'        => $model->getCreatedAt() ? $model->getCreatedAt()->getUsingFormat(DATE_ATOM) : null,
             'updatedAt'        => $model->getUpdatedAt() ? $model->getUpdatedAt()->getUsingFormat(DATE_ATOM) : null,
 //            'deletedAt'        => $model->getDeletedAt() ? $model->getDeletedAt()->getUsingFormat(DATE_ATOM) : null,
+            // TODO inject a Scrub instance, and run this through it
             'body'             => $model->getBody(),
             'creator'          => $creator,
             'discussionThread' => $model->getDiscussionThread()
