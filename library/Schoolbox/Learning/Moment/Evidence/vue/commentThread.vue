@@ -123,10 +123,11 @@ export default {
                 self   = this;
             if (getUrl && cursor) {
                 axios
-                    .get(getUrl, {cursor: cursor})
+                    .get(getUrl, {params: {cursor: cursor}})
                     .then((response) => {
                         self.thread.children.data = self.thread.children.data.concat(response.data.data);
                         self.thread.children.metadata.cursor.next = response.data.metadata.cursor.next;
+                        // self.$forceUpdate();
                     })
             }
         },
@@ -143,7 +144,9 @@ export default {
             prePromise
                 .then(() => axios.post(self.thread._links.createComment.href, {content: self.pendingComment}))
                 .then((response) => {
+                    self.thread.children.metadata.count += 1;
                     self.thread.children.data.unshift(response.data);
+                    // self.$forceUpdate();
                 })
         },
     },
@@ -161,8 +164,8 @@ export default {
         </span>
         <template v-else>
             <span>
-                {{ commentTotalCount }} comments
-                <template v-if="!allCommentsLoaded">
+                {{ thread.children.metadata.count }} comments
+                <template v-if="thread.children.metadata.count > thread.children.data.length && thread.children.metadata.cursor.next">
                     (<a @click.prevent="loadMoreComments">Load more</a>)
                 </template>
             </span>
