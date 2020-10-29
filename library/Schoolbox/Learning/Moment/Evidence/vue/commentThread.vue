@@ -6,12 +6,14 @@ import moment from 'moment';
 import MediaArticle from '@schoolbox/media-article';
 import Storage from '@schoolbox/storage';
 import Toast from '@schoolbox/toast';
+import CKEditor from 'ckeditor4-vue';
 
 export default {
     components: {
         MediaArticle,
         Storage,
         Toast,
+        ckeditor: CKEditor.component,
     },
     props: {
         thread: {
@@ -219,8 +221,7 @@ export default {
             </ul>
         </template>
 
-        <!-- This Vue instance has included the CKEditor plugin, therefore the ckeditor tag exists -->
-        <ckeditor v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
+        <ckeditor tag-name="textarea" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
         <a class="button submit"
            @click="postComment"
            :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
