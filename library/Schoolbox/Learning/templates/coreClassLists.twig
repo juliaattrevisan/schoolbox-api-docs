@@ -13,6 +13,15 @@ Data:
     <div class="small-12 island">
         {% block header %}
         <h1>${ subject }</h1>
+
+            <ul class="flex-list buttons">
+                <li><a href="#" class="disabled">Award Achievement</a></li>
+                <li><a href="#" class="disabled">Set Goal(s)</a></li>
+                <li><a href="#" class="disabled">Add Pastoral Record</a></li>
+                <li><a @click.prevent="openShareLearningMomentDialog" :class="{disabled: selectedStudentIds.length === 0}">Share Learning Moment</a></li>
+                <li><a href="#" class="disabled">Email</a></li>
+            </ul>
+
         <template v-if="showSkeletonLoader" v-for="n in 3">
             <div class="list-item">
                 <div class="small-12 card skeleton">
@@ -287,6 +296,10 @@ Data:
                 var self = this;
 
                 self.enableSendEmailButton = self.selectedStudentIds.length > 0 && self.selectedGroups.length > 0;
+            },
+            openShareLearningMomentDialog: function() {
+                // Which users are selected?
+                console.log(this.selectedStudentIds.join(','));
             },
         },
         computed: {
