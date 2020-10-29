@@ -80,6 +80,27 @@
   }
 }
 
+/* Extremely specific to news on the dashboard,
+   in the small right column on large only */
+@media #{$large-only} {
+  .column-right {
+    #news-component {
+      .card > a > img {
+        margin: 0 0 1rem 0;
+        float: none;
+      }
+      .v-card {
+        flex: 0 0 100%;
+      }
+    }
+    .skeleton.news-reversed > .img,
+    .skeleton.news > .img {
+      float: left;
+      margin: 0 0 1rem 0;
+    }
+  }
+}
+
 .skeleton.news > .img {
   margin: 0 1rem 0 0;
   width: rem-calc(200);
