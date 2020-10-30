@@ -7,6 +7,7 @@ import MediaArticle from '@schoolbox/media-article';
 import Storage from '@schoolbox/storage';
 import Toast from '@schoolbox/toast';
 import CKEditor from 'ckeditor4-vue';
+import RevealModal from '@schoolbox/reveal-modal';
 
 export default {
     components: {
@@ -14,6 +15,7 @@ export default {
         Storage,
         Toast,
         ckeditor: CKEditor.component,
+        RevealModal
     },
     props: {
         thread: {
@@ -37,6 +39,7 @@ export default {
             commentThread: this.thread,
             pendingComment: '',
             saveInProgress: false,
+            commentIndexToDelete: null,
         }
     },
     computed: {
@@ -194,6 +197,18 @@ export default {
 
 
         /**
+         * Opens the delete modal: pressing the Confirm button in the modal will
+         * delete that comment.
+         *
+         * @param {Number} index
+         */
+        showDeleteModal(index) {
+            this.commentIndexToDelete = index;
+            this.$refs.deleteModal.open();
+        },
+
+
+        /**
          * Deletes the comment at the given index within the thread.
          *
          * @param {Number} index
@@ -201,7 +216,8 @@ export default {
         deleteComment(index) {
             let self       = this,
                 comment    = self.commentThread.children.data[index],
-                deleteLink = comment?._links?.delete?.href
+                deleteLink = comment?._links?.delete?.href;
+            self.$refs.deleteModal.close();
             if (deleteLink) {
                 self.$refs.toast.activate('Deleting...');
                 axios
@@ -250,7 +266,7 @@ export default {
                     </div>
                     <nav>
                         <a v-if="comment._links.delete.auth"
-                           @click.prevent="deleteComment(index)"
+                           @click.prevent="showDeleteModal(index)"
                            class="icon-delete"
                            title="Delete comment" />
                     </nav>
@@ -265,5 +281,16 @@ export default {
            :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
 
         <toast ref="toast"></toast>
+
+        <reveal-modal ref="deleteModal">
+            <template>
+                <h2>Please confirm</h2>
+                <p>Are you sure you want to delete this comment?</p>
+                <ul class="flex-list buttons">
+                    <li><a @click.prevent="deleteComment(commentIndexToDelete)" class="button icon-approve submit">OK</a></li>
+                    <li><a @click.prevent="$refs.deleteModal.close" class="button icon-close">Cancel</a></li>
+                </ul>
+            </template>
+        </reveal-modal>
     </div>
 </template>
