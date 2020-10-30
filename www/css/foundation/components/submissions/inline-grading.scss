@@ -50,6 +50,14 @@
        */
       .selectize-input {
         padding: 0;
+
+        /* There's a little white input field that dingleberries itself,
+         * creating an obscene margin under the avatar-switch element
+         */
+        input {
+          height: 0;
+        }
+
         input[type="text"] {
           display: none !important;
         }
