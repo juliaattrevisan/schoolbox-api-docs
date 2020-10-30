@@ -69,7 +69,7 @@ class Standard
     public function produce(): array
     {
         return [
-            'currentPerson' => $this->getCurrentPerson(),
+            'currentPerson' => $this->getUrl($this->student),
             'allPeople' => $this->getAllPeople(),
         ];
     }
@@ -134,14 +134,6 @@ class Standard
                 }
             }
 
-            /* Viewing the most recent response for the next student
-             */
-            $urlValue = $this->router->generate('learningDueWorkResponse.getParticularResponse', [
-                'assessmentId' => $this->assessment->getId(),
-                'studentId'    => $currentParticipant->getUser()->getId(),
-                'assessment'   => $this->assessment
-            ]);
-
             $html = "
                 <div class=\"row\">
                     <div class=\"card small-10\">
@@ -154,7 +146,7 @@ class Standard
 
             $person = [
                 'text' => $currentParticipant->getUser()->getFullname(),
-                'value' => $urlValue,
+                'value' => $this->getUrl($currentParticipant->getUser()),
                 'html' => $html,
                 'submitted' => $currentParticipant->isFeedbackRequired(),
             ];
@@ -169,14 +161,15 @@ class Standard
     /**
      * Get the url corresponding to this person, to preselect selectize
      *
+     * @param User $user
      * @return string
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    private function getCurrentPerson(): string
+    private function getUrl(User $user): string
     {
         $url = $this->router->generate('learningDueWorkResponse.getParticularResponse', [
             'assessmentId' => $this->assessment->getId(),
-            'studentId'    => $this->student->getId(),
+            'studentId'    => $user->getId(),
             'assessment'   => $this->assessment
         ]);
 
