@@ -48,7 +48,8 @@ Usage:
     {% include '@learningDueWorkResponse/inlineGrading/fragments/participantCarousel.twig' with {
         carousel: carousel,
         participant: participant,
-        assessment: assessment
+        assessment: assessment,
+        blindMode: blindMode ?? false
     } only %}
 {% endblock %}
 
