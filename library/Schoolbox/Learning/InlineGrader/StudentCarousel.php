@@ -7,6 +7,7 @@
 namespace Schoolbox\Learning\InlineGrader;
 
 use Aura\Router\Router;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\Participant;
@@ -114,17 +115,31 @@ class StudentCarousel
 
 
     /**
-     * Get a list of possible participants and whether they've submitted stuff
+     * Filter out users we don't want in the Carousel
+     * Blind Mode returns a subset of vanilla inline grader mode
+     *
+     * @return Collection|Participant[]
      */
-    private function getAllPeople(): array
+    private function prefilterParticipants()
     {
-        $allPeople = [];
 
-        $allParticipants = $this->assessment->getAllParticipants();
+        /* Always disregard Excluded user
+         */
+        $allParticipants = $this->assessment->getAllParticipants()->filter(function(Participant $currentParticipant) {
+            return !$currentParticipant->isExcluded();
+        });
 
         /* Decide if we need to change the ordering around some more, for Blind Mode
          */
         if ($this->blindMode) {
+            $allParticipants = $allParticipants->filter(function(Participant $currentParticipant) {
+
+                /* Filter out guys so that all who remain are students who have submitted a Response
+                 * electronically (online) and those Responses require published Feedback
+                 */
+                return !($currentParticipant->isResubmissionRequired() || $currentParticipant->isReviewComplete());
+            });
+
             $allParticipants = $allParticipants->sortByCallback(function (Participant $p1, Participant $p2) {
 
                 /* You could probably throw in some more obfuscating ideas
@@ -138,19 +153,25 @@ class StudentCarousel
             });
         }
 
+        return $allParticipants;
+    }
+
+    /**
+     * Get a list of possible participants and whether they've submitted stuff
+     */
+    private function getAllPeople(): array
+    {
+        $allPeople = [];
+        $allParticipants = $this->prefilterParticipants();
+
         foreach ($allParticipants as $currentParticipant) {
-            // Skip, if excluded from the assessment
-            if ($currentParticipant->isExcluded()) {
-                continue;
-            }
 
             // CSS/label rules
             // TODO move CSS/label generation to participant class, and dedupe usages
-            if($currentParticipant->isResubmissionRequired()) {
-             $css = 'alert';
-             $label = 'Resubmit Required';
-            }
-            else if ($currentParticipant->isReviewComplete()) {
+            if ($currentParticipant->isResubmissionRequired()) {
+                $css = 'alert';
+                $label = 'Resubmit Required';
+            } elseif ($currentParticipant->isReviewComplete()) {
                 // Is review complete? Always say "Reviewed"
                 $css   = 'reviewed';
                 $label = 'Reviewed';
@@ -165,12 +186,18 @@ class StudentCarousel
                     if ($latestSubmission->isSubmittedOnTime()) {
                         $css   = 'submitted';
                         $label = $multipleResponses ? 'Resubmitted ' . $inPerson . 'on time' : 'Submitted ' . $inPerson . 'on time';
-
                     } else {
                         $css   = 'submitted-late';
                         $label = $multipleResponses ? 'Resubmitted ' . $inPerson . 'late' : 'Submitted ' . $inPerson . 'late';
                     }
                 } else {
+
+                    /* Skip unsubmitted
+                     */
+                    if ($this->blindMode) {
+                        continue;
+                    }
+
                     /* No submission exists
                      */
                     $css   = 'unsubmitted';
