@@ -127,8 +127,10 @@
                     if (data?.custom?.modifyLink) {
                         modifyLink = data?.custom?.modifyLink;
                     } else if (metadata?.eventId) {
-                        modifyLink = ENDPOINTS.generateUrlFromConst(this.eventModifyFormUrl, metadata?.eventId, this.returnUrl);
-                        deleteLink = ENDPOINTS.generateUrlFromConst(this.eventDeleteUrl, metadata?.eventId, this.returnUrl);
+                        // this.returnUrl does not get updated while switching months
+                        let returnUrl = btoa(window.location.pathname);
+                        modifyLink = ENDPOINTS.generateUrlFromConst(this.eventModifyFormUrl, metadata?.eventId, returnUrl);
+                        deleteLink = ENDPOINTS.generateUrlFromConst(this.eventDeleteUrl, metadata?.eventId, returnUrl);
                     }
                 }
 
