@@ -521,10 +521,6 @@
                                     response.submittedLate,
                                     $toast
                                 )
-
-                                $('#blind-review').blindReview({
-                                    params: '{{ blindModeParams ?? '' }}'
-                                });
                             })
                             .fail(function () {
                                 soboFailure($button, buttonText, $toast);
