@@ -80,6 +80,12 @@ class Blind
         $this->router     = $router;
         $this->student    = $student;
         $this->assessment = $assessment;
+
+        /* Work with Blind Mode querystring params
+         */
+        $this->blindModeParams = '?' . http_build_query([
+            self::QUERYSTRING_BLIND_MARKING => 1
+        ]);
     }
 
 
@@ -92,11 +98,6 @@ class Blind
      */
     public function produce(): array
     {
-        /* Decide whether we need to work with Blind Mode querystring params
-         */
-        $this->blindModeParams = '?' . http_build_query([
-            self::QUERYSTRING_BLIND_MARKING => 1
-        ]);
 
         return [
             'currentPerson' => $this->student ? $this->getUrl($this->student) : '',

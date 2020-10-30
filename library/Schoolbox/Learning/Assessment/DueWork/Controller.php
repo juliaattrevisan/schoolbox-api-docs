@@ -215,13 +215,13 @@ class Controller extends Assessment\Controller
             'rubricMarks'       => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
             'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
 
-            /* This is appended to a random url determined in javascript
-             * This url belongs to random person who's got a pending response
-             * It's the starting point in the carousel when you first click Blind Review
+            /* Find the first valid Blind Review url
              */
-            'blindModeParams' => '?' . http_build_query([
-                StudentCarousel\Blind::QUERYSTRING_BLIND_MARKING => 1
-            ]),
+            'blindReviewUrl' => (new StudentCarousel\Blind(
+                $this->getRouter(),
+                null,
+                $assessment
+            ))->getFirstUrl()
         ];
 
         $this->getResponse()->content->set(

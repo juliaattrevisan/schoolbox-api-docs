@@ -10,7 +10,7 @@
      - markSchemeName:   string    filename of markScheme template fragment
      - rubricMarks:       bool[]  Whether the student's instructor-given feedback exists and has rubric marks, indexed by user.id
      - interactionLocked: bool Is the assessment locked for interactions because it is due in an archived term?
-     - blindModeParams:  array
+     - blindReviewUrl:   string
 #}
 {% extends '@learningAssessment/status.twig' %}
 
@@ -26,18 +26,12 @@
     <li>
         <a id="import-feedback" data-reveal-id="importFeedbackModal" class="icon-upload">Import Feedback</a>
     </li>
-    <li>
-        <a id="blind-review" class="icon-task">Blind Review</a>
 
-        <script src="/javascript/shared/submissions/jquery.blind-review.js"></script>
-        <script>
-            $(function() {
-                $('#blind-review').blindReview({
-                    params: '{{ blindModeParams ?? '' }}'
-                });
-            });
-        </script>
+    {% if blindReviewUrl %}
+    <li>
+        <a href="{{ blindReviewUrl }}" class="icon-task">Blind Review</a>
     </li>
+    {% endif %}
 
     {% if download %}
         <li>
