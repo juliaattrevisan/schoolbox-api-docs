@@ -17,9 +17,77 @@
   }
 }
 
-/* Blind Mode for obfuscating marking
+/* In Inline Grading, there is a selectize of cards
+ * This is the context-switch in a special case
  */
 .avatar-switch {
+  @extend .context-switch;
+
+  /* Getting overriden by the extension of .button styles
+   * !Bang it.
+   */
+  nav {
+    a {
+      height: 4.10rem !important;
+
+      @media #{$medium-down} {
+        height: rem-calc(50) !important;
+      }
+    }
+  }
+
+  .student {
+    width: calc(100% - #{($global-button-height * 2)});
+    float: left;
+
+    .selectize-control {
+
+      /* Underneath the card is an input field that you
+       * could right-click to focus; I think it's where the carat
+       * goes for when you're adding more items (which we don't)
+       *
+       * selectize bangs it, so I have to bang it too
+       */
+      .selectize-input {
+        padding: 0;
+        input[type="text"] {
+          display: none !important;
+        }
+
+        /* To combat the weird giant white gap under the current
+         * card selected
+         */
+        line-height: 0.5rem;
+        /* Push the current card to the left, to offset some
+         * other margin setting
+         */
+        .card {
+          p {
+            margin: 0;
+            display: inline;
+          }
+          margin-left: -0.5rem;
+        }
+      }
+
+      /* Repair .row .row -1rem margin offset
+       */
+      .selectize-dropdown-content .row{
+        margin-left: 0;
+      }
+    }
+  }
+
+  .selectize-control {
+    &.single {
+      .selectize-input > div {
+        margin-left: 0;
+      }
+    }
+  }
+
+  /* Blind Mode for obfuscating marking
+   */
   .blind-container {
     float: left;
     margin: -0.5rem 0 0 -1rem;
@@ -62,3 +130,5 @@
     }
   }
 }
+
+
