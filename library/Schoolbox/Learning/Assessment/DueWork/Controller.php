@@ -55,7 +55,7 @@ use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
-use Schoolbox\Learning\InlineGrader\StudentCarousel;
+use Schoolbox\Learning\InlineGrader\Standard;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -220,7 +220,7 @@ class Controller extends Assessment\Controller
              * It's the starting point in the carousel when you first click Blind Review
              */
             'blindModeParams' => '?' . http_build_query([
-                StudentCarousel::QUERYSTRING_BLIND_MARKING => 1
+                StudentCarousel\Blind::QUERYSTRING_BLIND_MARKING => 1
             ]),
         ];
 

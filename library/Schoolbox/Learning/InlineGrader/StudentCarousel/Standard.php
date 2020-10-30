@@ -4,7 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-namespace Schoolbox\Learning\InlineGrader;
+namespace Schoolbox\Learning\InlineGrader\StudentCarousel;
 
 use Aura\Router\Router;
 use Schoolbox\Collection;
@@ -20,27 +20,10 @@ use Schoolbox\User;
  * Allows you to load a student's response, mark it, then visit the next
  * (or previous) guy in the list
  *
- * There is a Blind Mode option that obfuscates identifying features for
- * each student, and changes their order to something not otherwise seen
- * in the Status screen to help mentally disconnect the marker from the
- * student whom they are marking but if you're familiar with the student's
- * work you'll probably recognise them regardless.
- *
- * To mix the order up we just order by id. I did consider randomising
- * with shuffle() or something, but it has to persist between next/prev
- * selections, and that's annoying
- *
  * @package Schoolbox\Learning\InlineGrader
  */
-class StudentCarousel
+class Standard
 {
-
-    /**
-     * The querystring parameter corresponding to Blind Marking
-     * If it's set, presume that Blind Marking was desired; starts the
-     * Student Carousel in a special way if set int he url
-     */
-    public const QUERYSTRING_BLIND_MARKING = 'b';
 
 
     /**
@@ -62,31 +45,17 @@ class StudentCarousel
 
 
     /**
-     * @var bool
-     */
-    private $blindMode;
-
-
-    /**
-     * @var string
-     */
-    private $blindModeParams = '';
-
-
-    /**
      * StudentCarousel constructor.
      *
      * @param Router      $router
      * @param User        $student
      * @param DueWork     $assessment
-     * @param string|null $blindMode
      */
-    public function __construct(Router $router, User $student, DueWork $assessment, ?string $blindMode)
+    public function __construct(Router $router, User $student, DueWork $assessment)
     {
         $this->router     = $router;
         $this->student    = $student;
         $this->assessment = $assessment;
-        $this->blindMode  = (bool)$blindMode;
     }
 
 
@@ -99,14 +68,6 @@ class StudentCarousel
      */
     public function produce(): array
     {
-        /* Decide whether we need to work with Blind Mode querystring params
-         */
-        if ($this->blindMode) {
-            $this->blindModeParams = '?' . http_build_query([
-                self::QUERYSTRING_BLIND_MARKING => 1
-            ]);
-        }
-
         return [
             'currentPerson' => $this->getCurrentPerson(),
             'allPeople' => $this->getAllPeople(),
@@ -116,7 +77,6 @@ class StudentCarousel
 
     /**
      * Filter out users we don't want in the Carousel
-     * Blind Mode returns a subset of vanilla inline grader mode
      *
      * @return Collection|Participant[]
      */
@@ -125,36 +85,11 @@ class StudentCarousel
 
         /* Always disregard Excluded user
          */
-        $allParticipants = $this->assessment->getAllParticipants()->filter(function(Participant $currentParticipant) {
+        return $this->assessment->getAllParticipants()->filter(function(Participant $currentParticipant) {
             return !$currentParticipant->isExcluded();
         });
-
-        /* Decide if we need to change the ordering around some more, for Blind Mode
-         */
-        if ($this->blindMode) {
-            $allParticipants = $allParticipants->filter(function(Participant $currentParticipant) {
-
-                /* Filter out guys so that all who remain are students who have submitted a Response
-                 * electronically (online) and those Responses require published Feedback
-                 */
-                return !($currentParticipant->isResubmissionRequired() || $currentParticipant->isReviewComplete());
-            });
-
-            $allParticipants = $allParticipants->sortByCallback(function (Participant $p1, Participant $p2) {
-
-                /* You could probably throw in some more obfuscating ideas
-                 * like salting the comparison with today's date, such that
-                 * revisiting Blind Mode tomorrow gives you a different order
-                 *
-                 * This sorts by user id reversed, to make the marking user
-                 * do more mental gymnastics if they want to guess identities
-                 */
-                return $p1->getUser()->getId() >= $p2->getUser()->getId();
-            });
-        }
-
-        return $allParticipants;
     }
+
 
     /**
      * Get a list of possible participants and whether they've submitted stuff
@@ -192,12 +127,6 @@ class StudentCarousel
                     }
                 } else {
 
-                    /* Skip unsubmitted
-                     */
-                    if ($this->blindMode) {
-                        continue;
-                    }
-
                     /* No submission exists
                      */
                     $css   = 'unsubmitted';
@@ -213,36 +142,19 @@ class StudentCarousel
                 'assessment'   => $this->assessment
             ]);
 
-            /* Decide if we need an obfuscating class for Blind Mode
-             * This keeps the image blur from expanding beyond the dimensions we wanted
-             */
-            if ($this->blindMode) {
-                $html = "
-                    <div class=\"row\">
-                        <div class=\"card small-10\">
-                            <div class='blind-container'>
-                                <img src=\"/portrait.php?userId={$currentParticipant->getUser()->getExternalId()}&size=square64\" class=\"blind\" alt=\"View Profile\" />
-                            </div>
-                            <p class=\"blind\" >{$currentParticipant->getUser()->getFullName()}</p>
-                            <span class=\"label status {$css}\">{$label}</span>
-                        </div>
+            $html = "
+                <div class=\"row\">
+                    <div class=\"card small-10\">
+                        <img src=\"/portrait.php?userId={$currentParticipant->getUser()->getExternalId()}&size=square64\" alt=\"View Profile\" />
+                        <p>{$currentParticipant->getUser()->getFullName()}</p>
+                        <span class=\"label status {$css}\">{$label}</span>
                     </div>
-                ";
-            } else {
-                $html = "
-                    <div class=\"row\">
-                        <div class=\"card small-10\">
-                            <img src=\"/portrait.php?userId={$currentParticipant->getUser()->getExternalId()}&size=square64\" alt=\"View Profile\" />
-                            <p>{$currentParticipant->getUser()->getFullName()}</p>
-                            <span class=\"label status {$css}\">{$label}</span>
-                        </div>
-                    </div>
-                ";
-            }
+                </div>
+            ";
 
             $person = [
                 'text' => $currentParticipant->getUser()->getFullname(),
-                'value' => "{$urlValue}{$this->blindModeParams}",
+                'value' => $urlValue,
                 'html' => $html,
                 'submitted' => $currentParticipant->isFeedbackRequired(),
             ];
@@ -268,12 +180,6 @@ class StudentCarousel
             'assessment'   => $this->assessment
         ]);
 
-        if ($url) {
-            $url .= $this->blindModeParams;
-
-            return $url;
-        }
-
-        return '';
+        return (string)$url;
     }
 }

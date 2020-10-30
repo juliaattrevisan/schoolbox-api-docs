@@ -274,6 +274,20 @@ class Controller extends Base
         // Is the page being displayed in readonly mode?
         $isInteractionLocked = (new LockedChecker($this->termMapper))->isLockedForInteractions($assessment);
 
+        /* Decide which StudentCarousel to show
+        */
+        $carousel = $this->getRequest()->query[StudentCarousel\Blind::QUERYSTRING_BLIND_MARKING] ?
+            (new StudentCarousel\Blind(
+                $this->getRouter(),
+                $participant->getUser(),
+                $assessment
+            ))->produce() :
+            (new StudentCarousel\Standard(
+                $this->getRouter(),
+                $participant->getUser(),
+                $assessment
+            ))->produce();
+
         $data = [
             'assessment' => $assessment,
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
@@ -294,17 +308,12 @@ class Controller extends Base
              * the 'b' option indicates whether the Carousel should initiate Blind Marking, which
              * obfuscates the student's identifying features while you're doing the marking
              */
-            'carousel' => (new StudentCarousel(
-                $this->getRouter(),
-                $participant->getUser(),
-                $assessment,
-                $this->getRequest()->query[StudentCarousel::QUERYSTRING_BLIND_MARKING]
-            ))->produce(),
+            'carousel' => $carousel,
 
             /* This is passed through standard.twig into comment.twig, where a placeholder text
              * identifies the current guy you're marking
              */
-            'blindMode' => $this->getRequest()->query[StudentCarousel::QUERYSTRING_BLIND_MARKING],
+            'blindMode' => $this->getRequest()->query[StudentCarousel\Blind::QUERYSTRING_BLIND_MARKING],
 
             /* A list of all the Responses that the participant has spawned
              */
