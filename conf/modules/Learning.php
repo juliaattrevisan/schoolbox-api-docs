@@ -56,6 +56,8 @@ class Learning extends ModuleLoader
         $this->loadModule($kernel, Upcoming\Module::class, "/{$namespace}/due");
         $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
         $this->loadModule($kernel, MarkScheme\Module::class, "/{$namespace}/markscheme");
+
+        // Learning moment evidence
         $this->loadModule($kernel, StudentToolkitModule::class, "/{$namespace}/studentToolkit");
         $this->loadModule($kernel, EvidenceModule::class, "/{$namespace}/evidence");
 
@@ -72,7 +74,7 @@ class Learning extends ModuleLoader
             );
         }
 
-        // Learning moments discussions
+        // Discussion threads and comments for learning moment evidence
         $this->loadModule($kernel, EvidenceThreadModule::class, "/discussion/evidence/{contextId}/threads");
         $this->loadModule($kernel, EvidenceCommentModule::class, "/discussion/evidence/{contextId}/comments");
     }
