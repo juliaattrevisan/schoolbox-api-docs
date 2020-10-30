@@ -20,7 +20,7 @@ use Schoolbox\User;
  * Allows you to load a student's response, mark it, then visit the next
  * (or previous) guy in the list
  *
- * @package Schoolbox\Learning\InlineGrader
+ * @package Schoolbox\Learning\InlineGrader\StudentCarousel
  */
 class Standard
 {
@@ -45,7 +45,7 @@ class Standard
 
 
     /**
-     * StudentCarousel constructor.
+     * Standard constructor.
      *
      * @param Router      $router
      * @param User        $student

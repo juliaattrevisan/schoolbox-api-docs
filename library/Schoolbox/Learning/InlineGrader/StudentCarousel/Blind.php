@@ -69,7 +69,7 @@ class Blind
 
 
     /**
-     * StudentCarousel constructor.
+     * Blind constructor.
      *
      * @param Router      $router
      * @param User        $student
@@ -162,7 +162,7 @@ class Blind
                 continue;
             }
 
-            /* Skip In-Person submissions
+            /* Skip Offline submissions when student hands in work in-person
              */
             if ($latestSubmission->isSubmittedOffline()) {
                 continue;
