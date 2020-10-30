@@ -106,6 +106,16 @@ class Blind
 
 
     /**
+     * Find the first blind-reviewable person's url
+     * If none exist, return null
+     */
+    public function getFirstUrl() : ?string
+    {
+        return $this->getAllPeople()[0]['value'] ?? null;
+    }
+
+
+    /**
      * Filter out users we don't want in the Carousel
      * Blind Mode returns a subset of vanilla inline grader mode
      *

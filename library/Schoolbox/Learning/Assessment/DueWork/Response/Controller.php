@@ -281,12 +281,12 @@ class Controller extends Base
                 $this->getRouter(),
                 $participant->getUser(),
                 $assessment
-            ))->produce() :
+            )) :
             (new StudentCarousel\Standard(
                 $this->getRouter(),
                 $participant->getUser(),
                 $assessment
-            ))->produce();
+            ));
 
         $data = [
             'assessment' => $assessment,
@@ -308,7 +308,7 @@ class Controller extends Base
              * the 'b' option indicates whether the Carousel should initiate Blind Marking, which
              * obfuscates the student's identifying features while you're doing the marking
              */
-            'carousel' => $carousel,
+            'carousel' => $carousel->produce(),
 
             /* This is passed through standard.twig into comment.twig, where a placeholder text
              * identifies the current guy you're marking
