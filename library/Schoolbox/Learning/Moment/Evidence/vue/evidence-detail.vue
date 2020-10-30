@@ -113,7 +113,7 @@ export default {
                         <div class="small-12 island">
                             <section class="detail content">
                                 <p class="meta">By
-                                    {{ this.evidence.recipient.fullName }}
+                                    {{ this.evidence.creator.fullName }}
                                     &mdash;
                                     <relative-time :datetime="this.evidence.createdAt"></relative-time>
                                 </p>
