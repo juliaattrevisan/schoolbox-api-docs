@@ -122,10 +122,10 @@ export default {
         },
 
     },
-    // mounted() {
-    //     this.load();
-    // },
     methods: {
+        /**
+         * Loads the next cursor of comments.
+         */
         loadMoreComments() {
             // What's the cursor?
             let cursor = this.commentThread?.children?.metadata?.cursor?.next,
@@ -144,6 +144,13 @@ export default {
             }
         },
 
+
+        /**
+         * Posts a comment to this thread.
+         *
+         * If there's no thread yet: this method will create one, and then
+         * post the comment to it.
+         */
         postComment() {
             // maybe there's not a thread at all. If not: create one, then post
             let prePromise = Promise.resolve(),
@@ -184,6 +191,29 @@ export default {
                 .catch(() => self.$refs.toast.timeout('Save failed', false, 5000))
                 .finally(() => self.saveInProgress = false)
         },
+
+
+        /**
+         * Deletes the comment at the given index within the thread.
+         *
+         * @param {Number} index
+         */
+        deleteComment(index) {
+            let self       = this,
+                comment    = self.commentThread.children.data[index],
+                deleteLink = comment?._links?.delete?.href
+            if (deleteLink) {
+                self.$refs.toast.activate('Deleting...');
+                axios
+                    .delete(deleteLink)
+                    .then(() => {
+                        self.commentThread.children.data.splice(index, 1);
+                        self.commentThread.children.metadata.count -= 1;
+                        self.$refs.toast.timeout('Deleted', true, 2000);
+                    })
+                    .catch(() => self.$refs.toast.timeout('Delete failed', false, 5000))
+            }
+        }
     },
     filters: {
         dateFormat: (date, format) => moment(date).format(format),
@@ -205,7 +235,7 @@ export default {
                 </template>
             </span>
             <ul class="information-list social-stream">
-                <li class="actions-small-0" v-for="comment in comments">
+                <li class="actions-small-1" v-for="(comment, index) in comments">
                     <div class="list-item">
                         <div class="card small-12 compact">
                             <a :href="comment.author._links.profile.href" title="View Profile">
@@ -219,7 +249,10 @@ export default {
                         </div>
                     </div>
                     <nav>
-                        <!-- Delete will go here -->
+                        <a v-if="comment._links.delete.auth"
+                           @click.prevent="deleteComment(index)"
+                           class="icon-delete"
+                           title="Delete comment" />
                     </nav>
                     <media-article v-html="comment.content"></media-article>
                 </li>
