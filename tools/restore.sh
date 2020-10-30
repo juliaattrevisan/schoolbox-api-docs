@@ -17,6 +17,26 @@ if [[ $EUID != "0" ]]; then
   exit 1;
 fi
 
+# Names of config that should be preserved when performing a restoration
+readonly PRESERVED_CONFIG=(
+  # Retrieve some of the Schoolbox config from MySQL using provided credentials
+  "site_hostname" "site_domain" "amqp_user" "amqp_pass" "amqp_vhost" "websocket_port" "websocket_port_ssl"
+
+  # External DB Config
+  "external_db_host" "external_db_user" "external_db_passwd" "external_db_db" "external_portal"
+
+  # SAML Config
+  "saml_sso_url" "saml_idp_metadata_url" "saml_enabled" "saml_slo_enabled" "saml_slo_url" "saml_logout_url" "saml_private_cert" "saml_public_cert" "saml_idp_certificate"
+
+  # LDAP Config
+  "ldap_enable" "ldap_host" "ldap_user" "ldap_pass" "ldap_base" "ldap_host_alt" "ldap_user_alt" "ldap_base_alt" "ldap_username"
+
+  # Others
+  "xml_dir" "file_dir" "otfs_verify_previous_file" "api_key"
+);
+# Associative array of config to preserve during restoration. Maps config_name to config_value.
+declare -A sql_config=();
+
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
 
@@ -71,90 +91,26 @@ readsqlver() {
 }
 
 readsqlconfig() {
-	# Retrive some of the Schoolbox config from MySQL using provided credentials
-	tempsqlsitehostname=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='site_hostname'" 2>/dev/null`;
-	tempsqlsitedomain=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='site_domain'" 2>/dev/null`;
-	tempsqlamqpuser=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='amqp_user'" 2>/dev/null`;
-	tempsqlamqppass=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='amqp_pass'" 2>/dev/null`;
-	tempsqlamqpvhost=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='amqp_vhost'" 2>/dev/null`;
-	tempsqlwebsocketport=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='websocket_port'" 2>/dev/null`;
-	tempsqlwebsocketportssl=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='websocket_port_ssl'" 2>/dev/null`;
-
-    #External DB Config
-	tempsqlexternaldbhost=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='external_db_host'" 2>/dev/null`;
-    tempsqlexternaldbuser=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='external_db_user'" 2>/dev/null`;
-	tempsqlexternaldbpassword=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='external_db_passwd'" 2>/dev/null`;
-	tempsqlexternaldbdb=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='external_db_db'" 2>/dev/null`;
-	tempsqlexternalportal=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='external_portal'" 2>/dev/null`;
-
-    #SAML Config
-	tempsqlsamlssourl=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_sso_url'" 2>/dev/null`;
-	tempsqlsamlidpmetadataurl=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_idp_metadata_url'" 2>/dev/null`;
-	tempsqlsamlenabled=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_enabled'" 2>/dev/null`;
-	tempsqlsamlsloenabled=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_slo_enabled'" 2>/dev/null`;
-	tempsqlsamlslourl=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_slo_url'" 2>/dev/null`;
-	tempsqlsamllogouturl=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_logout_url'" 2>/dev/null`;
-	tempsqlsamlprivate=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_private_cert'" 2>/dev/null`;
-	tempsqlsamlpublic=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_public_cert'" 2>/dev/null`;
-	tempsqlsamlidpcertificate=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_idp_certificate'" 2>/dev/null`;
-
-    #LDAP Config
-	tempsqlldapenable=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_enable'" 2>/dev/null`;
-	tempsqlldaphost=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_host'" 2>/dev/null`;
-	tempsqlldapuser=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_user'" 2>/dev/null`;
-	tempsqlldappass=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_pass'" 2>/dev/null`;
-	tempsqlldapbase=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_base'" 2>/dev/null`;
-	tempsqlldaphostalt=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_host_alt'" 2>/dev/null`;
-	tempsqlldapuseralt=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_user_alt'" 2>/dev/null`;
-	tempsqlldapbasealt=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_base_alt'" 2>/dev/null`;
-	tempsqlldapusername=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_username'" 2>/dev/null`;
-
-	temp_sql_xml_dir=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='xml_dir'" 2>/dev/null);
-	temp_sql_file_dir=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='file_dir'" 2>/dev/null);
-  temp_otfs_verify_previous_file=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='otfs_verify_previous_file'" 2>/dev/null);
-  temp_api_key=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='api_key'" 2>/dev/null);
+  local config_value;
+  local sql_command;
+  for config_name in "${PRESERVED_CONFIG[@]}"; do
+    sql_command="SELECT value FROM config WHERE name='$config_name'"
+    if ! config_value=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command" 2>/dev/null); then
+      echo "Unable to fetch value for config '$config_name'" >&2
+      exit 1
+    fi
+    sql_config[$config_name]="$config_value"
+  done
 }
 
 setsqlconfig() {
-	# Set some of the Schoolbox config from MySQL using provided credentials
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsitehostname' WHERE name='site_hostname'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsitedomain' WHERE name='site_domain'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlamqpuser' WHERE name='amqp_user'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlamqppass' WHERE name='amqp_pass'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlamqpvhost' WHERE name='amqp_vhost'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlwebsocketport' WHERE name='websocket_port'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlwebsocketportssl' WHERE name='websocket_port_ssl'";
-
-    #External DB Config
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternaldbhost' WHERE name='external_db_host'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternaldbuser' WHERE name='external_db_user'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternaldbpassword' WHERE name='external_db_passwd'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternaldbdb' WHERE name='external_db_db'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternalportal' WHERE name='external_portal'";
-
-    #SAML Config
-  mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlssourl' WHERE name='saml_sso_url'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlidpmetadataurl' WHERE name='saml_idp_metadata_url'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlenabled' WHERE name='saml_enabled'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlsloenabled' WHERE name='saml_slo_enabled'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlslourl' WHERE name='saml_slo_url'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamllogouturl' WHERE name='saml_logout_url'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlprivate' WHERE name='saml_private_cert'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlpublic' WHERE name='saml_public_cert'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlidpcertificate' WHERE name='saml_idp_certificate'";
-
-    #LDAP Config
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapenable' WHERE name='ldap_enable'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldaphost' WHERE name='ldap_host'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapuser' WHERE name='ldap_user'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldappass' WHERE name='ldap_pass'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapbase' WHERE name='ldap_base'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldaphostalt' WHERE name='ldap_host_alt'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapuseralt' WHERE name='ldap_user_alt'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapbasealt' WHERE name='ldap_base_alt'";
-	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapusername' WHERE name='ldap_username'";
-  mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "UPDATE config SET value='$temp_otfs_verify_previous_file' WHERE name='otfs_verify_previous_file'";
-  mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "UPDATE config SET value='$temp_api_key' WHERE name='api_key'";
+  local sql_command;
+  for config_name in "${!sql_config[@]}"; do
+    sql_command="UPDATE config SET value='${sql_config[$config_name]}' WHERE name='$config_name'"
+    if ! mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command"; then
+      echo "Unable to set value for config '$config_name' to '${sql_config[$config_name]}'" >&2
+    fi
+  done
 }
 
 truncateTables() {
@@ -668,15 +624,15 @@ function restore_pre_v20.1_config_dirs(){
   if [[  "$(echo -e "20.1.alpha1\n${sql_ver}" | sort -V | head -n 1)" != "20.1.alpha1"  ]]; then
     echo "Restored schema is older than this normalisation script. Trying to restore previous local data_dir values, or set new sane values if previous local values are not available"
 
-    if [[ -n "$temp_sql_xml_dir" ]]; then
-      xml_dir=$temp_sql_xml_dir
+    if [[ -n "${sql_config[xml_dir]}" ]]; then
+      xml_dir="${sql_config[xml_dir]}"
     else
       xml_dir="$thisdatadir/cache/xml"
     fi;
     mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "UPDATE config SET value='$xml_dir' WHERE name='xml_dir'";
 
-    if [[ -n "$temp_sql_file_dir" ]]; then
-      file_dir=$temp_sql_file_dir
+    if [[ -n "${sql_config[file_dir]}" ]]; then
+      file_dir="${sql_config[file_dir]}"
     else
       file_dir="$thisdatadir/files"
     fi;
