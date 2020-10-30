@@ -165,6 +165,8 @@ class Blind
         $allParticipants = $this->prefilterParticipants();
 
         foreach ($allParticipants as $currentParticipant) {
+
+            /** @var Submission $latestSubmission */
             $latestSubmission = $currentParticipant->findMostRecentSubmittedResponse();
 
             /* Skip unsubmitted
@@ -179,7 +181,6 @@ class Blind
                 continue;
             }
 
-            /** @var Submission $latestSubmission */
             $multipleResponses = \count($currentParticipant->getAllResponses()) > 1;
 
             if ($latestSubmission->isSubmittedOnTime()) {
