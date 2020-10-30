@@ -51,7 +51,7 @@ class Blind
 
 
     /**
-     * @var User
+     * @var User|null
      */
     private $student;
 
@@ -71,11 +71,11 @@ class Blind
     /**
      * Blind constructor.
      *
-     * @param Router      $router
-     * @param User        $student
-     * @param DueWork     $assessment
+     * @param Router    $router
+     * @param User|null $student
+     * @param DueWork   $assessment
      */
-    public function __construct(Router $router, User $student, DueWork $assessment)
+    public function __construct(Router $router, ?User $student, DueWork $assessment)
     {
         $this->router     = $router;
         $this->student    = $student;
@@ -99,7 +99,7 @@ class Blind
         ]);
 
         return [
-            'currentPerson' => $this->getUrl($this->student),
+            'currentPerson' => $this->student ? $this->getUrl($this->student) : '',
             'allPeople' => $this->getAllPeople(),
         ];
     }
