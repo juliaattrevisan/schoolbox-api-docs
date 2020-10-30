@@ -65,18 +65,24 @@ class Module extends BaseModule
         /* Superusers, Staff, Parents of Evidence Recipient and Evidence Recipients
          * can view the detail screen
          */
-        $viewEvidenceDetailRule = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\HasRole(Role::STAFF),
-            $isParentOrUserRule
+        $viewEvidenceDetailRule = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF),
+                $isParentOrUserRule
+            )
         );
 
         /* Superusers, Staff and Evidence Creators can delete an Evidence instance
          */
-        $deleteEvidenceRule = new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\HasRole(Role::STAFF),
-            new Rule\IsUser('creatorId')
+        $deleteEvidenceRule = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF),
+                new Rule\IsUser('creatorId')
+            )
         );
 
 
