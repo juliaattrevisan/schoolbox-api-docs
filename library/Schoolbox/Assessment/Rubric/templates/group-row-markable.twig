@@ -16,14 +16,11 @@
     {% if markScheme.gradeGroup is defined %}
         {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
             {# If cap mark has been given, find the bracket that matches the given mark #}
-            {% if capabilityMark.value ?? false %}
+            {% if capabilityMark is not null and capabilityMark.value is not null %}
                 {# Is this below the last? If so use the last one #}
                 {% if not letterGradeBracket and (capabilityNormMark >= gradeLevel.lowerBound or loop.last) %}
                     {% set letterGradeBracket = gradeLevel.lowerBound %}
                 {% endif %}
-            {% elseif loop.last %}
-                {# If no cap mark has been given yet, default to selecting the lowest bracket in the dropdown #}
-                {% set letterGradeBracket = gradeLevel.lowerBound %}
             {% endif %}
         {% endfor %}
     {% endif %}
@@ -68,10 +65,10 @@
                                 name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
                                 id="group-{{ capabilityId }}-mark">
 
-                            <option value="" {% if capabilityMark is null %}selected{% endif %}>(no grade)</option>
+                            <option value="" {% if letterGradeBracket is null %}selected{% endif %}>(no grade)</option>
                             {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
                                 <option value="{{ gradeLevel.lowerBound }}"
-                                        {% if capabilityMark.value ?? false and letterGradeBracket == gradeLevel.lowerBound %}selected{% endif %}
+                                        {% if letterGradeBracket is not null and letterGradeBracket == gradeLevel.lowerBound %}selected{% endif %}
                                         data-letter="{{ gradeLevel.caption }}">
                                     {{ gradeLevel.caption }}
                                 </option>
