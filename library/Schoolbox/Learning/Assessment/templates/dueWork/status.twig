@@ -10,6 +10,7 @@
      - markSchemeName:   string    filename of markScheme template fragment
      - rubricMarks:       bool[]  Whether the student's instructor-given feedback exists and has rubric marks, indexed by user.id
      - interactionLocked: bool Is the assessment locked for interactions because it is due in an archived term?
+     - blindReviewUrl:   string
 #}
 {% extends '@learningAssessment/status.twig' %}
 
@@ -25,6 +26,12 @@
     <li>
         <a id="import-feedback" data-reveal-id="importFeedbackModal" class="icon-upload">Import Feedback</a>
     </li>
+
+    {% if blindReviewUrl %}
+    <li>
+        <a href="{{ blindReviewUrl }}" class="icon-task">Blind Review</a>
+    </li>
+    {% endif %}
 
     {% if download %}
         <li>
@@ -115,7 +122,7 @@
                     <ul id="feedback-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
                         {%- spaceless %}
                             {% if pActionResponses %}
-                                <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}">View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
+                                <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}" data-inline-grader>View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
                             {% endif %}
                             {% if pActionSummary %}
                                 <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.firstName }}'s history">{{ responseHistory }}</a></li>
@@ -166,7 +173,8 @@
                             feedback:    participant.findMostRecentInstructorGivenFeedback,
                             participant: participant,
                             tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
-                            readonly:    readonly
+                            readonly:    readonly,
+                            blindMode:   false
                         } only %}
                         {% set inputNo = inputNo + 1 %}
                         {% if 'none' == markSchemeName | lower %}
@@ -551,6 +559,7 @@
                         $statusIcon.addClass('{{ statusPending }}');
                         $statusLabel.html('Submitted in person ' + (submittedLate ? 'late' : 'on time'));
                         $statusIcon.attr('title', '{{ labelPending }}');
+                        $statusIcon.attr('data-assessment-status-light', 'pending');
                         $('#filters').find('[data-status="pending"]').prop('checked', true);
                     }
 

@@ -36,6 +36,7 @@ use Schoolbox\User;
 
 class Controller extends Base
 {
+
     /**
      * @var ErrorMapper
      */
@@ -206,15 +207,16 @@ class Controller extends Base
      *
      * I can't call it getResponse() lol wups
      *
-     * @param DueWork $assessment
-     * @param User    $student
-     * @param Model   $response
+     * @param DueWork    $assessment
+     * @param User       $student
+     * @param Model|null $response
      * @throws ApplicationException\Exception When trying to access a draft Response when you shouldn't
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws \Aura\Router\Exception\RouteNotFound If cannot generate a requested route
      * @throws \InvalidArgumentException If assessment due date is null.
-     * @throws \PDOException If something went wrong when saving the kami document's status
      * @throws \LogicException If attempting to update the status of a kami doc that is not processing.
+     * @throws \PDOException If something went wrong when saving the kami document's status
+     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
      */
     public function getParticularResponse(
@@ -272,6 +274,20 @@ class Controller extends Base
         // Is the page being displayed in readonly mode?
         $isInteractionLocked = (new LockedChecker($this->termMapper))->isLockedForInteractions($assessment);
 
+        /* Decide which StudentCarousel to show
+        */
+        $carousel = $this->getRequest()->query[StudentCarousel\Blind::QUERYSTRING_BLIND_MARKING] ?
+            (new StudentCarousel\Blind(
+                $this->getRouter(),
+                $participant->getUser(),
+                $assessment
+            )) :
+            (new StudentCarousel\Standard(
+                $this->getRouter(),
+                $participant->getUser(),
+                $assessment
+            ));
+
         $data = [
             'assessment' => $assessment,
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
@@ -284,7 +300,20 @@ class Controller extends Base
             'attachzone' => $attachZone->getTwigContext(),
             'selectedFileHash' => $this->getRequest()->query['hash'],
             'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
-            'carousel' => (new StudentCarousel($this->getRouter(), $participant->getUser(), $assessment))->produce(),
+
+            /* The Student Carousel is the selectize thing that cycles between the currently
+             * selected student and the previous/next students participating in the assessment
+             * (it appears at the top of Inline Grader)
+             *
+             * the 'b' option indicates whether the Carousel should initiate Blind Marking, which
+             * obfuscates the student's identifying features while you're doing the marking
+             */
+            'carousel' => $carousel->produce(),
+
+            /* This is passed through standard.twig into comment.twig, where a placeholder text
+             * identifies the current guy you're marking
+             */
+            'blindMode' => $this->getRequest()->query[StudentCarousel\Blind::QUERYSTRING_BLIND_MARKING],
 
             /* A list of all the Responses that the participant has spawned
              */

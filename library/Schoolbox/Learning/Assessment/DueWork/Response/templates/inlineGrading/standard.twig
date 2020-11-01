@@ -9,11 +9,12 @@ Usage:
     assessment        DueWork\Model                  The DueWork being assessed
     breadcrumbs       Collection|string[][]          An array of label + URL pairs
     response          null|DueWork\Submission
-    feedback    null|DueWork\Feedback
+    feedback          null|DueWork\Feedback
     attachzone        array
     selectedFileHash  string
     markSchemeName    string
     carousel          StudentCarousel
+    blindMode         bool
     responseList      Collection|DueWork\Submission
     file              null|File\Model
     subfragment       null|string[]
@@ -47,7 +48,8 @@ Usage:
     {% include '@learningDueWorkResponse/inlineGrading/fragments/participantCarousel.twig' with {
         carousel: carousel,
         participant: participant,
-        assessment: assessment
+        assessment: assessment,
+        blindMode: blindMode ?? false
     } only %}
 {% endblock %}
 
@@ -266,10 +268,11 @@ Usage:
                     {% block comment %}
                         <div class="small-12{% if 'none' != markSchemeName | lower %} medium-9{% endif %} column">
                             {% include '@learningAssessment/dueWork/comment.twig' with {
-                            participant: participant,
-                            feedback: feedback,
-                            tabIndex: 2,
-                            readonly: readonly
+                                participant: participant,
+                                feedback: feedback,
+                                tabIndex: 2,
+                                readonly: readonly,
+                                blindMode: blindMode ?? false
                             } only %}
 
                             {# Resubmission required checkbox #}

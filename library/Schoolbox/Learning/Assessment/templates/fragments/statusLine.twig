@@ -52,7 +52,7 @@
     {% endset %}
 
     <span data-status
-          data-assessment-status-light
+          data-assessment-status-light="{{ pStatusClass }}"
           class="progress-tick no-text tiny {{ pStatusClass }}" title="{{ pTooltip }}"></span>
     <span data-status-label
           data-assessment-status-text>{{ pStatusText }}</span>

@@ -8,6 +8,7 @@
     @param string      carousel.currentPerson - the getParticularResponse url for the current response's submittedOnBehalfOf
     @param Participant participant            - currently displayed participant
     @param DueWork     participant.assessable - the assessment to which this Submission belongs
+    @param bool        blindMode              - whether you're reviewing in Blind Mode
  #}
 <script src="/javascript/components/selectize/dist/js/standalone/selectize.js"></script>
 <script>
@@ -158,7 +159,13 @@
         <form action="{{ routeLookup('learningAssessment.patchUpdateAssessment', { assessmentId: participant.assessable.id, assessment: participant.assessable }) }}" method="post">
             <input type="hidden" name='assessmentId' value="{{ participant.assessable.id }}" />
             <input type="hidden" name="skipUnsubmitted" value="0" />
-            <input type="checkbox" name="showSubmittedOnly" id="showSubmittedOnly" {% if participant.assessable.showSubmittedOnly %}checked="checked"{% endif %} value='1' />
+
+            {% if blindMode %}
+                <input type="checkbox" name="showSubmittedOnly" id="showSubmittedOnly" checked="checked" disabled="disabled" />
+            {% else %}
+                <input type="checkbox" name="showSubmittedOnly" id="showSubmittedOnly" {% if participant.assessable.showSubmittedOnly %}checked="checked"{% endif %} value='1' />
+            {% endif %}
+
             <label for="showSubmittedOnly" class="checkbox-label">Show unmarked submissions <span class='hint has-tip tip-top' title="If selected, you will only see student submissions that need to be marked." data-tooltip="">?</span></label>
         </form>
     </div>

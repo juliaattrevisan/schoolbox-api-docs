@@ -55,6 +55,7 @@ use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -196,7 +197,6 @@ class Controller extends Assessment\Controller
      *
      * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
-     * @throws ServiceNotFound
      * @throws InvalidArgumentException If assessment due date is null.
      * @throws PDOException
      * @throws UnexpectedValueException
@@ -206,14 +206,22 @@ class Controller extends Assessment\Controller
         // Only display download link if there are actually files to download
 
         $twigData = [
-            'errors'         => StateMapper::getInstance()->listDisplayValues(),
-            'type'           => Assessment\AssessmentType::objectToString($assessment),
-            'markSchemeName' => $this->deriveSchemeName($assessment->getMarkScheme()),
-            'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
-            'assessment'     => $assessment,
-            'download'       => $this->hasDownloadableSubmissionFiles($assessment),
-            'rubricMarks'    => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
+            'errors'            => StateMapper::getInstance()->listDisplayValues(),
+            'type'              => Assessment\AssessmentType::objectToString($assessment),
+            'markSchemeName'    => $this->deriveSchemeName($assessment->getMarkScheme()),
+            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
+            'assessment'        => $assessment,
+            'download'          => $this->hasDownloadableSubmissionFiles($assessment),
+            'rubricMarks'       => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
             'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
+
+            /* Find the first valid Blind Review url
+             */
+            'blindReviewUrl' => (new StudentCarousel\Blind(
+                $this->getRouter(),
+                null,
+                $assessment
+            ))->getFirstUrl()
         ];
 
         $this->getResponse()->content->set(
@@ -234,7 +242,6 @@ class Controller extends Assessment\Controller
      * @throws MapperException
      * @throws PDOException
      * @throws RouteNotFound
-     * @throws ServiceNotFound
      * @throws UnexpectedValueException
      */
     public function getSummary(IAssessable $assessment, User $student): void
