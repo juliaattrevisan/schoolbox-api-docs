@@ -46,6 +46,13 @@
         })
     });
 
+    $(function () {
+        $('#email-all-parents').click(function () {
+            $('#email-contacts-form').submit();
+        })
+    });
+
+
     // Enable Expandables
     $(function () {
         $('[data-collapser]').collapsable();
@@ -362,7 +369,7 @@
                             {% endblock buttons_documents %}
 
                             {% block buttons_email_all_staff %}
-                                {% if isStaff and config.email_all_staff %}
+                                {% if isStaff and config.email_all_staff and session.user.email %}
                                     {% set replyTo = session.user.getFormattedEmailDisplay %}
                                     <li>
                                         <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">Email All Teachers</a>
@@ -373,6 +380,20 @@
                                     </li>
                                 {% endif %}
                             {% endblock  buttons_email_all_staff  %}
+
+                            {% block buttons_email_parents %}
+                                {% if isStaff and config.email_all_parents and session.user.email %}
+                                    <li>
+                                        <a class="icon-email" id="email-all-parents" title="Emails the parents that have email addresses and can be contacted">Email Parents</a>
+                                        <form action="/mail/createMail.php" method="post" class="no-margin" id="email-contacts-form">
+                                            <input type="hidden" name="replyto" value="{{session.user.getFormattedEmailDisplay}}"/>
+                                            <input type="hidden" name="selectedIds" value="{{ user.externalId }}"/>
+                                            <input type="hidden" name="selectedGroups" value="parents"/>
+                                        </form>
+                                    </li>
+                                {% endif %}
+
+                            {% endblock buttons_email_parents %}
 
                             {% block buttons_miscellaneous %}
                             {% endblock buttons_miscellaneous %}
