@@ -13,6 +13,15 @@ Data:
     <div class="small-12 island">
         {% block header %}
         <h1>${ subject }</h1>
+
+            <ul class="flex-list buttons">
+                <li><a href="#" class="disabled">Award Achievement</a></li>
+                <li><a href="#" class="disabled">Set Goal(s)</a></li>
+                <li><a href="#" class="disabled">Add Pastoral Record</a></li>
+                <li><a @click.prevent="openShareLearningMomentDialog" :class="{disabled: selectedStudentIds.length === 0}">Share Learning Moment</a></li>
+                <li><a href="#" class="disabled">Email</a></li>
+            </ul>
+
         <template v-if="showSkeletonLoader" v-for="n in 3">
             <div class="list-item">
                 <div class="small-12 card skeleton">
@@ -45,9 +54,9 @@ Data:
                 <template v-if="studentLists.length > 0">
                     <tr v-for="student in studentLists">
                         <td v-if="mailEnabled">
-                            <input type="checkbox" name="students[]" :id="'id-' + student.synergy_id" :value="student.synergy_id"
+                            <input type="checkbox" name="students[]" :id="'id-' + student.id" :value="student.id"
                                    @click="select"/>
-                            <label :for="'id-' + student.synergy_id" class="checkbox-label"></label>
+                            <label :for="'id-' + student.id" class="checkbox-label"></label>
                         </td>
                         <td>
                             <img :src="'/portrait.php?id=' + student.id + '&size=square64'"
@@ -115,7 +124,7 @@ Data:
             <span class="right">
                 <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent class="class-list-form">
                     <input type="hidden" name="replyto" :value="replyTo"/>
-                    <input type="hidden" id="selectedIds" name="selectedIds" v-model="selectedStudentIds" />
+                    <input type="hidden" id="selectedIds" name="selectedIds" v-model="selectedStudentExternalIds" />
                     <input type="hidden" id="selectedGroups" name="selectedGroups" v-model="selectedGroups" />
                     <button type="submit" class="button icon-email" :disabled="! enableSendEmailButton" @click="sendEmail">${ sendEmailButtonText }</button>
                 </form>
@@ -164,6 +173,7 @@ Data:
             showSkeletonLoader: true,
             isAllSelected: false,
             selectedStudentIds: [],
+            selectedStudentExternalIds: [],
             studentsCheckboxElements: undefined,
             groups: {{ emailGroups | raw }},
             groupsCheckboxElements: [],
@@ -235,6 +245,7 @@ Data:
                     }
                 });
 
+                self.updateSelectedExternalIds();
                 self.updateSendEmailButtonState();
 
                 self.isAllSelected = isChecked;
@@ -256,6 +267,7 @@ Data:
                     self.isAllSelected = true;
                 }
 
+                self.updateSelectedExternalIds();
                 self.updateSendEmailButtonState();
             },
             sendEmail: function(event) {
@@ -265,6 +277,20 @@ Data:
                 self.enableSendEmailButton = false;
                 self.sendEmailButtonText = self.loadingText;
                 this.$refs.form.submit();
+            },
+
+            /**
+             * Convert selected Schoolbox IDs to external IDs
+             */
+            updateSelectedExternalIds: function () {
+                let self = this;
+                self.selectedStudentExternalIds = [];
+                this.studentLists.forEach(function (v) {
+                    let internalId = v.id;
+                    if (self.selectedStudentIds.indexOf(String(internalId)) >= 0) {
+                        self.selectedStudentExternalIds.push(v.synergy_id);
+                    }
+                });
             },
             updateSelectedGroups: function(event)
             {
@@ -286,7 +312,13 @@ Data:
             {
                 var self = this;
 
-                self.enableSendEmailButton = self.selectedStudentIds.length > 0 && self.selectedGroups.length > 0;
+                self.enableSendEmailButton = self.selectedStudentExternalIds.length > 0 && self.selectedGroups.length > 0;
+            },
+            openShareLearningMomentDialog: function() {
+                // Set the form's target to the selected users
+                $('#classList-shareLearningMoment-form')
+                    .attr('action', '/learning/evidence/user/' + this.selectedStudentIds.join(',') + '/create');
+                $('#classList-shareLearningMoment').foundation('reveal', 'open');
             },
         },
         computed: {
@@ -309,3 +341,43 @@ Data:
     });
 </script>
 {% endautoescape %}
+
+<div data-reveal id="classList-shareLearningMoment" aria-hidden="true" class="reveal-modal">
+    <h2>Share a Learning Moment</h2>
+    <form id="classList-shareLearningMoment-form" method="get">
+        <input name="{{ RETURN_URL.name }}" value="{{ RETURN_URL.current }}" type="hidden" />
+        <input type="radio"
+               name="momentType"
+               value="photo"
+               id="classList-shareLearningMoment-momentType-photo">
+        <label for="classList-shareLearningMoment-momentType-photo" class="block"><i class="icon-camera"></i>Take a photo</label>
+
+        <input type="radio"
+               name="momentType"
+               value="video"
+               id="classList-shareLearningMoment-momentType-video">
+        <label for="classList-shareLearningMoment-momentType-video" class="block"><i class="icon-video"></i>Record a video</label>
+
+        <input type="radio"
+               name="momentType"
+               value="audio"
+               id="classList-shareLearningMoment-momentType-audio">
+        <label for="classList-shareLearningMoment-momentType-audio" class="block"><i class="icon-audio"></i>Record audio</label>
+
+        <input type="radio"
+               name="momentType"
+               value="upload"
+               id="classList-shareLearningMoment-momentType-upload">
+        <label for="classList-shareLearningMoment-momentType-upload" class="block"><i class="icon-upload"></i>Upload image or video</label>
+
+        <input type="radio"
+               name="momentType"
+               value="text"
+               id="classList-shareLearningMoment-momentType-text">
+        <label for="classList-shareLearningMoment-momentType-text" class="block"><i class="icon-textbox"></i>Write something</label>
+
+        <button id="classList-shareLearningMoment-shareWork-submit" type="submit">Continue</button>
+
+    </form>
+    <a class="close-reveal-modal" aria-label="Close">×</a>
+</div>
