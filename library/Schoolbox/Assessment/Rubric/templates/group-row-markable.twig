@@ -16,7 +16,7 @@
     {% if markScheme.gradeGroup is defined %}
         {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
             {# If cap mark has been given, find the bracket that matches the given mark #}
-            {% if capabilityMark.value is not null %}
+            {% if capabilityMark is not null and capabilityMark.value is not null %}
                 {# Is this below the last? If so use the last one #}
                 {% if not letterGradeBracket and (capabilityNormMark >= gradeLevel.lowerBound or loop.last) %}
                     {% set letterGradeBracket = gradeLevel.lowerBound %}
