@@ -85,9 +85,9 @@
                             <div class="icon-group size-48" title="User Role"></div>
                             <span class="neutral label right">{{ locale.pastoralPrivate.proper }} Content Visible</span>
                             <p>{{ access.role.name }}</p>
-                            {% if access.role.isParent and not record.student.hideContacts %}
+                            {% if access.role.isParent %}
                                 {% for parent in record.student.parents %}
-                                    {%  if parent.isDeleted %}
+                                    {%  if parent.isDeleted or record.student.hideContacts %}
                                         {{ parent.fullName }}<br>
                                     {% else %}
                                         <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a><br>
@@ -175,9 +175,9 @@
                         <div class="small-12 card wrap-down">
                             <div class="icon-group size-48" title="User Role"></div>
                             <p>{{ access.role.name }}</p>
-                            {% if access.role.isParent and not record.student.hideContacts %}
+                            {% if access.role.isParent %}
                                 {% for parent in record.student.parents %}
-                                        {% if parent.isDeleted() %}
+                                        {% if parent.isDeleted() or record.student.hideContacts  %}
                                             {{ parent.fullName }}<br>
                                         {% else %}
                                             <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a><br>
@@ -267,9 +267,9 @@
                             <div class="icon-group size-48" title="User Role"></div>
                             <span class="alert label right">Denied Access</span>
                             <p>{{ access.role.name }}</p>
-                            {% if access.role.isParent and not record.student.hideContacts %}
+                            {% if access.role.isParent  %}
                                 {% for parent in record.student.parents %}
-                                    {% if parent.isDeleted() %}
+                                    {% if parent.isDeleted() or record.student.hideContacts %}
                                         {{ parent.fullName }}<br>
                                     {% else %}
                                         <a href="{{ profile.link(parent) }}">{{ parent.fullName }}</a><br>
