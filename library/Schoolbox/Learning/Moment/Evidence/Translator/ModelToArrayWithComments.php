@@ -133,6 +133,7 @@ class ModelToArrayWithComments
         if ($evidence->getDiscussionThread()) {
             $translation['discussionThread'] = $this->loadAndTranslateCommentsInDiscussionThread($evidence);
         } else {
+            // TODO move this into a dedicated links translator
             // Output the create thread link.
             // TBD: is it output as a simple link, or a href/auth object?
             // The old Aura link outputs the object, newer links are output
