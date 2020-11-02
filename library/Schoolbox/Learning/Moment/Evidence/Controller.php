@@ -143,10 +143,7 @@ class Controller extends Base
      */
     public function getEvidenceDetail(Model $evidence): void
     {
-        $translator = new Translator\ModelToArray(
-            new User\Translator\ModelToArray(),
-            new Storage\Translator\ModelToArray(),
-        );
+        $translator = $this->buildTranslatorWithComments(10);
 
         $item = $translator($evidence);
         $item = $this->generateLinks($item);
@@ -182,27 +179,11 @@ class Controller extends Base
      */
     public function getMomentsForUser(User $user): void
     {
-        $encodedCursor     = $this->request->query->get('cursor');
-        $cursor            = new Cursor($this->mapper, $user);
-        $data              = $cursor->retrieveResults($encodedCursor);
-        $linkDecorator     = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
-        $propertyDecorator = new PropertyDecorator(null, $linkDecorator);
-        $mappedData        = $data
-            ->map(
-                new Translator\ModelToArrayWithComments(
-                    new Translator\ModelToArray(
-                        new User\Translator\Author\ModelToArray(),
-                        new Storage\Translator\ModelToArray(),
-                    ),
-                    $this->router,
-                    $this->authorizer,
-                    $this->getUser(),
-                    Comment\Mapper::getInstance(),
-                    $linkDecorator,
-                    $propertyDecorator,
-                    2,
-                )
-            )
+        $encodedCursor = $this->request->query->get('cursor');
+        $cursor        = new Cursor($this->mapper, $user);
+        $data          = $cursor->retrieveResults($encodedCursor);
+        $mappedData    = $data
+            ->map($this->buildTranslatorWithComments(2))
             ->reindex()
             ->map(
                 /* Add router-generated urls to every Evidence array
@@ -352,6 +333,7 @@ class Controller extends Base
      */
     private function generateLinks(array $evidence): array
     {
+        // TODO consider moving this into Translator\ModelToArrayWithComments
         if (!array_key_exists('_links', $evidence)) {
             $evidence['_links'] = [];
         }
@@ -371,5 +353,31 @@ class Controller extends Base
         ]);
 
         return $evidence;
+    }
+
+
+    /**
+     * Builds a translator which contains comments.
+     *
+     * @param int $commentLimit
+     * @return Translator\ModelToArrayWithComments
+     */
+    private function buildTranslatorWithComments(int $commentLimit): Translator\ModelToArrayWithComments
+    {
+        $linkDecorator     = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
+        $propertyDecorator = new PropertyDecorator(null, $linkDecorator);
+        return new Translator\ModelToArrayWithComments(
+            new Translator\ModelToArray(
+                new User\Translator\Author\ModelToArray(),
+                new Storage\Translator\ModelToArray(),
+            ),
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
+            Comment\Mapper::getInstance(),
+            $linkDecorator,
+            $propertyDecorator,
+            $commentLimit,
+        );
     }
 }
