@@ -101,6 +101,12 @@
   }
 }
 
+@media #{$large-up} {
+  .column-right #news-component .card > a > img {
+    width: 6rem;
+  }
+}
+
 .skeleton.news > .img {
   margin: 0 1rem 0 0;
   width: rem-calc(200);
