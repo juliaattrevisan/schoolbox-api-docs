@@ -1,7 +1,8 @@
 <script>
-import MediaArticle from '@schoolbox/media-article';
-import Storage      from '@schoolbox/storage';
-import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
+import MediaArticle  from '@schoolbox/media-article';
+import Storage       from '@schoolbox/storage';
+import RelativeTime  from '@schoolboxLearningMomentEvidence/relative-time';
+import CommentThread from './commentThread';
 
 export default {
     /**
@@ -36,7 +37,8 @@ export default {
     components: {
         MediaArticle,
         Storage,
-        RelativeTime
+        RelativeTime,
+        CommentThread,
     },
 
     /**
@@ -127,6 +129,10 @@ export default {
                                 <article v-if="this.evidence.filename && this.evidence.storage">
                                     <storage :storage="this.evidence.storage" :filename="this.evidence.filename"></storage>
                                 </article>
+
+                                <!-- Discussion thread -->
+                                <comment-thread :thread="evidence.discussionThread"
+                                                :create-thread-endpoint="evidence._links.createThread" />
                             </section>
                         </div>
                     </div>
