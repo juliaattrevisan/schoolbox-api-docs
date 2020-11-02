@@ -56,14 +56,14 @@ if (isset($type, $id)) {
         // If it has failed transcoding, display sad mountain
         // (Do not cache, because the video should be re-encoded soon)
         if ($videoQueue->isFailed()) {
-            SitePage::localRedir("/images/core/video-failed-thumb.png");
+            SitePage::localRedir("/images/core/video-error.png");
             exit;
         }
 
         // If it hasn't finished processing, display please wait image
         // (Do not cache, because the video should be done processing soon)
         if (!$videoQueue->isComplete()) {
-            SitePage::localRedir("/images/core/video-processing-thumb.png");
+            SitePage::localRedir("/images/core/video-processing.gif");
             exit;
         }
 

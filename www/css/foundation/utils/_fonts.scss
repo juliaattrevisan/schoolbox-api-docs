@@ -790,6 +790,11 @@
     font-family: $font-family-icon;
 }
 
+.icon-video-error:before {
+    content: "\e91a";
+    font-family: $font-family-icon;
+}
+
 .icon-view:before,
 .icon-eye:before {
     content: '\e675';
