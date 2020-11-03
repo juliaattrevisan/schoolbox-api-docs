@@ -146,7 +146,6 @@ class Controller extends Base
         $translator = $this->buildTranslatorWithComments(10);
 
         $item = $translator($evidence);
-        $item = $this->generateLinks($item);
 
         $this->response->content->set($this->buildHtmlOutput('@learningMomentEvidence/detail.twig', [
             'evidence' => $item,
@@ -180,14 +179,7 @@ class Controller extends Base
         $data          = $cursor->retrieveResults($encodedCursor);
         $mappedData    = $data
             ->map($this->buildTranslatorWithComments(2))
-            ->reindex()
-            ->map(
-                /* Add router-generated urls to every Evidence array
-                 */
-                function (array $item): array {
-                    return $this->generateLinks($item);
-                }
-            );
+            ->reindex();
 
         $this->response->content->set(
             $this->buildJsonOutput([
@@ -323,6 +315,8 @@ class Controller extends Base
      * The router and its mechanics are pretty solidly tied to controllers and I don't
      * necessarily want to inject an entire controller instance into the Translator
      * classes and assorted places like that
+     *
+     * @deprecated now handled in `Translator\ModelToArray\Links`
      *
      * @param array $evidence
      * @return array
