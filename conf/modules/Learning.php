@@ -58,12 +58,14 @@ class Learning extends ModuleLoader
         $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
         $this->loadModule($kernel, MarkScheme\Module::class, "/{$namespace}/markscheme");
 
+        // Student toolkit component: not feature flagged
+        $this->loadModule($kernel, StudentToolkitModule::class, "/{$namespace}/studentToolkit");
+
         /** @var IConfigLoader $config */
         $config = $kernel->getDependencyInjector()->get('config');
 
         // Learning moment evidence: behind a feature flag
         if ($config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)) {
-            $this->loadModule($kernel, StudentToolkitModule::class, "/{$namespace}/studentToolkit");
             $this->loadModule($kernel, EvidenceModule::class, "/{$namespace}/evidence");
 
             // Discussion threads and comments for learning moment evidence:
