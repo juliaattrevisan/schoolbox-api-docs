@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator;
+namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\HTMLPurifier\Wrapper\IWrapper;
@@ -17,6 +17,7 @@ use Schoolbox\Discussion\Comment;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Learning\Moment\Evidence;
 use Schoolbox\Learning\Moment\Evidence\Discussion;
+use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 
@@ -24,7 +25,7 @@ use Schoolbox\User;
  * Translator for translating a learning moment evidence model into an array,
  * along with some of its comments and links.
  */
-class ModelToArrayWithComments
+class Comments
 {
     /**
      * The base model-to-array translator, as used to translate most of the

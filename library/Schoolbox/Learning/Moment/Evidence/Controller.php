@@ -362,13 +362,13 @@ class Controller extends Base
      * Builds a translator which contains comments.
      *
      * @param int $commentLimit
-     * @return Translator\ModelToArrayWithComments
+     * @return \Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Comments
      */
-    private function buildTranslatorWithComments(int $commentLimit): Translator\ModelToArrayWithComments
+    private function buildTranslatorWithComments(int $commentLimit): Translator\ModelToArray\Comments
     {
         $linkDecorator     = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
         $propertyDecorator = new PropertyDecorator(null, $linkDecorator);
-        return new Translator\ModelToArrayWithComments(
+        return new Translator\ModelToArray\Comments(
             new Translator\ModelToArray(
                 new User\Translator\Author\ModelToArray(),
                 new Storage\Translator\ModelToArray(),
