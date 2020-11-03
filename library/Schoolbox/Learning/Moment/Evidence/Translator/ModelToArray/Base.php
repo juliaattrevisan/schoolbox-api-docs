@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
 
-use Alaress\HTMLPurifier\Wrapper\IWrapper;
+use Alaress\HTMLPurifier\IPurifier;
 use Error;
 use Schoolbox\Learning\Moment\Evidence;
 
@@ -42,23 +42,25 @@ class Base
 
 
     /**
-     * Wrapper around a HTMLPurifier instance.
+     * HTMLPurifier instance, or an adapter thereof.
+     *
+     * Required for purifying the evidence's body (if present).
      */
-    private IWrapper $wrapper;
+    private IPurifier $purifier;
 
 
     /**
      * Constructor
      *
-     * @param callable $userTranslator
-     * @param callable $storageTranslator
-     * @param IWrapper $wrapper
+     * @param callable  $userTranslator
+     * @param callable  $storageTranslator
+     * @param IPurifier $purifier
      */
-    public function __construct(callable $userTranslator, callable $storageTranslator, IWrapper $wrapper)
+    public function __construct(callable $userTranslator, callable $storageTranslator, IPurifier $purifier)
     {
         $this->userTranslator    = $userTranslator;
         $this->storageTranslator = $storageTranslator;
-        $this->wrapper           = $wrapper;
+        $this->purifier          = $purifier;
     }
 
 
@@ -85,8 +87,7 @@ class Base
             'id'               => $model->getId(),
             'createdAt'        => $model->getCreatedAt() ? $model->getCreatedAt()->getUsingFormat(DATE_ATOM) : null,
             'updatedAt'        => $model->getUpdatedAt() ? $model->getUpdatedAt()->getUsingFormat(DATE_ATOM) : null,
-//            'deletedAt'        => $model->getDeletedAt() ? $model->getDeletedAt()->getUsingFormat(DATE_ATOM) : null,
-            'body'             => $this->wrapper->purify($model->getBody()),
+            'body'             => $this->purifier->purify($model->getBody()),
             'creator'          => $creator,
             'discussionThread' => $model->getDiscussionThread()
                 ? ['id' => $model->getDiscussionThread()->getId()]

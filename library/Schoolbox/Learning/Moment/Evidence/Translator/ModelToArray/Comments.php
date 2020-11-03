@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
 
-use Alaress\HTMLPurifier\Wrapper\IWrapper;
+use Alaress\HTMLPurifier\IPurifier;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Json\Decorator\LinkDecorator;
@@ -51,10 +51,11 @@ class Comments
 
 
     /**
-     * Wrapper around a HTMLPurifier instance, required for purifying the
-     * content of each comment.
+     * HTMLPurifier instance, or an adapter thereof.
+     *
+     * Required for purifying the content of each comment.
      */
-    private IWrapper $wrapper;
+    private IPurifier $purifier;
 
 
     /**
@@ -64,20 +65,20 @@ class Comments
      * @param LinkDecorator     $linkDecorator
      * @param PropertyDecorator $propertyDecorator
      * @param int               $commentLimit
-     * @param IWrapper          $wrapper
+     * @param IPurifier         $purifier
      */
     public function __construct(
         Comment\Mapper $commentMapper,
         LinkDecorator $linkDecorator,
         PropertyDecorator $propertyDecorator,
         int $commentLimit,
-        IWrapper $wrapper
+        IPurifier $purifier
     ) {
         $this->commentMapper     = $commentMapper;
         $this->linkDecorator     = $linkDecorator;
         $this->propertyDecorator = $propertyDecorator;
         $this->commentLimit      = $commentLimit;
-        $this->wrapper           = $wrapper;
+        $this->purifier          = $purifier;
     }
 
 
@@ -134,7 +135,7 @@ class Comments
 
         // Scrub each result's comment
         foreach ($encodedResults as &$encodedResult) {
-            $encodedResult['content'] = $this->wrapper->purify($encodedResult['content']);
+            $encodedResult['content'] = $this->purifier->purify($encodedResult['content']);
         }
         unset($encodedResult);
 

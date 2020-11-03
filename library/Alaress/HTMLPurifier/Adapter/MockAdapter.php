@@ -7,20 +7,20 @@
 
 declare(strict_types=1);
 
-namespace Alaress\HTMLPurifier\Wrapper;
+namespace Alaress\HTMLPurifier\Adapter;
 
-use Scrub;
+use Alaress\HTMLPurifier\IPurifier;
 
 /**
- * A simple wrapper around the HTMLPurifier instance used by `Scrub::html`.
+ * A mock HTMLPurifier adapter: just returns the input for testing purposes.
  */
-class ScrubWrapper implements IWrapper
+class MockAdapter implements IPurifier
 {
     /**
      * @inheritdoc
      */
     public function purify(?string $input): ?string
     {
-        return isset($input) ? Scrub::html($input) : null;
+        return $input;
     }
 }

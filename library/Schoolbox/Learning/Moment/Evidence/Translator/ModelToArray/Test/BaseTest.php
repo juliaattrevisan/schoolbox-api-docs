@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Test;
 
-use Alaress\HTMLPurifier\Wrapper\MockWrapper;
+use Alaress\HTMLPurifier\Adapter\MockAdapter;
 use Alaress_Date_Format;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
@@ -101,7 +101,7 @@ class BaseTest extends TestCase
         };
         self::assertEquals(
             $expected,
-            (new Base($userTranslator, $storageTranslator, new MockWrapper()))($input)
+            (new Base($userTranslator, $storageTranslator, new MockAdapter()))($input)
         );
     }
 }
