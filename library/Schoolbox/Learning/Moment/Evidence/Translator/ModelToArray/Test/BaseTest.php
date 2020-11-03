@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator\Test;
+namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Test;
 
 use Alaress\HTMLPurifier\Wrapper\MockWrapper;
 use Alaress_Date_Format;
@@ -15,7 +15,7 @@ use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\Learning\Moment\Evidence\Model;
-use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
+use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Base;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 
@@ -23,9 +23,9 @@ use Schoolbox\User;
  * Tests for converting from a model to array representation of learning moment
  * evidence.
  *
- * @covers \Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray
+ * @covers \Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Base
  */
-class ModelToArrayTest extends TestCase
+class BaseTest extends TestCase
 {
     /**
      * Data provider for `testInvoke`.
@@ -81,7 +81,7 @@ class ModelToArrayTest extends TestCase
 
     /**
      * @dataProvider getTestInvokeData
-     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray::__invoke
+     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Base::__invoke
      *
      * @param Model $input
      * @param array $expected
@@ -101,7 +101,7 @@ class ModelToArrayTest extends TestCase
         };
         self::assertEquals(
             $expected,
-            (new ModelToArray($userTranslator, $storageTranslator, new MockWrapper()))($input)
+            (new Base($userTranslator, $storageTranslator, new MockWrapper()))($input)
         );
     }
 }

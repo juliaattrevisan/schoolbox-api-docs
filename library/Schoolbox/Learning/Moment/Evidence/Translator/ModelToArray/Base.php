@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator;
+namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
 
 use Alaress\HTMLPurifier\Wrapper\IWrapper;
 use Error;
@@ -19,7 +19,7 @@ use Schoolbox\Learning\Moment\Evidence;
  *
  * Used when translating a model created by Schoolbox into a response.
  */
-class ModelToArray
+class Base
 {
     /**
      * Translator for converting a user within the evidence model.

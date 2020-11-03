@@ -261,7 +261,7 @@ class Controller extends Base
         $this->response->content->set(
             $this->buildJsonOutput(
                 $evidenceCollection->map(
-                    new Translator\ModelToArray(
+                    new Translator\ModelToArray\Base(
                         new User\Translator\Author\ModelToArray(),
                         new Storage\Translator\ModelToArray(),
                         new ScrubWrapper(),
@@ -356,7 +356,7 @@ class Controller extends Base
     private function buildTranslatorWithComments(int $commentLimit): Translator\Composite
     {
         $scrubWrapper   = new ScrubWrapper();
-        $baseTranslator = new Translator\ModelToArray(
+        $baseTranslator = new Translator\ModelToArray\Base(
             new User\Translator\Author\ModelToArray(),
             new Storage\Translator\ModelToArray(),
             $scrubWrapper,
