@@ -17,6 +17,9 @@ use Schoolbox\Learning\Moment\Evidence;
  *
  * Keys returned by translators later in the list will override keys returned by
  * translators earlier in the list.
+ *
+ * TODO nothing about this is peculiar to evidence, so this is a prime candidate
+ *      to be moved to somewhere generic
  */
 class Composite
 {
