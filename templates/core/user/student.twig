@@ -39,7 +39,7 @@
 {% set showClasses = showClasses and showDetails %}
 {% set showTitle = user.hasPositionTitle() %}
 
-{% set showLearningMoments = config.learning_moments_enabled and (isStaff or isSelf or isParentOfStudent) %}
+{% set showActivityFeed = (isStaff or isSelf or isParentOfStudent) %}
 
 <script type="text/javascript">
     $(function () {
@@ -425,10 +425,10 @@
 <div class="row">
     <div class="small-12 island">
         <dl class="tabs" data-tab>
-            {% if showLearningMoments %}
+            {% if showActivityFeed %}
             <dd class="active"><a href="#activity">Activity Feed</a></dd>
             {% endif %}
-            <dd class="{% if not showLearningMoments %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
+            <dd class="{% if not showActivityFeed %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
             {% if showClasses %}
             <dd><a href="#classes">Groups &amp; Classes</a></dd>
             {% endif %}
@@ -438,7 +438,7 @@
         </dl>
 
         <div class="tabs-content content no-margin no-pad">
-            {% if showLearningMoments %}
+            {% if showActivityFeed %}
             <div class="content active" id="activity">
                 {# Vue component goes here #}
                 {% autoescape 'js' %}
