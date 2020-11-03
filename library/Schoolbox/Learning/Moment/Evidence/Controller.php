@@ -355,10 +355,11 @@ class Controller extends Base
      */
     private function buildTranslatorWithComments(int $commentLimit): Translator\Composite
     {
+        $scrubWrapper   = new ScrubWrapper();
         $baseTranslator = new Translator\ModelToArray(
             new User\Translator\Author\ModelToArray(),
             new Storage\Translator\ModelToArray(),
-            new ScrubWrapper(),
+            $scrubWrapper,
         );
 
         $linkTranslator = new Translator\ModelToArray\Links(
@@ -370,19 +371,11 @@ class Controller extends Base
         $linkDecorator     = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
         $propertyDecorator = new PropertyDecorator(null, $linkDecorator);
         $commentTranslator = new Translator\ModelToArray\Comments(
-            new Translator\ModelToArray(
-                new User\Translator\Author\ModelToArray(),
-                new Storage\Translator\ModelToArray(),
-                new ScrubWrapper(),
-            ),
-            $this->router,
-            $this->authorizer,
-            $this->getUser(),
             Comment\Mapper::getInstance(),
             $linkDecorator,
             $propertyDecorator,
             $commentLimit,
-            new ScrubWrapper(),
+            $scrubWrapper,
         );
 
         return new Translator\Composite(
@@ -390,23 +383,5 @@ class Controller extends Base
             $linkTranslator,
             $commentTranslator,
         );
-
-//        $linkDecorator     = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
-//        $propertyDecorator = new PropertyDecorator(null, $linkDecorator);
-//        return new Translator\ModelToArray\Comments(
-//            new Translator\ModelToArray(
-//                new User\Translator\Author\ModelToArray(),
-//                new Storage\Translator\ModelToArray(),
-//                new ScrubWrapper(),
-//            ),
-//            $this->router,
-//            $this->authorizer,
-//            $this->getUser(),
-//            Comment\Mapper::getInstance(),
-//            $linkDecorator,
-//            $propertyDecorator,
-//            $commentLimit,
-//            new ScrubWrapper(),
-//        );
     }
 }
