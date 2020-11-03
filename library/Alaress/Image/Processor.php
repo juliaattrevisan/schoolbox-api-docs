@@ -258,6 +258,8 @@ class Processor
             case 'image/png':
             case 'image/x-png':
                 return 'png';
+            case 'image/bmp':
+                return 'bmp';
             case 'image/svg+xml':
                 return 'svg';
             default:
