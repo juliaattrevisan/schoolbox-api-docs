@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -47,7 +48,8 @@ interface IThreadLocation
     /**
      * Gets notifier class name for this thread comments
      *
-     * @return string
+     * @return string|null The fully qualified class name, or null if this has
+     *                     no notifier.
      */
-    public function getCommentNotifier(): string;
+    public function getCommentNotifier(): ?string;
 }

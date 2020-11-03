@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -60,6 +61,12 @@ class Cursor
 
 
     /**
+     * How many results (max) should
+     */
+    private int $limit;
+
+
+    /**
      * The codec implementation used for the cursor.
      *
      * @var ICodec
@@ -73,10 +80,15 @@ class Cursor
      * @param Mapper       $mapper
      * @param Thread\Model $thread
      * @param string       $order
+     * @param int          $limit
      * @throws InvalidArgumentException if $order isn't one of this class' ORDER_* constants
      */
-    public function __construct(Mapper $mapper, Thread\Model $thread, string $order = self::ORDER_ASC)
-    {
+    public function __construct(
+        Mapper $mapper,
+        Thread\Model $thread,
+        string $order = self::ORDER_ASC,
+        int $limit = self::RESULTS_PER_REQUEST
+    ) {
         $this->mapper = $mapper;
         $this->thread = $thread;
 
@@ -89,6 +101,7 @@ class Cursor
             );
         }
         $this->order = $order;
+        $this->limit = $limit;
         $this->codec = new Base64();
     }
 
@@ -118,7 +131,7 @@ class Cursor
         return $this->mapper->findByPredicates(
             $this->applyCursor($this->buildPredicateBuilder(), $currentCursor),
             [
-                'limit' => self::RESULTS_PER_REQUEST,
+                'limit' => $this->limit,
                 'order' => [
                     $this->mapper->getIdentifierColumn() => $this->order,
                 ],
@@ -177,7 +190,6 @@ class Cursor
             $nextCursor = $this->codec->encode($lastRecord->$getIdMethod());
         }
         return $nextCursor;
-
     }
 
 
@@ -228,5 +240,4 @@ class Cursor
         }
         return $pb;
     }
-
 }

@@ -9,15 +9,18 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence;
 
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
+use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
-use Schoolbox\Learning\Moment\Evidence\Translator;
+use Schoolbox\Discussion\Comment;
+use Schoolbox\Json\Decorator\LinkDecorator;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
-use Scrub;
 
 /**
  * Controller for learning moments.
@@ -140,17 +143,9 @@ class Controller extends Base
      */
     public function getEvidenceDetail(Model $evidence): void
     {
-        $translator = new Translator\ModelToArray(
-            new User\Translator\ModelToArray(),
-            new Storage\Translator\ModelToArray(),
-        );
+        $translator = $this->buildTranslatorWithComments(10);
 
         $item = $translator($evidence);
-        $item = $this->generateLinks($item);
-
-        /* TODO: Why wouldn't you just scrub this in ModelToArray
-         */
-        $item['body'] = Scrub::html($item['body']);
 
         $this->response->content->set($this->buildHtmlOutput('@learningMomentEvidence/detail.twig', [
             'evidence' => $item,
@@ -183,29 +178,8 @@ class Controller extends Base
         $cursor        = new Cursor($this->mapper, $user);
         $data          = $cursor->retrieveResults($encodedCursor);
         $mappedData    = $data
-            ->map(
-                new Translator\ModelToArray(
-                    new User\Translator\Author\ModelToArray(),
-                    new Storage\Translator\ModelToArray(),
-                ),
-            )
-            ->reindex()
-            ->map(
-                static function (array $item): array {
-                    // Scrub body HTML, as there's no guarantee it has been
-                    // scrubbed elsewhere (and Vue can't do it)
-                    $item['body'] = Scrub::html($item['body']);
-                    return $item;
-                }
-            )
-            ->map(
-
-                /* Add router-generated urls to every Evidence array
-                 */
-                function (array $item): array {
-                    return $this->generateLinks($item);
-                }
-            );
+            ->map($this->buildTranslatorWithComments(2))
+            ->reindex();
 
         $this->response->content->set(
             $this->buildJsonOutput([
@@ -265,7 +239,7 @@ class Controller extends Base
      * @since 20.2
      *
      * @param Collection|User[] $users
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function postMomentForUsers(Collection $users): void
     {
@@ -287,9 +261,10 @@ class Controller extends Base
         $this->response->content->set(
             $this->buildJsonOutput(
                 $evidenceCollection->map(
-                    new Translator\ModelToArray(
+                    new Translator\ModelToArray\Base(
                         new User\Translator\Author\ModelToArray(),
                         new Storage\Translator\ModelToArray(),
+                        new ScrubAdapter(),
                     ),
                 )
             )
@@ -341,29 +316,72 @@ class Controller extends Base
      * necessarily want to inject an entire controller instance into the Translator
      * classes and assorted places like that
      *
+     * @deprecated now handled in `Translator\ModelToArray\Links`
+     *
      * @param array $evidence
      * @return array
      * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function generateLinks(array $evidence): array
     {
-        $evidence['_links'] = [
-            'detail' => $this->getRouteIfAuthorized('learningMomentEvidence.getEvidenceDetail', [
-                'evidenceId' => $evidence['id'],
-                'userId' => $evidence['recipient']['id']
-            ]),
+        // TODO consider moving this into Translator\ModelToArrayWithComments
+        if (!array_key_exists('_links', $evidence)) {
+            $evidence['_links'] = [];
+        }
+        $evidence['_links']['detail'] = $this->getRouteIfAuthorized('learningMomentEvidence.getEvidenceDetail', [
+            'evidenceId' => $evidence['id'],
+            'userId' => $evidence['recipient']['id']
+        ]);
 
-            /* TODO Figure out what the modify perms will be
-             *  I added this here, it was in there SA-11246 screenshot.
-             */
-            'modify' => null,
+        /* TODO Figure out what the modify perms will be
+         *  I added this here, it was in there SA-11246 screenshot.
+         */
+        $evidence['_links']['modify'] = null;
 
-            'delete' => $this->getRouteIfAuthorized('learningMomentEvidence.deleteEvidence', [
-                'evidenceId' => $evidence['id'],
-                'creatorId' => $evidence['creator']['id']
-            ])
-        ];
+        $evidence['_links']['delete'] = $this->getRouteIfAuthorized('learningMomentEvidence.deleteEvidence', [
+            'evidenceId' => $evidence['id'],
+            'creatorId' => $evidence['creator']['id']
+        ]);
 
         return $evidence;
+    }
+
+
+    /**
+     * Builds a translator which contains comments.
+     *
+     * @param int $commentLimit
+     * @return Translator\Composite
+     */
+    private function buildTranslatorWithComments(int $commentLimit): Translator\Composite
+    {
+        $scrubWrapper   = new ScrubAdapter();
+        $baseTranslator = new Translator\ModelToArray\Base(
+            new User\Translator\Author\ModelToArray(),
+            new Storage\Translator\ModelToArray(),
+            $scrubWrapper,
+        );
+
+        $linkTranslator = new Translator\ModelToArray\Links(
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
+        );
+
+        $linkDecorator     = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
+        $propertyDecorator = new PropertyDecorator(null, $linkDecorator);
+        $commentTranslator = new Translator\ModelToArray\Comments(
+            Comment\Mapper::getInstance(),
+            $linkDecorator,
+            $propertyDecorator,
+            $commentLimit,
+            $scrubWrapper,
+        );
+
+        return new Translator\Composite(
+            $baseTranslator,
+            $linkTranslator,
+            $commentTranslator,
+        );
     }
 }

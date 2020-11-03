@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence;
 
+use Schoolbox\Discussion\Thread\Context\IThreadLocation;
 use Schoolbox\Discussion\Thread\Model as ThreadModel;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTraits;
@@ -18,7 +19,7 @@ use Schoolbox\User;
 /**
  * Class Model
  */
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, IThreadLocation
 {
     use ModelTraits\Id;
     use ModelTraits\CreatedAtDate;
@@ -193,5 +194,14 @@ class Model implements ISoftDeletable
     {
         $this->creator = $creator;
         return $this;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getCommentNotifier(): ?string
+    {
+        return null;
     }
 }

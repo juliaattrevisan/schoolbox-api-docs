@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -27,6 +28,12 @@ use TypeError;
 
 class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thread\Context\IThreadLocation
 {
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
+    use SerializeTrait;
+
     // The discrete, atomic states this article may be in.
     // @see https://www.draw.io/#G1hgNAeuen61KzCzlIa0gEzYK5l0qsYtkw
     public const STATE_DRAFT                = 1;
@@ -61,12 +68,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     private const VALID_STATES_TO_PUBLISH   = self::STATE_AWAITING_PUBLICATION;
     // Action=Archive
     private const VALID_STATES_TO_ARCHIVE   = self::STATE_AWAITING_PUBLICATION | self::STATE_PUBLISHED;
-
-    use Id;
-    use CreatedAtDate;
-    use UpdatedAtDate;
-    use DeletedAtDate;
-    use SerializeTrait;
 
 
     /**
@@ -1073,7 +1074,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     /**
      * @inheritDoc
      */
-    public function getCommentNotifier(): string
+    public function getCommentNotifier(): ?string
     {
         return Discussion\Comment\Notifier::class;
     }

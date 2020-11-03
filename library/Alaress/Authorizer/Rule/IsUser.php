@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Validates whether the user is the given ID.
  *
@@ -15,25 +16,27 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\User;
+
 use function is_scalar;
 
 class IsUser implements IAuthorizationRule
 {
     /**
-     * The array key in $params that contains the user ID.
+     * The array key in $params that contains the user ID (if a string), or a
+     * callable which can retrieve the ID.
      *
-     * @var string
+     * @var string|callable
      */
-    protected $paramsKey = 'id';
+    protected $userIdSource = 'id';
 
     /**
      * Constructor (obviously)
      *
-     * @param string $paramsKey
+     * @param string|callable $userIdSource
      */
-    public function __construct($paramsKey = 'id')
+    public function __construct($userIdSource = 'id')
     {
-        $this->paramsKey = $paramsKey;
+        $this->userIdSource = $userIdSource;
     }
 
     /**
@@ -46,19 +49,24 @@ class IsUser implements IAuthorizationRule
      * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      * @throws InsufficientHydrationException If route indicates
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = [], User $user = null)
     {
-        // You misconfigured or misapplied your route
-        if (!array_key_exists($this->paramsKey, $params)) {
-            throw new Base(sprintf('Key "%s" not in route params', $this->paramsKey));
-        }
-
         // No session user?
         if (!$user instanceof User) {
             throw new Unauthenticated("No session user provided");
         }
 
-        $param = $params[$this->paramsKey];
+        if (is_callable($this->userIdSource)) {
+            $param = call_user_func($this->userIdSource, $params, $user);
+        } else {
+            // You misconfigured or misapplied your route
+            if (!array_key_exists($this->userIdSource, $params)) {
+                throw new Base(sprintf('Key "%s" not in route params', $this->userIdSource));
+            }
+
+            $param = $params[$this->userIdSource];
+        }
+
 
         if ($param instanceof User) {
             if ($param->getId() === $user->getId()) {

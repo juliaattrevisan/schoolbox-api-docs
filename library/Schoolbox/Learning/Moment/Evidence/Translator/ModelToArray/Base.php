@@ -7,8 +7,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator;
+namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
 
+use Alaress\HTMLPurifier\IPurifier;
 use Error;
 use Schoolbox\Learning\Moment\Evidence;
 
@@ -18,7 +19,7 @@ use Schoolbox\Learning\Moment\Evidence;
  *
  * Used when translating a model created by Schoolbox into a response.
  */
-class ModelToArray
+class Base
 {
     /**
      * Translator for converting a user within the evidence model.
@@ -41,15 +42,25 @@ class ModelToArray
 
 
     /**
+     * HTMLPurifier instance, or an adapter thereof.
+     *
+     * Required for purifying the evidence's body (if present).
+     */
+    private IPurifier $purifier;
+
+
+    /**
      * Constructor
      *
-     * @param callable $userTranslator
-     * @param callable $storageTranslator
+     * @param callable  $userTranslator
+     * @param callable  $storageTranslator
+     * @param IPurifier $purifier
      */
-    public function __construct(callable $userTranslator, callable $storageTranslator)
+    public function __construct(callable $userTranslator, callable $storageTranslator, IPurifier $purifier)
     {
         $this->userTranslator    = $userTranslator;
         $this->storageTranslator = $storageTranslator;
+        $this->purifier          = $purifier;
     }
 
 
@@ -76,8 +87,7 @@ class ModelToArray
             'id'               => $model->getId(),
             'createdAt'        => $model->getCreatedAt() ? $model->getCreatedAt()->getUsingFormat(DATE_ATOM) : null,
             'updatedAt'        => $model->getUpdatedAt() ? $model->getUpdatedAt()->getUsingFormat(DATE_ATOM) : null,
-//            'deletedAt'        => $model->getDeletedAt() ? $model->getDeletedAt()->getUsingFormat(DATE_ATOM) : null,
-            'body'             => $model->getBody(),
+            'body'             => $this->purifier->purify($model->getBody()),
             'creator'          => $creator,
             'discussionThread' => $model->getDiscussionThread()
                 ? ['id' => $model->getDiscussionThread()->getId()]
@@ -87,7 +97,7 @@ class ModelToArray
             'storage'          => $model->getStorage()
                 ? call_user_func($this->storageTranslator, $model->getStorage())
                 : null,
-            '_links'           => []
+            '_links'           => [],
         ];
     }
 }

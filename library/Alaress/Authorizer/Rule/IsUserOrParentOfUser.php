@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Validates whether the user is either the given user, or their parent.
  *
@@ -19,16 +20,16 @@ class IsUserOrParentOfUser extends Any
      *
      * @param External_UserInterface $externalDb
      * @param UserMapper             $userMapper
-     * @param string                 $paramsKey
+     * @param string|callable        $userIdSource
      */
     public function __construct(
         External_UserInterface $externalDb,
         UserMapper $userMapper,
-        $paramsKey = 'id'
+        $userIdSource = 'id'
     ) {
         parent::__construct(
-            new IsUser($paramsKey),
-            new IsParentOfUser($externalDb, $userMapper, $paramsKey)
+            new IsUser($userIdSource),
+            new IsParentOfUser($externalDb, $userMapper, $userIdSource)
         );
     }
 }

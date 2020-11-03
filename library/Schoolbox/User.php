@@ -1407,7 +1407,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
             $links['profile'] = new SitePageLink("/search/user/{$this->id}");
             $links['avatar']  = new SitePageLink(
                 sprintf(
-                    '/portrait?id=%s&size=%s',
+                    '/portrait.php?id=%s&size=%s',
                     urlencode($this->id),
                     urlencode(\Alaress\Image\Transformation\Storage::TRANSFORM_SQUARE64)
                 )

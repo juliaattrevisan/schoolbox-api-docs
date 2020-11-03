@@ -13,6 +13,10 @@
     ['Learning Moment']
 ) }}
 
+{# Include the editor and its configurator (required for comments) #}
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+
 <div id="evidence-detail-container">
     <evidence-detail :evidence="{{ evidence|json_encode }}"></evidence-detail>
 </div>

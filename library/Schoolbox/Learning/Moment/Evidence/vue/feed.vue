@@ -5,11 +5,13 @@ import moment from 'moment';
 
 import MediaArticle from '@schoolbox/media-article';
 import Storage      from '@schoolbox/storage';
+import CommentThread from './commentThread';
 
 export default {
     components: {
         MediaArticle,
         Storage,
+        CommentThread,
     },
     data() {
         return {
@@ -31,6 +33,20 @@ export default {
         },
         currentCount () {
             return data.length;
+        },
+        ckeditorConfig () {
+            // Use the same config as the editor in the news does
+            return window.jQuery.alaressEditorConfig({
+                removePlugins: 'uploadimage,link,schoolboxanchor',
+                removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+                toolbarGroups: [
+                    {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                    {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
+                    {name: 'links', groups: ['links']},
+                    {name: 'insert', groups: ['insert']},
+                    {name: 'schoolbox', groups: ['schoolboxlink']},
+                ],
+            });
         },
     },
     mounted() {
@@ -122,7 +138,11 @@ export default {
             }
             return moment.duration(dayDiff, 'd').humanize(true);
         },
-    }
+    },
+    filters: {
+        dateFormat: (date, format) => moment(date).format(format),
+        fromNow:    (date)         => moment(date).fromNow(),
+    },
 }
 </script>
 
@@ -130,8 +150,8 @@ export default {
     <div>
         <div class="content" v-for="evidenceGroup in groupedEvidence">
             <h2 class="subheader">
-                <time :datetime="evidenceGroup.date.format('YYYY-MM-DD')"
-                      :title="evidenceGroup.date.format(dateDisplayFormats.momentJsDateLong)"
+                <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
+                      :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
                 >{{ renderCreatedAt(evidenceGroup.date) }}</time>
             </h2>
 
@@ -140,25 +160,33 @@ export default {
                     <li v-for="evidence in evidenceGroup.evidence">
                         <div class="card small-12 compact">
                             <a :href="evidence.creator._links.profile" title="View Profile">
-                                <img :src="evidence.creator._links.avatar + '&amp;size=square64'" alt="View Profile">
+                                <img :src="evidence.creator._links.avatar" alt="View Profile">
                                 <p>{{ evidence.creator.fullName }}</p>
                                 <time class="pipe meta"
-                                      :datetime="evidence.createdAt.format()"
-                                      :title="evidence.createdAt.format(dateDisplayFormats.momentJsDatetime)"
-                                >{{ evidence.createdAt.format(dateDisplayFormats.momentJsTime) }}</time>
+                                      :datetime="evidence.createdAt | dateFormat"
+                                      :title="evidence.createdAt  | dateFormat(dateDisplayFormats.momentJsDatetime)"
+                                >{{ evidence.createdAt | dateFormat(dateDisplayFormats.momentJsTime) }}</time>
                             </a>
                         </div>
 
-                        <!-- Display evidence body, with media players initialised -->
-                        <media-article v-if="evidence.body">
-                            <div v-html="evidence.body" />
-                        </media-article>
+                        <div class="small-12 large-6 column">
+                            <!-- Display evidence body, with media players initialised -->
+                            <media-article v-if="evidence.body">
+                                <div v-html="evidence.body" />
+                            </media-article>
 
 
-                        <!-- Is there an attachment? Display it appropriately -->
-                        <article v-if="evidence.filename && evidence.storage">
-                            <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
-                        </article>
+                            <!-- Is there an attachment? Display it appropriately -->
+                            <article v-if="evidence.filename && evidence.storage">
+                                <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
+                            </article>
+                        </div>
+
+                        <div class="small-12 large-6 column">
+                            <comment-thread :thread="evidence.discussionThread"
+                                            :create-thread-endpoint="evidence._links.createThread"
+                            />
+                        </div>
 
                         <div class="content">
                             <p><a :href="evidence._links.detail">More Detail</a></p>

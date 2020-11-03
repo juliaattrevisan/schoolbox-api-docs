@@ -7,14 +7,15 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator\Test;
+namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Test;
 
+use Alaress\HTMLPurifier\Adapter\MockAdapter;
 use Alaress_Date_Format;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\Learning\Moment\Evidence\Model;
-use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
+use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Base;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 
@@ -22,9 +23,9 @@ use Schoolbox\User;
  * Tests for converting from a model to array representation of learning moment
  * evidence.
  *
- * @covers \Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray
+ * @covers \Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Base
  */
-class ModelToArrayTest extends TestCase
+class BaseTest extends TestCase
 {
     /**
      * Data provider for `testInvoke`.
@@ -45,7 +46,7 @@ class ModelToArrayTest extends TestCase
                 'creator'          => null,
                 'recipient'        => null,
                 'discussionThread' => null,
-                '_links'           => []
+                '_links'           => [],
             ],
         ];
 
@@ -72,7 +73,7 @@ class ModelToArrayTest extends TestCase
                 'creator'          => ['id' => 55],
                 'recipient'        => ['id' => 193],
                 'discussionThread' => ['id' => 14],
-                '_links'           => []
+                '_links'           => [],
             ],
         ];
     }
@@ -80,7 +81,7 @@ class ModelToArrayTest extends TestCase
 
     /**
      * @dataProvider getTestInvokeData
-     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray::__invoke
+     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Base::__invoke
      *
      * @param Model $input
      * @param array $expected
@@ -88,7 +89,7 @@ class ModelToArrayTest extends TestCase
     public function testInvoke(Model $input, array $expected): void
     {
         // Test with a stripped-down user and storage translator
-        $userTranslator = static function (?User $user) {
+        $userTranslator    = static function (?User $user) {
             return $user
                 ? ['id' => $user->getId(),]
                 : null;
@@ -98,6 +99,9 @@ class ModelToArrayTest extends TestCase
                 ? ['hash' => $storage->getHash(),]
                 : null;
         };
-        self::assertEquals($expected, (new ModelToArray($userTranslator, $storageTranslator))($input));
+        self::assertEquals(
+            $expected,
+            (new Base($userTranslator, $storageTranslator, new MockAdapter()))($input)
+        );
     }
 }
