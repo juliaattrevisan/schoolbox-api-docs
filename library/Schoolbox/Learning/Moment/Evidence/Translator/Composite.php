@@ -49,6 +49,11 @@ class Composite
         foreach ($this->translators as $translator) {
             $translations[] = $translator($evidence);
         }
-        return array_merge_recursive(...$translations);
+
+        // array_merge_recursive doesn't do what I expected:
+        // if it finds the same key in two arrays, it will preserve both in an
+        // array.
+        // array_merge_recursive(['a' => 'b'], ['a' => 'c']) returns ["a" => ["b", "c", ],]
+        return array_replace_recursive(...$translations);
     }
 }
