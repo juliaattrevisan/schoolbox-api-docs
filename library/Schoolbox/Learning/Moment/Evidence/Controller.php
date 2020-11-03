@@ -357,13 +357,25 @@ class Controller extends Base
      * Builds a translator which contains comments.
      *
      * @param int $commentLimit
-     * @return \Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Comments
+     * @return Translator\Composite
      */
-    private function buildTranslatorWithComments(int $commentLimit): Translator\ModelToArray\Comments
+    private function buildTranslatorWithComments(int $commentLimit): Translator\Composite
     {
+        $baseTranslator = new Translator\ModelToArray(
+            new User\Translator\Author\ModelToArray(),
+            new Storage\Translator\ModelToArray(),
+            new ScrubWrapper(),
+        );
+
+        $linkTranslator = new Translator\ModelToArray\Links(
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
+        );
+
         $linkDecorator     = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
         $propertyDecorator = new PropertyDecorator(null, $linkDecorator);
-        return new Translator\ModelToArray\Comments(
+        $commentTranslator = new Translator\ModelToArray\Comments(
             new Translator\ModelToArray(
                 new User\Translator\Author\ModelToArray(),
                 new Storage\Translator\ModelToArray(),
@@ -378,5 +390,29 @@ class Controller extends Base
             $commentLimit,
             new ScrubWrapper(),
         );
+
+        return new Translator\Composite(
+            $baseTranslator,
+            $linkTranslator,
+            $commentTranslator,
+        );
+
+//        $linkDecorator     = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
+//        $propertyDecorator = new PropertyDecorator(null, $linkDecorator);
+//        return new Translator\ModelToArray\Comments(
+//            new Translator\ModelToArray(
+//                new User\Translator\Author\ModelToArray(),
+//                new Storage\Translator\ModelToArray(),
+//                new ScrubWrapper(),
+//            ),
+//            $this->router,
+//            $this->authorizer,
+//            $this->getUser(),
+//            Comment\Mapper::getInstance(),
+//            $linkDecorator,
+//            $propertyDecorator,
+//            $commentLimit,
+//            new ScrubWrapper(),
+//        );
     }
 }
