@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator;
+namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
 
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Router;
@@ -17,7 +17,7 @@ use Schoolbox\User;
 /**
  * Translator for loading links into the array.
  */
-class ModelToArrayLinks
+class Links
 {
     /**
      * The router object, as required to generate a link to content.
