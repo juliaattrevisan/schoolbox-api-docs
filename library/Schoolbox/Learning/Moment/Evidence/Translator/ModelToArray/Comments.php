@@ -129,11 +129,12 @@ class Comments
      */
     public function __invoke(Evidence\Model $evidence): array
     {
-        // Basic translation with the model-to-array translator
-        $translation = $this->baseTranslator->__invoke($evidence);
-
-
-        $translation['_links'] = [];
+        $translation = [];
+//        // Basic translation with the model-to-array translator
+//        $translation = $this->baseTranslator->__invoke($evidence);
+//
+//
+//        $translation['_links'] = [];
 
 
         // Does this evidence have a discussion thread?
@@ -141,20 +142,20 @@ class Comments
         // If not: create a link to create a thread.
         if ($evidence->getDiscussionThread()) {
             $translation['discussionThread'] = $this->loadAndTranslateCommentsInDiscussionThread($evidence);
-        } else {
-            // TODO move this into a dedicated links translator
-            // Output the create thread link.
-            // TBD: is it output as a simple link, or a href/auth object?
-            // The old Aura link outputs the object, newer links are output
-            // as simple values (and are not output at all if permission denied)
-            $routeParams       = [
-                'context'   => $evidence,
-                'contextId' => $evidence->getId(),
-            ];
-            $createThreadRoute = 'evidenceDiscussionThreads.createThread';
-            if ($this->authorizer->isPathAuthorizedForUser($createThreadRoute, $routeParams, $this->currentUser)) {
-                $translation['_links']['createThread'] = $this->router->generate($createThreadRoute, $routeParams);
-            }
+//        } else {
+//            // TODO move this into a dedicated links translator
+//            // Output the create thread link.
+//            // TBD: is it output as a simple link, or a href/auth object?
+//            // The old Aura link outputs the object, newer links are output
+//            // as simple values (and are not output at all if permission denied)
+//            $routeParams       = [
+//                'context'   => $evidence,
+//                'contextId' => $evidence->getId(),
+//            ];
+//            $createThreadRoute = 'evidenceDiscussionThreads.createThread';
+//            if ($this->authorizer->isPathAuthorizedForUser($createThreadRoute, $routeParams, $this->currentUser)) {
+//                $translation['_links']['createThread'] = $this->router->generate($createThreadRoute, $routeParams);
+//            }
         }
 
         return $translation;
