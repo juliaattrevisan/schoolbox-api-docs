@@ -8,7 +8,8 @@ INSERT INTO config (
     type_id,
     editable,
     hidden,
-    required
+    required,
+    sequence
 ) VALUES (
     'learning_moments_enabled',
     '1',
@@ -18,6 +19,7 @@ INSERT INTO config (
     '',
     (SELECT id FROM lu_config_type WHERE type = 'Modules'),
     'true',
-    'true',
-    'false'
+    'false',
+    'false',
+    (SELECT COUNT(*) FROM config c2 JOIN lu_config_type lct on c2.type_id = lct.id WHERE type = 'Modules')
 );
