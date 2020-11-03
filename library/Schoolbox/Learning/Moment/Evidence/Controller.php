@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence;
 
+use Alaress\HTMLPurifier\Wrapper\ScrubWrapper;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
@@ -276,6 +277,7 @@ class Controller extends Base
                     new Translator\ModelToArray(
                         new User\Translator\Author\ModelToArray(),
                         new Storage\Translator\ModelToArray(),
+                        new ScrubWrapper(),
                     ),
                 )
             )
@@ -370,6 +372,7 @@ class Controller extends Base
             new Translator\ModelToArray(
                 new User\Translator\Author\ModelToArray(),
                 new Storage\Translator\ModelToArray(),
+                new ScrubWrapper(),
             ),
             $this->router,
             $this->authorizer,

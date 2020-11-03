@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence\Translator\Test;
 
+use Alaress\HTMLPurifier\Wrapper\MockWrapper;
 use Alaress_Date_Format;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
@@ -45,7 +46,7 @@ class ModelToArrayTest extends TestCase
                 'creator'          => null,
                 'recipient'        => null,
                 'discussionThread' => null,
-                '_links'           => []
+                '_links'           => [],
             ],
         ];
 
@@ -72,7 +73,7 @@ class ModelToArrayTest extends TestCase
                 'creator'          => ['id' => 55],
                 'recipient'        => ['id' => 193],
                 'discussionThread' => ['id' => 14],
-                '_links'           => []
+                '_links'           => [],
             ],
         ];
     }
@@ -88,7 +89,7 @@ class ModelToArrayTest extends TestCase
     public function testInvoke(Model $input, array $expected): void
     {
         // Test with a stripped-down user and storage translator
-        $userTranslator = static function (?User $user) {
+        $userTranslator    = static function (?User $user) {
             return $user
                 ? ['id' => $user->getId(),]
                 : null;
@@ -98,6 +99,9 @@ class ModelToArrayTest extends TestCase
                 ? ['hash' => $storage->getHash(),]
                 : null;
         };
-        self::assertEquals($expected, (new ModelToArray($userTranslator, $storageTranslator))($input));
+        self::assertEquals(
+            $expected,
+            (new ModelToArray($userTranslator, $storageTranslator, new MockWrapper()))($input)
+        );
     }
 }
