@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment\Evidence\Translator;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\HTMLPurifier\Wrapper\IWrapper;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Aura\Router\Router;
 use Schoolbox\Discussion\Comment;
@@ -18,7 +19,6 @@ use Schoolbox\Learning\Moment\Evidence;
 use Schoolbox\Learning\Moment\Evidence\Discussion;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
-use Scrub;
 
 /**
  * Translator for translating a learning moment evidence model into an array,
@@ -80,6 +80,13 @@ class ModelToArrayWithComments
 
 
     /**
+     * Wrapper around a HTMLPurifier instance, required for purifying the
+     * content of each comment.
+     */
+    private IWrapper $wrapper;
+
+
+    /**
      * Constructor
      *
      * @param ModelToArray      $baseTranslator
@@ -90,6 +97,7 @@ class ModelToArrayWithComments
      * @param LinkDecorator     $linkDecorator
      * @param PropertyDecorator $propertyDecorator
      * @param int               $commentLimit
+     * @param IWrapper          $wrapper
      */
     public function __construct(
         ModelToArray $baseTranslator,
@@ -99,7 +107,8 @@ class ModelToArrayWithComments
         Comment\Mapper $commentMapper,
         LinkDecorator $linkDecorator,
         PropertyDecorator $propertyDecorator,
-        int $commentLimit
+        int $commentLimit,
+        IWrapper $wrapper
     ) {
         $this->baseTranslator    = $baseTranslator;
         $this->router            = $router;
@@ -109,6 +118,7 @@ class ModelToArrayWithComments
         $this->linkDecorator     = $linkDecorator;
         $this->propertyDecorator = $propertyDecorator;
         $this->commentLimit      = $commentLimit;
+        $this->wrapper           = $wrapper;
     }
 
 
@@ -123,7 +133,7 @@ class ModelToArrayWithComments
 
 
         // TODO remove once the base translator can scrub
-        $translation['body']   = Scrub::html($translation['body']);
+        $translation['body']   = $this->wrapper->purify($translation['body']);
         $translation['_links'] = [];
 
 
@@ -186,7 +196,7 @@ class ModelToArrayWithComments
 
         // Scrub each result's comment
         foreach ($encodedResults as &$encodedResult) {
-            $encodedResult['content'] = Scrub::html($encodedResult['content']);
+            $encodedResult['content'] = $this->wrapper->purify($encodedResult['content']);
         }
         unset($encodedResult);
 

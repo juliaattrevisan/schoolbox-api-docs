@@ -381,6 +381,7 @@ class Controller extends Base
             $linkDecorator,
             $propertyDecorator,
             $commentLimit,
+            new ScrubWrapper(),
         );
     }
 }
