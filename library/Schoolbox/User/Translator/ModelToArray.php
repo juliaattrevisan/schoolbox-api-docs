@@ -181,7 +181,7 @@ class ModelToArray
                 'profile' => '/search/user/' . $user->getId(),
                 'avatar'  =>
                     sprintf(
-                        '/portrait?id=%d&size=%s',
+                        '/portrait.php?id=%d&size=%s',
                         $user->getId(),
                         urlencode(Storage::TRANSFORM_SQUARE64)
                     ),

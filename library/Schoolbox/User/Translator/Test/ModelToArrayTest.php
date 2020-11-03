@@ -157,7 +157,7 @@ class ModelToArrayTest extends TestCase
                 'email'            => 'mrjohndoe@mail.com',
                 '_links'           => [
                     'profile' => '/search/user/1',
-                    'avatar'  => '/portrait?id=1&size=square64',
+                    'avatar'  => '/portrait.php?id=1&size=square64',
                 ],
                 'externalId'       => '7',
                 'username'         => 'test',

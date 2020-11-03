@@ -103,7 +103,7 @@ class ModelToArrayTest extends TestCase
                 'id'        => 1,
                 '_links'    => [
                     'profile' => '/search/user/1',
-                    'avatar'  => '/portrait?id=1&size=square64',
+                    'avatar'  => '/portrait.php?id=1&size=square64',
                 ],
                 'title'     => 'Mr',
                 'firstName' => 'John',
