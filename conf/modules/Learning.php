@@ -10,6 +10,7 @@ namespace Config\Modules;
 use Alaress\Application\Kernel;
 use Config\ModuleLoader;
 use Schoolbox\Assessment\Course;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Calendar\Events\Module as AssessmentCalendarEventsModule;
 use Schoolbox\Learning\Assessment\Calendar\Module as AssessmentCalendarModule;
@@ -57,14 +58,24 @@ class Learning extends ModuleLoader
         $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
         $this->loadModule($kernel, MarkScheme\Module::class, "/{$namespace}/markscheme");
 
-        // Learning moment evidence
+        // Student toolkit component: not feature flagged
         $this->loadModule($kernel, StudentToolkitModule::class, "/{$namespace}/studentToolkit");
-        $this->loadModule($kernel, EvidenceModule::class, "/{$namespace}/evidence");
+
+        /** @var IConfigLoader $config */
+        $config = $kernel->getDependencyInjector()->get('config');
+
+        // Learning moment evidence: behind a feature flag
+        if ($config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)) {
+            $this->loadModule($kernel, EvidenceModule::class, "/{$namespace}/evidence");
+
+            // Discussion threads and comments for learning moment evidence:
+            // also behind the same feature flag
+            $this->loadModule($kernel, EvidenceThreadModule::class, "/discussion/evidence/{contextId}/threads");
+            $this->loadModule($kernel, EvidenceCommentModule::class, "/discussion/evidence/{contextId}/comments");
+        }
 
         /* Assessment Calendar is behind a feature flag
          */
-        /** @var IConfigLoader $config */
-        $config = $kernel->getDependencyInjector()->get('config');
         if ($config->get('assessment_calendar_enabled')) {
             $this->loadModule($kernel, AssessmentCalendarModule::class, "/{$namespace}/assessment/calendar");
             $this->loadModule(
@@ -73,9 +84,5 @@ class Learning extends ModuleLoader
                 "/{$namespace}/assessment/calendar/events"
             );
         }
-
-        // Discussion threads and comments for learning moment evidence
-        $this->loadModule($kernel, EvidenceThreadModule::class, "/discussion/evidence/{contextId}/threads");
-        $this->loadModule($kernel, EvidenceCommentModule::class, "/discussion/evidence/{contextId}/comments");
     }
 }

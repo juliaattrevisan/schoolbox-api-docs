@@ -39,6 +39,8 @@
 {% set showClasses = showClasses and showDetails %}
 {% set showTitle = user.hasPositionTitle() %}
 
+{% set showActivityFeed = (isStaff or isSelf or isParentOfStudent) %}
+
 <script type="text/javascript">
     $(function () {
         $('#email-all-staff').click(function () {
@@ -423,8 +425,10 @@
 <div class="row">
     <div class="small-12 island">
         <dl class="tabs" data-tab>
+            {% if showActivityFeed %}
             <dd class="active"><a href="#activity">Activity Feed</a></dd>
-            <dd><a href="#achievements">Achievements</a></dd>
+            {% endif %}
+            <dd class="{% if not showActivityFeed %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
             {% if showClasses %}
             <dd><a href="#classes">Groups &amp; Classes</a></dd>
             {% endif %}
@@ -434,6 +438,7 @@
         </dl>
 
         <div class="tabs-content content no-margin no-pad">
+            {% if showActivityFeed %}
             <div class="content active" id="activity">
                 {# Vue component goes here #}
                 {% autoescape 'js' %}
@@ -456,6 +461,7 @@
                 <div id="activity-feed"></div>
                 <script type="text/javascript" src="/javascript/components/learningMomentsFeed.bundle.js"></script>
             </div>
+            {% endif %}
 
             <div class="content" id="achievements">
                 <div class="content">

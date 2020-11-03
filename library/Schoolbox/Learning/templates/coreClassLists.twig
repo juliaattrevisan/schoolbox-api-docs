@@ -18,7 +18,9 @@ Data:
                 <li><a href="#" class="disabled">Award Achievement</a></li>
                 <li><a href="#" class="disabled">Set Goal(s)</a></li>
                 <li><a href="#" class="disabled">Add Pastoral Record</a></li>
-                <li><a @click.prevent="openShareLearningMomentDialog" :class="{disabled: selectedStudentIds.length === 0}">Share Learning Moment</a></li>
+                {% if config.learning_moments_enabled %}
+                    <li><a @click.prevent="openShareLearningMomentDialog" :class="{disabled: selectedStudentIds.length === 0}">Share Learning Moment</a></li>
+                {% endif %}
                 <li><a href="#" class="disabled">Email</a></li>
             </ul>
 
