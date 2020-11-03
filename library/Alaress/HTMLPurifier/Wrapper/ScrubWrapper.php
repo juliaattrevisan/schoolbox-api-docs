@@ -18,8 +18,8 @@ class ScrubWrapper implements IWrapper
     /**
      * @inheritdoc
      */
-    public function purify(string $input): string
+    public function purify(?string $input): ?string
     {
-        return Scrub::html($input);
+        return isset($input) ? Scrub::html($input) : null;
     }
 }

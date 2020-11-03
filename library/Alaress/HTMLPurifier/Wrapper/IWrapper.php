@@ -20,8 +20,8 @@ interface IWrapper
     /**
      * Runs `$input` through a HTMLPurifier instance.
      *
-     * @param string $input
-     * @return string
+     * @param string|null $input
+     * @return string|null
      */
-    public function purify(string $input): string;
+    public function purify(?string $input): ?string;
 }

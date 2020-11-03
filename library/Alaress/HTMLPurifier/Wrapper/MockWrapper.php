@@ -16,7 +16,7 @@ class MockWrapper implements IWrapper
     /**
      * @inheritdoc
      */
-    public function purify(string $input): string
+    public function purify(?string $input): ?string
     {
         return $input;
     }
