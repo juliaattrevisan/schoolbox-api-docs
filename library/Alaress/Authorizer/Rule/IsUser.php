@@ -22,29 +22,34 @@ use function is_scalar;
 class IsUser implements IAuthorizationRule
 {
     /**
-     * The array key in $params that contains the user ID (if a string), or a
-     * callable which can retrieve the ID.
+     * The source for the value within `$params` which is used to determine the
+     * user to compare to the current user.
+     *
+     * This value may be either:
+     * * a string or int, in which case it's a direct key lookup in `$params`
+     * * a callable, in which case the callable is called (with `$params` and
+     *   the current user as parameters), and is expected to return the value
      *
      * @var string|callable
      */
-    protected $userIdSource = 'id';
+    protected $paramSource = 'id';
 
     /**
      * Constructor (obviously)
      *
-     * @param string|callable $userIdSource
+     * @param string|callable $paramSource
      */
-    public function __construct($userIdSource = 'id')
+    public function __construct($paramSource = 'id')
     {
-        $this->userIdSource = $userIdSource;
+        $this->paramSource = $paramSource;
     }
 
     /**
      * Validate whether the user has the same user id as the given parameter.
      * When 'participant' is passed as the parameter key, this validate the user against the participant object.
-     * @param array $params  Any parameters passed as part of the route.
-     * @param User  $user    The user to authorize, if any. Null value assumes
-     *                       that no user is logged in.
+     * @param array     $params Any parameters passed as part of the route.
+     * @param User|null $user   The user to authorize, if any. Null value
+     *                          assumes that no user is logged in.
      * @return true If the request is authorized.
      * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      * @throws InsufficientHydrationException If route indicates
@@ -56,18 +61,21 @@ class IsUser implements IAuthorizationRule
             throw new Unauthenticated("No session user provided");
         }
 
-        if (is_callable($this->userIdSource)) {
-            $param = call_user_func($this->userIdSource, $params, $user);
-        } else {
-            // You misconfigured or misapplied your route
-            if (!array_key_exists($this->userIdSource, $params)) {
-                throw new Base(sprintf('Key "%s" not in route params', $this->userIdSource));
-            }
 
-            $param = $params[$this->userIdSource];
+        // Extract the param from the param source
+        if (
+            (is_string($this->paramSource) || is_int($this->paramSource))
+            && array_key_exists($this->paramSource, $params)
+        ) {
+            $param = $params[$this->paramSource];
+        } elseif (is_callable($this->paramSource)) {
+            $param = call_user_func($this->paramSource, $params, $user);
+        } else {
+            throw new Base('`$paramSource` parameter is neither an array key nor a callable');
         }
 
 
+        // Now check that the param matches the user somehow.
         if ($param instanceof User) {
             if ($param->getId() === $user->getId()) {
                 return true;
