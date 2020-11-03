@@ -21,7 +21,6 @@ use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
-use Scrub;
 
 /**
  * Controller for learning moments.
@@ -148,10 +147,6 @@ class Controller extends Base
 
         $item = $translator($evidence);
         $item = $this->generateLinks($item);
-
-        /* TODO: Why wouldn't you just scrub this in ModelToArray
-         */
-        $item['body'] = Scrub::html($item['body']);
 
         $this->response->content->set($this->buildHtmlOutput('@learningMomentEvidence/detail.twig', [
             'evidence' => $item,

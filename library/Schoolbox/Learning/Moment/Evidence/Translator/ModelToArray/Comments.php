@@ -133,8 +133,6 @@ class Comments
         $translation = $this->baseTranslator->__invoke($evidence);
 
 
-        // TODO remove once the base translator can scrub
-        $translation['body']   = $this->wrapper->purify($translation['body']);
         $translation['_links'] = [];
 
 
