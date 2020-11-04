@@ -353,10 +353,12 @@ Data:
             selectedStudentIds: function () {
                 let ids  = [],
                     self = this;
-                self.selectedStudents.forEach(function (item, index) {
-                    let student = self.studentLists[index];
-                    if (student.id) {
-                        ids.push(student.id);
+                self.selectedStudents.forEach(function (selected, index) {
+                    if (selected) {
+                        let student = self.studentLists[index];
+                        if (student.id) {
+                            ids.push(student.id);
+                        }
                     }
                 });
                 return ids;
@@ -364,10 +366,12 @@ Data:
             selectedStudentExternalIds: function () {
                 let externalIds = [],
                     self        = this;
-                self.selectedStudents.forEach(function (item, index) {
-                    let student = self.studentLists[index];
-                    if (student.externalId) {
-                        externalIds.push(student.externalId);
+                self.selectedStudents.forEach(function (selected, index) {
+                    if (selected) {
+                        let student = self.studentLists[index];
+                        if (student.externalId) {
+                            externalIds.push(student.externalId);
+                        }
                     }
                 });
                 return externalIds;
