@@ -10,6 +10,7 @@ use Alaress\Mail\AbstractMailer;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter\Codec;
 use function func_get_args;
 use External_ClassInterface;
@@ -430,11 +431,12 @@ class Controller extends Base
     {
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learning/classLists.twig', [
-                'specialNeeds'      => $this->rosettaStone->translate('specialNeeds',true, true),
-                'replyTo'           => $this->getUser()->getEmail(),
-                'mailEnabled'       => $this->getConfigLoader()->get('mail_enable'),
-                'emailGroups'       => $this->getClassListsEmailGroups(),
-                'folder'            => $folder,
+                'specialNeeds'           => $this->rosettaStone->translate('specialNeeds',true, true),
+                'replyTo'                => $this->getUser()->getEmail(),
+                'mailEnabled'            => $this->getConfigLoader()->get('mail_enable'),
+                'learningMomentsEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
+                'emailGroups'            => $this->getClassListsEmailGroups(),
+                'folder'                 => $folder,
             ])->setTab('classes')->setTitle($folder->getName())
         );
     }

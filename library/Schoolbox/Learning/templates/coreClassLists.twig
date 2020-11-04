@@ -1,10 +1,11 @@
 {#
 Data:
-    folder            object    The folder object
-    specialNeeds      string    A localised label for Special Needs
-    replyTo           string    Current user's email address
-    mailEnabled       bool      Config for whether mail is enabled
-    emailGroups       array     Data for mail group checkboxes
+    folder                 object    The folder object
+    specialNeeds           string    A localised label for Special Needs
+    replyTo                string    Current user's email address
+    mailEnabled            bool      Config for whether mail is enabled
+    learningMomentsEnabled bool      Config for whether learning moment creation is enabled
+    emailGroups            array     Data for mail group checkboxes
 #}
 
 {% include '@learning/component/classLists/breadcrumbs.twig' %}
@@ -18,10 +19,12 @@ Data:
                 <li><a href="#" class="disabled">Award Achievement</a></li>
                 <li><a href="#" class="disabled">Set Goal(s)</a></li>
                 <li><a href="#" class="disabled">Add Pastoral Record</a></li>
-                {% if config.learning_moments_enabled %}
+                {% if learningMomentsEnabled %}
                     <li><a @click.prevent="openShareLearningMomentDialog" :class="{disabled: selectedStudentIds.length === 0}">Share Learning Moment</a></li>
                 {% endif %}
-                <li><a href="#" class="disabled">Email</a></li>
+                {% if mailEnabled %}
+                    <li><a href="#" class="disabled">Email</a></li>
+                {% endif %}
             </ul>
 
         <template v-if="showSkeletonLoader" v-for="n in 3">
@@ -35,11 +38,11 @@ Data:
         </template>
         {% endblock %}
 
-        <table id="contact-table" v-if="! showSkeletonLoader && studentLists.length">
+        <table id="contact-table" v-if="!showSkeletonLoader && studentLists.length">
             <thead>
             {% block table_header %}
             <tr>
-                <th v-if="mailEnabled">
+                <th v-if="showCheckboxes">
                     <input type="checkbox" id="select-all" @click="selectAllStudents" v-model="isAllSelected"/>
                     <label for="select-all" class="checkbox-label"></label>
                 </th>
@@ -55,7 +58,7 @@ Data:
             <tbody>
                 <template v-if="studentLists.length > 0">
                     <tr v-for="student in studentLists">
-                        <td v-if="mailEnabled">
+                        <td v-if="showCheckboxes">
                             <input type="checkbox" name="students[]" :id="'id-' + student.id" :value="student.id"
                                    @click="select"/>
                             <label :for="'id-' + student.id" class="checkbox-label"></label>
@@ -169,6 +172,7 @@ Data:
             classCode: '{{ folder.codeString }}',
             replyToEmail: '{{ replyTo }}',
             mailEnabled: Boolean({{ mailEnabled }}),
+            learningMomentsEnabled: Boolean({{ learningMomentsEnabled }}),
             specialNeeds: '{{ specialNeeds }}',
             hideMedicalAlerts: Boolean({{ config.protect_medicalspecial }}),
             studentLists: [],
@@ -329,7 +333,10 @@ Data:
             },
             subject: function() {
                 return this.subjectName + ' (' + this.classCode + ')';
-            }
+            },
+            showCheckboxes: function() {
+                return this.learningMomentsEnabled || this.mailEnabled;
+            },
         },
         filters: {
             capitalise: function (val) {
