@@ -487,10 +487,10 @@
                                                     {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
                                                     {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
                                                         <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
-                                                            <h3 class="no-margin">{{ subject.name }} <span class="meta">({{ subjectCode }})</span></h3>
+                                                            <h3 class="no-margin">{{ subject.name }} {% if subjectCode|length %}<span class="meta">({{ subjectCode }})</span>{% endif %}</h3>
                                                         </a>
                                                     {% else %}
-                                                        <h3 class="no-margin">{{ subject.name }} <span class="meta">({{ subjectCode }})</span></h3>
+                                                        <h3 class="no-margin">{{ subject.name }} {% if subjectCode|length %}<span class="meta">({{ subjectCode }})</span>{% endif %}</h3>
                                                     {% endif %}
                                                 </div>
                                                 {% block folderListItemActions %}{% endblock %}
