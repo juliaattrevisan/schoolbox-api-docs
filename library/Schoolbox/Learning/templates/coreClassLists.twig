@@ -20,7 +20,8 @@ Data:
                 <li><a href="#" class="disabled">Set Goal(s)</a></li>
                 <li><a href="#" class="disabled">Add Pastoral Record</a></li>
                 {% if learningMomentsEnabled %}
-                    <li><a @click.prevent="openShareLearningMomentDialog" :class="{disabled: selectedStudentIds.length === 0}">Share Learning Moment</a></li>
+                    <li><a @click.prevent="openShareLearningMomentDialog"
+                           :class="{disabled: !isAllSelected && selectedStudentIds.length === 0}">Share Learning Moment</a></li>
                 {% endif %}
                 {% if mailEnabled %}
                     <li><a href="#" class="disabled">Email</a></li>
@@ -43,7 +44,7 @@ Data:
             {% block table_header %}
             <tr>
                 <th v-if="showCheckboxes">
-                    <input type="checkbox" id="select-all" @click="selectAllStudents" v-model="isAllSelected"/>
+                    <input type="checkbox" id="select-all" @click="selectAllStudents" :checked="isAllSelected"/>
                     <label for="select-all" class="checkbox-label"></label>
                 </th>
                 <th></th>
@@ -180,7 +181,7 @@ Data:
             hideMedicalAlerts: Boolean({{ config.protect_medicalspecial }}),
             studentLists: [],
             showSkeletonLoader: true,
-            isAllSelected: false,
+            // isAllSelected: false,
             selectedStudents: [],
             // selectedStudentIds: [],
             // selectedStudentExternalIds: [],
@@ -268,10 +269,10 @@ Data:
                 // self.updateSelectedExternalIds();
                 // self.updateSendEmailButtonState();
 
-                self.isAllSelected = isChecked;
+                // self.isAllSelected = isChecked;
 
                 // Force a reload here
-                self.$forceUpdate();
+                self.$nextTick(self.$forceUpdate);
             },
             // select: function(student, event) {
             //     console.log(arguments)
@@ -304,42 +305,6 @@ Data:
                 self.sendEmailButtonText = self.loadingText;
                 this.$refs.form.submit();
             },
-
-            // /**
-            //  * Convert selected Schoolbox IDs to external IDs
-            //  */
-            // updateSelectedExternalIds: function () {
-            //     let self = this;
-            //     self.selectedStudentExternalIds = [];
-            //     this.studentLists.forEach(function (v) {
-            //         let internalId = v.id;
-            //         if (self.selectedStudentIds.indexOf(String(internalId)) >= 0) {
-            //             self.selectedStudentExternalIds.push(v.synergy_id);
-            //         }
-            //     });
-            // },
-            // updateSelectedGroups: function(event)
-            // {
-            //     var self = this;
-            //
-            //     if (!self.groupsCheckboxElements) {
-            //         return;
-            //     }
-            //
-            //     if (event.target.checked) {
-            //         self.selectedGroups.push(event.target.value);
-            //     } else {
-            //         self.selectedGroups.splice(self.selectedGroups.indexOf(event.target.value), 1);
-            //     }
-            //
-            //     // self.updateSendEmailButtonState();
-            // },
-            // updateSendEmailButtonState: function()
-            // {
-            //     var self = this;
-            //
-            //     self.enableSendEmailButton = self.selectedStudentExternalIds.length > 0 && self.selectedGroups.length > 0;
-            // },
             openShareLearningMomentDialog: function() {
                 // Set the form's target to the selected users
                 $('#classList-shareLearningMoment-form')
@@ -383,6 +348,11 @@ Data:
                 });
                 return externalIds;
             },
+            isAllSelected: function () {
+                return this.selectedStudents.every(function (selected) {
+                    return selected;
+                });
+            },
             selectedGroups: function () {
                 let groups = [],
                     self   = this;
@@ -390,12 +360,6 @@ Data:
                     if (group.isChecked) {
                         groups.push(group.value);
                     }
-                    // if (selected) {
-                    //     let student = self.studentLists[index];
-                    //     if (student.externalId) {
-                    //         externalIds.push(student.externalId);
-                    //     }
-                    // }
                 });
                 return groups;
             },
