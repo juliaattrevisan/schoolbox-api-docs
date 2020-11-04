@@ -57,11 +57,10 @@ Data:
             </thead>
             <tbody>
                 <template v-if="studentLists.length > 0">
-                    <tr v-for="student in studentLists">
+                    <tr v-for="(student, index) in studentLists">
                         <td v-if="showCheckboxes">
-                            <input type="checkbox" name="students[]" :id="'id-' + student.id" :value="student.id"
-                                   @click="select"/>
-                            <label :for="'id-' + student.id" class="checkbox-label"></label>
+                            <input type="checkbox" name="students[]" :id="'id-' + index" @click="select(student, $event)"/>
+                            <label :for="'id-' + index" class="checkbox-label"></label>
                         </td>
                         <td>
                             <img :src="'/portrait.php?id=' + student.id + '&size=square64'"
@@ -178,8 +177,9 @@ Data:
             studentLists: [],
             showSkeletonLoader: true,
             isAllSelected: false,
-            selectedStudentIds: [],
-            selectedStudentExternalIds: [],
+            selectedStudents: [],
+            // selectedStudentIds: [],
+            // selectedStudentExternalIds: [],
             studentsCheckboxElements: undefined,
             groups: {{ emailGroups | raw }},
             groupsCheckboxElements: [],
@@ -251,29 +251,32 @@ Data:
                     }
                 });
 
-                self.updateSelectedExternalIds();
+                // self.updateSelectedExternalIds();
                 self.updateSendEmailButtonState();
 
                 self.isAllSelected = isChecked;
             },
-            select: function(event) {
+            select: function(student, event) {
+                console.log(arguments)
                 var self = this;
 
                 // If selected, add the student ids into the array. Otherwise, just remove the id
                 if (event.target.checked) {
-                    self.selectedStudentIds.push(event.target.value);
+                    self.selectedStudents.push(student);
+                    // self.selectedStudentIds.push(event.target.value);
                 } else {
-                    self.selectedStudentIds.splice(self.selectedStudentIds.indexOf(event.target.value), 1);
+                    self.selectedStudents.splice(student, self.selectedStudents.indexOf(student), 1);
+                    // self.selectedStudentIds.splice(self.selectedStudentIds.indexOf(event.target.value), 1);
                 }
 
                 // Check whether all the students are selected. If so make the select all checkbox ticked
-                if (self.selectedStudentIds.length < self.studentsCheckboxElements.length) {
-                    this.isAllSelected = false;
+                if (self.selectedStudents.length < self.studentsCheckboxElements.length) {
+                    self.isAllSelected = false;
                 } else {
                     self.isAllSelected = true;
                 }
 
-                self.updateSelectedExternalIds();
+                // self.updateSelectedExternalIds();
                 self.updateSendEmailButtonState();
             },
             sendEmail: function(event) {
@@ -336,6 +339,24 @@ Data:
             },
             showCheckboxes: function() {
                 return this.learningMomentsEnabled || this.mailEnabled;
+            },
+            selectedStudentIds: function () {
+                let ids = [];
+                this.selectedStudents.forEach(function (student) {
+                    if (student.id) {
+                        ids.push(student.id);
+                    }
+                });
+                return ids;
+            },
+            selectedStudentExternalIds: function () {
+                let externalIds = [];
+                this.selectedStudents.forEach(function (student) {
+                    if (student.externalId) {
+                        externalIds.push(student.externalId);
+                    }
+                });
+                return externalIds;
             },
         },
         filters: {
