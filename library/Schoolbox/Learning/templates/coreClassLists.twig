@@ -21,7 +21,7 @@ Data:
                 <li><a href="#" class="disabled">Add Pastoral Record</a></li>
                 {% if learningMomentsEnabled %}
                     <li><a @click.prevent="openShareLearningMomentDialog"
-                           :class="{disabled: !isAllSelected && selectedStudentIds.length === 0}">Share Learning Moment</a></li>
+                           :class="{disabled: selectedStudentIds.length === 0}">Share Learning Moment</a></li>
                 {% endif %}
                 {% if mailEnabled %}
                     <li><a href="#" class="disabled">Email</a></li>
@@ -60,7 +60,7 @@ Data:
                 <template v-if="studentLists.length > 0">
                     <tr v-for="(student, index) in studentLists">
                         <td v-if="showCheckboxes">
-                            <input type="checkbox" name="students[]" :id="'id-' + index" v-model="selectedStudents[index]" />
+                            <input type="checkbox" name="students[]" :id="'id-' + index" v-model="student.isChecked" @click="forceUpdate" />
                             <label :for="'id-' + index" class="checkbox-label"></label>
                         </td>
                         <td>
@@ -247,57 +247,25 @@ Data:
                 var self = this;
                 var isChecked = (event === undefined || event.target.checked);
 
-                self.studentLists.forEach(function (item, index) {
-                    self.selectedStudents[index] = isChecked;
+                // self.studentLists.forEach(function (item, index) {
+                //     self.selectedStudents[index] = isChecked;
+                // });
+                self.studentLists = self.studentLists.map(function (student) {
+                    student.isChecked = isChecked;
+                    return student;
                 });
 
-                // if (isChecked) {
-                //     self.selectedStudents = self.studentLists;
-                // } else {
-                //     self.selectedStudents = [];
-                // }
-
-                // self.selectedStudentIds = [];
-
-                // $.each(self.studentsCheckboxElements, function (index, element) {
-                //     element.checked = isChecked;
-                //     if (isChecked) {
-                //         self.selectedStudentIds.push(element.value);
-                //     }
-                // });
-
-                // self.updateSelectedExternalIds();
-                // self.updateSendEmailButtonState();
-
-                // self.isAllSelected = isChecked;
-
                 // Force a reload here
-                self.$nextTick(self.$forceUpdate);
+                self.forceUpdate();
             },
-            // select: function(student, event) {
-            //     console.log(arguments)
-            //     var self = this;
-            //
-            //     // If selected, add the student ids into the array. Otherwise, just remove the id
-            //     if (event.target.checked) {
-            //         self.selectedStudents.push(student);
-            //         // self.selectedStudentIds.push(event.target.value);
-            //     } else {
-            //         self.selectedStudents.splice(student, self.selectedStudents.indexOf(student), 1);
-            //         // self.selectedStudentIds.splice(self.selectedStudentIds.indexOf(event.target.value), 1);
-            //     }
-            //
-            //     // Check whether all the students are selected. If so make the select all checkbox ticked
-            //     if (self.selectedStudents.length < self.studentsCheckboxElements.length) {
-            //         self.isAllSelected = false;
-            //     } else {
-            //         self.isAllSelected = true;
-            //     }
-            //
-            //     // self.updateSelectedExternalIds();
-            //     self.updateSendEmailButtonState();
-            // },
-            sendEmail: function(event) {
+            forceUpdate: function () {
+                let self = this;
+                self.$forceUpdate();
+                // self.$nextTick(function () {
+                //     self.$forceUpdate();
+                // });
+            },
+            sendEmail: function() {
                 var self = this;
 
                 // While the system is preparing the email lists, disable the button
@@ -322,15 +290,17 @@ Data:
             showCheckboxes: function() {
                 return this.learningMomentsEnabled || this.mailEnabled;
             },
+            isAllSelected: function () {
+                return this.studentLists.every(function (student) {
+                    return student.isChecked;
+                });
+            },
             selectedStudentIds: function () {
                 let ids  = [],
                     self = this;
-                self.selectedStudents.forEach(function (selected, index) {
-                    if (selected) {
-                        let student = self.studentLists[index];
-                        if (student.id) {
-                            ids.push(student.id);
-                        }
+                self.studentLists.forEach(function (student) {
+                    if (student.isChecked && student.id) {
+                        ids.push(student.id);
                     }
                 });
                 return ids;
@@ -338,20 +308,12 @@ Data:
             selectedStudentExternalIds: function () {
                 let externalIds = [],
                     self        = this;
-                self.selectedStudents.forEach(function (selected, index) {
-                    if (selected) {
-                        let student = self.studentLists[index];
-                        if (student.synergy_id) {
-                            externalIds.push(student.synergy_id);
-                        }
+                self.studentLists.forEach(function (student) {
+                    if (student.isChecked && student.synergy_id) {
+                        externalIds.push(student.synergy_id);
                     }
                 });
                 return externalIds;
-            },
-            isAllSelected: function () {
-                return this.selectedStudents.every(function (selected) {
-                    return selected;
-                });
             },
             selectedGroups: function () {
                 let groups = [],
