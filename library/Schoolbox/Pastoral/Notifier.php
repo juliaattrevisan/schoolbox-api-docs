@@ -114,11 +114,12 @@ class Notifier extends AbstractModuleNotifier
 
         $builder = new Builder();
         $builder->setTitle("A :pastoralcare record has been {$method}")
-                ->setParam('pastoralcare', new Param("{$severity} {$type}", $href))
+                ->setParam('pastoralcare', new Param("{$severity} {$type}", $href, Param::STACKING_APPEND))
                 ->setIcon($this->getUserIcon($effector))
                 ->setHref($href)
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::ERROR)
+                ->setTimestamp($pastoral->getUpdatedAt()->getUnixTimeStamp())
                 ->addTopic("pastoral.{$pastoral->getId()}.{$method}");
 
         $message = $builder->build();
