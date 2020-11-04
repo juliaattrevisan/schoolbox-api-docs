@@ -19,6 +19,12 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 {
 
     /**
+     * This indicates the event was cancelled
+     */
+    public const STATUS_CANCELLED = 'CANCELLED';
+
+
+    /**
      * A list of luEventType records. You can assign a "colour scheme" to Vcal events
      * using the luEventType table.
      *
@@ -298,6 +304,15 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
 
         $event->setAttendance(0);
         $event->setCompleted(false);
+
+        /* Decide whether this should display with custom styles
+         *
+         * Inactive events are synonymous with "cancelled" etc. where we need to indicate
+         * this event is, for whatever reason, to be disregarded
+         */
+        if (self::STATUS_CANCELLED === (string)$currentEvent->STATUS) {
+            $event->setActive(false);
+        }
 
         /* Give the calendar_connector id so this event knows where it came from
          * This allows you to create an event detail screen in Mobile

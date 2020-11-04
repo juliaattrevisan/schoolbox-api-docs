@@ -25,12 +25,6 @@ class Vcal extends Base
 {
 
     /**
-     * This indicates the event was cancelled
-     */
-    private const STATUS_CANCELLED = 'CANCELLED';
-
-
-    /**
      * Find an event type from an array of possibilities
      * The array contains the "type" (name) values
      *
@@ -111,7 +105,7 @@ class Vcal extends Base
                 /* Skip cancelled event instances
                  * Log them to the user then carry on
                  */
-                if (self::STATUS_CANCELLED === (string)$currentEvent->STATUS) {
+                if (\Calendar_Api_EventType_Event_Vcal_Default::STATUS_CANCELLED === (string)$currentEvent->STATUS) {
                     $output[] = [
                         'name'   => \Scrub::text((string)$currentEvent->SUMMARY),
                         'status' => 'Not Added',
