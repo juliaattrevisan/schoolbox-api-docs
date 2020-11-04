@@ -44,7 +44,7 @@ Data:
             {% block table_header %}
             <tr>
                 <th v-if="showCheckboxes">
-                    <input type="checkbox" id="select-all" @click="selectAllStudents" v-model="allSelected"/>
+                    <input type="checkbox" id="select-all" v-model="allSelected"/>
                     <label for="select-all" class="checkbox-label"></label>
                 </th>
                 <th></th>
@@ -233,28 +233,6 @@ Data:
                         self.actionsPlaceholder = false; // Remove actions placeholder once everything is ready
                     }, 100);
                 });
-            },
-            selectAllStudents: function(event) {
-                var self = this;
-                var isChecked = (event === undefined || event.target.checked);
-
-                // self.studentLists.forEach(function (item, index) {
-                //     self.selectedStudents[index] = isChecked;
-                // });
-                self.studentLists = self.studentLists.map(function (student) {
-                    student.isChecked = isChecked;
-                    return student;
-                });
-
-                // Force a reload here
-                self.forceUpdate();
-            },
-            forceUpdate: function () {
-                let self = this;
-                self.$forceUpdate();
-                // self.$nextTick(function () {
-                //     self.$forceUpdate();
-                // });
             },
             sendEmail: function() {
                 var self = this;
