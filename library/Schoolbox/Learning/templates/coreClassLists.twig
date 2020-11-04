@@ -44,7 +44,7 @@ Data:
             {% block table_header %}
             <tr>
                 <th v-if="showCheckboxes">
-                    <input type="checkbox" id="select-all" @click="selectAllStudents" :checked="isAllSelected"/>
+                    <input type="checkbox" id="select-all" @click="selectAllStudents" v-model="allSelected"/>
                     <label for="select-all" class="checkbox-label"></label>
                 </th>
                 <th></th>
@@ -60,7 +60,7 @@ Data:
                 <template v-if="studentLists.length > 0">
                     <tr v-for="(student, index) in studentLists">
                         <td v-if="showCheckboxes">
-                            <input type="checkbox" name="students[]" :id="'id-' + index" v-model="student.isChecked" @click="forceUpdate" />
+                            <input type="checkbox" name="students[]" :id="'id-' + index" v-model="student.isChecked" />
                             <label :for="'id-' + index" class="checkbox-label"></label>
                         </td>
                         <td>
@@ -217,7 +217,12 @@ Data:
                 studentLists = new Promise(function (resolve) {
                     axios.get(self.getStudentListsEndpoint)
                         .then(function (response) {
-                            self.studentLists = response.data;
+                            // Set all students to checked by default
+                            self.studentLists = response.data
+                                .map(function (student) {
+                                    student.isChecked = true;
+                                    return student;
+                                });
                             resolve();
                         })
                         .catch(function (error) {
@@ -232,14 +237,6 @@ Data:
                         self.studentsCheckboxElements = document.getElementsByName('students[]');
                         self.groupsCheckboxElements = document.getElementsByName('groups[]');
                         self.actionsPlaceholder = false; // Remove actions placeholder once everything is ready
-
-                        // $.each(self.groupsCheckboxElements, function (index, element) {
-                        //     if (element.checked) {
-                        //         self.selectedGroups.push(element.value);
-                        //     }
-                        // });
-
-                        self.selectAllStudents();
                     }, 100);
                 });
             },
@@ -290,10 +287,18 @@ Data:
             showCheckboxes: function() {
                 return this.learningMomentsEnabled || this.mailEnabled;
             },
-            isAllSelected: function () {
-                return this.studentLists.every(function (student) {
-                    return student.isChecked;
-                });
+            allSelected: {
+                get: function () {
+                    return this.studentLists.every(function (student) {
+                        return student.isChecked;
+                    });
+                },
+                set: function (value) {
+                    this.studentLists = this.studentLists.map(function (student) {
+                        student.isChecked = value;
+                        return student;
+                    });
+                }
             },
             selectedStudentIds: function () {
                 let ids  = [],
