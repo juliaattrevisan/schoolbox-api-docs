@@ -120,7 +120,12 @@ Data:
             <ul class="inline-list no-margin left">
                 <template v-for="(group, index) in groups">
                     <li v-bind:class="index < 1 ? 'no-margin' : ''">
-                        <input :id="group.label" name="groups[]" type="checkbox" :value="group.value" @click="updateSelectedGroups" v-model="group.isChecked" />
+                        <input :id="group.label"
+                               name="groups[]"
+                               type="checkbox"
+                               :value="group.value"
+                               @click="updateSelectedGroups"
+                               v-model="group.isChecked" />
                         <label :for="group.label">${ group.label }</label>
                     </li>
                 </template>
@@ -128,8 +133,8 @@ Data:
             <span class="right">
                 <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent class="class-list-form">
                     <input type="hidden" name="replyto" :value="replyTo"/>
-                    <input type="hidden" id="selectedIds" name="selectedIds" v-model="selectedStudentExternalIds" />
-                    <input type="hidden" id="selectedGroups" name="selectedGroups" v-model="selectedGroups" />
+                    <input type="hidden" id="selectedIds" name="selectedIds" :value="selectedStudentExternalIds.join(',')" />
+                    <input type="hidden" id="selectedGroups" name="selectedGroups" :value="selectedGroups" />
                     <button type="submit" class="button icon-email" :disabled="! enableSendEmailButton" @click="sendEmail">${ sendEmailButtonText }</button>
                 </form>
             </span>
@@ -184,7 +189,7 @@ Data:
             groups: {{ emailGroups | raw }},
             groupsCheckboxElements: [],
             selectedGroups: [],
-            enableSendEmailButton: false,
+            // enableSendEmailButton: false,
             sendEmailButtonDefaultText: 'Email Selected',
             sendEmailButtonText: null,
             emailDelimiter: String.fromCharCode(30),
@@ -262,7 +267,7 @@ Data:
                 // });
 
                 // self.updateSelectedExternalIds();
-                self.updateSendEmailButtonState();
+                // self.updateSendEmailButtonState();
 
                 self.isAllSelected = isChecked;
             },
@@ -298,19 +303,19 @@ Data:
                 this.$refs.form.submit();
             },
 
-            /**
-             * Convert selected Schoolbox IDs to external IDs
-             */
-            updateSelectedExternalIds: function () {
-                let self = this;
-                self.selectedStudentExternalIds = [];
-                this.studentLists.forEach(function (v) {
-                    let internalId = v.id;
-                    if (self.selectedStudentIds.indexOf(String(internalId)) >= 0) {
-                        self.selectedStudentExternalIds.push(v.synergy_id);
-                    }
-                });
-            },
+            // /**
+            //  * Convert selected Schoolbox IDs to external IDs
+            //  */
+            // updateSelectedExternalIds: function () {
+            //     let self = this;
+            //     self.selectedStudentExternalIds = [];
+            //     this.studentLists.forEach(function (v) {
+            //         let internalId = v.id;
+            //         if (self.selectedStudentIds.indexOf(String(internalId)) >= 0) {
+            //             self.selectedStudentExternalIds.push(v.synergy_id);
+            //         }
+            //     });
+            // },
             updateSelectedGroups: function(event)
             {
                 var self = this;
@@ -325,14 +330,14 @@ Data:
                     self.selectedGroups.splice(self.selectedGroups.indexOf(event.target.value), 1);
                 }
 
-                self.updateSendEmailButtonState();
+                // self.updateSendEmailButtonState();
             },
-            updateSendEmailButtonState: function()
-            {
-                var self = this;
-
-                self.enableSendEmailButton = self.selectedStudentExternalIds.length > 0 && self.selectedGroups.length > 0;
-            },
+            // updateSendEmailButtonState: function()
+            // {
+            //     var self = this;
+            //
+            //     self.enableSendEmailButton = self.selectedStudentExternalIds.length > 0 && self.selectedGroups.length > 0;
+            // },
             openShareLearningMomentDialog: function() {
                 // Set the form's target to the selected users
                 $('#classList-shareLearningMoment-form')
@@ -375,6 +380,9 @@ Data:
                     }
                 });
                 return externalIds;
+            },
+            enableSendEmailButton: function () {
+                return this.selectedStudentExternalIds.length > 0 && this.selectedGroups.length > 0;
             },
         },
         filters: {
