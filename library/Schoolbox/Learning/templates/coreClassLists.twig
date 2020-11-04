@@ -59,7 +59,7 @@ Data:
                 <template v-if="studentLists.length > 0">
                     <tr v-for="(student, index) in studentLists">
                         <td v-if="showCheckboxes">
-                            <input type="checkbox" name="students[]" :id="'id-' + index" @click="select(student, $event)"/>
+                            <input type="checkbox" name="students[]" :id="'id-' + index" v-model="selectedStudents[index]" />
                             <label :for="'id-' + index" class="checkbox-label"></label>
                         </td>
                         <td>
@@ -242,43 +242,53 @@ Data:
                 var self = this;
                 var isChecked = (event === undefined || event.target.checked);
 
-                self.selectedStudentIds = [];
-
-                $.each(self.studentsCheckboxElements, function (index, element) {
-                    element.checked = isChecked;
-                    if (isChecked) {
-                        self.selectedStudentIds.push(element.value);
-                    }
+                self.studentLists.forEach(function (item, index) {
+                    self.selectedStudents[index] = isChecked;
                 });
+
+                // if (isChecked) {
+                //     self.selectedStudents = self.studentLists;
+                // } else {
+                //     self.selectedStudents = [];
+                // }
+
+                // self.selectedStudentIds = [];
+
+                // $.each(self.studentsCheckboxElements, function (index, element) {
+                //     element.checked = isChecked;
+                //     if (isChecked) {
+                //         self.selectedStudentIds.push(element.value);
+                //     }
+                // });
 
                 // self.updateSelectedExternalIds();
                 self.updateSendEmailButtonState();
 
                 self.isAllSelected = isChecked;
             },
-            select: function(student, event) {
-                console.log(arguments)
-                var self = this;
-
-                // If selected, add the student ids into the array. Otherwise, just remove the id
-                if (event.target.checked) {
-                    self.selectedStudents.push(student);
-                    // self.selectedStudentIds.push(event.target.value);
-                } else {
-                    self.selectedStudents.splice(student, self.selectedStudents.indexOf(student), 1);
-                    // self.selectedStudentIds.splice(self.selectedStudentIds.indexOf(event.target.value), 1);
-                }
-
-                // Check whether all the students are selected. If so make the select all checkbox ticked
-                if (self.selectedStudents.length < self.studentsCheckboxElements.length) {
-                    self.isAllSelected = false;
-                } else {
-                    self.isAllSelected = true;
-                }
-
-                // self.updateSelectedExternalIds();
-                self.updateSendEmailButtonState();
-            },
+            // select: function(student, event) {
+            //     console.log(arguments)
+            //     var self = this;
+            //
+            //     // If selected, add the student ids into the array. Otherwise, just remove the id
+            //     if (event.target.checked) {
+            //         self.selectedStudents.push(student);
+            //         // self.selectedStudentIds.push(event.target.value);
+            //     } else {
+            //         self.selectedStudents.splice(student, self.selectedStudents.indexOf(student), 1);
+            //         // self.selectedStudentIds.splice(self.selectedStudentIds.indexOf(event.target.value), 1);
+            //     }
+            //
+            //     // Check whether all the students are selected. If so make the select all checkbox ticked
+            //     if (self.selectedStudents.length < self.studentsCheckboxElements.length) {
+            //         self.isAllSelected = false;
+            //     } else {
+            //         self.isAllSelected = true;
+            //     }
+            //
+            //     // self.updateSelectedExternalIds();
+            //     self.updateSendEmailButtonState();
+            // },
             sendEmail: function(event) {
                 var self = this;
 
@@ -341,8 +351,10 @@ Data:
                 return this.learningMomentsEnabled || this.mailEnabled;
             },
             selectedStudentIds: function () {
-                let ids = [];
-                this.selectedStudents.forEach(function (student) {
+                let ids  = [],
+                    self = this;
+                self.selectedStudents.forEach(function (item, index) {
+                    let student = self.studentLists[index];
                     if (student.id) {
                         ids.push(student.id);
                     }
@@ -350,8 +362,10 @@ Data:
                 return ids;
             },
             selectedStudentExternalIds: function () {
-                let externalIds = [];
-                this.selectedStudents.forEach(function (student) {
+                let externalIds = [],
+                    self        = this;
+                self.selectedStudents.forEach(function (item, index) {
+                    let student = self.studentLists[index];
                     if (student.externalId) {
                         externalIds.push(student.externalId);
                     }
