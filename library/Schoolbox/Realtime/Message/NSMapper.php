@@ -38,6 +38,7 @@ class NSMapper extends Mapper {
     const NS_TIMETABLE               = 'timetable';
     const NS_UPS                     = 'ups';
     const NS_NEWS_DISCUSSION_COMMENT = 'news_discussion_comment';
+    const NS_LEARNING_MOMENT         = 'learning_moment';
 
 
     protected function mapping() {

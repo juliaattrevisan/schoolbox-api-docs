@@ -1,0 +1,235 @@
+<?php
+/**
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+declare(strict_types=1);
+
+namespace Schoolbox\Learning\Moment\Evidence;
+
+use Alaress\Async\Notification\Parameter\Param;
+use Schoolbox\Learning\Moment\Evidence\Model as Evidence;
+use Alaress\Async\Notification\Instance\Builder;
+use Aura\Di\ContainerInterface;
+use Aura\Di\Exception\ServiceNotFound;
+use Monolog\Logger;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\MapperFactory;
+use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
+use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
+use Schoolbox\Role;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+
+/**
+ * @method Evidence buildPrevious($current, ?array $diff, int $previousKey = 1)
+ */
+class Notifier extends AbstractModuleNotifier
+{
+    public const TRIGGER_POSTED = 'posted';
+
+    private const PATTERN_STAFF_POSTED_TITLE   = ':teacher posted :evidence for :student';
+    private const PATTERN_STUDENT_POSTED_TITLE = ':student has posted :evidence';
+    private const PATTERN_EVIDENCE_HREF        = '/learning/evidence/%d';
+
+    /** @var UserMapper */
+    private $userMapper;
+
+    /**
+     * @inheritdoc
+     *
+     * @throws ServiceNotFound
+     */
+    public static function getSetters(ContainerInterface $di): array
+    {
+        /** @var MapperFactory $mf */
+        $mf = $di->get('mapperFactory');
+
+        return [
+            'setMapper'     => $mf->getLazy(Mapper::class),
+            'setUserMapper' => $mf->getLazy(UserMapper::class),
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function __construct($configLoader)
+    {
+        parent::__construct($configLoader);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getSlug(): string
+    {
+        return NSMapper::NS_LEARNING_MOMENT;
+    }
+
+    /**
+     * Setter for UserMapper
+     * @param UserMapper $userMapper
+     */
+    public function setUserMapper(UserMapper $userMapper)
+    {
+        $this->userMapper = $userMapper;
+    }
+
+    /**
+     * Attaches and detaches triggers properly depending on the Evidence status and transition
+     *
+     * @param TriggerBundleInterface $bundle
+     * @return void
+     */
+    public function bundleTriggers($bundle): void
+    {
+        $crudMethod = $bundle->getMethod();
+
+        /**
+         * Deleted
+         */
+        if ($crudMethod === \Schoolbox\Mapper::METHOD_DELETE) {
+            // Evidence deleted; revoke that bad boy
+            $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
+            $bundle->detach(self::TRIGGER_POSTED);
+            return;
+        }
+
+        /**
+         * Created
+         */
+        if ($crudMethod === \Schoolbox\Mapper::METHOD_CREATE) {
+            // Evidence deleted; revoke that bad boy
+            $bundle->attach(self::TRIGGER_POSTED, self::IMMEDIATELY);
+        }
+    }
+
+    /**
+     * Retracts a deleted Evidence.
+     *
+     * @param Evidence $Evidence
+     * @return Envelope
+     */
+    public function notifySystemDeleted(Evidence $Evidence): Envelope
+    {
+        $envelope = new Envelope();
+        return $this->retractPosted($envelope, $Evidence);
+    }
+
+    /**
+     * Retracts a given Evidence.
+     *
+     * @param Envelope $envelope
+     * @param Evidence $Evidence
+     * @return Envelope
+     */
+    private function retractPosted(Envelope $envelope, Evidence $Evidence): Envelope
+    {
+        return $this->retractEventObject($envelope, $Evidence);
+    }
+
+    /**
+     * Notify relevant users in given role type that an evidence has been posted
+     *
+     * @param string     $roleType
+     * @param Evidence   $model
+     * @param User       $effector
+     * @param array|null $diff
+     * @return Envelope
+     */
+    private function notifyPosted(string $roleType, Evidence $model, User $effector, ?array $diff): Envelope
+    {
+        $envelope = new Envelope();
+
+        try {
+            /** @var Evidence $evidence */
+            $evidence = $this->mapper->findById($model->getId());
+            $effector = $this->userMapper->findById($effector->getId());
+        } catch (MapperException $e) {
+            return $envelope;
+        }
+
+
+        $student      = $evidence->getRecipient();
+        $evidenceHref = sprintf(self::PATTERN_EVIDENCE_HREF, $evidence->getId());
+
+        $bob = new Builder();
+        $bob->setIcon($this->getUserIcon($effector))
+            ->setHref($evidenceHref)
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::INFO)
+            ->addTopic("{$this->getSlug()}.{$evidence->getId()}." . self::TRIGGER_POSTED)
+            ->setTimestamp($evidence->getCreatedAt()->getUnixTimeStamp())
+            ->addFilter('roleType', [$roleType]);
+
+        // a teacher posts for a student - to the student, the teachers of the student and parents of the student
+        if ($effector->getRole()->isStaff()) {
+            $bob->setTitle(self::PATTERN_STAFF_POSTED_TITLE)
+                ->setParams([
+                    'teacher'  => new UserParam($effector),
+                    'student'  => new UserParam($student),
+                    'evidence' => new Param('a new learning moment', $evidenceHref, Param::STACKING_REPLACE_NO_DECORATION),
+                ]);
+
+        } // a student posts - to the parent and teachers of the student
+        elseif ($effector->getRole()->isStudent() && $student->getId() === $effector->getId()) {
+            $bob->setTitle(self::PATTERN_STUDENT_POSTED_TITLE)
+                ->setParams([
+                    'student'  => new UserParam($effector),
+                    'evidence' => new Param('a new learning moment', $evidenceHref, Param::STACKING_REPLACE_NO_DECORATION),
+                ]);
+        }
+        $instance = $bob->build();
+        $envelope->targetToParent($student->getId(), $instance);
+        $envelope->targetToUser($evidence->getRecipient(), $instance);
+
+        $student->loadTeachers();
+        foreach ($student->getTeacherCollection() as $teacher) {
+            $envelope->targetToUser($teacher, $instance);
+        }
+        return $envelope;
+    }
+
+    /**
+     * Notify students that evidence has been posted.
+     *
+     * @param Evidence   $evidence
+     * @param User       $user
+     * @param array|null $diff
+     * @return Envelope
+     */
+    public function notifyStudentPosted(Evidence $evidence, User $user, ?array $diff): Envelope
+    {
+        return $this->notifyPosted(Role::STUDENT, $evidence, $user, $diff);
+    }
+
+    /**
+     * Notify staff that evidence has been posted.
+     *
+     * @param Evidence   $evidence
+     * @param User       $user
+     * @param array|null $diff
+     * @return Envelope
+     */
+    public function notifyStaffPosted(Evidence $evidence, User $user, ?array $diff): Envelope
+    {
+        return $this->notifyPosted(Role::STAFF, $evidence, $user, $diff);
+    }
+
+    /**
+     * Notify parents that evidence has been posted.
+     *
+     * @param Evidence   $evidence
+     * @param User       $user
+     * @param array|null $diff
+     * @return Envelope
+     */
+    public function notifyParentPosted(Evidence $evidence, User $user, ?array $diff): Envelope
+    {
+        return $this->notifyPosted(Role::PARENT, $evidence, $user, $diff);
+    }
+}
