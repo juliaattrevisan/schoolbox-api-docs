@@ -111,25 +111,25 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Retracts a deleted Evidence.
      *
-     * @param Evidence $Evidence
+     * @param Evidence $evidence
      * @return Envelope
      */
-    public function notifySystemDeleted(Evidence $Evidence): Envelope
+    public function notifySystemDeleted(Evidence $evidence): Envelope
     {
         $envelope = new Envelope();
-        return $this->retractPosted($envelope, $Evidence);
+        return $this->retractPosted($envelope, $evidence);
     }
 
     /**
      * Retracts a given Evidence.
      *
      * @param Envelope $envelope
-     * @param Evidence $Evidence
+     * @param Evidence $evidence
      * @return Envelope
      */
-    private function retractPosted(Envelope $envelope, Evidence $Evidence): Envelope
+    private function retractPosted(Envelope $envelope, Evidence $evidence): Envelope
     {
-        return $this->retractEventObject($envelope, $Evidence);
+        return $this->retractEventObject($envelope, $evidence);
     }
 
     /**
@@ -152,7 +152,6 @@ class Notifier extends AbstractModuleNotifier
         } catch (MapperException $e) {
             return $envelope;
         }
-
 
         $student      = $evidence->getRecipient();
         $evidenceHref = sprintf(self::PATTERN_EVIDENCE_HREF, $evidence->getId());
