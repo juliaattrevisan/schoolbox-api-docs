@@ -20,14 +20,30 @@
 {# Should a student see their own contact details? I think so #}
 {% set showContacts = (isStaff or isParentOfStudent) and not hideContacts %}
 {% set showContactsAlert = config.synergetic_community_alerts and showContacts and isStaff %}
+
+{# Emergency Contact Information, due to non-normalisation, must be manually inspected
+ # for contents in three possible places; name, phone, phone alt. Information can exist
+ # in any one, or more, of those fields per emergency contact
+ #
+ # Using a defined() check isn't enough. It needs to contain useful information.
+ # Therefore check for string length in each of name, phone, phone alt to decide
+ #
+ # tbh I think that you need both a name and at least one phone number for this section
+ # to be even remotely useful, but anyway I'll go with what was previously here...
+#}
+{% set hasEmergencyContacts = false %}
+{% for i in 1..3 %}
+    {% set index = (i == 1 ? '' : i) %}
+
+    {% if (externalUser["StudentEmergency#{index}Name"] is defined and externalUser["StudentEmergency#{index}Name"]|length) %}
+        {% set hasEmergencyContacts = true %}
+    {% endif %}
+{% endfor %}
+
 {% set showEmergencyContacts =
     (isPrimaryCarer or isStaff)
     and not hideContacts
-    and (
-        externalUser.StudentEmergencyName is defined
-        or externalUser.StudentEmergency2Name is defined
-        or externalUser.StudentEmergency3Name is defined
-    )
+    and hasEmergencyContacts
 %}
 {% set showContactsTab =
     (showContacts and contacts|length > 0)
