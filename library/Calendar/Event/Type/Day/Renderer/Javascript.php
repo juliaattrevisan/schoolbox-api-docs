@@ -93,7 +93,7 @@ class Javascript extends Base
                     'path'     => $this->getEvent()->getPath(),
                 ],
                 'styles'     => [
-                    'visible' => $cssClass,
+                    'visible' => $this->getEvent()->getActive() ? $cssClass : 'strike',
                 ],
                 'attendance' => $this->renderEventAttendance(),
             ],

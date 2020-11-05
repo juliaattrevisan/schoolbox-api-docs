@@ -246,4 +246,17 @@ interface EventInterface
      * @return $this
      */
     public function setMaxAttendees(?int $maxAttendees): EventInterface;
+
+
+    /**
+     * @return bool
+     */
+    public function getActive(): bool;
+
+
+    /**
+     * @param bool $active
+     * @return $this
+     */
+    public function setActive(bool $active): EventInterface;
 }

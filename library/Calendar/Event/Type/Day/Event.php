@@ -115,6 +115,7 @@ class Event extends EventBase
      */
     protected $attendanceStatus;
 
+
     /**
      * Can someone attend this event
      *
@@ -400,6 +401,7 @@ class Event extends EventBase
         $this->maxAttendees = $maxAttendees;
         return $this;
     }
+
 
     /**
      * @return string[]

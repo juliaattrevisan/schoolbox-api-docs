@@ -12,7 +12,6 @@
 namespace Calendar\Event\Type;
 
 use Alaress_Date_Format;
-use Calendar\Event\Type\External\Event;
 use Schoolbox\Calendar\Event as EventModel;
 
 abstract class EventBase implements EventInterface
@@ -149,6 +148,16 @@ abstract class EventBase implements EventInterface
      * @var string
      */
     protected $location = '';
+
+
+    /**
+     * Whether this event is active. Inactive events are ones that are "Cancelled" etc.
+     * By default all new Event instances are considered active unless otherwise stated
+     *
+     * @var bool
+     */
+    protected $active = true;
+
 
     /**
      * Find out if the currently logged in user is the owner (creator)
@@ -706,6 +715,26 @@ abstract class EventBase implements EventInterface
      */
     public function setMaxAttendees(?int $maxAttendees): EventInterface
     {
+        return $this;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function getActive(): bool
+    {
+        return $this->active;
+    }
+
+
+    /**
+     * @param bool $active
+     * @return $this
+     */
+    public function setActive(bool $active): EventInterface
+    {
+        $this->active = $active;
         return $this;
     }
 }

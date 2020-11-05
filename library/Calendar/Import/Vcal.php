@@ -95,94 +95,111 @@ class Vcal extends Base
             $allEvents = $allEvents->expand(new \DateTime($now->getDatabaseDate()), new \DateTime($later->getDatabaseDate()));
 
             foreach ($allEvents->getComponents() as $currentEvent) {
-                if ($currentEvent instanceof VEvent) {
 
-                    /* Set up some aliases
-                     */
-                    $eventStartTimestamp = strtotime((string)$currentEvent->DTSTART);
-                    $eventEndTimestamp = strtotime((string)$currentEvent->DTEND);
+                /* Skip non-VEvent instances
+                 */
+                if (!$currentEvent instanceof VEvent) {
+                    continue;
+                }
 
-                    /* Start datetime occurs after finish datetime
-                     */
-                    if ($eventStartTimestamp > $eventEndTimestamp) {
-                        $output[] = array(
-                            'name'   => \Scrub::text((string)$currentEvent->SUMMARY),
-                            'status' => 'Not Added',
-                            'error'  => 'Invalid date and/or times',
-                        );
+                /* Skip cancelled event instances
+                 * Log them to the user then carry on
+                 */
+                if (\Calendar_Api_EventType_Event_Vcal_Default::STATUS_CANCELLED === (string)$currentEvent->STATUS) {
+                    $output[] = [
+                        'name'   => \Scrub::text((string)$currentEvent->SUMMARY),
+                        'status' => 'Not Added',
+                        'error'  => 'Event was cancelled',
+                    ];
 
-                        continue;
-                    }
+                    continue;
+                }
 
-                    // According to VCAL standard: end of all day event is 12am next day
-                    $allDay = !$currentEvent->DTSTART->hasTime();
+                /* Set up some aliases
+                 */
+                $eventStartTimestamp = strtotime((string)$currentEvent->DTSTART);
+                $eventEndTimestamp = strtotime((string)$currentEvent->DTEND);
 
-                    if ($allDay) {
-                        --$eventEndTimestamp;
-                    }
+                /* Start datetime occurs after finish datetime
+                 */
+                if ($eventStartTimestamp > $eventEndTimestamp) {
+                    $output[] = array(
+                        'name'   => \Scrub::text((string)$currentEvent->SUMMARY),
+                        'status' => 'Not Added',
+                        'error'  => 'Invalid date and/or times',
+                    );
 
-                    /* Determine some metadata about the event
-                     */
-                    // Get category list for this event.
-                    // If this event has a category which matches
-                    // any event type, then apply that event type's
-                    // color instead of the configured one.
-                    $categoryList = explode(';', (string)$currentEvent->CATEGORIES);
+                    continue;
+                }
 
-                    /* Put it all together
-                     */
-                    $event = new Event();
-                    $event->setOwner($this->getUser());
-                    $event->setAuthor($this->getAuthor());
-                    $event->setStartDateTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
-                    $event->setEndDateTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
-                    $event->setTitle((string)$currentEvent->SUMMARY);
-                    $event->setAccess($this->getAccess());
-                    $event->setType($this->findEventTypeFromArray($categoryList));
-                    $event->setCampusCollection($allCampuses);
-                    $event->setDetail(nl2br((string)$currentEvent->DESCRIPTION));
-                    $event->setLocation((string)$currentEvent->LOCATION);
-                    $event->setAllDay($allDay);
-                    $event->setAttendance(0);
-                    $event->setCompleted(0);
+                // According to VCAL standard: end of all day event is 12am next day
+                $allDay = !$currentEvent->DTSTART->hasTime();
 
-                    /* Save it
-                     */
-                    $result = $eventMapper->save($event);
+                if ($allDay) {
+                    --$eventEndTimestamp;
+                }
 
-                    /* Assign Category relations
-                     */
-                    foreach ($this->getCategoryList() as $currentCategory) {
-                        $category = new Category();
-                        $category->setEventId($event->getId());
-                        $category->setCategoryId($currentCategory);
-                        $categoryRelationMapper->save($category);
-                    }
+                /* Determine some metadata about the event
+                 */
+                // Get category list for this event.
+                // If this event has a category which matches
+                // any event type, then apply that event type's
+                // color instead of the configured one.
+                $categoryList = explode(';', (string)$currentEvent->CATEGORIES);
 
-                    /* Assign Role relations
-                     */
-                    foreach ($this->getGroupList() as $currentRole) {
-                        $role = new Role();
-                        $role->setEventId($event->getId());
-                        $role->setRoleId($currentRole);
-                        $roleRelationMapper->save($role);
-                    }
+                /* Put it all together
+                 */
+                $event = new Event();
+                $event->setOwner($this->getUser());
+                $event->setAuthor($this->getAuthor());
+                $event->setStartDateTime(new Alaress_Date_Format($eventStartTimestamp, 'U'));
+                $event->setEndDateTime(new Alaress_Date_Format($eventEndTimestamp, 'U'));
+                $event->setTitle((string)$currentEvent->SUMMARY);
+                $event->setAccess($this->getAccess());
+                $event->setType($this->findEventTypeFromArray($categoryList));
+                $event->setCampusCollection($allCampuses);
+                $event->setDetail(nl2br((string)$currentEvent->DESCRIPTION));
+                $event->setLocation((string)$currentEvent->LOCATION);
+                $event->setAllDay($allDay);
+                $event->setAttendance(0);
+                $event->setCompleted(0);
 
-                    /* Output messages
-                     */
-                    if (\is_array($result) && \count($result)) {
-                        $output[] = array(
-                            'name'   => $event->getTitle(),
-                            'status' => 'Added',
-                            'error'  => 'OK',
-                        );
-                    } else {
-                        $output[] = array(
-                            'name'   => $event->getTitle(),
-                            'status' => 'Not Added',
-                            'error'  => 'Could not create event',
-                        );
-                    }
+                /* Save it
+                 */
+                $result = $eventMapper->save($event);
+
+                /* Assign Category relations
+                 */
+                foreach ($this->getCategoryList() as $currentCategory) {
+                    $category = new Category();
+                    $category->setEventId($event->getId());
+                    $category->setCategoryId($currentCategory);
+                    $categoryRelationMapper->save($category);
+                }
+
+                /* Assign Role relations
+                 */
+                foreach ($this->getGroupList() as $currentRole) {
+                    $role = new Role();
+                    $role->setEventId($event->getId());
+                    $role->setRoleId($currentRole);
+                    $roleRelationMapper->save($role);
+                }
+
+                /* Output messages
+                 */
+                if (\is_array($result) && \count($result)) {
+                    $output[] = array(
+                        'name'   => $event->getTitle(),
+                        'status' => 'Added',
+                        'error'  => 'OK',
+                    );
+                } else {
+                    $output[] = array(
+                        'name'   => $event->getTitle(),
+                        'status' => 'Not Added',
+                        'error'  => 'Could not create event',
+                    );
                 }
             }
         }

@@ -130,6 +130,7 @@ class Renderer
     public function renderEvent($event, $format, ?string $returnStr = null, ?string $baseUrl = null)
     {
         $rendererClass = $event->getRendererClass($format);
+
         /** @var RendererInterface $renderObj */
         $renderObj = new $rendererClass(
             $this->authorizer,
