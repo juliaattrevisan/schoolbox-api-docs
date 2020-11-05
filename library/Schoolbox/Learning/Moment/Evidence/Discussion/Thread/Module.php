@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Moment\Evidence\Discussion\Thread;
 use Alaress\Authorizer as Auth;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Learning\Moment\Evidence;
@@ -94,7 +93,7 @@ class Module extends Thread\Module
      */
     protected function buildCommentModelDecoratorFactory(): Comment\ModelDecorator\IFactory
     {
-        return new News\Discussion\Comment\ModelDecorator\Factory();
+        return new Evidence\Discussion\Comment\ModelDecorator\Factory();
     }
 
 
