@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -38,7 +38,7 @@ class NSMapper extends Mapper {
     const NS_TIMETABLE               = 'timetable';
     const NS_UPS                     = 'ups';
     const NS_NEWS_DISCUSSION_COMMENT = 'news_discussion_comment';
-    const NS_LEARNING_MOMENT         = 'learning_moment';
+    const NS_EVIDENCE                = 'evidence';
 
 
     protected function mapping() {

@@ -34,6 +34,7 @@ class Notifier extends AbstractModuleNotifier
 
     private const PATTERN_STAFF_POSTED_TITLE   = ':teacher posted :evidence for :student';
     private const PATTERN_STUDENT_POSTED_TITLE = ':student has posted :evidence';
+
     private const PATTERN_EVIDENCE_HREF        = '/learning/evidence/%d';
 
     /** @var UserMapper */
@@ -68,7 +69,7 @@ class Notifier extends AbstractModuleNotifier
      */
     protected function getSlug(): string
     {
-        return NSMapper::NS_LEARNING_MOMENT;
+        return NSMapper::NS_EVIDENCE;
     }
 
     /**
