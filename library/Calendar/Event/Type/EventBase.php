@@ -732,7 +732,7 @@ abstract class EventBase implements EventInterface
      * @param bool $active
      * @return $this
      */
-    public function setActive(bool $active): self
+    public function setActive(bool $active): EventInterface
     {
         $this->active = $active;
         return $this;
