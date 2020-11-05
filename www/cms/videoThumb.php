@@ -96,5 +96,5 @@ if (isset($type, $id)) {
 }
 
 // Fallthrough for if something went wrong
-$kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
-SitePage::redirectToBrokenImageOfSize(64, 64, 500);
+SitePage::localRedir("/images/core/video-error.png");
+exit;
