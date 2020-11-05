@@ -1,10 +1,11 @@
 {#
 Data:
-    folder            object    The folder object
-    specialNeeds      string    A localised label for Special Needs
-    replyTo           string    Current user's email address
-    mailEnabled       bool      Config for whether mail is enabled
-    emailGroups       array     Data for mail group checkboxes
+    folder                 object    The folder object
+    specialNeeds           string    A localised label for Special Needs
+    replyTo                string    Current user's email address
+    mailEnabled            bool      Config for whether mail is enabled
+    learningMomentsEnabled bool      Config for whether learning moment creation is enabled
+    emailGroups            array     Data for mail group checkboxes
 #}
 
 {% include '@learning/component/classLists/breadcrumbs.twig' %}
@@ -18,10 +19,13 @@ Data:
                 <li><a href="#" class="disabled">Award Achievement</a></li>
                 <li><a href="#" class="disabled">Set Goal(s)</a></li>
                 <li><a href="#" class="disabled">Add Pastoral Record</a></li>
-                {% if config.learning_moments_enabled %}
-                    <li><a @click.prevent="openShareLearningMomentDialog" :class="{disabled: selectedStudentIds.length === 0}">Share Learning Moment</a></li>
+                {% if learningMomentsEnabled %}
+                    <li><a @click.prevent="openShareLearningMomentDialog"
+                           :class="{disabled: selectedStudentIds.length === 0}">Share Learning Moment</a></li>
                 {% endif %}
-                <li><a href="#" class="disabled">Email</a></li>
+                {% if mailEnabled %}
+                    <li><a href="#" class="disabled">Email</a></li>
+                {% endif %}
             </ul>
 
         <template v-if="showSkeletonLoader" v-for="n in 3">
@@ -35,12 +39,12 @@ Data:
         </template>
         {% endblock %}
 
-        <table id="contact-table" v-if="! showSkeletonLoader && studentLists.length">
+        <table id="contact-table" v-if="!showSkeletonLoader && studentLists.length">
             <thead>
             {% block table_header %}
             <tr>
-                <th v-if="mailEnabled">
-                    <input type="checkbox" id="select-all" @click="selectAllStudents" v-model="isAllSelected"/>
+                <th v-if="showCheckboxes">
+                    <input type="checkbox" id="select-all" v-model="allSelected"/>
                     <label for="select-all" class="checkbox-label"></label>
                 </th>
                 <th></th>
@@ -54,11 +58,10 @@ Data:
             </thead>
             <tbody>
                 <template v-if="studentLists.length > 0">
-                    <tr v-for="student in studentLists">
-                        <td v-if="mailEnabled">
-                            <input type="checkbox" name="students[]" :id="'id-' + student.id" :value="student.id"
-                                   @click="select"/>
-                            <label :for="'id-' + student.id" class="checkbox-label"></label>
+                    <tr v-for="(student, index) in studentLists">
+                        <td v-if="showCheckboxes">
+                            <input type="checkbox" name="students[]" :id="'id-' + index" v-model="student.isChecked" />
+                            <label :for="'id-' + index" class="checkbox-label"></label>
                         </td>
                         <td>
                             <img :src="'/portrait.php?id=' + student.id + '&size=square64'"
@@ -118,7 +121,11 @@ Data:
             <ul class="inline-list no-margin left">
                 <template v-for="(group, index) in groups">
                     <li v-bind:class="index < 1 ? 'no-margin' : ''">
-                        <input :id="group.label" name="groups[]" type="checkbox" :value="group.value" @click="updateSelectedGroups" v-model="group.isChecked" />
+                        <input :id="group.label"
+                               name="groups[]"
+                               type="checkbox"
+                               :value="group.value"
+                               v-model="group.isChecked" />
                         <label :for="group.label">${ group.label }</label>
                     </li>
                 </template>
@@ -126,8 +133,8 @@ Data:
             <span class="right">
                 <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent class="class-list-form">
                     <input type="hidden" name="replyto" :value="replyTo"/>
-                    <input type="hidden" id="selectedIds" name="selectedIds" v-model="selectedStudentExternalIds" />
-                    <input type="hidden" id="selectedGroups" name="selectedGroups" v-model="selectedGroups" />
+                    <input type="hidden" id="selectedIds" name="selectedIds" :value="selectedStudentExternalIds.join(',')" />
+                    <input type="hidden" id="selectedGroups" name="selectedGroups" :value="selectedGroups.join(',')" />
                     <button type="submit" class="button icon-email" :disabled="! enableSendEmailButton" @click="sendEmail">${ sendEmailButtonText }</button>
                 </form>
             </span>
@@ -169,21 +176,17 @@ Data:
             classCode: '{{ folder.codeString }}',
             replyToEmail: '{{ replyTo }}',
             mailEnabled: Boolean({{ mailEnabled }}),
+            learningMomentsEnabled: Boolean({{ learningMomentsEnabled }}),
             specialNeeds: '{{ specialNeeds }}',
             hideMedicalAlerts: Boolean({{ config.protect_medicalspecial }}),
             studentLists: [],
             showSkeletonLoader: true,
-            isAllSelected: false,
-            selectedStudentIds: [],
-            selectedStudentExternalIds: [],
+            selectedStudents: [],
             studentsCheckboxElements: undefined,
             groups: {{ emailGroups | raw }},
             groupsCheckboxElements: [],
-            selectedGroups: [],
-            enableSendEmailButton: false,
             sendEmailButtonDefaultText: 'Email Selected',
             sendEmailButtonText: null,
-            emailDelimiter: String.fromCharCode(30),
             getStudentListsEndpoint: '{{ routeLookup('learning.getStudentListByClassId', {folderId: folder.getId, folder: folder}) }}',
             formIsReady: false,
             actionsPlaceholder: true,
@@ -208,7 +211,12 @@ Data:
                 studentLists = new Promise(function (resolve) {
                     axios.get(self.getStudentListsEndpoint)
                         .then(function (response) {
-                            self.studentLists = response.data;
+                            // Set all students to checked by default
+                            self.studentLists = response.data
+                                .map(function (student) {
+                                    student.isChecked = true;
+                                    return student;
+                                });
                             resolve();
                         })
                         .catch(function (error) {
@@ -223,98 +231,16 @@ Data:
                         self.studentsCheckboxElements = document.getElementsByName('students[]');
                         self.groupsCheckboxElements = document.getElementsByName('groups[]');
                         self.actionsPlaceholder = false; // Remove actions placeholder once everything is ready
-
-                        $.each(self.groupsCheckboxElements, function (index, element) {
-                            if (element.checked) {
-                                self.selectedGroups.push(element.value);
-                            }
-                        });
-
-                        self.selectAllStudents();
                     }, 100);
                 });
             },
-            selectAllStudents: function(event) {
-                var self = this;
-                var isChecked = (event === undefined || event.target.checked);
-
-                self.selectedStudentIds = [];
-
-                $.each(self.studentsCheckboxElements, function (index, element) {
-                    element.checked = isChecked;
-                    if (isChecked) {
-                        self.selectedStudentIds.push(element.value);
-                    }
-                });
-
-                self.updateSelectedExternalIds();
-                self.updateSendEmailButtonState();
-
-                self.isAllSelected = isChecked;
-            },
-            select: function(event) {
-                var self = this;
-
-                // If selected, add the student ids into the array. Otherwise, just remove the id
-                if (event.target.checked) {
-                    self.selectedStudentIds.push(event.target.value);
-                } else {
-                    self.selectedStudentIds.splice(self.selectedStudentIds.indexOf(event.target.value), 1);
-                }
-
-                // Check whether all the students are selected. If so make the select all checkbox ticked
-                if (self.selectedStudentIds.length < self.studentsCheckboxElements.length) {
-                    this.isAllSelected = false;
-                } else {
-                    self.isAllSelected = true;
-                }
-
-                self.updateSelectedExternalIds();
-                self.updateSendEmailButtonState();
-            },
-            sendEmail: function(event) {
+            sendEmail: function() {
                 var self = this;
 
                 // While the system is preparing the email lists, disable the button
                 self.enableSendEmailButton = false;
                 self.sendEmailButtonText = self.loadingText;
                 this.$refs.form.submit();
-            },
-
-            /**
-             * Convert selected Schoolbox IDs to external IDs
-             */
-            updateSelectedExternalIds: function () {
-                let self = this;
-                self.selectedStudentExternalIds = [];
-                this.studentLists.forEach(function (v) {
-                    let internalId = v.id;
-                    if (self.selectedStudentIds.indexOf(String(internalId)) >= 0) {
-                        self.selectedStudentExternalIds.push(v.synergy_id);
-                    }
-                });
-            },
-            updateSelectedGroups: function(event)
-            {
-                var self = this;
-
-                if (!self.groupsCheckboxElements) {
-                    return;
-                }
-
-                if (event.target.checked) {
-                    self.selectedGroups.push(event.target.value);
-                } else {
-                    self.selectedGroups.splice(self.selectedGroups.indexOf(event.target.value), 1);
-                }
-
-                self.updateSendEmailButtonState();
-            },
-            updateSendEmailButtonState: function()
-            {
-                var self = this;
-
-                self.enableSendEmailButton = self.selectedStudentExternalIds.length > 0 && self.selectedGroups.length > 0;
             },
             openShareLearningMomentDialog: function() {
                 // Set the form's target to the selected users
@@ -329,7 +255,56 @@ Data:
             },
             subject: function() {
                 return this.subjectName + ' (' + this.classCode + ')';
-            }
+            },
+            showCheckboxes: function() {
+                return this.learningMomentsEnabled || this.mailEnabled;
+            },
+            allSelected: {
+                get: function () {
+                    return this.studentLists.every(function (student) {
+                        return student.isChecked;
+                    });
+                },
+                set: function (value) {
+                    this.studentLists = this.studentLists.map(function (student) {
+                        student.isChecked = value;
+                        return student;
+                    });
+                }
+            },
+            selectedStudentIds: function () {
+                let ids  = [],
+                    self = this;
+                self.studentLists.forEach(function (student) {
+                    if (student.isChecked && student.id) {
+                        ids.push(student.id);
+                    }
+                });
+                return ids;
+            },
+            selectedStudentExternalIds: function () {
+                let externalIds = [],
+                    self        = this;
+                self.studentLists.forEach(function (student) {
+                    if (student.isChecked && student.synergy_id) {
+                        externalIds.push(student.synergy_id);
+                    }
+                });
+                return externalIds;
+            },
+            selectedGroups: function () {
+                let groups = [],
+                    self   = this;
+                self.groups.forEach(function (group) {
+                    if (group.isChecked) {
+                        groups.push(group.value);
+                    }
+                });
+                return groups;
+            },
+            enableSendEmailButton: function () {
+                return this.selectedStudentExternalIds.length > 0 && this.selectedGroups.length > 0;
+            },
         },
         filters: {
             capitalise: function (val) {

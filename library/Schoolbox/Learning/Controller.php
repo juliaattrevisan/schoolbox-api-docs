@@ -1,17 +1,19 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning;
 
 use Alaress\Mail\AbstractMailer;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Filter\Codec;
-use function func_get_args;
 use External_ClassInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
@@ -28,13 +30,15 @@ use Schoolbox\User;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\UserMapper;
 use Timetable_ColourMapper;
-use \Alaress_Date_Format;
+use Alaress_Date_Format;
 use Schoolbox\Filter;
 use Schoolbox\Mapper;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Resource\Folder;
 use UnexpectedValueException;
 use Schoolbox\L10n\RosettaStone;
+
+use function func_get_args;
 
 /**
  * Class Controller
@@ -176,7 +180,7 @@ class Controller extends Base
      */
     public function getPendingAssessmentsForUser(User $viewee, Filter\IFactoryFactory $filterFactoryFactory): void
     {
-        if(!$viewee->getRole()->isStaff()){
+        if (!$viewee->getRole()->isStaff()) {
             throw new NotFound('Only staff have pending assessments. Found: ' . $viewee->getRole()->getType());
         }
 
@@ -187,7 +191,7 @@ class Controller extends Base
         $filterPanel = $filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, func_get_args(), $queryArgs);
 
         $title = 'Pending Assessments';
-        if($viewee->getId() !== $this->getUser()->getId()){
+        if ($viewee->getId() !== $this->getUser()->getId()) {
             $title .= " for {$viewee->getFullName()}";
         }
 
@@ -226,7 +230,6 @@ class Controller extends Base
                 'status'  => 200,
                 'content' => $content,
             ]));
-
         } catch (\Exception $e) {
             // TODO - can remove this block when we abandon PHP 5 support
             $this->returnJsonError($e);
@@ -309,8 +312,8 @@ class Controller extends Base
                 $totalAssessmentsToChase += $assessmentStatistics[$assessment->getId()]->getCountResponseRequired();
                 $assessmentsToChase[$assessment->getId()] = $assessment;
                 $assessmentStudentsToEmail[$assessment->getId()] = [];
-                foreach($assessment->getAllParticipants() as $participant){
-                    if($participant->isResponseRequired()){
+                foreach ($assessment->getAllParticipants() as $participant) {
+                    if ($participant->isResponseRequired()) {
                         $student = $participant->getUser();
                         $assessmentStudentsToEmail[$assessment->getId()][$student->getId()] = $student->getFormattedEmailDisplay();
                     }
@@ -430,11 +433,12 @@ class Controller extends Base
     {
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learning/classLists.twig', [
-                'specialNeeds'      => $this->rosettaStone->translate('specialNeeds',true, true),
-                'replyTo'           => $this->getUser()->getEmail(),
-                'mailEnabled'       => $this->getConfigLoader()->get('mail_enable'),
-                'emailGroups'       => $this->getClassListsEmailGroups(),
-                'folder'            => $folder,
+                'specialNeeds'           => $this->rosettaStone->translate('specialNeeds', true, true),
+                'replyTo'                => $this->getUser()->getEmail(),
+                'mailEnabled'            => $this->getConfigLoader()->get('mail_enable'),
+                'learningMomentsEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
+                'emailGroups'            => $this->getClassListsEmailGroups(),
+                'folder'                 => $folder,
             ])->setTab('classes')->setTitle($folder->getName())
         );
     }
