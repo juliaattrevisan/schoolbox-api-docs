@@ -97,7 +97,7 @@
             url: opt.url,
             paramName: opt.paramName,
             // The dropzone is clickable if the modal is disabled
-            clickable: opt.useModal ? false : opt.trigger,
+            clickable: opt.useModal ? false : dzone[0],
             maxFiles: opt.multi ? null : 1,
             maxFilesize: opt.maxFilesize,
             acceptedFiles: opt.allowedFiles === '*/*' ? null : opt.allowedFiles,
@@ -122,7 +122,7 @@
             },
 
             init: function () {
-                dzone.append($('<span/>').html(prompt));
+                dzone.append($('<span class="needsclick"/>').html(prompt));
 
                 // *goes crosseyed*
                 self.dropzone = this;
