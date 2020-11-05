@@ -18,6 +18,7 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
+use Schoolbox\Realtime\Routing\Filter\RoletypeFilter;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\Role;
@@ -163,7 +164,7 @@ class Notifier extends AbstractModuleNotifier
             ->setSeverity(Logger::INFO)
             ->addTopic("{$this->getSlug()}.{$evidence->getId()}." . self::TRIGGER_POSTED)
             ->setTimestamp($evidence->getCreatedAt()->getUnixTimeStamp())
-            ->addFilter('roleType', [$roleType]);
+            ->addFilter(RoletypeFilter::NAME, [$roleType]);
 
         // a teacher posts for a student - to the student, the teachers of the student and parents of the student
         if ($effector->getRole()->isStaff()) {
