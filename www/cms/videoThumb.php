@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Generate video thumbnail
  *
@@ -42,7 +43,7 @@ if (isset($_GET['hash'])) {
 }
 
 if (isset($type, $id)) {
-    $page          = new SitePage;
+    $page          = new SitePage();
     $storageMapper = StorageMapper::getInstance();
     $videoQueue    = null;
     try {
