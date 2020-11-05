@@ -345,13 +345,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $student = $feedback->getReviewee();
         $marker  = $feedback->getReviewer();
 
-        // Don't sync marks if:
-        // * Student is deleted
+        // Donq't sync marks if:
         // * Student's ID is invalid
         // * Marker's ID is invalid
-        if ($student->isDeleted()) {
-            return false;
-        }
         if (!$this->isExternalIdValid($student->getExternalId())) {
             return false;
         }
@@ -565,13 +561,19 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
          */
         /** @var string[] $folderCodes */
         $folderCodes = $this->retrieveFolderCodesFromAssessment($activity);
-        $classCodes  = array_column($this->externalUser->getSubjectList($student), 'code');
 
-        // Only push to codes are currently attached to the assessment's folder, and the student is enrolled in
-        $markbookFolderCodes = array_intersect(
-            $this->normalizeClassCodes($folderCodes),
-            $this->normalizeClassCodes($classCodes)
-        );
+        if(count($folderCodes) > 1 ) {
+            $classCodes = array_column($this->externalUser->getSubjectList($student), 'code');
+
+            // Only push to codes are currently attached to the assessment's folder, and the student is enrolled in
+            $markbookFolderCodes = array_intersect(
+                $this->normalizeClassCodes($folderCodes),
+                $this->normalizeClassCodes($classCodes)
+            );
+        }
+        else {
+            $markbookFolderCodes =  $this->normalizeClassCodes($folderCodes);
+        }
 
         // In this context, we need to ensure the fileYear etc match the student, not the marker
         $this->insertMarkbooksIfNotExists($activity, $markbookFolderCodes, $studentFileYear, $studentFileSemester);
@@ -853,7 +855,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $owner = $this->retrieveOwnerFromAssessment($activity);
         if (!($owner && $this->isExternalIdValid($owner->getExternalId()))) {
-            return false;
+            //return false;
         }
 
         $remoteAssessmentList = $this->getSynergeticMarkbookList($activity, $fileYear, $fileSemester);
