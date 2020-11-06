@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Learning\Moment\Evidence;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -105,11 +106,10 @@ class Module extends Comment\Module
 
                     // The comment's author should never be null, as a comment
                     // cannot be created with a null author.
-                    // Nonetheless, return null if they're not found.
                     if ($author) {
                         return $author->getId();
                     }
-                    return null;
+                    throw new InsufficientHydrationException('Comment author is not hydrated');
                 },
             ),
         );
