@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Learning\Moment\Evidence;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -72,6 +73,7 @@ class Module extends Comment\Module
                 $this->getExternalUser(),
                 $userMapper,
                 static function (array $params) {
+                    /** @var Evidence\Model $evidence */
                     $evidence = $params['context'];
                     return $evidence->getRecipient()->getId();
                 },
@@ -84,8 +86,9 @@ class Module extends Comment\Module
      * Builds an authorization rule for whether a user has permission to delete
      * comments.
      *
-     * Any user who may read comments may delete comments, except for the
-     * recipient's parents.
+     * The rules for deleting comments are:
+     * * Staff/superuser may delete any comment
+     * * Any user may delete comments which they created
      *
      * @return Auth\Rule\IAuthorizationRule
      * @throws InvalidArgumentException
@@ -97,8 +100,16 @@ class Module extends Comment\Module
             new Auth\Rule\HasRole(Role::STAFF),
             new Auth\Rule\IsUser(
                 static function (array $params) {
-                    $evidence = $params['context'];
-                    return $evidence->getRecipient()->getId();
+                    /** @var Comment\Model $comment */
+                    $comment = $params['comment'];
+                    $author  = $comment->getAuthor();
+
+                    // The comment's author should never be null, as a comment
+                    // cannot be created with a null author.
+                    if ($author) {
+                        return $author->getId();
+                    }
+                    throw new InsufficientHydrationException('Comment author is not hydrated');
                 },
             ),
         );
