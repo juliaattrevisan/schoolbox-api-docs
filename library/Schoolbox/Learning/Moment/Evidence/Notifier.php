@@ -35,7 +35,7 @@ class Notifier extends AbstractModuleNotifier
     private const PATTERN_STAFF_POSTED_TITLE   = ':teacher posted :evidence for :student';
     private const PATTERN_STUDENT_POSTED_TITLE = ':student has posted :evidence';
 
-    private const PATTERN_EVIDENCE_HREF        = '/learning/evidence/%d';
+    private const PATTERN_EVIDENCE_HREF = '/learning/evidence/%d';
 
     /** @var UserMapper */
     private $userMapper;
@@ -172,7 +172,8 @@ class Notifier extends AbstractModuleNotifier
             $bob->setTitle(self::PATTERN_STAFF_POSTED_TITLE)
                 ->setParams([
                     'teacher'  => new UserParam($effector),
-                    'student'  => new UserParam($student),
+                    'student'  => $roleType === Role::STUDENT ?
+                        new Param('you', null, Param::STACKING_REPLACE_NO_DECORATION) : new UserParam($student),
                     'evidence' => new Param('a new learning moment', $evidenceHref, Param::STACKING_REPLACE_NO_DECORATION),
                 ]);
 
@@ -186,7 +187,7 @@ class Notifier extends AbstractModuleNotifier
         }
         $instance = $bob->build();
         $envelope->targetToParent($student->getId(), $instance);
-        $envelope->targetToUser($evidence->getRecipient(), $instance);
+        $envelope->targetToUser($student, $instance);
 
         $student->loadTeachers();
         foreach ($student->getTeacherCollection() as $teacher) {
