@@ -99,9 +99,17 @@ class Module extends Comment\Module
             new Auth\Rule\HasRole(Role::STAFF),
             new Auth\Rule\IsUser(
                 static function (array $params) {
-                    /** @var Evidence\Model $evidence */
-                    $evidence = $params['context'];
-                    return $evidence->getCreator()->getId();
+                    /** @var Comment\Model $comment */
+                    $comment = $params['comment'];
+                    $author  = $comment->getAuthor();
+
+                    // The comment's author should never be null, as a comment
+                    // cannot be created with a null author.
+                    // Nonetheless, return null if they're not found.
+                    if ($author) {
+                        return $author->getId();
+                    }
+                    return null;
                 },
             ),
         );
