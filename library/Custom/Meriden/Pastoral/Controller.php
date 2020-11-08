@@ -12,6 +12,7 @@ namespace Custom\Meriden\Pastoral;
 use Alaress\Web\Controller\Base;
 use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
 use Custom\Meriden\Pastoral\StudentInvolvement\TutorGroup;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -110,9 +111,9 @@ class Controller extends Base
      * Builds data for the report for this student for this year, with an
      * optional subject to drill down into.
      *
-     * @param int    $year
-     * @param User   $student
-     * @param string $subjectCode
+     * @param int         $year
+     * @param User        $student
+     * @param string|null $subjectCode
      *
      * @return array
      *
@@ -122,10 +123,29 @@ class Controller extends Base
     {
         $this->assertValidYearForReport($year, $student);
 
-        $tutorGroup     = null;
-        $tutorGroupList = $this->retrieveTutorGroupList($student);
-        $subject        = null;
-        $subjectList    = $this->getStudentInvolvementFactory()->buildSubjectList($year, $student);
+        $tutorGroup       = null;
+        $tutorGroupList   = $this->retrieveTutorGroupList($student);
+        $subject          = null;
+        $subjectList      = $this->getStudentInvolvementFactory()->buildSubjectList($year, $student);
+        $roleTypeOverride = null;
+
+        // Only staff may override role type?
+        if ($this->getUser()->getRole()->isStaff()) {
+            $roleTypeOverride = $this->request->query->get('role-type');
+            if (isset($roleTypeOverride)) {
+                if (!in_array($roleTypeOverride, [Role::STAFF, Role::STUDENT, ROLE::PARENT], true)) {
+                    throw new \RangeException(
+                        sprintf(
+                            "If role type is overridden, it must be one of: [%s, %s, %s]",
+                            Role::STAFF,
+                            Role::STUDENT,
+                            ROLE::PARENT
+                        )
+                    );
+                }
+            }
+        }
+
         if (!isset($subjectCode)) {
             // Does this student exist for this year and subject?
             $exists = false;
