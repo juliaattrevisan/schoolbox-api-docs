@@ -158,7 +158,7 @@ class Controller extends Base
             if (!$exists) {
                 throw new \RangeException("Student has no tutor group in $year");
             }
-            $tutorGroup = $this->getStudentInvolvementFactory()->buildTutorGroup($year, $student);
+            $tutorGroup = $this->getStudentInvolvementFactory()->buildTutorGroup($year, $student, $roleTypeOverride);
         } else {
             // Does this subject exist for this student?
             $exists = false;
@@ -171,7 +171,7 @@ class Controller extends Base
             if (!$exists) {
                 throw new \RangeException("Student was not in subject $subjectCode in $year");
             }
-            $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode);
+            $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode, $roleTypeOverride);
         }
         return array(
             'report' => array(
