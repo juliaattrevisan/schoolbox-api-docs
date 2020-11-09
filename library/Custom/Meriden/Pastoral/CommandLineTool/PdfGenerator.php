@@ -158,8 +158,6 @@ class PdfGenerator extends App
         $sessionHash = $this->getOpt(self::OPT_LONG_HASH);
         if (!$sessionHash) {
             $sessionHash = $this->generateSessionHashViaLoginForm($this->getUsername());
-        } else {
-            $cookie = [PipeManager::PHP_SESSION_PREFIX => $sessionHash];
         }
 
 
