@@ -6,9 +6,10 @@
 
 declare(strict_types=1);
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement;
+namespace Custom\Meriden\Pastoral\CommandLineTool;
 
 use Aura\Router\Router;
+use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
 use Schoolbox\User;
 
 /**
