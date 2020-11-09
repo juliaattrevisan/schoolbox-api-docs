@@ -12,16 +12,21 @@ use Alaress\Database\Connector\IConnector;
 use Aura\Router\Router;
 use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
 use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
+use GuzzleHttp\Client;
+use Knp\Snappy\Pdf;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Auth\Remote\RemoteLogin;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\Sync\Provisioner\UserMapper;
 use Schoolbox\User;
 use function fwrite;
+use function trim;
 
 /**
  * Command-line PDF generator
@@ -45,6 +50,9 @@ class PdfGenerator extends App
     private const DEFAULT_MAX_FAILS   = 3;
     private const DEFAULT_JS_DELAY    = 1000;
     private const DEFAULT_YEAR_LEVELS = [7, 8, 9,];
+
+    private const EXIT_STATUS_AUTHENTICATION_FAILURE = 100;
+    private const EXIT_STATUS_AUTHORISATION_FAILURE  = 101;
 
     /**
      * @inheritdoc
@@ -144,10 +152,26 @@ class PdfGenerator extends App
         }
 
 
+        // Attempt to sign in:
+        // Create a remote authentication class, whose only output is a
+        // session ID cookie
+        $sessionHash = $this->getOpt(self::OPT_LONG_HASH);
+        if (!$sessionHash) {
+            $sessionHash = $this->generateSessionHashViaLoginForm($this->getUsername());
+        } else {
+            $cookie = [PipeManager::PHP_SESSION_PREFIX => $sessionHash];
+        }
+
+
+        // Build a PDF generator object, put the session ID cookie in it
+        $pdfGenerator = $this->buildPdfGenerator();
+        $pdfGenerator->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
+
+
         // start making a user query.
         // TODO for 20.2 year will be in a join table, so update the query
         $userQuery = $userMapper->getPredicateBuilder()
-            ->in('year', $searchYearLevels);
+                                ->in('year', $searchYearLevels);
         $studentId = $this->getOptAsInt(self::OPT_LONG_STUDENT_ID);
         if (isset($studentId)) {
             $userQuery = $userQuery->equals('id', $studentId);
@@ -160,7 +184,7 @@ class PdfGenerator extends App
                 'order' => [
                     'lastname'  => 'asc',
                     'firstname' => 'asc',
-                ]
+                ],
             ]
         );
         $this->getLogger()->notice(
@@ -185,9 +209,9 @@ class PdfGenerator extends App
             // The first URL will be the pastoral report
             // All subsequent will be subject reports
             // Collate these all into a single page
-            foreach ($urls as $url) {
-                // Each one of these URLs will be sent to the PDF generator
-            }
+
+            // create a file pointer
+//            fwrite($fp, $pdfGenerator->getOutput($urls));
         }
     }
 
@@ -305,5 +329,97 @@ EXAMPLES:
     private function getCurrentYear(): int
     {
         return (int)date('Y');
+    }
+
+
+    /**
+     * Build a PDF generator with sensible settings.
+     *
+     * @return Pdf
+     */
+    private function buildPdfGenerator(): Pdf
+    {
+        $snappy = new Pdf('/usr/local/bin/wkhtmltopdf');
+
+        // TODO expose timeout as CLI option
+        $snappy->setTimeout(120);
+        $snappy->setOption('orientation', 'Landscape');
+        $snappy->setOption('disable-external-links', true);
+        $snappy->setOption('viewport-size', 1024);
+        $snappy->setOption(
+            'javascript-delay',
+            $this->getOptAsInt(self::OPT_LONG_JS_DELAY) ?? self::DEFAULT_JS_DELAY
+        );
+
+        $userStyleSheet = $this->getOpt(self::OPT_LONG_USER_STYLE_SHEET);
+        if (isset($userStyleSheet)) {
+            $snappy->setOption('user-style-sheet', $userStyleSheet);
+        }
+        return $snappy;
+    }
+
+
+    /**
+     * Return a username, either from command line options, or by prompting the
+     * user.
+     *
+     * @return string
+     */
+    private function getUsername(): string
+    {
+        // Revert to username and password
+        $username = $this->getOpt(self::OPT_LONG_USERNAME);
+        if (isset($username)) {
+            $this->getLogger()->debug('Using username provided on command line');
+            return $username;
+        }
+
+        while (true) {
+            $this->getLogger()->debug("Requesting username");
+            $username = trim($this->readLine('Please provide a schoolbox username: '));
+            // TODO use a regex
+            if ($username) {
+                $this->getLogger()->debug("Username set to '$username'");
+                break;
+            }
+            $this->getLogger()->warning("Username '$username' appears invalid");
+        }
+        return $username;
+    }
+
+
+    /**
+     * Attempt to login via the web form, and return the generated session hash.
+     *
+     * @param string $username
+     * @return string
+     */
+    private function generateSessionHashViaLoginForm(string $username): string
+    {
+        $attempts    = 0;
+        $maxAttempts = 3;
+        $remoteLogin = new RemoteLogin(
+            new Client(),
+            trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}")
+        );
+        while (true) {
+            $attempts++;
+            if ($attempts > $maxAttempts) {
+                $this->getLogger()->warning("Login failed");
+                exit(self::EXIT_STATUS_AUTHENTICATION_FAILURE);
+            }
+            $remaining = $maxAttempts - $attempts + 1;
+            $this->getLogger()->debug("Requesting password, ($remaining attempts remaining)");
+            $password = $this->readPassword("Please provide your password ($remaining attempts remaining): ");
+            // TODO use regex
+            if ($password) {
+                $this->getLogger()->info("Password provided, attempting login");
+                $cookie = $remoteLogin->authenticate($username, $password);
+                if (isset($cookie)) {
+                    return $cookie;
+                }
+            }
+            $this->getLogger()->warning("Password appears invalid");
+        }
     }
 }
