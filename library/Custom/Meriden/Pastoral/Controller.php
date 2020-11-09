@@ -128,21 +128,15 @@ class Controller extends Base
         $subject          = null;
         $subjectList      = $this->getStudentInvolvementFactory()->buildSubjectList($year, $student);
         $roleTypeOverride = null;
+        $roleTypes        = Role::getRoleTypes();
 
         // Only staff may override role type?
         if ($this->getUser()->getRole()->isStaff()) {
             $roleTypeOverride = $this->request->query->get('role-type');
-            if (isset($roleTypeOverride)) {
-                if (!in_array($roleTypeOverride, [Role::STAFF, Role::STUDENT, ROLE::PARENT], true)) {
-                    throw new \RangeException(
-                        sprintf(
-                            "If role type is overridden, it must be one of: [%s, %s, %s]",
-                            Role::STAFF,
-                            Role::STUDENT,
-                            ROLE::PARENT
-                        )
-                    );
-                }
+            if (isset($roleTypeOverride) && !in_array($roleTypeOverride, $roleTypes, true)) {
+                throw new \RangeException(
+                    sprintf("If role type is overridden, it must be one of: %s", implode(', ', $roleTypes))
+                );
             }
         }
 
