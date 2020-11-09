@@ -33,6 +33,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\WorkType;
+use Schoolbox\Learning\Markbook\CohortMarks;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper\DefinitionException;
@@ -416,8 +417,12 @@ class Controller extends Base
          *
          * These markbook instances provide the five-point summary for the graphs
          */
-
-        $markbook = new Markbook($assessments, $overallMarkScheme, $this->getUser());
+        if (true) {
+            $markbook = (new CohortMarks($this->assessmentMapperProxy, $assessments))->collate($viewee);
+            new \Alaress_Probe($markbook);
+        } else {
+            $markbook = new Markbook($assessments, $overallMarkScheme, $this->getUser());
+        }
 
         /* Find the teachers of this particular subject */
         $subject->loadTeachers(true);

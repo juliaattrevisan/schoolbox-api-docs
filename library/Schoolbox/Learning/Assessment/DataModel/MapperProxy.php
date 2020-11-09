@@ -265,6 +265,49 @@ class MapperProxy
 
 
     /**
+     * For a given set of $assesmentIds, find all the assessment ids which share a common
+     * specification; this essentially gets you the other implementations of an assessment
+     * when you're looking for a cohort-context set
+     *
+     * @param array $assessmentIds
+     * @return array
+     * @throws PDOException
+     */
+    public function findImplementationIdWithCommonSpecificationId(array $assessmentIds): array
+    {
+        /* I could have used a repeated combination of
+         *
+         * foreach ($assessment) {
+         *     $swamp->findSpecificationByImplementationId();
+         *     $swamp findAllImplementationsBySpecificationId();
+         * }
+         *
+         * ...but this is a deeply deeply deeply inefficient way of doing it
+         * Instead make a custom query to find siblings of an assessment implementation
+         */
+        $ids = implode(',', $assessmentIds);
+
+        $query = "
+            SELECT DISTINCT asi2.implementation_assessment_id
+            FROM assessment_specification_implementation asi1
+            INNER JOIN assessment_specification_implementation asi2 ON asi1.specification_assessment_id = asi2.specification_assessment_id
+            WHERE asi1.implementation_assessment_id IN ({$ids})
+        ";
+
+        $statement = $this->baseMapper->getDatabase()->prepare($query);
+        $statement->execute();
+
+        $assessmentIds = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $assessmentIds[] = $row['implementation_assessment_id'];
+        }
+
+        return $assessmentIds;
+    }
+
+
+    /**
      * Finds the specification assessment for a implementation assessment.
      *
      * This method does not load participants, because assessments in a unit spec

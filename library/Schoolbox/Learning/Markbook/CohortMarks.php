@@ -24,24 +24,33 @@ class CohortMarks
 {
 
     /**
-     * @var array
-     */
-    private $studentStatistics = [];
-
-
-    /**
      * @var AssessmentMapperProxy
      */
     private $assessmentMapperProxy;
 
 
     /**
+     * @var Collection
+     */
+    private $assessments;
+
+
+    /**
+     * @var null|array
+     */
+    private $studentStatistics;
+
+
+    /**
      * CohortMarks constructor.
      *
-     * @param Collection $assessments
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param Collection            $assessments
      */
-    public function __construct(Collection $assessments)
+    public function __construct(AssessmentMapperProxy $assessmentMapperProxy, Collection $assessments)
     {
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
+        $this->assessments = $assessments;
     }
 
 
@@ -50,26 +59,23 @@ class CohortMarks
      * using $viewee's results as scatter plot values
      *
      * @param User $viewee
+     * @return array
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \LogicException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
+     * @throws \PDOException
      */
-    protected function collateDataSeries(User $viewee): array
+    public function collate(User $viewee): array
     {
 
         /* A user has participated in each of the elements inside $assessment
          * We need to find all the other assessments that shared a common specification
          *
          * Find all the assessment ids that fit this description
-         *
-        $assessmentIds =
-            SELECT DISTINCT asi2.implementation_assessment_id
-            FROM assessment_specification_implementation asi1
-            INNER JOIN assessment_specification_implementation asi2 ON asi1.specification_assessment_id = asi2.specification_assessment_id
-            WHERE asi1.implementation_assessment_id IN ( ... )
-        */
+         */
+        $assessmentIds = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId($this->assessments->getPropertyValues('id'));
 
         /* Use the swamp to hydrate all the participants' pieces via assessmentMapperProxy
          */
@@ -159,10 +165,16 @@ class CohortMarks
 
 
     /**
-     * @return array
+     * Generate then return the cohort-level statistics for $assessments
+     *
+     * @return array|null
      */
-    public function getStudentStatistics(): array
+    public function getStudentStatistics(): ?array
     {
+        if (null === $this->studentStatistics) {
+            $this->studentStatistics = $this->getStudentStatistics();
+        }
+
         return $this->studentStatistics;
     }
 }
