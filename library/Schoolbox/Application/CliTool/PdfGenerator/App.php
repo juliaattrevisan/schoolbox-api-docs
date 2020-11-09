@@ -8,24 +8,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application\CliTool\PdfGenerator;
 
-use Alaress\Database\Connector\IConnector;
-use Aura\Router\Router;
-use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
-use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
 use GuzzleHttp\Client;
 use Knp\Snappy\Pdf;
 use RuntimeException;
-use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App as BaseApp;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Auth\Remote\RemoteLogin;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Pipe\PipeManager;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Role;
-use Schoolbox\Sync\Provisioner\UserMapper;
-use Schoolbox\User;
+use ZipArchive;
 
 
 /**
@@ -35,20 +24,20 @@ abstract class App extends BaseApp
 {
 //    private const OPT_SHORT_HELP      = 'h';                 // print help
 //    private const OPT_LONG_HELP       = 'help';              // print help
-    private const OPT_LONG_HASH       = 'hash:';             // session hash
-    private const OPT_LONG_USERNAME   = 'username:';         // username
+    private const OPT_LONG_HASH     = 'hash:';             // session hash
+    private const OPT_LONG_USERNAME = 'username:';         // username
 //    private const OPT_LONG_STUDENT_ID = 'student-id:';       // student external id
 //    private const OPT_LONG_YEAR_LEVEL = 'year-level:';       // year-level
 //    private const OPT_LONG_CURRICULUM       = 'curriculum:';       // curriculum
-    private const OPT_LONG_MAX_FAILS        = 'max-fails:';        // Number of consecutive fails after which to abort the script's execution.
-    private const OPT_LONG_JS_DELAY         = 'js-delay:';         // How many milliseconds to let JS run before attempting to print page
+    private const OPT_LONG_MAX_FAILS = 'max-fails:';        // Number of consecutive fails after which to abort the script's execution.
+    private const OPT_LONG_JS_DELAY  = 'js-delay:';         // How many milliseconds to let JS run before attempting to print page
 //    private const OPT_LONG_REPORT_YEAR      = 'report-year:';      // to generate a report for some point in time
     private const OPT_LONG_USER_STYLE_SHEET = 'user-style-sheet:'; // user style sheet
 //    private const OPT_LONG_ROLE_TYPE        = 'role-type:';        // role-type override
 //    private const OPT_LONG_INCLUDE_SUBJECTS = 'include-subjects';  // include subject reports
 
-    private const DEFAULT_MAX_FAILS   = 3;
-    private const DEFAULT_JS_DELAY    = 1000;
+    private const DEFAULT_MAX_FAILS = 3;
+    private const DEFAULT_JS_DELAY  = 1000;
 //    private const DEFAULT_YEAR_LEVELS = [7, 8, 9,];
 
     private const EXIT_STATUS_AUTHENTICATION_FAILURE = 100;
@@ -164,6 +153,8 @@ abstract class App extends BaseApp
 
 
         // Build a PDF generator object, put the session ID cookie in it
+        $domain       = trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}");
+        $port         = null;
         $pdfGenerator = $this->buildPdfGenerator();
         $pdfGenerator->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
 
@@ -173,7 +164,9 @@ abstract class App extends BaseApp
 
 
         // Generate a list of filenames and files that will be generated
-        foreach ($this->generatePdfSources() as $pdfSource) {
+        $pdfFilenames = [];
+        foreach ($this->generatePdfSources($domain, $port) as $pdfSource) {
+            // TODO wrap this in a retry
             $this->getLogger()->notice($pdfSource['message']);
 
             // Create the PDF
@@ -186,6 +179,7 @@ abstract class App extends BaseApp
             $maxAttempts       = 10;
             $attempts          = 0;
             $previousException = null;
+            $jsDelay           = $this->getOptAsInt(self::OPT_LONG_JS_DELAY) ?? self::DEFAULT_JS_DELAY;
             while (true) {
                 if ($attempts++ >= $maxAttempts) {
                     unlink($filename);
@@ -193,14 +187,18 @@ abstract class App extends BaseApp
                 }
                 try {
                     // Creating the filename
+                    $pdfGenerator->setOption('javascript-delay', $jsDelay);
+
+                    // URLs need to have a port added
                     fwrite($fp, $pdfGenerator->getOutput($pdfSource['urls']));
+                    $pdfFilenames[] = $filename;
                     break;
                 } catch (RuntimeException $e) {
                     $this->getLogger()->warning($e->getMessage());
                     $this->getLogger()->warning($e->getTraceAsString());
 
-                    // May need to extend the JS delay
-//                    $javascriptDelayMs *= 2;
+                    // Extend the JS delay, as that might prevent rendering
+                    $jsDelay           *= 2;
                     $previousException = $e;
                 }
             }
@@ -208,7 +206,9 @@ abstract class App extends BaseApp
         }
 
 
-        // Done generating PDFs: zip them somewhere
+        // Done generating PDFs: zip them up
+        $this->createZipArchive($pdfFilenames, $tempdir);
+        $this->cleanUpTempFiles($pdfFilenames, $tempdir);
 
 
 //        // start making a user query.
@@ -482,5 +482,81 @@ abstract class App extends BaseApp
     }
 
 
-    abstract protected function generatePdfSources(): array;
+    /**
+     * Create a single ZIP archive of all the PDF documents
+     *
+     * @param string[] $pdfFilenames
+     * @param string   $tempDir
+     */
+    private function createZipArchive(array $pdfFilenames, string $tempDir): void
+    {
+        $zipFilename = tempnam($tempDir, 'zip');
+
+        /* https://stackoverflow.com/questions/32694148/ziparchivegetstatusstring-invalid-or-uninitialized-zip-object
+         * Also, SA-10419
+         *
+         * ZipArchive doesn't expect a file to exist when it's creating its zip archive
+         */
+        @unlink($zipFilename);
+
+        $zipArchive = new ZipArchive();
+        $this->getLogger()->debug("Creating temp zip archive: $zipFilename");
+        $zipArchive->open($zipFilename, ZipArchive::CREATE);
+
+        // To avoid exceeding open file limit, may need to batch zip
+        $openFileLimit = (int)exec('ulimit -n');
+        $batchSize     = round($openFileLimit - 20, -2); // buffer of 20, round to nearest 100
+        $this->getLogger()->debug(sprintf('Open file limit: %d, setting batch size to %d', $openFileLimit, $batchSize));
+        $batchIndex = 1;
+        $batches    = ceil(count($pdfFilenames) / $batchSize);
+        foreach ($pdfFilenames as $pdfFilename) {
+            if ($batchIndex++ % $batchSize === 0) {
+                $batchCount = (int)($batchIndex / $batchSize);
+                $this->getLogger()->info("Writing zip batch $batchCount/$batches...");
+                $zipArchive->close();
+                $zipArchive->open($zipFilename);
+            }
+            $this->getLogger()->debug("Adding PDF file to zip archive: $pdfFilename");
+            $zipArchive->addFile($pdfFilename, basename($pdfFilename));
+        }
+        $this->getLogger()->info("Writing zip batch $batches/$batches...");
+        $zipArchive->close();
+
+        $this->getLogger()->debug("Writing zip archive to output stream");
+        if (false === stream_copy_to_stream(fopen($zipFilename, 'rb'), $this->getOutStream())) {
+            $this->getLogger()->error('Unable to write zip archive to output stream');
+        }
+
+        $this->getLogger()->debug("Deleting zip archive: $zipFilename");
+        unlink($zipFilename);
+    }
+
+
+    /**
+     * Explicitly deletes temporary files
+     *
+     * @param array  $pdfFilenames
+     * @param string $tempDir
+     */
+    private function cleanUpTempFiles(array $pdfFilenames, string $tempDir): void
+    {
+        $this->getLogger()->debug("Cleaning up temporary files");
+        foreach ($pdfFilenames as $pdfFilename) {
+            $this->getLogger()->debug("Deleting $pdfFilename");
+            unlink($pdfFilename);
+        }
+
+        $this->getLogger()->debug("Deleting temp directory $tempDir");
+        rmdir($tempDir);
+    }
+
+
+    /**
+     * Generate the list of PDFs to generate.
+     *
+     * @param string   $domain
+     * @param int|null $port
+     * @return array
+     */
+    abstract protected function generatePdfSources(string $domain, ?int $port): array;
 }
