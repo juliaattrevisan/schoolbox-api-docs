@@ -8,9 +8,18 @@ declare(strict_types=1);
 
 namespace Custom\Meriden\Pastoral\CommandLineTool;
 
+use Alaress\Database\Connector\IConnector;
+use Aura\Router\Router;
+use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
+use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
+use Schoolbox\Sync\Provisioner\UserMapper;
 use function fwrite;
 
 /**
@@ -18,12 +27,12 @@ use function fwrite;
  */
 class PdfGenerator extends App
 {
-    private const OPT_SHORT_HELP            = 'h';                 // print help
-    private const OPT_LONG_HELP             = 'help';              // print help
-    private const OPT_LONG_HASH             = 'hash:';             // session hash
-    private const OPT_LONG_USERNAME         = 'username:';         // username
-    private const OPT_LONG_STUDENT_ID       = 'student-id:';       // student external id
-    private const OPT_LONG_YEAR_LEVEL       = 'year-level:';       // year-level
+    private const OPT_SHORT_HELP      = 'h';                 // print help
+    private const OPT_LONG_HELP       = 'help';              // print help
+    private const OPT_LONG_HASH       = 'hash:';             // session hash
+    private const OPT_LONG_USERNAME   = 'username:';         // username
+    private const OPT_LONG_STUDENT_ID = 'student-id:';       // student external id
+    private const OPT_LONG_YEAR_LEVEL = 'year-level:';       // year-level
 //    private const OPT_LONG_CURRICULUM       = 'curriculum:';       // curriculum
     private const OPT_LONG_MAX_FAILS        = 'max-fails:';        // Number of consecutive fails after which to abort the script's execution.
     private const OPT_LONG_JS_DELAY         = 'js-delay:';         // How many milliseconds to let JS run before attempting to print page
@@ -34,6 +43,7 @@ class PdfGenerator extends App
 
     private const DEFAULT_MAX_FAILS   = 3;
     private const DEFAULT_JS_DELAY    = 1000;
+    private const DEFAULT_YEAR_LEVELS = [7, 8, 9,];
 
     /**
      * @inheritdoc
@@ -73,6 +83,73 @@ class PdfGenerator extends App
         if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
             $this->printHelp();
             exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
+        // generate a list of URLs
+
+        /** @var Router $router */
+        $router = $this->getDi()->get('router');
+        /** @var IConnector $externalDb */
+        $externalDb   = $this->getDi()->get('databaseExternal');
+        $userMapper   = UserMapper::getInstance();
+        $folderMapper = FolderMapper::getInstance();
+        /** @var MapperProxy $assessmentDataSource */
+        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+        $rubricDataSource     = RubricDataSource::getInstance();
+        $userAccessMapper     = UserAccessMapper::getInstance();
+        $urlGenerator         = new UrlGenerator(
+            $router,
+            new Factory(
+                new Gateway($externalDb),
+                $userMapper,
+                $folderMapper,
+                $assessmentDataSource,
+                $rubricDataSource,
+                $userAccessMapper
+            )
+        );
+
+
+        // Determine the report year and year levels to run the report for.
+        $reportYear = $this->getOptAsInt(self::OPT_LONG_REPORT_YEAR) ?? $this->getDefaultReportYear();
+        $yearLevel  = $this->getOptAsInt(self::OPT_LONG_YEAR_LEVEL);
+        if (isset($yearLevel)) {
+            $yearLevels = [$yearLevel];
+        } else {
+            $yearLevels = self::DEFAULT_YEAR_LEVELS;
+        }
+
+
+        // Once we have a report year and year level:
+        // figure out which students were in that year level that year.
+        // (Since this relies upon student year level: it won't work well for
+        //  fetching reports for students who are no longer at school.
+        //  Schoolbox doesn't store the dates in which a student was enrolled
+        //  within a particular year level, so there's nothing I can do there.)
+        $yearDelta = $this->getCurrentYear() - $reportYear;
+
+
+        // By default: generate for years 7, 8 and 9
+        $searchYearLevels = [];
+        foreach ($yearLevels as $yearLevel) {
+            $searchYearLevels[] = $yearLevel + $yearDelta;
+        }
+
+
+        // start making a user query.
+        // TODO for 20.2 year will be in a join table, so update the query
+        $userQuery = $userMapper->getPredicateBuilder()
+            ->in('year', $searchYearLevels);
+        $studentId = $this->getOptAsInt(self::OPT_LONG_STUDENT_ID);
+        if (isset($studentId)) {
+            $userQuery = $userQuery->equals('id', $studentId);
+        }
+
+        foreach ($userMapper->findByPredicates($userQuery) as $student) {
+            $urls = $urlGenerator->generate($reportYear, $student);
+            foreach ($urls as $url) {
+                var_dump($url['url']);
+            }
         }
     }
 
@@ -135,27 +212,29 @@ DESCRIPTION
 
     $yellow--year-level=YEAR_LEVEL$white
         Just generate reports for students in this year level for the report's
-        year, e.g. '--year-level=7'
+        year, e.g. '--year-level=7'.
+        Defaults to generating reports for all year levels which may have an
+        eReport (i.e. 7, 8 and 9).
 
     $yellow--max-fails=COUNT$white
-         If the tool fails for this many students in a row, exit immediately.
-         Defaults to $defaultMaxFails.
+        If the tool fails for this many students in a row, exit immediately.
+        Defaults to $defaultMaxFails.
 
     $yellow--js-delay=COUNT$white
-         Number of milliseconds to wait before printing a page to allow
-         javascript to execute.
-         Defaults to $defaultJsDelay.
+        Number of milliseconds to wait before printing a page to allow
+        javascript to execute.
+        Defaults to $defaultJsDelay.
 
     $yellow--report-year=REPORT_YEAR$white
-         Generate the reports for the given year.
-         Defaults to the current year ($defaultReportYear).
+        Generate the reports for the given year.
+        Defaults to the current year ($defaultReportYear).
 
     $yellow--user-style-sheet=STYLE_FILE$white
-         Filename of a style sheet to load with every page.
+        Filename of a style sheet to load with every page.
 
     $yellow--role-type=ROLE_TYPE$white
-         Print eReports as they would appear to users with this role type.
-         Must be one of [{$roleTypes}]
+        Print eReports as they would appear to users with this role type.
+        Must be one of [{$roleTypes}]
 
 EXAMPLES:
  * Write log to terminal, output to archive.zip
@@ -175,6 +254,17 @@ EXAMPLES:
      * @return int
      */
     private function getDefaultReportYear(): int
+    {
+        return $this->getCurrentYear();
+    }
+
+
+    /**
+     * What is the current year?
+     *
+     * @return int
+     */
+    private function getCurrentYear(): int
     {
         return (int)date('Y');
     }
