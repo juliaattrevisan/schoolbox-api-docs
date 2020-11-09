@@ -36,15 +36,23 @@ class CohortMarks
 
 
     /**
+     * @var User
+     */
+    private $viewer;
+
+
+    /**
      * CohortMarks constructor.
      *
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param Collection            $assessments
+     * @param User                  $viewer
      */
-    public function __construct(AssessmentMapperProxy $assessmentMapperProxy, Collection $assessments)
+    public function __construct(AssessmentMapperProxy $assessmentMapperProxy, Collection $assessments, User $viewer)
     {
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->assessments = $assessments;
+        $this->viewer = $viewer;
     }
 
 
@@ -96,27 +104,33 @@ class CohortMarks
 
         foreach ($assessments as $assessment) {
 
-            /* For each assessment, get all the Participants' feedbacks, and find out their normalised mark
-             * Index them by specification id; we calculate a five point summary of everything here
+            /* Obey visibility restrictions; feedback must be visible to $viewer
+             * and assessment's mark scheme must be quantitative
              */
-            $specificationId = $assessmentTuples[$assessment->getId()];
+            if ($assessment->isFeedbackVisibleToUser($this->viewer) && $assessment->getMarkScheme()->isQuantitative()) {
 
-            /* Remember the unique titles of each $assessment we encountered, for highcharts
-             */
-            if (!isset($graphAssessments[$assessment->getTitle()])) {
-                $graphAssessments[$specificationId] = $assessment->getTitle();
-            }
-
-            foreach ($assessment->getAllParticipants() as $participant) {
-                $normMarks[$specificationId][] = $participant->getNormalisedMark(true);
-
-                /* If $participant is the $viewee, remember their result in the $scatter
-                 *
-                 * TODO What happens when someone does the same assessment implementation in two different places
-                 *  They share the same specification, but you get two different results
+                /* For each assessment, get all the Participants' feedbacks, and find out their normalised mark
+                 * Index them by specification id; we calculate a five point summary of everything here
                  */
-                if ($participant->getUser()->getId() === $viewee->getId()) {
-                    $scatter[$specificationId] = $participant->getNormalisedMark(true);
+                $specificationId = $assessmentTuples[$assessment->getId()];
+
+                /* Remember the unique titles of each $assessment we encountered, for highcharts
+                 */
+                if (!isset($graphAssessments[$assessment->getTitle()])) {
+                    $graphAssessments[$specificationId] = $assessment->getTitle();
+                }
+
+                foreach ($assessment->getAllParticipants() as $participant) {
+                    $normMarks[$specificationId][] = $participant->getNormalisedMark(true);
+
+                    /* If $participant is the $viewee, remember their result in the $scatter
+                     *
+                     * TODO What happens when someone does the same assessment implementation in two different places
+                     *  They share the same specification, but you get two different results
+                     */
+                    if ($participant->getUser()->getId() === $viewee->getId()) {
+                        $scatter[$specificationId] = $participant->getNormalisedMark(true);
+                    }
                 }
             }
         }
