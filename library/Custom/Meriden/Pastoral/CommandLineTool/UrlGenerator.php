@@ -59,11 +59,7 @@ class UrlGenerator
             'id'          => $student->getId(),
             'year'        => $year,
         ];
-        $results[] = [
-            'type'   => 'index',
-            'params' => $params,
-            'url'    => $this->router->generate('customMeridenPastoral.index', $params),
-        ];
+        $results[] = $this->router->generate('customMeridenPastoral.index', $params);
 
         // Find the pages for each subject
         foreach ($this->factory->buildSubjectList($year, $student) as $subject) {
@@ -74,11 +70,7 @@ class UrlGenerator
                 'subject'     => $subject,
                 'subjectCode' => $subject->getSubjectCode(),
             ];
-            $results[] = [
-                'type'   => 'subject',
-                'params' => $params,
-                'url'    => $this->router->generate('customMeridenPastoral.subject', $params),
-            ];
+            $results[] = $this->router->generate('customMeridenPastoral.subject', $params);
         }
 
         return $results;

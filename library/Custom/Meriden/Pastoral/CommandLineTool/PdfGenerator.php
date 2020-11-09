@@ -20,6 +20,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\Sync\Provisioner\UserMapper;
+use Schoolbox\User;
 use function fwrite;
 
 /**
@@ -118,6 +119,13 @@ class PdfGenerator extends App
         } else {
             $yearLevels = self::DEFAULT_YEAR_LEVELS;
         }
+        $this->getLogger()->notice(
+            sprintf(
+                'Generating PDF reports for students in year(s) %s in calendar year %d',
+                implode(', ', $yearLevels),
+                $reportYear
+            )
+        );
 
 
         // Once we have a report year and year level:
@@ -145,10 +153,40 @@ class PdfGenerator extends App
             $userQuery = $userQuery->equals('id', $studentId);
         }
 
-        foreach ($userMapper->findByPredicates($userQuery) as $student) {
+        /** @var User[] $students */
+        $students = $userMapper->findByPredicates(
+            $userQuery,
+            [
+                'order' => [
+                    'lastname'  => 'asc',
+                    'firstname' => 'asc',
+                ]
+            ]
+        );
+        $this->getLogger()->notice(
+            sprintf('Found %d student(s) to generate reports for', count($students))
+        );
+        foreach ($students as $student) {
+            $this->getLogger()->info(
+                sprintf(
+                    'Generating report for %s, %s (ID: %d, TASS ID: %s)',
+                    $student->getLastname(),
+                    $student->getFirstname(),
+                    $student->getId(),
+                    $student->getExternalId()
+
+                )
+            );
+            $filename = sprintf('%s.pdf', $student->getExternalId());
+            $this->getLogger()->debug(sprintf('Generating report file: %s', $filename));
+
             $urls = $urlGenerator->generate($reportYear, $student);
+
+            // The first URL will be the pastoral report
+            // All subsequent will be subject reports
+            // Collate these all into a single page
             foreach ($urls as $url) {
-                var_dump($url['url']);
+                // Each one of these URLs will be sent to the PDF generator
             }
         }
     }
