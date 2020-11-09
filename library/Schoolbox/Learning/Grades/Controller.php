@@ -408,6 +408,15 @@ class Controller extends Base
         $isInstructor       = $this->access->isInstructor($this->getUser(), $subject);
         $markSchemeFactory = new Factory($this->getConfigLoader());
         $overallMarkScheme = $markSchemeFactory->spawnForFolder($subject, $isInstructor);
+
+        /* If the config option lms_cohort_comparison is set,
+         * instantiate a new CohortMarks instance
+         *
+         * Otherwise use the default Markbook instance
+         *
+         * These markbook instances provide the five-point summary for the graphs
+         */
+
         $markbook = new Markbook($assessments, $overallMarkScheme, $this->getUser());
 
         /* Find the teachers of this particular subject */
