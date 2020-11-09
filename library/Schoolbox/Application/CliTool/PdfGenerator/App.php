@@ -14,6 +14,8 @@ use RuntimeException;
 use Schoolbox\Application\CliTool\App as BaseApp;
 use Schoolbox\Auth\Remote\RemoteLogin;
 use Schoolbox\Realtime\Pipe\PipeManager;
+use Zend\Uri\Uri;
+use Zend\Uri\UriInterface;
 use ZipArchive;
 
 
@@ -153,8 +155,6 @@ abstract class App extends BaseApp
 
 
         // Build a PDF generator object, put the session ID cookie in it
-        $domain       = trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}");
-        $port         = null;
         $pdfGenerator = $this->buildPdfGenerator();
         $pdfGenerator->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
 
@@ -164,8 +164,16 @@ abstract class App extends BaseApp
 
 
         // Generate a list of filenames and files that will be generated
+        $domain  = trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}");
+        $port    = null;
+        $baseUrl = (new Uri())
+            ->setScheme('https')
+            ->setHost($domain);
+        if (isset($port)) {
+            $baseUrl = $baseUrl->setPort($port);
+        }
         $pdfFilenames = [];
-        foreach ($this->generatePdfSources($domain, $port) as $pdfSource) {
+        foreach ($this->generatePdfSources($baseUrl) as $pdfSource) {
             // TODO wrap this in a retry
             $this->getLogger()->notice($pdfSource['message']);
 
@@ -554,9 +562,8 @@ abstract class App extends BaseApp
     /**
      * Generate the list of PDFs to generate.
      *
-     * @param string   $domain
-     * @param int|null $port
+     * @param UriInterface $baseUrl
      * @return array
      */
-    abstract protected function generatePdfSources(string $domain, ?int $port): array;
+    abstract protected function generatePdfSources(UriInterface $baseUrl): array;
 }
