@@ -572,12 +572,12 @@ class Controller extends Base
          * These markbook instances provide the five-point summary for the graphs
          */
         if (true) {
-            $graph = (new CohortMarks(
+            $graph = $canSeeGraph ? (new CohortMarks(
                 $this->getConfigLoader()->get('grade_gradient_enable'),
                 $this->assessmentMapperProxy,
                 $assessments,
                 $this->getUser()
-            ))->collate($viewee);
+            ))->collate($viewee) : [];
         } else {
             $graph = $canSeeGraph ? $this->buildGraph($filteredMarkbook, $viewee) : [];
         }
