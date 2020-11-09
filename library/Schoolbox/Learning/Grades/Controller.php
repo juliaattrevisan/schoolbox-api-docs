@@ -409,20 +409,7 @@ class Controller extends Base
         $isInstructor       = $this->access->isInstructor($this->getUser(), $subject);
         $markSchemeFactory = new Factory($this->getConfigLoader());
         $overallMarkScheme = $markSchemeFactory->spawnForFolder($subject, $isInstructor);
-
-        /* If the config option lms_cohort_comparison is set,
-         * instantiate a new CohortMarks instance
-         *
-         * Otherwise use the default Markbook instance
-         *
-         * These markbook instances provide the five-point summary for the graphs
-         */
-        if (true) {
-            $markbook = (new CohortMarks($this->assessmentMapperProxy, $assessments))->collate($viewee);
-            new \Alaress_Probe($markbook);
-        } else {
-            $markbook = new Markbook($assessments, $overallMarkScheme, $this->getUser());
-        }
+        $markbook = new Markbook($assessments, $overallMarkScheme, $this->getUser());
 
         /* Find the teachers of this particular subject */
         $subject->loadTeachers(true);
@@ -577,7 +564,18 @@ class Controller extends Base
         $overallMarkScheme = $markSchemeFactory->spawnForFolder($subject, $this->getUser()->getRole()->isStaff());
         $filteredMarkbook = (new Markbook($assessments, $overallMarkScheme, $this->getUser()))->sortAssessables(new AssessmentComparator($viewee));
 
-        $graph = $canSeeGraph ? $this->buildGraph($filteredMarkbook, $viewee) : [];
+        /* If the config option lms_cohort_comparison is set,
+         * instantiate a new CohortMarks instance
+         *
+         * Otherwise use the default Markbook instance
+         *
+         * These markbook instances provide the five-point summary for the graphs
+         */
+        if (true) {
+            $graph = (new CohortMarks($this->assessmentMapperProxy, $assessments))->collate($viewee);
+        } else {
+            $graph = $canSeeGraph ? $this->buildGraph($filteredMarkbook, $viewee) : [];
+        }
 
         /* Get Rubric Data for display */
         $longitudinalRubric   = [];

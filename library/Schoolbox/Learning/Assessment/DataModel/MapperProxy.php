@@ -288,7 +288,9 @@ class MapperProxy
         $ids = implode(',', $assessmentIds);
 
         $query = "
-            SELECT DISTINCT asi2.implementation_assessment_id
+            SELECT
+                asi2.implementation_assessment_id,
+                asi2.specification_assessment_id
             FROM assessment_specification_implementation asi1
             INNER JOIN assessment_specification_implementation asi2 ON asi1.specification_assessment_id = asi2.specification_assessment_id
             WHERE asi1.implementation_assessment_id IN ({$ids})
@@ -300,7 +302,7 @@ class MapperProxy
         $assessmentIds = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $assessmentIds[] = $row['implementation_assessment_id'];
+            $assessmentIds[$row['implementation_assessment_id']] = $row['specification_assessment_id'];
         }
 
         return $assessmentIds;

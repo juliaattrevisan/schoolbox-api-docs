@@ -36,12 +36,6 @@ class CohortMarks
 
 
     /**
-     * @var null|array
-     */
-    private $studentStatistics;
-
-
-    /**
      * CohortMarks constructor.
      *
      * @param AssessmentMapperProxy $assessmentMapperProxy
@@ -75,11 +69,11 @@ class CohortMarks
          *
          * Find all the assessment ids that fit this description
          */
-        $assessmentIds = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId($this->assessments->getPropertyValues('id'));
+        $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId($this->assessments->getPropertyValues('id'));
 
         /* Use the swamp to hydrate all the participants' pieces via assessmentMapperProxy
          */
-        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
+        $assessments = $this->assessmentMapperProxy->findAllByIds(array_keys($assessmentTuples));
 
         /* Populate all the participants' data into this set
          * We need to build the five-point summary using EVERYONE's feedbacks for this assessment specification
@@ -88,93 +82,115 @@ class CohortMarks
         $assessments = $this->assessmentMapperProxy
             ->loadParticipantsIntoAssessmentCollection($assessments, null, false, false);
 
-        /* Remember all the boxplot data series
+        /* Remember all the boxplot data series grouped by specification id
          */
-        $statistics = [];
+        $normMarks = [];
 
         /* For the $viewee, remember their value in a separate data series for highcharts
          */
         $scatter = [];
 
+        /* Remember the unique titles of each $assessment we encountered, for highcharts
+         */
+        $graphAssessments = [];
+
         foreach ($assessments as $assessment) {
 
             /* For each assessment, get all the Participants' feedbacks, and find out their normalised mark
+             * Index them by specification id; we calculate a five point summary of everything here
              */
-            $normMarks = [];
+            $specificationId = $assessmentTuples[$assessment->getId()];
+
+            /* Remember the unique titles of each $assessment we encountered, for highcharts
+             */
+            if (!isset($graphAssessments[$assessment->getTitle()])) {
+                $graphAssessments[$specificationId] = $assessment->getTitle();
+            }
 
             foreach ($assessment->getAllParticipants() as $participant) {
-                $normMarks[] = $participant->getNormalisedMark(true);
+                $normMarks[$specificationId][] = $participant->getNormalisedMark(true);
 
                 /* If $participant is the $viewee, remember their result in the $scatter
+                 *
+                 * TODO What happens when someone does the same assessment implementation in two different places
+                 *  They share the same specification, but you get two different results
                  */
                 if ($participant->getUser()->getId() === $viewee->getId()) {
-                    $scatter[] = $participant->getNormalisedMark(true);
+                    $scatter[$specificationId] = $participant->getNormalisedMark(true);
                 }
             }
+        }
+
+        /* Now process summaries for each of the data sets we obtained
+         */
+        $statistics = [];
+
+        foreach ($normMarks as $specificationId => $dataSet) {
+
+            /* TODO: Find out what this means
+             */
+            $statistics['graphInfo'][] = [];
+
+            /* Yank the name for this specification id
+             */
+            $statistics['graphAssessments'][] = $graphAssessments[$specificationId];
 
             /* Calculate a five-point summary for each assessment spec, consisting of all the grades
              * given to all the participants
              */
-            $fivePoints = (new Summary($normMarks))->getSummary();
+            $fivePoints = (new Summary($dataSet))->getSummary();
 
-            /* Index by specification id
+            /* For some reason, use this array struct
              */
-            $statistics[$assessment->getSpecificationAssessment()->getId()] = [
-                'data' => [
+            $statistics['graphData'][] = [
 
-                    /* For some reason, use this array struct
-                     */
-
-                    // Minimum
-                    [
-                        'info'  => null,
-                        'uid'   => null,
-                        'value' => $fivePoints['min'],
-                    ],
-                    // 1st Quartile
-                    [
-                        'info'  => null,
-                        'uid'   => null,
-                        'value' => $fivePoints['quartile1'],
-                    ],
-                    // Median
-                    [
-                        'info'  => null,
-                        'uid'   => null,
-                        'value' => $fivePoints['quartile2'],
-                    ],
-                    // 3rd Quartile
-                    [
-                        'info'  => null,
-                        'uid'   => null,
-                        'value' => $fivePoints['quartile3'],
-                    ],
-                    // Maximum
-                    [
-                        'info'  => null,
-                        'uid'   => null,
-                        'value' => $fivePoints['max'],
-                    ],
+                // Minimum
+                [
+                    'info'  => null,
+                    'uid'   => null,
+                    'value' => $fivePoints['min'],
                 ],
-                'scatter' => $scatter
+                // 1st Quartile
+                [
+                    'info'  => null,
+                    'uid'   => null,
+                    'value' => $fivePoints['quartile1'],
+                ],
+                // Median
+                [
+                    'info'  => null,
+                    'uid'   => null,
+                    'value' => $fivePoints['quartile2'],
+                ],
+                // 3rd Quartile
+                [
+                    'info'  => null,
+                    'uid'   => null,
+                    'value' => $fivePoints['quartile3'],
+                ],
+                // Maximum
+                [
+                    'info'  => null,
+                    'uid'   => null,
+                    'value' => $fivePoints['max'],
+                ],
             ];
+
+            /* Yank the scatter for this specification id
+             */
+            $statistics['graphScatter'][] = $scatter[$specificationId];
         }
 
-        return $statistics;
-    }
-
-
-    /**
-     * Generate then return the cohort-level statistics for $assessments
-     *
-     * @return array|null
-     */
-    public function getStudentStatistics(): ?array
-    {
-        if (null === $this->studentStatistics) {
-            $this->studentStatistics = $this->getStudentStatistics();
-        }
-
-        return $this->studentStatistics;
+        /* Statistics is now a set of everything, but highcharts likes us to encode stuff
+         * It's a very fussy eater
+         *
+         * This is used by Grades/templates/fragments/graph.twig
+         */
+        return [
+            'info' => json_encode($statistics['graphInfo']),
+            'assessments' => json_encode($statistics['graphAssessments']),
+            'data' => json_encode($statistics['graphData']),
+            'scatter' => json_encode($statistics['graphScatter'])
+        ];
     }
 }
