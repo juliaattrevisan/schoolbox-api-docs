@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Markbook;
 
 use Schoolbox\Collection;
+use Schoolbox\Config\Loader;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\User;
@@ -22,6 +23,12 @@ use Schoolbox\User;
  */
 class CohortMarks
 {
+
+    /**
+     * @var bool
+     */
+    private $gradeGradientEnabled;
+
 
     /**
      * @var AssessmentMapperProxy
@@ -44,12 +51,18 @@ class CohortMarks
     /**
      * CohortMarks constructor.
      *
+     * @param bool                  $gradeGradientEnabled
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param Collection            $assessments
      * @param User                  $viewer
      */
-    public function __construct(AssessmentMapperProxy $assessmentMapperProxy, Collection $assessments, User $viewer)
-    {
+    public function __construct(
+        bool $gradeGradientEnabled,
+        AssessmentMapperProxy $assessmentMapperProxy,
+        Collection $assessments,
+        User $viewer
+    ) {
+        $this->gradeGradientEnabled = $gradeGradientEnabled;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->assessments = $assessments;
         $this->viewer = $viewer;
@@ -81,7 +94,7 @@ class CohortMarks
 
         /* Use the swamp to hydrate all the participants' pieces via assessmentMapperProxy
          */
-        $assessments = $this->assessmentMapperProxy->findAllByIds(array_keys($assessmentTuples));
+        $assessments = $this->assessmentMapperProxy->findAllByIds(array_keys($assessmentTuples))->sortBy('title', 'asc');
 
         /* Populate all the participants' data into this set
          * We need to build the five-point summary using EVERYONE's feedbacks for this assessment specification
@@ -101,6 +114,10 @@ class CohortMarks
         /* Remember the unique titles of each $assessment we encountered, for highcharts
          */
         $graphAssessments = [];
+
+        /* Remember the $viewee's accomplishment in each specification id
+         */
+        $graphInfo = [];
 
         foreach ($assessments as $assessment) {
 
@@ -129,7 +146,44 @@ class CohortMarks
                      *  They share the same specification, but you get two different results
                      */
                     if ($participant->getUser()->getId() === $viewee->getId()) {
-                        $scatter[$specificationId] = $participant->getNormalisedMark(true);
+
+                        /* Find out what this $viewee accomplished; null normalised marks are disregarded
+                         * We optionally apply a gradient colour
+                         */
+                        $normalisedMark = $participant->getNormalisedMark(true);
+                        $scatter[$specificationId] = $normalisedMark;
+
+                        /* This little data set appears in highcharts when you hover over the
+                         * $viewee's scatter plot, telling you some more metadata about what they achieved
+                         */
+                        $comment = null;
+
+                        /* Look for an authoritative feedback to get the most recent info
+                         */
+                        $feedback = $participant->findAuthoritativeVisibleFeedback($viewee);
+
+                        if ($feedback) {
+                            $comment = $feedback->getComment();
+                        }
+
+                        /* Get the nicer version of the normalised mark
+                         */
+                        $humanReadableMark = $participant->getHumanReadableMark(true);
+
+                        /* If eitehr of these two vars are truthy, there's something to show
+                         */
+                        if ($humanReadableMark || $comment) {
+                            $graphInfo[$specificationId] = [
+                                'displayMark'  => $humanReadableMark,
+                                'gradientMark' => $this->gradeGradientEnabled ? (int)($normalisedMark / 10) : 'none',
+                                'info'         => $comment ?? '',
+                            ];
+                        } else {
+
+                            /* Otherwise, nothing to show
+                             */
+                            $graphInfo[$specificationId] = [];
+                        }
                     }
                 }
             }
@@ -141,9 +195,9 @@ class CohortMarks
 
         foreach ($normMarks as $specificationId => $dataSet) {
 
-            /* TODO: Find out what this means
+            /* The hover info thingy on the highcharts
              */
-            $statistics['graphInfo'][] = [];
+            $statistics['graphInfo'][] = $graphInfo[$specificationId];
 
             /* Yank the name for this specification id
              */
