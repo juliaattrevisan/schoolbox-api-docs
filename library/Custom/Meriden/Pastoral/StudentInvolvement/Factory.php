@@ -57,20 +57,6 @@ class Factory
     private $rubricMapper;
 
     /**
-     * The currently authenticated user.
-     *
-     * @var User
-     */
-    private $currentUser;
-
-    /**
-     * Access permissions data source
-     *
-     * @var Access
-     */
-    private $access;
-
-    /**
      * Data source for fetching users who have access to a folder.
      *
      * @var UserAccessMapper
@@ -85,8 +71,6 @@ class Factory
      * @param FolderMapper         $folderMapper
      * @param AssessmentDataSource $assessmentDataSource
      * @param RubricDataSource     $rubricMapper
-     * @param User                 $currentUser
-     * @param Access               $access
      * @param UserAccessMapper     $userAccessMapper
      */
     public function __construct(
@@ -95,8 +79,6 @@ class Factory
         FolderMapper $folderMapper,
         AssessmentDataSource $assessmentDataSource,
         RubricDataSource $rubricMapper,
-        User $currentUser,
-        Access $access,
         UserAccessMapper $userAccessMapper
     ) {
         $this->gateway              = $gateway;
@@ -104,8 +86,6 @@ class Factory
         $this->folderMapper         = $folderMapper;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->rubricMapper         = $rubricMapper;
-        $this->currentUser          = $currentUser;
-        $this->access               = $access;
         $this->userAccessMapper     = $userAccessMapper;
     }
 
