@@ -8,7 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application\CliTool\PdfGenerator;
 
+use Alaress\Authorizer\Failure\Unauthenticated;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\GenericCollection;
+use Schoolbox\User;
 use Zend\Uri\UriInterface;
 
 /**
@@ -50,6 +53,26 @@ EXAMPLES:
       $file -l export.log -o archive.zip
 ";
         fwrite(STDOUT, $help);
+    }
+
+
+    /**
+     * This tool requires that the authenticated user be a superuser.
+     *
+     * @param User|null $user
+     *
+     * @throws Unauthenticated if no user is authenticated
+     * @throws Unauthorized    if user is not a superuser
+     */
+    protected function authorizeUser(?User $user): void
+    {
+        $message = 'This tool requires that a user be authenticated, and that they be a superuser';
+        if (!$user) {
+            throw new Unauthenticated($message);
+        }
+        if (!$user->isSuperuser()) {
+            throw new Unauthorized($message);
+        }
     }
 
 

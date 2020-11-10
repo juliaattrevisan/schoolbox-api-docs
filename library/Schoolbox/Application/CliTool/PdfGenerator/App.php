@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application\CliTool\PdfGenerator;
 
+use Alaress\Authorizer\Failure\Unauthenticated;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Aura\Di\Exception\ServiceNotFound;
 use GuzzleHttp\Client;
 use Knp\Snappy\Pdf;
@@ -56,6 +58,9 @@ abstract class App extends BaseApp
 
     // Exit status for an authentication failure
     private const EXIT_STATUS_AUTHENTICATION_FAILURE = 100;
+
+    // Exit status for an authorization failure
+    private const EXIT_STATUS_AUTHORIZATION_FAILURE = 101;
 
     /**
      * @inheritdoc
@@ -111,7 +116,17 @@ abstract class App extends BaseApp
         }
 
 
-        // TODO determine who is identified by the session hash, and optionally authorize them
+        // Authorize the user identified by the session hash
+        $authenticatedUser = $this->determineAuthenticatedUserFromSessionHash($sessionHash);
+        try {
+            $this->authorizeUser($authenticatedUser);
+        } catch (Unauthenticated $e) {
+            $this->getLogger()->error($e->getMessage());
+            exit(self::EXIT_STATUS_AUTHENTICATION_FAILURE);
+        } catch (Unauthorized $e) {
+            $this->getLogger()->error($e->getMessage());
+            exit(self::EXIT_STATUS_AUTHORIZATION_FAILURE);
+        }
 
 
         // Build a PDF generator object, put the session hash in it
@@ -379,6 +394,24 @@ BASE;
             return null;
         }
         return $user;
+    }
+
+
+    /**
+     * Authorizes the user `determineAuthenticatedUserFromSessionHash` fetched,
+     * if any.
+     *
+     * This default implementation does not authorize the user at all, nor even
+     * verify that they are authenticated: subclasses may choose to do either.
+     *
+     * @param User|null $user
+     * @throws Unauthenticated if user was not able to be authenticated at all,
+     *                         and that is not acceptable to this implementation
+     * @throws Unauthorized    if user is not authorized to perform the action
+     *                         requested in this implementation
+     */
+    protected function authorizeUser(?User $user): void
+    {
     }
 
 
