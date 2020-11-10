@@ -157,45 +157,48 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        $markbookId = $this->getMarkbookIdentifier($assessment);
-        if (!isset($markbookId)) {
-            return false;
-        }
-
-        $this->insertMarkbooksIfNotExists(
+        if( $this->insertMarkbooksIfNotExists(
             $assessment,
             $folderCodes,
             $this->getSystemFileYear(),
             $this->getSystemFileSemester()
-        );
+        ) ) {
+            return true;
+        } else {
 
-        $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
-        $resultType            = $this->getResultType($assessment);
+            $markbookId = $this->getMarkbookIdentifier($assessment);
+            if (!isset($markbookId)) {
+                return false;
+            }
 
-        $sql = "
-            UPDATE StaffAssessmentMarkBook
-            SET    Heading         = :heading,
-                   HdgAbbrev1      = :headingAbbreviation1,
-                   WeightingFactor = :weightingFactor,
-                   ResultType      = :resultType,
-                   TestDate        = :dueDate
-            WHERE  HdgAbbrev2      = :headingAbbreviation2
-            AND    FileYear        = :fileYear
-            AND    FileSemester    = :fileSemester
-        ";
+            $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
+            $resultType            = $this->getResultType($assessment);
 
-        $params = [
-            'heading'              => $assessmentFieldValues["Heading"],
-            'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
-            'headingAbbreviation2' => $markbookId,
-            'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
-            'resultType'           => $resultType,
-            'fileYear'             => $this->getSystemFileYear(),
-            'fileSemester'         => $this->getSystemFileSemester(),
-            'dueDate'              => $assessment->getDueAt()->getDatabase(),
-        ];
+            $sql = "
+                UPDATE StaffAssessmentMarkBook
+                SET    Heading         = :heading,
+                       HdgAbbrev1      = :headingAbbreviation1,
+                       WeightingFactor = :weightingFactor,
+                       ResultType      = :resultType,
+                       TestDate        = :dueDate
+                WHERE  HdgAbbrev2      = :headingAbbreviation2
+                AND    FileYear        = :fileYear
+                AND    FileSemester    = :fileSemester
+            ";
 
-        return $this->getConnector()->prepareQuery($sql, $params)->execute();
+            $params = [
+                'heading'              => $assessmentFieldValues["Heading"],
+                'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
+                'headingAbbreviation2' => $markbookId,
+                'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
+                'resultType'           => $resultType,
+                'fileYear'             => $this->getSystemFileYear(),
+                'fileSemester'         => $this->getSystemFileSemester(),
+                'dueDate'              => $assessment->getDueAt()->getDatabase(),
+            ];
+
+            return $this->getConnector()->prepareQuery($sql, $params)->execute();
+        }
     }
 
 
@@ -345,15 +348,17 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $student = $feedback->getReviewee();
         $marker  = $feedback->getReviewer();
 
-        // Donq't sync marks if:
+        // Don't sync marks if:
         // * Student's ID is invalid
         // * Marker's ID is invalid
         if (!$this->isExternalIdValid($student->getExternalId())) {
             return false;
         }
-        if (!$this->isExternalIdValid($marker->getExternalId())) {
-            return false;
-        }
+        /*        if (!$this->isExternalIdValid($marker->getExternalId())) {
+            echo $marker->getUsername();
+            echo $marker->getExternalId();
+                    return false;
+                }*/
 
         return $this->setActivityMark($feedback);
     }
@@ -470,7 +475,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
             'dueDate'              => $assessment->getDueAt()->getDatabase(),
         ]);
-
+        var_dump($statement);
         return $statement->execute();
     }
 
@@ -855,7 +860,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $owner = $this->retrieveOwnerFromAssessment($activity);
         if (!($owner && $this->isExternalIdValid($owner->getExternalId()))) {
-            //return false;
+            //  return false;
         }
 
         $remoteAssessmentList = $this->getSynergeticMarkbookList($activity, $fileYear, $fileSemester);
