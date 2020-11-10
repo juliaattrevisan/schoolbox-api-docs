@@ -95,7 +95,7 @@ class CohortMarks
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
-    private function getAssessmentSet(): Collection
+    private function getCohortAssessmentSet(): Collection
     {
 
         /* The input implementation ids are in a particular sort order which isn't easy to replicate
@@ -184,7 +184,7 @@ class CohortMarks
 
         /* Get all the assessments we need to analyse
          */
-        $assessments = $this->getAssessmentSet();
+        $assessments = $this->getCohortAssessmentSet();
 
         /* Remember all the boxplot data series grouped by specification id
          */
