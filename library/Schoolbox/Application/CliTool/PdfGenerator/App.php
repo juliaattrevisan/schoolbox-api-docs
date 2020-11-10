@@ -389,23 +389,19 @@ abstract class App extends BaseApp
      */
     private function buildPdfGenerator(): Pdf
     {
-        $snappy = new Pdf('/usr/local/bin/wkhtmltopdf');
+        $pdfGenerator = new Pdf('/usr/local/bin/wkhtmltopdf');
 
-        // TODO expose timeout as CLI option
-        $snappy->setTimeout(120);
-        $snappy->setOption('orientation', 'Landscape');
-        $snappy->setOption('disable-external-links', true);
-        $snappy->setOption('viewport-size', 1024);
-        $snappy->setOption(
-            'javascript-delay',
-            $this->getOptAsInt(self::OPT_LONG_JS_DELAY) ?? self::DEFAULT_JS_DELAY
-        );
+        // TODO expose more CLI options
+        $pdfGenerator->setTimeout(120);
+        $pdfGenerator->setOption('orientation', 'Landscape');
+        $pdfGenerator->setOption('disable-external-links', true);
+        $pdfGenerator->setOption('viewport-size', 1024);
 
         $userStyleSheet = $this->getOpt(self::OPT_LONG_USER_STYLE_SHEET);
         if (isset($userStyleSheet)) {
-            $snappy->setOption('user-style-sheet', $userStyleSheet);
+            $pdfGenerator->setOption('user-style-sheet', $userStyleSheet);
         }
-        return $snappy;
+        return $pdfGenerator;
     }
 
 
