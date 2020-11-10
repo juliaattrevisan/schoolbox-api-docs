@@ -118,27 +118,13 @@ EXAMPLES:
      */
     protected function generatePdfSources(UriInterface $baseUrl): GenericCollection
     {
-        /** @var Router $router */
-        $router = $this->getDi()->get('router');
-        /** @var IConnector $externalDb */
-        $externalDb   = $this->getDi()->get('databaseExternal');
-        $userMapper   = UserMapper::getInstance();
-        $folderMapper = FolderMapper::getInstance();
-        /** @var MapperProxy $assessmentDataSource */
-        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-        $rubricDataSource     = RubricDataSource::getInstance();
-        $userAccessMapper     = UserAccessMapper::getInstance();
-        $urlGenerator         = new UrlGenerator(
-            $router,
-            new Factory(
-                new Gateway($externalDb),
-                $userMapper,
-                $folderMapper,
-                $assessmentDataSource,
-                $rubricDataSource,
-                $userAccessMapper
-            )
-        );
+        // Determine and validate the role type, if there is one
+        $roleType = $this->getOpt(self::OPT_LONG_ROLE_TYPE);
+        if (isset($roleType) && !in_array($roleType, Role::getRoleTypes(), true)) {
+            throw new InvalidArgumentException(
+                sprintf('If provided, --role-type option must be one of: %s', Role::getRoleTypes())
+            );
+        }
 
 
         // Determine the report year and year levels to run the report for.
@@ -174,7 +160,31 @@ EXAMPLES:
         }
 
 
-        // start making a user query.
+        // Build the URL generator
+        /** @var Router $router */
+        $router = $this->getDi()->get('router');
+        /** @var IConnector $externalDb */
+        $externalDb   = $this->getDi()->get('databaseExternal');
+        $userMapper   = UserMapper::getInstance();
+        $folderMapper = FolderMapper::getInstance();
+        /** @var MapperProxy $assessmentDataSource */
+        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+        $rubricDataSource     = RubricDataSource::getInstance();
+        $userAccessMapper     = UserAccessMapper::getInstance();
+        $urlGenerator         = new UrlGenerator(
+            $router,
+            new Factory(
+                new Gateway($externalDb),
+                $userMapper,
+                $folderMapper,
+                $assessmentDataSource,
+                $rubricDataSource,
+                $userAccessMapper
+            )
+        );
+
+
+        // Build the list of students
         // TODO for 20.2 year will be in a join table, so update the query
         $userQuery = $userMapper->getPredicateBuilder()
                                 ->in('year', $searchYearLevels);
@@ -196,13 +206,10 @@ EXAMPLES:
         $this->getLogger()->notice(
             sprintf('Found %d student(s) to generate reports for', count($students))
         );
-        $result   = new GenericCollection(SourceBundle::class);
-        $roleType = $this->getOpt(self::OPT_LONG_ROLE_TYPE);
-        if (isset($roleType) && !in_array($roleType, Role::getRoleTypes(), true)) {
-            throw new InvalidArgumentException(
-                sprintf('If provided, --role-type option must be one of: %s', Role::getRoleTypes())
-            );
-        }
+
+
+        // Build the source bundles, each will have a PDF generated for it
+        $result = new GenericCollection(SourceBundle::class);
         foreach ($students as $student) {
             $result->add(
                 new SourceBundle(
