@@ -12,90 +12,111 @@ use Alaress\Database\Connector\IConnector;
 use Aura\Router\Router;
 use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
 use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
-use GuzzleHttp\Client;
-use Knp\Snappy\Pdf;
-use Schoolbox\Application\CliKernelAbstract;
-use Schoolbox\Application\CliTool\App;
+use Schoolbox\Application\CliTool\PdfGenerator\App;
+use Schoolbox\Application\CliTool\PdfGenerator\SourceBundle;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
-use Schoolbox\Auth\Remote\RemoteLogin;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\Sync\Provisioner\UserMapper;
 use Schoolbox\User;
-use function fwrite;
-use function trim;
+use Zend\Uri\UriInterface;
 
 /**
- * Command-line PDF generator
+ * Command-line PDF generator for Meriden's eReports.
  */
 class PdfGenerator extends App
 {
-    private const OPT_SHORT_HELP      = 'h';                 // print help
-    private const OPT_LONG_HELP       = 'help';              // print help
-    private const OPT_LONG_HASH       = 'hash:';             // session hash
-    private const OPT_LONG_USERNAME   = 'username:';         // username
-    private const OPT_LONG_STUDENT_ID = 'student-id:';       // student external id
-    private const OPT_LONG_YEAR_LEVEL = 'year-level:';       // year-level
-//    private const OPT_LONG_CURRICULUM       = 'curriculum:';       // curriculum
-    private const OPT_LONG_MAX_FAILS        = 'max-fails:';        // Number of consecutive fails after which to abort the script's execution.
-    private const OPT_LONG_JS_DELAY         = 'js-delay:';         // How many milliseconds to let JS run before attempting to print page
-    private const OPT_LONG_REPORT_YEAR      = 'report-year:';      // to generate a report for some point in time
-    private const OPT_LONG_USER_STYLE_SHEET = 'user-style-sheet:'; // user style sheet
-    private const OPT_LONG_ROLE_TYPE        = 'role-type:';        // role-type override
-//    private const OPT_LONG_INCLUDE_SUBJECTS = 'include-subjects';  // include subject reports
+    // student ID to generate the report for
+    private const OPT_LONG_STUDENT_ID = 'student-id:';
 
-    private const DEFAULT_MAX_FAILS   = 3;
-    private const DEFAULT_JS_DELAY    = 1000;
+    // Year levels to generate the report for
+    private const OPT_LONG_YEAR_LEVEL = 'year-level:';
     private const DEFAULT_YEAR_LEVELS = [7, 8, 9,];
 
-    private const EXIT_STATUS_AUTHENTICATION_FAILURE = 100;
-    private const EXIT_STATUS_AUTHORISATION_FAILURE  = 101;
+    // Calendar year to generate a report for
+    private const OPT_LONG_REPORT_YEAR = 'report-year:';
 
-    /**
-     * @inheritdoc
-     */
-    public function getShortOpts(): array
-    {
-        return [self::OPT_SHORT_HELP];
-    }
-
+    // role-type override: ensure that only particular users may see reports
+    private const OPT_LONG_ROLE_TYPE = 'role-type:';
 
     /**
      * @inheritdoc
      */
     public function getLongOpts(): array
     {
-        return [
-            self::OPT_LONG_HELP,
-            self::OPT_LONG_HASH,
-            self::OPT_LONG_USERNAME,
-            self::OPT_LONG_STUDENT_ID,
-            self::OPT_LONG_YEAR_LEVEL,
-            self::OPT_LONG_MAX_FAILS,
-            self::OPT_LONG_JS_DELAY,
-            self::OPT_LONG_REPORT_YEAR,
-            self::OPT_LONG_USER_STYLE_SHEET,
-            self::OPT_LONG_ROLE_TYPE,
-        ];
+        return array_merge(
+            parent::getLongOpts(),
+            [
+                self::OPT_LONG_STUDENT_ID,
+                self::OPT_LONG_YEAR_LEVEL,
+                self::OPT_LONG_REPORT_YEAR,
+                self::OPT_LONG_ROLE_TYPE,
+            ]
+        );
     }
 
 
     /**
      * @inheritdoc
      */
-    public function run(): void
+    protected function printHelp(): void
     {
-        // Did user request help?
-        if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
-            $this->printHelp();
-            exit(CliKernelAbstract::EXIT_STATUS_OK);
-        }
+        $file              = $this->getToolFilename();
+        $green             = self::COLOUR_GREEN;
+        $white             = self::COLOUR_WHITE;
+        $yellow            = self::COLOUR_YELLOW;
+        $defaultReportYear = $this->getDefaultReportYear();
+        $roleTypes         = implode(', ', Role::getRoleTypes());
+        $baseOptionHelp    = $this->generateHelpMessageForBaseOptions();
+        $help              = "{$white}NAME:
+    Meriden eReport PDF Batch Generator
 
-        // generate a list of URLs
+SYNOPSIS:
+    $green{$file} {$yellow}[OPTION]...$white
 
+DESCRIPTION
+    This tool generates an archive of eReports in PDF format.
+
+OPTIONS
+$baseOptionHelp
+
+    $yellow--student-id=ID$white
+        Just generate the report for the student with this TASS ID.
+
+    $yellow--year-level=YEAR_LEVEL$white
+        Just generate reports for students in this year level for the report's
+        year, e.g. '--year-level=7'.
+        Defaults to generating reports for all year levels which may have an
+        eReport (i.e. 7, 8 and 9).
+
+    $yellow--report-year=REPORT_YEAR$white
+        Generate the reports for the given year.
+        Defaults to the current year ($defaultReportYear).
+
+    $yellow--role-type=ROLE_TYPE$white
+        Print eReports as they would appear to users with this role type.
+        Must be one of [{$roleTypes}]
+
+EXAMPLES:
+ * Write log to terminal, output to archive.zip
+      $file 1> archive.zip
+      $file -o archive.zip
+ * Append log to export.log, output to archive.zip
+      $file 2>> export.log 1> archive.zip
+      $file -l export.log -o archive.zip
+";
+        fwrite(STDOUT, $help);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function generatePdfSources(UriInterface $baseUrl): GenericCollection
+    {
         /** @var Router $router */
         $router = $this->getDi()->get('router');
         /** @var IConnector $externalDb */
@@ -152,27 +173,13 @@ class PdfGenerator extends App
         }
 
 
-        // Attempt to sign in:
-        // Create a remote authentication class, whose only output is a
-        // session ID cookie
-        $sessionHash = $this->getOpt(self::OPT_LONG_HASH);
-        if (!$sessionHash) {
-            $sessionHash = $this->generateSessionHashViaLoginForm($this->getUsername());
-        }
-
-
-        // Build a PDF generator object, put the session ID cookie in it
-        $pdfGenerator = $this->buildPdfGenerator();
-        $pdfGenerator->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
-
-
         // start making a user query.
         // TODO for 20.2 year will be in a join table, so update the query
         $userQuery = $userMapper->getPredicateBuilder()
                                 ->in('year', $searchYearLevels);
-        $studentId = $this->getOptAsInt(self::OPT_LONG_STUDENT_ID);
+        $studentId = $this->getOpt(self::OPT_LONG_STUDENT_ID);
         if (isset($studentId)) {
-            $userQuery = $userQuery->equals('id', $studentId);
+            $userQuery = $userQuery->equals('synergy_id', $studentId);
         }
 
         /** @var User[] $students */
@@ -188,123 +195,24 @@ class PdfGenerator extends App
         $this->getLogger()->notice(
             sprintf('Found %d student(s) to generate reports for', count($students))
         );
+        $result = new GenericCollection(SourceBundle::class);
         foreach ($students as $student) {
-            $this->getLogger()->info(
-                sprintf(
-                    'Generating report for %s, %s (ID: %d, TASS ID: %s)',
-                    $student->getLastname(),
-                    $student->getFirstname(),
-                    $student->getId(),
-                    $student->getExternalId()
+            $result->add(
+                new SourceBundle(
+                    sprintf('%s.pdf', $student->getExternalId()),
+                    $urlGenerator->generate($reportYear, $student),
+                    sprintf(
+                        'Generating report for %s, %s (ID: %d, TASS ID: %s)',
+                        $student->getLastname(),
+                        $student->getFirstname(),
+                        $student->getId(),
+                        $student->getExternalId()
 
+                    )
                 )
             );
-            $filename = sprintf('%s.pdf', $student->getExternalId());
-            $this->getLogger()->debug(sprintf('Generating report file: %s', $filename));
-
-            $urls = $urlGenerator->generate($reportYear, $student);
-
-            // The first URL will be the pastoral report
-            // All subsequent will be subject reports
-            // Collate these all into a single page
-
-            // create a file pointer
-//            fwrite($fp, $pdfGenerator->getOutput($urls));
         }
-    }
-
-
-    /**
-     * Prints a help message, always to STDOUT, regardless of Kernel's output file option
-     */
-    private function printHelp(): void
-    {
-        $file              = $this->getToolFilename();
-        $defaultMaxFails   = self::DEFAULT_MAX_FAILS;
-        $defaultJsDelay    = self::DEFAULT_JS_DELAY;
-        $defaultReportYear = $this->getDefaultReportYear();
-        $roleTypes         = implode(', ', Role::getRoleTypes());
-
-        $green  = self::COLOUR_GREEN;
-        $white  = self::COLOUR_WHITE;
-        $yellow = self::COLOUR_YELLOW;
-
-        $help = "$white
-
-NAME:
-    Meriden eReport PDF Batch Printer
-
-SYNOPSIS:
-    $green{$file} {$yellow}[OPTION]...$white
-
-DESCRIPTION
-    This tool generates an archive of eReports in PDF format.
-
-    By default, writes archive to STDOUT (1>) and writes log to STDERR (2>)
-
-    This can be changed by providing an output and/or log file. If provided,
-    tool will not write to STDOUT or STDERR, respectively.
-
-    To authenticate the app, you can either provide a session hash, or a
-    username + password. If the latter, this app will prompt you to enter the
-    password on STDIN and STDOUT.
-
-    $yellow-h, --help$white
-        Print this help and exit
-
-    $yellow-o=OUT_FILE$white
-        Filename to write archive to, e.g. '-o=output.zip'
-
-    $yellow-l=LOG_FILE$white
-        Filename to append logs to, e.g. '-l=error.log'
-
-    $yellow-v[v[v]]$white
-        Log verbosity. Max 3 levels, e.g. -vvv
-
-    $yellow--hash=HASH$white
-        A valid session hash, you can extract this from a browser session
-
-    $yellow--username=USERNAME$white
-        A username to run the tool as
-
-    $yellow--student-id=ID$white
-        Just generate the report for this student.
-
-    $yellow--year-level=YEAR_LEVEL$white
-        Just generate reports for students in this year level for the report's
-        year, e.g. '--year-level=7'.
-        Defaults to generating reports for all year levels which may have an
-        eReport (i.e. 7, 8 and 9).
-
-    $yellow--max-fails=COUNT$white
-        If the tool fails for this many students in a row, exit immediately.
-        Defaults to $defaultMaxFails.
-
-    $yellow--js-delay=COUNT$white
-        Number of milliseconds to wait before printing a page to allow
-        javascript to execute.
-        Defaults to $defaultJsDelay.
-
-    $yellow--report-year=REPORT_YEAR$white
-        Generate the reports for the given year.
-        Defaults to the current year ($defaultReportYear).
-
-    $yellow--user-style-sheet=STYLE_FILE$white
-        Filename of a style sheet to load with every page.
-
-    $yellow--role-type=ROLE_TYPE$white
-        Print eReports as they would appear to users with this role type.
-        Must be one of [{$roleTypes}]
-
-EXAMPLES:
- * Write log to terminal, output to archive.zip
-      $file 1> archive.zip
-      $file -o archive.zip
- * Append log to export.log, output to archive.zip
-      $file 2>> export.log 1> archive.zip
-      $file -l export.log -o archive.zip
-";
-        fwrite(STDOUT, $help);
+        return $result;
     }
 
 
@@ -327,97 +235,5 @@ EXAMPLES:
     private function getCurrentYear(): int
     {
         return (int)date('Y');
-    }
-
-
-    /**
-     * Build a PDF generator with sensible settings.
-     *
-     * @return Pdf
-     */
-    private function buildPdfGenerator(): Pdf
-    {
-        $snappy = new Pdf('/usr/local/bin/wkhtmltopdf');
-
-        // TODO expose timeout as CLI option
-        $snappy->setTimeout(120);
-        $snappy->setOption('orientation', 'Landscape');
-        $snappy->setOption('disable-external-links', true);
-        $snappy->setOption('viewport-size', 1024);
-        $snappy->setOption(
-            'javascript-delay',
-            $this->getOptAsInt(self::OPT_LONG_JS_DELAY) ?? self::DEFAULT_JS_DELAY
-        );
-
-        $userStyleSheet = $this->getOpt(self::OPT_LONG_USER_STYLE_SHEET);
-        if (isset($userStyleSheet)) {
-            $snappy->setOption('user-style-sheet', $userStyleSheet);
-        }
-        return $snappy;
-    }
-
-
-    /**
-     * Return a username, either from command line options, or by prompting the
-     * user.
-     *
-     * @return string
-     */
-    private function getUsername(): string
-    {
-        // Revert to username and password
-        $username = $this->getOpt(self::OPT_LONG_USERNAME);
-        if (isset($username)) {
-            $this->getLogger()->debug('Using username provided on command line');
-            return $username;
-        }
-
-        while (true) {
-            $this->getLogger()->debug("Requesting username");
-            $username = trim($this->readLine('Please provide a schoolbox username: '));
-            // TODO use a regex
-            if ($username) {
-                $this->getLogger()->debug("Username set to '$username'");
-                break;
-            }
-            $this->getLogger()->warning("Username '$username' appears invalid");
-        }
-        return $username;
-    }
-
-
-    /**
-     * Attempt to login via the web form, and return the generated session hash.
-     *
-     * @param string $username
-     * @return string
-     */
-    private function generateSessionHashViaLoginForm(string $username): string
-    {
-        $attempts    = 0;
-        $maxAttempts = 3;
-        $remoteLogin = new RemoteLogin(
-            new Client(),
-            trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}")
-        );
-        while (true) {
-            $attempts++;
-            if ($attempts > $maxAttempts) {
-                $this->getLogger()->warning("Login failed");
-                exit(self::EXIT_STATUS_AUTHENTICATION_FAILURE);
-            }
-            $remaining = $maxAttempts - $attempts + 1;
-            $this->getLogger()->debug("Requesting password, ($remaining attempts remaining)");
-            $password = $this->readPassword("Please provide your password ($remaining attempts remaining): ");
-            // TODO use regex
-            if ($password) {
-                $this->getLogger()->info("Password provided, attempting login");
-                $cookie = $remoteLogin->authenticate($username, $password);
-                if (isset($cookie)) {
-                    return $cookie;
-                }
-            }
-            $this->getLogger()->warning("Password appears invalid");
-        }
     }
 }
