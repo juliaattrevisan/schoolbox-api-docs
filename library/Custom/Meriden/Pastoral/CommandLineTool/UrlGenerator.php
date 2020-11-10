@@ -10,6 +10,7 @@ namespace Custom\Meriden\Pastoral\CommandLineTool;
 
 use Aura\Router\Router;
 use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
+use Custom\Meriden\Pastoral\StudentInvolvement\Subject;
 use Schoolbox\User;
 
 /**
@@ -67,8 +68,15 @@ class UrlGenerator
             $this->router->generate('customMeridenPastoral.index', $params) . $queryString,
         ];
 
-        // Find the pages for each subject
+        // Find the pages for each subject: sort by alphabetical order
         $subjectList = $this->factory->buildSubjectList($year, $student);
+        usort(
+            $subjectList,
+            static function (Subject $a, Subject $b) {
+                return strnatcasecmp($a->getName(), $b->getName());
+            }
+        );
+
         foreach ($subjectList as $subject) {
             $params    = [
                 'student'     => $student,
