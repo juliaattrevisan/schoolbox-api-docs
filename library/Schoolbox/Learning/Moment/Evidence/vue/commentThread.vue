@@ -240,9 +240,9 @@ export default {
 
 <template>
     <div>
-        <h3 v-if="!hasComments">
+        <span class="comment-count" v-if="!hasComments">
             No comments yet
-        </h3>
+        </span>
         <template v-else>
             <span class="comment-count">
                 {{ commentThread.children.metadata.count }} comment(s)
