@@ -8,14 +8,17 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application\CliTool\PdfGenerator;
 
+use Aura\Di\Exception\ServiceNotFound;
 use GuzzleHttp\Client;
 use Knp\Snappy\Pdf;
+use Predis\ClientInterface as RedisClient;
 use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App as BaseApp;
 use Schoolbox\Auth\Remote\RemoteLogin;
 use Schoolbox\GenericCollection;
 use Schoolbox\Realtime\Pipe\PipeManager;
+use Schoolbox\User;
 use Zend\Uri\Uri;
 use Zend\Uri\UriInterface;
 use ZipArchive;
@@ -319,6 +322,63 @@ BASE;
             }
             $this->getLogger()->warning("Password appears invalid");
         }
+    }
+
+
+    /**
+     * Determine which user is logged in given a session hash.
+     *
+     * Note that this implementation is highly specific to the Redis session
+     * handler, and should the session handler ever change this will cease to
+     * function.
+     *
+     * @param string|null $hash
+     * @return User|null
+     */
+    private function determineAuthenticatedUserFromSessionHash(?string $hash): ?User
+    {
+        // Find the redis client
+        try {
+            $redis = $this->getDi()->get('redis');
+        } catch (ServiceNotFound $e) {
+            $redis = null;
+        }
+        if (!$redis instanceof RedisClient) {
+            $this->getLogger()->alert("Unable to fetch redis client");
+            return null;
+        }
+
+
+        // Find the session data within Redis
+        $redisData = $redis->get(sprintf('%s%s', PipeManager::REDIS_SESSION_PREFIX, $hash));
+        if (null === $redisData) {
+            $this->getLogger()->alert("No redis data found for hash: {$hash}");
+            return null;
+        }
+
+
+        // Decode the session data.
+        // Unfortunately a session must be started in order to do this:
+        // abort the session immediately after we are done
+        session_start();
+        session_decode($redisData);
+        /** @var User $user */
+        $user     = $_SESSION['user'] ?? null;
+        $lastTime = $_SESSION['lasttime'] ?? null;
+        session_unset();
+        session_abort();
+
+
+        // Return the user, if their session has not expired
+        if (!$user) {
+            $this->getLogger()->alert("No user object found in session data");
+            return null;
+        }
+        if (!$lastTime || time() - $lastTime > $this->getConfig()->get('session_length')) {
+            $this->getLogger()->alert("Session has expired");
+            return null;
+        }
+        return $user;
     }
 
 
