@@ -35,24 +35,21 @@
           method="POST"
           class="progress-tick-form"
           data-progress-tick-form="{{ assessment.isSelfAssessable ?? false ? 'selfAssessed' : 'teacherAssessed' }}">
-        {% if not participant or participant.isResponseRequired %}
-            <a href="#"
-               class="no-text progress-tick"
+        {% if participant.isResponseRequired and (USER.role.isStaff or (student.id == USER.id and assessment.isSelfAssessable)) %}
+            <a class="no-text progress-tick"
                title="Incomplete"
                data-progress-tick-status="incomplete"></a>
         {% elseif participant.isFeedbackRequired %}
-            <a href="#"
-               class="no-text progress-tick pending"
+            <a class="no-text progress-tick pending"
                title="Self-assessed"
                data-progress-tick-status="selfAssessed"></a>
         {% elseif participant.isReviewComplete %}
-            <a href="#"
-               class="no-text progress-tick reviewed"
+            <a class="no-text progress-tick reviewed"
                title="Completed"
                data-progress-tick-status="teacherAssessed"></a>
         {% endif %}
     </form>
-{% else %}
+{% elseif assessment is not task %}
 
     {# Other assessment types get non-POST behaviour
      # Excluded people and non-participants probably shouldn't even get a link to anything?
