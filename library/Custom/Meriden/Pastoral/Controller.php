@@ -174,6 +174,7 @@ class Controller extends Base
                 'subjectReport'    => $subject,
                 'tutorGroupList'   => $tutorGroupList,
                 'subjectList'      => $subjectList,
+                'roleTypeOverride' => $roleTypeOverride,
             )
         );
     }
