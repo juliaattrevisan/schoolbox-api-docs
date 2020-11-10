@@ -186,9 +186,8 @@ EXAMPLES:
 
 
         // Build the list of students
-        // TODO for 20.2 year will be in a join table, so update the query
         $userQuery = $userMapper->getPredicateBuilder()
-                                ->in('year', $searchYearLevels);
+                                ->in('lyl.name', $searchYearLevels);
         $studentId = $this->getOpt(self::OPT_LONG_STUDENT_ID);
         if (isset($studentId)) {
             $userQuery = $userQuery->equals('synergy_id', $studentId);
