@@ -37,7 +37,6 @@ abstract class App extends BaseApp
     private const DEFAULT_JS_DELAY  = 1000;
 
     private const EXIT_STATUS_AUTHENTICATION_FAILURE = 100;
-    private const EXIT_STATUS_AUTHORISATION_FAILURE  = 101;
 
     /**
      * @inheritdoc
