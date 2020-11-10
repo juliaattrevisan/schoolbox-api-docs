@@ -78,73 +78,51 @@ abstract class App extends BaseApp
         }
 
 
+        // Set up required base information:
+        // * base URL for requests
+        // * temp dir for PDFs
         $baseUrl = $this->generateBaseUrl();
+        $tempDir = $this->createTempDir();
 
 
-        // Attempt to sign in:
-        // Create a remote authentication class, whose only output is a
-        // session ID cookie
+        // If no session hash was provided:
+        // attempt to log in, and use that session's hash in the PDF generator
         $sessionHash = $this->getOpt(self::OPT_LONG_HASH);
         if (!$sessionHash) {
             $sessionHash = $this->generateSessionHashViaLoginForm($this->getUsername(), $baseUrl);
         }
 
 
-        // Build a PDF generator object, put the session ID cookie in it
+        // Build a PDF generator object, put the session hash in it
         $pdfGenerator = $this->buildPdfGenerator();
         $pdfGenerator->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
 
 
-        // Create a temp dir
-        $tempdir = $this->createTempDir();
-
-
-        // Generate a list of filenames and files that will be generated
-        $pdfFilenames = [];
+        // Generate all PDFs
+        $pdfFilenames        = [];
+        $consecutiveFailures = 0;
+        $maxFailures         = $this->getOptAsInt(self::OPT_LONG_MAX_FAILS) ?? self::DEFAULT_MAX_FAILS;
         foreach ($this->generatePdfSources($baseUrl) as $pdfSource) {
-            // TODO wrap this in a retry
-            $this->getLogger()->notice($pdfSource['message']);
-
-            // Create the PDF
-            $filename = $tempdir . '/' . $pdfSource['filename'];
-            $fp       = fopen($filename, 'wb');
-            if (!$fp) {
-                throw new RuntimeException("Unable to create file: '{$filename}'");
-            }
-
-            $maxAttempts       = 10;
-            $attempts          = 0;
-            $previousException = null;
-            $jsDelay           = $this->getOptAsInt(self::OPT_LONG_JS_DELAY) ?? self::DEFAULT_JS_DELAY;
-            while (true) {
-                if ($attempts++ >= $maxAttempts) {
-                    unlink($filename);
-                    throw new RuntimeException("Unable to generate PDF after $maxAttempts attempts, skipping", 0, $previousException);
-                }
-                try {
-                    // Creating the filename
-                    $pdfGenerator->setOption('javascript-delay', $jsDelay);
-
-                    // URLs need to have a port added
-                    fwrite($fp, $pdfGenerator->getOutput($pdfSource['urls']));
-                    $pdfFilenames[] = $filename;
+            try {
+                $this->getLogger()->notice($pdfSource['message']);
+                $pdfFilenames[]      = $this->generatePdf($pdfSource, $tempDir, $pdfGenerator);
+                $consecutiveFailures = 0;
+            } catch (RuntimeException $e) {
+                // Something went wrong: log it
+                // abort if there's been enough consecutive failures
+                $this->getLogger()->warning($e->getMessage());
+                if ($consecutiveFailures++ >= $maxFailures){
+                    $this->getLogger()->error("$consecutiveFailures consecutive failures, giving up...");
                     break;
-                } catch (RuntimeException $e) {
-                    $this->getLogger()->warning($e->getMessage());
-                    $this->getLogger()->warning($e->getTraceAsString());
-
-                    // Extend the JS delay, as that might prevent rendering
-                    $jsDelay           *= 2;
-                    $previousException = $e;
                 }
+                continue;
             }
-            fclose($fp);
         }
 
 
-        // Done generating PDFs: zip them up
-        $this->createZipArchive($pdfFilenames, $tempdir);
-        $this->cleanUpTempFiles($pdfFilenames, $tempdir);
+        // Done generating PDFs: zip them up and clean up
+        $this->createZipArchive($pdfFilenames, $tempDir);
+        $this->cleanUpTempFiles($pdfFilenames, $tempDir);
     }
 
 
@@ -326,6 +304,51 @@ BASE;
             throw new RuntimeException(sprintf('Directory "%s" was not created', $tempDir));
         }
         return $tempDir;
+    }
+
+
+    /**
+     * Generates a PDF for this source.
+     *
+     * @param array  $pdfSource
+     * @param string $tempDir
+     * @param Pdf    $pdfGenerator
+     * @return string
+     */
+    private function generatePdf(array $pdfSource, string $tempDir, Pdf $pdfGenerator): string
+    {
+        // Create the PDF
+        $filename = $tempDir . '/' . $pdfSource['filename'];
+        $fp       = fopen($filename, 'wb');
+        if (!$fp) {
+            throw new RuntimeException("Unable to create file: '{$filename}'");
+        }
+
+        $maxAttempts       = 10;
+        $attempts          = 0;
+        $previousException = null;
+        $jsDelay           = $this->getOptAsInt(self::OPT_LONG_JS_DELAY) ?? self::DEFAULT_JS_DELAY;
+        while (true) {
+            if ($attempts++ >= $maxAttempts) {
+                unlink($filename);
+                throw new RuntimeException("Unable to generate PDF after $maxAttempts attempts, skipping", 0, $previousException);
+            }
+            try {
+                // Create the file, applying the increased delay if necessary
+                $pdfGenerator->setOption('javascript-delay', $jsDelay);
+                fwrite($fp, $pdfGenerator->getOutput($pdfSource));
+                break;
+            } catch (RuntimeException $e) {
+                $this->getLogger()->warning($e->getMessage());
+                $this->getLogger()->warning($e->getTraceAsString());
+
+                // Extend the JS delay, as that might prevent rendering
+                $jsDelay           *= 2;
+                $previousException = $e;
+            }
+        }
+        fclose($fp);
+        return $filename;
     }
 
 
