@@ -50,7 +50,7 @@ config[amqp_user]=sbc_"$INSTANCE_ID"
 config[amqp_pass]=password
 
 # Assume these are always required. (if we wish to override this assumption, add a new flag to support that)
-declare required_config=(site_hostname site_domain title amqp_host redis_url site_school_code)
+declare required_config=(site_hostname site_domain title amqp_host redis_url site_school_code otfs_s3_bucket otfs_s3_cred_key otfs_s3_cred_secret)
 
 function log(){
   $LOG $L_INFO "$1"
@@ -64,6 +64,10 @@ function error(){
 function check_run_as_root(){
   if [[ $EUID -ne 0 ]]; then
     error "This script must be run as root"
+    exit 1
+  fi
+  if [[ -n $SUDO_USER ]] && [[ $SUDO_COMMAND != '/bin/su' ]]; then
+    error "This script cannot be run as sudo. Please su to root first";
     exit 1
   fi
 }
@@ -247,6 +251,20 @@ function import_dataset(){
 }
 
 
+# Copy's S3 bucket contents from dataset bucket to this instance's bucket
+function copy_bucket_contents(){
+  local bucket_dataset;
+  bucket_dataset=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value FROM config WHERE name = 'otfs_s3_bucket'")
+  local bucket_instance=${config[otfs_s3_bucket]};
+  # TODO. Just a temp hack. Replace this with an API call to the IR. Need to remove AWS creds from
+  log "Copying contents of source S3 bucket '${bucket_dataset}' to instance S3 bucket '${bucket_instance}'"
+  if ! aws s3 sync s3://"${bucket_dataset}" s3://"${bucket_instance}"; then
+    error "Unable to copy contents of source bucket '${bucket_dataset}' to instance bucket '${bucket_instance}'"
+    exit 1;
+  fi
+}
+
+
 # Localise the database config table.
 # This needs to run:
 # 1. After initial data import to ensure update scripts can function in this environment
@@ -361,6 +379,7 @@ function main(){
   # Import dataset SQL and upgrade to current version
   empty_schema
   import_dataset "$working_dir"
+  copy_bucket_contents
   localise_database_config
   update_su_password
   upgrade_sql
