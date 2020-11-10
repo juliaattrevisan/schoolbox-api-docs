@@ -225,14 +225,14 @@ class CohortMarks
                  */
                 $specificationId = $this->tuples[$assessment->getId()];
 
+                foreach ($assessment->getAllParticipants() as $participant) {
+                    $normMarks[$specificationId][] = $participant->getNormalisedMark(true);
+                }
+
                 /* Remember the unique titles of each $assessment we encountered, for highcharts
                  */
                 if (!isset($graphAssessments[$assessment->getTitle()])) {
                     $graphAssessments[$specificationId] = $assessment->getTitle();
-                }
-
-                foreach ($assessment->getAllParticipants() as $participant) {
-                    $normMarks[$specificationId][] = $participant->getNormalisedMark(true);
                 }
             }
         }
