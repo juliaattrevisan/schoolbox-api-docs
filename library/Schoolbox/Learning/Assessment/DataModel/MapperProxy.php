@@ -293,7 +293,9 @@ class MapperProxy
                 asi2.specification_assessment_id
             FROM assessment_specification_implementation asi1
             INNER JOIN assessment_specification_implementation asi2 ON asi1.specification_assessment_id = asi2.specification_assessment_id
+            INNER JOIN assessment a ON a.id = asi2.implementation_assessment_id
             WHERE asi1.implementation_assessment_id IN ({$ids})
+            AND a.deleted_at IS NULL
         ";
 
         $statement = $this->baseMapper->getDatabase()->prepare($query);

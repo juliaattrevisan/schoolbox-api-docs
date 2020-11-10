@@ -49,6 +49,12 @@ class CohortMarks
 
 
     /**
+     * @var array
+     */
+    private $tuples;
+
+
+    /**
      * CohortMarks constructor.
      *
      * @param bool                  $gradeGradientEnabled
@@ -81,6 +87,7 @@ class CohortMarks
      *
      * The resultant assessments' order is then made the same as the input's order.
      *
+     * @return Collection
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \LogicException
@@ -88,14 +95,21 @@ class CohortMarks
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
-    private function getAssessmentSet()
+    private function getAssessmentSet(): Collection
     {
+
+        /* The input implementation ids are in a particular sort order which isn't easy to replicate
+         * It's nominally by Due Date, but CAP plans throw a spanner in the works as you have to
+         * examine those instead of the assessment's due date; to skip this hankypanky I'll just put
+         * the result set in the same order as the input set
+         */
+        $inputImplementationIds = $this->assessments->getPropertyValues('id');
 
         /* A user has participated in each of the elements inside $this->assessments
          * We need to find all the other assessments that shared a common specification
          * as the ones in $this->assessments
          */
-        $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId($this->assessments->getPropertyValues('id'));
+        $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId($inputImplementationIds);
 
         /* Use the swamp to hydrate all the participants' pieces via assessmentMapperProxy
          */
@@ -106,9 +120,49 @@ class CohortMarks
          * (normally it's just the guys in the same class, but we're getting a broader data set now)
          */
         $assessments = $this->assessmentMapperProxy
-            ->loadParticipantsIntoAssessmentCollection($assessments, null, false, false);
+            ->loadParticipantsIntoAssessmentCollection($assessments, null, false, false)
+            ->indexBy('id');
 
-        return $assessments;
+        /* Put specifications into the same order as their input implementations
+         *
+         * The findAllByIds() can produce a result set in a different order so we have to forcibly
+         * return it to its original order. There might be a faster/smarter way to do this but I'll
+         * accept O(n^2) complexity on two integer arrays
+         */
+        $sortedSpecificationIds = [];
+
+        foreach ($inputImplementationIds as $inputImplementationId) {
+            foreach ($assessmentTuples as $implementationId => $specificationId) {
+                if ($implementationId === $inputImplementationId) {
+                    $sortedSpecificationIds[] = $specificationId;
+                }
+            }
+        }
+
+        $sortedTuples = [];
+
+        foreach ($sortedSpecificationIds as $sortedSpecificationId) {
+            foreach ($assessmentTuples as $implementationId => $specificationId) {
+                if ($specificationId === $sortedSpecificationId) {
+                    $sortedTuples[$implementationId] = $sortedSpecificationId;
+                }
+            }
+        }
+
+        /* Remember this for later
+         */
+        $this->tuples = $sortedTuples;
+
+        /* Index the result set, forcing the $assessments collection to be in the same
+         * specification order as $inputImplementationIds (jesus)
+         */
+        $result = new Collection();
+
+        foreach ($sortedTuples as $implementationId => $specificationId) {
+            $result->add($assessments->getOffset($implementationId));
+        }
+
+        return $result;
     }
 
 
@@ -158,7 +212,7 @@ class CohortMarks
                 /* For each assessment, get all the Participants' feedbacks, and find out their normalised mark
                  * Index them by specification id; we calculate a five point summary of everything here
                  */
-                $specificationId = $assessmentTuples[$assessment->getId()];
+                $specificationId = $this->tuples[$assessment->getId()];
 
                 /* Remember the unique titles of each $assessment we encountered, for highcharts
                  */
