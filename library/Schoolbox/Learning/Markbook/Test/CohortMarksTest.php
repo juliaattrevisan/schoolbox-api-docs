@@ -29,11 +29,11 @@ class CohortMarksTest extends TestCase
      * @dataProvider provider_validLMSCohortComparison
      * @param bool         $configOption
      * @param Folder\Model $folder
-     * @param              $expected
+     * @param bool         $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function testValidLMSCohortComparison(bool $configOption, Folder\Model $folder, $expected): void
+    public function testValidLMSCohortComparison(bool $configOption, Folder\Model $folder, bool $expected): void
     {
         $actual = (new ValidUseCohortMarks())->isSatisfiedBy($configOption, $folder);
 
