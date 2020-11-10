@@ -21,3 +21,9 @@ else
   echo "Using default instance registry URL";
 fi
 echo "{\"instance_registry_url_override\": \"${instance_registry_url_override}\"}" > $instance_registry_conf_file
+
+# This is needed by the puppet Instance Registry API integration
+if ! /opt/puppetlabs/puppet/bin/gem list | grep -q lookup_http; then
+  echo "Installing 'lookup_http' gem"
+  /opt/puppetlabs/puppet/bin/gem install lookup_http
+fi
