@@ -363,7 +363,7 @@ BASE;
 
 
     /**
-     * Create a single ZIP archive of all the PDF documents
+     * Create a single ZIP archive of all the PDF documents.
      *
      * @param string[] $pdfFilenames
      * @param string   $tempDir
@@ -375,7 +375,8 @@ BASE;
         /* https://stackoverflow.com/questions/32694148/ziparchivegetstatusstring-invalid-or-uninitialized-zip-object
          * Also, SA-10419
          *
-         * ZipArchive doesn't expect a file to exist when it's creating its zip archive
+         * ZipArchive doesn't expect a file to exist when it's creating its zip
+         * archive: therefore, the file should be deleted
          */
         @unlink($zipFilename);
 
@@ -383,10 +384,13 @@ BASE;
         $this->getLogger()->debug("Creating temp zip archive: $zipFilename");
         $zipArchive->open($zipFilename, ZipArchive::CREATE);
 
-        // To avoid exceeding open file limit, may need to batch zip
+        // To avoid exceeding open file limit, may need to batch zip processing.
+        // Buffer of 20, round to nearest 100
         $openFileLimit = (int)exec('ulimit -n');
-        $batchSize     = round($openFileLimit - 20, -2); // buffer of 20, round to nearest 100
+        $batchSize     = round($openFileLimit - 20, -2);
         $this->getLogger()->debug(sprintf('Open file limit: %d, setting batch size to %d', $openFileLimit, $batchSize));
+
+        // Write each batch to the zip
         $batchIndex = 1;
         $batches    = ceil(count($pdfFilenames) / $batchSize);
         foreach ($pdfFilenames as $pdfFilename) {
@@ -402,18 +406,18 @@ BASE;
         $this->getLogger()->info("Writing zip batch $batches/$batches...");
         $zipArchive->close();
 
+        // Send this zip to this tool's output stream, and delete the zip
         $this->getLogger()->debug("Writing zip archive to output stream");
         if (false === stream_copy_to_stream(fopen($zipFilename, 'rb'), $this->getOutStream())) {
             $this->getLogger()->error('Unable to write zip archive to output stream');
         }
-
         $this->getLogger()->debug("Deleting zip archive: $zipFilename");
         unlink($zipFilename);
     }
 
 
     /**
-     * Explicitly deletes temporary files
+     * Explicitly deletes any temporary files this tool created.
      *
      * @param array  $pdfFilenames
      * @param string $tempDir
