@@ -204,7 +204,7 @@ class CohortMarks
 
         /* For the $viewee, remember their value in a separate data series for highcharts
          */
-        $scatter = [];
+        $graphScatter = [];
 
         /* Get all the cohort's results and pump them into a struct organised by specification id
          * We'll need to make a five-point summary of each of these specifications' values
@@ -258,7 +258,7 @@ class CohortMarks
                  * We optionally apply a gradient colour
                  */
                 $normalisedMark = $participant->getNormalisedMark(true);
-                $scatter[$specificationId] = $normalisedMark;
+                $graphScatter[$specificationId] = $normalisedMark;
 
                 $comment = null;
 
@@ -349,7 +349,7 @@ class CohortMarks
 
             /* Yank the scatter for this specification id
              */
-            $statistics['graphScatter'][] = $scatter[$specificationId];
+            $statistics['graphScatter'][] = $graphScatter[$specificationId];
         }
 
         /* Statistics is now a set of everything, but highcharts likes us to encode stuff
