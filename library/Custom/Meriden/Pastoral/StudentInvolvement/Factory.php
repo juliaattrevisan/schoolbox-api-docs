@@ -78,6 +78,7 @@ class Factory
      * @param FolderMapper         $folderMapper
      * @param AssessmentDataSource $assessmentDataSource
      * @param RubricDataSource     $rubricMapper
+     * @param User                 $currentUser
      * @param UserAccessMapper     $userAccessMapper
      */
     public function __construct(
@@ -86,6 +87,7 @@ class Factory
         FolderMapper $folderMapper,
         AssessmentDataSource $assessmentDataSource,
         RubricDataSource $rubricMapper,
+        User $currentUser,
         UserAccessMapper $userAccessMapper
     ) {
         $this->gateway              = $gateway;
@@ -93,6 +95,7 @@ class Factory
         $this->folderMapper         = $folderMapper;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->rubricMapper         = $rubricMapper;
+        $this->currentUser          = $currentUser;
         $this->userAccessMapper     = $userAccessMapper;
     }
 
