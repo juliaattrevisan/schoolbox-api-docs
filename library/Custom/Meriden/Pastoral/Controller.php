@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller for Meriden's pastoral page.
  *
@@ -56,7 +57,6 @@ class Controller extends Base
                         'year' => min($lastReportYear, $currentYear)
                     )
                 )
-
             );
         }
     }

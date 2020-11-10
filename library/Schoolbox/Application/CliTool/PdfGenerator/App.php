@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -24,7 +25,6 @@ use Schoolbox\User;
 use Zend\Uri\Uri;
 use Zend\Uri\UriInterface;
 use ZipArchive;
-
 
 /**
  * Generic functionality for a CLI tool which can generate PDFs.

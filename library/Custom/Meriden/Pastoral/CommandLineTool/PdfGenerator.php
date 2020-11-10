@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -243,7 +244,6 @@ EXAMPLES:
                         $student->getFirstname(),
                         $student->getId(),
                         $student->getExternalId()
-
                     )
                 )
             );

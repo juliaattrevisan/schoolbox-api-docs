@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory for creating tutor group factory objects
  *
@@ -404,12 +405,13 @@ class Factory
 
         // Only due works are shown
         // Not interested in work types other than assessment tasks
-        foreach ($this->assessmentDataSource->findAllByFolderIdForReview(
-            $folder->getId(),
-            $student,
-            ['order' => ['due_date' => 'asc'],]
-        ) as $assessment) {
-
+        foreach (
+            $this->assessmentDataSource->findAllByFolderIdForReview(
+                $folder->getId(),
+                $student,
+                ['order' => ['due_date' => 'asc'],]
+            ) as $assessment
+        ) {
             $participant = $assessment->getParticipantIfExtant($student);
             if ($participant) {
                 // Filter this grade out if not visible to the current user.
@@ -425,7 +427,8 @@ class Factory
 
                 $feedback = $participant->getAuthoritativeFeedback($publishedOnly);
                 $rubric   = null;
-                if ($assessment instanceof DueWork
+                if (
+                    $assessment instanceof DueWork
                     && $feedback instanceof DueWorkFeedback
                     && $assessment->getUseRubric()
                 ) {
@@ -659,7 +662,7 @@ class Factory
      * @param int $reportYear
      * @return bool
      */
-    private function doesDraftFeedbackContribute($reportYear) : bool
+    private function doesDraftFeedbackContribute($reportYear): bool
     {
         return $reportYear < 2018;
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module definition for Meriden's custom pastoral page.
  *
