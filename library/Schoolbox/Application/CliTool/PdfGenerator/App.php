@@ -356,6 +356,9 @@ BASE;
             try {
                 // Create the file, applying the increased delay if necessary
                 $pdfGenerator->setOption('javascript-delay', $jsDelay);
+                $this->getLogger()->debug(
+                    "Generating PDF from the following URLs:\n* " . implode("\n* ", $pdfSource->getUrls())
+                );
                 fwrite($fp, $pdfGenerator->getOutput($pdfSource->getUrls()));
                 break;
             } catch (RuntimeException $e) {
