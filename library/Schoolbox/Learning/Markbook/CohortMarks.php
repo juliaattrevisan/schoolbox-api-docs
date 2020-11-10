@@ -206,18 +206,21 @@ class CohortMarks
          */
         $scatter = [];
 
+        /* Get all the cohort's results and pump them into a struct organised by specification id
+         * We'll need to make a five-point summary of each of these specifications' values
+         */
         foreach ($assessments as $assessment) {
 
             /* Assessment's mark scheme must be quantitative
              *
              * There's no check on isFeedbackVisibleToUser because we're doing cohort analysis
-             * and the currently logged in user might not be able to see other class' feedbacks,
-             * but those values still contribute to the statistica numbers
+             * and the currently logged in user might not be able to see other class' Feedbacks,
+             * but those values still contribute to the statistical numbers
              */
             if ($assessment->getMarkScheme()->isQuantitative()) {
 
                 /* For each assessment, get all the Participants' feedbacks, and find out their normalised mark
-                 * Index them by specification id; we calculate a five point summary of everything here
+                 * Index them by specification id; we eventually calculate a five point summary of everything here
                  */
                 $specificationId = $this->tuples[$assessment->getId()];
 
