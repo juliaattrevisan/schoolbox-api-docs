@@ -571,15 +571,21 @@ class Controller extends Base
          *
          * These markbook instances provide the five-point summary for the graphs
          */
-        if (true) {
-            $graph = $canSeeGraph ? (new CohortMarks(
-                $this->getConfigLoader()->get('grade_gradient_enable'),
-                $this->assessmentMapperProxy,
-                $assessments,
-                $this->getUser()
-            ))->collate($viewee) : [];
-        } else {
-            $graph = $canSeeGraph ? $this->buildGraph($filteredMarkbook, $viewee) : [];
+        $cohortAnalysis = true;
+
+        $graph = [];
+
+        if ($canSeeGraph) {
+            if ($cohortAnalysis) {
+                $graph = (new CohortMarks(
+                    $this->getConfigLoader()->get('grade_gradient_enable'),
+                    $this->assessmentMapperProxy,
+                    $assessments,
+                    $this->getUser()
+                ))->collate($viewee);
+            } else {
+                $graph = $this->buildGraph($filteredMarkbook, $viewee);
+            }
         }
 
         /* Get Rubric Data for display */
