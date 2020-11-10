@@ -70,6 +70,49 @@ class CohortMarks
 
 
     /**
+     * The assessments (and all their participants) that contain all Feedback values
+     * we need to analyse. These assessments consist of all their sibling implementations,
+     * which are ones that have the same assessment specification, allowing us to collate
+     * data from everyone who did an assessment derived from the same specification
+     *
+     * I've made a quick sql shortcut that saves you from having to fight with the swamp, hydrating
+     * useless data and so on. Instead it gives you a conclusive set of ids which you hydrate via
+     * the MapperProxy.
+     *
+     * The resultant assessments' order is then made the same as the input's order.
+     *
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
+     */
+    private function getAssessmentSet()
+    {
+
+        /* A user has participated in each of the elements inside $this->assessments
+         * We need to find all the other assessments that shared a common specification
+         * as the ones in $this->assessments
+         */
+        $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId($this->assessments->getPropertyValues('id'));
+
+        /* Use the swamp to hydrate all the participants' pieces via assessmentMapperProxy
+         */
+        $assessments = $this->assessmentMapperProxy->findAllByIds(array_keys($assessmentTuples));
+
+        /* Populate all the participants' data into this set
+         * We need to build the five-point summary using EVERYONE's feedbacks for this assessment specification
+         * (normally it's just the guys in the same class, but we're getting a broader data set now)
+         */
+        $assessments = $this->assessmentMapperProxy
+            ->loadParticipantsIntoAssessmentCollection($assessments, null, false, false);
+
+        return $assessments;
+    }
+
+
+    /**
      * Collate statistics from everyone in the cohort,
      * using $viewee's results as scatter plot values
      *
@@ -85,23 +128,9 @@ class CohortMarks
     public function collate(User $viewee): array
     {
 
-        /* A user has participated in each of the elements inside $assessment
-         * We need to find all the other assessments that shared a common specification
-         *
-         * Find all the assessment ids that fit this description
+        /* Get all the assessments we need to analyse
          */
-        $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId($this->assessments->getPropertyValues('id'));
-
-        /* Use the swamp to hydrate all the participants' pieces via assessmentMapperProxy
-         */
-        $assessments = $this->assessmentMapperProxy->findAllByIds(array_keys($assessmentTuples))->sortBy('title', 'asc');
-
-        /* Populate all the participants' data into this set
-         * We need to build the five-point summary using EVERYONE's feedbacks for this assessment specification
-         * (normally it's just the guys in the same class, but we're getting a broader data set now)
-         */
-        $assessments = $this->assessmentMapperProxy
-            ->loadParticipantsIntoAssessmentCollection($assessments, null, false, false);
+        $assessments = $this->getAssessmentSet();
 
         /* Remember all the boxplot data series grouped by specification id
          */
