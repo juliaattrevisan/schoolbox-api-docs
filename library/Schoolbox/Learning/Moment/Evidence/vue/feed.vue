@@ -148,8 +148,8 @@ export default {
 
 <template>
     <div>
-        <div class="content" v-for="evidenceGroup in groupedEvidence">
-            <h2 class="subheader">
+        <div v-for="evidenceGroup in groupedEvidence">
+            <h2 class="subheader feed">
                 <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
                       :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
                 >{{ renderCreatedAt(evidenceGroup.date) }}</time>
@@ -157,7 +157,7 @@ export default {
 
             <section>
                 <ul class="information-list">
-                    <li v-for="evidence in evidenceGroup.evidence">
+                    <li v-for="evidence in evidenceGroup.evidence" class="feed-item">
                         <div class="card small-12 compact">
                             <a :href="evidence.creator._links.profile" title="View Profile">
                                 <img :src="evidence.creator._links.avatar" alt="View Profile">
@@ -169,27 +169,26 @@ export default {
                             </a>
                         </div>
 
-                        <div class="small-12 large-6 column">
+                        <div class="feed-body small-12 large-6 column">
                             <!-- Display evidence body, with media players initialised -->
                             <media-article v-if="evidence.body">
                                 <div v-html="evidence.body" />
                             </media-article>
 
-
                             <!-- Is there an attachment? Display it appropriately -->
                             <article v-if="evidence.filename && evidence.storage">
                                 <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
                             </article>
+
+                            <div class="article-read-more">
+                                <a :href="evidence._links.detail">More Detail</a>
+                            </div>
                         </div>
 
-                        <div class="small-12 large-6 column">
+                        <div class="feed-comments small-12 large-6 column">
                             <comment-thread :thread="evidence.discussionThread"
                                             :create-thread-endpoint="evidence._links.createThread"
                             />
-                        </div>
-
-                        <div class="content">
-                            <p><a :href="evidence._links.detail">More Detail</a></p>
                         </div>
                     </li>
                 </ul>

@@ -141,9 +141,9 @@ export default {
                     .then((response) => {
                         self.commentThread.children.data = self.commentThread.children.data.concat(response.data.data);
                         self.commentThread.children.metadata.cursor.next = response.data.metadata.cursor.next;
-                        this.$refs.toast.timeout('Loaded', true, 2000);
+                        this.$refs.toast.timeout('Loaded comments', true, 2000);
                     })
-                    .catch(() => self.$refs.toast.timeout('Loading failed', false, 5000))
+                    .catch(() => self.$refs.toast.timeout('Loading comments failed', false, 5000))
             }
         },
 
@@ -240,16 +240,22 @@ export default {
 
 <template>
     <div>
-        <span v-if="!hasComments">
-            No comments yet.
-        </span>
+        <h3 v-if="!hasComments">
+            No comments yet
+        </h3>
         <template v-else>
-            <span>
-                {{ commentThread.children.metadata.count }} comments
+            <span class="comment-count">
+                {{ commentThread.children.metadata.count }} comment(s)
                 <template v-if="commentThread.children.metadata.count > commentThread.children.data.length && commentThread.children.metadata.cursor.next">
                     (<a @click.prevent="loadMoreComments">Load more</a>)
                 </template>
             </span>
+
+            <ckeditor tag-name="textarea" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
+            <a class="button submit"
+               @click="postComment"
+               :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
+
             <ul class="information-list social-stream">
                 <li class="actions-small-1" v-for="(comment, index) in comments">
                     <div class="list-item">
@@ -274,11 +280,6 @@ export default {
                 </li>
             </ul>
         </template>
-
-        <ckeditor tag-name="textarea" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
-        <a class="button submit"
-           @click="postComment"
-           :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
 
         <toast ref="toast"></toast>
 

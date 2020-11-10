@@ -1,3 +1,38 @@
 #evidence-form #evidence-storage-preview {
   width: 100%;
 }
+
+.subheader.feed {
+  background: $white;
+  padding: .5rem;
+  margin: 0;
+  border-bottom: 1px solid $body-bg;
+}
+
+.feed-body {
+  article {
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+  }
+
+  .article-read-more {
+    margin-top: 0;
+    padding: .5rem 0;
+    width: 100%;
+    clear: both;
+  }
+}
+
+.feed-comments {
+  .comment-count {
+    font-weight: $font-weight-semibold;
+  }
+}
+
+@media #{$medium-down} {
+  .feed-comments > div {
+    border-top: 1px solid $body-bg;
+    padding-top: 1rem;
+  }
+}
+
