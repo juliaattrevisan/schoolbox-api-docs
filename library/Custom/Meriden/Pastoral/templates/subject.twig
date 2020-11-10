@@ -37,7 +37,7 @@
     </div>
 
     {# course grade - derived from grade for this class #}
-    {% if report.subjectReport.namedGrades.courseGrade and report.subjectReport.namedGrades.courseGrade.assessment.isFeedbackVisibleToUser(USER) %}
+    {% if report.subjectReport.namedGrades.courseGrade %}
         <div class="row" id="course-info">
             <div class="small-6 medium-3 column">
                 <dl>
@@ -83,7 +83,7 @@
     {% include '@customMeridenPastoral/sub/endeavourGrades.twig' %}
 
     {# Approaches to learning - another rubric #}
-    {% if report.subjectReport.namedGrades.learningApproaches and report.subjectReport.namedGrades.learningApproaches.assessment.isFeedbackVisibleToUser(USER) %}
+    {% if report.subjectReport.namedGrades.learningApproaches %}
         <div class="row" id="learning-approaches">
             <div class="small-12 column">
                 <dl class="small-gap">
