@@ -131,12 +131,8 @@ class CohortMarks
          */
         $sortedSpecificationIds = [];
 
-        foreach ($inputImplementationIds as $inputImplementationId) {
-            foreach ($assessmentTuples as $implementationId => $specificationId) {
-                if ($implementationId === $inputImplementationId) {
-                    $sortedSpecificationIds[] = $specificationId;
-                }
-            }
+        foreach (array_flip($inputImplementationIds) as $inputImplementationId => $i) {
+            $sortedSpecificationIds[] = $assessmentTuples[$inputImplementationId];
         }
 
         $sortedTuples = [];
