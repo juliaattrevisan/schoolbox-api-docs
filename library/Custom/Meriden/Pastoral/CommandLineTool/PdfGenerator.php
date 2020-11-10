@@ -21,7 +21,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
-use Schoolbox\Sync\Provisioner\UserMapper;
+use Schoolbox\UserMapper;
 use Schoolbox\User;
 use Zend\Uri\UriInterface;
 
