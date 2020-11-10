@@ -8,7 +8,7 @@ ALTER TABLE `lu_year_level`
 
 INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
-   'lms_cohort_comparision',
+   'lms_cohort_comparison',
    '0',
    'Enable Cohort Comparison',
    'If toggled \'ON\', the graphs in the Grades page will use marks from the entire cohort instead of just the class.',
