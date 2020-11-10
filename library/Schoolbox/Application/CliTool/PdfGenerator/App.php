@@ -88,61 +88,7 @@ abstract class App extends BaseApp
 //        }
 
 
-//        // generate a list of URLs
-//        /** @var Router $router */
-//        $router = $this->getDi()->get('router');
-//        /** @var IConnector $externalDb */
-//        $externalDb   = $this->getDi()->get('databaseExternal');
-//        $userMapper   = UserMapper::getInstance();
-//        $folderMapper = FolderMapper::getInstance();
-//        /** @var MapperProxy $assessmentDataSource */
-//        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
-//        $rubricDataSource     = RubricDataSource::getInstance();
-//        $userAccessMapper     = UserAccessMapper::getInstance();
-//        $urlGenerator         = new UrlGenerator(
-//            $router,
-//            new Factory(
-//                new Gateway($externalDb),
-//                $userMapper,
-//                $folderMapper,
-//                $assessmentDataSource,
-//                $rubricDataSource,
-//                $userAccessMapper
-//            )
-//        );
-
-
-//        // Determine the report year and year levels to run the report for.
-//        $reportYear = $this->getOptAsInt(self::OPT_LONG_REPORT_YEAR) ?? $this->getDefaultReportYear();
-//        $yearLevel  = $this->getOptAsInt(self::OPT_LONG_YEAR_LEVEL);
-//        if (isset($yearLevel)) {
-//            $yearLevels = [$yearLevel];
-//        } else {
-//            $yearLevels = self::DEFAULT_YEAR_LEVELS;
-//        }
-//        $this->getLogger()->notice(
-//            sprintf(
-//                'Generating PDF reports for students in year(s) %s in calendar year %d',
-//                implode(', ', $yearLevels),
-//                $reportYear
-//            )
-//        );
-//
-//
-//        // Once we have a report year and year level:
-//        // figure out which students were in that year level that year.
-//        // (Since this relies upon student year level: it won't work well for
-//        //  fetching reports for students who are no longer at school.
-//        //  Schoolbox doesn't store the dates in which a student was enrolled
-//        //  within a particular year level, so there's nothing I can do there.)
-//        $yearDelta = $this->getCurrentYear() - $reportYear;
-//
-//
-//        // By default: generate for years 7, 8 and 9
-//        $searchYearLevels = [];
-//        foreach ($yearLevels as $yearLevel) {
-//            $searchYearLevels[] = $yearLevel + $yearDelta;
-//        }
+        $baseUrl = $this->generateBaseUrl();
 
 
         // Attempt to sign in:
@@ -150,7 +96,7 @@ abstract class App extends BaseApp
         // session ID cookie
         $sessionHash = $this->getOpt(self::OPT_LONG_HASH);
         if (!$sessionHash) {
-            $sessionHash = $this->generateSessionHashViaLoginForm($this->getUsername());
+            $sessionHash = $this->generateSessionHashViaLoginForm($this->getUsername(), $baseUrl);
         }
 
 
@@ -164,14 +110,6 @@ abstract class App extends BaseApp
 
 
         // Generate a list of filenames and files that will be generated
-        $domain  = trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}");
-        $port    = null;
-        $baseUrl = (new Uri())
-            ->setScheme('https')
-            ->setHost($domain);
-        if (isset($port)) {
-            $baseUrl = $baseUrl->setPort($port);
-        }
         $pdfFilenames = [];
         foreach ($this->generatePdfSources($baseUrl) as $pdfSource) {
             // TODO wrap this in a retry
@@ -217,52 +155,6 @@ abstract class App extends BaseApp
         // Done generating PDFs: zip them up
         $this->createZipArchive($pdfFilenames, $tempdir);
         $this->cleanUpTempFiles($pdfFilenames, $tempdir);
-
-
-//        // start making a user query.
-//        $userQuery = $userMapper->getPredicateBuilder()
-//                                ->in('year', $searchYearLevels);
-//        $studentId = $this->getOptAsInt(self::OPT_LONG_STUDENT_ID);
-//        if (isset($studentId)) {
-//            $userQuery = $userQuery->equals('id', $studentId);
-//        }
-//
-//        /** @var User[] $students */
-//        $students = $userMapper->findByPredicates(
-//            $userQuery,
-//            [
-//                'order' => [
-//                    'lastname'  => 'asc',
-//                    'firstname' => 'asc',
-//                ],
-//            ]
-//        );
-//        $this->getLogger()->notice(
-//            sprintf('Found %d student(s) to generate reports for', count($students))
-//        );
-//        foreach ($students as $student) {
-//            $this->getLogger()->info(
-//                sprintf(
-//                    'Generating report for %s, %s (ID: %d, TASS ID: %s)',
-//                    $student->getLastname(),
-//                    $student->getFirstname(),
-//                    $student->getId(),
-//                    $student->getExternalId()
-//
-//                )
-//            );
-//            $filename = sprintf('%s.pdf', $student->getExternalId());
-//            $this->getLogger()->debug(sprintf('Generating report file: %s', $filename));
-//
-//            $urls = $urlGenerator->generate($reportYear, $student);
-//
-//            // The first URL will be the pastoral report
-//            // All subsequent will be subject reports
-//            // Collate these all into a single page
-//
-//            // create a file pointer
-////            fwrite($fp, $pdfGenerator->getOutput($urls));
-//        }
     }
 
 
@@ -435,19 +327,39 @@ abstract class App extends BaseApp
 
 
     /**
+     * Generate the base URL for this Schoolbox instance.
+     *
+     * Login requests will be made to this Schoolbox instance, as will any
+     * page requests generated by `generatePdfSources`.
+     *
+     * @return UriInterface
+     */
+    private function generateBaseUrl(): UriInterface
+    {
+        $domain  = trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}");
+        $port    = null;
+        $baseUrl = (new Uri())
+            ->setScheme('https')
+            ->setHost($domain);
+        if (isset($port)) {
+            $baseUrl = $baseUrl->setPort($port);
+        }
+        return $baseUrl;
+    }
+
+
+    /**
      * Attempt to login via the web form, and return the generated session hash.
      *
-     * @param string $username
+     * @param string       $username
+     * @param UriInterface $baseUrl
      * @return string
      */
-    private function generateSessionHashViaLoginForm(string $username): string
+    private function generateSessionHashViaLoginForm(string $username, UriInterface $baseUrl): string
     {
         $attempts    = 0;
         $maxAttempts = 3;
-        $remoteLogin = new RemoteLogin(
-            new Client(),
-            trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}")
-        );
+        $remoteLogin = new RemoteLogin(new Client(), $baseUrl);
         while (true) {
             $attempts++;
             if ($attempts > $maxAttempts) {

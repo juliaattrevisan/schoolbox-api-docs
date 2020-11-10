@@ -10,7 +10,7 @@ namespace Schoolbox\Auth\Remote;
 
 use GuzzleHttp\ClientInterface;
 use Schoolbox\Realtime\Pipe\PipeManager;
-use Zend\Uri\Uri;
+use Zend\Uri\UriInterface;
 
 /**
  * Class for creating a session which is authenticated as a particular user.
@@ -29,34 +29,23 @@ class RemoteLogin
 
 
     /**
-     * The domain name on which the Schoolbox instance is hosted.
+     * The URL on which the Schoolbox instance is hosted.
      *
-     * @var string
+     * @var UriInterface
      */
-    private $domain;
-
-
-    /**
-     * The port on which this instance is accessible, null to use the standard
-     * HTTPS port.
-     *
-     * @var int|null
-     */
-    private $port;
+    private $baseUrl;
 
 
     /**
      * Constructor
      *
      * @param ClientInterface $httpClient
-     * @param string          $host
-     * @param int|null        $port
+     * @param UriInterface    $baseUrl
      */
-    public function __construct(ClientInterface $httpClient, string $host, ?int $port = null)
+    public function __construct(ClientInterface $httpClient, UriInterface $baseUrl)
     {
         $this->httpClient = $httpClient;
-        $this->domain     = $host;
-        $this->port       = $port;
+        $this->baseUrl    = $baseUrl;
 
     }
 
@@ -72,15 +61,8 @@ class RemoteLogin
      */
     public function authenticate(string $username, string $password): ?string
     {
-        $url = (new Uri())
-            ->setScheme('https')
-            ->setHost($this->domain)
-            ->setPath('/login');
-        if (isset($this->port)) {
-            $url = $url->setPort($this->port);
-        }
-
-        $headers  = ['Origin' => $this->domain];
+        $url      = $this->baseUrl->setPath('/login')->toString();
+        $headers  = ['Origin' => $this->baseUrl->getHost()];
         $postData = [
             'page'     => '/login/',
             'username' => $username,
@@ -94,7 +76,7 @@ class RemoteLogin
             'allow_redirects' => false,
         ];
 
-        $response = $this->httpClient->request('POST', $url->toString(), $options);
+        $response = $this->httpClient->request('POST', $url, $options);
         if (303 !== $response->getStatusCode()) {
             return null;
         }
