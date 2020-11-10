@@ -572,8 +572,6 @@ class Controller extends Base
          *
          * These markbook instances provide the five-point summary for the graphs
          */
-        $cohortAnalysis = true;
-
         $graph = [];
 
         if ($canSeeGraph) {
