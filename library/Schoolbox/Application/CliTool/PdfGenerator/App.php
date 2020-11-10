@@ -30,6 +30,10 @@ abstract class App extends BaseApp
     private const OPT_SHORT_HELP = 'h';
     private const OPT_LONG_HELP  = 'help';
 
+    // Which port does this Schoolbox instance run on?
+    // This is not in configuration, so must be provided
+    private const OPT_LONG_PORT = 'port:';
+
     // Session hash
     private const OPT_LONG_HASH = 'hash:';
 
@@ -177,6 +181,10 @@ abstract class App extends BaseApp
     $yellow-v[v[v]]$white
         Log verbosity. Max 3 levels, e.g. -vvv
 
+    $yellow--port=PORT$white
+        The port the Schoolbox instance to generate PDFs from is running on.
+        Defaults to empty (thus the standard HTTPS port).
+
     $yellow--hash=HASH$white
         A valid session hash. If provided, this tool will use this session hash,
         and thus run within the context of the user who has authenticated in
@@ -269,7 +277,7 @@ BASE;
     private function generateBaseUrl(): UriInterface
     {
         $domain  = trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}");
-        $port    = null;
+        $port    = $this->getOptAsInt(self::OPT_LONG_PORT);
         $baseUrl = (new Uri())
             ->setScheme('https')
             ->setHost($domain);
