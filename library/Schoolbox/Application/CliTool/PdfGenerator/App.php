@@ -14,6 +14,7 @@ use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App as BaseApp;
 use Schoolbox\Auth\Remote\RemoteLogin;
+use Schoolbox\GenericCollection;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Zend\Uri\Uri;
 use Zend\Uri\UriInterface;
@@ -113,8 +114,17 @@ abstract class App extends BaseApp
         $consecutiveFailures = 0;
         $maxFailures         = $this->getOptAsInt(self::OPT_LONG_MAX_FAILS) ?? self::DEFAULT_MAX_FAILS;
         foreach ($this->generatePdfSources($baseUrl) as $pdfSource) {
+            if (!$pdfSource instanceof SourceBundle) {
+                $this->getLogger()->warning(
+                    sprintf(
+                        '`generatePdfSources` must return an iterable which contains instances of `%s`: skipping',
+                        SourceBundle::class
+                    )
+                );
+                continue;
+            }
             try {
-                $this->getLogger()->notice($pdfSource['message']);
+                $this->getLogger()->notice($pdfSource->getMessage());
                 $pdfFilenames[]      = $this->generatePdf($pdfSource, $tempDir, $pdfGenerator);
                 $consecutiveFailures = 0;
             } catch (RuntimeException $e) {
@@ -320,15 +330,15 @@ BASE;
     /**
      * Generates a PDF for this source.
      *
-     * @param array  $pdfSource
-     * @param string $tempDir
-     * @param Pdf    $pdfGenerator
+     * @param SourceBundle $pdfSource
+     * @param string       $tempDir
+     * @param Pdf          $pdfGenerator
      * @return string
      */
-    private function generatePdf(array $pdfSource, string $tempDir, Pdf $pdfGenerator): string
+    private function generatePdf(SourceBundle $pdfSource, string $tempDir, Pdf $pdfGenerator): string
     {
         // Create the PDF
-        $filename = $tempDir . '/' . $pdfSource['filename'];
+        $filename = $tempDir . '/' . $pdfSource->getFilename();
         $fp       = fopen($filename, 'wb');
         if (!$fp) {
             throw new RuntimeException("Unable to create file: '{$filename}'");
@@ -346,7 +356,7 @@ BASE;
             try {
                 // Create the file, applying the increased delay if necessary
                 $pdfGenerator->setOption('javascript-delay', $jsDelay);
-                fwrite($fp, $pdfGenerator->getOutput($pdfSource));
+                fwrite($fp, $pdfGenerator->getOutput($pdfSource->getUrls()));
                 break;
             } catch (RuntimeException $e) {
                 $this->getLogger()->warning($e->getMessage());
@@ -446,7 +456,7 @@ BASE;
      * Generate the list of PDFs to generate.
      *
      * @param UriInterface $baseUrl
-     * @return array
+     * @return GenericCollection|SourceBundle[]
      */
-    abstract protected function generatePdfSources(UriInterface $baseUrl): array;
+    abstract protected function generatePdfSources(UriInterface $baseUrl): GenericCollection;
 }

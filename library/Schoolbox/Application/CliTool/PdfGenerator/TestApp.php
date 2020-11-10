@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application\CliTool\PdfGenerator;
 
+use Schoolbox\GenericCollection;
 use Zend\Uri\UriInterface;
 
 /**
@@ -51,19 +52,21 @@ EXAMPLES:
         fwrite(STDOUT, $help);
     }
 
+
     /**
      * @inheritdoc
      */
-    protected function generatePdfSources(UriInterface $baseUrl): array
+    protected function generatePdfSources(UriInterface $baseUrl): GenericCollection
     {
-        return [
+        return new GenericCollection(
+            SourceBundle::class,
             [
-                'filename' => 'test.pdf',
-                'message'  => 'Generating test.pdf',
-                'urls'     => [
-                    $baseUrl->setPath('/')->toString(),
-                ],
-            ],
-        ];
+                new SourceBundle(
+                    'test.pdf',
+                    [$baseUrl->setPath('/')->toString(),],
+                    'Generating test.pdf'
+                ),
+            ]
+        );
     }
 }
