@@ -759,7 +759,7 @@ class Controller extends Base
                     'caption'   => 'Overall Grade',
                     'tooltip'   => 'Controls the default method for displaying the students overall grade on the grade report for a subject with this year level.',
                     'lookup'    => $luGradeList,
-                    'width'     => 3,
+                    'width'     => 2,
                     'mandatory' => false,
                 ],
                 'showOverallGrade'         => [
@@ -810,6 +810,13 @@ class Controller extends Base
                 'showRubricPoints' => [
                     'caption'   => 'Show Points on Rubrics',
                     'tooltip'   => 'If toggled to \'ON\', rubrics will display the number of points associated and attained for each level of a capability.',
+                    'checkbox'  => true,
+                    'width'     => 1,
+                    'mandatory' => true,
+                ],
+                'lmsCohortComparison' => [
+                    'caption'   => 'Enable Cohort Comparison',
+                    'tooltip'   => 'If toggled \'ON\', the graphs in the Grades page will use marks from the entire cohort instead of just the class.',
                     'checkbox'  => true,
                     'width'     => 1,
                     'mandatory' => true,
