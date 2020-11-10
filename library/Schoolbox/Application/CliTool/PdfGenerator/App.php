@@ -352,6 +352,12 @@ BASE;
      */
     private function determineAuthenticatedUserFromSessionHash(?string $hash): ?User
     {
+        // Don't try anything if there is no session hash
+        if (!isset($hash)) {
+            return null;
+        }
+
+
         // Find the redis client
         try {
             $redis = $this->getDi()->get('redis');
