@@ -213,7 +213,7 @@ EXAMPLES:
         foreach ($students as $student) {
             $result->add(
                 new SourceBundle(
-                    sprintf('%s.pdf', $student->getExternalId()),
+                    sprintf('%s-%d.pdf', $student->getExternalId(), $reportYear),
                     $urlGenerator->generate($reportYear, $student, $roleType),
                     sprintf(
                         'Generating report for %s, %s (ID: %d, TASS ID: %s)',
