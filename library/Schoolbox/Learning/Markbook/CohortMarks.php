@@ -237,10 +237,13 @@ class CohortMarks
         }
 
         /* Collate the $viewee's data, which is their scatter plot and hover thingo
-         * This scatter plot represents the $viewee's feedbacks for an assessment
-         * for the given class
+         * This little data set appears in highcharts when you hover over the
+         * $viewee's scatter plot, telling you some more metadata about what they achieved
+         *
+         * The scatter plot represents the $viewee's feedbacks for an assessment for the given class
          *
          * $assessments and $this->assessments are ordered similarly, by same specification id
+         * so we can ASSUME something here about the sequence of $assessment
          */
         foreach ($this->assessments as $assessment) {
             $specificationId = $this->tuples[$assessment->getId()];
@@ -257,9 +260,6 @@ class CohortMarks
                 $normalisedMark = $participant->getNormalisedMark(true);
                 $scatter[$specificationId] = $normalisedMark;
 
-                /* This little data set appears in highcharts when you hover over the
-                 * $viewee's scatter plot, telling you some more metadata about what they achieved
-                 */
                 $comment = null;
 
                 /* Look for an authoritative feedback to get the most recent info
