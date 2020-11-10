@@ -247,7 +247,7 @@ export default {
             <h2 class="comment-count">
                 {{ commentThread.children.metadata.count }} comment(s)
                 <template v-if="commentThread.children.metadata.count > commentThread.children.data.length && commentThread.children.metadata.cursor.next">
-                    (<a @click.prevent="loadMoreComments">Load more</a>)
+                    (<a @click.prevent="loadMoreComments">Load older comments</a>)
                 </template>
             </h2>
 
