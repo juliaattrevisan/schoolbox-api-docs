@@ -179,6 +179,7 @@ EXAMPLES:
                 $folderMapper,
                 $assessmentDataSource,
                 $rubricDataSource,
+                $userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN),
                 $userAccessMapper
             )
         );
