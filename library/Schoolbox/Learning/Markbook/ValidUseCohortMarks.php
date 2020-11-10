@@ -38,13 +38,11 @@ class ValidUseCohortMarks
             return $configOption;
         }
 
-        /* Otherwise, if any of the associated Year Levels want to enable LMS Cohort Comparison,
-         * return true
+        /* Otherwise, if there's exactly one the associated Year Level, and that instance
+         * wants to enable LMS Cohort Comparison, return true
          */
-        foreach ($folder->getYearLevels() as $yearLevel) {
-            if ($yearLevel->getLmsCohortComparison()) {
-                return true;
-            }
+        if ($folder->getYearLevels()->count() === 1) {
+            return $folder->getYearLevels()->first()->getLmsCohortComparison();
         }
 
         /* Otherwise, fall back to the current global setting lms_cohort_comparison
