@@ -57,6 +57,13 @@ class Factory
     private $rubricMapper;
 
     /**
+     * The currently authenticated user.
+     *
+     * @var User
+     */
+    private $currentUser;
+
+    /**
      * Data source for fetching users who have access to a folder.
      *
      * @var UserAccessMapper
@@ -403,6 +410,11 @@ class Factory
 
             $participant = $assessment->getParticipantIfExtant($student);
             if ($participant) {
+                // Filter this grade out if not visible to the current user.
+                if (!$assessment->isFeedbackVisibleToUser($this->currentUser)) {
+                    continue;
+                }
+
                 // Filter this grade out if there is a role type override,
                 // and feedback isn't visible to it
                 if ($roleTypeOverride && !$assessment->isFeedbackVisibleToRoleType($roleTypeOverride)) {
