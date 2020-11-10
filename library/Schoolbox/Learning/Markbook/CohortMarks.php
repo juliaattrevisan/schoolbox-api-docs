@@ -174,6 +174,7 @@ class CohortMarks
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      * @throws \PDOException
+     * @throws \JsonException
      */
     public function collate(User $viewee): array
     {
@@ -189,7 +190,7 @@ class CohortMarks
         /* Highcharts' data format expects each series to be in its own element:
          * (you can't collect them into a struct)
          *
-         * so all the asseessment titles in an ordered array,
+         * so all the assessment titles in an ordered array,
          * all the hover contents are in an ordered array,
          * the $viewee's results are in an ordered array
          */
@@ -358,10 +359,10 @@ class CohortMarks
          * This is used by Grades/templates/fragments/graph.twig
          */
         return [
-            'info' => json_encode($statistics['graphInfo']),
-            'assessments' => json_encode($statistics['graphAssessments']),
-            'data' => json_encode($statistics['graphData']),
-            'scatter' => json_encode($statistics['graphScatter'])
+            'info' => json_encode($statistics['graphInfo'], JSON_THROW_ON_ERROR),
+            'assessments' => json_encode($statistics['graphAssessments'], JSON_THROW_ON_ERROR),
+            'data' => json_encode($statistics['graphData'], JSON_THROW_ON_ERROR),
+            'scatter' => json_encode($statistics['graphScatter'], JSON_THROW_ON_ERROR)
         ];
     }
 }
