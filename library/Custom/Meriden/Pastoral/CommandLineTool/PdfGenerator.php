@@ -12,6 +12,7 @@ use Alaress\Database\Connector\IConnector;
 use Aura\Router\Router;
 use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
 use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
+use InvalidArgumentException;
 use Schoolbox\Application\CliTool\PdfGenerator\App;
 use Schoolbox\Application\CliTool\PdfGenerator\SourceBundle;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -195,13 +196,18 @@ EXAMPLES:
         $this->getLogger()->notice(
             sprintf('Found %d student(s) to generate reports for', count($students))
         );
-        $result           = new GenericCollection(SourceBundle::class);
-        $roleTypeOverride = $this->getOpt(self::OPT_LONG_ROLE_TYPE);
+        $result   = new GenericCollection(SourceBundle::class);
+        $roleType = $this->getOpt(self::OPT_LONG_ROLE_TYPE);
+        if (isset($roleType) && !in_array($roleType, Role::getRoleTypes(), true)) {
+            throw new InvalidArgumentException(
+                sprintf('If provided, --role-type option must be one of: %s', Role::getRoleTypes())
+            );
+        }
         foreach ($students as $student) {
             $result->add(
                 new SourceBundle(
                     sprintf('%s.pdf', $student->getExternalId()),
-                    $urlGenerator->generate($reportYear, $student, $roleTypeOverride),
+                    $urlGenerator->generate($reportYear, $student, $roleType),
                     sprintf(
                         'Generating report for %s, %s (ID: %d, TASS ID: %s)',
                         $student->getLastname(),
