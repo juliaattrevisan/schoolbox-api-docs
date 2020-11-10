@@ -104,6 +104,9 @@ abstract class App extends BaseApp
         }
 
 
+        // TODO determine who is identified by the session hash, and optionally authorize them
+
+
         // Build a PDF generator object, put the session hash in it
         $pdfGenerator = $this->buildPdfGenerator();
         $pdfGenerator->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
