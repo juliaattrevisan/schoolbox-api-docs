@@ -66,6 +66,10 @@ function check_run_as_root(){
     error "This script must be run as root"
     exit 1
   fi
+  if [[ -n $SUDO_USER ]] && [[ $SUDO_COMMAND != '/bin/su' ]]; then
+    error "This script cannot be run as sudo. Please su to root first";
+    exit 1
+  fi
 }
 
 
