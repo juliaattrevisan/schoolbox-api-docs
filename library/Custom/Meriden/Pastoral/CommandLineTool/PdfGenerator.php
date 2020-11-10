@@ -195,12 +195,13 @@ EXAMPLES:
         $this->getLogger()->notice(
             sprintf('Found %d student(s) to generate reports for', count($students))
         );
-        $result = new GenericCollection(SourceBundle::class);
+        $result           = new GenericCollection(SourceBundle::class);
+        $roleTypeOverride = $this->getOpt(self::OPT_LONG_ROLE_TYPE);
         foreach ($students as $student) {
             $result->add(
                 new SourceBundle(
                     sprintf('%s.pdf', $student->getExternalId()),
-                    $urlGenerator->generate($reportYear, $student),
+                    $urlGenerator->generate($reportYear, $student, $roleTypeOverride),
                     sprintf(
                         'Generating report for %s, %s (ID: %d, TASS ID: %s)',
                         $student->getLastname(),

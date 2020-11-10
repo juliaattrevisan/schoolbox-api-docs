@@ -45,11 +45,13 @@ class UrlGenerator
     /**
      * Generate a list of URLs for this student.
      *
-     * @param int  $year
-     * @param User $student
+     * @param int         $year
+     * @param User        $student
+     * @param string|null $roleTypeOverride If provided, show only results for
+     *                                      this role type
      * @return array
      */
-    public function generate(int $year, User $student): array
+    public function generate(int $year, User $student, ?string $roleTypeOverride): array
     {
         $results = [];
 
