@@ -15,6 +15,7 @@ use League\Flysystem\FilesystemInterface;
 use League\Flysystem\MountManager;
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\Mimetype;
+use enshrined\svgSanitize\Sanitizer;
 
 use function sprintf;
 
@@ -163,9 +164,12 @@ class Manager
      *
      * @return bool
      */
-    protected function copy($tmpFilePath, Model $storage)
+    protected function copy(string $tmpFilePath, Model $storage): bool
     {
         try {
+            if ($storage->getExtension() === 'svg') {
+                $this->sanitize(self::FS_TEMP, $tmpFilePath);
+            }
             return $this->mountManager->copy(
                 self::FS_TEMP . "://$tmpFilePath",
                 self::FS_STORAGE . '://' . $storage->getPath()
@@ -176,6 +180,33 @@ class Manager
             // file path: we can assume it's the same file.
             return true;
         }
+    }
+
+    /**
+     * Sanitize before storing
+     * @param string $fileSystem
+     * @param string $path
+     * @param bool   $dryRun
+     * @return bool
+     */
+    public function sanitize(string $fileSystem, string $path, bool $dryRun = false): bool
+    {
+        // purify before storing, if the file is svg
+        $sanitizer = new Sanitizer();
+        $sanitizer->minify(true);
+        try {
+            $rawSVG = $this->mountManager->getFilesystem($fileSystem)->read($path);
+        } catch (FileNotFoundException $e) {
+            return false;
+        }
+        $purifiedSVG = $sanitizer->sanitize($rawSVG);
+        if (!$purifiedSVG || $rawSVG === $purifiedSVG) {
+            return false;
+        }
+        if ($dryRun) {
+            return true;
+        }
+        return $this->mountManager->getFilesystem($fileSystem)->put($path, $purifiedSVG);
     }
 
     /**

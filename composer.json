@@ -107,7 +107,8 @@
         "ssnepenthe/color-utils": "^0.4.2",
         "symfony/lock": "^4.4",
         "dragonmantank/cron-expression": "^3.0",
-        "ext-simplexml": "*"
+        "ext-simplexml": "*",
+        "enshrined/svg-sanitize": "^0.13.3"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
