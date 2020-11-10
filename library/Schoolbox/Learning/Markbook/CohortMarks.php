@@ -292,6 +292,7 @@ class CohortMarks
         }
 
         /* Now process summaries for each of the data sets we obtained
+         * Each assessment needs its own five-point summary
          */
         $statistics = [];
 
