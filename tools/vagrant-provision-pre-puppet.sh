@@ -10,3 +10,14 @@ if [[ ! -f /etc/schoolboxdev/conf.php ]]; then
     mkdir -p /etc/schoolboxdev;
     ln -sf /vagrant/www/conf/conf.php /etc/schoolboxdev/conf.php;
 fi;
+
+# Does vagrant environment file indicate we wish this host to use a custom IR endpoint?
+# We would do this if we wished to test an integration between Schoolbox, Puppet + IR
+instance_registry_url_override=$1
+instance_registry_conf_file="/etc/schoolbox/instance-registry.json"
+if [[ -n $instance_registry_url_override ]]; then
+  echo "Setting instance_registry_url_override to '$instance_registry_url_override' in $instance_registry_conf_file";
+else
+  echo "Using default instance registry URL";
+fi
+echo "{\"instance_registry_url_override\": \"${instance_registry_url_override}\"}" > $instance_registry_conf_file

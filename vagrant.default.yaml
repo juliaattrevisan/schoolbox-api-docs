@@ -17,3 +17,6 @@ bridged_network_interface:
 puppet_dir: "../puppet-alaress"
 # Show debug output when provisioning?
 puppet_debug: false
+# By default is empty, so will fall back to real IR URL.
+# Set this to your dev IR when developing integrations between IR, Puppet + Schoolbox
+instance_registry_url_override: ""

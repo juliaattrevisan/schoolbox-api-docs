@@ -23,6 +23,7 @@ enable_xdebug = default["enable_xdebug"]
 bridged_network_interface = default["bridged_network_interface"]
 puppet_dir = default["puppet_dir"]
 puppet_debug = default["puppet_debug"]
+instance_registry_url_override = default["instance_registry_url_override"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -73,7 +74,9 @@ if File.file?('vagrant.yaml')
   if !conf["puppet_debug"].nil?
     puppet_debug = conf["puppet_debug"]
   end
-
+  if !conf["instance_registry_url_override"].nil?
+    instance_registry_url_override = conf["instance_registry_url_override"]
+  end
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -101,7 +104,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vf.vmx["memsize"] = memory
   end
 
-  config.vm.provision "shell", run: "always", path: "tools/vagrant-provision-pre-puppet.sh"
+  config.vm.provision "shell" do |s|
+    s.path = "tools/vagrant-provision-pre-puppet.sh"
+    s.args = "#{instance_registry_url_override}"
+  end
 
   # Puppet Apply Provisioner (without a puppet master)
   # See https://www.vagrantup.com/docs/provisioning/puppet_apply.html
