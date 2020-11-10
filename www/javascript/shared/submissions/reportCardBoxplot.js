@@ -202,111 +202,24 @@
 
             return merged;
         }
-        /**
-         * http://www.purplemath.com/modules/boxwhisk.htm
-         */
-        function findMedian(values) {
-            var median = null;
 
-            /* Figure out medians in different ways depending
-             * on even or odd number of elements
-             */
-            var halfway = Math.floor(values.length/2);
-
-            var even = !(values.length % 2);
-
-            /* Careful of these offsets
-             */
-            if (even) {
-                median = (values[halfway-1] + values[halfway])/2.0;
-            }
-            else {
-                median = values[halfway];
-            }
-
-            if (median != null) {
-                median = parseFloat(median.toFixed(1));
-            }
-
-            return median;
-        }
-
-        /**
-         * Find the values used to calculate first quartile
-         */
-        function setupFirstQuartile(values) {
-            return values.slice(0, Math.floor(values.length/2));
-        }
-
-        /**
-         * Find the values used to calculate third quartile
-         *
-         * Even number of items: split down the middle
-         * Odd number of items: ignore the median value
-         */
-        function setupThirdQuartile(values) {
-            var even = !(values.length % 2);
-
-            if (even) {
-                return values.slice(Math.floor(values.length/2), values.length);
-            }
-
-            return values.slice(Math.ceil(values.length/2), values.length);
-        }
-
-        /**
-         * Find minimum value in an array
-         */
-        function findMinimum(values) {
-            var minimum = null;
-
-            if (values.length) {
-                minimum = values[0];
-
-                for (var i = 0; i < values.length; i++) {
-                    if (values[i] < minimum) {
-                        minimum = values[i];
-                    }
-                }
-            }
-
-            return minimum;
-        }
-
-        /**
-         * Find maximum value in an array
-         */
-        function findMaximum(values) {
-            var maximum = null;
-
-            if (values.length) {
-                maximum = values[0];
-
-                for (var i = 0; i < values.length; i++) {
-                    if (values[i] > maximum) {
-                        maximum = values[i];
-                    }
-                }
-            }
-
-            return maximum;
-        }
 
         /**
          * Generate an object containing all the box plot values
          * required to manufacture a graph
+         *
+         * config.values is already a precomputed Five Point Summary
          */
         function generateValues() {
-            var data = {
-                minimum: findMinimum(config.values),
-                quartile1: findMedian(setupFirstQuartile(config.values)),
-                quartile2: findMedian(config.values),
-                quartile3: findMedian(setupThirdQuartile(config.values)),
-                maximum: findMaximum(config.values)
+            return {
+                minimum: config.values[0],
+                quartile1: config.values[1],
+                quartile2: config.values[2],
+                quartile3: config.values[3],
+                maximum: config.values[4]
             };
-
-            return data;
         }
+
 
         /**
          * Generate IQR value
@@ -337,7 +250,6 @@
              */
             output.fivePointSummary.structured = fivePointSummary;
             output.iqr = iqr;
-
 
             /* Convert into an array format
              */
