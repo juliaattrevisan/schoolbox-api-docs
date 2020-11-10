@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Markbook;
 
 use Schoolbox\Collection;
-use Schoolbox\Config\Loader;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\User;
