@@ -186,9 +186,13 @@ class CohortMarks
          */
         $normMarks = [];
 
-        /* For the $viewee, remember their value in a separate data series for highcharts
+        /* Highcharts' data format expects each series to be in its own element:
+         * (you can't collect them into a struct)
+         *
+         * so all the asseessment titles in an ordered array,
+         * all the hover contents are in an ordered array,
+         * the $viewee's results are in an ordered array
          */
-        $scatter = [];
 
         /* Remember the unique titles of each $assessment we encountered, for highcharts
          */
@@ -197,6 +201,10 @@ class CohortMarks
         /* Remember the $viewee's accomplishment in each specification id
          */
         $graphInfo = [];
+
+        /* For the $viewee, remember their value in a separate data series for highcharts
+         */
+        $scatter = [];
 
         foreach ($assessments as $assessment) {
 
