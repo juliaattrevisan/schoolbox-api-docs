@@ -135,28 +135,29 @@ class CohortMarks
             $sortedSpecificationIds[] = $assessmentTuples[$inputImplementationId];
         }
 
+        /* Index the result set, forcing the $assessments collection to be in the same
+         * specification order as $inputImplementationIds (jesus)
+         */
+        $result = new Collection();
+
         $sortedTuples = [];
 
         foreach ($sortedSpecificationIds as $sortedSpecificationId) {
             foreach ($assessmentTuples as $implementationId => $specificationId) {
                 if ($specificationId === $sortedSpecificationId) {
                     $sortedTuples[$implementationId] = $sortedSpecificationId;
+
+                    /* Stack it up in the same order
+                     */
+                    $result->add($assessments->getOffset($implementationId));
                 }
             }
         }
 
-        /* Remember this for later
+        /* Remember this for later; we use it to find data sets by specification id,
+         * using the assessment's implementation id as the key
          */
         $this->tuples = $sortedTuples;
-
-        /* Index the result set, forcing the $assessments collection to be in the same
-         * specification order as $inputImplementationIds (jesus)
-         */
-        $result = new Collection();
-
-        foreach ($sortedTuples as $implementationId => $specificationId) {
-            $result->add($assessments->getOffset($implementationId));
-        }
 
         return $result;
     }
