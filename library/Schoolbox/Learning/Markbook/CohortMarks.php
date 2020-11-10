@@ -204,10 +204,13 @@ class CohortMarks
 
         foreach ($assessments as $assessment) {
 
-            /* Obey visibility restrictions; feedback must be visible to $viewer
-             * and assessment's mark scheme must be quantitative
+            /* Assessment's mark scheme must be quantitative
+             *
+             * There's no check on isFeedbackVisibleToUser because we're doing cohort analysis
+             * and the currently logged in user might not be able to see other class' feedbacks,
+             * but those values still contribute to the statistica numbers
              */
-            if ($assessment->isFeedbackVisibleToUser($this->viewer) && $assessment->getMarkScheme()->isQuantitative()) {
+            if ($assessment->getMarkScheme()->isQuantitative()) {
 
                 /* For each assessment, get all the Participants' feedbacks, and find out their normalised mark
                  * Index them by specification id; we calculate a five point summary of everything here
@@ -222,52 +225,61 @@ class CohortMarks
 
                 foreach ($assessment->getAllParticipants() as $participant) {
                     $normMarks[$specificationId][] = $participant->getNormalisedMark(true);
+                }
+            }
+        }
 
-                    /* If $participant is the $viewee, remember their result in the $scatter
-                     *
-                     * TODO What happens when someone does the same assessment implementation in two different places
-                     *  They share the same specification, but you get two different results
+        /* Collate the $viewee's data, which is their scatter plot and hover thingo
+         * This scatter plot represents the $viewee's feedbacks for an assessment
+         * for the given class
+         *
+         * $assessments and $this->assessments are ordered similarly, by same specification id
+         */
+        foreach ($this->assessments as $assessment) {
+            $specificationId = $this->tuples[$assessment->getId()];
+
+            /* Obey visibility restrictions; feedback must be visible to $viewer
+             * and assessment's mark scheme must be quantitative
+             */
+            if ($assessment->isFeedbackVisibleToUser($this->viewer) && $assessment->getMarkScheme()->isQuantitative()) {
+                $participant = $assessment->getParticipantIfExtant($viewee);
+
+                /* Find out what this $viewee accomplished; null normalised marks are disregarded
+                 * We optionally apply a gradient colour
+                 */
+                $normalisedMark = $participant->getNormalisedMark(true);
+                $scatter[$specificationId] = $normalisedMark;
+
+                /* This little data set appears in highcharts when you hover over the
+                 * $viewee's scatter plot, telling you some more metadata about what they achieved
+                 */
+                $comment = null;
+
+                /* Look for an authoritative feedback to get the most recent info
+                 */
+                $feedback = $participant->findAuthoritativeVisibleFeedback($viewee);
+
+                if ($feedback) {
+                    $comment = $feedback->getComment();
+                }
+
+                /* Get the nicer version of the normalised mark
+                 */
+                $humanReadableMark = $participant->getHumanReadableMark(true);
+
+                /* If either of these two vars are truthy, there's something to show
+                 */
+                if ($humanReadableMark || $comment) {
+                    $graphInfo[$specificationId] = [
+                        'displayMark'  => $humanReadableMark,
+                        'gradientMark' => $this->gradeGradientEnabled ? (int)($normalisedMark / 10) : 'none',
+                        'info'         => $comment ?? '',
+                    ];
+                } else {
+
+                    /* Otherwise, nothing to show
                      */
-                    if ($participant->getUser()->getId() === $viewee->getId()) {
-
-                        /* Find out what this $viewee accomplished; null normalised marks are disregarded
-                         * We optionally apply a gradient colour
-                         */
-                        $normalisedMark = $participant->getNormalisedMark(true);
-                        $scatter[$specificationId] = $normalisedMark;
-
-                        /* This little data set appears in highcharts when you hover over the
-                         * $viewee's scatter plot, telling you some more metadata about what they achieved
-                         */
-                        $comment = null;
-
-                        /* Look for an authoritative feedback to get the most recent info
-                         */
-                        $feedback = $participant->findAuthoritativeVisibleFeedback($viewee);
-
-                        if ($feedback) {
-                            $comment = $feedback->getComment();
-                        }
-
-                        /* Get the nicer version of the normalised mark
-                         */
-                        $humanReadableMark = $participant->getHumanReadableMark(true);
-
-                        /* If eitehr of these two vars are truthy, there's something to show
-                         */
-                        if ($humanReadableMark || $comment) {
-                            $graphInfo[$specificationId] = [
-                                'displayMark'  => $humanReadableMark,
-                                'gradientMark' => $this->gradeGradientEnabled ? (int)($normalisedMark / 10) : 'none',
-                                'info'         => $comment ?? '',
-                            ];
-                        } else {
-
-                            /* Otherwise, nothing to show
-                             */
-                            $graphInfo[$specificationId] = [];
-                        }
-                    }
+                    $graphInfo[$specificationId] = [];
                 }
             }
         }
