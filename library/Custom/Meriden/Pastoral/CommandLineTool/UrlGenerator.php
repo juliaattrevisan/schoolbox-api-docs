@@ -53,26 +53,31 @@ class UrlGenerator
      */
     public function generate(int $year, User $student, ?string $roleTypeOverride): array
     {
-        $results = [];
+        $queryString = $roleTypeOverride
+            ? ('?' . http_build_query(['role-type' => $roleTypeOverride]))
+            : '';
 
         // Find the page for the current year
-        $params = [
-            'student'     => $student,
-            'id'          => $student->getId(),
-            'year'        => $year,
+        $params  = [
+            'student' => $student,
+            'id'      => $student->getId(),
+            'year'    => $year,
         ];
-        $results[] = $this->router->generate('customMeridenPastoral.index', $params);
+        $results = [
+            $this->router->generate('customMeridenPastoral.index', $params) . $queryString,
+        ];
 
         // Find the pages for each subject
-        foreach ($this->factory->buildSubjectList($year, $student) as $subject) {
-            $params = [
+        $subjectList = $this->factory->buildSubjectList($year, $student);
+        foreach ($subjectList as $subject) {
+            $params    = [
                 'student'     => $student,
                 'id'          => $student->getId(),
                 'year'        => $year,
                 'subject'     => $subject,
                 'subjectCode' => $subject->getSubjectCode(),
             ];
-            $results[] = $this->router->generate('customMeridenPastoral.subject', $params);
+            $results[] = $this->router->generate('customMeridenPastoral.subject', $params) . $queryString;
         }
 
         return $results;
