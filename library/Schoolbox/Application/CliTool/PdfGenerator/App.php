@@ -25,17 +25,28 @@ use ZipArchive;
  */
 abstract class App extends BaseApp
 {
-    private const OPT_SHORT_HELP            = 'h';                 // print help
-    private const OPT_LONG_HELP             = 'help';              // print help
-    private const OPT_LONG_HASH             = 'hash:';             // session hash
-    private const OPT_LONG_USERNAME         = 'username:';         // username
-    private const OPT_LONG_MAX_FAILS        = 'max-fails:';        // Number of consecutive fails after which to abort the script's execution.
-    private const OPT_LONG_JS_DELAY         = 'js-delay:';         // How many milliseconds to let JS run before attempting to print page
-    private const OPT_LONG_USER_STYLE_SHEET = 'user-style-sheet:'; // user style sheet
+    // print help
+    private const OPT_SHORT_HELP = 'h';
+    private const OPT_LONG_HELP  = 'help';
 
-    private const DEFAULT_MAX_FAILS = 3;
+    // Session hash
+    private const OPT_LONG_HASH = 'hash:';
+
+    // Username, if session hash is not provided
+    private const OPT_LONG_USERNAME = 'username:';
+
+    // Number of consecutive fails after which to abort the script's execution.
+    private const OPT_LONG_MAX_FAILS = 'max-fails:';
+    private const DEFAULT_MAX_FAILS  = 3;
+
+    // How many milliseconds to let JS run before attempting to print page
+    private const OPT_LONG_JS_DELAY = 'js-delay:';
     private const DEFAULT_JS_DELAY  = 1000;
 
+    // user style sheet
+    private const OPT_LONG_USER_STYLE_SHEET = 'user-style-sheet:';
+
+    // Exit status for an authentication failure
     private const EXIT_STATUS_AUTHENTICATION_FAILURE = 100;
 
     /**
@@ -110,7 +121,7 @@ abstract class App extends BaseApp
                 // Something went wrong: log it
                 // abort if there's been enough consecutive failures
                 $this->getLogger()->warning($e->getMessage());
-                if ($consecutiveFailures++ >= $maxFailures){
+                if ($consecutiveFailures++ >= $maxFailures) {
                     $this->getLogger()->error("$consecutiveFailures consecutive failures, giving up...");
                     break;
                 }
