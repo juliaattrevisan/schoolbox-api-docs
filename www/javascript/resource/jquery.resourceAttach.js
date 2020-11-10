@@ -97,7 +97,7 @@
             url: opt.url,
             paramName: opt.paramName,
             // The dropzone is clickable if the modal is disabled
-            clickable: !opt.useModal,
+            clickable: opt.useModal ? false : dzone[0],
             maxFiles: opt.multi ? null : 1,
             maxFilesize: opt.maxFilesize,
             acceptedFiles: opt.allowedFiles === '*/*' ? null : opt.allowedFiles,
@@ -122,7 +122,7 @@
             },
 
             init: function () {
-                dzone.append($('<span/>').html(prompt));
+                dzone.append($('<span class="needsclick"/>').html(prompt));
 
                 // *goes crosseyed*
                 self.dropzone = this;
@@ -251,15 +251,22 @@
         // cache the content for this reveal modal
         this.cacheModal();
 
-        $(this.element).on('click', this.options.trigger, function (e) {
-            e.preventDefault();
-
-            if (opt.useModal) {
+        if (opt.useModal) {
+            $(this.element).on('click', opt.trigger, function (e) {
+                e.preventDefault();
                 self.open();
-            } else {
-                azone.trigger('click');
-            }
-        });
+            });
+        }
+
+        // $(this.element).on('click', opt.trigger, function (e) {
+        //     e.preventDefault();
+        //
+        //     if (opt.useModal) {
+        //         self.open();
+        //     } else {
+        //         azone.trigger('click');
+        //     }
+        // });
     }
 
 
