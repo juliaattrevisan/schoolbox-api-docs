@@ -240,16 +240,16 @@ export default {
 
 <template>
     <div>
-        <span class="comment-count" v-if="!hasComments">
+        <h2 class="comment-count" v-if="!hasComments">
             No comments yet
-        </span>
+        </h2>
         <template v-else>
-            <span class="comment-count">
+            <h2 class="comment-count">
                 {{ commentThread.children.metadata.count }} comment(s)
                 <template v-if="commentThread.children.metadata.count > commentThread.children.data.length && commentThread.children.metadata.cursor.next">
                     (<a @click.prevent="loadMoreComments">Load more</a>)
                 </template>
-            </span>
+            </h2>
 
             <ckeditor tag-name="textarea" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
             <a class="button submit"
@@ -288,8 +288,8 @@ export default {
                 <h2>Please confirm</h2>
                 <p>Are you sure you want to delete this comment?</p>
                 <ul class="flex-list buttons">
-                    <li><a @click.prevent="deleteComment(commentIndexToDelete)" class="button icon-approve submit">OK</a></li>
-                    <li><a @click.prevent="$refs.deleteModal.close" class="button icon-close">Cancel</a></li>
+                    <li><a @click.prevent="deleteComment(commentIndexToDelete)" class="button submit">OK</a></li>
+                    <li><a @click.prevent="$refs.deleteModal.close" class="button">Cancel</a></li>
                 </ul>
             </template>
         </reveal-modal>

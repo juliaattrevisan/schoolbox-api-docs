@@ -17,7 +17,7 @@
 
   .article-read-more {
     margin-top: 0;
-    padding: .5rem 0;
+    padding-bottom: 1rem;
     width: 100%;
     clear: both;
   }
@@ -25,7 +25,7 @@
 
 .feed-comments {
   .comment-count {
-    font-weight: $font-weight-semibold;
+    font-size: $paragraph-font-size;
   }
 }
 

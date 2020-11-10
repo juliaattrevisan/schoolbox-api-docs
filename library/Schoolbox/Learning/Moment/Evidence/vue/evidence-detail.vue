@@ -108,7 +108,7 @@ export default {
 }
 </script>
 <template>
-    <div>
+    <div class="evidence-detail">
         <template v-if="this.hasRoutes()">
             <div class="row">
                 <div class="small-12 columns">
@@ -137,7 +137,9 @@ export default {
                         <div class="small-12 island">
                             <section class="detail content">
                                 <p class="meta">By
+                                    <a :href="evidence.creator._links.profile" title="View Profile">
                                     {{ this.evidence.creator.fullName }}
+                                    </a>
                                     &mdash;
                                     <relative-time :datetime="this.evidence.createdAt"></relative-time>
                                 </p>
@@ -151,10 +153,15 @@ export default {
                                 <article v-if="this.evidence.filename && this.evidence.storage">
                                     <storage :storage="this.evidence.storage" :filename="this.evidence.filename"></storage>
                                 </article>
-
-                                <!-- Discussion thread -->
-                                <comment-thread :thread="evidence.discussionThread"
-                                                :create-thread-endpoint="evidence._links.createThread" />
+                            </section>
+                        </div>
+                        <div id="discussion" class="small-12 island">
+                            <section id="threads-section" class="discussion content">
+                                <div class="discussion-threads">
+                                    <!-- Discussion thread -->
+                                    <comment-thread :thread="evidence.discussionThread"
+                                                    :create-thread-endpoint="evidence._links.createThread" />
+                                </div>
                             </section>
                         </div>
                     </div>
