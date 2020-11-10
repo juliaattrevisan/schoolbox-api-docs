@@ -191,9 +191,7 @@
             /* Remove null values before computing
              */
             for (var i = 0; i < options.input.length; i++) {
-                if (options.input[i].value != undefined) {
-                    derived.values.push(options.input[i].value);
-                }
+                derived.values.push(options.input[i].value);
             }
 
             /* Merge everything
