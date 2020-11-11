@@ -4,7 +4,7 @@
     <section>
         <fieldset class="content">
             <div class="small-12 columns">
-                {% block formInputUpload %}
+                {% block formInputFile %}
                     {##
                      # I can't label attachzones as I would standard file inputs.
                      #
@@ -14,19 +14,26 @@
                      #  attached)
                      #}
                     <label class="required" for="evidence-filename">
-                        {% block fileUploadLabel %}
+                        {% block formInputFileLabel %}
                             Upload File
-                        {% endblock fileUploadLabel %}
+                        {% endblock formInputFileLabel %}
                     </label>
                     <input type="hidden" name="filename" id="evidence-filename" required />
                     {% include 'sub/attachzone.twig' with { attachzone: zone } %}
-                    {% block fileUploadPreview %}
-                    {% endblock fileUploadPreview %}
-                {% endblock formInputUpload %}
+                    {% block formInputFilePreview %}
+                    {% endblock formInputFilePreview %}
+                {% endblock formInputFile %}
             </div>
         </fieldset>
     </section>
 {% endblock formInputs %}
+
+{% block formInputBody %}
+    <label for="evidence-body">
+        Description
+    </label>
+    <textarea name="body" id="evidence-body"></textarea>
+{% endblock formInputBody %}
 
 {% block formJs %}
     {% autoescape 'js' %}

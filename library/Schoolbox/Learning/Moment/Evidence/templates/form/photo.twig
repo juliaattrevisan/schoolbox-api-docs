@@ -1,10 +1,10 @@
 {% extends '@learningMomentEvidence/form/upload.twig' %}
 
-{% block fileUploadLabel %}
+{% block formInputFileLabel %}
     Take a picture
-{% endblock fileUploadLabel %}
+{% endblock formInputFileLabel %}
 
-{% block fileUploadPreview %}
+{% block formInputFilePreview %}
     <img id="evidence-storage-preview" class="hide" src="" alt=""/>
 
     {% autoescape 'js' %}
@@ -27,4 +27,4 @@
             });
         </script>
     {% endautoescape %}
-{% endblock fileUploadPreview %}
+{% endblock formInputFilePreview %}

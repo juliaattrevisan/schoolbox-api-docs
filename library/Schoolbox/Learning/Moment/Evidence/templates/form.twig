@@ -68,14 +68,10 @@
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            {% block formInputUpload %}
-                            {% endblock formInputUpload %}
-                            {% block formInputDescription %}
-                                <label for="evidence-body">
-                                    Description
-                                </label>
-                                <textarea name="body" id="evidence-body"></textarea>
-                            {% endblock formInputDescription %}
+                            {% block formInputFile %}
+                            {% endblock formInputFile %}
+                            {% block formInputBody %}
+                            {% endblock formInputBody %}
                         </div>
                     </fieldset>
                 </section>
