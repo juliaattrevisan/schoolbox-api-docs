@@ -34,6 +34,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Grades\Cohort\ClassResults;
+use Schoolbox\Learning\Grades\Cohort\Progression;
 use Schoolbox\Learning\Grades\Cohort\ValidUseCohortMarks;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\MarkScheme\Factory;
@@ -592,7 +593,7 @@ class Controller extends Base
         $rubricAssessmentList = [];
         if ($canSeeRubricGrade || $canSeeCapabilityGrade || $canSeeProgression) {
             $includeComparison = $this->getUser()->getRole()->isStaff() || $viewee->getDisplayGradeGraph();
-            $longitudinalRubric   = $this->getLongitudinalRubricData($assessments, $viewee, $includeComparison);
+            $longitudinalRubric   = $this->getLongitudinalRubricData($assessments, $viewee, $includeComparison, $subject);
             $rubricAssessmentList = $longitudinalRubric['assessments'];
             unset($longitudinalRubric['assessments']);
         }
@@ -831,15 +832,34 @@ class Controller extends Base
      * @param GenericCollection|IAssessable[] $assessments
      * @param User                            $student
      * @param bool                            $includeComparison Include other students results for comparison
+     * @param Folder\Model                    $folder
      * @return array
+     * @throws DomainException
+     * @throws InvalidColumnException
+     * @throws ServiceNotFound
+     * @throws \RangeException
+     * @throws \UnderflowException
      */
-    private function getLongitudinalRubricData(GenericCollection $assessments, User $student, bool $includeComparison): array
-    {
+    private function getLongitudinalRubricData(
+        GenericCollection $assessments,
+        User $student,
+        bool $includeComparison,
+        Folder\Model $folder
+    ): array {
         // Filter to dueWork with marks visible to current user
         $user = $this->getUser();
         $dueWorksWithVisibleMarks = $assessments->filter(function (IAssessable $assessment) use ($user) {
             return $assessment instanceof DueWork\Model && $assessment->isFeedbackVisibleToUser($user);
         });
+
+        if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $folder)) {
+            return (new Progression(
+                $this->getDi()->get('databaseInternal'),
+                $this->assessmentMapperProxy,
+                $dueWorksWithVisibleMarks,
+                $includeComparison
+            ))->collate($student);
+        }
 
         return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student, $includeComparison);
     }
