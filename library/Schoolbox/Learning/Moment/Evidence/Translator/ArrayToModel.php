@@ -120,11 +120,17 @@ class ArrayToModel
         // * a triplet passed from a resource attacher, to be transformed into a
         //   storage hash by the collector factory
         if (array_key_exists('file', $json)) {
-            $file = $this->collectorFactory->build([$json['file']])->getFirst();
-            if ($file) {
+            if (!isset($json['file'])) {
                 $model
-                    ->setFilename($file->getBasename())
-                    ->setStorage($file);
+                    ->setFilename(null)
+                    ->setStorage(null);
+            } else {
+                $file = $this->collectorFactory->build([$json['file']])->getFirst();
+                if ($file) {
+                    $model
+                        ->setFilename($file->getBasename())
+                        ->setStorage($file);
+                }
             }
         }
 
