@@ -26,7 +26,8 @@ export default {
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
     props: [
-        'evidence'
+        'evidence',
+        'returnUrl',
     ],
 
     /**
@@ -84,7 +85,25 @@ export default {
              * straightforward to calculate this way
              */
             return this.evidence._links.modify || this.evidence._links.delete;
-        }
+        },
+
+        /**
+         * Create a modify form URL for this evidence, consisting of the
+         * evidence's existing modify form link and a return URL query string.
+         *
+         * @return {String}
+         */
+        createModifyFormUrl() {
+            if (this.evidence._links.modifyForm) {
+                let baseModifyLink = this.evidence._links.modifyForm;
+                if (this.returnUrl.name && this.returnUrl.current) {
+                    baseModifyLink = baseModifyLink
+                            + '?' + encodeURIComponent(this.returnUrl.name) + '=' + encodeURIComponent(this.returnUrl.current);
+                }
+                return baseModifyLink;
+            }
+            return '';
+        },
     }
 }
 </script>
@@ -101,7 +120,7 @@ export default {
                         </nav>
                         <ul id="header-options" class="f-dropdown" data-dropdown-content>
                             <li v-if="this.evidence._links.modifyForm">
-                                <a class="icon-modify" :href="this.evidence._links.modifyForm">Modify</a>
+                                <a class="icon-modify" :href="this.createModifyFormUrl()">Modify</a>
                             </li>
                             <template v-if="this.evidence._links.delete">
                                 <li><a class="icon-delete" :href="this.evidence._links.delete" data-delete>Delete</a></li>
