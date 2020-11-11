@@ -73,10 +73,18 @@ class ArrayToModel
         }
         if (array_key_exists('createdAt', $json)) {
             // Expect a datetime object
-            $model->setCreatedAt(new Alaress_Date_Format($json['createdAt'], DATE_ATOM));
+            $model->setCreatedAt(
+                isset($json['createdAt'])
+                    ? new Alaress_Date_Format($json['createdAt'], DATE_ATOM)
+                    : null
+            );
         }
         if (array_key_exists('updatedAt', $json)) {
-            $model->setUpdatedAt(new Alaress_Date_Format($json['updatedAt'], DATE_ATOM));
+            $model->setUpdatedAt(
+                isset($json['updatedAt'])
+                    ? new Alaress_Date_Format($json['updatedAt'], DATE_ATOM)
+                    : null
+            );
         }
 //        if (array_key_exists('deletedAt', $json)) {
 //            $model->setDeletedAt(new Alaress_Date_Format($json['deletedAt'], DATE_ATOM));
