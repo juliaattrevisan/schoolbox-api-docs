@@ -6,9 +6,10 @@ if [[ ! -f /etc/schoolbox/conf.php ]]; then
     mkdir -p /etc/schoolbox;
     ln -sf /vagrant/www/conf/conf.php /etc/schoolbox/conf.php;
 fi;
-if [[ ! -f /etc/schoolboxdev/conf.php ]]; then
-    mkdir -p /etc/schoolboxdev;
-    ln -sf /vagrant/www/conf/conf.php /etc/schoolboxdev/conf.php;
+
+# This isn't a schoolboxdev
+if [[ -f /etc/schoolboxdev/conf.php ]]; then
+    rm /etc/schoolboxdev/conf.php;
 fi;
 
 # Does vagrant environment file indicate we wish this host to use a custom IR endpoint?
