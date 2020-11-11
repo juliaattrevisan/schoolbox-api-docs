@@ -44,8 +44,11 @@ class ArrayToModel
 
 
     /**
+     * Translate the array representation of the evidence into a model.
+     *
      * @param array               $json
-     * @param Evidence\Model|null $model
+     * @param Evidence\Model|null $model If provided, update this model;
+     *                                   otherwise create a new one
      * @return Evidence\Model
      * @throws ResourceException if the collector factory can't find the file
      *                           that was uploaded
