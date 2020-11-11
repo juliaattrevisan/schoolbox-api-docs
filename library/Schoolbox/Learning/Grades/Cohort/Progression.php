@@ -54,6 +54,12 @@ class Progression
 
 
     /**
+     * @var array
+     */
+    private $tuples;
+
+
+    /**
      * Progression constructor.
      *
      * @param Connector\Base        $database
@@ -94,6 +100,11 @@ class Progression
         if (!$this->assessments->count()) {
             return [];
         }
+
+        /* Remember this for later; we use it to find data sets by specification id,
+         * using the assessment's implementation id as the key
+         */
+        $this->tuples = $this->getCohortAssessmentSet();
 
         /* Get the set of assessments whose feedbacks contain rubrics we want to analyse
          * for $viewee's data series
@@ -171,6 +182,30 @@ class Progression
 
 
     /**
+     * Find all the assessment implementation ids which share a common assessment specification
+     * with the implementations in $this->assessments
+     *
+     * @return array
+     * @throws \PDOException
+     */
+    private function getCohortAssessmentSet(): array
+    {
+        $inputImplementationIds = $this->assessments->getPropertyValues('id');
+
+        /* A user has participated in each of the elements inside $this->assessments
+         * We need to find all the other assessments that shared a common specification
+         * as the ones in $this->assessments
+         */
+        $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId($inputImplementationIds);
+
+        /* $assessmentTuples is a set of (key, value) tuples where $key is the implementation id,
+         * and $value is a corresponding specification id
+         */
+        return $assessmentTuples;
+    }
+
+
+    /**
      * Get all the most recent feedbacks for $viewee. This represents the $viewee's data series
      * overlaid on the cohort's boxplots
      *
@@ -206,7 +241,9 @@ class Progression
         $feedbackIds = [];
 
         while ($row = $feedbackStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $feedbackIds[$row['assessmentId']] = $row['feedbackId'];
+            $specificationId = $this->tuples[$row['assessmentId']];
+
+            $feedbackIds[$specificationId] = $row['feedbackId'];
         }
 
         return $feedbackIds;
@@ -267,14 +304,16 @@ class Progression
         $markSchemeFactory = new MarkSchemeFactory();
 
         while ($row = $descriptorStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $longitude[$row['capability_id']]['name']                             = $row['capability_name'];
-            $longitude[$row['capability_id']]['value'][$row['assessment_id']]     = $row['capability_value'];
-            $longitude[$row['capability_id']]['mark_type'][$row['assessment_id']] = $row['mark_type'];
-            $longitude[$row['capability_id']]['max_value'][$row['assessment_id']] = $row['capability_max_value'];
+            $specificationId = $this->tuples[$row['assessment_id']];
+
+            $longitude[$row['capability_id']]['name']                        = $row['capability_name'];
+            $longitude[$row['capability_id']]['value'][$specificationId]     = $row['capability_value'];
+            $longitude[$row['capability_id']]['mark_type'][$specificationId] = $row['mark_type'];
+            $longitude[$row['capability_id']]['max_value'][$specificationId] = $row['capability_max_value'];
 
             // Create the cap mark
-            if (!isset($longitude[$row['capability_id']]['mark'][$row['assessment_id']]) && $row['capability_max_value'] > 0 && isset($this->assessments[$row['assessment_id']])) {
-                $longitude[$row['capability_id']]['mark'][$row['assessment_id']] = $markSchemeFactory->spawnForCapability(
+            if (!isset($longitude[$row['capability_id']]['mark'][$specificationId]) && $row['capability_max_value'] > 0 && isset($this->assessments[$row['assessment_id']])) {
+                $longitude[$row['capability_id']]['mark'][$specificationId] = $markSchemeFactory->spawnForCapability(
                     $this->assessments[$row['assessment_id']],
                     (float)$row['capability_max_value']
                 )->getHumanReadableMark(($row['capability_value'] / $row['capability_max_value']) * 100);
@@ -282,46 +321,22 @@ class Progression
 
             $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['name'] = $row['indicator_name'];
 
-            $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$row['assessment_id']] = [
-                'name'                           => $row['assessment_title'],
+            $longitude[$row['capability_id']]['indicators'][$row['indicator_id']]['activities'][$specificationId] = [
+                'name' => $row['assessment_title'],
                 'rubric_capability_mark_type_id' => $row['rubric_capability_mark_type_id'],
-                'descriptor'                     => $row['description'],
-                'level'                          => $row['level'],
-                'max_value'                      => $row['max_value'],
-                'value'                          => $row['value'],
+                'descriptor' => $row['description'],
+                'level' => $row['level'],
+                'max_value' => $row['max_value'],
+                'value' => $row['value'],
             ];
 
-            $assessmentList[$row['assessment_id']]['name']                           = $row['assessment_title'];
-            $assessmentList[$row['assessment_id']]['rubric_capability_mark_type_id'] = $row['rubric_capability_mark_type_id'];
+            $assessmentList[$specificationId]['name'] = $row['assessment_title'];
+            $assessmentList[$specificationId]['rubric_capability_mark_type_id'] = $row['rubric_capability_mark_type_id'];
         }
 
         $longitude['assessments'] = $assessmentList;
 
         return $longitude;
-    }
-
-
-    /**
-     * Find all the assessment implementation ids which share a common assessment specification
-     * with the implementations in $this->assessments
-     *
-     * @return array
-     * @throws \PDOException
-     */
-    private function getCohortAssessmentSet(): array
-    {
-        $inputImplementationIds = $this->assessments->getPropertyValues('id');
-
-        /* A user has participated in each of the elements inside $this->assessments
-         * We need to find all the other assessments that shared a common specification
-         * as the ones in $this->assessments
-         */
-        $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId($inputImplementationIds);
-
-        /* $assessmentTuples is a set of (key, value) tuples where $key is the implementation id,
-         * and $value is a corresponding specification id
-         */
-        return $assessmentTuples;
     }
 
 
@@ -334,11 +349,10 @@ class Progression
      */
     private function getCohortFeedbacks(): array
     {
-        $assessments = $this->getCohortAssessmentSet();
 
         // Find the most recent feedback for each of these due works
         $pb = (new Builder($this->database, ''))
-            ->in('a.id', array_keys($assessments))
+            ->in('a.id', array_keys($this->tuples))
             ->isNull('a.deleted_at')
             ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->notNull('sr.published_at')
@@ -416,14 +430,16 @@ class Progression
         ", $pb->getParams());
 
         while ($row = $averageStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $allResults[$row['assessment_id']][$row['capability_id']][$row['indicator_id']][] = (float)$row['value'];
+            $specificationId = $this->tuples[$row['assessment_id']];
+
+            $allResults[$specificationId][$row['capability_id']][$row['indicator_id']][] = (float)$row['value'];
         }
 
         //Insert the statistical summary data collated from all students results across all indicators in all activities
-        foreach ($allResults as $assessmentId => $assessment) {
+        foreach ($allResults as $specificationId => $assessment) {
             foreach ($assessment as $capabilityId => $capability) {
                 foreach ($capability as $indicatorId => $indicator) {
-                    $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$assessmentId]['statistics'] = (new Summary($indicator))->getSummary();
+                    $longitude[$capabilityId]['indicators'][$indicatorId]['activities'][$specificationId]['statistics'] = (new Summary($indicator))->getSummary();
                 }
             }
         }
