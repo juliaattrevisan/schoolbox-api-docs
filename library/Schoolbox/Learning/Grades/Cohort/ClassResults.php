@@ -13,7 +13,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\User;
 
 /**
- * Class CohortMarks
+ * Class ClassResults
  *
  * Generate five-point summaries for assessment cohorts by aggregating
  * feedbacks for all assessments sharing a common assessment specification
@@ -54,7 +54,7 @@ class ClassResults
 
 
     /**
-     * CohortMarks constructor.
+     * ClassResults constructor.
      *
      * @param bool                  $gradeGradientEnabled
      * @param AssessmentMapperProxy $assessmentMapperProxy
