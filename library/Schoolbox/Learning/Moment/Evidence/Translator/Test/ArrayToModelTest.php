@@ -119,16 +119,20 @@ class ArrayToModelTest extends TestCase
      */
     public function getTestInvokeUpdateData(): iterable
     {
+        $oldDate   = '2020-01-01T00:00:00+00:00';
+        $newDate   = '2020-02-01T00:00:00+00:00';
+        $oldId     = 1;
+        $newId     = 2;
         $timezone  = new DateTimeZone('+00:00');
         $baseModel = (new Model())
-            ->setId(1)
-            ->setCreatedAt(new Alaress_Date_Format('2020-01-01T00:00:00+00:00', DATE_ATOM, $timezone))
-            ->setUpdatedAt(new Alaress_Date_Format('2020-02-01T00:00:00+00:00', DATE_ATOM, $timezone))
-            ->setDeletedAt(new Alaress_Date_Format('2020-03-01T00:00:00+00:00', DATE_ATOM, $timezone))
+            ->setId($oldId)
+            ->setCreatedAt(new Alaress_Date_Format($oldDate, DATE_ATOM, $timezone))
+            ->setUpdatedAt(new Alaress_Date_Format($oldDate, DATE_ATOM, $timezone))
+            ->setDeletedAt(new Alaress_Date_Format($oldDate, DATE_ATOM, $timezone))
             ->setBody('test')
-            ->setCreator((new User())->setId(55))
-            ->setRecipient((new User())->setId(193))
-            ->setDiscussionThread((new DiscussionThread())->setId(14))
+            ->setCreator((new User())->setId($oldId))
+            ->setRecipient((new User())->setId($oldId))
+            ->setDiscussionThread((new DiscussionThread())->setId($oldId))
             ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
             ->setFilename('test.gif');
 
@@ -136,9 +140,9 @@ class ArrayToModelTest extends TestCase
         // It feels wrong, because IDs should be immutable.
         // However, should that be the responsibility of this class?
         yield 'update id' => [
-            ['id' => 3,],
+            ['id' => $newId,],
             (clone $baseModel),
-            (clone $baseModel)->setId(3)
+            (clone $baseModel)->setId($newId)
         ];
 
         yield 'null id' => [
@@ -147,11 +151,12 @@ class ArrayToModelTest extends TestCase
             (clone $baseModel)->setId(null)
         ];
 
-        // Likewise, should created at be mutable?
+
+        // Likewise, should created/updated at be mutable?
         yield 'update created at' => [
-            ['createdAt' => '2020-02-01T00:00:00+00:00',],
+            ['createdAt' => $newDate,],
             (clone $baseModel),
-            (clone $baseModel)->setCreatedAt(new Alaress_Date_Format('2020-02-01T00:00:00+00:00', DATE_ATOM, $timezone))
+            (clone $baseModel)->setCreatedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone))
         ];
 
         yield 'null created at' => [
@@ -159,6 +164,85 @@ class ArrayToModelTest extends TestCase
             (clone $baseModel),
             (clone $baseModel)->setCreatedAt(null)
         ];
+
+        yield 'update updated at' => [
+            ['updatedAt' => $newDate,],
+            (clone $baseModel),
+            (clone $baseModel)->setUpdatedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone))
+        ];
+
+        yield 'null updated at' => [
+            ['updatedAt' => null,],
+            (clone $baseModel),
+            (clone $baseModel)->setUpdatedAt(null)
+        ];
+
+
+        // Body should be mutable
+        yield 'update body' => [
+            ['body' => 'new body',],
+            (clone $baseModel),
+            (clone $baseModel)->setBody('new body')
+        ];
+
+        yield 'null body' => [
+            ['body' => null,],
+            (clone $baseModel),
+            (clone $baseModel)->setBody(null)
+        ];
+
+
+        // Creator should not be mutable
+        yield 'update creator' => [
+            ['creator' => ['id' => $newId,],],
+            (clone $baseModel),
+            (clone $baseModel)->setCreator((new User())->setId($newId))
+        ];
+
+//        // Creator is not nullable: this should be rejected
+//        yield 'null creator' => [
+//            ['creator' => null,],
+//            (clone $baseModel),
+//            (clone $baseModel)->setCreator(null)
+//        ];
+
+        // What happens if creator's ID is null?
+        yield 'null creator ID' => [
+            ['creator' => ['id' => null],],
+            (clone $baseModel),
+            (clone $baseModel)->setCreator((new User())->setId(null))
+        ];
+
+
+        // Discussion thread should not be mutable
+        yield 'update discussion thread' => [
+            ['discussionThread' => ['id' => $newId,],],
+            (clone $baseModel),
+            (clone $baseModel)->setDiscussionThread((new DiscussionThread())->setId($newId))
+        ];
+
+        yield 'null discussion thread ID' => [
+            ['discussionThread' => ['id' => null],],
+            (clone $baseModel),
+            (clone $baseModel)->setDiscussionThread((new DiscussionThread())->setId(null))
+        ];
+
+
+        // Recipient should not be mutable
+        yield 'update recipient' => [
+            ['creator' => ['id' => $newId,],],
+            (clone $baseModel),
+            (clone $baseModel)->setCreator((new User())->setId($newId))
+        ];
+
+        yield 'null recipient ID' => [
+            ['creator' => ['id' => null],],
+            (clone $baseModel),
+            (clone $baseModel)->setCreator((new User())->setId(null))
+        ];
+
+
+
 
 //        $timezone = new DateTimeZone('+00:00');
 //        yield 'dates - deleted at not included' => [
