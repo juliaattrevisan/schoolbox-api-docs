@@ -44,14 +44,17 @@ class ArrayToModel
 
 
     /**
-     * @param array $json
+     * @param array               $json
+     * @param Evidence\Model|null $model
      * @return Evidence\Model
      * @throws ResourceException if the collector factory can't find the file
      *                           that was uploaded
      */
-    public function __invoke(array $json): Evidence\Model
+    public function __invoke(array $json, ?Evidence\Model $model = null): Evidence\Model
     {
-        $model = new Evidence\Model();
+        if (!isset($model)) {
+            $model = new Evidence\Model();
+        }
 
 
         // It feels like this should be possible via the mapper.
