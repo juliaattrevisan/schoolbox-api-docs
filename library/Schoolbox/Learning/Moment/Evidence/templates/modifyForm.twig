@@ -20,7 +20,7 @@
                         <label for="evidence-body">
                             Description
                         </label>
-                        <textarea name="body" id="evidence-body"></textarea>
+                        <textarea name="body" id="evidence-body">{{ evidence.body | purify }}</textarea>
                     </div>
                 </fieldset>
             </section>
