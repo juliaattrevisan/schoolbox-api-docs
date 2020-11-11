@@ -306,7 +306,22 @@ class Controller extends Base
      */
     public function putEvidence(Model $evidence): void
     {
-        // Decode
+        $requestBody       = json_decode(json_encode($this->request->content->get()), true);
+        $requestTranslator = new Translator\ArrayToModel(new CollectorFactory());
+        $evidence          = $requestTranslator($requestBody, $evidence);
+
+        $this->mapper->save($evidence);
+
+        $responseTranslator = new Translator\ModelToArray\Base(
+            new User\Translator\Author\ModelToArray(),
+            new Storage\Translator\ModelToArray(),
+            new ScrubAdapter(),
+        );
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $responseTranslator($evidence)
+            )
+        );
     }
 
 
