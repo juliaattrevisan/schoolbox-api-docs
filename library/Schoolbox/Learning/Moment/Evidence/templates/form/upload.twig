@@ -4,23 +4,25 @@
     <section>
         <fieldset class="content">
             <div class="small-12 columns">
-                {##
-                 # I can't label attachzones as I would standard file inputs.
-                 #
-                 # I don't think I can make them required either, thus the
-                 # existence of this dummy input with a required rule attached.
-                 # (This input will only fail validation if there's no files
-                 #  attached)
-                 #}
-                <label class="required" for="evidence-filename">
-                    {% block fileUploadLabel %}
-                        Upload File
-                    {% endblock fileUploadLabel %}
-                </label>
-                <input type="hidden" name="filename" id="evidence-filename" required />
-                {% include 'sub/attachzone.twig' with { attachzone: zone } %}
-                {% block fileUploadPreview %}
-                {% endblock fileUploadPreview %}
+                {% block formInputUpload %}
+                    {##
+                     # I can't label attachzones as I would standard file inputs.
+                     #
+                     # I don't think I can make them required either, thus the
+                     # existence of this dummy input with a required rule attached.
+                     # (This input will only fail validation if there's no files
+                     #  attached)
+                     #}
+                    <label class="required" for="evidence-filename">
+                        {% block fileUploadLabel %}
+                            Upload File
+                        {% endblock fileUploadLabel %}
+                    </label>
+                    <input type="hidden" name="filename" id="evidence-filename" required />
+                    {% include 'sub/attachzone.twig' with { attachzone: zone } %}
+                    {% block fileUploadPreview %}
+                    {% endblock fileUploadPreview %}
+                {% endblock formInputUpload %}
             </div>
         </fieldset>
     </section>

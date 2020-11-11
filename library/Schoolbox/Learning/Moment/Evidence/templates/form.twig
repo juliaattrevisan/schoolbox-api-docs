@@ -65,8 +65,20 @@
 <div class="row">
     <div class="small-12 island">
         <form action="{{ routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) }}" method="post" id="evidence-form">
-            {% block formInputs %}
-            {% endblock formInputs %}
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            {% block formInputUpload %}
+                            {% endblock formInputUpload %}
+                            {% block formInputDescription %}
+                                <label for="evidence-body">
+                                    Description
+                                </label>
+                                <textarea name="body" id="evidence-body"></textarea>
+                            {% endblock formInputDescription %}
+                        </div>
+                    </fieldset>
+                </section>
             <input type="submit" id="evidence-submit" value="Submit" />
         </form>
     </div>
@@ -83,7 +95,11 @@
                 return {};
             }
             let buildPayload = function (form) {
-                return {};
+                let formData = new FormData(form);
+                return {
+                    body: formData.get('body'),
+                    file: formData.get('file'),
+                };
             }
         </script>
     {% endautoescape %}
@@ -92,6 +108,15 @@
 {% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
+
+        let editorId = 'evidence-body';
+        $.fn.alaressEditor({
+            targetElements: $('#' + editorId)
+        });
+
+        // Update the editor's form input on change
+        CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
+
         $('#evidence-form').alaressValidate({
             rules: buildValidationRules(),
             submitHandler(form, event) {
