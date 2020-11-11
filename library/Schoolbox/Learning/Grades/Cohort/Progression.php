@@ -432,6 +432,10 @@ class Progression
         while ($row = $averageStatement->fetch(\PDO::FETCH_ASSOC)) {
             $specificationId = $this->tuples[$row['assessment_id']];
 
+            /* FIXME: Find the common ancestor for $row['capability_id'] instead, so all the indicators' values
+             *  are grouped up together for the capability across the cohort...instead of grouped into each
+             *  implementation which is what this currently does
+             */
             $allResults[$specificationId][$row['capability_id']][$row['indicator_id']][] = (float)$row['value'];
         }
 
