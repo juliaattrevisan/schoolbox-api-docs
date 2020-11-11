@@ -852,16 +852,16 @@ class Controller extends Base
             return $assessment instanceof DueWork\Model && $assessment->isFeedbackVisibleToUser($user);
         });
 
-        if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $folder)) {
+//        if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $folder)) {
             return (new Progression(
                 $this->getDi()->get('databaseInternal'),
                 $this->assessmentMapperProxy,
                 $dueWorksWithVisibleMarks,
                 $includeComparison
             ))->collate($student);
-        }
+//        }
 
-        return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student, $includeComparison);
+//        return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student, $includeComparison);
     }
 
 

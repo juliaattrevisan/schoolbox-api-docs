@@ -7,8 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Grades\Cohort;
 
+use Alaress\Database\Connector;
 use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Quoter\IQuoter;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
@@ -30,7 +30,7 @@ class Progression
     /**
      * We're making raw sql queries here, so I need this thing to do it
      *
-     * @var IQuoter
+     * @var Connector\Base
      */
     protected $database;
 
@@ -56,13 +56,13 @@ class Progression
     /**
      * Progression constructor.
      *
-     * @param IQuoter               $database
+     * @param Connector\Base        $database
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param GenericCollection     $assessments
      * @param bool                  $includeComparison
      */
     public function __construct(
-        IQuoter $database,
+        Connector\Base $database,
         AssessmentMapperProxy $assessmentMapperProxy,
         GenericCollection
         $assessments,
@@ -192,7 +192,7 @@ class Progression
 
         $where = implode(' AND ', $pb->getWhere());
 
-        $feedbackStatement = $this->database->prepare("
+        $feedbackStatement = $this->database->executeQuery("
             SELECT
                 sr.id AS feedbackId,
                 a.id  AS assessmentId
@@ -201,13 +201,11 @@ class Progression
             INNER JOIN assessment      a ON sb.assessment_id = a.id
             WHERE {$where}
             ORDER BY sr.published_at ASC
-        ");
-
-        $feedbackStatement->execute($pb->getParams());
+        ", $pb->getParams());
 
         $feedbackIds = [];
 
-        foreach ($feedbackStatement as $row) {
+        while ($row = $feedbackStatement->fetch(\PDO::FETCH_ASSOC)) {
             $feedbackIds[$row['assessmentId']] = $row['feedbackId'];
         }
 
@@ -233,7 +231,7 @@ class Progression
         $pb->in('sr.id', $feedbackIds);
 
         $where = implode(' AND ', $pb->getWhere());
-        $descriptorStatement = $this->database->prepare("
+        $descriptorStatement = $this->database->executeQuery("
             SELECT
                 rc.id AS capability_id,
                 rc.name AS capability_name,
@@ -261,9 +259,7 @@ class Progression
             INNER JOIN assessment              a   ON sb.assessment_id = a.id
             WHERE {$where}
             ORDER BY a.due_date ASC;
-        ");
-
-        $descriptorStatement->execute($pb->getParams());
+        ", $pb->getParams());
 
         // Collate the selected descriptor values into longitudinal array
         $longitude = [];
@@ -280,7 +276,7 @@ class Progression
             if (!isset($longitude[$row['capability_id']]['mark'][$row['assessment_id']]) && $row['capability_max_value'] > 0 && isset($this->assessments[$row['assessment_id']])) {
                 $longitude[$row['capability_id']]['mark'][$row['assessment_id']] = $markSchemeFactory->spawnForCapability(
                     $this->assessments[$row['assessment_id']],
-                    $row['capability_max_value']
+                    (float)$row['capability_max_value']
                 )->getHumanReadableMark(($row['capability_value'] / $row['capability_max_value']) * 100);
             }
 
@@ -350,7 +346,7 @@ class Progression
 
         $where = implode(' AND ', $pb->getWhere());
 
-        $feedbackStatement = $this->database->prepare("
+        $feedbackStatement = $this->database->executeQuery("
             SELECT
                 sr.id AS feedbackId,
                 a.id  AS assessmentId
@@ -359,13 +355,11 @@ class Progression
             INNER JOIN assessment      a ON sb.assessment_id = a.id
             WHERE {$where}
             ORDER BY sr.published_at ASC
-        ");
-
-        $feedbackStatement->execute($pb->getParams());
+        ", $pb->getParams());
 
         $feedbackIds = [];
 
-        foreach ($feedbackStatement as $row) {
+        while ($row = $feedbackStatement->fetch(\PDO::FETCH_ASSOC)) {
             $feedbackIds[] = $row['feedbackId'];
         }
 
@@ -402,7 +396,7 @@ class Progression
 
         $where = implode(' AND ', $pb->getWhere());
 
-        $averageStatement = $this->database->prepare("
+        $averageStatement = $this->database->executeQuery("
             SELECT
                 rc.id AS capability_id,
                 ri.id AS indicator_id,
@@ -419,9 +413,7 @@ class Progression
             INNER JOIN assessment               a ON sb.assessment_id = a.id
             WHERE {$where}
             ORDER BY a.due_date ASC;
-        ");
-
-        $averageStatement->execute($pb->getParams());
+        ", $pb->getParams());
 
         while ($row = $averageStatement->fetch(\PDO::FETCH_ASSOC)) {
             $allResults[$row['assessment_id']][$row['capability_id']][$row['indicator_id']][] = (float)$row['value'];
