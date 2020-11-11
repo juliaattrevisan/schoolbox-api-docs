@@ -240,7 +240,7 @@ export default {
 
 <template>
     <div id="discussion" class="small-12 island">
-        <section id="threads-section" class="discussion content">
+        <section id="threads-section" class="discussion">
             <div class="discussion-threads">
                 <h2 class="comment-count" v-if="!hasComments">No comments</h2>
                 <template v-else>

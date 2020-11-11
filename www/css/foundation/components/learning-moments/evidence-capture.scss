@@ -28,6 +28,11 @@
 .feed-comments {
   padding-bottom: 1rem;
 
+  .island,
+  .discussion-threads {
+    padding: 0;
+    margin: 0;
+  }
   .discussion {
     border: 0;
   }
@@ -44,7 +49,7 @@
 }
 
 @media #{$medium-down} {
-  .feed-comments > div {
+  .feed-comments .island {
     border-top: 1px solid $body-bg;
     padding-top: 1rem;
   }
