@@ -100,6 +100,9 @@ export default {
                             </template>
                         </nav>
                         <ul id="header-options" class="f-dropdown" data-dropdown-content>
+                            <li v-if="this.evidence._links.modifyForm">
+                                <a class="icon-modify" :href="this.evidence._links.modifyForm">Modify</a>
+                            </li>
                             <template v-if="this.evidence._links.delete">
                                 <li><a class="icon-delete" :href="this.evidence._links.delete" data-delete>Delete</a></li>
                             </template>

@@ -74,9 +74,10 @@ class Module extends BaseModule
             )
         );
 
-        /* Superusers, Staff and Evidence Creators can delete an Evidence instance
+        /* Superusers, Staff and Evidence Creators can modify or delete an
+         * Evidence instance
          */
-        $deleteEvidenceRule = new Rule\All(
+        $modifyEvidenceRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
@@ -84,6 +85,7 @@ class Module extends BaseModule
                 new Rule\IsUser('creatorId')
             )
         );
+        $deleteEvidenceRule = $modifyEvidenceRule;
 
 
         // Preloaders:
@@ -135,6 +137,24 @@ class Module extends BaseModule
             '/{evidenceId}',
             'getEvidenceDetail',
             $viewEvidenceDetailRule,
+            Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+        // Evidence modify form
+        $this->register(
+            self::METHOD_GET,
+            '/{evidenceId}/modify',
+            'getModifyForm',
+            $modifyEvidenceRule,
+            Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+        // Evidence modify form
+        $this->register(
+            self::METHOD_PUT,
+            '/{evidenceId}',
+            'putEvidence',
+            $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 

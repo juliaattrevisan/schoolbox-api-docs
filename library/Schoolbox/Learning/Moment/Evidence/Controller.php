@@ -273,12 +273,38 @@ class Controller extends Base
 
 
     /**
+     * Display the modify form for a single moment.
+     *
+     * @api   GET /learning/evidence/{id}/modify
+     * @since 20.2
+     * @param Model $evidence
+     */
+    public function getModifyForm(Model $evidence): void
+    {
+        // Show a form
+    }
+
+
+    /**
+     * Updates a single moment.
+     *
+     * @api   PUT /learning/evidence/{id}/modify
+     * @since 20.2
+     * @param Model $evidence
+     */
+    public function putEvidence(Model $evidence): void
+    {
+        // Decode
+    }
+
+
+    /**
      * Delete a single moment.
      *
      * @api   DELETE /learning/evidence/{id}
      * @since 20.2
      * @param Model $evidence
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function deleteEvidence(Model $evidence): void
     {
