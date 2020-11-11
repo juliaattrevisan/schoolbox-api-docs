@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Markbook;
+namespace Schoolbox\Learning\Grades\Cohort;
 
 use Schoolbox\Resource\Folder;
 
@@ -17,7 +17,7 @@ use Schoolbox\Resource\Folder;
  * There's a global configuration setting which should be used if $folder
  * isn't associated with any year levels
  *
- * @package Schoolbox\Learning\Markbook
+ * @package Schoolbox\Learning\Grades\Cohort
  */
 class ValidUseCohortMarks
 {

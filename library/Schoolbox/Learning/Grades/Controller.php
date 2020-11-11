@@ -33,9 +33,9 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\WorkType;
-use Schoolbox\Learning\Markbook\CohortMarks;
+use Schoolbox\Learning\Grades\Cohort\ClassResults;
+use Schoolbox\Learning\Grades\Cohort\ValidUseCohortMarks;
 use Schoolbox\Learning\Markbook\Markbook;
-use Schoolbox\Learning\Markbook\ValidUseCohortMarks;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -576,7 +576,7 @@ class Controller extends Base
 
         if ($canSeeGraph) {
             if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $subject)) {
-                $graph = (new CohortMarks(
+                $graph = (new ClassResults(
                     $this->getConfigLoader()->get('grade_gradient_enable'),
                     $this->assessmentMapperProxy,
                     $assessments,

@@ -8,7 +8,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Markbook;
+namespace Schoolbox\Learning\Grades\Cohort;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\GenericCollection;
@@ -16,11 +16,11 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\YearLevel;
 
 /**
- * Class ApiTest
+ * Class ValidUseCohortMarksTest
  *
- * @package Schoolbox\Learning\Markbook\Test
+ * @package Schoolbox\Learning\Grades\Cohort\Test
  */
-class CohortMarksTest extends TestCase
+class ValidUseCohortMarksTest extends TestCase
 {
 
     /**

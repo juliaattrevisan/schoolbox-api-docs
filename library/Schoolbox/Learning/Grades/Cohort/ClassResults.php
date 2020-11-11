@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Markbook;
+namespace Schoolbox\Learning\Grades\Cohort;
 
 use Schoolbox\Collection;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
@@ -18,9 +18,9 @@ use Schoolbox\User;
  * Generate five-point summaries for assessment cohorts by aggregating
  * feedbacks for all assessments sharing a common assessment specification
  *
- * @package Schoolbox\Learning\Markbook
+ * @package Schoolbox\Learning\Grades\Cohort
  */
-class CohortMarks
+class ClassResults
 {
 
     /**
