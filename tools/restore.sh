@@ -727,7 +727,7 @@ then
 fi
 if [ "$package" = 'schoolboxdev' ];
 then
-	titleprefix='[Dev]';
+	titleprefix='[Staging]';
 	updatetitle;
 	setmailcatcher;
 	setsqlconfig;
