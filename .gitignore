@@ -54,3 +54,6 @@ datepicker-fullcalendar.css
 .env
 # Deprecated in 19.2, Remove in 19.3
 /tools/browscap/
+# For now, these files exist in site root. In future will be moved to /etc/[package]/
+/config.ini
+/instances.ini
