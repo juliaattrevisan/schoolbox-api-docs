@@ -68,20 +68,20 @@ class ArrayToModel
 
 
         // Only set fields which are a part of the json payload
-        if (isset($json['id'])) {
+        if (array_key_exists('id', $json)) {
             $model->setId($json['id']);
         }
-        if (isset($json['createdAt'])) {
+        if (array_key_exists('createdAt', $json)) {
             // Expect a datetime object
             $model->setCreatedAt(new Alaress_Date_Format($json['createdAt'], DATE_ATOM));
         }
-        if (isset($json['updatedAt'])) {
+        if (array_key_exists('updatedAt', $json)) {
             $model->setUpdatedAt(new Alaress_Date_Format($json['updatedAt'], DATE_ATOM));
         }
-//        if (isset($json['deletedAt'])) {
+//        if (array_key_exists('deletedAt', $json)) {
 //            $model->setDeletedAt(new Alaress_Date_Format($json['deletedAt'], DATE_ATOM));
 //        }
-        if (isset($json['body'])) {
+        if (array_key_exists('body', $json)) {
             $model->setBody($json['body']);
         }
         if (isset($json['creator']['id'])) {
@@ -102,7 +102,7 @@ class ArrayToModel
         // * an extant storage hash
         // * a triplet passed from a resource attacher, to be transformed into a
         //   storage hash by the collector factory
-        if (isset($json['file'])) {
+        if (array_key_exists('file', $json)) {
             $file = $this->collectorFactory->build([$json['file']])->getFirst();
             if ($file) {
                 $model
@@ -117,7 +117,7 @@ class ArrayToModel
             // in API requests/responses yet
             $model->setStorage((new StorageModel())->setHash($json['storage']['hash']));
         }
-        if (isset($json['filename'])) {
+        if (array_key_exists('filename', $json)) {
             $model->setFilename($json['filename']);
         }
 
