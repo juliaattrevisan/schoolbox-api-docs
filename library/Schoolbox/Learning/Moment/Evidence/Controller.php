@@ -281,7 +281,19 @@ class Controller extends Base
      */
     public function getModifyForm(Model $evidence): void
     {
-        // Show a form
+        $zone = $this->buildAttachzone();
+        if ($evidence->getStorage()) {
+            $zone->attachFiles([$evidence->getStorage()->getHash()]);
+        }
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningMomentEvidence/modifyForm.twig',
+                [
+                    'evidence' => $evidence,
+                    'zone'     => $zone->getTwigContext(),
+                ]
+            )
+        );
     }
 
 
