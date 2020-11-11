@@ -298,6 +298,7 @@ class Controller extends Base
 
         $csvExporter = new Export\CSV();
         $csvExporter->export($markbook, sprintf('%s - Class Markbook.csv', $folder->getName()));
+        exit;
     }
 
 
