@@ -135,10 +135,16 @@ export default {
                 <section>
                     <div class="row">
                         <div class="small-12 island">
+                            <section class="banner content">
+                                <!-- Is there an attachment? Display it appropriately -->
+                                <article v-if="this.evidence.filename && this.evidence.storage">
+                                    <storage :storage="this.evidence.storage" :filename="this.evidence.filename"></storage>
+                                </article>
+                            </section>
                             <section class="detail content">
                                 <p class="meta">By
                                     <a :href="evidence.creator._links.profile" title="View Profile">
-                                    {{ this.evidence.creator.fullName }}
+                                        {{ this.evidence.creator.fullName }}
                                     </a>
                                     &mdash;
                                     <relative-time :datetime="this.evidence.createdAt"></relative-time>
@@ -148,22 +154,12 @@ export default {
                                 <media-article v-if="this.evidence.body">
                                     <div v-html="this.evidence.body" />
                                 </media-article>
+                            </section>
+                        </div>
 
-                                <!-- Is there an attachment? Display it appropriately -->
-                                <article v-if="this.evidence.filename && this.evidence.storage">
-                                    <storage :storage="this.evidence.storage" :filename="this.evidence.filename"></storage>
-                                </article>
-                            </section>
-                        </div>
-                        <div id="discussion" class="small-12 island">
-                            <section id="threads-section" class="discussion content">
-                                <div class="discussion-threads">
-                                    <!-- Discussion thread -->
-                                    <comment-thread :thread="evidence.discussionThread"
-                                                    :create-thread-endpoint="evidence._links.createThread" />
-                                </div>
-                            </section>
-                        </div>
+                        <!-- Discussion thread -->
+                        <comment-thread :thread="evidence.discussionThread"
+                                        :create-thread-endpoint="evidence._links.createThread" />
                     </div>
                 </section>
             </div>

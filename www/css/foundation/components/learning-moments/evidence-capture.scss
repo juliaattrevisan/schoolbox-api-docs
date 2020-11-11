@@ -2,6 +2,15 @@
   width: 100%;
 }
 
+.feed-item {
+  .article-read-more {
+    margin-top: 0;
+    padding-bottom: 1rem;
+    width: 100%;
+    clear: both;
+  }
+}
+
 .subheader.feed {
   background: $white;
   padding: .5rem;
@@ -14,18 +23,23 @@
     margin-bottom: 1rem;
     margin-top: 1rem;
   }
-
-  .article-read-more {
-    margin-top: 0;
-    padding-bottom: 1rem;
-    width: 100%;
-    clear: both;
-  }
 }
 
 .feed-comments {
+  padding-bottom: 1rem;
+
+  .discussion {
+    border: 0;
+  }
+  #threads-section {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.evidence-detail {
   .comment-count {
-    font-size: $paragraph-font-size;
+    font-size: $h2-font-size;
   }
 }
 

@@ -239,59 +239,61 @@ export default {
 </script>
 
 <template>
-    <div>
-        <h2 class="comment-count" v-if="!hasComments">
-            No comments yet
-        </h2>
-        <template v-else>
-            <h2 class="comment-count">
-                {{ commentThread.children.metadata.count }} comment(s)
-                <template v-if="commentThread.children.metadata.count > commentThread.children.data.length && commentThread.children.metadata.cursor.next">
-                    (<a @click.prevent="loadMoreComments">Load older comments</a>)
+    <div id="discussion" class="small-12 island">
+        <section id="threads-section" class="discussion content">
+            <div class="discussion-threads">
+                <h2 class="comment-count" v-if="!hasComments">No comments</h2>
+                <template v-else>
+                    <p class="comment-count">
+                        {{ commentThread.children.metadata.count }} comment(s)
+                    </p>
+
+                    <ckeditor tag-name="textarea" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
+                    <a class="button submit"
+                       @click="postComment"
+                       :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
+
+                    <ul class="information-list social-stream">
+                        <li class="actions-small-1" v-for="(comment, index) in comments">
+                            <div class="list-item">
+                                <div class="card small-12 compact">
+                                    <a :href="comment.author._links.profile.href" title="View Profile">
+                                        <img :src="comment.author._links.avatar.href" alt="View Profile" />
+                                        <p>{{ comment.author.firstname }} {{ comment.author.lastname }}</p>
+                                        <time class="pipe meta"
+                                              :datetime="comment.createdAt.json | dateFormat"
+                                              :title="comment.createdAt.json | dateFormat(dateDisplayFormats.momentJsDatetime)"
+                                        >{{ comment.createdAt.json | fromNow }}</time>
+                                    </a>
+                                </div>
+                            </div>
+                            <nav>
+                                <a v-if="comment._links.delete.auth"
+                                   @click.prevent="showDeleteModal(index)"
+                                   class="icon-delete"
+                                   title="Delete comment" />
+                            </nav>
+                            <media-article v-html="comment.content"></media-article>
+                        </li>
+                    </ul>
                 </template>
-            </h2>
+                <template v-if="commentThread.children.metadata.count > commentThread.children.data.length && commentThread.children.metadata.cursor.next">
+                    <a class="article-read-more" @click.prevent="loadMoreComments">Load older comments</a>
+                </template>
 
-            <ckeditor tag-name="textarea" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
-            <a class="button submit"
-               @click="postComment"
-               :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
+                <toast ref="toast"></toast>
 
-            <ul class="information-list social-stream">
-                <li class="actions-small-1" v-for="(comment, index) in comments">
-                    <div class="list-item">
-                        <div class="card small-12 compact">
-                            <a :href="comment.author._links.profile.href" title="View Profile">
-                                <img :src="comment.author._links.avatar.href" alt="View Profile" />
-                                <p>{{ comment.author.firstname }} {{ comment.author.lastname }}</p>
-                                <time class="pipe meta"
-                                      :datetime="comment.createdAt.json | dateFormat"
-                                      :title="comment.createdAt.json | dateFormat(dateDisplayFormats.momentJsDatetime)"
-                                >{{ comment.createdAt.json | fromNow }}</time>
-                            </a>
-                        </div>
-                    </div>
-                    <nav>
-                        <a v-if="comment._links.delete.auth"
-                           @click.prevent="showDeleteModal(index)"
-                           class="icon-delete"
-                           title="Delete comment" />
-                    </nav>
-                    <media-article v-html="comment.content"></media-article>
-                </li>
-            </ul>
-        </template>
-
-        <toast ref="toast"></toast>
-
-        <reveal-modal ref="deleteModal">
-            <template>
-                <h2>Please confirm</h2>
-                <p>Are you sure you want to delete this comment?</p>
-                <ul class="flex-list buttons">
-                    <li><a @click.prevent="deleteComment(commentIndexToDelete)" class="button submit">OK</a></li>
-                    <li><a @click.prevent="$refs.deleteModal.close" class="button">Cancel</a></li>
-                </ul>
-            </template>
-        </reveal-modal>
+                <reveal-modal ref="deleteModal">
+                    <template>
+                        <h2>Please confirm</h2>
+                        <p>Are you sure you want to delete this comment?</p>
+                        <ul class="flex-list buttons">
+                            <li><a @click.prevent="deleteComment(commentIndexToDelete)" class="button submit">OK</a></li>
+                            <li><a @click.prevent="$refs.deleteModal.close" class="button">Cancel</a></li>
+                        </ul>
+                    </template>
+                </reveal-modal>
+            </div>
+        </section>
     </div>
 </template>

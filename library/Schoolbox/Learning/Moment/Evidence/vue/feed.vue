@@ -208,8 +208,8 @@ export default {
         <div class="row" v-else>
             <div class="small-12 island">
                 <div v-if="metadata.count === 0" class="empty-state">
-                    <i class="icon-favourite"></i>
-                    <p>{{ config.student.firstname }} has no learning moments yet.</p>
+                    <i class="icon-advanced-list"></i>
+                    <p>There is no activity yet. To get started you can <a href="#" title="Share something">share something</a>.</p>
                 </div>
                 <button v-else-if="metadata.cursor.next && metadata.count > data.length" class="expand" @click.prevent="append(metadata.cursor.next)">
                     Load more
