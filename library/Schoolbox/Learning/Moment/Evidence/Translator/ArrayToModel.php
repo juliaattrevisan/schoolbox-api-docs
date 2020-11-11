@@ -84,15 +84,24 @@ class ArrayToModel
         if (array_key_exists('body', $json)) {
             $model->setBody($json['body']);
         }
-        if (isset($json['creator']['id'])) {
+        if (isset($json['creator'])
+            && is_array($json['creator'])
+            && array_key_exists('id', $json['creator'])
+        ) {
             // Expect a user ID, but no other details yet
             $model->setCreator((new User())->setId($json['creator']['id']));
         }
-        if (isset($json['discussionThread']['id'])) {
+        if (isset($json['discussionThread'])
+            && is_array($json['discussionThread'])
+            && array_key_exists('id', $json['discussionThread'])
+        ) {
             // Expect a discussion thread
             $model->setDiscussionThread((new DiscussionThread())->setId($json['discussionThread']['id']));
         }
-        if (isset($json['recipient']['id'])) {
+        if (isset($json['recipient'])
+            && is_array($json['recipient'])
+            && array_key_exists('id', $json['recipient'])
+        ) {
             // Expect a user object
             $model->setRecipient((new User())->setId($json['recipient']['id']));
         }
@@ -112,7 +121,10 @@ class ArrayToModel
         }
 
 
-        if (isset($json['storage']['hash'])) {
+        if (isset($json['storage'])
+            && is_array($json['storage'])
+            && array_key_exists('hash', $json['storage'])
+        ) {
             // Expect a hash? Not sure how storage files should be represented
             // in API requests/responses yet
             $model->setStorage((new StorageModel())->setHash($json['storage']['hash']));
