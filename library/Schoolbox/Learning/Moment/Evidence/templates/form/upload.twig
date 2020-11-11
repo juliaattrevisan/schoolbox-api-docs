@@ -46,13 +46,6 @@
                 }
             };
 
-            let buildPayload = function (form) {
-                let formData = new FormData(form);
-                return {
-                    file: formData.get('file'),
-                };
-            };
-
             // Fill/clear filename input
             $(function () {
                 let dropzoneInstance = Dropzone.instances.find(v => v.element.id === 'storage-zone');
