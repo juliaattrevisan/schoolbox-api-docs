@@ -349,7 +349,7 @@
         if ($("#useMarkRange").is(":checked")) {
             var descriptorList = $.makeArray($(indicatorCheckbox).closest("tr[data-group]").find("[data-descriptor-value]"));
 
-            function hasDescValue(descriptor) {
+            var hasDescValue = function (descriptor) {
                 // Value contains digits
                 return $(descriptor).val().match(/\d/);
             }
