@@ -107,23 +107,28 @@ class AllFields
                     $model->setCreator((new User())->setId($json['creator']['id']));
                 }
             } else {
-                $model->setCreator(null);
+                // raise an error
             }
         }
 
-        if (isset($json['discussionThread'])
-            && is_array($json['discussionThread'])
-            && array_key_exists('id', $json['discussionThread'])
-        ) {
-            // Expect a discussion thread
-            $model->setDiscussionThread((new DiscussionThread())->setId($json['discussionThread']['id']));
+        if (array_key_exists('discussionThread', $json)) {
+            if (isset($json['discussionThread'])) {
+                if (is_array($json['discussionThread']) && array_key_exists('id', $json['discussionThread'])) {
+                    $model->setDiscussionThread((new DiscussionThread())->setId($json['discussionThread']['id']));
+                }
+            } else {
+                $model->setDiscussionThread(null);
+            }
         }
-        if (isset($json['recipient'])
-            && is_array($json['recipient'])
-            && array_key_exists('id', $json['recipient'])
-        ) {
-            // Expect a user object
-            $model->setRecipient((new User())->setId($json['recipient']['id']));
+
+        if (array_key_exists('recipient', $json)) {
+            if (isset($json['recipient'])) {
+                if (is_array($json['recipient']) && array_key_exists('id', $json['recipient'])) {
+                    $model->setRecipient((new User())->setId($json['recipient']['id']));
+                }
+            } else {
+                // raise an error
+            }
         }
 
 

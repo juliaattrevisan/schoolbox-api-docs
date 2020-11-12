@@ -208,7 +208,7 @@ class AllFieldsTest extends TestCase
             (clone $baseModel)->setCreator((new User())->setId($newId))
         ];
 
-        // Creator cannot be set to null once created
+        // Creator cannot be set to null once created: this should be an error
         yield 'null creator' => [
             ['creator' => null,],
             (clone $baseModel),
@@ -218,7 +218,7 @@ class AllFieldsTest extends TestCase
         yield 'null creator id' => [
             ['creator' => ['id' => null],],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setCreator((new User())->setId(null))
         ];
 
         yield 'update discussion thread' => [
@@ -236,7 +236,7 @@ class AllFieldsTest extends TestCase
         yield 'null discussion thread ID' => [
             ['discussionThread' => ['id' => null],],
             (clone $baseModel),
-            (clone $baseModel)->setDiscussionThread(null)
+            (clone $baseModel)->setDiscussionThread((new DiscussionThread())->setId(null))
         ];
 
         yield 'update recipient' => [
@@ -246,6 +246,7 @@ class AllFieldsTest extends TestCase
         ];
 
         // Likewise recipient can't be set to null once created
+        // This should be an error
         yield 'null recipient' => [
             ['recipient' => null,],
             (clone $baseModel),
@@ -255,7 +256,7 @@ class AllFieldsTest extends TestCase
         yield 'null recipient ID' => [
             ['recipient' => ['id' => null],],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setRecipient((new User())->setId(null))
         ];
 
         // File is mutable, by either a file upload or a storage+filename
