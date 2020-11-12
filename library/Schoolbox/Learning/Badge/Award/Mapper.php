@@ -119,6 +119,10 @@ class Mapper extends \Schoolbox\Mapper
             /* Instead of getting the Badge/Mapper's fields and hydration and stuff
              * just access them if we haven't already seen it; otherwise reuse the
              * one in the cache
+             *
+             * You can probably improve this some more by finding all the badge_id
+             * then using findIn(...) instead, then map them back to their $awards
+             * but I can't tell if that's going to be really necessary at the moment
              */
             if (!array_key_exists($badgeId, $badges)) {
                 $badge = $badgeMapper->findById($badgeId);
