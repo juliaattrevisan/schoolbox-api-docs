@@ -388,11 +388,7 @@ class AllFieldsTest extends TestCase
      */
     public function testInvokeCreate(array $input, Model $expected, AllFields $converter = null): void
     {
-        if (!$converter) {
-            /** @var CollectorFactory|MockObject $collectorFactoryMock */
-            $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-            $converter            ??= new AllFields($collectorFactoryMock);
-        }
+        $converter = $this->createConverterIfNull($converter);
 
         /** @noinspection PhpUnhandledExceptionInspection */
         self::assertEquals($expected, $converter($input));
@@ -418,11 +414,7 @@ class AllFieldsTest extends TestCase
         Model $expected,
         AllFields $converter = null
     ): void {
-        if (!$converter) {
-            /** @var CollectorFactory|MockObject $collectorFactoryMock */
-            $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-            $converter            ??= new AllFields($collectorFactoryMock);
-        }
+        $converter = $this->createConverterIfNull($converter);
 
         /** @noinspection PhpUnhandledExceptionInspection */
         self::assertEquals($expected, $converter($input, $existing));
@@ -445,13 +437,31 @@ class AllFieldsTest extends TestCase
      */
     public function testInvokeUpdateInvalidValues(array $input, Model $existing, Model $expected): void
     {
-        /** @var CollectorFactory|MockObject $collectorFactoryMock */
-        $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-        $converter            = new AllFields($collectorFactoryMock);
+        $converter = $this->createConverterIfNull();
 
         $this->expectWarning();
 
         /** @noinspection PhpUnhandledExceptionInspection */
         self::assertEquals($expected, $converter($input, $existing));
+    }
+
+
+    /**
+     * Helper for creating the converter if it is null.
+     *
+     * If it's null, it creates a converter which contains a mock of the storage
+     * object collector factory.
+     *
+     * @param AllFields|null $converter
+     * @return AllFields
+     */
+    private function createConverterIfNull(?AllFields $converter = null): AllFields
+    {
+        if (!$converter) {
+            /** @var CollectorFactory|MockObject $collectorFactoryMock */
+            $collectorFactoryMock = $this->createMock(CollectorFactory::class);
+            $converter            ??= new AllFields($collectorFactoryMock);
+        }
+        return $converter;
     }
 }
