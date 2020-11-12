@@ -132,16 +132,17 @@ class MutableFieldsOnlyTest extends TestCase
             ->setFilename('test.gif');
 
 
+        // ID is not mutable
         yield 'update id' => [
             ['id' => $newId,],
             (clone $baseModel),
-            (clone $baseModel)->setId($newId),
+            (clone $baseModel),
         ];
 
         yield 'null id' => [
             ['id' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setId(null),
+            (clone $baseModel),
         ];
 
 
@@ -149,37 +150,37 @@ class MutableFieldsOnlyTest extends TestCase
         yield 'update created at' => [
             ['createdAt' => $newDate,],
             (clone $baseModel),
-            (clone $baseModel)->setCreatedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone)),
+            (clone $baseModel),
         ];
 
         yield 'null created at' => [
             ['createdAt' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setCreatedAt(null),
+            (clone $baseModel),
         ];
 
         yield 'update updated at' => [
             ['updatedAt' => $newDate,],
             (clone $baseModel),
-            (clone $baseModel)->setUpdatedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone)),
+            (clone $baseModel),
         ];
 
         yield 'null updated at' => [
             ['updatedAt' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setUpdatedAt(null),
+            (clone $baseModel),
         ];
 
         yield 'update deleted at' => [
             ['deletedAt' => $newDate,],
             (clone $baseModel),
-            (clone $baseModel)->setDeletedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone)),
+            (clone $baseModel),
         ];
 
         yield 'null deleted at' => [
             ['deletedAt' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setDeletedAt(null),
+            (clone $baseModel),
         ];
 
 
@@ -196,10 +197,12 @@ class MutableFieldsOnlyTest extends TestCase
             (clone $baseModel)->setBody(null),
         ];
 
+
+        // Creator is not mutable
         yield 'update creator' => [
             ['creator' => ['id' => $newId,],],
             (clone $baseModel),
-            (clone $baseModel)->setCreator((new User())->setId($newId)),
+            (clone $baseModel),
         ];
 
         // Creator cannot be set to null once created, but this converter
@@ -213,31 +216,35 @@ class MutableFieldsOnlyTest extends TestCase
         yield 'null creator id' => [
             ['creator' => ['id' => null],],
             (clone $baseModel),
-            (clone $baseModel)->setCreator((new User())->setId(null)),
+            (clone $baseModel),
         ];
 
+
+        // Discussion thread is not mutable
         yield 'update discussion thread' => [
             ['discussionThread' => ['id' => $newId,],],
             (clone $baseModel),
-            (clone $baseModel)->setDiscussionThread((new DiscussionThread())->setId($newId)),
+            (clone $baseModel),
         ];
 
         yield 'null discussion thread' => [
             ['discussionThread' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setDiscussionThread(null),
+            (clone $baseModel),
         ];
 
         yield 'null discussion thread ID' => [
             ['discussionThread' => ['id' => null],],
             (clone $baseModel),
-            (clone $baseModel)->setDiscussionThread((new DiscussionThread())->setId(null)),
+            (clone $baseModel),
         ];
 
+
+        // Recipient is not mutable
         yield 'update recipient' => [
             ['recipient' => ['id' => $newId,],],
             (clone $baseModel),
-            (clone $baseModel)->setRecipient((new User())->setId($newId)),
+            (clone $baseModel),
         ];
 
         // Likewise: recipient cannot be set to null once created, but this
@@ -251,8 +258,9 @@ class MutableFieldsOnlyTest extends TestCase
         yield 'null recipient ID' => [
             ['recipient' => ['id' => null],],
             (clone $baseModel),
-            (clone $baseModel)->setRecipient((new User())->setId(null)),
+            (clone $baseModel),
         ];
+
 
         // File is mutable, by either a file upload or a storage+filename
         // Will need to mock the collector factory though
