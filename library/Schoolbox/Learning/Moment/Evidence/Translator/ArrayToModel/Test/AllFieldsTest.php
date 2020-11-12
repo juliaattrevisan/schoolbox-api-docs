@@ -11,8 +11,8 @@ namespace Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\Test;
 
 use Alaress_Date_Format;
 use DateTimeZone;
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\Learning\Moment\Evidence\Model;
 use Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields;
@@ -91,7 +91,7 @@ class AllFieldsTest extends TestCase
         ];
 
         // Storage file upload: require a mock here
-        $storage = (new Storage())
+        $storage       = (new Storage())
             ->setHash('1234567890123456789012345678901234567890')
             ->setBasename('test.gif');
         $collectorMock = $this->createMock(Collector::class);
@@ -141,13 +141,13 @@ class AllFieldsTest extends TestCase
         yield 'update id' => [
             ['id' => $newId,],
             (clone $baseModel),
-            (clone $baseModel)->setId($newId)
+            (clone $baseModel)->setId($newId),
         ];
 
         yield 'null id' => [
             ['id' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setId(null)
+            (clone $baseModel)->setId(null),
         ];
 
 
@@ -155,37 +155,37 @@ class AllFieldsTest extends TestCase
         yield 'update created at' => [
             ['createdAt' => $newDate,],
             (clone $baseModel),
-            (clone $baseModel)->setCreatedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone))
+            (clone $baseModel)->setCreatedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone)),
         ];
 
         yield 'null created at' => [
             ['createdAt' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setCreatedAt(null)
+            (clone $baseModel)->setCreatedAt(null),
         ];
 
         yield 'update updated at' => [
             ['updatedAt' => $newDate,],
             (clone $baseModel),
-            (clone $baseModel)->setUpdatedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone))
+            (clone $baseModel)->setUpdatedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone)),
         ];
 
         yield 'null updated at' => [
             ['updatedAt' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setUpdatedAt(null)
+            (clone $baseModel)->setUpdatedAt(null),
         ];
 
         yield 'update deleted at' => [
             ['deletedAt' => $newDate,],
             (clone $baseModel),
-            (clone $baseModel)->setDeletedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone))
+            (clone $baseModel)->setDeletedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone)),
         ];
 
         yield 'null deleted at' => [
             ['deletedAt' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setDeletedAt(null)
+            (clone $baseModel)->setDeletedAt(null),
         ];
 
 
@@ -193,19 +193,19 @@ class AllFieldsTest extends TestCase
         yield 'update body' => [
             ['body' => 'new body',],
             (clone $baseModel),
-            (clone $baseModel)->setBody('new body')
+            (clone $baseModel)->setBody('new body'),
         ];
 
         yield 'null body' => [
             ['body' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setBody(null)
+            (clone $baseModel)->setBody(null),
         ];
 
         yield 'update creator' => [
             ['creator' => ['id' => $newId,],],
             (clone $baseModel),
-            (clone $baseModel)->setCreator((new User())->setId($newId))
+            (clone $baseModel)->setCreator((new User())->setId($newId)),
         ];
 
         // Creator cannot be set to null once created:
@@ -219,31 +219,31 @@ class AllFieldsTest extends TestCase
         yield 'null creator id' => [
             ['creator' => ['id' => null],],
             (clone $baseModel),
-            (clone $baseModel)->setCreator((new User())->setId(null))
+            (clone $baseModel)->setCreator((new User())->setId(null)),
         ];
 
         yield 'update discussion thread' => [
             ['discussionThread' => ['id' => $newId,],],
             (clone $baseModel),
-            (clone $baseModel)->setDiscussionThread((new DiscussionThread())->setId($newId))
+            (clone $baseModel)->setDiscussionThread((new DiscussionThread())->setId($newId)),
         ];
 
         yield 'null discussion thread' => [
             ['discussionThread' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setDiscussionThread(null)
+            (clone $baseModel)->setDiscussionThread(null),
         ];
 
         yield 'null discussion thread ID' => [
             ['discussionThread' => ['id' => null],],
             (clone $baseModel),
-            (clone $baseModel)->setDiscussionThread((new DiscussionThread())->setId(null))
+            (clone $baseModel)->setDiscussionThread((new DiscussionThread())->setId(null)),
         ];
 
         yield 'update recipient' => [
             ['recipient' => ['id' => $newId,],],
             (clone $baseModel),
-            (clone $baseModel)->setRecipient((new User())->setId($newId))
+            (clone $baseModel)->setRecipient((new User())->setId($newId)),
         ];
 
         // Likewise recipient can't be set to null once created:
@@ -257,12 +257,12 @@ class AllFieldsTest extends TestCase
         yield 'null recipient ID' => [
             ['recipient' => ['id' => null],],
             (clone $baseModel),
-            (clone $baseModel)->setRecipient((new User())->setId(null))
+            (clone $baseModel)->setRecipient((new User())->setId(null)),
         ];
 
         // File is mutable, by either a file upload or a storage+filename
         // Will need to mock the collector factory though
-        $storage = (new Storage())
+        $storage       = (new Storage())
             ->setHash('9876543210987654321098765432109876543210')
             ->setBasename('test.png');
         $collectorMock = $this->createMock(Collector::class);
@@ -290,7 +290,7 @@ class AllFieldsTest extends TestCase
             (clone $baseModel),
             (clone $baseModel)
                 ->setStorage(null)
-                ->setFilename(null)
+                ->setFilename(null),
         ];
 
 
@@ -298,7 +298,7 @@ class AllFieldsTest extends TestCase
         // but will they ever be mutated via their individual fields?
         yield 'update storage' => [
             [
-                'storage' => ['hash' => '12345']
+                'storage' => ['hash' => '12345'],
             ],
             (clone $baseModel),
             (clone $baseModel)
@@ -340,7 +340,7 @@ class AllFieldsTest extends TestCase
             ],
             (clone $baseModel),
             (clone $baseModel)
-                ->setFilename(null)
+                ->setFilename(null),
         ];
     }
 
@@ -360,7 +360,7 @@ class AllFieldsTest extends TestCase
         yield 'null creator' => [
             ['creator' => null,],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel),
         ];
 
         // Likewise recipient can't be set to null once created
@@ -368,7 +368,7 @@ class AllFieldsTest extends TestCase
         yield 'null recipient' => [
             ['recipient' => null,],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel),
         ];
 
     }
@@ -391,7 +391,7 @@ class AllFieldsTest extends TestCase
         if (!$converter) {
             /** @var CollectorFactory|MockObject $collectorFactoryMock */
             $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-            $converter ??= new AllFields($collectorFactoryMock);
+            $converter            ??= new AllFields($collectorFactoryMock);
         }
 
         /** @noinspection PhpUnhandledExceptionInspection */
@@ -421,7 +421,7 @@ class AllFieldsTest extends TestCase
         if (!$converter) {
             /** @var CollectorFactory|MockObject $collectorFactoryMock */
             $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-            $converter ??= new AllFields($collectorFactoryMock);
+            $converter            ??= new AllFields($collectorFactoryMock);
         }
 
         /** @noinspection PhpUnhandledExceptionInspection */
@@ -447,7 +447,7 @@ class AllFieldsTest extends TestCase
     {
         /** @var CollectorFactory|MockObject $collectorFactoryMock */
         $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-        $converter = new AllFields($collectorFactoryMock);
+        $converter            = new AllFields($collectorFactoryMock);
 
         $this->expectWarning();
 
