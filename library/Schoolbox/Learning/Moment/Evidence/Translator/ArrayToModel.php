@@ -92,13 +92,17 @@ class ArrayToModel
         if (array_key_exists('body', $json)) {
             $model->setBody($json['body']);
         }
-        if (isset($json['creator'])
-            && is_array($json['creator'])
-            && array_key_exists('id', $json['creator'])
-        ) {
-            // Expect a user ID, but no other details yet
-            $model->setCreator((new User())->setId($json['creator']['id']));
+
+        if (array_key_exists('creator', $json)) {
+            if (isset($json['creator'])) {
+                if (is_array($json['creator']) && array_key_exists('id', $json['creator'])) {
+                    $model->setCreator((new User())->setId($json['creator']['id']));
+                }
+            } else {
+                $model->setCreator(null);
+            }
         }
+
         if (isset($json['discussionThread'])
             && is_array($json['discussionThread'])
             && array_key_exists('id', $json['discussionThread'])
