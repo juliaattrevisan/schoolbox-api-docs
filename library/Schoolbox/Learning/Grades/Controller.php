@@ -852,16 +852,21 @@ class Controller extends Base
             return $assessment instanceof DueWork\Model && $assessment->isFeedbackVisibleToUser($user);
         });
 
+        /* Attempt to process statistics for Cohort aggregation for each capability/indicator/descriptor
+         * but...there's a problem I can't solve
+         *
+         * Disabled this for now if/until we figure it out
+         */
 //        if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $folder)) {
-            return (new Progression(
-                $this->getDi()->get('databaseInternal'),
-                $this->assessmentMapperProxy,
-                $dueWorksWithVisibleMarks,
-                $includeComparison
-            ))->collate($student);
+//            return (new Progression(
+//                $this->getDi()->get('databaseInternal'),
+//                $this->assessmentMapperProxy,
+//                $dueWorksWithVisibleMarks,
+//                $includeComparison
+//            ))->collate($student);
 //        }
 
-//        return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student, $includeComparison);
+        return $this->rubricMapper->getLongitudinal($dueWorksWithVisibleMarks, $student, $includeComparison);
     }
 
 
