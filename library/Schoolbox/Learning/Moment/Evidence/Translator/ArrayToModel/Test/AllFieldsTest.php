@@ -137,17 +137,16 @@ class AllFieldsTest extends TestCase
             ->setFilename('test.gif');
 
 
-        // ID is not mutable
         yield 'update id' => [
             ['id' => $newId,],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setId($newId)
         ];
 
         yield 'null id' => [
             ['id' => null,],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setId(null)
         ];
 
 
@@ -155,37 +154,38 @@ class AllFieldsTest extends TestCase
         yield 'update created at' => [
             ['createdAt' => $newDate,],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setCreatedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone))
         ];
 
         yield 'null created at' => [
             ['createdAt' => null,],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setCreatedAt(null)
         ];
 
         yield 'update updated at' => [
             ['updatedAt' => $newDate,],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setUpdatedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone))
         ];
 
         yield 'null updated at' => [
             ['updatedAt' => null,],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setCreatedAt(null)
         ];
 
+        // Deleted at is never mutable, not even by this translator?
         yield 'update deleted at' => [
             ['deletedAt' => $newDate,],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setDeletedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone))
         ];
 
         yield 'null deleted at' => [
             ['deletedAt' => null,],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setDeletedAt(null)
         ];
 
 
@@ -202,14 +202,13 @@ class AllFieldsTest extends TestCase
             (clone $baseModel)->setBody(null)
         ];
 
-
-        // Creator is not mutable
         yield 'update creator' => [
             ['creator' => ['id' => $newId,],],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setCreator((new User())->setId($newId))
         ];
 
+        // Creator cannot be set to null once created
         yield 'null creator' => [
             ['creator' => null,],
             (clone $baseModel),
@@ -222,36 +221,31 @@ class AllFieldsTest extends TestCase
             (clone $baseModel)
         ];
 
-
-        // Discussion thread is not mutable:
-        // * threads are added to evidence via a create thread route
-        // * comments within the thread are mutated via the comment routes
         yield 'update discussion thread' => [
             ['discussionThread' => ['id' => $newId,],],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setDiscussionThread((new DiscussionThread())->setId($newId))
         ];
 
         yield 'null discussion thread' => [
             ['discussionThread' => null,],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setDiscussionThread(null)
         ];
 
         yield 'null discussion thread ID' => [
             ['discussionThread' => ['id' => null],],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setDiscussionThread(null)
         ];
 
-
-        // Recipient is not mutable
         yield 'update recipient' => [
             ['recipient' => ['id' => $newId,],],
             (clone $baseModel),
-            (clone $baseModel)
+            (clone $baseModel)->setRecipient((new User())->setId($newId))
         ];
 
+        // Likewise recipient can't be set to null once created
         yield 'null recipient' => [
             ['recipient' => null,],
             (clone $baseModel),
@@ -263,7 +257,6 @@ class AllFieldsTest extends TestCase
             (clone $baseModel),
             (clone $baseModel)
         ];
-
 
         // File is mutable, by either a file upload or a storage+filename
         // Will need to mock the collector factory though
