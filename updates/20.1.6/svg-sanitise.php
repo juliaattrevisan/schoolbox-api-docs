@@ -9,5 +9,5 @@
 
 declare(strict_types=1);
 
-passthru(__DIR__ .  '/../../../tools/image/sanitize.php -p', $returnVar);
+passthru(__DIR__ .  '/../../tools/image/sanitize.php -p', $returnVar);
 exit($returnVar);
