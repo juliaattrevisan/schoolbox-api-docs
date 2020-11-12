@@ -77,6 +77,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        $badgeMapper = \Schoolbox\Learning\Badge\Mapper::getInstance();
         $collection = $this->createCollection();
 
         /* A lookup, because badge hydration is a dog
@@ -120,7 +121,7 @@ class Mapper extends \Schoolbox\Mapper
              * one in the cache
              */
             if (!array_key_exists($badgeId, $badges)) {
-                $badge = \Schoolbox\Learning\Badge\Mapper::getInstance()->findById($badgeId);
+                $badge = $badgeMapper->findById($badgeId);
 
                 /* Save it for later
                  */
