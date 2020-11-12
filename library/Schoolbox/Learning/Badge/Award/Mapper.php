@@ -128,6 +128,8 @@ class Mapper extends \Schoolbox\Mapper
             }
 
             $award->setBadge($badges[$badgeId]);
+
+            $collection->add($award);
         }
 
         return $collection;

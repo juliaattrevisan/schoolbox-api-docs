@@ -26,11 +26,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * The user who created this category of Badge
-     *
      * @var User
      */
-    private User $creator;
+    private User $createdBy;
 
 
     /**
@@ -42,20 +40,20 @@ class Model implements ISoftDeletable
     /**
      * @return User
      */
-    public function getCreator(): User
+    public function getCreatedBy(): User
     {
-        return $this->creator;
+        return $this->createdBy;
     }
 
 
     /**
-     * @param User $creator
+     * @param User $createdBy
      * @return $this
      *
      */
-    public function setCreator(User $creator): self
+    public function setCreatedBy(User $createdBy): self
     {
-        $this->creator = $creator;
+        $this->createdBy = $createdBy;
         return $this;
     }
 

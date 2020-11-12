@@ -36,7 +36,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
-        $this->joins('created_by', UserMapper::class, 'id', null, null, 'creator', 'creator');
+        $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -52,11 +52,11 @@ class Mapper extends \Schoolbox\Mapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('creator', 'c')},
-                {$this->getJoinColumnString('creator.role', 'cr')}
+                {$this->getJoinColumnString('createdBy', 'c')},
+                {$this->getJoinColumnString('createdBy.role', 'cr')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
-            INNER JOIN {$this->getJoinSql('creator', '', 'c', true)}
-            INNER JOIN {$this->getJoinSql('creator.role', 'c', 'cr')}
+            INNER JOIN {$this->getJoinSql('createdBy', '', 'c', true)}
+            INNER JOIN {$this->getJoinSql('createdBy.role', 'c', 'cr')}
         ";
     }
 
@@ -78,16 +78,16 @@ class Mapper extends \Schoolbox\Mapper
 
             /* Set the creator and also their rolw
              */
-            $creator = $this->hydrateJoin($row, 'creator', 'c');
+            $createdBy = $this->hydrateJoin($row, 'createdBy', 'c');
 
-            if ($creator instanceof User) {
-                $role = $this->hydrateJoin($row, 'creator.role', 'cr');
+            if ($createdBy instanceof User) {
+                $role = $this->hydrateJoin($row, 'createdBy.role', 'cr');
 
                 if ($role instanceof Role) {
-                    $creator->setRole($role);
+                    $createdBy->setRole($role);
                 }
 
-                $model->setCreator($creator);
+                $model->setCreatedBy($createdBy);
             }
 
             $collection->add($model);

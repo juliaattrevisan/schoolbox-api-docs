@@ -62,19 +62,15 @@ class Model implements ISoftDeletable
 
 
     /**
-     * The user who created this Badge
-     *
      * @var User
      */
-    private User $creator;
+    private User $createdBy;
 
 
     /**
-     * The user who updated this Badge
-     *
      * @var User
      */
-    private User $updator;
+    private User $updatedBy;
 
 
     /**
@@ -180,20 +176,20 @@ class Model implements ISoftDeletable
     /**
      * @return User
      */
-    public function getCreator(): User
+    public function getCreatedBy(): User
     {
-        return $this->creator;
+        return $this->createdBy;
     }
 
 
     /**
-     * @param User $creator
+     * @param User $createdBy
      * @return $this
      *
      */
-    public function setCreator(User $creator): self
+    public function setCreatedBy(User $createdBy): self
     {
-        $this->creator = $creator;
+        $this->createdBy = $createdBy;
         return $this;
     }
 
@@ -201,19 +197,19 @@ class Model implements ISoftDeletable
     /**
      * @return User
      */
-    public function getUpdator(): User
+    public function getUpdatedBy(): User
     {
-        return $this->updator;
+        return $this->updatedBy;
     }
 
 
     /**
-     * @param User $updator
+     * @param User $updatedBy
      * @return $this
      */
-    public function setUpdator(User $updator): self
+    public function setUpdatedBy(User $updatedBy): self
     {
-        $this->updator = $updator;
+        $this->updatedBy = $updatedBy;
         return $this;
     }
 }

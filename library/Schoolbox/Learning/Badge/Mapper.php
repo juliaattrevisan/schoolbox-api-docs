@@ -41,10 +41,10 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('body', self::TYPE_STRING);
         $this->joins('image_hash', StorageMapper::class, 'hash', null, null, 'image', 'image');
         $this->joins('category_id', Category\Mapper::class, 'id', null, null, 'category', 'category');
-        $this->joins('created_by', UserMapper::class, 'id', null, null, 'creator', 'creator');
+        $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updator', 'updator');
+        $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         /* A bunch of Curriculum Nodes
@@ -78,19 +78,19 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('image.allowedFileExtension', 'm')},
                 {$this->getJoinColumnString('category', 'bc')},
                 {$curriculumNodeMapper->getColumnString('cn')},
-                {$this->getJoinColumnString('creator', 'c')},
-                {$this->getJoinColumnString('creator.role', 'cr')},
-                {$this->getJoinColumnString('updator', 'u')},
-                {$this->getJoinColumnString('updator.role', 'ur')}
+                {$this->getJoinColumnString('createdBy', 'c')},
+                {$this->getJoinColumnString('createdBy.role', 'cr')},
+                {$this->getJoinColumnString('updatedBy', 'u')},
+                {$this->getJoinColumnString('updatedBy.role', 'ur')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('image', '', 'i', true)}
             LEFT JOIN {$this->getJoinSql('image.allowedFileExtension', 'i', 'm', true)}
             INNER JOIN {$this->getJoinSql('category', '', 'bc', true)}
             LEFT JOIN {$this->getJoinSql('curriculum_badge', '', 'cn')}
-            INNER JOIN {$this->getJoinSql('creator', '', 'c', true)}
-            INNER JOIN {$this->getJoinSql('creator.role', 'c', 'cr')}
-            INNER JOIN {$this->getJoinSql('updator', '', 'u', true)}
-            INNER JOIN {$this->getJoinSql('updator.role', 'u', 'ur')}
+            INNER JOIN {$this->getJoinSql('createdBy', '', 'c', true)}
+            INNER JOIN {$this->getJoinSql('createdBy.role', 'c', 'cr')}
+            INNER JOIN {$this->getJoinSql('updatedBy', '', 'u', true)}
+            INNER JOIN {$this->getJoinSql('updatedBy.role', 'u', 'ur')}
         ";
     }
 
@@ -139,30 +139,30 @@ class Mapper extends \Schoolbox\Mapper
 
             /* Set the creator and also their role
              */
-            $creator = $this->hydrateJoin($row, 'creator', 'c');
+            $createdBy = $this->hydrateJoin($row, 'createdBy', 'c');
 
-            if ($creator instanceof User) {
-                $role = $this->hydrateJoin($row, 'creator.role', 'cr');
+            if ($createdBy instanceof User) {
+                $role = $this->hydrateJoin($row, 'createdBy.role', 'cr');
 
                 if ($role instanceof Role) {
-                    $creator->setRole($role);
+                    $createdBy->setRole($role);
                 }
 
-                $collection[$badgeId]->setCreator($creator);
+                $collection[$badgeId]->setCreatedBy($createdBy);
             }
 
             /* Set the updator and also their role
              */
-            $updator = $this->hydrateJoin($row, 'updator', 'u');
+            $updatedBy = $this->hydrateJoin($row, 'updatedBy', 'u');
 
-            if ($updator instanceof User) {
-                $role = $this->hydrateJoin($row, 'updator.role', 'ur');
+            if ($updatedBy instanceof User) {
+                $role = $this->hydrateJoin($row, 'updatedBy.role', 'ur');
 
                 if ($role instanceof Role) {
-                    $updator->setRole($role);
+                    $updatedBy->setRole($role);
                 }
 
-                $collection[$badgeId]->setUpdator($updator);
+                $collection[$badgeId]->setUpdatedBy($updatedBy);
             }
 
             /* Add the optional image and its mime
