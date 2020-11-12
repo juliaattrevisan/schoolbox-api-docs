@@ -15,6 +15,7 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Translator for translating an array representation of learning moment
@@ -107,7 +108,11 @@ class AllFields
                     $model->setCreator((new User())->setId($json['creator']['id']));
                 }
             } else {
-                // raise an error
+                // raise a warning, but continue
+                trigger_error(
+                    'Attempting to set evidence creator to invalid null value: skipping',
+                    E_USER_WARNING
+                );
             }
         }
 
@@ -127,7 +132,10 @@ class AllFields
                     $model->setRecipient((new User())->setId($json['recipient']['id']));
                 }
             } else {
-                // raise an error
+                trigger_error(
+                    'Attempting to set evidence recipient to invalid null value: skipping',
+                    E_USER_WARNING
+                );
             }
         }
 

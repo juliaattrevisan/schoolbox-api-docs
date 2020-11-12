@@ -208,12 +208,13 @@ class AllFieldsTest extends TestCase
             (clone $baseModel)->setCreator((new User())->setId($newId))
         ];
 
-        // Creator cannot be set to null once created: this should be an error
-        yield 'null creator' => [
-            ['creator' => null,],
-            (clone $baseModel),
-            (clone $baseModel)
-        ];
+        // Creator cannot be set to null once created:
+        // this error case is covered in `testInvokeUpdateInvalidValues`.
+//        yield 'null creator' => [
+//            ['creator' => null,],
+//            (clone $baseModel),
+//            (clone $baseModel)
+//        ];
 
         yield 'null creator id' => [
             ['creator' => ['id' => null],],
@@ -245,13 +246,13 @@ class AllFieldsTest extends TestCase
             (clone $baseModel)->setRecipient((new User())->setId($newId))
         ];
 
-        // Likewise recipient can't be set to null once created
-        // This should be an error
-        yield 'null recipient' => [
-            ['recipient' => null,],
-            (clone $baseModel),
-            (clone $baseModel)
-        ];
+        // Likewise recipient can't be set to null once created:
+        // likewise this is covered in `testInvokeUpdateInvalidValues`.
+//        yield 'null recipient' => [
+//            ['recipient' => null,],
+//            (clone $baseModel),
+//            (clone $baseModel)
+//        ];
 
         yield 'null recipient ID' => [
             ['recipient' => ['id' => null],],
@@ -345,6 +346,37 @@ class AllFieldsTest extends TestCase
 
 
     /**
+     * Data provider for `testInvokeUpdateInvalidValues`.
+     *
+     * @return iterable
+     */
+    public function getTestInvokeUpdateInvalidValuesData(): iterable
+    {
+        $baseModel = (new Model())
+            ->setCreator((new User())->setId(1))
+            ->setRecipient((new User())->setId(1));
+
+        // Creator cannot be set to null once created: this should be an error
+        yield 'null creator' => [
+            ['creator' => null,],
+            (clone $baseModel),
+            (clone $baseModel)
+        ];
+
+        // Likewise recipient can't be set to null once created
+        // This should be an error
+        yield 'null recipient' => [
+            ['recipient' => null,],
+            (clone $baseModel),
+            (clone $baseModel)
+        ];
+
+    }
+
+
+    /**
+     * Test that creation of a new model from an array works as expected.
+     *
      * @dataProvider getTestInvokeCreateData
      * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields::__invoke
      *
@@ -368,6 +400,8 @@ class AllFieldsTest extends TestCase
 
 
     /**
+     * Test that update of an existing model from an array works as expected.
+     *
      * @dataProvider getTestInvokeUpdateData
      * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields::__invoke
      *
@@ -389,6 +423,33 @@ class AllFieldsTest extends TestCase
             $collectorFactoryMock = $this->createMock(CollectorFactory::class);
             $converter ??= new AllFields($collectorFactoryMock);
         }
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        self::assertEquals($expected, $converter($input, $existing));
+    }
+
+
+    /**
+     * Test that attempting to update an existing model from an array refuses to
+     * set fields which would cause an error: these fields should raise a
+     * warning message, and leave the value as is.
+     *
+     * @dataProvider getTestInvokeUpdateInvalidValuesData
+     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields::__invoke
+     *
+     * @param array $input
+     * @param Model $existing
+     * @param Model $expected
+     *
+     * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
+     */
+    public function testInvokeUpdateInvalidValues(array $input, Model $existing, Model $expected): void
+    {
+        /** @var CollectorFactory|MockObject $collectorFactoryMock */
+        $collectorFactoryMock = $this->createMock(CollectorFactory::class);
+        $converter = new AllFields($collectorFactoryMock);
+
+        $this->expectWarning();
 
         /** @noinspection PhpUnhandledExceptionInspection */
         self::assertEquals($expected, $converter($input, $existing));
