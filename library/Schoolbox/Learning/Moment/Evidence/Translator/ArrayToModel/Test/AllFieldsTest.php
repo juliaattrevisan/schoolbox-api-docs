@@ -48,7 +48,7 @@ class AllFieldsTest extends TestCase
         ];
 
         $timezone = new DateTimeZone('+00:00');
-        yield 'dates - deleted at not included' => [
+        yield 'dates' => [
             [
                 'createdAt' => '2020-01-01T00:00:00+00:00',
                 'updatedAt' => '2020-02-01T00:00:00+00:00',
@@ -56,7 +56,8 @@ class AllFieldsTest extends TestCase
             ],
             (new Model())
                 ->setCreatedAt(new Alaress_Date_Format('2020-01-01T00:00:00+00:00', DATE_ATOM, $timezone))
-                ->setUpdatedAt(new Alaress_Date_Format('2020-02-01T00:00:00+00:00', DATE_ATOM, $timezone)),
+                ->setUpdatedAt(new Alaress_Date_Format('2020-02-01T00:00:00+00:00', DATE_ATOM, $timezone))
+                ->setDeletedAt(new Alaress_Date_Format('2020-03-01T00:00:00+00:00', DATE_ATOM, $timezone)),
         ];
 
         yield 'storage' => [
@@ -172,10 +173,9 @@ class AllFieldsTest extends TestCase
         yield 'null updated at' => [
             ['updatedAt' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setCreatedAt(null)
+            (clone $baseModel)->setUpdatedAt(null)
         ];
 
-        // Deleted at is never mutable, not even by this translator?
         yield 'update deleted at' => [
             ['deletedAt' => $newDate,],
             (clone $baseModel),

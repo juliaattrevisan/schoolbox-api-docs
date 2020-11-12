@@ -85,9 +85,18 @@ class AllFields
                     : null
             );
         }
-//        if (array_key_exists('deletedAt', $json)) {
-//            $model->setDeletedAt(new Alaress_Date_Format($json['deletedAt'], DATE_ATOM));
-//        }
+
+        // Allow this translator to set deleted_at:
+        // this translator is not intended to restrict the fields which may be
+        // set, only to create a new instance of an object from JSON.
+        if (array_key_exists('deletedAt', $json)) {
+            $model->setDeletedAt(
+                isset($json['deletedAt'])
+                    ? new Alaress_Date_Format($json['deletedAt'], DATE_ATOM)
+                    : null
+            );
+        }
+
         if (array_key_exists('body', $json)) {
             $model->setBody($json['body']);
         }
