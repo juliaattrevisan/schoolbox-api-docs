@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator\Test;
+namespace Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\Test;
 
 use Alaress_Date_Format;
 use DateTimeZone;
@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\Learning\Moment\Evidence\Model;
-use Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel;
+use Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields;
 use Schoolbox\Resource\Attachment\Collector\Collector;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Model as Storage;
@@ -25,9 +25,9 @@ use Schoolbox\User;
  * Tests for converting from an array to model representation of learning moment
  * evidence.
  *
- * @covers \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel
+ * @covers \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields
  */
-class ArrayToModelTest extends TestCase
+class AllFieldsTest extends TestCase
 {
     /**
      * Data provider for `testInvokeCreate`.
@@ -107,7 +107,7 @@ class ArrayToModelTest extends TestCase
             (new Model())
                 ->setStorage($storage)
                 ->setFilename('test.gif'),
-            new ArrayToModel($collectorFactoryMock),
+            new AllFields($collectorFactoryMock),
         ];
     }
 
@@ -285,7 +285,7 @@ class ArrayToModelTest extends TestCase
             (clone $baseModel)
                 ->setStorage($storage)
                 ->setFilename('test.png'),
-            new ArrayToModel($collectorFactoryMock),
+            new AllFields($collectorFactoryMock),
         ];
 
         yield 'null file' => [
@@ -308,7 +308,7 @@ class ArrayToModelTest extends TestCase
             (clone $baseModel),
             (clone $baseModel)
                 ->setStorage((new Storage())->setHash('12345')),
-            new ArrayToModel($collectorFactoryMock),
+            new AllFields($collectorFactoryMock),
         ];
 
         yield 'null storage' => [
@@ -336,7 +336,7 @@ class ArrayToModelTest extends TestCase
             (clone $baseModel),
             (clone $baseModel)
                 ->setFilename('test.png'),
-            new ArrayToModel($collectorFactoryMock),
+            new AllFields($collectorFactoryMock),
         ];
 
         yield 'null filename' => [
@@ -352,20 +352,20 @@ class ArrayToModelTest extends TestCase
 
     /**
      * @dataProvider getTestInvokeCreateData
-     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel::__invoke
+     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields::__invoke
      *
-     * @param array             $input
-     * @param Model             $expected
-     * @param ArrayToModel|null $converter
+     * @param array          $input
+     * @param Model          $expected
+     * @param AllFields|null $converter
      *
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
-    public function testInvokeCreate(array $input, Model $expected, ArrayToModel $converter = null): void
+    public function testInvokeCreate(array $input, Model $expected, AllFields $converter = null): void
     {
         if (!$converter) {
             /** @var CollectorFactory|MockObject $collectorFactoryMock */
             $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-            $converter ??= new ArrayToModel($collectorFactoryMock);
+            $converter ??= new AllFields($collectorFactoryMock);
         }
 
         /** @noinspection PhpUnhandledExceptionInspection */
@@ -375,12 +375,12 @@ class ArrayToModelTest extends TestCase
 
     /**
      * @dataProvider getTestInvokeUpdateData
-     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel::__invoke
+     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields::__invoke
      *
-     * @param array             $input
-     * @param Model             $existing
-     * @param Model             $expected
-     * @param ArrayToModel|null $converter
+     * @param array          $input
+     * @param Model          $existing
+     * @param Model          $expected
+     * @param AllFields|null $converter
      *
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
@@ -388,12 +388,12 @@ class ArrayToModelTest extends TestCase
         array $input,
         Model $existing,
         Model $expected,
-        ArrayToModel $converter = null
+        AllFields $converter = null
     ): void {
         if (!$converter) {
             /** @var CollectorFactory|MockObject $collectorFactoryMock */
             $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-            $converter ??= new ArrayToModel($collectorFactoryMock);
+            $converter ??= new AllFields($collectorFactoryMock);
         }
 
         /** @noinspection PhpUnhandledExceptionInspection */

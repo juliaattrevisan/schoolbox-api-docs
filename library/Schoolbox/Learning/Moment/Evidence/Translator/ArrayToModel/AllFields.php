@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -7,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator;
+namespace Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel;
 
 use Alaress_Date_Format;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
@@ -24,12 +23,12 @@ use Schoolbox\User;
  * Used when translating JSON passed in a request body into a model, so that it
  * may be persisted.
  */
-class ArrayToModel
+class AllFields
 {
     /**
      * @var CollectorFactory
      */
-    private $collectorFactory;
+    private CollectorFactory $collectorFactory;
 
 
     /**
@@ -51,7 +50,7 @@ class ArrayToModel
      *                                   otherwise create a new one
      * @return Evidence\Model
      * @throws ResourceException if the collector factory can't find the file
-     *                           that was uploaded
+     *                                   that was uploaded
      */
     public function __invoke(array $json, ?Evidence\Model $model = null): Evidence\Model
     {
