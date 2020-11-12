@@ -250,7 +250,7 @@ class Controller extends Base
 
         // Save the evidence
         $evidenceCollection = $this->mapper->createCollection();
-        $baseModel          = (new Translator\ArrayToModel\AllFields(new CollectorFactory()))($requestBody)
+        $baseModel          = (new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory()))($requestBody)
             ->setCreator($this->getUser());
         foreach ($users as $user) {
             $evidenceCollection->add(
@@ -307,7 +307,7 @@ class Controller extends Base
     public function putEvidence(Model $evidence): void
     {
         $requestBody       = json_decode(json_encode($this->request->content->get()), true);
-        $requestTranslator = new Translator\ArrayToModel\AllFields(new CollectorFactory());
+        $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $evidence          = $requestTranslator($requestBody, $evidence);
 
         $this->mapper->save($evidence);
