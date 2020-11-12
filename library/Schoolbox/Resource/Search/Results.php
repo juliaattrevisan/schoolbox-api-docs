@@ -113,17 +113,18 @@ class Results implements Searchable
     {
         $result = new Collection();
 
-        /* Run search() on each minion in the registry if 'all' is selected
-         * or if this particular minion was chosen specifically (e.g. 'link')
-         */
-        foreach ($this->registry as $currentDefinition) {
-            if (($this->type === 'all') || ($currentDefinition->getType() === $this->type)) {
-                $searcher = $currentDefinition->getMapper()->search($articleResolver, $user, $keyword, $offset, $limit, $sortProperty, $sortDirection);
+        if (strlen((string)$keyword) >= self::MIN_SEARCH_LENGTH) {
+            /* Run search() on each minion in the registry if 'all' is selected
+             * or if this particular minion was chosen specifically (e.g. 'link')
+             */
+            foreach ($this->registry as $currentDefinition) {
+                if (($this->type === 'all') || ($currentDefinition->getType() === $this->type)) {
+                    $searcher = $currentDefinition->getMapper()->search($articleResolver, $user, $keyword, $offset, $limit, $sortProperty, $sortDirection);
 
-                $result->setOffset($currentDefinition->getType(), $searcher);
+                    $result->setOffset($currentDefinition->getType(), $searcher);
+                }
             }
         }
-
         $this->result = $result;
     }
 
@@ -193,7 +194,9 @@ class Results implements Searchable
 
         foreach ($this->registry as $currentDefinition) {
             $searcher = $this->result->getOffset($currentDefinition->getType());
-
+            if (!$searcher) {
+                continue;
+            }
             $sum += $searcher->getCount();
         }
 
