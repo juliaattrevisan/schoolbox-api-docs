@@ -242,17 +242,16 @@ export default {
     <div id="discussion" class="small-12 island">
         <section id="threads-section" class="discussion">
             <div class="discussion-threads">
-                <h2 class="comment-count" v-if="!hasComments">No comments</h2>
-                <template v-else>
-                    <p class="comment-count">
-                        {{ commentThread.children.metadata.count }} comment(s)
-                    </p>
+                <template v-if="hasComments">
+                    <p class="comment-count">{{ commentThread.children.metadata.count }} comment(s)</p>
+                </template>
 
-                    <ckeditor tag-name="textarea" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
-                    <a class="button submit"
-                       @click="postComment"
-                       :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
+                <ckeditor tag-name="textarea" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
+                <a class="button submit"
+                   @click="postComment"
+                   :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
 
+                <template v-if="hasComments">
                     <ul class="information-list social-stream">
                         <li class="actions-small-1" v-for="(comment, index) in comments">
                             <div class="list-item">
@@ -276,20 +275,19 @@ export default {
                             <media-article v-html="comment.content"></media-article>
                         </li>
                     </ul>
-                </template>
-                <template v-if="commentThread.children.metadata.count > commentThread.children.data.length && commentThread.children.metadata.cursor.next">
-                    <a class="article-read-more" @click.prevent="loadMoreComments">Load older comments</a>
+                    <template v-if="commentThread.children.metadata.count > commentThread.children.data.length && commentThread.children.metadata.cursor.next">
+                        <a @click.prevent="loadMoreComments" class="article-read-more">Load older comments</a>
+                    </template>
                 </template>
 
                 <toast ref="toast"></toast>
-
                 <reveal-modal ref="deleteModal">
                     <template>
                         <h2>Please confirm</h2>
                         <p>Are you sure you want to delete this comment?</p>
                         <ul class="flex-list buttons">
-                            <li><a @click.prevent="deleteComment(commentIndexToDelete)" class="button submit">OK</a></li>
-                            <li><a @click.prevent="$refs.deleteModal.close" class="button">Cancel</a></li>
+                            <li><a @click.prevent="deleteComment(commentIndexToDelete)" class="button icon-approve submit">OK</a></li>
+                            <li><a @click.prevent="$refs.deleteModal.close" class="button icon-close">Cancel</a></li>
                         </ul>
                     </template>
                 </reveal-modal>
