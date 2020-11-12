@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\Resource\Storage;
@@ -52,6 +53,12 @@ class Model implements ISoftDeletable
      * @var Category\Model
      */
     private Category\Model $category;
+
+
+    /**
+     * @var GenericCollection
+     */
+    private GenericCollection $curriculumNodes;
 
 
     /**
@@ -146,6 +153,26 @@ class Model implements ISoftDeletable
     public function setCategory(Category\Model $category): self
     {
         $this->category = $category;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection
+     */
+    public function getCurriculumNodes(): GenericCollection
+    {
+        return $this->curriculumNodes;
+    }
+
+
+    /**
+     * @param GenericCollection $curriculumNodes
+     * @return Model
+     */
+    public function setCurriculumNodes(GenericCollection $curriculumNodes): self
+    {
+        $this->curriculumNodes = $curriculumNodes;
         return $this;
     }
 

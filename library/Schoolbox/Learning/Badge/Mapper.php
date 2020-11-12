@@ -46,6 +46,20 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updator', 'updator');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        /* A bunch of Curriculum Nodes
+         */
+        $this->joinsVia(
+            'curriculum_badge',
+            \Schoolbox\Curriculum\Node\Mapper::class,
+            'id',
+            'curriculum_node_id',
+            'badge_id',
+            null,
+            null,
+            null,
+            'curriculumNodes'
+        );
     }
 
 
@@ -55,12 +69,15 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function getSelectString(): string
     {
+        $curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
+
         return "
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('image', 'i')},
                 {$this->getJoinColumnString('image.allowedFileExtension', 'm')},
                 {$this->getJoinColumnString('category', 'bc')},
+                {$curriculumNodeMapper->getColumnString('cn')},
                 {$this->getJoinColumnString('creator', 'c')},
                 {$this->getJoinColumnString('creator.role', 'cr')},
                 {$this->getJoinColumnString('updator', 'u')},
@@ -69,6 +86,7 @@ class Mapper extends \Schoolbox\Mapper
             INNER JOIN {$this->getJoinSql('image', '', 'i', true)}
             LEFT JOIN {$this->getJoinSql('image.allowedFileExtension', 'i', 'm', true)}
             INNER JOIN {$this->getJoinSql('category', '', 'bc', true)}
+            LEFT JOIN {$this->getJoinSql('curriculum_badge', '', 'cn')}
             INNER JOIN {$this->getJoinSql('creator', '', 'c', true)}
             INNER JOIN {$this->getJoinSql('creator.role', 'c', 'cr')}
             INNER JOIN {$this->getJoinSql('updator', '', 'u', true)}
@@ -87,17 +105,36 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        $curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
         $collection = $this->createCollection();
+        $curriculumNodeCache = [];
 
         foreach ($statement as $row) {
-            $model = $this->hydrate($row);
+            $badgeId = $row['id'];
+
+            if (!$collection->offsetExists($badgeId)) {
+                $collection[$badgeId] = $this->hydrate($row);
+                $collection[$badgeId]->setCurriculumNodes($curriculumNodeMapper->createCollection());
+            }
 
             /* Set the Category
              */
             $category = $this->hydrateJoin($row, 'category', 'bc');
 
             if ($category instanceof Category\Model) {
-                $model->setCategory($category);
+                $collection[$badgeId]->setCategory($category);
+            }
+
+            /* Set all the curriculum nodes
+             */
+            $curriculumNodeId = $row['cn.id'];
+
+            if ($curriculumNodeId) {
+                if (!array_key_exists($curriculumNodeId, $curriculumNodeCache)) {
+                    $curriculumNodeCache[$curriculumNodeId] = $curriculumNodeMapper->hydrate($row, 'cn');
+                }
+
+                $collection[$badgeId]->getCurriculumNodes()->setOffset($curriculumNodeId, $curriculumNodeCache[$curriculumNodeId]);
             }
 
             /* Set the creator and also their role
@@ -111,7 +148,7 @@ class Mapper extends \Schoolbox\Mapper
                     $creator->setRole($role);
                 }
 
-                $model->setCreator($creator);
+                $collection[$badgeId]->setCreator($creator);
             }
 
             /* Set the updator and also their role
@@ -125,7 +162,7 @@ class Mapper extends \Schoolbox\Mapper
                     $updator->setRole($role);
                 }
 
-                $model->setUpdator($updator);
+                $collection[$badgeId]->setUpdator($updator);
             }
 
             /* Add the optional image and its mime
@@ -139,10 +176,8 @@ class Mapper extends \Schoolbox\Mapper
                     $image->setMimetype($mime);
                 }
 
-                $model->setImage($image);
+                $collection[$badgeId]->setImage($image);
             }
-
-            $collection->add($model);
         }
 
         return $collection;
