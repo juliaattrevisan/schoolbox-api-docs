@@ -135,13 +135,20 @@ class ArrayToModel
         }
 
 
-        if (isset($json['storage'])
-            && is_array($json['storage'])
-            && array_key_exists('hash', $json['storage'])
-        ) {
-            // Expect a hash? Not sure how storage files should be represented
-            // in API requests/responses yet
-            $model->setStorage((new StorageModel())->setHash($json['storage']['hash']));
+        if (array_key_exists('storage', $json)) {
+            if (isset($json['storage'])) {
+                if (is_array($json['storage'])
+                    && array_key_exists('hash', $json['storage'])
+                ) {
+                    if (!isset($json['storage']['hash'])) {
+                        $model->setStorage(null);
+                    } else {
+                        $model->setStorage((new StorageModel())->setHash($json['storage']['hash']));
+                    }
+                }
+            } else {
+                $model->setStorage(null);
+            }
         }
         if (array_key_exists('filename', $json)) {
             $model->setFilename($json['filename']);
