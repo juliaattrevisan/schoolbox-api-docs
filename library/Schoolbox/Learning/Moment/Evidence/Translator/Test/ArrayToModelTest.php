@@ -136,49 +136,60 @@ class ArrayToModelTest extends TestCase
             ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
             ->setFilename('test.gif');
 
-        // TODO determine if ID should even be settable by this
-        // It feels wrong, because IDs should be immutable.
-        // However, should that be the responsibility of this class?
+
+        // ID is not mutable
         yield 'update id' => [
             ['id' => $newId,],
             (clone $baseModel),
-            (clone $baseModel)->setId($newId)
+            (clone $baseModel)
         ];
 
         yield 'null id' => [
             ['id' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setId(null)
+            (clone $baseModel)
         ];
 
 
-        // Likewise, should created/updated at be mutable?
+        // created/updated/deleted at are not mutable
         yield 'update created at' => [
             ['createdAt' => $newDate,],
             (clone $baseModel),
-            (clone $baseModel)->setCreatedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone))
+            (clone $baseModel)
         ];
 
         yield 'null created at' => [
             ['createdAt' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setCreatedAt(null)
+            (clone $baseModel)
         ];
 
         yield 'update updated at' => [
             ['updatedAt' => $newDate,],
             (clone $baseModel),
-            (clone $baseModel)->setUpdatedAt(new Alaress_Date_Format($newDate, DATE_ATOM, $timezone))
+            (clone $baseModel)
         ];
 
         yield 'null updated at' => [
             ['updatedAt' => null,],
             (clone $baseModel),
-            (clone $baseModel)->setUpdatedAt(null)
+            (clone $baseModel)
+        ];
+
+        yield 'update deleted at' => [
+            ['deletedAt' => $newDate,],
+            (clone $baseModel),
+            (clone $baseModel)
+        ];
+
+        yield 'null deleted at' => [
+            ['deletedAt' => null,],
+            (clone $baseModel),
+            (clone $baseModel)
         ];
 
 
-        // Body should be mutable
+        // Body is mutable
         yield 'update body' => [
             ['body' => 'new body',],
             (clone $baseModel),
@@ -192,120 +203,150 @@ class ArrayToModelTest extends TestCase
         ];
 
 
-        // Creator should not be mutable
+        // Creator is not mutable
         yield 'update creator' => [
             ['creator' => ['id' => $newId,],],
             (clone $baseModel),
             (clone $baseModel)->setCreator((new User())->setId($newId))
         ];
 
-//        // Creator is not nullable: this should be rejected
-//        yield 'null creator' => [
-//            ['creator' => null,],
-//            (clone $baseModel),
-//            (clone $baseModel)->setCreator(null)
-//        ];
+        yield 'null creator' => [
+            ['creator' => null,],
+            (clone $baseModel),
+            (clone $baseModel)
+        ];
 
-        // What happens if creator's ID is null?
-        yield 'null creator ID' => [
+        yield 'null creator id' => [
             ['creator' => ['id' => null],],
             (clone $baseModel),
-            (clone $baseModel)->setCreator((new User())->setId(null))
+            (clone $baseModel)
         ];
 
 
-        // Discussion thread should not be mutable
+        // Discussion thread is not mutable:
+        // * threads are added to evidence via a create thread route
+        // * comments within the thread are mutated via the comment routes
         yield 'update discussion thread' => [
             ['discussionThread' => ['id' => $newId,],],
             (clone $baseModel),
-            (clone $baseModel)->setDiscussionThread((new DiscussionThread())->setId($newId))
+            (clone $baseModel)
+        ];
+
+        yield 'null discussion thread' => [
+            ['discussionThread' => null,],
+            (clone $baseModel),
+            (clone $baseModel)
         ];
 
         yield 'null discussion thread ID' => [
             ['discussionThread' => ['id' => null],],
             (clone $baseModel),
-            (clone $baseModel)->setDiscussionThread((new DiscussionThread())->setId(null))
+            (clone $baseModel)
         ];
 
 
         // Recipient should not be mutable
         yield 'update recipient' => [
-            ['creator' => ['id' => $newId,],],
+            ['recipient' => ['id' => $newId,],],
             (clone $baseModel),
-            (clone $baseModel)->setCreator((new User())->setId($newId))
+            (clone $baseModel)
+        ];
+
+        yield 'null recipient' => [
+            ['recipient' => null,],
+            (clone $baseModel),
+            (clone $baseModel)
         ];
 
         yield 'null recipient ID' => [
-            ['creator' => ['id' => null],],
+            ['recipient' => ['id' => null],],
             (clone $baseModel),
-            (clone $baseModel)->setCreator((new User())->setId(null))
+            (clone $baseModel)
         ];
 
 
+        // File is mutable, by either a file upload or a storage+filename
+        // Will need to mock the collector factory though
+        $storage = (new Storage())
+            ->setHash('9876543210987654321098765432109876543210')
+            ->setBasename('test.png');
+        $collectorMock = $this->createMock(Collector::class);
+        $collectorMock->method('getFirst')->willReturn($storage);
+
+        /** @var CollectorFactory|MockObject $collectorFactoryMock */
+        $collectorFactoryMock = $this->createMock(CollectorFactory::class);
+        $collectorFactoryMock->method('build')->willReturn($collectorMock);
+
+        yield 'update file' => [
+            [
+                'file' => 'file:9876543210987654321098765432109876543210:test.png',
+            ],
+            (clone $baseModel),
+            (clone $baseModel)
+                ->setStorage($storage)
+                ->setFilename('test.png'),
+            new ArrayToModel($collectorFactoryMock),
+        ];
+
+        yield 'null file' => [
+            [
+                'file' => null,
+            ],
+            (clone $baseModel),
+            (clone $baseModel)
+                ->setStorage(null)
+                ->setFilename(null)
+        ];
 
 
-//        $timezone = new DateTimeZone('+00:00');
-//        yield 'dates - deleted at not included' => [
-//            [
-//                'createdAt' => '2020-01-01T00:00:00+00:00',
-//                'updatedAt' => '2020-02-01T00:00:00+00:00',
-//                'deletedAt' => '2020-03-01T00:00:00+00:00',
-//            ],
-//            (new Model())
-//                ->setCreatedAt(new Alaress_Date_Format('2020-01-01T00:00:00+00:00', DATE_ATOM, $timezone))
-//                ->setUpdatedAt(new Alaress_Date_Format('2020-02-01T00:00:00+00:00', DATE_ATOM, $timezone)),
-//        ];
-//
-//        yield 'storage' => [
-//            [
-//                'storage'  => [
-//                    'hash' => '1234567890123456789012345678901234567890',
-//                ],
-//                'filename' => 'test.gif',
-//            ],
-//            (new Model())
-//                ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
-//                ->setFilename('test.gif'),
-//        ];
-//
-//        yield 'users' => [
-//            [
-//                'creator'   => ['id' => 55],
-//                'recipient' => ['id' => 193],
-//            ],
-//            (new Model())
-//                ->setCreator((new User())->setId(55))
-//                ->setRecipient((new User())->setId(193)),
-//        ];
-//
-//        yield 'discussion thread' => [
-//            [
-//                'discussionThread' => ['id' => 14],
-//            ],
-//            (new Model())
-//                ->setDiscussionThread((new DiscussionThread())->setId(14)),
-//        ];
-//
-//        // Storage file upload: require a mock here
-//        $storage = (new Storage())
-//            ->setHash('1234567890123456789012345678901234567890')
-//            ->setBasename('test.gif');
-//        $collectorMock = $this->createMock(Collector::class);
-//        $collectorMock->method('getFirst')->willReturn($storage);
-//
-//        /** @var CollectorFactory|MockObject $collectorFactoryMock */
-//        $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-//        $collectorFactoryMock->method('build')->willReturn($collectorMock);
-//
-//        yield 'file upload' => [
-//            [
-//                'file' => 'file:1234567890123456789012345678901234567890:test.gif',
-//            ],
-//            (new Model())
-//                ->setStorage($storage)
-//                ->setFilename('test.gif'),
-//            new ArrayToModel($collectorFactoryMock),
-//        ];
+        // Storage and filename are mutable:
+        // but will they ever be mutated via their individual fields?
+        yield 'update storage' => [
+            [
+                'storage' => ['hash' => '12345']
+            ],
+            (clone $baseModel),
+            (clone $baseModel)
+                ->setStorage((new Storage())->setHash('12345')),
+            new ArrayToModel($collectorFactoryMock),
+        ];
+
+        yield 'null storage' => [
+            [
+                'storage' => null,
+            ],
+            (clone $baseModel),
+            (clone $baseModel)
+                ->setStorage(null),
+        ];
+
+        yield 'null storage hash' => [
+            [
+                'storage' => ['hash' => null],
+            ],
+            (clone $baseModel),
+            (clone $baseModel)
+                ->setStorage(null),
+        ];
+
+        yield 'update filename' => [
+            [
+                'filename' => 'test.png',
+            ],
+            (clone $baseModel),
+            (clone $baseModel)
+                ->setFilename('test.png'),
+            new ArrayToModel($collectorFactoryMock),
+        ];
+
+        yield 'null filename' => [
+            [
+                'filename' => null,
+            ],
+            (clone $baseModel),
+            (clone $baseModel)
+                ->setFilename(null)
+        ];
     }
 
 
