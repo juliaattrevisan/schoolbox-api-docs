@@ -370,7 +370,6 @@ class AllFieldsTest extends TestCase
             (clone $baseModel),
             (clone $baseModel),
         ];
-
     }
 
 

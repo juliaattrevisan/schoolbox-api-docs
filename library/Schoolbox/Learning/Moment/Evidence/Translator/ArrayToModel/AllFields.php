@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -162,7 +163,8 @@ class AllFields
 
         if (array_key_exists('storage', $json)) {
             if (isset($json['storage'])) {
-                if (is_array($json['storage'])
+                if (
+                    is_array($json['storage'])
                     && array_key_exists('hash', $json['storage'])
                 ) {
                     if (!isset($json['storage']['hash'])) {
