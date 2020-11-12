@@ -207,7 +207,7 @@ class ArrayToModelTest extends TestCase
         yield 'update creator' => [
             ['creator' => ['id' => $newId,],],
             (clone $baseModel),
-            (clone $baseModel)->setCreator((new User())->setId($newId))
+            (clone $baseModel)
         ];
 
         yield 'null creator' => [
@@ -245,7 +245,7 @@ class ArrayToModelTest extends TestCase
         ];
 
 
-        // Recipient should not be mutable
+        // Recipient is not mutable
         yield 'update recipient' => [
             ['recipient' => ['id' => $newId,],],
             (clone $baseModel),
