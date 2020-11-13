@@ -188,10 +188,10 @@ export default {
                     // thread, clear the pending comment box
                     self.commentThread.children.metadata.count += 1;
                     self.commentThread.children.data.unshift(response.data);
-                    self.$refs.toast.timeout('Saved', true, 2000);
+                    self.$refs.toast.timeout('Comment posted', true, 2000);
                     self.pendingComment = '';
                 })
-                .catch(() => self.$refs.toast.timeout('Save failed', false, 5000))
+                .catch(() => self.$refs.toast.timeout('Comment post failed', false, 5000))
                 .finally(() => self.saveInProgress = false)
         },
 
@@ -286,8 +286,8 @@ export default {
                         <h2>Please confirm</h2>
                         <p>Are you sure you want to delete this comment?</p>
                         <ul class="flex-list buttons">
-                            <li><a @click.prevent="deleteComment(commentIndexToDelete)" class="button submit">OK</a></li>
-                            <li><a @click.prevent="$refs.deleteModal.close" class="button">Cancel</a></li>
+                            <li><a @click.prevent="deleteComment(commentIndexToDelete)" class="button submit">Yes</a></li>
+                            <li><a @click.prevent="$refs.deleteModal.close" class="button">No</a></li>
                         </ul>
                     </template>
                 </reveal-modal>

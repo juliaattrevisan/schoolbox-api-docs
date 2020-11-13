@@ -76,7 +76,7 @@
 
         var settings = $.extend(true, {}, defaults, dataOptions, options);
 
-        var modal        = $('<div data-reveal class="reveal-modal" />');
+        var modal        = $('<div data-reveal class="reveal-modal small" />');
         var h2 = $('<h2 />');
         h2.text(settings.header );
 
