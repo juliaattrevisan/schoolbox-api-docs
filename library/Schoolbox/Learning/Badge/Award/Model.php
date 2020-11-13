@@ -51,12 +51,6 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @var int
-     */
-    private int $level;
-
-
-    /**
      * @var User
      */
     private User $awardedBy;
@@ -124,26 +118,6 @@ class Model implements ISoftDeletable
     public function setStatus(string $status): self
     {
         $this->status = $status;
-        return $this;
-    }
-
-
-    /**
-     * @return int
-     */
-    public function getLevel(): int
-    {
-        return $this->level;
-    }
-
-
-    /**
-     * @param int $level
-     * @return Model
-     */
-    public function setLevel(int $level): self
-    {
-        $this->level = $level;
         return $this;
     }
 

@@ -89,7 +89,6 @@ CREATE TABLE IF NOT EXISTS `badge_user` (
     `recipient_id` INT UNSIGNED NULL,
     `badge_id` INT UNSIGNED NULL,
     `status` ENUM('goal', 'achieved') NULL,
-    `level` INT NULL,
     `awarded_by` INT UNSIGNED NULL,
     `awarded_at` DATETIME NULL,
     `deleted_at` DATETIME NULL,
