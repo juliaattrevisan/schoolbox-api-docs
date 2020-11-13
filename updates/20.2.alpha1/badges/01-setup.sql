@@ -1,14 +1,20 @@
 -- -----------------------------------------------------
 -- Table `badge_category`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `badge_category` (
-    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NULL,
+CREATE TABLE IF NOT EXISTS `badge_category`(
+    `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name`       VARCHAR(255) NULL,
     `created_by` INT UNSIGNED NULL,
-    `created_at` DATETIME NULL,
-    `updated_at` DATETIME NULL,
-    `deleted_at` DATETIME NULL,
-    PRIMARY KEY (`id`))
+    `created_at` DATETIME     NULL,
+    `updated_at` DATETIME     NULL,
+    `deleted_at` DATETIME     NULL,
+    PRIMARY KEY (`id`),
+CONSTRAINT `fk_achievement_badge_category_created_by_id`
+    FOREIGN KEY (`created_by`)
+    REFERENCES `user` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
@@ -88,7 +94,7 @@ COLLATE = utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS `badge_user` (
     `recipient_id` INT UNSIGNED NULL,
     `badge_id` INT UNSIGNED NULL,
-    `status` ENUM('goal', 'achieved') NULL,
+    `status` ENUM('goal', 'achievement') NULL,
     `awarded_by` INT UNSIGNED NULL,
     `awarded_at` DATETIME NULL,
     `deleted_at` DATETIME NULL,
