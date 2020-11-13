@@ -265,6 +265,58 @@ class MapperProxy
 
 
     /**
+     * For a given set of $assesmentIds, find all the assessment ids which share a common
+     * specification; this essentially gets you the other implementations of an assessment
+     * when you're looking for a cohort-context set
+     *
+     * @param array $assessmentIds
+     * @return array
+     * @throws InvalidColumnException
+     * @throws PDOException
+     * @throws UnderflowException
+     */
+    public function findImplementationIdWithCommonSpecificationId(array $assessmentIds): array
+    {
+        /* I could have used a repeated combination of
+         *
+         * foreach ($assessment) {
+         *     $swamp->findSpecificationByImplementationId();
+         *     $swamp findAllImplementationsBySpecificationId();
+         * }
+         *
+         * ...but this is a deeply deeply deeply inefficient way of doing it
+         * Instead make a custom query to find siblings of an assessment implementation
+         */
+        $pb = $this->baseMapper->getPredicateBuilder()
+            ->in('asi1.implementation_assessment_id', $assessmentIds)
+            ->isNull('a.deleted_at');
+
+        $where = implode(' AND ', $pb->getWhere());
+
+        $query = "
+            SELECT
+                asi2.implementation_assessment_id,
+                asi2.specification_assessment_id
+            FROM assessment_specification_implementation asi1
+            INNER JOIN assessment_specification_implementation asi2 ON asi1.specification_assessment_id = asi2.specification_assessment_id
+            INNER JOIN assessment a ON a.id = asi2.implementation_assessment_id
+            WHERE {$where}
+        ";
+
+        $statement = $this->baseMapper->getDatabase()->prepare($query);
+        $statement->execute($pb->getParams());
+
+        $assessmentIds = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $assessmentIds[$row['implementation_assessment_id']] = $row['specification_assessment_id'];
+        }
+
+        return $assessmentIds;
+    }
+
+
+    /**
      * Finds the specification assessment for a implementation assessment.
      *
      * This method does not load participants, because assessments in a unit spec

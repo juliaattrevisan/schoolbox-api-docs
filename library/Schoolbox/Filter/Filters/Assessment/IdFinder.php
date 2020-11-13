@@ -200,6 +200,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     {$nonContextJoin}
                     WHERE {$folderWhere} AND {$nonContextWhereClause}
                     ";
+
             }
             if ($this->subQueryProjectFolder($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
                 $folderJoin   = count($folderParams) ? 'JOIN folder f ON paf.folder_id = f.id' : '';

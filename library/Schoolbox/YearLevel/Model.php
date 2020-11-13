@@ -77,6 +77,11 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
     private $showRubricPoints;
 
     /**
+     * @var bool
+     */
+    private $lmsCohortComparison;
+
+    /**
      * @return string
      */
     public function getName(): ?string
@@ -255,6 +260,26 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
         $this->showRubricPoints = $showRubricPoints;
         return $this;
     }
+
+
+    /**
+     * @return bool
+     */
+    public function getLmsCohortComparison(): bool
+    {
+        return $this->lmsCohortComparison;
+    }
+
+
+    /**
+     * @param bool $lmsCohortComparison
+     */
+    public function setLmsCohortComparison(bool $lmsCohortComparison): self
+    {
+        $this->lmsCohortComparison = $lmsCohortComparison;
+        return $this;
+    }
+
 
     /**
      * Find a key/value representation of this model's data
