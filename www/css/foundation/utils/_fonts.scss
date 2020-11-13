@@ -237,6 +237,11 @@
     font-family: $font-family-icon;
 }
 
+.icon-dollar:before {
+    content: "\e91b";
+    font-family: $font-family-icon;
+}
+
 .icon-download:before {
     content: '\e61e';
     font-family: $font-family-icon;
