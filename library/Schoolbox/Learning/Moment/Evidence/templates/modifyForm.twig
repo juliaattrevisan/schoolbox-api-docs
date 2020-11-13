@@ -1,0 +1,111 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbs(
+    [evidence.recipient.fullName, '/search/user/' ~ evidence.recipient.id],
+    ['Learning Moment', routeLookup('@learningMomentEvidence.getEvidenceDetail', {evidenceId: evidence.id})],
+    ['Modify']
+) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <form action="{{ routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) }}" method="post" id="evidence-form">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label for="evidence-filename">
+                            File
+                        </label>
+                        <input type="hidden" name="filename" id="evidence-filename" />
+                        {% include 'sub/attachzone.twig' with { attachzone: zone } %}
+                        <label for="evidence-body">
+                            Description
+                        </label>
+                        <textarea name="body" id="evidence-body">{{ evidence.body | purify }}</textarea>
+                    </div>
+                </fieldset>
+            </section>
+            <input type="submit" id="evidence-submit" value="Submit" />
+        </form>
+    </div>
+</div>
+
+
+{# Set up CKEditor #}
+<script src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+
+{% autoescape 'js' %}
+<script type="text/javascript">
+    let buildPayload = function (form) {
+        let formData = new FormData(form);
+        return {
+            body: formData.get('body'),
+            file: formData.get('file'),
+        };
+    }
+
+    $(function () {
+
+        let editorId = 'evidence-body';
+        $.fn.alaressEditor({
+            targetElements: $('#' + editorId)
+        });
+
+        // Update the editor's form input on change
+        CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
+
+        // Fill/clear filename input
+        $(function () {
+            let dropzoneInstance = Dropzone.instances.find(v => v.element.id === 'storage-zone');
+            if (dropzoneInstance) {
+                let filenameInput = document.getElementById('evidence-filename');
+                dropzoneInstance.on('addedfile', file => filenameInput.value = file.name);
+                dropzoneInstance.on('removedfile', () => filenameInput.value = '');
+            }
+        });
+
+        // Either body or file is required
+        $('#evidence-form').alaressValidate({
+            rules: {
+                filename: {
+                    required: {
+                        depends: function () {
+                            return $('#evidence-body').val() === '';
+                        },
+                    },
+                },
+            },
+            messages: {
+                filename: {
+                    required: 'Either a file or description is required.',
+                }
+            },
+            submitHandler(form, event) {
+                event.preventDefault();
+
+                // Build a request to post the form
+                let payload = buildPayload(form),
+                    toast   = $('#toast'),
+                    submit  = $('#evidence-submit');
+
+                // Toast then post
+                toast.toastActivate('Saving...')
+                submit.prop('disabled', true);
+
+                // Redirect to the return URL provided
+                axios.put(form.action, payload)
+                    .then(() => {
+                        toast.toastTimeout({text: 'Saved'});
+                        window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
+                    })
+                    .catch(() => {
+                        toast.toastTimeout({text: 'Save failed', css: 'alert'});
+                        submit.prop('disabled', false);
+                    });
+            }
+        })
+    });
+</script>
+{% endautoescape %}
+
+<div id="toast" class="toast"></div>

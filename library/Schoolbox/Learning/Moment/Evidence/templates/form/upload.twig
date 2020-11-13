@@ -4,27 +4,36 @@
     <section>
         <fieldset class="content">
             <div class="small-12 columns">
-                {##
-                 # I can't label attachzones as I would standard file inputs.
-                 #
-                 # I don't think I can make them required either, thus the
-                 # existence of this dummy input with a required rule attached.
-                 # (This input will only fail validation if there's no files
-                 #  attached)
-                 #}
-                <label class="required" for="evidence-filename">
-                    {% block fileUploadLabel %}
-                        Upload File
-                    {% endblock fileUploadLabel %}
-                </label>
-                <input type="hidden" name="filename" id="evidence-filename" required />
-                {% include 'sub/attachzone.twig' with { attachzone: zone } %}
-                {% block fileUploadPreview %}
-                {% endblock fileUploadPreview %}
+                {% block formInputFile %}
+                    {##
+                     # I can't label attachzones as I would standard file inputs.
+                     #
+                     # I don't think I can make them required either, thus the
+                     # existence of this dummy input with a required rule attached.
+                     # (This input will only fail validation if there's no files
+                     #  attached)
+                     #}
+                    <label class="required" for="evidence-filename">
+                        {% block formInputFileLabel %}
+                            Upload File
+                        {% endblock formInputFileLabel %}
+                    </label>
+                    <input type="hidden" name="filename" id="evidence-filename" required />
+                    {% include 'sub/attachzone.twig' with { attachzone: zone } %}
+                    {% block formInputFilePreview %}
+                    {% endblock formInputFilePreview %}
+                {% endblock formInputFile %}
             </div>
         </fieldset>
     </section>
 {% endblock formInputs %}
+
+{% block formInputBody %}
+    <label for="evidence-body">
+        Description
+    </label>
+    <textarea name="body" id="evidence-body"></textarea>
+{% endblock formInputBody %}
 
 {% block formJs %}
     {% autoescape 'js' %}
@@ -35,13 +44,6 @@
                         required: true,
                     },
                 }
-            };
-
-            let buildPayload = function (form) {
-                let formData = new FormData(form);
-                return {
-                    file: formData.get('file'),
-                };
             };
 
             // Fill/clear filename input

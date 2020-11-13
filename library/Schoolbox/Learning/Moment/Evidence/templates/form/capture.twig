@@ -1,13 +1,13 @@
 {% extends '@learningMomentEvidence/form/upload.twig' %}
 
-{% block fileUploadLabel %}
+{% block formInputFileLabel %}
     Say something
-{% endblock fileUploadLabel %}
+{% endblock formInputFileLabel %}
 
-{% block fileUploadPreview %}
+{% block formInputFilePreview %}
     <section class="no-margin">
-        {% block fileUploadPreviewElement %}
-        {% endblock fileUploadPreviewElement %}
+        {% block formInputFilePreviewElement %}
+        {% endblock formInputFilePreviewElement %}
     </section>
 
     {% autoescape 'js' %}
@@ -48,4 +48,4 @@
             });
         </script>
     {% endautoescape %}
-{% endblock fileUploadPreview %}
+{% endblock formInputFilePreview %}

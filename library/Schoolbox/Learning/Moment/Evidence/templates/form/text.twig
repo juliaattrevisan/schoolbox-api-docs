@@ -1,43 +1,20 @@
 {% extends '@learningMomentEvidence/form.twig' %}
 
-{% block formInputs %}
-    <section>
-        <fieldset class="content">
-            <div class="small-12 columns">
-                <label class="required" for="evidence-body">
-                    Write something
-                </label>
-                <textarea name="body" id="evidence-body" required></textarea>
-            </div>
-        </fieldset>
-    </section>
-{% endblock formInputs %}
+{% block formInputBody %}
+    <label class="required" for="evidence-body">
+        Write something
+    </label>
+    <textarea name="body" id="evidence-body" required></textarea>
+{% endblock formInputBody %}
 
 {% block formJs %}
     {% autoescape 'js' %}
         <script type="text/javascript">
-            $(function () {
-                let editorId = 'evidence-body';
-                $.fn.alaressEditor({
-                    targetElements: $('#' + editorId)
-                });
-
-                // Update the editor's form input on change
-                CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
-            });
-
             let buildValidationRules = function () {
                 return {
                     body: {
                         required: true,
                     },
-                };
-            };
-
-            let buildPayload = function (form) {
-                let formData = new FormData(form);
-                return {
-                    body: formData.get('body'),
                 };
             };
         </script>

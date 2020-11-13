@@ -18,7 +18,7 @@
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
 
 <div id="evidence-detail-container">
-    <evidence-detail :evidence="{{ evidence|json_encode }}"></evidence-detail>
+    <evidence-detail :evidence="{{ evidence|json_encode }}" :return-url="{{ RETURN_URL|json_encode }}"></evidence-detail>
 </div>
 <script src="/javascript/components/learningMomentsEvidenceDetail.bundle.js"></script>
 

@@ -250,7 +250,7 @@ class Controller extends Base
 
         // Save the evidence
         $evidenceCollection = $this->mapper->createCollection();
-        $baseModel          = (new Translator\ArrayToModel(new CollectorFactory()))($requestBody)
+        $baseModel          = (new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory()))($requestBody)
             ->setCreator($this->getUser());
         foreach ($users as $user) {
             $evidenceCollection->add(
@@ -273,12 +273,65 @@ class Controller extends Base
 
 
     /**
+     * Display the modify form for a single moment.
+     *
+     * @api   GET /learning/evidence/{id}/modify
+     * @since 20.2
+     * @param Model $evidence
+     */
+    public function getModifyForm(Model $evidence): void
+    {
+        $zone = $this->buildAttachzone();
+        if ($evidence->getStorage()) {
+            $zone->attachFiles([$evidence->getStorage()->getHash()]);
+        }
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningMomentEvidence/modifyForm.twig',
+                [
+                    'evidence' => $evidence,
+                    'zone'     => $zone->getTwigContext(),
+                ]
+            )
+        );
+    }
+
+
+    /**
+     * Updates a single moment.
+     *
+     * @api   PUT /learning/evidence/{id}/modify
+     * @since 20.2
+     * @param Model $evidence
+     */
+    public function putEvidence(Model $evidence): void
+    {
+        $requestBody       = json_decode(json_encode($this->request->content->get()), true);
+        $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
+        $evidence          = $requestTranslator($requestBody, $evidence);
+
+        $this->mapper->save($evidence);
+
+        $responseTranslator = new Translator\ModelToArray\Base(
+            new User\Translator\Author\ModelToArray(),
+            new Storage\Translator\ModelToArray(),
+            new ScrubAdapter(),
+        );
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $responseTranslator($evidence)
+            )
+        );
+    }
+
+
+    /**
      * Delete a single moment.
      *
      * @api   DELETE /learning/evidence/{id}
      * @since 20.2
      * @param Model $evidence
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      */
     public function deleteEvidence(Model $evidence): void
     {

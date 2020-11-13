@@ -89,10 +89,21 @@ class Links
             ]
         );
 
-        /* TODO Figure out what the modify perms will be
-         *  I added this here, it was in there SA-11246 screenshot.
-         */
-        $translation['_links']['modify'] = null;
+        $translation['_links']['modifyForm'] = $this->getRouteIfAuthorized(
+            'learningMomentEvidence.getModifyForm',
+            [
+                'evidenceId' => $evidence->getId(),
+                'creatorId'  => $evidence->getCreator()->getId(),
+            ]
+        );
+
+        $translation['_links']['put'] = $this->getRouteIfAuthorized(
+            'learningMomentEvidence.putEvidence',
+            [
+                'evidenceId' => $evidence->getId(),
+                'creatorId'  => $evidence->getCreator()->getId(),
+            ]
+        );
 
         $translation['_links']['delete'] = $this->getRouteIfAuthorized(
             'learningMomentEvidence.deleteEvidence',
