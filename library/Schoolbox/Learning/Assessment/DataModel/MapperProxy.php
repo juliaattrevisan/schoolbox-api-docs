@@ -271,7 +271,9 @@ class MapperProxy
      *
      * @param array $assessmentIds
      * @return array
+     * @throws InvalidColumnException
      * @throws PDOException
+     * @throws UnderflowException
      */
     public function findImplementationIdWithCommonSpecificationId(array $assessmentIds): array
     {
@@ -285,11 +287,11 @@ class MapperProxy
          * ...but this is a deeply deeply deeply inefficient way of doing it
          * Instead make a custom query to find siblings of an assessment implementation
          */
-        $builder = $this->baseMapper->getPredicateBuilder()
+        $pb = $this->baseMapper->getPredicateBuilder()
             ->in('asi1.implementation_assessment_id', $assessmentIds)
             ->isNull('a.deleted_at');
 
-        $where = implode(' AND ', $builder->getWhere());
+        $where = implode(' AND ', $pb->getWhere());
 
         $query = "
             SELECT
@@ -302,7 +304,7 @@ class MapperProxy
         ";
 
         $statement = $this->baseMapper->getDatabase()->prepare($query);
-        $statement->execute();
+        $statement->execute($pb->getParams());
 
         $assessmentIds = [];
 
