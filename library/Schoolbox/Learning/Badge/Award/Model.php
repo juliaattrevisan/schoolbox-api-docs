@@ -24,6 +24,13 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Consts corresponding to an award Status
+     */
+    public const AWARD_STATUS_GOAL = 'goal';
+    public const AWARD_STATUS_ACHIEVEMENT = 'achievement';
+
+
+    /**
      * @var User
      */
     private User $recipient;
