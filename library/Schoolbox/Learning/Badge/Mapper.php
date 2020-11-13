@@ -38,7 +38,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('badge');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('title', self::TYPE_STRING);
+        $this->uses('name', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
         $this->joins('image_hash', StorageMapper::class, 'hash', null, null, 'image', 'image');
         $this->joins('category_id', Category\Mapper::class, 'id', null, null, 'category', 'category');

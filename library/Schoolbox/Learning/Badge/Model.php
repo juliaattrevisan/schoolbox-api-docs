@@ -30,7 +30,7 @@ class Model implements ISoftDeletable
     /**
      * @var string
      */
-    private string $title;
+    private string $name;
 
 
     /**
@@ -76,19 +76,19 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getTitle(): string
+    public function getName(): string
     {
-        return $this->title;
+        return $this->name;
     }
 
 
     /**
-     * @param string $title
+     * @param string $name
      * @return Model
      */
-    public function setTitle(string $title): self
+    public function setName(string $name): self
     {
-        $this->title = $title;
+        $this->name = $name;
         return $this;
     }
 
