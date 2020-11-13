@@ -255,6 +255,12 @@ class ClassResults
             if ($assessment->isFeedbackVisibleToUser($this->viewer) && $assessment->getMarkScheme()->isQuantitative()) {
                 $participant = $assessment->getParticipantIfExtant($viewee);
 
+                /* Account for null scenario where this person participated but doesn't exist
+                 */
+                if (null === $participant) {
+                    continue;
+                }
+
                 /* Find out what this $viewee accomplished; null normalised marks are disregarded
                  * We optionally apply a gradient colour
                  */

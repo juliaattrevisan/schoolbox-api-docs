@@ -1893,7 +1893,7 @@
     "ckeditor4-vue": {
       "version": "1.1.0",
       "resolved": "https://registry.npmjs.org/ckeditor4-vue/-/ckeditor4-vue-1.1.0.tgz",
-      "integrity": "sha512-dzIobyow+fXrY7Q08Wr7qY5sSpUfAFCydu0m3+JMH3lLC6kiknuvDl6mPnlhaNvYHD0tDU1dlzGFr7G2than0Q==",
+      "integrity": "sha1-9ZZdT5ah353HzmOLax95a1MBU5g=",
       "requires": {
         "load-script": "^1.0.0"
       }
