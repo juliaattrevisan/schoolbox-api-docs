@@ -22,6 +22,11 @@
   article {
     margin-bottom: 1rem;
     margin-top: 1rem;
+
+    // prevent images in posts displaying too large
+    img {
+      max-height: rem-calc(500);
+    }
   }
 }
 
@@ -33,6 +38,9 @@
     padding: 0;
     margin: 0;
     max-width: 100%;
+  }
+  .comment-count {
+    font-weight: $font-weight-semibold;
   }
   .discussion {
     border: 0;
