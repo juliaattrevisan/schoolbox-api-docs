@@ -167,7 +167,7 @@ class Manager
     protected function copy(string $tmpFilePath, Model $storage): bool
     {
         try {
-            if ($storage->getExtension() === 'svg') {
+            if (strtolower((string)$storage->getMimetype()) === 'image/svg+xml') {
                 $this->sanitize(self::FS_TEMP, $tmpFilePath);
             }
             return $this->mountManager->copy(
