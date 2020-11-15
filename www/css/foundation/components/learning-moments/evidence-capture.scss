@@ -50,9 +50,12 @@
   .comment-count {
     font-size: $h2-font-size;
   }
+  .information-list {
+    margin-top: 1rem;
+  }
 }
 
-@media #{$medium-down} {
+@media #{$mediumwide-down} {
   .feed-comments .island {
     border-top: 1px solid $body-bg;
     padding-top: 1rem;

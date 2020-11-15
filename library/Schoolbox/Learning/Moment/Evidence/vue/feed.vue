@@ -170,15 +170,15 @@ export default {
                         </div>
 
                         <div class="feed-body small-12 large-6 column">
-                            <!-- Display evidence body, with media players initialised -->
-                            <media-article v-if="evidence.body">
-                                <div v-html="evidence.body" />
-                            </media-article>
-
                             <!-- Is there an attachment? Display it appropriately -->
                             <article v-if="evidence.filename && evidence.storage">
                                 <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
                             </article>
+
+                            <!-- Display evidence body, with media players initialised -->
+                            <media-article v-if="evidence.body">
+                                <div v-html="evidence.body" />
+                            </media-article>
 
                             <div class="article-read-more">
                                 <a :href="evidence._links.detail">More Detail</a>

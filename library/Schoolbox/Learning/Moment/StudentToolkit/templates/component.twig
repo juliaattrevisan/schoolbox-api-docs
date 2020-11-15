@@ -25,7 +25,7 @@
 </div>
 
 {% if createLearningMomentEvidenceUrl %}
-    <div data-reveal id="component{{ component.instance.id }}-shareWork" aria-hidden="true" class="reveal-modal">
+    <div data-reveal id="component{{ component.instance.id }}-shareWork" aria-hidden="true" class="reveal-modal small">
         <h2>Share a Learning Moment</h2>
         <form id="component{{ component.instance.id }}-shareWork-form" action="{{ createLearningMomentEvidenceUrl }}">
             <input name="{{ RETURN_URL.name }}" value="{{ RETURN_URL.current }}" type="hidden" />

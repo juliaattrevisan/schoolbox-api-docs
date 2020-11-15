@@ -242,9 +242,7 @@ export default {
     <div id="discussion" class="small-12 island">
         <section id="threads-section" class="discussion">
             <div class="discussion-threads">
-                <template v-if="hasComments">
-                    <p class="comment-count">{{ commentThread.children.metadata.count }} comment(s)</p>
-                </template>
+                <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
 
                 <ckeditor tag-name="textarea" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
                 <a class="button submit"
