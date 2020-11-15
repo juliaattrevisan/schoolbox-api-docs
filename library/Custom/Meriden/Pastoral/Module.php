@@ -36,9 +36,12 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'currentReport', $basePath, '/{id}');
-        $this->addGetRoute($router, 'index', $basePath, '/{id}/{year}');
-        $this->addGetRoute($router, 'subject', $basePath, '/{id}/{year}/{subjectCode}');
+        $this->addGetRoute($router, 'currentReport', $basePath, '/{id}')
+             ->addTokens(['id' => '\\d+']);
+        $this->addGetRoute($router, 'index', $basePath, '/{id}/{year}')
+             ->addTokens(['id' => '\\d+', 'year' => '\\d+']);
+        $this->addGetRoute($router, 'subject', $basePath, '/{id}/{year}/{subjectCode}')
+             ->addTokens(['id' => '\\d+', 'year' => '\\d+']);
     }
 
     /**
