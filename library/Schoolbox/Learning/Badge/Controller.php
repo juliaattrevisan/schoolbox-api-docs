@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Badge;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\API\Cursor\MapperCursor;
 
 /**
  * Controller for badge requests.
@@ -40,7 +41,17 @@ class Controller extends Base
         // the JSON will contain the actual results
         if ($this->isJsonRequest()) {
             // Also cursor this request
-            $this->response->content->set($this->buildJsonOutput([]));
+            // Add translators for this object too, write an API spec
+            $cursor = new MapperCursor(
+                $this->mapper,
+                40,
+                ['name' => $this->mapper::SORT_ORDER_ASC]
+            );
+            $results = $cursor->retrieveResults($this->request->query->get('cursor', null));
+            // Run results thru the translator
+            $this->response->content->set(
+                $this->buildJsonOutput([])
+            );
         }
 
         // Output a Twig template
