@@ -20,28 +20,28 @@
                 <div class="small-12 island">
                     {% if comments | length > 0 %}
                         <section>
-                            <ul class="action-list">
+                            <ul class="information-list">
                                 {% for comment in comments %}
                                     <li class="actions-small-1">
                                         <div class="list-item">
-                                            <div class="small-12 card wrap-down">
+                                            <div class="small-12 compact card">
                                                 {% if comment.owner.isDeleted() %}
                                                     {{ profile.imageSquare64(comment.owner) }}
-                                                    <p class="meta">
-                                                        Posted by {{ comment.owner.fullName }}
-                                                        <span title="{{ comment.createdAt.short }}">{{ comment.createdAt.relativeDay }}</span>
+                                                    <p>
+                                                        {{ comment.owner.fullName }}
                                                     </p>
+                                                    <span class="pipe meta" title="{{ comment.createdAt.short }}">{{ comment.createdAt.relativeDay }}</span>
                                                 {% else %}
                                                     <a href="{{ profile.link(comment.owner) }}" title="View Profile">
-                                                    {{ profile.imageSquare64(comment.owner) }}</a>
-                                                    <p class="meta">
-                                                        Posted by <a href="{{ profile.link(comment.owner) }}">{{ comment.owner.fullName }}</a>
-                                                        <span title="{{ comment.createdAt.short }}">{{ comment.createdAt.relativeDay }}</span>
-                                                    </p>
+                                                        {{ profile.imageSquare64(comment.owner) }}
+                                                        <p>
+                                                            {{ comment.owner.fullName }}
+                                                        </p>
+                                                        <span class="pipe meta" title="{{ comment.createdAt.short }}">{{ comment.createdAt.relativeDay }}</span>
+                                                    </a>
                                                 {%  endif %}
-
-                                                <p>{{ comment.body | e('html') | nl2br }}</p>
                                             </div>
+                                            <article>{{ comment.body | purify }}</article>
                                         </div>
                                         <nav>
                                             {% set commentDeleteRoute = routeLookupIfAuthorized('pastoral.postCommentDelete', {'recordId': record.id, 'commentId': comment.id}) %}
@@ -55,8 +55,8 @@
                         </section>
                     {% endif %}
 
-                    <section>
-                        <form class="no-margin" method="post" action="{{ commentInsertRoute }}">
+                    <section class="content">
+                        <form method="post" action="{{ commentInsertRoute }}">
                             <input type="hidden" name="pastoral_id" value="{{ record.id }}"> <input type="hidden" name="student_id" value="{{ record.student.id }}">
                             <textarea id="comment-body-{{ recordType }}" rows="3" cols="50" name="comment_body" placeholder="Add Comment"></textarea>
                             {% if recordType == 'private' %}
@@ -69,12 +69,18 @@
             </div>
         </div>
 
+        <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
         <script type="text/javascript">
             {# Disable the add comment button if text box is empty to prevent saving blank comments #}
 
             $(function () {
-                $('#comment-body-{{ recordType }}').on('change keyup paste', function () {
-                    $('[data-comment-insert-{{ recordType }}]').prop('disabled', $('#comment-body-{{ recordType }}').val().trim() === '');
+                {#$('#comment-body-{{ recordType }}').on('change keyup paste', function () {#}
+                {#    $('[data-comment-insert-{{ recordType }}]').prop('disabled', $('#comment-body-{{ recordType }}').val().trim() === '');#}
+                {#});#}
+
+                $.fn.alaressEditor({
+                    targetElements: $('#comment-body-{{ recordType }}')
                 });
             });
         </script>
