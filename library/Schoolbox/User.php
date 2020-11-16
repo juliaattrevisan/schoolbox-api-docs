@@ -26,6 +26,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Code\SubjectCodeMatchFactory;
+use Schoolbox\Resource\Folder\Code\SubjectMatcherBase;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Pastoral;
 
@@ -1112,7 +1113,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
             if (is_array($subjects)) {
                 foreach ($subjects as $subject) {
-                    $teachers = $externalClass->getTeachers($codeMatcher::generateFolderCode($subject['campusCode'], $subject['code']));
+                    $teachers = $externalClass->getTeachers(SubjectMatcherBase::generateFolderCode($subject['campusCode'], $subject['code']));
 
                     foreach ($teachers as $teacher) {
                         // If we haven't already, add this teacher to their collection
