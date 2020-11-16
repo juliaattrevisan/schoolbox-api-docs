@@ -2,17 +2,11 @@
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
 
 <div id="printable-report" class="e-report">
-    {% include '@customMeridenPastoral/contents/index.twig' with {
-        report:              baseReport,
-        showSubjectSelector: false,
-    } only %}
+    {% include '@customMeridenPastoral/contents/index.twig' with baseReport | merge({showSubjectSelector: false}) only %}
     <br style="page-break-after: always" />
 
     {% for subjectReport in subjectReports %}
-        {% include '@customMeridenPastoral/contents/subject.twig' with {
-            report:              subjectReport,
-            showSubjectSelector: false,
-        } only %}
+        {% include '@customMeridenPastoral/contents/subject.twig' with subjectReport | merge({showSubjectSelector: false}) only %}
         <br style="page-break-after: always" />
     {% endfor %}
 </div>
