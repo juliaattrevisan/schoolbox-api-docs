@@ -162,7 +162,7 @@ class MapperCursor implements ICursor
             // Craft a query builder which will fetch results after the item
             // encoded in the cursor.
             // For example: if this cursor's order is "user_id asc, date desc, id asc"
-            // and the encoded cursor contains "id=50, date=2020-12-12, user_id=65"
+            // and the encoded cursor contains "user_id=65, date=2020-12-12, id=50"
             // then the query builder must include results which match any of:
             // * user_id > 65
             // * user_id = 65 AND date < 2020-12-12
@@ -171,22 +171,30 @@ class MapperCursor implements ICursor
 
             // Create a set of predicate builders, one for each column in the
             // order by list.
-            $builders         = [];
-            $previousBuilders = [];
+            $builders                   = [];
+            $buildersForPreviousColumns = [];
             foreach ($this->order as $column => $orderBy) {
-                if ($orderBy === Mapper::SORT_ORDER_ASC) {
-                    $thisBuilder = $builder->emptyClone()->greaterThan($column, $decodedCursor[$column]);
-                } elseif ($orderBy === Mapper::SORT_ORDER_DESC) {
-                    $thisBuilder = $builder->emptyClone()->lessThan($column, $decodedCursor[$column]);
-                } else {
+                $value = $decodedCursor[$column] ?? null;
+                if (!isset($value)) {
                     continue;
                 }
 
-                $builders[] = array_merge(
-                    $previousBuilders,
-                    [$thisBuilder]
-                );
-                $previousBuilders[] = $builder->emptyClone()->equals($column, $decodedCursor[$column]);
+                // Create a builder for finding all records lt/gt this value
+                if ($orderBy === Mapper::SORT_ORDER_ASC) {
+                    $thisBuilder = $builder->emptyClone()->greaterThan($column, $value);
+                } elseif ($orderBy === Mapper::SORT_ORDER_DESC) {
+                    $thisBuilder = $builder->emptyClone()->lessThan($column, $value);
+                } else {
+                    // This should be an error
+                    continue;
+                }
+
+                $builders[] = array_merge($buildersForPreviousColumns, [$thisBuilder]);
+
+                // Create a builder which matches this column's value, so that
+                // subsequent columns may find records which equal this, but are
+                // lt/gt their value.
+                $buildersForPreviousColumns[] = $builder->emptyClone()->equals($column, $value);
             }
 
 
