@@ -171,8 +171,8 @@ class MapperCursor implements ICursor
 
             // Create a set of predicate builders, one for each column in the
             // order by list.
-            $builders                   = [];
-            $buildersForPreviousColumns = [];
+            $columnBuilders         = [];
+            $previousColumnBuilders = [];
             foreach ($this->order as $column => $orderBy) {
                 $value = $decodedCursor[$column] ?? null;
                 if (!isset($value)) {
@@ -189,36 +189,33 @@ class MapperCursor implements ICursor
                     continue;
                 }
 
-                $builders[] = array_merge($buildersForPreviousColumns, [$thisBuilder]);
+                // Piece together a builder for this order by column:
+                // this builder is lt/gt this column, and also equals the value
+                // of previous columns.
+                // TODO consider an easier way to merge multiple builders together
+                //  $builder->all(...$subBuilders) would be ideal
+                $columnBuilder = $builder->emptyClone();
+                foreach ($previousColumnBuilders as $previousColumnBuilder) {
+                    $columnBuilder = $columnBuilder->all($previousColumnBuilder);
+                }
+                $columnBuilders[] = $columnBuilder->all($thisBuilder);
 
                 // Create a builder which matches this column's value, so that
                 // subsequent columns may find records which equal this, but are
                 // lt/gt their value.
-                $buildersForPreviousColumns[] = $builder->emptyClone()->equals($column, $value);
+                $previousColumnBuilders[] = $builder->emptyClone()->equals($column, $value);
             }
 
 
-            // Create a new one: any of $builders[] may match, but all within
-            // each $builders[] must match
-            $subBuilders = [];
-            foreach ($builders as $subBuilderList) {
-                $subSubBuilder = $builder->emptyClone();
-                foreach ($subBuilderList as $subBuilderItem) {
-                    $subSubBuilder = $subSubBuilder->all($subBuilderItem);
-                }
-                $subBuilders[] = $builder->emptyClone()->all($subSubBuilder);
-            }
-
+            // Put each column builder into the main predicate builder
             $subBuilder = $builder->emptyClone();
-            foreach ($subBuilders as $subBuilder2) {
-                $subBuilder = $subBuilder->any($subBuilder2);
+            foreach ($columnBuilders as $columnBuilder) {
+                // All the builders in the column builder must match
+                $subBuilder = $subBuilder->all($columnBuilder);
             }
-            $builder->any($subBuilder);
+            // Any of the column builders may match
+            $builder = $builder->any($subBuilder);
         }
-
-
-        // Just return the builder
         return $builder;
     }
-
 }
