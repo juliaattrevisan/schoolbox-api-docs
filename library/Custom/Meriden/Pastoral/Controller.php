@@ -105,7 +105,7 @@ class Controller extends Base
         }
 
         $subjectReportDataList = [];
-        foreach ($baseReportData['subjectList'] as $subject) {
+        foreach ($baseReportData['report']['subjectList'] as $subject) {
             /** @var Subject $subject */
             try {
                 $subjectReportDataList[$subject->getSubjectCode()] = $this->buildReportData(

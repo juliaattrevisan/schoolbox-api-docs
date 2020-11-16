@@ -9,7 +9,7 @@
 
     <div class="row" id="context">
         <div class="small-12 column">
-            {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: baseReport.student} %}
+            {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: baseReport.report.student} %}
         </div>
     </div>
 
@@ -18,7 +18,7 @@
         <div class="small-12 medium-4 column">
             <dl>
                 <dt>House</dt>
-                <dd>{{ baseReport.student.schoolHouse.house }}</dd>
+                <dd>{{ baseReport.report.student.schoolHouse.house }}</dd>
             </dl>
         </div>
     </div>
