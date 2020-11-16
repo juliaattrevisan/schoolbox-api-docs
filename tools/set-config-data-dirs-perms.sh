@@ -14,6 +14,7 @@
 readonly LOG=/usr/bin/alaress-logger
 readonly L_DEBUG=100
 readonly L_INFO=200
+readonly L_WARN=300
 readonly L_ERROR=400
 readonly ARG_OWNER='owner'
 readonly ARG_GROUP='group'
@@ -38,6 +39,10 @@ function debug(){
 
 function log(){
   $LOG $L_INFO "$1"
+}
+
+function warn(){
+  $LOG $L_WARN "$1"
 }
 
 function error(){
@@ -227,7 +232,7 @@ function update_directories(){
     if ! dir_path=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = '$data_dir'"); then
       error "Unable to execute mysql command to fetch path for data dir '$data_dir'"
     elif [[ -z $dir_path ]]; then
-      error "Unable to execute mysql command to fetch path for data dir '$data_dir'"
+      warn "No path set for data dir '$data_dir'. Either config name does not exist, or config value is empty. Skipping."
     else
       # Change owner, group, or both
       log "Updating directory ($data_dir): $dir_path"
