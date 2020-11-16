@@ -19,7 +19,7 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Module as DueworkFeedbackModu
 use Schoolbox\Learning\Assessment\DueWork\Response\Module as DueworkResponseModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
-use Schoolbox\Learning\Badge\BadgeModule;
+use Schoolbox\Learning\Badge\Module as BadgeModule;
 use Schoolbox\Learning\Grades;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
 use Schoolbox\Learning\MarkScheme;

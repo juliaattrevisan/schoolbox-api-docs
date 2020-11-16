@@ -17,7 +17,7 @@ use Schoolbox\Role;
 /**
  * Module for badge requests.
  */
-class BadgeModule extends BaseModule
+class Module extends BaseModule
 {
     protected $basename = 'learningBadge';
 
