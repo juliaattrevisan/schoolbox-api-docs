@@ -120,3 +120,7 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
+
+-- Badge Category sequence
+ALTER TABLE `badge_category`
+    ADD COLUMN `sequence` INT(10) UNSIGNED NOT NULL AFTER `name`;

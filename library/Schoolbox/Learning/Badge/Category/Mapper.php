@@ -38,12 +38,14 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
+        $this->uses('Sequence', self::TYPE_INTEGER);
         $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateName']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setSequenceIfUnset']);
     }
 
 
@@ -147,5 +149,39 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return true;
+    }
+
+
+    /**
+     * Sets the model's sequence to the next available value if not already set
+     *
+     * @param Model $model
+     * @return bool
+     */
+    protected function setSequenceIfUnset(Model $model): bool
+    {
+        if (null === $model->getSequence()) {
+            $query = "
+                SELECT MAX(sequence)
+                FROM {$this->getTable()}
+                WHERE deleted_at IS NULL
+            ";
+
+            $maxSequence = $this->getDatabase()->query($query)->fetchColumn();
+            $nextSequence = $maxSequence !== null ? $maxSequence + 1 : $model::sequenceBase();
+
+            $model->setSequence($nextSequence);
+        }
+
+        return true;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
     }
 }

@@ -10,6 +10,8 @@ namespace Schoolbox\Learning\Badge\Category;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\Mapper\Traits\Model\HasSequence;
+use Schoolbox\Sequential;
 use Schoolbox\User;
 
 /**
@@ -17,8 +19,9 @@ use Schoolbox\User;
  *
  * @package Schoolbox\Learning\Badge\Category
  */
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, Sequential
 {
+    use HasSequence;
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
