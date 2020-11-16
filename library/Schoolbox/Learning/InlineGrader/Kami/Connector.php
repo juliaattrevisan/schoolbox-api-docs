@@ -108,7 +108,7 @@ class Connector implements IConnector
         if (!$this->isEnabled()) {
             return false;
         }
-        $request = new Request('GET', $this->getPathGetDocument('FAKE_DOC_ID'));
+        $request = new Request('GET', $this->getPathGetDocument('FAKE_DOC_ID'), ['timeout' => 2]);
         try {
             $response = $this->client->send($request, $this->getOptions());
         } catch (GuzzleException $e) {
