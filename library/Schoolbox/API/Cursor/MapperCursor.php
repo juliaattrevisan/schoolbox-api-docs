@@ -85,10 +85,12 @@ class MapperCursor implements ICursor
         // The fields in the codec ought to match the fields in the last record
         $unencodedCursor = [];
         foreach ($this->order as $column => $orderBy) {
-            $unencodedCursor[$column] = $this->mapper->getModelProperty(
+            $hydrator = $this->mapper->getColumnScalarHydrator($column);
+            $property = $this->mapper->getModelProperty(
                 $lastRecord,
                 $this->mapper->getPropertyFromColumn($column),
             );
+            $unencodedCursor[$column] = $hydrator->hydrate($property);
 
             // Special case for date objects: convert to a database date
             // Alternately: try dehydrating the fields
