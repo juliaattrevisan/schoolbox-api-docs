@@ -177,6 +177,8 @@ class RelationshipFilterer
      * This is technically irrelevant for the LEARNER:INSTRUCTOR relationship, but slightly more performance and likely
      * better reflects expected behaviour.
      *
+     * This no longer returns 'write' access members of groups in which the students involve (SA-10020)
+     *
      * @param int[] $userIds
      * @return int[]
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -209,7 +211,6 @@ class RelationshipFilterer
 
         // Find all class codes these students are in.
         $classCodes = [];
-        $folderIds  = [];
         foreach ($allFolders as $folder) {
             $folderIds[] = $folder->getId();
             foreach ($folder->getCodes() as $code) {
@@ -220,28 +221,15 @@ class RelationshipFilterer
         // Then find the teachers of these classes from synergetic.
         $teacherExternalIds = $this->externalClass->getTeachers(\implode(',', \array_unique($classCodes)));
 
-        $instructorIds = $this->userAccessMapper->findScalarByPredicates(
-            'uid',
-            $this->userAccessMapper->getPredicateBuilder()
-                                   ->equals('service', UserAccess::SERVICE_HOMEPAGE)
-                                   ->in('sid', $folderIds)
-                                   ->equals('type', UserAccess::ACCESS_WRITE)
-        );
 
         // No class teachers or group instructors?
-        if (!\count($teacherExternalIds) && !\count($instructorIds)) {
+        if (!\count($teacherExternalIds)) {
             return [];
         }
 
         $innerPb = $this->userMapper->getPredicateBuilder();
+        $innerPb->in('synergy_id', $teacherExternalIds);
 
-        if (\count($teacherExternalIds)) {
-            $innerPb->in('synergy_id', $teacherExternalIds);
-        }
-
-        if (\count($instructorIds)) {
-            $innerPb->in('id', $instructorIds);
-        }
         $outerPb = $this->userMapper->getPredicateBuilder()
                                     ->any($innerPb)
                                     ->equals('g.group_type', Role::STAFF);
