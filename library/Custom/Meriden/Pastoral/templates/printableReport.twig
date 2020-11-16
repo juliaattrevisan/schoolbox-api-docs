@@ -1,0 +1,36 @@
+<div id="pastoral-report" class="e-report">
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="meriden-crest">
+                {% include '@customMeridenPastoral/sub/crestSvg.twig' %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="context">
+        <div class="small-12 column">
+            {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: baseReport.student} %}
+        </div>
+    </div>
+
+    {# This should include the report without the jump menu #}
+    <div class="row" id="house-info">
+        <div class="small-12 medium-4 column">
+            <dl>
+                <dt>House</dt>
+                <dd>{{ baseReport.student.schoolHouse.house }}</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="row" id="house-info">
+        <div class="small-12 medium-4 column">
+            <dl>
+                {% for subjectReport in subjectReports %}
+                    <dt>{{ subjectReport.report.subjectReport.name }} ({{ subjectReport.report.subjectReport.subjectCode }})</dt>
+                    <dd>{{ subjectReport.report.subjectReport.description }}</dd>
+                {% endfor %}
+            </dl>
+        </div>
+    </div>
+</div>

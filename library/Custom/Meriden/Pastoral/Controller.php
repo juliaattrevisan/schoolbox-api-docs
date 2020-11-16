@@ -12,6 +12,7 @@ namespace Custom\Meriden\Pastoral;
 
 use Alaress\Web\Controller\Base;
 use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
+use Custom\Meriden\Pastoral\StudentInvolvement\Subject;
 use Custom\Meriden\Pastoral\StudentInvolvement\TutorGroup;
 use RangeException;
 use Schoolbox\Role;
@@ -103,7 +104,31 @@ class Controller extends Base
             return;
         }
 
+        $subjectReportDataList = [];
+        foreach ($baseReportData['subjectList'] as $subject) {
+            /** @var Subject $subject */
+            try {
+                $subjectReportDataList[$subject->getSubjectCode()] = $this->buildReportData(
+                    $year,
+                    $student,
+                    $subject->getSubjectCode()
+                );
+            } catch (RangeException $e) {
+                // Skip this one
+                continue;
+            }
+        }
 
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@customMeridenPastoral/printableReport.twig',
+                [
+                    'baseReport'     => $baseReportData,
+                    'subjectReports' => $subjectReportDataList,
+                ],
+                'School Report - ' . $year . ' - ' . $student->formatName()
+            )
+        );
     }
 
 
