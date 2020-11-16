@@ -210,11 +210,9 @@ class Cursor implements ICursor
             if (isset($lastId) && $lastId > 0) {
                 if ($this->order === self::ORDER_ASC) {
                     // Ascending: get only items greater than last ID
-                    /** @noinspection PhpUnhandledExceptionInspection */
                     $builder->greaterThan($this->mapper->getIdentifierColumn(), $lastId);
                 } elseif ($this->order === self::ORDER_DESC) {
                     // Descending: get only items less than last ID
-                    /** @noinspection PhpUnhandledExceptionInspection */
                     $builder->lessThan($this->mapper->getIdentifierColumn(), $lastId);
                 }
             }
@@ -233,11 +231,9 @@ class Cursor implements ICursor
         $pb       = $this->mapper->getPredicateBuilder();
         $threadId = $this->thread->getId();
         try {
-            /** @noinspection PhpUnhandledExceptionInspection */
             $pb = $pb->equals('discussion_thread_id', $threadId);
         } catch (\TypeError $e) {
             // $thread doesn't exist yet
-            /** @noinspection PhpUnhandledExceptionInspection */
             $pb = $pb->isNull('discussion_thread_id');
         }
         return $pb;
