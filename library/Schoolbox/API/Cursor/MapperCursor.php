@@ -12,7 +12,6 @@ use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
-use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 
@@ -43,6 +42,8 @@ class MapperCursor implements ICursor
     /**
      * A codec for encoding a result set into a cursor, and decoding a cursor
      * into a pointer to a result set.
+     *
+     * Defaults to `\Alaress\Codec\Json\Base64`.
      */
     private ICodec $codec;
 
@@ -50,21 +51,23 @@ class MapperCursor implements ICursor
     /**
      * Constructor
      *
-     * @param Mapper $mapper
-     * @param array  $order
-     * @param int    $limit
+     * @param Mapper      $mapper
+     * @param int         $limit
+     * @param array       $order
+     * @param ICodec|null $codec If provided, use this codec to translate the
+     *                           cursor.
+     *                           Defaults to `\Alaress\Codec\Json\Base64`.
      */
     public function __construct(
         Mapper $mapper,
         int $limit,
-        array $order
+        array $order,
+        ?ICodec $codec = null
     ) {
         $this->mapper = $mapper;
-        $this->limit = $limit;
-        $this->order = $order;
-
-        // TODO a codec should be injected
-        $this->codec = new Base64();
+        $this->limit  = $limit;
+        $this->order  = $order;
+        $this->codec  = $codec ?? new Base64();
     }
 
 
