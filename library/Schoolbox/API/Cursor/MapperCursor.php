@@ -85,15 +85,13 @@ class MapperCursor implements ICursor
         // The fields in the codec ought to match the fields in the last record
         $unencodedCursor = [];
         foreach ($this->order as $column => $orderBy) {
+            // Use the hydrator to convert the property into a scalar
             $hydrator = $this->mapper->getColumnScalarHydrator($column);
             $property = $this->mapper->getModelProperty(
                 $lastRecord,
                 $this->mapper->getPropertyFromColumn($column),
             );
             $unencodedCursor[$column] = $hydrator->hydrate($property);
-
-            // Special case for date objects: convert to a database date
-            // Alternately: try dehydrating the fields
         }
 
 
@@ -103,11 +101,18 @@ class MapperCursor implements ICursor
 
 
     /**
-     * @inheritdoc
+     * This cursor cannot reliably generate an encoded cursor to a result set,
+     * so it will always return null.
+     *
+     * This is because it can't guarantee that the column in the final order
+     * clause is unique, so it can't determine what the last result in the
+     * previous cursor would have been.
+     *
+     * @param Collection $collection
+     * @return null
      */
     public function current(Collection $collection): ?string
     {
-        // TODO implement this
         return null;
     }
 
