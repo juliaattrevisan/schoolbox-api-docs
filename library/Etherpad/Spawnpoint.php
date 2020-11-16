@@ -11,6 +11,7 @@ use EtherpadLite\Client;
 use InvalidArgumentException;
 use PDOException;
 use RuntimeException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 
@@ -21,13 +22,6 @@ use UnexpectedValueException;
  */
 class Spawnpoint
 {
-
-    /**
-     * Fallback host when ETHERPAD_HOST wasn't defined
-     */
-    private const ETHERPAD_LOCALHOST = 'http://localhost:9001';
-
-
     /**
      * Messages that worked out equal this string
      */
@@ -60,7 +54,7 @@ class Spawnpoint
     public function __construct()
     {
         $this->authenticator = new Authenticator();
-        $this->etherpadHost = defined('ETHERPAD_HOST') ? ETHERPAD_HOST : self::ETHERPAD_LOCALHOST;
+        $this->etherpadHost = \Config::get(ConfigMapper::NAME_ETHERPAD_HOST);
         $this->apiToken = (string)\Config::get('etherpad_api_token');
     }
 

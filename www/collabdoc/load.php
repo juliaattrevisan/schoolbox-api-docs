@@ -9,6 +9,9 @@
 
 /* Check if the currently logged in user can participate
  */
+
+use Schoolbox\Config\ConfigMapper;
+
 $authenticator = new \Etherpad\Authenticator();
 
 /* Load the pad from our db to get its groupId
@@ -43,7 +46,7 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 
 	/* Find the author id
 	 */
-	$client = new \EtherpadLite\Client(Config::get('etherpad_api_token'), defined('ETHERPAD_HOST') ? ETHERPAD_HOST : 'http://localhost:9001');
+	$client = new \EtherpadLite\Client(Config::get('etherpad_api_token'), Config::get(ConfigMapper::NAME_ETHERPAD_HOST));
 
 	$createResult = $client->createAuthorIfNotExistsFor($_SESSION['user']->getId(), $_SESSION['user']->getFullName());
 	$response = $createResult->getResponse();
@@ -53,7 +56,7 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 	if ($createResult->getMessage() == 'ok') {
 		$etherpadSession = new \Etherpad\Session();
 
-		list($groupId, $padName) = explode('$', $pad->getPadId());
+		[$groupId, $padName] = explode('$', $pad->getPadId());
 
 		$sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimeStamp());
 		$data = $sessionResult->getData();
@@ -68,7 +71,7 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
 			$respawn = new \Etherpad\Spawnpoint();
 			$pad = $respawn->respawn($pad);
 
-			list($groupId, $padName) = explode('$', $pad->getPadId());
+			[$groupId, $padName] = explode('$', $pad->getPadId());
 
 			$sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimeStamp());
 			$data = $sessionResult->getData();

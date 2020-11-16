@@ -9,6 +9,9 @@
 
 /* Check if the currently logged in user can participate
  */
+
+use Schoolbox\Config\ConfigMapper;
+
 $authenticator = new \Etherpad\Authenticator();
 
 /* Load the pad from our db to get its groupId
@@ -35,7 +38,7 @@ if ($authenticator->canCreate($pad->getHomepageId())) {
 
 	/* Save pad contents to db, just in case
 	 */
-	$client = new \EtherpadLite\Client(Config::get('etherpad_api_token') ,defined('ETHERPAD_HOST') ? ETHERPAD_HOST : 'http://localhost:9001');
+	$client = new \EtherpadLite\Client(Config::get('etherpad_api_token'), Config::get(ConfigMapper::NAME_ETHERPAD_HOST));
 	$getTextResult = $client->getHTML($pad->getPadId());
 
 	if ($getTextResult->getMessage() == 'ok') {

@@ -9,6 +9,9 @@
 
 /* Check that you have write permissions
  */
+
+use Schoolbox\Config\ConfigMapper;
+
 $authenticator = new \Etherpad\Authenticator();
 
 if ($_POST['type'] == 'update') {
@@ -48,7 +51,7 @@ else if ($_POST['type'] == 'delete') {
 
 		/* Delete it
 		 */
-		$client = new \EtherpadLite\Client(Config::get('etherpad_api_token'), defined('ETHERPAD_HOST') ? ETHERPAD_HOST : 'http://localhost:9001');
+		$client = new \EtherpadLite\Client(Config::get('etherpad_api_token'), Config::get(ConfigMapper::NAME_ETHERPAD_HOST));
 		$client->deletePad($pad->getPadId());
 
 		/* Soft delete it
