@@ -13,13 +13,15 @@ use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
 use Alaress\Database\Predicate\Builder;
 use InvalidArgumentException;
+use Schoolbox\API\Cursor\ICursor;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 /**
  * Cursor for learning moments.
  */
-class Cursor
+class Cursor implements ICursor
 {
     /**
      * The number of comments to return per request.
@@ -124,10 +126,10 @@ class Cursor
      * This may be useful when retrieving a result set without a cursor, in
      * case the initial result set at this time needs to be fetched.
      *
-     * @param GenericCollection $collection
+     * @param Collection $collection
      * @return string|null
      */
-    public function current(GenericCollection $collection): ?string
+    public function current(Collection $collection): ?string
     {
         $firstRecord = $collection->first();
         if (!$firstRecord instanceof Model) {
@@ -156,10 +158,10 @@ class Cursor
     /**
      * Retrieves a cursor to the next collection.
      *
-     * @param GenericCollection $collection
+     * @param Collection $collection
      * @return string|null
      */
-    public function next(GenericCollection $collection): ?string
+    public function next(Collection $collection): ?string
     {
         $lastRecord = $collection->last();
         if (!$lastRecord instanceof Model) {
