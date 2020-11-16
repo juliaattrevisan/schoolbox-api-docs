@@ -11,13 +11,9 @@
 {% if (recordType == 'public' and access.public) or (recordType == 'private' and access.private)  %}
 
     {% import '@pastoral/macros/profile.twig' as profile %}
-    
+
     <div class="row">
         <div class="small-12 island">
-            {% if access.private %}
-                <h2 class="subheader">{{ heading }}</h2>
-            {% endif %}
-
             {% if not (body is empty and attachments is empty) %}
                 <section class="content">
                     {{ body | purify }}

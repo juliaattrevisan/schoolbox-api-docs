@@ -15,11 +15,11 @@
     {# Only users that are able to make comments should see comments #}
     {% if commentInsertRoute %}
 
-        <div class="content" id="comments">
+        <div id="comments">
             <div class="row">
                 <div class="small-12 island">
                     {% if comments | length > 0 %}
-                        <section class="no-margin">
+                        <section>
                             <ul class="action-list">
                                 {% for comment in comments %}
                                     <li class="actions-small-1">
@@ -55,7 +55,7 @@
                         </section>
                     {% endif %}
 
-                    <section class="content">
+                    <section>
                         <form class="no-margin" method="post" action="{{ commentInsertRoute }}">
                             <input type="hidden" name="pastoral_id" value="{{ record.id }}"> <input type="hidden" name="student_id" value="{{ record.student.id }}">
                             <textarea id="comment-body-{{ recordType }}" rows="3" cols="50" name="comment_body" placeholder="Add Comment"></textarea>

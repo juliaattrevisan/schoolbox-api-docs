@@ -84,16 +84,30 @@
     </div>
 </div>
 
-{# General body #}
+<div class="row">
+    <div class="small-12 island">
+        <dl class="tabs" data-tab>
+            <dd class="active"><a data-tab href="#panel-general">General Content</a></dd>
+            <dd><a data-tab href="#panel-confidential">Confidential Content</a></dd>
+        </dl>
 
-{% include '@pastoral/record_section_body.twig' with { recordType: 'public' } %}
-{% include '@pastoral/record_section_comments.twig' with { comments: commentsPublic, recordType: 'public' } %}
+        <section class="content tabs-content">
+            <div class="content active" id="panel-general">
+                {# General body #}
+                {% include '@pastoral/record_section_body.twig' with { recordType: 'public' } %}
+                {% include '@pastoral/record_section_comments.twig' with { comments: commentsPublic, recordType: 'public' } %}
+            </div>
+            <div class="content" id="panel-confidential">
+                {# Confidential body #}
+                {% if record.bodyPrivate or attachmentsPrivate|length > 0 %}
+                    {% include '@pastoral/record_section_body.twig' with { recordType: 'private' } %}
+                {% endif %}
 
-{# Confidential body #}
-{% if record.bodyPrivate or attachmentsPrivate|length > 0 %}
-    {% include '@pastoral/record_section_body.twig' with { recordType: 'private' } %}
-    {% include '@pastoral/record_section_comments.twig' with { comments: commentsPrivate, recordType: 'private' } %}
-{% endif %}
+                {% include '@pastoral/record_section_comments.twig' with { comments: commentsPrivate, recordType: 'private' } %}
+            </div>
+        </section>
+    </div>
+</div>
 
 {# Only staff can ever see the other information things #}
 {% if user.role.isStaff %}
