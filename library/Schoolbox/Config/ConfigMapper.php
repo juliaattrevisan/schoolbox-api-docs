@@ -124,6 +124,7 @@ class ConfigMapper extends Mapper
 
     public const NAME_JWT_PUBLIC_KEY  = 'jwt_public_key';
     public const NAME_JWT_PRIVATE_KEY = 'jwt_private_key';
+    public const NAME_ETHERPAD_HOST   = 'etherpad_host';
 
     /**
      * @throws \InvalidArgumentException
