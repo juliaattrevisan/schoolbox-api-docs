@@ -68,9 +68,15 @@ class MapperCursor implements ICursor
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function next(Collection $collection): ?string
     {
         $lastRecord = $collection->last();
+        if (!isset($lastRecord)) {
+            return null;
+        }
 
 
         // The fields in the codec ought to match the fields in the last record
@@ -82,6 +88,7 @@ class MapperCursor implements ICursor
             );
 
             // Special case for date objects: convert to a database date
+            // Alternately: try dehydrating the fields
         }
 
 
@@ -90,8 +97,12 @@ class MapperCursor implements ICursor
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function current(Collection $collection): ?string
     {
+        // TODO implement this
         return null;
     }
 
@@ -138,17 +149,25 @@ class MapperCursor implements ICursor
      * Apply a cursor to the predicate builder.
      *
      * @param Builder     $builder
-     * @param string|null $cursor
+     * @param string|null $encodedCursor
      * @return Builder
-     * @throws InvalidColumnException if somehow the query built references a column that doesn't exist
+     * @throws InvalidColumnException if somehow the query built references a
+     *                                column which doesn't exist
      */
-    private function applyCursor(Builder $builder, ?string $cursor): Builder
+    private function applyCursor(Builder $builder, ?string $encodedCursor): Builder
     {
-//        $subBuilder = $builder->emptyClone();
-        if (isset($cursor) && $cursor !== '') {
-            $decodedCursor = $this->codec->decode($cursor);
+        if (isset($encodedCursor) && $encodedCursor !== '') {
+            $decodedCursor = $this->codec->decode($encodedCursor);
 
-//            $nextBuilder   = null;
+            // Craft a query builder which will fetch results after the item
+            // encoded in the cursor.
+            // For example: if this cursor's order is "user_id asc, date desc, id asc"
+            // and the encoded cursor contains "id=50, date=2020-12-12, user_id=65"
+            // then the query builder must include results which match any of:
+            // * user_id > 65
+            // * user_id = 65 AND date < 2020-12-12
+            // * user_id = 65 AND date = 2020-12-12 AND id > 50
+
 
             // Create a set of predicate builders, one for each column in the
             // order by list.
@@ -186,7 +205,6 @@ class MapperCursor implements ICursor
             foreach ($subBuilders as $subBuilder2) {
                 $subBuilder = $subBuilder->any($subBuilder2);
             }
-            $subBuilder = $subBuilder->any($subBuilder);
             $builder->any($subBuilder);
         }
 
