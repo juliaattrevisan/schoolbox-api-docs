@@ -1,36 +1,18 @@
-<div id="pastoral-report" class="e-report">
-    <div class="row">
-        <div class="small-12 columns">
-            <div class="meriden-crest">
-                {% include '@customMeridenPastoral/sub/crestSvg.twig' %}
-            </div>
-        </div>
-    </div>
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
 
-    <div class="row" id="context">
-        <div class="small-12 column">
-            {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: baseReport.report.student} %}
-        </div>
-    </div>
+<div id="printable-report" class="e-report">
+    {% include '@customMeridenPastoral/contents/index.twig' with {
+        report:              baseReport,
+        showSubjectSelector: false,
+    } only %}
+    <br style="page-break-after: always" />
 
-    {# This should include the report without the jump menu #}
-    <div class="row" id="house-info">
-        <div class="small-12 medium-4 column">
-            <dl>
-                <dt>House</dt>
-                <dd>{{ baseReport.report.student.schoolHouse.house }}</dd>
-            </dl>
-        </div>
-    </div>
-
-    <div class="row" id="house-info">
-        <div class="small-12 medium-4 column">
-            <dl>
-                {% for subjectReport in subjectReports %}
-                    <dt>{{ subjectReport.report.subjectReport.name }} ({{ subjectReport.report.subjectReport.subjectCode }})</dt>
-                    <dd>{{ subjectReport.report.subjectReport.description }}</dd>
-                {% endfor %}
-            </dl>
-        </div>
-    </div>
+    {% for subjectReport in subjectReports %}
+        {% include '@customMeridenPastoral/contents/subject.twig' with {
+            report:              subjectReport,
+            showSubjectSelector: false,
+        } only %}
+        <br style="page-break-after: always" />
+    {% endfor %}
 </div>

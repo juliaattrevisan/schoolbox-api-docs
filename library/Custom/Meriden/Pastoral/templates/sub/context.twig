@@ -1,13 +1,16 @@
-<div class="small-12 medium-8 column">
+{% set showSubjectSelector = showSubjectSelector ?? true %}
+<div class="small-12 {% if showSubjectSelector %}medium-8{% endif %} column">
     {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
 </div>
-<div class="small-12 medium-4 column">
-    {% include '@customMeridenPastoral/sub/selector.twig' with {
-        tutorGroupList:   report.tutorGroupList,
-        subjectList:      report.subjectList,
-        student:          report.student,
-        subjectReport:    report.subjectReport,
-        tutorGroupReport: report.tutorGroupReport,
-        roleTypeOverride: report.roleTypeOverride,
-    } %}
-</div>
+{% if showSubjectSelector %}
+    <div class="small-12 medium-4 column">
+        {% include '@customMeridenPastoral/sub/selector.twig' with {
+            tutorGroupList:   report.tutorGroupList,
+            subjectList:      report.subjectList,
+            student:          report.student,
+            subjectReport:    report.subjectReport,
+            tutorGroupReport: report.tutorGroupReport,
+            roleTypeOverride: report.roleTypeOverride,
+        } %}
+    </div>
+{% endif %}
