@@ -12,6 +12,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Code\SubjectMatcherBase;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -185,7 +186,7 @@ class RelationshipFilterer
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function getTeachersAndInstructors(array $userIds): array
+    public function getTeachers(array $userIds): array
     {
         if (!\count($userIds)) {
             return $this->userMapper->createCollection();
@@ -197,29 +198,27 @@ class RelationshipFilterer
 
         $students = $this->userMapper->findByPredicates($pb);
 
-        $allFolders = $this->folderMapper->createCollection();
+        $codeMatcher = new SubjectMatcherBase();
+        $classCodes  = [];
         foreach ($students as $student) {
             // Find all folders where the user is a class student or learner-only.
-            $allFolders = $allFolders->mergeUnique($this->folderMapper->findForUser($student, true, UserAccess::ACCESS_READ, true), 'id');
+            $subjects = $this->externalUser->getSubjectList($student);
+            foreach ($subjects as $subject) {
+                $classCode = $codeMatcher->generateFolderCode($subject['campusCode'], $subject['code']);
+                if (!in_array($classCode, $classCodes)) {
+                    $classCodes[] = $classCode;
+                }
+            }
         }
 
         // Students are not in any groups/classes?
-        if (!$allFolders->count()) {
+        if (!count($classCodes)) {
             // Then they have no teachers
             return [];
         }
 
-        // Find all class codes these students are in.
-        $classCodes = [];
-        foreach ($allFolders as $folder) {
-            $folderIds[] = $folder->getId();
-            foreach ($folder->getCodes() as $code) {
-                $classCodes[] = $code->getCode();
-            }
-        }
-
         // Then find the teachers of these classes from synergetic.
-        $teacherExternalIds = $this->externalClass->getTeachers(\implode(',', \array_unique($classCodes)));
+        $teacherExternalIds = $this->externalClass->getTeachers(\implode(',', $classCodes));
 
 
         // No class teachers or group instructors?

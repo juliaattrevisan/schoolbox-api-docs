@@ -389,7 +389,7 @@ class UserResolver implements IUserResolver
             case Model::RELATIONSHIP_PARENTS_OF:
                 return $this->relationshipFilterer->getParents($userIds);
             case Model::RELATIONSHIP_TEACHERS_OF:
-                return $this->relationshipFilterer->getTeachersAndInstructors($userIds);
+                return $this->relationshipFilterer->getTeachers($userIds);
             default:
                 throw new UnexpectedValueException("Unrecognised relationship modifier: {$relationship}");
         }
