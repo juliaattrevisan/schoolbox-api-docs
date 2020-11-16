@@ -18,8 +18,17 @@ class SubjectMatcherBase implements ISubjectMatcher
         return strcasecmp($sbFolderCode, $sisClass) === 0 || strcasecmp($sbFolderCode, $this->generateFolderCode($sisCampus, $sisClass)) === 0;
     }
 
-    /** @inheritDoc */
-    public function generateFolderCode(?string $sisCampus, string $sisClass): string
+    /**
+     * Consistently generate a Schoolbox folder code from a SIS subject's campus+class codes
+     * 
+     * TODO, consider a synergetic-specific implementation of this that uses a config flag to determine
+     *       whether the campusCode is prefixed.
+     *
+     * @param string|null $sisCampus
+     * @param string      $sisClass
+     * @return string
+     */
+    public static function generateFolderCode(?string $sisCampus, string $sisClass): string
     {
         // This is the canonical implementation (even for Synergetic which has an alternative fuzzy match fallback)
         $sisCampus = trim($sisCampus ?? '');

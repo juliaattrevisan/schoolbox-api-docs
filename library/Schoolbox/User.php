@@ -1112,7 +1112,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
             if (is_array($subjects)) {
                 foreach ($subjects as $subject) {
-                    $teachers = $externalClass->getTeachers($codeMatcher->generateFolderCode($subject['campusCode'], $subject['code']));
+                    $teachers = $externalClass->getTeachers($codeMatcher::generateFolderCode($subject['campusCode'], $subject['code']));
 
                     foreach ($teachers as $teacher) {
                         // If we haven't already, add this teacher to their collection

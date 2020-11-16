@@ -198,13 +198,12 @@ class RelationshipFilterer
 
         $students = $this->userMapper->findByPredicates($pb);
 
-        $codeMatcher = new SubjectMatcherBase();
         $classCodes  = [];
         foreach ($students as $student) {
             // Find all folders where the user is a class student or learner-only.
             $subjects = $this->externalUser->getSubjectList($student);
             foreach ($subjects as $subject) {
-                $classCode = $codeMatcher->generateFolderCode($subject['campusCode'], $subject['code']);
+                $classCode = SubjectMatcherBase::generateFolderCode($subject['campusCode'], $subject['code']);
                 if (!in_array($classCode, $classCodes)) {
                     $classCodes[] = $classCode;
                 }
