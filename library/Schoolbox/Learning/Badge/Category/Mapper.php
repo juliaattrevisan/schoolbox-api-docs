@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Badge\Category;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception\CallbackException;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -41,6 +42,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateName']);
     }
 
 
@@ -95,5 +98,54 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return $collection;
+    }
+
+
+    /**
+     * Validates that the name is not empty and is unique
+     *
+     * @param Model $model
+     * @return bool
+     * @throws CallbackException
+     */
+    protected function validateName(Model $model): bool
+    {
+        if ('' === trim($model->getName() ?? '')) {
+            throw new CallbackException("Achievement Category name cannot be empty");
+        }
+
+        $query = "
+            SELECT id, name
+            FROM {$this->getTable()}
+            WHERE deleted_at IS NULL
+            AND name = :name
+        ";
+
+        $params = [
+            'name' => $model->getName()
+        ];
+
+        /* Updating an existing model shouldn't have its own name count toward collisions
+         * i.e. a model shouldn't collide with itself
+         */
+        if ($model->getId()) {
+            $query .= '
+                AND id != :id
+            ';
+
+            $params['id'] = $model->getId();
+        }
+
+        $collisionRows = $this->getDatabase()->query($query, $params)->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (count($collisionRows)) {
+            $collisions = array_map(static function (array $row) {
+                return "id: {$row['id']}, name: '{$row['name']}'";
+            }, $collisionRows);
+
+            throw new CallbackException("Achievement Category names must be unique. Collisions found: " . implode(', ', $collisions));
+        }
+
+        return true;
     }
 }
