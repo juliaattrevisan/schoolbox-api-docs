@@ -37,7 +37,7 @@ class MapperCursor implements ICursor
     /**
      * The order in which results are retrieved from this mapper.
      */
-    private string $order;
+    private array $order;
 
 
     /**
@@ -51,25 +51,15 @@ class MapperCursor implements ICursor
      * Constructor
      *
      * @param Mapper $mapper
-     * @param string $order
+     * @param array  $order
      * @param int    $limit
-     * @throws InvalidArgumentException if $order isn't one of this class' ORDER_* constants
      */
     public function __construct(
         Mapper $mapper,
         int $limit,
-        string $order = Mapper::SORT_ORDER_ASC
+        array $order
     ) {
         $this->mapper = $mapper;
-
-        if (!in_array($order, [Mapper::SORT_ORDER_ASC, Mapper::SORT_ORDER_ASC], true)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Order must be one of the %s::SORT_ORDER_* constants',
-                    Mapper::class
-                )
-            );
-        }
         $this->limit = $limit;
         $this->order = $order;
 
@@ -82,58 +72,59 @@ class MapperCursor implements ICursor
     {
         $lastRecord = $collection->last();
 
-        // The most basic version: sort by ID
-        if (!$lastRecord instanceof Id) {
-            return null;
+
+        // The fields in the codec ought to match the fields in the last record
+        $unencodedCursor = [];
+        foreach ($this->order as $column => $orderBy) {
+            $unencodedCursor[$column] = $this->mapper->getModelProperty(
+                $lastRecord,
+                $this->mapper->getPropertyFromColumn($column),
+            );
+
+            // Special case for date objects: convert to a database date
         }
 
+
         // The next cursor points to the last record.
-        return $this->codec->encode([
-            'created_at' => $lastRecord->getCreatedAt()->getDatabase(),
-            'id'         => $lastRecord->getId(),
-        ]);
+        return $this->codec->encode($unencodedCursor);
     }
 
 
     public function current(Collection $collection): ?string
     {
-        // TODO: Implement current() method.
+        return null;
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function retrieveResultCount(): ?int
     {
         return $this->mapper->countByPredicates($this->buildPredicateBuilder());
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function retrieveResults(?string $encodedCursor): Collection
     {
         return $this->mapper->findByPredicates(
             $this->applyCursor($this->buildPredicateBuilder(), $encodedCursor),
             [
                 'limit' => $this->limit,
-                'order' => [
-                    'created_at' => $this->order,
-                    'id'         => $this->order,
-                ],
+                'order' => $this->order,
             ]
         )->reindex();
     }
 
 
     /**
-     * Which columns are ordered on?
-     */
-    private function retrieveOrderByProperties(): array
-    {
-        // Allow separate ordering here
-        return ['created_at', 'id',];
-    }
-
-
-    /**
      * Create a predicate builder.
+     *
+     * This may be overridden by subclasses, in order to filter a response to
+     * (for example) only items which belong to a particular user.
      *
      * @return Builder
      */
@@ -153,18 +144,54 @@ class MapperCursor implements ICursor
      */
     private function applyCursor(Builder $builder, ?string $cursor): Builder
     {
+//        $subBuilder = $builder->emptyClone();
         if (isset($cursor) && $cursor !== '') {
-            $lastId = $this->codec->decode($cursor);
-            if (isset($lastId) && $lastId > 0) {
-                if ($this->order === Mapper::SORT_ORDER_ASC) {
-                    // Ascending: get only items greater than last ID
-                    $builder->greaterThan($this->mapper->getIdentifierColumn(), $lastId);
-                } elseif ($this->order ===  Mapper::SORT_ORDER_DESC) {
-                    // Descending: get only items less than last ID
-                    $builder->lessThan($this->mapper->getIdentifierColumn(), $lastId);
+            $decodedCursor = $this->codec->decode($cursor);
+
+//            $nextBuilder   = null;
+
+            // Create a set of predicate builders, one for each column in the
+            // order by list.
+            $builders         = [];
+            $previousBuilders = [];
+            foreach ($this->order as $column => $orderBy) {
+                if ($orderBy === Mapper::SORT_ORDER_ASC) {
+                    $thisBuilder = $builder->emptyClone()->greaterThan($column, $decodedCursor[$column]);
+                } elseif ($orderBy === Mapper::SORT_ORDER_DESC) {
+                    $thisBuilder = $builder->emptyClone()->lessThan($column, $decodedCursor[$column]);
+                } else {
+                    continue;
                 }
+
+                $builders[] = array_merge(
+                    $previousBuilders,
+                    [$thisBuilder]
+                );
+                $previousBuilders[] = $builder->emptyClone()->equals($column, $decodedCursor[$column]);
             }
+
+
+            // Create a new one: any of $builders[] may match, but all within
+            // each $builders[] must match
+            $subBuilders = [];
+            foreach ($builders as $subBuilderList) {
+                $subSubBuilder = $builder->emptyClone();
+                foreach ($subBuilderList as $subBuilderItem) {
+                    $subSubBuilder = $subSubBuilder->all($subBuilderItem);
+                }
+                $subBuilders[] = $builder->emptyClone()->all($subSubBuilder);
+            }
+
+            $subBuilder = $builder->emptyClone();
+            foreach ($subBuilders as $subBuilder2) {
+                $subBuilder = $subBuilder->any($subBuilder2);
+            }
+            $subBuilder = $subBuilder->any($subBuilder);
+            $builder->any($subBuilder);
         }
+
+
+        // Just return the builder
         return $builder;
     }
 
