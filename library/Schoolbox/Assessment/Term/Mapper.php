@@ -508,4 +508,56 @@ class Mapper extends BaseMapper
             'termId' => $model->getId()
         ]);
     }
+
+
+    /**
+     * Generate a quick and dirty report about Ordinary Term continuity
+     *
+     * @throws PDOException
+     * @throws \DebugBar\DebugBarException
+     * @throws \InvalidArgumentException
+     */
+    public function checkContiguous(): void
+    {
+        $query = "
+            SELECT *
+            FROM {$this->getTable()}
+            LEFT JOIN term_year_level tyl ON {$this->getTable()}.{$this->getIdentifierColumn()} = tyl.term_id
+            WHERE tyl.term_id IS NULL
+            ORDER BY `start`
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute();
+
+        $contiguous = true;
+        $previous = null;
+
+        new \Alaress_Probe('Title', 'Start', 'Actual Finish', 'Diff');
+        new \Alaress_Probe('<hr>');
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            if ($previous) {
+                $d1   = new \Alaress_Date_Format($previous['actual_finish'], \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                $d2   = new \Alaress_Date_Format($row['start'], \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                $diff = $d2->diffInDays($d1);
+
+                new \Alaress_Probe((string)$row['title'], (string)$row['start'], (string)$row['actual_finish'], $diff);
+
+                if ($diff > 1) {
+                    $contiguous = false;
+                }
+            } else {
+                new \Alaress_Probe((string)$row['title'], (string)$row['start'], (string)$row['actual_finish'], '');
+            }
+
+            $previous = $row;
+        }
+
+        if (!$contiguous) {
+            new \Alaress_Probe("<strong style='color:#d00'>Not Contiguous</strong>");
+        } else {
+            new \Alaress_Probe("<strong style='color:#0d0'>Contiguous</strong>");
+        }
+    }
 }
