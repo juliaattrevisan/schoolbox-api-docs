@@ -36,15 +36,19 @@ class Controller extends Base
     }
 
 
+    /**
+     * Retrieve a list of badges.
+     *
+     * Depending on request type, this will fetch either a JSON or HTML result:
+     * The HTML result will only contain a Vue component, the JSON will contain
+     * the actual results.
+     *
+     * @api   GET /learning/badge/
+     * @since 20.2
+     */
     public function getBadges(): void
     {
-        // Depending on request type:
-        // this will fetch either a JSON or HTML result
-        // The HTML result will only contain a Vue component,
-        // the JSON will contain the actual results
         if ($this->isJsonRequest()) {
-            // Also cursor this request
-            // Add translators for this object too, write an API spec
             $cursor     = new MapperCursor(
                 $this->mapper,
                 40,
@@ -59,7 +63,6 @@ class Controller extends Base
                 new Storage\Translator\ModelToArray(),
                 new ScrubAdapter()
             );
-            // Run results thru the translator
             $this->response->content->set(
                 $this->buildJsonOutput([
                     'data'     => $results->map($translator),
