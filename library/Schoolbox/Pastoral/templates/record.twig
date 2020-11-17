@@ -87,9 +87,24 @@
 <div class="row">
     <div class="small-12 island">
         <dl class="tabs" data-tab>
-            <dd class="active"><a data-tab href="#panel-general">General</a></dd>
+            <dd><a data-tab href="#panel-general">General</a></dd>
             <dd><a data-tab href="#panel-confidential">Confidential</a></dd>
         </dl>
+
+        <script>
+            $(function() {
+                switch (window.location.hash) {
+                    case '#panel-confidential':
+                    case '#panel-general':
+                        $('[data-tab] a[href='+window.location.hash+']').trigger('click');
+                        break;
+
+                    default:
+                        $('[data-tab] a[href=#panel-general]').trigger('click');
+                        break;
+                }
+            });
+        </script>
 
         <section class="tabs-content">
             <div class="content active" id="panel-general">
