@@ -50,8 +50,18 @@ class Controller extends Base
             $results = $cursor->retrieveResults($this->request->query->get('cursor', null));
             // Run results thru the translator
             $this->response->content->set(
-                $this->buildJsonOutput([])
+                $this->buildJsonOutput([
+                    'data' => $results,
+                    'metadata' => [
+                        'count' => $cursor->retrieveResultCount(),
+                        'cursor' => [
+                            'next'    => $cursor->next($results),
+                            'current' => $cursor->current($results),
+                        ]
+                    ]
+                ])
             );
+            return;
         }
 
         // Output a Twig template
