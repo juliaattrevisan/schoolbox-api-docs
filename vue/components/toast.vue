@@ -5,13 +5,22 @@
     const STATE_DONE    = 'done';
     const STATE_FAILED  = 'failed';
 
+    const DEFAULT_FADE_DURATION = 2000;
+    const DEFAULT_DISPLAY_DURATION_SUCCESSFUL = 2000;
+    const DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL = 5000;
+
     export default {
+        constants: {
+            DEFAULT_FADE_DURATION,
+            DEFAULT_DISPLAY_DURATION_SUCCESSFUL,
+            DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL,
+        },
         name: "toast",
         data() {
             return {
                 text:         '',
                 state:        STATE_HIDDEN,
-                fadeDuration: 2000,
+                fadeDuration: DEFAULT_FADE_DURATION,
                 hidden:       true,
             };
         },
@@ -40,6 +49,11 @@
                 let self   = this;
                 this.text  = text;
                 this.state = successful ? STATE_DONE : STATE_FAILED;
+                if (duration === undefined) {
+                    duration = successful
+                        ? DEFAULT_DISPLAY_DURATION_SUCCESSFUL
+                        : DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL
+                }
                 if (fadeDuration) {
                     this.fadeDuration = fadeDuration;
                 }

@@ -66,9 +66,9 @@ export default {
                     this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
                     this.metadata.cursor = response?.data?.metadata?.cursor ? response.data.metadata.cursor : null;
-                    this.$refs.toast.timeout('Loaded', true, 2000);
+                    this.$refs.toast.timeout('Loaded', true, Toast.DEFAULT_DISPLAY_DURATION_SUCCESSFUL);
                 })
-                .catch(() => this.$refs.toast.timeout('Loading failed', false, 5000))
+                .catch(() => this.$refs.toast.timeout('Loading failed', false, Toast.DEFAULT_DISPLAY_DURATION_SUCCESSFUL))
                 .finally(() => this.showSkeletonLoader = false);
         },
 
