@@ -574,10 +574,10 @@ class Builder implements IBuilder
      * list of placeholders for an IN condition.
      *
      * @param array  $input
-     * @param string $prefix If not supplied, ? will be used as the placeholder
+     * @param string|null $prefix If not supplied, ? will be used as the placeholder
      *                       for all values.
      *
-     * @return string[] Something like:
+     * @return array Something like:
      *
      *      [
      *          'placeholders' => ":id_0, :id_1, :id_2",

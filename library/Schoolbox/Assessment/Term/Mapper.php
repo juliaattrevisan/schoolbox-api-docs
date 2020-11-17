@@ -470,17 +470,41 @@ class Mapper extends BaseMapper
     /**
      * Sets the actual finish date for all terms as appropriate.
      */
-    public function updateActualFinishDates()
+    public function updateActualFinishDates(): void
     {
+        $query = "
+            SELECT id
+            FROM {$this->getTable()}
+            LEFT JOIN term_year_level tyl ON {$this->getTable()}.{$this->getIdentifierColumn()} = tyl.term_id
+            WHERE tyl.term_id IS NULL
+            ORDER BY `start`
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute();
+
+        $ids = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $ids[] = $row['id'];
+        }
+
+        /* Only update the ordinary terms
+         */
+        $predicate = \Alaress\Database\Predicate\Builder::getArrayBindings($ids, 'i');
+
         $updateTermQuery = $this->getDatabase()->prepare(
             "UPDATE {$this->getTable()} SET `actual_finish` = :actual_finish WHERE `id` = :id"
         );
+
         $selectActualFinishQuery = $this->getDatabase()->query("
             SELECT `current`.`id`, (MIN(`next`.`start`) - INTERVAL 1 DAY) AS `actual_finish`
             FROM {$this->getTable()} `current`
             LEFT JOIN {$this->getTable()} `next` ON `current`.`display_finish` < `next`.`start`
+            WHERE `current`.`id` IN ({$predicate['placeholders']}) AND `next`.`id` IN ({$predicate['placeholders']})
             GROUP BY `current`.`id`;
-        ");
+        ", $predicate['bindings']);
+
         foreach ($selectActualFinishQuery->fetchAll() as $row) {
             $updateTermQuery->execute([
                 'id'            => $row['id'],
