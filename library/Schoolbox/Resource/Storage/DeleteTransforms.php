@@ -129,27 +129,49 @@ class DeleteTransforms extends CliTool\App
      * @param S3Client $s3Client
      * @param string   $bucketName
      * @return int
+     * @throws UnexpectedValueException
      */
     private function deleteFromNonVersionControlledBucket(S3Client $s3Client, string $bucketName): int
     {
-        $verb      = $this->perform() ? "Deleting" : "Would delete";
-        $iterator  = $s3Client->getIterator('ListObjects', [
+        $verb           = $this->perform() ? "Deleting" : "Would delete";
+        $iterator       = $s3Client->getIterator('ListObjects', [
             'Bucket' => $bucketName,
             'Prefix' => FilesystemFactory::PREFIX_STORAGE,
         ]);
-        $filesInS3 = [];
+        $transformsInS3 = [];
+        $storageInS3    = [];
         foreach ($iterator as $i => $object) {
-            if (preg_match("#/([0-9a-f]{40})-[\w-]+$#", $object['Key'])) {
-                $filesInS3[] = $object['Key'];
+            if (preg_match("#/[0-9a-f]{40}-[\w-]+$#", $object['Key'])) {
+                $transformsInS3[] = $object['Key'];
+            } elseif (preg_match("#/[0-9a-f]{40}$#", $object['Key'])) {
+                $storageInS3[$object['Key']] = true;
+            } else {
+                $this->getLogger()->warning("Unrecognised Key: '{$object['Key']}'");
             }
         }
+
+        // Extra safety. Filter to transforms for which we still have the original file
+        $transformsWithOriginal = [];
+        foreach ($transformsInS3 as $transformKey) {
+            $matches = [];
+            if (preg_match("#^(.+/[0-9a-f]{40})-[\w-]+$#", $transformKey, $matches)) {
+                $stripped = $matches[1];
+                if (array_key_exists($stripped, $storageInS3)) {
+                    $transformsWithOriginal[] = $transformKey;
+                }
+            } else {
+                throw new UnexpectedValueException("Unable to derive expected storage filename");
+            }
+        }
+
+
         // Need to do this in chunks of 1000
         $chunkSize  = 1000;
-        $chunkCount = ceil(count($filesInS3) / $chunkSize);
+        $chunkCount = ceil(count($transformsWithOriginal) / $chunkSize);
         for ($i = 0; $i < $chunkCount; $i++) {
             $first = $i * $chunkSize;
-            $last  = min(($i + 1) * $chunkSize - 1, count($filesInS3) - 1);
-            $chunk = array_slice($filesInS3, $first, $last - $first + 1);
+            $last  = min(($i + 1) * $chunkSize - 1, count($transformsWithOriginal) - 1);
+            $chunk = array_slice($transformsInS3, $first, $last - $first + 1);
 
             $objects = [];
             foreach ($chunk as $key) {
@@ -167,7 +189,7 @@ class DeleteTransforms extends CliTool\App
                 ]);
             }
         }
-        return count($filesInS3);
+        return count($transformsWithOriginal);
     }
 
 
@@ -177,11 +199,13 @@ class DeleteTransforms extends CliTool\App
      * @param S3Client $s3Client
      * @param string   $bucketName
      * @return int
+     * @throws UnexpectedValueException
      */
     private function deleteFromVersionControlledBucket(S3Client $s3Client, string $bucketName): int
     {
         $verb        = $this->perform() ? "Deleting" : "Would delete";
         $allVersions = [];
+        $storageInS3 = [];
         $keyMarker   = $versionMarker = '';
         do {
             $args = [
@@ -195,21 +219,39 @@ class DeleteTransforms extends CliTool\App
             $result   = $s3Client->listObjectVersions($args);
             $versions = $result->get('Versions') ?? [];
             foreach ($versions as $version) {
-                if (preg_match("#/([0-9a-f]{40})-[\w-]+$#", $version['Key'])) {
+                if (preg_match("#/[0-9a-f]{40}-[\w-]+$#", $version['Key'])) {
                     $allVersions[] = ['Key' => $version['Key'], 'VersionId' => $version['VersionId']];
+                } elseif (preg_match("#/[0-9a-f]{40}$#", $version['Key'])) {
+                    $storageInS3[$version['Key']] = true;
+                } else {
+                    $this->getLogger()->warning("Unrecognised Key: '{$version['Key']}'");
                 }
             }
             $keyMarker     = $result->get('NextKeyMarker');
             $versionMarker = $result->get('NextVersionIdMaker');
         } while ($keyMarker);
 
+        // Extra safety. Filter to transforms for which we still have the original file
+        $transformsWithOriginal = [];
+        foreach ($allVersions as $version) {
+            $matches = [];
+            if (preg_match("#^(.+/[0-9a-f]{40})-[\w-]+$#", $version['Key'], $matches)) {
+                $stripped = $matches[1];
+                if (array_key_exists($stripped, $storageInS3)) {
+                    $transformsWithOriginal[] = $version;
+                }
+            } else {
+                throw new UnexpectedValueException("Unable to derive expected storage filename");
+            }
+        }
+
         // Need to do this in chunks of 1000
         $chunkSize  = 1000;
-        $chunkCount = ceil(count($allVersions) / $chunkSize);
+        $chunkCount = ceil(count($transformsWithOriginal) / $chunkSize);
         for ($i = 0; $i < $chunkCount; $i++) {
             $first = $i * $chunkSize;
-            $last  = min(($i + 1) * $chunkSize - 1, count($allVersions) - 1);
-            $chunk = array_slice($allVersions, $first, $last - $first + 1);
+            $last  = min(($i + 1) * $chunkSize - 1, count($transformsWithOriginal) - 1);
+            $chunk = array_slice($transformsWithOriginal, $first, $last - $first + 1);
 
             foreach ($chunk as $object) {
                 $this->getLogger()->debug("$verb s3 transform. Key: '{$object['Key']}', VersionId: '{$object['VersionId']}'");
@@ -224,7 +266,7 @@ class DeleteTransforms extends CliTool\App
                 ]);
             }
         }
-        return count($allVersions);
+        return count($transformsWithOriginal);
     }
 
 
