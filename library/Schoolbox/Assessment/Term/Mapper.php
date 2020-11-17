@@ -468,7 +468,10 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Sets the actual finish date for all terms as appropriate.
+     * Update all Ordinary Terms (these are Terms with zero Year Level relations) so that
+     * their start and actual_finish dates are continuous. Other entities in schoolbox often
+     * depend on existing within these date ranges, so if you have a gap you'll be unable
+     * to access such entities.
      */
     public function updateActualFinishDates(): void
     {
