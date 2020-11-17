@@ -1,9 +1,12 @@
 <script>
 
-import axios  from 'axios';
-// import moment from 'moment';
+import axios from 'axios';
+import Toast from "@schoolbox/toast";
+import RevealModal from "@schoolbox/reveal-modal";
+import BadgeDetail from "./badgeDetail";
 
 export default {
+    components: {BadgeDetail, RevealModal, Toast},
     props: {
         getBadgesRoute: {
             type: String,
@@ -16,37 +19,16 @@ export default {
     },
     data() {
         return {
-            data:     [],
+            currentBadge: {},
+            data: [],
             metadata: {
-                count:  null,
+                count: null,
                 cursor: null,
             },
             showSkeletonLoader: true,
         }
     },
     computed: {
-        // config: () => window.learningEvidenceFeedConfig,
-        // dateDisplayFormats: () => window.dateDisplayFormats,
-        // groupedEvidence() {
-        //     return this.groupEvidence(this.data);
-        // },
-        // currentCount () {
-        //     return data.length;
-        // },
-        // ckeditorConfig () {
-        //     // Use the same config as the editor in the news does
-        //     return window.jQuery.alaressEditorConfig({
-        //         removePlugins: 'uploadimage,link,schoolboxanchor',
-        //         removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
-        //         toolbarGroups: [
-        //             {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-        //             {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-        //             {name: 'links', groups: ['links']},
-        //             {name: 'insert', groups: ['insert']},
-        //             {name: 'schoolbox', groups: ['schoolboxlink']},
-        //         ],
-        //     });
-        // },
     },
     mounted() {
         this.load();
@@ -61,12 +43,12 @@ export default {
         },
 
         /**
-         * Appends learning evidence to the data list.
+         * Appends badges to the data list.
          *
          * @param {String|null} cursor
          */
         append(cursor) {
-            // This is very generic, a candidate to be factored into its own place
+            // TODO this is very generic, a candidate to be factored into its own place
             let params = {};
             if (cursor) {
                 params.cursor = cursor;
@@ -82,12 +64,13 @@ export default {
         },
 
         /**
-         * Opens a modal window for modifying this badge.
+         * Opens a modal window for viewing this badge's full details.
          *
          * @param {Object} badge
          */
-        openModifyModal(badge) {
-            //
+        openDetailModal(badge) {
+            this.currentBadge = badge;
+            this.$refs.detailModal.open();
         },
     },
 }
@@ -108,14 +91,19 @@ export default {
             <ul class="information-list">
                 <li v-for="badge in data">
                     <div class="card small-12">
-                        <img :src="badge.image._links.image" :alt="badge.name" />
-                        <a @click.prevent="openModifyModal(badge)">
+                        <img :src="badge.image._links.image" :alt="badge.name"/>
+                        <a @click.prevent="openDetailModal(badge)">
                             <p>{{ badge.name }}</p>
                         </a>
                     </div>
                 </li>
             </ul>
         </section>
-    </div>
 
+        <reveal-modal ref="detailModal">
+            <badge-detail :badge="currentBadge"></badge-detail>
+        </reveal-modal>
+
+        <toast ref="toast"></toast>
+    </div>
 </template>
