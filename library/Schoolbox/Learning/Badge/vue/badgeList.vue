@@ -112,10 +112,12 @@ export default {
                 <ul class="grid small-block-grid-2 medium-block-grid-3 large-block-grid-4">
                     <li v-for="badge in data">
                         <!-- I'd apply the click to the entire <li> but that intercepts dropdown clicks -->
-                        <img :src="badge.image._links.image" :alt="badge.name" @click.prevent="openDetailModal(badge)" />
+                        <a @click.prevent="openDetailModal(badge)">
+                            <img :src="badge.image._links.image" :alt="badge.name" />
+                        </a>
                         <div class="actions-small-1">
-                            <div class="compact card list-item">
-                                <p><a @click.prevent="openDetailModal(badge)">{{ badge.name }}</a></p>
+                            <div class="compact card list-item" @click.prevent="openDetailModal(badge)">
+                                <h3><a>{{ badge.name }}</a></h3>
                                 <p class="meta" v-if="badge.category">{{ badge.category.name }}</p>
                             </div>
                             <nav>
