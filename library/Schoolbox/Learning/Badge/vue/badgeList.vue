@@ -59,13 +59,16 @@ export default {
             if (cursor) {
                 params.cursor = cursor;
             }
+            this.$refs.toast.activate('Loading...');
             axios
                 .get(this.getBadgesRoute, {params})
                 .then(response => {
                     this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
                     this.metadata.cursor = response?.data?.metadata?.cursor ? response.data.metadata.cursor : null;
+                    this.$refs.toast.timeout('Loaded', true, 2000);
                 })
+                .catch(() => this.$refs.toast.timeout('Loading failed', false, 5000))
                 .finally(() => this.showSkeletonLoader = false);
         },
 
@@ -137,6 +140,11 @@ export default {
                     </li>
                 </ul>
             </template>
+
+            <!-- Load more button, if there are more to load -->
+            <a @click.prevent="append(metadata.cursor.next)"
+               class="button expand"
+               v-if="metadata.cursor.next && data.length < metadata.count">Load more</a>
         </section>
 
         <reveal-modal ref="detailModal">
