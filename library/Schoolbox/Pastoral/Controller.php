@@ -605,11 +605,19 @@ class Controller extends Base
 
             // Go back to pastoral record
 
+            /* If you posted a confidential comment, go back and open the confidential tab
+             */
+            $hash = '';
+
+            if ($post['comment_private']) {
+                $hash = '#panel-confidential';
+            }
+
             $this->getResponse()->redirect->afterPost(
                 $this->getrouter()->generate('pastoral.getStudentRecord', [
                     'studentId' => $post['student_id'],
                     'recordId'  => $record->getId(),
-                ])
+                ]) . $hash
             );
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
