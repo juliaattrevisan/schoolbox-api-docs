@@ -1,40 +1,14 @@
-<section>
-    <dl class="accordion" data-accordion>
-
-        {# Content #}
-
-        <dd class="accordion-navigation active">
-            <a href="#panelPublic" aria-expanded="true">General</a>
-            <div id="panelPublic" class="content active">
-                <section class="no-margin">
-                    <fieldset class="content no-padding">
-                        <div class="small-12 columns">
-                            <section class="no-margin">
-                                <textarea id="body_public" name="body_public">{{ record.bodyPublic }}</textarea>
-                                {% include 'sub/attachzone.twig' with {attachzone: attachzonePublic} %}
-                            </section>
-                        </div>
-                    </fieldset>
-                </section>
-            </div>
-        </dd>
-
-        {# Confidential Content #}
-
-        <dd class="accordion-navigation">
-            <a href="#panelPrivate">{{ locale.pastoralPrivate.proper }}</a>
-            <div id="panelPrivate" class="content">
-                <section class="no-margin">
-                    <fieldset class="content no-padding">
-                        <div class="small-12 columns">
-                            <section class="no-margin">
-                                <textarea id="body_private" name="body_private">{{ record.bodyPrivate }}</textarea>
-                                {% include 'sub/attachzone.twig' with {attachzone: attachzonePrivate} %}
-                            </section>
-                        </div>
-                    </fieldset>
-                </section>
-            </div>
-        </dd>
-    </dl>
+<dl class="tabs" data-tab>
+    <dd class="active"><a data-tab href="#panel-general">General</a></dd>
+    <dd><a data-tab href="#panel-confidential">Confidential</a></dd>
+</dl>
+<section class="content tabs-content">
+    <div class="content active" id="panel-general">
+        <textarea id="body_public" name="body_public">{{ record.bodyPublic }}</textarea>
+        {% include 'sub/attachzone.twig' with {attachzone: attachzonePublic} %}
+    </div>
+    <div class="content" id="panel-confidential">
+        <textarea id="body_private" name="body_private">{{ record.bodyPrivate }}</textarea>
+        {% include 'sub/attachzone.twig' with {attachzone: attachzonePrivate} %}
+    </div>
 </section>

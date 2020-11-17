@@ -11,13 +11,9 @@
 {% if (recordType == 'public' and access.public) or (recordType == 'private' and access.private)  %}
 
     {% import '@pastoral/macros/profile.twig' as profile %}
-    
+
     <div class="row">
         <div class="small-12 island">
-            {% if access.private %}
-                <h2 class="subheader">{{ heading }}</h2>
-            {% endif %}
-
             {% if not (body is empty and attachments is empty) %}
                 <section class="content">
                     {{ body | purify }}
@@ -38,12 +34,6 @@
                         {% endfor %}
                     {% endif %}
                 </section>
-            {% else %}
-                {% set routeRecordUpdate = routeLookupIfAuthorized('pastoral.getStudentRecordUpdateForm', {'studentId': record.student.id, 'recordId': record.id}) %}
-                <div class="empty-state">
-                    <i class="icon-pastoral"></i>
-                    <p>There is no content yet. {% if routeRecordUpdate %} <a href={{ routeRecordUpdate }}> Edit this pastoral record. </a> {% endif %}</p>
-                </div>
             {% endif %}
         </div>
     </div>
