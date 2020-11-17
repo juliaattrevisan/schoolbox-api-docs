@@ -10,6 +10,8 @@ namespace Schoolbox\Learning\Badge\Category;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\Mapper\Traits\Model\HasSequence;
+use Schoolbox\Sequential;
 use Schoolbox\User;
 
 /**
@@ -17,8 +19,9 @@ use Schoolbox\User;
  *
  * @package Schoolbox\Learning\Badge\Category
  */
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, Sequential
 {
+    use HasSequence;
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
@@ -26,21 +29,21 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @var User
+     * @var User|null
      */
-    private User $createdBy;
+    private ?User $createdBy = null;
 
 
     /**
-     * @var string
+     * @var string|null
      */
-    private string $name;
+    private ?string $name = null;
 
 
     /**
-     * @return User
+     * @return User|null
      */
-    public function getCreatedBy(): User
+    public function getCreatedBy(): ?User
     {
         return $this->createdBy;
     }
@@ -59,9 +62,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }

@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Badge\Category;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception\CallbackException;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -37,10 +38,14 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
+        $this->uses('Sequence', self::TYPE_INTEGER);
         $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateName']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setSequenceIfUnset']);
     }
 
 
@@ -95,5 +100,88 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return $collection;
+    }
+
+
+    /**
+     * Validates that the name is not empty and is unique
+     *
+     * @param Model $model
+     * @return bool
+     * @throws CallbackException
+     */
+    protected function validateName(Model $model): bool
+    {
+        if ('' === trim($model->getName() ?? '')) {
+            throw new CallbackException("Achievement Category name cannot be empty");
+        }
+
+        $query = "
+            SELECT id, name
+            FROM {$this->getTable()}
+            WHERE deleted_at IS NULL
+            AND name = :name
+        ";
+
+        $params = [
+            'name' => $model->getName()
+        ];
+
+        /* Updating an existing model shouldn't have its own name count toward collisions
+         * i.e. a model shouldn't collide with itself
+         */
+        if ($model->getId()) {
+            $query .= '
+                AND id != :id
+            ';
+
+            $params['id'] = $model->getId();
+        }
+
+        $collisionRows = $this->getDatabase()->query($query, $params)->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (count($collisionRows)) {
+            $collisions = array_map(static function (array $row) {
+                return "id: {$row['id']}, name: '{$row['name']}'";
+            }, $collisionRows);
+
+            throw new CallbackException("Achievement Category names must be unique. Collisions found: " . implode(', ', $collisions));
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Sets the model's sequence to the next available value if not already set
+     *
+     * @param Model $model
+     * @return bool
+     */
+    protected function setSequenceIfUnset(Model $model): bool
+    {
+        if (null === $model->getSequence()) {
+            $query = "
+                SELECT MAX(sequence)
+                FROM {$this->getTable()}
+                WHERE deleted_at IS NULL
+            ";
+
+            $maxSequence = $this->getDatabase()->query($query)->fetchColumn();
+            $nextSequence = $maxSequence !== null ? $maxSequence + 1 : $model::sequenceBase();
+
+            $model->setSequence($nextSequence);
+        }
+
+        return true;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
     }
 }

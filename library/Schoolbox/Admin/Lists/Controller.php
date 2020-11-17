@@ -238,6 +238,18 @@ class Controller extends Base
                 if (method_exists($model, $mapper->getGetMethodName('updatedBy'))) {
                     $model->setUpdatedBy($this->getUser()->getId());
                 }
+
+                /* Set the Created By field, if it exists, as this records who created
+                 * this row item. updatedBy a couple lines above uses an int instead of
+                 * a user instance for some reason (probably for compatibility across
+                 * multiple coding styles throughout schoolbox)
+                 */
+                $setCreatedByMethod = $mapper->getSetMethodName('createdBy');
+
+                if (method_exists($model, $setCreatedByMethod)){
+                    $model->$setCreatedByMethod($this->getUser());
+                }
+
                 $mapper->save($model);
             }
         }
@@ -828,6 +840,20 @@ class Controller extends Base
         $return['evidence-tag'] = [
             'title'             => 'Learning Moments',
             'mapper'            => LearningMomentEvidenceTag::class,
+            'delete'            => true,
+            'fields'            => [
+                'name'          => [
+                    'caption'   => 'Name',
+                    'width'     => 12,
+                    'maxLength' => 60,
+                    'mandatory' => true,
+                ],
+            ]
+        ];
+
+        $return['achievement-category'] = [
+            'title'             => 'Achievement Categories',
+            'mapper'            => \Schoolbox\Learning\Badge\Category\Mapper::class,
             'delete'            => true,
             'fields'            => [
                 'name'          => [
