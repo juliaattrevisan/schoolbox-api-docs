@@ -19,6 +19,10 @@ use Schoolbox\User;
  */
 class Controller extends Base
 {
+    // How many badges show per page by default?
+    private const BADGES_PER_PAGE = 40;
+
+
     /**
      * The badge mapper.
      */
@@ -51,7 +55,7 @@ class Controller extends Base
         if ($this->isJsonRequest()) {
             $cursor     = new MapperCursor(
                 $this->mapper,
-                40,
+                self::BADGES_PER_PAGE,
                 [
                     'name' => $this->mapper::SORT_ORDER_ASC,
                     'id'   => $this->mapper::SORT_ORDER_ASC,
