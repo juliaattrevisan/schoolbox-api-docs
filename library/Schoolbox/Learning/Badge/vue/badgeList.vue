@@ -21,6 +21,7 @@ export default {
         return {
             currentBadge: {},
             data: [],
+            search: {},
             metadata: {
                 count: null,
                 cursor: null,
@@ -92,15 +93,29 @@ export default {
                 <i class="icon-schoolbox"></i>
                 <p>No badges have been created yet.</p>
             </div>
-            <ul v-else class="grid small-block-grid-2 medium-block-grid-3 large-block-grid-4">
-                <li v-for="badge in data">
-                    <a @click.prevent="openDetailModal(badge)">
-                        <img :src="badge.image._links.image" :alt="badge.name"/>
-                        <p>{{ badge.name }}</p>
-                        <p class="meta" v-if="badge.category">{{ badge.category.name }}</p>
-                    </a>
-                </li>
-            </ul>
+            <template v-else>
+
+                <!-- Search panel. Should this use the filters system? -->
+                <ul class="flex-list buttons">
+                    <li><input type="text" placeholder="Badge Name" v-model="search.badgeName" /></li>
+                    <li><input type="text" placeholder="Creator" v-model="search.creator" /></li>
+                    <li><input type="text" placeholder="Category" v-model="search.category" /></li>
+                    <li><a href="#">Reset to defaults</a></li>
+                    <li><a href="#" class="submit">Apply filters</a></li>
+                </ul>
+
+                <ul class="grid small-block-grid-2 medium-block-grid-3 large-block-grid-4">
+                    <li v-for="badge in data" @click.prevent="openDetailModal(badge)">
+                        <div class="card small-12">
+                            <img class="no-margin" :src="badge.image._links.image" :alt="badge.name" />
+
+                            <!-- actions go here -->
+                            <p><a>{{ badge.name }}</a></p>
+                            <p class="meta" v-if="badge.category">{{ badge.category.name }}</p>
+                        </div>
+                    </li>
+                </ul>
+            </template>
         </section>
 
         <reveal-modal ref="detailModal">
