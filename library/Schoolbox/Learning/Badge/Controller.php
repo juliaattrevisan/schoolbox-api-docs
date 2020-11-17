@@ -8,8 +8,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge;
 
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Cursor\MapperCursor;
+use Schoolbox\Resource\Storage;
+use Schoolbox\User;
 
 /**
  * Controller for badge requests.
@@ -42,23 +45,31 @@ class Controller extends Base
         if ($this->isJsonRequest()) {
             // Also cursor this request
             // Add translators for this object too, write an API spec
-            $cursor = new MapperCursor(
+            $cursor     = new MapperCursor(
                 $this->mapper,
                 40,
-                ['name' => $this->mapper::SORT_ORDER_ASC]
+                [
+                    'name' => $this->mapper::SORT_ORDER_ASC,
+                    'id'   => $this->mapper::SORT_ORDER_ASC,
+                ]
             );
-            $results = $cursor->retrieveResults($this->request->query->get('cursor', null));
+            $results    = $cursor->retrieveResults($this->request->query->get('cursor', null));
+            $translator = new Translator\ModelToArray(
+                new User\Translator\ModelToArray(),
+                new Storage\Translator\ModelToArray(),
+                new ScrubAdapter()
+            );
             // Run results thru the translator
             $this->response->content->set(
                 $this->buildJsonOutput([
-                    'data' => $results,
+                    'data'     => $results->map($translator),
                     'metadata' => [
-                        'count' => $cursor->retrieveResultCount(),
+                        'count'  => $cursor->retrieveResultCount(),
                         'cursor' => [
                             'next'    => $cursor->next($results),
                             'current' => $cursor->current($results),
-                        ]
-                    ]
+                        ],
+                    ],
                 ])
             );
             return;
