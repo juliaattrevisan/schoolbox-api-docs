@@ -80,6 +80,15 @@ export default {
                 })
                 .finally(() => this.showSkeletonLoader = false);
         },
+
+        /**
+         * Opens a modal window for modifying this badge.
+         *
+         * @param {Object} badge
+         */
+        openModifyModal(badge) {
+            //
+        },
     },
 }
 </script>
@@ -100,7 +109,7 @@ export default {
                 <li v-for="badge in data">
                     <div class="card small-12">
                         <img :src="badge.image._links.image" :alt="badge.name" />
-                        <a :href="evidence.creator._links.profile" title="View Profile">
+                        <a @click.prevent="openModifyModal(badge)">
                             <p>{{ badge.name }}</p>
                         </a>
                     </div>
