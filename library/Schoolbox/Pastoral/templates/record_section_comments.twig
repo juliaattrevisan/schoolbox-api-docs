@@ -78,6 +78,21 @@
             {# Disable the add comment button if text box is empty to prevent saving blank comments #}
             $(function () {
                 $.fn.alaressEditor({
+                    removePlugins: 'uploadimage,link,schoolboxanchor',
+                    removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+                    toolbarGroups: [
+                        {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                        {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
+                        {name: 'links', groups: ['links']},
+                        {name: 'insert', groups: ['insert']},
+
+                        /* Custom schoolbox-specific plugin stuff can go here
+                         * This is a hole into which you may put once-off abilities
+                         * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
+                         * This is typically not used for anything else for now
+                         */
+                        {name: 'schoolbox', groups: ['schoolboxlink']},
+                    ],
                     targetElements: $('#comment-body-{{ recordType }}'),
                     on: {
                         change: function (event) {
