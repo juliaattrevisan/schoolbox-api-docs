@@ -92,15 +92,13 @@ export default {
                 <i class="icon-schoolbox"></i>
                 <p>No badges have been created yet.</p>
             </div>
-            <ul v-else class="information-list">
+            <ul v-else class="grid small-block-grid-2 medium-block-grid-3 large-block-grid-4">
                 <li v-for="badge in data">
-                    <div class="card small-12">
+                    <a @click.prevent="openDetailModal(badge)">
                         <img :src="badge.image._links.image" :alt="badge.name"/>
-                        <a @click.prevent="openDetailModal(badge)">
-                            <p>{{ badge.name }}</p>
-                            <p class="meta" v-if="badge.category">{{ badge.category.name }}</p>
-                        </a>
-                    </div>
+                        <p>{{ badge.name }}</p>
+                        <p class="meta" v-if="badge.category">{{ badge.category.name }}</p>
+                    </a>
                 </li>
             </ul>
         </section>
