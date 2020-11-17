@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Badge\Translator;
 
 use Alaress\HTMLPurifier\IPurifier;
 use Error;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\Learning\Badge\Model;
 
 /**
@@ -83,21 +84,59 @@ class ModelToArray
             $updatedBy = null;
         }
 
+        // Category and nodes should eventually have separate translators.
+        // For now, they just have something inbuilt here.
+        try {
+            $image = $model->getImage();
+        } catch (Error $e) {
+            $image = null;
+        }
+
+        try {
+            $category = $model->getCategory();
+        } catch (Error $e) {
+            $category = null;
+        }
+
+        try {
+            $curriculumNodes = $model->getCurriculumNodes();
+        } catch (Error $e) {
+            $curriculumNodes = null;
+        }
+
+
         return [
             'id'              => $model->getId(),
-            'createdAt'       => $model->getCreatedAt() ? $model->getCreatedAt()->getUsingFormat(DATE_ATOM) : null,
+            'createdAt'       => $model->getCreatedAt() && !$model->getCreatedAt()->isNull()
+                ? $model->getCreatedAt()->getUsingFormat(DATE_ATOM)
+                : null,
             'createdBy'       => $createdBy,
-            'updatedAt'       => $model->getUpdatedAt() ? $model->getUpdatedAt()->getUsingFormat(DATE_ATOM) : null,
+            'updatedAt'       => $model->getUpdatedAt() && !$model->getUpdatedAt()->isNull()
+                ? $model->getUpdatedAt()->getUsingFormat(DATE_ATOM)
+                : null,
             'updatedBy'       => $updatedBy,
             'name'            => $model->getName(),
             'body'            => $this->purifier->purify($model->getBody()),
-            'image'           => $model->getImage()
+            'image'           => $image
                 ? call_user_func($this->storageTranslator, $model->getImage())
                 : null,
-
-            // TODO translate category, curriculum nodes
-            'category'        => null,
-            'curriculumNodes' => null,
+            'category'        => $category
+                ? [
+                    'id'   => $category->getId(),
+                    'name' => $category->getName(),
+                ]
+                : null,
+            'curriculumNodes' => $curriculumNodes
+                ? $curriculumNodes
+                    ->map(static function (Node\Model $node) {
+                        return [
+                            'id'   => $node->getId(),
+                            'name' => $node->getName(),
+                            'code' => $node->getCode(),
+                        ];
+                    })
+                    ->reindex()
+                : null,
         ];
     }
 }
