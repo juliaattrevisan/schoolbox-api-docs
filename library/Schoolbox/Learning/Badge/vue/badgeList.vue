@@ -30,9 +30,14 @@ export default {
         }
     },
     computed: {
+        jQuery: () => window.jQuery,
     },
     mounted() {
         this.load();
+    },
+    updated() {
+        // Re-apply Foundation dropdowns
+        this.$nextTick(() => this.jQuery(this.$el).foundation('dropdown', 'reflow'));
     },
     methods: {
         /**
@@ -105,13 +110,27 @@ export default {
                 </ul>
 
                 <ul class="grid small-block-grid-2 medium-block-grid-3 large-block-grid-4">
-                    <li v-for="badge in data" @click.prevent="openDetailModal(badge)">
-                        <div class="card small-12">
-                            <img class="no-margin" :src="badge.image._links.image" :alt="badge.name" />
-
-                            <!-- actions go here -->
-                            <p><a>{{ badge.name }}</a></p>
-                            <p class="meta" v-if="badge.category">{{ badge.category.name }}</p>
+                    <li v-for="badge in data">
+                        <!-- I'd apply the click to the entire <li> but that intercepts dropdown clicks -->
+                        <img :src="badge.image._links.image" :alt="badge.name" @click.prevent="openDetailModal(badge)" />
+                        <div class="actions-small-1">
+                            <div class="compact card list-item">
+                                <p><a @click.prevent="openDetailModal(badge)">{{ badge.name }}</a></p>
+                                <p class="meta" v-if="badge.category">{{ badge.category.name }}</p>
+                            </div>
+                            <nav>
+                                <a href="#"
+                                   class="icon-overflow"
+                                   :data-dropdown="'badge-' + String(badge.id) + '-dropdown'"
+                                   aria-expanded="false" title="Actions"></a>
+                            </nav>
+                            <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
+                                <li><a href="#" class="icon-add" title="Award">Award</a></li>
+                                <li><a href="#" class="icon-task" title="Set as Goal">Set as Goal</a></li>
+                                <li><a href="#" class="icon-minus" title="Award">Withdraw</a></li>
+                                <li><a href="#" class="icon-modify" title="Modify">Modify</a></li>
+                                <li><a href="#" class="icon-delete" title="Delete">Delete</a></li>
+                            </ul>
                         </div>
                     </li>
                 </ul>
