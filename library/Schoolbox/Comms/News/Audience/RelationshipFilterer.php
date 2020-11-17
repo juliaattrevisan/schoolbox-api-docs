@@ -12,6 +12,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Code\SubjectMatcherBase;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -177,13 +178,15 @@ class RelationshipFilterer
      * This is technically irrelevant for the LEARNER:INSTRUCTOR relationship, but slightly more performance and likely
      * better reflects expected behaviour.
      *
+     * This no longer returns 'write' access members of groups in which the students involve (SA-10020)
+     *
      * @param int[] $userIds
      * @return int[]
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    public function getTeachersAndInstructors(array $userIds): array
+    public function getTeachers(array $userIds): array
     {
         if (!\count($userIds)) {
             return $this->userMapper->createCollection();
@@ -195,53 +198,36 @@ class RelationshipFilterer
 
         $students = $this->userMapper->findByPredicates($pb);
 
-        $allFolders = $this->folderMapper->createCollection();
+        $classCodes  = [];
         foreach ($students as $student) {
             // Find all folders where the user is a class student or learner-only.
-            $allFolders = $allFolders->mergeUnique($this->folderMapper->findForUser($student, true, UserAccess::ACCESS_READ, true), 'id');
+            $subjects = $this->externalUser->getSubjectList($student);
+            foreach ($subjects as $subject) {
+                $classCode = SubjectMatcherBase::generateFolderCode($subject['campusCode'], $subject['code']);
+                if (!in_array($classCode, $classCodes)) {
+                    $classCodes[] = $classCode;
+                }
+            }
         }
 
         // Students are not in any groups/classes?
-        if (!$allFolders->count()) {
+        if (!count($classCodes)) {
             // Then they have no teachers
             return [];
         }
 
-        // Find all class codes these students are in.
-        $classCodes = [];
-        $folderIds  = [];
-        foreach ($allFolders as $folder) {
-            $folderIds[] = $folder->getId();
-            foreach ($folder->getCodes() as $code) {
-                $classCodes[] = $code->getCode();
-            }
-        }
-
         // Then find the teachers of these classes from synergetic.
-        $teacherExternalIds = $this->externalClass->getTeachers(\implode(',', \array_unique($classCodes)));
+        $teacherExternalIds = $this->externalClass->getTeachers(\implode(',', $classCodes));
 
-        $instructorIds = $this->userAccessMapper->findScalarByPredicates(
-            'uid',
-            $this->userAccessMapper->getPredicateBuilder()
-                                   ->equals('service', UserAccess::SERVICE_HOMEPAGE)
-                                   ->in('sid', $folderIds)
-                                   ->equals('type', UserAccess::ACCESS_WRITE)
-        );
 
         // No class teachers or group instructors?
-        if (!\count($teacherExternalIds) && !\count($instructorIds)) {
+        if (!\count($teacherExternalIds)) {
             return [];
         }
 
         $innerPb = $this->userMapper->getPredicateBuilder();
+        $innerPb->in('synergy_id', $teacherExternalIds);
 
-        if (\count($teacherExternalIds)) {
-            $innerPb->in('synergy_id', $teacherExternalIds);
-        }
-
-        if (\count($instructorIds)) {
-            $innerPb->in('id', $instructorIds);
-        }
         $outerPb = $this->userMapper->getPredicateBuilder()
                                     ->any($innerPb)
                                     ->equals('g.group_type', Role::STAFF);
