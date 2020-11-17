@@ -21,7 +21,7 @@
             <div class="row">
                 <div class="small-12 island">
                     <section class="content">
-                        <h2>{{ commentHeading }} comments ({{ comments|length }})</h2>
+                        <h2>{{ commentHeading }} Comments ({{ comments|length }})</h2>
                         <form method="post" action="{{ commentInsertRoute }}">
                             <input type="hidden" name="pastoral_id" value="{{ record.id }}"> <input type="hidden" name="student_id" value="{{ record.student.id }}">
                             <textarea id="comment-body-{{ recordType }}" rows="3" cols="50" name="comment_body" placeholder="Add Comment"></textarea>
@@ -95,6 +95,7 @@
                          */
                         {name: 'schoolbox', groups: ['schoolboxlink']},
                     ],
+                    height: 150,
                     targetElements: $('#comment-body-{{ recordType }}'),
                     on: {
                         change: function (event) {
