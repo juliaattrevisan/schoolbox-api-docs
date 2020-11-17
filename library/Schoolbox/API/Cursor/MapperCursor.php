@@ -203,7 +203,7 @@ class MapperCursor implements ICursor
                 // this builder is lt/gt this column, and also equals the value
                 // of previous columns.
                 // TODO consider an easier way to merge multiple builders together
-                //  $builder->all(...$subBuilders) would be ideal
+                //  $builder->all(...$columnBuilders) would be ideal
                 $columnBuilder = $builder->emptyClone();
                 foreach ($previousColumnBuilders as $previousColumnBuilder) {
                     $columnBuilder = $columnBuilder->all($previousColumnBuilder);
