@@ -18,7 +18,21 @@
         <div id="comments">
             <div class="row">
                 <div class="small-12 island">
+                    <section class="content">
+                        <h2>Comments ({{ comments|length }})</h2>
+                        <form method="post" action="{{ commentInsertRoute }}">
+                            <input type="hidden" name="pastoral_id" value="{{ record.id }}"> <input type="hidden" name="student_id" value="{{ record.student.id }}">
+                            <textarea id="comment-body-{{ recordType }}" rows="3" cols="50" name="comment_body" placeholder="Add Comment"></textarea>
+                            {% if recordType == 'private' %}
+                                <input type="hidden" name="comment_private" value="1"/>
+                            {% endif %}
+                            <input disabled data-comment-insert-{{ recordType }} type="submit" value="Add Comment">
+                        </form>
+                    </section>
+
                     {% if comments | length > 0 %}
+                        <hr />
+
                         <section>
                             <ul class="information-list">
                                 {% for comment in comments %}
@@ -53,21 +67,7 @@
                                 {% endfor %}
                             </ul>
                         </section>
-
-                        <hr />
                     {% endif %}
-
-                    <section class="content">
-                        <h2>Comments ({{ comments|length }})</h2>
-                        <form method="post" action="{{ commentInsertRoute }}">
-                            <input type="hidden" name="pastoral_id" value="{{ record.id }}"> <input type="hidden" name="student_id" value="{{ record.student.id }}">
-                            <textarea id="comment-body-{{ recordType }}" rows="3" cols="50" name="comment_body" placeholder="Add Comment"></textarea>
-                            {% if recordType == 'private' %}
-                                <input type="hidden" name="comment_private" value="1"/>
-                            {% endif %}
-                            <input disabled data-comment-insert-{{ recordType }} type="submit" value="Add Comment">
-                        </form>
-                    </section>
                 </div>
             </div>
         </div>
