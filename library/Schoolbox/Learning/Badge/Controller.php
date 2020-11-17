@@ -62,6 +62,8 @@ class Controller extends Base
                 ]
             );
             $results    = $cursor->retrieveResults($this->request->query->get('cursor', null));
+
+            // TODO add links translator
             $translator = new Translator\ModelToArray(
                 new User\Translator\ModelToArray(),
                 new Storage\Translator\ModelToArray(),
