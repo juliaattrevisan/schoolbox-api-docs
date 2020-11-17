@@ -1,7 +1,15 @@
-<h1>Badges</h1>
+{% import 'sub/breadcrumbs.twig' as bread %}
 
-<div id="badge-list-container">
-    <badge-list get-badges-route="{{ routeLookup('learningBadge.getBadges') }}">
-    </badge-list>
+{{ bread.crumbs(
+    ['Badges']
+) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <div id="badge-list-container" >
+            <badge-list get-badges-route="{{ routeLookup('learningBadge.getBadges') }}">
+            </badge-list>
+        </div>
+        <script src="/javascript/components/badgeList.bundle.js"></script>
+    </div>
 </div>
-<script src="/javascript/components/badgeList.bundle.js"></script>
