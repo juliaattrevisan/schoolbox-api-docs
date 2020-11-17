@@ -88,12 +88,17 @@ export default {
             </div>
         </section>
         <section v-else class="content">
-            <ul class="information-list">
+            <div v-if="data.length === 0" class="empty-state">
+                <i class="icon-schoolbox"></i>
+                <p>No badges have been created yet.</p>
+            </div>
+            <ul v-else class="information-list">
                 <li v-for="badge in data">
                     <div class="card small-12">
                         <img :src="badge.image._links.image" :alt="badge.name"/>
                         <a @click.prevent="openDetailModal(badge)">
                             <p>{{ badge.name }}</p>
+                            <p class="meta" v-if="badge.category">{{ badge.category.name }}</p>
                         </a>
                     </div>
                 </li>
