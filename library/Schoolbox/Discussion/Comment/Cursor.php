@@ -14,6 +14,8 @@ use Alaress\Codec\Integer\Base64;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use InvalidArgumentException;
+use Schoolbox\API\Cursor\ICursor;
+use Schoolbox\Collection;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -21,7 +23,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 /**
  * Class Cursor
  */
-class Cursor
+class Cursor implements ICursor
 {
     /**
      * The number of comments to return per request.
@@ -146,10 +148,10 @@ class Cursor
      * This may be useful when retrieving a result set without a cursor, in
      * case the initial result set at this time needs to be fetched.
      *
-     * @param GenericCollection $collection
+     * @param Collection $collection
      * @return string|null
      */
-    public function current(GenericCollection $collection): ?string
+    public function current(Collection $collection): ?string
     {
         $currentCursor = null;
         $firstRecord   = $collection->first();
@@ -176,10 +178,10 @@ class Cursor
     /**
      * Retrieves a cursor to the next collection.
      *
-     * @param GenericCollection $collection
+     * @param Collection $collection
      * @return string|null
      */
-    public function next(GenericCollection $collection): ?string
+    public function next(Collection $collection): ?string
     {
         $nextCursor  = null;
         $lastRecord  = $collection->last();
@@ -208,11 +210,9 @@ class Cursor
             if (isset($lastId) && $lastId > 0) {
                 if ($this->order === self::ORDER_ASC) {
                     // Ascending: get only items greater than last ID
-                    /** @noinspection PhpUnhandledExceptionInspection */
                     $builder->greaterThan($this->mapper->getIdentifierColumn(), $lastId);
                 } elseif ($this->order === self::ORDER_DESC) {
                     // Descending: get only items less than last ID
-                    /** @noinspection PhpUnhandledExceptionInspection */
                     $builder->lessThan($this->mapper->getIdentifierColumn(), $lastId);
                 }
             }
@@ -231,11 +231,9 @@ class Cursor
         $pb       = $this->mapper->getPredicateBuilder();
         $threadId = $this->thread->getId();
         try {
-            /** @noinspection PhpUnhandledExceptionInspection */
             $pb = $pb->equals('discussion_thread_id', $threadId);
         } catch (\TypeError $e) {
             // $thread doesn't exist yet
-            /** @noinspection PhpUnhandledExceptionInspection */
             $pb = $pb->isNull('discussion_thread_id');
         }
         return $pb;

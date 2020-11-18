@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Module as DueworkFeedbackModu
 use Schoolbox\Learning\Assessment\DueWork\Response\Module as DueworkResponseModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
+use Schoolbox\Learning\Badge\Module as BadgeModule;
 use Schoolbox\Learning\Grades;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
 use Schoolbox\Learning\MarkScheme;
@@ -73,6 +74,8 @@ class Learning extends ModuleLoader
             $this->loadModule($kernel, EvidenceThreadModule::class, "/discussion/evidence/{contextId}/threads");
             $this->loadModule($kernel, EvidenceCommentModule::class, "/discussion/evidence/{contextId}/comments");
         }
+
+        $this->loadModule($kernel, BadgeModule::class, "/{$namespace}/badge");
 
         /* Assessment Calendar is behind a feature flag
          */
