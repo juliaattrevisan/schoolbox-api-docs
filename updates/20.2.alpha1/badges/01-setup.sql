@@ -25,13 +25,13 @@ COLLATE = utf8mb4_unicode_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `badge` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NULL,
-    `body` TEXT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `body` TEXT NOT NULL,
     `image_hash` VARCHAR(100) CHARACTER SET ascii NOT NULL,
     `category_id` INT UNSIGNED NOT NULL,
     `created_by` INT UNSIGNED NOT NULL,
-    `created_at` DATETIME NULL,
-    `updated_at` DATETIME NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
     `updated_by` INT UNSIGNED NOT NULL,
     `deleted_at` DATETIME NULL,
     PRIMARY KEY (`id`),
