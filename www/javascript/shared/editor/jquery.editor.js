@@ -155,7 +155,7 @@
         // removed all the Schoolboxlink plugins: comments should be plain text
         // anyway.
         return init({
-            removePlugins: 'uploadimage,link,schoolboxanchor',
+            removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount',
             removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
             toolbarGroups: [
                 {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
@@ -163,7 +163,9 @@
                 {name: 'links', groups: ['links']},
                 {name: 'insert', groups: ['insert']},
                 // {name: 'schoolbox', groups: ['schoolboxlink']},
-            ]
+            ],
+            height: '5rem',
+            resize_enabled: false,
         });
     };
 
