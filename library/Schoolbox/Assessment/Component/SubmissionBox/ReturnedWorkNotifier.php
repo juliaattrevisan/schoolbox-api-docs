@@ -237,15 +237,17 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
 
         $box        = $returnedWork->getSubmissionBox();
         $assessment = $this->getAssessment($box, $student);
-        $cat        = $assessment->getBaseContext()->getFolder();
+        if (!$assessment) {
+            return $envelope;
+        }
+        $cat = $assessment->getBaseContext()->getFolder();
 
         // Request re-submission, even when mark is not visible.
         $restrictGrades = $this->conf->get('restrict_parent_grades')
             || !$this->conf->get(ConfigMapper::NAME_GRADES_ENABLED)
             || !$cat->isGradePageEnabled();
         $requestResubmission = $returnedWork->getResubmissionRequired();
-        if (!$assessment
-            || $this->conf->get('restrict_parent_duework_access')  // hide due work
+        if ($this->conf->get('restrict_parent_duework_access')  // hide due work
             || ($restrictGrades && $this->conf->get('restrict_student_submissions'))
             || !($assessment->isFeedbackVisibleToRoleType(Role::PARENT))) {
             return $envelope;
