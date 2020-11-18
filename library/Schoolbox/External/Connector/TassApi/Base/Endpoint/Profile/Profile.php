@@ -682,7 +682,11 @@ class Profile implements IStrategy
             if ('' !== (string)$teacher['employee_code']) {
                 unset($employeeSetDedupe[$teacher['employee_code']]);
 
-                $this->log->debug("Removed teaching staff {$teacher['employee_code']} from non-teaching set");
+                $this->log->debug(sprintf(
+                    "Removed teaching staff %s (%s) from non-teaching set",
+                    $teacher['employee_code'],
+                    $teacher['teacher_code']
+                ));
             }
         }
 
