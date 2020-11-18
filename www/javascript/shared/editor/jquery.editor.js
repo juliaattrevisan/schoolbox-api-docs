@@ -130,9 +130,35 @@
     }
 
 
+    /**
+     * Retrieve a configuration for a CKEditor instance.
+     *
+     * @param {Object|null} options Any overrides of the default configuration
+     * @returns {Object}
+     */
     $.alaressEditorConfig = function (options) {
         options = options || {};
         return init(options);
+    };
+
+
+    /**
+     * Retrieve a standard configuration for comment CKEditor instances.
+     *
+     * @returns {Object}
+     */
+    $.alaressEditorConfigForComments = function () {
+        return init({
+            removePlugins: 'uploadimage,link,schoolboxanchor',
+            removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+            toolbarGroups: [
+                {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
+                {name: 'links', groups: ['links']},
+                {name: 'insert', groups: ['insert']},
+                // {name: 'schoolbox', groups: ['schoolboxlink']},
+            ]
+        });
     };
 
 
