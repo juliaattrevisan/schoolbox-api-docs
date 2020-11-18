@@ -22,22 +22,22 @@ INSERT INTO component_definition (
     null
 );
 
--- Add a default heading (default: My Dashboard)
-INSERT INTO component_config_definition (
-    component_definition_id,
-    `key`,
-    default_value,
-    label,
-    description
-) VALUES (
-    (
-        SELECT id
-        FROM component_definition
-        WHERE class = 'Schoolbox\\Learning\\Moment\\StudentToolkit\\Component\\Dashboard\\Controller'
-        LIMIT 1
-    ),
-    'componentname',
-    'My Dashboard',
-    'Heading',
-    null
-);
+-- This component no longer has a heading
+# INSERT INTO component_config_definition (
+#     component_definition_id,
+#     `key`,
+#     default_value,
+#     label,
+#     description
+# ) VALUES (
+#     (
+#         SELECT id
+#         FROM component_definition
+#         WHERE class = 'Schoolbox\\Learning\\Moment\\StudentToolkit\\Component\\Dashboard\\Controller'
+#         LIMIT 1
+#     ),
+#     'componentname',
+#     'My Dashboard',
+#     'Heading',
+#     null
+# );
