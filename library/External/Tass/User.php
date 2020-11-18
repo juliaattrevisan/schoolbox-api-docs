@@ -729,7 +729,7 @@ class External_Tass_User implements External_UserInterface
                 dbo.tel_vw_telemf.prefer_name_text AS StaffPreferredName,
                 dbo.tel_vw_telemf.surname_text AS StaffSurname,
                 dbo.tel_vw_telemf.phone_w_text AS StaffOccupPhone,
-                dbo.tel_vw_telemf.school_email AS StaffOccupEmail,
+                CASE WHEN tch_code IS NOT NULL THEN dbo.teacher.e_mail ELSE dbo.tel_vw_telemf.school_email END AS StaffOccupEmail,
                 '' AS StaffExtension,
                 '' AS StaffCampusDescription,
                 {$caseAwardMappings},
