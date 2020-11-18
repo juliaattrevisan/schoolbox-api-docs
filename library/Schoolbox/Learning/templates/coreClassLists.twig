@@ -243,10 +243,15 @@ Data:
                 this.$refs.form.submit();
             },
             openShareLearningMomentDialog: function() {
-                // Set the form's target to the selected users
-                $('#classList-shareLearningMoment-form')
-                    .attr('action', '/learning/evidence/user/' + this.selectedStudentIds.join(',') + '/create');
-                $('#classList-shareLearningMoment').foundation('reveal', 'open');
+                // Set each link's href to the selected users
+                let dialog   = $('#classList-shareLearningMoment'),
+                    pathname = '/learning/evidence/user/' + this.selectedStudentIds.join(',') + '/create';
+                dialog.find('a[data-action="shareLearningMoment"]').each(function () {
+                    let url      = new URL(this.href);
+                    url.pathname = pathname;
+                    this.href    = url.href;
+                });
+                dialog.foundation('reveal', 'open');
             },
         },
         computed: {
@@ -321,40 +326,10 @@ Data:
 
 <div data-reveal id="classList-shareLearningMoment" aria-hidden="true" class="reveal-modal small">
     <h2>Share a Learning Moment</h2>
-    <form id="classList-shareLearningMoment-form" method="get">
-        <input name="{{ RETURN_URL.name }}" value="{{ RETURN_URL.current }}" type="hidden" />
-        <input type="radio"
-               name="momentType"
-               value="photo"
-               id="classList-shareLearningMoment-momentType-photo">
-        <label for="classList-shareLearningMoment-momentType-photo" class="block"><i class="icon-camera"></i>Take a photo</label>
-
-        <input type="radio"
-               name="momentType"
-               value="video"
-               id="classList-shareLearningMoment-momentType-video">
-        <label for="classList-shareLearningMoment-momentType-video" class="block"><i class="icon-video"></i>Record a video</label>
-
-        <input type="radio"
-               name="momentType"
-               value="audio"
-               id="classList-shareLearningMoment-momentType-audio">
-        <label for="classList-shareLearningMoment-momentType-audio" class="block"><i class="icon-audio"></i>Record audio</label>
-
-        <input type="radio"
-               name="momentType"
-               value="upload"
-               id="classList-shareLearningMoment-momentType-upload">
-        <label for="classList-shareLearningMoment-momentType-upload" class="block"><i class="icon-upload"></i>Upload image or video</label>
-
-        <input type="radio"
-               name="momentType"
-               value="text"
-               id="classList-shareLearningMoment-momentType-text">
-        <label for="classList-shareLearningMoment-momentType-text" class="block"><i class="icon-textbox"></i>Write something</label>
-
-        <button id="classList-shareLearningMoment-shareWork-submit" type="submit">Continue</button>
-
-    </form>
+    <a data-action="shareLearningMoment" href="?momentType=photo&amp;{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="block"><i class="icon-camera"></i>Take a photo</a>
+    <a data-action="shareLearningMoment" href="?momentType=video&amp;{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="block"><i class="icon-video"></i>Record a video</a>
+    <a data-action="shareLearningMoment" href="?momentType=audio&amp;{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="block"><i class="icon-audio"></i>Record audio</a>
+    <a data-action="shareLearningMoment" href="?momentType=upload&amp;{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="block"><i class="icon-upload"></i>Upload file</a>
+    <a data-action="shareLearningMoment" href="?momentType=text&amp;{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="block"><i class="icon-textbox"></i>Write something</a>
     <a class="close-reveal-modal" aria-label="Close">×</a>
 </div>
