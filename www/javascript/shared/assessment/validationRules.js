@@ -22,12 +22,17 @@ var validateOptions = {
     },
     errorPlacement: function(error, element) {
         var $element = $(element);
+
         if ($element.is("[data-criterion-name]")) {
             // For validating descriptor rows - make sure error message is inserted AFTER the indicator checkbox
             error.insertAfter($element.next("label.checkbox-label"));
         } else if ($element.is("[data-group-max-value]")) {
-            // For validating max cap marks - mark sure error message is UNDERNEATH input+button pairing
-            error.insertAfter($element.next("button"));
+
+            /* When Capability Mark Type is used, you need to provide maximum capability marks
+             * There are two elements - the input, and the "Assign from indicators"
+             * Spawn the error underneath these two elements
+             */
+            error.insertAfter($element.siblings('[data-use-criterion-values]'));
         } else if ($element.is("#useRubric")) {
             // For validating if at least one indicator is selected
             error.insertAfter($element.closest('div.switch'));
