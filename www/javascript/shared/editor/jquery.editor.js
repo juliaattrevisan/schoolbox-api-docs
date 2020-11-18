@@ -148,6 +148,12 @@
      * @returns {Object}
      */
     $.alaressEditorConfigForComments = function () {
+        // Somehow when including a CKeditor instance as a Vue component:
+        // If the "eqneditor" plugin is not present, or its button is removed,
+        // then embedding an image fails!
+        // I don't yet know how to work around this, so for now I've just
+        // removed all the Schoolboxlink plugins: comments should be plain text
+        // anyway.
         return init({
             removePlugins: 'uploadimage,link,schoolboxanchor',
             removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',

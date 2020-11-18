@@ -35,20 +35,6 @@ export default {
         currentCount () {
             return data.length;
         },
-        ckeditorConfig () {
-            // Use the same config as the editor in the news does
-            return window.jQuery.alaressEditorConfig({
-                removePlugins: 'uploadimage,link,schoolboxanchor',
-                removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
-                toolbarGroups: [
-                    {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                    {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                    {name: 'links', groups: ['links']},
-                    {name: 'insert', groups: ['insert']},
-                    {name: 'schoolbox', groups: ['schoolboxlink']},
-                ],
-            });
-        },
     },
     mounted() {
         this.load();
