@@ -18,7 +18,10 @@ Data:
             <ul class="flex-list buttons">
                 <li><a href="#" class="disabled">Award Achievement</a></li>
                 <li><a href="#" class="disabled">Set Goal(s)</a></li>
-                <li><a href="#" class="disabled">Add Pastoral Record</a></li>
+                {% if pastoralEnabled %}
+                    <li><a @click.prevent="addPastoralRecord"
+                           :class="{disabled: selectedStudentIds.length === 0}">Add Pastoral Record</a></li>
+                {% endif %}
                 {% if learningMomentsEnabled %}
                     <li><a @click.prevent="openShareLearningMomentDialog"
                            :class="{disabled: selectedStudentIds.length === 0}">Share Learning Moment</a></li>
@@ -241,6 +244,9 @@ Data:
                 self.enableSendEmailButton = false;
                 self.sendEmailButtonText = self.loadingText;
                 this.$refs.form.submit();
+            },
+            addPastoralRecord: function () {
+                window.location.href = '/pastoral/student/' + this.selectedStudentIds.shift() + '/record/insert?duplicates=' + this.selectedStudentIds.join(',');
             },
             openShareLearningMomentDialog: function() {
                 // Set the form's target to the selected users

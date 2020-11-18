@@ -528,6 +528,21 @@ class Controller extends Base
 
         $audienceDefaults = $this->audienceMapper->findAll();
 
+        // When student ids are provided to copy this record to, prefill Create duplicate record field.
+        $duplicateIds = explode(',', $this->request->query->get('duplicates') ?? '');
+        $duplicates   = $this->userMapper->findByColumn('id', $duplicateIds);
+        $students     = [];
+        /** @var User $student */
+        foreach ($duplicates as $student) {
+            if (!$student->getRole()->isStudent()) {
+                continue;
+            }
+            $students[] = [
+                'id'   => $student->getId(),
+                'name' => $student->getFullName(),
+            ];
+        }
+
         // Render this thing out
 
         $this->getResponse()->content->set([
@@ -547,6 +562,7 @@ class Controller extends Base
                 'attachzonePublic'  => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
                 'attachzonePrivate' => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
                 'audiences'         => $audienceDefaults,
+                'students'          => json_encode($students),
             ],
             'title' => 'Pastoral Record',
         ]);
