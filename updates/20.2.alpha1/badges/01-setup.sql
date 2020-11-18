@@ -3,10 +3,10 @@
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `badge_category`(
     `id`         INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name`       VARCHAR(255) NULL,
-    `created_by` INT UNSIGNED NULL,
-    `created_at` DATETIME     NULL,
-    `updated_at` DATETIME     NULL,
+    `name`       VARCHAR(255) NOT NULL,
+    `created_by` INT UNSIGNED NOT NULL,
+    `created_at` DATETIME     NOT NULL,
+    `updated_at` DATETIME     NOT NULL,
     `deleted_at` DATETIME     NULL,
     PRIMARY KEY (`id`),
 CONSTRAINT `fk_achievement_badge_category_created_by_id`
@@ -92,11 +92,11 @@ COLLATE = utf8mb4_unicode_ci;
 -- Table `badge_user`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `badge_user` (
-    `recipient_id` INT UNSIGNED NULL,
-    `badge_id` INT UNSIGNED NULL,
-    `status` ENUM('goal', 'achievement') NULL,
-    `awarded_by` INT UNSIGNED NULL,
-    `awarded_at` DATETIME NULL,
+    `recipient_id` INT UNSIGNED NOT NULL,
+    `badge_id` INT UNSIGNED NOT NULL,
+    `status` ENUM('goal', 'achievement') NOT NULL,
+    `awarded_by` INT UNSIGNED NOT NULL,
+    `awarded_at` DATETIME NOT NULL,
     `deleted_at` DATETIME NULL,
     INDEX `fk_badge_user_recipient_id_idx` (`recipient_id` ASC),
     INDEX `fk_badge_user_badge_id_idx` (`badge_id` ASC),
