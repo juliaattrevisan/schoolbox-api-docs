@@ -70,15 +70,16 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function getSelectString(): string
     {
-        $curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
-
+        // As of SA-11248: curriculum nodes aren't hydrated by default.
+        // "{$curriculumNodeMapper->getColumnString('cn')}," was in the SELECT,
+        // "LEFT JOIN {$this->getJoinSql('curriculum_badge', '', 'cn')}" was in
+        // the JOIN, if you need to add them back
         return "
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('image', 'i')},
                 {$this->getJoinColumnString('image.allowedFileExtension', 'm')},
                 {$this->getJoinColumnString('category', 'bc')},
-                {$curriculumNodeMapper->getColumnString('cn')},
                 {$this->getJoinColumnString('createdBy', 'c')},
                 {$this->getJoinColumnString('createdBy.role', 'cr')},
                 {$this->getJoinColumnString('updatedBy', 'u')},
@@ -87,7 +88,6 @@ class Mapper extends \Schoolbox\Mapper
             INNER JOIN {$this->getJoinSql('image', '', 'i', true)}
             LEFT JOIN {$this->getJoinSql('image.allowedFileExtension', 'i', 'm', true)}
             INNER JOIN {$this->getJoinSql('category', '', 'bc', true)}
-            LEFT JOIN {$this->getJoinSql('curriculum_badge', '', 'cn')}
             INNER JOIN {$this->getJoinSql('createdBy', '', 'c', true)}
             INNER JOIN {$this->getJoinSql('createdBy.role', 'c', 'cr')}
             INNER JOIN {$this->getJoinSql('updatedBy', '', 'u', true)}
@@ -106,16 +106,17 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
+//        $curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
         $collection = $this->createCollection();
-        $curriculumNodeCache = [];
+//        $curriculumNodeCache = [];
 
         foreach ($statement as $row) {
             $badgeId = $row['id'];
 
             if (!$collection->offsetExists($badgeId)) {
                 $collection[$badgeId] = $this->hydrate($row);
-                $collection[$badgeId]->setCurriculumNodes($curriculumNodeMapper->createCollection());
+                // As of SA-11248: curriculum nodes aren't hydrated by default
+//                $collection[$badgeId]->setCurriculumNodes($curriculumNodeMapper->createCollection());
             }
 
             /* Set the Category
@@ -126,17 +127,18 @@ class Mapper extends \Schoolbox\Mapper
                 $collection[$badgeId]->setCategory($category);
             }
 
-            /* Set all the curriculum nodes
-             */
-            $curriculumNodeId = $row['cn.id'];
-
-            if ($curriculumNodeId) {
-                if (!array_key_exists($curriculumNodeId, $curriculumNodeCache)) {
-                    $curriculumNodeCache[$curriculumNodeId] = $curriculumNodeMapper->hydrate($row, 'cn');
-                }
-
-                $collection[$badgeId]->getCurriculumNodes()->setOffset($curriculumNodeId, $curriculumNodeCache[$curriculumNodeId]);
-            }
+            // As of SA-11248: curriculum nodes aren't hydrated by default
+//            /* Set all the curriculum nodes
+//             */
+//            $curriculumNodeId = $row['cn.id'];
+//
+//            if ($curriculumNodeId) {
+//                if (!array_key_exists($curriculumNodeId, $curriculumNodeCache)) {
+//                    $curriculumNodeCache[$curriculumNodeId] = $curriculumNodeMapper->hydrate($row, 'cn');
+//                }
+//
+//                $collection[$badgeId]->getCurriculumNodes()->setOffset($curriculumNodeId, $curriculumNodeCache[$curriculumNodeId]);
+//            }
 
             /* Set the creator and also their role
              */
