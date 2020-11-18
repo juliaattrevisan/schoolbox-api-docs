@@ -1,5 +1,11 @@
-#evidence-form #evidence-storage-preview {
-  width: 100%;
+#evidence-form {
+  #evidence-storage-preview {
+    max-height: rem-calc(500);
+    margin-bottom: 1rem;
+  }
+  label[for=evidence-body] {
+    display: block;
+  }
 }
 
 .feed-item {
