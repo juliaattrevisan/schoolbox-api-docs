@@ -57,6 +57,14 @@
 
 {% set showActivityFeed = (isStaff or isSelf or isParentOfStudent) %}
 
+{% set shareLearningMomentUrl = routeLookupIfAuthorized(
+    'learningMomentEvidence.getCreateForm',
+    {
+        users:   [user],
+        userIds: user.id
+    }
+) %}
+
 <script type="text/javascript">
     $(function () {
         $('#email-all-staff').click(function () {
@@ -305,9 +313,15 @@
             {% block buttons_island %}
                 <ul class='flex-list flex-wrap buttons'>
                     {% block buttons %}
-                        <li>
-                            <a href="#" class="icon-share">Share Work</a>
-                        </li>
+
+                        {% block buttons_shareLearningMoment %}
+                            {% if shareLearningMomentUrl %}
+                                <li>
+                                    <a href="#" class="icon-share" data-reveal-id="shareLearningMoment">Share Work</a>
+                                </li>
+                            {% endif %}
+                        {% endblock buttons_shareLearningMoment %}
+
                         {% if eportfolioAuth %}
                             {% block buttons_eportfolio %}
                                 <li>
@@ -870,3 +884,19 @@
         min-height: 1px;
     }
 </style>
+
+
+{##
+ # Modal for sharing a learning moment
+ #
+ # TODO put this in its own template
+ #}
+<div data-reveal id="shareLearningMoment" aria-hidden="true" class="reveal-modal small">
+    <h2>Share a Learning Moment</h2>
+    <a href="{{ shareLearningMomentUrl }}?momentType=photo&amp;{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="block"><i class="icon-camera"></i>Take a photo</a>
+    <a href="{{ shareLearningMomentUrl }}?momentType=video&amp;{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="block"><i class="icon-video"></i>Record a video</a>
+    <a href="{{ shareLearningMomentUrl }}?momentType=audio&amp;{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="block"><i class="icon-audio"></i>Record audio</a>
+    <a href="{{ shareLearningMomentUrl }}?momentType=upload&amp;{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="block"><i class="icon-upload"></i>Upload file</a>
+    <a href="{{ shareLearningMomentUrl }}?momentType=text&amp;{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="block"><i class="icon-textbox"></i>Write something</a>
+    <a class="close-reveal-modal" aria-label="Close">×</a>
+</div>
