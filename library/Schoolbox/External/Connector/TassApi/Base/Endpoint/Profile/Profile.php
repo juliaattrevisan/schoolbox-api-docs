@@ -643,15 +643,86 @@ class Profile implements IStrategy
 
 
     /**
-     * Import staff profile data
+     * Staff members actually consist of two populations: Teachers and Non-Teachers
+     *
+     * Non-Teachers include IT Admin, Librarians and other support staff in a school
+     * who need user accounts but don't teach students
+     *
+     * @throws DomainException
+     * @throws RuntimeException
      */
-    private function importStaff(): void
+    private function findStaff()
     {
+
+        /* Get a list of teaching staff
+         */
         $teachers = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', [
             'currentstatus' => 'current'
         ]);
 
-        foreach ($teachers['teachers'] as $staff) {
+        /* Get a list of non-teaching staff
+         */
+        $employees = $this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getEmployees', [
+            'user_code' => 'all'
+        ]);
+
+        /* For every teacher, find out if they have a non-teaching record
+         * If so, disregard the non-teaching record and remove it from its set
+         */
+        $employeeSetDedupe = [];
+
+        foreach ($employees['employees'] as $employee) {
+            $employeeSetDedupe[$employee['user_code']] = $employee;
+        }
+
+        /* Unite the two data sets; teaching records get precedence
+         * The result is: employeeSetDedupe = Teaching Staff XOR Non-Teaching Staff
+         */
+        foreach ($teachers['teachers'] as $teacher) {
+            if ('' !== (string)$teacher['employee_code']) {
+                unset($employeeSetDedupe[$teacher['employee_code']]);
+
+                $this->log->debug("Removed teaching staff {$teacher['employee_code']} from non-teaching set");
+            }
+        }
+
+        /* Reformat the Employee struct to be similar to teaching struct
+         */
+        $employeeSetReformatted = [];
+
+        foreach ($employeeSetDedupe as $employee) {
+
+            /* Apparently there's both title and salutation for some bizarre reason
+             */
+            $employeeSetReformatted[] = [
+                'teacher_code' => $employee['user_code'],
+                'salutation' => array_values(array_filter([$employee['title'], $employee['salutation']]))[0],
+                'given_names' => $employee['first_name'],
+                'surname' => $employee['surname'],
+                'school_email_address' => $employee['school_email'],
+                'email_address' => $employee['e_mail'],
+                'department' => $employee['departments'],
+                'portal_user_code' => $employee['user_code'],
+                'active_flag' => null,
+            ];
+        }
+
+        /* Combine the two sets; this contains all the staff members
+         * Both teaching and non-teaching, though you can't distinguish
+         * between them in UPS except by the contents of teacher_code
+         */
+        return array_merge($teachers['teachers'], $employeeSetReformatted);
+    }
+
+
+    /**
+     * Import staff profile data
+     */
+    private function importStaff(): void
+    {
+        $staffs = $this->findStaff();
+
+        foreach ($staffs as $staff) {
             $externalId = trim((string)$staff['teacher_code']);
             $building = '';
             $campusName = '';
