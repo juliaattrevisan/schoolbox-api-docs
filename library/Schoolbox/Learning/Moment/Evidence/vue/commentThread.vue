@@ -141,9 +141,9 @@ export default {
                     .then((response) => {
                         self.commentThread.children.data = self.commentThread.children.data.concat(response.data.data);
                         self.commentThread.children.metadata.cursor.next = response.data.metadata.cursor.next;
-                        this.$refs.toast.timeout('Loaded', true, 2000);
+                        this.$refs.toast.timeout('Loaded comments', true, 2000);
                     })
-                    .catch(() => self.$refs.toast.timeout('Loading failed', false, 5000))
+                    .catch(() => self.$refs.toast.timeout('Loading comments failed', false, 5000))
             }
         },
 
@@ -188,10 +188,10 @@ export default {
                     // thread, clear the pending comment box
                     self.commentThread.children.metadata.count += 1;
                     self.commentThread.children.data.unshift(response.data);
-                    self.$refs.toast.timeout('Saved', true, 2000);
+                    self.$refs.toast.timeout('Comment posted', true, 2000);
                     self.pendingComment = '';
                 })
-                .catch(() => self.$refs.toast.timeout('Save failed', false, 5000))
+                .catch(() => self.$refs.toast.timeout('Comment post failed', false, 5000))
                 .finally(() => self.saveInProgress = false)
         },
 
@@ -239,58 +239,57 @@ export default {
 </script>
 
 <template>
-    <div>
-        <span v-if="!hasComments">
-            No comments yet.
-        </span>
-        <template v-else>
-            <span>
-                {{ commentThread.children.metadata.count }} comments
-                <template v-if="commentThread.children.metadata.count > commentThread.children.data.length && commentThread.children.metadata.cursor.next">
-                    (<a @click.prevent="loadMoreComments">Load more</a>)
+    <div id="discussion" class="small-12 island">
+        <section id="threads-section" class="discussion">
+            <div class="discussion-threads">
+                <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
+
+                <ckeditor tag-name="textarea" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
+                <a class="button submit"
+                   @click="postComment"
+                   :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
+
+                <template v-if="hasComments">
+                    <ul class="information-list social-stream">
+                        <li class="actions-small-1" v-for="(comment, index) in comments">
+                            <div class="list-item">
+                                <div class="card small-12 compact">
+                                    <a :href="comment.author._links.profile.href" title="View Profile">
+                                        <img :src="comment.author._links.avatar.href" alt="View Profile" />
+                                        <p>{{ comment.author.firstname }} {{ comment.author.lastname }}</p>
+                                        <time class="pipe meta"
+                                              :datetime="comment.createdAt.json | dateFormat"
+                                              :title="comment.createdAt.json | dateFormat(dateDisplayFormats.momentJsDatetime)"
+                                        >{{ comment.createdAt.json | fromNow }}</time>
+                                    </a>
+                                </div>
+                            </div>
+                            <nav>
+                                <a v-if="comment._links.delete.auth"
+                                   @click.prevent="showDeleteModal(index)"
+                                   class="icon-delete"
+                                   title="Delete comment" />
+                            </nav>
+                            <media-article v-html="comment.content"></media-article>
+                        </li>
+                    </ul>
+                    <template v-if="commentThread.children.metadata.count > commentThread.children.data.length && commentThread.children.metadata.cursor.next">
+                        <a @click.prevent="loadMoreComments" class="article-read-more">Load older comments</a>
+                    </template>
                 </template>
-            </span>
-            <ul class="information-list social-stream">
-                <li class="actions-small-1" v-for="(comment, index) in comments">
-                    <div class="list-item">
-                        <div class="card small-12 compact">
-                            <a :href="comment.author._links.profile.href" title="View Profile">
-                                <img :src="comment.author._links.avatar.href" alt="View Profile" />
-                                <p>{{ comment.author.firstname }} {{ comment.author.lastname }}</p>
-                                <time class="pipe meta"
-                                      :datetime="comment.createdAt.json | dateFormat"
-                                      :title="comment.createdAt.json | dateFormat(dateDisplayFormats.momentJsDatetime)"
-                                >{{ comment.createdAt.json | fromNow }}</time>
-                            </a>
-                        </div>
-                    </div>
-                    <nav>
-                        <a v-if="comment._links.delete.auth"
-                           @click.prevent="showDeleteModal(index)"
-                           class="icon-delete"
-                           title="Delete comment" />
-                    </nav>
-                    <media-article v-html="comment.content"></media-article>
-                </li>
-            </ul>
-        </template>
 
-        <ckeditor tag-name="textarea" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
-        <a class="button submit"
-           @click="postComment"
-           :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
-
-        <toast ref="toast"></toast>
-
-        <reveal-modal ref="deleteModal">
-            <template>
-                <h2>Please confirm</h2>
-                <p>Are you sure you want to delete this comment?</p>
-                <ul class="flex-list buttons">
-                    <li><a @click.prevent="deleteComment(commentIndexToDelete)" class="button icon-approve submit">OK</a></li>
-                    <li><a @click.prevent="$refs.deleteModal.close" class="button icon-close">Cancel</a></li>
-                </ul>
-            </template>
-        </reveal-modal>
+                <toast ref="toast"></toast>
+                <reveal-modal ref="deleteModal">
+                    <template>
+                        <h2>Please confirm</h2>
+                        <p>Are you sure you want to delete this comment?</p>
+                        <ul class="flex-list buttons">
+                            <li><a @click.prevent="deleteComment(commentIndexToDelete)" class="button submit">Yes</a></li>
+                            <li><a @click.prevent="$refs.deleteModal.close" class="button">No</a></li>
+                        </ul>
+                    </template>
+                </reveal-modal>
+            </div>
+        </section>
     </div>
 </template>

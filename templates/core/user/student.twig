@@ -305,6 +305,9 @@
             {% block buttons_island %}
                 <ul class='flex-list flex-wrap buttons'>
                     {% block buttons %}
+                        <li>
+                            <a href="#" class="icon-share">Share Work</a>
+                        </li>
                         {% if eportfolioAuth %}
                             {% block buttons_eportfolio %}
                                 <li>
@@ -453,9 +456,9 @@
             {% endif %}
         </dl>
 
-        <div class="tabs-content content no-margin no-pad">
+        <div class="tabs-content content no-pad">
             {% if showActivityFeed %}
-            <div class="content active" id="activity">
+            <div class="no-pad content active" id="activity">
                 {# Vue component goes here #}
                 {% autoescape 'js' %}
                     <script type="text/javascript">
@@ -479,14 +482,14 @@
             </div>
             {% endif %}
 
-            <div class="content" id="achievements">
+            <div class="content no-pad" id="achievements">
                 <div class="content">
                     <h2 class="subheader">Achievements</h2>
                 </div>
             </div>
 
             {% if showClasses %}
-            <div class="content" id="classes">
+            <div class="content no-pad" id="classes">
                 <div class="content">
                     {% if showSubjects %}
                     {% for group, subjectGroup in subjects %}
@@ -626,7 +629,7 @@
             {% endif %}
 
             {% if showContactsTab %}
-            <div class="content" id="contacts">
+            <div class="content no-pad" id="contacts">
                 <div class="content">
                     {% block contacts_island %}
                         {% block contacts %}

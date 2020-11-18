@@ -148,8 +148,8 @@ export default {
 
 <template>
     <div>
-        <div class="content" v-for="evidenceGroup in groupedEvidence">
-            <h2 class="subheader">
+        <div v-for="evidenceGroup in groupedEvidence">
+            <h2 class="subheader feed no-margin">
                 <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
                       :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
                 >{{ renderCreatedAt(evidenceGroup.date) }}</time>
@@ -157,7 +157,7 @@ export default {
 
             <section>
                 <ul class="information-list">
-                    <li v-for="evidence in evidenceGroup.evidence">
+                    <li v-for="evidence in evidenceGroup.evidence" class="feed-item">
                         <div class="card small-12 compact">
                             <a :href="evidence.creator._links.profile" title="View Profile">
                                 <img :src="evidence.creator._links.avatar" alt="View Profile">
@@ -169,27 +169,26 @@ export default {
                             </a>
                         </div>
 
-                        <div class="small-12 large-6 column">
+                        <div class="feed-body small-12 large-6 column">
+                            <!-- Is there an attachment? Display it appropriately -->
+                            <article v-if="evidence.filename && evidence.storage">
+                                <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
+                            </article>
+
                             <!-- Display evidence body, with media players initialised -->
                             <media-article v-if="evidence.body">
                                 <div v-html="evidence.body" />
                             </media-article>
 
-
-                            <!-- Is there an attachment? Display it appropriately -->
-                            <article v-if="evidence.filename && evidence.storage">
-                                <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
-                            </article>
+                            <div class="article-read-more">
+                                <a :href="evidence._links.detail">More Detail</a>
+                            </div>
                         </div>
 
-                        <div class="small-12 large-6 column">
+                        <div class="feed-comments small-12 large-6 column">
                             <comment-thread :thread="evidence.discussionThread"
                                             :create-thread-endpoint="evidence._links.createThread"
                             />
-                        </div>
-
-                        <div class="content">
-                            <p><a :href="evidence._links.detail">More Detail</a></p>
                         </div>
                     </li>
                 </ul>
@@ -209,8 +208,8 @@ export default {
         <div class="row" v-else>
             <div class="small-12 island">
                 <div v-if="metadata.count === 0" class="empty-state">
-                    <i class="icon-favourite"></i>
-                    <p>{{ config.student.firstname }} has no learning moments yet.</p>
+                    <i class="icon-advanced-list"></i>
+                    <p>There is no activity yet. To get started you can <a href="#" title="Share something">share something</a>.</p>
                 </div>
                 <button v-else-if="metadata.cursor.next && metadata.count > data.length" class="expand" @click.prevent="append(metadata.cursor.next)">
                     Load more

@@ -9,21 +9,23 @@
 <div class="small-12 columns no-pad">
     <div class="student-toolkit">
         <div class="profile-image">
-            <img alt="{{ user.fullName }}" src="/portrait.php?id={{ user.id }}&amp;size=square64" />
+            <a href="/search/user/{{ user.id }}" title="View profile">
+                <img alt="{{ user.fullName }}" src="/portrait.php?id={{ user.id }}&amp;size=square64" />
+            </a>
         </div>
         <div class="buttons">
             {% if createLearningMomentEvidenceUrl %}
                 <a class="button icon-share" href="#" data-reveal-id="component{{ component.instance.id }}-shareWork">Share my work</a>
             {% endif %}
             <a class="button icon-goal" href="#">Set my goals</a>
-            <a class="button icon-trophy" href="#">My Achievements</a>
             <a class="button icon-advanced-list" href="/search/user/{{ user.id }}">My Activity</a>
+            <a class="button icon-trophy" href="#">My Achievements</a>
         </div>
     </div>
 </div>
 
 {% if createLearningMomentEvidenceUrl %}
-    <div data-reveal id="component{{ component.instance.id }}-shareWork" aria-hidden="true" class="reveal-modal">
+    <div data-reveal id="component{{ component.instance.id }}-shareWork" aria-hidden="true" class="reveal-modal small">
         <h2>Share a Learning Moment</h2>
         <form id="component{{ component.instance.id }}-shareWork-form" action="{{ createLearningMomentEvidenceUrl }}">
             <input name="{{ RETURN_URL.name }}" value="{{ RETURN_URL.current }}" type="hidden" />
@@ -49,7 +51,7 @@
                    name="momentType"
                    value="upload"
                    id="component{{ component.instance.id }}-momentType-upload">
-            <label for="component{{ component.instance.id }}-momentType-upload" class="block"><i class="icon-upload"></i>Upload image or video</label>
+            <label for="component{{ component.instance.id }}-momentType-upload" class="block"><i class="icon-upload"></i>Upload file</label>
 
             <input type="radio"
                    name="momentType"

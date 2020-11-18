@@ -28,6 +28,7 @@
       &:before {
         @extend .size-32;
         display: block;
+        line-height: 2.25rem;
         padding: 0;
       }
     }
@@ -50,6 +51,7 @@
     .button {
       display: block;
       margin-bottom: 1px;
+      padding: .75rem;
       width: 100%;
 
       &:last-child{
