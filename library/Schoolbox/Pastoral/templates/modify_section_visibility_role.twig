@@ -74,7 +74,7 @@
                                     {% if role.isParent %}
                                         <br />
                                         (Only
-                                        {{ (record is defined and record.student) ? record.student.firstName : 'the student' }}'s
+                                        {{ (record is defined and record.student is defined and record.student) ? record.student.firstName : 'the student' }}'s
                                         parents will be able to view this record.)
                                     {% endif %}
                                 </p>
