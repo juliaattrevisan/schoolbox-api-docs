@@ -96,7 +96,6 @@
         var form = $('form#pastoralForm');
         
         $.validator.addMethod("duplicateIdSelected", function () {
-            console.log($('#duplicateIds').val());
             return $('#duplicateIds').val() !== '';
         }, $.validator.format("You must select at least one student before you can proceed"));
         

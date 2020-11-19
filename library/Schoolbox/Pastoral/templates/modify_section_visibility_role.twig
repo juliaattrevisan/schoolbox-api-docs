@@ -147,7 +147,7 @@
                         var roleId = $(this).attr('data-role-id');
 
                         if (roleId !== '{ID}') {
-                            if (window.rolesAdded.indexOf(roleId) !== -1) {
+                            if (window.rolesAdded.indexOf(parseInt(roleId)) !== -1) {
                                 $("[data-role-add=" + roleId + "]").addClass('hide');
                             } else {
                                 $("[data-role-add=" + roleId + "]").removeClass('hide');
@@ -180,7 +180,7 @@
                         .replace(/{NAME}/g, roleName)
                         .replace(/{ID}/g, roleId);
 
-                    window.rolesAdded.push(roleId);
+                    window.rolesAdded.push(parseInt(roleId));
 
                     var permissionListRoles = $('#permission-roles');
                     permissionListRoles.html(permissionListRoles.html() + html);
