@@ -26,6 +26,14 @@ class Model implements ISoftDeletable, IModel
     use DeletedAtDate;
     use CreateCollection;
 
+
+    /**
+     * Corresponds to the ui elements in record.twig
+     */
+    public const PANEL_GENERAL = 'panel-general';
+    public const PANEL_CONFIDENTIAL = 'panel-confidential';
+
+
     /** @var Pastoral */
     protected $pastoral;
 
@@ -44,6 +52,22 @@ class Model implements ISoftDeletable, IModel
 
     /** @var User */
     protected $owner;
+
+
+    /**
+     * Decide which panel to open in the ui (record.twig usually)
+     *
+     * This hash corresponds to the panel id so you can also jump to it
+     * when you append the hash on the url e.g. /student/25/record/9#panel-confidential
+     */
+    public function getPanel(): string
+    {
+        if ($this->getPrivate()) {
+            return self::PANEL_CONFIDENTIAL;
+        }
+
+        return self::PANEL_GENERAL;
+    }
 
 
     /**

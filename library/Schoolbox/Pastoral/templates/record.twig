@@ -84,19 +84,29 @@
     </div>
 </div>
 
+{# Decide if you can see the Confidential area
+ #}
+{% set canSeeConfidential = access.private %}
+
 <div class="row">
     <div class="small-12 island">
-        <dl class="tabs" data-tab>
-            <dd><a data-tab href="#panel-general">General</a></dd>
-            <dd><a data-tab href="#panel-confidential">Confidential</a></dd>
+        <dl id="tabs" class="tabs" data-tab data-deep-link-smudge="true" data-deep-link="true">
+            <dd><a id="panel-general" href="#panel-general" data-tab>General</a></dd>
+
+            {% if canSeeConfidential %}
+            <dd><a id="panel-confidential" href="#panel-confidential" data-tab>Confidential</a></dd>
+            {% endif %}
         </dl>
 
         <script>
             $(function() {
                 switch (window.location.hash) {
+                    {% if canSeeConfidential %}
                     case '#panel-confidential':
+                    {% endif %}
                     case '#panel-general':
                         $('[data-tab] a[href='+window.location.hash+']').trigger('click');
+
                         break;
 
                     default:
@@ -106,18 +116,21 @@
             });
         </script>
 
-        <section class="tabs-content">
+        <section class="tabs-content" data-tabs-content="tabs">
             <div class="content active" id="panel-general">
                 {# General body #}
                 {% include '@pastoral/record_section_body.twig' with { recordType: 'public' } %}
                 {% include '@pastoral/record_section_comments.twig' with { comments: commentsPublic, recordType: 'public' } %}
             </div>
+
+            {% if canSeeConfidential %}
             <div class="content" id="panel-confidential">
                 {# Confidential body #}
                 {% include '@pastoral/record_section_body.twig' with { recordType: 'private' } %}
 
                 {% include '@pastoral/record_section_comments.twig' with { comments: commentsPrivate, recordType: 'private' } %}
             </div>
+            {% endif %}
         </section>
     </div>
 </div>

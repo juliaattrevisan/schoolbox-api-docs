@@ -602,6 +602,7 @@ class Controller extends Base
     public function postCommentInsert(): void
     {
         $post = $this->getRequest()->post;
+        $hash = '';
 
         try {
             /** @var Model $record */
@@ -623,18 +624,13 @@ class Controller extends Base
 
                 $pastoralExternal = new External_Pastoral();
                 $pastoralExternal->createComment($comment);
+
+                /* If you posted a confidential comment, go back and open the confidential tab
+                 */
+                $hash = "#{$comment->getPanel()}";
             }
 
             // Go back to pastoral record
-
-            /* If you posted a confidential comment, go back and open the confidential tab
-             */
-            $hash = '';
-
-            if ($post['comment_private']) {
-                $hash = '#panel-confidential';
-            }
-
             $this->getResponse()->redirect->afterPost(
                 $this->getrouter()->generate('pastoral.getStudentRecord', [
                     'studentId' => $post['student_id'],

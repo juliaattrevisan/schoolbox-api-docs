@@ -113,7 +113,8 @@ class Notifier extends AbstractModuleNotifier
         }
 
         // Create the message
-        $href = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}#comments";
+        $hash = $model->getPanel();
+        $href = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}#{$hash}";
 
         $builder = new Builder();
         $builder->setTitle("A :pastoralcare comment has been {$method}")
