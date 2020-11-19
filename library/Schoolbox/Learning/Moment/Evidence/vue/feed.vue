@@ -39,6 +39,10 @@ export default {
     mounted() {
         this.load();
     },
+    updated() {
+        // Re-apply Foundation dropdowns
+        this.$nextTick(() => this.jQuery(this.$el).foundation('dropdown', 'reflow'));
+    },
     methods: {
         /**
          * Load learning evidence for the student in question.
@@ -154,15 +158,28 @@ export default {
             <section>
                 <ul class="information-list">
                     <li v-for="evidence in evidenceGroup.evidence" class="feed-item">
-                        <div class="card small-12 compact">
-                            <a :href="evidence.creator._links.profile" title="View Profile">
-                                <img :src="evidence.creator._links.avatar" alt="View Profile">
-                                <p>{{ evidence.creator.fullName }}</p>
-                                <time class="pipe meta"
-                                      :datetime="evidence.createdAt | dateFormat"
-                                      :title="evidence.createdAt  | dateFormat(dateDisplayFormats.momentJsDatetime)"
-                                >{{ evidence.createdAt | dateFormat(dateDisplayFormats.momentJsTime) }}</time>
-                            </a>
+                        <!-- This evidence isn't necessarily editable -->
+                        <div class="actions-small-1">
+                            <div class="card small-12 compact">
+                                <a :href="evidence.creator._links.profile" title="View Profile">
+                                    <img :src="evidence.creator._links.avatar" alt="View Profile">
+                                    <p>{{ evidence.creator.fullName }}</p>
+                                    <time class="pipe meta"
+                                          :datetime="evidence.createdAt | dateFormat"
+                                          :title="evidence.createdAt  | dateFormat(dateDisplayFormats.momentJsDatetime)"
+                                    >{{ evidence.createdAt | dateFormat(dateDisplayFormats.momentJsTime) }}</time>
+                                </a>
+                            </div>
+                            <nav>
+                                <a href="#"
+                                   class="icon-overflow"
+                                   :data-dropdown="'evidence-' + String(evidence.id) + '-dropdown'"
+                                   aria-expanded="false" title="Actions"></a>
+                            </nav>
+                            <ul :id="'evidence-' + String(evidence.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
+                                <li><a class="icon-modify" title="Modify">Modify</a></li>
+                                <li><a class="icon-delete" title="Delete">Delete</a></li>
+                            </ul>
                         </div>
 
                         <div class="feed-body small-12 large-6 column">
