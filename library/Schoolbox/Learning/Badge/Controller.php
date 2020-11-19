@@ -104,6 +104,13 @@ class Controller extends Base
      */
     public function getCreateForm(): void
     {
-
+        // Output a Twig template
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningBadge/createForm.twig',
+                [],
+                'Create Badge'
+            )
+        );
     }
 }

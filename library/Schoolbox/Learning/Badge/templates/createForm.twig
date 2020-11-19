@@ -1,0 +1,17 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbs(
+    ['Badges', routeLookup('learningBadge.getBadges') ],
+    ['Create Badge']
+) }}
+
+<div class="row">
+    <div class="small-12 column">
+        <h1>Create Badge</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+    </div>
+</div>
