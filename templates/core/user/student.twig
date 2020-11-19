@@ -888,11 +888,13 @@
 
 {##
  # Modal for sharing a learning moment
+ #
+ # Only show "sharing on behalf of" if you're not viewing your own profile
  #}
 {% if shareLearningMomentUrl %}
     {% include '@learningMomentEvidence/shareModal.twig' with {
         id:      "shareLearningMoment",
         baseUrl: shareLearningMomentUrl,
-        user:    user,
+        user:    user.id == USER.id ? null : user,
     } only %}
 {% endif %}

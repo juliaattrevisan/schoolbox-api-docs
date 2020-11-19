@@ -16,7 +16,7 @@
 <div data-reveal id="{{ id }}" aria-hidden="true" class="reveal-modal small">
     <h2>Share a Learning Moment</h2>
 
-    {% if user is defined %}
+    {% if user is defined and user is not null %}
     <ul class="meta">
         <li>
             Sharing on behalf of <a href="/search/user/{{ user.id }}">{{ user.fullName }}</a>
