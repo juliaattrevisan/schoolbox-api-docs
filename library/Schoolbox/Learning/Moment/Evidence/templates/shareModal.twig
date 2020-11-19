@@ -29,11 +29,12 @@
             </li>
         </ul>
     {% endif %}
-
-    <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=photo&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="block"><i class="icon-camera"></i>Take a photo</a>
-    <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=video&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="block"><i class="icon-video"></i>Record a video</a>
-    <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=audio&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="block"><i class="icon-audio"></i>Record audio</a>
-    <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=upload&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="block"><i class="icon-upload"></i>Upload file</a>
-    <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=text&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="block"><i class="icon-textbox"></i>Write something</a>
+    <div class="share-work-buttons">
+        <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=photo&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-camera share-photo" title="Take a photo">Take a photo</a>
+        <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=video&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-video share-video" title="Record a video">Record a video</a>
+        <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=audio&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-audio share-audio" title="Record audio">Record audio</a>
+        <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=upload&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-upload share-file" title="Upload file">Upload file</a>
+        <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=text&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-textbox share-text" title="Write something">Write something</a>
+    </div>
     <a class="close-reveal-modal" aria-label="Close">×</a>
 </div>
