@@ -7,9 +7,11 @@ import MediaArticle from '@schoolbox/media-article';
 import Storage      from '@schoolbox/storage';
 import CommentThread from './commentThread';
 import RevealModal from "@schoolbox/reveal-modal";
+import Toast from "@schoolbox/toast";
 
 export default {
     components: {
+        Toast,
         RevealModal,
         MediaArticle,
         Storage,
@@ -160,8 +162,32 @@ export default {
          * @param {Object} evidence
          */
         showDeleteModal(evidence) {
+            this.currentlyDeletingEvidence = evidence;
             this.$refs.deleteModal.open();
         },
+
+
+        /**
+         * Actually delete this evidence.
+         *
+         * @param {Object} evidence
+         */
+        deleteEvidence(evidence) {
+            this.$refs.toast.activate('Deleting...');
+            axios
+                .delete(evidence._links.delete)
+                .then(() => {
+                    // extract out the deleted evidence
+                    this.data            = this.data.filter((v) => v.id !== evidence.id);
+                    this.metadata.count  -= 1;
+                    this.$refs.toast.timeout('Deleted', true);
+                })
+                .catch(() => this.$refs.toast.timeout('Could not delete', false))
+                .finally(() => {
+                    this.showSkeletonLoader = false;
+                    this.$refs.deleteModal.close();
+                })
+        }
     },
     filters: {
         dateFormat: (date, format) => moment(date).format(format),
@@ -260,10 +286,12 @@ export default {
             <h2>Please confirm</h2>
             <p>Are you sure you wish to delete this learning moment?</p>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="" class="button submit">Yes</a></li>
+                <li><a @click.prevent="deleteEvidence(currentlyDeletingEvidence)" class="button submit">Yes</a></li>
                 <li><a @click.prevent="$refs.deleteModal.close()" class="button">No</a></li>
             </ul>
         </reveal-modal>
+
+        <toast ref="toast"></toast>
     </div>
 
 </template>
