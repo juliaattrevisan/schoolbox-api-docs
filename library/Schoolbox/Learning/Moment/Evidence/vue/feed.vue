@@ -138,6 +138,17 @@ export default {
             // shareLearningMoment
             this.jQuery('#shareLearningMoment').foundation('reveal', 'open');
         },
+
+
+        /**
+         * Does this evidence have a menu?
+         *
+         * @param evidence
+         * @returns {Boolean}
+         */
+        hasMenu(evidence) {
+            return Boolean(evidence?._links?.modifyForm || evidence?._links?.deleteForm)
+        }
     },
     filters: {
         dateFormat: (date, format) => moment(date).format(format),
@@ -159,7 +170,7 @@ export default {
                 <ul class="information-list">
                     <li v-for="evidence in evidenceGroup.evidence" class="feed-item">
                         <!-- This evidence isn't necessarily editable -->
-                        <div class="actions-small-1">
+                        <div :class="{'actions-small-1': hasMenu(evidence), 'actions-small-0': !hasMenu(evidence)}">
                             <div class="card small-12 compact">
                                 <a :href="evidence.creator._links.profile" title="View Profile">
                                     <img :src="evidence.creator._links.avatar" alt="View Profile">
@@ -170,13 +181,13 @@ export default {
                                     >{{ evidence.createdAt | dateFormat(dateDisplayFormats.momentJsTime) }}</time>
                                 </a>
                             </div>
-                            <nav>
+                            <nav v-if="hasMenu(evidence)">
                                 <a href="#"
                                    class="icon-overflow"
                                    :data-dropdown="'evidence-' + String(evidence.id) + '-dropdown'"
                                    aria-expanded="false" title="Actions"></a>
                             </nav>
-                            <ul :id="'evidence-' + String(evidence.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
+                            <ul v-if="hasMenu(evidence)" :id="'evidence-' + String(evidence.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
                                 <li><a class="icon-modify" title="Modify">Modify</a></li>
                                 <li><a class="icon-delete" title="Delete">Delete</a></li>
                             </ul>
