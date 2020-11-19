@@ -244,13 +244,42 @@ Data:
             },
             openShareLearningMomentDialog: function() {
                 // Set each link's href to the selected users
-                let dialog   = $('#classList-shareLearningMoment'),
-                    pathname = '/learning/evidence/user/' + this.selectedStudentIds.join(',') + '/create';
+                let self     = this,
+                    dialog   = $('#classList-shareLearningMoment'),
+                    pathname = '/learning/evidence/user/' + self.selectedStudentIds.join(',') + '/create';
                 dialog.find('a[data-action="shareLearningMoment"]').each(function () {
                     let url      = new URL(this.href);
                     url.pathname = pathname;
                     this.href    = url.href;
                 });
+
+                // Also update the "sharing on behalf of" part here
+                let selectedStudents = [];
+                self.studentLists.forEach(function (student) {
+                    if (student.id && self.selectedStudentIds.includes(student.id)) {
+                        selectedStudents.push(student);
+                    }
+                });
+
+                // Create the list of links
+                let parts = [];
+                selectedStudents.forEach(function (student) {
+                    parts.push($('<a>')
+                        .attr('href', '/search/user/' + student.id)
+                        .text(student.firstname + ' ' + student.lastname));
+                    parts.push(', ');
+                });
+
+                // Slice off the last comma
+                parts = parts.slice(0, -1);
+
+                // Replace the last comma with "and"
+                if (parts.length > 1) {
+                    parts.splice(-2, 1, ' and ');
+                }
+
+                // Shove it in the dynamic users slot
+                dialog.find('[data-relation="dynamicUsersSlot"]').empty().append(parts);
                 dialog.foundation('reveal', 'open');
             },
         },
@@ -325,6 +354,7 @@ Data:
 {% endautoescape %}
 
 {% include '@learningMomentEvidence/shareModal.twig' with {
-    id:      "classList-shareLearningMoment",
-    baseUrl: '',
+    id:                "classList-shareLearningMoment",
+    baseUrl:           '',
+    allowDynamicUsers: true,
 } only %}
