@@ -26,6 +26,14 @@ class Model implements ISoftDeletable, IModel
     use DeletedAtDate;
     use CreateCollection;
 
+
+    /**
+     * Corresponds to the ui elements in record.twig
+     */
+    public const PANEL_GENERAL = 'panel-general';
+    public const PANEL_CONFIDENTIAL = 'panel-confidential';
+
+
     /** @var Pastoral */
     protected $pastoral;
 
