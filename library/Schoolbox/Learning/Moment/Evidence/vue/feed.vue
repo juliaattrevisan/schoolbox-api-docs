@@ -184,7 +184,6 @@ export default {
                 })
                 .catch(() => this.$refs.toast.timeout('Could not delete', false))
                 .finally(() => {
-                    this.showSkeletonLoader = false;
                     this.$refs.deleteModal.close();
                 })
         }
