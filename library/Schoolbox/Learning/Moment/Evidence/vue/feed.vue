@@ -6,9 +6,11 @@ import moment from 'moment';
 import MediaArticle from '@schoolbox/media-article';
 import Storage      from '@schoolbox/storage';
 import CommentThread from './commentThread';
+import RevealModal from "@schoolbox/reveal-modal";
 
 export default {
     components: {
+        RevealModal,
         MediaArticle,
         Storage,
         CommentThread,
@@ -21,6 +23,7 @@ export default {
                 cursor: null,
             },
             showSkeletonLoader: true,
+            currentlyDeletingEvidence: null,
         }
     },
     created() {
@@ -148,7 +151,17 @@ export default {
          */
         hasMenu(evidence) {
             return Boolean(evidence?._links?.modifyForm || evidence?._links?.deleteForm)
-        }
+        },
+
+
+        /**
+         * Display the delete modal for a piece of evidence.
+         *
+         * @param {Object} evidence
+         */
+        showDeleteModal(evidence) {
+            this.$refs.deleteModal.open();
+        },
     },
     filters: {
         dateFormat: (date, format) => moment(date).format(format),
@@ -188,8 +201,8 @@ export default {
                                    aria-expanded="false" title="Actions"></a>
                             </nav>
                             <ul v-if="hasMenu(evidence)" :id="'evidence-' + String(evidence.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                <li><a class="icon-modify" title="Modify">Modify</a></li>
-                                <li><a class="icon-delete" title="Delete">Delete</a></li>
+                                <li><a v-if="evidence._links.modifyForm" :href="evidence._links.modifyForm" class="icon-modify" title="Modify">Modify</a></li>
+                                <li><a @click.prevent="showDeleteModal(evidence)" v-if="evidence._links.delete" class="icon-delete" title="Delete">Delete</a></li>
                             </ul>
                         </div>
 
@@ -240,6 +253,17 @@ export default {
                 </button>
             </div>
         </div>
+
+
+        <!-- TODO create a Vue equivalent of $.confirmDialog -->
+        <reveal-modal ref="deleteModal">
+            <h2>Please confirm</h2>
+            <p>Are you sure you wish to delete this learning moment?</p>
+            <ul class="flex-list buttons">
+                <li><a @click.prevent="" class="button submit">Yes</a></li>
+                <li><a @click.prevent="$refs.deleteModal.close()" class="button">No</a></li>
+            </ul>
+        </reveal-modal>
     </div>
 
 </template>
