@@ -94,4 +94,16 @@ class Controller extends Base
             )
         );
     }
+
+
+    /**
+     * View the form for creating a badge.
+     *
+     * @api   GET /learning/badge/create/
+     * @since 20.2
+     */
+    public function getCreateForm(): void
+    {
+
+    }
 }

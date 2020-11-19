@@ -4,6 +4,20 @@
     ['Badges']
 ) }}
 
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Badge List</h1>
+        </div>
+    </div>
+    <nav>
+        {% if routeLookupIfAuthorized('learningBadge.getCreateForm') %}
+            <a href="{{ routeLookup('learningBadge.getCreateForm') }}" class="icon-add" title="Create Badge"></a>
+        {% endif %}
+    </nav>
+</div>
+
 <div class="row">
     <div class="small-12 island">
         <div id="badge-list-container" >
