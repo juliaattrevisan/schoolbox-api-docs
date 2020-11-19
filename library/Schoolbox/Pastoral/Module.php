@@ -232,7 +232,7 @@ class Module extends BaseModule
 
             // Load student record
 
-            if (array_key_exists('studentId', $params)) {
+            if (array_key_exists('studentId', $params) && $params['studentId'] !== '0') {
                 try {
                     /** @var UserMapper $userMapper */
                     $userMapper = $this->getMapperFactory()->get(UserMapper::class);

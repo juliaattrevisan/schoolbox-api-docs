@@ -77,27 +77,35 @@
 
         {# Create Duplicate Record Selectize #}
 
-        $('#addStudent').selectizeSelector({
+        $('#duplicateIds').selectizeSelector({
             multiple: true,
             ajax: {
                 url: '/ajax/user.php',
                 type: 'GET',
                 data: {
                     roleTypeID: 'student',
-                    excludeID: '{{ record.student.id }}'
+                    excludeID: '{{ record.student ? record.student.id : '' }}'
                 },
                 dataType: 'json'
-            }
+            },
+            value: {{ students | raw}}
         });
 
         {# Form Validation #}
 
         var form = $('form#pastoralForm');
-
+        
+        $.validator.addMethod("duplicateIdSelected", function () {
+            return $('#duplicateIds').val() !== '';
+        }, $.validator.format("You must select at least one student before you can proceed"));
+        
         form.alaressValidate({
             ignore: ':disabled',
             rules: {
-                'heading': {requiredNotBlank: true}
+                'heading': {requiredNotBlank: true},
+                'duplicateIds': {
+                    'duplicateIdSelected': {{ record.student ? 'false' : 'true' }}
+                },
             },
 
             messages: {
@@ -173,11 +181,11 @@
                         {% set type    = subtype is null ? audience.type : subtype.pastoralType %}
 
                         if ('{{ type.id }}' === typeId && '{{ subtype.id|default(noSubTypeVal) }}' === subtypeId) {
-                            {% if audience.group.id %}
+                            {% if audience.group %}
                             window.addGroup("{{ audience.group.id }}", "{{ audience.group.name }}", "{{ audience.access }}");
-                            {% elseif audience.role.id %}
+                            {% elseif audience.role %}
                             window.addRole("{{ audience.role.id }}", "{{ audience.role.name }}", "{{ audience.access}}");
-                            {% elseif audience.user.id %}
+                            {% elseif audience.user %}
                             window.modalUserAdded({
                                 'id' : {{ audience.user.id }},
                                 'first_name': "{{ audience.user.firstname }}",

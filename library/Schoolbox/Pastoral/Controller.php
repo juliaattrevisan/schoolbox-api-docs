@@ -21,6 +21,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
@@ -471,9 +472,10 @@ class Controller extends Base
     {
         // Throw in a blank pastoral record with the student populated
 
-        /** @var PastoralModel $record */
         $record = $this->pastoralDataSource->createModel();
-        $record->setStudent($student);
+        if ($student) {
+            $record->setStudent($student);
+        }
 
         $this->getStudentRecordUpdateForm($record);
     }
@@ -518,15 +520,32 @@ class Controller extends Base
             if ($allowParents && $roleCurrent->isParent()) {
                 $roles->add($roleCurrent);
                 $roleUsers[$roleCurrent->getId()] = 0;
-                foreach ($record->getStudent()->getParents() as $parent) {
-                    if ($parent->getRole()->getId() == $roleCurrent->getId()) {
-                        $roleUsers[$roleCurrent->getId()]++;
+                if ($record->getStudent()) {
+                    foreach ($record->getStudent()->getParents() as $parent) {
+                        if ($parent->getRole()->getId() == $roleCurrent->getId()) {
+                            $roleUsers[$roleCurrent->getId()]++;
+                        }
                     }
                 }
             }
         }
 
         $audienceDefaults = $this->audienceMapper->findAll();
+
+        // When student ids are provided to copy this record to, prefill Create duplicate record field.
+        $duplicateIds = explode(',', $this->request->query->get('duplicates') ?? '');
+        $duplicates   = $this->userMapper->findByColumn('id', $duplicateIds);
+        $students     = [];
+        /** @var User $student */
+        foreach ($duplicates as $student) {
+            if (!$student->getRole()->isStudent()) {
+                continue;
+            }
+            $students[] = [
+                'id'   => $student->getId(),
+                'name' => $student->getFullName(),
+            ];
+        }
 
         // Render this thing out
 
@@ -547,6 +566,9 @@ class Controller extends Base
                 'attachzonePublic'  => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
                 'attachzonePrivate' => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
                 'audiences'         => $audienceDefaults,
+                'students'          => json_encode($students),
+                'returnUrlName'     => Redirect::RETURN_URL,
+                'encodedReturnUrl'  => $this->request->query->get(Redirect::RETURN_URL),
             ],
             'title' => 'Pastoral Record',
         ]);
@@ -683,8 +705,14 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
 
-        $studentId           = $post["student_id"];
-        $duplicateStudentIds = $post["duplicate_id"];
+        $studentId           = $post->get('student_id');
+        $duplicateStudentIds = explode(',', $post->get('duplicateIds') ?? '');
+        if (empty($studentId) && empty($duplicateStudentIds)) {
+            throw new InvalidArgumentException('No student provided.');
+        }
+        if (empty($studentId)) {
+            $studentId = array_shift($duplicateStudentIds);
+        }
 
         // Check if we need to create any duplicates
 
@@ -707,12 +735,15 @@ class Controller extends Base
         }
 
         // Go back to students pastoral record
-
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('pastoral.getStudent', [
+        $encodedReturnUrl = $post->get(Redirect::RETURN_URL);
+        if (!empty($encodedReturnUrl)) {
+            $returnUrl = Redirect::decode($encodedReturnUrl);
+        } else {
+            $returnUrl = $this->getRouter()->generate('pastoral.getStudent', [
                 'studentId' => $studentId,
-            ])
-        );
+            ]);
+        }
+        $this->getResponse()->redirect->afterPost($returnUrl);
     }
 
     /**
@@ -730,13 +761,13 @@ class Controller extends Base
 
         try {
             /** @var Model $record */
-            $record = $this->pastoralDataSource->findById($this->getUser(), $post['id']);
+            $record = $this->pastoralDataSource->findById($this->getUser(), $post->get('id'));
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
 
-        $studentId           = $post["student_id"];
-        $duplicateStudentIds = $post["duplicate_id"];
+        $studentId           = $post->get('student_id');
+        $duplicateStudentIds = explode(',', $post->get('duplicateIds') ?? '');
 
         // Check if we need to create any duplicates
 

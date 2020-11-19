@@ -408,6 +408,7 @@
 
                 if (additionalHtmlResults.length === 0 && searchResults.html().trim() === '') {
                     searchResultsEmpty.removeClass('hide');
+                    userSearch.val('');
                 }
 
                 {# Put focus back on the search box so they can keep typing #}

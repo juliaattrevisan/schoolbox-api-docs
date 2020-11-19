@@ -68,11 +68,13 @@
                                 <p>{{ role.name }}</p>
                                 <p class="meta">
                                     System Role
-                                    ({{ roleUsers[role.id] }} {% if roleUsers[role.id] == 1 %}User{% else %}Users{% endif %})
+                                    {% if not role.isParent or not bulkCreate %}
+                                        ({{ roleUsers[role.id] }} {% if roleUsers[role.id] == 1 %}User{% else %}Users{% endif %})
+                                    {% endif %}
                                     {% if role.isParent %}
                                         <br />
                                         (Only
-                                        {{ record is defined and record.student is defined ? record.student.firstName : 'the student' }}'s
+                                        {{ (record is defined and record.student is defined and record.student) ? record.student.firstName : 'the student' }}'s
                                         parents will be able to view this record.)
                                     {% endif %}
                                 </p>
@@ -145,7 +147,7 @@
                         var roleId = $(this).attr('data-role-id');
 
                         if (roleId !== '{ID}') {
-                            if (window.rolesAdded.indexOf(roleId) !== -1) {
+                            if (window.rolesAdded.indexOf(parseInt(roleId)) !== -1) {
                                 $("[data-role-add=" + roleId + "]").addClass('hide');
                             } else {
                                 $("[data-role-add=" + roleId + "]").removeClass('hide');
@@ -178,7 +180,7 @@
                         .replace(/{NAME}/g, roleName)
                         .replace(/{ID}/g, roleId);
 
-                    window.rolesAdded.push(roleId);
+                    window.rolesAdded.push(parseInt(roleId));
 
                     var permissionListRoles = $('#permission-roles');
                     permissionListRoles.html(permissionListRoles.html() + html);

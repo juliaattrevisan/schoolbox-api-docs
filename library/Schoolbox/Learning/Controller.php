@@ -436,9 +436,12 @@ class Controller extends Base
                 'specialNeeds'           => $this->rosettaStone->translate('specialNeeds', true, true),
                 'replyTo'                => $this->getUser()->getEmail(),
                 'mailEnabled'            => $this->getConfigLoader()->get('mail_enable'),
+                'pastoralEnabled'        => $this->getConfigLoader()->get('pastoral_enabled'),
                 'learningMomentsEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
                 'emailGroups'            => $this->getClassListsEmailGroups(),
                 'folder'                 => $folder,
+                'returnUrlName'          => Assessment\Redirect::RETURN_URL,
+                'encodedReturnUrl'       => Assessment\Redirect::encode($_SERVER['REQUEST_URI']),
             ])->setTab('classes')->setTitle($folder->getName())
         );
     }
