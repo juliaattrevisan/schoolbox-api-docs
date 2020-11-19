@@ -20,7 +20,7 @@ Data:
                 <li><a href="#" class="disabled">Set Goal(s)</a></li>
                 {% if pastoralEnabled %}
                     <li><a @click.prevent="addPastoralRecord"
-                           :class="{disabled: selectedStudentIds.length === 0}">Add Pastoral Record</a></li>
+                           :class="{disabled: selectedStudentIds.length === 0}">Add {{ locale.pastoralCare.proper }} Record</a></li>
                 {% endif %}
                 {% if learningMomentsEnabled %}
                     <li><a @click.prevent="openShareLearningMomentDialog"
@@ -195,6 +195,8 @@ Data:
             actionsPlaceholder: true,
             loadingText: 'Please Wait...',
             noEmailsFoundText: 'Sorry we cannot send an email to the selected users as they do not have an email',
+            returnUrlName: '{{ returnUrlName }}',
+            encodedReturnUrl: '{{ encodedReturnUrl }}',
         },
         mounted: function() {
             var self = this;
@@ -246,7 +248,7 @@ Data:
                 this.$refs.form.submit();
             },
             addPastoralRecord: function () {
-                window.location.href = '/pastoral/student/0/record/insert?duplicates=' + this.selectedStudentIds.join(',');
+                window.location.href = '/pastoral/student/0/record/insert?' + this.returnUrlName + '=' + this.encodedReturnUrl + '&duplicates=' + this.selectedStudentIds.join(',');
             },
             openShareLearningMomentDialog: function() {
                 // Set the form's target to the selected users

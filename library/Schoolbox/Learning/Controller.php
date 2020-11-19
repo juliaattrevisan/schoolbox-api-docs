@@ -440,6 +440,8 @@ class Controller extends Base
                 'learningMomentsEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
                 'emailGroups'            => $this->getClassListsEmailGroups(),
                 'folder'                 => $folder,
+                'returnUrlName'          => Assessment\Redirect::RETURN_URL,
+                'encodedReturnUrl'       => Assessment\Redirect::encode($_SERVER['REQUEST_URI']),
             ])->setTab('classes')->setTitle($folder->getName())
         );
     }

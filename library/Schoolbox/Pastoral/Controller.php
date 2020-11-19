@@ -21,6 +21,7 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted as MapperDeletedException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
@@ -566,6 +567,8 @@ class Controller extends Base
                 'attachzonePrivate' => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
                 'audiences'         => $audienceDefaults,
                 'students'          => json_encode($students),
+                'returnUrlName'     => Redirect::RETURN_URL,
+                'encodedReturnUrl'  => $this->request->query->get(Redirect::RETURN_URL),
             ],
             'title' => 'Pastoral Record',
         ]);
@@ -732,12 +735,15 @@ class Controller extends Base
         }
 
         // Go back to students pastoral record
-
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('pastoral.getStudent', [
+        $encodedReturnUrl = $post->get(Redirect::RETURN_URL);
+        if (!empty($encodedReturnUrl)) {
+            $returnUrl = Redirect::decode($encodedReturnUrl);
+        } else {
+            $returnUrl = $this->getRouter()->generate('pastoral.getStudent', [
                 'studentId' => $studentId,
-            ])
-        );
+            ]);
+        }
+        $this->getResponse()->redirect->afterPost($returnUrl);
     }
 
     /**

@@ -56,6 +56,7 @@
     </div>
     <div class="small-12 island hide" id="formPastoral">
         <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data" action="{{ saveRoute }}">
+            <input type="hidden" name="{{ returnUrlName }}" value="{{ encodedReturnUrl }}">
             {% if bulkCreate %}
                 {% include "@pastoral/modify_section_linked.twig" %}
             {% endif %}
