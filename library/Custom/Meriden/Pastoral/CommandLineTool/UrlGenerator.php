@@ -13,6 +13,7 @@ use Aura\Router\Router;
 use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
 use Custom\Meriden\Pastoral\StudentInvolvement\Subject;
 use Schoolbox\User;
+use Zend\Uri\UriInterface;
 
 /**
  * Class UrlGenerator
@@ -47,13 +48,14 @@ class UrlGenerator
     /**
      * Generate a list of URLs for this student.
      *
-     * @param int         $year
-     * @param User        $student
-     * @param string|null $roleTypeOverride If provided, show only results for
+     * @param UriInterface $baseUrl
+     * @param int          $year
+     * @param User         $student
+     * @param string|null  $roleTypeOverride If provided, show only results for
      *                                      this role type
-     * @return array
+     * @return array|string[]
      */
-    public function generate(int $year, User $student, ?string $roleTypeOverride): array
+    public function generate(UriInterface $baseUrl, int $year, User $student, ?string $roleTypeOverride): array
     {
         $queryString = $roleTypeOverride
             ? ('?' . http_build_query(['role-type' => $roleTypeOverride]))
@@ -66,7 +68,10 @@ class UrlGenerator
             'year'    => $year,
         ];
         $results = [
-            $this->router->generate('customMeridenPastoral.index', $params) . $queryString,
+            $baseUrl
+                ->setPath($this->router->generate('customMeridenPastoral.index', $params))
+                ->setQuery($queryString)
+                ->toString(),
         ];
 
         // Find the pages for each subject: sort by alphabetical order
@@ -86,7 +91,10 @@ class UrlGenerator
                 'subject'     => $subject,
                 'subjectCode' => $subject->getSubjectCode(),
             ];
-            $results[] = $this->router->generate('customMeridenPastoral.subject', $params) . $queryString;
+            $results[] = $baseUrl
+                ->setPath($this->router->generate('customMeridenPastoral.subject', $params))
+                ->setQuery($queryString)
+                ->toString();
         }
 
         return $results;

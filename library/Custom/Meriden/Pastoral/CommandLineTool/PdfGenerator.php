@@ -237,7 +237,7 @@ EXAMPLES:
             $result->add(
                 new SourceBundle(
                     sprintf('%s-%d.pdf', $student->getExternalId(), $reportYear),
-                    $urlGenerator->generate($reportYear, $student, $roleType),
+                    $urlGenerator->generate($baseUrl, $reportYear, $student, $roleType),
                     sprintf(
                         'Generating report for %s, %s (ID: %d, TASS ID: %s)',
                         $student->getLastname(),
