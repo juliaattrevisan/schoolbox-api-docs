@@ -7,6 +7,8 @@
  * * Other files are rendered with an `<a>` tag, providing a link for download
  */
 
+import filesize from "filesize";
+
 export default {
     name: "storage",
     props: {
@@ -41,8 +43,8 @@ export default {
                 // Work around what I think is an issue with mediaelement not
                 // knowing what to do when the player loads.
                 // The video isn't set to the same size as the player.
-                let container = $el.closest('.mejs__container');
-                this.videoWidth = container.width();
+                let container    = $el.closest('.mejs__container');
+                this.videoWidth  = container.width();
                 this.videoHeight = container.height();
                 break;
 
@@ -50,6 +52,15 @@ export default {
                 break;
         }
     },
+    filters: {
+        filesize(size) {
+            // This uses the JEDEC standard (1KB = 1024B),
+            // rather than the SI standard (1KB = 1000B, 1KiB = 1024B):
+            // Schoolbox's file size rendering uses the JEDEC standard for
+            // better or worse.
+            return filesize(size);
+        }
+    }
 }
 </script>
 
@@ -69,5 +80,6 @@ export default {
     <img v-else-if="storage.type === 'image'" :src="storage._links.image" :alt="filename" />
     <a v-else :href="storage._links.fetch">
         <img :src="storage._links.icon" :alt="filename" /> {{ filename }}
+        <span class="meta">({{ storage.size | filesize }})</span>
     </a>
 </template>
