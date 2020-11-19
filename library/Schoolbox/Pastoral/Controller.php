@@ -471,9 +471,10 @@ class Controller extends Base
     {
         // Throw in a blank pastoral record with the student populated
 
-        /** @var PastoralModel $record */
         $record = $this->pastoralDataSource->createModel();
-        $record->setStudent($student);
+        if ($student) {
+            $record->setStudent($student);
+        }
 
         $this->getStudentRecordUpdateForm($record);
     }
@@ -518,9 +519,11 @@ class Controller extends Base
             if ($allowParents && $roleCurrent->isParent()) {
                 $roles->add($roleCurrent);
                 $roleUsers[$roleCurrent->getId()] = 0;
-                foreach ($record->getStudent()->getParents() as $parent) {
-                    if ($parent->getRole()->getId() == $roleCurrent->getId()) {
-                        $roleUsers[$roleCurrent->getId()]++;
+                if ($record->getStudent()) {
+                    foreach ($record->getStudent()->getParents() as $parent) {
+                        if ($parent->getRole()->getId() == $roleCurrent->getId()) {
+                            $roleUsers[$roleCurrent->getId()]++;
+                        }
                     }
                 }
             }
@@ -699,8 +702,14 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
 
-        $studentId           = $post["student_id"];
-        $duplicateStudentIds = $post["duplicate_id"];
+        $studentId           = $post->get('student_id');
+        $duplicateStudentIds = explode(',', $post->get('duplicateIds') ?? '');
+        if (empty($studentId) && empty($duplicateStudentIds)) {
+            throw new InvalidArgumentException('No student provided.');
+        }
+        if (empty($studentId)) {
+            $studentId = array_shift($duplicateStudentIds);
+        }
 
         // Check if we need to create any duplicates
 
@@ -746,13 +755,13 @@ class Controller extends Base
 
         try {
             /** @var Model $record */
-            $record = $this->pastoralDataSource->findById($this->getUser(), $post['id']);
+            $record = $this->pastoralDataSource->findById($this->getUser(), $post->get('id'));
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
 
-        $studentId           = $post["student_id"];
-        $duplicateStudentIds = $post["duplicate_id"];
+        $studentId           = $post->get('student_id');
+        $duplicateStudentIds = explode(',', $post->get('duplicateIds') ?? '');
 
         // Check if we need to create any duplicates
 

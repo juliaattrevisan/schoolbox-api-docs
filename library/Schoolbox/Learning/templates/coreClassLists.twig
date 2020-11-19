@@ -246,7 +246,7 @@ Data:
                 this.$refs.form.submit();
             },
             addPastoralRecord: function () {
-                window.location.href = '/pastoral/student/' + this.selectedStudentIds.shift() + '/record/insert?duplicates=' + this.selectedStudentIds.join(',');
+                window.location.href = '/pastoral/student/0/record/insert?duplicates=' + this.selectedStudentIds.join(',');
             },
             openShareLearningMomentDialog: function() {
                 // Set the form's target to the selected users

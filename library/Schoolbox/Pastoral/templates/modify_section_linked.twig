@@ -1,14 +1,15 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
+{% if not bulkCreate %}
 <h2 class="subheader">Create Duplicate Record</h2>
-
+{% endif %}
 <section>
     <fieldset class="content">
         <div class="small-12 columns">
             <label>
                 Select Students
                 <span class="hint has-tip tip-top" data-tooltip title="This will create a duplicate entry on each selected students {{ locale.pastoral }} record.">?</span>
-                <select id="addStudent" name="duplicate_id[]" multiple placeholder="Enter Student Names"></select>
+                <input type="text" id="duplicateIds" name="duplicateIds" multiple placeholder="Enter Student Names"></input>
             </label>
 
             {% if record.relatedRecords | length %}
