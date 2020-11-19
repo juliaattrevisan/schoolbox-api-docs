@@ -47,6 +47,12 @@ class Module extends BaseModule
             'getCreateForm',
             $baseRule
         );
+        $this->register(
+            self::METHOD_POST,
+            '',
+            'postBadge',
+            $baseRule
+        );
     }
 
 
