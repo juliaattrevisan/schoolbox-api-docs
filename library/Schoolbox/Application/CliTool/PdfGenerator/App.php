@@ -81,6 +81,7 @@ abstract class App extends BaseApp
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_HASH,
+            self::OPT_LONG_PORT,
             self::OPT_LONG_USERNAME,
             self::OPT_LONG_MAX_FAILS,
             self::OPT_LONG_JS_DELAY,
