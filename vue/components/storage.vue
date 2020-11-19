@@ -22,11 +22,28 @@ export default {
     computed: {
         jQuery: () => window.jQuery,
     },
+    data() {
+        return {
+            videoWidth: null,
+            videoHeight: null,
+        }
+    },
     mounted() {
         switch (this.storage.type) {
             case 'audio':
-            case 'video':
                 this.jQuery(this.$el).mediaelementplayer();
+                break;
+
+            case 'video':
+                let $el = this.jQuery(this.$el);
+                $el.mediaelementplayer();
+
+                // Work around what I think is an issue with mediaelement not
+                // knowing what to do when the player loads.
+                // The video isn't set to the same size as the player.
+                let container = $el.closest('.mejs__container');
+                this.videoWidth = container.width();
+                this.videoHeight = container.height();
                 break;
 
             default:
@@ -37,7 +54,13 @@ export default {
 </script>
 
 <template>
-    <video v-if="storage.type === 'video'" controls preload="none" :poster="storage._links.poster">
+    <video v-if="storage.type === 'video'"
+           controls
+           preload="none"
+           :poster="storage._links.poster"
+           :width="videoWidth"
+           :height="videoHeight"
+    >
         <source type="video/mp4" :src="storage._links.stream">
     </video>
     <audio v-else-if="storage.type === 'audio'" controls preload="none">
