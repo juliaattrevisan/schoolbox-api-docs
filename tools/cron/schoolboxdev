@@ -51,4 +51,7 @@ MAILTO="support@schoolbox.com.au"
 # Data dir ownership - every 10 min - skip storage dir (just a hack until we fix this properly)
 */10 * * * * root /usr/share/schoolboxdev/tools/set-config-data-dirs-perms.sh --skip storage_dir --owner www-data --group www-data >> /var/log/schoolboxdev/set-config-data-dirs-perms.log 2>&1
 
+# Submit system metrics to telegraf server every day at 3:15am
+15 3 * * * www-data php /usr/share/schoolboxdev/tools/stats.php | curl -X POST -d @- 'http://localhost:8126/telegraf' 2>&1
+
 # End of file - do not delete
