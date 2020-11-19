@@ -113,7 +113,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         // Create the message
-        $hash = $model->getPrivate() ? Model::PANEL_CONFIDENTIAL : MODEL::PANEL_GENERAL;
+        $hash = $model->getPanel();
         $href = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}#{$hash}";
 
         $builder = new Builder();

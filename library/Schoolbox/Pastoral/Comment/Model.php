@@ -55,6 +55,22 @@ class Model implements ISoftDeletable, IModel
 
 
     /**
+     * Decide which panel to open in the ui (record.twig usually)
+     *
+     * This hash corresponds to the panel id so you can also jump to it
+     * when you append the hash on the url e.g. /student/25/record/9#panel-confidential
+     */
+    public function getPanel(): string
+    {
+        if ($this->getPrivate()) {
+            return self::PANEL_CONFIDENTIAL;
+        }
+
+        return self::PANEL_GENERAL;
+    }
+
+
+    /**
      * Returns whether this is a public comment
      *
      * @return bool

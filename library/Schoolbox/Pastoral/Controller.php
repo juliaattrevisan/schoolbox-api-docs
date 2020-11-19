@@ -605,9 +605,7 @@ class Controller extends Base
 
                 /* If you posted a confidential comment, go back and open the confidential tab
                  */
-                if ($comment->getPrivate()) {
-                    $hash = '#' . PastoralComment::PANEL_CONFIDENTIAL;;
-                }
+                $hash = "#{$comment->getPanel()}";
             }
 
             // Go back to pastoral record
