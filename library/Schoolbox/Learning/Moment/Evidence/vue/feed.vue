@@ -8,11 +8,9 @@ import Storage      from '@schoolbox/storage';
 import CommentThread from './commentThread';
 import RevealModal from "@schoolbox/reveal-modal";
 import Toast from "@schoolbox/toast";
-import Dropdown from "@schoolbox/dropdown";
 
 export default {
     components: {
-        Dropdown,
         Toast,
         RevealModal,
         MediaArticle,
@@ -177,32 +175,39 @@ export default {
         deleteEvidence(evidence) {
             this.$refs.toast.activate('Deleting...');
 
-            // This should work, but it causes problems?
-            // slice might work?
-            // let deletedIndex = this.data.findIndex((v) => v.id !== evidence.id);
-            // this.data.splice(deletedIndex, 1);
+            // // This should work, but it causes problems?
+            // // slice might work?
+            // // let deletedIndex = this.data.findIndex((v) => v.id !== evidence.id);
+            // // this.data.splice(deletedIndex, 1);
+            // let newData = this.data.filter((v) => v.id !== evidence.id);
+            // this.data   = [];
+            // this.$refs.deleteModal.close();
+            // this.$nextTick(() => {
+            //     this.data = newData;
+            //     this.metadata.count  -= 1;
+            //     this.$refs.toast.timeout('Deleted', true);
+            // });
+
+
+            // Replacing the data in place in the same tick causes issues with
+            // the MediaElement player and Foundation dropdowns for some reason.
+            // Clear it first; then replace it with the filtered data in the
+            // next tick.
             let newData = this.data.filter((v) => v.id !== evidence.id);
-            this.data   = [];
-            this.$refs.deleteModal.close();
-            this.$nextTick(() => {
-                this.data = newData;
-                this.metadata.count  -= 1;
-                this.$refs.toast.timeout('Deleted', true);
-            });
-
-
-            // axios
-            //     .delete(evidence._links.delete)
-            //     .then(() => {
-            //         // extract out the deleted evidence
-            //         this.data            = this.data.filter((v) => v.id !== evidence.id);
-            //         this.metadata.count  -= 1;
-            //         this.$refs.toast.timeout('Deleted', true);
-            //     })
-            //     .catch(() => this.$refs.toast.timeout('Could not delete', false))
-            //     .finally(() => {
-            //         this.$refs.deleteModal.close();
-            //     })
+            axios
+                .delete(evidence._links.delete)
+                .then(() => {
+                    this.data = [];
+                    this.$refs.toast.timeout('Deleted', true);
+                    this.$nextTick(() => {
+                        this.data = newData;
+                        this.metadata.count  -= 1;
+                    });
+                })
+                .catch(() => this.$refs.toast.timeout('Could not delete', false))
+                .finally(() => {
+                    this.$refs.deleteModal.close();
+                })
         }
     },
     filters: {
@@ -225,7 +230,7 @@ export default {
                 <ul class="information-list">
                     <li v-for="evidence in evidenceGroup.evidence" class="feed-item">
                         <!-- This evidence isn't necessarily editable -->
-                        <div data-evidence-card :class="{'actions-small-1': hasMenu(evidence), 'actions-small-0': !hasMenu(evidence)}">
+                        <div :class="{'actions-small-1': hasMenu(evidence), 'actions-small-0': !hasMenu(evidence)}">
                             <div class="card small-12 compact">
                                 <a :href="evidence.creator._links.profile" title="View Profile">
                                     <img :src="evidence.creator._links.avatar" alt="View Profile">
