@@ -46,11 +46,10 @@ export default {
     mounted() {
         this.load();
     },
-    // updated() {
-    //     // Re-apply Foundation dropdowns
-    //     // this.jQuery(this.$el).foundation('dropdown', 'reflow');
-    //     this.$nextTick(() => this.jQuery(this.$el).foundation('dropdown', 'reflow'));
-    // },
+    updated() {
+        // Re-apply Foundation dropdowns
+        this.$nextTick(() => this.jQuery(this.$el).foundation('dropdown', 'reflow'));
+    },
     methods: {
         /**
          * Load learning evidence for the student in question.
@@ -237,23 +236,16 @@ export default {
                                     >{{ evidence.createdAt | dateFormat(dateDisplayFormats.momentJsTime) }}</time>
                                 </a>
                             </div>
-                            <dropdown v-if="hasMenu(evidence)">
+                            <nav v-if="hasMenu(evidence)">
+                                <a href="#"
+                                   class="icon-overflow"
+                                   :data-dropdown="'evidence-' + String(evidence.id) + '-dropdown'"
+                                   aria-expanded="false" title="Actions"></a>
+                            </nav>
+                            <ul v-if="hasMenu(evidence)" :id="'evidence-' + String(evidence.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
                                 <li><a v-if="evidence._links.modifyForm" :href="evidence._links.modifyForm" class="icon-modify" title="Modify">Modify</a></li>
                                 <li><a @click.prevent="showDeleteModal(evidence)" v-if="evidence._links.delete" class="icon-delete" title="Delete">Delete</a></li>
-                            </dropdown>
-<!--                            <nav v-if="hasMenu(evidence)">-->
-
-<!--                                &lt;!&ndash;<a @click.prevent="showDeleteModal(evidence)" v-if="evidence._links.delete" class="icon-delete" title="Delete"></a>&ndash;&gt;-->
-
-<!--                                <a href="#"-->
-<!--                                   class="icon-overflow"-->
-<!--                                   :data-dropdown="'evidence-' + String(evidence.id) + '-dropdown'"-->
-<!--                                   aria-expanded="false" title="Actions"></a>-->
-<!--                            </nav>-->
-<!--                            <ul v-if="hasMenu(evidence)" :id="'evidence-' + String(evidence.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>-->
-<!--                                <li><a v-if="evidence._links.modifyForm" :href="evidence._links.modifyForm" class="icon-modify" title="Modify">Modify</a></li>-->
-<!--                                <li><a @click.prevent="showDeleteModal(evidence)" v-if="evidence._links.delete" class="icon-delete" title="Delete">Delete</a></li>-->
-<!--                            </ul>-->
+                            </ul>
                         </div>
 
                         <div class="feed-body small-12 large-6 column">
