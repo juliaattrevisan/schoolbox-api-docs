@@ -22,31 +22,32 @@ export default {
         },
     },
     computed: {
-        jQuery: () => window.jQuery,
-        mejs: () => window.mejs,
+        MediaElementPlayer: () => window.MediaElementPlayer,
     },
     data() {
         return {
             videoWidth: null,
             videoHeight: null,
+            player: null,
         }
     },
     mounted() {
         switch (this.storage.type) {
             case 'audio':
-                this.jQuery(this.$el).mediaelementplayer();
+                this.player = new this.MediaElementPlayer(this.$el);
                 break;
 
             case 'video':
-                let $el = this.jQuery(this.$el);
-                $el.mediaelementplayer();
+                this.player = new this.MediaElementPlayer(this.$el);
 
                 // Work around what I think is an issue with mediaelement not
                 // knowing what to do when the player loads.
                 // The video isn't set to the same size as the player.
-                let container    = $el.closest('.mejs__container');
-                this.videoWidth  = container.width();
-                this.videoHeight = container.height();
+                let container = this.$el.closest('.mejs__container');
+                if (container) {
+                    this.videoWidth  = container.clientWidth;
+                    this.videoHeight = container.clientHeight;
+                }
                 break;
 
             default:
@@ -57,13 +58,12 @@ export default {
         switch (this.storage.type) {
             case 'audio':
             case 'video':
-                let playerId = this.jQuery(this.$el).closest('.mejs__container').attr('id');
-                let player   = mejs.players[playerId];
-                if (player) {
-                    if (!player.paused) {
-                        player.pause();
+                if (this.player) {
+                    if (!this.player.paused) {
+                        this.player.pause();
                     }
-                    player.remove();
+                    this.player.remove();
+                    this.player = null;
                 }
                 break;
         }
