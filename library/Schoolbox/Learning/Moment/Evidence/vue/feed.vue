@@ -175,20 +175,6 @@ export default {
         deleteEvidence(evidence) {
             this.$refs.toast.activate('Deleting...');
 
-            // // This should work, but it causes problems?
-            // // slice might work?
-            // // let deletedIndex = this.data.findIndex((v) => v.id !== evidence.id);
-            // // this.data.splice(deletedIndex, 1);
-            // let newData = this.data.filter((v) => v.id !== evidence.id);
-            // this.data   = [];
-            // this.$refs.deleteModal.close();
-            // this.$nextTick(() => {
-            //     this.data = newData;
-            //     this.metadata.count  -= 1;
-            //     this.$refs.toast.timeout('Deleted', true);
-            // });
-
-
             // Replacing the data in place in the same tick causes issues with
             // the MediaElement player and Foundation dropdowns for some reason.
             // Clear it first; then replace it with the filtered data in the
