@@ -8,9 +8,11 @@ import Storage      from '@schoolbox/storage';
 import CommentThread from './commentThread';
 import RevealModal from "@schoolbox/reveal-modal";
 import Toast from "@schoolbox/toast";
+import Dropdown from "@schoolbox/dropdown";
 
 export default {
     components: {
+        Dropdown,
         Toast,
         RevealModal,
         MediaArticle,
@@ -44,10 +46,11 @@ export default {
     mounted() {
         this.load();
     },
-    updated() {
-        // Re-apply Foundation dropdowns
-        this.$nextTick(() => this.jQuery(this.$el).foundation('dropdown', 'reflow'));
-    },
+    // updated() {
+    //     // Re-apply Foundation dropdowns
+    //     // this.jQuery(this.$el).foundation('dropdown', 'reflow');
+    //     this.$nextTick(() => this.jQuery(this.$el).foundation('dropdown', 'reflow'));
+    // },
     methods: {
         /**
          * Load learning evidence for the student in question.
@@ -174,18 +177,32 @@ export default {
          */
         deleteEvidence(evidence) {
             this.$refs.toast.activate('Deleting...');
-            axios
-                .delete(evidence._links.delete)
-                .then(() => {
-                    // extract out the deleted evidence
-                    this.data            = this.data.filter((v) => v.id !== evidence.id);
-                    this.metadata.count  -= 1;
-                    this.$refs.toast.timeout('Deleted', true);
-                })
-                .catch(() => this.$refs.toast.timeout('Could not delete', false))
-                .finally(() => {
-                    this.$refs.deleteModal.close();
-                })
+
+            // This should work, but it causes problems?
+            // slice might work?
+            // let deletedIndex = this.data.findIndex((v) => v.id !== evidence.id);
+            // this.data.splice(deletedIndex, 1);
+            let newData = this.data.filter((v) => v.id !== evidence.id);
+            this.data            = [];
+            this.data = newData;
+            this.metadata.count  -= 1;
+            this.$forceUpdate();
+            this.$refs.toast.timeout('Deleted', true);
+            this.$refs.deleteModal.close();
+
+
+            // axios
+            //     .delete(evidence._links.delete)
+            //     .then(() => {
+            //         // extract out the deleted evidence
+            //         this.data            = this.data.filter((v) => v.id !== evidence.id);
+            //         this.metadata.count  -= 1;
+            //         this.$refs.toast.timeout('Deleted', true);
+            //     })
+            //     .catch(() => this.$refs.toast.timeout('Could not delete', false))
+            //     .finally(() => {
+            //         this.$refs.deleteModal.close();
+            //     })
         }
     },
     filters: {
@@ -208,7 +225,7 @@ export default {
                 <ul class="information-list">
                     <li v-for="evidence in evidenceGroup.evidence" class="feed-item">
                         <!-- This evidence isn't necessarily editable -->
-                        <div :class="{'actions-small-1': hasMenu(evidence), 'actions-small-0': !hasMenu(evidence)}">
+                        <div data-evidence-card :class="{'actions-small-1': hasMenu(evidence), 'actions-small-0': !hasMenu(evidence)}">
                             <div class="card small-12 compact">
                                 <a :href="evidence.creator._links.profile" title="View Profile">
                                     <img :src="evidence.creator._links.avatar" alt="View Profile">
@@ -219,16 +236,23 @@ export default {
                                     >{{ evidence.createdAt | dateFormat(dateDisplayFormats.momentJsTime) }}</time>
                                 </a>
                             </div>
-                            <nav v-if="hasMenu(evidence)">
-                                <a href="#"
-                                   class="icon-overflow"
-                                   :data-dropdown="'evidence-' + String(evidence.id) + '-dropdown'"
-                                   aria-expanded="false" title="Actions"></a>
-                            </nav>
-                            <ul v-if="hasMenu(evidence)" :id="'evidence-' + String(evidence.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
+                            <dropdown v-if="hasMenu(evidence)">
                                 <li><a v-if="evidence._links.modifyForm" :href="evidence._links.modifyForm" class="icon-modify" title="Modify">Modify</a></li>
                                 <li><a @click.prevent="showDeleteModal(evidence)" v-if="evidence._links.delete" class="icon-delete" title="Delete">Delete</a></li>
-                            </ul>
+                            </dropdown>
+<!--                            <nav v-if="hasMenu(evidence)">-->
+
+<!--                                &lt;!&ndash;<a @click.prevent="showDeleteModal(evidence)" v-if="evidence._links.delete" class="icon-delete" title="Delete"></a>&ndash;&gt;-->
+
+<!--                                <a href="#"-->
+<!--                                   class="icon-overflow"-->
+<!--                                   :data-dropdown="'evidence-' + String(evidence.id) + '-dropdown'"-->
+<!--                                   aria-expanded="false" title="Actions"></a>-->
+<!--                            </nav>-->
+<!--                            <ul v-if="hasMenu(evidence)" :id="'evidence-' + String(evidence.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>-->
+<!--                                <li><a v-if="evidence._links.modifyForm" :href="evidence._links.modifyForm" class="icon-modify" title="Modify">Modify</a></li>-->
+<!--                                <li><a @click.prevent="showDeleteModal(evidence)" v-if="evidence._links.delete" class="icon-delete" title="Delete">Delete</a></li>-->
+<!--                            </ul>-->
                         </div>
 
                         <div class="feed-body small-12 large-6 column">

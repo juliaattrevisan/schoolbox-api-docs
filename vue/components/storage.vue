@@ -23,6 +23,7 @@ export default {
     },
     computed: {
         jQuery: () => window.jQuery,
+        mejs: () => window.mejs,
     },
     data() {
         return {
@@ -49,6 +50,21 @@ export default {
                 break;
 
             default:
+                break;
+        }
+    },
+    beforeDestroy() {
+        switch (this.storage.type) {
+            case 'audio':
+            case 'video':
+                let playerId = this.jQuery(this.$el).closest('.mejs__container').attr('id');
+                let player   = mejs.players[playerId];
+                if (player) {
+                    if (!player.paused) {
+                        player.pause();
+                    }
+                    player.remove();
+                }
                 break;
         }
     },
