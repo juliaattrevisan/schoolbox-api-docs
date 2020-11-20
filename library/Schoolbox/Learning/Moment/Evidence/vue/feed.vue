@@ -183,12 +183,13 @@ export default {
             // let deletedIndex = this.data.findIndex((v) => v.id !== evidence.id);
             // this.data.splice(deletedIndex, 1);
             let newData = this.data.filter((v) => v.id !== evidence.id);
-            this.data            = [];
-            this.data = newData;
-            this.metadata.count  -= 1;
-            this.$forceUpdate();
-            this.$refs.toast.timeout('Deleted', true);
+            this.data   = [];
             this.$refs.deleteModal.close();
+            this.$nextTick(() => {
+                this.data = newData;
+                this.metadata.count  -= 1;
+                this.$refs.toast.timeout('Deleted', true);
+            });
 
 
             // axios
