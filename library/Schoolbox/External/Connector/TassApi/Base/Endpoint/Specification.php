@@ -461,14 +461,14 @@ class Specification implements ISpecification
 //                    'user_code' => 'all',
 //                ]
 //            ],
-//            [
-//                'api' => DSNCodec::MODULE_IDENTITY_MANAGEMENT,
-//                'method' => 'getEmployees',
-//                'version' => 3,
-//                'args' => [
-//                    'user_code' => 'all',
-//                ]
-//            ],
+            [
+                'api' => DSNCodec::MODULE_IDENTITY_MANAGEMENT,
+                'method' => 'getEmployees',
+                'version' => 3,
+                'args' => [
+                    'user_code' => 'all',
+                ]
+            ],
             [
                 'api' => DSNCodec::MODULE_IDENTITY_MANAGEMENT,
                 'method' => 'getParents',
