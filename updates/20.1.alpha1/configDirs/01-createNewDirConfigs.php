@@ -46,7 +46,7 @@ $app = new class extends CliTool\App {
     {
         // Add Purifier dir (adjacent to xml_dir)
         $purifierCacheDir = dirname($xmlDir) . "/purifier/";
-        if (!mkdir($purifierCacheDir) && !is_dir($purifierCacheDir)) {
+        if (!is_dir($purifierCacheDir) && !mkdir($purifierCacheDir) && !is_dir($purifierCacheDir)) {
             throw new RuntimeException(sprintf('Directory "%s" was not created', $purifierCacheDir));
         }
         $sql = "
@@ -90,7 +90,7 @@ $app = new class extends CliTool\App {
     {
         // Twig Cache dir (adjacent to xml_dir)
         $twigCacheDir = dirname($xmlDir) . "/twig/";
-        if (!mkdir($twigCacheDir) && !is_dir($twigCacheDir)) {
+        if (!is_dir($twigCacheDir) && !mkdir($twigCacheDir) && !is_dir($twigCacheDir)) {
             throw new RuntimeException(sprintf('Directory "%s" was not created', $twigCacheDir));
         }
         $sql = "
