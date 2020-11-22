@@ -2,12 +2,12 @@
 
 {{ bread.crumbs(
     ['Badges', routeLookup('learningBadge.getBadges') ],
-    ['Create Badge']
+    ['Add new', routeLookup('learningBadge.getCreateForm')]
 ) }}
 
 <div class="row">
     <div class="small-12 column">
-        <h1>Create Badge</h1>
+        <h1>Add new badge</h1>
     </div>
 </div>
 
@@ -17,9 +17,28 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
+                        <label for="badge-name">Achievement Name</label>
+                        <input type="text" id="badge-name" />
+
+                        <label for="badge-body">
+                            Description
+                        </label>
+                        <textarea name="body" id="badge-body"></textarea>
                     </div>
                 </fieldset>
             </section>
         </form>
     </div>
 </div>
+
+<script src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+{% autoescape 'js' %}
+<script type="text/javascript">
+    $(function () {
+        $.fn.alaressEditor({
+            targetElements: $('#badge-body')
+        });
+    });
+</script>
+{% endautoescape %}
