@@ -108,7 +108,6 @@ class Controller extends Base
      * @param User $user
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DebugBar\DebugBarException
      */
     public function getAwardedBadges(User $user): array
     {
