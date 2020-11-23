@@ -46,7 +46,7 @@ abstract class Base
      * @param string $modelFieldSetter The setter to call on `$model`
      * @return object
      */
-    private function setScalar(array $array, string $arrayField, object $model, string $modelFieldSetter): object
+    protected function setScalar(array $array, string $arrayField, object $model, string $modelFieldSetter): object
     {
         if (array_key_exists($arrayField, $array)) {
             $model = $model->$modelFieldSetter($array[$arrayField]);
@@ -82,7 +82,7 @@ abstract class Base
      * @throws TypeError if attempting to set `$model->$modelFieldSetter` to
      *                   null, when it is not nullable
      */
-    private function setModel(
+    protected function setModel(
         array $array,
         string $arrayField,
         string $arrayIdField,
@@ -118,7 +118,7 @@ abstract class Base
      * @param string $modelFieldSetter The setter to call on `$model`
      * @return object
      */
-    private function setDate(array $array, string $arrayField, object $model, string $modelFieldSetter): object
+    protected function setDate(array $array, string $arrayField, object $model, string $modelFieldSetter): object
     {
         if (array_key_exists($arrayField, $array)) {
             $model = $model->$modelFieldSetter(
@@ -153,7 +153,7 @@ abstract class Base
      * @return object
      * @throws ResourceException if `$collectorFactory` can't locate the file
      */
-    private function setFile(
+    protected function setFile(
         array $array,
         string $arrayField,
         object $model,
