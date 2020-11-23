@@ -1,0 +1,40 @@
+{##
+ # The Twig version of the share learning moment modal.
+
+    Parameters:
+    id:                the ID of the modal
+    baseUrl:           the base URL for the learning moment modal
+    encodedReturnUrl:  if set, return to this URL after saving the moment.
+                       Defaults to the current URL
+    user:              if set, a single user on whose behalf the moment is to be
+                       shared
+    allowDynamicUsers: if true and user is not set, allow the list of users to
+                       be updated dynamically outside of this modal.
+                       The list of users may be placed in
+                       `<span data-relation="dynamicUsersSlot">`
+ #}
+<div data-reveal id="{{ id }}" aria-hidden="true" class="reveal-modal small">
+    <h2>Share a Learning Moment</h2>
+
+    {% if user is defined and user is not null %}
+    <ul class="meta">
+        <li>
+            Sharing on behalf of <a href="/search/user/{{ user.id }}">{{ user.fullName }}</a>
+        </li>
+    </ul>
+    {% elseif (allowDynamicUsers ?? false) %}
+        <ul class="meta">
+            <li>
+                Sharing on behalf of <span data-relation="dynamicUsersSlot"></span>
+            </li>
+        </ul>
+    {% endif %}
+    <div class="share-work-buttons">
+        <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=photo&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-camera share-photo" title="Take a photo">Take a photo</a>
+        <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=video&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-video share-video" title="Record a video">Record a video</a>
+        <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=audio&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-audio share-audio" title="Record audio">Record audio</a>
+        <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=upload&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-upload share-file" title="Upload file">Upload file</a>
+        <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=text&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-textbox share-text" title="Write something">Write something</a>
+    </div>
+    <a class="close-reveal-modal" aria-label="Close">×</a>
+</div>

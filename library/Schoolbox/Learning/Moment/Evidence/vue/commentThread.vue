@@ -45,23 +45,7 @@ export default {
     computed: {
         dateDisplayFormats: () => window.dateDisplayFormats,
         ckeditorConfig () {
-            // Use the same config as the news comment thread does.
-            // Somehow: if the "eqneditor" plugin is not present, or its button
-            // is removed, then embedding an image fails!
-            // I don't yet know how to work around this, so for now I've just
-            // removed all the Schoolboxlink plugins: these should be plain text
-            // anyway.
-            return window.jQuery.alaressEditorConfig({
-                removePlugins: 'uploadimage,link,schoolboxanchor',
-                removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
-                toolbarGroups: [
-                    {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                    {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                    {name: 'links', groups: ['links']},
-                    {name: 'insert', groups: ['insert']},
-                    // {name: 'schoolbox', groups: ['schoolboxlink']},
-                ],
-            });
+            return window.jQuery.alaressEditorConfigForComments();
         },
 
         /**

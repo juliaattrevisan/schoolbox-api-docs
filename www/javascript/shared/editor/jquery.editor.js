@@ -130,9 +130,43 @@
     }
 
 
+    /**
+     * Retrieve a configuration for a CKEditor instance.
+     *
+     * @param {Object|null} options Any overrides of the default configuration
+     * @returns {Object}
+     */
     $.alaressEditorConfig = function (options) {
         options = options || {};
         return init(options);
+    };
+
+
+    /**
+     * Retrieve a standard configuration for comment CKEditor instances.
+     *
+     * @returns {Object}
+     */
+    $.alaressEditorConfigForComments = function () {
+        // Somehow when including a CKeditor instance as a Vue component:
+        // If the "eqneditor" plugin is not present, or its button is removed,
+        // then embedding an image fails!
+        // I don't yet know how to work around this, so for now I've just
+        // removed all the Schoolboxlink plugins: comments should be plain text
+        // anyway.
+        return init({
+            removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount',
+            removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+            toolbarGroups: [
+                {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
+                {name: 'links', groups: ['links']},
+                {name: 'insert', groups: ['insert']},
+                // {name: 'schoolbox', groups: ['schoolboxlink']},
+            ],
+            height: '5rem',
+            resize_enabled: false,
+        });
     };
 
 

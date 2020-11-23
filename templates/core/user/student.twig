@@ -57,6 +57,14 @@
 
 {% set showActivityFeed = (isStaff or isSelf or isParentOfStudent) %}
 
+{% set shareLearningMomentUrl = routeLookupIfAuthorized(
+    'learningMomentEvidence.getCreateForm',
+    {
+        users:   [user],
+        userIds: user.id
+    }
+) %}
+
 <script type="text/javascript">
     $(function () {
         $('#email-all-staff').click(function () {
@@ -305,9 +313,15 @@
             {% block buttons_island %}
                 <ul class='flex-list flex-wrap buttons'>
                     {% block buttons %}
-                        <li>
-                            <a href="#" class="icon-share">Share Work</a>
-                        </li>
+
+                        {% block buttons_shareLearningMoment %}
+                            {% if shareLearningMomentUrl %}
+                                <li>
+                                    <a href="#" class="icon-share" data-reveal-id="shareLearningMoment">Share Work</a>
+                                </li>
+                            {% endif %}
+                        {% endblock buttons_shareLearningMoment %}
+
                         {% if eportfolioAuth %}
                             {% block buttons_eportfolio %}
                                 <li>
@@ -870,3 +884,17 @@
         min-height: 1px;
     }
 </style>
+
+
+{##
+ # Modal for sharing a learning moment
+ #
+ # Only show "sharing on behalf of" if you're not viewing your own profile
+ #}
+{% if shareLearningMomentUrl %}
+    {% include '@learningMomentEvidence/shareModal.twig' with {
+        id:      "shareLearningMoment",
+        baseUrl: shareLearningMomentUrl,
+        user:    user.id == USER.id ? null : user,
+    } only %}
+{% endif %}
