@@ -157,7 +157,7 @@ class Controller extends Base
 
             /* Extraordinary Terms have their actual_finish equal to their display_finish
              */
-            if ($term->getYearLevels() && $term->getYearLevels()->count()) {
+            if ($term->getExtraordinary()) {
                 $term->setActualFinish($term->getDisplayFinish());
             }
 
