@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Etherpad;
 
 use Alaress_Date_Format;
@@ -123,7 +125,6 @@ class Spawnpoint
             $createResult = $client->createGroupPad($groupId, $padName);
 
             if ($createResult->getMessage() === self::MESSAGE_OK) {
-
                 /* Get pad id to set to private and to pass it as a redirect element.
                  * Note that padId's come in the form g.abcdefg$padName
                  */
@@ -201,7 +202,6 @@ class Spawnpoint
             $createResult = $client->createGroupPad($groupId, $padName);
 
             if ($createResult->getMessage() === self::MESSAGE_OK) {
-
                 /* Get pad id to set to private and to pass it as a redirect element.
                  * Note that padId's come in the form g.abcdefg$padName
                  */

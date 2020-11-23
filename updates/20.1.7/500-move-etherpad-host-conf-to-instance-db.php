@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
@@ -56,7 +57,8 @@ $app = new class extends CliTool\App {
                 'hidden'      => 'true',
                 'required'    => 'true',
                 'module'      => ConfigMapper::MODULE_SETTINGS,
-            ]);
+            ]
+        );
         $this->getLogger()->notice(sprintf("Inserted new config 'Etherpad host' with value '%s'", ETHERPAD_HOST));
     }
 };

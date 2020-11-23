@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -84,7 +85,6 @@ HELP;
                 } catch (Exception $e) {
                     $logger->error(sprintf("Error while saving pad %d: %s", $currentPad->getId(), $e->getMessage()));
                 }
-
             } else {
                 $logger->warning(sprintf("Failed to get pad %d with key %s: %s", $currentPad->getId(), $currentPad->getPadId(), $getTextResult->getMessage()));
             }
@@ -95,4 +95,3 @@ HELP;
 
 $kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
 $kernel->runApp();
-
