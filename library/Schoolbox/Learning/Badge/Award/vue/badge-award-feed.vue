@@ -94,18 +94,30 @@ export default {
                 </tbody>
             </table>
         </template>
-        <template v-else>
-            <section class="content awards">
+        <template v-else-if="this.data.categories">
+            <section class="awards">
                 <template v-for="category in this.data.categories">
-                    <h2 class="subheader">{{ category.name }}</h2>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <div class="content">
+                                <h2 class="subheader">{{ category.name }}</h2>
 
-                    <div class="badge" v-for="award in category.awards">
-                        <img :src="award.badge.image._links.image" />
-                        <h3 class="no-margin">{{ award.badge.name }} ({{ award.count }})</h3>
-                        <span class="meta">{{ award.awardedAt }}</span>
+                                <div class="badge" v-for="award in category.awards">
+                                    <img :src="award.badge.image._links.image" />
+                                    <h3 class="no-margin">{{ award.badge.name }} ({{ award.count }})</h3>
+                                    <span class="meta">{{ award.awardedAt }}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </template>
             </section>
+        </template>
+        <template v-else>
+            <div class="empty-state">
+                <i class="icon-advanced-list"></i>
+                <p>There haven't been any goals set nor any achievements received.</p>
+            </div>
         </template>
     </div>
 </template>

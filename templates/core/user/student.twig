@@ -497,22 +497,20 @@
             {% endif %}
 
             <div class="content no-pad" id="achievements">
-                <div class="content">
-                    {% autoescape 'js' %}
-                        <script type="text/javascript">
-                            window.learningBadgeAwardFeedConfig = {
-                                routes: {
-                                    getAwardFeed: '{{ routeLookupIfAuthorized(
-                                        'learningBadge.getAwardedBadges',
-                                        {user: user, userId: user.id}
-                                    ) }}'
-                                },
-                            };
-                        </script>
-                    {% endautoescape %}
-                    <div id="badge-award-feed"></div>
-                    <script type="text/javascript" src="/javascript/components/badgeAwardFeed.bundle.js"></script>
-                </div>
+                {% autoescape 'js' %}
+                    <script type="text/javascript">
+                        window.learningBadgeAwardFeedConfig = {
+                            routes: {
+                                getAwardFeed: '{{ routeLookupIfAuthorized(
+                                    'learningBadge.getAwardedBadges',
+                                    {user: user, userId: user.id}
+                                ) }}'
+                            },
+                        };
+                    </script>
+                {% endautoescape %}
+                <div id="badge-award-feed"></div>
+                <script type="text/javascript" src="/javascript/components/badgeAwardFeed.bundle.js"></script>
             </div>
 
             {% if showClasses %}
