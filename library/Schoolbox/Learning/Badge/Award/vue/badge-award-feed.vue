@@ -62,8 +62,6 @@ export default {
         axios.get(this.config.routes.getAwardFeed, {})
             .then(response => {
                 self.data = response.data;
-
-                console.log(self.data);
             })
             .finally(() => this.loading = false);
     },
