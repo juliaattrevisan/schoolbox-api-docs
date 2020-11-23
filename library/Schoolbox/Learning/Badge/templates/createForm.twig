@@ -31,6 +31,8 @@
                         <label for="badge-image" class="required">
                             Upload badge from your device
                         </label>
+                        {# Dummy element for form validation #}
+                        <input type="hidden" name="imageAttachzone">
                         {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
 
                         <label for="badge-category" class="required">
@@ -74,7 +76,8 @@
 
 
         // Set up validation and save
-        $('#badge-form').alaressValidate({
+        let $form = $('#badge-form');
+        $form.alaressValidate({
             rules: {
                 name: {
                     required: true,
@@ -85,6 +88,18 @@
                 category: {
                     required: true,
                 },
+                // Attachzones aren't able to have validators applied to them,
+                // as the input doesn't exist at form creation time.
+                // Jank together a validator on a hidden field, and make it
+                // depend on the presence of attachzones.
+                imageAttachzone: {
+                    required: {
+                        depends: () => $form.find('input[name="image"]').length === 0
+                    },
+                },
+            },
+            messages: {
+                imageAttachzone: "Please attach a file."
             },
             submitHandler(form, event) {
                 event.preventDefault();
