@@ -8,7 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Translator;
 
+use Schoolbox\Learning\Badge\Category\Model as BadgeCategory;
 use Schoolbox\Learning\Badge\Model;
+use Schoolbox\User;
+use TypeError;
 
 /**
  * Translator for translating an array (generally from a request body) into a
@@ -27,44 +30,48 @@ class ArrayToModel
     public function __invoke(array $array, Model $model = null): Model
     {
         $model ??= new Model();
+        $model = $this->setDate($array, 'createdAt', $model, 'setCreatedAt');
+        $model = $this->setDate($array, 'updatedAt', $model, 'setUpdatedAt');
+        $model = $this->setDate($array, 'deletedAt', $model, 'setDeletedAt');
+        $model = $this->setScalar($array, 'id', $model, 'setId');
+        $model = $this->setScalar($array, 'name', $model, 'setName');
+        $model = $this->setScalar($array, 'body', $model, 'setBody');
 
-        // consider karriere/json-decoder for this?
+        // Set image, either from a triplet or from a hash directly
 
-        // $model = $this->setScalar($array, 'id', $model, 'setId');
-
-        // $model = $this->setScalar($array, 'name', $model, 'setName');
-        if (array_key_exists('name', $array)) {
-            $model = $model->setName($array['name']);
-        }
-
-        // $model = $this->setScalar($array, 'body', $model, 'setBody');
-        if (array_key_exists('body', $array)) {
-            $model = $model->setBody($array['body']);
-        }
-
-        // $model = $this->setModel($array, 'category', 'id', new \Schoolbox\Learning\Badge\Category\Model()), $model, 'setCategory', )
-        if (array_key_exists('category', $array)) {
-            if (isset($array['category'])) {
-                if (is_array($array['category']) && array_key_exists('id', $array['category'])) {
-                    $model = $model->setCategory((new \Schoolbox\Learning\Badge\Category\Model())->setId($array['category']['id']));
-                }
-            } else {
-                // raise a warning, but continue
-                trigger_error(
-                    'Attempting to set badge category to invalid null value: skipping',
-                    E_USER_WARNING
-                );
-            }
-        }
-
-        // Set the image
-        // $model = $this->setModel('image', 'hash', new Storage\Model(), [$model, 'setStorage']);
-
-        // Or from a collector:
-        // $
-
+        $model = $this->setModel(
+            $array,
+            'category',
+            'id',
+            $model,
+            'setCategory',
+            new BadgeCategory(),
+            'setId'
+        );
 
         // Set tags
+
+        // Set curriculum nodes
+
+        // Set created/updated by
+        $model = $this->setModel(
+            $array,
+            'createdBy',
+            'id',
+            $model,
+            'setCreatedBy',
+            new User(),
+            'setId'
+        );
+        $model = $this->setModel(
+            $array,
+            'updatedBy',
+            'id',
+            $model,
+            'setUpdatedBy',
+            new User(),
+            'setId'
+        );
 
         return $model;
     }
@@ -101,6 +108,9 @@ class ArrayToModel
      * * `$joinedModel->$joinedModelIdSetter` will be called with that value
      * * `$model->$modelFieldSetter` will be called with `$joinedModel`
      *
+     * If `$array[$arrayField]` is null, then:
+     * * `$model->$modelFieldSetter` will be called with `null`
+     *
      * @param array  $array               The array that is being set from
      * @param string $arrayField          The field in `$array` which contains
      *                                    the array which contains the joined
@@ -114,6 +124,8 @@ class ArrayToModel
      *                                    with the joined model's ID
      *
      * @return Model
+     * @throws TypeError if attempting to set `$model->$modelFieldSetter` to
+     *                   null, when it is not nullable
      */
     private function setModel(
         array $array,
@@ -132,11 +144,7 @@ class ArrayToModel
                     );
                 }
             } else {
-                // Is this nullable?
-                trigger_error(
-                    'Attempting to set badge category to invalid null value: skipping',
-                    E_USER_WARNING
-                );
+                $model = $model->$modelFieldSetter(null);
             }
         }
         return $model;

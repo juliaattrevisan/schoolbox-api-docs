@@ -132,7 +132,9 @@ class Controller extends Base
     {
         $data       = json_decode(json_encode($this->request->content->get()), true);
         $translator = new Translator\ArrayToModel();
-        $model      = $translator($data);
+        $model      = $translator($data)
+            ->setCreatedBy($this->getUser())
+            ->setUpdatedBy($this->getUser());
 
         $this->mapper->save($model);
 
