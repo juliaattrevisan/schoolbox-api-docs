@@ -116,6 +116,15 @@ class Controller extends Base
 
         new \Alaress_Probe($awards);
 
+        /* Group by category
+         */
+
+        /* Collapse duplicate badge ids with a count
+         */
+
+        /* Convert to array syntax
+         */
+
         return [];
     }
 
