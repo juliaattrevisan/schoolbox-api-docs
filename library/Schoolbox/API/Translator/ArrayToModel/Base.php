@@ -14,24 +14,12 @@ use Schoolbox\Resource\Exception as ResourceException;
 use TypeError;
 
 /**
- * A base class for translators from an array (likely from an API request body)
- * to a model class (for persistence by a mapper instance).
+ * A base class for array-to-model translators.
+ *
+ * Provides helper methods for setting values from an array into a model.
  */
-abstract class Base
+abstract class Base implements ITranslator
 {
-    /**
-     * Searches `$array` for fields which correspond to a model property, and
-     * sets them into the model.
-     *
-     * @param array       $array Fields as received in an API request body
-     * @param object|null $model If provided, update fields in this model;
-     *                           otherwise, the implementation must create a new
-     *                           model
-     * @return object `$model` with the fields from `$array` applied to it
-     */
-    abstract public function __invoke(array $array, object $model = null): object;
-
-
     /**
      * Helper method for setting a scalar value from an array into a model.
      *
