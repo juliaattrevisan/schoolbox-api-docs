@@ -132,7 +132,7 @@ class Controller extends Base
     public function postBadge(): void
     {
         $data       = json_decode(json_encode($this->request->content->get()), true);
-        $translator = new Translator\ArrayToModel(new CollectorFactory());
+        $translator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $model      = $translator($data)
             ->setCreatedBy($this->getUser())
             ->setUpdatedBy($this->getUser())

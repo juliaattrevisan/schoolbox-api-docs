@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Badge\Translator;
+namespace Schoolbox\Learning\Badge\Translator\ArrayToModel;
 
 use Schoolbox\Learning\Badge\Category\Model as BadgeCategory;
 use Schoolbox\Learning\Badge\Model;
@@ -18,8 +18,11 @@ use TypeError;
 /**
  * Translator for translating an array (generally from a request body) into a
  * model.
+ *
+ * Used when translating JSON passed in a request body into a model, so that it
+ * may be persisted.
  */
-class ArrayToModel
+class AllFields
 {
     /**
      * @var CollectorFactory
