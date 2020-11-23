@@ -95,17 +95,17 @@ export default {
             </table>
         </template>
         <template v-else>
+            <section class="content awards">
+                <template v-for="category in this.data.categories">
+                    <h2 class="subheader">{{ category.name }}</h2>
 
-            <div v-for="category in this.data.categories">
-                <h2 class="subheader">{{ category.name }}</h2>
-                <div v-for="award in category.awards">
-                    <img :src="award.badge.image._links.image" />
-                    <p><strong>{{ award.badge.name }}</strong></p>
-                    <p class="meta">{{ award.awardedAt }}</p>
-                </div>
-            </div>
-        loaded!
+                    <div class="badge" v-for="award in category.awards">
+                        <img :src="award.badge.image._links.image" />
+                        <h3 class="no-margin">{{ award.badge.name }} ({{ award.count }})</h3>
+                        <span class="meta">{{ award.awardedAt }}</span>
+                    </div>
+                </template>
+            </section>
         </template>
-
     </div>
 </template>
