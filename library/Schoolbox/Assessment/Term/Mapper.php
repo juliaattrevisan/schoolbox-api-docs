@@ -492,6 +492,14 @@ class Mapper extends BaseMapper
             $ids[] = $row['id'];
         }
 
+        /* If there aren't any ordinary terms, just leave; there's nothing to do
+         * Although, I don't expect this to ever be the case, it's possible that a school
+         * could be using an Extraordinary Term as its one and only term instance
+         */
+        if (!\count($ids)) {
+            return;
+        }
+
         /* Only update the ordinary terms
          */
         $predicate = \Alaress\Database\Predicate\Builder::getArrayBindings($ids, 'i');
