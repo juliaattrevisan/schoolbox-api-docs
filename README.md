@@ -32,42 +32,36 @@ This file is internal use and is not shipped to clients.
 * Install [vagrant](https://vagrantup.com/downloads)
 * Create an SSH key and add to Github
 * Fork the [Schoolbox repo](https://github.com/alaress/schoolbox) to your Github
-* `git clone git@github.com:%YourGitHubUsername%/schoolbox.git schoolbox` your schoolbox repo to local machine
-* `git remote add upstream git@github.com:alaress/schoolbox.git`
-* `git fetch upstream`
-* `git checkout origin/master`
-* `git checkout -b master`
-* create `vagrant.yaml` for overrides if needed
-* Place your `.env` file in the project's root directory
-* `vagrant up`
+```
+  git clone git@github.com:%YourGitHubUsername%/schoolbox.git schoolbox
+  git remote add upstream git@github.com:alaress/schoolbox.git
+  git fetch upstream
+  git checkout origin/master
+  git checkout -b master
+```
+* For the [Puppet repo](https://github.com/puppet-alaress) to your Github
+```
+  git clone git@github.com:%YourGitHubUsername%/puppet-alaress.git puppet-alaress
+  git remote add upstream git@github.com:alaress/puppet-alaress.git
+  git fetch upstream
+  git checkout origin/stable
+  git checkout -b stable
+```
+* create `vagrant.yaml` for overrides if needed, see `vagrant.default.yaml` for defaults
+* Place your `.env` file in the project's root directory (contents in Lastpass)
+* In your schoolbox directory import your vagrant box and bring it up for the first time
+```
+  vagrant box add ubuntu-1804-php71 https://s3-ap-southeast-2.amazonaws.com/schoolbox-data/ubuntu-1804-php71.box;
+  vagrant up;
+  vagrant provision;
+```
 * (optional) install the [gitsync script](https://github.com/alaress/git-scripts) to keep upstream insync with origin
 
-## Live environment deployed using packages with Puppet
+## Live environment
+
+When a release is tagged, APT packages are built by [ConcourseCI](https://ci.schoolbox.com.au/). These are then uploaded to the Schoolbox repo for distribution to servers.  The [Puppet repo](https://github.com/alaress/puppet-alaress) is then updated to trigger staging, and then live to update to the latest package.
 
 For full information on the build process of making a APT package and deploying [please refer to this guide](https://schoolbox.atlassian.net/wiki/spaces/SUP/pages/350257186/Building+Schoolbox+Releases+and+Packages).
-
-This is to follow the standard packaging process linux distributions use for web applications.
-
-/etc/schoolbox
-* contents from www/conf/* copied to /etc/schoolbox/examples
-* www/conf symlinked to /etc/schoolbox
-* client side conf.php to be located in /etc/schoolbox
-* Cron files copied to /etc/cron.d/schoolbox
-
-/usr/share/schoolbox
-* dav
-* include
-* library
-* sql
-* templates
-* tools
-* updates
-* www
-* data symlinked to /var/lib/schoolbox
-
-/var/lib/schoolbox
-* replaces previous data folder
-* directory structure auto created on install/update by tools/create-data-dirs.sh
 
 ## Table of Contents
 1. Only top-level docs should be listed here, sub-docs should be listed in their parent README.md.
@@ -108,6 +102,7 @@ This is to follow the standard packaging process linux distributions use for web
   * [Loyola: Survey](./library/Custom/Loyola/Survey/README.md)
   * [Meriden: Pastoral](./library/Custom/Meriden/Pastoral/README.md)
 * Javascript
+  * [Vue](./docs/vue/00-intro.md)
   * [Selectize](./www/css/core/selectize/README.md)
 * Custom Templates:
   * [For Aura modules](./docs/custom/custom-templates-for-aura-modules.md)

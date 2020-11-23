@@ -64,7 +64,8 @@
 
 * The ticket is not worked on until either:
 
-    1. The ticket is labelled `expresslane` by the SM or PO
+    1. <s>The ticket is labelled `expresslane` by the SM or PO</s>
+       AFAIK there's no express lane anymore?
     2. The ticket goes through at least a Sprint Planning meeting, ideally a Refinement meeting prior to that.
 
 * The coding process follows the same as above, except there is just one PR for develop (unless custom work or otherwise stated).

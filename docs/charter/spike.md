@@ -1,5 +1,7 @@
 # Spiking a Ticket
 
+> TODO I haven't heard much about spiking recently. Do we need to set aside time/people for it?
+
 A spike (technical or otherwise) is preparation work to be undertaken on a Story, Task or Epic with the intended purpose
 of making it ready for a Backlog Refinement session. To be considered "ready for refinement", it needs to contain enough
 detail that any seasoned Schoolbox Developer could read the description and associated documentation and understand the

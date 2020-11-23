@@ -2,6 +2,8 @@
 
 No coding should start on a ticket until the ticket has met the Definition of Ready.
 
+> TODO consider an automated mechanism for verifying that a ticket is "ready"?
+
 Tickets that meet the definitions below may have its status moved from 'Unconfirmed' to 'Ready' in Jira, signalling that the ticket has met the Definition of Ready.
 
 Bugs that are 'ready' may be brought into Sprint at any time as part of BAU. Stories and Tasks must either go through Sprint Planning, or be agreed upon as a team before going into Sprint. The one exception to this is if the task or story has an 'expresslane' label, in which case the ticket can be brought into Sprint at any time like BAU.
@@ -27,5 +29,5 @@ Bugs that are 'ready' may be brought into Sprint at any time as part of BAU. Sto
     * If it is, decomposition is required.
 
 ## Custom Work
-* Budget, cost centre (Function Point Job)
+* Budget, cost centre (NetSuite Job ID for logging time)
 * Contact information for customer
