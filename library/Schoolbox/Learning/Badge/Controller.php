@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Badge;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Cursor\MapperCursor;
+use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -104,11 +105,21 @@ class Controller extends Base
      */
     public function getCreateForm(): void
     {
-        // Output a Twig template
+        $attachzone = new GenericZone('image', Storage\Mapper::getInstance());
+        $attachzone->setAttachmentsLabel('')
+             ->setAttachPrompt('upload a badge')
+             ->setMimeFilter('image/*')
+             ->setFileVar('image')
+             ->setMulti(false)
+             ->setThumbnailSize(64)
+             ->setModalTitle('Select image');
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningBadge/createForm.twig',
-                [],
+                [
+                    'attachzone' => $attachzone->getTwigContext(),
+                ],
                 'Create Badge'
             )
         );

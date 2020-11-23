@@ -24,6 +24,24 @@
                             Description
                         </label>
                         <textarea name="body" id="badge-body"></textarea>
+
+                        <label>Select badge from existing set</label>
+                        <button class="full-width">Browse badges</button>
+
+                        <label for="badge-image">
+                            Upload badge from your device
+                        </label>
+                        {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+
+                        <label for="badge-categories">
+                            Categories
+                        </label>
+                        <input type="text" id="badge-categories" />
+
+                        <label for="badge-tags">
+                            Tags
+                        </label>
+                        <input type="text" id="badge-tags" />
                     </div>
                 </fieldset>
             </section>
