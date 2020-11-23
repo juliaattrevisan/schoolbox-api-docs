@@ -13,17 +13,17 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form action="{{ routeLookup('learningBadge.postBadge') }}">
+        <form method="post" action="{{ routeLookup('learningBadge.postBadge') }}">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label for="badge-name">Achievement Name</label>
-                        <input type="text" id="badge-name" />
+                        <label for="badge-name" class="required">Achievement Name</label>
+                        <input type="text" id="badge-name" required />
 
-                        <label for="badge-body">
+                        <label for="badge-body" class="required">
                             Description
                         </label>
-                        <textarea name="body" id="badge-body"></textarea>
+                        <textarea name="body" id="badge-body" required></textarea>
 
                         <label>Select badge from existing set</label>
                         <button class="full-width">Browse badges</button>
@@ -33,10 +33,10 @@
                         </label>
                         {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
 
-                        <label for="badge-category">
+                        <label for="badge-category" class="required">
                             Category
                         </label>
-                        <input type="text" id="badge-category" />
+                        <input type="text" id="badge-category" required />
 
                         <label for="badge-tags">
                             Tags
@@ -45,6 +45,8 @@
                     </div>
                 </fieldset>
             </section>
+
+            <input type="submit" value="Add new badge" />
         </form>
     </div>
 </div>
