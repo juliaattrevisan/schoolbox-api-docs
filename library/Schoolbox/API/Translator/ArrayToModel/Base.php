@@ -11,6 +11,7 @@ namespace Schoolbox\API\Translator\ArrayToModel;
 use Alaress_Date_Format;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Exception as ResourceException;
+use Schoolbox\Resource\Storage\Model as StorageModel;
 use TypeError;
 
 /**
@@ -123,16 +124,22 @@ abstract class Base implements ITranslator
      * Helper method for setting a storage file into a model.
      *
      * If `$array[$arrayField]` exists and is set, then:
-     * * `$collectorFactory` will build a collector which can locate that file
-     * * `$model->$modelFieldSetter` will be called with the storage object it
-     *   creates
+     * * if it's an array with the key "hash": it will create a new storage file
+     *   with that hash, and call `$model->$modelFieldSetter` with that file
+     *   (just as `setModel` would work)
+     * * if it's a storage triplet (i.e. "storage:hash:filename"):
+     *  `$collectorFactory` will build a collector which can locate that file,
+     *   then `$model->$modelFieldSetter` will be called with the storage object
+     *   it creates
      *
      * If `$array[$arrayField]` is null, then:
      * * `$model->$modelFieldSetter` will be called with `null`
      *
      * @param array            $array            The array being set from
      * @param string           $arrayField       The field in `$array` which
-     *                                           contains the storage triplet
+     *                                           contains either:
+     *                                           * a storage triplet
+     *                                           * an array with the key "hash"
      * @param object           $model            The model to update
      * @param string           $modelFieldSetter The setter to call on `$model`
      * @param CollectorFactory $collectorFactory The object which locates a
@@ -151,6 +158,16 @@ abstract class Base implements ITranslator
         if (array_key_exists($arrayField, $array)) {
             if (!isset($array[$arrayField])) {
                 $model = $model->$modelFieldSetter(null);
+            } elseif (is_array($array[$arrayField])) {
+                $model = $this->setModel(
+                    $array,
+                    $arrayField,
+                    'hash',
+                    $model,
+                    $modelFieldSetter,
+                    new StorageModel(),
+                    'setHash'
+                );
             } else {
                 $file = $collectorFactory->build([$array[$arrayField]])->getFirst();
                 if ($file) {
