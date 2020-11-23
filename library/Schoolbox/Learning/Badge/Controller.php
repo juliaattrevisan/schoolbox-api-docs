@@ -133,14 +133,23 @@ class Controller extends Base
         foreach ($awards as $award) {
             $badgeId = $award->getBadge()->getId();
             $categoryId = $award->getBadge()->getCategory()->getId();
+            $badge = $translator($award);
 
-            /* Init stack and badge count
+            /* Init stack
+             *
+             * Remember one copy of the category
+             */
+            if (!isset($stack[$categoryId])) {
+                $stack[$categoryId] = $badge['badge']['category'];
+                $stack[$categoryId]['awards'] = [];
+            }
+
+            /* Init badge count
              *
              * findRecentForUser() is listed reverse chronologically so the first
              * in the list is the most recently awarded
              */
-            if (!isset($stack[$categoryId][$badgeId])) {
-                $badge = $translator($award);
+            if (!isset($stack[$categoryId]['awards'][$badgeId])) {
 
                 /* This is a set-based aggregation, not an individual model property
                  */
@@ -148,12 +157,12 @@ class Controller extends Base
 
                 /* Stick it into the stack
                  */
-                $stack[$categoryId][$badgeId] = $badge;
+                $stack[$categoryId]['awards'][$badgeId] = $badge;
             }
 
             /* Collapse duplicate badge ids with a count
              */
-            $stack[$categoryId][$badgeId]['count']++;
+            $stack[$categoryId]['awards'][$badgeId]['count']++;
         }
 
         return $stack;
