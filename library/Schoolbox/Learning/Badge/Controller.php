@@ -114,17 +114,38 @@ class Controller extends Base
     {
         $awards = $this->awardMapper->findRecentForUser($user);
 
-        new \Alaress_Probe($awards);
+        $stack = [];
+        $translator = new Translator\ModelToArray(
+            new User\Translator\ModelToArray(),
+            new Storage\Translator\ModelToArray(),
+            new ScrubAdapter()
+        );
 
         /* Group by category
          */
+        foreach ($awards as $award) {
+            $badgeId = $award->getBadge()->getId();
+            $categoryId = $award->getBadge()->getCategory()->getId();
 
-        /* Collapse duplicate badge ids with a count
-         */
+            /* Init stack and badge count
+             *
+             * findRecentForUser() is listed reverse chronologically so the first
+             * in the list is the most recently awarded
+             */
+            if (!isset($stack[$categoryId][$badgeId])) {
+                $stack[$categoryId][$badgeId] = [
+                    'badge' => $translator($award->getBadge()),
+                    'awardedAt' => $award->getAwardedAt()->getDatabase(),
+                    'count' => 0
+                ];
+            }
 
-        /* Convert to array syntax
-         */
+            /* Collapse duplicate badge ids with a count
+             */
+            $stack[$categoryId][$badgeId]['count']++;
+        }
 
+        new \Alaress_Probe($stack);
         return [];
     }
 
