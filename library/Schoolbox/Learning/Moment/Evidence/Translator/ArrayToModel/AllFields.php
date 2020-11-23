@@ -10,13 +10,13 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel;
 
 use Alaress_Date_Format;
+use Schoolbox\API\Translator\ArrayToModel\ITranslator;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\Learning\Moment\Evidence;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
-use UnexpectedValueException;
 
 /**
  * Translator for translating an array representation of learning moment
@@ -24,10 +24,8 @@ use UnexpectedValueException;
  *
  * Used when translating JSON passed in a request body into a model, so that it
  * may be persisted.
- *
- * TODO consider extending new base class `Schoolbox\API\Translator\ArrayToModel\Base`
  */
-class AllFields
+class AllFields implements ITranslator
 {
     /**
      * @var CollectorFactory
@@ -49,14 +47,14 @@ class AllFields
     /**
      * Translate the array representation of the evidence into a model.
      *
-     * @param array               $json
-     * @param Evidence\Model|null $model If provided, update this model;
+     * @param array                      $json
+     * @param object|Evidence\Model|null $model If provided, update this model;
      *                                   otherwise create a new one
-     * @return Evidence\Model
+     * @return object|Evidence\Model
      * @throws ResourceException if the collector factory can't find the file
      *                                   that was uploaded
      */
-    public function __invoke(array $json, ?Evidence\Model $model = null): Evidence\Model
+    public function __invoke(array $json, ?object $model = null): object
     {
         if (!isset($model)) {
             $model = new Evidence\Model();
