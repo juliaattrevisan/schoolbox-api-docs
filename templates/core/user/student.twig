@@ -500,6 +500,18 @@
                 <div class="content">
                     <h2 class="subheader">Achievements</h2>
 
+                    {% autoescape 'js' %}
+                        <script type="text/javascript">
+                            window.learningEvidenceAchievementsFeedConfig = {
+                                routes: {
+                                    getAchievementsFeed: '{{ routeLookupIfAuthorized(
+                                        'learningBadge.getAwardedBadges',
+                                        {user: user, userId: user.id}
+                                    ) }}'
+                                },
+                            };
+                        </script>
+                    {% endautoescape %}
                     <div id="evidence-achievements-feed"></div>
                     <script type="text/javascript" src="/javascript/components/learningMomentsEvidenceAchievementsFeed.bundle.js"></script>
                 </div>
