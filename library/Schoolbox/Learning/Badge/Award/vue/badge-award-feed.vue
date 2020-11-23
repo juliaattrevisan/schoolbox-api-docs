@@ -107,6 +107,7 @@ export default {
                                 <div class="badge" v-for="award in category.awards">
                                     <img :src="award.badge.image._links.image" />
                                     <h3 class="no-margin">{{ award.badge.name }} ({{ award.count }})</h3>
+                                    <p>{{ award.badge.body }}</p>
 
                                     <p class="meta">Awarded <relative-time :datetime="award.awardedAt"></relative-time></p>
 
