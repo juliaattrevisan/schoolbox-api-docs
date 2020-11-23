@@ -26,6 +26,6 @@ export default {
         <h2>{{ badge.name }}</h2>
         <p class="meta" v-if="badge.category">Category: {{ badge.category.name }}</p>
         <p class="meta" v-if="badgeTagNames.length > 0">Tags: {{ badgeTagNames }}</p>
-        <article>{{ badge.body }}</article>
+        <article v-html="badge.body"></article>
     </div>
 </template>
