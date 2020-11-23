@@ -514,6 +514,13 @@ class Mapper extends BaseMapper
                 'actual_finish' => $row['actual_finish'],
             ]);
         }
+
+        /* Set the last ordinary term's actual_finish to null, for enforced continuity
+         */
+        $updateTermQuery->execute([
+            'id'            => $ids[\count($ids)-1],
+            'actual_finish' => null,
+        ]);
     }
 
 
