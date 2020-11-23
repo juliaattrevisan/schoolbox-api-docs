@@ -84,24 +84,30 @@
                 },
                 category: {
                     required: true,
-                }
+                },
             },
             submitHandler(form, event) {
                 event.preventDefault();
 
                 // Build a request to post the form
-                // let formData = new FormData(form);
-                // return {
-                //     body: formData.get('body'),
-                //     file: formData.get('file'),
-                // };
                 let formData = new FormData(form),
                     payload  = {
-                        name: formData.get('name'),
-                        body: formData.get('body'),
+                        name:     formData.get('name'),
+                        body:     formData.get('body'),
+                        image:    formData.get('image'),
+                        category: null,
+                        tags:     [],
                     },
-                    toast    = $('#toast'),
-                    submit   = $('#badge-submit');
+                    categoryId = formData.get('category'),
+                    tags       = formData.get('tags'),
+                    toast      = $('#toast'),
+                    submit     = $('#badge-submit');
+
+                if (categoryId) {
+                    payload.category = {
+                        id: categoryId
+                    }
+                }
 
                 // Toast then post
                 toast.toastActivate('Saving...')
