@@ -82,6 +82,21 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
+
+        /**
+         * Decide if this Award was a goal or an achievement
+         * and provide the css class accordingly
+         *
+         * @param award
+         * @returns string
+         */
+        getCss(award) {
+            if ('goal' === award.status) {
+                return 'goal';
+            }
+
+            return '';
+        }
     }
 }
 </script>
@@ -105,7 +120,7 @@ export default {
                                 <h2 class="subheader">{{ category.name }}</h2>
 
                                 <div class="badge" v-for="award in category.awards">
-                                    <img :src="award.badge.image._links.image" />
+                                    <img :src="award.badge.image._links.image" :class="getCss(award)"/>
                                     <h3 class="no-margin">{{ award.badge.name }} ({{ award.count }})</h3>
                                     <p>{{ award.badge.body }}</p>
 

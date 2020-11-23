@@ -8,13 +8,10 @@
     padding: 0.5rem;
 
     /* Goals are greyscaled
+     * Achievements are full colour
      */
-    &.goal {
-    }
-
-    /* Achievements are full colour
-     */
-    &.achievement {
+    img.goal {
+      filter: grayscale(100%);
     }
   }
 }
