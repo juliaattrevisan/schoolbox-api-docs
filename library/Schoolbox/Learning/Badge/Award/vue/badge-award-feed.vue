@@ -43,7 +43,7 @@ export default {
     data() {
         return {
             data: [],
-            showSkeletonLoader: true,
+            loading: true,
         }
     },
 
@@ -53,14 +53,17 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
+        let self = this;
 
         /* Access the feed endpoint, grab the awards for the user
          */
         axios.get(this.config.routes.getAwardFeed, {})
             .then(response => {
-                console.log(response);
+                self.data = response.data;
+
+                console.log(self.data);
             })
-            .finally(() => this.showSkeletonLoader = false);
+            .finally(() => this.loading = false);
     },
 
     /**
@@ -82,6 +85,27 @@ export default {
 </script>
 <template>
     <div>
-        Vue components must have exactly one node directly inside the <em>template</em> node itself.
+        <template v-if="this.loading">
+            <table class="skeleton">
+                <tbody>
+                <tr v-for="n in 3">
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </template>
+        <template v-else>
+
+            <div v-for="category in this.data.categories">
+                <h2 class="subheader">{{ category.name }}</h2>
+                <div v-for="award in category.awards">
+                    <img :src="award.badge.image._links.image" />
+                    <p><strong>{{ award.badge.name }}</strong></p>
+                    <p class="meta">{{ award.awardedAt }}</p>
+                </div>
+            </div>
+        loaded!
+        </template>
+
     </div>
 </template>
