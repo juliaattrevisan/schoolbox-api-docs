@@ -26,7 +26,7 @@
                         <textarea name="body" id="badge-body" required></textarea>
 
                         <label>Select badge from existing set</label>
-                        <button class="full-width">Browse badges</button>
+                        <button class="full-width">Browse badges (to be developed)</button>
 
                         <label for="badge-image" class="required">
                             Upload badge from your device
@@ -46,7 +46,7 @@
                         <label for="badge-tags">
                             Tags
                         </label>
-                        <input name="tags" type="text" id="badge-tags" />
+                        <input name="tags" type="text" id="badge-tags" readonly placeholder="To be developed" />
                     </div>
                 </fieldset>
             </section>
@@ -92,16 +92,18 @@
                 // Build a request to post the form
                 let formData = new FormData(form),
                     payload  = {
-                        name:     formData.get('name'),
-                        body:     formData.get('body'),
-                        image:    formData.get('image'),
-                        category: null,
-                        tags:     [],
+                        name:            formData.get('name'),
+                        body:            formData.get('body'),
+                        image:           formData.get('image'),
+                        category:        null,
+                        tags:            [],
+                        curriculumNodes: [],
                     },
-                    categoryId = formData.get('category'),
-                    tags       = formData.get('tags'),
-                    toast      = $('#toast'),
-                    submit     = $('#badge-submit');
+                    categoryId      = formData.get('category'),
+                    tags            = formData.get('tags'),
+                    curriculumNodes = formData.get('curriculumNodes'),
+                    toast           = $('#toast'),
+                    submit          = $('#badge-submit');
 
                 if (categoryId) {
                     payload.category = {
