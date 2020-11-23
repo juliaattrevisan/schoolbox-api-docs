@@ -10,6 +10,8 @@ namespace Schoolbox\Learning\Badge\Translator;
 
 use Schoolbox\Learning\Badge\Category\Model as BadgeCategory;
 use Schoolbox\Learning\Badge\Model;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\User;
 use TypeError;
 
@@ -19,6 +21,23 @@ use TypeError;
  */
 class ArrayToModel
 {
+    /**
+     * @var CollectorFactory
+     */
+    private CollectorFactory $collectorFactory;
+
+
+    /**
+     * Constructor
+     *
+     * @param CollectorFactory $collectorFactory
+     */
+    public function __construct(CollectorFactory $collectorFactory)
+    {
+        $this->collectorFactory = $collectorFactory;
+    }
+
+
     /**
      * Convert an array to a model.
      *
@@ -36,9 +55,7 @@ class ArrayToModel
         $model = $this->setScalar($array, 'id', $model, 'setId');
         $model = $this->setScalar($array, 'name', $model, 'setName');
         $model = $this->setScalar($array, 'body', $model, 'setBody');
-
-        // Set image, either from a triplet or from a hash directly
-
+        $model = $this->setFile($array, 'image', $model, 'setImage', $this->collectorFactory);
         $model = $this->setModel(
             $array,
             'category',
@@ -171,6 +188,49 @@ class ArrayToModel
                     ? new \Alaress_Date_Format($array[$arrayField], DATE_ATOM)
                     : null
             );
+        }
+        return $model;
+    }
+
+
+    /**
+     * Helper method for setting a storage file into a model.
+     *
+     * If `$array[$arrayField]` exists and is set, then:
+     * * `$collectorFactory` will build a collector which can locate that file
+     * * `$model->$modelFieldSetter` will be called with the storage object it
+     *   creates
+     *
+     * If `$array[$arrayField]` is null, then:
+     * * `$model->$modelFieldSetter` will be called with `null`
+     *
+     * @param array            $array            The array being set from
+     * @param string           $arrayField       The field in `$array` which
+     *                                           contains the storage triplet
+     * @param Model            $model            The model to update
+     * @param string           $modelFieldSetter The setter to call on `$model`
+     * @param CollectorFactory $collectorFactory The object which locates a
+     *                                           previously uploaded file in
+     *                                           the storage system.
+     * @return Model
+     * @throws ResourceException if `$collectorFactory` can't locate the file
+     */
+    private function setFile(
+        array $array,
+        string $arrayField,
+        Model $model,
+        string $modelFieldSetter,
+        CollectorFactory $collectorFactory
+    ): Model {
+        if (array_key_exists($arrayField, $array)) {
+            if (!isset($array[$arrayField])) {
+                $model = $model->$modelFieldSetter(null);
+            } else {
+                $file = $collectorFactory->build([$array[$arrayField]])->getFirst();
+                if ($file) {
+                    $model = $model->$modelFieldSetter($file);
+                }
+            }
         }
         return $model;
     }

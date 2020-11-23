@@ -13,6 +13,7 @@ use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\Learning\Badge\Translator;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -131,7 +132,7 @@ class Controller extends Base
     public function postBadge(): void
     {
         $data       = json_decode(json_encode($this->request->content->get()), true);
-        $translator = new Translator\ArrayToModel();
+        $translator = new Translator\ArrayToModel(new CollectorFactory());
         $model      = $translator($data)
             ->setCreatedBy($this->getUser())
             ->setUpdatedBy($this->getUser());
