@@ -115,10 +115,17 @@ class Controller extends Base
         $awards = $this->awardMapper->findRecentForUser($user);
 
         $stack = [];
-        $translator = new Translator\ModelToArray(
+
+        /* Award translator; uses a Badge translator to convert one of
+         * the parts into a fully-fledged badge array representation
+         */
+        $translator = new Award\Translator\ModelToArray(
             new User\Translator\ModelToArray(),
-            new Storage\Translator\ModelToArray(),
-            new ScrubAdapter()
+            new Translator\ModelToArray(
+                new User\Translator\ModelToArray(),
+                new Storage\Translator\ModelToArray(),
+                new ScrubAdapter()
+            )
         );
 
         /* Group by category
@@ -133,11 +140,15 @@ class Controller extends Base
              * in the list is the most recently awarded
              */
             if (!isset($stack[$categoryId][$badgeId])) {
-                $stack[$categoryId][$badgeId] = [
-                    'badge' => $translator($award->getBadge()),
-                    'awardedAt' => $award->getAwardedAt()->getDatabase(),
-                    'count' => 0
-                ];
+                $badge = $translator($award);
+
+                /* This is a set-based aggregation, not an individual model property
+                 */
+                $badge['count'] = 0;
+
+                /* Stick it into the stack
+                 */
+                $stack[$categoryId][$badgeId] = $badge;
             }
 
             /* Collapse duplicate badge ids with a count
@@ -145,8 +156,7 @@ class Controller extends Base
             $stack[$categoryId][$badgeId]['count']++;
         }
 
-        new \Alaress_Probe($stack);
-        return [];
+        return $stack;
     }
 
 
