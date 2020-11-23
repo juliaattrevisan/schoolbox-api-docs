@@ -37,7 +37,7 @@ class MutableFieldsOnly extends AllFields
     /**
      * @inheritdoc
      */
-    public function __invoke(array $array, Model $model = null): Model
+    public function __invoke(array $array, object $model = null): object
     {
         return parent::__invoke(
             array_intersect_key(
