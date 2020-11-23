@@ -13,12 +13,12 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form method="post" action="{{ routeLookup('learningBadge.postBadge') }}">
+        <form method="post" action="{{ routeLookup('learningBadge.postBadge') }}" id="badge-form">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="badge-name" class="required">Achievement Name</label>
-                        <input type="text" id="badge-name" required />
+                        <input name="name" type="text" id="badge-name" required />
 
                         <label for="badge-body" class="required">
                             Description
@@ -28,7 +28,7 @@
                         <label>Select badge from existing set</label>
                         <button class="full-width">Browse badges</button>
 
-                        <label for="badge-image">
+                        <label for="badge-image" class="required">
                             Upload badge from your device
                         </label>
                         {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
@@ -36,17 +36,22 @@
                         <label for="badge-category" class="required">
                             Category
                         </label>
-                        <input type="text" id="badge-category" required />
+                        <select name="category" id="badge-category" required>
+                            <option disabled selected>-- select a category --</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" label="{{ category.name }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
 
                         <label for="badge-tags">
                             Tags
                         </label>
-                        <input type="text" id="badge-tags" />
+                        <input name="tags" type="text" id="badge-tags" />
                     </div>
                 </fieldset>
             </section>
 
-            <input type="submit" value="Add new badge" />
+            <input type="submit" value="Add new badge" id="badge-submit" />
         </form>
     </div>
 </div>
