@@ -502,9 +502,9 @@
 
                     {% autoescape 'js' %}
                         <script type="text/javascript">
-                            window.learningEvidenceAchievementsFeedConfig = {
+                            window.learningBadgeAwardFeedConfig = {
                                 routes: {
-                                    getAchievementsFeed: '{{ routeLookupIfAuthorized(
+                                    getAwardFeed: '{{ routeLookupIfAuthorized(
                                         'learningBadge.getAwardedBadges',
                                         {user: user, userId: user.id}
                                     ) }}'
@@ -512,8 +512,8 @@
                             };
                         </script>
                     {% endautoescape %}
-                    <div id="evidence-achievements-feed"></div>
-                    <script type="text/javascript" src="/javascript/components/learningMomentsEvidenceAchievementsFeed.bundle.js"></script>
+                    <div id="badge-award-feed"></div>
+                    <script type="text/javascript" src="/javascript/components/badgeAwardFeed.bundle.js"></script>
                 </div>
             </div>
 

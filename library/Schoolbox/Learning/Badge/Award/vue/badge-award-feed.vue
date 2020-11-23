@@ -1,4 +1,6 @@
 <script>
+import axios from "axios";
+
 export default {
 
     /**
@@ -6,7 +8,7 @@ export default {
      * The name of the component that we have here. This name will be used in the container
      * to spawn this component.
      */
-    name: "evidence-achievements-feed",
+    name: "badge-award-feed",
 
     /**
      * Mixins.
@@ -40,6 +42,8 @@ export default {
      */
     data() {
         return {
+            data: [],
+            showSkeletonLoader: true,
         }
     },
 
@@ -49,6 +53,14 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
+
+        /* Access the feed endpoint, grab the awards for the user
+         */
+        axios.get(this.config.routes.getAwardFeed, {})
+            .then(response => {
+                console.log(response);
+            })
+            .finally(() => this.showSkeletonLoader = false);
     },
 
     /**
@@ -56,6 +68,7 @@ export default {
      * Access the results of a function as if they were a property of an object.
      */
     computed: {
+        config: () => window.learningBadgeAwardFeedConfig
     },
 
     /**

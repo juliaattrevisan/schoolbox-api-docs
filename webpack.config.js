@@ -21,7 +21,7 @@ module.exports = {
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js',
         learningMomentsFeed: './library/Schoolbox/Learning/Moment/Evidence/vue/feed.main.js',
         learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/evidence-detail.js',
-        learningMomentsEvidenceAchievementsFeed: './library/Schoolbox/Learning/Moment/Evidence/vue/evidence-achievements-feed.js',
+        badgeAwardFeed: './library/Schoolbox/Learning/Badge/Award/vue/badge-award-feed.js',
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.main.js',
     },
     output: {
