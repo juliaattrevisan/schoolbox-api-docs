@@ -61,9 +61,66 @@
 {% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
+        // Set up editor
+        let editorId = 'badge-body';
         $.fn.alaressEditor({
-            targetElements: $('#badge-body')
+            targetElements: $('#' + editorId)
         });
+
+
+        // Update the editor's form input on change
+        // (required so that validation triggers)
+        CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
+
+
+        // Set up validation and save
+        $('#badge-form').alaressValidate({
+            rules: {
+                name: {
+                    required: true,
+                },
+                body: {
+                    required: true,
+                },
+                category: {
+                    required: true,
+                }
+            },
+            submitHandler(form, event) {
+                event.preventDefault();
+
+                // Build a request to post the form
+                // let formData = new FormData(form);
+                // return {
+                //     body: formData.get('body'),
+                //     file: formData.get('file'),
+                // };
+                let formData = new FormData(form),
+                    payload  = {
+                        name: formData.get('name'),
+                        body: formData.get('body'),
+                    },
+                    toast    = $('#toast'),
+                    submit   = $('#badge-submit');
+
+                // Toast then post
+                toast.toastActivate('Saving...')
+                submit.prop('disabled', true);
+
+                axios
+                    .post(form.action, payload)
+                    .then(() => {
+                        toast.toastTimeout({text: 'Saved'});
+                        window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadges') }}';
+                    })
+                    .catch(() => {
+                        toast.toastTimeout({text: 'Save failed', css: 'alert'});
+                        submit.prop('disabled', false);
+                    });
+            }
+        })
     });
 </script>
 {% endautoescape %}
+
+<div id="toast" class="toast"></div>
