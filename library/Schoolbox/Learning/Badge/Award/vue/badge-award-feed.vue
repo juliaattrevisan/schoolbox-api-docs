@@ -1,5 +1,6 @@
 <script>
 import axios from "axios";
+import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 
 export default {
 
@@ -32,6 +33,7 @@ export default {
      * at the top of the file.
      */
     components: {
+        RelativeTime
     },
 
     /**
@@ -105,7 +107,8 @@ export default {
                                 <div class="badge" v-for="award in category.awards">
                                     <img :src="award.badge.image._links.image" />
                                     <h3 class="no-margin">{{ award.badge.name }} ({{ award.count }})</h3>
-                                    <span class="meta">{{ award.awardedAt }}</span>
+
+                                    <p class="meta">Awarded <relative-time :datetime="award.awardedAt"></relative-time></p>
                                 </div>
                             </div>
                         </div>
