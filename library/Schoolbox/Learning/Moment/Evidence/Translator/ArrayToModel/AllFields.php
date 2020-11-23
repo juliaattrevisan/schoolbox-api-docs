@@ -24,6 +24,8 @@ use UnexpectedValueException;
  *
  * Used when translating JSON passed in a request body into a model, so that it
  * may be persisted.
+ *
+ * TODO consider extending new base class `Schoolbox\API\Translator\ArrayToModel\Base`
  */
 class AllFields
 {
