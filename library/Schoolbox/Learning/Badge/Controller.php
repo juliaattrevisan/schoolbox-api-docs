@@ -106,10 +106,10 @@ class Controller extends Base
      * @api GET /learning/badge/{userId}/awarded
      *
      * @param User $user
-     * @return array
+     * @return void
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function getAwardedBadges(User $user): array
+    public function getAwardedBadges(User $user): void
     {
         $awards = $this->awardMapper->findRecentForUser($user);
 
@@ -138,9 +138,9 @@ class Controller extends Base
              *
              * Remember one copy of the category
              */
-            if (!isset($stack[$categoryId])) {
-                $stack[$categoryId] = $badge['badge']['category'];
-                $stack[$categoryId]['awards'] = [];
+            if (!isset($stack['categories'][$categoryId])) {
+                $stack['categories'][$categoryId] = $badge['badge']['category'];
+                $stack['categories'][$categoryId]['awards'] = [];
             }
 
             /* Init badge count
@@ -148,7 +148,7 @@ class Controller extends Base
              * findRecentForUser() is listed reverse chronologically so the first
              * in the list is the most recently awarded
              */
-            if (!isset($stack[$categoryId]['awards'][$badgeId])) {
+            if (!isset($stack['categories'][$categoryId]['awards'][$badgeId])) {
 
                 /* This is a set-based aggregation, not an individual model property
                  */
@@ -156,15 +156,15 @@ class Controller extends Base
 
                 /* Stick it into the stack
                  */
-                $stack[$categoryId]['awards'][$badgeId] = $badge;
+                $stack['categories'][$categoryId]['awards'][$badgeId] = $badge;
             }
 
             /* Collapse duplicate badge ids with a count
              */
-            $stack[$categoryId]['awards'][$badgeId]['count']++;
+            $stack['categories'][$categoryId]['awards'][$badgeId]['count']++;
         }
 
-        return $stack;
+        $this->response->content->set($this->buildJsonOutput($stack));
     }
 
 
