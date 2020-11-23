@@ -46,7 +46,7 @@ class AllFields extends Base
      *
      * @param array             $array
      * @param object|Model|null $model
-     * @return object
+     * @return object|Model
      * @throws ResourceException
      */
     public function __invoke(array $array, object $model = null): object
@@ -93,6 +93,8 @@ class AllFields extends Base
             'setId'
         );
 
+        // If at the end of it all it isn't a model: raise an error
+        $this->assertModelIsInstanceOf($model, Model::class);
         return $model;
     }
 }

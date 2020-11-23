@@ -172,4 +172,28 @@ abstract class Base
         }
         return $model;
     }
+
+
+    /**
+     * Helper for ensuring that the given model is an instance of the given class.
+     *
+     * In the absence of generics: use this to verify that the object passed
+     * into the translator is recognised by this translator.
+     *
+     * @param object $model
+     * @param string $className
+     * @throws TypeError if `$model` isn't an instance of `$classname`
+     */
+    protected function assertModelIsInstanceOf(object $model, string $className): void
+    {
+        if (!is_a($model, $className, true)) {
+            throw new TypeError(
+                sprintf(
+                    'Model must be an instance of %s: got %s instead',
+                    $className,
+                    get_class($model)
+                )
+            );
+        }
+    }
 }
