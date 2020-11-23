@@ -109,6 +109,14 @@ export default {
                                     <h3 class="no-margin">{{ award.badge.name }} ({{ award.count }})</h3>
 
                                     <p class="meta">Awarded <relative-time :datetime="award.awardedAt"></relative-time></p>
+
+                                    <template v-if="award.badge.curriculumNodes.length">
+                                        <span class="meta">
+                                            <template v-for="curriculumNode in award.badge.curriculumNodes">
+                                                {{ curriculumNode.code }}
+                                            </template>
+                                        </span>
+                                    </template>
                                 </div>
                             </div>
                         </div>
