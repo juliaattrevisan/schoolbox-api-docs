@@ -38,7 +38,7 @@ abstract class Base implements ITranslator
     protected function setScalar(array $array, string $arrayField, object $model, string $modelFieldSetter): object
     {
         if (array_key_exists($arrayField, $array)) {
-            $model = $model->$modelFieldSetter($array[$arrayField]);
+            $model = $this->setFieldOnModel($model, $modelFieldSetter, $array[$arrayField]);
         }
         return $model;
     }
@@ -83,12 +83,14 @@ abstract class Base implements ITranslator
         if (array_key_exists($arrayField, $array)) {
             if (isset($array[$arrayField])) {
                 if (is_array($array[$arrayField]) && array_key_exists($arrayIdField, $array[$arrayField])) {
-                    $model = $model->$modelFieldSetter(
+                    $model = $this->setFieldOnModel(
+                        $model,
+                        $modelFieldSetter,
                         $joinedModel->$joinedModelIdSetter($array[$arrayField][$arrayIdField])
                     );
                 }
             } else {
-                $model = $model->$modelFieldSetter(null);
+                $model = $this->setFieldOnModel($model, $modelFieldSetter, null);
             }
         }
         return $model;
@@ -110,7 +112,9 @@ abstract class Base implements ITranslator
     protected function setDate(array $array, string $arrayField, object $model, string $modelFieldSetter): object
     {
         if (array_key_exists($arrayField, $array)) {
-            $model = $model->$modelFieldSetter(
+            $model = $this->setFieldOnModel(
+                $model,
+                $modelFieldSetter,
                 isset($array[$arrayField])
                     ? new Alaress_Date_Format($array[$arrayField], DATE_ATOM)
                     : null
@@ -157,7 +161,7 @@ abstract class Base implements ITranslator
     ): object {
         if (array_key_exists($arrayField, $array)) {
             if (!isset($array[$arrayField])) {
-                $model = $model->$modelFieldSetter(null);
+                $model = $this->setFieldOnModel($model, $modelFieldSetter, null);
             } elseif (is_array($array[$arrayField])) {
                 $model = $this->setModel(
                     $array,
@@ -171,7 +175,7 @@ abstract class Base implements ITranslator
             } else {
                 $file = $collectorFactory->build([$array[$arrayField]])->getFirst();
                 if ($file) {
-                    $model = $model->$modelFieldSetter($file);
+                    $model = $this->setFieldOnModel($model, $modelFieldSetter, $file);
                 }
             }
         }
@@ -199,6 +203,41 @@ abstract class Base implements ITranslator
                     get_class($model)
                 )
             );
+        }
+    }
+
+
+    /**
+     * Helper for setting a field on the model.
+     *
+     * This helper is tolerant of `TypeError` errors when setting the model's
+     * field value: it will instead raise a `E_USER_WARNING` and leave the field
+     * value as it was.
+     *
+     * TODO consider whether to actually be lenient of type errors here.
+     *      I can see a case for not silently ignoring values that are of an
+     *      invalid type.
+     *
+     * @param object $model
+     * @param string $modelFieldSetter
+     * @param mixed  $value
+     * @return object
+     */
+    private function setFieldOnModel(object $model, string $modelFieldSetter, $value): object
+    {
+        try {
+            return $model->$modelFieldSetter($value);
+        } catch (TypeError $e) {
+            trigger_error(
+                sprintf(
+                    'Attempting to call "%s::%s" with invalid parameter of type "%s": skipping',
+                    get_class($model),
+                    $modelFieldSetter,
+                    (is_object($value) ? get_class($value) : gettype($value))
+                ),
+                E_USER_WARNING
+            );
+            return $model;
         }
     }
 }
