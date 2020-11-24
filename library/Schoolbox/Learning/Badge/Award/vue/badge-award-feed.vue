@@ -112,26 +112,32 @@ export default {
         <template v-else-if="this.data.categories">
             <section class="awards">
                 <template v-for="category in this.data.categories">
-                    <div class="row">
-                        <div class="small-12 columns">
-                            <div class="content">
-                                <h2 class="subheader">{{ category.name }}</h2>
+                    <h2 class="subheader content">{{ category.name }}</h2>
 
-                                <div class="badge" v-for="award in category.awards">
+                    <div class="v-card-list">
+                        <div class="v-card card wrap-down" v-for="award in category.awards">
+                            <div class="card-feature-image">
+                                <a href="#">
                                     <img :src="award.badge.image._links.image" :class="getCss(award)"/>
-                                    <h3 class="no-margin">{{ award.badge.name }} ({{ award.count }})</h3>
+                                </a>
+                            </div>
+                            <div class="card-content">
+                                <h3><a href="#">{{ award.badge.name }} ({{ award.count }})</a></h3>
+                                <p class="meta">
+                                    Awarded <relative-time :datetime="award.awardedAt"></relative-time> by
+                                    <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
+                                </p>
+                                <article>
                                     <p>{{ award.badge.body }}</p>
+                                </article>
 
-                                    <p class="meta">Awarded <relative-time :datetime="award.awardedAt"></relative-time></p>
-
-                                    <template v-if="award.badge.curriculumNodes.length">
-                                        <span class="meta">
-                                            <template v-for="curriculumNode in award.badge.curriculumNodes">
-                                                {{ curriculumNode.code }}
-                                            </template>
-                                        </span>
-                                    </template>
-                                </div>
+                                <template v-if="award.badge.curriculumNodes.length">
+                                    <span class="meta">
+                                        <template v-for="curriculumNode in award.badge.curriculumNodes">
+                                            {{ curriculumNode.code }}
+                                        </template>
+                                    </span>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -146,3 +152,8 @@ export default {
         </template>
     </div>
 </template>
+
+
+
+
+
