@@ -72,9 +72,11 @@ class AllFieldsTest extends TestCase
         yield 'users' => [
             [
                 'createdBy' => ['id' => 55],
+                'updatedBy' => ['id' => 55],
             ],
             (new Model())
-                ->setCreatedBy((new User())->setId(55)),
+                ->setCreatedBy((new User())->setId(55))
+                ->setUpdatedBy((new User())->setId(55)),
         ];
 
         // Storage file upload: require a mock here
@@ -172,84 +174,67 @@ class AllFieldsTest extends TestCase
             (clone $baseModel)->setDeletedAt(null),
         ];
 
-        // Name is not nullable:
-        // that will be covered in `testInvokeUpdateInvalidValues`
+        // Name is not nullable
+        // (covered in `testInvokeUpdateInvalidValues)
         yield 'update name' => [
             ['name' => 'new name',],
             (clone $baseModel),
             (clone $baseModel)->setName('new name'),
         ];
 
-        // Body is mutable but not nullable
-        // this error case is covered in `testInvokeUpdateInvalidValues`.
+        // Body is not nullable
+        // (covered in `testInvokeUpdateInvalidValues)
         yield 'update body' => [
             ['body' => 'new body',],
             (clone $baseModel),
             (clone $baseModel)->setBody('new body'),
         ];
 
-        // Category (not nullable)
+        // Category is not nullable
+        // (covered in `testInvokeUpdateInvalidValues)
         yield 'update category' => [
             ['category' => ['id' => $newId,],],
             (clone $baseModel),
             (clone $baseModel)->setCategory((new Category())->setId($newId)),
         ];
 
-        yield 'null category' => [
+        yield 'null category id' => [
             ['category' => ['id' => null],],
             (clone $baseModel),
             (clone $baseModel)->setCategory((new Category())->setId(null)),
         ];
 
-        // Body is not nullable: cover in `testInvokeUpdateInvalidValues`
-//        yield 'null body' => [
-//            ['body' => null,],
-//            (clone $baseModel),
-//            (clone $baseModel),
-//        ];
-
+        // Created by is not nullable
+        // (covered in `testInvokeUpdateInvalidValues)
         yield 'update created by' => [
             ['createdBy' => ['id' => $newId,],],
             (clone $baseModel),
             (clone $baseModel)->setCreatedBy((new User())->setId($newId)),
         ];
 
-        // Creator cannot be set to null once created:
-        // this error case is covered in `testInvokeUpdateInvalidValues`.
-//        yield 'null creator' => [
-//            ['creator' => null,],
-//            (clone $baseModel),
-//            (clone $baseModel)
-//        ];
-
-        yield 'null created by' => [
+        yield 'null created by id' => [
             ['createdBy' => ['id' => null],],
             (clone $baseModel),
             (clone $baseModel)->setCreatedBy((new User())->setId(null)),
         ];
 
+        // Updated by is not nullable
+        // (covered in `testInvokeUpdateInvalidValues)
         yield 'update updated by' => [
             ['updatedBy' => ['id' => $newId,],],
             (clone $baseModel),
             (clone $baseModel)->setUpdatedBy((new User())->setId($newId)),
         ];
 
-        // Updater cannot be set to null once created:
-        // this error case is covered in `testInvokeUpdateInvalidValues`.
-//        yield 'null updatedBy by' => [
-//            ['creator' => null,],
-//            (clone $baseModel),
-//            (clone $baseModel)
-//        ];
-
-        yield 'null updated by' => [
+        yield 'null updated by id' => [
             ['updatedBy' => ['id' => null],],
             (clone $baseModel),
             (clone $baseModel)->setUpdatedBy((new User())->setId(null)),
         ];
 
-        // File is mutable, by either a file upload or a storage+filename
-        // Will need to mock the collector factory though
+        // Image set from upload and storage hash
+        // Image is not nullable
+        // (covered in `testInvokeUpdateInvalidValues)
         $storage       = (new Storage())
             ->setHash('9876543210987654321098765432109876543210')
             ->setBasename('test.png');
@@ -269,15 +254,6 @@ class AllFieldsTest extends TestCase
             new AllFields($collectorFactoryMock),
         ];
 
-        // Image is not nullable::cover in invalidValues test
-//        yield 'null image' => [
-//            [
-//                'image' => null,
-//            ],
-//            (clone $baseModel),
-//            (clone $baseModel)->setImage(null),
-//        ];
-
         yield 'update image from hash' => [
             [
                 'image' => ['hash' => '12345'],
@@ -286,23 +262,6 @@ class AllFieldsTest extends TestCase
             (clone $baseModel)->setImage((new Storage())->setHash('12345')),
             new AllFields($collectorFactoryMock),
         ];
-
-        // Image is not null: cover in invalidValues test
-//        yield 'null image' => [
-//            [
-//                'image' => null,
-//            ],
-//            (clone $baseModel),
-//            (clone $baseModel)->setImage(null),
-//        ];
-//
-//        yield 'null image hash' => [
-//            [
-//                'image' => ['hash' => null],
-//            ],
-//            (clone $baseModel),
-//            (clone $baseModel)->setImage(null),
-//        ];
     }
 
 
