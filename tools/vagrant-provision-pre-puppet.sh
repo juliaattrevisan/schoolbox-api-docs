@@ -51,7 +51,9 @@ rm -rf /var/lib/schoolbox /vagrant/data
 mkdir /vagrant/data
 ln -sf /vagrant/data /var/lib/schoolbox
 
-# Always remove this TODO - probably move to puppet once IST-604 goes in, or remove from VM image.
+# TODO, need to rebuild image to get fix from:
+# https://github.com/alaress/packer-templates/commit/3c1d0ae56ad5f870e6026fa99933373a954ae802#diff-f0a3cfe79f4fee4578823022ff15cff935dd423042caeb7c51e7d93b841de4b2
+# This is a dependency for kernel updates
 if apt list --installed 2>/dev/null | grep -q 'initramfs-tools/'; then
   echo "[SB][$(date +%Y-%m-%d\ %X)] Removing initramfs-tools";
   apt-get -y remove initramfs-tools
