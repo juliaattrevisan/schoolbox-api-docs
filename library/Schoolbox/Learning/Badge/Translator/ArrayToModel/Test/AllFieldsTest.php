@@ -314,21 +314,61 @@ class AllFieldsTest extends TestCase
      */
     public function getTestInvokeUpdateInvalidValuesData(): iterable
     {
+        $oldDate   = '2020-01-01T00:00:00+00:00';
+        $oldId     = 1;
+        $timezone  = new DateTimeZone('+00:00');
         $baseModel = (new Model())
-            ->setCreator((new User())->setId(1))
-            ->setRecipient((new User())->setId(1));
+            ->setId($oldId)
+            ->setCreatedAt(new Alaress_Date_Format($oldDate, DATE_ATOM, $timezone))
+            ->setUpdatedAt(new Alaress_Date_Format($oldDate, DATE_ATOM, $timezone))
+            ->setDeletedAt(new Alaress_Date_Format($oldDate, DATE_ATOM, $timezone))
+            ->setName('test')
+            ->setBody('test')
+            ->setImage((new Storage())->setHash('1234567890123456789012345678901234567890'))
+            ->setCategory((new Category())->setId($oldId))
+            ->setCreatedBy((new User())->setId($oldId))
+            ->setUpdatedBy((new User())->setId($oldId));
 
-        // Creator cannot be set to null once created: this should be an error
-        yield 'null creator' => [
-            ['creator' => null,],
+        // These fields are not nullable:
+        // * name
+        // * body
+        // * image
+        // * category
+        // * createdBy
+        // * updatedBy
+
+        yield 'null name' => [
+            ['name' => null,],
             (clone $baseModel),
             (clone $baseModel),
         ];
 
-        // Likewise recipient can't be set to null once created
-        // This should be an error
-        yield 'null recipient' => [
-            ['recipient' => null,],
+        yield 'null body' => [
+            ['body' => null,],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        yield 'null image' => [
+            ['image' => null,],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        yield 'null category' => [
+            ['category' => null,],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        yield 'null created by' => [
+            ['createdBy' => null,],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        yield 'null updated by' => [
+            ['updatedBy' => null,],
             (clone $baseModel),
             (clone $baseModel),
         ];
