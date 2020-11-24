@@ -118,7 +118,7 @@ export default {
                         <div class="v-card card wrap-down" v-for="award in category.awards">
                             <div class="card-feature-image">
                                 <a href="#">
-                                    <img :src="award.badge.image._links.image" :class="getCss(award)"/>
+                                    <img :src="award.badge.image._links.image + '&size=constrain200'" :class="getCss(award)"/>
                                 </a>
                             </div>
                             <div class="card-content">
@@ -141,6 +141,8 @@ export default {
                             </div>
                         </div>
                     </div>
+
+                    <hr />
                 </template>
             </section>
         </template>
