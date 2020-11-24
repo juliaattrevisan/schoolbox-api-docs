@@ -79,5 +79,12 @@ if [[ -f /etc/cron.d/vagrant ]]; then
   rm /etc/cron.d/vagrant
 fi
 
+
+# Remove old single-instance daemons
+for service in socketd digestd routed scheduled; do
+  systemctl stop "schoolbox-$service.service";
+  find /etc/systemd/system/multi-user.target.wants/ -iname "schoolbox-$service.service" -delete
+done
+
 # TODO We could hook in here to switch PHP versions in puppet if desired
 # cat /etc/puppetlabs/code/hieradata/node/ubuntu-1804-php71.vagrant.yaml
