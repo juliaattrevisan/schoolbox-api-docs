@@ -44,7 +44,7 @@ class DisasterRecovery extends CliTool\App
      *
      * @var string
      */
-    public const PREFIX_BACKUPS = 'backups/';
+    public const PREFIX_BACKUPS = 'instance/' . INSTANCE_ID . '/backups/';
 
     public const CONFIG_DR_VISIBILITY = 'aws_s3_dr_backup_visibility';
     public const CONFIG_DR_SYNC_STATUS = 'aws_s3_dr_sync_status';
