@@ -21,7 +21,7 @@ use Schoolbox\Learning\Badge\Model;
  * * image
  * * category
  * * tags
- * * curriculumCodes
+ * * curriculumNodes
  */
 class MutableFieldsOnly extends AllFields
 {
@@ -31,7 +31,7 @@ class MutableFieldsOnly extends AllFields
         'image'           => true,
         'category'        => true,
         'tags'            => true,
-        'curriculumCodes' => true,
+        'curriculumNodes' => true,
     ];
 
 
