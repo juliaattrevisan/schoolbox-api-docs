@@ -13,7 +13,6 @@ use Alaress_Date_Format;
 use DateTimeZone;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\Learning\Badge\Category\Model as Category;
 use Schoolbox\Learning\Badge\Model;
 use Schoolbox\Learning\Badge\Translator\ArrayToModel\AllFields;
@@ -62,7 +61,7 @@ class AllFieldsTest extends TestCase
 
         yield 'image as hash' => [
             [
-                'image'  => [
+                'image' => [
                     'hash' => '1234567890123456789012345678901234567890',
                 ],
             ],
