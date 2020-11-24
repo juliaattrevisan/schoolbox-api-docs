@@ -74,5 +74,10 @@ if ! /opt/puppetlabs/puppet/bin/gem list | grep -q lookup_http; then
   /opt/puppetlabs/puppet/bin/gem install lookup_http
 fi
 
+
+if [[ -f /etc/cron.d/vagrant ]]; then
+  rm /etc/cron.d/vagrant
+fi
+
 # TODO We could hook in here to switch PHP versions in puppet if desired
 # cat /etc/puppetlabs/code/hieradata/node/ubuntu-1804-php71.vagrant.yaml
