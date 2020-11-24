@@ -12,6 +12,16 @@ if [[ -f /etc/schoolboxdev/conf.php ]]; then
     rm /etc/schoolboxdev/conf.php;
 fi;
 
+# We want to be able to reference schoolbox code at the standard location,
+# but have the disks on the shared mount se we can directly manipulate from the host
+rm -rf /usr/share/schoolbox
+ln -sf /vagrant /usr/share/schoolbox
+
+rm -rf /var/lib/schoolbox /vagrant/data
+mkdir /vagrant/data
+ln -sf /vagrant/data /var/lib/schoolbox
+
+
 # Does vagrant environment file indicate we wish this host to use a custom IR endpoint?
 # We would do this if we wished to test an integration between Schoolbox, Puppet + IR
 instance_registry_url_override=$1
