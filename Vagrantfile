@@ -126,7 +126,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     puppet.facter = {
       "is_vagrant_puppet_provision" => true
-#       "schoolbox_host_ir_url" => "https://bad.com"
     }
   end
 
