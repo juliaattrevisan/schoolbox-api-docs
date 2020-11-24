@@ -114,8 +114,9 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@learningBadge/createForm.twig',
                 [
-                    'attachzone' => $attachzone->getTwigContext(),
-                    'categories' => Category\Mapper::getInstance()->findAll(),
+                    'attachzone'               => $attachzone->getTwigContext(),
+                    'categories'               => Category\Mapper::getInstance()->findAll(),
+                    'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                 ],
                 'Create Badge'
             )

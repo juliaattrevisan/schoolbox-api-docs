@@ -49,6 +49,20 @@
                             Tags
                         </label>
                         <input name="tags" type="text" id="badge-tags" readonly placeholder="To be developed" />
+
+                        {% if curriculumTaggingEnabled %}
+                            <label for="curriculum-code-select">Curriculum Codes</label>
+                            <div class="input-group">
+                                {%
+                                    include 'sub/curriculumCodeSelector.twig' with
+                                    {
+                                        codeList: [],
+                                        renderButton: true
+                                    }
+                                %}
+                            </div>
+                        {% endif %}
+
                     </div>
                 </fieldset>
             </section>
@@ -60,6 +74,9 @@
 
 <script src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
 {% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
