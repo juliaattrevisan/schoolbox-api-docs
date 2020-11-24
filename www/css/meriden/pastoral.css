@@ -197,13 +197,13 @@ body.login input[type=checkbox]:not(.plain):checked + label:after {
 .e-report #assessments table td:first-child {
   text-align: left;
 }
-.e-report #assessments col.title {
+.e-report #assessments .title {
   width: 25%;
 }
-.e-report #assessments col.result {
+.e-report #assessments .result {
   width: 15%;
 }
-.e-report #assessments col.distribution {
+.e-report #assessments .distribution {
   width: 60%;
 }
 .e-report .card p {

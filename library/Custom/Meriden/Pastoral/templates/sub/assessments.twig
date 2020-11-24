@@ -37,16 +37,16 @@
             {{ thead }}
         {% endif %}
         <tr>
-            <td>
+            <td class="title">
                 <a href="/learning/assessments/{{ workItem.assessment.id }}/{{ student.id }}">
                     {{ workItem.assessment.title }}
                 </a>
             </td>
-            <td>{{ workItem.pretty_mark | replace({'%': ''}) }}</td>
-            <td>
+            <td class="result">{{ workItem.pretty_mark | replace({'%': ''}) }}</td>
+            <td class="distribution">
                 {% if workItem.distribution.continuous.series is defined %}
                     {# Graph goes here #}
-                    <div id="assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}"></div>
+                    <div class="chart" id="assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}"></div>
 
                     {% autoescape 'js' %}
                     <script type="text/javascript">
