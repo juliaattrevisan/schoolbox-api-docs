@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel;
 
-use Schoolbox\Learning\Moment\Evidence;
-
 /**
  * Array-to-model translator which filters out fields which may not be mutated
  * by the create or update evidence API calls.
@@ -33,7 +31,7 @@ class MutableFieldsOnly extends AllFields
     /**
      * @inheritdoc
      */
-    public function __invoke(array $json, ?Evidence\Model $model = null): Evidence\Model
+    public function __invoke(array $json, ?object $model = null): object
     {
         return parent::__invoke(
             array_intersect_key(

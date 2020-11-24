@@ -41,6 +41,18 @@ class Module extends BaseModule
             'getBadges',
             $baseRule
         );
+        $this->register(
+            self::METHOD_GET,
+            '/create',
+            'getCreateForm',
+            $baseRule
+        );
+        $this->register(
+            self::METHOD_POST,
+            '',
+            'postBadge',
+            $baseRule
+        );
     }
 
 

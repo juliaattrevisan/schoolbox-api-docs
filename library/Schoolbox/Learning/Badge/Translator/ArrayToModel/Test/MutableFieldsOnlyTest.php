@@ -1,0 +1,320 @@
+<?php
+
+/**
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Learning\Badge\Translator\ArrayToModel\Test;
+
+use Alaress_Date_Format;
+use DateTimeZone;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Schoolbox\Learning\Badge\Category\Model as Category;
+use Schoolbox\Learning\Badge\Model;
+use Schoolbox\Learning\Badge\Translator\ArrayToModel\MutableFieldsOnly;
+use Schoolbox\Resource\Attachment\Collector\Collector;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Storage\Model as Storage;
+use Schoolbox\User;
+
+/**
+ * Tests for converting from an array to model representation of badges, when
+ * only the subset of fields which is mutable by API calls is converted.
+ *
+ * @covers \Schoolbox\Learning\Badge\Translator\ArrayToModel\MutableFieldsOnly
+ */
+class MutableFieldsOnlyTest extends TestCase
+{
+    /**
+     * Data provider for `testInvokeCreate`.
+     *
+     * @return iterable
+     */
+    public function getTestInvokeCreateData(): iterable
+    {
+        yield 'empty' => [[], new Model()];
+
+        // Should ID be settable by this?
+        yield 'id + body' => [
+            [
+                'id'   => 3,
+                'body' => 'something',
+            ],
+            (new Model())->setBody('something'),
+        ];
+
+        yield 'dates' => [
+            [
+                'createdAt' => '2020-01-01T00:00:00+00:00',
+                'updatedAt' => '2020-02-01T00:00:00+00:00',
+                'deletedAt' => '2020-03-01T00:00:00+00:00',
+            ],
+            (new Model()),
+        ];
+
+        yield 'image as hash' => [
+            [
+                'image' => [
+                    'hash' => '1234567890123456789012345678901234567890',
+                ],
+            ],
+            (new Model())
+                ->setImage((new Storage())->setHash('1234567890123456789012345678901234567890')),
+        ];
+
+        yield 'users' => [
+            [
+                'createdBy' => ['id' => 55],
+                'updatedBy' => ['id' => 55],
+            ],
+            (new Model()),
+        ];
+
+        // Storage file upload: require a mock here
+        $storage       = (new Storage())
+            ->setHash('1234567890123456789012345678901234567890')
+            ->setBasename('test.gif');
+        $collectorMock = $this->createMock(Collector::class);
+        $collectorMock->method('getFirst')->willReturn($storage);
+
+        /** @var CollectorFactory|MockObject $collectorFactoryMock */
+        $collectorFactoryMock = $this->createMock(CollectorFactory::class);
+        $collectorFactoryMock->method('build')->willReturn($collectorMock);
+
+        yield 'image as file upload' => [
+            [
+                'image' => 'file:1234567890123456789012345678901234567890:test.gif',
+            ],
+            (new Model())
+                ->setImage($storage),
+            new MutableFieldsOnly($collectorFactoryMock),
+        ];
+    }
+
+
+    /**
+     * Data provider for `testInvokeUpdate`.
+     *
+     * @return iterable
+     */
+    public function getTestInvokeUpdateData(): iterable
+    {
+        $oldDate   = '2020-01-01T00:00:00+00:00';
+        $newDate   = '2020-02-01T00:00:00+00:00';
+        $oldId     = 1;
+        $newId     = 2;
+        $timezone  = new DateTimeZone('+00:00');
+        $baseModel = (new Model())
+            ->setId($oldId)
+            ->setCreatedAt(new Alaress_Date_Format($oldDate, DATE_ATOM, $timezone))
+            ->setUpdatedAt(new Alaress_Date_Format($oldDate, DATE_ATOM, $timezone))
+            ->setDeletedAt(new Alaress_Date_Format($oldDate, DATE_ATOM, $timezone))
+            ->setName('test')
+            ->setBody('test')
+            ->setImage((new Storage())->setHash('1234567890123456789012345678901234567890'))
+            ->setCategory((new Category())->setId($oldId))
+            ->setCreatedBy((new User())->setId($oldId))
+            ->setUpdatedBy((new User())->setId($oldId));
+
+
+        yield 'update id' => [
+            ['id' => $newId,],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        yield 'null id' => [
+            ['id' => null,],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        yield 'update created at' => [
+            ['createdAt' => $newDate,],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        yield 'null created at' => [
+            ['createdAt' => null,],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        yield 'update updated at' => [
+            ['updatedAt' => $newDate,],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        yield 'null updated at' => [
+            ['updatedAt' => null,],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        yield 'update deleted at' => [
+            ['deletedAt' => $newDate,],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        yield 'null deleted at' => [
+            ['deletedAt' => null,],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        yield 'update name' => [
+            ['name' => 'new name',],
+            (clone $baseModel),
+            (clone $baseModel)->setName('new name'),
+        ];
+
+        yield 'update body' => [
+            ['body' => 'new body',],
+            (clone $baseModel),
+            (clone $baseModel)->setBody('new body'),
+        ];
+
+        yield 'update category' => [
+            ['category' => ['id' => $newId,],],
+            (clone $baseModel),
+            (clone $baseModel)->setCategory((new Category())->setId($newId)),
+        ];
+
+        yield 'null category id' => [
+            ['category' => ['id' => null],],
+            (clone $baseModel),
+            (clone $baseModel)->setCategory((new Category())->setId(null)),
+        ];
+
+        yield 'update created by' => [
+            ['createdBy' => ['id' => $newId,],],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        yield 'null created by id' => [
+            ['createdBy' => ['id' => null],],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        // Updated by is not nullable
+        // (covered in `testInvokeUpdateInvalidValues)
+        yield 'update updated by' => [
+            ['updatedBy' => ['id' => $newId,],],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        yield 'null updated by id' => [
+            ['updatedBy' => ['id' => null],],
+            (clone $baseModel),
+            (clone $baseModel),
+        ];
+
+        // Image set from upload and storage hash
+        // Image is not nullable
+        // (covered in `testInvokeUpdateInvalidValues)
+        $storage       = (new Storage())
+            ->setHash('9876543210987654321098765432109876543210')
+            ->setBasename('test.png');
+        $collectorMock = $this->createMock(Collector::class);
+        $collectorMock->method('getFirst')->willReturn($storage);
+
+        /** @var CollectorFactory|MockObject $collectorFactoryMock */
+        $collectorFactoryMock = $this->createMock(CollectorFactory::class);
+        $collectorFactoryMock->method('build')->willReturn($collectorMock);
+
+        yield 'update image from upload' => [
+            [
+                'image' => 'file:9876543210987654321098765432109876543210:test.png',
+            ],
+            (clone $baseModel),
+            (clone $baseModel)->setImage($storage),
+            new MutableFieldsOnly($collectorFactoryMock),
+        ];
+
+        yield 'update image from hash' => [
+            [
+                'image' => ['hash' => '12345'],
+            ],
+            (clone $baseModel),
+            (clone $baseModel)->setImage((new Storage())->setHash('12345')),
+            new MutableFieldsOnly($collectorFactoryMock),
+        ];
+    }
+
+
+    /**
+     * Test that creation of a new model from an array works as expected.
+     *
+     * @dataProvider getTestInvokeCreateData
+     * @covers       \Schoolbox\Learning\Badge\Translator\ArrayToModel\MutableFieldsOnly::__invoke
+     *
+     * @param array                  $input
+     * @param Model                  $expected
+     * @param MutableFieldsOnly|null $converter
+     *
+     * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
+     */
+    public function testInvokeCreate(array $input, Model $expected, MutableFieldsOnly $converter = null): void
+    {
+        $converter = $this->createConverterIfNull($converter);
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        self::assertEquals($expected, $converter($input));
+    }
+
+
+    /**
+     * Test that update of an existing model from an array works as expected.
+     *
+     * @dataProvider getTestInvokeUpdateData
+     * @covers       \Schoolbox\Learning\Badge\Translator\ArrayToModel\MutableFieldsOnly::__invoke
+     *
+     * @param array                  $input
+     * @param Model                  $existing
+     * @param Model                  $expected
+     * @param MutableFieldsOnly|null $converter
+     *
+     * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
+     */
+    public function testInvokeUpdate(
+        array $input,
+        Model $existing,
+        Model $expected,
+        MutableFieldsOnly $converter = null
+    ): void {
+        $converter = $this->createConverterIfNull($converter);
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        self::assertEquals($expected, $converter($input, $existing));
+    }
+
+
+    /**
+     * Helper for creating the converter if it is null.
+     *
+     * If it's null, it creates a converter which contains a mock of the storage
+     * object collector factory.
+     *
+     * @param MutableFieldsOnly|null $converter
+     * @return MutableFieldsOnly
+     */
+    private function createConverterIfNull(?MutableFieldsOnly $converter = null): MutableFieldsOnly
+    {
+        if (!$converter) {
+            /** @var CollectorFactory|MockObject $collectorFactoryMock */
+            $collectorFactoryMock = $this->createMock(CollectorFactory::class);
+            $converter            ??= new MutableFieldsOnly($collectorFactoryMock);
+        }
+        return $converter;
+    }
+}

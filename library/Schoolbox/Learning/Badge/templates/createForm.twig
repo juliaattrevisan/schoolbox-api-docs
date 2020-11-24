@@ -1,0 +1,149 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbs(
+    ['Badges', routeLookup('learningBadge.getBadges') ],
+    ['Add new', routeLookup('learningBadge.getCreateForm')]
+) }}
+
+<div class="row">
+    <div class="small-12 column">
+        <h1>Add new badge</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form method="post" action="{{ routeLookup('learningBadge.postBadge') }}" id="badge-form">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label for="badge-name" class="required">Achievement Name</label>
+                        <input name="name" type="text" id="badge-name" required />
+
+                        <label for="badge-body" class="required">
+                            Description
+                        </label>
+                        <textarea name="body" id="badge-body" required></textarea>
+
+                        <label>Select badge from existing set</label>
+                        <button class="full-width">Browse badges (to be developed)</button>
+
+                        <label for="badge-image" class="required">
+                            Upload badge from your device
+                        </label>
+                        {# Dummy element for form validation #}
+                        <input type="hidden" name="imageAttachzone">
+                        {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+
+                        <label for="badge-category" class="required">
+                            Category
+                        </label>
+                        <select name="category" id="badge-category" required>
+                            <option disabled selected>-- select a category --</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" label="{{ category.name }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <label for="badge-tags">
+                            Tags
+                        </label>
+                        <input name="tags" type="text" id="badge-tags" readonly placeholder="To be developed" />
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Add new badge" id="badge-submit" />
+        </form>
+    </div>
+</div>
+
+<script src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+{% autoescape 'js' %}
+<script type="text/javascript">
+    $(function () {
+        // Set up editor
+        let editorId = 'badge-body';
+        $.fn.alaressEditor({
+            targetElements: $('#' + editorId)
+        });
+
+
+        // Update the editor's form input on change
+        // (required so that validation triggers)
+        CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
+
+
+        // Set up validation and save
+        let $form = $('#badge-form');
+        $form.alaressValidate({
+            rules: {
+                name: {
+                    required: true,
+                },
+                body: {
+                    required: true,
+                },
+                category: {
+                    required: true,
+                },
+                // Attachzones aren't able to have validators applied to them,
+                // as the input doesn't exist at form creation time.
+                // Jank together a validator on a hidden field, and make it
+                // depend on the presence of attachzones.
+                imageAttachzone: {
+                    required: {
+                        depends: () => $form.find('input[name="image"]').length === 0
+                    },
+                },
+            },
+            messages: {
+                imageAttachzone: "Please attach a file."
+            },
+            submitHandler(form, event) {
+                event.preventDefault();
+
+                // Build a request to post the form
+                let formData = new FormData(form),
+                    payload  = {
+                        name:            formData.get('name'),
+                        body:            formData.get('body'),
+                        image:           formData.get('image'),
+                        category:        null,
+                        tags:            [],
+                        curriculumNodes: [],
+                    },
+                    categoryId      = formData.get('category'),
+                    tags            = formData.get('tags'),
+                    curriculumNodes = formData.get('curriculumNodes'),
+                    toast           = $('#toast'),
+                    submit          = $('#badge-submit');
+
+                if (categoryId) {
+                    payload.category = {
+                        id: categoryId
+                    }
+                }
+
+                // Toast then post
+                toast.toastActivate('Saving...')
+                submit.prop('disabled', true);
+
+                axios
+                    .post(form.action, payload)
+                    .then(() => {
+                        toast.toastTimeout({text: 'Saved'});
+                        window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadges') }}';
+                    })
+                    .catch(() => {
+                        toast.toastTimeout({text: 'Save failed', css: 'alert'});
+                        submit.prop('disabled', false);
+                    });
+            }
+        })
+    });
+</script>
+{% endautoescape %}
+
+<div id="toast" class="toast"></div>

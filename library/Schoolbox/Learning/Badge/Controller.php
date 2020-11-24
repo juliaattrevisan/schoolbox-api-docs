@@ -12,6 +12,9 @@ namespace Schoolbox\Learning\Badge;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Cursor\MapperCursor;
+use Schoolbox\Learning\Badge\Translator;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -54,7 +57,7 @@ class Controller extends Base
     public function getBadges(): void
     {
         if ($this->isJsonRequest()) {
-            $cursor     = new MapperCursor(
+            $cursor  = new MapperCursor(
                 $this->mapper,
                 self::BADGES_PER_PAGE,
                 [
@@ -62,17 +65,10 @@ class Controller extends Base
                     'id'   => $this->mapper::SORT_ORDER_ASC,
                 ]
             );
-            $results    = $cursor->retrieveResults($this->request->query->get('cursor', null));
-
-            // TODO add links translator
-            $translator = new Translator\ModelToArray(
-                new User\Translator\ModelToArray(),
-                new Storage\Translator\ModelToArray(),
-                new ScrubAdapter()
-            );
+            $results = $cursor->retrieveResults($this->request->query->get('cursor', null));
             $this->response->content->set(
                 $this->buildJsonOutput([
-                    'data'     => $results->map($translator),
+                    'data'     => $results->map($this->buildModelToArrayTranslator()),
                     'metadata' => [
                         'count'  => $cursor->retrieveResultCount(),
                         'cursor' => [
@@ -92,6 +88,80 @@ class Controller extends Base
                 [],
                 'Badges'
             )
+        );
+    }
+
+
+    /**
+     * View the form for creating a badge.
+     *
+     * @api   GET /learning/badge/create/
+     * @since 20.2
+     */
+    public function getCreateForm(): void
+    {
+        $attachzone = new GenericZone('image', Storage\Mapper::getInstance());
+        $attachzone
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('upload a badge')
+            ->setMimeFilter('image/*')
+            ->setFileVar('image')
+            ->setMulti(false)
+            ->setThumbnailSize(64)
+            ->setModalTitle('Select image');
+
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningBadge/createForm.twig',
+                [
+                    'attachzone' => $attachzone->getTwigContext(),
+                    'categories' => Category\Mapper::getInstance()->findAll(),
+                ],
+                'Create Badge'
+            )
+        );
+    }
+
+
+    /**
+     * Create a badge from POST data.
+     *
+     * @api   POST /learning/badge/
+     * @since 20.2
+     */
+    public function postBadge(): void
+    {
+        $data       = json_decode(json_encode($this->request->content->get()), true);
+        $translator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
+        $model      = $translator($data)
+            ->setCreatedBy($this->getUser())
+            ->setUpdatedBy($this->getUser())
+            // TODO this will be set by the translator: it must be set now so it will save
+            ->setCurriculumNodes(\Schoolbox\Curriculum\Node\Mapper::getInstance()->createCollection());
+
+        $this->mapper->save($model);
+
+        // Return the badge just created
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $this->buildModelToArrayTranslator()($model)
+            )
+        );
+    }
+
+
+    /**
+     * Builder for the model-to-array translator for badges.
+     *
+     * @return Translator\ModelToArray
+     */
+    private function buildModelToArrayTranslator(): Translator\ModelToArray
+    {
+        // TODO add links translator
+        return new Translator\ModelToArray(
+            new User\Translator\ModelToArray(),
+            new Storage\Translator\ModelToArray(),
+            new ScrubAdapter()
         );
     }
 }
