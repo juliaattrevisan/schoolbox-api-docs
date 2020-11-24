@@ -50,7 +50,6 @@ function main() {
   tar xzf tls-vagrant.dev.schoolbox.cloud.tar.gz;
   cp -f vagrant.dev.schoolbox.cloud/fullchain.pem /etc/nginx/certs/schoolbox-fullchain.crt;
   cp -f vagrant.dev.schoolbox.cloud/privkey.pem /etc/nginx/certs/schoolbox-private.key;
-  service php7.4-fpm restart
 }
 
 ##################################################################################
