@@ -1,4 +1,5 @@
 <script>
+import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
 
@@ -17,7 +18,9 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [],
+    mixins: [
+        goalMixin
+    ],
 
     /**
      * Props.
@@ -70,30 +73,6 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
-        /**
-         * Decide if this Award is a goal or not
-         */
-        isGoal(award) {
-            return 'goal' === award.status;
-        },
-
-
-        /**
-         * Decide if this Award was a goal or an achievement
-         * and provide the css class accordingly
-         *
-         * @param award
-         * @returns string
-         */
-        getCss(award) {
-            if (this.isGoal(award)) {
-                return 'goal';
-            }
-
-            return '';
-        },
-
 
         /**
          * Open this modal.

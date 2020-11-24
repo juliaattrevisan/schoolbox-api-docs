@@ -1,6 +1,7 @@
 <script>
 import axios from "axios";
 import BadgeDetailModal from './badge-detail-modal';
+import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 
 export default {
@@ -18,7 +19,9 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [],
+    mixins: [
+        goalMixin
+    ],
 
     /**
      * Props.
@@ -84,22 +87,6 @@ export default {
     methods: {
 
         /**
-         * Decide if this Award was a goal or an achievement
-         * and provide the css class accordingly
-         *
-         * @param award
-         * @returns string
-         */
-        getCss(award) {
-            if ('goal' === award.status) {
-                return 'goal';
-            }
-
-            return '';
-        },
-
-
-        /**
          * Open a modal to show the badge that aws given as an award
          *
          * @param award
@@ -136,7 +123,14 @@ export default {
                             <div class="card-content">
                                 <h3 class="no-margin"><a href="#" v-on:click="openModal(award)">{{ award.badge.name }} ({{ award.count }})</a></h3>
                                 <p class="meta">
-                                    Awarded <relative-time :datetime="award.awardedAt"></relative-time>
+                                    <template v-if="isGoal(award)">
+                                        Goal set
+                                    </template>
+                                    <template v-else>
+                                        Awarded
+                                    </template>
+
+                                    <relative-time :datetime="award.awardedAt"></relative-time>
                                 </p>
                             </div>
                         </div>
