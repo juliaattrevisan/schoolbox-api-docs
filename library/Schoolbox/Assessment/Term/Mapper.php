@@ -468,25 +468,67 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Sets the actual finish date for all terms as appropriate.
+     * Update all Ordinary Terms (these are Terms with zero Year Level relations) so that
+     * their start and actual_finish dates are continuous. Other entities in schoolbox often
+     * depend on existing within these date ranges, so if you have a gap you'll be unable
+     * to access such entities.
      */
-    public function updateActualFinishDates()
+    public function updateActualFinishDates(): void
     {
+        $query = "
+            SELECT id
+            FROM {$this->getTable()}
+            LEFT JOIN term_year_level tyl ON {$this->getTable()}.{$this->getIdentifierColumn()} = tyl.term_id
+            WHERE tyl.term_id IS NULL
+            ORDER BY `start`
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute();
+
+        $ids = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $ids[] = $row['id'];
+        }
+
+        /* If there aren't any ordinary terms, just leave; there's nothing to do
+         * Although, I don't expect this to ever be the case, it's possible that a school
+         * could be using an Extraordinary Term as its one and only term instance
+         */
+        if (!\count($ids)) {
+            return;
+        }
+
+        /* Only update the ordinary terms
+         */
+        $predicate = \Alaress\Database\Predicate\Builder::getArrayBindings($ids, 'i');
+
         $updateTermQuery = $this->getDatabase()->prepare(
             "UPDATE {$this->getTable()} SET `actual_finish` = :actual_finish WHERE `id` = :id"
         );
+
         $selectActualFinishQuery = $this->getDatabase()->query("
             SELECT `current`.`id`, (MIN(`next`.`start`) - INTERVAL 1 DAY) AS `actual_finish`
             FROM {$this->getTable()} `current`
             LEFT JOIN {$this->getTable()} `next` ON `current`.`display_finish` < `next`.`start`
+            WHERE `current`.`id` IN ({$predicate['placeholders']}) AND `next`.`id` IN ({$predicate['placeholders']})
             GROUP BY `current`.`id`;
-        ");
+        ", $predicate['bindings']);
+
         foreach ($selectActualFinishQuery->fetchAll() as $row) {
             $updateTermQuery->execute([
                 'id'            => $row['id'],
                 'actual_finish' => $row['actual_finish'],
             ]);
         }
+
+        /* Set the last ordinary term's actual_finish to null, for enforced continuity
+         */
+        $updateTermQuery->execute([
+            'id'            => $ids[\count($ids)-1],
+            'actual_finish' => null,
+        ]);
     }
 
 

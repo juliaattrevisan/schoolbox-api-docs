@@ -154,6 +154,13 @@ class Controller extends Base
 
         try {
             $term->setDisplayFinish(Alaress_Date_Format::newLocalShort($postdata->get('finish')));
+
+            /* Extraordinary Terms have their actual_finish equal to their display_finish
+             */
+            if ($term->getExtraordinary()) {
+                $term->setActualFinish($term->getDisplayFinish());
+            }
+
         } catch (\Exception $e) {
             throw new \Exception('Finish date is not a valid date.');
         }
