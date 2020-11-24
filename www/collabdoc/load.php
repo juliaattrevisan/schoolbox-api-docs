@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -9,6 +10,9 @@
 
 /* Check if the currently logged in user can participate
  */
+
+use Schoolbox\Config\ConfigMapper;
+
 $authenticator = new \Etherpad\Authenticator();
 
 /* Load the pad from our db to get its groupId
@@ -17,94 +21,88 @@ $authenticator = new \Etherpad\Authenticator();
 $padMapper = new \Etherpad\PadMapper();
 
 try {
-	$pad = $padMapper->findById($this->arg[0]);
-}
-catch (\Exception $e) {
-	exit();
+    $pad = $padMapper->findById($this->arg[0]);
+} catch (\Exception $e) {
+    exit();
 }
 
 /* If you can participate, create a session and off you go
  */
 if ($authenticator->isParticipator($pad->getHomepageId())) {
+    /* Check whether this pad record exists from a different environment
+     * e.g. copied pads from live environment to dev environment
+     *
+     * Update the environment value so it's in the current environment
+     * then continue on as normal
+     */
+    if (!$pad->isExistsInCurrentEnvironment()) {
+        $pad->setEnvironment(INSTANCE_ID);
+        $padMapper->save($pad);
 
-	/* Check whether this pad record exists from a different environment
-	 * e.g. copied pads from live environment to dev environment
-	 *
-	 * Update the environment value so it's in the current environment
-	 * then continue on as normal
-	 */
-	if (!$pad->isExistsInCurrentEnvironment()) {
-		$pad->setEnvironment(INSTANCE_ID);
-		$padMapper->save($pad);
+        $respawn = new \Etherpad\Spawnpoint();
+        $pad = $respawn->respawn($pad);
+    }
 
-		$respawn = new \Etherpad\Spawnpoint();
-		$pad = $respawn->respawn($pad);
-	}
+    /* Find the author id
+     */
+    $client = new \EtherpadLite\Client(Config::get('etherpad_api_token'), Config::get(ConfigMapper::NAME_ETHERPAD_HOST));
 
-	/* Find the author id
-	 */
-	$client = new \EtherpadLite\Client(Config::get('etherpad_api_token'), defined('ETHERPAD_HOST') ? ETHERPAD_HOST : 'http://localhost:9001');
+    $createResult = $client->createAuthorIfNotExistsFor($_SESSION['user']->getId(), $_SESSION['user']->getFullName());
+    $response = $createResult->getResponse();
 
-	$createResult = $client->createAuthorIfNotExistsFor($_SESSION['user']->getId(), $_SESSION['user']->getFullName());
-	$response = $createResult->getResponse();
+    /* Spawn a session and redirect to the actual edit url
+     */
+    if ($createResult->getMessage() == 'ok') {
+        $etherpadSession = new \Etherpad\Session();
 
-	/* Spawn a session and redirect to the actual edit url
-	 */
-	if ($createResult->getMessage() == 'ok') {
-		$etherpadSession = new \Etherpad\Session();
+        [$groupId, $padName] = explode('$', $pad->getPadId());
 
-		list($groupId, $padName) = explode('$', $pad->getPadId());
+        $sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimeStamp());
+        $data = $sessionResult->getData();
 
-		$sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimeStamp());
-		$data = $sessionResult->getData();
+        /* When the groupId is nonexistent in Etherpad
+         *
+         * That happens when we have the pad in our local db but someone purges
+         * epl's memory or redis. Reincarnate the pad in epl/redis and spawn a
+         * new attempt at getting the sessionResult
+         */
+        if ($sessionResult->getMessage() != 'ok') {
+            $respawn = new \Etherpad\Spawnpoint();
+            $pad = $respawn->respawn($pad);
 
-		/* When the groupId is nonexistent in Etherpad
-		 *
-		 * That happens when we have the pad in our local db but someone purges
-		 * epl's memory or redis. Reincarnate the pad in epl/redis and spawn a
-		 * new attempt at getting the sessionResult
-		 */
-		if ($sessionResult->getMessage() != 'ok') {
-			$respawn = new \Etherpad\Spawnpoint();
-			$pad = $respawn->respawn($pad);
+            [$groupId, $padName] = explode('$', $pad->getPadId());
 
-			list($groupId, $padName) = explode('$', $pad->getPadId());
+            $sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimeStamp());
+            $data = $sessionResult->getData();
+        }
 
-			$sessionResult = $client->createSession($groupId, $response['data']['authorID'], $etherpadSession->generateValidUntil()->getUnixTimeStamp());
-			$data = $sessionResult->getData();
-		}
+        /* Otherwise continue as normal
+         */
+        if ($sessionResult->getMessage() == 'ok') {
+            $etherpadSession->generateCookie($data['sessionID']);
 
-		/* Otherwise continue as normal
-		 */
-		if ($sessionResult->getMessage() == 'ok') {
-			$etherpadSession->generateCookie($data['sessionID']);
+            /* Remember last updated time
+             */
+            $pad = $padMapper->findByColumn('pad_id', $pad->getPadId())->first();
+            $pad->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
+            $padMapper->save($pad);
 
-			/* Remember last updated time
-			 */
-			$pad = $padMapper->findByColumn('pad_id', $pad->getPadId())->first();
-			$pad->setUpdatedAt(new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'));
-			$padMapper->save($pad);
+            if ($authenticator->canCreate($pad->getHomepageId()) || !$pad->isLocked()) {
+                $this->localRedir(':' . $this->getWebsocketPort() . "/pad/p/{$pad->getPadId()}");
+            } else if ($pad->isLocked()) {
+                $readonlyResult = $client->getReadOnlyID($pad->getPadId());
+                $data = $readonlyResult->getData();
 
-			if ($authenticator->canCreate($pad->getHomepageId()) || !$pad->isLocked()) {
-				$this->localRedir(':' . $this->getWebsocketPort() . "/pad/p/{$pad->getPadId()}");
-			}
-			else if ($pad->isLocked()) {
-				$readonlyResult = $client->getReadOnlyID($pad->getPadId());
-				$data = $readonlyResult->getData();
-
-				if ($readonlyResult->getMessage() == 'ok') {
-					$this->localRedir(":" . $this->getWebsocketPort() . "/pad/p/{$data['readOnlyID']}?showControls=false");
-				}
-			}
-		}
-		else {
-			throw new \Exception("Couldn't start session.");
-		}
-	}
-	else {
-		throw new \Exception("Couldn't start session.");
-	}
-}
-else {
-	throw new \Exception("You can't edit this document.");
+                if ($readonlyResult->getMessage() == 'ok') {
+                    $this->localRedir(":" . $this->getWebsocketPort() . "/pad/p/{$data['readOnlyID']}?showControls=false");
+                }
+            }
+        } else {
+            throw new \Exception("Couldn't start session.");
+        }
+    } else {
+        throw new \Exception("Couldn't start session.");
+    }
+} else {
+    throw new \Exception("You can't edit this document.");
 }

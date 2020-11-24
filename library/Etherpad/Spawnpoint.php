@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Etherpad;
 
 use Alaress_Date_Format;
@@ -11,6 +13,7 @@ use EtherpadLite\Client;
 use InvalidArgumentException;
 use PDOException;
 use RuntimeException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
 
@@ -21,13 +24,6 @@ use UnexpectedValueException;
  */
 class Spawnpoint
 {
-
-    /**
-     * Fallback host when ETHERPAD_HOST wasn't defined
-     */
-    private const ETHERPAD_LOCALHOST = 'http://localhost:9001';
-
-
     /**
      * Messages that worked out equal this string
      */
@@ -60,7 +56,7 @@ class Spawnpoint
     public function __construct()
     {
         $this->authenticator = new Authenticator();
-        $this->etherpadHost = defined('ETHERPAD_HOST') ? ETHERPAD_HOST : self::ETHERPAD_LOCALHOST;
+        $this->etherpadHost = \Config::get(ConfigMapper::NAME_ETHERPAD_HOST);
         $this->apiToken = (string)\Config::get('etherpad_api_token');
     }
 
@@ -129,7 +125,6 @@ class Spawnpoint
             $createResult = $client->createGroupPad($groupId, $padName);
 
             if ($createResult->getMessage() === self::MESSAGE_OK) {
-
                 /* Get pad id to set to private and to pass it as a redirect element.
                  * Note that padId's come in the form g.abcdefg$padName
                  */
@@ -207,7 +202,6 @@ class Spawnpoint
             $createResult = $client->createGroupPad($groupId, $padName);
 
             if ($createResult->getMessage() === self::MESSAGE_OK) {
-
                 /* Get pad id to set to private and to pass it as a redirect element.
                  * Note that padId's come in the form g.abcdefg$padName
                  */

@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -7,6 +8,7 @@
  */
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\MapperFactory;
 
 require_once __DIR__ . '/../conf/core/require.php';
@@ -57,7 +59,7 @@ HELP;
         $allPads = $padMapper->findAll();
 
         // Save pad contents to db, just in case
-        $client = new EtherpadLite\Client($this->getConfig()->get('etherpad_api_token'), defined('ETHERPAD_HOST') ? ETHERPAD_HOST : 'http://localhost:9001');
+        $client = new EtherpadLite\Client($this->getConfig()->get('etherpad_api_token'), $this->getConfig()->get(ConfigMapper::NAME_ETHERPAD_HOST));
         $logger->info(sprintf("Commencing etherpad sync, processing %d pads", count($allPads)));
 
         $db        = $this->getDatabaseInternal();
@@ -83,7 +85,6 @@ HELP;
                 } catch (Exception $e) {
                     $logger->error(sprintf("Error while saving pad %d: %s", $currentPad->getId(), $e->getMessage()));
                 }
-
             } else {
                 $logger->warning(sprintf("Failed to get pad %d with key %s: %s", $currentPad->getId(), $currentPad->getPadId(), $getTextResult->getMessage()));
             }
@@ -94,4 +95,3 @@ HELP;
 
 $kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
 $kernel->runApp();
-
