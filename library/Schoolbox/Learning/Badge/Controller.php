@@ -136,9 +136,13 @@ class Controller extends Base
         $translator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $model      = $translator($data)
             ->setCreatedBy($this->getUser())
-            ->setUpdatedBy($this->getUser())
-            // TODO this will be set by the translator: it must be set now so it will save
-            ->setCurriculumNodes(\Schoolbox\Curriculum\Node\Mapper::getInstance()->createCollection());
+            ->setUpdatedBy($this->getUser());
+
+        // Is curriculum tagging disabled?
+        // Set an empty collection if so, as that is required to save the badge
+        if (!$this->getConfigLoader()->get('curriculum_tagging_enabled')) {
+            $model = $model->setCurriculumNodes(\Schoolbox\Curriculum\Node\Mapper::getInstance()->createCollection());
+        }
 
         $this->mapper->save($model);
 
