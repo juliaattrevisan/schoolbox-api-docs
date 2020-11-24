@@ -1,7 +1,7 @@
 <script>
 import axios from "axios";
-import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import BadgeDetailModal from './badge-detail-modal';
+import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 
 export default {
 
@@ -134,22 +134,10 @@ export default {
                                 </a>
                             </div>
                             <div class="card-content">
-                                <h3><a href="#" v-on:click="openModal(award)">{{ award.badge.name }} ({{ award.count }})</a></h3>
+                                <h3 class="no-margin"><a href="#" v-on:click="openModal(award)">{{ award.badge.name }} ({{ award.count }})</a></h3>
                                 <p class="meta">
-                                    Awarded <relative-time :datetime="award.awardedAt"></relative-time> by
-                                    <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
+                                    Awarded <relative-time :datetime="award.awardedAt"></relative-time>
                                 </p>
-                                <article>
-                                    <p>{{ award.badge.body }}</p>
-                                </article>
-
-                                <template v-if="award.badge.curriculumNodes.length">
-                                    <span class="meta">
-                                        <template v-for="curriculumNode in award.badge.curriculumNodes">
-                                            {{ curriculumNode.code }}
-                                        </template>
-                                    </span>
-                                </template>
                             </div>
                         </div>
                     </div>

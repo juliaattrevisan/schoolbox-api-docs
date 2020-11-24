@@ -1,4 +1,5 @@
 <script>
+import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
 
 export default {
@@ -32,6 +33,7 @@ export default {
      * at the top of the file.
      */
     components: {
+        RelativeTime,
         RevealModal
     },
 
@@ -70,18 +72,61 @@ export default {
     methods: {
 
         /**
+         * Decide if this Award was a goal or an achievement
+         * and provide the css class accordingly
+         *
+         * @param award
+         * @returns string
+         */
+        getCss(award) {
+            if ('goal' === award.status) {
+                return 'goal';
+            }
+
+            return '';
+        },
+
+
+        /**
          * Open this modal.
          */
         open(award) {
             this.award = award;
 
-            this.$refs.badgeDetailModal.open();
+            this.$refs.modal.open();
         }
     }
 }
 </script>
 <template>
-    <reveal-modal ref="badgeDetailModal">
-        {{ award }}
+    <reveal-modal ref="modal">
+        <template v-if="award.badge">
+            <div class="v-card-list awards">
+                <div class="v-card card wrap-down">
+                    <div class="card-feature-image">
+                        <img :src="award.badge.image._links.image + '&size=constrain200'" :class="getCss(award)"/>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="no-margin">{{ award.badge.name }} ({{ award.count }})</h3>
+                        <p class="meta">
+                            Awarded <relative-time :datetime="award.awardedAt"></relative-time> by
+                            <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
+                        </p>
+
+                        <article v-html="award.badge.body"></article>
+
+                        <template v-if="award.badge.curriculumNodes.length">
+                            <hr />
+
+                            <p class="meta">
+                                <template v-for="curriculumNode in award.badge.curriculumNodes">
+                                    {{ curriculumNode.code }}
+                                </template>
+                            </p>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </template>
     </reveal-modal>
 </template>
