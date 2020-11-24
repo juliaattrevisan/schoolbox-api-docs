@@ -72,6 +72,14 @@ export default {
     methods: {
 
         /**
+         * Decide if this Award is a goal or not
+         */
+        isGoal(award) {
+            return 'goal' === award.status;
+        },
+
+
+        /**
          * Decide if this Award was a goal or an achievement
          * and provide the css class accordingly
          *
@@ -79,7 +87,7 @@ export default {
          * @returns string
          */
         getCss(award) {
-            if ('goal' === award.status) {
+            if (this.isGoal(award)) {
                 return 'goal';
             }
 
@@ -108,10 +116,19 @@ export default {
                     </div>
                     <div class="card-content">
                         <h3 class="no-margin">{{ award.badge.name }} ({{ award.count }})</h3>
+                        <p class="meta">Category: {{ award.badge.category.name }}</p>
                         <p class="meta">
-                            Awarded <relative-time :datetime="award.awardedAt"></relative-time> by
-                            <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
+                            <template v-if="isGoal(award)">
+                                Goal set <relative-time :datetime="award.awardedAt"></relative-time> by
+                                <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
+                            </template>
+                            <template v-else>
+                                Awarded <relative-time :datetime="award.awardedAt"></relative-time> by
+                                <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
+                            </template>
                         </p>
+
+                        <hr />
 
                         <article v-html="award.badge.body"></article>
 
