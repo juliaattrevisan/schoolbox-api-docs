@@ -134,8 +134,12 @@ class Controller extends Base
         /* Group by category
          */
         foreach ($awards as $award) {
-            $badgeId = $award->getBadge()->getId();
-            $categoryId = $award->getBadge()->getCategory()->getId();
+
+            /* Force string indexes, otherwise the numeric values get inserted in-order
+             * which isn't intended here; they are already in a particular order
+             */
+            $badgeId = "badge-{$award->getBadge()->getId()}";
+            $categoryId = "category-{$award->getBadge()->getCategory()->getId()}";
 
             /* Some inline hydration due to curriculum nodes no longer being included
              * as part of the hydrateSelect in badge mapper
