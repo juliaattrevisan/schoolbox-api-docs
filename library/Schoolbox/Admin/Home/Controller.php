@@ -455,7 +455,8 @@ class Controller extends Base
         foreach ($objects as $object) {
             $backupFileCount++;
             $backupFileUsage += $object['Size'];
-            $date            = preg_filter('/backups\/(\d{4}-\d{2}-\d{2})\/.+/', '$1', $object['Key']);
+            $prefix          = DisasterRecovery::PREFIX_BACKUPS;
+            $date            = preg_filter("#$prefix(\d{4}-\d{2}-\d{2})/.+#", '$1', $object['Key']);
 
             if (strpos($object['Key'], "conf_{$date}.php") !== false) {
                 $files[$date]['conf'] = $object['Size'];
