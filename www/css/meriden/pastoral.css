@@ -206,6 +206,12 @@ body.login input[type=checkbox]:not(.plain):checked + label:after {
 .e-report #assessments .distribution {
   width: 60%;
 }
+/** Hardcode width of charts for print **/
+@media print {
+  .e-report #assessments .chart svg {
+    width: 50vw;
+  }
+}
 .e-report .card p {
   font-size: 1rem;
 }
