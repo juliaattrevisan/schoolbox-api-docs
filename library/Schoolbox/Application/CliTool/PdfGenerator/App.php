@@ -56,6 +56,9 @@ abstract class App extends BaseApp
     // user style sheet
     private const OPT_LONG_USER_STYLE_SHEET = 'user-style-sheet:';
 
+    // print media type style sheet
+    private const OPT_LONG_PRINT_MEDIA_TYPE = 'print-media-type';
+
     // Exit status for an authentication failure
     private const EXIT_STATUS_AUTHENTICATION_FAILURE = 100;
 
@@ -86,6 +89,7 @@ abstract class App extends BaseApp
             self::OPT_LONG_MAX_FAILS,
             self::OPT_LONG_JS_DELAY,
             self::OPT_LONG_USER_STYLE_SHEET,
+            self::OPT_LONG_PRINT_MEDIA_TYPE,
         ];
     }
 
@@ -229,6 +233,10 @@ abstract class App extends BaseApp
 
     $yellow--user-style-sheet=STYLE_FILE$white
         Filename of a style sheet to load with every page.
+
+    $yellow--print-media-type$white
+        If set, generate PDFs using the print media type and its styles;
+        otherwise, PDFs will be generated using the screen media type.
 BASE;
     }
 
@@ -247,6 +255,10 @@ BASE;
         $pdfGenerator->setOption('orientation', 'Landscape');
         $pdfGenerator->setOption('disable-external-links', true);
         $pdfGenerator->setOption('viewport-size', 1024);
+
+        if ($this->getOpt(self::OPT_LONG_PRINT_MEDIA_TYPE)) {
+            $pdfGenerator->setOption('print-media-type', true);
+        }
 
         $userStyleSheet = $this->getOpt(self::OPT_LONG_USER_STYLE_SHEET);
         if (isset($userStyleSheet)) {
