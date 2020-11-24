@@ -1,0 +1,24 @@
+a {
+    /* var(--content-ui-foreground) is overridden by this anyway */
+    color: #13294b;
+}
+
+.subheader {
+    /* was var(--body-foreground) */
+    color: rgb(166, 166, 166) !important;
+}
+
+.meta {
+    /* was var(--body-foreground) */
+    color: rgb(166, 166, 166);
+}
+
+body {
+    /* was var(--body-background) */
+    background: rgb(255, 255, 255);
+}
+
+/** Otherwise the crest takes up an entire page **/
+.meriden-crest svg {
+    height: 5.75rem;
+}
