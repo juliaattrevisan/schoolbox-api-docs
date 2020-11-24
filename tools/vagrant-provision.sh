@@ -62,7 +62,6 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $ph
 # Schoolbox <= 20.1 requires PHP 7.1: >= 20.2 requires PHP 7.4
 if [ "$phpversion_current" != "$phpversion_supported" ]; then
   warn " Current and supported PHP versions do not match. Check 'ubuntu-1804-php71.vagrant.yaml' in puppet repo";
-#    /vagrant/tools/switchPHP.sh;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";

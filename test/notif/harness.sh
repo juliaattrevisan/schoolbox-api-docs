@@ -13,10 +13,7 @@ INSTANCE_ID="vagrantx"
 cd $WD_ROOT;
 
 # slay the demons
-service schoolbox-scheduled stop
-service schoolbox-routed stop
-service schoolbox-socketd stop
-service schoolbox-digestd stop
+tools/notif/allstop
 
 # clear redis of all messaging
 redis-cli keys "msg:${INSTANCE_ID}:*" | xargs redis-cli del
@@ -31,8 +28,8 @@ service rabbitmq-server start
 mysql schoolbox < sql/notifications-all-instant.sql
 
 # create a special hell for yourself (we don't need socket or digest presently)
-service schoolbox-scheduled start
-service schoolbox-routed start
+service schoolbox-cloud-scheduled@vagrantx start
+service schoolbox-cloud-routed@vagrantx start
 
 # run the test case
 php test/notif/harness.php 2> /dev/null
