@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\API\Translator\ArrayToModel;
 
 use Alaress_Date_Format;
+use Schoolbox\Collection;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage\Model as StorageModel;
@@ -97,6 +98,57 @@ abstract class Base implements ITranslator
         return $model;
     }
 
+
+    /**
+     * Helper method for translating a collection of values from an array into a
+     * collection of joined models, and then setting that collection into a
+     * model.
+     *
+     * @example [['id' => 1], ['id' => 2], ['id' => 3]] will be translated into
+     *          a collection of objects:
+     *          the first with ID=1, then ID=2, then ID=3
+     *
+     * @param array      $array                 The array that is being set from
+     * @param string     $arrayField            The field in `$array` which has
+     *                                          the list of joined model IDs
+     * @param string     $arrayIdField          The field in each item in
+     *                                          `$array[$arrayField]` which has
+     *                                          the joined model's ID
+     * @param object     $model                 The model to update
+     * @param string     $modelFieldSetter      The setter to call on `$model`
+     * @param Collection $joinedModelCollection The value to set in `$model`
+     * @param object     $joinedModelTemplate   A template object: clones of
+     *                                          this object are used to populate
+     *                                          `$joinedModelCollection`
+     * @param string     $joinedModelIdSetter   The setter to call on the clone
+     *                                          of `$joinedModelTemplate`
+     *                                          with the joined model's ID
+     * @return object
+     */
+    protected function setCollection(
+        array $array,
+        string $arrayField,
+        string $arrayIdField,
+        object $model,
+        string $modelFieldSetter,
+        Collection $joinedModelCollection,
+        object $joinedModelTemplate,
+        string $joinedModelIdSetter
+    ): object {
+        if (array_key_exists($arrayField, $array)) {
+            if (isset($array[$arrayField])) {
+                foreach ($array[$arrayField] as $curriculumCode) {
+                    $joinedModelCollection->add(
+                        (clone $joinedModelTemplate)->$joinedModelIdSetter($curriculumCode[$arrayIdField])
+                    );
+                }
+                $model = $model->$modelFieldSetter($joinedModelCollection);
+            } else {
+                $model = $model->$modelFieldSetter(null);
+            }
+        }
+        return $model;
+    }
 
     /**
      * Helper method for setting a date value from an array into a model.

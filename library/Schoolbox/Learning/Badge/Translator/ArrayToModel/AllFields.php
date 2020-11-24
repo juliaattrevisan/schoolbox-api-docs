@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Badge\Translator\ArrayToModel;
 
 use Schoolbox\API\Translator\ArrayToModel\Base;
+use Schoolbox\Curriculum\Node\Model as CurriculumNode;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge\Category\Model as BadgeCategory;
 use Schoolbox\Learning\Badge\Model;
@@ -72,20 +73,19 @@ class AllFields extends Base
             'setId'
         );
 
-        // Set tags
+        // TODO set tags
 
         // Set curriculum nodes
-        if (array_key_exists('curriculumNodes', $array)) {
-            if (isset($array['curriculumNodes'])) {
-                $collection = new GenericCollection(\Schoolbox\Curriculum\Node\Model::class);
-                foreach ($array['curriculumNodes'] as $curriculumCode) {
-                    $collection->add((new \Schoolbox\Curriculum\Node\Model())->setId($curriculumCode['id']));
-                }
-                $model = $model->setCurriculumNodes($collection);
-            } else {
-                $model = $model->setCurriculumNodes(null);
-            }
-        }
+        $this->setCollection(
+            $array,
+            'curriculumNodes',
+            'id',
+            $model,
+            'setCurriculumNodes',
+            new GenericCollection(CurriculumNode::class),
+            new CurriculumNode(),
+            'setId'
+        );
 
         // Set created/updated by
         $model = $this->setModel(
