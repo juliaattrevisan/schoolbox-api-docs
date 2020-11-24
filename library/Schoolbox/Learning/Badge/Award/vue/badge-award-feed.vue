@@ -1,6 +1,7 @@
 <script>
 import axios from "axios";
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
+import BadgeDetailModal from './badge-detail-modal';
 
 export default {
 
@@ -33,6 +34,7 @@ export default {
      * at the top of the file.
      */
     components: {
+        BadgeDetailModal,
         RelativeTime
     },
 
@@ -94,6 +96,16 @@ export default {
             }
 
             return '';
+        },
+
+
+        /**
+         * Open a modal to show the badge that aws given as an award
+         *
+         * @param award
+         */
+        openModal(award) {
+            this.$refs.badgeDetailModal.open(award);
         }
     }
 }
@@ -117,12 +129,12 @@ export default {
                     <div class="v-card-list">
                         <div class="v-card card wrap-down" v-for="award in category.awards">
                             <div class="card-feature-image">
-                                <a href="#">
+                                <a href="#" v-on:click="openModal(award)">
                                     <img :src="award.badge.image._links.image + '&size=constrain200'" :class="getCss(award)"/>
                                 </a>
                             </div>
                             <div class="card-content">
-                                <h3><a href="#">{{ award.badge.name }} ({{ award.count }})</a></h3>
+                                <h3><a href="#" v-on:click="openModal(award)">{{ award.badge.name }} ({{ award.count }})</a></h3>
                                 <p class="meta">
                                     Awarded <relative-time :datetime="award.awardedAt"></relative-time> by
                                     <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
@@ -152,6 +164,8 @@ export default {
                 <p>There haven't been any goals set nor any achievements received.</p>
             </div>
         </template>
+
+        <badge-detail-modal ref="badgeDetailModal"></badge-detail-modal>
     </div>
 </template>
 
