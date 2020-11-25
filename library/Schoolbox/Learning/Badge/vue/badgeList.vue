@@ -4,9 +4,10 @@ import axios from 'axios';
 import Toast from "@schoolbox/toast";
 import RevealModal from "@schoolbox/reveal-modal";
 import BadgeDetail from "./badgeDetail";
+import BadgeAward from "./badgeAward";
 
 export default {
-    components: {BadgeDetail, RevealModal, Toast},
+    components: {BadgeAward, BadgeDetail, RevealModal, Toast},
     props: {
         getBadgesRoute: {
             type: String,
@@ -172,7 +173,7 @@ export default {
         </reveal-modal>
 
         <reveal-modal ref="awardModal">
-            <h2>Awarding &lsquo;<i>{{ currentBadge.name }}</i>&rsquo;</h2>
+            <badge-award :badge="currentBadge"></badge-award>
         </reveal-modal>
 
         <reveal-modal ref="setAsGoalModal">
