@@ -1,11 +1,11 @@
 #!/usr/bin/php
 <?php
+
 declare(strict_types=1);
 
 use Aws\S3\S3Client;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
-
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
