@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Badge\Award;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Badge;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -171,11 +172,11 @@ class Mapper extends \Schoolbox\Mapper
      * Intentionally avoid hydration as there's no point to doing all that
      * when we're just updating a scalar
      *
-     * @param array                           $userIds
-     * @param \Schoolbox\Learning\Badge\Model $badge
+     * @param array       $userIds
+     * @param Badge\Model $badge
      * @throws \PDOException
      */
-    public function deleteMostRecentlyAwarded(array $userIds, \Schoolbox\Learning\Badge\Model $badge): void
+    public function deleteMostRecentlyAwarded(array $userIds, Badge\Model $badge): void
     {
 
         /* Find a list of the most recent instances of $badge given
