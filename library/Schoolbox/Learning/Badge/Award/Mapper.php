@@ -163,4 +163,56 @@ class Mapper extends \Schoolbox\Mapper
             ]
         ]);
     }
+
+
+    /**
+     * Find the most recent awardings of $badge across all users
+     *
+     * @param array                           $userIds
+     * @param \Schoolbox\Learning\Badge\Model $badge
+     * @throws \PDOException
+     */
+    public function deleteMostRecentlyAwarded(array $userIds, \Schoolbox\Learning\Badge\Model $badge): void
+    {
+
+        /* Find a list of the most recent instances of $badge given
+         * to the selected users
+         */
+        $query = "
+            SELECT
+                bu.recipient_id,
+                bu.badge_id,
+                bu.status,
+                bu.awarded_by,
+                MAX(awarded_at) AS awarded_at,
+                bu.deleted_at
+            FROM {$this->getTable()} bu
+            WHERE badge_id = :badgeId
+            AND recipient_id IN {$this->getPredicateBuilder()->getArrayPlaceholders($userIds, 'recipient_id')}
+            GROUP BY recipient_id
+        ";
+
+        $params = $this->getPredicateBuilder()->getArrayParameters($userIds, 'recipient_id');
+        $params['badgeId'] = $badge->getId();
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($params);
+
+        /* Delete one particular row at a time based on multiple columns
+         */
+        $deleteQuery = $this->getDatabase()->prepare("
+            DELETE FROM {$this->getTable()}
+            WHERE recipient_id = :recipientId
+            AND badge_id = :badgeId
+            AND awarded_at = :awardedAt
+        ");
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $deleteQuery->execute([
+                'recipientId' => $row['recipient_id'],
+                'badgeId' => $row['badge_id'],
+                'awardedAt' => $row['awarded_at']
+            ]);
+        }
+    }
 }
