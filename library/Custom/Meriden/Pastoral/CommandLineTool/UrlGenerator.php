@@ -57,9 +57,9 @@ class UrlGenerator
      */
     public function generate(UriInterface $baseUrl, int $year, User $student, ?string $roleTypeOverride): array
     {
-        $queryString = $roleTypeOverride
-            ? ('?' . http_build_query(['role-type' => $roleTypeOverride]))
-            : '';
+        $query = $roleTypeOverride
+            ? ['role-type' => $roleTypeOverride]
+            : [];
 
         // Find the page for the current year
         $params  = [
@@ -70,7 +70,7 @@ class UrlGenerator
         $results = [
             $baseUrl
                 ->setPath($this->router->generate('customMeridenPastoral.index', $params))
-                ->setQuery($queryString)
+                ->setQuery($query)
                 ->toString(),
         ];
 
@@ -93,7 +93,7 @@ class UrlGenerator
             ];
             $results[] = $baseUrl
                 ->setPath($this->router->generate('customMeridenPastoral.subject', $params))
-                ->setQuery($queryString)
+                ->setQuery($query)
                 ->toString();
         }
 
