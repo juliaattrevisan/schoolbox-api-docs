@@ -28,29 +28,27 @@ export default {
         }
     },
     methods: {
-        search: debounce(function(loading, query, vm) {
-            axios.get('/ajax/user.php', {
-                params: {
-                    query: query,
-                    groupID: 0
-                }
-            })
-            .then(function(response) {
-                vm.options = response.data;
-                loading(false);
-            });
-        }, 350),
-
         /**
-         * @param {String} query
-         * @param {Function} loading
+         * Search callback for the selectize.
+         *
+         * This method is debounced so that the search doesn't trigger until
+         *
+         * @param {String}   query   The search string
+         * @param {Function} loading A function to call when the loading state
+         *                           changes (accepts a Boolean)
          */
-        onSearch(query, loading) {
+        onSearch: debounce(function(query, loading) {
             loading(true);
-            this.search(loading, query, this);
-        },
-
-
+            axios
+                .get('/ajax/user.php', {
+                    params: {
+                        query: query,
+                        roleTypeID: 'student'
+                    }
+                })
+                .then(response => this.options = response.data)
+                .finally(() => loading(false))
+        }, 350),
     },
 }
 </script>
