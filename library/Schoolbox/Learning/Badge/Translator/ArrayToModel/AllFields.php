@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Badge\Translator\ArrayToModel;
 
 use Schoolbox\API\Translator\ArrayToModel\Base;
+use Schoolbox\Curriculum\Node\Model as CurriculumNode;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge\Category\Model as BadgeCategory;
 use Schoolbox\Learning\Badge\Model;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -52,6 +54,7 @@ class AllFields extends Base
      */
     public function __invoke(array $array, object $model = null): object
     {
+        /** @var Model $model */
         $model ??= new Model();
         $model = $this->setDate($array, 'createdAt', $model, 'setCreatedAt');
         $model = $this->setDate($array, 'updatedAt', $model, 'setUpdatedAt');
@@ -70,9 +73,19 @@ class AllFields extends Base
             'setId'
         );
 
-        // Set tags
+        // TODO set tags
 
         // Set curriculum nodes
+        $this->setCollection(
+            $array,
+            'curriculumNodes',
+            'id',
+            $model,
+            'setCurriculumNodes',
+            new GenericCollection(CurriculumNode::class),
+            new CurriculumNode(),
+            'setId'
+        );
 
         // Set created/updated by
         $model = $this->setModel(

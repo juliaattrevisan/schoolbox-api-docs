@@ -72,10 +72,6 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function getSelectString(): string
     {
-        // As of SA-11248: curriculum nodes aren't hydrated by default.
-        // "{$curriculumNodeMapper->getColumnString('cn')}," was in the SELECT,
-        // "LEFT JOIN {$this->getJoinSql('curriculum_badge', '', 'cn')}" was in
-        // the JOIN, if you need to add them back
         return "
             SELECT
                 {$this->getColumnString()},
@@ -108,17 +104,13 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-//        $curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
         $collection = $this->createCollection();
-//        $curriculumNodeCache = [];
 
         foreach ($statement as $row) {
             $badgeId = $row['id'];
 
             if (!$collection->offsetExists($badgeId)) {
                 $collection[$badgeId] = $this->hydrate($row);
-                // As of SA-11248: curriculum nodes aren't hydrated by default
-//                $collection[$badgeId]->setCurriculumNodes($curriculumNodeMapper->createCollection());
             }
 
             /* Set the Category
@@ -129,18 +121,9 @@ class Mapper extends \Schoolbox\Mapper
                 $collection[$badgeId]->setCategory($category);
             }
 
-            // As of SA-11248: curriculum nodes aren't hydrated by default
-//            /* Set all the curriculum nodes
-//             */
-//            $curriculumNodeId = $row['cn.id'];
-//
-//            if ($curriculumNodeId) {
-//                if (!array_key_exists($curriculumNodeId, $curriculumNodeCache)) {
-//                    $curriculumNodeCache[$curriculumNodeId] = $curriculumNodeMapper->hydrate($row, 'cn');
-//                }
-//
-//                $collection[$badgeId]->getCurriculumNodes()->setOffset($curriculumNodeId, $curriculumNodeCache[$curriculumNodeId]);
-//            }
+            // Set the list of curriculum codes as an empty collection:
+            // these will be hydrated in `hydrateCurriculumNodesIntoCollection`
+            $collection[$badgeId]->setCurriculumNodes($this->getJoinMapper('curriculum_badge')->createCollection());
 
             /* Set the creator and also their role
              */
@@ -185,6 +168,37 @@ class Mapper extends \Schoolbox\Mapper
             }
         }
 
+        // Fetch curriculum nodes in a separate query
+        return $this->hydrateCurriculumNodesIntoCollection($collection);
+    }
+
+
+    /**
+     * Helper method for hydrating curriculum nodes into the collection of
+     * badges retrieved by `hydrateSelect`.
+     *
+     * @param GenericCollection $collection
+     * @return GenericCollection
+     */
+    private function hydrateCurriculumNodesIntoCollection(GenericCollection $collection): GenericCollection
+    {
+        $badgeIds = $collection->keys();
+        $pb       = $this->getPredicateBuilder()->in('id', $badgeIds);
+        $query    = "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('curriculum_badge', 'cn')}
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            INNER JOIN {$this->getJoinSql('curriculum_badge', '', 'cn')}
+            WHERE {$pb->getWhereIntersect()}
+        ";
+
+        $curriculumNodeStatement = $this->database->query($query, $pb->getParams());
+        foreach ($curriculumNodeStatement as $row) {
+            /** @var \Schoolbox\Curriculum\Node\Model $curriculumNode */
+            $curriculumNode = $this->hydrateJoin($row, 'curriculum_badge', 'cn');
+            $collection[$row['id']]->getCurriculumNodes()->setOffset($curriculumNode->getId(), $curriculumNode);
+        }
         return $collection;
     }
 }
