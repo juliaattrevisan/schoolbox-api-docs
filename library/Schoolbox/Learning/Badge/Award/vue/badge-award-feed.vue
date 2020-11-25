@@ -114,12 +114,12 @@ export default {
                     <div class="v-card-list">
                         <div class="v-card card wrap-down" v-for="award in category.awards">
                             <div class="card-feature-image">
-                                <a href="#" v-on:click="openModal(award)">
+                                <a href="#" @click.prevent="openModal(award)">
                                     <img :src="award.badge.image._links.image + '&size=constrain200'" :class="getCss(award)"/>
                                 </a>
                             </div>
                             <div class="card-content">
-                                <h3 class="no-margin"><a href="#" v-on:click="openModal(award)">{{ award.badge.name }} ({{ award.count }})</a></h3>
+                                <h3 class="no-margin"><a href="#" @click.prevent="openModal(award)">{{ award.badge.name }} ({{ award.count }})</a></h3>
                                 <p class="meta">
                                     <template v-if="award.isGoal">
                                         Goal set
