@@ -168,6 +168,9 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Find the most recent awardings of $badge across all users
      *
+     * Intentionally avoid hydration as there's no point to doing all that
+     * when we're just updating a scalar
+     *
      * @param array                           $userIds
      * @param \Schoolbox\Learning\Badge\Model $badge
      * @throws \PDOException
@@ -188,6 +191,7 @@ class Mapper extends \Schoolbox\Mapper
                 bu.deleted_at
             FROM {$this->getTable()} bu
             WHERE badge_id = :badgeId
+            AND deleted_at IS NULL
             AND recipient_id IN {$this->getPredicateBuilder()->getArrayPlaceholders($userIds, 'recipient_id')}
             GROUP BY recipient_id
         ";
@@ -201,7 +205,8 @@ class Mapper extends \Schoolbox\Mapper
         /* Delete one particular row at a time based on multiple columns
          */
         $deleteQuery = $this->getDatabase()->prepare("
-            DELETE FROM {$this->getTable()}
+            UPDATE {$this->getTable()}
+            SET deleted_at = NOW()
             WHERE recipient_id = :recipientId
             AND badge_id = :badgeId
             AND awarded_at = :awardedAt
