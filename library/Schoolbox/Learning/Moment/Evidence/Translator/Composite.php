@@ -20,6 +20,8 @@ use Schoolbox\Learning\Moment\Evidence;
  *
  * TODO nothing about this is peculiar to evidence, so this is a prime candidate
  *      to be moved to somewhere generic
+ *
+ * @deprecated use generic class `\Schoolbox\API\Translator\ModelToArray\Composite` instead
  */
 class Composite
 {
