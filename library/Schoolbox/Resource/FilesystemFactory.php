@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -18,6 +19,7 @@ use LogicException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage\Manager;
 use UnexpectedValueException;
+
 use function trim;
 
 /**
