@@ -72,10 +72,6 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function getSelectString(): string
     {
-        // As of SA-11248: curriculum nodes aren't hydrated by default.
-        // "{$curriculumNodeMapper->getColumnString('cn')}," was in the SELECT,
-        // "LEFT JOIN {$this->getJoinSql('curriculum_badge', '', 'cn')}" was in
-        // the JOIN, if you need to add them back
         return "
             SELECT
                 {$this->getColumnString()},
@@ -108,17 +104,13 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-//        $curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
         $collection = $this->createCollection();
-//        $curriculumNodeCache = [];
 
         foreach ($statement as $row) {
             $badgeId = $row['id'];
 
             if (!$collection->offsetExists($badgeId)) {
                 $collection[$badgeId] = $this->hydrate($row);
-                // As of SA-11248: curriculum nodes aren't hydrated by default
-//                $collection[$badgeId]->setCurriculumNodes($curriculumNodeMapper->createCollection());
             }
 
             /* Set the Category
@@ -132,19 +124,6 @@ class Mapper extends \Schoolbox\Mapper
             // Set the list of curriculum codes as an empty collection:
             // these will be hydrated in `hydrateCurriculumNodesIntoCollection`
             $collection[$badgeId]->setCurriculumNodes($this->getJoinMapper('curriculum_badge')->createCollection());
-
-            // As of SA-11248: curriculum nodes aren't hydrated by default
-//            /* Set all the curriculum nodes
-//             */
-//            $curriculumNodeId = $row['cn.id'];
-//
-//            if ($curriculumNodeId) {
-//                if (!array_key_exists($curriculumNodeId, $curriculumNodeCache)) {
-//                    $curriculumNodeCache[$curriculumNodeId] = $curriculumNodeMapper->hydrate($row, 'cn');
-//                }
-//
-//                $collection[$badgeId]->getCurriculumNodes()->setOffset($curriculumNodeId, $curriculumNodeCache[$curriculumNodeId]);
-//            }
 
             /* Set the creator and also their role
              */
