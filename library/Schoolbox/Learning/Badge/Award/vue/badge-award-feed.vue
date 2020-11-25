@@ -100,13 +100,11 @@ export default {
 <template>
     <div>
         <template v-if="this.loading">
-            <table class="skeleton">
-                <tbody>
-                <tr v-for="n in 3">
-                    <td></td>
-                </tr>
-                </tbody>
-            </table>
+            <dl class="tabs">
+                <dd class="skeleton" v-for="n in 3">
+                    <a></a>
+                </dd>
+            </dl>
         </template>
         <template v-else-if="this.data.categories">
             <section class="awards">
