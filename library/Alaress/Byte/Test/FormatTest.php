@@ -62,6 +62,14 @@ class FormatTest extends TestCase
         $this->assertEquals($expected, Alaress_Byte_Format::bytesToString($input));
     }
 
+    public function testNegativeBytesToGB(): void
+    {
+        $input = '-12458731246';
+        $expected = '-11.6 GB';
+
+        self::assertEquals($expected, Alaress_Byte_Format::bytesToString($input));
+    }
+
     public function testBToBytes()
     {
         $input = '100 B';

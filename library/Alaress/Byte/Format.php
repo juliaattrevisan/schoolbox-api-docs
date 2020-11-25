@@ -27,6 +27,9 @@ class Alaress_Byte_Format {
      */
 	public static function bytesToString($size, int $precision = 2, bool $useIEC = true, bool $renderIecExplicitly = false): string
     {
+        $sign = $size < 0 ? '-' : '';
+        $size = abs($size);
+
         // IEC uses 2^X, SI uses 10^X
         $multiplier = $useIEC ? 1024 : 1000;
 
@@ -39,7 +42,7 @@ class Alaress_Byte_Format {
 			$size /= $multiplier;
 		}
 
-		return round($size,$precision) . ' ' . $a[$i];
+		return $sign . round($size,$precision) . ' ' . $a[$i];
 	}
 
     /**
