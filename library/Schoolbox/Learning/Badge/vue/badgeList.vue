@@ -180,7 +180,7 @@ export default {
         </reveal-modal>
 
         <reveal-modal ref="awardModal">
-            <badge-award :badge="currentBadge" @cancel="closeAwardModal"></badge-award>
+            <badge-award :badge="currentBadge" @cancel="closeAwardModal" @done="closeAwardModal"></badge-award>
         </reveal-modal>
 
         <reveal-modal ref="setAsGoalModal">

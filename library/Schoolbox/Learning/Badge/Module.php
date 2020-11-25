@@ -124,6 +124,9 @@ class Module extends BaseModule
             $baseRule,
             $preloadBadge
         );
+
+        // Only staff may set goals for arbitrary users:
+        // any user may set goals for themselves
         $this->register(
             self::METHOD_POST,
             '/{id}/setGoal',

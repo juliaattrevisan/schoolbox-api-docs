@@ -1,6 +1,7 @@
 <script>
 
 import axios from "axios";
+import Toast from "@schoolbox/toast";
 
 // Vue-select boilerplate
 // TODO consider wrapping in our own component
@@ -14,6 +15,7 @@ import Deselect from '@schoolbox/selectize/Deselect';
 vSelect.props.components.default = () => ({ Deselect });
 
 const EVENTS = {
+    done: 'done',
     cancel: 'cancel'
 };
 
@@ -24,10 +26,11 @@ const EVENTS = {
 /**
  * Award badge form.
  *
+ * @emits done   The award badge action was successfully completed
  * @emits cancel The award badge action was cancelled
  */
 export default {
-    components: {vSelect},
+    components: {Toast, vSelect},
     props: {
         badge: {
             type: Object,
@@ -55,18 +58,27 @@ export default {
             axios
                 .get('/ajax/user.php', {
                     params: {
-                        query: query,
-                        roleTypeID: 'student'
+                        query: query
                     }
                 })
                 .then(response => this.options = response.data)
                 .finally(() => loading(false))
         }, 350),
 
+        onSubmit() {
+            // Craft a POST request with a bunch of users
+            this.$refs.toast.activate('Awarding...');
+            axios.post(this.badge._links.award, {users: this.selected})
+                .then(() => {
+                    this.$emit(EVENTS.done);
+                    this.$refs.toast.timeout('Awarded', true);
+                })
+                .catch(() => this.$refs.toast.timeout('Award failed', false))
+        },
 
         onCancel() {
             this.$emit(EVENTS.cancel);
-        }
+        },
     },
 }
 </script>
@@ -95,8 +107,10 @@ export default {
             </template>
         </v-select>
         <ul class="flex-list buttons">
-            <li><button class="submit" :disabled="selected.length === 0">Award</button></li>
+            <li><button @click.prevent="onSubmit" class="submit" :disabled="selected.length === 0">Award</button></li>
             <li><button @click.prevent="onCancel">Cancel</button></li>
         </ul>
+
+        <toast ref="toast"></toast>
     </div>
 </template>
