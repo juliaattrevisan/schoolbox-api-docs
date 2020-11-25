@@ -896,11 +896,9 @@ class External_Synergetic_User implements External_UserInterface
                                   StudentClasses.FileSemester = SubjectClasses.FileSemester AND
                                   StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
                                   StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-                                  StudentClasses.ID = :externalId
-                JOIN              FileSemesters Semester ON
-                                      Semester.FileSemester = StudentClasses.FileSemester AND
-                                      Semester.FileYear = StudentClasses.FileYear AND
-                                      Semester.SystemCurrentFlag = 1
+                                  StudentClasses.ID = :externalId AND
+                                  StudentClasses.FileSemester = :currentSemester AND
+                                  StudentClasses.FileYear = :currentYear
                 LEFT JOIN         luFileType ON StudentClasses.FileType = luFileType.Code
                 WHERE             StudentClasses.StartDate <= getdate() AND
                                   (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
@@ -925,11 +923,9 @@ class External_Synergetic_User implements External_UserInterface
                                         c1.FileSemester = c2.FileSemester AND
                                         c1.ClassCampus = c2.ClassCampus AND
                                         c1.ClassCode = c2.ClassCode AND
-                                        c1.StaffID = :externalId
-                JOIN              FileSemesters Semester ON
-                                      Semester.FileSemester = c2.FileSemester AND
-                                      Semester.FileYear = c2.FileYear AND
-                                      Semester.SystemCurrentFlag = 1
+                                        c1.StaffID = :externalId AND
+                                        c1.FileSemester = :currentSemester AND
+                                        c1.FileYear = :currentYear
                 LEFT JOIN         luFileType ON c2.FileType = luFileType.Code
                 {$allowedFileTypesSql}
                 ORDER BY          classType ASC,
@@ -943,7 +939,11 @@ class External_Synergetic_User implements External_UserInterface
             return [];
         }
 
-        $subjectList = $this->getConnector()->executeQuery($sql, ['externalId' => $externalId])->fetchAll();
+        $subjectList = $this->getConnector()->executeQuery($sql, [
+            'externalId'      => $externalId,
+            'currentSemester' => $this->getCurrentSemester($externalId),
+            'currentYear'     => $this->getCurrentYear($externalId),
+        ])->fetchAll();
 
         if (is_array($subjectList)) {
 
