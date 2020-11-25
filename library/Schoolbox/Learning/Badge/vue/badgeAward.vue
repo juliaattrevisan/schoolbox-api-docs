@@ -49,6 +49,11 @@ export default {
                 .then(response => this.options = response.data)
                 .finally(() => loading(false))
         }, 350),
+
+
+        onCancel() {
+            this.$emit('cancel');
+        }
     },
 }
 </script>
@@ -78,7 +83,7 @@ export default {
         </v-select>
         <ul class="flex-list buttons">
             <li><button class="submit" :disabled="selected.length === 0">Award</button></li>
-            <li><button>Cancel</button></li>
+            <li><button @click.prevent="onCancel">Cancel</button></li>
         </ul>
     </div>
 </template>

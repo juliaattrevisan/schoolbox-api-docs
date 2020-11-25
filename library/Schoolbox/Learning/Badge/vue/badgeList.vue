@@ -94,6 +94,13 @@ export default {
         },
 
         /**
+         * Closes the modal window for the award form.
+         */
+        closeAwardModal() {
+            this.$refs.awardModal.close();
+        },
+
+        /**
          * Opens a modal window for viewing this badge's set as goal form.
          *
          * @param {Object} badge
@@ -173,7 +180,7 @@ export default {
         </reveal-modal>
 
         <reveal-modal ref="awardModal">
-            <badge-award :badge="currentBadge"></badge-award>
+            <badge-award :badge="currentBadge" @cancel="closeAwardModal"></badge-award>
         </reveal-modal>
 
         <reveal-modal ref="setAsGoalModal">
