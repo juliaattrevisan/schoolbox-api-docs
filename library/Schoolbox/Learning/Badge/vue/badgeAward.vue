@@ -63,7 +63,7 @@ export default {
                   multiple
                   @search="onSearch"
                   label="name"
-                  placeholder="Search for people to invite"
+                  placeholder="Search for students to award"
                   v-model="selected">
             <template slot="option" slot-scope="option">
                 <span class="d-center">
@@ -72,9 +72,13 @@ export default {
             </template>
             <template slot="selected-option" slot-scope="option">
                 <span class="selected d-center">
-                    {{ option.first_name }} {{ option.last_name }}
+                    {{ option.name }}
                 </span>
             </template>
         </v-select>
+        <ul class="flex-list buttons">
+            <li><button class="submit" :disabled="selected.length === 0">Award</button></li>
+            <li><button>Cancel</button></li>
+        </ul>
     </div>
 </template>
