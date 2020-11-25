@@ -129,6 +129,10 @@ class Mapper extends \Schoolbox\Mapper
                 $collection[$badgeId]->setCategory($category);
             }
 
+            // Set the list of curriculum codes as an empty collection:
+            // these will be hydrated in `hydrateCurriculumNodesIntoCollection`
+            $collection[$badgeId]->setCurriculumNodes($this->getJoinMapper('curriculum_badge')->createCollection());
+
             // As of SA-11248: curriculum nodes aren't hydrated by default
 //            /* Set all the curriculum nodes
 //             */
@@ -185,6 +189,37 @@ class Mapper extends \Schoolbox\Mapper
             }
         }
 
+        // Fetch curriculum nodes in a separate query
+        return $this->hydrateCurriculumNodesIntoCollection($collection);
+    }
+
+
+    /**
+     * Helper method for hydrating curriculum nodes into the collection of
+     * badges retrieved by `hydrateSelect`.
+     *
+     * @param GenericCollection $collection
+     * @return GenericCollection
+     */
+    private function hydrateCurriculumNodesIntoCollection(GenericCollection $collection): GenericCollection
+    {
+        $badgeIds = $collection->keys();
+        $pb       = $this->getPredicateBuilder()->in('id', $badgeIds);
+        $query    = "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('curriculum_badge', 'cn')}
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            INNER JOIN {$this->getJoinSql('curriculum_badge', '', 'cn')}
+            WHERE {$pb->getWhereIntersect()}
+        ";
+
+        $curriculumNodeStatement = $this->database->query($query, $pb->getParams());
+        foreach ($curriculumNodeStatement as $row) {
+            /** @var \Schoolbox\Curriculum\Node\Model $curriculumNode */
+            $curriculumNode = $this->hydrateJoin($row, 'curriculum_badge', 'cn');
+            $collection[$row['id']]->getCurriculumNodes()->setOffset($curriculumNode->getId(), $curriculumNode);
+        }
         return $collection;
     }
 }
