@@ -85,6 +85,7 @@ class ModelToArray
         return [
             'badge' => call_user_func($this->badgeTranslator ,$model->getBadge()),
             'status' => $model->getStatus(),
+            'isGoal' => $model->isGoal(),
             'recipient' => $recipient,
             'awardedBy' => $awardedBy,
             'awardedAt' => $model->getAwardedAt() && !$model->getAwardedAt()->isNull()

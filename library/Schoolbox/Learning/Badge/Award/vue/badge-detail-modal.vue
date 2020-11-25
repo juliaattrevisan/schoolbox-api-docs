@@ -97,7 +97,7 @@ export default {
                         <h3 class="no-margin">{{ award.badge.name }} ({{ award.count }})</h3>
                         <p class="meta">Category: {{ award.badge.category.name }}</p>
                         <p class="meta">
-                            <template v-if="isGoal(award)">
+                            <template v-if="award.isGoal">
                                 Goal set <relative-time :datetime="award.awardedAt"></relative-time> by
                                 <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
                             </template>

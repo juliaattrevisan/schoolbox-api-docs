@@ -123,7 +123,7 @@ export default {
                             <div class="card-content">
                                 <h3 class="no-margin"><a href="#" v-on:click="openModal(award)">{{ award.badge.name }} ({{ award.count }})</a></h3>
                                 <p class="meta">
-                                    <template v-if="isGoal(award)">
+                                    <template v-if="award.isGoal">
                                         Goal set
                                     </template>
                                     <template v-else>

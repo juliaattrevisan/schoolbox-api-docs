@@ -6,14 +6,6 @@ export default {
     methods: {
 
         /**
-         * Decide if this Award is a goal or not
-         */
-        isGoal(award) {
-            return 'goal' === award.status;
-        },
-
-
-        /**
          * Decide if this Award was a goal or an achievement
          * and provide the css class accordingly
          *
@@ -21,7 +13,7 @@ export default {
          * @returns string
          */
         getCss(award) {
-            if (this.isGoal(award)) {
+            if (award.isGoal) {
                 return 'goal';
             }
 

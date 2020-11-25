@@ -63,6 +63,28 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Decide whether this awarding was a Goal
+     *
+     * @return bool
+     */
+    public function isGoal(): bool
+    {
+        return self::AWARD_STATUS_GOAL === $this->getStatus();
+    }
+
+
+    /**
+     * Decide whether this awarding was an Achievement
+     *
+     * @return bool
+     */
+    public function isAchievement(): bool
+    {
+        return self::AWARD_STATUS_ACHIEVEMENT === $this->getStatus();
+    }
+
+
+    /**
      * @return User
      */
     public function getRecipient(): User
