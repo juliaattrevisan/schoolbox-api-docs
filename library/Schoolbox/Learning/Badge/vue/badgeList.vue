@@ -81,6 +81,26 @@ export default {
             this.currentBadge = badge;
             this.$refs.detailModal.open();
         },
+
+        /**
+         * Opens a modal window for viewing this badge's award form.
+         *
+         * @param {Object} badge
+         */
+        openAwardModal(badge) {
+            this.currentBadge = badge;
+            this.$refs.awardModal.open();
+        },
+
+        /**
+         * Opens a modal window for viewing this badge's set as goal form.
+         *
+         * @param {Object} badge
+         */
+        openSetAsGoalModal(badge) {
+            this.currentBadge = badge;
+            this.$refs.setAsGoalModal.open();
+        },
     },
 }
 </script>
@@ -113,7 +133,7 @@ export default {
                 </ul>
 
                 <ul class="grid small-block-grid-2 medium-block-grid-3 large-block-grid-4">
-                    <li v-for="badge in data">
+                    <li v-for="badge in data" :key="badge.id">
                         <!-- I'd apply the click to the entire <li> but that intercepts dropdown clicks -->
                         <a @click.prevent="openDetailModal(badge)">
                             <img :src="badge.image._links.image" :alt="badge.name" />
@@ -130,8 +150,8 @@ export default {
                                    aria-expanded="false" title="Actions"></a>
                             </nav>
                             <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                <li><a href="#" class="icon-add" title="Award">Award</a></li>
-                                <li><a href="#" class="icon-task" title="Set as Goal">Set as Goal</a></li>
+                                <li><a @click.prevent="openAwardModal(badge)" class="icon-add" title="Award">Award</a></li>
+                                <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-task" title="Set as Goal">Set as Goal</a></li>
                                 <li><a href="#" class="icon-minus" title="Award">Withdraw</a></li>
                                 <li><a href="#" class="icon-modify" title="Modify">Modify</a></li>
                                 <li><a href="#" class="icon-delete" title="Delete">Delete</a></li>
@@ -149,6 +169,14 @@ export default {
 
         <reveal-modal ref="detailModal">
             <badge-detail :badge="currentBadge"></badge-detail>
+        </reveal-modal>
+
+        <reveal-modal ref="awardModal">
+            <h2>Awarding &lsquo;<i>{{ currentBadge.name }}</i>&rsquo;</h2>
+        </reveal-modal>
+
+        <reveal-modal ref="setAsGoalModal">
+            <h2>Setting &lsquo;<i>{{ currentBadge.name }}</i>&rsquo; as a Goal</h2>
         </reveal-modal>
 
         <toast ref="toast"></toast>
