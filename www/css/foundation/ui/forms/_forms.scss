@@ -518,6 +518,9 @@ input[type=checkbox].plain {
 
 		&:checked + label {
 			background: $content-ui-background;
+            &:hover {
+                background: css-lighten($content-ui-background,3%);
+            }
 		}
 
 		+ label {
