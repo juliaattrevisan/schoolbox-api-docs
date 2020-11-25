@@ -167,7 +167,7 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * Find the most recent awardings of $badge across all users
+     * Find the most recent awardings of $badge across all users in $userIds
      *
      * Intentionally avoid hydration as there's no point to doing all that
      * when we're just updating a scalar
