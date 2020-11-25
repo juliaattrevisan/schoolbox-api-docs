@@ -123,7 +123,11 @@ class Mapper extends \Schoolbox\Mapper
         $nodes = $curriculumNodeMapper->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $nodes->add($curriculumNodeMapper->hydrate($row, 'cn'));
+            $node = $curriculumNodeMapper->hydrate($row, 'cn');
+
+            if ($node) {
+                $nodes->add($node);
+            }
         }
 
         return $nodes;
