@@ -8,17 +8,15 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage\S3;
 
 use Alaress_Byte_Format;
-use Aura\Di\Exception\ServiceNotFound;
+use Alaress\Database as AlaressDatabase;
 use Aws\S3\S3Client;
 use InvalidArgumentException;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem;
 use League\Flysystem\Filesystem;
-use LogicException;
 use Monolog\Logger;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\MapperFactory;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
 use function array_filter;
@@ -53,10 +51,6 @@ use const DIRECTORY_SEPARATOR;
  */
 class Migration extends CliTool\App
 {
-
-    /** @var Storage\Mapper */
-    private $storageMapper;
-
     /**
      * Configured local storage directory. No trailing slash.
      *
@@ -112,9 +106,10 @@ class Migration extends CliTool\App
 
     /**
      * @inheritDoc
-     * @throws ServiceNotFound
+     * @throws AlaressDatabase\Exception
+     * @throws Flysystem\FileExistsException
      * @throws InvalidArgumentException
-     * @throws LogicException
+     * @throws \Psr\Log\InvalidArgumentException
      */
     public function run(): void
     {
@@ -129,9 +124,6 @@ class Migration extends CliTool\App
         $level                 = $this->deleteLocalCopy ? Logger::WARNING : Logger::NOTICE;
         $this->getLogger()->log($level, ($this->deleteLocalCopy ? 'Deleting' : 'Keeping') . ' local storage files');
 
-        /** @var MapperFactory $mapperFactory */
-        $mapperFactory       = $this->getDi()->get('mapperFactory');
-        $this->storageMapper = $mapperFactory->get(Storage\Mapper::class);
         $this->storageDir    = rtrim($this->getConfig()->get('storage_dir'), DIRECTORY_SEPARATOR);
         $this->byteFormat    = new Alaress_Byte_Format();
 
@@ -198,6 +190,9 @@ class Migration extends CliTool\App
 
     /**
      * Retrieves and migrates all local storage files to S3
+     * @throws Flysystem\FileExistsException
+     * @throws AlaressDatabase\Exception
+     * @throws \Psr\Log\InvalidArgumentException
      */
     private function migrateFiles(): void
     {
@@ -207,14 +202,13 @@ class Migration extends CliTool\App
 
         // Retrieve and iterate all files referenced by `storage` table in database
         $this->getLogger()->notice("Fetching storage models from database, this may take a while on large datasets...");
-        $files    = $this->storageMapper->findAll();
-        $countAll = $files->count();
+        $files    = $this->getDatabaseInternal()->executeQuery("SELECT hash, filename, ext FROM storage")->fetchAll(\PDO::FETCH_ASSOC);
+        $countAll = count($files);
         foreach ($files as $file) {
-            // Set file to use AWS S3 filesystem, regardless of Schoolbox's currently configured file system
-            $file->setFilesystem($this->fileSystemAwsS3);
             $count++;
-            $this->getLogger()->notice("Checking file $count/$countAll  {$file->getHash()}, '{$file->getBasename()}'");
-            if ($this->migrateFile($file)) {
+            $baseName = "{$file['filename']}.{$file['extension']}";
+            $this->getLogger()->notice("Checking file $count/$countAll  {$file['hash']}, '$baseName'");
+            if ($this->migrateFile($file['hash'])) {
                 $countFilesInS3++;
             }
         }
@@ -317,17 +311,19 @@ class Migration extends CliTool\App
     /**
      * Migrate a file from local storage to S3
      *
-     * @param Storage\Model $file
+     * @param string $hash
      * @return bool Whether the file is now in S3 (either previously or newly uploaded)
+     * @throws Flysystem\FileExistsException
      */
-    private function migrateFile(Storage\Model $file): bool
+    private function migrateFile(string $hash): bool
     {
+        $relativePath = Storage\Manager::getPathFromHash($hash);
         // Does file exist locally?
-        $filepath     = "{$this->storageDir}/{$file->getPath()}";
+        $filepath     = "{$this->storageDir}/{$relativePath}";
         $foundLocally = file_exists($filepath);
 
         // Does file already exist in S3?
-        $foundInS3 = array_key_exists(FilesystemFactory::PREFIX_STORAGE . $file->getPath(), $this->filesInS3);
+        $foundInS3 = array_key_exists(FilesystemFactory::PREFIX_STORAGE . $relativePath, $this->filesInS3);
 
         // Handle each of four possible scenarios re: file's presence on local and S3 filesystems:
         if (!$foundLocally) {
@@ -338,7 +334,7 @@ class Migration extends CliTool\App
             }
         } elseif (!$foundInS3) {
             $this->getLogger()->info("File on local disk but not in S3, uploading... (" . $this->byteFormat::bytesToString(filesize($filepath)) . ")");
-            if ($this->moveFileToS3($filepath, $file)) {
+            if ($this->moveFileToS3($filepath)) {
                 $foundInS3 = true;
                 $this->countStorageFilesUploaded++;
             }
@@ -359,20 +355,26 @@ class Migration extends CliTool\App
     /**
      * Moves file from local to S3 filesystem, deleting local copy
      *
-     * @param string         $filepath
-     * @param Flysystem\File $file
+     * @param string         $filepathLocalAbsolute
      * @return bool Whether the move was successful
+     * @throws Flysystem\FileExistsException
      */
-    private function moveFileToS3(string $filepath, Flysystem\File $file): bool
+    private function moveFileToS3(string $filepathLocalAbsolute): bool
     {
-        $fp = fopen($filepath, 'rb');
+        $fp = fopen($filepathLocalAbsolute, 'rb');
         if (!is_resource($fp)) {
             $this->getLogger()->error("Cannot open file for reading, skipping");
             return false;
         }
 
+        $relativeLocalPath = $this->getRelativeLocalPath($filepathLocalAbsolute);
         if ($this->perform()) {
-            $writeSucceeded = $file->writeStream($fp);
+            try{
+                $writeSucceeded = $this->fileSystemAwsS3->writeStream($relativeLocalPath, $fp);
+            } catch (InvalidArgumentException $e){
+                $this->getLogger()->error("Cannot write file to S3, skipping: '{$e->getMessage()}'");
+                return false;
+            }
         } else {
             $writeSucceeded = true;
         }
@@ -380,20 +382,34 @@ class Migration extends CliTool\App
 
         if ($writeSucceeded) {
             $this->getLogger()->debug("Upload completed");
-            $this->countBytesUploaded += filesize($filepath);
+            $this->countBytesUploaded += filesize($filepathLocalAbsolute);
         } else {
             $this->getLogger()->warning("Upload failed");
             return false;
         }
 
         if ($this->deleteLocalCopy) {
-            $this->getLogger()->debug("Deleting local file '$filepath'");
+            $this->getLogger()->debug("Deleting local file '$filepathLocalAbsolute'");
             if ($this->perform()) {
-                unlink($filepath);
+                unlink($filepathLocalAbsolute);
             }
         }
 
         return true;
+    }
+
+
+    /**
+     * Convert a local absolute path to a path relative to the storage dir
+     *
+     * eg '/var/lib/schoolbox/vagrantx/storage/h/a/s/h/hash' => 'h/a/s/h/hash'
+     *
+     * @param string $filePathLocalAbsolute
+     * @return string
+     */
+    private function getRelativeLocalPath(string $filePathLocalAbsolute): string
+    {
+        return str_replace("{$this->storageDir}/", '', $filePathLocalAbsolute);
     }
 
 
@@ -435,7 +451,7 @@ class Migration extends CliTool\App
                 continue;
             }
             $this->getLogger()->info("Transcode file '$entry' found locally but not in S3, uploading...");
-            if ($this->moveFileToS3($transcodeFilePath, $transcodeFile)) {
+            if ($this->moveFileToS3($transcodeFilePath)) {
                 $this->countTranscodeFilesUploaded++;
             }
         }
