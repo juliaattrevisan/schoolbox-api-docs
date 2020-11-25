@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by JetBrains PhpStorm.
  * User: jleckie
@@ -141,5 +142,4 @@ class FormatTest extends TestCase
 
         self::assertSame($expected, Alaress_Byte_Format::stringToBytes($input));
     }
-
 }
