@@ -90,18 +90,21 @@ class Migration extends CliTool\App
      */
     private $filesInS3;
 
+    /** @var bool */
+    private $quiet;
+
 
     /** @inheritDoc */
     public function getShortOpts(): array
     {
-        return ['h', 'd'];
+        return ['h', 'd', 'q'];
     }
 
 
     /** @inheritDoc */
     public function getLongOpts(): array
     {
-        return ['help', 'delete'];
+        return ['help', 'delete', 'quiet'];
     }
 
     /** @var Filesystem */
@@ -121,6 +124,7 @@ class Migration extends CliTool\App
             $this->printHelp();
             exit(CliTool\Kernel::EXIT_STATUS_OK);
         }
+        $this->quiet           = $this->getOpt('q') || $this->getOpt('quiet');
         $this->deleteLocalCopy = $this->getOpt('d') || $this->getOpt('delete');
         $level                 = $this->deleteLocalCopy ? Logger::WARNING : Logger::NOTICE;
         $this->getLogger()->log($level, ($this->deleteLocalCopy ? 'Deleting' : 'Keeping') . ' local storage files');
@@ -199,7 +203,7 @@ class Migration extends CliTool\App
     {
         // Reset counts for logging
         $countFilesInS3        = $count = $this->countStorageFilesUploaded = $this->countTranscodeFilesUploaded = $this->countBytesUploaded = 0;
-        $storageBeforeTransfer = $this->getDirectorySize($this->storageDir);
+        $storageBeforeTransfer = $this->quiet ? null : $this->getDirectorySize($this->storageDir);
 
         // Retrieve and iterate all files referenced by `storage` table in database
         $this->getLogger()->notice("Fetching storage models from database, this may take a while on large datasets...");
@@ -215,34 +219,40 @@ class Migration extends CliTool\App
             }
         }
 
-        $remainingFiles = $this->getRemainingFiles();
+        $remainingFiles = $this->quiet ? [] : $this->getRemainingFiles();
         if ($this->deleteLocalCopy && !$this->perform()) {
             $storageAfterTransfer = 0;
             // Directories also take up storage space
             $directories = [];
-            foreach ($remainingFiles as $remainingFile) {
-                $storageAfterTransfer += filesize($remainingFile);
-                $directories          = $this->addFileDirectoryAncestors($directories, $remainingFile);
-            }
-            foreach ($directories as $directory => $_) {
-                $storageAfterTransfer += shell_exec("stat -c%s $directory");
+            if (!$this->quiet) {
+                foreach ($remainingFiles as $remainingFile) {
+                    $storageAfterTransfer += filesize($remainingFile);
+                    $directories          = $this->addFileDirectoryAncestors($directories, $remainingFile);
+                }
+                foreach ($directories as $directory => $_) {
+                    $storageAfterTransfer += shell_exec("stat -c%s $directory");
+                }
             }
         } else {
-            $storageAfterTransfer = $this->getDirectorySize($this->storageDir);
+            $storageAfterTransfer = $this->quiet ? null : $this->getDirectorySize($this->storageDir);
         }
         $this->getLogger()->notice(sprintf("Files in storage table:     %d", $countAll));
         $this->getLogger()->notice(sprintf("Files in s3 storage:        %d", count($this->filesInS3)));
         $this->getLogger()->notice(sprintf("Storage files uploaded:     %d", $this->countStorageFilesUploaded));
         $this->getLogger()->notice(sprintf("Transcode files uploaded:   %d", $this->countTranscodeFilesUploaded));
         $this->getLogger()->notice(sprintf("Data transferred:           %s", $this->byteFormat::bytesToString($this->countBytesUploaded)));
-        $this->getLogger()->notice(sprintf("Storage before transfer:    %s", $this->byteFormat::bytesToString($storageBeforeTransfer)));
-        $this->getLogger()->notice(sprintf("Storage after transfer:     %s", $this->byteFormat::bytesToString($storageAfterTransfer)));
+        if(!$this->quiet) {
+            $this->getLogger()->notice(sprintf("Storage before transfer:    %s", $this->byteFormat::bytesToString($storageBeforeTransfer)));
+            $this->getLogger()->notice(sprintf("Storage after transfer:     %s", $this->byteFormat::bytesToString($storageAfterTransfer)));
+        }
         $this->getLogger()->notice(sprintf("Storage files in S3:        %d", $countFilesInS3));
         $countNotInS3 = $countAll - $countFilesInS3;
         $this->getLogger()->log($countNotInS3 ? Logger::WARNING : Logger::NOTICE, sprintf("Storage files not in S3:    %d", $countNotInS3));
-        $this->getLogger()->log(count($remainingFiles) ? Logger::WARNING : Logger::NOTICE, sprintf("Files in local storage but not in S3: %d", count($remainingFiles)));
-        foreach ($remainingFiles as $remainingFile) {
-            $this->getLogger()->debug($remainingFile);
+        if(!$this->quiet) {
+            $this->getLogger()->log(count($remainingFiles) ? Logger::WARNING : Logger::NOTICE, sprintf("Files in local storage but not in S3: %d", count($remainingFiles)));
+            foreach ($remainingFiles as $remainingFile) {
+                $this->getLogger()->debug($remainingFile);
+            }
         }
     }
 
@@ -497,6 +507,8 @@ Options:
         Print help message and exit.
     -d, --delete
         If present, delete files from local storage
+    -q, --quiet
+        Don't derive or print file system usage (faster tool execution)
     -p, --perform
         Without this flag, tool will not persist files to S3 or delete from local storage
 ";
