@@ -1,18 +1,31 @@
 <script>
 
-import vSelect from "vue-select";
 import axios from "axios";
-import debounce from "lodash/debounce";
 
+// Vue-select boilerplate
+// TODO consider wrapping in our own component
+import vSelect from "vue-select";
+import debounce from "lodash/debounce";
 import "vue-select/dist/vue-select.css";
 
-/* Render custom template for Deselect icon/button
- * It's not well documented, but you can trawl through closed PRs to figger out how
- * https://github.com/sagalbot/vue-select/issues/994
- */
+// Render a custom template for the deselect icon.
+// Partially documented on https://github.com/sagalbot/vue-select/issues/994
 import Deselect from '@schoolbox/selectize/Deselect';
 vSelect.props.components.default = () => ({ Deselect });
 
+const EVENTS = {
+    cancel: 'cancel'
+};
+
+// There's no official method for documenting a component's events,
+// https://forum.vuejs.org/t/how-to-document-events-for-components/35541/3
+// suggests the @emits tag.
+
+/**
+ * Award badge form.
+ *
+ * @emits cancel The award badge action was cancelled
+ */
 export default {
     components: {vSelect},
     props: {
@@ -52,7 +65,7 @@ export default {
 
 
         onCancel() {
-            this.$emit('cancel');
+            this.$emit(EVENTS.cancel);
         }
     },
 }
