@@ -191,10 +191,11 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     {
         $timetableDef = [];
 
-        $timetableDefinition = $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
+        $dayCount = $this->externalDatabase->executeQuery('SELECT MAX(day) FROM Lessons')->fetchColumn();
 
         $periods = $this->externalDatabase->executeQuery(
-            'SELECT period, startTime, endTime FROM Lessons WHERE day = 1 GROUP BY period ORDER BY period'
+            'SELECT period, startTime, endTime FROM Lessons WHERE day = :day GROUP BY period ORDER BY period',
+            ['day' => $day > 0 ? $day : 1]
         )->fetchAll();
 
         foreach ($periods as $period) {
@@ -204,7 +205,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             $timetableDef['sequence'][] = $period['period'];
         }
 
-        $timetableDef['dayCount'] = $timetableDefinition['cycle_length'];
+        $timetableDef['dayCount'] = $dayCount;
 
         return $timetableDef;
     }
@@ -440,7 +441,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                 'periodStart'    => '',
                 'periodEnd'      => '',
                 'periodSequence' => '1',
-                'day'            => array_fill(1, $definition['cycle_length'], []),
+                'day'            => array_fill(1, $definition['dayCount'], []),
                 'class'          => [],
             ];
         }
