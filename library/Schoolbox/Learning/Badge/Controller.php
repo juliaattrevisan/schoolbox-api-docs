@@ -34,13 +34,21 @@ class Controller extends Base
 
 
     /**
+     * @var Award\Mapper
+     */
+    private Award\Mapper $awardMapper;
+
+
+    /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param Mapper       $mapper
+     * @param Award\Mapper $awardMapper
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, Award\Mapper $awardMapper)
     {
         $this->mapper = $mapper;
+        $this->awardMapper = $awardMapper;
     }
 
 
@@ -89,6 +97,26 @@ class Controller extends Base
                 'Badges'
             )
         );
+    }
+
+
+    /**
+     * Get a list of badges and their counts, awarded to $user
+     *
+     * @api GET /learning/badge/{userId}/awarded
+     *
+     * @param User $user
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DebugBar\DebugBarException
+     */
+    public function getAwardedBadges(User $user): array
+    {
+        $awards = $this->awardMapper->findRecentForUser($user);
+
+        new \Alaress_Probe($awards);
+
+        return [];
     }
 
 

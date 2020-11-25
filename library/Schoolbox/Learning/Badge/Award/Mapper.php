@@ -139,4 +139,28 @@ class Mapper extends \Schoolbox\Mapper
 
         return $collection;
     }
+
+
+    /**
+     * Find awarded badges in the last year (the most recent rolling 12 months)
+     *
+     * @param User $user
+     * @return GenericCollection
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    public function findRecentForUser(User $user): GenericCollection
+    {
+        $from = \Alaress_Date_Format::now()->addYears(-1);
+        $to = \Alaress_Date_Format::now();
+
+        $pb = $this->getPredicateBuilder()
+            ->equals('recipient_id', $user->getId())
+            ->betweenDates('awarded_at', $from, $to);
+
+        return $this->findByPredicates($pb, [
+            'order' => [
+                'awarded_at' => 'desc'
+            ]
+        ]);
+    }
 }
