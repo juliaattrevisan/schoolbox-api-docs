@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Badge;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Cursor\MapperCursor;
+use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Learning\Badge\Translator;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
@@ -248,6 +249,24 @@ class Controller extends Base
     }
 
 
+    public function awardBadge(Model $badge): void
+    {
+
+    }
+
+
+    public function setBadgeAsGoal(Model $badge): void
+    {
+
+    }
+
+
+    public function setBadgeAsGoalForSelf(Model $badge): void
+    {
+
+    }
+
+
     /**
      * Withdraw an Awarding of $badge to a specific set of users
      *
@@ -271,15 +290,21 @@ class Controller extends Base
     /**
      * Builder for the model-to-array translator for badges.
      *
-     * @return Translator\ModelToArray
+     * @return Composite
      */
-    private function buildModelToArrayTranslator(): Translator\ModelToArray
+    private function buildModelToArrayTranslator(): Composite
     {
-        // TODO add links translator
-        return new Translator\ModelToArray(
-            new User\Translator\ModelToArray(),
-            new Storage\Translator\ModelToArray(),
-            new ScrubAdapter()
+        return new Composite(
+            new Translator\ModelToArray(
+                new User\Translator\ModelToArray(),
+                new Storage\Translator\ModelToArray(),
+                new ScrubAdapter()
+            ),
+            new Translator\ModelToArray\Links(
+                $this->router,
+                $this->authorizer,
+                $this->getUser()
+            )
         );
     }
 }
