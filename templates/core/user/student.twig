@@ -457,23 +457,6 @@
 {# Tabs #}
 <div class="row">
     <div class="small-12 island">
-        <script>
-            $(function() {
-                switch (window.location.hash) {
-                    case '#activity':
-                    case '#achievements':
-                    case '#classes':
-                    case '#contacts':
-                        $('[data-tab] a[href='+window.location.hash+']').trigger('click');
-                        break;
-
-                    default:
-                        $('[data-tab] a[href=#activity]').trigger('click');
-                        break;
-                }
-            });
-        </script>
-
         <dl class="tabs" data-tab data-options="deep_linking:true">
             {% if showActivityFeed %}
             <dd class="active"><a href="#activity">Activity Feed</a></dd>
