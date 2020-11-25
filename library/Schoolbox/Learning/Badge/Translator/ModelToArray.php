@@ -138,6 +138,7 @@ class ModelToArray
                     })
                     ->reindex()
                 : null,
+
             // Tags don't exist yet, they will be added soon though
             'tags'            => null,
         ];

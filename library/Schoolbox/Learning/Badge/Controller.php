@@ -108,6 +108,10 @@ class Controller extends Base
      * @param User $user
      * @return void
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function getAwardedBadges(User $user): void
     {
@@ -132,6 +136,14 @@ class Controller extends Base
         foreach ($awards as $award) {
             $badgeId = $award->getBadge()->getId();
             $categoryId = $award->getBadge()->getCategory()->getId();
+
+            /* Some inline hydration due to curriculum nodes no longer being included
+             * as part of the hydrateSelect in badge mapper
+             */
+            $award->getBadge()->setCurriculumNodes($this->mapper->findCurriculumNodes($award->getBadge()));
+
+            /* Convert to array format
+             */
             $badge = $translator($award);
 
             /* Init stack

@@ -95,6 +95,42 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
+     * Find all the curriculum nodes that used to come with each Model instance
+     *
+     * @param Model $badge
+     * @return GenericCollection
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function findCurriculumNodes(Model $badge): GenericCollection
+    {
+        $curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
+
+        $query = "
+            SELECT {$curriculumNodeMapper->getColumnString('cn')}
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('curriculum_badge', '', 'cn')}
+            WHERE {$this->getTable()}.{$this->getIdentifierColumn()} = :badgeId
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'badgeId' => $badge->getId()
+        ]);
+
+        $nodes = $curriculumNodeMapper->createCollection();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $nodes->add($curriculumNodeMapper->hydrate($row, 'cn'));
+        }
+
+        return $nodes;
+    }
+
+
+    /**
      * Hydrate joins added in `getSelectString`.
      *
      * @param PDOStatement $statement
