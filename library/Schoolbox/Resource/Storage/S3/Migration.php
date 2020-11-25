@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\S3;
@@ -19,6 +21,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
+
 use function array_filter;
 use function array_key_exists;
 use function basename;
@@ -44,6 +47,7 @@ use function strlen;
 use function strpos;
 use function trim;
 use function unlink;
+
 use const DIRECTORY_SEPARATOR;
 
 /**
@@ -235,14 +239,14 @@ class Migration extends CliTool\App
         $this->getLogger()->notice(sprintf("Storage files uploaded:     %d", $this->countStorageFilesUploaded));
         $this->getLogger()->notice(sprintf("Transcode files uploaded:   %d", $this->countTranscodeFilesUploaded));
         $this->getLogger()->notice(sprintf("Data transferred:           %s", $this->byteFormat::bytesToString($this->countBytesUploaded)));
-        if(!$this->quiet) {
+        if (!$this->quiet) {
             $this->getLogger()->notice(sprintf("Storage before transfer:    %s", $this->byteFormat::bytesToString($storageBeforeTransfer)));
             $this->getLogger()->notice(sprintf("Storage after transfer:     %s", $this->byteFormat::bytesToString($storageAfterTransfer)));
         }
         $this->getLogger()->notice(sprintf("Storage files in S3:        %d", $countFilesInS3));
         $countNotInS3 = $countAll - $countFilesInS3;
         $this->getLogger()->log($countNotInS3 ? Logger::WARNING : Logger::NOTICE, sprintf("Storage files not in S3:    %d", $countNotInS3));
-        if(!$this->quiet) {
+        if (!$this->quiet) {
             $this->getLogger()->log(count($remainingFiles) ? Logger::WARNING : Logger::NOTICE, sprintf("Files in local storage but not in S3: %d", count($remainingFiles)));
             foreach ($remainingFiles as $remainingFile) {
                 $this->getLogger()->debug($remainingFile);
@@ -369,9 +373,9 @@ class Migration extends CliTool\App
 
         $relativeLocalPath = $this->getRelativeLocalPath($filepathLocalAbsolute);
         if ($this->perform()) {
-            try{
+            try {
                 $writeSucceeded = $this->fileSystemAwsS3->writeStream($relativeLocalPath, $fp);
-            } catch (InvalidArgumentException $e){
+            } catch (InvalidArgumentException $e) {
                 $this->getLogger()->error("Cannot write file to S3, skipping: '{$e->getMessage()}'");
                 return false;
             }
