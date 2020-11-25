@@ -210,6 +210,7 @@ EXAMPLES:
 
         // Build the list of students
         $userQuery = $userMapper->getPredicateBuilder()
+                                ->isTrue('enabled')
                                 ->in('lyl.name', $searchYearLevels);
         $studentId = $this->getOpt(self::OPT_LONG_STUDENT_ID);
         if (isset($studentId)) {
