@@ -26,14 +26,17 @@
             },
 
             /**
-             * Any options to add to the modal at time of open.
+             * Is the modal closed when the background is clicked?
+             *
+             * This corresponds to the modal's `close_on_background_click`
+             * setting.
              *
              * @see https://get.foundation/sites/docs-v5/components/reveal.html
              */
-            modalOptions: {
-                type: Object,
-                default: () => {},
-            }
+            closeOnBackgroundClick: {
+                type: Boolean,
+                default: true,
+            },
         },
         beforeCreate() {
 
@@ -70,7 +73,11 @@
              * Open this modal.
              */
             open() {
-                this.modal.foundation('reveal', 'open', this.modalOptions);
+                this.modal.foundation(
+                    'reveal',
+                    'open',
+                    {close_on_background_click: this.closeOnBackgroundClick}
+                );
             },
 
             /**
