@@ -333,12 +333,12 @@ class Controller extends Base
                 new User\Translator\ModelToArray(),
                 new Storage\Translator\ModelToArray(),
                 new ScrubAdapter()
-            )
+            ),
+            new Award\Translator\Links($this->router, $this->authorizer, $this->getUser())
         );
         $this->response->content->set(
             $this->buildJsonOutput($collection->map($translator))
         );
-
     }
 
 
