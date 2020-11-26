@@ -58,7 +58,8 @@ export default {
             axios
                 .get('/ajax/user.php', {
                     params: {
-                        query: query
+                        query: query,
+                        groupID: 0,
                     }
                 })
                 .then(response => this.options = response.data)
