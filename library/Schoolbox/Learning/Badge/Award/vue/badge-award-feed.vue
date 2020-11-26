@@ -150,7 +150,7 @@ export default {
                                     <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
                                 </nav>
                                 <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
-                                    <li><a href="#" class="icon-close" title="Withdraw">Withdraw</a></li>
+                                    <li><a :href="award._links.withdraw" class="icon-close" title="Withdraw">Withdraw</a></li>
                                 </ul>
                             </div>
                         </div>

@@ -44,15 +44,27 @@ class ModelToArray
 
 
     /**
+     * Translator for generating urls relevant to an Award
+     *
+     * (callable isn't a valid typedef)
+     *
+     * @var callable
+     */
+    private $linkTranslator;
+
+
+    /**
      * Constructor
      *
      * @param callable $userTranslator
      * @param callable $badgeTranslator
+     * @param callable $linkTranslator
      */
-    public function __construct(callable $userTranslator, callable $badgeTranslator)
+    public function __construct(callable $userTranslator, callable $badgeTranslator, callable $linkTranslator)
     {
         $this->userTranslator  = $userTranslator;
         $this->badgeTranslator = $badgeTranslator;
+        $this->linkTranslator  = $linkTranslator;
     }
 
 
@@ -91,6 +103,7 @@ class ModelToArray
             'awardedAt' => $model->getAwardedAt() && !$model->getAwardedAt()->isNull()
                 ? $model->getAwardedAt()->getUsingFormat(DATE_ATOM)
                 : null,
+            '_links' => call_user_func($this->linkTranslator, $model)
         ];
     }
 }
