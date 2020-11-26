@@ -13,11 +13,13 @@ use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\API\Translator\ModelToArray\Composite;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge\Translator;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
  * Controller for badge requests.
@@ -249,9 +251,47 @@ class Controller extends Base
     }
 
 
+    /**
+     * Award a badge to a set of users in the request body.
+     *
+     * Users to award to will be in the "users" key, and each user will be
+     * identified by the "id" key of each item in "users".
+     *
+     * @api   POST /learning/badge/{id}/award
+     * @since 20.2
+     *
+     * @param Model $badge
+     * @throws \Schoolbox\Mapper\Exception
+     */
     public function awardBadge(Model $badge): void
     {
+        // Users are in the data.
+        // So far: it's assumed all staff may award a badge to anyone.
+        $data       = json_decode($this->request->content->getRaw(), true);
+        $collection = $this->awardMapper->createCollection();
+        foreach ($data['users'] as $user) {
+            $award = $this->awardMapper->createModel()
+                ->setRecipient(UserMapper::getInstance()->findById($user['id']))
+                ->setBadge($badge)
+                ->setStatus(\Schoolbox\Learning\Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT)
+                ->setAwardedBy($this->getUser())
+                ->setAwardedAt(\Alaress_Date_Format::now());
+            $collection->add($award);
+        }
+        $this->awardMapper->save($collection);
 
+        // Return what was just created
+        $translator = new Award\Translator\ModelToArray(
+            new User\Translator\ModelToArray(),
+            new Translator\ModelToArray(
+                new User\Translator\ModelToArray(),
+                new Storage\Translator\ModelToArray(),
+                new ScrubAdapter()
+            )
+        );
+        $this->response->content->set(
+            $this->buildJsonOutput($collection->map($translator))
+        );
     }
 
 
