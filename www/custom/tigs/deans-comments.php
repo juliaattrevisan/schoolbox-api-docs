@@ -20,6 +20,7 @@ use Schoolbox\Application\Exception\AccessDenied;
 use Schoolbox\Application\Exception\NotAuthenticated;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\WebRequest;
+use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
 
@@ -62,6 +63,15 @@ function authenticateUser(array $session, IConfigLoader $config): void
     }
     if (!$user->isSuperuser()) {
         throw new AccessDenied();
+    }
+
+    # Turn on stack traces
+    if ($config instanceof Loader) {
+        $function = function () {
+            $this::$allConfigs['debug_mode']             = '1';
+            $this::$allConfigs['debug_show_stack_trace'] = '1';
+        };
+        $function->call($config);
     }
 
     if($config->get('site_location') !== 'tigs'){
