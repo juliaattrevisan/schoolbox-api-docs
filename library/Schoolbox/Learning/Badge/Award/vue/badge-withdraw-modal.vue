@@ -133,7 +133,7 @@ export default {
     <reveal-modal ref="modal">
         <template v-if="award.badge">
             <h2>Please confirm</h2>
-            <p>Are you sure you want to withdraw this achievement from {{ award.recipient.fullName }}?</p>
+            <p>Are you sure you want to withdraw <strong>{{ award.badge.name }}</strong> from {{ award.recipient.fullName }}?</p>
             <ul class="flex-list buttons">
                 <li><a @click.prevent="withdraw()" class="button submit">Yes</a></li>
                 <li><a @click.prevent="close()" class="button">No</a></li>
