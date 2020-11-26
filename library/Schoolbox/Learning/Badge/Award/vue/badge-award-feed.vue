@@ -4,6 +4,7 @@ import BadgeDetailModal from './badge-detail-modal';
 import foundationMixin from './foundation-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
+import BadgeWithdrawModal from "./badge-withdraw-modal";
 
 export default {
 
@@ -39,6 +40,7 @@ export default {
      * at the top of the file.
      */
     components: {
+        BadgeWithdrawModal,
         BadgeDetailModal,
         RelativeTime
     },
@@ -93,8 +95,19 @@ export default {
          *
          * @param award
          */
-        openModal(award) {
+        openDetailModal(award) {
             this.$refs.badgeDetailModal.open(award);
+        },
+
+        /**
+         * Open a confirmdialog for withdrawing a badge
+         *
+         * @param award
+         */
+        openWithdrawModal(award) {
+            // const url = award._links.withdraw;
+
+            this.$refs.badgeWithdrawModal.open(award);
         },
 
         /**
@@ -126,12 +139,12 @@ export default {
                     <div class="v-card-list">
                         <div class="v-card card wrap-down" v-for="award in category.awards">
                             <div class="card-feature-image">
-                                <a href="#" @click.prevent="openModal(award)">
+                                <a href="#" @click.prevent="openDetailModal(award)">
                                     <img :src="award.badge.image._links.image + '&size=constrain200'" :class="getCss(award)"/>
                                 </a>
                             </div>
                             <div class="card-content">
-                                <h3 class="no-margin"><a href="#" @click.prevent="openModal(award)">{{ award.badge.name }} ({{ award.count }})</a></h3>
+                                <h3 class="no-margin"><a href="#" @click.prevent="openDetailModal(award)">{{ award.badge.name }} ({{ award.count }})</a></h3>
                                 <p class="meta">
                                     <template v-if="award.isGoal">
                                         Goal set
@@ -150,7 +163,7 @@ export default {
                                     <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
                                 </nav>
                                 <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
-                                    <li><a :href="award._links.withdraw" class="icon-close" title="Withdraw">Withdraw</a></li>
+                                    <li><a @click.prevent="openWithdrawModal(award)" class="icon-close" title="Withdraw">Withdraw</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -168,5 +181,6 @@ export default {
         </template>
 
         <badge-detail-modal ref="badgeDetailModal"></badge-detail-modal>
+        <badge-withdraw-modal ref="badgeWithdrawModal"></badge-withdraw-modal>
     </div>
 </template>
