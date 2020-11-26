@@ -171,6 +171,9 @@ export default {
         -->
         <slot name="header" :badge="badge"></slot>
 
+        <img :src="badge.image._links.image" :alt="badge.name"/>
+        <h3>{{ badge.name }}</h3>
+
         <v-select class="schoolbox-vue-selectize"
                   :options="options"
                   :clear-search-on-blur="function() { return true; }"
