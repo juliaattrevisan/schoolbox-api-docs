@@ -107,7 +107,7 @@ export default {
 </script>
 <template>
     <div>
-        <h2>Awarding &lsquo;<i>{{ badge.name }}</i>&rsquo;</h2>
+        <h2>Awarding &lsquo;<i>{{ badge.name }}</i>&rsquo; as an Achievement</h2>
         <v-select class="schoolbox-vue-selectize"
                   :options="options"
                   :clear-search-on-blur="function() { return true; }"
@@ -116,7 +116,7 @@ export default {
                   multiple
                   @search="onSearch"
                   label="name"
-                  placeholder="Search for students to award"
+                  placeholder="Search for users to award achievement to"
                   v-model="selected">
             <template slot="option" slot-scope="option">
                 <span class="d-center">

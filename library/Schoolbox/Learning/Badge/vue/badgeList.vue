@@ -88,7 +88,7 @@ export default {
          *
          * @param {Object} badge
          */
-        openAwardModal(badge) {
+        openAwardAsAchievementModal(badge) {
             this.currentBadge = badge;
             this.$refs.awardModal.open();
         },
@@ -158,7 +158,7 @@ export default {
                                    aria-expanded="false" title="Actions"></a>
                             </nav>
                             <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                <li><a @click.prevent="openAwardModal(badge)" class="icon-add" title="Award">Award</a></li>
+                                <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-add" title="Award">Award as Achievement</a></li>
                                 <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-task" title="Set as Goal">Set as Goal</a></li>
                                 <li><a href="#" class="icon-minus" title="Award">Withdraw</a></li>
                                 <li><a href="#" class="icon-modify" title="Modify">Modify</a></li>
