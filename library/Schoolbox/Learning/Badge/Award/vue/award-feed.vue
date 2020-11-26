@@ -1,6 +1,8 @@
 <script>
 import axios from "axios";
-import BadgeDetailModal from './badge-detail-modal';
+import AwardDetailModal from './award-detail-modal';
+import AwardWithdrawModal from "./award-withdraw-modal";
+import foundationMixin from './foundation-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 
@@ -11,7 +13,7 @@ export default {
      * The name of the component that we have here. This name will be used in the container
      * to spawn this component.
      */
-    name: "badge-award-feed",
+    name: "award-feed",
 
     /**
      * Mixins.
@@ -20,6 +22,7 @@ export default {
      * be superpositioned on top of this javascript here, inside export default {}
      */
     mixins: [
+        foundationMixin,
         goalMixin
     ],
 
@@ -37,7 +40,8 @@ export default {
      * at the top of the file.
      */
     components: {
-        BadgeDetailModal,
+        AwardDetailModal,
+        AwardWithdrawModal,
         RelativeTime
     },
 
@@ -60,15 +64,7 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
-        let self = this;
-
-        /* Access the feed endpoint, grab the awards for the user
-         */
-        axios.get(this.config.routes.getAwardFeed, {})
-            .then(response => {
-                self.data = response.data;
-            })
-            .finally(() => this.loading = false);
+        this.updateAwards();
     },
 
     /**
@@ -91,8 +87,45 @@ export default {
          *
          * @param award
          */
-        openModal(award) {
-            this.$refs.badgeDetailModal.open(award);
+        openDetailModal(award) {
+            this.$refs.awardDetailModal.open(award);
+        },
+
+        /**
+         * Open a confirmdialog for withdrawing a badge
+         *
+         * @param award
+         */
+        openWithdrawModal(award) {
+            this.$refs.awardWithdrawModal.open(award);
+        },
+
+        /**
+         * Generate an identifier for tots
+         *
+         * @param award
+         * @returns {string}
+         */
+        generateIdentifier(award) {
+            return 'header-options-' + award.badge.category.id + '-' + award.badge.id;
+        },
+
+        /**
+         * Fetch the list of awards
+         */
+        updateAwards() {
+            let self = this;
+
+            /* Access the feed endpoint, grab the awards for the user
+             */
+            axios.get(this.config.routes.getAwardFeed, {})
+                .then(response => {
+                    self.data = [];
+                    self.$nextTick(() => {
+                        self.data = response.data;
+                    });
+                })
+                .finally(() => this.loading = false);
         }
     }
 }
@@ -114,12 +147,12 @@ export default {
                     <div class="v-card-list">
                         <div class="v-card card wrap-down" v-for="award in category.awards">
                             <div class="card-feature-image">
-                                <a href="#" @click.prevent="openModal(award)">
+                                <a href="#" @click.prevent="openDetailModal(award)">
                                     <img :src="award.badge.image._links.image + '&size=constrain200'" :class="getCss(award)"/>
                                 </a>
                             </div>
                             <div class="card-content">
-                                <h3 class="no-margin"><a href="#" @click.prevent="openModal(award)">{{ award.badge.name }} ({{ award.count }})</a></h3>
+                                <h3 class="no-margin"><a href="#" @click.prevent="openDetailModal(award)">{{ award.badge.name }} ({{ award.count }})</a></h3>
                                 <p class="meta">
                                     <template v-if="award.isGoal">
                                         Goal set
@@ -130,6 +163,18 @@ export default {
 
                                     <relative-time :datetime="award.awardedAt"></relative-time>
                                 </p>
+                            </div>
+                            <div class="card-actions">
+                                <div class="card-spacer"></div>
+
+                                <template v-if="!award.isGoal">
+                                    <nav>
+                                        <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
+                                    </nav>
+                                    <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
+                                        <li><a @click.prevent="openWithdrawModal(award)" class="icon-close" title="Withdraw">Withdraw</a></li>
+                                    </ul>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -145,11 +190,7 @@ export default {
             </div>
         </template>
 
-        <badge-detail-modal ref="badgeDetailModal"></badge-detail-modal>
+        <award-detail-modal ref="awardDetailModal"></award-detail-modal>
+        <award-withdraw-modal ref="awardWithdrawModal" v-on:withdraw-complete="updateAwards()"></award-withdraw-modal>
     </div>
 </template>
-
-
-
-
-

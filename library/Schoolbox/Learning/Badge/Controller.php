@@ -127,8 +127,9 @@ class Controller extends Base
             new Translator\ModelToArray(
                 new User\Translator\ModelToArray(),
                 new Storage\Translator\ModelToArray(),
-                new ScrubAdapter()
-            )
+                new ScrubAdapter(),
+            ),
+            new Award\Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
         );
 
         /* Group by category
@@ -244,6 +245,26 @@ class Controller extends Base
                 $this->buildModelToArrayTranslator()($model)
             )
         );
+    }
+
+
+    /**
+     * Withdraw an Awarding of $badge to a specific set of users
+     *
+     * @param Model $badge
+     * @throws \PDOException
+     */
+    public function postWithdraw(Model $badge): void
+    {
+        $userIds = $this->getRequest()->post['userIds'] ?? [];
+
+        /* Empty user list; nothing to do
+         */
+        if (!\count($userIds)) {
+            return;
+        }
+
+        $this->awardMapper->deleteMostRecentlyAwarded($userIds, $badge);
     }
 
 

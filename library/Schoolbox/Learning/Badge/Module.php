@@ -67,6 +67,14 @@ class Module extends BaseModule
         );
 
         $this->register(
+            self::METHOD_POST,
+            '/{badgeId}/withdraw',
+            'postWithdraw',
+            $baseRule,
+            Closure::fromCallable([$this, 'preloadBadge']),
+        );
+
+        $this->register(
             self::METHOD_GET,
             '/create',
             'getCreateForm',
@@ -94,6 +102,25 @@ class Module extends BaseModule
             'user' => $this->getMapperFactory()
                            ->get(UserMapper::class)
                            ->findById($params['userId']),
+        ];
+    }
+
+
+    /**
+     * Preload the requested badge
+     *
+     * @param array $params
+     * @return array
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    private function preloadBadge(array $params): array
+    {
+        return [
+            'badge' => $this->getMapperFactory()
+                ->get(Mapper::class)
+                ->findById($params['badgeId']),
         ];
     }
 
