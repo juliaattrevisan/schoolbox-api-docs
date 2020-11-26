@@ -64,15 +64,7 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
-        let self = this;
-
-        /* Access the feed endpoint, grab the awards for the user
-         */
-        axios.get(this.config.routes.getAwardFeed, {})
-            .then(response => {
-                self.data = response.data;
-            })
-            .finally(() => this.loading = false);
+        this.updateAwards();
     },
 
     /**
@@ -118,6 +110,22 @@ export default {
          */
         generateIdentifier(award) {
             return 'header-options-' + award.badge.category.id + '-' + award.badge.id;
+        },
+
+
+        /**
+         * Fetch the list of awards
+         */
+        updateAwards() {
+            let self = this;
+
+            /* Access the feed endpoint, grab the awards for the user
+             */
+            axios.get(this.config.routes.getAwardFeed, {})
+                .then(response => {
+                    self.data = response.data;
+                })
+                .finally(() => this.loading = false);
         }
     }
 }
@@ -183,6 +191,6 @@ export default {
         </template>
 
         <badge-detail-modal ref="badgeDetailModal"></badge-detail-modal>
-        <badge-withdraw-modal ref="badgeWithdrawModal"></badge-withdraw-modal>
+        <badge-withdraw-modal ref="badgeWithdrawModal" v-on:withdraw-complete="updateAwards()"></badge-withdraw-modal>
     </div>
 </template>

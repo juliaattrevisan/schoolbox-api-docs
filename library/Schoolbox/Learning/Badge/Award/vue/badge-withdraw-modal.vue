@@ -104,9 +104,10 @@ export default {
                 method: 'post',
                 responseType: 'json'
             }
+
             axios.request(request)
                 .then(response => {
-                    self.data = response.data;
+                    this.$emit('withdraw-complete');
                 });
         }
     }
