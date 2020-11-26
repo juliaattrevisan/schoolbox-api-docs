@@ -38,7 +38,7 @@ export default {
     props: {
         badge: {
             type: Object,
-            default: {},
+            default: null,
         },
     },
     data() {
@@ -107,7 +107,9 @@ export default {
 </script>
 <template>
     <div>
-        <h2>Awarding &lsquo;<i>{{ badge.name }}</i>&rsquo; as an Achievement</h2>
+
+        <slot name="header" v-bind:badge="badge"></slot>
+
         <v-select class="schoolbox-vue-selectize"
                   :options="options"
                   :clear-search-on-blur="function() { return true; }"
@@ -130,7 +132,11 @@ export default {
             </template>
         </v-select>
         <ul class="flex-list buttons">
-            <li><button @click.prevent="onSubmit" class="submit" :disabled="selected.length === 0">Award</button></li>
+            <li>
+                <button @click.prevent="onSubmit" class="submit" :disabled="selected.length === 0">
+                    Award Achievement
+                </button>
+            </li>
             <li><button @click.prevent="onCancel">Cancel</button></li>
         </ul>
 

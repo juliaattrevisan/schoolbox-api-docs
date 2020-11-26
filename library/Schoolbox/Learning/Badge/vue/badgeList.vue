@@ -20,7 +20,7 @@ export default {
     },
     data() {
         return {
-            currentBadge: {},
+            currentBadge: null,
             data: [],
             search: {},
             metadata: {
@@ -176,15 +176,23 @@ export default {
         </section>
 
         <reveal-modal ref="detailModal">
-            <badge-detail :badge="currentBadge"></badge-detail>
+            <badge-detail :badge="currentBadge" v-if="currentBadge"></badge-detail>
         </reveal-modal>
 
         <reveal-modal ref="awardModal">
-            <badge-award :badge="currentBadge" @cancel="closeAwardModal" @done="closeAwardModal"></badge-award>
+            <badge-award :badge="currentBadge" @cancel="closeAwardModal" @done="closeAwardModal" v-if="currentBadge">
+                <template v-slot:header>
+                    <h2>Awarding &lsquo;<i>{{ currentBadge.name }}</i>&rsquo; as an Achievement</h2>
+                </template>
+            </badge-award>
         </reveal-modal>
 
         <reveal-modal ref="setAsGoalModal">
-            <h2>Setting &lsquo;<i>{{ currentBadge.name }}</i>&rsquo; as a Goal</h2>
+            <badge-award :badge="currentBadge" @cancel="closeAwardModal" @done="closeAwardModal" v-if="currentBadge">
+                <template v-slot:header>
+                    <h2>Setting &lsquo;<i>{{ currentBadge.name }}</i>&rsquo; as a Goal</h2>
+                </template>
+            </badge-award>
         </reveal-modal>
 
         <toast ref="toast"></toast>
