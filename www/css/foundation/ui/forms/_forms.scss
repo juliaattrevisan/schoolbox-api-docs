@@ -511,32 +511,34 @@ input[type=checkbox].plain {
 .checklist.checklist-container {
 	padding: 0;
 	max-height: 13rem;
-	border: $fieldset-border-width $fieldset-border-style $fieldset-border-color;
+	border: $fieldset-border-width $fieldset-border-style $input-border-color;
 
 	input[type=checkbox]:not(.plain):not(:disabled) {
 		border: none;
 
 		&:checked + label {
-			background: $smoke;
+			background: $content-ui-background;
+            &:hover {
+                background: css-lighten($content-ui-background,3%);
+            }
 		}
 
 		+ label {
-			border-bottom: 1px solid $smoke;
+			border-bottom: 1px solid $input-border-color;
 			margin: 0;
 			padding: .5rem 0 .5rem 2rem;
 
 			&:after,
 			&:before {
-				padding: .5rem 0 .5rem 0;
+				padding: .5rem 0 .5rem .5rem;
 				background-color: transparent;
 			}
 
 			&:hover {
-				background: $snow;
+				background: $content-ui-background;
 
 				&:after,
 				&:before {
-					padding: .5rem 0 .5rem 0;
 					background-color: transparent;
 				}
 			}
