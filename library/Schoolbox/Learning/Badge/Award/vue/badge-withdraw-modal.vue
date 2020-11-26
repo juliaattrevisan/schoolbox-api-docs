@@ -107,7 +107,14 @@ export default {
 
             axios.request(request)
                 .then(response => {
+
+                    /* Send bat signal to the parent component
+                     */
                     this.$emit('withdraw-complete');
+
+                    /* Close this modal
+                     */
+                    self.close();
                 });
         }
     }

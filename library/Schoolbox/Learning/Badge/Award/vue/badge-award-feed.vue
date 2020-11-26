@@ -123,7 +123,10 @@ export default {
              */
             axios.get(this.config.routes.getAwardFeed, {})
                 .then(response => {
-                    self.data = response.data;
+                    self.data = [];
+                    self.$nextTick(() => {
+                        self.data = response.data;
+                    });
                 })
                 .finally(() => this.loading = false);
         }
