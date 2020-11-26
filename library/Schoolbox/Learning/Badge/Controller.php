@@ -248,6 +248,26 @@ class Controller extends Base
 
 
     /**
+     * Withdraw an Awarding of $badge to a specific set of users
+     *
+     * @param Model $badge
+     * @throws \PDOException
+     */
+    public function postWithdraw(Model $badge): void
+    {
+        $userIds = $this->getRequest()->post['userIds'] ?? [];
+
+        /* Empty user list; nothing to do
+         */
+        if (!\count($userIds)) {
+            return;
+        }
+
+        $this->awardMapper->deleteMostRecentlyAwarded($userIds, $badge);
+    }
+
+
+    /**
      * Builder for the model-to-array translator for badges.
      *
      * @return Translator\ModelToArray
