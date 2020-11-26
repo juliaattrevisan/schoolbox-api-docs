@@ -32,7 +32,7 @@
              */
             modalOptions: {
                 type: Object,
-                default: {},
+                default: () => {},
             }
         },
         beforeCreate() {
