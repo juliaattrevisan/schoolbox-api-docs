@@ -64,6 +64,31 @@ export default {
             type: String,
             default: 'Search for users to award achievement to',
         },
+
+        /**
+         * Toast activation message
+         */
+        toastActivateMessage: {
+            type: String,
+            default: 'Awarding achievement...',
+        },
+
+
+        /**
+         * Toast success message
+         */
+        toastSuccessMessage: {
+            type: String,
+            default: 'Awarded achievement',
+        },
+
+        /**
+         * Toast failure message
+         */
+        toastFailureMessage: {
+            type: String,
+            default: 'Awarding achievement failed',
+        },
     },
     data() {
         return {
@@ -107,17 +132,23 @@ export default {
          *             achievement or a goal)
          */
         onSubmit() {
-            this.$refs.toast.activate('Awarding...');
+            this.$refs.toast.activate(this.toastActivateMessage);
             axios.post(this.endpoint, {users: this.selected})
                 .then(() => {
                     // Clear the select, so they don't show next time this opens
                     this.selected = [];
-                    this.$emit(EVENTS.done);
-                    // This timeout ought to wait a little longer,
-                    // as it's saving something
-                    this.$refs.toast.timeout('Awarded', true, 5000);
+
+                    // The toast's lifetime is tied to this modal's lifetime.
+                    // Wait until the toast times out to raise the done event.
+                    this.$refs.toast.timeout(
+                        this.toastSuccessMessage,
+                        true,
+                        Toast.DEFAULT_DISPLAY_DURATION_SUCCESSFUL,
+                        Toast.DEFAULT_FADE_DURATION,
+                        () => this.$emit(EVENTS.done)
+                    );
                 })
-                .catch(() => this.$refs.toast.timeout('Award failed', false))
+                .catch(() => this.$refs.toast.timeout(this.toastFailureMessage, false))
         },
 
 

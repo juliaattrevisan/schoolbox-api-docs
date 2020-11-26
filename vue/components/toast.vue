@@ -44,8 +44,10 @@
              *                     a success? Change the style if it wasn't.
              * @param duration     How long should the toast show?
              * @param fadeDuration How long to wait before the toast disappears?
+             * @param {Function|null} timeoutCallback If callable, call this
+             *                        when the toast times out
              */
-            timeout(text, successful, duration, fadeDuration) {
+            timeout(text, successful, duration, fadeDuration, timeoutCallback) {
                 let self   = this;
                 this.text  = text;
                 this.state = successful ? STATE_DONE : STATE_FAILED;
@@ -61,6 +63,9 @@
                     function () {
                         self.state  = STATE_HIDDEN;
                         self.hidden = true;
+                        if (timeoutCallback instanceof Function) {
+                            timeoutCallback();
+                        }
                     },
                     duration
                 )

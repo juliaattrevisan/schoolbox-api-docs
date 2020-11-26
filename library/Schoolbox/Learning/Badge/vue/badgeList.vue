@@ -203,7 +203,11 @@ export default {
                          :endpoint="currentBadge._links.awardAsAchievement"
                          @cancel="closeAwardAsAchievementModal"
                          @done="closeAwardAsAchievementModal"
-                         placeholder="Search for users to award achievement to">
+                         placeholder="Search for users to award achievement to"
+                         toast-activate-message="Awarding achievement..."
+                         toast-success-message="Awarded achievement"
+                         toast-failure-message="Awarding achievement failed"
+            >
                 <template v-slot:header="slotProps">
                     <h2>Awarding &lsquo;<i>{{ slotProps.badge.name }}</i>&rsquo; as an Achievement</h2>
                 </template>
@@ -219,7 +223,11 @@ export default {
                          :endpoint="currentBadge._links.setAsGoal"
                          @cancel="closeSetAsGoalModal"
                          @done="closeSetAsGoalModal"
-                         placeholder="Search for users to set a goal for">
+                         placeholder="Search for users to set a goal for"
+                         toast-activate-message="Setting goal..."
+                         toast-success-message="Goal set"
+                         toast-failure-message="Setting goal failed"
+            >
                 <template v-slot:header="slotProps">
                     <h2>Setting &lsquo;<i>{{ slotProps.badge.name }}</i>&rsquo; as a Goal</h2>
                 </template>
