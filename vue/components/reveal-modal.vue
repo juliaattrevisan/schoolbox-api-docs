@@ -1,5 +1,6 @@
 <template>
     <div :class="'reveal-modal ' + size" data-reveal aria-hidden="true" role="dialog" :id="elementId">
+        <!-- @slot Reveal modal content goes into this slot -->
         <slot></slot>
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
@@ -13,11 +14,22 @@
     export default {
         name: "reveal-modal",
         props: {
+            /**
+             * The size of the modal to display.
+             *
+             * This is added as a class to the modal.
+             */
             size: {
                 type: String,
                 default: 'small',
                 validator: (value) => VALID_SIZES.indexOf(value) !== -1
             },
+
+            /**
+             * Any options to add to the modal at time of open.
+             *
+             * @see https://get.foundation/sites/docs-v5/components/reveal.html
+             */
             modalOptions: {
                 type: Object,
                 default: {},

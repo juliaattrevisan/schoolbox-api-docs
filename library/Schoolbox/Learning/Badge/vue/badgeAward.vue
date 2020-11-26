@@ -36,15 +36,30 @@ const SEARCH_RESULT_RETRIEVE_DELAY = 350;
 export default {
     components: {Toast, vSelect},
     props: {
+        /**
+         * The badge to display in this detail panel.
+         */
         badge: {
             type: Object,
             default: null,
         },
+
+        /**
+         * The endpoint to post the badge award request to.
+         *
+         * It is expected that this will be either the badge's
+         * "awardAsAchievement" or "setAsGoal" links.
+         */
         endpoint: {
             type: String,
             default: null,
             required: true,
         },
+
+        /**
+         * Placeholder text to display in the form's v-select input, before any
+         * users are selected.
+         */
         placeholder: {
             type: String,
             default: 'Search for users to award achievement to',
@@ -116,7 +131,7 @@ export default {
 </script>
 <template>
     <div>
-
+        <!-- @slot The header for this badge award form -->
         <slot name="header" v-bind:badge="badge"></slot>
 
         <v-select class="schoolbox-vue-selectize"
@@ -143,6 +158,7 @@ export default {
         <ul class="flex-list buttons">
             <li>
                 <button @click.prevent="onSubmit" class="submit" :disabled="selected.length === 0">
+                    <!-- @slot The text for this badge award form's confirm button -->
                     <slot name="confirmButton">
                         Award Achievement
                     </slot>

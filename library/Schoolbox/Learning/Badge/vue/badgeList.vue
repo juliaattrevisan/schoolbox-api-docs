@@ -9,10 +9,19 @@ import BadgeAward from "./badgeAward";
 export default {
     components: {BadgeAward, BadgeDetail, RevealModal, Toast},
     props: {
+        /**
+         * The route via which badges are retrieved.
+         */
         getBadgesRoute: {
             type: String,
             default: '',
         },
+
+        /**
+         * The route via which new badges are posted.
+         *
+         * TODO remove as this seems unused
+         */
         postBadgeRoute: {
             type: String,
             default: '',
