@@ -258,7 +258,7 @@ class Controller extends Base
      *
      * TODO consider moving to award controller?
      *
-     * @api   POST /learning/badge/{id}/achievement
+     * @api   POST /learning/badge/{badgeId}/achievement
      * @since 20.2
      *
      * @param Model $badge The badge to award as an achievement.
@@ -278,7 +278,7 @@ class Controller extends Base
      *
      * TODO consider moving to award controller?
      *
-     * @api   POST /learning/badge/{id}/goal
+     * @api   POST /learning/badge/{badgeId}/goal
      * @since 20.2
      *
      * @param Model $badge The badge to set as a goal.
@@ -350,7 +350,7 @@ class Controller extends Base
      *
      * TODO consider moving to award controller?
      *
-     * @api   POST /learning/badge/{id}/achievement
+     * @api   POST /learning/badge/{badgeId}/achievement
      * @since 20.2
      *
      * @param Model $badge
