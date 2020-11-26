@@ -98,28 +98,31 @@ export default {
 
 
         /**
-         * Callback for when the award form is submitted.
+         * Callback for when the badge award form is submitted.
          *
-         * Posts to the badge's award link, then triggers this component's
+         * Posts to the `endpoint` property, then triggers this component's
          * "done" event.
          *
-         * @emits done if the badge was successfully awarded
+         * @emits done if the badge was successfully awarded (whether as an
+         *             achievement or a goal)
          */
         onSubmit() {
             this.$refs.toast.activate('Awarding...');
             axios.post(this.endpoint, {users: this.selected})
                 .then(() => {
-                    // Clear the user list, so they don't show in the next badge award
+                    // Clear the select, so they don't show next time this opens
                     this.selected = [];
                     this.$emit(EVENTS.done);
-                    this.$refs.toast.timeout('Awarded', true);
+                    // This timeout ought to wait a little longer,
+                    // as it's saving something
+                    this.$refs.toast.timeout('Awarded', true, 5000);
                 })
                 .catch(() => this.$refs.toast.timeout('Award failed', false))
         },
 
 
         /**
-         * Callback for when the award form is cancelled.
+         * Callback for when the badge award form is cancelled.
          *
          * @emits cancel
          */
