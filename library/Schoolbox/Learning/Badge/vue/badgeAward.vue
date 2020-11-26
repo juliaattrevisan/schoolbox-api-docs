@@ -131,8 +131,11 @@ export default {
 </script>
 <template>
     <div>
-        <!-- @slot The header for this badge award form -->
-        <slot name="header" v-bind:badge="badge"></slot>
+        <!--
+        @slot The header for this badge award form
+        @binding {Object} badge The badge that is being shown in this component
+        -->
+        <slot name="header" :badge="badge"></slot>
 
         <v-select class="schoolbox-vue-selectize"
                   :options="options"

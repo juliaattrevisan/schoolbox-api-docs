@@ -204,8 +204,8 @@ export default {
                          @cancel="closeAwardAsAchievementModal"
                          @done="closeAwardAsAchievementModal"
                          placeholder="Search for users to award achievement to">
-                <template v-slot:header>
-                    <h2>Awarding &lsquo;<i>{{ currentBadge.name }}</i>&rsquo; as an Achievement</h2>
+                <template v-slot:header="slotProps">
+                    <h2>Awarding &lsquo;<i>{{ slotProps.badge.name }}</i>&rsquo; as an Achievement</h2>
                 </template>
                 <template v-slot:confirmButton>
                     Award Achievement
@@ -220,8 +220,8 @@ export default {
                          @cancel="closeSetAsGoalModal"
                          @done="closeSetAsGoalModal"
                          placeholder="Search for users to set a goal for">
-                <template v-slot:header>
-                    <h2>Setting &lsquo;<i>{{ currentBadge.name }}</i>&rsquo; as a Goal</h2>
+                <template v-slot:header="slotProps">
+                    <h2>Setting &lsquo;<i>{{ slotProps.badge.name }}</i>&rsquo; as a Goal</h2>
                 </template>
                 <template v-slot:confirmButton>
                     Set Goal
