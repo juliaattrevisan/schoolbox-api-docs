@@ -40,6 +40,11 @@ export default {
             type: Object,
             default: null,
         },
+        endpoint: {
+            type: String,
+            default: null,
+            required: true,
+        },
         placeholder: {
             type: String,
             default: 'Search for users to award achievement to',
@@ -87,7 +92,7 @@ export default {
          */
         onSubmit() {
             this.$refs.toast.activate('Awarding...');
-            axios.post(this.badge._links.awardAsAchievement, {users: this.selected})
+            axios.post(this.endpoint, {users: this.selected})
                 .then(() => {
                     // Clear the user list, so they don't show in the next badge award
                     this.selected = [];

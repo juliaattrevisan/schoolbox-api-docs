@@ -90,14 +90,14 @@ export default {
          */
         openAwardAsAchievementModal(badge) {
             this.currentBadge = badge;
-            this.$refs.awardModal.open();
+            this.$refs.awardAsAchievementModal.open();
         },
 
         /**
          * Closes the modal window for the award form.
          */
-        closeAwardModal() {
-            this.$refs.awardModal.close();
+        closeAwardAsAchievementModal() {
+            this.$refs.awardAsAchievementModal.close();
         },
 
         /**
@@ -108,6 +108,15 @@ export default {
         openSetAsGoalModal(badge) {
             this.currentBadge = badge;
             this.$refs.setAsGoalModal.open();
+        },
+
+        /**
+         * Closes the modal window for the set as goal form.
+         *
+         * @param {Object} badge
+         */
+        closeSetAsGoalModal(badge) {
+            this.$refs.setAsGoalModal.close();
         },
     },
 }
@@ -179,11 +188,12 @@ export default {
             <badge-detail :badge="currentBadge" v-if="currentBadge"></badge-detail>
         </reveal-modal>
 
-        <reveal-modal ref="awardModal">
+        <reveal-modal ref="awardAsAchievementModal">
             <badge-award v-if="currentBadge"
                          :badge="currentBadge"
-                         @cancel="closeAwardModal"
-                         @done="closeAwardModal"
+                         :endpoint="currentBadge._links.awardAsAchievement"
+                         @cancel="closeAwardAsAchievementModal"
+                         @done="closeAwardAsAchievementModal"
                          placeholder="Search for users to award achievement to">
                 <template v-slot:header>
                     <h2>Awarding &lsquo;<i>{{ currentBadge.name }}</i>&rsquo; as an Achievement</h2>
@@ -197,8 +207,9 @@ export default {
         <reveal-modal ref="setAsGoalModal">
             <badge-award v-if="currentBadge"
                          :badge="currentBadge"
-                         @cancel="closeAwardModal"
-                         @done="closeAwardModal"
+                         :endpoint="currentBadge._links.setAsGoal"
+                         @cancel="closeSetAsGoalModal"
+                         @done="closeSetAsGoalModal"
                          placeholder="Search for users to set a goal for">
                 <template v-slot:header>
                     <h2>Setting &lsquo;<i>{{ currentBadge.name }}</i>&rsquo; as a Goal</h2>
