@@ -1,6 +1,7 @@
 <script>
 import axios from "axios";
 import BadgeDetailModal from './badge-detail-modal';
+import foundationMixin from './foundation-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 
@@ -20,6 +21,7 @@ export default {
      * be superpositioned on top of this javascript here, inside export default {}
      */
     mixins: [
+        foundationMixin,
         goalMixin
     ],
 
@@ -93,6 +95,16 @@ export default {
          */
         openModal(award) {
             this.$refs.badgeDetailModal.open(award);
+        },
+
+        /**
+         * Generate an identifier for tots
+         *
+         * @param award
+         * @returns {string}
+         */
+        generateIdentifier(award) {
+            return 'header-options-' + award.badge.category.id + '-' + award.badge.id;
         }
     }
 }
@@ -131,6 +143,16 @@ export default {
                                     <relative-time :datetime="award.awardedAt"></relative-time>
                                 </p>
                             </div>
+                            <div class="card-actions">
+                                <div class="card-spacer"></div>
+
+                                <nav>
+                                    <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
+                                </nav>
+                                <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
+                                    <li><a href="#" class="icon-close" title="Withdraw">Withdraw</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -148,8 +170,3 @@ export default {
         <badge-detail-modal ref="badgeDetailModal"></badge-detail-modal>
     </div>
 </template>
-
-
-
-
-
