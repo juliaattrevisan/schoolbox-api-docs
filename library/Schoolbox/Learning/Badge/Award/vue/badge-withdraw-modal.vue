@@ -1,5 +1,7 @@
 <script>
 import RevealModal from '@schoolbox/reveal-modal'
+import axios from "axios";
+import qs from 'qs';
 
 export default {
 
@@ -92,7 +94,20 @@ export default {
          * Perform withdrawl
          */
         withdraw() {
-            console.log(this.award._links.withdraw);
+            let self = this;
+
+            /* Access the withdraw endpoint, grab the awards for the user
+             */
+            let request = {
+                url: this.award._links.withdraw,
+                data: qs.stringify({userIds: [this.award.recipient.id]}),
+                method: 'post',
+                responseType: 'json'
+            }
+            axios.request(request)
+                .then(response => {
+                    self.data = response.data;
+                });
         }
     }
 }
