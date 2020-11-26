@@ -1,7 +1,8 @@
 <script>
-import RevealModal from '@schoolbox/reveal-modal'
 import axios from "axios";
+import RevealModal from '@schoolbox/reveal-modal'
 import qs from 'qs';
+import Toast from "@schoolbox/toast";
 
 export default {
 
@@ -35,7 +36,8 @@ export default {
      * at the top of the file.
      */
     components: {
-        RevealModal
+        RevealModal,
+        Toast
     },
 
     /**
@@ -105,6 +107,8 @@ export default {
                 responseType: 'json'
             }
 
+            self.$refs.toast.activate('Loading...');
+
             axios.request(request)
                 .then(response => {
 
@@ -115,7 +119,12 @@ export default {
                     /* Close this modal
                      */
                     self.close();
-                });
+
+                    /* Pop toast
+                     */
+                    this.$refs.toast.timeout('Withdraw complete', true);
+                })
+                .catch(() => this.$refs.toast.timeout('Withdraw failed', false))
         }
     }
 }
@@ -130,5 +139,6 @@ export default {
                 <li><a @click.prevent="close()" class="button">No</a></li>
             </ul>
         </template>
+        <toast ref="toast"></toast>
     </reveal-modal>
 </template>
