@@ -19,6 +19,10 @@ const EVENTS = {
     cancel: 'cancel'
 };
 
+// The number of milliseconds to wait between the user's input and a search for
+// users.
+const SEARCH_RESULT_RETRIEVE_DELAY = 350;
+
 // There's no official method for documenting a component's events,
 // https://forum.vuejs.org/t/how-to-document-events-for-components/35541/3
 // suggests the @emits tag.
@@ -48,6 +52,8 @@ export default {
          * Search callback for the selectize.
          *
          * This method is debounced so that the search doesn't trigger until
+         * the user has stopped typing for `SEARCH_RESULT_RETRIEVE_DELAY`
+         * milliseconds.
          *
          * @param {String}   query   The search string
          * @param {Function} loading A function to call when the loading state
@@ -64,7 +70,7 @@ export default {
                 })
                 .then(response => this.options = response.data)
                 .finally(() => loading(false))
-        }, 350),
+        }, SEARCH_RESULT_RETRIEVE_DELAY),
 
         onSubmit() {
             // Craft a POST request with a bunch of users
