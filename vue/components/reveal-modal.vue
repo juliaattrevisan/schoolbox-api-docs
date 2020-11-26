@@ -18,6 +18,10 @@
                 default: 'small',
                 validator: (value) => VALID_SIZES.indexOf(value) !== -1
             },
+            modalOptions: {
+                type: Object,
+                default: {},
+            }
         },
         beforeCreate() {
 
@@ -54,7 +58,7 @@
              * Open this modal.
              */
             open() {
-                this.modal.foundation('reveal', 'open');
+                this.modal.foundation('reveal', 'open', this.modalOptions);
             },
 
             /**
