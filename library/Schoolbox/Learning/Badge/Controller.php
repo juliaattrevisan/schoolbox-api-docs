@@ -256,15 +256,17 @@ class Controller extends Base
     /**
      * Award a badge as an achievement for a set of users in the request body.
      *
-     * @api   POST /learning/badge/{id}/award
+     * TODO consider moving to award controller?
+     *
+     * @api   POST /learning/badge/{id}/achievement
      * @since 20.2
      *
      * @param Model $badge The badge to award as an achievement.
      * @throws MapperException
      */
-    public function awardBadge(Model $badge): void
+    public function awardAsAchievement(Model $badge): void
     {
-        $this->createBadgeAwardsFromRequestBody(
+        $this->createAwardsFromRequestBody(
             $badge,
             AwardModel::AWARD_STATUS_ACHIEVEMENT
         );
@@ -274,15 +276,17 @@ class Controller extends Base
     /**
      * Set a badge as a goal for a set of users in the request body.
      *
+     * TODO consider moving to award controller?
+     *
      * @api   POST /learning/badge/{id}/goal
      * @since 20.2
      *
      * @param Model $badge The badge to set as a goal.
      * @throws MapperException
      */
-    public function setBadgeAsGoal(Model $badge): void
+    public function setAsGoal(Model $badge): void
     {
-        $this->createBadgeAwardsFromRequestBody(
+        $this->createAwardsFromRequestBody(
             $badge,
             AwardModel::AWARD_STATUS_GOAL
         );
@@ -303,7 +307,7 @@ class Controller extends Base
      *                         badge as a goal to be achieved
      * @throws MapperException
      */
-    private function createBadgeAwardsFromRequestBody(Model $badge, string $status): void
+    private function createAwardsFromRequestBody(Model $badge, string $status): void
     {
         // Users are in the data.
         // So far: it's assumed all staff may award or set a badge as a goal to
@@ -338,7 +342,7 @@ class Controller extends Base
     }
 
 
-    public function setBadgeAsGoalForSelf(Model $badge): void
+    public function setAsGoalForSelf(Model $badge): void
     {
 
     }

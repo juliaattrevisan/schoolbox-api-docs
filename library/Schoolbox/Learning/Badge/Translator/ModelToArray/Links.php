@@ -64,20 +64,18 @@ class Links
         ];
 
         // Award and set goal routes
-        $translation['_links']['award'] = $this->getRouteIfAuthorized(
-            'learningBadge.awardBadge',
+        $translation['_links']['awardAsAchievement'] = $this->getRouteIfAuthorized(
+            'learningBadge.awardAsAchievement',
             ['id' => $badge->getId(),]
         );
-        $translation['_links']['setGoal'] = $this->getRouteIfAuthorized(
-            'learningBadge.setBadgeAsGoal',
+        $translation['_links']['setAsGoal'] = $this->getRouteIfAuthorized(
+            'learningBadge.setAsGoal',
             ['id' => $badge->getId(),]
         );
-        $translation['_links']['setGoalForSelf'] = $this->getRouteIfAuthorized(
-            'learningBadge.setBadgeAsGoalForSelf',
+        $translation['_links']['setAsGoalForSelf'] = $this->getRouteIfAuthorized(
+            'learningBadge.setAsGoalForSelf',
             ['id' => $badge->getId(),]
         );
-
-        // Perhaps a setGoalForSelf
 
         // Modify/delete routes (not yet implemented)
 //        $translation['_links']['modifyForm'] = $this->getRouteIfAuthorized(

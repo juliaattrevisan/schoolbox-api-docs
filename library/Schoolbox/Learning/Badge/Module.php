@@ -119,8 +119,8 @@ class Module extends BaseModule
         $preloadBadge = Closure::fromCallable([$this, 'preloadBadge']);
         $this->register(
             self::METHOD_POST,
-            '/{id}/award',
-            'awardBadge',
+            '/{id}/achievement',
+            'awardAsAchievement',
             $baseRule,
             $preloadBadge
         );
@@ -129,15 +129,15 @@ class Module extends BaseModule
         // any user may set goals for themselves
         $this->register(
             self::METHOD_POST,
-            '/{id}/setGoal',
-            'setBadgeAsGoal',
+            '/{id}/goal',
+            'setAsGoal',
             $baseRule,
             $preloadBadge
         );
         $this->register(
             self::METHOD_POST,
             '/{id}/setGoalForSelf',
-            'setBadgeAsGoalForSelf',
+            'setAsGoalForSelf',
             new Rule\IsLoggedIn(),
             $preloadBadge
         );

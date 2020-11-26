@@ -83,7 +83,7 @@ export default {
          */
         onSubmit() {
             this.$refs.toast.activate('Awarding...');
-            axios.post(this.badge._links.award, {users: this.selected})
+            axios.post(this.badge._links.awardAsAchievement, {users: this.selected})
                 .then(() => {
                     // Clear the user list, so they don't show in the next badge award
                     this.selected = [];
