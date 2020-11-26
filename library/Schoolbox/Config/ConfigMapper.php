@@ -110,6 +110,7 @@ class ConfigMapper extends Mapper
     public const _CANVAS_URL                        = 'canvas_url';
 
     public const NAME_OTFS_ADAPTER                   = 'otfs_adapter';
+    public const NAME_OTFS_S3_BUCKET                 = 'otfs_s3_bucket';
     public const NAME_OTFS_VERIFY_PREVIOUS_FILE      = 'otfs_verify_previous_file';
     public const NAME_S3_PRESIGNED_URL_ENABLED       = 'otfs_s3_presigned_urls_enabled';
     public const NAME_IMAGE_S3_PRESIGNED_URL_ENABLED = 'otfs_image_s3_presigned_urls_enabled';
