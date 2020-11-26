@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by JetBrains PhpStorm.
  * User: jleckie
@@ -60,6 +61,14 @@ class FormatTest extends TestCase
         $expected = '11.6 GB';
 
         $this->assertEquals($expected, Alaress_Byte_Format::bytesToString($input));
+    }
+
+    public function testNegativeBytesToGB(): void
+    {
+        $input = '-12458731246';
+        $expected = '-11.6 GB';
+
+        self::assertEquals($expected, Alaress_Byte_Format::bytesToString($input));
     }
 
     public function testBToBytes()
@@ -133,5 +142,4 @@ class FormatTest extends TestCase
 
         self::assertSame($expected, Alaress_Byte_Format::stringToBytes($input));
     }
-
 }

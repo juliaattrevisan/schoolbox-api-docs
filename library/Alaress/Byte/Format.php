@@ -1,4 +1,5 @@
 <?php
+
 /**
  * User: jleckie
  * Date: 9/19/11
@@ -14,7 +15,8 @@
  *
  * @see https://en.wikipedia.org/wiki/Binary_prefix
  */
-class Alaress_Byte_Format {
+class Alaress_Byte_Format
+{
 
     /**
      * Converts a size in bytes to human readable size
@@ -25,8 +27,11 @@ class Alaress_Byte_Format {
      * @param bool             $renderIecExplicitly  If using IEC, should we generate this explicitly
      * @return string
      */
-	public static function bytesToString($size, int $precision = 2, bool $useIEC = true, bool $renderIecExplicitly = false): string
+    public static function bytesToString($size, int $precision = 2, bool $useIEC = true, bool $renderIecExplicitly = false): string
     {
+        $sign = $size < 0 ? '-' : '';
+        $size = abs($size);
+
         // IEC uses 2^X, SI uses 10^X
         $multiplier = $useIEC ? 1024 : 1000;
 
@@ -36,11 +41,11 @@ class Alaress_Byte_Format {
             : ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
 
         for ($i = 0; $size >= $multiplier; $i++) {
-			$size /= $multiplier;
-		}
+            $size /= $multiplier;
+        }
 
-		return round($size,$precision) . ' ' . $a[$i];
-	}
+        return $sign . round($size, $precision) . ' ' . $a[$i];
+    }
 
     /**
      * Converts human readable size into an integer
@@ -49,7 +54,7 @@ class Alaress_Byte_Format {
      * @param bool   $assumeIecIfAmbiguous Should we assume IEC or SI standard if string is ambiguous?
      * @return int
      */
-	public static function stringToBytes(string $size, bool $assumeIecIfAmbiguous = true): int
+    public static function stringToBytes(string $size, bool $assumeIecIfAmbiguous = true): int
     {
         $trimmed = \trim($size);
 
@@ -69,10 +74,10 @@ class Alaress_Byte_Format {
 
         // What multiple should we use if prefix is ambiguous?
         // eg KiB is explicitly 1024, but K may be 1000 or 1024 depending on use case
-	    $multiplier = $explicitIEC || $assumeIecIfAmbiguous ? 1024 : 1000;
+        $multiplier = $explicitIEC || $assumeIecIfAmbiguous ? 1024 : 1000;
 
-	    $power = array_search(strtoupper($exponent), ['B','K','M','G','T']);
+        $power = array_search(strtoupper($exponent), ['B','K','M','G','T']);
 
         return (int)round($mantissa * ($multiplier ** $power), 0);
-	}
+    }
 }
