@@ -186,12 +186,10 @@ class Mapper extends \Schoolbox\Mapper
             SELECT
                 bu.recipient_id,
                 bu.badge_id,
-                bu.status,
-                bu.awarded_by,
-                MAX(awarded_at) AS awarded_at,
-                bu.deleted_at
+                MAX(awarded_at) AS awarded_at
             FROM {$this->getTable()} bu
             WHERE badge_id = :badgeId
+            AND status = :status
             AND deleted_at IS NULL
             AND recipient_id IN {$this->getPredicateBuilder()->getArrayPlaceholders($userIds, 'recipient_id')}
             GROUP BY recipient_id
@@ -199,6 +197,11 @@ class Mapper extends \Schoolbox\Mapper
 
         $params = $this->getPredicateBuilder()->getArrayParameters($userIds, 'recipient_id');
         $params['badgeId'] = $badge->getId();
+
+        /* Only withdraw Achievements for now, not Goals
+         * FIXME This will probably change later, pass it as an arg
+         */
+        $params['status'] = Model::AWARD_STATUS_ACHIEVEMENT;
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
