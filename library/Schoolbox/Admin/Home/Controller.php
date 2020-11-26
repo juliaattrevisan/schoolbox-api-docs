@@ -491,6 +491,11 @@ class Controller extends Base
             }, $dateFiles);
         }
 
+        // Sort most recent backup first
+        uksort($files, static function (string $left, string $right): int {
+            return strcmp($right, $left);
+        });
+
         $enabledData['backupFiles']      = $files;
         $enabledData['backupFileTotals'] = $fileTotals;
 
