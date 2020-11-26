@@ -11,10 +11,12 @@ namespace Schoolbox\Learning\Badge;
 
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\API\Translator\ModelToArray\Composite;
-use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Badge\Award\Model as AwardModel;
 use Schoolbox\Learning\Badge\Translator;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
@@ -113,7 +115,7 @@ class Controller extends Base
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      * @throws \UnexpectedValueException
      */
     public function getAwardedBadges(User $user): void
@@ -252,47 +254,55 @@ class Controller extends Base
 
 
     /**
-     * Award a badge to a set of users in the request body.
-     *
-     * Users to award to will be in the "users" key, and each user will be
-     * identified by the "id" key of each item in "users".
+     * Award a badge as an achievement for a set of users in the request body.
      *
      * @api   POST /learning/badge/{id}/award
      * @since 20.2
      *
-     * @param Model $badge
-     * @throws \Schoolbox\Mapper\Exception
+     * @param Model $badge The badge to award as an achievement.
+     * @throws MapperException
      */
     public function awardBadge(Model $badge): void
     {
         $this->createBadgeAwardsFromRequestBody(
             $badge,
-            \Schoolbox\Learning\Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT
+            AwardModel::AWARD_STATUS_ACHIEVEMENT
         );
     }
 
 
     /**
-     * Award a goal to a set of users in the request body.
-     *
-     * Users to award to will be in the "users" key, and each user will be
-     * identified by the "id" key of each item in "users".
+     * Set a badge as a goal for a set of users in the request body.
      *
      * @api   POST /learning/badge/{id}/goal
      * @since 20.2
      *
-     * @param Model $badge
-     * @throws \Schoolbox\Mapper\Exception
+     * @param Model $badge The badge to set as a goal.
+     * @throws MapperException
      */
     public function setBadgeAsGoal(Model $badge): void
     {
         $this->createBadgeAwardsFromRequestBody(
             $badge,
-            \Schoolbox\Learning\Badge\Award\Model::AWARD_STATUS_GOAL
+            AwardModel::AWARD_STATUS_GOAL
         );
     }
 
 
+    /**
+     * Creates badge awards from the request body.
+     *
+     * Users to award to will be in the "users" key, and each user will be
+     * identified by the "id" key of each item in "users".
+     *
+     * @param Model  $badge  The badge to award.
+     * @param string $status The status to award the badge with:
+     *                       * `AwardModel::AWARD_STATUS_ACHIEVEMENT` for
+     *                         awarding the badge as an achievement
+     *                       * `AwardModel::AWARD_STATUS_GOAL` for awarding the
+     *                         badge as a goal to be achieved
+     * @throws MapperException
+     */
     private function createBadgeAwardsFromRequestBody(Model $badge, string $status): void
     {
         // Users are in the data.
@@ -302,11 +312,12 @@ class Controller extends Base
         $collection = $this->awardMapper->createCollection();
         foreach ($data['users'] as $user) {
             $award = $this->awardMapper->createModel()
+                // TODO inject user mapper
                 ->setRecipient(UserMapper::getInstance()->findById($user['id']))
                 ->setBadge($badge)
                 ->setStatus($status)
                 ->setAwardedBy($this->getUser())
-                ->setAwardedAt(\Alaress_Date_Format::now());
+                ->setAwardedAt(Alaress_Date_Format::now());
             $collection->add($award);
         }
         $this->awardMapper->save($collection);
