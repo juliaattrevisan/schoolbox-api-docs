@@ -457,6 +457,22 @@
 {# Tabs #}
 <div class="row">
     <div class="small-12 island">
+        <script>
+            $(function() {
+                switch (window.location.hash) {
+                    case '#activity':
+                    case '#achievements':
+                    case '#classes':
+                    case '#contacts':
+                        $('[data-tab] a[href='+window.location.hash+']').trigger('click');
+                        break;
+
+                    default:
+                        $('[data-tab] a[href=#activity]').trigger('click');
+                        break;
+                }
+            });
+        </script>
         <dl class="tabs" data-tab>
             {% if showActivityFeed %}
             <dd class="active"><a href="#activity">Activity Feed</a></dd>
@@ -470,7 +486,7 @@
             {% endif %}
         </dl>
 
-        <div class="tabs-content content no-pad">
+        <div class="tabs-content no-pad">
             {% if showActivityFeed %}
             <div class="no-pad content active" id="activity">
                 {# Vue component goes here #}
@@ -497,9 +513,20 @@
             {% endif %}
 
             <div class="content no-pad" id="achievements">
-                <div class="content">
-                    <h2 class="subheader">Achievements</h2>
-                </div>
+                {% autoescape 'js' %}
+                    <script type="text/javascript">
+                        window.learningBadgeAwardFeedConfig = {
+                            routes: {
+                                getAwardFeed: '{{ routeLookupIfAuthorized(
+                                    'learningBadge.getAwardedBadges',
+                                    {user: user, userId: user.id}
+                                ) }}'
+                            },
+                        };
+                    </script>
+                {% endautoescape %}
+                <div id="badge-award-feed"></div>
+                <script type="text/javascript" src="/javascript/components/badgeAwardFeed.bundle.js"></script>
             </div>
 
             {% if showClasses %}

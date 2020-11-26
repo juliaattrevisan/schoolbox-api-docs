@@ -34,13 +34,21 @@ class Controller extends Base
 
 
     /**
+     * @var Award\Mapper
+     */
+    private Award\Mapper $awardMapper;
+
+
+    /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param Mapper       $mapper
+     * @param Award\Mapper $awardMapper
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, Award\Mapper $awardMapper)
     {
         $this->mapper = $mapper;
+        $this->awardMapper = $awardMapper;
     }
 
 
@@ -89,6 +97,90 @@ class Controller extends Base
                 'Badges'
             )
         );
+    }
+
+
+    /**
+     * Get a list of badges and their counts, awarded to $user
+     *
+     * @api GET /learning/badge/{userId}/awarded
+     *
+     * @param User $user
+     * @return void
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function getAwardedBadges(User $user): void
+    {
+        $awards = $this->awardMapper->findRecentForUser($user);
+
+        $stack = [];
+
+        /* Award translator; uses a Badge translator to convert one of
+         * the parts into a fully-fledged badge array representation
+         */
+        $translator = new Award\Translator\ModelToArray(
+            new User\Translator\ModelToArray(),
+            new Translator\ModelToArray(
+                new User\Translator\ModelToArray(),
+                new Storage\Translator\ModelToArray(),
+                new ScrubAdapter()
+            )
+        );
+
+        /* Group by category
+         */
+        foreach ($awards as $award) {
+
+            /* Force string indexes, otherwise the numeric values get inserted in-order
+             * which isn't intended here; they are already in a particular order
+             */
+            $badgeId = "badge-{$award->getBadge()->getId()}";
+            $categoryId = "category-{$award->getBadge()->getCategory()->getId()}";
+
+            /* Some inline hydration due to curriculum nodes no longer being included
+             * as part of the hydrateSelect in badge mapper
+             */
+            $award->getBadge()->setCurriculumNodes($this->mapper->findCurriculumNodes($award->getBadge()));
+
+            /* Convert to array format
+             */
+            $badge = $translator($award);
+
+            /* Init stack
+             *
+             * Remember one copy of the category
+             */
+            if (!isset($stack['categories'][$categoryId])) {
+                $stack['categories'][$categoryId] = $badge['badge']['category'];
+                $stack['categories'][$categoryId]['awards'] = [];
+            }
+
+            /* Init badge count
+             *
+             * findRecentForUser() is listed reverse chronologically so the first
+             * in the list is the most recently awarded
+             */
+            if (!isset($stack['categories'][$categoryId]['awards'][$badgeId])) {
+
+                /* This is a set-based aggregation, not an individual model property
+                 */
+                $badge['count'] = 0;
+
+                /* Stick it into the stack
+                 */
+                $stack['categories'][$categoryId]['awards'][$badgeId] = $badge;
+            }
+
+            /* Collapse duplicate badge ids with a count
+             */
+            $stack['categories'][$categoryId]['awards'][$badgeId]['count']++;
+        }
+
+        $this->response->content->set($this->buildJsonOutput($stack));
     }
 
 

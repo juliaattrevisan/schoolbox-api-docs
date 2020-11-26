@@ -1,0 +1,9 @@
+.awards {
+
+    /* Goals are greyscaled
+     * Achievements are full colour
+     */
+    img.goal {
+      filter: grayscale(100%);
+    }
+}

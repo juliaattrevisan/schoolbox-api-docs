@@ -56,9 +56,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @var GenericCollection
+     * @var GenericCollection|null
      */
-    private GenericCollection $curriculumNodes;
+    private ?GenericCollection $curriculumNodes = null;
 
 
     /**
@@ -154,9 +154,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return GenericCollection
+     * @return GenericCollection|null
      */
-    public function getCurriculumNodes(): GenericCollection
+    public function getCurriculumNodes(): ?GenericCollection
     {
         return $this->curriculumNodes;
     }
