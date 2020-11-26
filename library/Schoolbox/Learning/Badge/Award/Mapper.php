@@ -214,6 +214,7 @@ class Mapper extends \Schoolbox\Mapper
             WHERE recipient_id = :recipientId
             AND badge_id = :badgeId
             AND awarded_at = :awardedAt
+            LIMIT 1
         ");
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
