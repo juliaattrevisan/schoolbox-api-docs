@@ -159,12 +159,14 @@ export default {
                             <div class="card-actions">
                                 <div class="card-spacer"></div>
 
-                                <nav>
-                                    <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
-                                </nav>
-                                <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
-                                    <li><a @click.prevent="openWithdrawModal(award)" class="icon-close" title="Withdraw">Withdraw</a></li>
-                                </ul>
+                                <template v-if="!award.isGoal">
+                                    <nav>
+                                        <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
+                                    </nav>
+                                    <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
+                                        <li><a @click.prevent="openWithdrawModal(award)" class="icon-close" title="Withdraw">Withdraw</a></li>
+                                    </ul>
+                                </template>
                             </div>
                         </div>
                     </div>
