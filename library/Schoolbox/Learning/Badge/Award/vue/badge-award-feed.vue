@@ -97,8 +97,6 @@ export default {
          * @param award
          */
         openWithdrawModal(award) {
-            // const url = award._links.withdraw;
-
             this.$refs.badgeWithdrawModal.open(award);
         },
 
@@ -111,7 +109,6 @@ export default {
         generateIdentifier(award) {
             return 'header-options-' + award.badge.category.id + '-' + award.badge.id;
         },
-
 
         /**
          * Fetch the list of awards
