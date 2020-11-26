@@ -72,8 +72,16 @@ export default {
                 .finally(() => loading(false))
         }, SEARCH_RESULT_RETRIEVE_DELAY),
 
+
+        /**
+         * Callback for when the award form is submitted.
+         *
+         * Posts to the badge's award link, then triggers this component's
+         * "done" event.
+         *
+         * @emits done if the badge was successfully awarded
+         */
         onSubmit() {
-            // Craft a POST request with a bunch of users
             this.$refs.toast.activate('Awarding...');
             axios.post(this.badge._links.award, {users: this.selected})
                 .then(() => {
@@ -85,6 +93,12 @@ export default {
                 .catch(() => this.$refs.toast.timeout('Award failed', false))
         },
 
+
+        /**
+         * Callback for when the award form is cancelled.
+         *
+         * @emits cancel
+         */
         onCancel() {
             this.$emit(EVENTS.cancel);
         },

@@ -265,15 +265,46 @@ class Controller extends Base
      */
     public function awardBadge(Model $badge): void
     {
+        $this->createBadgeAwardsFromRequestBody(
+            $badge,
+            \Schoolbox\Learning\Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT
+        );
+    }
+
+
+    /**
+     * Award a goal to a set of users in the request body.
+     *
+     * Users to award to will be in the "users" key, and each user will be
+     * identified by the "id" key of each item in "users".
+     *
+     * @api   POST /learning/badge/{id}/goal
+     * @since 20.2
+     *
+     * @param Model $badge
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function setBadgeAsGoal(Model $badge): void
+    {
+        $this->createBadgeAwardsFromRequestBody(
+            $badge,
+            \Schoolbox\Learning\Badge\Award\Model::AWARD_STATUS_GOAL
+        );
+    }
+
+
+    private function createBadgeAwardsFromRequestBody(Model $badge, string $status): void
+    {
         // Users are in the data.
-        // So far: it's assumed all staff may award a badge to anyone.
+        // So far: it's assumed all staff may award or set a badge as a goal to
+        // any other user.
         $data       = json_decode($this->request->content->getRaw(), true);
         $collection = $this->awardMapper->createCollection();
         foreach ($data['users'] as $user) {
             $award = $this->awardMapper->createModel()
                 ->setRecipient(UserMapper::getInstance()->findById($user['id']))
                 ->setBadge($badge)
-                ->setStatus(\Schoolbox\Learning\Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT)
+                ->setStatus($status)
                 ->setAwardedBy($this->getUser())
                 ->setAwardedAt(\Alaress_Date_Format::now());
             $collection->add($award);
@@ -292,11 +323,6 @@ class Controller extends Base
         $this->response->content->set(
             $this->buildJsonOutput($collection->map($translator))
         );
-    }
-
-
-    public function setBadgeAsGoal(Model $badge): void
-    {
 
     }
 
