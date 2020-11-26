@@ -342,6 +342,19 @@ class Controller extends Base
     }
 
 
+    /**
+     * Set a badge as a goal for the current user.
+     *
+     * To be implemented when students are given the ability to set goals for
+     * themselves.
+     *
+     * TODO consider moving to award controller?
+     *
+     * @api   POST /learning/badge/{id}/achievement
+     * @since 20.2
+     *
+     * @param Model $badge
+     */
     public function setAsGoalForSelf(Model $badge): void
     {
 
