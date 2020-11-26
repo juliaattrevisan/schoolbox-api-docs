@@ -1,10 +1,10 @@
 <script>
 import axios from "axios";
-import BadgeDetailModal from './badge-detail-modal';
+import AwardDetailModal from './award-detail-modal';
+import AwardWithdrawModal from "./award-withdraw-modal";
 import foundationMixin from './foundation-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
-import BadgeWithdrawModal from "./badge-withdraw-modal";
 
 export default {
 
@@ -13,7 +13,7 @@ export default {
      * The name of the component that we have here. This name will be used in the container
      * to spawn this component.
      */
-    name: "badge-award-feed",
+    name: "award-feed",
 
     /**
      * Mixins.
@@ -40,8 +40,8 @@ export default {
      * at the top of the file.
      */
     components: {
-        BadgeWithdrawModal,
-        BadgeDetailModal,
+        AwardDetailModal,
+        AwardWithdrawModal,
         RelativeTime
     },
 
@@ -88,7 +88,7 @@ export default {
          * @param award
          */
         openDetailModal(award) {
-            this.$refs.badgeDetailModal.open(award);
+            this.$refs.awardDetailModal.open(award);
         },
 
         /**
@@ -97,7 +97,7 @@ export default {
          * @param award
          */
         openWithdrawModal(award) {
-            this.$refs.badgeWithdrawModal.open(award);
+            this.$refs.awardWithdrawModal.open(award);
         },
 
         /**
@@ -190,7 +190,7 @@ export default {
             </div>
         </template>
 
-        <badge-detail-modal ref="badgeDetailModal"></badge-detail-modal>
-        <badge-withdraw-modal ref="badgeWithdrawModal" v-on:withdraw-complete="updateAwards()"></badge-withdraw-modal>
+        <award-detail-modal ref="awardDetailModal"></award-detail-modal>
+        <award-withdraw-modal ref="awardWithdrawModal" v-on:withdraw-complete="updateAwards()"></award-withdraw-modal>
     </div>
 </template>

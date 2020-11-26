@@ -1,8 +1,7 @@
 <script>
-import axios from "axios";
+import goalMixin from './goal-mixin';
+import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
-import qs from 'qs';
-import Toast from "@schoolbox/toast";
 
 export default {
 
@@ -11,7 +10,7 @@ export default {
      * The name of the component that we have here. This name will be used in the container
      * to spawn this component.
      */
-    name: "badge-withdraw-modal",
+    name: "award-detail-modal",
 
     /**
      * Mixins.
@@ -20,6 +19,7 @@ export default {
      * be superpositioned on top of this javascript here, inside export default {}
      */
     mixins: [
+        goalMixin
     ],
 
     /**
@@ -36,8 +36,8 @@ export default {
      * at the top of the file.
      */
     components: {
-        RevealModal,
-        Toast
+        RelativeTime,
+        RevealModal
     },
 
     /**
@@ -81,50 +81,6 @@ export default {
             this.award = award;
 
             this.$refs.modal.open();
-        },
-
-
-        /**
-         * Close this modal
-         */
-        close() {
-            this.$refs.modal.close();
-        },
-
-
-        /**
-         * Perform withdrawl
-         */
-        withdraw() {
-            let self = this;
-
-            /* Access the withdraw endpoint, grab the awards for the user
-             */
-            let request = {
-                url: this.award._links.withdraw,
-                data: qs.stringify({userIds: [this.award.recipient.id]}),
-                method: 'post',
-                responseType: 'json'
-            }
-
-            self.$refs.toast.activate('Loading...');
-
-            axios.request(request)
-                .then(response => {
-
-                    /* Send bat signal to the parent component
-                     */
-                    this.$emit('withdraw-complete');
-
-                    /* Close this modal
-                     */
-                    self.close();
-
-                    /* Pop toast
-                     */
-                    this.$refs.toast.timeout('Withdraw complete', true);
-                })
-                .catch(() => this.$refs.toast.timeout('Withdraw failed', false))
         }
     }
 }
@@ -132,13 +88,41 @@ export default {
 <template>
     <reveal-modal ref="modal">
         <template v-if="award.badge">
-            <h2>Please confirm</h2>
-            <p>Are you sure you want to withdraw <strong>{{ award.badge.name }}</strong> from {{ award.recipient.fullName }}?</p>
-            <ul class="flex-list buttons">
-                <li><a @click.prevent="withdraw()" class="button submit">Yes</a></li>
-                <li><a @click.prevent="close()" class="button">No</a></li>
-            </ul>
+            <div class="v-card-list awards">
+                <div class="v-card card wrap-down">
+                    <div class="card-feature-image">
+                        <img :src="award.badge.image._links.image + '&size=constrain200'" :class="getCss(award)"/>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="no-margin">{{ award.badge.name }} ({{ award.count }})</h3>
+                        <p class="meta">Category: {{ award.badge.category.name }}</p>
+                        <p class="meta">
+                            <template v-if="award.isGoal">
+                                Goal set <relative-time :datetime="award.awardedAt"></relative-time> by
+                                <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
+                            </template>
+                            <template v-else>
+                                Awarded <relative-time :datetime="award.awardedAt"></relative-time> by
+                                <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
+                            </template>
+                        </p>
+
+                        <hr />
+
+                        <article v-html="award.badge.body"></article>
+
+                        <template v-if="award.badge.curriculumNodes.length">
+                            <hr />
+
+                            <p class="meta">
+                                <template v-for="curriculumNode in award.badge.curriculumNodes">
+                                    {{ curriculumNode.code }}
+                                </template>
+                            </p>
+                        </template>
+                    </div>
+                </div>
+            </div>
         </template>
-        <toast ref="toast"></toast>
     </reveal-modal>
 </template>
