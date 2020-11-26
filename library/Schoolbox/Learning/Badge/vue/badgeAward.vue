@@ -71,6 +71,8 @@ export default {
             this.$refs.toast.activate('Awarding...');
             axios.post(this.badge._links.award, {users: this.selected})
                 .then(() => {
+                    // Clear the user list, so they don't show in the next badge award
+                    this.selected = [];
                     this.$emit(EVENTS.done);
                     this.$refs.toast.timeout('Awarded', true);
                 })
