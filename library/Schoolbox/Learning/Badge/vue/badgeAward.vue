@@ -40,6 +40,10 @@ export default {
             type: Object,
             default: null,
         },
+        placeholder: {
+            type: String,
+            default: 'Search for users to award achievement to',
+        },
     },
     data() {
         return {
@@ -118,7 +122,7 @@ export default {
                   multiple
                   @search="onSearch"
                   label="name"
-                  placeholder="Search for users to award achievement to"
+                  :placeholder="placeholder"
                   v-model="selected">
             <template slot="option" slot-scope="option">
                 <span class="d-center">
@@ -134,7 +138,9 @@ export default {
         <ul class="flex-list buttons">
             <li>
                 <button @click.prevent="onSubmit" class="submit" :disabled="selected.length === 0">
-                    Award Achievement
+                    <slot name="confirmButton">
+                        Award Achievement
+                    </slot>
                 </button>
             </li>
             <li><button @click.prevent="onCancel">Cancel</button></li>

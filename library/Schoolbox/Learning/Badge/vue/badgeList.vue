@@ -180,17 +180,31 @@ export default {
         </reveal-modal>
 
         <reveal-modal ref="awardModal">
-            <badge-award :badge="currentBadge" @cancel="closeAwardModal" @done="closeAwardModal" v-if="currentBadge">
+            <badge-award v-if="currentBadge"
+                         :badge="currentBadge"
+                         @cancel="closeAwardModal"
+                         @done="closeAwardModal"
+                         placeholder="Search for users to award achievement to">
                 <template v-slot:header>
                     <h2>Awarding &lsquo;<i>{{ currentBadge.name }}</i>&rsquo; as an Achievement</h2>
+                </template>
+                <template v-slot:confirmButton>
+                    Award Achievement
                 </template>
             </badge-award>
         </reveal-modal>
 
         <reveal-modal ref="setAsGoalModal">
-            <badge-award :badge="currentBadge" @cancel="closeAwardModal" @done="closeAwardModal" v-if="currentBadge">
+            <badge-award v-if="currentBadge"
+                         :badge="currentBadge"
+                         @cancel="closeAwardModal"
+                         @done="closeAwardModal"
+                         placeholder="Search for users to set a goal for">
                 <template v-slot:header>
                     <h2>Setting &lsquo;<i>{{ currentBadge.name }}</i>&rsquo; as a Goal</h2>
+                </template>
+                <template v-slot:confirmButton>
+                    Set Goal
                 </template>
             </badge-award>
         </reveal-modal>
