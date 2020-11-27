@@ -99,7 +99,7 @@
 
     {# Assessments #}
     {% if report.subjectReport.grades %}
-        {% include '@customMeridenPastoral/sub/assessments.twig' with {work: report.subjectReport.grades, student: report.student} %}
+        {% include '@customMeridenPastoral/sub/assessments.twig' with {work: report.subjectReport.grades, student: report.student, graphWidth: graphWidth} %}
     {% endif %}
 
     {# Class Teacher(s) #}

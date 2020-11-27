@@ -97,9 +97,10 @@ class Controller extends Base
             $subjectReport = $reportData['report']['subjectReport'];
             $this->getResponse()->content->set(
                 array(
-                    'template' => '@customMeridenPastoral/subject.twig',
-                    'data'     => $reportData,
-                    'title'    => $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName()
+                    'template'   => '@customMeridenPastoral/subject.twig',
+                    'data'       => $reportData,
+                    'title'      => $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName(),
+                    'graphWidth' => $this->request->query->getInt('graph-width'),
                 )
             );
         } catch (\RangeException $e) {

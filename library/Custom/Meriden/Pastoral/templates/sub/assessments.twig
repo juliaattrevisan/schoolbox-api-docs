@@ -59,6 +59,7 @@
                                     chart: {
                                         inverted: true,
                                         height: 100,
+                                        {% if graphWidth %}width: Number('{{ graphWidth }}'),{% endif %}
                                         reflow: true,
                                     },
                                     title: {
