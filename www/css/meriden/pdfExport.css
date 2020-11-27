@@ -22,3 +22,9 @@ body {
 .meriden-crest svg {
     height: 5.75rem;
 }
+
+@media print {
+    .e-report #assessments .chart svg {
+        width: 50vw;
+    }
+}
