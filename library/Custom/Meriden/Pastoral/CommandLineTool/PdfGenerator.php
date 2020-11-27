@@ -46,6 +46,9 @@ class PdfGenerator extends App
     // role-type override: ensure that only particular users may see reports
     private const OPT_LONG_ROLE_TYPE = 'role-type:';
 
+    // graph width override:
+    private const OPT_LONG_GRAPH_WIDTH = 'graph-width:';
+
     /**
      * @inheritdoc
      */
@@ -58,6 +61,7 @@ class PdfGenerator extends App
                 self::OPT_LONG_YEAR_LEVEL,
                 self::OPT_LONG_REPORT_YEAR,
                 self::OPT_LONG_ROLE_TYPE,
+                self::OPT_LONG_GRAPH_WIDTH,
             ]
         );
     }
@@ -104,6 +108,9 @@ $baseOptionHelp
         Print eReports as they would appear to users with this role type.
         Must be one of [{$roleTypes}]
 
+    $yellow--graph-width=GRAPH_WIDTH$white
+        If provided, set this as the width of all graphs.
+
 EXAMPLES:
  * Write log to terminal, output to archive.zip
       $file 1> archive.zip
@@ -148,6 +155,10 @@ EXAMPLES:
                 sprintf('If provided, --role-type option must be one of: %s', Role::getRoleTypes())
             );
         }
+
+
+        // Determine the graph width, if there is one
+        $graphWidth = $this->getOptAsInt(self::OPT_LONG_GRAPH_WIDTH);
 
 
         // Determine the report year and year levels to run the report for.
@@ -238,7 +249,7 @@ EXAMPLES:
             $result->add(
                 new SourceBundle(
                     sprintf('%s-%d.pdf', $student->getExternalId(), $reportYear),
-                    $urlGenerator->generate($baseUrl, $reportYear, $student, $roleType),
+                    $urlGenerator->generate($baseUrl, $reportYear, $student, $roleType, $graphWidth),
                     sprintf(
                         'Generating report for %s, %s (ID: %d, TASS ID: %s)',
                         $student->getLastname(),
