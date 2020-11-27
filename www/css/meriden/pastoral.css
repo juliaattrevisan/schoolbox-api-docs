@@ -191,11 +191,11 @@ body.login input[type=checkbox]:not(.plain):checked + label:after {
 .e-report #endeavour-grades table td {
   width: 5rem;
 }
-.e-report #learning-approaches table th:first-child,
-.e-report #learning-approaches table td:first-child,
 .e-report #assessments table {
   table-layout: fixed !important;
 }
+.e-report #learning-approaches table th:first-child,
+.e-report #learning-approaches table td:first-child,
 .e-report #assessments table th:first-child,
 .e-report #assessments table td:first-child {
   text-align: left;
@@ -209,14 +209,6 @@ body.login input[type=checkbox]:not(.plain):checked + label:after {
 .e-report #assessments .distribution {
   width: 60%;
 }
-/** Hardcode width of charts for print **/
-/*
-@media print {
-  .e-report #assessments .chart svg {
-    width: 50vw;
-  }
-}
-*/
 .e-report .card p {
   font-size: 1rem;
 }
