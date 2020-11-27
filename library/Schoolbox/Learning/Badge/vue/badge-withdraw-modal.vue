@@ -99,6 +99,12 @@ export default {
             this.$refs.modal.open();
         },
 
+        /**
+         * Close this modal
+         */
+        close() {
+            this.$refs.modal.close();
+        },
 
         /**
          * Start searching for keyword
@@ -111,12 +117,11 @@ export default {
             this.search(loading, query, this);
         },
 
-
         /**
          * Perform async request and load results into component
          */
         search: _.debounce(function(loading, query, vm) {
-            axios.get('/learning/badge/' + this.badge.id + '/recipients', {
+            axios.get(this.badge._links.recipients, {
                 params: {
                     query: query
                 }
@@ -126,12 +131,22 @@ export default {
                 loading(false);
             });
         }, 350),
+
+        /**
+         * Perform achievement withdrawal from selected users
+         */
+        withdraw() {
+            console.log(this.badge._links.withdraw);
+        }
     }
 }
 </script>
 <template>
     <reveal-modal ref="modal">
         <template v-if="badge">
+            <h2>Withdraw <strong>{{ badge.name }}</strong></h2>
+            <p>Remove the student(s) allocated to this achievement to withdraw it from them.</p>
+
             <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Search for recipients of thie badge" v-model="selected">
                 <template slot="option" slot-scope="option">
                     <div class="d-center">
@@ -144,6 +159,11 @@ export default {
                     </div>
                 </template>
             </v-select>
+
+            <ul class="flex-list buttons">
+                <li><a href="#" class="submit" @click.prevent="withdraw()">Withdraw Achievement</a></li>
+                <li><a href="#" class="button" @click.prevent="close()">Cancel</a></li>
+            </ul>
         </template>
     </reveal-modal>
 </template>
