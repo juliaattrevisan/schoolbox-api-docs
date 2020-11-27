@@ -382,6 +382,26 @@ class Controller extends Base
 
 
     /**
+     * Find a list of guys who received $badge
+     *
+     * @param Model $badge
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DebugBar\DebugBarException
+     * @throws \PDOException
+     */
+    public function getRecipients(Model $badge): void
+    {
+        $keyword = (string)($this->getRequest()->query['keyword'] ?? '');
+
+        /* For now, just search for student recipients
+         */
+        $users = $this->awardMapper->findRecipients($keyword, $badge, \Schoolbox\Role::STUDENT);
+
+        $this->response->content->set($this->buildJsonOutput($users));
+    }
+
+
+    /**
      * Builder for the model-to-array translator for badges.
      *
      * @return Composite
