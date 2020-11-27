@@ -2,27 +2,25 @@
 <div class="row" id="assessments">
     <div class="small-12 column">
         <h2>Assessments <span class="explanation">(Feedback is provided with the marked task)</span></h2>
-        <div class="scrollable">
-            <table class="bordered-table">
-                <colgroup>
-                    <col class="title" />
-                    <col class="result" />
-                    <col class="distribution" />
-                </colgroup>
-                <thead>
-                <tr>
-                    <th class="title">Title</th>
-                    <th class="result">Result %</th>
-                    <th class="distribution">Distribution</th>
-                </tr>
-                </thead>
-                <tbody>
+        <table class="bordered-table">
+            <colgroup>
+                <col class="title" />
+                <col class="result" />
+                <col class="distribution" />
+            </colgroup>
+            <thead>
+            <tr>
+                <th class="title">Title</th>
+                <th class="result">Result %</th>
+                <th class="distribution">Distribution</th>
+            </tr>
+            </thead>
+            <tbody>
 {% endset %}
 
 {% set tfoot %}
-                </tbody>
-            </table>
-        </div>
+            </tbody>
+        </table>
     </div>
 </div>
 {% endset %}
@@ -61,6 +59,7 @@
                                     chart: {
                                         inverted: true,
                                         height: 100,
+                                        reflow: true,
                                     },
                                     title: {
                                         text: null
