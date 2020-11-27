@@ -51,15 +51,26 @@ class UrlGenerator
      * @param UriInterface $baseUrl
      * @param int          $year
      * @param User         $student
-     * @param string|null  $roleTypeOverride If provided, show only results for
-     *                                      this role type
+     * @param string|null  $roleTypeOverride   If provided, show only results
+     *                                         for this role type
+     * @param int|null     $graphWidthOverride If provided, hardcode graph width
+     *                                         to this value
      * @return array|string[]
      */
-    public function generate(UriInterface $baseUrl, int $year, User $student, ?string $roleTypeOverride): array
-    {
-        $query = $roleTypeOverride
-            ? ['role-type' => $roleTypeOverride]
-            : [];
+    public function generate(
+        UriInterface $baseUrl,
+        int $year,
+        User $student,
+        ?string $roleTypeOverride,
+        ?int $graphWidthOverride
+    ): array {
+        $query = [];
+        if (isset($roleTypeOverride)) {
+            $query['role-type'] = $roleTypeOverride;
+        }
+        if (isset($graphWidthOverride)) {
+            $query['graph-width'] = $graphWidthOverride;
+        }
 
         // Find the page for the current year
         $params  = [
