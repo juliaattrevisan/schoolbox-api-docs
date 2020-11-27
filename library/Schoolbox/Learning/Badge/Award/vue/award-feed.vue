@@ -2,7 +2,7 @@
 import axios from "axios";
 import AwardDetailModal from './award-detail-modal';
 import AwardWithdrawModal from "./award-withdraw-modal";
-import foundationMixin from './foundation-mixin';
+import foundationMixin from '@schoolbox/foundation-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 
