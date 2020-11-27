@@ -391,7 +391,7 @@ class Controller extends Base
      */
     public function getRecipients(Model $badge): void
     {
-        $keyword = (string)($this->getRequest()->query['keyword'] ?? '');
+        $keyword = (string)($this->getRequest()->query['query'] ?? '');
 
         /* For now, just search for student recipients
          */

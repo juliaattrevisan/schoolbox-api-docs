@@ -1,5 +1,18 @@
 <script>
 import RevealModal from '@schoolbox/reveal-modal'
+import axios from "axios";
+
+/* Vue select
+ */
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
+
+/* Render custom template for Deselect icon/button
+ * It's not well documented, but you can trawl through closed PRs to figger out how
+ * https://github.com/sagalbot/vue-select/issues/994
+ */
+import Deselect from '@schoolbox/selectize/Deselect';
+vSelect.props.components.default = () => ({ Deselect });
 
 export default {
 
@@ -33,7 +46,8 @@ export default {
      * at the top of the file.
      */
     components: {
-        RevealModal
+        RevealModal,
+        vSelect
     },
 
     /**
@@ -44,7 +58,13 @@ export default {
      */
     data() {
         return {
-            badge: {}
+            badge: {},
+            loading: true,
+
+            /* Vue Select
+             */
+            options: [],
+            selected: [],
         }
     },
 
@@ -77,14 +97,53 @@ export default {
             this.badge = badge;
 
             this.$refs.modal.open();
-        }
+        },
+
+
+        /**
+         * Start searching for keyword
+         *
+         * @param query
+         * @param loading
+         */
+        onSearch(query, loading) {
+            loading(true);
+            this.search(loading, query, this);
+        },
+
+
+        /**
+         * Perform async request and load results into component
+         */
+        search: _.debounce(function(loading, query, vm) {
+            axios.get('/learning/badge/' + this.badge.id + '/recipients', {
+                params: {
+                    query: query
+                }
+            })
+            .then(function(response) {
+                vm.options = response.data;
+                loading(false);
+            });
+        }, 350),
     }
 }
 </script>
 <template>
     <reveal-modal ref="modal">
         <template v-if="badge">
-            cat
+            <v-select :options="options" multiple @search="onSearch" label="name" placeholder="Search for recipients of thie badge" v-model="selected">
+                <template slot="option" slot-scope="option">
+                    <div class="d-center">
+                        {{ option.name }}
+                    </div>
+                </template>
+                <template slot="selected-option" slot-scope="option">
+                    <div class="selected d-center">
+                       {{ option.name }}
+                    </div>
+                </template>
+            </v-select>
         </template>
     </reveal-modal>
 </template>
