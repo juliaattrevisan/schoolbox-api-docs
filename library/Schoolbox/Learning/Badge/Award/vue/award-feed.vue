@@ -126,6 +126,24 @@ export default {
                     });
                 })
                 .finally(() => this.loading = false);
+        },
+
+        /**
+         * Decide if this Award has a tot menu
+         * If there aren't any actions you can undertake, hide the tot
+         */
+        hasTot(award) {
+            return this.canWithdraw(award);
+        },
+
+        /**
+         * Decide if the current user can Withdraw an Award
+         *
+         * @param award
+         * @returns {boolean}
+         */
+        canWithdraw(award) {
+            return Boolean(award._links.withdraw);
         }
     }
 }
@@ -168,12 +186,22 @@ export default {
                                 <div class="card-spacer"></div>
 
                                 <template v-if="!award.isGoal">
+
+                                    <template v-if="hasTot(award)">
                                     <nav>
                                         <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
                                     </nav>
                                     <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
+
+                                        <!--
+                                         -- Only show Withdraw button if you can actually do it
+                                         -- Students can't withdraw their own Achievement
+                                         -->
+                                        <template v-if="canWithdraw(award)">
                                         <li><a @click.prevent="openWithdrawModal(award)" class="icon-close" title="Withdraw">Withdraw</a></li>
+                                        </template>
                                     </ul>
+                                    </template>
                                 </template>
                             </div>
                         </div>
