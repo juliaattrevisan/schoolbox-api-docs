@@ -92,16 +92,16 @@ class Controller extends Base
     public function subject($year, User $student, $subjectCode)
     {
         try {
-            $reportData    = $this->buildReportData($year, $student, $subjectCode);
+            $reportData               = $this->buildReportData($year, $student, $subjectCode);
+            $reportData['graphWidth'] = $this->request->query->getInt('graph-width');
             /** @var StudentInvolvement\Subject $subjectReport */
             $subjectReport = $reportData['report']['subjectReport'];
             $this->getResponse()->content->set(
-                array(
-                    'template'   => '@customMeridenPastoral/subject.twig',
-                    'data'       => $reportData,
-                    'title'      => $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName(),
-                    'graphWidth' => $this->request->query->getInt('graph-width'),
-                )
+                [
+                    'template' => '@customMeridenPastoral/subject.twig',
+                    'data'     => $reportData,
+                    'title'    => $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName(),
+                ]
             );
         } catch (\RangeException $e) {
             $this->getResponse()->status->setCode(404);
