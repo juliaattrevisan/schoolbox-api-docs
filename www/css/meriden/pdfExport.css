@@ -22,3 +22,7 @@ body {
 .meriden-crest svg {
     height: 5.75rem;
 }
+
+.e-report #assessments table {
+    table-layout: fixed !important;
+}
