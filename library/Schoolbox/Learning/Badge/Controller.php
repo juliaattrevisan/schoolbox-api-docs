@@ -133,6 +133,7 @@ class Controller extends Base
                 new User\Translator\ModelToArray(),
                 new Storage\Translator\ModelToArray(),
                 new ScrubAdapter(),
+                new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
             ),
             new Award\Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
         );
