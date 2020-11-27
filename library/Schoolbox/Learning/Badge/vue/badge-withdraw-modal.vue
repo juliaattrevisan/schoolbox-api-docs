@@ -140,50 +140,55 @@ export default {
          * Perform achievement withdrawal from selected users
          */
         withdraw() {
-            if (this.selected.length) {
-              let self = this;
 
-              /* Mine $selected for ids
-               */
-              let userIds = [];
-
-              for (let i = 0; i < this.selected.length; i++) {
-                  userIds.push(this.selected[i].id);
-              }
-
-              /* Pack it up and send it
-               */
-              let request = {
-                  url: this.badge._links.withdraw,
-                  data:  qs.stringify({userIds: userIds}),
-                  method: 'post',
-                  responseType: 'json'
-              }
-
-              /* A toast - to your valour, my sword, and our victory together
-               */
-              self.$refs.toast.activate('Withdrawing achievements from ' + this.selected.length + ' student(s)');
-
-              axios.request(request)
-                  .then(function (response) {
-
-                      /* Pop toast
-                       */
-                      self.$refs.toast.timeout('Withdraw complete', true);
-                      self.close();
-                  })
-                  .then(function() {
-
-                      /* Clear selection after async outcome
-                       */
-                      self.selected = [];
-                  })
-                  .catch(error => {
-                      if (error.response) {
-                          self.$refs.toast.timeout('Unable to withdraw achievement; please try again.', false)
-                      }
-                  });
+            /* Nobody selected - nothing to do
+             */
+            if (!this.selected.length) {
+                return;
             }
+
+            let self = this;
+
+            /* Mine $selected for ids
+             */
+            let userIds = [];
+
+            for (let i = 0; i < this.selected.length; i++) {
+                userIds.push(this.selected[i].id);
+            }
+
+            /* Pack it up and send it
+             */
+            let request = {
+                url: this.badge._links.withdraw,
+                data:  qs.stringify({userIds: userIds}),
+                method: 'post',
+                responseType: 'json'
+            }
+
+            /* A toast - to your valour, my sword, and our victory together
+             */
+            self.$refs.toast.activate('Withdrawing achievements from ' + this.selected.length + ' student(s)');
+
+            axios.request(request)
+                .then(function (response) {
+
+                    /* Pop toast
+                     */
+                    self.$refs.toast.timeout('Withdraw complete', true);
+                    self.close();
+                })
+                .then(function() {
+
+                    /* Clear selection after async outcome
+                     */
+                    self.selected = [];
+                })
+                .catch(error => {
+                    if (error.response) {
+                        self.$refs.toast.timeout('Unable to withdraw achievement; please try again.', false)
+                    }
+                });
         }
     }
 }
@@ -208,7 +213,7 @@ export default {
             </v-select>
 
             <ul class="flex-list buttons">
-                <li><a href="#" class="submit" @click.prevent="withdraw()">Withdraw Achievement</a></li>
+                <li><a href="#" class="submit" @click.prevent="withdraw()" v-bind:class="{ disabled: !this.selected.length}">Withdraw Achievement</a></li>
                 <li><a href="#" class="button" @click.prevent="close()">Cancel</a></li>
             </ul>
         </template>
