@@ -83,7 +83,7 @@ export default {
     methods: {
 
         /**
-         * Open a modal to show the badge that aws given as an award
+         * Open a modal to show the badge that was given as an award
          *
          * @param award
          */
@@ -92,7 +92,7 @@ export default {
         },
 
         /**
-         * Open a confirmdialog for withdrawing a badge
+         * Open a confirmDialog for withdrawing a badge
          *
          * @param award
          */
@@ -172,6 +172,10 @@ export default {
                             <div class="card-content">
                                 <h3 class="no-margin"><a href="#" @click.prevent="openDetailModal(award)">{{ award.badge.name }} ({{ award.count }})</a></h3>
                                 <p class="meta">
+
+                                    <!-- Change metadata text subtly depending on the Award status
+                                      -- Goals and Achievements, while badges, aren't the same thing
+                                      -->
                                     <template v-if="award.isGoal">
                                         Goal set
                                     </template>
@@ -186,19 +190,17 @@ export default {
                                 <div class="card-spacer"></div>
 
                                 <template v-if="!award.isGoal">
-
                                     <template v-if="hasTot(award)">
                                     <nav>
                                         <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
                                     </nav>
                                     <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
 
-                                        <!--
-                                         -- Only show Withdraw button if you can actually do it
-                                         -- Students can't withdraw their own Achievement
-                                         -->
+                                        <!-- Only show Withdraw button if you can actually do it
+                                          -- Students can't withdraw their own Achievement
+                                          -->
                                         <template v-if="canWithdraw(award)">
-                                        <li><a @click.prevent="openWithdrawModal(award)" class="icon-close" title="Withdraw">Withdraw</a></li>
+                                            <li><a @click.prevent="openWithdrawModal(award)" class="icon-close" title="Withdraw">Withdraw</a></li>
                                         </template>
                                     </ul>
                                     </template>
