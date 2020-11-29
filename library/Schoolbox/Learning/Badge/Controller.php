@@ -11,12 +11,17 @@ namespace Schoolbox\Learning\Badge;
 
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Schoolbox\API\Cursor\MapperCursor;
+use Schoolbox\API\Translator\ModelToArray\Composite;
+use Schoolbox\Learning\Badge\Award\Model as AwardModel;
 use Schoolbox\Learning\Badge\Translator;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
  * Controller for badge requests.
@@ -110,7 +115,7 @@ class Controller extends Base
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      * @throws \UnexpectedValueException
      */
     public function getAwardedBadges(User $user): void
@@ -249,6 +254,114 @@ class Controller extends Base
 
 
     /**
+     * Award a badge as an achievement for a set of users in the request body.
+     *
+     * TODO consider moving to award controller?
+     *
+     * @api   POST /learning/badge/{badgeId}/achievement
+     * @since 20.2
+     *
+     * @param Model $badge The badge to award as an achievement.
+     * @throws MapperException
+     */
+    public function awardAsAchievement(Model $badge): void
+    {
+        $this->createAwardsFromRequestBody(
+            $badge,
+            AwardModel::AWARD_STATUS_ACHIEVEMENT
+        );
+    }
+
+
+    /**
+     * Set a badge as a goal for a set of users in the request body.
+     *
+     * TODO consider moving to award controller?
+     *
+     * @api   POST /learning/badge/{badgeId}/goal
+     * @since 20.2
+     *
+     * @param Model $badge The badge to set as a goal.
+     * @throws MapperException
+     */
+    public function setAsGoal(Model $badge): void
+    {
+        $this->createAwardsFromRequestBody(
+            $badge,
+            AwardModel::AWARD_STATUS_GOAL
+        );
+    }
+
+
+    /**
+     * Creates badge awards from the request body.
+     *
+     * Users to award to will be in the "users" key, and each user will be
+     * identified by the "id" key of each item in "users".
+     *
+     * @param Model  $badge  The badge to award.
+     * @param string $status The status to award the badge with:
+     *                       * `AwardModel::AWARD_STATUS_ACHIEVEMENT` for
+     *                         awarding the badge as an achievement
+     *                       * `AwardModel::AWARD_STATUS_GOAL` for awarding the
+     *                         badge as a goal to be achieved
+     * @throws MapperException
+     */
+    private function createAwardsFromRequestBody(Model $badge, string $status): void
+    {
+        // Users are in the data.
+        // So far: it's assumed all staff may award or set a badge as a goal to
+        // any other user.
+        $data       = json_decode($this->request->content->getRaw(), true);
+        $collection = $this->awardMapper->createCollection();
+        foreach ($data['users'] as $user) {
+            $award = $this->awardMapper->createModel()
+                // TODO inject user mapper
+                ->setRecipient(UserMapper::getInstance()->findById($user['id']))
+                ->setBadge($badge)
+                ->setStatus($status)
+                ->setAwardedBy($this->getUser())
+                ->setAwardedAt(Alaress_Date_Format::now());
+            $collection->add($award);
+        }
+        $this->awardMapper->save($collection);
+
+        // Return what was just created
+        $translator = new Award\Translator\ModelToArray(
+            new User\Translator\ModelToArray(),
+            new Translator\ModelToArray(
+                new User\Translator\ModelToArray(),
+                new Storage\Translator\ModelToArray(),
+                new ScrubAdapter()
+            ),
+            new Award\Translator\Links($this->router, $this->authorizer, $this->getUser())
+        );
+        $this->response->content->set(
+            $this->buildJsonOutput($collection->map($translator))
+        );
+    }
+
+
+    /**
+     * Set a badge as a goal for the current user.
+     *
+     * To be implemented when students are given the ability to set goals for
+     * themselves.
+     *
+     * TODO consider moving to award controller?
+     *
+     * @api   POST /learning/badge/{badgeId}/achievement
+     * @since 20.2
+     *
+     * @param Model $badge
+     */
+    public function setAsGoalForSelf(Model $badge): void
+    {
+
+    }
+
+
+    /**
      * Withdraw an Awarding of $badge to a specific set of users
      *
      * @param Model $badge
@@ -271,15 +384,21 @@ class Controller extends Base
     /**
      * Builder for the model-to-array translator for badges.
      *
-     * @return Translator\ModelToArray
+     * @return Composite
      */
-    private function buildModelToArrayTranslator(): Translator\ModelToArray
+    private function buildModelToArrayTranslator(): Composite
     {
-        // TODO add links translator
-        return new Translator\ModelToArray(
-            new User\Translator\ModelToArray(),
-            new Storage\Translator\ModelToArray(),
-            new ScrubAdapter()
+        return new Composite(
+            new Translator\ModelToArray(
+                new User\Translator\ModelToArray(),
+                new Storage\Translator\ModelToArray(),
+                new ScrubAdapter()
+            ),
+            new Translator\ModelToArray\Links(
+                $this->router,
+                $this->authorizer,
+                $this->getUser()
+            )
         );
     }
 }

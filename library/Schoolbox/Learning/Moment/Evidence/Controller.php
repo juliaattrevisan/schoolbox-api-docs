@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Moment\Evidence;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base;
+use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Collection;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Json\Decorator\LinkDecorator;
@@ -404,9 +405,9 @@ class Controller extends Base
      * Builds a translator which contains comments.
      *
      * @param int $commentLimit
-     * @return Translator\Composite
+     * @return Composite
      */
-    private function buildTranslatorWithComments(int $commentLimit): Translator\Composite
+    private function buildTranslatorWithComments(int $commentLimit): Composite
     {
         $scrubWrapper   = new ScrubAdapter();
         $baseTranslator = new Translator\ModelToArray\Base(
@@ -431,7 +432,7 @@ class Controller extends Base
             $scrubWrapper,
         );
 
-        return new Translator\Composite(
+        return new Composite(
             $baseTranslator,
             $linkTranslator,
             $commentTranslator,

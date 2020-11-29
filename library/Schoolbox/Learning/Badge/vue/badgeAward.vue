@@ -1,0 +1,214 @@
+<script>
+
+import axios from "axios";
+import Toast from "@schoolbox/toast";
+
+// Vue-select boilerplate
+// TODO consider wrapping in our own component
+import vSelect from "vue-select";
+import debounce from "lodash/debounce";
+import "vue-select/dist/vue-select.css";
+
+// Render a custom template for the deselect icon.
+// Partially documented on https://github.com/sagalbot/vue-select/issues/994
+import Deselect from '@schoolbox/selectize/Deselect';
+vSelect.props.components.default = () => ({ Deselect });
+
+const EVENTS = {
+    done: 'done',
+    cancel: 'cancel'
+};
+
+// The number of milliseconds to wait between the user's input and a search for
+// users.
+const SEARCH_RESULT_RETRIEVE_DELAY = 350;
+
+// There's no official method for documenting a component's events,
+// https://forum.vuejs.org/t/how-to-document-events-for-components/35541/3
+// suggests the @emits tag.
+
+/**
+ * Award badge form.
+ *
+ * @emits done   The award badge action was successfully completed
+ * @emits cancel The award badge action was cancelled
+ */
+export default {
+    components: {Toast, vSelect},
+    props: {
+        /**
+         * The badge to display in this detail panel.
+         */
+        badge: {
+            type: Object,
+            default: null,
+        },
+
+        /**
+         * The endpoint to post the badge award request to.
+         *
+         * It is expected that this will be either the badge's
+         * "awardAsAchievement" or "setAsGoal" links.
+         */
+        endpoint: {
+            type: String,
+            default: null,
+            required: true,
+        },
+
+        /**
+         * Placeholder text to display in the form's v-select input, before any
+         * users are selected.
+         */
+        placeholder: {
+            type: String,
+            default: 'Search for users to award achievement to',
+        },
+
+        /**
+         * Toast activation message
+         */
+        toastActivateMessage: {
+            type: String,
+            default: 'Awarding achievement...',
+        },
+
+
+        /**
+         * Toast success message
+         */
+        toastSuccessMessage: {
+            type: String,
+            default: 'Awarded achievement',
+        },
+
+        /**
+         * Toast failure message
+         */
+        toastFailureMessage: {
+            type: String,
+            default: 'Awarding achievement failed',
+        },
+    },
+    data() {
+        return {
+            options: [],
+            selected: [],
+        }
+    },
+    methods: {
+        /**
+         * Search callback for the selectize.
+         *
+         * This method is debounced so that the search doesn't trigger until
+         * the user has stopped typing for `SEARCH_RESULT_RETRIEVE_DELAY`
+         * milliseconds.
+         *
+         * @param {String}   query   The search string
+         * @param {Function} loading A function to call when the loading state
+         *                           changes (accepts a Boolean)
+         */
+        onSearch: debounce(function(query, loading) {
+            loading(true);
+            axios
+                .get('/ajax/user.php', {
+                    params: {
+                        query: query,
+                        groupID: 0,
+                    }
+                })
+                .then(response => this.options = response.data)
+                .finally(() => loading(false))
+        }, SEARCH_RESULT_RETRIEVE_DELAY),
+
+
+        /**
+         * Callback for when the badge award form is submitted.
+         *
+         * Posts to the `endpoint` property, then triggers this component's
+         * "done" event.
+         *
+         * @emits done if the badge was successfully awarded (whether as an
+         *             achievement or a goal)
+         */
+        onSubmit() {
+            this.$refs.toast.activate(this.toastActivateMessage);
+            axios.post(this.endpoint, {users: this.selected})
+                .then(() => {
+                    // Clear the select, so they don't show next time this opens
+                    this.selected = [];
+
+                    // The toast's lifetime is tied to this modal's lifetime.
+                    // Wait until the toast times out to raise the done event.
+                    this.$refs.toast.timeout(
+                        this.toastSuccessMessage,
+                        true,
+                        Toast.DEFAULT_DISPLAY_DURATION_SUCCESSFUL,
+                        Toast.DEFAULT_FADE_DURATION,
+                        () => this.$emit(EVENTS.done)
+                    );
+                })
+                .catch(() => this.$refs.toast.timeout(this.toastFailureMessage, false))
+        },
+
+
+        /**
+         * Callback for when the badge award form is cancelled.
+         *
+         * @emits cancel
+         */
+        onCancel() {
+            this.$emit(EVENTS.cancel);
+        },
+    },
+}
+</script>
+<template>
+    <div>
+        <!--
+        @slot The header for this badge award form
+        @binding {Object} badge The badge that is being shown in this component
+        -->
+        <slot name="header" :badge="badge"></slot>
+
+        <div class="card small-12 compact">
+            <img :src="badge.image._links.image" :alt="badge.name"/>
+            <h3>{{ badge.name }}</h3>
+        </div>
+
+        <v-select class="schoolbox-vue-selectize"
+                  :options="options"
+                  :clear-search-on-blur="function() { return true; }"
+                  :clear-search-on-select="false"
+                  :close-on-select="false"
+                  multiple
+                  @search="onSearch"
+                  label="name"
+                  :placeholder="placeholder"
+                  v-model="selected">
+            <template slot="option" slot-scope="option">
+                <span class="d-center">
+                    {{ option.name }}
+                </span>
+            </template>
+            <template slot="selected-option" slot-scope="option">
+                <span class="selected d-center">
+                    {{ option.name }}
+                </span>
+            </template>
+        </v-select>
+        <ul class="flex-list buttons">
+            <li>
+                <button @click.prevent="onSubmit" class="submit" :disabled="selected.length === 0">
+                    <!-- @slot The text for this badge award form's confirm button -->
+                    <slot name="confirmButton">
+                        Award Achievement
+                    </slot>
+                </button>
+            </li>
+            <li><button @click.prevent="onCancel">Cancel</button></li>
+        </ul>
+
+        <toast ref="toast"></toast>
+    </div>
+</template>

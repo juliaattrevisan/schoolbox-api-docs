@@ -1,5 +1,6 @@
 <template>
     <div :class="'reveal-modal ' + size" data-reveal aria-hidden="true" role="dialog" :id="elementId">
+        <!-- @slot Reveal modal content goes into this slot -->
         <slot></slot>
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
@@ -13,10 +14,28 @@
     export default {
         name: "reveal-modal",
         props: {
+            /**
+             * The size of the modal to display.
+             *
+             * This is added as a class to the modal.
+             */
             size: {
                 type: String,
                 default: 'small',
                 validator: (value) => VALID_SIZES.indexOf(value) !== -1
+            },
+
+            /**
+             * Is the modal closed when the background is clicked?
+             *
+             * This corresponds to the modal's `close_on_background_click`
+             * setting.
+             *
+             * @see https://get.foundation/sites/docs-v5/components/reveal.html
+             */
+            closeOnBackgroundClick: {
+                type: Boolean,
+                default: true,
             },
         },
         beforeCreate() {
@@ -54,7 +73,11 @@
              * Open this modal.
              */
             open() {
-                this.modal.foundation('reveal', 'open');
+                this.modal.foundation(
+                    'reveal',
+                    'open',
+                    {close_on_background_click: this.closeOnBackgroundClick}
+                );
             },
 
             /**

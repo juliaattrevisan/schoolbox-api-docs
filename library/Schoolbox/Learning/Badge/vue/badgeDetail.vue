@@ -2,9 +2,12 @@
 export default {
     components: {},
     props: {
+        /**
+         * The badge to display in this detail panel.
+         */
         badge: {
             type: Object,
-            default: {},
+            default: null,
         },
     },
     computed: {

@@ -4,14 +4,24 @@ import axios from 'axios';
 import Toast from "@schoolbox/toast";
 import RevealModal from "@schoolbox/reveal-modal";
 import BadgeDetail from "./badgeDetail";
+import BadgeAward from "./badgeAward";
 
 export default {
-    components: {BadgeDetail, RevealModal, Toast},
+    components: {BadgeAward, BadgeDetail, RevealModal, Toast},
     props: {
+        /**
+         * The route via which badges are retrieved.
+         */
         getBadgesRoute: {
             type: String,
             default: '',
         },
+
+        /**
+         * The route via which new badges are posted.
+         *
+         * TODO remove as this seems unused
+         */
         postBadgeRoute: {
             type: String,
             default: '',
@@ -19,7 +29,7 @@ export default {
     },
     data() {
         return {
-            currentBadge: {},
+            currentBadge: null,
             data: [],
             search: {},
             metadata: {
@@ -81,6 +91,42 @@ export default {
             this.currentBadge = badge;
             this.$refs.detailModal.open();
         },
+
+        /**
+         * Opens a modal window for viewing this badge's award form.
+         *
+         * @param {Object} badge
+         */
+        openAwardAsAchievementModal(badge) {
+            this.currentBadge = badge;
+            this.$refs.awardAsAchievementModal.open();
+        },
+
+        /**
+         * Closes the modal window for the award form.
+         */
+        closeAwardAsAchievementModal() {
+            this.$refs.awardAsAchievementModal.close();
+        },
+
+        /**
+         * Opens a modal window for viewing this badge's set as goal form.
+         *
+         * @param {Object} badge
+         */
+        openSetAsGoalModal(badge) {
+            this.currentBadge = badge;
+            this.$refs.setAsGoalModal.open();
+        },
+
+        /**
+         * Closes the modal window for the set as goal form.
+         *
+         * @param {Object} badge
+         */
+        closeSetAsGoalModal(badge) {
+            this.$refs.setAsGoalModal.close();
+        },
     },
 }
 </script>
@@ -113,7 +159,7 @@ export default {
                 </ul>
 
                 <ul class="grid small-block-grid-2 medium-block-grid-3 large-block-grid-4">
-                    <li v-for="badge in data">
+                    <li v-for="badge in data" :key="badge.id">
                         <!-- I'd apply the click to the entire <li> but that intercepts dropdown clicks -->
                         <a @click.prevent="openDetailModal(badge)">
                             <img :src="badge.image._links.image" :alt="badge.name" />
@@ -130,9 +176,9 @@ export default {
                                    aria-expanded="false" title="Actions"></a>
                             </nav>
                             <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                <li><a href="#" class="icon-add" title="Award">Award</a></li>
-                                <li><a href="#" class="icon-task" title="Set as Goal">Set as Goal</a></li>
-                                <li><a href="#" class="icon-minus" title="Award">Withdraw</a></li>
+                                <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase" title="Award">Award</a></li>
+                                <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set as Goal">Set as Goal</a></li>
+                                <li><a href="#" class="icon-close" title="Award">Withdraw</a></li>
                                 <li><a href="#" class="icon-modify" title="Modify">Modify</a></li>
                                 <li><a href="#" class="icon-delete" title="Delete">Delete</a></li>
                             </ul>
@@ -148,7 +194,47 @@ export default {
         </section>
 
         <reveal-modal ref="detailModal">
-            <badge-detail :badge="currentBadge"></badge-detail>
+            <badge-detail :badge="currentBadge" v-if="currentBadge"></badge-detail>
+        </reveal-modal>
+
+        <reveal-modal size="large" ref="awardAsAchievementModal" :closeOnBackgroundClick="false">
+            <badge-award v-if="currentBadge"
+                         :badge="currentBadge"
+                         :endpoint="currentBadge._links.awardAsAchievement"
+                         @cancel="closeAwardAsAchievementModal"
+                         @done="closeAwardAsAchievementModal"
+                         placeholder="Search for users to award achievement to"
+                         toast-activate-message="Awarding achievement..."
+                         toast-success-message="Awarded achievement"
+                         toast-failure-message="Awarding achievement failed"
+            >
+                <template v-slot:header="slotProps">
+                    <h2>Award &lsquo;<i>{{ slotProps.badge.name }}</i>&rsquo; as an Achievement</h2>
+                </template>
+                <template v-slot:confirmButton>
+                    Award Achievement
+                </template>
+            </badge-award>
+        </reveal-modal>
+
+        <reveal-modal size="large" ref="setAsGoalModal" :closeOnBackgroundClick="false">
+            <badge-award v-if="currentBadge"
+                         :badge="currentBadge"
+                         :endpoint="currentBadge._links.setAsGoal"
+                         @cancel="closeSetAsGoalModal"
+                         @done="closeSetAsGoalModal"
+                         placeholder="Search for users to set a goal for"
+                         toast-activate-message="Setting goal..."
+                         toast-success-message="Goal set"
+                         toast-failure-message="Setting goal failed"
+            >
+                <template v-slot:header="slotProps">
+                    <h2>Set &lsquo;<i>{{ slotProps.badge.name }}</i>&rsquo; as a Goal</h2>
+                </template>
+                <template v-slot:confirmButton>
+                    Set Goal
+                </template>
+            </badge-award>
         </reveal-modal>
 
         <toast ref="toast"></toast>
