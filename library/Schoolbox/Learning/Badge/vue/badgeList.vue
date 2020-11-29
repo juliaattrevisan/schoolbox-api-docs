@@ -176,9 +176,9 @@ export default {
                                    aria-expanded="false" title="Actions"></a>
                             </nav>
                             <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-add" title="Award">Award as Achievement</a></li>
-                                <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-task" title="Set as Goal">Set as Goal</a></li>
-                                <li><a href="#" class="icon-minus" title="Award">Withdraw</a></li>
+                                <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase" title="Award">Award</a></li>
+                                <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set as Goal">Set as Goal</a></li>
+                                <li><a href="#" class="icon-close" title="Award">Withdraw</a></li>
                                 <li><a href="#" class="icon-modify" title="Modify">Modify</a></li>
                                 <li><a href="#" class="icon-delete" title="Delete">Delete</a></li>
                             </ul>
@@ -209,7 +209,7 @@ export default {
                          toast-failure-message="Awarding achievement failed"
             >
                 <template v-slot:header="slotProps">
-                    <h2>Awarding &lsquo;<i>{{ slotProps.badge.name }}</i>&rsquo; as an Achievement</h2>
+                    <h2>Award &lsquo;<i>{{ slotProps.badge.name }}</i>&rsquo; as an Achievement</h2>
                 </template>
                 <template v-slot:confirmButton>
                     Award Achievement
@@ -229,7 +229,7 @@ export default {
                          toast-failure-message="Setting goal failed"
             >
                 <template v-slot:header="slotProps">
-                    <h2>Setting &lsquo;<i>{{ slotProps.badge.name }}</i>&rsquo; as a Goal</h2>
+                    <h2>Set &lsquo;<i>{{ slotProps.badge.name }}</i>&rsquo; as a Goal</h2>
                 </template>
                 <template v-slot:confirmButton>
                     Set Goal
