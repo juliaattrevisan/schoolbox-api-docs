@@ -98,8 +98,9 @@ class Controller extends Base
     }
 
     /**
-     * @api /adminv2/lists/save
-     * @since 160
+     * @throws \Alaress\Web\Controller\Exception
+     * @since    160
+     * @api      /adminv2/lists/save
      */
     public function postSave()
     {
@@ -250,7 +251,12 @@ class Controller extends Base
                     $model->$setCreatedByMethod($this->getUser());
                 }
 
-                $mapper->save($model);
+                try {
+                    $mapper->save($model);
+                } catch (\Exception $e) {
+                    $this->sendError('Could not save: ' . $e->getMessage());
+                    return;
+                }
             }
         }
 
