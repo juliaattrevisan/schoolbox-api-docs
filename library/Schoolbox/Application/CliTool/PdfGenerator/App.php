@@ -59,6 +59,9 @@ abstract class App extends BaseApp
     // print media type style sheet
     private const OPT_LONG_PRINT_MEDIA_TYPE = 'print-media-type';
 
+    // should landscape orientation be used? If not default to portrait
+    private const OPT_LONG_ORIENTATION_LANDSCAPE = 'orientation-landscape';
+
     // Exit status for an authentication failure
     private const EXIT_STATUS_AUTHENTICATION_FAILURE = 100;
 
@@ -90,6 +93,7 @@ abstract class App extends BaseApp
             self::OPT_LONG_JS_DELAY,
             self::OPT_LONG_USER_STYLE_SHEET,
             self::OPT_LONG_PRINT_MEDIA_TYPE,
+            self::OPT_LONG_ORIENTATION_LANDSCAPE,
         ];
     }
 
@@ -237,6 +241,10 @@ abstract class App extends BaseApp
     $yellow--print-media-type$white
         If set, generate PDFs using the print media type and its styles;
         otherwise, PDFs will be generated using the screen media type.
+
+    $yellow--orientation-landscape$white
+        If set, generate PDFs in landscape orientation: by default, they will be
+        generated in portrait orientation.
 BASE;
     }
 
@@ -252,7 +260,10 @@ BASE;
 
         // TODO expose more CLI options
         $pdfGenerator->setTimeout(120);
-        $pdfGenerator->setOption('orientation', 'Landscape');
+        $pdfGenerator->setOption(
+            'orientation',
+            ($this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE) ? 'Landscape' : 'Portrait')
+        );
         $pdfGenerator->setOption('disable-external-links', true);
         $pdfGenerator->setOption('viewport-size', 1024);
 
