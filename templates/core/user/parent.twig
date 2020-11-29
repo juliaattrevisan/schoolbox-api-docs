@@ -57,7 +57,7 @@
                             {% endif %}
 
                             {% if showDetails and not (externalUser.SilentPhoneFlag ?? false) %}
-                                {% if externalUser.HomePhone %}
+                                {% if externalUser and externalUser.HomePhone %}
                                     <dt class="small-12 medium-3">Home Phone:</dt>
                                     <dd class="small-12 medium-9">
                                         <a href="tel:{{ externalUser.HomePhone }}">{{ externalUser.HomePhone }}</a>
@@ -66,7 +66,7 @@
                             {% endif %}
 
                             {% if showDetails and not (externalUser.SilentMobilePhoneFlag ?? false) %}
-                                {% if externalUser.MobilePhone %}
+                                {% if externalUser and externalUser.MobilePhone %}
                                     <dt class="small-12 medium-3">Mobile Phone:</dt>
                                     <dd class="small-12 medium-9">
                                         <a href="tel:{{ externalUser.MobilePhone }}">{{ externalUser.MobilePhone }}</a>
@@ -76,7 +76,7 @@
                             {% if showDetails %}
                                 <dt class="small-12 medium-3">Role:</dt>
                                 <dd class="small-12 medium-9">{{ user.role.name }}</dd>
-                                {% if externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname and (not spouse.getHideContacts()) %}
+                                {% if externalUser and externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname and (not spouse.getHideContacts()) %}
                                     <dt class="small-12">Partner:</dt>
                                     <dd class="small-12">
                                         <div class="card small-12">
