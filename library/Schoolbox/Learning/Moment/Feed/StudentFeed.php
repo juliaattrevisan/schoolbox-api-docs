@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Feed;
 
+use Alaress\Codec\ICodec;
+use Alaress\Codec\Json\Base64;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Mapper;
 
@@ -21,35 +23,57 @@ use Schoolbox\Mapper;
  *
  * It should be cursored just as the learning moment feed is.
  */
-class StudentFeed
+class StudentFeed implements ICursor
 {
-    private const DEFAULT_LIMIT = 10;
-
-
     /**
+     * A list of mappers to cursor over.
+     *
      * @var Mapper[]
      */
     private array $mappers;
 
 
     /**
-     * How should this work?
-     * My thought:
-     *
-     * Supply at least one mapper
-     * Each mapper will require:
-     * * order by columns (these must be equivalent for each mapper: i.e. the
-     *   first column of each order for each mapper must be the same type)
-     * * a discriminator field (so I know which mapper a result came from)
+     * The maximum number of results which may be retrieved at once from this
+     * cursor.
      */
-    public function __construct(Mapper ...$mappers)
+    private int $limit;
+
+
+    /**
+     * The order in which results are retrieved from this mapper.
+     */
+    private array $order;
+
+
+    /**
+     * A codec for encoding a result set into a cursor, and decoding a cursor
+     * into a pointer to a result set.
+     *
+     * Defaults to `\Alaress\Codec\Json\Base64`.
+     */
+    private ICodec $codec;
+
+
+    /**
+     * Constructor
+     *
+     * @param int         $limit Fetch only this number of results at a time.
+     * @param ICodec|null $codec If provided, use this codec to translate the
+     *                           cursor.
+     *                           Defaults to `\Alaress\Codec\Json\Base64`.
+     */
+    public function __construct(int $limit, ?ICodec $codec = null)
     {
-        $this->mappers = $mappers;
+        $this->limit = $limit;
+        $this->codec = $codec ?? new Base64();
     }
 
 
-    public function addCursor(string $discriminator, ICursor $cursor): self
+    public function addMapper(string $discriminator, Mapper $mapper, array $order): self
     {
+        $this->mappers[$discriminator] = $mapper;
+        $this->order[$discriminator]   = $order;
         return $this;
     }
 
@@ -60,11 +84,11 @@ class StudentFeed
     private function buildBaseQuery(): string
     {
         $queryParts = [];
-        $params     = [];
-        foreach ($this->mappers as $i => $mapper) {
+        $params     = ['limit' => $this->limit];
+        foreach ($this->mappers as $discriminator => $mapper) {
             $query = "
                 SELECT
-                    {$mapper->getDatabase()->quoteIdentifier($this->buildDiscriminator($mapper))},
+                    {$mapper->getDatabase()->quoteIdentifier($discriminator)},
                     {$mapper->getDatabase()->quoteIdentifier($mapper->getIdentifierColumn())} AS id
                     -- Add each order by field for this mapper here
                 FROM {$mapper->getDatabase()->quoteIdentifier($mapper->getTable())}
@@ -74,7 +98,7 @@ class StudentFeed
                 -- then the composite cursor would be responsible for managing
                 -- limits for each sub-cursor.
                 -- Also: what will the encoded cursor look like?
-                LIMIT :limit{$i}
+                LIMIT :limit
             ";
             $queryParts[] = $query;
         }
