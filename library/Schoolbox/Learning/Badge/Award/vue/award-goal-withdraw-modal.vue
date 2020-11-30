@@ -101,7 +101,7 @@ export default {
             /* Access the withdraw endpoint, grab the awards for the user
              */
             let request = {
-                url: this.award._links.withdraw,
+                url: this.award._links.goalWithdraw,
                 data: qs.stringify({userIds: [this.award.recipient.id]}),
                 method: 'post',
                 responseType: 'json'
@@ -109,7 +109,7 @@ export default {
 
             /* A toast - to your valour, my sword, and our victory together
              */
-            self.toastActivate('Withdrawing achievement...');
+            self.toastActivate('Unsetting goal...');
 
             axios.request(request)
                 .then(response => {
@@ -124,11 +124,11 @@ export default {
 
                     /* Pop toast
                      */
-                    self.toastSuccess('Withdraw complete');
+                    self.toastSuccess('Unset complete');
                 })
                 .catch(error => {
                     if (error.response) {
-                        self.toastError('Unable to withdraw achievement; please try again.');
+                        self.toastError('Unable to unset goal; please try again.');
                     }
                 });
         }
@@ -139,7 +139,7 @@ export default {
     <reveal-modal ref="modal">
         <template v-if="award.badge">
             <h2>Please confirm</h2>
-            <p>Are you sure you want to withdraw <strong>{{ award.badge.name }}</strong> from {{ award.recipient.fullName }}?</p>
+            <p>Are you sure you want to unset <strong>{{ award.badge.name }}</strong> for {{ award.recipient.fullName }}?</p>
             <ul class="flex-list buttons">
                 <li><a @click.prevent="withdraw()" class="button submit">Yes</a></li>
                 <li><a @click.prevent="close()" class="button">No</a></li>

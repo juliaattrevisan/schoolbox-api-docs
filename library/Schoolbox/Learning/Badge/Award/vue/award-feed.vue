@@ -1,7 +1,8 @@
 <script>
 import axios from "axios";
 import AwardDetailModal from './award-detail-modal';
-import AwardWithdrawModal from "./award-withdraw-modal";
+import AchievementWithdrawModal from "./award-achievement-withdraw-modal";
+import GoalWithdrawModal from "./award-goal-withdraw-modal";
 import foundationMixin from '@schoolbox/foundation-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
@@ -41,7 +42,8 @@ export default {
      */
     components: {
         AwardDetailModal,
-        AwardWithdrawModal,
+        AchievementWithdrawModal,
+        GoalWithdrawModal,
         RelativeTime
     },
 
@@ -96,8 +98,17 @@ export default {
          *
          * @param award
          */
-        openWithdrawModal(award) {
-            this.$refs.awardWithdrawModal.open(award);
+        openAchievementWithdrawModal(award) {
+            this.$refs.achievementWithdrawModal.open(award);
+        },
+
+        /**
+         * Open a confirmDialog for withdrawing a badge
+         *
+         * @param award
+         */
+        openGoalWithdrawModal(award) {
+            this.$refs.goalWithdrawModal.open(award);
         },
 
         /**
@@ -137,13 +148,13 @@ export default {
         },
 
         /**
-         * Decide if the current user can Withdraw an Award
+         * Decide if the current user can Withdraw an Achievement or Goal
          *
          * @param award
          * @returns {boolean}
          */
         canWithdraw(award) {
-            return Boolean(award._links.withdraw);
+            return Boolean(award._links.goalWithdraw) || Boolean(award._links.achievementWithdraw);
         }
     }
 }
@@ -200,7 +211,12 @@ export default {
                                           -- Students can't withdraw their own Achievement
                                           -->
                                         <template v-if="canWithdraw(award)">
-                                            <li><a @click.prevent="openWithdrawModal(award)" class="icon-close" title="Withdraw">Withdraw</a></li>
+                                            <template v-if="!award.isGoal">
+                                                <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-close" title="Withdraw achievement">Withdraw achievement</a></li>
+                                            </template>
+                                            <template v-else>
+                                                <li><a @click.prevent="openGoalWithdrawModal(award)" class="icon-close" title="Unset goal">Unset goal</a></li>
+                                            </template>
                                         </template>
                                     </ul>
                                     </template>
@@ -221,6 +237,8 @@ export default {
         </template>
 
         <award-detail-modal ref="awardDetailModal"></award-detail-modal>
-        <award-withdraw-modal ref="awardWithdrawModal" v-on:withdraw-complete="updateAwards()"></award-withdraw-modal>
+
+        <achievement-withdraw-modal ref="achievementWithdrawModal" v-on:withdraw-complete="updateAwards()"></achievement-withdraw-modal>
+        <goal-withdraw-modal ref="goalWithdrawModal" v-on:withdraw-complete="updateAwards()"></goal-withdraw-modal>
     </div>
 </template>

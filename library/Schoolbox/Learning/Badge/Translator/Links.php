@@ -73,7 +73,7 @@ class Links
             ]
         );
 
-        /* All the people who have received this badge as an achievement
+        /* All the people who have received this badge as a goal
          */
         $translation['goalRecipients'] = $this->getRouteIfAuthorized(
             'learningBadge.getGoalRecipients', [
