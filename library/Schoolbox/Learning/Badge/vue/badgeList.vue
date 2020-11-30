@@ -189,7 +189,7 @@ export default {
                             <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
                                 <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase" title="Award">Award</a></li>
                                 <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set as Goal">Set as Goal</a></li>
-                                <li><a href="#" class="icon-close" title="Withdraw awards" @click.prevent="openWithdrawModal(badge)">Withdraw</a></li>
+                                <li><a @click.prevent="openWithdrawModal(badge)" class="icon-close" title="Withdraw awards" >Withdraw</a></li>
                                 <li><a href="#" class="icon-modify" title="Modify">Modify</a></li>
                                 <li><a href="#" class="icon-delete" title="Delete">Delete</a></li>
                             </ul>
