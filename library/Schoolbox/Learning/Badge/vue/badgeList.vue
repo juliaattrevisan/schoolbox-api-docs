@@ -5,9 +5,16 @@ import Toast from "@schoolbox/toast";
 import RevealModal from "@schoolbox/reveal-modal";
 import BadgeDetail from "./badgeDetail";
 import BadgeAward from "./badgeAward";
+import BadgeWithdrawModal from "./badge-withdraw-modal";
 
 export default {
-    components: {BadgeAward, BadgeDetail, RevealModal, Toast},
+    components: {
+      BadgeAward,
+      BadgeDetail,
+      BadgeWithdrawModal,
+      RevealModal,
+      Toast
+    },
     props: {
         /**
          * The route via which badges are retrieved.
@@ -90,6 +97,10 @@ export default {
         openDetailModal(badge) {
             this.currentBadge = badge;
             this.$refs.detailModal.open();
+        },
+
+        openWithdrawModal(badge) {
+          this.$refs.withdrawModal.open(badge);
         },
 
         /**
@@ -178,7 +189,7 @@ export default {
                             <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
                                 <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase" title="Award">Award</a></li>
                                 <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set as Goal">Set as Goal</a></li>
-                                <li><a href="#" class="icon-close" title="Award">Withdraw</a></li>
+                                <li><a href="#" class="icon-close" title="Withdraw awards" @click.prevent="openWithdrawModal(badge)">Withdraw</a></li>
                                 <li><a href="#" class="icon-modify" title="Modify">Modify</a></li>
                                 <li><a href="#" class="icon-delete" title="Delete">Delete</a></li>
                             </ul>
@@ -236,6 +247,8 @@ export default {
                 </template>
             </badge-award>
         </reveal-modal>
+
+        <badge-withdraw-modal ref="withdrawModal"></badge-withdraw-modal>
 
         <toast ref="toast"></toast>
     </div>
