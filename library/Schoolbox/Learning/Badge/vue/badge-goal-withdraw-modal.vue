@@ -205,7 +205,7 @@ export default {
 <template>
     <reveal-modal ref="modal">
         <template v-if="badge">
-            <h2>Withdraw <strong>{{ badge.name }}</strong></h2>
+            <h2>Unset <strong>{{ badge.name }}</strong></h2>
 
             <div class="card small-12 compact">
                 <img :src="badge.image._links.image" :alt="badge.name"/>

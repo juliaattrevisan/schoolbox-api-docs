@@ -138,7 +138,13 @@ export default {
 <template>
     <reveal-modal ref="modal">
         <template v-if="award.badge">
-            <h2>Please confirm</h2>
+            <h2>Unset <strong>{{ award.badge.name }}</strong></h2>
+
+            <div class="card small-12 compact">
+                <img :src="award.badge.image._links.image" :alt="award.badge.name"/>
+                <h3>{{ award.badge.name }}</h3>
+            </div>
+
             <p>Are you sure you want to unset <strong>{{ award.badge.name }}</strong> for {{ award.recipient.fullName }}?</p>
             <ul class="flex-list buttons">
                 <li><a @click.prevent="withdraw()" class="button submit">Yes</a></li>
