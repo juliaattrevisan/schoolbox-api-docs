@@ -13,7 +13,6 @@ import "vue-select/dist/vue-select.css";
  * https://github.com/sagalbot/vue-select/issues/994
  */
 import Deselect from '@schoolbox/selectize/Deselect';
-import {ENDPOINTS} from "@schoolboxCalendarEvent/endpoints";
 import qs from "qs";
 vSelect.props.components.default = () => ({ Deselect });
 
