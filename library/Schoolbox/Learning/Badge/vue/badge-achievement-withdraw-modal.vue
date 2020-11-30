@@ -23,7 +23,7 @@ export default {
      * The name of the component that we have here. This name will be used in the container
      * to spawn this component.
      */
-    name: "badge-withdraw-achievement-modal",
+    name: "badge-achievement-withdraw-modal",
 
     /**
      * Mixins.
