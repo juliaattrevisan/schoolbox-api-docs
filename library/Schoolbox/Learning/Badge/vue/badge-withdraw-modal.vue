@@ -1,6 +1,7 @@
 <script>
 import axios from "axios";
 import RevealModal from '@schoolbox/reveal-modal'
+import toastMixin from '@schoolbox/toast-mixin';
 
 /* Vue select
  */
@@ -31,6 +32,7 @@ export default {
      * be superpositioned on top of this javascript here, inside export default {}
      */
     mixins: [
+        toastMixin
     ],
 
     /**
@@ -82,7 +84,6 @@ export default {
      * Access the results of a function as if they were a property of an object.
      */
     computed: {
-       jQuery: () => window.jQuery,
     },
 
     /**
@@ -166,23 +167,18 @@ export default {
 
             /* A toast - to your valour, my sword, and our victory together
              */
-            let toast = this.jQuery('[data-toast]');
-
-            toast.toastActivate({
-                text: 'Withdrawing achievements from ' + this.selected.length + ' student(s)'
-            });
+            self.toastActivate('Withdrawing achievements from ' + this.selected.length + ' student(s)');
 
             axios.request(request)
                 .then(function (response) {
 
+                    /* Close this modal
+                     */
+                    self.close();
+
                     /* Pop toast
                      */
-                    toast.toastTimeout({
-                        text: 'Withdraw complete',
-                        css: 'success'
-                    });
-
-                    self.close();
+                    self.toastSuccess('Withdraw complete');
                 })
                 .then(function() {
 
@@ -192,10 +188,9 @@ export default {
                 })
                 .catch(error => {
                     if (error.response) {
-                        toast.toastTimeout({
-                            text: 'Unable to withdraw achievement; please try again.',
-                            css: 'alert'
-                        });
+                        if (error.response) {
+                            self.toastError('Unable to withdraw achievement; please try again.');
+                        }
                     }
                 });
         }

@@ -2,6 +2,7 @@
 import axios from "axios";
 import RevealModal from '@schoolbox/reveal-modal'
 import qs from 'qs';
+import toastMixin from '@schoolbox/toast-mixin';
 
 export default {
 
@@ -19,6 +20,7 @@ export default {
      * be superpositioned on top of this javascript here, inside export default {}
      */
     mixins: [
+        toastMixin
     ],
 
     /**
@@ -63,7 +65,6 @@ export default {
      * Access the results of a function as if they were a property of an object.
      */
     computed: {
-        jQuery: () => window.jQuery,
     },
 
     /**
@@ -108,11 +109,7 @@ export default {
 
             /* A toast - to your valour, my sword, and our victory together
              */
-            let toast = this.jQuery('[data-toast]');
-
-            toast.toastActivate({
-               text: 'Withdrawing achievement...'
-            });
+            self.toastActivate('Withdrawing achievement...');
 
             axios.request(request)
                 .then(response => {
@@ -127,17 +124,11 @@ export default {
 
                     /* Pop toast
                      */
-                    toast.toastTimeout({
-                        text: 'Withdraw complete',
-                        css: 'success'
-                    });
+                    self.toastSuccess('Withdraw complete');
                 })
                 .catch(error => {
                     if (error.response) {
-                        toast.toastTimeout({
-                            text: 'Unable to withdraw achievement; please try again.',
-                            css: 'alert'
-                        });
+                        self.toastError('Unable to withdraw achievement; please try again.');
                     }
                 });
         }
