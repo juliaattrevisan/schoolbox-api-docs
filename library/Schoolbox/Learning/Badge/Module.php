@@ -67,14 +67,6 @@ class Module extends BaseModule
         );
 
         $this->register(
-            self::METHOD_POST,
-            '/{badgeId}/withdraw',
-            'postWithdraw',
-            $baseRule,
-            Closure::fromCallable([$this, 'preloadBadge']),
-        );
-
-        $this->register(
             self::METHOD_GET,
             '/{badgeId}/achievement/recipients',
             'getAchievementRecipients',
@@ -83,9 +75,25 @@ class Module extends BaseModule
         );
 
         $this->register(
+            self::METHOD_POST,
+            '/{badgeId}/achievement/withdraw',
+            'postWithdrawAchievement',
+            $baseRule,
+            Closure::fromCallable([$this, 'preloadBadge']),
+        );
+
+        $this->register(
             self::METHOD_GET,
             '/{badgeId}/goal/recipients',
             'getGoalRecipients',
+            $baseRule,
+            Closure::fromCallable([$this, 'preloadBadge']),
+        );
+
+        $this->register(
+            self::METHOD_POST,
+            '/{badgeId}/goal/withdraw',
+            'postWithdrawGoal',
             $baseRule,
             Closure::fromCallable([$this, 'preloadBadge']),
         );

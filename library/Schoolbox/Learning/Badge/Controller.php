@@ -362,17 +362,40 @@ class Controller extends Base
 
     }
 
-
     /**
-     * Withdraw an Awarding of $badge to a specific set of users
+     * Withdraw an achievement that aws set for a set of users
      *
      * @param Model $badge
      * @throws \PDOException
      */
-    public function postWithdraw(Model $badge): void
+    public function postWithdrawAchievement(Model $badge): void
+    {
+        $this->postWithdraw($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT);
+    }
+
+
+    /**
+     * Withdraw a goal that aws set for a set of users
+     *
+     * @param Model $badge
+     * @throws \PDOException
+     */
+    public function postWithdrawGoal(Model $badge): void
+    {
+        $this->postWithdraw($badge, AwardModel::AWARD_STATUS_GOAL);
+    }
+
+
+    /**
+     * Withdraw an Awarding of $badge to a specific set of users
+     *
+     * @param Model  $badge
+     * @param string $status
+     * @throws \PDOException
+     */
+    private function postWithdraw(Model $badge, string $status): void
     {
         $userIds = $this->getRequest()->post['userIds'] ?? [];
-        $status = $this->getRequest()->post['status'] ?? '';
 
         /* Empty user list; nothing to do
          */
