@@ -144,11 +144,11 @@ then
 fi
 
 # Ensure all required resources are available before update, hard fail if not
-$instdir/tools/notif/syscheck.php -v;
-if [ $? -ne 0 ];
-then
+"$instdir"/tools/notif/syscheck.php -v;
+syscheck_exit_code=$?
+if [ $syscheck_exit_code -ne 0 ]; then
     echo "Error: all system dependencies must be available to start the update"
-    exit $?;
+    exit $syscheck_exit_code;
 fi
 
 # Only run DB backup if not completed in the last hour
