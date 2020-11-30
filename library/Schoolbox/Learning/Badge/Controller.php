@@ -372,6 +372,7 @@ class Controller extends Base
     public function postWithdraw(Model $badge): void
     {
         $userIds = $this->getRequest()->post['userIds'] ?? [];
+        $status = $this->getRequest()->post['status'] ?? '';
 
         /* Empty user list; nothing to do
          */
@@ -379,7 +380,13 @@ class Controller extends Base
             return;
         }
 
-        $this->awardMapper->deleteMostRecentlyAwarded($userIds, $badge);
+        /* Must be a valid status
+         */
+        if (!\in_array($this->getRequest()->post['status'], [AwardModel::AWARD_STATUS_ACHIEVEMENT, AwardModel::AWARD_STATUS_GOAL], true)) {
+            return;
+        }
+
+        $this->awardMapper->deleteMostRecentlyAwarded($userIds, $badge, $status);
     }
 
 

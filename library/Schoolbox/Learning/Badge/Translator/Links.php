@@ -65,28 +65,29 @@ class Links
     {
         $translation = [];
 
-        /* All the people who have received this badge
+        /* All the people who have received this badge as an achievement
          */
-        $translation['recipients'] = $this->getRouteIfAuthorized(
-            'learningBadge.getRecipients', [
+        $translation['achievementRecipients'] = $this->getRouteIfAuthorized(
+            'learningBadge.getAchievementRecipients', [
+                'badgeId' => $badge->getId(),
+            ]
+        );
+
+        /* All the people who have received this badge as an achievement
+         */
+        $translation['goalRecipients'] = $this->getRouteIfAuthorized(
+            'learningBadge.getGoalRecipients', [
                 'badgeId' => $badge->getId(),
             ]
         );
 
         /* Endpoint for withdrawing the awarding of this achievement
+         * Also the endpoint for unsetting the goal
          */
         $translation['withdrawAchievement'] = $this->getRouteIfAuthorized(
-            'learningBadge.postWithdrawAchievement', [
+            'learningBadge.postWithdraw', [
                 'badgeId' => $badge->getId(),
             ]
-        );
-
-        /* Endpoint for withdrawing the awarding of this achievement
-         */
-        $translation['withdrawGoal'] = $this->getRouteIfAuthorized(
-            'learningBadge.postWithdrawGoal', [
-               'badgeId' => $badge->getId(),
-           ]
         );
 
         return $translation;

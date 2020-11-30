@@ -273,9 +273,10 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param array       $userIds
      * @param Badge\Model $badge
+     * @param string      $status
      * @throws \PDOException
      */
-    public function deleteMostRecentlyAwarded(array $userIds, Badge\Model $badge): void
+    public function deleteMostRecentlyAwarded(array $userIds, Badge\Model $badge, string $status): void
     {
 
         /* Find a list of the most recent instances of $badge given
@@ -298,9 +299,8 @@ class Mapper extends \Schoolbox\Mapper
         $params['badgeId'] = $badge->getId();
 
         /* Only withdraw Achievements for now, not Goals
-         * FIXME This will probably change later, pass it as an arg
          */
-        $params['status'] = Model::AWARD_STATUS_ACHIEVEMENT;
+        $params['status'] = $status;
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
