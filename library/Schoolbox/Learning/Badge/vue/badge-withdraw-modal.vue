@@ -168,8 +168,6 @@ export default {
              */
             let toast = this.jQuery('[data-toast]');
 
-            /* A toast - to your valour, my sword, and our victory together
-             */
             toast.toastActivate({
                 text: 'Withdrawing achievements from ' + this.selected.length + ' student(s)'
             });

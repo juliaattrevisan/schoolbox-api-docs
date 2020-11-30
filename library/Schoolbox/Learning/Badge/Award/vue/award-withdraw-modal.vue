@@ -2,7 +2,6 @@
 import axios from "axios";
 import RevealModal from '@schoolbox/reveal-modal'
 import qs from 'qs';
-import Toast from "@schoolbox/toast";
 
 export default {
 
@@ -36,8 +35,7 @@ export default {
      * at the top of the file.
      */
     components: {
-        RevealModal,
-        Toast
+        RevealModal
     },
 
     /**
@@ -65,6 +63,7 @@ export default {
      * Access the results of a function as if they were a property of an object.
      */
     computed: {
+        jQuery: () => window.jQuery,
     },
 
     /**
@@ -93,7 +92,7 @@ export default {
 
 
         /**
-         * Perform withdrawl
+         * Perform withdrawal
          */
         withdraw() {
             let self = this;
@@ -107,7 +106,13 @@ export default {
                 responseType: 'json'
             }
 
-            self.$refs.toast.activate('Loading...');
+            /* A toast - to your valour, my sword, and our victory together
+             */
+            let toast = this.jQuery('[data-toast]');
+
+            toast.toastActivate({
+               text: 'Withdrawing achievement...'
+            });
 
             axios.request(request)
                 .then(response => {
@@ -122,9 +127,19 @@ export default {
 
                     /* Pop toast
                      */
-                    this.$refs.toast.timeout('Withdraw complete', true);
+                    toast.toastTimeout({
+                        text: 'Withdraw complete',
+                        css: 'success'
+                    });
                 })
-                .catch(() => this.$refs.toast.timeout('Withdraw failed', false))
+                .catch(error => {
+                    if (error.response) {
+                        toast.toastTimeout({
+                            text: 'Unable to withdraw achievement; please try again.',
+                            css: 'alert'
+                        });
+                    }
+                });
         }
     }
 }
@@ -139,6 +154,5 @@ export default {
                 <li><a @click.prevent="close()" class="button">No</a></li>
             </ul>
         </template>
-        <toast ref="toast"></toast>
     </reveal-modal>
 </template>
