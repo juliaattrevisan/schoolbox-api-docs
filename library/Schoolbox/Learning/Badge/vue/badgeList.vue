@@ -205,7 +205,7 @@ export default {
         </section>
 
         <reveal-modal ref="detailModal">
-<!--            <badge-detail :badge="currentBadge" v-if="currentBadge"></badge-detail>-->
+            <badge-detail :badge="currentBadge" v-if="currentBadge"></badge-detail>
         </reveal-modal>
 
         <reveal-modal size="large" ref="awardAsAchievementModal" :closeOnBackgroundClick="false">
