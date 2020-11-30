@@ -76,8 +76,16 @@ class Module extends BaseModule
 
         $this->register(
             self::METHOD_GET,
-            '/{badgeId}/recipients',
-            'getRecipients',
+            '/{badgeId}/achievement/recipients',
+            'getAchievementRecipients',
+            $baseRule,
+            Closure::fromCallable([$this, 'preloadBadge']),
+        );
+
+        $this->register(
+            self::METHOD_GET,
+            '/{badgeId}/goal/recipients',
+            'getGoalRecipients',
             $baseRule,
             Closure::fromCallable([$this, 'preloadBadge']),
         );

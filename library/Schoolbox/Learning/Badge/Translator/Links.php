@@ -73,12 +73,20 @@ class Links
             ]
         );
 
-        /* Endpoint for withdrawing the awarding of this badge
+        /* Endpoint for withdrawing the awarding of this achievement
          */
-        $translation['withdraw'] = $this->getRouteIfAuthorized(
-            'learningBadge.postWithdraw', [
+        $translation['withdrawAchievement'] = $this->getRouteIfAuthorized(
+            'learningBadge.postWithdrawAchievement', [
                 'badgeId' => $badge->getId(),
             ]
+        );
+
+        /* Endpoint for withdrawing the awarding of this achievement
+         */
+        $translation['withdrawGoal'] = $this->getRouteIfAuthorized(
+            'learningBadge.postWithdrawGoal', [
+               'badgeId' => $badge->getId(),
+           ]
         );
 
         return $translation;

@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Badge\Award;
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge;
+use Schoolbox\Learning\Badge\Award;
 use Schoolbox\Resource\Search\Results;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -175,18 +176,24 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param string      $keyword
      * @param Badge\Model $badge
+     * @param string      $awardStatus
      * @param string      $roleType
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DebugBar\DebugBarException
      * @throws \PDOException
      */
-    public function findRecipients(string $keyword, Badge\Model $badge, string $roleType): array
+    public function findRecipients(string $keyword, Badge\Model $badge, string $awardStatus, string $roleType): array
     {
 
         /* No keyword provided; nothing to search
          */
         if (strlen($keyword) < Results::MIN_SEARCH_LENGTH) {
+            return [];
+        }
+
+        /* Award status must be one of the prescribed enums in Award\Model
+         */
+        if (!\in_array($awardStatus, [Award\Model::AWARD_STATUS_ACHIEVEMENT, Award\Model::AWARD_STATUS_GOAL], true)) {
             return [];
         }
 
@@ -212,6 +219,7 @@ class Mapper extends \Schoolbox\Mapper
             LEFT JOIN lu_year_level lyl ON `user`.year_id = lyl.id
             WHERE `groups`.`group_type` = :roleType
             AND badge_user.badge_id = :badgeId
+            AND badge_user.status = :status
             AND badge_user.deleted_at IS NULL
             AND ({$where})
         ";
@@ -219,6 +227,7 @@ class Mapper extends \Schoolbox\Mapper
         $params = $pb->getParams();
 
         $params['badgeId'] = $badge->getId();
+        $params['status'] = $awardStatus;
         $params['roleType'] = $roleType;
 
         $statement = $this->getDatabase()->prepare($query);

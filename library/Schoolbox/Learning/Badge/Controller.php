@@ -384,20 +384,38 @@ class Controller extends Base
 
 
     /**
-     * Find a list of guys who received $badge
+     * Find a list of guys who received $badge as an Achievement
      *
      * @param Model $badge
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DebugBar\DebugBarException
      * @throws \PDOException
      */
-    public function getRecipients(Model $badge): void
+    public function getAchievementRecipients(Model $badge): void
     {
         $keyword = (string)($this->getRequest()->query['query'] ?? '');
 
         /* For now, just search for student recipients
          */
-        $users = $this->awardMapper->findRecipients($keyword, $badge, \Schoolbox\Role::STUDENT);
+        $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, \Schoolbox\Role::STUDENT);
+
+        $this->response->content->set($this->buildJsonOutput($users));
+    }
+
+
+    /**
+     * Find a list of guys who set $badge as a Goal
+     *
+     * @param Model $badge
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     */
+    public function getGoalRecipients(Model $badge): void
+    {
+        $keyword = (string)($this->getRequest()->query['query'] ?? '');
+
+        /* For now, just search for student recipients
+         */
+        $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_GOAL, \Schoolbox\Role::STUDENT);
 
         $this->response->content->set($this->buildJsonOutput($users));
     }
