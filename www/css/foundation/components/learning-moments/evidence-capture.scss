@@ -56,17 +56,26 @@
 }
 
 #activity {
-  > div {
-    display: flex;
+  .skeleton-feed > div {
+    max-width: 45rem;
+    margin: 0 auto;
+    padding: 1rem;
+    h3 {
+      width: 80%;
+    }
+    p {
+      width: 40%;
+    }
   }
   .feed-column {
     background-color: $white;
     flex: 1 0 auto;
   }
   .feed {
-    max-width: 45rem;
+    display: flex;
 
-    > section {
+    section {
+      max-width: 45rem;
       margin-bottom: 0;
     }
   }
@@ -85,6 +94,7 @@
 
 .subheader.feed {
   background: $white;
+  color: $header-font-color;
   padding: .5rem 1rem;
   margin: 0;
   border-top: 2px solid #EDEDED;
