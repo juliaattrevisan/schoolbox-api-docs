@@ -3,8 +3,8 @@
 import axios from 'axios';
 import Toast from "@schoolbox/toast";
 import RevealModal from "@schoolbox/reveal-modal";
-import BadgeDetail from "./badgeDetail";
 import BadgeAward from "./badgeAward";
+import BadgeDetail from "./badgeDetail";
 import BadgeWithdrawModal from "./badge-withdraw-modal";
 
 export default {
@@ -100,7 +100,7 @@ export default {
         },
 
         openWithdrawModal(badge) {
-          this.$refs.withdrawModal.open(badge);
+            this.$refs.withdrawModal.open(badge);
         },
 
         /**
@@ -205,7 +205,7 @@ export default {
         </section>
 
         <reveal-modal ref="detailModal">
-            <badge-detail :badge="currentBadge" v-if="currentBadge"></badge-detail>
+<!--            <badge-detail :badge="currentBadge" v-if="currentBadge"></badge-detail>-->
         </reveal-modal>
 
         <reveal-modal size="large" ref="awardAsAchievementModal" :closeOnBackgroundClick="false">
