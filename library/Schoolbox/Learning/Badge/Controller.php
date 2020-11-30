@@ -227,10 +227,17 @@ class Controller extends Base
      *
      * @api   POST /learning/badge/
      * @since 20.2
+     * @throws \Exception if the badge's name is empty
      */
     public function postBadge(): void
     {
-        $data       = json_decode(json_encode($this->request->content->get()), true);
+        $data = json_decode(json_encode($this->request->content->get()), true);
+
+        // TODO figure out a better way to handle backend validation than this
+        if (trim($data['name']) === '') {
+            throw $this->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
+
         $translator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $model      = $translator($data)
             ->setCreatedBy($this->getUser())
