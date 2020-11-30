@@ -1,7 +1,6 @@
 <script>
 import axios from "axios";
 import RevealModal from '@schoolbox/reveal-modal'
-import Toast from "@schoolbox/toast";
 
 /* Vue select
  */
@@ -49,7 +48,6 @@ export default {
      */
     components: {
         RevealModal,
-        Toast,
         vSelect
     },
 
@@ -84,6 +82,7 @@ export default {
      * Access the results of a function as if they were a property of an object.
      */
     computed: {
+       jQuery: () => window.jQuery,
     },
 
     /**
@@ -167,14 +166,24 @@ export default {
 
             /* A toast - to your valour, my sword, and our victory together
              */
-            self.$refs.toast.activate('Withdrawing achievements from ' + this.selected.length + ' student(s)');
+            let toast = this.jQuery('[data-toast]');
+
+            /* A toast - to your valour, my sword, and our victory together
+             */
+            toast.toastActivate({
+                text: 'Withdrawing achievements from ' + this.selected.length + ' student(s)'
+            });
 
             axios.request(request)
                 .then(function (response) {
 
                     /* Pop toast
                      */
-                    self.$refs.toast.timeout('Withdraw complete', true);
+                    toast.toastTimeout({
+                        text: 'Withdraw complete',
+                        css: 'success'
+                    });
+
                     self.close();
                 })
                 .then(function() {
@@ -185,7 +194,10 @@ export default {
                 })
                 .catch(error => {
                     if (error.response) {
-                        self.$refs.toast.timeout('Unable to withdraw achievement; please try again.', false)
+                        toast.toastTimeout({
+                            text: 'Unable to withdraw achievement; please try again.',
+                            css: 'alert'
+                        });
                     }
                 });
         }
@@ -216,6 +228,5 @@ export default {
                 <li><a href="#" class="button" @click.prevent="close()">Cancel</a></li>
             </ul>
         </template>
-        <toast ref="toast"></toast>
     </reveal-modal>
 </template>
