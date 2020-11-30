@@ -37,13 +37,28 @@ class AllFieldsTest extends TestCase
     {
         yield 'empty' => [[], new Model()];
 
-        // Should ID be settable by this?
-        yield 'id + body' => [
+        yield 'id + name + body' => [
             [
                 'id'   => 3,
+                'name' => 'test',
                 'body' => 'something',
             ],
-            (new Model())->setId(3)->setBody('something'),
+            (new Model())
+                ->setId(3)
+                ->setName('test')
+                ->setBody('something'),
+        ];
+
+        yield 'id + name + body: trim' => [
+            [
+                'id'   => 3,
+                'name' => '  test  ',
+                'body' => '  something  ',
+            ],
+            (new Model())
+                ->setId(3)
+                ->setName('test')
+                ->setBody('something'),
         ];
 
         $timezone = new DateTimeZone('+00:00');
@@ -182,10 +197,46 @@ class AllFieldsTest extends TestCase
             (clone $baseModel)->setName('new name'),
         ];
 
+        yield 'update name - left trim' => [
+            ['name' => '  new name',],
+            (clone $baseModel),
+            (clone $baseModel)->setName('new name'),
+        ];
+
+        yield 'update name - right trim' => [
+            ['name' => 'new name  ',],
+            (clone $baseModel),
+            (clone $baseModel)->setName('new name'),
+        ];
+
+        yield 'update name - left+right trim' => [
+            ['name' => '  new name  ',],
+            (clone $baseModel),
+            (clone $baseModel)->setName('new name'),
+        ];
+
         // Body is not nullable
         // (covered in `testInvokeUpdateInvalidValues)
         yield 'update body' => [
             ['body' => 'new body',],
+            (clone $baseModel),
+            (clone $baseModel)->setBody('new body'),
+        ];
+
+        yield 'update body - left trim' => [
+            ['body' => ' new body',],
+            (clone $baseModel),
+            (clone $baseModel)->setBody('new body'),
+        ];
+
+        yield 'update body - right trim' => [
+            ['body' => 'new body ',],
+            (clone $baseModel),
+            (clone $baseModel)->setBody('new body'),
+        ];
+
+        yield 'update bodye - left+right trim' => [
+            ['body' => ' new body ',],
             (clone $baseModel),
             (clone $baseModel)->setBody('new body'),
         ];
