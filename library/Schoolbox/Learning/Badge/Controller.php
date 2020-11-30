@@ -333,7 +333,8 @@ class Controller extends Base
             new Translator\ModelToArray(
                 new User\Translator\ModelToArray(),
                 new Storage\Translator\ModelToArray(),
-                new ScrubAdapter()
+                new ScrubAdapter(),
+                new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
             ),
             new Award\Translator\Links($this->router, $this->authorizer, $this->getUser())
         );
