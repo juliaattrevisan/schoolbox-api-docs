@@ -4,7 +4,7 @@ scriptdir="$(command dirname -- "${0}")"
 
 $scriptdir/allstop
 
-service schoolbox-scheduled start;
-service schoolbox-routed    start;
-service schoolbox-socketd   start;
-service schoolbox-digestd   start;
+service schoolbox-cloud-scheduled@vagrantx start;
+service schoolbox-cloud-routed@vagrantx    start;
+service schoolbox-cloud-socketd@vagrantx   start;
+service schoolbox-cloud-digestd@vagrantx   start;

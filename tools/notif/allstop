@@ -4,3 +4,8 @@ service schoolbox-scheduled stop;
 service schoolbox-routed    stop;
 service schoolbox-socketd   stop;
 service schoolbox-digestd   stop;
+
+service schoolbox-cloud-scheduled@vagrantx stop;
+service schoolbox-cloud-routed@vagrantx    stop;
+service schoolbox-cloud-socketd@vagrantx   stop;
+service schoolbox-cloud-digestd@vagrantx   stop;

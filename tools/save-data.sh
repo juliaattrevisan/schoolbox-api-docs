@@ -18,21 +18,15 @@ logMessage() {
 stopservices() {
     echo "Stopping Services";
     service nginx stop >/dev/null 2>&1;
-    service schoolbox-socketd stop >/dev/null 2>&1;
-    service schoolbox-routed stop >/dev/null 2>&1;
-    service schoolbox-digestd stop >/dev/null 2>&1;
-    service schoolbox-scheduled stop >/dev/null 2>&1;
-    mv /etc/cron.d/vagrant /tmp/vagrant;
+    /vagrant/tools/notif/allstop >/dev/null 2>&1;
+    mv /etc/cron.d/sbc_vagrantx /tmp/sbc_vagrantx;
 }
 
 restartservices() {
     echo "Restarting Services";
     service nginx restart >/dev/null 2>&1;
-    service schoolbox-socketd restart >/dev/null 2>&1;
-    service schoolbox-routed restart >/dev/null 2>&1;
-    service schoolbox-digestd restart >/dev/null 2>&1;
-    service schoolbox-scheduled restart >/dev/null 2>&1;
-    mv /tmp/vagrant /etc/cron.d/vagrant;
+    /vagrant/tools/notif/allrestart >/dev/null 2>&1;
+    mv /tmp/sbc_vagrantx /etc/cron.d/sbc_vagrantx;
 }
 
 localiseVagrant() {

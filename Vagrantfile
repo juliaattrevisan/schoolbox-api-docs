@@ -124,6 +124,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     if puppet_debug
         puppet.options = "--verbose --debug"
     end
+    puppet.facter = {
+      "is_vagrant_puppet_provision" => true
+    }
   end
 
   config.vm.provision "shell" do |s|

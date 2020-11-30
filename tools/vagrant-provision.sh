@@ -1,47 +1,40 @@
 #!/bin/bash
-# Ensure running an appropriate era vagrant box
-if [ `cat /home/vagrant/.vagrant.buildtimestamp` -gt 1528782104 ];
-then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Vagrant box meets minimum requirements: 1528782105 Current: "`cat /home/vagrant/.vagrant.buildtimestamp`;
-else
-    echo "Error: Your vagrant box is out of date. Please ensure you are using the latest version (>= 1528782105). Current: "`cat /home/vagrant/.vagrant.buildtimestamp` >2;
-    echo "To fix this:";
-    echo "  vagrant destroy;";
-    echo "  vagrant box remove ubuntu-1404-php71;";
-    echo "  vagrant box remove ubuntu-1804-php71;";
-    if [ -f /vagrant/vagrant.yaml ] && [ `grep vagrant_box /vagrant/vagrant.yaml | grep -v '#' | wc -l` -gt 0 ];
-    then
-        echo "then:";
-        echo "  remove the 'vagrant_box' line from your vagrant.yaml file";
-    fi
-    echo "then:";
-    echo "  vagrant up;";
-    exit 1;
-fi;
+# Provisions the vagrant environment
+# * Executed after puppet provisioner has set up host
+# * Installs the vagrantx instance into this host, then invokes puppet again to configure the host for this instance
 
-# Ensure .env environment file is present
-if [ ! -f /vagrant/.env ];
-then
-    echo "Error: '.env' environment file missing";
-    exit 1;
-fi
+# Global constants
+readonly LOG=/usr/bin/alaress-logger
+readonly L_INFO=200;
+readonly L_WARN=300;
+readonly L_ERROR=400;
+readonly cachedir='/vagrant/vagrantcache';
 
-cachedir='/vagrant/vagrantcache';
-mkdir -p $cachedir;
-cd $cachedir;
-
+# Global vars
 # Defaults
 external_db="synergetic";
 external_db_host="172.31.15.10";
 external_db_db="Synergetic_AUVIC_ALARESS_PRD";
 enable_xdebug="true";
 
+
+function log(){
+  $LOG $L_INFO "$1"
+}
+function warn(){
+  $LOG $L_WARN "$1"
+}
+function error(){
+  $LOG $L_ERROR "$1"
+}
+
+mkdir -p $cachedir;
+cd $cachedir || exit;
+
 # Get options
 if [ ! -z $1 ]; then data_source=$1; else echo "Please provide data_source"; exit 1; fi;
-if [ ! -z $2 ];
-then
+if [ ! -z $2 ]; then
     data_filename=$2;
-    data_filename_short=`echo "$data_filename" | cut -d'?' -f1`;
 else
     echo "Please provide data_filename";
     exit 1;
@@ -67,10 +60,8 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Checking for correct PHP version - current: $ph
 #fi
 
 # Schoolbox <= 20.1 requires PHP 7.1: >= 20.2 requires PHP 7.4
-if [ "$phpversion_current" != "$phpversion_supported" ];
-then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Current and supported PHP versions do not match: switching";
-    /vagrant/tools/switchPHP.sh;
+if [ "$phpversion_current" != "$phpversion_supported" ]; then
+  warn " Current and supported PHP versions do not match. Check 'ubuntu-1804-php71.vagrant.yaml' in puppet repo";
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
@@ -91,92 +82,18 @@ if [[ -z $s3Referer ]]; then
     exit 1;
 fi
 
-# function to retrieve latest files from S3, needs $S3file set first
-S3file_short='';
-getS3file() {
-    if [ -z $S3file ];
-    then
-        echo "Error - missing S3file target";
-    else
-        predir=`pwd`;
-        cd $cachedir;
-
-        curletag=$(curl -I -H "Referer: $s3Referer" $data_source/$S3file 2>/dev/null);
-        if [ $? -eq 0 ];
-        then
-            responsecode=`echo "$curletag" | egrep 'HTTP/(1.0|1.1|2)' | cut -d' ' -f2`;
-            if [ "$responsecode" != "200" ];
-            then
-                echo "[SB][`date +%Y-%m-%d\ %X`] File unable to be retrieved (code $responsecode), using cache: $S3file";
-            else
-                etag=`echo "$curletag" | grep ETag | cut -d'"' -f2`;
-                # If S3file_short is not set, assume same as S3file for simplicity
-                if [ -z $S3file_short ] || [ "$S3file_short" == '' ]; then S3file_short="$S3file"; fi;
-                # Auto cleanup etag cache file if actual file is missing
-                if [ ! -f $S3file_short ]; then rm -f $S3file_short.etag.cache; fi;
-                checketag=`grep $etag $S3file_short.etag.cache 2>/dev/null | wc -l`;
-                if [ $checketag -eq 0 ];
-                then
-                    # New/updated version available - download it
-                    echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest $S3file_short";
-                    wget --no-verbose --header="Referer: $s3Referer" $data_source/$S3file -O $S3file_short 2>&1;
-                    if [ $? -eq 0 ];
-                    then
-                        # This is a new file, so remove old references
-                        sed -i "/$S3file_short/d" $S3file_short.etag.cache 2>/dev/null;
-                        # Add new file to etag cache
-                        echo "$etag $S3file_short" >> $S3file_short.etag.cache;
-                    else
-                        # when download fails, remove bad download
-                        echo "[SB][`date +%Y-%m-%d\ %X`] Download failed of: $S3file_short";
-                        rm -vf $S3file_short;
-                    fi
-                else
-                    echo "[SB][`date +%Y-%m-%d\ %X`] File up to date: $S3file_short";
-                fi
-            fi
-        else
-            echo "[SB][`date +%Y-%m-%d\ %X`] File unable to be retrieved, using cache: $S3file";
-        fi
-
-        cd $predir;
-    fi
-}
-
-S3file='vagrant-secrets.sql'
-S3file_short='vagrant-secrets.sql'
-getS3file;
-if [ ! -f $cachedir/$S3file_short ];
-then
-    echo "Error: file missing $S3file";
-    exit 1;
+# Download some files from S3
+if ! schoolbox-download-s3-file.sh --data-source "$data_source"  --s3-referer "$s3Referer" --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
+  echo "Error: Unable to download s3 file: 'vagrant-secrets.sql'";
+  exit 1;
 fi
-
-S3file='vagrant-cleanup-secrets.sql'
-S3file_short='vagrant-cleanup-secrets.sql'
-getS3file;
-if [ ! -f $cachedir/$S3file_short ];
-then
-    echo "Error: file missing $S3file";
-    exit 1;
+if ! schoolbox-download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
+  echo "Error: Unable to download s3 file: 'vagrant-cleanup-secrets.sql'";
+  exit 1;
 fi
-
-S3file="$data_filename";
-S3file_short="$data_filename_short";
-getS3file;
-if [ ! -f $cachedir/$S3file_short ];
-then
-    echo "Error: file missing $S3file";
-    exit 1;
-fi
-
-S3file="tls-vagrant.dev.schoolbox.cloud.tar.gz";
-S3file_short="tls-vagrant.dev.schoolbox.cloud.tar.gz";
-getS3file;
-if [ ! -f $cachedir/$S3file_short ];
-then
-    echo "Error: file missing $S3file";
-    exit 1;
+if ! schoolbox-download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --file-name "tls-vagrant.dev.schoolbox.cloud.tar.gz" --cache-dir "$cachedir"; then
+  echo "Error: Unable to download s3 file: 'tls-vagrant.dev.schoolbox.cloud.tar.gz'";
+  exit 1;
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Putting system in maintenance mode";
@@ -185,21 +102,6 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Putting system in maintenance mode";
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
 mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Removing current Schoolbox MySQL database";
-mysql --defaults-extra-file=/root/.my.cnf -e "DROP DATABASE IF EXISTS schoolbox";
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Removing current Schoolbox MySQL user";
-mysql --defaults-extra-file=/root/.my.cnf -e "DROP USER IF EXISTS 'schoolboxvagrant'@'localhost'";
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Removing current Schoolbox Data directory";
-rm /vagrant/data/* -fR;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox data directories";
-cd /vagrant;
-tar -xzf $cachedir/$data_filename_short;
-rm -rf /vagrant/data/cache;
-/vagrant/tools/create-data-dirs.sh /vagrant/data;
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL schema";
 mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';";
 
@@ -207,21 +109,9 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL user";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "CREATE USER 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123'";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "GRANT ALL ON schoolbox.* to 'schoolboxvagrant'@'localhost'";
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Loading Schoolbox MySQL Demo data";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox < /vagrant/data/schoolbox.sql;
-mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db' WHERE name='external_type'";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db_host' WHERE name='external_db_host'";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db_db' WHERE name='external_db_db'";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='vagrant' WHERE name='site_school_code'";
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox conf file";
-cp -f /vagrant/www/conf/tarball.conf.php /vagrant/www/conf/conf.php;
-sed -i 's/xxxxxxxx/vagrantx/g' /vagrant/www/conf/conf.php;
-sed -i -E "s/^define\(['\"]SQL_user['\"].+$/define\(\"SQL_user\", \"schoolboxvagrant\"\);/g" /vagrant/www/conf/conf.php;
-sed -i 's/xxxxxx/abc123/g' /vagrant/www/conf/conf.php;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing vendor submodules with composer";
-cd $cachedir;
+cd $cachedir || exit;
 vendorfile='';
 composerlocksha=`sha1sum ../composer.lock 2>/dev/null | awk '{print $1}'`;
 if [ -f /vagrant/vendor/composer.lock.checksum ];
@@ -283,7 +173,7 @@ then
             fi
         done
     fi
-    cd /vagrant;
+    cd /vagrant || exit;
     if [ "$vendorfile" != '' ];
     then
         if [ -f /vagrant/vagrantcache/$vendorfile ];
@@ -303,39 +193,52 @@ then
         /vagrant/tools/composer.sh 2>&1;
     fi
 fi
-cd /vagrant;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Removing cache directories";
-/vagrant/tools/clean-cache-dir.sh;
+cd /vagrant || exit;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating composer autoload";
 composer dump-autoload -o --no-interaction;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Building SQL updates";
-cd tools;
-./build-sql-update.sh >/dev/null;
-cd /vagrant;
+
+echo "[SB][`date +%Y-%m-%d\ %X`] Installing instance via 'schoolbox-data-refresh.sh'";
+INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
+--data-source "$data_source" \
+--dataset "$data_filename" \
+--s3-referer "$s3Referer" \
+--site-root '/vagrant' \
+--skip-bucket-copy \
+--sql-host 'localhost' \
+--sql-schema 'schoolbox' \
+--sql-user 'schoolboxvagrant' \
+--sql-pass 'abc123' \
+--cache-dir '/vagrant/vagrantcache' \
+--config amqp_host 'localhost' \
+--config amqp_user 'guest' \
+--config amqp_pass 'guest' \
+--config amqp_vhost '/' \
+--config external_type "$external_db" \
+--config external_db_host "$external_db_host" \
+--config external_db_db "$external_db_db" \
+--config redis_url 'tcp://127.0.0.1:6379' \
+--config site_domain 'dev.schoolbox.cloud' \
+--config site_hostname 'vagrant' \
+--config site_school_code "vagrant" \
+--config title 'Schoolbox [vagrant]';
+
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
-cat /vagrant/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
-cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+mysql --defaults-extra-file=/root/.my.cnf schoolbox < /vagrant/sql/vagrant.sql
+mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/vagrant-secrets.sql
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Applying data dir sql fixes";
-/vagrant/tools/generate-dir-sql.sh /vagrant/data | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Upgrading demo data with latest SQL updates";
-mkdir /var/lib/vagrant -p > /dev/null;
-/vagrant/tools/update-sql.sh;
-rm -f /vagrant/updates/*/scripts_list > /dev/null;
-rm -R /var/lib/vagrant > /dev/null;
-rm -f /vagrant/www/conf/pre*conf.php;
+# Set up the host for the newly-installed instance
+echo "[SB][`date +%Y-%m-%d\ %X`] Invoking puppet to configure host for newly-installed instance";
+/vagrant/puppet-apply.sh
+
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
 cat /vagrant/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Applying data dir sql fixes (post version upgrade)";
-/vagrant/tools/generate-dir-sql.sh /vagrant/data | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox nginx vhost";
 chown -fR vagrant:vagrant /mnt/data/php_tmp;
@@ -353,14 +256,6 @@ tar xzf tls-vagrant.dev.schoolbox.cloud.tar.gz;
 cp -f vagrant.dev.schoolbox.cloud/fullchain.pem /etc/nginx/certs/schoolbox-fullchain.crt;
 cp -f vagrant.dev.schoolbox.cloud/privkey.pem /etc/nginx/certs/schoolbox-private.key;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Set up video cronjobs"
-cp -f /vagrant/tools/cron/schoolboxdev $cachedir/schoolboxdemo-latest-cron
-sed -i 's/usr\/share\/schoolboxdev/vagrant/g' $cachedir/schoolboxdemo-latest-cron
-sed -i 's/schoolboxdev/vagrant/g' $cachedir/schoolboxdemo-latest-cron
-sed -i 's/var\/log\/vagrant/vagrant\/data/g' $cachedir/schoolboxdemo-latest-cron
-sed -i 's/var\/lib\/vagrant/vagrant\/data/g' $cachedir/schoolboxdemo-latest-cron
-sed -i 's/www-data/root/g' $cachedir/schoolboxdemo-latest-cron
-cp -f $cachedir/schoolboxdemo-latest-cron /etc/cron.d/vagrant
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing grunt-cli if not already installed";
 /vagrant/tools/grunt.sh;
@@ -562,36 +457,6 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Building CSS";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Run Notifications binding cache rebuild (in background)";
-/vagrant/tools/notif/route/refresh-binding-cache.php --instance=vagrantx &
-
-if [[ "$(readlink /proc/1/exe)" == */systemd ]];
-then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Installing daemon systemd configurations";
-    cp -f /vagrant/tools/init/schoolbox-*.service /lib/systemd/system/;
-    sed -i 's/usr\/share\/schoolbox/vagrant/g' /lib/systemd/system/schoolbox-*d.service;
-    systemctl daemon-reload;
-    systemctl -q enable schoolbox-scheduled.service;
-    systemctl -q enable schoolbox-routed.service;
-    systemctl -q enable schoolbox-socketd.service;
-    systemctl -q enable schoolbox-digestd.service;
-    #systemctl -q enable schoolbox-belld.service;
-else
-    echo "[SB][`date +%Y-%m-%d\ %X`] Installing daemon upstart configurations";
-    cp -f /vagrant/tools/init/upstart-scheduled.conf /etc/init/schoolbox-scheduled.conf;
-    cp -f /vagrant/tools/init/upstart-scheduled.override /etc/init/schoolbox-scheduled.override;
-    cp -f /vagrant/tools/init/upstart-socketd.conf /etc/init/schoolbox-socketd.conf;
-    cp -f /vagrant/tools/init/upstart-socketd.override /etc/init/schoolbox-socketd.override;
-    cp -f /vagrant/tools/init/upstart-digestd.conf /etc/init/schoolbox-digestd.conf;
-    cp -f /vagrant/tools/init/upstart-digestd.override /etc/init/schoolbox-digestd.override;
-    cp -f /vagrant/tools/init/upstart-routed.conf /etc/init/schoolbox-routed.conf;
-    cp -f /vagrant/tools/init/upstart-routed.override /etc/init/schoolbox-routed.override;
-    #cp -f /vagrant/tools/init/upstart-belld.conf /etc/init/schoolbox-belld.conf;
-    #cp -f /vagrant/tools/init/upstart-belld.override /etc/init/schoolbox-belld.override;
-fi
-
-
-
 ffmpegver=`dpkg -l schoolbox-ffmpeg | tail -n1 | awk {'print $3'}`;
 echo "[SB][`date +%Y-%m-%d\ %X`] schoolbox-ffmpeg installed: $ffmpegver";
 
@@ -652,9 +517,11 @@ else
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
-service schoolbox-epl restart > /dev/null 2>&1;
-service php7.4-fpm restart > /dev/null 2>&1;
-service nginx restart > /dev/null 2>&1;
+service schoolbox-epl restart;
+# TODO this next line is generating error output because of custom puppet facts that don't support multi-instance arch.
+php_major_version=$(/opt/puppetlabs/puppet/bin/ruby /opt/puppetlabs/puppet/bin/puppet lookup schoolbox::php::majver --render-as s)
+service "php${php_major_version}-fpm" restart
+service nginx restart;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
 /vagrant/tools/maintenance/site_up.sh;
