@@ -99,6 +99,11 @@ export default {
         open(badge) {
             this.badge = badge;
 
+            /* Clear selectize
+             */
+            this.options = [];
+            this.selected = [];
+
             this.$refs.modal.open();
         },
 
