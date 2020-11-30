@@ -206,6 +206,12 @@ export default {
     <reveal-modal ref="modal">
         <template v-if="badge">
             <h2>Withdraw <strong>{{ badge.name }}</strong></h2>
+
+            <div class="card small-12 compact">
+                <img :src="badge.image._links.image" :alt="badge.name"/>
+                <h3>{{ badge.name }}</h3>
+            </div>
+
             <p>Remove the student(s) allocated to this achievement to withdraw it from them.</p>
 
             <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Search for recipients of this badge" v-model="selected">
