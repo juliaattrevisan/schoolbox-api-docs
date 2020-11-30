@@ -13,6 +13,7 @@ use HouseMapper;
 use HouseResidentialMapper;
 use PDOStatement;
 use Schoolbox;
+use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Search\Results;
@@ -1035,5 +1036,22 @@ class UserMapper extends Mapper
     {
         $query = "SELECT calendar_view FROM {$this->table} WHERE id = :userId";
         return $this->database->query($query, ['userId' => $userId])->fetchColumn();
+    }
+
+    /**
+     * Updates calendar view for the user
+     *
+     * @param int    $userId
+     * @param string $calendarView
+     * @return bool
+     */
+    public function updateCalendarView(int $userId, string $calendarView): bool
+    {
+        if (!\in_array($calendarView, ViewNameMapping::MAP_FC_TO_STORED)) {
+            return false;
+        }
+        $query = "UPDATE {$this->table} SET calendar_view = :calendarView WHERE id = :userId";
+        $this->database->query($query, ['userId' => $userId, 'calendarView' => $calendarView]);
+        return true;
     }
 }
