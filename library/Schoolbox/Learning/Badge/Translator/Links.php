@@ -83,16 +83,16 @@ class Links
 
         /* Endpoint for withdrawing the awarding of this achievement
          */
-        $translation['withdrawAchievement'] = $this->getRouteIfAuthorized(
-            'learningBadge.postWithdrawAchievement', [
+        $translation['achievementWithdraw'] = $this->getRouteIfAuthorized(
+            'learningBadge.postAchievementWithdraw', [
                 'badgeId' => $badge->getId(),
             ]
         );
 
         /* Endpoint for unsetting the goal
          */
-        $translation['withdrawGoal'] = $this->getRouteIfAuthorized(
-            'learningBadge.postWithdrawGoal', [
+        $translation['goalWithdraw'] = $this->getRouteIfAuthorized(
+            'learningBadge.postGoalWithdraw', [
                 'badgeId' => $badge->getId(),
             ]
         );

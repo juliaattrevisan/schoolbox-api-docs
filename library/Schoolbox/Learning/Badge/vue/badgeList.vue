@@ -5,15 +5,15 @@ import Toast from "@schoolbox/toast";
 import RevealModal from "@schoolbox/reveal-modal";
 import BadgeAward from "./badgeAward";
 import BadgeDetail from "./badgeDetail";
-import BadgeWithdrawAchievementModal from "./badge-withdraw-achievement-modal";
-import BadgeWithdrawGoalModal from "./badge-withdraw-goal-modal";
+import BadgeAchievementWithdrawModal from "./badge-achievement-withdraw-modal";
+import BadgeGoalWithdrawModal from "./badge-goal-withdraw-modal";
 
 export default {
     components: {
       BadgeAward,
       BadgeDetail,
-      BadgeWithdrawAchievementModal,
-      BadgeWithdrawGoalModal,
+      BadgeAchievementWithdrawModal,
+      BadgeGoalWithdrawModal,
       RevealModal,
       Toast
     },
@@ -106,8 +106,8 @@ export default {
          *
          * @param {Object} badge
          */
-        openWithdrawAchievementModal(badge) {
-            this.$refs.withdrawAchievementModal.open(badge);
+        openAchievementWithdrawModal(badge) {
+            this.$refs.achievementWithdrawModal.open(badge);
         },
 
         /**
@@ -115,8 +115,8 @@ export default {
          *
          * @param {Object} badge
          */
-        openWithdrawGoalModal(badge) {
-          this.$refs.withdrawGoalModal.open(badge);
+        openGoalWithdrawModal(badge) {
+          this.$refs.goalWithdrawModal.open(badge);
         },
 
         /**
@@ -205,8 +205,8 @@ export default {
                             <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
                                 <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase" title="Award">Award achievement</a></li>
                                 <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set as Goal">Set goal</a></li>
-                                <li><a @click.prevent="openWithdrawAchievementModal(badge)" class="icon-close" title="Withdraw awards" >Withdraw achievement</a></li>
-                                <li><a @click.prevent="openWithdrawGoalModal(badge)" class="icon-close" title="Unset goal" >Unset goal</a></li>
+                                <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-close" title="Withdraw awards" >Withdraw achievement</a></li>
+                                <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-close" title="Unset goal" >Unset goal</a></li>
                                 <li><a href="#" class="icon-modify" title="Modify">Modify</a></li>
                                 <li><a href="#" class="icon-delete" title="Delete">Delete</a></li>
                             </ul>
@@ -265,8 +265,8 @@ export default {
             </badge-award>
         </reveal-modal>
 
-        <badge-withdraw-achievement-modal ref="withdrawAchievementModal"></badge-withdraw-achievement-modal>
-        <badge-withdraw-goal-modal ref="withdrawGoalModal"></badge-withdraw-goal-modal>
+        <badge-achievement-withdraw-modal ref="achievementWithdrawModal"></badge-achievement-withdraw-modal>
+        <badge-goal-withdraw-modal ref="goalWithdrawModal"></badge-goal-withdraw-modal>
 
         <toast ref="toast"></toast>
     </div>

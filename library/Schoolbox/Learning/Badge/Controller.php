@@ -362,56 +362,6 @@ class Controller extends Base
 
     }
 
-    /**
-     * Withdraw an achievement that aws set for a set of users
-     *
-     * @param Model $badge
-     * @throws \PDOException
-     */
-    public function postWithdrawAchievement(Model $badge): void
-    {
-        $this->postWithdraw($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT);
-    }
-
-
-    /**
-     * Withdraw a goal that aws set for a set of users
-     *
-     * @param Model $badge
-     * @throws \PDOException
-     */
-    public function postWithdrawGoal(Model $badge): void
-    {
-        $this->postWithdraw($badge, AwardModel::AWARD_STATUS_GOAL);
-    }
-
-
-    /**
-     * Withdraw an Awarding of $badge to a specific set of users
-     *
-     * @param Model  $badge
-     * @param string $status
-     * @throws \PDOException
-     */
-    private function postWithdraw(Model $badge, string $status): void
-    {
-        $userIds = $this->getRequest()->post['userIds'] ?? [];
-
-        /* Empty user list; nothing to do
-         */
-        if (!\count($userIds)) {
-            return;
-        }
-
-        /* Must be a valid status
-         */
-        if (!\in_array($this->getRequest()->post['status'], [AwardModel::AWARD_STATUS_ACHIEVEMENT, AwardModel::AWARD_STATUS_GOAL], true)) {
-            return;
-        }
-
-        $this->awardMapper->deleteMostRecentlyAwarded($userIds, $badge, $status);
-    }
-
 
     /**
      * Find a list of guys who received $badge as an Achievement
@@ -448,6 +398,57 @@ class Controller extends Base
         $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_GOAL, \Schoolbox\Role::STUDENT);
 
         $this->response->content->set($this->buildJsonOutput($users));
+    }
+
+
+    /**
+     * Withdraw an achievement that aws set for a set of users
+     *
+     * @param Model $badge
+     * @throws \PDOException
+     */
+    public function postAchievementWithdraw(Model $badge): void
+    {
+        $this->postWithdraw($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT);
+    }
+
+
+    /**
+     * Withdraw a goal that aws set for a set of users
+     *
+     * @param Model $badge
+     * @throws \PDOException
+     */
+    public function postGoalWithdraw(Model $badge): void
+    {
+        $this->postWithdraw($badge, AwardModel::AWARD_STATUS_GOAL);
+    }
+
+
+    /**
+     * Withdraw an Awarding of $badge to a specific set of users
+     *
+     * @param Model  $badge
+     * @param string $status
+     * @throws \PDOException
+     */
+    private function postWithdraw(Model $badge, string $status): void
+    {
+        $userIds = $this->getRequest()->post['userIds'] ?? [];
+
+        /* Empty user list; nothing to do
+         */
+        if (!\count($userIds)) {
+            return;
+        }
+
+        /* Must be a valid status
+         */
+        if (!\in_array($this->getRequest()->post['status'], [AwardModel::AWARD_STATUS_ACHIEVEMENT, AwardModel::AWARD_STATUS_GOAL], true)) {
+            return;
+        }
+
+        $this->awardMapper->deleteMostRecentlyAwarded($userIds, $badge, $status);
     }
 
 

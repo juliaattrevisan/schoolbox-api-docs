@@ -23,7 +23,7 @@ export default {
      * The name of the component that we have here. This name will be used in the container
      * to spawn this component.
      */
-    name: "badge-withdraw-goal-modal",
+    name: "badge-withdraw-achievement-modal",
 
     /**
      * Mixins.
@@ -129,7 +129,7 @@ export default {
          * Perform async request and load results into component
          */
         search: _.debounce(function(loading, query, vm) {
-            axios.get(this.badge._links.goalRecipients, {
+            axios.get(this.badge._links.achievementRecipients, {
                 params: {
                     query: query
                 }
@@ -164,7 +164,7 @@ export default {
             /* Pack it up and send it
              */
             let request = {
-                url: this.badge._links.withdrawGoal,
+                url: this.badge._links.achievementWithdraw,
                 data:  qs.stringify({userIds: userIds}),
                 method: 'post',
                 responseType: 'json'
@@ -172,7 +172,7 @@ export default {
 
             /* A toast - to your valour, my sword, and our victory together
              */
-            self.toastActivate('Unsetting goal for ' + this.selected.length + ' student(s)');
+            self.toastActivate('Withdrawing achievements from ' + this.selected.length + ' student(s)');
 
             axios.request(request)
                 .then(function (response) {
@@ -183,7 +183,7 @@ export default {
 
                     /* Pop toast
                      */
-                    self.toastSuccess('Unset complete');
+                    self.toastSuccess('Withdraw complete');
                 })
                 .then(function() {
 
@@ -194,7 +194,7 @@ export default {
                 .catch(error => {
                     if (error.response) {
                         if (error.response) {
-                            self.toastError('Unable to unset goal; please try again.');
+                            self.toastError('Unable to withdraw achievement; please try again.');
                         }
                     }
                 });
@@ -206,7 +206,7 @@ export default {
     <reveal-modal ref="modal">
         <template v-if="badge">
             <h2>Withdraw <strong>{{ badge.name }}</strong></h2>
-            <p>Remove the student(s) allocated to this goal to withdraw it from them.</p>
+            <p>Remove the student(s) allocated to this achievement to withdraw it from them.</p>
 
             <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Search for recipients of thie badge" v-model="selected">
                 <template slot="option" slot-scope="option">
