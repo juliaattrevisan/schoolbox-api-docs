@@ -444,7 +444,7 @@ class Controller extends Base
 
         /* Must be a valid status
          */
-        if (!\in_array($this->getRequest()->post['status'], [AwardModel::AWARD_STATUS_ACHIEVEMENT, AwardModel::AWARD_STATUS_GOAL], true)) {
+        if (!\in_array($status, [AwardModel::AWARD_STATUS_ACHIEVEMENT, AwardModel::AWARD_STATUS_GOAL], true)) {
             return;
         }
 
