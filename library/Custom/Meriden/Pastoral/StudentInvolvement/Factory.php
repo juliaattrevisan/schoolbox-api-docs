@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory for creating tutor group factory objects
  *
@@ -17,7 +18,6 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -64,13 +64,6 @@ class Factory
     private $currentUser;
 
     /**
-     * Access permissions data source
-     *
-     * @var Access
-     */
-    private $access;
-
-    /**
      * Data source for fetching users who have access to a folder.
      *
      * @var UserAccessMapper
@@ -86,7 +79,6 @@ class Factory
      * @param AssessmentDataSource $assessmentDataSource
      * @param RubricDataSource     $rubricMapper
      * @param User                 $currentUser
-     * @param Access               $access
      * @param UserAccessMapper     $userAccessMapper
      */
     public function __construct(
@@ -96,7 +88,6 @@ class Factory
         AssessmentDataSource $assessmentDataSource,
         RubricDataSource $rubricMapper,
         User $currentUser,
-        Access $access,
         UserAccessMapper $userAccessMapper
     ) {
         $this->gateway              = $gateway;
@@ -105,7 +96,6 @@ class Factory
         $this->assessmentDataSource = $assessmentDataSource;
         $this->rubricMapper         = $rubricMapper;
         $this->currentUser          = $currentUser;
-        $this->access               = $access;
         $this->userAccessMapper     = $userAccessMapper;
     }
 
@@ -114,12 +104,13 @@ class Factory
      *
      * This is used as a data store for the year level eReport.
      *
-     * @param int  $year
-     * @param User $student
+     * @param int         $year
+     * @param User        $student
+     * @param string|null $roleTypeOverride
      *
      * @return TutorGroup
      */
-    public function buildTutorGroup($year, User $student)
+    public function buildTutorGroup($year, User $student, ?string $roleTypeOverride)
     {
         $tutorGroup = new TutorGroup();
         $tutorGroup
@@ -141,7 +132,7 @@ class Factory
         // Add grades for the tutor group class page
         $tutorGroupCode   = $tutorGroup->getTutorGroup();
         $publishedOnly    = !$this->doesDraftFeedbackContribute($year);
-        $folderWithGrades = $this->getFolderWithGrades($tutorGroupCode['code'], $student, $publishedOnly);
+        $folderWithGrades = $this->getFolderWithGrades($tutorGroupCode['code'], $student, $publishedOnly, $roleTypeOverride);
         $tutorGroup
             ->setSubjectCode($tutorGroupCode['code'])
             ->setFolder($folderWithGrades['folder'])
@@ -173,13 +164,14 @@ class Factory
      *
      * This is used as a data store for the subject eReport.
      *
-     * @param int    $year
-     * @param User   $student
-     * @param string $subjectCode
+     * @param int         $year
+     * @param User        $student
+     * @param string      $subjectCode
+     * @param string|null $roleTypeOverride
      *
      * @return Subject
      */
-    public function buildSubject($year, User $student, $subjectCode)
+    public function buildSubject($year, User $student, $subjectCode, ?string $roleTypeOverride)
     {
         $subject      = new Subject();
         $externalData = $this->gateway->getSubject($year, $subjectCode);
@@ -194,7 +186,7 @@ class Factory
 
         // Add grades for the class page
         $publishedOnly    = !$this->doesDraftFeedbackContribute($year);
-        $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student, $publishedOnly);
+        $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student, $publishedOnly, $roleTypeOverride);
         $subject
             ->setFolder($folderWithGrades['folder'])
             ->setCohortFolders($this->getCohortFolders($folderWithGrades['folder'], $subjectCode))
@@ -288,21 +280,22 @@ class Factory
      * Gets the (current or archived) folder for this subject code and student,
      * or an empty one if not found.
      *
-     * @param string $subjectCode
-     * @param User   $student
-     * @param bool  $publishedOnly
+     * @param string      $subjectCode
+     * @param User        $student
+     * @param bool        $publishedOnly
+     * @param string|null $roleTypeOverride
      *
      * @return array {
      *  folder: Folder
      *  grades: array
      * }
      */
-    protected function getFolderWithGrades($subjectCode, User $student, bool $publishedOnly)
+    protected function getFolderWithGrades($subjectCode, User $student, bool $publishedOnly, ?string $roleTypeOverride)
     {
         // Find by category code, and figure out if they're involved.
         $folder = $this->folderMapper->findForCampusAndClass('', $subjectCode);
         if ($folder) {
-            $involvement = $this->getStudentInvolvement($folder, $student, $publishedOnly);
+            $involvement = $this->getStudentInvolvement($folder, $student, $publishedOnly, $roleTypeOverride);
             if ($involvement) {
                 return [
                     'folder' => $folder,
@@ -317,7 +310,7 @@ class Factory
         // To do this, every matching category has to be checked.
         $archivedFolders = $this->folderMapper->findAllByArchivedCode($subjectCode);
         foreach ($archivedFolders as $archivedFolder) {
-            $involvement = $this->getStudentInvolvement($archivedFolder, $student, $publishedOnly);
+            $involvement = $this->getStudentInvolvement($archivedFolder, $student, $publishedOnly, $roleTypeOverride);
             if ($involvement) {
                 return [
                     'folder' => $archivedFolder,
@@ -340,16 +333,21 @@ class Factory
      * * Is this student currently a member of the class?
      * * Does this student have a grade in this folder?
      *
-     * @param Folder $folder
-     * @param User   $student
-     * @param bool   $publishedOnly
+     * @param Folder      $folder
+     * @param User        $student
+     * @param bool        $publishedOnly
+     * @param string|null $roleTypeOverride
      *
      * @return array {
      *  grades: array (if the student is involved)
      * }
      */
-    protected function getStudentInvolvement(Folder $folder, User $student, bool $publishedOnly)
-    {
+    protected function getStudentInvolvement(
+        Folder $folder,
+        User $student,
+        bool $publishedOnly,
+        ?string $roleTypeOverride
+    ) {
         // Is $student a member of $folder (by class code?)
         if ($folder->getCodes()) {
             foreach ($student->getSubjectCollection() as $subject) {
@@ -358,7 +356,7 @@ class Factory
                         // Student is involved, even if they have no grades.
                         // Try to get them anyway.
                         return [
-                            'grades' => $this->getGrades($folder, $student, $publishedOnly),
+                            'grades' => $this->getGrades($folder, $student, $publishedOnly, $roleTypeOverride),
                         ];
                     }
                 }
@@ -366,7 +364,7 @@ class Factory
         }
 
         // If not, has $student got a grade in this folder?
-        $grades = $this->getGrades($folder, $student, $publishedOnly);
+        $grades = $this->getGrades($folder, $student, $publishedOnly, $roleTypeOverride);
         if (!empty($grades)) {
             return [
                 'grades' => $grades,
@@ -378,9 +376,10 @@ class Factory
     /**
      * Gets all assessment and quiz grades.
      *
-     * @param Folder $folder
-     * @param User   $student
-     * @param bool   $publishedOnly
+     * @param Folder      $folder
+     * @param User        $student
+     * @param bool        $publishedOnly
+     * @param string|null $roleTypeOverride
      *
      * @return array {
      *  assessment:  IAssessable
@@ -400,23 +399,36 @@ class Factory
      *  comment:     string
      * }
      */
-    protected function getGrades(Folder $folder, User $student, bool $publishedOnly)
+    protected function getGrades(Folder $folder, User $student, bool $publishedOnly, ?string $roleTypeOverride)
     {
         $allGrades = [];
 
         // Only due works are shown
         // Not interested in work types other than assessment tasks
-        foreach ($this->assessmentDataSource->findAllByFolderIdForReview(
-            $folder->getId(),
-            $student,
-            ['order' => ['due_date' => 'asc'],]
-        ) as $assessment) {
-
+        foreach (
+            $this->assessmentDataSource->findAllByFolderIdForReview(
+                $folder->getId(),
+                $student,
+                ['order' => ['due_date' => 'asc'],]
+            ) as $assessment
+        ) {
             $participant = $assessment->getParticipantIfExtant($student);
             if ($participant) {
+                // Filter this grade out if not visible to the current user.
+                if (!$assessment->isFeedbackVisibleToUser($this->currentUser)) {
+                    continue;
+                }
+
+                // Filter this grade out if there is a role type override,
+                // and feedback isn't visible to it
+                if ($roleTypeOverride && !$assessment->isFeedbackVisibleToRoleType($roleTypeOverride)) {
+                    continue;
+                }
+
                 $feedback = $participant->getAuthoritativeFeedback($publishedOnly);
                 $rubric   = null;
-                if ($assessment instanceof DueWork
+                if (
+                    $assessment instanceof DueWork
                     && $feedback instanceof DueWorkFeedback
                     && $assessment->getUseRubric()
                 ) {
@@ -650,7 +662,7 @@ class Factory
      * @param int $reportYear
      * @return bool
      */
-    private function doesDraftFeedbackContribute($reportYear) : bool
+    private function doesDraftFeedbackContribute($reportYear): bool
     {
         return $reportYear < 2018;
     }

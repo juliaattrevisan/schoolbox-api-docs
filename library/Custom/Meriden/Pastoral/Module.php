@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module definition for Meriden's custom pastoral page.
  *
@@ -133,7 +134,6 @@ class Module extends BaseModule
             = $this->getMapperFactory()->getLazy(RubricDataSource::class);
         $injector->params[StudentInvolvement\Factory::class]['currentUser']
             = $injector->lazyGet('user');
-        $injector->params[StudentInvolvement\Factory::class]['access'] = Access::getInstance();
         $injector->params[StudentInvolvement\Factory::class]['userAccessMapper']
             = $this->getMapperFactory()->getLazy(UserAccessMapper::class);
 

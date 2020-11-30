@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller for Meriden's pastoral page.
  *
@@ -12,6 +13,7 @@ namespace Custom\Meriden\Pastoral;
 use Alaress\Web\Controller\Base;
 use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
 use Custom\Meriden\Pastoral\StudentInvolvement\TutorGroup;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -55,7 +57,6 @@ class Controller extends Base
                         'year' => min($lastReportYear, $currentYear)
                     )
                 )
-
             );
         }
     }
@@ -91,15 +92,16 @@ class Controller extends Base
     public function subject($year, User $student, $subjectCode)
     {
         try {
-            $reportData    = $this->buildReportData($year, $student, $subjectCode);
+            $reportData               = $this->buildReportData($year, $student, $subjectCode);
+            $reportData['graphWidth'] = $this->request->query->getInt('graph-width');
             /** @var StudentInvolvement\Subject $subjectReport */
             $subjectReport = $reportData['report']['subjectReport'];
             $this->getResponse()->content->set(
-                array(
+                [
                     'template' => '@customMeridenPastoral/subject.twig',
                     'data'     => $reportData,
-                    'title'    => $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName()
-                )
+                    'title'    => $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName(),
+                ]
             );
         } catch (\RangeException $e) {
             $this->getResponse()->status->setCode(404);
@@ -110,9 +112,9 @@ class Controller extends Base
      * Builds data for the report for this student for this year, with an
      * optional subject to drill down into.
      *
-     * @param int    $year
-     * @param User   $student
-     * @param string $subjectCode
+     * @param int         $year
+     * @param User        $student
+     * @param string|null $subjectCode
      *
      * @return array
      *
@@ -122,10 +124,23 @@ class Controller extends Base
     {
         $this->assertValidYearForReport($year, $student);
 
-        $tutorGroup     = null;
-        $tutorGroupList = $this->retrieveTutorGroupList($student);
-        $subject        = null;
-        $subjectList    = $this->getStudentInvolvementFactory()->buildSubjectList($year, $student);
+        $tutorGroup       = null;
+        $tutorGroupList   = $this->retrieveTutorGroupList($student);
+        $subject          = null;
+        $subjectList      = $this->getStudentInvolvementFactory()->buildSubjectList($year, $student);
+        $roleTypeOverride = null;
+        $roleTypes        = Role::getRoleTypes();
+
+        // Only staff may override role type?
+        if ($this->getUser()->getRole()->isStaff()) {
+            $roleTypeOverride = $this->request->query->get('role-type');
+            if (isset($roleTypeOverride) && !in_array($roleTypeOverride, $roleTypes, true)) {
+                throw new \RangeException(
+                    sprintf("If role type is overridden, it must be one of: %s", implode(', ', $roleTypes))
+                );
+            }
+        }
+
         if (!isset($subjectCode)) {
             // Does this student exist for this year and subject?
             $exists = false;
@@ -138,7 +153,7 @@ class Controller extends Base
             if (!$exists) {
                 throw new \RangeException("Student has no tutor group in $year");
             }
-            $tutorGroup = $this->getStudentInvolvementFactory()->buildTutorGroup($year, $student);
+            $tutorGroup = $this->getStudentInvolvementFactory()->buildTutorGroup($year, $student, $roleTypeOverride);
         } else {
             // Does this subject exist for this student?
             $exists = false;
@@ -151,7 +166,7 @@ class Controller extends Base
             if (!$exists) {
                 throw new \RangeException("Student was not in subject $subjectCode in $year");
             }
-            $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode);
+            $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode, $roleTypeOverride);
         }
         return array(
             'report' => array(
@@ -160,6 +175,7 @@ class Controller extends Base
                 'subjectReport'    => $subject,
                 'tutorGroupList'   => $tutorGroupList,
                 'subjectList'      => $subjectList,
+                'roleTypeOverride' => $roleTypeOverride,
             )
         );
     }

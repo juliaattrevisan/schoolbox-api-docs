@@ -2,27 +2,25 @@
 <div class="row" id="assessments">
     <div class="small-12 column">
         <h2>Assessments <span class="explanation">(Feedback is provided with the marked task)</span></h2>
-        <div class="scrollable">
-            <table class="bordered-table">
-                <colgroup>
-                    <col class="title" />
-                    <col class="result" />
-                    <col class="distribution" />
-                </colgroup>
-                <thead>
-                <tr>
-                    <th class="title">Title</th>
-                    <th class="result">Result %</th>
-                    <th class="distribution">Distribution</th>
-                </tr>
-                </thead>
-                <tbody>
+        <table class="bordered-table">
+            <colgroup>
+                <col class="title" />
+                <col class="result" />
+                <col class="distribution" />
+            </colgroup>
+            <thead>
+            <tr>
+                <th class="title">Title</th>
+                <th class="result">Result %</th>
+                <th class="distribution">Distribution</th>
+            </tr>
+            </thead>
+            <tbody>
 {% endset %}
 
 {% set tfoot %}
-                </tbody>
-            </table>
-        </div>
+            </tbody>
+        </table>
     </div>
 </div>
 {% endset %}
@@ -30,23 +28,23 @@
 {% set first = true %}
 {% for workItem in work %}
     {# Is this work item shown to the logged in user? #}
-    {% if workItem.distribution and workItem.assessment.isFeedbackVisibleToUser(USER) %}
+    {% if workItem.distribution %}
         {# Is this the first row that's getting displayed? show the header and that #}
         {% if first %}
             {% set first = false %}
             {{ thead }}
         {% endif %}
         <tr>
-            <td>
+            <td class="title">
                 <a href="/learning/assessments/{{ workItem.assessment.id }}/{{ student.id }}">
                     {{ workItem.assessment.title }}
                 </a>
             </td>
-            <td>{{ workItem.pretty_mark | replace({'%': ''}) }}</td>
-            <td>
+            <td class="result">{{ workItem.pretty_mark | replace({'%': ''}) }}</td>
+            <td class="distribution">
                 {% if workItem.distribution.continuous.series is defined %}
                     {# Graph goes here #}
-                    <div id="assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}"></div>
+                    <div class="chart" id="assessmentGraph-{{ workItem.assessment.id }}-{{ student.id }}"></div>
 
                     {% autoescape 'js' %}
                     <script type="text/javascript">
@@ -61,11 +59,8 @@
                                     chart: {
                                         inverted: true,
                                         height: 100,
-                                        events: {
-                                            load: function() {
-                                                window.dispatchEvent(new Event('resize'));
-                                            }
-                                        }
+                                        {% if graphWidth %}width: Number('{{ graphWidth }}'),{% endif %}
+                                        reflow: true,
                                     },
                                     title: {
                                         text: null
@@ -99,6 +94,12 @@
                                         },
                                         labels: {
                                             step: 2
+                                        }
+                                    },
+                                    plotOptions: {
+                                        series: {
+                                            shadow: false,
+                                            animation: false
                                         }
                                     },
                                     series: [
