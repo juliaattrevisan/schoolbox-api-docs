@@ -35,12 +35,23 @@ abstract class Base implements ITranslator
      *                                 value
      * @param object $model            The model to update
      * @param string $modelFieldSetter The setter to call on `$model`
+     * @param bool   $trimStringValues If true, and the value is a string:
+     *                                 trim the value before setting the field
      * @return object
      */
-    protected function setScalar(array $array, string $arrayField, object $model, string $modelFieldSetter): object
-    {
+    protected function setScalar(
+        array $array,
+        string $arrayField,
+        object $model,
+        string $modelFieldSetter,
+        bool $trimStringValues = true
+    ): object {
         if (array_key_exists($arrayField, $array)) {
-            $model = $this->setFieldOnModel($model, $modelFieldSetter, $array[$arrayField]);
+            $value = $array[$arrayField];
+            if ($trimStringValues && is_string($value)) {
+                $value = trim($value);
+            }
+            $model = $this->setFieldOnModel($model, $modelFieldSetter, $value);
         }
         return $model;
     }
