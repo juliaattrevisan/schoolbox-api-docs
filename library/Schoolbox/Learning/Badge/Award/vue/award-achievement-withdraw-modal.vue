@@ -2,7 +2,7 @@
 import axios from "axios";
 import RevealModal from '@schoolbox/reveal-modal'
 import qs from 'qs';
-import Toast from "@schoolbox/toast";
+import toastMixin from '@schoolbox/toast-mixin';
 
 export default {
 
@@ -20,6 +20,7 @@ export default {
      * be superpositioned on top of this javascript here, inside export default {}
      */
     mixins: [
+        toastMixin
     ],
 
     /**
@@ -36,8 +37,7 @@ export default {
      * at the top of the file.
      */
     components: {
-        RevealModal,
-        Toast
+        RevealModal
     },
 
     /**
@@ -93,7 +93,7 @@ export default {
 
 
         /**
-         * Perform withdrawl
+         * Perform withdrawal
          */
         withdraw() {
             let self = this;
@@ -101,13 +101,15 @@ export default {
             /* Access the withdraw endpoint, grab the awards for the user
              */
             let request = {
-                url: this.award._links.withdraw,
+                url: this.award._links.achievementWithdraw,
                 data: qs.stringify({userIds: [this.award.recipient.id]}),
                 method: 'post',
                 responseType: 'json'
             }
 
-            self.$refs.toast.activate('Loading...');
+            /* A toast - to your valour, my sword, and our victory together
+             */
+            self.toastActivate('Withdrawing achievement...');
 
             axios.request(request)
                 .then(response => {
@@ -122,9 +124,13 @@ export default {
 
                     /* Pop toast
                      */
-                    this.$refs.toast.timeout('Withdraw complete', true);
+                    self.toastSuccess('Withdraw complete');
                 })
-                .catch(() => this.$refs.toast.timeout('Withdraw failed', false))
+                .catch(error => {
+                    if (error.response) {
+                        self.toastError('Unable to withdraw achievement; please try again.');
+                    }
+                });
         }
     }
 }
@@ -132,13 +138,18 @@ export default {
 <template>
     <reveal-modal ref="modal">
         <template v-if="award.badge">
-            <h2>Please confirm</h2>
+            <h2>Withdraw <strong>{{ award.badge.name }}</strong></h2>
+
+            <div class="card small-12 compact">
+                <img :src="award.badge.image._links.image" :alt="award.badge.name"/>
+                <h3>{{ award.badge.name }}</h3>
+            </div>
+
             <p>Are you sure you want to withdraw <strong>{{ award.badge.name }}</strong> from {{ award.recipient.fullName }}?</p>
             <ul class="flex-list buttons">
                 <li><a @click.prevent="withdraw()" class="button submit">Yes</a></li>
                 <li><a @click.prevent="close()" class="button">No</a></li>
             </ul>
         </template>
-        <toast ref="toast"></toast>
     </reveal-modal>
 </template>

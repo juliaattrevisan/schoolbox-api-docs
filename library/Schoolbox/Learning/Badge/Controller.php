@@ -133,6 +133,7 @@ class Controller extends Base
                 new User\Translator\ModelToArray(),
                 new Storage\Translator\ModelToArray(),
                 new ScrubAdapter(),
+                new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
             ),
             new Award\Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
         );
@@ -339,7 +340,8 @@ class Controller extends Base
             new Translator\ModelToArray(
                 new User\Translator\ModelToArray(),
                 new Storage\Translator\ModelToArray(),
-                new ScrubAdapter()
+                new ScrubAdapter(),
+                new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
             ),
             new Award\Translator\Links($this->router, $this->authorizer, $this->getUser())
         );
@@ -369,12 +371,75 @@ class Controller extends Base
 
 
     /**
-     * Withdraw an Awarding of $badge to a specific set of users
+     * Find a list of guys who received $badge as an Achievement
+     *
+     * @param Model $badge
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     */
+    public function getAchievementRecipients(Model $badge): void
+    {
+        $keyword = (string)($this->getRequest()->query['query'] ?? '');
+
+        /* For now, just search for student recipients
+         */
+        $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, \Schoolbox\Role::STUDENT);
+
+        $this->response->content->set($this->buildJsonOutput($users));
+    }
+
+
+    /**
+     * Find a list of guys who set $badge as a Goal
+     *
+     * @param Model $badge
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     */
+    public function getGoalRecipients(Model $badge): void
+    {
+        $keyword = (string)($this->getRequest()->query['query'] ?? '');
+
+        /* For now, just search for student recipients
+         */
+        $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_GOAL, \Schoolbox\Role::STUDENT);
+
+        $this->response->content->set($this->buildJsonOutput($users));
+    }
+
+
+    /**
+     * Withdraw an achievement that aws set for a set of users
      *
      * @param Model $badge
      * @throws \PDOException
      */
-    public function postWithdraw(Model $badge): void
+    public function postAchievementWithdraw(Model $badge): void
+    {
+        $this->postWithdraw($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT);
+    }
+
+
+    /**
+     * Withdraw a goal that aws set for a set of users
+     *
+     * @param Model $badge
+     * @throws \PDOException
+     */
+    public function postGoalWithdraw(Model $badge): void
+    {
+        $this->postWithdraw($badge, AwardModel::AWARD_STATUS_GOAL);
+    }
+
+
+    /**
+     * Withdraw an Awarding of $badge to a specific set of users
+     *
+     * @param Model  $badge
+     * @param string $status
+     * @throws \PDOException
+     */
+    private function postWithdraw(Model $badge, string $status): void
     {
         $userIds = $this->getRequest()->post['userIds'] ?? [];
 
@@ -384,7 +449,13 @@ class Controller extends Base
             return;
         }
 
-        $this->awardMapper->deleteMostRecentlyAwarded($userIds, $badge);
+        /* Must be a valid status
+         */
+        if (!\in_array($status, [AwardModel::AWARD_STATUS_ACHIEVEMENT, AwardModel::AWARD_STATUS_GOAL], true)) {
+            return;
+        }
+
+        $this->awardMapper->deleteMostRecentlyAwarded($userIds, $badge, $status);
     }
 
 
@@ -399,7 +470,8 @@ class Controller extends Base
             new Translator\ModelToArray(
                 new User\Translator\ModelToArray(),
                 new Storage\Translator\ModelToArray(),
-                new ScrubAdapter()
+                new ScrubAdapter(),
+                new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
             ),
             new Translator\ModelToArray\Links(
                 $this->router,

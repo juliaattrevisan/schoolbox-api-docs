@@ -11,6 +11,8 @@ namespace Schoolbox\Learning\Badge\Award;
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge;
+use Schoolbox\Learning\Badge\Award;
+use Schoolbox\Resource\Search\Results;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -21,6 +23,7 @@ use Schoolbox\UserMapper;
  * @method Model findById($id)
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method Model findOneByColumnList($columnList, array $options = [])
+ * @method Model[] findByColumn($columnName, $columnValue, array $options = [])
  * @method Model[] findByColumnList($columnList, array $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)
@@ -167,6 +170,102 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
+     * Find a list of people who have received $badge at least once
+     *
+     * $roleType is one of the student/staff/parent/guest consts in Role
+     *
+     * @param string      $keyword
+     * @param Badge\Model $badge
+     * @param string      $awardStatus
+     * @param string      $roleType
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     */
+    public function findRecipients(string $keyword, Badge\Model $badge, string $awardStatus, string $roleType): array
+    {
+
+        /* No keyword provided; nothing to search
+         */
+        if (strlen($keyword) < Results::MIN_SEARCH_LENGTH) {
+            return [];
+        }
+
+        /* Award status must be one of the prescribed enums in Award\Model
+         */
+        if (!\in_array($awardStatus, [Award\Model::AWARD_STATUS_ACHIEVEMENT, Award\Model::AWARD_STATUS_GOAL], true)) {
+            return [];
+        }
+
+        $pb = $this->getPredicateBuilder()
+            ->like('user.firstname', "%{$keyword}%")
+            ->like('user.lastname', "%{$keyword}%")
+            ->like('user.username', "%{$keyword}%")
+            ->like('user.synergy_id', "%{$keyword}%");
+
+        $where = implode(' OR ', $pb->getWhere());
+
+        $query = "
+            SELECT DISTINCT
+                `user`.id,
+                `user`.firstname,
+                `user`.lastname,
+                lyl.name,
+                `groups`.name AS role,
+                `user`.synergy_id
+            FROM `user`
+            INNER JOIN `groups` ON `user`.group_id = `groups`.id
+            INNER JOIN badge_user ON `user`.id = badge_user.recipient_id
+            LEFT JOIN lu_year_level lyl ON `user`.year_id = lyl.id
+            WHERE `groups`.`group_type` = :roleType
+            AND badge_user.badge_id = :badgeId
+            AND badge_user.status = :status
+            AND badge_user.deleted_at IS NULL
+            AND ({$where})
+        ";
+
+        $params = $pb->getParams();
+
+        $params['badgeId'] = $badge->getId();
+        $params['status'] = $awardStatus;
+        $params['roleType'] = $roleType;
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($params);
+
+        $users = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+
+            /* Manufacture a string to present to the user
+             */
+            $person = "{$row['firstname']} {$row['lastname']} - ";
+
+            if ($row['year']) {
+                $person .= "Year {$row['year']}, ";
+            }
+
+            $person .= $row['role'];
+
+            if ($row['synergy_id']) {
+                $person .= " ({$row['synergy_id']})";
+            }
+
+            $users[] = [
+                'name' => $person,
+                'id' => $row['id'],
+                'first_name' => $row['firstname'],
+                'last_name' => $row['lastname'],
+                'role' => $row['role'],
+                'external_id' => $row['synergy_id']
+            ];
+        }
+
+        return $users;
+    }
+
+
+    /**
      * Find the most recent awardings of $badge across all users in $userIds
      *
      * Intentionally avoid hydration as there's no point to doing all that
@@ -174,9 +273,10 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param array       $userIds
      * @param Badge\Model $badge
+     * @param string      $status
      * @throws \PDOException
      */
-    public function deleteMostRecentlyAwarded(array $userIds, Badge\Model $badge): void
+    public function deleteMostRecentlyAwarded(array $userIds, Badge\Model $badge, string $status): void
     {
 
         /* Find a list of the most recent instances of $badge given
@@ -199,9 +299,8 @@ class Mapper extends \Schoolbox\Mapper
         $params['badgeId'] = $badge->getId();
 
         /* Only withdraw Achievements for now, not Goals
-         * FIXME This will probably change later, pass it as an arg
          */
-        $params['status'] = Model::AWARD_STATUS_ACHIEVEMENT;
+        $params['status'] = $status;
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);

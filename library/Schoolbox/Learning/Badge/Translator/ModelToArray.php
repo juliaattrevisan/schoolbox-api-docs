@@ -52,17 +52,28 @@ class ModelToArray
 
 
     /**
+     * Translator for generating urls relevant to an badge
+     *
+     * (callable isn't a valid typedef)
+     *
+     * @var callable
+     */
+    private $linkTranslator;
+
+
+    /**
      * Constructor
      *
      * @param callable  $userTranslator
      * @param callable  $storageTranslator
      * @param IPurifier $purifier
      */
-    public function __construct(callable $userTranslator, callable $storageTranslator, IPurifier $purifier)
+    public function __construct(callable $userTranslator, callable $storageTranslator, IPurifier $purifier, callable $linkTranslator)
     {
         $this->userTranslator    = $userTranslator;
         $this->storageTranslator = $storageTranslator;
         $this->purifier          = $purifier;
+        $this->linkTranslator  = $linkTranslator;
     }
 
 
@@ -141,6 +152,10 @@ class ModelToArray
 
             // Tags don't exist yet, they will be added soon though
             'tags'            => null,
+
+            /* Assign a variety of useful urls about this badge
+             */
+            '_links' => call_user_func($this->linkTranslator, $model)
         ];
     }
 }
