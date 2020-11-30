@@ -28,31 +28,28 @@
  # Feedback status happens to be
  #}
 {% set participant = assessment.participantIfExtant(student) %}
-
+{% set isOpenForStudent = (student.id == USER.id) and assessment.isOpen(USER) %}
 {# Tasks only #}
 {% if postRoute is not null %}
     <form action="{{ postRoute }}"
           method="POST"
           class="progress-tick-form"
           data-progress-tick-form="{{ assessment.isSelfAssessable ?? false ? 'selfAssessed' : 'teacherAssessed' }}">
-        {% if not participant or participant.isResponseRequired %}
-            <a href="#"
-               class="no-text progress-tick"
+        {% if participant.isResponseRequired and (USER.role.isStaff or (isOpenForStudent and assessment.isSelfAssessable)) %}
+            <a class="no-text progress-tick"
                title="Incomplete"
                data-progress-tick-status="incomplete"></a>
         {% elseif participant.isFeedbackRequired %}
-            <a href="#"
-               class="no-text progress-tick pending"
+            <a class="no-text progress-tick pending"
                title="Self-assessed"
                data-progress-tick-status="selfAssessed"></a>
         {% elseif participant.isReviewComplete %}
-            <a href="#"
-               class="no-text progress-tick reviewed"
+            <a class="no-text progress-tick reviewed"
                title="Completed"
                data-progress-tick-status="teacherAssessed"></a>
         {% endif %}
     </form>
-{% else %}
+{% elseif assessment is not task %}
 
     {# Other assessment types get non-POST behaviour
      # Excluded people and non-participants probably shouldn't even get a link to anything?
@@ -76,7 +73,7 @@
          # If you can't see this destination, you don't get a link to anything
          #}
         {% if detailRoute %}
-            {% if participant.isResponseRequired %}
+            {% if participant.isResponseRequired and isOpenForStudent %}
                 <a href="{{ detailRoute }}" class="no-text progress-tick" title="Incomplete"></a>
             {% elseif participant.isFeedbackRequired %}
                 <a href="{{ detailRoute }}" class="no-text progress-tick pending" title="Awaiting Feedback"></a>
