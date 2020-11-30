@@ -205,7 +205,8 @@ export default {
 
 <template>
     <div>
-        <div v-for="evidenceGroup in groupedEvidence">
+        <div class="feed-column left"></div>
+        <div class="feed" v-for="evidenceGroup in groupedEvidence">
             <h2 class="subheader feed no-margin">
                 <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
                       :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
@@ -239,7 +240,7 @@ export default {
                             </ul>
                         </div>
 
-                        <div class="feed-body small-12 large-6 column">
+                        <div class="feed-body small-12 columns">
                             <!-- Is there an attachment? Display it appropriately -->
                             <article v-if="evidence.filename && evidence.storage">
                                 <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
@@ -255,7 +256,7 @@ export default {
                             </div>
                         </div>
 
-                        <div class="feed-comments small-12 large-6 column">
+                        <div class="feed-comments small-12 columns">
                             <comment-thread :thread="evidence.discussionThread"
                                             :create-thread-endpoint="evidence._links.createThread"
                             />
@@ -264,6 +265,7 @@ export default {
                 </ul>
             </section>
         </div>
+        <div class="feed-column right"></div>
 
         <section v-if="showSkeletonLoader">
             <div v-for="n in 3" class="list-item">
