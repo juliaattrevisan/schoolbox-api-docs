@@ -265,8 +265,6 @@ export default {
                 </ul>
             </section>
         </div>
-        <div class="feed-column right"></div>
-
         <section v-if="showSkeletonLoader">
             <div v-for="n in 3" class="list-item">
                 <div class="small-12 card skeleton">
@@ -276,7 +274,6 @@ export default {
                 </div>
             </div>
         </section>
-
         <div class="row" v-else>
             <div class="small-12 island">
                 <div v-if="metadata.count === 0" class="empty-state">
@@ -284,11 +281,11 @@ export default {
                     <p>There is no activity yet. To get started you can <a href="#" title="Share something" @click="openShareLearningMomentModal">share something</a>.</p>
                 </div>
                 <button v-else-if="metadata.cursor.next && metadata.count > data.length" class="expand" @click.prevent="append(metadata.cursor.next)">
-                    Load more
+                  Load more
                 </button>
             </div>
         </div>
-
+        <div class="feed-column right"></div>
 
         <!-- TODO create a Vue equivalent of $.confirmDialog -->
         <reveal-modal ref="deleteModal">

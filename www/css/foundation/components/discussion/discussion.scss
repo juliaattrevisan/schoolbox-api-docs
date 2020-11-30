@@ -14,4 +14,10 @@
     display: flex;
     flex-flow: row-reverse;
   }
+
+  // applies to news/learning moment comments
+  .information-list article {
+    padding-top: 0;
+    padding-left: 3.5rem;
+  }
 }
