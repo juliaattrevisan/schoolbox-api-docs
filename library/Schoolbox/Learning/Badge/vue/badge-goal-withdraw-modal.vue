@@ -61,7 +61,7 @@ export default {
      */
     data() {
         return {
-            badge: {},
+            badge: null,
             loading: true,
 
             /* Vue Select
