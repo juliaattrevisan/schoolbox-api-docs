@@ -1,9 +1,10 @@
 #!/bin/bash
 
-service schoolbox-scheduled stop;
-service schoolbox-routed    stop;
-service schoolbox-socketd   stop;
-service schoolbox-digestd   stop;
+for service in socketd digestd routed scheduled; do
+  if systemctl | grep -q "schoolbox-$service.service"; then
+    systemctl stop "schoolbox-$service.service";
+  fi
+done
 
 service schoolbox-cloud-scheduled@vagrantx stop;
 service schoolbox-cloud-routed@vagrantx    stop;
