@@ -20,7 +20,7 @@
                         <label for="badge-name" class="required">Achievement Name</label>
                         <input name="name" type="text" id="badge-name" required />
 
-                        <label for="badge-body" class="required">
+                        <label for="badge-body">
                             Description
                         </label>
                         <textarea name="body" id="badge-body" required></textarea>
@@ -92,10 +92,7 @@
         $form.alaressValidate({
             rules: {
                 name: {
-                    required: true,
-                },
-                body: {
-                    required: true,
+                    requiredNotBlank: true,
                 },
                 category: {
                     required: true,

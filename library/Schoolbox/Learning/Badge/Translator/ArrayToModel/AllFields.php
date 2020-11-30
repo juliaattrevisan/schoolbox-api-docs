@@ -54,7 +54,6 @@ class AllFields extends Base
      */
     public function __invoke(array $array, object $model = null): object
     {
-        /** @var Model $model */
         $model ??= new Model();
         $model = $this->setDate($array, 'createdAt', $model, 'setCreatedAt');
         $model = $this->setDate($array, 'updatedAt', $model, 'setUpdatedAt');
