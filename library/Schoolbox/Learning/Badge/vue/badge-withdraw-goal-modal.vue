@@ -129,7 +129,7 @@ export default {
          * Perform async request and load results into component
          */
         search: _.debounce(function(loading, query, vm) {
-            axios.get(this.badge._links.recipients, {
+            axios.get(this.badge._links.goalRecipients, {
                 params: {
                     query: query
                 }
