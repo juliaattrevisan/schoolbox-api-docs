@@ -200,8 +200,7 @@ export default {
                             <div class="card-actions">
                                 <div class="card-spacer"></div>
 
-                                <template v-if="!award.isGoal">
-                                    <template v-if="hasTot(award)">
+                                <template v-if="hasTot(award)">
                                     <nav>
                                         <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
                                     </nav>
@@ -219,7 +218,6 @@ export default {
                                             </template>
                                         </template>
                                     </ul>
-                                    </template>
                                 </template>
                             </div>
                         </div>
