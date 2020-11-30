@@ -212,6 +212,7 @@ class Mapper extends \Schoolbox\Mapper
             LEFT JOIN lu_year_level lyl ON `user`.year_id = lyl.id
             WHERE `groups`.`group_type` = :roleType
             AND badge_user.badge_id = :badgeId
+            AND badge_user.deleted_at IS NULL
             AND ({$where})
         ";
 
