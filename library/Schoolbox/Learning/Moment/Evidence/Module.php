@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Closure;
+use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -115,30 +116,19 @@ class Module extends BaseModule
         // * Staff and superusers may view anyone's
         // * Students may view their own
         // * Parents may view their own and their kid's
-        $feedPermissions = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF),
-                $isParentOrUserRule,
-            ),
-        );
-        $feedPreload = Closure::fromCallable([$this, 'preloadUser']);
-
         $this->register(
             self::METHOD_GET,
             '/user/{userId}',
             'getMomentsForUser',
-            $feedPermissions,
-            $feedPreload,
-        );
-
-        $this->register(
-            self::METHOD_GET,
-            '/user/{userId}/feed',
-            'getFeedForUser',
-            $feedPermissions,
-            $feedPreload,
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF),
+                    $isParentOrUserRule,
+                ),
+            ),
+            Closure::fromCallable([$this, 'preloadUser']),
         );
 
         /* Evidence Detail screen
@@ -200,7 +190,8 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'mapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+                    'mapper'        => $this->getMapperFactory()->getLazy(Mapper::class),
+                    'commentMapper' => $this->getMapperFactory()->getLazy(CommentMapper::class),
                 ]
             )
         );

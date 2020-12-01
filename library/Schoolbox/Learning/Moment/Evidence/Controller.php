@@ -16,8 +16,7 @@ use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Collection;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Json\Decorator\LinkDecorator;
-use Schoolbox\Learning\Moment\Feed\Hydrator;
-use Schoolbox\Learning\Moment\Feed\Translator\ModelToArray;
+use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
@@ -44,13 +43,20 @@ class Controller extends Base
 
 
     /**
+     * @var Comment\Mapper
+     */
+    private Comment\Mapper $commentMapper;
+
+
+    /**
      * Constructor
      *
      * @param Mapper $mapper
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, Comment\Mapper $commentMapper)
     {
-        $this->mapper = $mapper;
+        $this->mapper        = $mapper;
+        $this->commentMapper = $commentMapper;
     }
 
 
@@ -182,52 +188,6 @@ class Controller extends Base
         $data          = $cursor->retrieveResults($encodedCursor);
         $mappedData    = $data
             ->map($this->buildTranslatorWithComments(2))
-            ->reindex();
-
-        $this->response->content->set(
-            $this->buildJsonOutput([
-                'data'     => $mappedData,
-                'metadata' => [
-                    'count'  => $cursor->retrieveResultCount(),
-                    'cursor' => [
-                        'current' => $encodedCursor ?? $cursor->current($data),
-                        'next'    => $cursor->next($data),
-                    ],
-                ],
-            ])
-        );
-    }
-
-
-    /**
-     * Retrieve a user's learning moments and badges, in one API endpoint.
-     *
-     * @api   GET /learning/evidence/user/{userId}/feed
-     * @since 20.2
-     *
-     * @param User $user
-     */
-    public function getFeedForUser(User $user): void
-    {
-        $encodedCursor = $this->request->query->get('cursor');
-        $cursor        = new \Schoolbox\Learning\Moment\Feed\Cursor($this->getDi()->get('databaseInternal'), $user, 10);
-        $hydrator      = new Hydrator($this->mapper, \Schoolbox\Learning\Badge\Award\Mapper::getInstance());
-        $translator    = new ModelToArray(
-            $this->buildTranslatorWithComments(2),
-            new \Schoolbox\Learning\Badge\Award\Translator\ModelToArray(
-                new User\Translator\ModelToArray(),
-                new \Schoolbox\Learning\Badge\Translator\ModelToArray(
-                    new User\Translator\ModelToArray(),
-                    new Storage\Translator\ModelToArray(),
-                    new ScrubAdapter(),
-                ),
-                new \Schoolbox\Learning\Badge\Award\Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
-            )
-        );
-
-        $data          = $cursor->retrieveResults($encodedCursor);
-        $mappedData    = $hydrator->hydrateResults($data)
-            ->map($translator)
             ->reindex();
 
         $this->response->content->set(
@@ -457,33 +417,11 @@ class Controller extends Base
      */
     private function buildTranslatorWithComments(int $commentLimit): Composite
     {
-        $scrubWrapper   = new ScrubAdapter();
-        $baseTranslator = new Translator\ModelToArray\Base(
-            new User\Translator\Author\ModelToArray(),
-            new Storage\Translator\ModelToArray(),
-            $scrubWrapper,
-        );
-
-        $linkTranslator = new Translator\ModelToArray\Links(
+        return (new Factory(
             $this->router,
             $this->authorizer,
             $this->getUser(),
-        );
-
-        $linkDecorator     = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
-        $propertyDecorator = new PropertyDecorator(null, $linkDecorator);
-        $commentTranslator = new Translator\ModelToArray\Comments(
-            Comment\Mapper::getInstance(),
-            $linkDecorator,
-            $propertyDecorator,
-            $commentLimit,
-            $scrubWrapper,
-        );
-
-        return new Composite(
-            $baseTranslator,
-            $linkTranslator,
-            $commentTranslator,
-        );
+            $this->commentMapper
+        ))->buildWithComments($commentLimit);
     }
 }
