@@ -147,7 +147,7 @@ this is a reasonable assumption we can make.
          * by providing the registry from backend instead
          */
         const registry = $.parseJSON('{{ registry|json_encode|raw }}');
-        const pageLength = 40;
+        const pageLength = {{ pageLength }};
         let folder = '';
 
         /* Load the first set of icons when you start a new category
@@ -198,7 +198,7 @@ this is a reasonable assumption we can make.
             </ul>
         </div>
         <div class="small-9 columns" data-icon-container>
-            {% for n in 1..40 %}
+            {% for n in 1..pageLength %}
                 <img src="" class="hide" data-icon="{{ n }}" width="64" height="64" />
             {% endfor %}
         </div>
