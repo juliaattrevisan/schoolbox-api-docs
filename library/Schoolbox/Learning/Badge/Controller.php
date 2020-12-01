@@ -234,39 +234,38 @@ class Controller extends Base
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
 
-        print_r($data);
-        echo 'asofmasojfasdf';
-        die();
-//
-//        // TODO figure out a better way to handle backend validation than this
-//        if (trim($data['name']) === '') {
-//            throw $this->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
-//        }
-//
-//        $translator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
-//        $model      = $translator($data)
-//            ->setCreatedBy($this->getUser())
-//            ->setUpdatedBy($this->getUser());
-//
-//        /* Decide whether to use the icon or the uploaded image
-//         */
-//        new \Alaress_Probe($model);
-//        die();
-//
-//        // Is curriculum tagging disabled?
-//        // Set an empty collection if so, as that is required to save the badge
-//        if (!$this->getConfigLoader()->get('curriculum_tagging_enabled')) {
-//            $model = $model->setCurriculumNodes(\Schoolbox\Curriculum\Node\Mapper::getInstance()->createCollection());
-//        }
-//
-//        $this->mapper->save($model);
-//
-//        // Return the badge just created
-//        $this->response->content->set(
-//            $this->buildJsonOutput(
-//                $this->buildModelToArrayTranslator()($model)
-//            )
-//        );
+        // TODO figure out a better way to handle backend validation than this
+        if (trim($data['name']) === '') {
+            throw $this->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
+
+        $translator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
+        $model      = $translator($data)
+            ->setCreatedBy($this->getUser())
+            ->setUpdatedBy($this->getUser());
+
+        /* Decide whether to use the icon or the uploaded image
+         */
+        if ($data['icon']) {
+            $model->setIcon($data['icon']);
+        } elseif ($data['image']) {
+            $model->setImage($data['image']);
+        }
+
+        // Is curriculum tagging disabled?
+        // Set an empty collection if so, as that is required to save the badge
+        if (!$this->getConfigLoader()->get('curriculum_tagging_enabled')) {
+            $model = $model->setCurriculumNodes(\Schoolbox\Curriculum\Node\Mapper::getInstance()->createCollection());
+        }
+
+        $this->mapper->save($model);
+
+        // Return the badge just created
+        $this->response->content->set(
+            $this->buildJsonOutput(
+                $this->buildModelToArrayTranslator()($model)
+            )
+        );
     }
 
 

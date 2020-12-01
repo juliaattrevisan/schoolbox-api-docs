@@ -50,9 +50,9 @@ class Model implements ISoftDeletable
     /**
      * Optional image associated with this Badge
      *
-     * @var Storage\Model
+     * @var Storage\Model|null
      */
-    private Storage\Model $image;
+    private ?Storage\Model $image = null;
 
 
     /**
@@ -142,19 +142,19 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return Storage\Model
+     * @return Storage\Model|null
      */
-    public function getImage(): Storage\Model
+    public function getImage(): ?Storage\Model
     {
         return $this->image;
     }
 
 
     /**
-     * @param Storage\Model $image
+     * @param Storage\Model|null $image
      * @return $this
      */
-    public function setImage(Storage\Model $image): self
+    public function setImage(?Storage\Model $image): self
     {
         $this->image = $image;
         return $this;
