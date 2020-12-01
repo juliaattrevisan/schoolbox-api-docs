@@ -19,20 +19,39 @@ use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
  */
 class Hydrator
 {
-
+    /**
+     * Mapper for retrieving evidence.
+     */
     private EvidenceMapper $evidenceMapper;
 
+
+    /**
+     * Mapper for retrieving badge awards.
+     */
     private BadgeAwardMapper $badgeAwardMapper;
 
-    public function __construct(
-        EvidenceMapper $evidenceMapper,
-        BadgeAwardMapper $badgeAwardMapper
-    ) {
-        $this->evidenceMapper = $evidenceMapper;
+
+    /**
+     * Constructor
+     *
+     * @param EvidenceMapper   $evidenceMapper
+     * @param BadgeAwardMapper $badgeAwardMapper
+     */
+    public function __construct(EvidenceMapper $evidenceMapper, BadgeAwardMapper $badgeAwardMapper)
+    {
+        $this->evidenceMapper   = $evidenceMapper;
         $this->badgeAwardMapper = $badgeAwardMapper;
     }
 
 
+    /**
+     * Hydrates the results from `CombinedCursor` into a set of actual objects.
+     *
+     * @param Collection $results
+     * @return Collection Each item  will contain:
+     *                    * discriminator: identifier of object's type
+     *                    * object:        the actual object
+     */
     public function hydrateResults(Collection $results): Collection
     {
         $evidencePb  = $this->evidenceMapper->getPredicateBuilder();
@@ -103,6 +122,7 @@ class Hydrator
                     break;
 
                 case CombinedCursor::DISCRIMINATOR_BADGE_AWARD:
+                    // find the badge award
                     $return[$i] = [
                         'discriminator' => $result['discriminator'],
                         'object'        => $badgeAwardResults[$this->createBadgeAwardKey((int)$result['id'], $result['date'])],
@@ -119,8 +139,17 @@ class Hydrator
     }
 
 
-    private function createBadgeAwardKey(int $id, string $date): string
+    /**
+     * Helper method for determining the key of a badge award.
+     *
+     * Required because badge awards don't have an ID field.
+     *
+     * @param int    $badgeId
+     * @param string $date
+     * @return string
+     */
+    private function createBadgeAwardKey(int $badgeId, string $date): string
     {
-        return sprintf('%d-%s', $id, $date);
+        return sprintf('%d-%s', $badgeId, $date);
     }
 }
