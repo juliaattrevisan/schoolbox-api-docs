@@ -1,0 +1,148 @@
+{% set registry = {
+    'arrow': {
+        'name': 'Arrow',
+        'num': 88
+    },
+    'avatars': {
+        'name': 'Avatars',
+        'num': 100
+    },
+    'baby': {
+        'name': 'Baby',
+        'num': 40
+    },
+    'business': {
+        'name': 'Business',
+        'num': 112,
+    },
+    'christmas': {
+        'name': 'Christmas',
+        'num': 17,
+    },
+    'clothes-and-accessories': {
+        'name': 'Clothes and Accessories',
+        'num': 72,
+    },
+    'communication': {
+        'name': 'Communication',
+        'num': 32,
+    },
+    'computer-hardware': {
+        'name': 'Computer Hardware',
+        'num': 40,
+    },
+    'construction': {
+        'name': 'Construction',
+        'num': 35,
+    },
+    'country': {
+        'name': 'Country',
+        'num': 35,
+    },
+    'education': {
+        'name': 'Education',
+        'num': 88,
+    },
+    'food': {
+        'name': 'Food',
+        'num': 27,
+    },
+    'furniture': {
+        'name': 'Furniture',
+        'num': 26,
+    },
+    'halloween': {
+        'name': 'Halloween',
+        'num': 40,
+    },
+    'home-appliances': {
+        'name': 'Home Appliances',
+        'num': 50,
+    },
+    'medical': {
+        'name': 'Medical',
+        'num': 38,
+    },
+    'music': {
+        'name': 'Music',
+        'num': 32,
+    },
+    'party': {
+        'name': 'Party',
+        'num': 24,
+    },
+    'real-estate': {
+        'name': 'Real Estate',
+        'num': 24,
+    },
+    'scene': {
+        'name': 'Scene',
+        'num': 30,
+    },
+    'seo': {
+        'name': 'SEO',
+        'num': 100,
+    },
+    'shopping-cart': {
+        'name': 'Shopping Cart',
+        'num': 24,
+    },
+    'sport': {
+        'name': 'Sport',
+        'num': 50,
+    },
+    'tools': {
+        'name': 'Tools',
+        'num': 25,
+    },
+    'transport': {
+        'name': 'Transport',
+        'num': 24,
+    },
+    'travel': {
+        'name': 'Travel',
+        'num': 40,
+    },
+    'ui': {
+        'name': 'User Interface',
+        'num': 210,
+    },
+    'valentines-day': {
+        'name': 'Valentine\'s Day',
+        'num': 23,
+    },
+    'warning-signs': {
+        'name': 'Warning Signs',
+        'num': 24,
+    },
+    'weather': {
+        'name': 'Weather',
+        'num': 32,
+    },
+    'zodiac': {
+        'name': 'Zodiac',
+        'num': 12,
+    }
+} %}
+
+{#
+set up registry of folders, category names, quantity of icons
+
+foreach category,
+put its name in the left column
+
+in the right column show that category's icons
+show e.g. 40 at a time
+since you know $num, you know how many pages there are
+
+as you paginate, you can array_splice(0,$pageLength) and use the filename assumption
+so you don't actually need any backend work, you just load new images by changing its src
+attribute via js numerically. we know they're always svg and not user-modifiable, so
+this is a reasonable assumption we can make.
+#}
+<a href="#" data-reveal-id="icon-modal" class="button">Open Modal</a>
+
+<div id="icon-modal" class="reveal-modal" data-reveal>
+
+    <a class="close-reveal-modal">&#215;</a>
+</div>
