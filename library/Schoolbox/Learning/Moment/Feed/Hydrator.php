@@ -15,7 +15,7 @@ use Schoolbox\Learning\Badge\Award\Model as BadgeAwardModel;
 use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
 
 /**
- * Hydrator for the list of IDs retrieved by `CombinedCursor`.
+ * Hydrator for the list of IDs retrieved by `\Schoolbox\Learning\Moment\Feed\Cursor`.
  */
 class Hydrator
 {
@@ -45,7 +45,8 @@ class Hydrator
 
 
     /**
-     * Hydrates the results from `CombinedCursor` into a set of actual objects.
+     * Hydrates the results from `\Schoolbox\Learning\Moment\Feed\Cursor::retrieveResults`
+     * into a set of actual objects.
      *
      * @param Collection $results
      * @return Collection Each item  will contain:
@@ -65,7 +66,7 @@ class Hydrator
         // Build predicate builders
         foreach ($results as $result) {
             switch ($result['discriminator'] ?? null) {
-                case CombinedCursor::DISCRIMINATOR_EVIDENCE:
+                case Cursor::DISCRIMINATOR_EVIDENCE:
                     $hasEvidence = true;
                     $evidencePb->all(
                         $this->evidenceMapper->getPredicateBuilder()
@@ -74,7 +75,7 @@ class Hydrator
                     );
                     break;
 
-                case CombinedCursor::DISCRIMINATOR_BADGE_AWARD:
+                case Cursor::DISCRIMINATOR_BADGE_AWARD:
                     $hasBadgeAwards = true;
                     $badgeAwardPb->all(
                         $this->badgeAwardMapper->getPredicateBuilder()
@@ -113,7 +114,7 @@ class Hydrator
         $return = new Collection();
         foreach ($results as $i => $result) {
             switch ($result['discriminator'] ?? null) {
-                case CombinedCursor::DISCRIMINATOR_EVIDENCE:
+                case Cursor::DISCRIMINATOR_EVIDENCE:
                     // Find the evidence
                     $return[$i] = [
                         'discriminator' => $result['discriminator'],
@@ -121,7 +122,7 @@ class Hydrator
                     ];
                     break;
 
-                case CombinedCursor::DISCRIMINATOR_BADGE_AWARD:
+                case Cursor::DISCRIMINATOR_BADGE_AWARD:
                     // find the badge award
                     $return[$i] = [
                         'discriminator' => $result['discriminator'],

@@ -21,7 +21,7 @@ use Schoolbox\User;
  *
  * This combines evidence and badges into the one cursored result.
  */
-class CombinedCursor implements ICursor
+class Cursor implements ICursor
 {
     /**
      * Discriminator value for identifying that a retrieved result points to an
