@@ -154,7 +154,7 @@ this is a reasonable assumption we can make.
             /* Inflict it upon the form
              */
             onSelect: function(element) {
-                $('[data-icon-selection] img').attr('src', $(element).attr('src')).removeClass('hide');
+                $('[data-icon-selection] img').attr('src', $(element).attr('src')).show();
                 $('input[name=imagePath]').val($(element).attr('src'));
 
                 $('#icon-modal').foundation('reveal', 'close');
@@ -163,7 +163,7 @@ this is a reasonable assumption we can make.
     });
 </script>
 
-<a href="#" data-reveal-id="icon-modal" class="button">Open Modal</a>
+<a href="#" data-reveal-id="icon-modal" class="button">Browse</a>
 
 <div id="icon-modal" class="reveal-modal icon-picker file-picker" data-reveal>
     <div class="attachment-browser-container">
