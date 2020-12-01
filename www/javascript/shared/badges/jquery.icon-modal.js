@@ -34,7 +34,15 @@
 
                 /* Default number of icons per page
                  */
-                pageLength: 40
+                pageLength: 40,
+
+                /* Paginator elements
+                 */
+                paginators: $('[data-previous], [data-next]'),
+
+                /* Landing page that presumably explains something useful
+                 */
+                landing: $('#landing')
             };
 
             return $.extend(defaults, options);
@@ -65,6 +73,14 @@
                 if (folder === current) {
                     return;
                 }
+
+                /* Make paginators available from now on
+                 */
+                config.paginators.removeClass('hide');
+
+                /* Always hide empty state thing
+                 */
+                config.landing.hide();
 
                 /* Change category
                  */
@@ -115,7 +131,7 @@
 
             /* Clear events for paginator buttons
              */
-            $('[data-previous], [data-next]').unbind('click');
+            config.paginators.unbind('click');
 
             /* "Next" availability
              */
