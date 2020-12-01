@@ -140,92 +140,17 @@ so you don't actually need any backend work, you just load new images by changin
 attribute via js numerically. we know they're always svg and not user-modifiable, so
 this is a reasonable assumption we can make.
 #}
+<script src="/javascript/shared/badges/jquery.icon-modal.js"></script>
 <script>
     $(function() {
 
         /* Shank twig data into js; I could probably skip this
          * by providing the registry from backend instead
          */
-        const registry = $.parseJSON('{{ registry|json_encode|raw }}');
-        const pageLength = {{ pageLength }};
-        let sockets = $('[data-icon]');
-        let folder = '';
-
-        /* Load the first set of icons when you start a new category
-         */
-        $('[data-icon-path]').on('click', function(event) {
-            let current = $(this).attr('data-icon-path');
-
-            /* Already current folder; noop
-             */
-            if (folder === current) {
-                return;
-            }
-
-            /* Change category
-             */
-            folder = current;
-            $('[data-icon-path]').removeClass('active')
-            $(this).addClass('active');
-
-            loadPage(1, registry[folder].num);
+        $('#icon-modal').iconModal({
+            registry: $.parseJSON('{{ registry|json_encode|raw }}'),
+            pageLength: {{ pageLength }}
         });
-
-        initSockets();
-
-        /**
-         * Add events for each socket
-         */
-        function initSockets() {
-            sockets.each(function(index, element) {
-                $(element).on('click', function(event) {
-                    alert($(this).attr('src'));
-                });
-            });
-        }
-
-
-        /**
-         * Fetch a new set of icons
-         *
-         * @param start
-         * @param max
-         */
-        function loadPage(start, max) {
-            let imgIndex = 0;
-
-            /* Clear template
-             */
-            $(sockets).attr('src', '').addClass('hide');
-
-            /* Reload icon set
-             */
-            for (let i = start; i <= (start+pageLength) || i <= max; i++, imgIndex++) {
-                let src = '/images/badges/' + folder + '/' + i + '.svg';
-
-                $(sockets[imgIndex]).attr('src', src).removeClass('hide');
-            }
-
-            /* Clear events for paginator
-             */
-            $('[data-previous], [data-next]').unbind('click');
-
-            if (start+pageLength < max) {
-                $('[data-next]').on('click', function(event) {
-                    loadPage(start+pageLength, max);
-                }).removeClass('hide');
-            } else {
-                $('[data-next]').addClass('hide');
-            }
-
-            if (start > 1) {
-                $('[data-previous]').on('click', function(event) {
-                    loadPage(start-pageLength, max);
-                }).removeClass('hide');
-            } else {
-                $('[data-previous]').addClass('hide');
-            }
-        }
     });
 </script>
 
