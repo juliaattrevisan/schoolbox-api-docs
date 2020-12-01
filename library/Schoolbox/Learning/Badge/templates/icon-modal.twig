@@ -125,6 +125,8 @@
     }
 } %}
 
+{% set pageLength = 40 %}
+
 {#
 set up registry of folders, category names, quantity of icons
 
@@ -140,9 +142,34 @@ so you don't actually need any backend work, you just load new images by changin
 attribute via js numerically. we know they're always svg and not user-modifiable, so
 this is a reasonable assumption we can make.
 #}
+<script>
+    $(function() {
+
+    });
+</script>
+
 <a href="#" data-reveal-id="icon-modal" class="button">Open Modal</a>
 
 <div id="icon-modal" class="reveal-modal" data-reveal>
+
+    {# Set up placeholder elements once; javascript will give them src values
+     # As we paginate, we replace these src values without having to respawn
+     # dom elements all day
+     #}
+    <div class="row">
+        <div class="small-3 columns">
+            <ul>
+                {% for path, node in registry %}
+                <li>{{ node.name }} ({{ node.num }})</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="small-9 columns">
+            {% for n in 1..pageLength %}
+                <img src="" class="hide" />
+            {% endfor %}
+        </div>
+    </div>
 
     <a class="close-reveal-modal">&#215;</a>
 </div>
