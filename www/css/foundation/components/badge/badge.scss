@@ -7,3 +7,11 @@
       filter: grayscale(100%);
     }
 }
+
+/* Icon Picker Modal has a lot of categories in it, we need
+ * to add some vertical scroll for small viewport guys
+ */
+.icon-category-picker {
+    max-height: 80vh;
+    overflow-y: auto;
+}
