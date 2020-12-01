@@ -79,7 +79,7 @@
 </script>
 <table>
     {% for capability in longitudinalRubric %}
-        <tr><th class="rubric-progression-capability">{{ (capability.name ?? '') | nl2br }}</th>
+        <tr><th class="rubric-progression-capability">{{ capability.name | nl2br }}</th>
         {% for indicatorId,indicator in capability.indicators %}
             {% if not loop.first %}
                 <tr><th class="rubric-progression-capability">&nbsp;</th>
@@ -100,7 +100,7 @@
                             {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}
                             {% if activity.max_value ?? 0 > 0  %}
                             {
-                                y: {{ activity.value ? ((activity.value / activity.max_value) * 100) : 'null' }},
+                                y: {{ ((activity.value / activity.max_value) * 100) }},
                                 desc: "{{ activity.descriptor |nl2br | escape('js') }}",
                                 title: "{{ activity_name }}",
                                 level: "{{ activity.level }}"
