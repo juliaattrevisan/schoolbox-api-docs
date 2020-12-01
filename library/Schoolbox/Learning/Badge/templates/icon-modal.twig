@@ -148,6 +148,7 @@ this is a reasonable assumption we can make.
          */
         const registry = $.parseJSON('{{ registry|json_encode|raw }}');
         const pageLength = {{ pageLength }};
+        let sockets = $('[data-icon]');
         let folder = '';
 
         /* Load the first set of icons when you start a new category
@@ -170,6 +171,20 @@ this is a reasonable assumption we can make.
             loadPage(1, registry[folder].num);
         });
 
+        initSockets();
+
+        /**
+         * Add events for each socket
+         */
+        function initSockets() {
+            sockets.each(function(index, element) {
+                $(element).on('click', function(event) {
+                    alert($(this).attr('src'));
+                });
+            });
+        }
+
+
         /**
          * Fetch a new set of icons
          *
@@ -178,7 +193,6 @@ this is a reasonable assumption we can make.
          */
         function loadPage(start, max) {
             let imgIndex = 0;
-            let sockets = $('[data-icon]');
 
             /* Clear template
              */
@@ -192,7 +206,7 @@ this is a reasonable assumption we can make.
                 $(sockets[imgIndex]).attr('src', src).removeClass('hide');
             }
 
-            /* Clear events
+            /* Clear events for paginator
              */
             $('[data-previous], [data-next]').unbind('click');
 
@@ -211,7 +225,6 @@ this is a reasonable assumption we can make.
             } else {
                 $('[data-previous]').addClass('hide');
             }
-
         }
     });
 </script>
