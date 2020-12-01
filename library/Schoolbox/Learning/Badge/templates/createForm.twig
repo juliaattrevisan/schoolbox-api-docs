@@ -24,14 +24,19 @@
                             Description
                         </label>
                         <textarea name="body" id="badge-body" required></textarea>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>Choose badge image</label>
+                        <p class="meta">Choose a badge image from our existing set or upload your own.</p>
 
-                        <label>Select badge from existing set</label>
                         <div data-icon-selection>
                             <img src="" width="64" height="64" style="display:none"/>
                             <input name="imagePath" type="hidden" value="" />
                         </div>
                         <div>
-                        {% include '@learningBadge/icon-modal.twig' %}
+                            {% include '@learningBadge/icon-modal.twig' %}
                         </div>
 
                         <label for="badge-image" class="required">
@@ -40,7 +45,10 @@
                         {# Dummy element for form validation #}
                         <input type="hidden" name="imageAttachzone">
                         {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
-
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
                         <label for="badge-category" class="required">
                             Category
                         </label>
@@ -63,7 +71,6 @@
                                 %}
                             </div>
                         {% endif %}
-
                     </div>
                 </fieldset>
             </section>
