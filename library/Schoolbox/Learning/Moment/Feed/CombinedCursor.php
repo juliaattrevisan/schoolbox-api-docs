@@ -17,24 +17,46 @@ use Schoolbox\Collection;
 use Schoolbox\User;
 
 /**
- * Feed for the student's learning moment feed.
+ * Feed for a user's learning moment feed.
  *
  * This combines evidence and badges into the one cursored result.
  */
 class CombinedCursor implements ICursor
 {
+    /**
+     * A connection to a database from which the result is retrieved.
+     */
     private IConnector $database;
 
 
+    /**
+     * A user to retrieve the learning moment feed for.
+     *
+     * Usually, but not always, a student.
+     */
     private User $user;
 
 
+    /**
+     * The maximum number of results to fetch in one query.
+     */
     private int $limit;
 
 
+    /**
+     * The codec for encoding/decoding a cursor.
+     */
     private ICodec $codec;
 
 
+    /**
+     * Constructor
+     *
+     * @param IConnector $database
+     * @param User $user
+     * @param int $limit
+     * @param ICodec|null $codec
+     */
     public function __construct(
         IConnector $database,
         User $user,
@@ -48,6 +70,9 @@ class CombinedCursor implements ICursor
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function next(Collection $collection) : ?string
     {
         // As usual: if the collection is empty, there is no next
@@ -61,13 +86,21 @@ class CombinedCursor implements ICursor
     }
 
 
+    /**
+     * This returns null for now, until there's a need for the current cursor.
+     *
+     * @param Collection $collection
+     * @return null
+     */
     public function current(Collection $collection) : ?string
     {
-        // Just return null for now
         return null;
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function retrieveResultCount() : ?int
     {
         $count        = 0;
@@ -88,6 +121,9 @@ class CombinedCursor implements ICursor
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function retrieveResults(?string $encodedCursor) : Collection
     {
         // Don't need to know the details of the badge:
@@ -101,7 +137,12 @@ class CombinedCursor implements ICursor
         $wherePart = '';
         if (isset($encodedCursor)) {
             // the cursor contains 'date', 'id', 'discriminator' fields
-            $cursor                   = $this->codec->decode($encodedCursor);
+            $cursor = $this->codec->decode($encodedCursor);
+
+            // The usual cursor where part:
+            // fetch items from before the last item's date, as well as ones
+            // which match the last item's date and whose other fields are less
+            // than the current field
             $whereParts[]             = '(date < :date1)';
             $whereParts[]             = '(date = :date2 AND discriminator > :discriminator2)';
             $whereParts[]             = '(date = :date3 AND discriminator = :discriminator3 AND id < :id3)';
