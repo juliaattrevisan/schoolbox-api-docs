@@ -11,7 +11,14 @@
 /* Icon Picker Modal has a lot of categories in it, we need
  * to add some vertical scroll for small viewport guys
  */
-.icon-category-picker {
-    max-height: 80vh;
-    overflow-y: auto;
+.icon-picker {
+    .icon-category-list-container {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    img {
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
 }
