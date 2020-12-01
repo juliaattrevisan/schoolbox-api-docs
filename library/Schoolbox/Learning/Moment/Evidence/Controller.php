@@ -368,48 +368,6 @@ class Controller extends Base
 
 
     /**
-     * Generate a set of links relevant to $model
-     *
-     * This uses the router's getRouteIfAuthorized() method and some controller parts
-     * to figure out which links are available and which aren't. We shouldn't provide
-     * links that a person can't visit.
-     *
-     * The router and its mechanics are pretty solidly tied to controllers and I don't
-     * necessarily want to inject an entire controller instance into the Translator
-     * classes and assorted places like that
-     *
-     * @deprecated now handled in `Translator\ModelToArray\Links`
-     *
-     * @param array $evidence
-     * @return array
-     * @throws \Aura\Router\Exception\RouteNotFound
-     */
-    private function generateLinks(array $evidence): array
-    {
-        // TODO consider moving this into Translator\ModelToArrayWithComments
-        if (!array_key_exists('_links', $evidence)) {
-            $evidence['_links'] = [];
-        }
-        $evidence['_links']['detail'] = $this->getRouteIfAuthorized('learningMomentEvidence.getEvidenceDetail', [
-            'evidenceId' => $evidence['id'],
-            'userId' => $evidence['recipient']['id']
-        ]);
-
-        /* TODO Figure out what the modify perms will be
-         *  I added this here, it was in there SA-11246 screenshot.
-         */
-        $evidence['_links']['modify'] = null;
-
-        $evidence['_links']['delete'] = $this->getRouteIfAuthorized('learningMomentEvidence.deleteEvidence', [
-            'evidenceId' => $evidence['id'],
-            'creatorId' => $evidence['creator']['id']
-        ]);
-
-        return $evidence;
-    }
-
-
-    /**
      * Builds a translator which contains comments.
      *
      * @param int $commentLimit
