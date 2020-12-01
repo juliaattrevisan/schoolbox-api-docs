@@ -51,11 +51,11 @@ class ModelToArray
         $return        = ['discriminator' => $discriminator];
         switch ($result['discriminator'] ?? null) {
             case Cursor::DISCRIMINATOR_EVIDENCE:
-                $return['object'] = $this->evidenceTranslator->__invoke($return['object']);
+                $return['object'] = $this->evidenceTranslator->__invoke($result['object']);
                 break;
 
             case Cursor::DISCRIMINATOR_BADGE_AWARD:
-                $return['object'] = $this->badgeAwardTranslator->__invoke($return['object']);
+                $return['object'] = $this->badgeAwardTranslator->__invoke($result['object']);
                 break;
 
             default:

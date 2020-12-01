@@ -111,23 +111,34 @@ class Module extends BaseModule
             $viewCreateFormPreloader
         );
 
-        // Rule for viewing a user's moments:
+        // Rule for viewing a user's moments or feed:
         // * Staff and superusers may view anyone's
         // * Students may view their own
         // * Parents may view their own and their kid's
+        $feedPermissions = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF),
+                $isParentOrUserRule,
+            ),
+        );
+        $feedPreload = Closure::fromCallable([$this, 'preloadUser']);
+
         $this->register(
             self::METHOD_GET,
             '/user/{userId}',
             'getMomentsForUser',
-            new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF),
-                    $isParentOrUserRule,
-                ),
-            ),
-            Closure::fromCallable([$this, 'preloadUser']),
+            $feedPermissions,
+            $feedPreload,
+        );
+
+        $this->register(
+            self::METHOD_GET,
+            '/user/{userId}/feed',
+            'getFeedForUser',
+            $feedPermissions,
+            $feedPreload,
         );
 
         /* Evidence Detail screen
