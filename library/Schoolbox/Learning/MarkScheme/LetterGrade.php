@@ -5,6 +5,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\MarkScheme;
 
@@ -97,6 +98,7 @@ class LetterGrade extends AbstractMarkScheme
      */
     public function getGradeGroup()
     {
+        $this->gradeGroup->getGradeLevels()->sortBy('lowerBound', 'desc');
         return $this->gradeGroup;
     }
 
@@ -106,11 +108,6 @@ class LetterGrade extends AbstractMarkScheme
      */
     protected function setGradeGroup(GradeGroup $gradeGroup)
     {
-        // Ensure levels are sorted DESC so facilitate search traversal
-        if ($gradeGroup->getGradeLevels()) {
-            $gradeGroup->getGradeLevels()->sortBy('lowerBound', 'desc');
-        }
-
         $this->gradeGroup = $gradeGroup;
         return $this;
     }
