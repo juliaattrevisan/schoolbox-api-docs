@@ -42,7 +42,12 @@
 
                 /* Landing page that presumably explains something useful
                  */
-                landing: $('#landing')
+                landing: $('#landing'),
+
+                /* Executes when you click on an icon
+                 */
+                onSelect: function(element) {
+                }
             };
 
             return $.extend(defaults, options);
@@ -55,7 +60,7 @@
         function initSockets(sockets) {
             sockets.each(function(index, element) {
                 $(element).on('click', function(event) {
-                    alert($(this).attr('src'));
+                    config.onSelect($(this))
                 });
             });
         }

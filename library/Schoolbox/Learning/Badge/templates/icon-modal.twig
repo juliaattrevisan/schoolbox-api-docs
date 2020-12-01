@@ -149,7 +149,13 @@ this is a reasonable assumption we can make.
          */
         $('#icon-modal').iconModal({
             registry: $.parseJSON('{{ registry|json_encode|raw }}'),
-            pageLength: {{ pageLength }}
+            pageLength: {{ pageLength }},
+
+            /* Inflict it upon the form
+             */
+            onSelect: function(element) {
+                alert($(element).attr('src'));
+            }
         });
     });
 </script>
@@ -177,7 +183,6 @@ this is a reasonable assumption we can make.
                         <p>This is a temporary landing zone for explaining stuff I guess</p>
                         <p>Or I could just open the first category of icons</p>
                     </div>
-
                 </div>
 
                 {# Set up placeholder elements once; javascript will give them src values
