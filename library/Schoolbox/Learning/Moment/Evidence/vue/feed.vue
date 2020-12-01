@@ -206,15 +206,15 @@ export default {
 <template>
     <div>
         <section class="skeleton-feed" v-if="showSkeletonLoader">
-          <div>
-              <div class="row" v-for="n in 3">
+          <ul class="information-list">
+              <li class="row" v-for="n in 3">
                   <div class="small-12 card skeleton">
                       <div class="img"></div>
                       <h3></h3>
                       <p class="meta"></p>
                   </div>
-              </div>
-          </div>
+              </li>
+          </ul>
         </section>
         <div class="row" v-else>
             <div class="small-12 island">
