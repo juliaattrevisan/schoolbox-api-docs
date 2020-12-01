@@ -230,7 +230,7 @@ export default {
         <div class="feed" v-for="evidenceGroup in groupedEvidence">
             <div class="feed-column left"></div>
             <section>
-                <h2 class="subheader feed no-margin">
+                <h2 class="subheader no-margin">
                   <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
                         :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
                   >{{ renderCreatedAt(evidenceGroup.date) }}</time>
