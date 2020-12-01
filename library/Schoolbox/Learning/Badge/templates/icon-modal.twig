@@ -177,18 +177,19 @@ this is a reasonable assumption we can make.
          * @param max
          */
         function loadPage(start, max) {
-            let imgIndex = 1;
+            let imgIndex = 0;
+            let sockets = $('[data-icon]');
 
             /* Clear template
              */
-            $('[data-icon]').attr('src', '').addClass('hide');
+            $(sockets).attr('src', '').addClass('hide');
 
             /* Reload icon set
              */
             for (let i = start; i <= (start+pageLength) || i <= max; i++, imgIndex++) {
                 let src = '/images/badges/' + folder + '/' + i + '.svg';
 
-                $('[data-icon="'+imgIndex+'"]').attr('src', src).removeClass('hide');
+                $(sockets[imgIndex]).attr('src', src).removeClass('hide');
             }
 
             /* Clear events
@@ -236,7 +237,7 @@ this is a reasonable assumption we can make.
                  # dom elements all day
                  #}
                 {% for n in 1..pageLength %}
-                    <img src="" class="hide" data-icon="{{ n }}" width="64" height="64" />
+                    <img src="" class="hide" data-icon width="64" height="64" />
                 {% endfor %}
 
                 <a class="button icon-previous" data-previous>Previous</a>
