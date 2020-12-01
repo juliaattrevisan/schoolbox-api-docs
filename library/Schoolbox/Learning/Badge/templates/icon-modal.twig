@@ -1,3 +1,4 @@
+{% set pageLength = 40 %}
 {% set registry = {
     'arrow': {
         'name': 'Arrow',
@@ -108,7 +109,7 @@
         'num': 210,
     },
     'valentines-day': {
-        'name': 'Valentine\'s Day',
+        'name': "Valentines Day",
         'num': 23,
     },
     'warning-signs': {
@@ -124,9 +125,6 @@
         'num': 12,
     }
 } %}
-
-{% set pageLength = 40 %}
-
 {#
 set up registry of folders, category names, quantity of icons
 
@@ -145,6 +143,41 @@ this is a reasonable assumption we can make.
 <script>
     $(function() {
 
+        /* Shank twig data into js; I could probably skip this
+         * by providing the registry from backend instead
+         */
+        const registry = $.parseJSON('{{ registry|json_encode|raw }}');
+        const pageLength = 40;
+        let folder = '';
+
+        /* Load the first set of icons when you start a new category
+         */
+        $('[data-icon-path]').on('click', function(event) {
+            let current = $(this).attr('data-icon-path');
+
+            /* Already current folder; noop
+             */
+            if (folder === current) {
+                return;
+            }
+
+            /* Change category
+             */
+            folder = current;
+            let n = registry[folder].num;
+
+            /* Clear template
+             */
+            $('[data-icon]').attr('src', '').addClass('hide');
+
+            /* Fetch icon
+             */
+            for (let i = 1; i <= pageLength && i < n; i++) {
+                let src = '/images/badges/' + folder + '/' + i + '.svg';
+
+                $('[data-icon="'+i+'"]').attr('src', src).removeClass('hide');
+            }
+        });
     });
 </script>
 
@@ -160,13 +193,13 @@ this is a reasonable assumption we can make.
         <div class="small-3 columns">
             <ul>
                 {% for path, node in registry %}
-                <li>{{ node.name }} ({{ node.num }})</li>
+                <li data-icon-path="{{ path }}">{{ node.name }} ({{ node.num }})</li>
                 {% endfor %}
             </ul>
         </div>
-        <div class="small-9 columns">
-            {% for n in 1..pageLength %}
-                <img src="" class="hide" />
+        <div class="small-9 columns" data-icon-container>
+            {% for n in 1..40 %}
+                <img src="" class="hide" data-icon="{{ n }}" width="64" height="64" />
             {% endfor %}
         </div>
     </div>
