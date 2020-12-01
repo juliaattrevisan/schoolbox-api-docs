@@ -154,7 +154,10 @@ this is a reasonable assumption we can make.
             /* Inflict it upon the form
              */
             onSelect: function(element) {
-                alert($(element).attr('src'));
+                $('[data-icon-selection] img').attr('src', $(element).attr('src')).removeClass('hide');
+                $('input[name=imagePath]').val($(element).attr('src'));
+
+                $('#icon-modal').foundation('reveal', 'close');
             }
         });
     });
