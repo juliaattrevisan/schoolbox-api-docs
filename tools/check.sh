@@ -226,7 +226,7 @@ function check_http(){
     error "$prefix" 'Error: Unable to locate curl';
   else
     http_list='http://google.com.au https://google.com.au http://repo.schoolbox.com.au/testfile.txt https://repo.schoolbox.com.au/testfile.txt https://api.notablepdf.com/';
-    http_list_ignore_ssl_check='https://puppet.alaress.com.au:8140 https://puppet.alaress.com.au:443';
+    http_list_ignore_ssl_check='https://puppetstage.alaress.com.au:8140 https://puppetstage.alaress.com.au:443 https://puppet.alaress.com.au:8140 https://puppet.alaress.com.au:443';
     if [ "$ipv6_check_pretty" == "true" ]; then
       http_list="$http_list http://[2404:6800:4006:806::2003]/";
     fi
