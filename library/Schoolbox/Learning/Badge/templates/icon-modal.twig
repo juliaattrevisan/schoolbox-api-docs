@@ -164,20 +164,54 @@ this is a reasonable assumption we can make.
             /* Change category
              */
             folder = current;
-            let n = registry[folder].num;
+            $('[data-icon-path]').removeClass('active')
+            $(this).addClass('active');
+
+            loadPage(1, registry[folder].num);
+        });
+
+        /**
+         * Fetch a new set of icons
+         *
+         * @param start
+         * @param max
+         */
+        function loadPage(start, max) {
+            let imgIndex = 1;
 
             /* Clear template
              */
             $('[data-icon]').attr('src', '').addClass('hide');
 
-            /* Fetch icon
+            /* Reload icon set
              */
-            for (let i = 1; i <= pageLength && i < n; i++) {
+            for (let i = start; i <= (start+pageLength) || i <= max; i++, imgIndex++) {
                 let src = '/images/badges/' + folder + '/' + i + '.svg';
 
-                $('[data-icon="'+i+'"]').attr('src', src).removeClass('hide');
+                $('[data-icon="'+imgIndex+'"]').attr('src', src).removeClass('hide');
             }
-        });
+
+            /* Clear events
+             */
+            $('[data-previous], [data-next]').unbind('click');
+
+            if (start+pageLength < max) {
+                $('[data-next]').on('click', function(event) {
+                    loadPage(start+pageLength, max);
+                }).removeClass('hide');
+            } else {
+                $('[data-next]').addClass('hide');
+            }
+
+            if (start > 1) {
+                $('[data-previous]').on('click', function(event) {
+                    loadPage(start-pageLength, max);
+                }).removeClass('hide');
+            } else {
+                $('[data-previous]').addClass('hide');
+            }
+
+        }
     });
 </script>
 
@@ -188,7 +222,9 @@ this is a reasonable assumption we can make.
         <div class="attachment-browser-filesystems">
             <ul class="side-nav">
                 {% for path, node in registry %}
-                    <li class="tab-title"><a data-icon-path="{{ path }}">{{ node.name }} ({{ node.num }})</a></li>
+                    <li class="tab-title" data-icon-path="{{ path }}">
+                        <a>{{ node.name }} ({{ node.num }})</a>
+                    </li>
                 {% endfor %}
             </ul>
         </div>
@@ -202,6 +238,9 @@ this is a reasonable assumption we can make.
                 {% for n in 1..pageLength %}
                     <img src="" class="hide" data-icon="{{ n }}" width="64" height="64" />
                 {% endfor %}
+
+                <a class="button icon-previous" data-previous>Previous</a>
+                <a class="button icon-next" data-next>Next</a>
             </div>
         </div>
     </div>
