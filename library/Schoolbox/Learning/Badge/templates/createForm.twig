@@ -28,23 +28,53 @@
                 </fieldset>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>Choose badge image</label>
+                        <label class="required">Choose badge image</label>
                         <p class="meta">Choose a badge image from our existing set or upload your own.</p>
 
-                        <div data-icon-selection>
-                            <img src="" width="64" height="64" style="display:none"/>
-                            <input name="imagePath" type="hidden" value="" />
-                        </div>
-                        <div>
-                            {% include '@learningBadge/icon-modal.twig' %}
-                        </div>
+                        <fieldset class="radiolist">
+                            <input id="badge-icon" type="radio" name="image" value="icon" data-icon />
+                            <label for="badge-icon">Choose an existing icon</label>
 
-                        <label for="badge-image" class="required">
-                            Upload badge from your device
-                        </label>
-                        {# Dummy element for form validation #}
-                        <input type="hidden" name="imageAttachzone">
-                        {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+                            <input id="badge-image" type="radio" name="image" value="image" data-image/>
+                            <label for="badge-image">Upload from your device</label>
+                        </fieldset>
+
+                        <script>
+                            $(function() {
+
+                                /* Mutex div switch
+                                 */
+                                $('[data-icon]').on('click', function(event) {
+                                    $('[data-image-container]').hide();
+                                    $('[data-icon-container]').show();
+                                });
+
+                                $('[data-image]').on('click', function(event) {
+                                    $('[data-image-container]').show();
+                                    $('[data-icon-container]').hide();
+                                });
+                            });
+                        </script>
+
+                        <div class="row">
+                            <div class="small-12 columns" style="display:none;" data-icon-container>
+                                <div data-icon-selection>
+                                    <img src="" width="64" height="64" style="display:none"/>
+                                    <input id="badge-icon" name="imagePath" type="hidden" value="" />
+                                </div>
+                                <div>
+                                    {% include '@learningBadge/icon-modal.twig' %}
+                                </div>
+                            </div>
+                            <div class="small-12 columns" style="display:none;" data-image-container>
+                                <label for="badge-image" class="required">
+                                    Upload badge from your device
+                                </label>
+                                {# Dummy element for form validation #}
+                                <input type="hidden" name="imageAttachzone">
+                                {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+                            </div>
+                        </div>
                     </div>
                 </fieldset>
                 <fieldset class="content">
