@@ -43,6 +43,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('name', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
         $this->joins('image_hash', StorageMapper::class, 'hash', null, null, 'image', 'image');
+        $this->joins('image_path', StorageMapper::class, null, null, null, 'icon', 'icon');
         $this->joins('category_id', Category\Mapper::class, 'id', null, null, 'category', 'category');
         $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);

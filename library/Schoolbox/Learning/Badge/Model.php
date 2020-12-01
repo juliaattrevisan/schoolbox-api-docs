@@ -40,6 +40,14 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Optional icon file associated with this Badge
+     *
+     * @var string|null
+     */
+    private ?string $icon = null;
+
+
+    /**
      * Optional image associated with this Badge
      *
      * @var Storage\Model
@@ -109,6 +117,26 @@ class Model implements ISoftDeletable
     public function setBody(string $body): self
     {
         $this->body = $body;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+
+    /**
+     * @param string|null $icon
+     * @return $this
+     */
+    public function setIcon(?string $icon): self
+    {
+        $this->icon = $icon;
         return $this;
     }
 

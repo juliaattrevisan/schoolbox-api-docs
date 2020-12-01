@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS `badge` (
     `name` VARCHAR(255) NOT NULL,
     `body` TEXT NOT NULL,
     `image_hash` VARCHAR(100) CHARACTER SET ascii NOT NULL,
+    `image_path` VARCHAR(255),
     `category_id` INT UNSIGNED NOT NULL,
     `created_by` INT UNSIGNED NOT NULL,
     `created_at` DATETIME NOT NULL,
