@@ -24,6 +24,20 @@ use Schoolbox\User;
 class CombinedCursor implements ICursor
 {
     /**
+     * Discriminator value for identifying that a retrieved result points to an
+     * evidence record.
+     */
+    public const DISCRIMINATOR_EVIDENCE = 'evidence';
+
+
+    /**
+     * Discriminator value for identifying that a retrieved result points to a
+     * badge award.
+     */
+    public const DISCRIMINATOR_BADGE_AWARD = 'badgeAward';
+
+
+    /**
      * A connection to a database from which the result is retrieved.
      */
     private IConnector $database;
@@ -130,9 +144,11 @@ class CombinedCursor implements ICursor
         // just what it points to
         // There's a possible issue in that `badge_user.badge_id` is not unique
         $params = [
-            'userIdEvidence' => $this->user->getId(),
-            'userIdBadge'    => $this->user->getId(),
-            'limit'          => $this->limit,
+            'discriminatorEvidence'   => self::DISCRIMINATOR_EVIDENCE,
+            'discriminatorBadgeAward' => self::DISCRIMINATOR_BADGE_AWARD,
+            'userIdEvidence'          => $this->user->getId(),
+            'userIdBadgeAward'        => $this->user->getId(),
+            'limit'                   => $this->limit,
         ];
         $wherePart = '';
         if (isset($encodedCursor)) {
@@ -158,19 +174,19 @@ class CombinedCursor implements ICursor
             SELECT id, discriminator, date FROM (
                 SELECT
                     id,
-                    'evidence' AS discriminator,
-                    created_at AS date
+                    :discriminatorEvidence AS discriminator,
+                    created_at             AS date
                 FROM evidence
                 WHERE user_id = :userIdEvidence AND deleted_at IS NULL
 
                 UNION ALL
 
                 SELECT
-                    badge_id   AS id,
-                    'badge'    AS discriminator,
-                    awarded_at AS date
+                    badge_id                 AS id,
+                    :discriminatorBadgeAward AS discriminator,
+                    awarded_at               AS date
                 FROM badge_user
-                WHERE recipient_id = :userIdBadge AND deleted_at IS NULL
+                WHERE recipient_id = :userIdBadgeAward AND deleted_at IS NULL
             ) AS combined
 
             {$wherePart}
