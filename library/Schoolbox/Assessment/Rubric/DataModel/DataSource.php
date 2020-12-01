@@ -1791,7 +1791,7 @@ class DataSource
                 $studentFeedbackIds[$row['assessmentId']] = $row['feedbackId'];
             }
             if ($includeComparison) {
-                $allFeedbackIds[$row['assessmentId']] = $row['feedbackId'];
+                $allFeedbackIds[] = $row['feedbackId'];
             }
         }
         return [$studentFeedbackIds, $allFeedbackIds];
