@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 2422 2422"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil3 {fill:#C5C6C6}
+    .fil2 {fill:#EBECEC}
+    .fil7 {fill:#004F59}
+    .fil6 {fill:#006775}
+    .fil1 {fill:#63A147}
+    .fil0 {fill:#71B84F}
+    .fil5 {fill:#C94545}
+    .fil4 {fill:#E84F4F}
+   ]]>
+  </style>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_499459328">
+   <circle class="fil0" cx="1211" cy="1211" r="1211"/>
+   <path class="fil1" d="M2405 1419l-920 -920 -42 496 -437 -491 -18 544 215 870 0 506c3,0 6,0 8,0 598,0 1095,-434 1193,-1004z"/>
+   <g>
+    <path class="fil2" d="M951 488l16 0c30,0 55,25 55,55l0 453c0,30 -25,55 -55,55l-16 0c-30,0 -55,-25 -55,-55l0 -453c0,-30 25,-55 55,-55z"/>
+    <path class="fil3" d="M958 488l9 0c30,0 55,25 55,55l0 453c0,30 -25,55 -55,55l-9 0 0 -563z"/>
+    <path class="fil2" d="M1436 488l16 0c30,0 55,25 55,55l0 453c0,30 -25,55 -55,55l-16 0c-30,0 -55,-25 -55,-55l0 -453c0,-30 25,-55 55,-55z"/>
+    <path class="fil3" d="M1442 488l9 0c30,0 55,25 55,55l0 453c0,30 -25,55 -55,55l-9 0 0 -563z"/>
+   </g>
+   <g>
+    <path class="fil4" d="M1151 1905l105 0 0 516c-15,1 -29,1 -44,1 -20,0 -41,-1 -61,-2l0 -516z"/>
+    <path class="fil5" d="M1203 1905l52 0 0 516c-15,1 -29,1 -44,1 -3,0 -6,0 -8,0l0 -517z"/>
+   </g>
+   <path class="fil6" d="M1150 1723l106 0c25,0 46,21 46,46l0 109c0,25 -21,46 -46,46l-106 0c-25,0 -46,-21 -46,-46l0 -109c0,-25 21,-46 46,-46z"/>
+   <path class="fil7" d="M1203 1723l53 0c25,0 46,21 46,46l0 109c0,25 -21,46 -46,46l-53 0 0 -201z"/>
+   <path class="fil7" d="M773 1013l877 0 0 508c0,155 -127,282 -282,282l-312 0c-155,0 -282,-127 -282,-282l0 -508z"/>
+   <path class="fil6" d="M752 960l919 0c36,0 65,29 65,65l0 0c0,36 -29,65 -65,65l-919 0c-36,0 -65,-29 -65,-65l0 0c0,-36 29,-65 65,-65z"/>
+   <path class="fil7" d="M1736 1025c0,36 -29,65 -65,65l-919 0c-36,0 -65,-29 -65,-65l1049 0z"/>
+  </g>
+ </g>
+</svg>

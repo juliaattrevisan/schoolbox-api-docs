@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="468px" height="468px" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 97626 97626"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil1 {fill:#293037}
+    .fil0 {fill:#37414C}
+    .fil5 {fill:#747474}
+    .fil4 {fill:#BBBBBB}
+    .fil3 {fill:#E5E5E5}
+    .fil2 {fill:#F3F3F3}
+    .fil7 {fill:#FF6E40}
+    .fil6 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="Name">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="48813" cy="48813" r="48813"/>
+  <path class="fil1" d="M48813 0l7 0 7 0c408,0 815,5 1221,16l58 1c393,10 784,25 1175,45l85 4c383,20 764,44 1145,73l135 10c360,28 719,60 1077,96l166 17c341,35 681,74 1019,116l244 31c319,42 637,86 954,134l307 47c285,45 569,92 852,141l405 73c245,45 489,92 732,140 160,32 320,64 479,98 229,48 457,98 685,149 187,42 373,85 559,129 204,48 408,98 611,149 177,45 354,90 531,136l34752 34752c1046,3976 1606,8150 1606,12455 0,25403 -19406,46270 -44201,48595l-30417 -30417 0 -4497 204 0 10976 -14608 3054 -5220 0 -313 0 -40969c348,-85 697,-165 1048,-242l175 -38 29 -6c303,-65 608,-128 913,-187l407 -78c223,-42 446,-81 670,-120 212,-36 424,-72 637,-106 167,-26 333,-52 500,-77 262,-39 525,-76 789,-111l362 -46c308,-38 617,-74 927,-106l246 -25c343,-34 688,-65 1033,-92l143 -11c380,-28 761,-53 1144,-73l72 -4c401,-20 803,-35 1207,-46l18 0c416,-11 833,-16 1251,-16z"/>
+  <path class="fil2" d="M61268 1606l0 41943 -24027 0 0 -42166c3710,-902 7584,-1384 11571,-1384 4305,0 8479,560 12456,1606z"/>
+  <path class="fil3" d="M61268 1606l0 41943 -12013 0 0 -43547c4149,37 8173,594 12013,1604z"/>
+  <polygon class="fil4" points="61268,42352 61268,43549 37242,43549 37242,42352 "/>
+  <polygon class="fil2" points="37445,43549 61472,43549 75706,62494 23212,62494 "/>
+  <polygon class="fil3" points="49255,43549 61268,43549 75503,62494 49255,62494 "/>
+  <polygon class="fil4" points="37242,43549 61268,43549 62314,44941 36196,44941 "/>
+  <rect class="fil4" x="23008" y="62494" width="52495" height="4497"/>
+  <rect class="fil5" x="23492" y="62978" width="51526" height="3528"/>
+  <rect class="fil6" x="39403" y="63582" width="19704" height="2321" rx="1059" ry="1059"/>
+  <circle class="fil7" cx="41651" cy="64769" r="743"/>
+  <circle class="fil7" cx="44756" cy="64769" r="743"/>
+  <circle class="fil7" cx="47646" cy="64769" r="743"/>
+  <rect class="fil5" transform="matrix(1 -0 -0.317536 1 50501.8 64045.9)" width="7308" height="1364"/>
+ </g>
+</svg>

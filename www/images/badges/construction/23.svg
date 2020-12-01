@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 4610 4610"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil6 {fill:#522222}
+    .fil5 {fill:#753E3E}
+    .fil3 {fill:#999999}
+    .fil8 {fill:#9E9E9E}
+    .fil4 {fill:#B3B3B3}
+    .fil9 {fill:#C8C8C8}
+    .fil2 {fill:#CCCCCC}
+    .fil7 {fill:#E6E6E6}
+    .fil1 {fill:#F5BE18}
+    .fil0 {fill:#FFD630}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="2305" cy="2305" r="2305"/>
+  <path class="fil1" d="M4608 2383c-36,1062 -790,1943 -1793,2169l-591 -591 -172 -1797 -639 -749 104 -316 707 -78 815 -208 1569 1569z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_504891872">
+   <path class="fil2" d="M2905 869l-1086 0c-508,0 -536,541 -406,547 29,1 62,-213 365,-229 97,8 244,31 285,97 63,101 26,164 55,222 29,58 108,29 108,29 0,0 79,29 108,-29 29,-58 -9,-121 55,-222 43,-69 203,-91 299,-98l211 0 6 -317z"/>
+   <path class="fil3" d="M2905 869l-681 0 0 666 2 -1c0,0 79,29 108,-29 29,-58 -9,-121 55,-222 43,-69 203,-91 299,-98l211 0 6 -317z"/>
+   <rect class="fil2" x="2815" y="814" width="244" height="412" rx="20" ry="20"/>
+   <path class="fil4" d="M3059 1020l0 186c0,11 -9,20 -20,20l-204 0c-11,0 -20,-9 -20,-20l0 -186 244 0z"/>
+   <path class="fil5" d="M2090 1339c118,58 164,56 270,0l119 2414c-53,298 -474,259 -503,0l113 -2414z"/>
+   <path class="fil6" d="M2224 1381c42,1 81,-13 137,-42l119 2414c-26,147 -142,212 -256,209l0 -2581z"/>
+   <g>
+    <path class="fil7" d="M3028 2537l106 0 0 1109 -50 196 -56 -196 0 -1109z"/>
+    <path class="fil4" d="M3084 2537l50 0 0 1109 -50 196 0 -1305z"/>
+    <ellipse class="fil8" cx="3081" cy="2543" rx="182" ry="64"/>
+    <ellipse class="fil4" cx="3081" cy="2527" rx="168" ry="48"/>
+    <ellipse class="fil9" cx="3081" cy="2527" rx="72" ry="21"/>
+   </g>
+  </g>
+ </g>
+</svg>

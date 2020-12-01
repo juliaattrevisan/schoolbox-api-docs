@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 3107 3107"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#006775}
+    .fil1 {fill:#055661}
+    .fil5 {fill:#C94545}
+    .fil3 {fill:#CCCCCC}
+    .fil2 {fill:#EFEFEF}
+    .fil4 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1553" cy="1553" r="1553"/>
+  <path class="fil1" d="M3105 1498c1,18 1,37 1,56 0,858 -695,1553 -1553,1553 -19,0 -37,0 -56,-1l-748 -748 131 -131 0 -929 -131 -134 0 -415 420 0 128 131 646 0 0 0 0 -131 415 0 748 748z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_487861776">
+   <path class="fil2" d="M880 880l1346 0 0 1346 -1346 0 0 -1346zm153 153l1040 0 0 1040 -1040 0 0 -1040z"/>
+   <path class="fil3" d="M2226 880l0 1346 -1346 0 153 -153 1040 0 0 -1040 153 -153z"/>
+   <path class="fil4" d="M1164 2357l-415 0 0 -415 131 0 0 284 284 0 0 131z"/>
+   <path class="fil4" d="M2357 1942l0 415 -415 0 0 -131 284 0 0 -284 131 0z"/>
+   <path class="fil5" d="M1942 749l131 0 153 0 131 0 0 284 0 131 -131 0 -284 0 0 -131 0 -153 0 -131zm131 284l153 0 0 -153 -153 0 0 153z"/>
+   <path class="fil4" d="M749 749l415 0 0 131 -284 0 0 284 -131 0 0 -415z"/>
+   <path class="fil5" d="M1942 1942l131 0 153 0 131 0 0 284 0 131 -131 0 -284 0 0 -131 0 -153 0 -131zm131 284l153 0 0 -153 -153 0 0 153z"/>
+   <path class="fil5" d="M749 1942l131 0 153 0 131 0 0 284 0 131 -131 0 -284 0 0 -131 0 -153 0 -131zm131 284l153 0 0 -153 -153 0 0 153z"/>
+   <path class="fil5" d="M749 749l131 0 153 0 131 0 0 284 0 131 -131 0 -284 0 0 -131 0 -153 0 -131zm131 284l153 0 0 -153 -153 0 0 153z"/>
+  </g>
+ </g>
+</svg>

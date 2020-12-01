@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 3107 3107"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil4 {fill:#BA6F1F}
+    .fil5 {fill:#CC7E2B}
+    .fil1 {fill:#D14747}
+    .fil2 {fill:#D69432}
+    .fil6 {fill:#DBA03B}
+    .fil0 {fill:#E84F4F}
+    .fil3 {fill:#E8AB41}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1553" cy="1553" r="1553"/>
+  <path class="fil1" d="M591 1423l-226 -228 2375 -163 358 358c6,54 9,108 9,163 0,838 -664,1521 -1495,1552l-1018 -1026 119 -30 -407 -409 232 -58 -171 -172 225 13z"/>
+ </g>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_462342384">
+   <g>
+    <rect class="fil2" x="2391" y="1615" width="122" height="465"/>
+    <rect class="fil3" x="2391" y="1615" width="61" height="465"/>
+   </g>
+   <g>
+    <rect class="fil2" x="594" y="1615" width="122" height="465"/>
+    <rect class="fil3" x="594" y="1615" width="61" height="465"/>
+   </g>
+  </g>
+  <g id="_541551720">
+   <g>
+    <path class="fil4" d="M2513 1630l0 36 -122 0 0 -36 122 0z"/>
+    <path class="fil5" d="M2452 1630l0 36 -61 0 0 -36 61 0z"/>
+   </g>
+   <g>
+    <path class="fil4" d="M716 1630l0 36 -122 0 0 -36 122 0z"/>
+    <path class="fil5" d="M655 1630l0 36 -61 0 0 -36 61 0z"/>
+   </g>
+  </g>
+  <path class="fil3" d="M387 1515l2333 0 81 63 0 63 -2495 0 0 -63 81 -63z"/>
+  <path class="fil6" d="M2760 1578l40 63 -2495 0 40 -63 2414 0z"/>
+  <path class="fil2" d="M2801 1578l0 63 -2495 0 0 -63 2495 0z"/>
+  <g id="_476622952">
+   <g>
+    <rect class="fil2" x="2240" y="1047" width="91" height="469"/>
+    <rect class="fil3" x="2240" y="1047" width="45" height="469"/>
+   </g>
+   <g>
+    <rect class="fil2" x="776" y="1047" width="91" height="469"/>
+    <rect class="fil3" x="776" y="1047" width="45" height="469"/>
+   </g>
+  </g>
+  <g id="_537883208">
+   <rect class="fil3" x="361" y="1027" width="2384" height="175" rx="18" ry="18"/>
+   <rect class="fil3" x="361" y="1248" width="2384" height="175" rx="18" ry="18"/>
+  </g>
+ </g>
+</svg>

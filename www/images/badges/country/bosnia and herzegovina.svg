@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="55px" height="55px" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 5724 5724"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#171796}
+    .fil1 {fill:#F7D117}
+    .fil2 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_318239520">
+   <path class="fil0" d="M2862 0c1581,0 2862,1281 2862,2862 0,1581 -1281,2862 -2862,2862 -1581,0 -2862,-1281 -2862,-2862 0,-1581 1281,-2862 2862,-2862z"/>
+   <path class="fil1" d="M4637 617l0 4091 -3834 -3835c520,-538 1250,-874 2058,-874 671,0 1288,231 1776,617z"/>
+   <polygon class="fil2" points="741,1084 820,1327 1075,1327 869,1477 948,1719 741,1569 535,1719 614,1477 434,1346 447,1327 662,1327 "/>
+   <polygon class="fil2" points="1203,1546 1281,1789 1536,1789 1331,1939 1409,2181 1203,2032 997,2181 1075,1939 869,1789 1124,1789 "/>
+   <polygon class="fil2" points="1664,2008 1743,2250 1999,2250 1792,2400 1871,2643 1664,2493 1459,2643 1537,2400 1331,2250 1586,2250 "/>
+   <polygon class="fil2" points="2127,2470 2205,2712 2460,2712 2254,2862 2332,3104 2127,2955 1920,3104 1999,2862 1793,2712 2047,2712 "/>
+   <polygon class="fil2" points="2588,2931 2667,3174 2922,3174 2716,3323 2794,3566 2588,3416 2382,3566 2460,3323 2255,3174 2509,3174 "/>
+   <polygon class="fil2" points="3050,3393 3128,3635 3384,3635 3177,3785 3256,4028 3050,3877 2844,4028 2923,3785 2716,3635 2971,3635 "/>
+   <polygon class="fil2" points="3511,3854 3590,4097 3846,4097 3639,4246 3718,4489 3511,4339 3304,4489 3384,4246 3178,4097 3432,4097 "/>
+   <polygon class="fil2" points="4032,4311 4111,4553 4367,4553 4160,4703 4239,4945 4032,4796 3825,4945 3904,4703 3698,4553 3953,4553 "/>
+   <path class="fil2" d="M4471 4757l79 242 215 0c-149,133 -313,251 -488,351l66 -201 -206 -149 254 0 79 -242z"/>
+  </g>
+ </g>
+</svg>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="55px" height="55px" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 4512 4513"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil1 {fill:#003580}
+    .fil2 {fill:#009543}
+    .fil0 {fill:#231F20}
+    .fil5 {fill:#D21034}
+    .fil3 {fill:#FFCE00}
+    .fil4 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_381701504">
+   <path class="fil0" d="M2213 4512l87 0 -44 1 -44 -1zm-2184 -2615l0 718c-19,-117 -28,-237 -28,-359 0,-122 10,-242 28,-359z"/>
+   <path class="fil1" d="M4414 1594l-3598 2399c-436,-363 -734,-886 -801,-1480l0 -513c127,-1125 1082,-2000 2242,-2000 1016,0 1874,671 2157,1594z"/>
+   <path class="fil2" d="M4414 1594l-3598 2399c391,325 893,520 1441,520 1246,0 2256,-1010 2256,-2256 0,-230 -35,-453 -99,-662z"/>
+   <path class="fil3" d="M1816 1352l317 -119 -317 -117 216 -261 -334 57 57 -334 -261 217 -117 -318 -118 318 -261 -217 58 334 -335 -57 217 261 -318 117 318 119 -217 261 335 -57 -58 334 261 -217 118 318 117 -318 261 217 -57 -334 334 57 -216 -261zm-439 337c-251,0 -454,-203 -454,-455 0,-251 203,-454 454,-454 250,0 454,203 454,454 0,251 -203,455 -453,455z"/>
+   <path class="fil3" d="M1755 1234c0,210 -169,380 -378,380 -209,0 -379,-169 -379,-379 0,-209 170,-378 379,-378 209,0 378,169 378,378z"/>
+   <path class="fil4" d="M4069 913l-3750 2500c32,54 67,107 104,158l3753 -2501c-33,-54 -69,-106 -106,-157z"/>
+   <path class="fil4" d="M4512 2210l-3166 2111c71,31 143,59 217,83l2942 -1962c5,-61 8,-123 8,-186l-1 -46z"/>
+   <path class="fil5" d="M4176 1070l-3753 2501c234,325 552,586 923,750l3166 -2111c-8,-418 -130,-807 -336,-1140z"/>
+  </g>
+ </g>
+</svg>

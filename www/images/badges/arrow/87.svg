@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 4610 4610"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil1 {fill:#2682BF}
+    .fil0 {fill:#3A99D7}
+    .fil2 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="Copy_x0020_of_x0020_circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="2305" cy="2305" r="2305"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <path class="fil1" d="M4607 2422l-642 -642 -637 0 -224 0 101 -55 -169 -169 -1963 167 4 1537 1346 1346c1180,-59 2126,-1005 2185,-2185z"/>
+  <path class="fil2" d="M869 2830l0 -860 0 -413 413 0 1753 0 -191 198 191 215 -1753 0 0 860 224 0 -431 431 -431 -431 214 0 10 0zm2871 -1050l0 860 0 413 -413 0 -1753 0 191 -198 -191 -215 1753 0 0 -860 -224 0 431 -431 431 431 -214 0 -10 0z"/>
+ </g>
+</svg>

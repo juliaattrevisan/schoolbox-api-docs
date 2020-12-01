@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 10211 10211"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil9 {fill:#CA4545}
+    .fil8 {fill:#E94E4E}
+    .fil3 {fill:#EBECEC}
+    .fil4 {fill:#004F59}
+    .fil5 {fill:#CCCCCC}
+    .fil1 {fill:#F5C918}
+    .fil2 {fill:#F7F7F7}
+    .fil0 {fill:#FFD630}
+    .fil7 {fill:white}
+    .fil6 {fill:white;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="5105" cy="5105" r="5105"/>
+  <path class="fil1" d="M10188 5593c-245,2591 -2427,4618 -5082,4618 -184,0 -366,-10 -545,-29l-1917 -1917 4924 -5293 2620 2620z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_495603104">
+   <g>
+    <path class="fil2" d="M2643 1946l3897 0 1027 1027 0 5293 -4924 0 0 -6319z"/>
+    <path class="fil3" d="M7054 2459l513 513 0 5293 -4924 0 4410 -5806z"/>
+    <path class="fil4" d="M2643 1946l3897 0 1027 1027 0 494 -4924 0 0 -1521z"/>
+    <path class="fil5" d="M6540 1946l0 1027 1027 0 -1027 -1027z"/>
+    <path class="fil6" d="M3800 3162l-195 0 -77 -203 -358 0 -74 203 -191 0 346 -892 191 0 357 892zm-330 -354l-124 -330 -120 330 244 0zm562 354l-319 -892 195 0 227 660 217 -660 192 0 -317 892 -195 0zm597 0l0 -892 181 0 0 892 -181 0z"/>
+   </g>
+   <g>
+    <rect class="fil7" x="3309" y="4985" width="3592" height="1334"/>
+    <path class="fil4" d="M3309 6320l414 0 0 -1334 -414 0 0 -495 3592 0 0 495 -414 0 0 1334 414 0 0 495 -3592 0 0 -495zm146 -1725l295 0 0 268 -295 0 0 -268zm0 1849l295 0 0 268 -295 0 0 -268zm3006 0l295 0 0 268 -295 0 0 -268zm-501 0l295 0 0 268 -295 0 0 -268zm-501 0l295 0 0 268 -295 0 0 -268zm-501 0l295 0 0 268 -295 0 0 -268zm-501 0l295 0 0 268 -295 0 0 -268zm-501 0l295 0 0 268 -295 0 0 -268zm2505 -1849l295 0 0 268 -295 0 0 -268zm-501 0l295 0 0 268 -295 0 0 -268zm-501 0l295 0 0 268 -295 0 0 -268zm-501 0l295 0 0 268 -295 0 0 -268zm-501 0l295 0 0 268 -295 0 0 -268zm-501 0l295 0 0 268 -295 0 0 -268zm67 1725l2166 0 0 -1334 -2166 0 0 1334z"/>
+    <g>
+     <path class="fil8" d="M4871 5168l521 440c26,22 26,67 0,89l-521 440c-31,26 -71,15 -71,-28 0,-297 0,-615 0,-912 0,-43 40,-54 71,-28z"/>
+     <path class="fil9" d="M5411 5652c0,17 -6,33 -19,44l-521 440c-31,26 -71,15 -71,-28l0 -456 612 0z"/>
+    </g>
+   </g>
+  </g>
+ </g>
+</svg>

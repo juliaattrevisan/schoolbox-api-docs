@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 4929 4929"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil3 {fill:#CCCCCC}
+    .fil1 {fill:#D14747}
+    .fil0 {fill:#E84F4F}
+    .fil2 {fill:#EFEFEF}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="2464" cy="2464" r="2464"/>
+  <path class="fil1" d="M4928 2397c1,22 1,45 1,67 0,589 -207,1130 -551,1553l-1756 -1703c297,-294 606,-600 1112,-1112l1195 1195zm-848 1928c-433,376 -997,603 -1615,603 -22,0 -45,0 -67,-1l-1202 -1202c510,-509 837,-831 1120,-1110l1764 1710z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_487874352">
+   <g>
+    <path class="fil2" d="M2934 1258l734 -81c23,-3 44,5 60,21 17,16 24,37 22,60l-66 735c-3,29 -21,53 -48,63 -28,10 -57,4 -78,-17l-232 -228 -499 509c-55,56 -145,57 -201,2l0 0c-56,-55 -57,-145 -2,-201l499 -509 -232 -228c-21,-21 -28,-50 -18,-77 10,-28 33,-46 62,-50z"/>
+    <path class="fil3" d="M3733 1203c13,15 19,34 17,55l-66 736c-3,29 -21,53 -48,63 -28,10 -57,4 -78,-17l-232 -228 -499 509c-55,56 -145,57 -201,2l1107 -1120zm-1107 1120l0 0z"/>
+   </g>
+   <g>
+    <path class="fil3" d="M1995 3671l-734 81c-23,3 -44,-5 -60,-21 -17,-16 -24,-37 -22,-60l66 -735c3,-29 21,-53 48,-63 28,-10 57,-4 78,17l232 228 499 -509c55,-56 145,-57 201,-2l0 0c56,55 57,145 2,201l-499 509 232 228c21,21 28,50 18,77 -10,28 -33,46 -62,50z"/>
+    <path class="fil2" d="M1196 3726c-13,-15 -19,-34 -17,-55l66 -736c3,-29 21,-53 48,-63 28,-10 57,-4 78,17l232 228 499 -509c55,-56 145,-57 201,-2l-1107 1120zm1107 -1120l0 0z"/>
+   </g>
+  </g>
+ </g>
+</svg>

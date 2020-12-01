@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 2422 2422"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#006775}
+    .fil1 {fill:#055661}
+    .fil4 {fill:gray}
+    .fil3 {fill:#999999}
+    .fil6 {fill:#C94545}
+    .fil5 {fill:#E84F4F}
+    .fil2 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1211" cy="1211" r="1211"/>
+  <path class="fil1" d="M2404 1423c-100,568 -596,999 -1193,999l-6 0 -644 -644 1059 -1138 783 783z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_487864344">
+   <g>
+    <path class="fil2" d="M562 419l838 0 221 221 0 1138 -1059 0 0 -1359z"/>
+    <path class="fil3" d="M1400 419l0 221 221 0 -221 -221z"/>
+    <g>
+     <rect class="fil4" x="716" y="679" width="713" height="68"/>
+     <rect class="fil4" x="716" y="805" width="713" height="68"/>
+     <rect class="fil4" x="716" y="931" width="713" height="68"/>
+     <rect class="fil4" x="716" y="1057" width="714" height="68"/>
+     <rect class="fil4" x="716" y="1183" width="547" height="68"/>
+    </g>
+   </g>
+   <g>
+    <g>
+     <circle class="fil5" transform="matrix(-0.344686 0.537331 0.537331 0.344686 1561.78 1660.16)" r="572"/>
+     <path class="fil6" d="M1197 1660c0,120 59,238 168,307 170,109 395,60 504,-110 39,-61 58,-129 58,-197l-730 0z"/>
+    </g>
+    <g>
+     <rect class="fil2" transform="matrix(1.82506E-014 -0.542925 0.72743 1.5181E-014 1335.29 1713.54)" width="197" height="623" rx="53" ry="53"/>
+     <rect class="fil2" x="1508" y="1434" width="107" height="453" rx="53" ry="53"/>
+    </g>
+   </g>
+  </g>
+ </g>
+</svg>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 10211 10211"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#006775}
+    .fil3 {fill:#00CC96}
+    .fil1 {fill:#055661}
+    .fil2 {fill:#E84F4F}
+    .fil4 {fill:#FFD630}
+    .fil5 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="Copy_x0020_of_x0020_Copy_x0020_of_x0020_circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="5105" cy="5105" r="5105"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <path class="fil1" d="M9980 6628l-4869 -4869 -2941 5870 2568 2568c121,9 243,13 366,13 2289,0 4227,-1507 4875,-3583z"/>
+  <path class="fil2" d="M6968 5481l1072 2149 -5870 0 1077 -2149 3721 0z"/>
+  <path class="fil3" d="M6150 3841l818 1640 -3721 0 822 -1640 2081 0z"/>
+  <path class="fil4" d="M5111 1759l1038 2081 -2081 0 1043 -2081z"/>
+  <g id="_520379776">
+   <path class="fil5" d="M3524 6126l1185 -6c124,-1 226,100 227,225l0 42 2 480 0 42c1,124 -100,226 -225,227l-1185 6c-124,1 -226,-100 -227,-225l-3 -564c-1,-124 100,-226 225,-227zm1203 262l0 -42c0,-9 -8,-17 -17,-17l-1185 6c-9,0 -17,8 -17,17l3 564c0,9 8,17 17,17l1185 -6c9,0 17,-8 17,-17l0 -42 -2 -480z"/>
+   <path class="fil5" d="M5497 6116l1185 -6c124,-1 226,100 227,225l3 564c1,124 -100,226 -225,227l-1185 6c-124,1 -226,-100 -227,-225l0 -42 0 -480 -3 0 0 -42c-1,-124 100,-226 225,-227zm-13 748l0 42c0,9 8,17 17,17l1185 -6c9,0 17,-8 17,-17l-3 -564c0,-9 -8,-17 -17,-17l-1185 6c-9,0 -17,8 -17,17l0 42 2 480z"/>
+   <path class="fil5" d="M4533 6499l1100 -5c71,0 130,58 131,129l0 0c0,72 -58,130 -129,131l-1100 5c-72,0 -130,-58 -131,-129l0 0c0,-71 58,-130 129,-131z"/>
+  </g>
+ </g>
+</svg>

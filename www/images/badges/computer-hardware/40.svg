@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 3107 3107"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil2 {fill:#FBBE00}
+    .fil3 {fill:#E84F4F}
+    .fil1 {fill:#F5BE18}
+    .fil0 {fill:#FFD630}
+    .fil4 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1553" cy="1553" r="1553"/>
+ </g>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <path class="fil1" d="M3096 1734l-1151 -1151 -773 1951 561 561c713,-83 1279,-648 1362,-1362z"/>
+  <g id="_396729984">
+   <path class="fil2" d="M1553 2282c26,0 48,21 48,48 0,26 -21,48 -48,48 -26,0 -48,-21 -48,-48 0,-26 21,-48 48,-48z"/>
+   <path class="fil3" d="M1223 553l660 0c43,0 78,35 78,78l0 1845c0,43 -35,78 -78,78l-660 0c-43,0 -78,-35 -78,-78l0 -1845c0,-43 35,-78 78,-78z"/>
+   <path class="fil4" d="M1553 2282c26,0 48,21 48,48 0,26 -21,48 -48,48 -26,0 -48,-21 -48,-48 0,-26 21,-48 48,-48z"/>
+   <path class="fil4" d="M1553 1893l0 0c11,0 19,9 19,19l0 200c0,11 -9,19 -19,19l0 0c-11,0 -19,-9 -19,-19l0 -200c0,-11 9,-19 19,-19z"/>
+   <path class="fil4" d="M1609 1968c47,21 80,69 80,124 0,75 -61,136 -136,136 -75,0 -136,-61 -136,-136 0,-55 33,-102 80,-124l0 39c-28,18 -46,50 -46,85 0,56 46,102 102,102 56,0 102,-46 102,-102 0,-36 -18,-67 -46,-85l0 -39z"/>
+   <path class="fil4" d="M1338 1104l430 0c11,0 19,9 19,19l0 0c0,10 -9,19 -19,19l-430 0c-10,0 -19,-9 -19,-19l0 0c0,-10 9,-19 19,-19z"/>
+   <path class="fil4" d="M1832 848l0 152 -579 0 0 -152 579 0z"/>
+   <path class="fil4" d="M1253 698l579 0 0 125 -579 0 0 -125z"/>
+  </g>
+ </g>
+</svg>

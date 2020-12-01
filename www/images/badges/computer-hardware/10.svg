@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 3248 3248"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#00CC96}
+    .fil1 {fill:#07B587}
+    .fil4 {fill:#4D4D4D}
+    .fil3 {fill:#666666}
+    .fil2 {fill:gray}
+    .fil5 {fill:#B3B3B3}
+    .fil6 {fill:#EBECEC;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1624" cy="1624" r="1624"/>
+  <path class="fil1" d="M3244 1743c-57,786 -673,1418 -1453,1497l-538 -538 191 -1572 -423 -405c679,-568 1038,-79 1205,0l1017 1017z"/>
+ </g>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_499459880">
+   <path class="fil0" d="M1611 1402l0 0c34,0 61,28 61,62l0 214c0,34 -27,62 -61,62l0 0c-34,0 -61,-28 -61,-62l0 -214c0,-34 27,-62 61,-62z"/>
+   <path class="fil2" d="M2127 2374l65 -877c14,-190 -170,-367 -361,-367l-438 0c-191,0 -377,176 -363,367l67 877c47,611 985,609 1030,0z"/>
+   <path class="fil3" d="M2127 2374l65 -877c14,-190 -170,-367 -361,-367l-223 0 0 1702c248,2 496,-151 519,-458z"/>
+   <rect class="fil4" x="1588" y="1130" width="46" height="905"/>
+   <rect class="fil4" x="1489" y="1352" width="244" height="456" rx="122" ry="122"/>
+   <path class="fil5" d="M1611 1394l0 0c47,0 85,39 85,86l0 201c0,48 -38,86 -85,86l0 0c-47,0 -85,-39 -85,-86l0 -201c0,-48 38,-86 85,-86z"/>
+   <path class="fil2" d="M1612 1394c47,0 85,39 85,86l0 201c0,47 -38,86 -85,86l0 -374z"/>
+   <path class="fil4" d="M1287 2523c58,251 590,253 648,0l-47 0c-59,180 -494,180 -553,0l-47 0z"/>
+   <path class="fil6" d="M2227 725c-23,-33 -49,-63 -78,-91 -134,-134 -320,-217 -525,-217 -205,0 -390,83 -525,217 -28,28 -54,59 -78,91l57 39c21,-29 44,-57 70,-82 122,-122 290,-197 476,-197 186,0 354,75 476,197 25,25 49,53 70,82l57 -39zm-409 283c-6,-8 -13,-16 -20,-23l0 0 0 0c-44,-44 -106,-72 -173,-72 -67,0 -129,27 -173,72l0 0 0 0c-7,7 -14,15 -20,23l57 39c4,-5 8,-9 12,-13l0 0c32,-32 76,-51 124,-51 49,0 93,20 124,51l0 0c4,4 8,9 12,13l57 -39zm120 -83c-11,-15 -24,-29 -37,-43l0 0c-71,-71 -168,-114 -276,-114 -108,0 -205,44 -276,114l0 0c-13,13 -26,28 -37,43l57 39c9,-12 19,-23 29,-33l0 0c58,-58 139,-94 227,-94 89,0 169,36 227,94 10,10 20,22 29,33l57 -39zm136 -94c-17,-23 -36,-45 -56,-66 -100,-100 -239,-163 -393,-163 -153,0 -292,62 -393,163 -20,20 -39,42 -56,66l57 39c15,-20 31,-39 48,-56 88,-88 209,-142 344,-142 134,0 256,54 344,142 17,17 34,36 48,56l57 -39z"/>
+  </g>
+ </g>
+</svg>

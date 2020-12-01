@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 142361 142361"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil3 {fill:#CA4545}
+    .fil5 {fill:#00CC96}
+    .fil6 {fill:#07B587}
+    .fil1 {fill:#63A147}
+    .fil0 {fill:#71B84F}
+    .fil7 {fill:#C94545}
+    .fil2 {fill:#E84F4F}
+    .fil4 {fill:#F9F9F9}
+    .fil8 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="71181" cy="71181" r="71181"/>
+  <path class="fil1" d="M142343 72602c-749,38184 -31562,68995 -69745,69742l-37741 -37741 72767 -118 -533 -67099 35251 35216z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_487869960">
+   <path class="fil2" d="M40629 35421l61105 0c4583,0 8331,3749 8331,8332l0 54855c0,4583 -3749,8331 -8331,8331l-61105 0c-4583,0 -8331,-3749 -8331,-8331l0 -54855c0,-4583 3749,-8332 8331,-8332z"/>
+   <path class="fil3" d="M107092 37386c1815,1531 2973,3820 2973,6367l0 54856c0,4583 -3749,8331 -8331,8331l-61105 0c-2235,0 -4271,-892 -5771,-2337l72235 -67217z"/>
+   <path class="fil4" d="M40629 39935c-2092,0 -3818,1726 -3818,3818l0 54857c0,2091 1727,3817 3818,3817l61105 0c2091,0 3818,-1726 3818,-3817l0 -54857c0,-2091 -1726,-3818 -3818,-3818l-61105 0z"/>
+   <path class="fil5" d="M40629 39935l61103 0c2100,0 3819,1718 3819,3819l0 8159 -68742 0 0 -8159c0,-2100 1719,-3819 3819,-3819z"/>
+   <path class="fil6" d="M103737 40508c1087,676 1814,1879 1814,3246l0 8159 -14070 0 12256 -11404z"/>
+   <g>
+    <path class="fil4" d="M46227 42148c2086,0 3775,1691 3775,3776 0,2084 -1690,3775 -3775,3775 -2085,0 -3776,-1691 -3776,-3775 0,-2085 1691,-3776 3776,-3776z"/>
+    <path class="fil4" d="M56078 42148c2086,0 3776,1691 3776,3776 0,2084 -1690,3775 -3776,3775 -2085,0 -3776,-1691 -3776,-3775 0,-2085 1691,-3776 3776,-3776z"/>
+    <path class="fil4" d="M72450 43624l25161 0c1264,0 2300,1033 2300,2300l0 1c0,1265 -1035,2300 -2300,2300l-25161 0c-1265,0 -2300,-1035 -2300,-2300l0 -1c0,-1266 1035,-2300 2300,-2300z"/>
+   </g>
+  </g>
+  <g id="_487862328">
+   <g>
+    <circle class="fil2" transform="matrix(0.290384 0.45268 -0.45268 0.290384 71180.8 76459.4)" r="33601"/>
+    <path class="fil7" d="M89253 76460c-5,5944 -2940,11762 -8315,15210 -8401,5388 -19579,2948 -24968,-5454 -1941,-3025 -2865,-6411 -2863,-9756l36146 0z"/>
+   </g>
+   <rect class="fil8" transform="matrix(-3.34018E-014 -0.457392 0.61283 -5.25793E-014 59966.2 79101.3)" width="11557" height="36597" rx="2643" ry="2643"/>
+  </g>
+ </g>
+</svg>

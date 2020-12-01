@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 3248 3248"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#00CC96}
+    .fil1 {fill:#07B587}
+    .fil3 {fill:#C94545}
+    .fil2 {fill:#E84F4F}
+    .fil4 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1624" cy="1624" r="1624"/>
+  <path class="fil1" d="M3231 1864c-104,705 -662,1263 -1367,1367l-923 -923 1367 -1367 923 923z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <path class="fil2" d="M657 1624c0,-534 433,-967 967,-967 534,0 967,433 967,967 0,534 -433,967 -967,967 -534,0 -967,-433 -967,-967z"/>
+  <path class="fil3" d="M1624 657c534,0 967,433 967,967 0,534 -433,967 -967,967l0 -1933z"/>
+  <path class="fil4" d="M1624 885c408,0 740,331 740,740 0,159 -50,307 -136,428l-1031 -1031c121,-86 268,-136 428,-136zm428 1343c-121,86 -268,136 -428,136 -408,0 -740,-331 -740,-740 0,-159 50,-307 136,-428l1031 1031z"/>
+  <path class="fil2" d="M2227 2052c-48,68 -108,127 -175,175l-1031 -1031c48,-68 108,-127 175,-175l1031 1031z"/>
+  <path class="fil3" d="M1624 1800l0 -351 603 603c-48,68 -108,127 -175,175l-428 -428z"/>
+ </g>
+</svg>

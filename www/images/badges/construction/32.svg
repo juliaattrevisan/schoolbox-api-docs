@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 3107 3107"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil1 {fill:#63A147}
+    .fil0 {fill:#71B84F}
+    .fil3 {fill:#CCCCCC}
+    .fil5 {fill:#D45500}
+    .fil2 {fill:#E6E6E6}
+    .fil4 {fill:#F25500}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1553" cy="1553" r="1553"/>
+  <path class="fil1" d="M3105 1494c33,880 -670,1612 -1552,1612l-386 -362 57 -48 0 -2278 649 -12 115 -31 1118 1118z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_504896000">
+   <g>
+    <g>
+     <rect class="fil2" x="1216" y="600" width="675" height="148"/>
+     <path class="fil3" d="M1891 708l0 39 -675 0 0 -39 675 0z"/>
+    </g>
+    <g>
+     <rect class="fil2" x="1216" y="874" width="675" height="148"/>
+     <path class="fil3" d="M1891 982l0 39 -675 0 0 -39 675 0z"/>
+    </g>
+    <g>
+     <rect class="fil2" x="1216" y="1149" width="675" height="148"/>
+     <path class="fil3" d="M1891 1257l0 39 -675 0 0 -39 675 0z"/>
+    </g>
+    <g>
+     <rect class="fil2" x="1216" y="1423" width="675" height="148"/>
+     <path class="fil3" d="M1891 1531l0 39 -675 0 0 -39 675 0z"/>
+    </g>
+    <g>
+     <rect class="fil2" x="1216" y="1698" width="675" height="148"/>
+     <path class="fil3" d="M1891 1806l0 39 -675 0 0 -39 675 0z"/>
+    </g>
+    <g>
+     <rect class="fil2" x="1216" y="1972" width="675" height="148"/>
+     <path class="fil3" d="M1891 2080l0 39 -675 0 0 -39 675 0z"/>
+    </g>
+    <g>
+     <rect class="fil2" x="1216" y="2247" width="675" height="148"/>
+     <path class="fil3" d="M1891 2355l0 39 -675 0 0 -39 675 0z"/>
+    </g>
+   </g>
+   <g>
+    <g>
+     <g>
+      <rect class="fil2" x="1173" y="419" width="102" height="2284"/>
+      <rect class="fil3" x="1173" y="419" width="22" height="2284"/>
+      <rect class="fil3" x="1253" y="419" width="22" height="2284"/>
+     </g>
+     <rect class="fil4" x="1156" y="2648" width="136" height="98" rx="17" ry="17"/>
+     <path class="fil5" d="M1224 2648l51 0c9,0 17,8 17,17l0 64c0,9 -8,17 -17,17l-51 0 0 -98z"/>
+    </g>
+    <g>
+     <g>
+      <rect class="fil2" x="1831" y="419" width="102" height="2284"/>
+      <rect class="fil3" x="1831" y="419" width="22" height="2284"/>
+      <rect class="fil3" x="1911" y="419" width="22" height="2284"/>
+     </g>
+     <rect class="fil4" x="1814" y="2648" width="136" height="98" rx="17" ry="17"/>
+     <path class="fil5" d="M1882 2648l51 0c9,0 17,8 17,17l0 64c0,9 -8,17 -17,17l-51 0 0 -98z"/>
+    </g>
+   </g>
+   <g>
+    <rect class="fil4" x="1108" y="361" width="891" height="92" rx="46" ry="46"/>
+    <path class="fil5" d="M1999 407l0 0c0,25 -21,46 -46,46l-799 0c-25,0 -46,-21 -46,-46l0 0 891 0z"/>
+   </g>
+  </g>
+ </g>
+</svg>

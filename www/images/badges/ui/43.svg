@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 4929 4929"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil1 {fill:#63A147}
+    .fil0 {fill:#71B84F}
+    .fil6 {fill:#999999}
+    .fil8 {fill:#C94545}
+    .fil7 {fill:#E84F4F}
+    .fil5 {fill:#F5BE18}
+    .fil2 {fill:#F7C600}
+    .fil3 {fill:#FFD630}
+    .fil4 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="2464" cy="2464" r="2464"/>
+  <path class="fil1" d="M4895 2873c-178,1068 -1043,1904 -2126,2037l-1576 -1576 2544 -1619 1158 1158z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_487870128">
+   <rect class="fil2" x="1192" y="1715" width="2544" height="1619"/>
+   <path class="fil3" d="M1192 1714l2544 0 -1272 -783 -1272 783z"/>
+   <path class="fil4" d="M1555 1424l1819 0c94,0 172,77 172,172l0 1738 -2162 0 0 -1738c0,-94 77,-172 172,-172z"/>
+   <path class="fil3" d="M1192 1714l1245 810 -1245 810 0 -1619z"/>
+   <path class="fil5" d="M1192 3334l2544 0 -1272 -811 -1272 811z"/>
+   <path class="fil3" d="M3736 1714l-1245 810 1245 810 0 -1619z"/>
+   <path class="fil6" d="M1849 1631l1231 0 0 101 -1231 0 0 -101zm0 353l1231 0 0 101 -1231 0 0 -101zm0 -176l1231 0 0 101 -1231 0 0 -101z"/>
+  </g>
+  <g id="_487864320">
+   <g>
+    <circle class="fil7" transform="matrix(-0.378213 0.589596 0.589596 0.378213 2464.34 3333.53)" r="1163"/>
+    <path class="fil8" d="M1649 3334c0,268 133,530 375,686 379,243 883,133 1126,-246 88,-136 129,-289 129,-440l-1630 0z"/>
+   </g>
+   <g>
+    <rect class="fil4" transform="matrix(-0.421248 -0.421248 -0.564403 0.564403 2906.18 3060.27)" width="400" height="1267" rx="119" ry="119"/>
+    <rect class="fil4" transform="matrix(0.421248 -0.421248 0.564403 0.564403 2022.54 3060.23)" width="400" height="1267" rx="119" ry="119"/>
+   </g>
+  </g>
+ </g>
+</svg>

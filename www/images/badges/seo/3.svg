@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 4929 4929"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil4 {fill:#EBECEC}
+    .fil0 {fill:#00CC96}
+    .fil5 {fill:#056B78}
+    .fil1 {fill:#07B587}
+    .fil2 {fill:#E84F4F}
+    .fil3 {fill:#EFEFF0}
+   ]]>
+  </style>
+ </defs>
+ <g id="Copy_x0020_of_x0020_Copy_x0020_of_x0020_circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="2464" cy="2464" r="2464"/>
+  <path class="fil1" d="M4925 2323c3,47 4,94 4,141 0,1361 -1103,2464 -2464,2464 -48,0 -95,-2 -142,-4l-1153 -1153 2606 -2597 1150 1150z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_466585440">
+   <rect class="fil2" x="1131" y="1131" width="2667" height="2667" rx="110" ry="110"/>
+   <rect class="fil3" x="1199" y="1525" width="2530" height="2205"/>
+   <rect class="fil4" x="2031" y="1258" width="1540" height="107" rx="23" ry="23"/>
+   <path class="fil4" d="M1385 1233c43,0 78,35 78,78 0,43 -35,78 -78,78 -43,0 -78,-35 -78,-78 0,-43 35,-78 78,-78zm409 0c43,0 78,35 78,78 0,43 -35,78 -78,78 -43,0 -78,-35 -78,-78 0,-43 35,-78 78,-78zm-205 0c43,0 78,35 78,78 0,43 -35,78 -78,78 -43,0 -78,-35 -78,-78 0,-43 35,-78 78,-78z"/>
+  </g>
+  <path class="fil5" d="M2489 2358c99,17 145,112 143,202l965 -8c26,0 48,13 48,29l0 0c0,16 -22,27 -48,29l-1000 94c-32,46 -80,75 -133,75 -53,0 -101,-29 -133,-75l-1000 -94c-26,-2 -48,-13 -48,-29l0 0c0,-16 22,-30 48,-29l965 8c-3,-89 44,-185 143,-202l1 -37 -295 0c-10,0 -19,-9 -19,-21l0 0c0,-11 8,-21 19,-21l296 0 4 -171c0,-16 4,-30 18,-30l0 0c13,0 17,13 18,30l4 171 296 0c10,0 19,9 19,21l0 0c0,11 -8,21 -19,21l-295 0 1 37zm-531 330c41,0 73,36 73,80 0,44 -33,80 -73,80 -41,0 -73,-36 -73,-80 0,-44 33,-80 73,-80zm1014 0c41,0 73,36 73,80 0,44 -33,80 -73,80 -41,0 -73,-36 -73,-80 0,-44 33,-80 73,-80zm0 45c18,0 32,16 32,35 0,19 -14,35 -32,35 -18,0 -32,-16 -32,-35 0,-20 14,-35 32,-35zm-1014 0c18,0 32,16 32,35 0,19 -14,35 -32,35 -18,0 -32,-16 -32,-35 0,-20 14,-35 32,-35z"/>
+ </g>
+</svg>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 2422 2422"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#00A085}
+    .fil1 {fill:#048C75}
+    .fil5 {fill:#32B1D4}
+    .fil9 {fill:#333333}
+    .fil11 {fill:#4B4B4B}
+    .fil7 {fill:#525252}
+    .fil6 {fill:#666666}
+    .fil10 {fill:#CCCCCC}
+    .fil3 {fill:#E6E6E6}
+    .fil8 {fill:#E8414F}
+    .fil4 {fill:#EF5764}
+    .fil2 {fill:whitesmoke}
+    .fil12 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1211" cy="1211" r="1211"/>
+ </g>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_506225464">
+   <path class="fil1" d="M2422 1199c0,4 0,8 0,12 0,669 -542,1211 -1211,1211 -17,0 -35,0 -52,-1l-831 -947 276 -99 -55 -63 374 -385 15 -84 28 3 294 294 813 -291 349 349z"/>
+   <path class="fil2" d="M2047 839l-959 0c-20,0 -37,17 -37,37l0 504 485 0c27,-35 69,-57 116,-57 47,0 89,22 116,57l315 0 0 -504c0,-20 -17,-37 -37,-37z"/>
+   <path class="fil3" d="M1072 843c-12,6 -21,19 -21,33l0 504 485 0c27,-35 69,-57 116,-57 47,0 89,22 116,57l208 0 -905 -537z"/>
+   <path class="fil4" d="M1051 909l0 60 1033 0 0 -60 -1033 0z"/>
+   <path class="fil4" d="M1051 1198l0 115 1033 0 0 -115 -1033 0z"/>
+   <path class="fil2" d="M1045 915l-209 0 -244 213c0,0 -228,19 -231,74l-13 205 141 0c24,-49 74,-83 133,-83 58,0 109,34 133,83l290 0 0 -492z"/>
+   <path class="fil4" d="M362 1198c0,1 -1,3 -1,4l-7 110 691 0 0 -115 -684 0z"/>
+   <path class="fil5" d="M362 1195c-1,2 -1,4 -2,7l-4 64 64 0c7,0 13,-6 13,-13l0 -45c0,-7 -6,-13 -13,-13l-58 0z"/>
+   <path class="fil6" d="M2094 1380l-325 0c20,25 31,57 31,91l0 3 294 0c11,0 20,-9 20,-20l0 -53c0,-11 -9,-20 -20,-20zm-558 0l-798 0c20,25 31,57 31,91l0 3 736 0 0 -3c0,-34 12,-66 31,-91zm-1031 0l-178 0c-11,0 -20,9 -20,20l0 53c0,11 9,20 20,20l147 0 0 -3c0,-34 12,-66 31,-91z"/>
+   <path class="fil7" d="M1797 1441c2,10 3,20 3,30l0 3 294 0c11,0 20,-9 20,-20l0 -13 -317 0zm-289 0l-742 0c2,10 3,20 3,30l0 3 736 0 0 -3c0,-10 1,-20 3,-30zm-1031 0l-170 0 0 13c0,11 9,20 20,20l147 0 0 -3c0,-10 1,-20 3,-30z"/>
+   <rect class="fil4" x="912" y="834" width="53" height="54" rx="13" ry="13"/>
+   <path class="fil5" d="M963 969l-102 0c0,0 -179,150 -196,164 -11,9 -10,27 4,27l294 0c15,0 27,-12 27,-27l0 -137c0,-15 -12,-27 -27,-27z"/>
+   <rect class="fil8" x="898" y="873" width="82" height="42" rx="8" ry="8"/>
+   <circle class="fil4" cx="1568" cy="1084" r="98"/>
+   <g>
+    <circle class="fil9" cx="1653" cy="1467" r="121"/>
+    <circle class="fil10" cx="1653" cy="1467" r="68"/>
+    <circle class="fil11" cx="1653" cy="1467" r="20"/>
+   </g>
+   <g>
+    <circle class="fil9" cx="621" cy="1467" r="121"/>
+    <circle class="fil10" cx="621" cy="1467" r="68"/>
+    <circle class="fil11" cx="621" cy="1467" r="20"/>
+   </g>
+   <path class="fil12" d="M1584 1015l-36 0 0 34 -28 -18 -19 30 32 21 -32 21 19 30 28 -18 0 34 36 0 0 -34 28 18 19 -30 -32 -21 32 -21 -19 -30 -28 18 0 -34z"/>
+  </g>
+ </g>
+</svg>

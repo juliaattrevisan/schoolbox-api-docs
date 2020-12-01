@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 3107 3107"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil4 {fill:#EBECEC}
+    .fil0 {fill:#00A085}
+    .fil1 {fill:#048C75}
+    .fil7 {fill:#C94545}
+    .fil5 {fill:#E0E0E0}
+    .fil6 {fill:#E84F4F}
+    .fil3 {fill:#F5BE18}
+    .fil2 {fill:#FFD630}
+    .fil8 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1553" cy="1553" r="1553"/>
+  <path class="fil1" d="M2989 2146c-186,450 -577,793 -1056,913l-573 -573 -673 -1862 779 801 -45 -334 655 655 302 -211 610 610z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <path class="fil2" d="M1326 2447l-556 -869c-9,-13 -41,-70 -44,-85 -10,-39 18,-480 21,-558 23,-79 71,-102 135,-86 72,30 485,190 515,215 12,8 50,62 59,75l556 869c34,53 18,124 -35,158l-494 316c-53,34 -124,18 -158,-35zm-480 -1291c-35,-54 -19,-126 35,-160 54,-34 126,-19 160,35 35,54 19,126 -35,160 -54,34 -126,19 -160,-35z"/>
+  <path class="fil3" d="M804 854c22,-11 48,-12 78,-5 72,30 485,190 515,215 12,8 50,62 59,75l556 869c34,53 18,124 -35,158l-258 165 -708 -1144c50,-36 63,-104 30,-157 -33,-51 -99,-68 -152,-40l-85 -138z"/>
+  <g id="_487878384">
+   <rect class="fil4" transform="matrix(-0.1605 -0.250857 0.250857 -0.1605 880.429 1071.6)" width="1744" height="268" rx="40" ry="40"/>
+   <path class="fil5" d="M634 613l0 0 280 437 0 0c18,-12 24,-37 12,-55l-237 -370c-12,-18 -37,-24 -55,-12z"/>
+  </g>
+  <g id="_487870992">
+   <circle class="fil6" transform="matrix(-0.342826 0.534431 0.534431 0.342826 1992.57 1787.74)" r="733"/>
+   <path class="fil7" d="M1527 1788c0,153 76,303 214,392 216,139 504,76 643,-141 50,-78 74,-165 74,-251l-931 0z"/>
+  </g>
+  <g id="_487875168">
+   <rect class="fil8" transform="matrix(1.81521E-014 -0.539995 0.723504 1.5099E-014 1703.68 1855.83)" width="252" height="799" rx="68" ry="68"/>
+   <rect class="fil8" x="1924" y="1499" width="136" height="578" rx="68" ry="68"/>
+  </g>
+ </g>
+</svg>

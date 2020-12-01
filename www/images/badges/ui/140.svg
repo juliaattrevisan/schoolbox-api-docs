@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 10211 10211"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil2 {fill:#00CC96}
+    .fil3 {fill:#12B589}
+    .fil5 {fill:#C94545}
+    .fil1 {fill:#CCCCCC}
+    .fil0 {fill:#E6E6E6}
+    .fil4 {fill:#E84F4F}
+    .fil6 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="5105" cy="5105" r="5105"/>
+  <path class="fil1" d="M10121 6061c-401,2118 -2110,3773 -4255,4093l-3865 -3865 5057 -2837 1315 1315 227 -227 1521 1521z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_487871112">
+   <path class="fil2" d="M7500 3657c628,0 1138,510 1138,1138 0,184 -43,357 -121,510 202,124 337,347 337,601l0 0c0,388 -317,705 -705,705l-5169 0 -34 0c-22,0 -44,-1 -66,-3 -851,-52 -1526,-758 -1526,-1623 0,-898 728,-1626 1626,-1626 196,0 385,35 559,99 267,-715 956,-1223 1764,-1223 901,0 1655,633 1840,1479 112,-37 231,-57 355,-57z"/>
+   <path class="fil3" d="M7500 3657c628,0 1138,509 1138,1138 0,184 -44,357 -121,510 202,124 337,347 337,601l0 0c0,388 -317,705 -704,705l-3045 0 0 -4366c66,-7 132,-11 200,-11 901,0 1655,633 1840,1479 112,-37 231,-57 355,-57z"/>
+  </g>
+  <g id="_487868208">
+   <g>
+    <circle class="fil4" transform="matrix(-0.323369 0.504099 0.504099 0.323369 5105.44 6611.07)" r="2410"/>
+    <path class="fil5" d="M3662 6611c0,475 235,939 664,1215 671,430 1564,235 1994,-436 155,-242 229,-512 229,-779l-2887 0z"/>
+   </g>
+   <rect class="fil6" transform="matrix(1.71219E-014 -0.509347 0.682442 1.42421E-014 4209.8 6822.17)" width="829" height="2625" rx="211" ry="211"/>
+  </g>
+ </g>
+</svg>

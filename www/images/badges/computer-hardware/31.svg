@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 4610 4610"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil9 {fill:blue}
+    .fil11 {fill:#0202BA}
+    .fil8 {fill:#03235E}
+    .fil10 {fill:#1034AD}
+    .fil3 {fill:#6F6F6F}
+    .fil12 {fill:#A7D8FF}
+    .fil6 {fill:#B3B3B3}
+    .fil4 {fill:#CCCCCC}
+    .fil1 {fill:#E37936}
+    .fil5 {fill:#E6E6E6}
+    .fil2 {fill:#EBEBEB}
+    .fil7 {fill:#F8F8F8}
+    .fil0 {fill:#FF873D}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="2305" cy="2305" r="2305"/>
+ </g>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <path class="fil1" d="M4608 2372l-612 -612 -1292 -48 -61 29 -343 -252 -1150 1911 1207 1207c1226,-28 2215,-1013 2250,-2237z"/>
+  <g id="_396743256">
+   <g>
+    <rect class="fil2" x="2585" y="1709" width="1452" height="978" rx="155" ry="155"/>
+    <path class="fil3" d="M4037 2042l0 313 -68 0c-20,0 -36,-16 -36,-36l0 -241c0,-20 16,-36 36,-36l68 0z"/>
+   </g>
+   <path class="fil4" d="M1219 1438l942 0c102,0 187,71 201,163l8 0c89,0 161,68 161,151l0 943c0,83 -73,151 -161,151l-8 0c-8,51 -38,95 -80,125l0 394c0,32 -26,58 -58,58l-1028 0c-32,0 -58,-26 -58,-58l0 -373c-71,-30 -121,-97 -121,-174l0 -1189c0,-105 92,-190 203,-190z"/>
+   <path class="fil5" d="M1219 1438l490 0 0 1985 -514 0c-32,0 -58,-26 -58,-58l0 -373c-71,-30 -121,-97 -121,-174l0 -1189c0,-105 92,-190 203,-190z"/>
+   <path class="fil6" d="M2532 1987l128 0c25,0 45,20 45,45l0 352c0,25 -20,45 -45,45l-128 0 0 -442z"/>
+   <g>
+    <circle class="fil7" cx="1782" cy="2013" r="720"/>
+    <circle class="fil8" cx="1782" cy="2013" r="574"/>
+    <circle class="fil9" cx="1782" cy="2013" r="494"/>
+    <path class="fil10" d="M1782 1519c162,0 306,78 396,199 -89,-84 -208,-136 -340,-136 -273,0 -494,221 -494,494 0,111 36,213 98,295 -95,-90 -154,-217 -154,-359 0,-273 221,-494 494,-494z"/>
+    <circle class="fil11" cx="1782" cy="2013" r="306"/>
+    <circle class="fil8" cx="1782" cy="2013" r="112"/>
+    <circle class="fil12" cx="1669" cy="1832" r="74"/>
+    <circle class="fil12" cx="1890" cy="2206" r="37"/>
+   </g>
+  </g>
+ </g>
+</svg>
