@@ -32,15 +32,162 @@
                         <p class="meta">Choose a badge image from our existing set or upload your own.</p>
 
                         <fieldset class="radiolist">
-                            <input id="badge-icon" type="radio" name="image" value="icon" data-icon />
+                            <input id="badge-icon" type="radio" name="badge-avatar-selector" value="icon" data-icon />
                             <label for="badge-icon">Choose an existing icon</label>
 
-                            <input id="badge-image" type="radio" name="image" value="image" data-image/>
+                            <input id="badge-image" type="radio" name="badge-avatar-selector" value="image" data-image/>
                             <label for="badge-image">Upload from your device</label>
                         </fieldset>
 
+                        {% set pageLength = 40 %}
+
+                        {% set registry = {
+                            'arrow': {
+                                'name': 'Arrow',
+                                'num': 88
+                            },
+                            'avatars': {
+                                'name': 'Avatars',
+                                'num': 100
+                            },
+                            'baby': {
+                                'name': 'Baby',
+                                'num': 40
+                            },
+                            'business': {
+                                'name': 'Business',
+                                'num': 112,
+                            },
+                            'christmas': {
+                                'name': 'Christmas',
+                                'num': 17,
+                            },
+                            'clothes-and-accessories': {
+                                'name': 'Clothes and Accessories',
+                                'num': 72,
+                            },
+                            'communication': {
+                                'name': 'Communication',
+                                'num': 32,
+                            },
+                            'computer-hardware': {
+                                'name': 'Computer Hardware',
+                                'num': 40,
+                            },
+                            'construction': {
+                                'name': 'Construction',
+                                'num': 35,
+                            },
+                            'country': {
+                                'name': 'Country',
+                                'num': 35,
+                            },
+                            'education': {
+                                'name': 'Education',
+                                'num': 80,
+                            },
+                            'food': {
+                                'name': 'Food',
+                                'num': 27,
+                            },
+                            'furniture': {
+                                'name': 'Furniture',
+                                'num': 26,
+                            },
+                            'halloween': {
+                                'name': 'Halloween',
+                                'num': 40,
+                            },
+                            'home-appliances': {
+                                'name': 'Home Appliances',
+                                'num': 50,
+                            },
+                            'medical': {
+                                'name': 'Medical',
+                                'num': 38,
+                            },
+                            'music': {
+                                'name': 'Music',
+                                'num': 32,
+                            },
+                            'party': {
+                                'name': 'Party',
+                                'num': 24,
+                            },
+                            'real-estate': {
+                                'name': 'Real Estate',
+                                'num': 24,
+                            },
+                            'scene': {
+                                'name': 'Scene',
+                                'num': 30,
+                            },
+                            'seo': {
+                                'name': 'SEO',
+                                'num': 100,
+                            },
+                            'shopping-cart': {
+                                'name': 'Shopping Cart',
+                                'num': 24,
+                            },
+                            'sport': {
+                                'name': 'Sport',
+                                'num': 50,
+                            },
+                            'tools': {
+                                'name': 'Tools',
+                                'num': 25,
+                            },
+                            'transport': {
+                                'name': 'Transport',
+                                'num': 24,
+                            },
+                            'travel': {
+                                'name': 'Travel',
+                                'num': 40,
+                            },
+                            'ui': {
+                                'name': 'User Interface',
+                                'num': 210,
+                            },
+                            'valentines-day': {
+                                'name': "Valentines Day",
+                                'num': 23,
+                            },
+                            'warning-signs': {
+                                'name': 'Warning Signs',
+                                'num': 24,
+                            },
+                            'weather': {
+                                'name': 'Weather',
+                                'num': 32,
+                            },
+                            'zodiac': {
+                                'name': 'Zodiac',
+                                'num': 12,
+                            }
+                        } %}
+
+                        <script src="/javascript/shared/badges/jquery.icon-modal.js"></script>
                         <script>
                             $(function() {
+
+                                /* Shank twig data into js; I could probably skip this
+                                 * by providing the registry from backend instead
+                                 */
+                                $('#icon-modal').iconModal({
+                                    registry: $.parseJSON('{{ registry|json_encode|raw }}'),
+                                    pageLength: {{ pageLength }},
+
+                                    /* Inflict it upon the form
+                                     */
+                                    onSelect: function(element) {
+                                        $('[data-icon-selection] img').attr('src', $(element).attr('src')).show();
+                                        $('input[name=icon]').val($(element).attr('src'));
+
+                                        $('#icon-modal').foundation('reveal', 'close');
+                                    }
+                                });
 
                                 /* Mutex div switch
                                  */
@@ -55,15 +202,17 @@
                                 });
                             });
                         </script>
-
                         <div class="row">
                             <div class="small-12 columns" style="display:none;" data-icon-container>
                                 <div data-icon-selection>
                                     <img src="" width="64" height="64" style="display:none"/>
-                                    <input id="badge-icon" name="imagePath" type="hidden" value="" />
+                                    <input id="badge-icon" name="icon" type="hidden" value="" />
                                 </div>
                                 <div>
-                                    {% include '@learningBadge/icon-modal.twig' %}
+                                    {% include '@learningBadge/icon-modal.twig' with {
+                                        registry: registry,
+                                        pageLength: pageLength
+                                    }%}
                                 </div>
                             </div>
                             <div class="small-12 columns" style="display:none;" data-image-container>
@@ -144,11 +293,11 @@
                 // as the input doesn't exist at form creation time.
                 // Jank together a validator on a hidden field, and make it
                 // depend on the presence of attachzones.
-                imageAttachzone: {
-                    required: {
-                        depends: () => $form.find('input[name="image"]').length === 0
-                    },
-                },
+                // imageAttachzone: {
+                //     required: {
+                //         depends: () => $form.find('input[name="image"]').length === 0
+                //     },
+                // },
             },
             messages: {
                 imageAttachzone: "Please attach a file."
@@ -161,6 +310,7 @@
                     payload  = {
                         name:            formData.get('name'),
                         body:            formData.get('body'),
+                        icon:            formData.get('icon'),
                         image:           formData.get('image'),
                         category:        null,
                         tags:            [],
@@ -191,7 +341,7 @@
                     .post(form.action, payload)
                     .then(() => {
                         toast.toastTimeout({text: 'Saved'});
-                        window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadges') }}';
+                        {#window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadges') }}';#}
                     })
                     .catch(() => {
                         toast.toastTimeout({text: 'Save failed', css: 'alert'});
