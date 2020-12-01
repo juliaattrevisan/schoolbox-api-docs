@@ -198,7 +198,6 @@ class Controller extends Base
     /**
      * Switch calendar view
      * This was originally www/calendar/changeState.php
-     * @throws MapperException
      */
     public function changeState()
     {
@@ -209,7 +208,7 @@ class Controller extends Base
         }
         $storedView = ViewNameMapping::MAP_FC_TO_STORED[$_POST['calendarView']];
         $this->getUser()->setCalendarView($storedView);
-        $this->userMapper->save($this->getUser());
+        $this->userMapper->updateCalendarView($this->getUser()->getId(), $storedView);
 
         // We no longer store calendarView in session, as it doesn't work as expected
         $this->getResponse()->content->set($this->buildJsonOutput([]));
