@@ -112,7 +112,7 @@ class Mapper extends BaseMapper
         }
         // Sort each group's level by lower bound
         foreach ($groups as $group) {
-            $group->getGradeLevels()->sortBy('lowerBound', 'asc');
+            $group->getGradeLevels()->sortBy('lowerBound', 'desc');
         }
         return $this->createCollection(array_values($groups));
     }
