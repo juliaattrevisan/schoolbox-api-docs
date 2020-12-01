@@ -55,44 +55,41 @@
   }
 }
 
-#activity {
-  .skeleton-feed > div {
+.skeleton-feed > div {
+  max-width: 45rem;
+  margin: 0 auto;
+  padding: 1rem;
+  img {
+    margin-bottom: 1rem;
+  }
+  h3 {
+    width: 80%;
+  }
+  p {
+    width: 40%;
+  }
+}
+.feed-column {
+  background-color: $white;
+  flex: 1 0 auto;
+}
+.feed {
+  background-color: $white;
+  display: flex;
+
+  .subheader {
+    background-color: $ghost;
+    color: $header-font-color;
+    padding: .5rem 1rem;
+    margin: 0;
+    border-top: 2px solid #EDEDED;
+    border-left: 2px solid #EDEDED;
+    border-right: 2px solid #EDEDED;
+  }
+
+  > section {
+    border-bottom: 2px solid #EDEDED;
     max-width: 45rem;
-    margin: 0 auto;
-    padding: 1rem;
-    img {
-      margin-bottom: 1rem;
-    }
-    h3 {
-      width: 80%;
-    }
-    p {
-      width: 40%;
-    }
-  }
-  .feed-column {
-    background-color: $white;
-    flex: 1 0 auto;
-  }
-  .feed {
-    background-color: $white;
-    display: flex;
-
-    .subheader {
-      background-color: $ghost;
-      color: $header-font-color;
-      padding: .5rem 1rem;
-      margin: 0;
-      border-top: 2px solid #EDEDED;
-      border-left: 2px solid #EDEDED;
-      border-right: 2px solid #EDEDED;
-    }
-
-    > section {
-      border-bottom: 2px solid #EDEDED;
-      max-width: 45rem;
-      //margin-bottom: 0;
-    }
   }
 }
 
@@ -157,7 +154,7 @@
 
 @media only screen and (max-width: 769px) {
   .feed-item,
-  .subheader.feed {
+  .feed .subheader {
     border-left: 0;
     border-right: 0;
   }
