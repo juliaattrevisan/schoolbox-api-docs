@@ -84,7 +84,7 @@
     <script type="text/javascript" src="/javascript/shared/textbox/jquery.inlineTextboxEditor.js"></script>
     <script type="text/javascript">
         $(function() {
-            
+
             var component             = $('#component{{ component.instance.id }}'),
                 content               = component.find('.content'),
                 configForm            = component.find('[data-component-panel="settings"] form'),
@@ -125,10 +125,12 @@
                 editorInline:          editorInline,
             });
 
-            //to allow the user to immediately be able to edit the ckeditor.js, without first selecting the #modifyButton 
-            const componentDOMElement = component[0];
-            if (componentDOMElement.querySelector('[data-textbox-exists]')) {
-                inlineTextboxEditor.data('inlineTextboxEditor').onClickModify();
+            
+            //to start the Text Box editor automatically after creating a Text Box, 
+            //previously users had to first select the #modifyButton to start editing
+            if ((window.newTextBoxId) && (window.newTextBoxId === '{{ component.instance.id }}')) { //check if a new Text Box has been created, and if so enable immediate focus within the relevant component
+                inlineTextboxEditor.data('inlineTextboxEditor').onClickModify(); //implement the existing method within #jquery.inlineTextboxEditor.js used by #modifyButton to fire up the editor straight after creation
+                window.newTextBoxId = undefined; //clear the reference to ensure immediate focus only occurs after initial creation
             } 
             
             // Before creating an editor: restore any placeholders, so that
@@ -186,6 +188,16 @@
             .on('inlineTextboxEditor.change inlineTextboxEditor.save', function (event, inlineTextboxEditor) {
                 dirtyIndicator.toggleClass('hide', !inlineTextboxEditor.isDirty());
             });
+            
+            //when the 'Create Text Box' modal is opened, ensure the Title input field is given immediate focus to allow easier/faster Text Box creation
+            $(document).on('opened.fndtn.reveal', '[data-reveal]', function () { //referenced from Event Bindings at https://get.foundation/sites/docs-v5/components/reveal.html
+                const openedModalDOMElement = $(this)[0];
+                const openedModalDOMElementID = openedModalDOMElement.id;
+                if (openedModalDOMElementID.includes('{{ component.instance.id }}')) {  //ensure the id matches the currently active component which contains the 'Create Text Box' modal just opened
+                    const titleInputDOMElement = openedModalDOMElement.querySelector('#addTextboxModal-{{ component.instance.id }}-form-heading');
+                    titleInputDOMElement.focus(); 
+                }
+            });
 
             // Dialog for creation of a textbox
             addTextboxForm.alaressValidate({
@@ -212,6 +224,10 @@
                             contentType: 'application/json',
                         }
                     ).done(function (response) {
+                        
+                        //to pass through that a new Text Box has been created, to allow the editor to start automatically
+                        window.newTextBoxId = '{{ component.instance.id }}';
+                        
                         // Reload the component, close the dialog
                         addTextboxModal.foundation('reveal', 'close');
                         toast.toastTimeout({text: 'Created', css: 'success'});
@@ -230,6 +246,7 @@
                             .find('input[name="componentname"]')
                             .val(response.heading);
                         configForm.submit();
+                        
                     }).fail(function () {
                         toast.toastTimeout({text: 'Could not create text box', css: 'alert'});
                     }).always(function () {
