@@ -122,9 +122,9 @@
             if (start+config.pageLength < max) {
                 $('[data-next]').on('click', function(event) {
                     loadPage(start+config.pageLength, max);
-                }).removeClass('hide');
+                }).removeClass('disabled');
             } else {
-                $('[data-next]').addClass('hide');
+                $('[data-next]').addClass('disabled');
             }
 
             /* "Previous" availability
@@ -132,9 +132,9 @@
             if (start > 1) {
                 $('[data-previous]').on('click', function(event) {
                     loadPage(start-config.pageLength, max);
-                }).removeClass('hide');
+                }).removeClass('disabled');
             } else {
-                $('[data-previous]').addClass('hide');
+                $('[data-previous]').addClass('disabled');
             }
         }
     }
