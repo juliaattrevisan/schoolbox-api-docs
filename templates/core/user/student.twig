@@ -495,7 +495,7 @@
                         window.learningEvidenceFeedConfig = {
                             student: {{ user | json_encode | raw }},
                             routes: {
-                                getEvidence: '{{ routeLookupIfAuthorized(
+                                getFeed: '{{ routeLookupIfAuthorized(
                                     'learningMomentFeed.getFeedForUser',
                                     {user: user, userId: user.id}
                                 ) }}',

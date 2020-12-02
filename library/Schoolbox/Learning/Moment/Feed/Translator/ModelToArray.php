@@ -49,13 +49,17 @@ class ModelToArray
     {
         $discriminator = $result['discriminator'] ?? null;
         $return        = ['discriminator' => $discriminator];
+
+        // Set the object and its date of creation into the return
         switch ($result['discriminator'] ?? null) {
             case Cursor::DISCRIMINATOR_EVIDENCE:
                 $return['object'] = $this->evidenceTranslator->__invoke($result['object']);
+                $return['date']   = $return['object']['createdAt'];
                 break;
 
             case Cursor::DISCRIMINATOR_BADGE_AWARD:
                 $return['object'] = $this->badgeAwardTranslator->__invoke($result['object']);
+                $return['date']   = $return['object']['awardedAt'];
                 break;
 
             default:

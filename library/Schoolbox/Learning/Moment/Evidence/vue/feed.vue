@@ -37,7 +37,7 @@ export default {
         config: () => window.learningEvidenceFeedConfig,
         dateDisplayFormats: () => window.dateDisplayFormats,
         groupedEvidence() {
-            return this.groupEvidence(this.data);
+            return this.groupFeedResults(this.data);
         },
         currentCount () {
             return data.length;
@@ -70,7 +70,7 @@ export default {
                 params.cursor = cursor;
             }
             axios
-                .get(this.config.routes.getEvidence, {params})
+                .get(this.config.routes.getFeed, {params})
                 .then(response => {
                     this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
@@ -80,25 +80,23 @@ export default {
         },
 
         /**
-         * Groups learning evidence by the date which it was posted.
+         * Groups learning evidence / badges by the date which it was posted.
          *
-         * @param {Array} evidence
+         * @param {Array} feedResults
          * @return Array
          */
-        groupEvidence(evidence) {
+        groupFeedResults(feedResults) {
             let groupedEvidenceByDate = {};
-            evidence.forEach(v => {
-                let createdAt = moment(v.createdAt),
-                    updatedAt = moment(v.updatedAt),
-                    key       = createdAt.format('YYYYMMDD');
+            feedResults.forEach(v => {
+                let date = moment(v.date),
+                    key  = date.format('YYYYMMDD');
                 if (!(key in groupedEvidenceByDate)) {
                     groupedEvidenceByDate[key] = {
-                        date:     moment(createdAt).startOf('d'),
+                        date:     moment(date).startOf('d'),
                         evidence: []
                     }
                 }
-                v.createdAt = createdAt;
-                v.updatedAt = updatedAt;
+                v.date = date;
                 groupedEvidenceByDate[key].evidence.push(v);
             });
 
@@ -110,7 +108,7 @@ export default {
             // Ensure that each evidence within the group is sorted
             groupedEvidence.forEach(v => {
                 v.evidence.sort(
-                    (a, b) => a.createdAt.isBefore(b.createdAt) ? 1 : -1
+                    (a, b) => a.date.isBefore(b.date) ? 1 : -1
                 )
             });
 
