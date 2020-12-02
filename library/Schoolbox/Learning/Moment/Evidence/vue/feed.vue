@@ -8,9 +8,11 @@ import Storage      from '@schoolbox/storage';
 import CommentThread from './commentThread';
 import RevealModal from "@schoolbox/reveal-modal";
 import Toast from "@schoolbox/toast";
+import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
 
 export default {
     components: {
+        AwardDetailModal,
         Toast,
         RevealModal,
         MediaArticle,
@@ -194,6 +196,16 @@ export default {
                 .finally(() => {
                     this.$refs.deleteModal.close();
                 })
+        },
+
+
+        /**
+         * Open the view badge award modal.
+         *
+         * @param {Object} badgeAward The badge award object to display
+         */
+        openViewBadgeAwardModal(badgeAward) {
+            this.$refs.awardDetailModal.open(badgeAward);
         }
     },
     filters: {
@@ -280,6 +292,21 @@ export default {
                                 />
                             </div>
                         </template>
+                        <template v-if="evidence.discriminator === 'badgeAward'">
+                            <div class="card small-12 compact">
+                                <img :src="evidence.object.badge.image._links.image" :alt="evidence.object.badge.name">
+                                <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">{{ evidence.object.badge.name }}</a>
+                                <time class="meta" :datetime="evidence.object.awardedAt | dateFormat"
+                                      :title="evidence.object.awardedAt  | dateFormat(dateDisplayFormats.momentJsDatetime)">
+                                    <template v-if="evidence.object.status === 'achievement'">Achievement Awarded</template>
+                                    <template v-if="evidence.object.status === 'goal'">Goal Set</template>
+                                    | {{ evidence.object.awardedAt | dateFormat(dateDisplayFormats.momentJsTime) }}
+                                </time>
+                                <div class="article-read-more">
+                                    <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">More Detail</a>
+                                </div>
+                            </div>
+                        </template>
                     </li>
                 </ul>
             </section>
@@ -295,6 +322,8 @@ export default {
                 <li><a @click.prevent="$refs.deleteModal.close()" class="button">No</a></li>
             </ul>
         </reveal-modal>
+
+        <award-detail-modal ref="awardDetailModal"></award-detail-modal>
 
         <toast ref="toast"></toast>
     </div>
