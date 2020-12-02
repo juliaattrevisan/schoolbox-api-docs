@@ -237,47 +237,49 @@ export default {
                 </h2>
                 <ul class="information-list">
                     <li v-for="evidence in evidenceGroup.evidence" class="feed-item">
-                        <!-- This evidence isn't necessarily editable -->
-                        <div :class="{'actions-small-1': hasMenu(evidence), 'actions-small-0': !hasMenu(evidence)}">
-                            <div class="card small-12 compact">
-                                <a :href="evidence.creator._links.profile" title="View Profile">
-                                    <img :src="evidence.creator._links.avatar" alt="View Profile">
-                                    <p>{{ evidence.creator.fullName }}</p>
-                                    <time class="pipe meta"
-                                          :datetime="evidence.createdAt | dateFormat"
-                                          :title="evidence.createdAt  | dateFormat(dateDisplayFormats.momentJsDatetime)"
-                                    >{{ evidence.createdAt | dateFormat(dateDisplayFormats.momentJsTime) }}</time>
-                                </a>
+                        <template v-if="evidence.discriminator === 'evidence'">
+                            <!-- This evidence isn't necessarily editable -->
+                            <div :class="{'actions-small-1': hasMenu(evidence.object), 'actions-small-0': !hasMenu(evidence.object)}">
+                                <div class="card small-12 compact">
+                                    <a :href="evidence.object.creator._links.profile" title="View Profile">
+                                        <img :src="evidence.object.creator._links.avatar" alt="View Profile">
+                                        <p>{{ evidence.object.creator.fullName }}</p>
+                                        <time class="pipe meta"
+                                              :datetime="evidence.object.createdAt | dateFormat"
+                                              :title="evidence.object.createdAt  | dateFormat(dateDisplayFormats.momentJsDatetime)"
+                                        >{{ evidence.object.createdAt | dateFormat(dateDisplayFormats.momentJsTime) }}</time>
+                                    </a>
+                                </div>
+                                <nav v-if="hasMenu(evidence)">
+                                    <a href="#"
+                                       class="icon-overflow"
+                                       :data-dropdown="'evidence-' + String(evidence.object.id) + '-dropdown'"
+                                       aria-expanded="false" title="Actions"></a>
+                                </nav>
+                                <ul v-if="hasMenu(evidence)" :id="'evidence-' + String(evidence.object.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
+                                    <li><a v-if="evidence.object._links.modifyForm" :href="evidence.object._links.modifyForm" class="icon-modify" title="Modify">Modify</a></li>
+                                    <li><a @click.prevent="showDeleteModal(evidence)" v-if="evidence.object._links.delete" class="icon-delete" title="Delete">Delete</a></li>
+                                </ul>
                             </div>
-                            <nav v-if="hasMenu(evidence)">
-                                <a href="#"
-                                   class="icon-overflow"
-                                   :data-dropdown="'evidence-' + String(evidence.id) + '-dropdown'"
-                                   aria-expanded="false" title="Actions"></a>
-                            </nav>
-                            <ul v-if="hasMenu(evidence)" :id="'evidence-' + String(evidence.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                <li><a v-if="evidence._links.modifyForm" :href="evidence._links.modifyForm" class="icon-modify" title="Modify">Modify</a></li>
-                                <li><a @click.prevent="showDeleteModal(evidence)" v-if="evidence._links.delete" class="icon-delete" title="Delete">Delete</a></li>
-                            </ul>
-                        </div>
 
-                        <div class="feed-body small-12 columns">
-                            <!-- Is there an attachment? Display it appropriately -->
-                            <article v-if="evidence.filename && evidence.storage">
-                                <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
-                            </article>
+                            <div class="feed-body small-12 columns">
+                                <!-- Is there an attachment? Display it appropriately -->
+                                <article v-if="evidence.object.filename && evidence.object.storage">
+                                    <storage :storage="evidence.object.storage" :filename="evidence.object.filename"></storage>
+                                </article>
 
-                            <!-- Display evidence body, with media players initialised -->
-                            <media-article v-if="evidence.body">
-                                <div v-html="evidence.body" />
-                            </media-article>
-                        </div>
+                                <!-- Display evidence body, with media players initialised -->
+                                <media-article v-if="evidence.object.body">
+                                    <div v-html="evidence.object.body" />
+                                </media-article>
+                            </div>
 
-                        <div class="feed-comments small-12 columns">
-                            <comment-thread :thread="evidence.discussionThread"
-                                            :create-thread-endpoint="evidence._links.createThread"
-                            />
-                        </div>
+                            <div class="feed-comments small-12 columns">
+                                <comment-thread :thread="evidence.object.discussionThread"
+                                                :create-thread-endpoint="evidence.object._links.createThread"
+                                />
+                            </div>
+                        </template>
                     </li>
                 </ul>
             </section>
