@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Moment\Evidence;
 
 use Schoolbox\Discussion\Thread\Context\IThreadLocation;
 use Schoolbox\Discussion\Thread\Model as ThreadModel;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTraits;
 use Schoolbox\Resource\Storage\IStorage;
@@ -77,6 +78,12 @@ class Model implements ISoftDeletable, IThreadLocation
     private User $creator;
 
 
+    /**
+     * @var GenericCollection|null
+     */
+    private ?GenericCollection $curriculumNodes = null;
+    
+    
     /**
      * @return IStorage|null
      */
@@ -193,6 +200,26 @@ class Model implements ISoftDeletable, IThreadLocation
     public function setCreator(User $creator): self
     {
         $this->creator = $creator;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection|null
+     */
+    public function getCurriculumNodes(): ?GenericCollection
+    {
+        return $this->curriculumNodes;
+    }
+
+
+    /**
+     * @param GenericCollection $curriculumNodes
+     * @return static
+     */
+    public function setCurriculumNodes(GenericCollection $curriculumNodes): self
+    {
+        $this->curriculumNodes = $curriculumNodes;
         return $this;
     }
 

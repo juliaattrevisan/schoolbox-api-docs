@@ -87,11 +87,12 @@ class Controller extends Base
         // * upload
         $momentType = $this->request->query->get('momentType');
         $template   = '@learningMomentEvidence/form/text.twig';
-        $params     = [
-            'users'          => $users,
-            'userIds'        => $users->getPropertyValues('id'),
-            'otherUsers'     => $otherUsers,
-            'sharingForSelf' => $sharingForSelf,
+        $params = [
+            'users'                    => $users,
+            'userIds'                  => $users->getPropertyValues('id'),
+            'otherUsers'               => $otherUsers,
+            'sharingForSelf'           => $sharingForSelf,
+            'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
         ];
         switch ($momentType) {
             case self::MOMENT_TYPE_PHOTO:
@@ -157,7 +158,8 @@ class Controller extends Base
         $item = $translator($evidence);
 
         $this->response->content->set($this->buildHtmlOutput('@learningMomentEvidence/detail.twig', [
-            'evidence' => $item,
+            'evidence'                 => $item,
+            'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
         ]));
     }
 
@@ -298,8 +300,9 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@learningMomentEvidence/modifyForm.twig',
                 [
-                    'evidence' => $evidence,
-                    'zone'     => $zone->getTwigContext(),
+                    'evidence'                 => $evidence,
+                    'zone'                     => $zone->getTwigContext(),
+                    'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                 ]
             )
         );
@@ -317,6 +320,7 @@ class Controller extends Base
     {
         $requestBody       = json_decode(json_encode($this->request->content->get()), true);
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
+        $requestTranslator->setCurriculumTaggingEnabled($this->getConfigLoader()->get('curriculum_tagging_enabled'));
         $evidence          = $requestTranslator($requestBody, $evidence);
 
         $this->mapper->save($evidence);

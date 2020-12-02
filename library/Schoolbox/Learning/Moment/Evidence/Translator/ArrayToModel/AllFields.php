@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel;
 
 use Alaress_Date_Format;
-use Schoolbox\API\Translator\ArrayToModel\ITranslator;
+use Schoolbox\API\Translator\ArrayToModel\Base;
+use Schoolbox\Curriculum\Node\Model as CurriculumNode;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Moment\Evidence;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Exception as ResourceException;
@@ -25,7 +27,7 @@ use Schoolbox\User;
  * Used when translating JSON passed in a request body into a model, so that it
  * may be persisted.
  */
-class AllFields implements ITranslator
+class AllFields extends Base
 {
     /**
      * @var CollectorFactory
@@ -180,6 +182,18 @@ class AllFields implements ITranslator
         if (array_key_exists('filename', $json)) {
             $model->setFilename($json['filename']);
         }
+
+        // Set curriculum nodes
+        $this->setCollection(
+            $json,
+            'curriculumNodes',
+            'id',
+            $model,
+            'setCurriculumNodes',
+            new GenericCollection(CurriculumNode::class),
+            new CurriculumNode(),
+            'setId'
+        );
 
         return $model;
     }

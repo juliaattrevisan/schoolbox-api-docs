@@ -43,6 +43,18 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->joinsVia(
+            'curriculum_evidence',
+            \Schoolbox\Curriculum\Node\Mapper::class,
+            'id',
+            'curriculum_node_id',
+            'evidence_id',
+            null,
+            null,
+            null,
+            'curriculumNodes'
+        );
     }
 
 
@@ -118,8 +130,84 @@ class Mapper extends BaseMapper
             $creator = $this->hydrateJoin($row, 'creator', 'creator');
             $model->setCreator($creator);
 
+            // Set the list of curriculum codes as an empty collection:
+            // these will be hydrated in `hydrateCurriculumNodesIntoCollection`
+            $model->setCurriculumNodes($this->getJoinMapper('curriculum_evidence')->createCollection());
+
             $collection[$model->getId()] = $model;
+        }
+        return $this->hydrateCurriculumNodesIntoCollection($collection);
+    }
+
+    /**
+     * Helper method for hydrating curriculum nodes into the collection of
+     * evidences retrieved by `hydrateSelect`.
+     *
+     * @param GenericCollection $collection
+     * @return GenericCollection
+     */
+    private function hydrateCurriculumNodesIntoCollection(GenericCollection $collection): GenericCollection
+    {
+        $evidenceIds = $collection->keys();
+        $pb          = $this->getPredicateBuilder()->in('id', $evidenceIds);
+        $query       = "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('curriculum_evidence', 'cn')}
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            INNER JOIN {$this->getJoinSql('curriculum_evidence', '', 'cn')}
+            WHERE {$pb->getWhereIntersect()}
+        ";
+
+        $curriculumNodeStatement = $this->database->query($query, $pb->getParams());
+        foreach ($curriculumNodeStatement as $row) {
+            /** @var \Schoolbox\Curriculum\Node\Model $curriculumNode */
+            $curriculumNode = $this->hydrateJoin($row, 'curriculum_evidence', 'cn');
+            $collection[$row['id']]->getCurriculumNodes()->setOffset($curriculumNode->getId(), $curriculumNode);
         }
         return $collection;
     }
+
+
+    /**
+     * Find all the curriculum nodes that used to come with each Model instance
+     *
+     * @param Model $evidence
+     * @return GenericCollection
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function findCurriculumNodes(Model $evidence): GenericCollection
+    {
+        $curriculumNodeMapper = \Schoolbox\Curriculum\Node\Mapper::getInstance();
+
+        $query = "
+            SELECT {$curriculumNodeMapper->getColumnString('cn')}
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('curriculum_evidence', '', 'cn')}
+            WHERE {$this->getTable()}.{$this->getIdentifierColumn()} = :evidenceId
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(
+            [
+                'evidenceId' => $evidence->getId(),
+            ]
+        );
+
+        $nodes = $curriculumNodeMapper->createCollection();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $node = $curriculumNodeMapper->hydrate($row, 'cn');
+
+            if ($node) {
+                $nodes->add($node);
+            }
+        }
+
+        return $nodes;
+    }
+
 }

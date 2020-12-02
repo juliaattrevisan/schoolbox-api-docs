@@ -25,6 +25,16 @@
                             Description
                         </label>
                         <textarea name="body" id="evidence-body">{{ evidence.body | purify }}</textarea>
+                        {% if curriculumTaggingEnabled %}
+                            <label for="curriculum-code-select">Curriculum Codes</label>
+                            <div class="input-group">
+                                {% include 'sub/curriculumCodeSelector.twig' with
+                                    {
+                                        codeList: evidence.curriculumNodes,
+                                        renderButton: true
+                                    } %}
+                            </div>
+                        {% endif %}
                     </div>
                 </fieldset>
             </section>
@@ -37,15 +47,28 @@
 {# Set up CKEditor #}
 <script src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
 
 {% autoescape 'js' %}
 <script type="text/javascript">
     let buildPayload = function (form) {
-        let formData = new FormData(form);
-        return {
-            body: formData.get('body'),
-            file: formData.get('file'),
-        };
+        let formData = new FormData(form),
+                payload = {
+                    body: formData.get('body'),
+                    file: formData.get('file'),
+                    curriculumNodes: [],
+                };
+        {% if curriculumTaggingEnabled %}
+        let curriculumNodes = form.querySelector('select[name="curriculumCodes[]"]').selectize.items;
+        payload.curriculumNodes = curriculumNodes.map(
+                (v) => {
+                    return {id: Number(v)}
+                }
+        );
+        {% endif %}
+        return payload;
     }
 
     $(function () {

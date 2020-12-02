@@ -28,17 +28,36 @@ class MutableFieldsOnly extends AllFields
         'filename' => true,
     ];
 
+    private bool $curriculumTaggingEnabled = true;
+
     /**
      * @inheritdoc
      */
     public function __invoke(array $json, ?object $model = null): object
     {
+        $fields = self::MUTABLE_FIELDS;
+        if ($this->curriculumTaggingEnabled) {
+            $fields = array_merge(
+                $fields,
+                ['curriculumNodes' => $this->curriculumTaggingEnabled,],
+            );
+        }
         return parent::__invoke(
             array_intersect_key(
                 $json,
-                self::MUTABLE_FIELDS,
+                $fields,
             ),
             $model
         );
+    }
+
+
+    /**
+     *
+     * @param bool $curriculumTaggingEnabled
+     */
+    public function setCurriculumTaggingEnabled(bool $curriculumTaggingEnabled): void
+    {
+        $this->curriculumTaggingEnabled = $curriculumTaggingEnabled;
     }
 }
