@@ -94,7 +94,8 @@ export default {
                         <img :src="award.badge.image._links.image + '&size=constrain200'" :class="getCss(award)"/>
                     </div>
                     <div class="card-content">
-                        <h3 class="no-margin">{{ award.badge.name }} ({{ award.count }})</h3>
+                        <!-- Only show the count if one was provided in the award -->
+                        <h3 class="no-margin">{{ award.badge.name }} <template v-if="'count' in award">({{ award.count }})</template></h3>
                         <p class="meta">Category: {{ award.badge.category.name }}</p>
                         <p class="meta">
                             <template v-if="award.isGoal">
