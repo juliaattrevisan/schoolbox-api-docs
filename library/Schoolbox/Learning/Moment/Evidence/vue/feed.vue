@@ -294,15 +294,24 @@ export default {
                         </template>
                         <template v-if="evidence.discriminator === 'badgeAward'">
                             <div class="card small-12 compact">
-                                <img :src="evidence.object.badge.image._links.image" :alt="evidence.object.badge.name" :class="{goal: evidence.object.status === 'goal'}">
-                                <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">{{ evidence.object.badge.name }}</a>
-                                <time class="meta" :datetime="evidence.object.awardedAt | dateFormat"
-                                      :title="evidence.object.awardedAt  | dateFormat(dateDisplayFormats.momentJsDatetime)">
-                                    <template v-if="evidence.object.status === 'achievement'">Achievement Awarded</template>
-                                    <template v-if="evidence.object.status === 'goal'">Goal Set</template>
-                                    by <a :href="evidence.object.awardedBy._links.profile" title="View Profile">{{ evidence.object.awardedBy.fullName }}</a>
-                                    | {{ evidence.object.awardedAt | dateFormat(dateDisplayFormats.momentJsTime) }}
-                                </time>
+                                <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">
+                                    <img :src="evidence.object.badge.image._links.image" :alt="evidence.object.badge.name" :class="{goal: evidence.object.status === 'goal'}">
+                                    <span>
+                                        {{ evidence.object.badge.name }}
+                                        <span class="meta pipe">
+                                            <template v-if="evidence.object.status === 'achievement'">Achievement awarded</template>
+                                            <template v-if="evidence.object.status === 'goal'">Goal set</template>
+                                            by {{ evidence.object.awardedBy.fullName }}
+                                            |
+                                            <time class="meta" :datetime="evidence.object.awardedAt | dateFormat"
+                                                  :title="evidence.object.awardedAt  | dateFormat(dateDisplayFormats.momentJsDatetime)">
+                                            {{ evidence.object.awardedAt | dateFormat(dateDisplayFormats.momentJsTime) }}
+                                            </time>
+                                        </span>
+                                    </span>
+                                </a>
+                            </div>
+                            <div class="feed-body small-12 column">
                                 <div class="article-read-more">
                                     <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">More Detail</a>
                                 </div>
