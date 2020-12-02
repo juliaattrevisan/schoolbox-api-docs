@@ -294,7 +294,7 @@ export default {
                         </template>
                         <template v-if="evidence.discriminator === 'badgeAward'">
                             <div class="card small-12 compact">
-                                <img :src="evidence.object.badge.image._links.image" :alt="evidence.object.badge.name">
+                                <img :src="evidence.object.badge.image._links.image" :alt="evidence.object.badge.name" :class="{goal: evidence.object.status === 'goal'}">
                                 <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">{{ evidence.object.badge.name }}</a>
                                 <time class="meta" :datetime="evidence.object.awardedAt | dateFormat"
                                       :title="evidence.object.awardedAt  | dateFormat(dateDisplayFormats.momentJsDatetime)">
