@@ -40,7 +40,7 @@ This file is internal use and is not shipped to clients.
   git checkout origin/master
   git checkout -b master
 ```
-* Fork the [Puppet repo](https://github.com/puppet-alaress) to your Github
+* Fork the [Puppet repo](https://github.com/alaress/puppet-alaress) to your Github
 ```
   git clone git@github.com:%YourGitHubUsername%/puppet-alaress.git puppet-alaress (for example git clone git@github.com:low613/puppet-alaress.git puppet-alaress)
   cd puppet-alaress
