@@ -244,14 +244,6 @@ class Controller extends Base
             ->setCreatedBy($this->getUser())
             ->setUpdatedBy($this->getUser());
 
-        /* Decide whether to use the icon or the uploaded image
-         */
-        if ($data['icon']) {
-            $model->setIcon($data['icon']);
-        } elseif ($data['image']) {
-            $model->setImage($data['image']);
-        }
-
         // Is curriculum tagging disabled?
         // Set an empty collection if so, as that is required to save the badge
         if (!$this->getConfigLoader()->get('curriculum_tagging_enabled')) {
