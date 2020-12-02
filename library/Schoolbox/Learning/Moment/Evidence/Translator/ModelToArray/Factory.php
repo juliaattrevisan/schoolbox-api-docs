@@ -70,9 +70,9 @@ class Factory
         User $user,
         CommentMapper $commentMapper
     ) {
-        $this->router = $router;
-        $this->authorizer = $authorizer;
-        $this->user = $user;
+        $this->router        = $router;
+        $this->authorizer    = $authorizer;
+        $this->user          = $user;
         $this->commentMapper = $commentMapper;
     }
 

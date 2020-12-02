@@ -12,10 +12,10 @@ namespace Schoolbox\Learning\Moment\Feed;
 
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
+use Schoolbox\Learning\Badge\Award\Translator\ModelToArray\Factory as BadgeAwardTranslatorFactory;
 use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory as EvidenceTranslatorFactory;
 use Schoolbox\Learning\Moment\Feed\Translator\ModelToArray;
@@ -96,17 +96,7 @@ class Controller extends Base
                 $this->getUser(),
                 $this->commentMapper
             ))->buildWithComments(2),
-            // TODO put this in a factory too
-            new \Schoolbox\Learning\Badge\Award\Translator\ModelToArray(
-                new User\Translator\ModelToArray(),
-                new \Schoolbox\Learning\Badge\Translator\ModelToArray(
-                    new User\Translator\ModelToArray(),
-                    new \Schoolbox\Resource\Storage\Translator\ModelToArray(),
-                    new ScrubAdapter(),
-                    new \Schoolbox\Learning\Badge\Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
-                ),
-                new \Schoolbox\Learning\Badge\Award\Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
-            )
+            (new BadgeAwardTranslatorFactory($this->router, $this->authorizer, $this->getUser()))->build()
         );
 
         $data          = $cursor->retrieveResults($encodedCursor);
