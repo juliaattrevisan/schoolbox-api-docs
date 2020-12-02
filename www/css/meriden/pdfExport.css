@@ -24,7 +24,17 @@ body {
 }
 
 @media print {
+    .meriden-crest svg {
+        width: 4rem;
+    }
     .e-report #assessments .chart svg {
         width: 50vw;
+    }
+    .e-report .context-switch,
+    .e-report #assessments table {
+        margin-bottom: 0;
+    }
+    .e-report #course-teacher {
+        padding-top: 0.25rem;
     }
 }
