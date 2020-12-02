@@ -43,7 +43,7 @@ This file is internal use and is not shipped to clients.
 * Fork the [Puppet repo](https://github.com/puppet-alaress) to your Github
 ```
   git clone git@github.com:%YourGitHubUsername%/puppet-alaress.git puppet-alaress (for example git clone git@github.com:low613/puppet-alaress.git puppet-alaress)
-  cd puppet alaress
+  cd puppet-alaress
   git remote add upstream git@github.com:alaress/puppet-alaress.git
   git fetch upstream
   git checkout origin/stable
