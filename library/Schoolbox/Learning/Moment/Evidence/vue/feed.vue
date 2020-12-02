@@ -293,22 +293,20 @@ export default {
                             </div>
                         </template>
                         <template v-if="evidence.discriminator === 'badgeAward'">
-                            <div class="card small-12 compact">
+                            <div class="card small-12">
                                 <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">
-                                    <img :src="evidence.object.badge.image._links.image" :alt="evidence.object.badge.name" :class="{goal: evidence.object.status === 'goal'}">
-                                    <span>
-                                        {{ evidence.object.badge.name }}
-                                        <span class="meta pipe">
-                                            <template v-if="evidence.object.status === 'achievement'">Achievement awarded</template>
-                                            <template v-if="evidence.object.status === 'goal'">Goal set</template>
-                                            by {{ evidence.object.awardedBy.fullName }}
-                                            |
-                                            <time class="meta" :datetime="evidence.object.awardedAt | dateFormat"
-                                                  :title="evidence.object.awardedAt  | dateFormat(dateDisplayFormats.momentJsDatetime)">
-                                            {{ evidence.object.awardedAt | dateFormat(dateDisplayFormats.momentJsTime) }}
-                                            </time>
-                                        </span>
-                                    </span>
+                                    <img :src="evidence.object.badge.image._links.image + '&size=square64'" :alt="evidence.object.badge.name" :class="{goal: evidence.object.status === 'goal'}">
+                                    <span>{{ evidence.object.badge.name }}</span>
+                                    <p class="meta">
+                                        <template v-if="evidence.object.status === 'achievement'">Achievement awarded</template>
+                                        <template v-if="evidence.object.status === 'goal'">Goal set</template>
+                                        by {{ evidence.object.awardedBy.fullName }}
+                                        |
+                                        <time class="meta" :datetime="evidence.object.awardedAt | dateFormat"
+                                              :title="evidence.object.awardedAt  | dateFormat(dateDisplayFormats.momentJsDatetime)">
+                                        {{ evidence.object.awardedAt | dateFormat(dateDisplayFormats.momentJsTime) }}
+                                        </time>
+                                    </p>
                                 </a>
                             </div>
                             <div class="feed-body small-12 column">
