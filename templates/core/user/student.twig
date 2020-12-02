@@ -496,7 +496,7 @@
                             student: {{ user | json_encode | raw }},
                             routes: {
                                 getEvidence: '{{ routeLookupIfAuthorized(
-                                    'learningMomentEvidence.getMomentsForUser',
+                                    'learningMomentFeed.getFeedForUser',
                                     {user: user, userId: user.id}
                                 ) }}',
                                 getCreateEvidenceForm: '{{ routeLookupIfAuthorized(

@@ -99,8 +99,8 @@ class Controller extends Base
             (new BadgeAwardTranslatorFactory($this->router, $this->authorizer, $this->getUser()))->build()
         );
 
-        $data          = $cursor->retrieveResults($encodedCursor);
-        $mappedData    = $hydrator->hydrateResults($data)
+        $data       = $cursor->retrieveResults($encodedCursor);
+        $mappedData = $hydrator->hydrateResults($data)
             ->map($translator)
             ->reindex();
 
