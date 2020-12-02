@@ -39,6 +39,11 @@
                             <label for="badge-image">Upload from your device</label>
                         </fieldset>
 
+                        {# I need to think about where I can put this for easy Stuart access
+                         # and maintenance. I'm thinking of putting it in a little special
+                         # place in php land, but I can't share vars between twig templates
+                         # via include().
+                         #}
                         {% set pageLength = 40 %}
 
                         {% set registry = {
