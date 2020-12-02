@@ -127,16 +127,7 @@ class Controller extends Base
         /* Award translator; uses a Badge translator to convert one of
          * the parts into a fully-fledged badge array representation
          */
-        $translator = new Award\Translator\ModelToArray(
-            new User\Translator\ModelToArray(),
-            new Translator\ModelToArray(
-                new User\Translator\ModelToArray(),
-                new Storage\Translator\ModelToArray(),
-                new ScrubAdapter(),
-                new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
-            ),
-            new Award\Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
-        );
+        $translator = $this->buildBadgeAwardModelToArrayTranslator();
 
         /* Group by category
          */
@@ -335,16 +326,7 @@ class Controller extends Base
         $this->awardMapper->save($collection);
 
         // Return what was just created
-        $translator = new Award\Translator\ModelToArray(
-            new User\Translator\ModelToArray(),
-            new Translator\ModelToArray(
-                new User\Translator\ModelToArray(),
-                new Storage\Translator\ModelToArray(),
-                new ScrubAdapter(),
-                new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
-            ),
-            new Award\Translator\Links($this->router, $this->authorizer, $this->getUser())
-        );
+        $translator = $this->buildBadgeAwardModelToArrayTranslator();
         $this->response->content->set(
             $this->buildJsonOutput($collection->map($translator))
         );
@@ -479,5 +461,17 @@ class Controller extends Base
                 $this->getUser()
             )
         );
+    }
+
+
+    /**
+     * Builder for the model-to-array translator for badge awards.
+     *
+     * @return Award\Translator\ModelToArray
+     */
+    private function buildBadgeAwardModelToArrayTranslator(): Award\Translator\ModelToArray
+    {
+        $factory = new Award\Translator\ModelToArray\Factory($this->router, $this->authorizer, $this->getUser());
+        return $factory->build();
     }
 }
