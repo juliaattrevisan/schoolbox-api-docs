@@ -26,22 +26,24 @@ This file is internal use and is not shipped to clients.
 
 ## Installation
 
-###Development Environment with Vagrant
+### Development Environment with Vagrant
 
 * Install [Virtualbox](https://www.virtualbox.org/) (sudo apt install virtualbox)
 * Install [vagrant](https://vagrantup.com/downloads)
 * Create an SSH key and add to Github
 * Fork the [Schoolbox repo](https://github.com/alaress/schoolbox) to your Github
 ```
-  git clone git@github.com:%YourGitHubUsername%/schoolbox.git schoolbox
+  git clone git@github.com:%YourGitHubUsername%/schoolbox.git schoolbox (for example git clone git@github.com:low613/schoolbox.git schoolbox)
+  cd schoolbox 
   git remote add upstream git@github.com:alaress/schoolbox.git
   git fetch upstream
   git checkout origin/master
   git checkout -b master
 ```
-* For the [Puppet repo](https://github.com/puppet-alaress) to your Github
+* Fork the [Puppet repo](https://github.com/puppet-alaress) to your Github
 ```
-  git clone git@github.com:%YourGitHubUsername%/puppet-alaress.git puppet-alaress
+  git clone git@github.com:%YourGitHubUsername%/puppet-alaress.git puppet-alaress (for example git clone git@github.com:low613/puppet-alaress.git puppet-alaress)
+  cd puppet alaress
   git remote add upstream git@github.com:alaress/puppet-alaress.git
   git fetch upstream
   git checkout origin/stable
