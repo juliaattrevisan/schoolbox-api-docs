@@ -64,7 +64,7 @@ function set_up_ip_based_web_request_routing(){
   for ip_address in $(ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk '{print $2}' | cut -d/ -f1); do
     extra_hostnames="$extra_hostnames\nhostnames[] = '$ip_address'"
   done
-  sed -i "s/\[vagrantx\]/[vagrant]$extra_hostnames/g" /etc/schoolbox/instances.ini;
+  sed -i "s/\[vagrantx\]/[vagrantx]$extra_hostnames/g" /etc/schoolbox/instances.ini;
 }
 
 ##################################################################################
