@@ -17,7 +17,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
 use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
-use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
+use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory as EvidenceTranslatorFactory;
 use Schoolbox\Learning\Moment\Feed\Translator\ModelToArray;
 use Schoolbox\User;
 
@@ -90,7 +90,12 @@ class Controller extends Base
         $cursor        = new Cursor($this->database, $user, 10);
         $hydrator      = new Hydrator($this->evidenceMapper, $this->badgeAwardMapper);
         $translator    = new ModelToArray(
-            (new Factory($this->router, $this->authorizer, $this->getUser(), $this->commentMapper))->buildWithComments(2),
+            (new EvidenceTranslatorFactory(
+                $this->router,
+                $this->authorizer,
+                $this->getUser(),
+                $this->commentMapper
+            ))->buildWithComments(2),
             // TODO put this in a factory too
             new \Schoolbox\Learning\Badge\Award\Translator\ModelToArray(
                 new User\Translator\ModelToArray(),

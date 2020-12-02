@@ -27,6 +27,43 @@ use Schoolbox\User;
  */
 class Factory
 {
+    /**
+     * The router used to build links to evidence.
+     */
+    private Router $router;
+
+
+    /**
+     * The router used to determine links to evidence.
+     *
+     * Required for determining permissions to links created by the router.
+     */
+    private Authorizer $authorizer;
+
+
+    /**
+     * The user to build a translator for.
+     *
+     * Required for determining permissions to links created by the router.
+     */
+    private User $user;
+
+
+    /**
+     * Mapper for retrieving comments for evidence found by that translators
+     * built by this class.
+     */
+    private CommentMapper $commentMapper;
+
+
+    /**
+     * Constructor
+     *
+     * @param Router $router
+     * @param Authorizer $authorizer
+     * @param User $user
+     * @param CommentMapper $commentMapper
+     */
     public function __construct(
         Router $router,
         Authorizer $authorizer,
