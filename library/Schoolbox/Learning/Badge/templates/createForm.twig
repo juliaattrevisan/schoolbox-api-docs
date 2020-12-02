@@ -216,9 +216,7 @@
                                 </div>
                             </div>
                             <div class="small-12 columns" style="display:none;" data-image-container>
-                                <label for="badge-image" class="required">
-                                    Upload badge from your device
-                                </label>
+
                                 {# Dummy element for form validation #}
                                 <input type="hidden" name="imageAttachzone">
                                 {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
@@ -343,15 +341,17 @@
                     }
                 }
             },
-            messages: {
-                imageAttachzone: "Please attach a file."
-            },
             errorPlacement: function(error, element) {
 
                 /* The icon and image messages appear in a special place
                  * Otherwise use the default placement
                  */
-                if ($(element).attr('name') === 'icon' || $(element).attr('name') === 'image') {
+                if (['icon', 'image', 'imageAttachzone'].indexOf($(element).attr('name')) > -1) {
+
+                    /* Only insert one
+                     */
+                    $('#badge-icon-error').remove();
+
                     error.insertBefore($('[data-badge-avatar-options]'));
                 } else {
                     $.alaressValidate.defaultErrorPlacement(error, element);
