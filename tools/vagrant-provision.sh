@@ -519,6 +519,7 @@ fi
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
 service schoolbox-epl restart;
 # TODO this next line is generating error output because of custom puppet facts that don't support multi-instance arch.
+# TODO make this faster in IST-530 (see puppet-apply.sh)
 php_major_version=$(/opt/puppetlabs/puppet/bin/ruby /opt/puppetlabs/puppet/bin/puppet lookup schoolbox::php::majver --render-as s)
 service "php${php_major_version}-fpm" restart
 service nginx restart;
