@@ -300,6 +300,7 @@ export default {
                                       :title="evidence.object.awardedAt  | dateFormat(dateDisplayFormats.momentJsDatetime)">
                                     <template v-if="evidence.object.status === 'achievement'">Achievement Awarded</template>
                                     <template v-if="evidence.object.status === 'goal'">Goal Set</template>
+                                    by <a :href="evidence.object.awardedBy._links.profile" title="View Profile">{{ evidence.object.awardedBy.fullName }}</a>
                                     | {{ evidence.object.awardedAt | dateFormat(dateDisplayFormats.momentJsTime) }}
                                 </time>
                                 <div class="article-read-more">
