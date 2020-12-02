@@ -216,9 +216,6 @@
                                 </div>
                             </div>
                             <div class="small-12 columns" style="display:none;" data-image-container>
-
-                                {# Dummy element for form validation #}
-                                <input type="hidden" name="imageAttachzone">
                                 {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
                             </div>
                         </div>
@@ -289,6 +286,7 @@
                 },
 
                 /* Selecting an image to represent a badge fills this input field
+                 * Attachzones spawn an input element
                  */
                 icon: {
                     required: {
@@ -306,24 +304,6 @@
                              */
                             if ('icon' === selectedOption) {
                                 return $form.find('input[name="icon"]').val().length === 0;
-                            }
-
-                            return false;
-                        }
-                    }
-                },
-
-                /* Attachzones spawn an input element
-                 */
-                imageAttachzone: {
-                    required: {
-                        depends: function(element) {
-                            let selectedOption = $('input[name=badge-avatar-selector]:checked').val();
-
-                            /* At least one element must be chosen
-                             */
-                            if (selectedOption === undefined) {
-                                return true;
                             }
 
                             /* Attachzones don't have any particular input field upon which you can
@@ -346,7 +326,8 @@
                 /* The icon and image messages appear in a special place
                  * Otherwise use the default placement
                  */
-                if (['icon', 'image', 'imageAttachzone'].indexOf($(element).attr('name')) > -1) {
+                console.log(element);
+                if (['icon', 'image'].indexOf($(element).attr('name')) > -1) {
 
                     /* Only insert one
                      */
