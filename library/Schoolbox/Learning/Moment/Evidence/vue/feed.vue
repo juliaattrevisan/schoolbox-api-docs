@@ -271,10 +271,6 @@ export default {
                             <media-article v-if="evidence.body">
                                 <div v-html="evidence.body" />
                             </media-article>
-
-                            <div class="article-read-more">
-                                <a :href="evidence._links.detail">More Detail</a>
-                            </div>
                         </div>
 
                         <div class="feed-comments small-12 columns">

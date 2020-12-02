@@ -84,13 +84,14 @@ export default {
     <video v-if="storage.type === 'video'"
            controls
            preload="none"
+           style="width:100%;height:100%;"
            :poster="storage._links.poster"
            :width="videoWidth"
            :height="videoHeight"
     >
         <source type="video/mp4" :src="storage._links.stream">
     </video>
-    <audio v-else-if="storage.type === 'audio'" controls preload="none">
+    <audio v-else-if="storage.type === 'audio'" controls preload="none" style="width:100%;height:100%;">
         <source type="audio/mpeg" :src="storage._links.stream">
     </audio>
     <img v-else-if="storage.type === 'image'" :src="storage._links.image" :alt="filename" />
