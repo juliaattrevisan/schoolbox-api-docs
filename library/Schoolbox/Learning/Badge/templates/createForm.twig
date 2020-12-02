@@ -377,7 +377,7 @@
                     .post(form.action, payload)
                     .then(() => {
                         toast.toastTimeout({text: 'Saved'});
-                        {#window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadges') }}';#}
+                        window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadges') }}';
                     })
                     .catch(() => {
                         toast.toastTimeout({text: 'Save failed', css: 'alert'});
