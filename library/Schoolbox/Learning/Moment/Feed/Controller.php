@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment\Feed;
 
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
@@ -21,24 +22,57 @@ use Schoolbox\Learning\Moment\Feed\Translator\ModelToArray;
 use Schoolbox\User;
 
 
+/**
+ * Controller for the learning moment feed.
+ *
+ * This feed encapsulates:
+ * * Evidence
+ * * Badge awards (achievements and goals)
+ */
 class Controller extends Base
 {
+    /**
+     * Mapper used to retrieve learning moment evidence.
+     */
     private EvidenceMapper $evidenceMapper;
 
+
+    /**
+     * Mapper used to retrieve badge awards.
+     */
     private BadgeAwardMapper $badgeAwardMapper;
 
 
+    /**
+     * Mapper used to retrieve comments on learning moments.
+     */
     private CommentMapper $commentMapper;
 
+
+    /**
+     * Database connector, required for the feed's cursor.
+     */
+    private IConnector $database;
+
+
+    /**
+     * Constructor
+     *
+     * @param EvidenceMapper   $evidenceMapper
+     * @param BadgeAwardMapper $badgeAwardMapper
+     * @param CommentMapper    $commentMapper
+     * @param IConnector       $database
+     */
     public function __construct(
-        EvidenceMapper $evidenceMapper,
+         EvidenceMapper $evidenceMapper,
          BadgeAwardMapper $badgeAwardMapper,
-         CommentMapper $commentMapper
-         )
-    {
-        $this->evidenceMapper = $evidenceMapper;
+         CommentMapper $commentMapper,
+         IConnector $database
+    ) {
+        $this->evidenceMapper   = $evidenceMapper;
         $this->badgeAwardMapper = $badgeAwardMapper;
-        $this->commentMapper = $commentMapper;
+        $this->commentMapper    = $commentMapper;
+        $this->database         = $database;
     }
 
 
@@ -46,14 +80,14 @@ class Controller extends Base
      * Retrieve a user's learning moments and badges, in one API endpoint.
      *
      * @param User $user
-     *@since 20.2
+     * @since 20.2
      *
      * @api   GET /learning/evidence/user/{userId}/feed
      */
     public function getFeedForUser(User $user): void
     {
         $encodedCursor = $this->request->query->get('cursor');
-        $cursor        = new Cursor($this->getDi()->get('databaseInternal'), $user, 10);
+        $cursor        = new Cursor($this->database, $user, 10);
         $hydrator      = new Hydrator($this->evidenceMapper, $this->badgeAwardMapper);
         $translator    = new ModelToArray(
             (new Factory($this->router, $this->authorizer, $this->getUser(), $this->commentMapper))->buildWithComments(2),

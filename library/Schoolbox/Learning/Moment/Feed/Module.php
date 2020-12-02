@@ -71,9 +71,10 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'evidenceMapper' => $this->getMapperFactory()->getLazy(EvidenceMapper::class),
+                    'evidenceMapper'   => $this->getMapperFactory()->getLazy(EvidenceMapper::class),
                     'badgeAwardMapper' => $this->getMapperFactory()->getLazy(BadgeAwardMapper::class),
-                    'commentMapper' => $this->getMapperFactory()->getLazy(CommentMapper::class),
+                    'commentMapper'    => $this->getMapperFactory()->getLazy(CommentMapper::class),
+                    'database'         => $injector->lazyGet('databaseInternal'),
                 ]
             )
         );
