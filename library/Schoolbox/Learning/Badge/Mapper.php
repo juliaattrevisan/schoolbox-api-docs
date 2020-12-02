@@ -84,7 +84,7 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('updatedBy', 'u')},
                 {$this->getJoinColumnString('updatedBy.role', 'ur')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
-            INNER JOIN {$this->getJoinSql('image', '', 'i', true)}
+            LEFT JOIN {$this->getJoinSql('image', '', 'i', true)}
             LEFT JOIN {$this->getJoinSql('image.allowedFileExtension', 'i', 'm', true)}
             INNER JOIN {$this->getJoinSql('category', '', 'bc', true)}
             INNER JOIN {$this->getJoinSql('createdBy', '', 'c', true)}

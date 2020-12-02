@@ -7,6 +7,7 @@ import BadgeAward from "./badgeAward";
 import BadgeDetail from "./badgeDetail";
 import BadgeAchievementWithdrawModal from "./badge-achievement-withdraw-modal";
 import BadgeGoalWithdrawModal from "./badge-goal-withdraw-modal";
+import BadgeImage from './badge-image';
 
 export default {
     components: {
@@ -14,6 +15,7 @@ export default {
       BadgeDetail,
       BadgeAchievementWithdrawModal,
       BadgeGoalWithdrawModal,
+      BadgeImage,
       RevealModal,
       Toast
     },
@@ -189,7 +191,7 @@ export default {
                     <li v-for="badge in data" :key="badge.id">
                         <!-- I'd apply the click to the entire <li> but that intercepts dropdown clicks -->
                         <a @click.prevent="openDetailModal(badge)">
-                            <img :src="badge.image._links.image" :alt="badge.name" />
+                            <badge-image :badge="badge"></badge-image>
                         </a>
                         <div class="actions-small-1">
                             <div class="compact card list-item" @click.prevent="openDetailModal(badge)">
