@@ -31,7 +31,7 @@
                         <label class="required">Choose badge image</label>
                         <p class="meta">Choose a badge image from our existing set or upload your own.</p>
 
-                        <fieldset class="radiolist">
+                        <fieldset class="radiolist" data-badge-avatar-options>
                             <input id="badge-icon" type="radio" name="badge-avatar-selector" value="icon" data-icon />
                             <label for="badge-icon">Choose an existing icon</label>
 
@@ -289,18 +289,71 @@
                 category: {
                     required: true,
                 },
-                // Attachzones aren't able to have validators applied to them,
-                // as the input doesn't exist at form creation time.
-                // Jank together a validator on a hidden field, and make it
-                // depend on the presence of attachzones.
-                // imageAttachzone: {
-                //     required: {
-                //         depends: () => $form.find('input[name="image"]').length === 0
-                //     },
-                // },
+
+                /* Selecting an image to represent a badge fills this input field
+                 */
+                icon: {
+                    required: {
+                        depends: function(element) {
+                            let selectedOption = $('input[name=badge-avatar-selector]:checked').val();
+
+                            /* At least one element must be chosen
+                             */
+                            if (selectedOption === undefined) {
+                                return true;
+                            }
+
+                            /* Depending on the radio element you chose,
+                             * require a specific input element's value
+                             */
+                            if ('icon' === selectedOption) {
+                                return $form.find('input[name="icon"]').val().length === 0;
+                            }
+
+                            return false;
+                        }
+                    }
+                },
+
+                /* Attachzones spawn an input element
+                 */
+                imageAttachzone: {
+                    required: {
+                        depends: function(element) {
+                            let selectedOption = $('input[name=badge-avatar-selector]:checked').val();
+
+                            /* At least one element must be chosen
+                             */
+                            if (selectedOption === undefined) {
+                                return true;
+                            }
+
+                            // Attachzones aren't able to have validators applied to them,
+                            // as the input doesn't exist at form creation time.
+                            // Jank together a validator on a hidden field, and make it
+                            // depend on the presence of attachzones.
+                            if ('image' === selectedOption) {
+                                return $form.find('input[name="image"]').length === 0;
+                            }
+
+                            return false;
+                        }
+                    }
+                }
             },
             messages: {
                 imageAttachzone: "Please attach a file."
+            },
+            errorPlacement: function(error, element) {
+
+                /* The icon and image messages appear in a special place
+                 * Otherwise use the default placement
+                 */
+                if ($(element).attr('name') === 'icon' || $(element).attr('name') === 'image') {
+                    error.insertBefore($('[data-badge-avatar-options]'));
+                } else {
+                    $.alaressValidate.defaultErrorPlacement(error, element);
+                }
             },
             submitHandler(form, event) {
                 event.preventDefault();
@@ -341,7 +394,7 @@
                     .post(form.action, payload)
                     .then(() => {
                         toast.toastTimeout({text: 'Saved'});
-                        window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadges') }}';
+                        {#window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadges') }}';#}
                     })
                     .catch(() => {
                         toast.toastTimeout({text: 'Save failed', css: 'alert'});
