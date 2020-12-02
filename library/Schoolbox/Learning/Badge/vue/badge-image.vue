@@ -22,7 +22,8 @@ export default {
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
     props: [
-        'badge'
+        'badge',
+        'css'
     ],
 
     /**
@@ -75,10 +76,10 @@ export default {
           -- on which fields were null
           -->
         <template v-if="badge.image">
-            <img :src="badge.image._links.image" :alt="badge.name" />
+            <img :src="badge.image._links.image + '&size=constrain200'" :alt="badge.name" :class="css" />
         </template>
         <template v-else>
-            <img :src="badge.icon" :alt="badge.name" />
+            <img :src="badge.icon" :alt="badge.name" :class="css" />
         </template>
     </div>
 </template>

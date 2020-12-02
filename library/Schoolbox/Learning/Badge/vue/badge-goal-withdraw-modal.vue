@@ -1,5 +1,6 @@
 <script>
 import axios from "axios";
+import BadgeImage from './badge-image';
 import RevealModal from '@schoolbox/reveal-modal'
 import toastMixin from '@schoolbox/toast-mixin';
 
@@ -49,6 +50,7 @@ export default {
      * at the top of the file.
      */
     components: {
+        BadgeImage,
         RevealModal,
         vSelect
     },
@@ -208,7 +210,7 @@ export default {
             <h2>Unset <strong>{{ badge.name }}</strong></h2>
 
             <div class="card small-12 compact">
-                <img :src="badge.image._links.image" :alt="badge.name"/>
+                <badge-image :badge="badge"></badge-image>
                 <h3>{{ badge.name }}</h3>
             </div>
 
