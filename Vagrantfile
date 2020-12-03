@@ -125,7 +125,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         puppet.options = "--verbose --debug"
     end
     puppet.facter = {
-      "is_vagrant_puppet_provision" => true
+      "is_vagrant_puppet_provision" => true,
+      "vagrant_schoolbox_version"   => %x[ls updates/ | grep -iv README | sort -V | tail -n 1]
     }
   end
 
