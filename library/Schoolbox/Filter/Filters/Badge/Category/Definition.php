@@ -31,6 +31,14 @@ class Definition extends AbstractDefinition
     private GenericCollection $categories;
 
 
+    /**
+     * Constructor
+     *
+     * @param Model                       $filter
+     * @param Page\Option\Mapper          $filterOptionMapper
+     * @param Page\Option\Defaults\Mapper $filterDefaultMapper
+     * @param GenericCollection           $categories
+     */
     public function __construct(
         Model $filter,
         Page\Option\Mapper $filterOptionMapper,
