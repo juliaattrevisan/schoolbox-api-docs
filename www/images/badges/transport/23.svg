@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 4610 4610"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil1 {fill:#2682BF}
+    .fil0 {fill:#3A99D7}
+    .fil2 {fill:#B3B3B3}
+    .fil10 {fill:#CCCCCC}
+    .fil7 {fill:#DC3A49}
+    .fil5 {fill:#E04E5A}
+    .fil4 {fill:#E3E3E3}
+    .fil3 {fill:#E6E6E6}
+    .fil8 {fill:#E9E9E9}
+    .fil6 {fill:#EF5764}
+    .fil9 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="2305" cy="2305" r="2305"/>
+  <path class="fil1" d="M4579 1929c20,122 31,248 31,376 0,1273 -1032,2305 -2305,2305 -20,0 -41,0 -61,-1l-1564 -1564 385 -93 -267 -267 854 -670 31 -1214 1613 1613 96 -23 20 -1601 27 -1 1140 1140z"/>
+ </g>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_504868472">
+   <g>
+    <g>
+     <rect class="fil2" transform="matrix(0.723988 -0.0353986 -0 1.69205 3382.01 791.675)" width="79" height="915"/>
+     <rect class="fil3" transform="matrix(1.35829 -0.171614 -0 1.29571 3163.62 1096.45)" width="365" height="40"/>
+    </g>
+    <rect class="fil3" transform="matrix(0.380433 -0.0186009 -0 1.69205 3382.01 791.675)" width="79" height="915"/>
+   </g>
+   <rect class="fil3" transform="matrix(0.426585 -0.0208574 -0 1.05988 1666.74 793.812)" width="37" height="658" rx="8" ry="8"/>
+   <path class="fil4" d="M1794 1496l50 246 -315 12 35 -244 120 -40 110 26z"/>
+   <path class="fil2" d="M1794 1496l50 246 -149 6 0 -86 -8 -191 108 25z"/>
+   <g>
+    <path class="fil3" d="M1145 1836l481 -221 0 597 -481 111 0 -487z"/>
+    <path class="fil2" d="M2117 1778l-491 -163 0 597 491 163 0 -597z"/>
+   </g>
+   <path class="fil5" d="M2591 2203l24 183 -208 1c-226,-31 -517,-22 -826,34 -349,63 -648,174 -839,298l93 -464c603,-276 1209,-364 1756,-52z"/>
+   <path class="fil3" d="M706 2493l1104 -187 0 494 -1205 1 100 -309z"/>
+   <path class="fil2" d="M1811 2306l854 84 76 310 -930 88 0 -482z"/>
+   <path class="fil6" d="M3800 2122l-1287 360 -177 158 -1482 70 -208 -140 -155 3 0 108 189 363 3029 128 198 -954 -106 -96z"/>
+   <path class="fil7" d="M630 2949l50 95 3029 128 48 -229 -71 -38 -3054 45z"/>
+   <path class="fil8" d="M3800 2122l-1287 360 -177 158 1453 -344 87 68 30 -147 -106 -96z"/>
+   <rect class="fil9" transform="matrix(0.917677 -0.245346 -0 0.879328 887.442 2304.02)" width="109" height="120" rx="18" ry="18"/>
+   <rect class="fil9" transform="matrix(1.00926 -0.26983 -0 0.967079 1082.45 2249.72)" width="109" height="120" rx="20" ry="20"/>
+   <rect class="fil9" transform="matrix(1.07694 -0.210456 -0 1.03193 1288.07 2198.17)" width="109" height="120" rx="22" ry="22"/>
+   <rect class="fil9" transform="matrix(1.16657 -0.185246 -0 1.11782 1510.34 2152.94)" width="109" height="120" rx="23" ry="23"/>
+   <rect class="fil9" transform="matrix(-0.852659 -0.158787 -0 0.879328 2548.3 2222.81)" width="109" height="120" rx="17" ry="17"/>
+   <rect class="fil9" transform="matrix(-0.937748 -0.174633 -0 0.967079 2367.11 2186.91)" width="109" height="120" rx="19" ry="19"/>
+   <rect class="fil9" transform="matrix(-1.00063 -0.186344 -0 1.03193 2176.06 2154.75)" width="109" height="120" rx="20" ry="20"/>
+   <rect class="fil9" transform="matrix(-1.08391 -0.119 -0 1.11782 1969.54 2130.48)" width="109" height="120" rx="21" ry="21"/>
+   <path class="fil8" d="M816 2685l-170 -115 -155 3 0 108 325 4z"/>
+   <path class="fil10" d="M1435 1265l89 -4 301 -15 89 -4 0 19 -89 4 -150 139 -150 -124 -89 4 0 -19zm369 1l-258 13 129 107 129 -119z"/>
+   <path class="fil10" d="M1435 1068l89 -4 301 -15 89 -4 0 19 -89 4 -150 139 -150 -124 -89 4 0 -19zm369 1l-258 13 129 106 129 -119z"/>
+  </g>
+ </g>
+</svg>

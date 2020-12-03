@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 2422 2422"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#00A085}
+    .fil1 {fill:#048C75}
+    .fil6 {fill:#999999}
+    .fil8 {fill:#C94545}
+    .fil7 {fill:#E84F4F}
+    .fil5 {fill:#F5BE18}
+    .fil2 {fill:#F7C600}
+    .fil3 {fill:#FFD630}
+    .fil4 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1211" cy="1211" r="1211"/>
+  <path class="fil1" d="M2406 1412c-88,525 -513,936 -1045,1001l-775 -775 1250 -796 569 569z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_487862184">
+   <rect class="fil2" x="586" y="843" width="1250" height="796"/>
+   <path class="fil3" d="M586 843l1250 0 -625 -385 -625 385z"/>
+   <path class="fil4" d="M764 700l894 0c46,0 84,38 84,84l0 854 -1063 0 0 -854c0,-46 38,-84 84,-84z"/>
+   <path class="fil3" d="M586 843l612 398 -612 398 0 -796z"/>
+   <path class="fil5" d="M586 1638l1250 0 -625 -398 -625 398z"/>
+   <path class="fil3" d="M1836 843l-612 398 612 398 0 -796z"/>
+   <path class="fil6" d="M909 802l605 0 0 50 -605 0 0 -50zm0 174l605 0 0 50 -605 0 0 -50zm0 -87l605 0 0 50 -605 0 0 -50z"/>
+  </g>
+  <g id="_487875384">
+   <g>
+    <circle class="fil7" transform="matrix(-0.378213 0.589596 0.589596 0.378213 1211.2 1638.41)" r="572"/>
+    <path class="fil8" d="M811 1638c0,132 65,261 184,337 186,119 434,65 553,-121 43,-67 64,-142 63,-216l-801 0z"/>
+   </g>
+   <g>
+    <rect class="fil4" transform="matrix(2.00259E-014 -0.595734 0.798186 1.66576E-014 962.685 1696.98)" width="197" height="623" rx="59" ry="59"/>
+    <rect class="fil4" x="1153" y="1390" width="117" height="497" rx="59" ry="59"/>
+   </g>
+  </g>
+ </g>
+</svg>

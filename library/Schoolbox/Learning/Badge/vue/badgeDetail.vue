@@ -1,6 +1,10 @@
 <script>
+import BadgeImage from './badge-image';
+
 export default {
-    components: {},
+    components: {
+        BadgeImage
+    },
     props: {
         /**
          * The badge to display in this detail panel.
@@ -31,7 +35,7 @@ export default {
 <template>
 
     <div>
-        <img :src="badge.image._links.image" :alt="badge.name"/>
+        <badge-image :badge="badge"></badge-image>
         <h2>{{ badge.name }}</h2>
         <p class="meta" v-if="badge.category">Category: {{ badge.category.name }}</p>
         <p class="meta" v-if="badge.curriculumNodes.length">

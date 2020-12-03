@@ -2,6 +2,7 @@
 import axios from "axios";
 import AwardDetailModal from './award-detail-modal';
 import AchievementWithdrawModal from "./award-achievement-withdraw-modal";
+import BadgeImage from './../../vue/badge-image';
 import GoalWithdrawModal from "./award-goal-withdraw-modal";
 import foundationMixin from '@schoolbox/foundation-mixin';
 import goalMixin from './goal-mixin';
@@ -43,6 +44,7 @@ export default {
     components: {
         AwardDetailModal,
         AchievementWithdrawModal,
+        BadgeImage,
         GoalWithdrawModal,
         RelativeTime
     },
@@ -173,11 +175,11 @@ export default {
                 <template v-for="category in this.data.categories">
                     <h2 class="subheader content">{{ category.name }}</h2>
 
-                    <div class="v-card-list">
+                    <div class="v-card-list badge-grid">
                         <div class="v-card card wrap-down" v-for="award in category.awards">
                             <div class="card-feature-image">
                                 <a href="#" @click.prevent="openDetailModal(award)">
-                                    <img :src="award.badge.image._links.image + '&size=constrain200'" :class="getCss(award)"/>
+                                    <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
                                 </a>
                             </div>
                             <div class="card-content">

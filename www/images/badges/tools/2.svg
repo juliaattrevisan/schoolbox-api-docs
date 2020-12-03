@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="374px" height="374px" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 162713 162713"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#37414C}
+    .fil4 {fill:#424242}
+    .fil5 {fill:#747474}
+    .fil3 {fill:#FFB100}
+    .fil1 {fill:#FFC928}
+    .fil2 {fill:#FFDF81}
+   ]]>
+  </style>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_395680656">
+   <path class="fil0" d="M81356 0c44932,0 81357,36424 81357,81357 0,44932 -36424,81356 -81357,81356 -44932,0 -81356,-36424 -81356,-81356 0,-44932 36424,-81357 81356,-81357z"/>
+   <g>
+    <path class="fil1" d="M92211 78997c33612,791 120021,36090 0,36001l0 -36001z"/>
+    <path class="fil2" d="M99483 82478c64207,14012 69373,29217 0,29046l0 -29046z"/>
+    <path class="fil1" d="M127615 101103c0,8371 -26581,15158 -59369,15158 -32789,0 -59370,-6786 -59370,-15158 0,-2187 1817,-4266 5083,-6144 3054,-27280 26201,-49219 54287,-48489 36432,948 59369,31990 59369,54633z"/>
+    <path class="fil3" d="M68246 69049c17703,0 32053,14351 32053,32054 -21369,6455 -42738,7019 -64107,0 0,-17703 14351,-32054 32054,-32054z"/>
+    <path class="fil2" d="M67284 52216c27302,0 56171,27255 56171,55241 186,2511 -3300,3138 -3492,1228 -1310,-26787 -29649,-52661 -56107,-52661 -10300,0 -19862,3230 -27779,8755 -198,138 -467,92 -611,-105 -142,-195 -111,-470 71,-626 8588,-7384 19661,-11831 31747,-11831z"/>
+    <circle class="fil4" cx="56472" cy="79564" r="3494"/>
+    <circle class="fil4" cx="68246" cy="79564" r="3494"/>
+    <circle class="fil4" cx="79940" cy="79564" r="3494"/>
+    <path class="fil3" d="M19636 95904c52,1482 1974,2025 2470,787 736,-17103 15054,-27989 28040,-32133 777,-248 1221,-1069 1008,-1852 -213,-783 -996,-1284 -1781,-1094 -13873,3359 -28607,13506 -29737,34292z"/>
+    <circle class="fil5" cx="68246" cy="79564" r="2937"/>
+    <circle class="fil5" cx="56472" cy="79564" r="2937"/>
+    <circle class="fil5" cx="79940" cy="79564" r="2937"/>
+    <polygon class="fil1" points="42469,94533 48437,96037 47370,104428 41402,102924 "/>
+    <rect class="fil1" x="65339" y="97797" width="6240" height="8775"/>
+    <polygon class="fil1" points="87825,95973 94065,94437 95552,102470 89312,104007 "/>
+   </g>
+  </g>
+ </g>
+</svg>

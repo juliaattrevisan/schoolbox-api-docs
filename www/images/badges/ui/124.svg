@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 10211 10211"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil4 {fill:#004F59}
+    .fil2 {fill:#006775}
+    .fil1 {fill:#2682BF}
+    .fil0 {fill:#3A99D7}
+    .fil5 {fill:#E0E0E0}
+    .fil6 {fill:#E84F4F}
+    .fil8 {fill:#F5C918}
+    .fil3 {fill:#F9F9F9}
+    .fil7 {fill:#FFD630}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="5105" cy="5105" r="5105"/>
+  <path class="fil1" d="M10210 5180c-39,2723 -2209,4930 -4918,5027l-2606 -2577 4891 -4997 2632 2547z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_487875480">
+   <g>
+    <circle class="fil2" transform="matrix(3.84239E-014 -1.4508 1.4508 3.84239E-014 5105.46 5105.46)" r="2410"/>
+    <circle class="fil3" transform="matrix(3.32497E-014 -1.25544 1.25544 3.32497E-014 5105.46 5105.46)" r="2410"/>
+   </g>
+   <path class="fil4" d="M5105 1609c1931,0 3496,1565 3496,3496 0,1931 -1565,3496 -3496,3496l0 -471c1671,0 3026,-1355 3026,-3026 0,-1671 -1355,-3026 -3026,-3026l0 -471z"/>
+   <path class="fil5" d="M5105 2080c1671,0 3026,1355 3026,3026 0,1671 -1355,3026 -3026,3026l0 -6051z"/>
+   <rect class="fil2" x="4892" y="2580" width="427" height="2435" rx="214" ry="214"/>
+   <path class="fil4" d="M5105 2581l0 0c117,0 214,96 214,214l0 2007c0,117 -96,213 -214,213l0 0 0 -2434z"/>
+   <rect class="fil4" transform="matrix(-0.0802606 1.19691 -1.01588 -0.0312587 7020.2 4955.85)" width="356" height="1719" rx="214" ry="214"/>
+   <path class="fil6" d="M3564 6982l-131 -119 1588 -1747 131 119 -1588 1747z"/>
+   <circle class="fil7" cx="5105" cy="5105" r="441"/>
+   <path class="fil8" d="M5105 4665c243,0 441,197 441,441 0,243 -197,441 -441,441l0 -881z"/>
+  </g>
+ </g>
+</svg>

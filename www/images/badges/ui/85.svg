@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 142361 142361"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil2 {fill:#666666}
+    .fil5 {fill:#C94545}
+    .fil1 {fill:#E37936}
+    .fil4 {fill:#E84F4F}
+    .fil0 {fill:#FF873D}
+    .fil3 {fill:#FFD630}
+    .fil6 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="71181" cy="71181" r="71181"/>
+  <path class="fil1" d="M142263 74940c-1910,36710 -31635,66054 -68499,67369l-40671 -40671 25440 -60663 4839 6126 50980 -72 27912 27911z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_487877592">
+   <path class="fil2" d="M59110 44840l50918 0c2964,0 5729,2463 5388,5415l-5430 46926c-339,2947 -2434,5415 -5387,5415l-64266 0c-2953,0 -5047,-2457 -5388,-5415l-5203 -44958c-122,-233 -198,-485 -214,-751l-599 -9674c-69,-1119 935,-2033 2235,-2033l25270 0c1300,0 2419,915 2489,2033l188 3041z"/>
+   <path class="fil3" d="M29674 51695l83013 0c3122,0 4088,1854 3733,4446l-5720 41683c-355,2588 -1280,4772 -4380,4772l-70281 0c-3106,0 -4020,-2165 -4380,-4772l-5720 -41683c-359,-2607 611,-4446 3733,-4446z"/>
+  </g>
+  <g id="_487864536">
+   <g>
+    <circle class="fil4" transform="matrix(-0.323369 0.504099 0.504099 0.323369 71179.7 98201.6)" r="33601"/>
+    <path class="fil5" d="M51054 98202c6,6619 3275,13099 9260,16938 9354,6001 21803,3281 27804,-6074 2161,-3368 3191,-7139 3188,-10864l-40251 0z"/>
+   </g>
+   <g>
+    <rect class="fil6" transform="matrix(1.71219E-014 -0.509347 0.682442 1.42421E-014 58692.6 101145)" width="11557" height="36597" rx="2943" ry="2943"/>
+    <rect class="fil6" x="68237" y="85714" width="5887" height="24975" rx="2943" ry="2943"/>
+   </g>
+  </g>
+ </g>
+</svg>

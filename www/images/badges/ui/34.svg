@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 3248 3248"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil3 {fill:#CA4545}
+    .fil5 {fill:#00CC96}
+    .fil6 {fill:#07B587}
+    .fil2 {fill:#E84F4F}
+    .fil1 {fill:#F5BE18}
+    .fil4 {fill:#F9F9F9}
+    .fil0 {fill:#FFD630}
+    .fil7 {fill:#E84F4F;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1624" cy="1624" r="1624"/>
+  <path class="fil1" d="M3248 1657c-17,871 -720,1574 -1591,1591l-861 -861 1660 -3 -12 -1531 804 804z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_499447328">
+   <path class="fil2" d="M927 808l1394 0c105,0 190,86 190,190l0 1252c0,105 -86,190 -190,190l-1394 0c-105,0 -190,-86 -190,-190l0 -1252c0,-105 86,-190 190,-190z"/>
+   <path class="fil3" d="M2444 853c41,35 68,87 68,145l0 1252c0,105 -86,190 -190,190l-1394 0c-51,0 -97,-20 -132,-53l1648 -1534z"/>
+   <path class="fil4" d="M927 911c-48,0 -87,39 -87,87l0 1252c0,48 39,87 87,87l1394 0c48,0 87,-39 87,-87l0 -1252c0,-48 -39,-87 -87,-87l-1394 0z"/>
+   <path class="fil5" d="M927 911l1394 0c48,0 87,39 87,87l0 186 -1569 0 0 -186c0,-48 39,-87 87,-87z"/>
+   <path class="fil6" d="M2367 924c25,15 41,43 41,74l0 186 -321 0 280 -260z"/>
+   <g>
+    <path class="fil4" d="M1055 962c48,0 86,39 86,86 0,48 -39,86 -86,86 -48,0 -86,-39 -86,-86 0,-48 39,-86 86,-86z"/>
+    <path class="fil4" d="M1280 962c48,0 86,39 86,86 0,48 -39,86 -86,86 -48,0 -86,-39 -86,-86 0,-48 39,-86 86,-86z"/>
+    <path class="fil4" d="M1653 995l574 0c29,0 52,24 52,52l0 0c0,29 -24,52 -52,52l-574 0c-29,0 -52,-24 -52,-52l0 0c0,-29 24,-52 52,-52z"/>
+   </g>
+   <g>
+    <path class="fil7" d="M1786 2226l0 -458 162 0 -324 -458 -324 458 162 0 0 458 324 0z"/>
+    <path class="fil3" d="M1786 2226l0 -458 162 0 -324 -458 0 916 162 0z"/>
+   </g>
+  </g>
+ </g>
+</svg>

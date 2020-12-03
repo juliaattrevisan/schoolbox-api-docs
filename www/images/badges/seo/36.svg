@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 10211 10211"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil4 {fill:#B2B3B3}
+    .fil7 {fill:#12B589}
+    .fil1 {fill:#63A147}
+    .fil0 {fill:#71B84F}
+    .fil6 {fill:#E84F4F}
+    .fil5 {fill:#F5BE18}
+    .fil2 {fill:#FFD630}
+    .fil8 {fill:white}
+    .fil3 {fill:#E7A20B}
+   ]]>
+  </style>
+ </defs>
+ <g id="Copy_x0020_of_x0020_Copy_x0020_of_x0020_circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="5105" cy="5105" r="5105"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <path class="fil1" d="M2577 8347l1814 1814c234,33 472,50 715,50 2695,0 4902,-2088 5092,-4735l-2563 -2563 -5058 5434z"/>
+  <g id="_499451648">
+   <g>
+    <path class="fil2" d="M2577 1864l3991 0 1066 1049 0 5434 -5058 0 0 -6483z"/>
+    <path class="fil3" d="M7094 2389l541 523 0 830 -1066 -827 526 -526z"/>
+    <path class="fil4" d="M6568 1864l1066 1049 -1066 2 0 -1051z"/>
+   </g>
+   <path class="fil5" d="M6020 4833c-225,301 -585,496 -990,496 -682,0 -1235,-553 -1235,-1235 0,-641 489,-1169 1115,-1229l121 1229 990 739zm-43 -1794c326,222 541,597 541,1022 0,266 -84,512 -227,714l-1008 -714 694 -1022zm-827 -383c257,0 496,79 694,214l-694 1021 -105 -1231c35,-3 70,-5 105,-5z"/>
+   <g>
+    <path class="fil6" d="M5969 4737c-225,301 -585,496 -990,496 -682,0 -1235,-553 -1235,-1235 0,-641 489,-1169 1115,-1229l121 1229 990 739zm-870 -2177c257,0 497,79 694,214l-694 1022 -105 -1231c35,-3 70,-5 105,-5z"/>
+    <path class="fil7" d="M5926 2944c326,222 541,597 541,1021 0,266 -84,512 -227,714l-1008 -714 694 -1021z"/>
+   </g>
+   <path class="fil8" d="M3606 7090l604 0 0 690 -604 0 0 -690zm-366 835l3731 0 0 184 -3731 0 0 -184zm2761 -2485l604 0 0 2341 -604 0 0 -2341zm-798 1473l604 0 0 868 -604 0 0 -868zm-798 -426l604 0 0 1295 -604 0 0 -1295z"/>
+  </g>
+ </g>
+</svg>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 3107 3107"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil1 {fill:#2682BF}
+    .fil0 {fill:#3A99D7}
+    .fil5 {fill:#999999}
+    .fil7 {fill:#C94545}
+    .fil4 {fill:#E84F4F}
+    .fil3 {fill:#F7F7F8}
+    .fil2 {fill:#FFD630}
+    .fil6 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="icons">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1553" cy="1553" r="1553"/>
+  <path class="fil1" d="M3101 1689c-69,794 -735,1417 -1547,1417 -19,0 -38,0 -57,-1l-735 -735 1333 -1687 1006 1006z"/>
+  <g id="_520378624">
+   <path class="fil2" d="M831 649c418,0 760,0 1181,0 64,0 116,52 116,116l0 692 0 164 0 582 0 50c0,78 -63,141 -141,141l-1156 0c-64,0 -116,-52 -116,-116l0 -1513c0,-64 52,-116 116,-116z"/>
+   <rect class="fil3" x="790" y="717" width="1263" height="1608"/>
+   <circle class="fil4" cx="2243" cy="2017" r="398"/>
+   <path class="fil4" d="M893 849l163 0 0 188 -163 0 0 -188zm0 1010l163 0 0 188 -163 0 0 -188zm0 -337l163 0 0 188 -163 0 0 -188zm0 -337l163 0 0 188 -163 0 0 -188z"/>
+   <path class="fil5" d="M1133 918l557 0 0 49 -557 0 0 -49zm0 1010l557 0 0 49 -557 0 0 -49zm0 -337l557 0 0 49 -557 0 0 -49zm0 -337l557 0 0 49 -557 0 0 -49z"/>
+   <circle class="fil2" cx="2243" cy="2017" r="336"/>
+   <path class="fil6" d="M1959 2028l107 -12 116 103c0,0 56,-234 318,-289 -128,69 -207,206 -260,395 -13,48 -48,35 -59,21 -18,-23 -138,-160 -222,-219z"/>
+   <g>
+    <path class="fil4" d="M1310 551l18 0c-5,-8 -8,-18 -8,-28l0 -60c0,-33 30,-60 67,-60l69 0c37,0 67,27 67,60l0 60c0,10 -3,19 -8,28l18 0c123,0 223,91 223,201l0 0 -670 0 0 0c0,-111 101,-201 223,-201z"/>
+    <path class="fil7" d="M1422 403l35 0c37,0 67,27 67,60l0 60c0,10 -3,19 -8,28l18 0c123,0 223,91 223,201l0 0 -335 0 0 -349z"/>
+   </g>
+  </g>
+ </g>
+</svg>

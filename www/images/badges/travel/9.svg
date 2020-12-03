@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 2422 2422"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil3 {fill:#004F59}
+    .fil2 {fill:#006775}
+    .fil0 {fill:#71B84F}
+    .fil5 {fill:#CCCCCC}
+    .fil7 {fill:#E37936}
+    .fil4 {fill:#E6E6E6}
+    .fil6 {fill:#FF873D}
+    .fil1 {fill:#FFD630;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="Copy_x0020_of_x0020_circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1211" cy="1211" r="1211"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <path class="fil1" d="M56 848c343,-68 754,6 1174,443 328,-452 734,-603 1053,-644 28,53 52,109 72,166 -97,10 -205,30 -317,69l375 176c6,50 10,101 10,153 0,14 0,28 -1,41l-586 -276 3 -6c-228,125 -458,341 -641,705 -153,305 -308,513 -455,652 -56,-24 -110,-51 -162,-83 143,-123 301,-324 463,-647 28,-57 58,-110 89,-161 -404,-435 -801,-482 -1120,-397 9,-66 24,-131 44,-193z"/>
+  <g id="_517642944">
+   <path class="fil2" d="M1228 1333l13 0c4,-18 22,-49 31,-66l99 -203c45,-91 88,-180 133,-270 52,-104 61,-205 0,-311 -48,-84 -149,-153 -250,-153 -75,0 -127,7 -188,48 -42,28 -72,58 -99,103 -64,105 -55,208 -2,314 8,15 258,518 263,539z"/>
+   <path class="fil3" d="M1231 1333l10 0c4,-18 22,-49 31,-66l99 -203c45,-91 88,-180 133,-270 52,-104 61,-205 0,-311 -48,-84 -149,-153 -250,-153 -8,0 -15,0 -23,0 0,385 0,341 0,1003z"/>
+   <circle class="fil4" cx="1234" cy="622" r="186"/>
+   <path class="fil5" d="M1231 436l0 373 3 0c103,0 186,-83 186,-186 0,-103 -83,-186 -186,-186l-3 0z"/>
+   <path class="fil6" d="M1234 554c38,0 68,30 68,68 0,38 -30,68 -68,68 -37,0 -68,-30 -68,-68 0,-38 30,-68 68,-68z"/>
+   <path class="fil7" d="M1231 554l0 136 3 0c38,0 68,-30 68,-68 0,-38 -30,-68 -68,-68l-3 0z"/>
+  </g>
+ </g>
+</svg>

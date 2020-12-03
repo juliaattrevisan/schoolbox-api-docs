@@ -1,5 +1,6 @@
 <script>
 import axios from "axios";
+import BadgeImage from './../../vue/badge-image';
 import RevealModal from '@schoolbox/reveal-modal'
 import qs from 'qs';
 import toastMixin from '@schoolbox/toast-mixin';
@@ -37,6 +38,7 @@ export default {
      * at the top of the file.
      */
     components: {
+        BadgeImage,
         RevealModal
     },
 
@@ -141,7 +143,7 @@ export default {
             <h2>Unset <strong>{{ award.badge.name }}</strong></h2>
 
             <div class="card small-12 compact">
-                <img :src="award.badge.image._links.image" :alt="award.badge.name"/>
+                <badge-image :badge="award.badge"></badge-image>
                 <h3>{{ award.badge.name }}</h3>
             </div>
 

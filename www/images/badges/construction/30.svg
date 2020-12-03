@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 8930 8930"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil7 {fill:#4D4D4D}
+    .fil2 {fill:#999999}
+    .fil3 {fill:#CCCCCC}
+    .fil1 {fill:#D14747}
+    .fil5 {fill:#E6E6E6}
+    .fil0 {fill:#E84F4F}
+    .fil6 {fill:#FFE200}
+    .fil4 {fill:white}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="4465" cy="4465" r="4465"/>
+  <path class="fil1" d="M8793 5568c-409,1610 -1693,2871 -3315,3247l-1218 -1218 333 -545 -2109 -2109 2157 -3527 4152 4152z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_504879008">
+   <g>
+    <rect class="fil2" x="4259" y="4109" width="412" height="3488"/>
+    <rect class="fil3" x="4259" y="4109" width="206" height="3488"/>
+   </g>
+   <path class="fil4" d="M4491 1338c81,13 147,63 192,130l1897 2876c36,54 67,116 87,178 23,74 30,154 5,228 -56,162 -220,211 -375,211l-3662 0c-156,0 -320,-48 -375,-211 -47,-137 16,-292 91,-406l1897 -2876c44,-67 111,-117 192,-130l26 -4 26 4z"/>
+   <path class="fil5" d="M4491 1338c81,13 147,63 192,130l1897 2876c36,54 67,116 87,178 23,74 30,154 5,228 -56,162 -220,211 -375,211l-1831 0 0 -3627 26 4z"/>
+   <path class="fil6" d="M4465 1499c30,5 59,24 82,59l1897 2876c53,80 211,364 -148,364l-1831 0 -1831 0c-359,0 -201,-284 -148,-364l1897 -2876c23,-34 52,-54 82,-59z"/>
+   <g>
+    <path class="fil7" d="M4657 2727c-33,216 -88,1169 -192,1169 -96,0 -192,-1159 -193,-1169 -22,-366 407,-376 385,0z"/>
+    <path class="fil7" d="M4465 4019c87,0 158,71 158,158 0,87 -71,158 -158,158 -87,0 -158,-71 -158,-158 0,-87 71,-158 158,-158z"/>
+   </g>
+  </g>
+ </g>
+</svg>

@@ -43,6 +43,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('name', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
         $this->joins('image_hash', StorageMapper::class, 'hash', null, null, 'image', 'image');
+        $this->uses('image_path', self::TYPE_STRING, null, 'icon', null);
         $this->joins('category_id', Category\Mapper::class, 'id', null, null, 'category', 'category');
         $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -83,7 +84,7 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('updatedBy', 'u')},
                 {$this->getJoinColumnString('updatedBy.role', 'ur')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
-            INNER JOIN {$this->getJoinSql('image', '', 'i', true)}
+            LEFT JOIN {$this->getJoinSql('image', '', 'i', true)}
             LEFT JOIN {$this->getJoinSql('image.allowedFileExtension', 'i', 'm', true)}
             INNER JOIN {$this->getJoinSql('category', '', 'bc', true)}
             INNER JOIN {$this->getJoinSql('createdBy', '', 'c', true)}

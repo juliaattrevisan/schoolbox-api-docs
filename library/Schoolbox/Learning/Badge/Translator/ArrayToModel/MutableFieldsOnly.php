@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Translator\ArrayToModel;
 
-use Schoolbox\Learning\Badge\Model;
 
 /**
  * Array-to-model translator which filters out fields which may not be mutated
@@ -18,6 +17,7 @@ use Schoolbox\Learning\Badge\Model;
  * The only fields which may be mutated are:
  * * name
  * * body
+ * * icon
  * * image
  * * category
  * * tags
@@ -28,6 +28,7 @@ class MutableFieldsOnly extends AllFields
     private const MUTABLE_FIELDS = [
         'name'            => true,
         'body'            => true,
+        'icon'            => true,
         'image'           => true,
         'category'        => true,
         'tags'            => true,

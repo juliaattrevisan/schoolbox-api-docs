@@ -7,13 +7,27 @@ import BadgeAward from "./badgeAward";
 import BadgeDetail from "./badgeDetail";
 import BadgeAchievementWithdrawModal from "./badge-achievement-withdraw-modal";
 import BadgeGoalWithdrawModal from "./badge-goal-withdraw-modal";
+import BadgeImage from './badge-image';
+import foundationMixin from '@schoolbox/foundation-mixin';
 
 export default {
+
+    /**
+     * Mixins.
+     * Basically traits for vue; allows you to share javascript between components in the same
+     * manner as a php trait. They must already be imported at the top of the file and will
+     * be superpositioned on top of this javascript here, inside export default {}
+     */
+    mixins: [
+        foundationMixin
+    ],
+
     components: {
       BadgeAward,
       BadgeDetail,
       BadgeAchievementWithdrawModal,
       BadgeGoalWithdrawModal,
+      BadgeImage,
       RevealModal,
       Toast
     },
@@ -49,14 +63,11 @@ export default {
         }
     },
     computed: {
-        jQuery: () => window.jQuery,
     },
     mounted() {
         this.load();
     },
     updated() {
-        // Re-apply Foundation dropdowns
-        this.$nextTick(() => this.jQuery(this.$el).foundation('dropdown', 'reflow'));
     },
     methods: {
         /**
@@ -185,11 +196,11 @@ export default {
                     <li><a href="#" class="submit">Apply filters</a></li>
                 </ul>
 
-                <ul class="grid small-block-grid-2 medium-block-grid-3 large-block-grid-4">
-                    <li v-for="badge in data" :key="badge.id">
+                <ul class="badge-grid grid small-block-grid-2 medium-block-grid-3 large-block-grid-4" data-equalizer>
+                    <li v-for="badge in data" :key="badge.id" data-equalizer-watch>
                         <!-- I'd apply the click to the entire <li> but that intercepts dropdown clicks -->
                         <a @click.prevent="openDetailModal(badge)">
-                            <img :src="badge.image._links.image" :alt="badge.name" />
+                            <badge-image :badge="badge"></badge-image>
                         </a>
                         <div class="actions-small-1">
                             <div class="compact card list-item" @click.prevent="openDetailModal(badge)">

@@ -7,3 +7,41 @@
       filter: grayscale(100%);
     }
 }
+
+/* Icon Picker Modal has a lot of categories in it, we need
+ * to add some vertical scroll for small viewport guys
+ */
+.icon-picker {
+    .icon-category-list-container {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    img {
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+    }
+
+    img:hover {
+        outline: 4px solid $content-ui-hover;
+    }
+}
+
+/* Badge List uses data-equalizer to make everything the same height
+ * @stuart will need to fix these properly at some point so they render consistently
+ * throught all of badges
+ */
+.badge-grid > li,
+.badge-grid > .v-card {
+    min-height: 12rem;
+
+    .badge-image, .badge-icon {
+        width: auto !important;
+        max-height: 8rem;
+    }
+
+    .badge-icon {
+        min-width: 8rem;
+    }
+}

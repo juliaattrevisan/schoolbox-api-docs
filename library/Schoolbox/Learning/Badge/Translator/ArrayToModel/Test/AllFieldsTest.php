@@ -333,7 +333,6 @@ class AllFieldsTest extends TestCase
             ->setDeletedAt(new Alaress_Date_Format($oldDate, DATE_ATOM, $timezone))
             ->setName('test')
             ->setBody('test')
-            ->setImage((new Storage())->setHash('1234567890123456789012345678901234567890'))
             ->setCategory((new Category())->setId($oldId))
             ->setCreatedBy((new User())->setId($oldId))
             ->setUpdatedBy((new User())->setId($oldId));
@@ -341,7 +340,6 @@ class AllFieldsTest extends TestCase
         // These fields are not nullable:
         // * name
         // * body
-        // * image
         // * category
         // * createdBy
         // * updatedBy
@@ -354,12 +352,6 @@ class AllFieldsTest extends TestCase
 
         yield 'null body' => [
             ['body' => null,],
-            (clone $baseModel),
-            (clone $baseModel),
-        ];
-
-        yield 'null image' => [
-            ['image' => null,],
             (clone $baseModel),
             (clone $baseModel),
         ];

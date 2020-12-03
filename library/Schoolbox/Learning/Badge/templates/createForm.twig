@@ -24,17 +24,78 @@
                             Description
                         </label>
                         <textarea name="body" id="badge-body" required></textarea>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label class="required" for="chooseBadge">Choose badge image</label>
+                        <p class="meta">Choose a badge image from our existing set or upload your own.</p>
+                        <div class="row">
+                            <div class="small-12 medium-6 columns">
 
-                        <label>Select badge from existing set</label>
-                        <button class="full-width">Browse badges (to be developed)</button>
+                                <fieldset class="radiolist" id="chooseBadge" data-badge-avatar-options>
+                                    <input id="badge-icon" type="radio" name="badge-avatar-selector" value="icon" data-icon-selector checked />
+                                    <label for="badge-icon">Choose an existing icon</label>
 
-                        <label for="badge-image" class="required">
-                            Upload badge from your device
-                        </label>
-                        {# Dummy element for form validation #}
-                        <input type="hidden" name="imageAttachzone">
-                        {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+                                    <input id="badge-image" type="radio" name="badge-avatar-selector" value="image" data-image-selector/>
+                                    <label for="badge-image">Upload from your device</label>
+                                </fieldset>
 
+                        <script src="/javascript/shared/badges/jquery.icon-modal.js"></script>
+                        <script>
+                            $(function() {
+
+                                /* Shank twig data into js; I could probably skip this
+                                 * by providing the registry from backend instead
+                                 */
+                                $('#icon-modal').iconModal({
+                                    registry: $.parseJSON('{{ iconRegistry.registry|json_encode|escape('js') }}'),
+                                    pageLength: {{ iconRegistry.pageLength }},
+
+                                    /* Inflict it upon the form
+                                     */
+                                    onSelect: function(element) {
+                                        $('[data-icon-selection] img').attr('src', $(element).attr('src')).show();
+                                        $('input[name=icon]').val($(element).attr('src'));
+
+                                        $('#icon-modal').foundation('reveal', 'close');
+                                    }
+                                });
+
+                                /* Mutex div switch
+                                 */
+                                $('[data-icon-selector]').on('click', function(event) {
+                                    $('[data-image-container]').hide();
+                                    $('[data-icon-container]').show();
+                                });
+
+                                $('[data-image-selector]').on('click', function(event) {
+                                    $('[data-image-container]').show();
+                                    $('[data-icon-container]').hide();
+                                });
+                            });
+                        </script>
+                            </div>
+                            <div class="small-12 medium-6 columns" data-icon-container>
+                                <div data-icon-selection>
+                                    <img src="" width="64" height="64" />
+                                    <input id="badge-icon" name="icon" type="hidden" value="" />
+                                </div>
+                                <div>
+                                    {% include '@learningBadge/icon-modal.twig' with {
+                                        registry: iconRegistry.registry,
+                                        pageLength: iconRegistry.pageLength
+                                    }%}
+                                </div>
+                            </div>
+                            <div class="small-12 medium-6 columns" style="display:none;" data-image-container>
+                                {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
                         <label for="badge-category" class="required">
                             Category
                         </label>
@@ -57,7 +118,6 @@
                                 %}
                             </div>
                         {% endif %}
-
                     </div>
                 </fieldset>
             </section>
@@ -97,18 +157,58 @@
                 category: {
                     required: true,
                 },
-                // Attachzones aren't able to have validators applied to them,
-                // as the input doesn't exist at form creation time.
-                // Jank together a validator on a hidden field, and make it
-                // depend on the presence of attachzones.
-                imageAttachzone: {
+
+                /* Selecting an image to represent a badge fills this input field
+                 * Attachzones spawn an input element
+                 */
+                icon: {
                     required: {
-                        depends: () => $form.find('input[name="image"]').length === 0
-                    },
-                },
+                        depends: function(element) {
+                            let selectedOption = $('input[name=badge-avatar-selector]:checked').val();
+
+                            /* At least one element must be chosen
+                             */
+                            if (selectedOption === undefined) {
+                                return true;
+                            }
+
+                            /* Depending on the radio element you chose,
+                             * require a specific input element's value
+                             */
+                            if ('icon' === selectedOption) {
+                                return $form.find('input[name="icon"]').val().length === 0;
+                            }
+
+                            /* Attachzones don't have any particular input field upon which you can
+                             * statically check like other form fields. The presence of one or more
+                             * <input data-az-attachment> elements, which spawn when you add files
+                             * etc., help you conclude whether at least one file was supplied.
+                             * These spawn in data-dz-previews
+                             */
+                            if ('image' === selectedOption) {
+                                return $form.find('input[name="image"]').length === 0;
+                            }
+
+                            return false;
+                        }
+                    }
+                }
             },
-            messages: {
-                imageAttachzone: "Please attach a file."
+            errorPlacement: function(error, element) {
+
+                /* The icon and image messages appear in a special place
+                 * Otherwise use the default placement
+                 */
+                if (['icon', 'image'].indexOf($(element).attr('name')) > -1) {
+
+                    /* Only insert one
+                     */
+                    $('#badge-icon-error').remove();
+
+                    error.insertBefore($('[data-badge-avatar-options]'));
+                } else {
+                    $.alaressValidate.defaultErrorPlacement(error, element);
+                }
             },
             submitHandler(form, event) {
                 event.preventDefault();
@@ -118,6 +218,7 @@
                     payload  = {
                         name:            formData.get('name'),
                         body:            formData.get('body'),
+                        icon:            formData.get('icon'),
                         image:           formData.get('image'),
                         category:        null,
                         tags:            [],

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 3107 3107"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil6 {fill:#FEFEFE}
+    .fil5 {fill:#006775}
+    .fil3 {fill:#DEDEDE}
+    .fil2 {fill:#E84F4F}
+    .fil4 {fill:#EFEFF0}
+    .fil1 {fill:#F5BE18}
+    .fil0 {fill:#FFD630}
+   ]]>
+  </style>
+ </defs>
+ <g id="circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1553" cy="1553" r="1553"/>
+  <path class="fil1" d="M1756 3093l-778 -778 1464 -1575 656 641c6,56 10,114 10,172 0,789 -589,1441 -1351,1540z"/>
+ </g>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <g id="_499450184">
+   <path class="fil2" d="M667 740c-8,251 -1,599 -1,861 0,314 131,523 292,694 79,84 163,152 275,225 58,38 282,176 347,154 194,-66 473,-263 601,-411 301,-351 260,-616 260,-1038l0 -484c-96,-33 -861,-309 -887,-309 -28,0 -388,133 -445,153 -149,51 -293,106 -442,156z"/>
+   <path class="fil3" d="M1554 2527c109,-35 291,-162 382,-237 110,-91 197,-187 277,-339 87,-165 68,-330 74,-520 6,-194 -1,-400 -1,-596 -123,-33 -413,-151 -546,-191 -62,-19 -119,-46 -185,-63l-1 1946z"/>
+   <path class="fil4" d="M1554 2527l1 -1946 -732 255 -3 551c9,92 -5,190 1,283 5,83 31,182 61,255 6,14 17,30 27,46 37,65 -6,8 59,100l188 212c15,14 20,12 43,30 122,95 124,88 243,163 20,13 90,42 113,52z"/>
+   <g>
+    <path class="fil2" d="M1281 1358l544 0c43,0 77,35 77,77l0 472 -699 0 0 -472c0,-43 35,-77 77,-77z"/>
+    <path class="fil5" d="M1332 1209l0 149 87 0 0 -153c0,-79 268,-95 268,0l0 153 87 0 0 -149c0,-226 -442,-226 -442,0z"/>
+    <path class="fil6" d="M1553 1576c40,0 72,32 72,72 0,29 -17,53 -41,65l0 151 -61 0 0 -151c-24,-11 -41,-36 -41,-65 0,-40 32,-72 72,-72z"/>
+   </g>
+  </g>
+ </g>
+</svg>

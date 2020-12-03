@@ -1,4 +1,5 @@
 <script>
+import BadgeImage from './../../vue/badge-image';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
@@ -36,6 +37,7 @@ export default {
      * at the top of the file.
      */
     components: {
+        BadgeImage,
         RelativeTime,
         RevealModal
     },
@@ -91,7 +93,7 @@ export default {
             <div class="v-card-list awards">
                 <div class="v-card card wrap-down">
                     <div class="card-feature-image">
-                        <img :src="award.badge.image._links.image + '&size=constrain200'" :class="getCss(award)"/>
+                        <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
                     </div>
                     <div class="card-content">
                         <!-- Only show the count if one was provided in the award -->

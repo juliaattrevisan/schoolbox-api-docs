@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Creator: CorelDRAW X6 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="22mm" height="22mm" version="1.0" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 3107 3107"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil1 {fill:#D14747}
+    .fil3 {fill:#E3E3E3}
+    .fil0 {fill:#E84F4F}
+    .fil2 {fill:#EDEDED}
+    .fil4 {fill:#FFD630}
+   ]]>
+  </style>
+ </defs>
+ <g id="Copy_x0020_of_x0020_Copy_x0020_of_x0020_circles">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <circle class="fil0" cx="1553" cy="1553" r="1553"/>
+  <path class="fil1" d="M3096 1738c-92,771 -747,1368 -1542,1368 -17,0 -34,0 -51,-1l-891 -891 501 -365c-370,-772 345,-1491 1211,-883l772 772z"/>
+ </g>
+ <g id="icons">
+  <metadata id="CorelCorpID_1Corel-Layer"/>
+  <path class="fil2" d="M904 2107l120 182 -37 24 -29 -44 -30 20 -26 -40 -25 16 55 84 -28 18 -24 -36 -8 5 -12 -18 -28 18 12 18 -8 5 24 36 -38 25 -120 -183c-34,15 -73,6 -92,-23l0 0c-27,-27 -10,-78 26,-101l817 -539c-11,-31 -17,-64 -17,-98 0,-159 129,-287 287,-287 159,0 287,129 287,287 0,159 -129,287 -287,287 -73,0 -140,-27 -191,-72l-630 416zm820 -762c73,0 132,59 132,132 0,73 -59,132 -132,132 -73,0 -132,-59 -132,-132 0,-73 59,-132 132,-132z"/>
+  <path class="fil3" d="M904 2107l120 182 -37 24 -29 -44 -30 20 -26 -40 -25 16 55 84 -28 18 -24 -36 -8 5 -12 -18 -28 18 12 18 -8 5 24 36 -38 25 -120 -183c-34,15 -73,6 -92,-23l0 0 0 0 1007 -660c24,32 63,54 106,54 73,0 132,-59 132,-132 0,-24 -6,-47 -18,-66l130 -85c27,44 43,96 43,151 0,159 -129,287 -287,287 -73,0 -140,-27 -191,-72l-630 416z"/>
+  <path class="fil4" d="M1720 686c435,0 789,353 789,789 0,435 -353,789 -789,789 -436,0 -789,-353 -789,-789 0,-435 353,-789 789,-789zm72 128l0 302 -144 0 0 -302c-309,33 -555,279 -588,588l302 0 0 144 -302 0c33,309 279,555 588,588l0 -302 144 0 0 302c309,-33 555,-279 588,-588l-302 0 0 -144 302 0c-33,-309 -279,-555 -588,-588z"/>
+ </g>
+</svg>
