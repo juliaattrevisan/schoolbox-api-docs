@@ -93,7 +93,7 @@ export default {
             <div class="v-card-list awards">
                 <div class="v-card card wrap-down">
                     <div class="card-feature-image">
-                        <badge-image :badge="award.badge" :class="getCss(award)"></badge-image>
+                        <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
                     </div>
                     <div class="card-content">
                         <h3 class="no-margin">{{ award.badge.name }} ({{ award.count }})</h3>

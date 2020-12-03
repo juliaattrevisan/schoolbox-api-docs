@@ -179,7 +179,7 @@ export default {
                         <div class="v-card card wrap-down" v-for="award in category.awards">
                             <div class="card-feature-image">
                                 <a href="#" @click.prevent="openDetailModal(award)">
-                                    <badge-image :badge="award.badge" :class="getCss(award)"></badge-image>
+                                    <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
                                 </a>
                             </div>
                             <div class="card-content">
