@@ -49,22 +49,6 @@ class IconRegistry
      *
      */
     private array $registry = [
-        'arrow' => [
-            'name' => 'Arrow',
-            'files' => [],
-        ],
-        'avatars' => [
-            'name' => 'Avatars',
-            'files' => [],
-        ],
-        'baby' => [
-            'name' => 'Baby',
-            'files' => [],
-        ],
-        'business' => [
-            'name' => 'Business',
-            'files' => [],
-        ],
         'christmas' => [
             'name' => 'Christmas',
             'files' => [],
@@ -73,20 +57,12 @@ class IconRegistry
             'name' => 'Clothes and Accessories',
             'files' => [],
         ],
-        'communication' => [
-            'name' => 'Communication',
-            'files' => [],
-        ],
         'computer-hardware' => [
             'name' => 'Computer Hardware',
             'files' => [],
         ],
         'construction' => [
             'name' => 'Construction',
-            'files' => [],
-        ],
-        'country' => [
-            'name' => 'Country',
             'files' => [],
         ],
         'education' => [
@@ -105,12 +81,8 @@ class IconRegistry
             'name' => 'Halloween',
             'files' => [],
         ],
-        'home-appliances' => [
-            'name' => 'Home Appliances',
-            'files' => [],
-        ],
         'medical' => [
-            'name' => 'Medical',
+            'name' => 'Science',
             'files' => [],
         ],
         'music' => [
@@ -121,20 +93,8 @@ class IconRegistry
             'name' => 'Party',
             'files' => [],
         ],
-        'real-estate' => [
-            'name' => 'Real Estate',
-            'files' => [],
-        ],
-        'scene' => [
-            'name' => 'Scene',
-            'files' => [],
-        ],
         'seo' => [
-            'name' => 'SEO',
-            'files' => [],
-        ],
-        'shopping-cart' => [
-            'name' => 'Shopping Cart',
+            'name' => 'Websites',
             'files' => [],
         ],
         'sport' => [
@@ -154,25 +114,13 @@ class IconRegistry
             'files' => [],
         ],
         'ui' => [
-            'name' => 'User Interface',
-            'files' => [],
-        ],
-        'valentines-day' => [
-            'name' => "Valentines Day",
-            'files' => [],
-        ],
-        'warning-signs' => [
-            'name' => 'Warning Signs',
+            'name' => 'Miscellaneous',
             'files' => [],
         ],
         'weather' => [
             'name' => 'Weather',
             'files' => [],
         ],
-        'zodiac' => [
-            'name' => 'Zodiac',
-            'files' => [],
-        ]
     ];
 
 
