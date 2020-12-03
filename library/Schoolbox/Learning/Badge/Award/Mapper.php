@@ -313,6 +313,7 @@ class Mapper extends \Schoolbox\Mapper
             WHERE recipient_id = :recipientId
             AND badge_id = :badgeId
             AND awarded_at = :awardedAt
+            AND deleted_at IS NULL
             LIMIT 1
         ");
 
