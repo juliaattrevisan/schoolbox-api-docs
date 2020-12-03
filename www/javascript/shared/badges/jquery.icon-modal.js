@@ -76,7 +76,8 @@
          */
         function initIconCategorySelector() {
             folder = config.landing;
-            loadPage(1, config.registry[folder].files.length);
+            $('[data-icon-path='+config.landing+']').addClass('active');
+            loadPage(0, config.registry[folder].files.length);
 
             $('[data-icon-path]').on('click', function(event) {
                 let current = $(this).attr('data-icon-path');
@@ -86,10 +87,6 @@
                 if (folder === current) {
                     return;
                 }
-
-                /* Make paginators available from now on
-                 */
-                config.paginators.removeClass('hide');
 
                 /* Change category
                  */
