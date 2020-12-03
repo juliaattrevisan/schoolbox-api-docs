@@ -47,7 +47,7 @@
                                  * by providing the registry from backend instead
                                  */
                                 $('#icon-modal').iconModal({
-                                    registry: $.parseJSON('{{ iconRegistry.registry|json_encode|raw }}'),
+                                    registry: $.parseJSON('{{ iconRegistry.registry|json_encode|escape('js') }}'),
                                     pageLength: {{ iconRegistry.pageLength }},
 
                                     /* Inflict it upon the form

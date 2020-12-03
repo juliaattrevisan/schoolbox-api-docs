@@ -209,6 +209,8 @@ class Controller extends Base
             ->setThumbnailSize(64)
             ->setModalTitle('Select image');
 
+        $iconRegistry = (new IconRegistry())->prepare();
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningBadge/createForm.twig',
@@ -217,7 +219,7 @@ class Controller extends Base
                     'categories'               => Category\Mapper::getInstance()->findAll(),
                     'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                     'iconRegistry' => [
-                        'registry' => IconRegistry::BADGE_ICON_REGISTRY,
+                        'registry' => $iconRegistry->getRegistry(),
                         'pageLength' => IconRegistry::BADGE_ICON_MODAL_PAGELENGTH
                     ]
                 ],

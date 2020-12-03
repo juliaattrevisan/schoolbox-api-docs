@@ -41,134 +41,134 @@ class IconRegistry
      *
      * folder name => [
      *    'name' => this appears in the modal as a list of icon categories to choose
-     *    'num' => the number of icon files in this folder, named numerically and sequentially
+     *    'files' => the list of files found in this folder, machine-sorted
      * ]
      *
      */
-    public const BADGE_ICON_REGISTRY = [
+    private array $registry = [
         'arrow' => [
             'name' => 'Arrow',
-            'num' => 88
+            'files' => [],
         ],
         'avatars' => [
             'name' => 'Avatars',
-            'num' => 100
+            'files' => [],
         ],
         'baby' => [
             'name' => 'Baby',
-            'num' => 40
+            'files' => [],
         ],
         'business' => [
             'name' => 'Business',
-            'num' => 112,
+            'files' => [],
         ],
         'christmas' => [
             'name' => 'Christmas',
-            'num' => 17,
+            'files' => [],
         ],
         'clothes-and-accessories' => [
             'name' => 'Clothes and Accessories',
-            'num' => 72,
+            'files' => [],
         ],
         'communication' => [
             'name' => 'Communication',
-            'num' => 32,
+            'files' => [],
         ],
         'computer-hardware' => [
             'name' => 'Computer Hardware',
-            'num' => 40,
+            'files' => [],
         ],
         'construction' => [
             'name' => 'Construction',
-            'num' => 35,
+            'files' => [],
         ],
         'country' => [
             'name' => 'Country',
-            'num' => 35,
+            'files' => [],
         ],
         'education' => [
             'name' => 'Education',
-            'num' => 80,
+            'files' => [],
         ],
         'food' => [
             'name' => 'Food',
-            'num' => 27,
+            'files' => [],
         ],
         'furniture' => [
             'name' => 'Furniture',
-            'num' => 26,
+            'files' => [],
         ],
         'halloween' => [
             'name' => 'Halloween',
-            'num' => 40,
+            'files' => [],
         ],
         'home-appliances' => [
             'name' => 'Home Appliances',
-            'num' => 50,
+            'files' => [],
         ],
         'medical' => [
             'name' => 'Medical',
-            'num' => 38,
+            'files' => [],
         ],
         'music' => [
             'name' => 'Music',
-            'num' => 32,
+            'files' => [],
         ],
         'party' => [
             'name' => 'Party',
-            'num' => 24,
+            'files' => [],
         ],
         'real-estate' => [
             'name' => 'Real Estate',
-            'num' => 24,
+            'files' => [],
         ],
         'scene' => [
             'name' => 'Scene',
-            'num' => 30,
+            'files' => [],
         ],
         'seo' => [
             'name' => 'SEO',
-            'num' => 100,
+            'files' => [],
         ],
         'shopping-cart' => [
             'name' => 'Shopping Cart',
-            'num' => 24,
+            'files' => [],
         ],
         'sport' => [
             'name' => 'Sport',
-            'num' => 50,
+            'files' => [],
         ],
         'tools' => [
             'name' => 'Tools',
-            'num' => 25,
+            'files' => [],
         ],
         'transport' => [
             'name' => 'Transport',
-            'num' => 24,
+            'files' => [],
         ],
         'travel' => [
             'name' => 'Travel',
-            'num' => 40,
+            'files' => [],
         ],
         'ui' => [
             'name' => 'User Interface',
-            'num' => 210,
+            'files' => [],
         ],
         'valentines-day' => [
             'name' => "Valentines Day",
-            'num' => 23,
+            'files' => [],
         ],
         'warning-signs' => [
             'name' => 'Warning Signs',
-            'num' => 24,
+            'files' => [],
         ],
         'weather' => [
             'name' => 'Weather',
-            'num' => 32,
+            'files' => [],
         ],
         'zodiac' => [
             'name' => 'Zodiac',
-            'num' => 12,
+            'files' => [],
         ]
     ];
 
@@ -182,7 +182,61 @@ class IconRegistry
     /**
      * Badge svgs live here
      */
-    private const BADGE_ICON_ROOT = './images/badges';
+    private string $root;
+
+
+    /**
+     * Set the root folder for traversing to get a list of files when
+     * you really don't need them
+     *
+     * IconRegistry constructor.
+     */
+    public function __construct()
+    {
+        $this->root = __DIR__ . '/../../../../www/images/badges';
+    }
+
+
+    /**
+     * Populate the registry with a list of known filenames
+     *
+     * @return $this
+     */
+    public function prepare(): self
+    {
+        foreach ($this->registry as $folder => $node) {
+            $files = [];
+
+            $path = "{$this->root}/{$folder}";
+
+            $dirhandle = opendir($path);
+
+            while ($file = readdir($dirhandle)) {
+                if ($file === '..' || $file === '.') {
+                    continue;
+                }
+
+                $files[] = $file;
+            }
+
+            sort($files);
+
+            $this->registry[$folder]['files'] = $files;
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * Get the list of folder nodes and their respective file contents
+     *
+     * @return array|array[]
+     */
+    public function getRegistry(): array
+    {
+        return $this->registry;
+    }
 
 
     /**
@@ -193,12 +247,10 @@ class IconRegistry
      */
     public function analyse(): void
     {
-        $root = self::BADGE_ICON_ROOT;
-
-        foreach (self::BADGE_ICON_REGISTRY as $folder => $node) {
+        foreach ($this->registry as $folder => $node) {
             for ($i = 1; $i <= $node['num']; $i++) {
 
-                $path = "{$root}/{$folder}/{$i}.svg";
+                $path = "{$this->root}/{$folder}/{$i}.svg";
 
                 $exists = file_exists($path);
 

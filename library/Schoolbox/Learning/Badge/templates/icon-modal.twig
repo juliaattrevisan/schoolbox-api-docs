@@ -26,7 +26,7 @@
             <ul class="side-nav">
                 {% for path, node in registry %}
                     <li class="tab-title" data-icon-path="{{ path }}">
-                        <a>{{ node.name }} ({{ node.num }})</a>
+                        <a>{{ node.name }} ({{ node.files|length }})</a>
                     </li>
                 {% endfor %}
             </ul>
