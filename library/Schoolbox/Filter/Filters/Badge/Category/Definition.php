@@ -12,23 +12,65 @@ namespace Schoolbox\Filter\Filters\Badge\Category;
 
 
 use Schoolbox\Filter\AbstractDefinition;
+use Schoolbox\Filter\Model;
+use Schoolbox\Filter\Page;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Badge\Category\Model as BadgeCategoryModel;
 
+
+/**
+ * Definition for badge category filters.
+ */
 class Definition extends AbstractDefinition
 {
+    /**
+     * A list of categories to display in the filter.
+     *
+     * @var GenericCollection|BadgeCategoryModel[]
+     */
+    private GenericCollection $categories;
+
+
+    public function __construct(
+        Model $filter,
+        Page\Option\Mapper $filterOptionMapper,
+        Page\Option\Defaults\Mapper $filterDefaultMapper,
+        GenericCollection $categories
+    ) {
+        parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
+        $this->categories = $categories;
+    }
+
+
+    /**
+     * This filter has no custom keys, so always returns empty.
+     *
+     * @return array
+     */
     protected function getCustomKeys() : array
     {
-        // TODO: Implement getCustomKeys() method.
+        return [];
     }
 
 
+    /**
+     * This filter is available on the badge list page.
+     *
+     * @return array
+     */
     public static function getPages() : array
     {
-        // TODO: Implement getPages() method.
+        return [
+            Page\Model::PAGE_BADGE_LIST,
+        ];
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function getLabel(string $key) : string
     {
-        // TODO: Implement getLabel() method.
+        return $this->categories[$key]->getName();
     }
 }
