@@ -260,13 +260,13 @@ export default {
                                         >{{ evidence.object.createdAt | dateFormat(dateDisplayFormats.momentJsTime) }}</time>
                                     </a>
                                 </div>
-                                <nav v-if="hasMenu(evidence)">
+                                <nav v-if="hasMenu(evidence.object)">
                                     <a href="#"
                                        class="icon-overflow"
                                        :data-dropdown="'evidence-' + String(evidence.object.id) + '-dropdown'"
                                        aria-expanded="false" title="Actions"></a>
                                 </nav>
-                                <ul v-if="hasMenu(evidence)" :id="'evidence-' + String(evidence.object.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
+                                <ul v-if="hasMenu(evidence.object)" :id="'evidence-' + String(evidence.object.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
                                     <li><a v-if="evidence.object._links.modifyForm" :href="evidence.object._links.modifyForm" class="icon-modify" title="Modify">Modify</a></li>
                                     <li><a @click.prevent="showDeleteModal(evidence)" v-if="evidence.object._links.delete" class="icon-delete" title="Delete">Delete</a></li>
                                 </ul>
@@ -307,11 +307,7 @@ export default {
                                     </p>
                                 </a>
                             </div>
-                            <div class="feed-body small-12 column">
-                                <div class="article-read-more">
-                                    <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">More Detail</a>
-                                </div>
-                            </div>
+
                         </template>
                     </li>
                 </ul>
