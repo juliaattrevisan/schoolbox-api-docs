@@ -1,3 +1,35 @@
+.badge-grid {
+  .badge {
+    flex: 0 0 250px;
+    border: 1px solid #EDEDED;
+    padding: 0;
+    margin: 0 1rem 1rem 0;
+
+    &:last-child {
+      margin: 0 0 1rem 0;
+    }
+
+    .card-feature-image {
+      background-color: $vapor;
+
+      div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 200px;
+      }
+      img {
+        max-height: 11rem;
+        margin: 0;
+      }
+    }
+    .card-content {
+      padding: .75rem 0 .75rem .75rem;
+      overflow: inherit;
+    }
+  }
+}
+
 .awards, .activity-feed {
 
     /* Goals are greyscaled
@@ -25,23 +57,5 @@
 
     img:hover {
         outline: 4px solid $content-ui-hover;
-    }
-}
-
-/* Badge List uses data-equalizer to make everything the same height
- * @stuart will need to fix these properly at some point so they render consistently
- * throught all of badges
- */
-.badge-grid > li,
-.badge-grid > .v-card {
-    min-height: 12rem;
-
-    .badge-image, .badge-icon {
-        width: auto !important;
-        max-height: 8rem;
-    }
-
-    .badge-icon {
-        min-width: 8rem;
     }
 }

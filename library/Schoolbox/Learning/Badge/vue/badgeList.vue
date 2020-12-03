@@ -196,34 +196,38 @@ export default {
                     <li><a href="#" class="submit">Apply filters</a></li>
                 </ul>
 
-                <ul class="badge-grid grid small-block-grid-2 medium-block-grid-3 large-block-grid-4" data-equalizer>
-                    <li v-for="badge in data" :key="badge.id" data-equalizer-watch>
+                <div class="badge-grid v-card-list">
+                    <div class="badge v-card" v-for="badge in data" :key="badge.id">
                         <!-- I'd apply the click to the entire <li> but that intercepts dropdown clicks -->
-                        <a @click.prevent="openDetailModal(badge)">
-                            <badge-image :badge="badge"></badge-image>
-                        </a>
-                        <div class="actions-small-1">
-                            <div class="compact card list-item" @click.prevent="openDetailModal(badge)">
-                                <h3><a>{{ badge.name }}</a></h3>
-                                <p class="meta" v-if="badge.category">{{ badge.category.name }}</p>
-                            </div>
-                            <nav>
-                                <a href="#"
-                                   class="icon-overflow"
-                                   :data-dropdown="'badge-' + String(badge.id) + '-dropdown'"
-                                   aria-expanded="false" title="Actions"></a>
-                            </nav>
-                            <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase" title="Award">Award achievement</a></li>
-                                <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set as Goal">Set goal</a></li>
-                                <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-close" title="Withdraw awards" >Withdraw achievement</a></li>
-                                <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-close" title="Unset goal" >Unset goal</a></li>
-                                <li><a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a></li>
-                                <li><a href="#" class="icon-delete" title="Delete">Delete</a></li>
-                            </ul>
+                        <div class="card-feature-image">
+                            <a @click.prevent="openDetailModal(badge)">
+                                <badge-image :badge="badge"></badge-image>
+                            </a>
                         </div>
-                    </li>
-                </ul>
+                        <div class="card-content">
+                            <div class="actions-small-1">
+                                <div class="list-item">
+                                    <h3><a @click.prevent="openDetailModal(badge)">{{ badge.name }}</a></h3>
+                                </div>
+                                <nav>
+                                  <a href="#"
+                                     class="icon-overflow"
+                                     :data-dropdown="'badge-' + String(badge.id) + '-dropdown'"
+                                     aria-expanded="false" title="Actions"></a>
+                                </nav>
+                                <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
+                                  <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase" title="Award">Award achievement</a></li>
+                                  <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set as Goal">Set goal</a></li>
+                                  <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-close" title="Withdraw awards" >Withdraw achievement</a></li>
+                                  <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-close" title="Unset goal" >Unset goal</a></li>
+                                  <li><a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a></li>
+                                  <li><a href="#" class="icon-delete" title="Delete">Delete</a></li>
+                                </ul>
+                            </div>
+                            <p class="meta" v-if="badge.category">{{ badge.category.name }}</p>
+                        </div>
+                    </div>
+                </div>
             </template>
 
             <!-- Load more button, if there are more to load -->
