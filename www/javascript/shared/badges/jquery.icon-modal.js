@@ -44,6 +44,10 @@
                  */
                 landing: $('#landing'),
 
+                /* Images are found at this relative url
+                 */
+                root: '/images/badges',
+
                 /* Executes when you click on an icon
                  */
                 onSelect: function(element) {
@@ -114,7 +118,7 @@
             /* Reload icon set
              */
             for (let i = start; i < (start+config.pageLength) && i < max; i++, imgIndex++) {
-                let src = '/images/badges/' + folder + '/' + config.registry[folder].files[i];
+                let src = config.root + '/' + folder + '/' + config.registry[folder].files[i];
 
                 $(config.sockets[imgIndex]).attr('src', src).removeClass('hide');
             }
