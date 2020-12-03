@@ -57,10 +57,6 @@ class IconRegistry
             'name' => 'Avatars',
             'files' => [],
         ],
-        'baby' => [
-            'name' => 'Baby',
-            'files' => [],
-        ],
         'business' => [
             'name' => 'Business',
             'files' => [],
@@ -83,10 +79,6 @@ class IconRegistry
         ],
         'construction' => [
             'name' => 'Construction',
-            'files' => [],
-        ],
-        'country' => [
-            'name' => 'Country',
             'files' => [],
         ],
         'education' => [
@@ -157,20 +149,12 @@ class IconRegistry
             'name' => 'User Interface',
             'files' => [],
         ],
-        'valentines-day' => [
-            'name' => "Valentines Day",
-            'files' => [],
-        ],
         'warning-signs' => [
             'name' => 'Warning Signs',
             'files' => [],
         ],
         'weather' => [
             'name' => 'Weather',
-            'files' => [],
-        ],
-        'zodiac' => [
-            'name' => 'Zodiac',
             'files' => [],
         ]
     ];
