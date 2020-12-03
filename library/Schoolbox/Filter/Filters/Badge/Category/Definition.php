@@ -23,6 +23,9 @@ use Schoolbox\Learning\Badge\Category\Model as BadgeCategoryModel;
  */
 class Definition extends AbstractDefinition
 {
+    protected const NAME = 'Category';
+
+
     /**
      * A list of categories to display in the filter.
      *
