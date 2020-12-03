@@ -42,7 +42,7 @@ class IconRegistry
     /**
      * Each struct represents this info:
      *
-     * folder name => [
+     * folder name on disk => [
      *    'name' => this appears in the modal as a list of icon categories to choose
      *    'files' => the list of files found in this folder, machine-sorted
      * ]
@@ -189,10 +189,10 @@ class IconRegistry
 
 
     /**
+     * IconRegistry constructor.
+     *
      * Set the root folder for traversing to get a list of files when
      * you really don't need them
-     *
-     * IconRegistry constructor.
      */
     public function __construct()
     {
