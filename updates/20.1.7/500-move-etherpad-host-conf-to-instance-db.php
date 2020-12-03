@@ -15,9 +15,11 @@ $app = new class extends CliTool\App {
 
     public function run(): void
     {
-        if (!defined('ETHERPAD_HOST')) {
-            $this->getLogger()->error("ETHERPAD_HOST is not defined");
-            exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
+        if (defined('ETHERPAD_HOST')) {
+            $etherPadHost = ETHERPAD_HOST;
+        } else {
+            $this->getLogger()->warning("ETHERPAD_HOST is not defined, falling back to 'http://localhost:9001'");
+            $etherPadHost = 'http://localhost:9001';
         }
 
         $sql = "
@@ -50,7 +52,7 @@ $app = new class extends CliTool\App {
             $sql,
             [
                 'name'        => ConfigMapper::NAME_ETHERPAD_HOST,
-                'value'       => ETHERPAD_HOST,
+                'value'       => $etherPadHost,
                 'title'       => "Etherpad host",
                 'description' => "Etherpad url including scheme and port",
                 'editable'    => 'false',
@@ -59,7 +61,7 @@ $app = new class extends CliTool\App {
                 'module'      => ConfigMapper::MODULE_SETTINGS,
             ]
         );
-        $this->getLogger()->notice(sprintf("Inserted new config 'Etherpad host' with value '%s'", ETHERPAD_HOST));
+        $this->getLogger()->notice(sprintf("Inserted new config 'Etherpad host' with value '%s'", $etherPadHost));
     }
 };
 
