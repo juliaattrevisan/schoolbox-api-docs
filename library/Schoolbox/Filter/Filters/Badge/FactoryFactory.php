@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Badge;
 
 
-use InvalidArgumentException;use Schoolbox\Collection;use Schoolbox\Filter;use Schoolbox\Filter\IFactory;use Schoolbox\User;
+use Schoolbox\Filter;use Schoolbox\Filter\IFactory;use Schoolbox\User;
 
 
 /**
