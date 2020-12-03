@@ -97,7 +97,7 @@
                 $('[data-icon-path]').removeClass('active')
                 $(this).addClass('active');
 
-                loadPage(1, config.registry[folder].files.length);
+                loadPage(0, config.registry[folder].files.length);
             });
 
         }
