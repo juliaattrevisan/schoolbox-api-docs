@@ -267,8 +267,9 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'mapper' => $this->getMapperFactory()->getLazy(Mapper::class),
-                    'awardMapper' => $this->getMapperFactory()->getLazy(Award\Mapper::class)
+                    'mapper'               => $this->getMapperFactory()->getLazy(Mapper::class),
+                    'awardMapper'          => $this->getMapperFactory()->getLazy(Award\Mapper::class),
+                    'filterFactoryFactory' => $injector->lazyGet('filters.factoryFactory'),
                 ]
             )
         );

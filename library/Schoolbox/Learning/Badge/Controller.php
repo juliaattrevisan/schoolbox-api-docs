@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\API\Translator\ModelToArray\Composite;
+use Schoolbox\Filter;
 use Schoolbox\Learning\Badge\Award\Model as AwardModel;
 use Schoolbox\Learning\Badge\Translator;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -45,15 +46,26 @@ class Controller extends Base
 
 
     /**
+     * Factory for filter factories: used to build each part of the filter.
+     */
+    private Filter\IFactoryFactory $filterFactoryFactory;
+
+
+    /**
      * Constructor
      *
-     * @param Mapper       $mapper
-     * @param Award\Mapper $awardMapper
+     * @param Mapper                 $mapper
+     * @param Award\Mapper           $awardMapper
+     * @param Filter\IFactoryFactory $filterFactoryFactory
      */
-    public function __construct(Mapper $mapper, Award\Mapper $awardMapper)
-    {
-        $this->mapper = $mapper;
-        $this->awardMapper = $awardMapper;
+    public function __construct(
+        Mapper $mapper,
+        Award\Mapper $awardMapper,
+        Filter\IFactoryFactory $filterFactoryFactory
+    ) {
+        $this->mapper               = $mapper;
+        $this->awardMapper          = $awardMapper;
+        $this->filterFactoryFactory = $filterFactoryFactory;
     }
 
 
@@ -95,10 +107,19 @@ class Controller extends Base
         }
 
         // Output a Twig template
+        $page        = Filter\Page\Model::PAGE_BADGE_LIST;
+        $filterPanel = $this->filterFactoryFactory->buildPanel(
+            $this->getUser(),
+            $page,
+            null,
+            $this->getUser(),
+            []
+        );
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningBadge/index.twig',
-                [],
+                ['filterPanel' => $filterPanel,],
                 'Badges'
             )
         );
