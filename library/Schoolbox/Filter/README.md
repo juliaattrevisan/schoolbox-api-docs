@@ -287,6 +287,10 @@ of developing for filters.
     {% include '@filters/panel.twig' with {
         contentId: 'filterPanel',
         panel:     filterPanel,
+        // set to true if this is expected to be a large data set
+        // When true, any JavaScript must be applied on the
+        // "filterContentLoaded" event of the contentId element.
+        quickload: false,
     } only %}
     ```
 
