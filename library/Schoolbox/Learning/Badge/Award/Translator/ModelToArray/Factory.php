@@ -1,0 +1,80 @@
+<?php
+
+/**
+ * @copyright Copyright 2020, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+
+namespace Schoolbox\Learning\Badge\Award\Translator\ModelToArray;
+
+
+use Alaress\Authorizer\Authorizer;use Alaress\HTMLPurifier\Adapter\ScrubAdapter;use Aura\Router\Router;use Schoolbox\Discussion\Comment\Mapper as CommentMapper;use Schoolbox\Learning\Badge\Award\Translator\Links as BadgeAwardLinksTranslator;use Schoolbox\Learning\Badge\Award\Translator\ModelToArray;use Schoolbox\Learning\Badge\Translator\Links as BadgeLinksTranslator;use Schoolbox\User;
+
+
+/**
+ * Factory for building a badge award model-to-array translator.
+ *
+ * Encapsulates the setup of the translator.
+ */
+class Factory
+{
+
+    /**
+     * The router used to build links to evidence.
+     */
+    private Router $router;
+
+
+    /**
+     * The router used to determine links to evidence.
+     *
+     * Required for determining permissions to links created by the router.
+     */
+    private Authorizer $authorizer;
+
+
+    /**
+     * The user to build a translator for.
+     *
+     * Required for determining permissions to links created by the router.
+     */
+    private User $user;
+
+
+    /**
+     * Constructor
+     *
+     * @param Router     $router
+     * @param Authorizer $authorizer
+     * @param User       $user
+     */
+    public function __construct(Router $router, Authorizer $authorizer, User $user)
+    {
+        $this->router     = $router;
+        $this->authorizer = $authorizer;
+        $this->user       = $user;
+    }
+
+
+    /**
+     * Create the translator for badge awards.
+     *
+     * @return ModelToArray
+     */
+    public function build(): ModelToArray
+    {
+        return new ModelToArray(
+            new User\Translator\ModelToArray(),
+            new \Schoolbox\Learning\Badge\Translator\ModelToArray(
+                new User\Translator\ModelToArray(),
+                new \Schoolbox\Resource\Storage\Translator\ModelToArray(),
+                new ScrubAdapter(),
+                new BadgeLinksTranslator($this->router, $this->authorizer, $this->user)
+            ),
+            new BadgeAwardLinksTranslator($this->router, $this->authorizer, $this->user)
+        );
+    }
+}

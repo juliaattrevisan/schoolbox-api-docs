@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Closure;
+use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -111,7 +112,7 @@ class Module extends BaseModule
             $viewCreateFormPreloader
         );
 
-        // Rule for viewing a user's moments:
+        // Rule for viewing a user's moments or feed:
         // * Staff and superusers may view anyone's
         // * Students may view their own
         // * Parents may view their own and their kid's
@@ -189,7 +190,8 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'mapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+                    'mapper'        => $this->getMapperFactory()->getLazy(Mapper::class),
+                    'commentMapper' => $this->getMapperFactory()->getLazy(CommentMapper::class),
                 ]
             )
         );

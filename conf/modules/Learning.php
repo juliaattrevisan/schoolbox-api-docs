@@ -27,6 +27,7 @@ use Schoolbox\Learning\Module as LearningModule;
 use Schoolbox\Learning\Moment\Evidence\Discussion\Comment\Module as EvidenceCommentModule;
 use Schoolbox\Learning\Moment\Evidence\Discussion\Thread\Module as EvidenceThreadModule;
 use Schoolbox\Learning\Moment\Evidence\Module as EvidenceModule;
+use Schoolbox\Learning\Moment\Feed\Module as FeedModule;
 use Schoolbox\Learning\Moment\StudentToolkit\Module as StudentToolkitModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Upcoming;
@@ -75,7 +76,11 @@ class Learning extends ModuleLoader
             $this->loadModule($kernel, EvidenceCommentModule::class, "/discussion/evidence/{contextId}/comments");
         }
 
+        // Badge module: not behind a feature flag for now
         $this->loadModule($kernel, BadgeModule::class, "/{$namespace}/badge");
+
+        // Feed module: not behind a feature flag
+        $this->loadModule($kernel, FeedModule::class, "/{$namespace}/evidenceFeed");
 
         /* Assessment Calendar is behind a feature flag
          */

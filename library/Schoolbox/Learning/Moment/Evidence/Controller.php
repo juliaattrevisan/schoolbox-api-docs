@@ -16,6 +16,7 @@ use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Collection;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Json\Decorator\LinkDecorator;
+use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
@@ -42,13 +43,20 @@ class Controller extends Base
 
 
     /**
+     * @var Comment\Mapper
+     */
+    private Comment\Mapper $commentMapper;
+
+
+    /**
      * Constructor
      *
      * @param Mapper $mapper
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, Comment\Mapper $commentMapper)
     {
-        $this->mapper = $mapper;
+        $this->mapper        = $mapper;
+        $this->commentMapper = $commentMapper;
     }
 
 
@@ -360,48 +368,6 @@ class Controller extends Base
 
 
     /**
-     * Generate a set of links relevant to $model
-     *
-     * This uses the router's getRouteIfAuthorized() method and some controller parts
-     * to figure out which links are available and which aren't. We shouldn't provide
-     * links that a person can't visit.
-     *
-     * The router and its mechanics are pretty solidly tied to controllers and I don't
-     * necessarily want to inject an entire controller instance into the Translator
-     * classes and assorted places like that
-     *
-     * @deprecated now handled in `Translator\ModelToArray\Links`
-     *
-     * @param array $evidence
-     * @return array
-     * @throws \Aura\Router\Exception\RouteNotFound
-     */
-    private function generateLinks(array $evidence): array
-    {
-        // TODO consider moving this into Translator\ModelToArrayWithComments
-        if (!array_key_exists('_links', $evidence)) {
-            $evidence['_links'] = [];
-        }
-        $evidence['_links']['detail'] = $this->getRouteIfAuthorized('learningMomentEvidence.getEvidenceDetail', [
-            'evidenceId' => $evidence['id'],
-            'userId' => $evidence['recipient']['id']
-        ]);
-
-        /* TODO Figure out what the modify perms will be
-         *  I added this here, it was in there SA-11246 screenshot.
-         */
-        $evidence['_links']['modify'] = null;
-
-        $evidence['_links']['delete'] = $this->getRouteIfAuthorized('learningMomentEvidence.deleteEvidence', [
-            'evidenceId' => $evidence['id'],
-            'creatorId' => $evidence['creator']['id']
-        ]);
-
-        return $evidence;
-    }
-
-
-    /**
      * Builds a translator which contains comments.
      *
      * @param int $commentLimit
@@ -409,33 +375,11 @@ class Controller extends Base
      */
     private function buildTranslatorWithComments(int $commentLimit): Composite
     {
-        $scrubWrapper   = new ScrubAdapter();
-        $baseTranslator = new Translator\ModelToArray\Base(
-            new User\Translator\Author\ModelToArray(),
-            new Storage\Translator\ModelToArray(),
-            $scrubWrapper,
-        );
-
-        $linkTranslator = new Translator\ModelToArray\Links(
+        return (new Factory(
             $this->router,
             $this->authorizer,
             $this->getUser(),
-        );
-
-        $linkDecorator     = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
-        $propertyDecorator = new PropertyDecorator(null, $linkDecorator);
-        $commentTranslator = new Translator\ModelToArray\Comments(
-            Comment\Mapper::getInstance(),
-            $linkDecorator,
-            $propertyDecorator,
-            $commentLimit,
-            $scrubWrapper,
-        );
-
-        return new Composite(
-            $baseTranslator,
-            $linkTranslator,
-            $commentTranslator,
-        );
+            $this->commentMapper
+        ))->buildWithComments($commentLimit);
     }
 }

@@ -8,9 +8,11 @@ import Storage      from '@schoolbox/storage';
 import CommentThread from './commentThread';
 import RevealModal from "@schoolbox/reveal-modal";
 import Toast from "@schoolbox/toast";
+import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
 
 export default {
     components: {
+        AwardDetailModal,
         Toast,
         RevealModal,
         MediaArticle,
@@ -35,7 +37,7 @@ export default {
         config: () => window.learningEvidenceFeedConfig,
         dateDisplayFormats: () => window.dateDisplayFormats,
         groupedEvidence() {
-            return this.groupEvidence(this.data);
+            return this.groupFeedResults(this.data);
         },
         currentCount () {
             return data.length;
@@ -68,7 +70,7 @@ export default {
                 params.cursor = cursor;
             }
             axios
-                .get(this.config.routes.getEvidence, {params})
+                .get(this.config.routes.getFeed, {params})
                 .then(response => {
                     this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
@@ -78,25 +80,23 @@ export default {
         },
 
         /**
-         * Groups learning evidence by the date which it was posted.
+         * Groups learning evidence / badges by the date which it was posted.
          *
-         * @param {Array} evidence
+         * @param {Array} feedResults
          * @return Array
          */
-        groupEvidence(evidence) {
+        groupFeedResults(feedResults) {
             let groupedEvidenceByDate = {};
-            evidence.forEach(v => {
-                let createdAt = moment(v.createdAt),
-                    updatedAt = moment(v.updatedAt),
-                    key       = createdAt.format('YYYYMMDD');
+            feedResults.forEach(v => {
+                let date = moment(v.date),
+                    key  = date.format('YYYYMMDD');
                 if (!(key in groupedEvidenceByDate)) {
                     groupedEvidenceByDate[key] = {
-                        date:     moment(createdAt).startOf('d'),
+                        date:     moment(date).startOf('d'),
                         evidence: []
                     }
                 }
-                v.createdAt = createdAt;
-                v.updatedAt = updatedAt;
+                v.date = date;
                 groupedEvidenceByDate[key].evidence.push(v);
             });
 
@@ -108,7 +108,7 @@ export default {
             // Ensure that each evidence within the group is sorted
             groupedEvidence.forEach(v => {
                 v.evidence.sort(
-                    (a, b) => a.createdAt.isBefore(b.createdAt) ? 1 : -1
+                    (a, b) => a.date.isBefore(b.date) ? 1 : -1
                 )
             });
 
@@ -194,6 +194,16 @@ export default {
                 .finally(() => {
                     this.$refs.deleteModal.close();
                 })
+        },
+
+
+        /**
+         * Open the view badge award modal.
+         *
+         * @param {Object} badgeAward The badge award object to display
+         */
+        openViewBadgeAwardModal(badgeAward) {
+            this.$refs.awardDetailModal.open(badgeAward);
         }
     },
     filters: {
@@ -205,79 +215,100 @@ export default {
 
 <template>
     <div>
-        <section class="skeleton-feed" v-if="showSkeletonLoader">
-          <ul class="information-list">
-              <li class="row" v-for="n in 3">
-                  <div class="small-12 card skeleton">
-                      <div class="img"></div>
-                      <h3></h3>
-                      <p class="meta"></p>
-                  </div>
-              </li>
-          </ul>
-        </section>
-        <div class="row" v-else>
-            <div class="small-12 island">
-                <div v-if="metadata.count === 0" class="empty-state">
-                    <i class="icon-advanced-list"></i>
-                    <p>There is no activity yet. To get started you can <a href="#" title="Share something" @click="openShareLearningMomentModal">share something</a>.</p>
-                </div>
-                <button v-else-if="metadata.cursor.next && metadata.count > data.length" class="expand" @click.prevent="append(metadata.cursor.next)">
-                  Load more
-                </button>
+      <section class="skeleton-feed" v-if="showSkeletonLoader">
+        <ul class="information-list">
+          <li class="row" v-for="n in 3">
+            <div class="small-12 card skeleton">
+              <div class="img"></div>
+              <h3></h3>
+              <p class="meta"></p>
             </div>
+          </li>
+        </ul>
+      </section>
+      <div class="row" v-else>
+        <div class="small-12 island">
+          <div v-if="metadata.count === 0" class="empty-state">
+            <i class="icon-advanced-list"></i>
+            <p>There is no activity yet. To get started you can <a href="#" title="Share something" @click="openShareLearningMomentModal">share something</a>.</p>
+          </div>
+          <button v-else-if="metadata.cursor.next && metadata.count > data.length" class="expand" @click.prevent="append(metadata.cursor.next)">
+            Load more
+          </button>
         </div>
-        <div class="feed" v-for="evidenceGroup in groupedEvidence">
-            <div class="feed-column left"></div>
-            <section>
-                <h2 class="subheader no-margin">
-                  <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
-                        :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
-                  >{{ renderCreatedAt(evidenceGroup.date) }}</time>
-                </h2>
+      </div>
+        <div class="feed"  v-for="evidenceGroup in groupedEvidence">
+          <div class="feed-column left"></div>
+          <section>
+            <h2 class="subheader no-margin">
+                <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
+                      :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
+                >{{ renderCreatedAt(evidenceGroup.date) }}</time>
+            </h2>
                 <ul class="information-list">
                     <li v-for="evidence in evidenceGroup.evidence" class="feed-item">
-                        <!-- This evidence isn't necessarily editable -->
-                        <div :class="{'actions-small-1': hasMenu(evidence), 'actions-small-0': !hasMenu(evidence)}">
-                            <div class="card small-12 compact">
-                                <a :href="evidence.creator._links.profile" title="View Profile">
-                                    <img :src="evidence.creator._links.avatar" alt="View Profile">
-                                    <p>{{ evidence.creator.fullName }}</p>
-                                    <time class="pipe meta"
-                                          :datetime="evidence.createdAt | dateFormat"
-                                          :title="evidence.createdAt  | dateFormat(dateDisplayFormats.momentJsDatetime)"
-                                    >{{ evidence.createdAt | dateFormat(dateDisplayFormats.momentJsTime) }}</time>
+                        <template v-if="evidence.discriminator === 'evidence'">
+                            <!-- This evidence isn't necessarily editable -->
+                            <div :class="{'actions-small-1': hasMenu(evidence.object), 'actions-small-0': !hasMenu(evidence.object)}">
+                                <div class="card small-12 compact">
+                                    <a :href="evidence.object.creator._links.profile" title="View Profile">
+                                        <img :src="evidence.object.creator._links.avatar" alt="View Profile">
+                                        <p>{{ evidence.object.creator.fullName }}</p>
+                                        <time class="pipe meta"
+                                              :datetime="evidence.object.createdAt | dateFormat"
+                                              :title="evidence.object.createdAt  | dateFormat(dateDisplayFormats.momentJsDatetime)"
+                                        >{{ evidence.object.createdAt | dateFormat(dateDisplayFormats.momentJsTime) }}</time>
+                                    </a>
+                                </div>
+                                <nav v-if="hasMenu(evidence.object)">
+                                    <a href="#"
+                                       class="icon-overflow"
+                                       :data-dropdown="'evidence-' + String(evidence.object.id) + '-dropdown'"
+                                       aria-expanded="false" title="Actions"></a>
+                                </nav>
+                                <ul v-if="hasMenu(evidence.object)" :id="'evidence-' + String(evidence.object.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
+                                    <li><a v-if="evidence.object._links.modifyForm" :href="evidence.object._links.modifyForm" class="icon-modify" title="Modify">Modify</a></li>
+                                    <li><a @click.prevent="showDeleteModal(evidence)" v-if="evidence.object._links.delete" class="icon-delete" title="Delete">Delete</a></li>
+                                </ul>
+                            </div>
+
+                            <div class="feed-body small-12 columns">
+                                <!-- Is there an attachment? Display it appropriately -->
+                                <article v-if="evidence.object.filename && evidence.object.storage">
+                                    <storage :storage="evidence.object.storage" :filename="evidence.object.filename"></storage>
+                                </article>
+
+                                <!-- Display evidence body, with media players initialised -->
+                                <media-article v-if="evidence.object.body">
+                                    <div v-html="evidence.object.body" />
+                                </media-article>
+                            </div>
+
+                            <div class="feed-comments small-12 columns">
+                                <comment-thread :thread="evidence.object.discussionThread"
+                                                :create-thread-endpoint="evidence.object._links.createThread"
+                                />
+                            </div>
+                        </template>
+                        <template v-if="evidence.discriminator === 'badgeAward'">
+                            <div class="card small-12">
+                                <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">
+                                    <img :src="evidence.object.badge.image._links.image + '&size=square64'" :alt="evidence.object.badge.name" :class="{goal: evidence.object.status === 'goal'}">
+                                    <span>{{ evidence.object.badge.name }}</span>
+                                    <p class="meta">
+                                        <template v-if="evidence.object.status === 'achievement'">Achievement awarded</template>
+                                        <template v-if="evidence.object.status === 'goal'">Goal set</template>
+                                        by {{ evidence.object.awardedBy.fullName }}
+                                        |
+                                        <time class="meta" :datetime="evidence.object.awardedAt | dateFormat"
+                                              :title="evidence.object.awardedAt  | dateFormat(dateDisplayFormats.momentJsDatetime)">
+                                        {{ evidence.object.awardedAt | dateFormat(dateDisplayFormats.momentJsTime) }}
+                                        </time>
+                                    </p>
                                 </a>
                             </div>
-                            <nav v-if="hasMenu(evidence)">
-                                <a href="#"
-                                   class="icon-overflow"
-                                   :data-dropdown="'evidence-' + String(evidence.id) + '-dropdown'"
-                                   aria-expanded="false" title="Actions"></a>
-                            </nav>
-                            <ul v-if="hasMenu(evidence)" :id="'evidence-' + String(evidence.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                <li><a v-if="evidence._links.modifyForm" :href="evidence._links.modifyForm" class="icon-modify" title="Modify">Modify</a></li>
-                                <li><a @click.prevent="showDeleteModal(evidence)" v-if="evidence._links.delete" class="icon-delete" title="Delete">Delete</a></li>
-                            </ul>
-                        </div>
 
-                        <div class="feed-body small-12 columns">
-                            <!-- Is there an attachment? Display it appropriately -->
-                            <article v-if="evidence.filename && evidence.storage">
-                                <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
-                            </article>
-
-                            <!-- Display evidence body, with media players initialised -->
-                            <media-article v-if="evidence.body">
-                                <div v-html="evidence.body" />
-                            </media-article>
-                        </div>
-
-                        <div class="feed-comments small-12 columns">
-                            <comment-thread :thread="evidence.discussionThread"
-                                            :create-thread-endpoint="evidence._links.createThread"
-                            />
-                        </div>
+                        </template>
                     </li>
                 </ul>
             </section>
@@ -293,6 +324,8 @@ export default {
                 <li><a @click.prevent="$refs.deleteModal.close()" class="button">No</a></li>
             </ul>
         </reveal-modal>
+
+        <award-detail-modal ref="awardDetailModal"></award-detail-modal>
 
         <toast ref="toast"></toast>
     </div>
