@@ -27,3 +27,18 @@
         outline: 4px solid $content-ui-hover;
     }
 }
+
+/* Badge List uses data-equalizer to make everything the same height
+ */
+.badge-grid > li {
+    min-height: 12rem;
+}
+
+.badge-image, .badge-icon {
+    max-height: 8rem;
+}
+
+.badge-icon {
+    min-width: 8rem;
+}
+
