@@ -11,26 +11,62 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Badge\Category;
 
 
+use InvalidArgumentException;
+use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
+use Schoolbox\User;
 
 
+/**
+ * Key converter for the badge category filter.
+ */
 class KeyConverter extends AbstractKeyConverter
 {
+    /**
+     * Extant category IDs
+     */
+    private array $categoryIds;
 
-    protected function getItem(string $key,\Schoolbox\User $user,string $page)
+
+    /**
+     * Constructor
+     *
+     * @param Filter\Model $filter
+     * @param array        $categoryIds
+     */
+    public function __construct(Filter\Model $filter, array $categoryIds)
     {
-        // TODO: Implement getItem() method.
+        parent::__construct($filter);
+        $this->categoryIds = $categoryIds;
     }
 
 
-    protected function assertValidKey(string $key,\Schoolbox\User $user,string $page) : void
+    /**
+     * @inheritdoc
+     */
+    protected function getItem(string $key, User $user, string $page): int
     {
-        // TODO: Implement assertValidKey() method.
+        $this->assertValidKey($key, $user, $page);
+        return (int)$key;
     }
 
 
-    public function possibleItemCount() : int
+    /**
+     * @inheritDoc
+     */
+    public function possibleItemCount(): int
     {
-        // TODO: Implement possibleItemCount() method.
+        return count($this->categoryIds);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function assertValidKey(string $key, User $user, string $page): void
+    {
+        if (!in_array($key, $this->categoryIds, false)) {
+            throw new InvalidArgumentException('Badge category is invalid: ' . $key);
+        }
     }
 }
