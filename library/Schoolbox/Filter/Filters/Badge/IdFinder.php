@@ -40,8 +40,21 @@ class IdFinder extends AbstractIdFinder
     }
 
 
-    protected function buildQuery(array $completeFilters,bool $deleted) : array
+    /**
+     * Retrieve ID of all badges which match the filters.
+     *
+     * @param array $completeFilters
+     * @param bool $deleted
+     * @return array
+     */
+    protected function buildQuery(array $completeFilters, bool $deleted) : array
     {
-        // TODO: Implement buildQuery() method.
+        $categoryIds = $completeFilters[Category\Definition::class];
+        $pb          = $this->getMapper()->getPredicateBuilder()
+                                         ->in('category_id', $categoryIds);
+
+        $query  = 'SELECT b.id FROM badge b WHERE ' . $pb->getWhereIntersect();
+        $params = $pb->getParams();
+        return [$query, $params];
     }
 }
