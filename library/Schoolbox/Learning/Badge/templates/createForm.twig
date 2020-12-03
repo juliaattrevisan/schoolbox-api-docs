@@ -28,16 +28,18 @@
                 </fieldset>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label class="required">Choose badge image</label>
+                        <label class="required" for="chooseBadge">Choose badge image</label>
                         <p class="meta">Choose a badge image from our existing set or upload your own.</p>
+                        <div class="row">
+                            <div class="small-12 medium-6 columns">
 
-                        <fieldset class="radiolist" data-badge-avatar-options>
-                            <input id="badge-icon" type="radio" name="badge-avatar-selector" value="icon" data-icon />
-                            <label for="badge-icon">Choose an existing icon</label>
+                                <fieldset class="radiolist" id="chooseBadge" data-badge-avatar-options>
+                                    <input id="badge-icon" type="radio" name="badge-avatar-selector" value="icon" data-icon checked />
+                                    <label for="badge-icon">Choose an existing icon</label>
 
-                            <input id="badge-image" type="radio" name="badge-avatar-selector" value="image" data-image/>
-                            <label for="badge-image">Upload from your device</label>
-                        </fieldset>
+                                    <input id="badge-image" type="radio" name="badge-avatar-selector" value="image" data-image/>
+                                    <label for="badge-image">Upload from your device</label>
+                                </fieldset>
 
                         <script src="/javascript/shared/badges/jquery.icon-modal.js"></script>
                         <script>
@@ -73,10 +75,10 @@
                                 });
                             });
                         </script>
-                        <div class="row">
-                            <div class="small-12 columns" style="display:none;" data-icon-container>
+                            </div>
+                            <div class="small-12 medium-6 columns" data-icon-container>
                                 <div data-icon-selection>
-                                    <img src="" width="64" height="64" style="display:none"/>
+                                    <img src="" width="64" height="64" />
                                     <input id="badge-icon" name="icon" type="hidden" value="" />
                                 </div>
                                 <div>
@@ -86,7 +88,7 @@
                                     }%}
                                 </div>
                             </div>
-                            <div class="small-12 columns" style="display:none;" data-image-container>
+                            <div class="small-12 medium-6 columns" style="display:none;" data-image-container>
                                 {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
                             </div>
                         </div>
