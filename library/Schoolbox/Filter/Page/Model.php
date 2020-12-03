@@ -106,6 +106,9 @@ class Model
             self::PAGE_ASSESSMENT_CALENDAR => [
                 Role::STAFF,
             ],
+            self::PAGE_BADGE_LIST => [
+                Role::STAFF,
+            ],
         ];
     }
 
