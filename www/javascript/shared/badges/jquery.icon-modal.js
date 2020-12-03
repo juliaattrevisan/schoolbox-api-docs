@@ -42,7 +42,7 @@
 
                 /* Landing page that presumably explains something useful
                  */
-                landing: $('#landing'),
+                landing: 'education',
 
                 /* Images are found at this relative url
                  */
@@ -67,6 +67,7 @@
                     config.onSelect($(this))
                 });
             });
+
         }
 
 
@@ -74,6 +75,9 @@
          * Load the first set of icons when you start a new category
          */
         function initIconCategorySelector() {
+            folder = config.landing;
+            loadPage(1, config.registry[folder].files.length);
+
             $('[data-icon-path]').on('click', function(event) {
                 let current = $(this).attr('data-icon-path');
 
@@ -87,10 +91,6 @@
                  */
                 config.paginators.removeClass('hide');
 
-                /* Always hide empty state thing
-                 */
-                config.landing.hide();
-
                 /* Change category
                  */
                 folder = current;
@@ -99,6 +99,7 @@
 
                 loadPage(1, config.registry[folder].files.length);
             });
+
         }
 
 

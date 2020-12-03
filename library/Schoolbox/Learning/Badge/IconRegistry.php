@@ -127,7 +127,7 @@ class IconRegistry
     /**
      * Number of icons to display per page
      */
-    public const BADGE_ICON_MODAL_PAGELENGTH = 40;
+    public const BADGE_ICON_MODAL_PAGELENGTH = 54;
 
 
     /**
