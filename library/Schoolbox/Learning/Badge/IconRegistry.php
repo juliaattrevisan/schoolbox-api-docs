@@ -240,25 +240,4 @@ class IconRegistry
     {
         return $this->registry;
     }
-
-
-    /**
-     * Check that each folder has the correct num specified
-     * and that each of the files is named sequentially
-     *
-     * Usage: in a test.php, (new \Schoolbox\Learning\Badge\IconRegistry())->analyse();
-     */
-    public function analyse(): void
-    {
-        foreach ($this->registry as $folder => $node) {
-            for ($i = 1; $i <= $node['num']; $i++) {
-
-                $path = "{$this->root}/{$folder}/{$i}.svg";
-
-                $exists = file_exists($path);
-
-                new \Alaress_Probe($path, $exists ? "<strong style='color:#0d0'>Exists</strong>" : "<strong style='color:#d00'>Missing</strong>");
-            }
-        }
-    }
 }
