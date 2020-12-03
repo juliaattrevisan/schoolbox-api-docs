@@ -135,13 +135,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/tags',
             'getTags',
-            new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF),
-                ),
-            )
+            new Rule\IsLoggedIn(),
         );
 
         /* Evidence Detail screen

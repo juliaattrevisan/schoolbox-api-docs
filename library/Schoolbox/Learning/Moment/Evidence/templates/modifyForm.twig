@@ -25,10 +25,8 @@
                             Description
                         </label>
                         <textarea name="body" id="evidence-body">{{ evidence.body | purify }}</textarea>
-                        {% if USER.role.isStaff %}
-                            <label for="evidence-tags">Tags</label>
-                            <select data-tags name="tags[]" id="evidence-tags" multiple></select>
-                        {% endif %}
+                        <label for="evidence-tags">Tags</label>
+                        <select data-tags name="tags[]" id="evidence-tags" multiple></select>
                         {% if curriculumTaggingEnabled %}
                             <label for="curriculum-code-select">Curriculum Codes</label>
                             <div class="input-group">
@@ -65,14 +63,12 @@
                     curriculumNodes: [],
                     tags: [],
                 };
-        {% if USER.role.isStaff %}
         let tags = form.querySelector('#evidence-tags').selectize.items;
         payload.tags = tags.map(
                 (v) => {
                     return {id: Number(v)}
                 }
         );
-        {% endif %}
         {% if curriculumTaggingEnabled %}
         let curriculumNodes = form.querySelector('select[name="curriculumCodes[]"]').selectize.items;
         payload.curriculumNodes = curriculumNodes.map(
@@ -144,7 +140,6 @@
                     });
             }
         })
-        {% if USER.role.isStaff %}
         $('[data-tags]').selectizeSelector({
             ajax: {
                 url: '{{ routeLookup('learningMomentEvidence.getTags') }}',
@@ -179,7 +174,6 @@
             ],
             multiple: true
         });
-        {% endif %}
     });
 </script>
 {% endautoescape %}
