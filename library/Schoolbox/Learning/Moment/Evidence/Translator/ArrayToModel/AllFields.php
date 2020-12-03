@@ -184,16 +184,32 @@ class AllFields extends Base
         }
 
         // Set curriculum nodes
-        $this->setCollection(
-            $json,
-            'curriculumNodes',
-            'id',
-            $model,
-            'setCurriculumNodes',
-            new GenericCollection(CurriculumNode::class),
-            new CurriculumNode(),
-            'setId'
-        );
+        if (array_key_exists('curriculumNodes', $json)) {
+            $this->setCollection(
+                $json,
+                'curriculumNodes',
+                'id',
+                $model,
+                'setCurriculumNodes',
+                new GenericCollection(CurriculumNode::class),
+                new CurriculumNode(),
+                'setId'
+            );
+        }
+
+        // Set curriculum nodes
+        if (array_key_exists('tags', $json)) {
+            $this->setCollection(
+                $json,
+                'tags',
+                'id',
+                $model,
+                'setTags',
+                new GenericCollection(Evidence\Tag\Model::class),
+                new Evidence\Tag\Model(),
+                'setId'
+            );
+        }
 
         return $model;
     }

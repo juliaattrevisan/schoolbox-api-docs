@@ -72,6 +72,10 @@
                             {% endblock formInputFile %}
                             {% block formInputBody %}
                             {% endblock formInputBody %}
+                            {% if USER.role.isStaff %}
+                                <label for="evidence-tags">Tags</label>
+                                <select data-tags name="tags[]" id="evidence-tags" multiple></select>
+                            {% endif %}
                             {% if curriculumTaggingEnabled %}
                                 <label for="curriculum-code-select">Curriculum Codes</label>
                                 <div class="input-group">
@@ -115,7 +119,16 @@
                     body: formData.get('body'),
                     file: formData.get('file'),
                     curriculumNodes: [],
+                    tags: [],
                 };
+        {% if USER.role.isStaff %}
+        let tags = form.querySelector('#evidence-tags').selectize.items;
+        payload.tags = tags.map(
+                (v) => {
+                    return {id: Number(v)}
+                }
+        );
+        {% endif %}
         {% if curriculumTaggingEnabled %}
         let curriculumNodes = form.querySelector('select[name="curriculumCodes[]"]').selectize.items;
         payload.curriculumNodes = curriculumNodes.map(
@@ -163,6 +176,38 @@
                     });
             }
         })
+        {% if USER.role.isStaff %}
+        $('[data-tags]').selectizeSelector({
+            ajax: {
+                url: '{{ routeLookup('learningMomentEvidence.getTags') }}',
+                type: 'GET',
+                dataType: 'json'
+            },
+            selectize: {
+                placeholder: '',
+                preload: true,
+                persist: true,
+                hideSelected: true,
+                load: function (query, callback) {
+                    // Load: get values from AJAX, and callback with result
+                    var ajaxSettings = {
+                        url: '{{ routeLookup('learningMomentEvidence.getTags') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                    };
+                    $.ajax(ajaxSettings)
+                            .done(function (result) {
+                                callback(result)
+                            })
+                            .fail(function () {
+                                callback()
+                            })
+                }
+            },
+            value: [],
+            multiple: true
+        });
+        {% endif %}
     });
 </script>
 {% endautoescape %}

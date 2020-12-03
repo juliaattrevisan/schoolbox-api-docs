@@ -131,6 +131,19 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadUser']),
         );
 
+        $this->register(
+            self::METHOD_GET,
+            '/tags',
+            'getTags',
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF),
+                ),
+            )
+        );
+
         /* Evidence Detail screen
          */
         $this->register(

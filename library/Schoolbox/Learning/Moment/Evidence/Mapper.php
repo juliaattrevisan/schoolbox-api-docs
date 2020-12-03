@@ -55,6 +55,18 @@ class Mapper extends BaseMapper
             null,
             'curriculumNodes'
         );
+
+        $this->joinsVia(
+            'evidence_tag',
+            Tag\Mapper::class,
+            'id',
+            'tag_id',
+            'evidence_id',
+            null,
+            null,
+            null,
+            'tags'
+        );
     }
 
 
@@ -130,14 +142,50 @@ class Mapper extends BaseMapper
             $creator = $this->hydrateJoin($row, 'creator', 'creator');
             $model->setCreator($creator);
 
+            // Set the list of tags as an empty collection:
+            // these will be hydrated in `hydrateTagsIntoCollection`
+            $model->setTags($this->getJoinMapper('evidence_tag')->createCollection());
+
             // Set the list of curriculum codes as an empty collection:
             // these will be hydrated in `hydrateCurriculumNodesIntoCollection`
             $model->setCurriculumNodes($this->getJoinMapper('curriculum_evidence')->createCollection());
 
             $collection[$model->getId()] = $model;
         }
+        $this->hydrateTagsIntoCollection($collection);
         return $this->hydrateCurriculumNodesIntoCollection($collection);
     }
+
+
+    /**
+     * Helper method for hydrating evidence tags into the collection of
+     * evidences retrieved by `hydrateSelect`.
+     *
+     * @param GenericCollection $collection
+     * @return GenericCollection
+     */
+    private function hydrateTagsIntoCollection(GenericCollection $collection): GenericCollection
+    {
+        $evidenceIds = $collection->keys();
+        $pb          = $this->getPredicateBuilder()->in('id', $evidenceIds);
+        $query       = "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('evidence_tag', 'et')}
+            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            INNER JOIN {$this->getJoinSql('evidence_tag', '', 'et')}
+            WHERE {$pb->getWhereIntersect()}
+        ";
+
+        $evidenceTagStatement = $this->database->query($query, $pb->getParams());
+        foreach ($evidenceTagStatement as $row) {
+            /** @var Tag\Model $evidenceTag */
+            $evidenceTag = $this->hydrateJoin($row, 'evidence_tag', 'et');
+            $collection[$row['id']]->getTags()->setOffset($evidenceTag->getId(), $evidenceTag);
+        }
+        return $collection;
+    }
+
 
     /**
      * Helper method for hydrating curriculum nodes into the collection of

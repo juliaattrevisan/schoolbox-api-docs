@@ -92,7 +92,7 @@ class Controller extends Base
             'userIds'                  => $users->getPropertyValues('id'),
             'otherUsers'               => $otherUsers,
             'sharingForSelf'           => $sharingForSelf,
-            'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+            'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
         ];
         switch ($momentType) {
             case self::MOMENT_TYPE_PHOTO:
@@ -157,10 +157,15 @@ class Controller extends Base
 
         $item = $translator($evidence);
 
-        $this->response->content->set($this->buildHtmlOutput('@learningMomentEvidence/detail.twig', [
-            'evidence'                 => $item,
-            'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-        ]));
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningMomentEvidence/detail.twig',
+                [
+                    'evidence'                 => $item,
+                    'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+                ]
+            )
+        );
     }
 
 
@@ -302,7 +307,7 @@ class Controller extends Base
                 [
                     'evidence'                 => $evidence,
                     'zone'                     => $zone->getTwigContext(),
-                    'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+                    'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
                 ]
             )
         );
@@ -320,7 +325,7 @@ class Controller extends Base
     {
         $requestBody       = json_decode(json_encode($this->request->content->get()), true);
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
-        $requestTranslator->setCurriculumTaggingEnabled($this->getConfigLoader()->get('curriculum_tagging_enabled'));
+        $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
         $evidence          = $requestTranslator($requestBody, $evidence);
 
         $this->mapper->save($evidence);
@@ -349,6 +354,29 @@ class Controller extends Base
     public function deleteEvidence(Model $evidence): void
     {
         $this->mapper->delete($evidence);
+    }
+
+
+    /**
+     * Get a list of available tags
+     *
+     * @api   GET /evidence/tags
+     * @since 20.2
+     */
+    public function getTags()
+    {
+        /** @var \Schoolbox\Learning\Moment\Evidence\Tag\Mapper $tagMapper */
+        $tagMapper = $this->mapper->getJoinMapper('evidence_tag');
+        $tags      = $tagMapper->findAll();
+        $output    = [];
+        /** @var Tag\Model $tag */
+        foreach ($tags as $tag) {
+            $output[] = [
+                'id'   => $tag->getId(),
+                'name' => $tag->getName(),
+            ];
+        }
+        $this->getResponse()->content->set($this->buildJsonOutput($output));
     }
 
 
@@ -385,5 +413,13 @@ class Controller extends Base
             $this->getUser(),
             $this->commentMapper
         ))->buildWithComments($commentLimit);
+    }
+
+    /**
+     * Checks whether curriculum tagging is enabled
+     */
+    private function curriculumTaggingEnabled(): bool
+    {
+        return $this->getUser()->getRole()->isStaff() && $this->getConfigLoader()->get('curriculum_tagging_enabled');
     }
 }

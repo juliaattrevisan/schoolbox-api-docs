@@ -82,7 +82,13 @@ class Model implements ISoftDeletable, IThreadLocation
      * @var GenericCollection|null
      */
     private ?GenericCollection $curriculumNodes = null;
-    
+
+
+    /**
+     * @var GenericCollection|null
+     */
+    private ?GenericCollection $tags = null;
+
     
     /**
      * @return IStorage|null
@@ -220,6 +226,26 @@ class Model implements ISoftDeletable, IThreadLocation
     public function setCurriculumNodes(GenericCollection $curriculumNodes): self
     {
         $this->curriculumNodes = $curriculumNodes;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection|null
+     */
+    public function getTags(): ?GenericCollection
+    {
+        return $this->tags;
+    }
+
+
+    /**
+     * @param GenericCollection $tags
+     * @return static
+     */
+    public function setTags(GenericCollection $tags): self
+    {
+        $this->tags = $tags;
         return $this;
     }
 
