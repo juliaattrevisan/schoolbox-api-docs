@@ -15,6 +15,9 @@ export default {
      *  - Re-apply Foundation dropdowns
      */
     updated() {
-        this.$nextTick(() => this.jQuery(this.$el).foundation('dropdown', 'reflow'));
+        this.$nextTick(() => {
+            this.jQuery(this.$el).foundation('dropdown', 'reflow');
+            this.jQuery(this.$el).foundation('equalizer', 'reflow');
+        });
     },
 }

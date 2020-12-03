@@ -34,10 +34,10 @@
                             <div class="small-12 medium-6 columns">
 
                                 <fieldset class="radiolist" id="chooseBadge" data-badge-avatar-options>
-                                    <input id="badge-icon" type="radio" name="badge-avatar-selector" value="icon" data-icon checked />
+                                    <input id="badge-icon" type="radio" name="badge-avatar-selector" value="icon" data-icon-selector checked />
                                     <label for="badge-icon">Choose an existing icon</label>
 
-                                    <input id="badge-image" type="radio" name="badge-avatar-selector" value="image" data-image/>
+                                    <input id="badge-image" type="radio" name="badge-avatar-selector" value="image" data-image-selector/>
                                     <label for="badge-image">Upload from your device</label>
                                 </fieldset>
 
@@ -64,12 +64,12 @@
 
                                 /* Mutex div switch
                                  */
-                                $('[data-icon]').on('click', function(event) {
+                                $('[data-icon-selector]').on('click', function(event) {
                                     $('[data-image-container]').hide();
                                     $('[data-icon-container]').show();
                                 });
 
-                                $('[data-image]').on('click', function(event) {
+                                $('[data-image-selector]').on('click', function(event) {
                                     $('[data-image-container]').show();
                                     $('[data-icon-container]').hide();
                                 });
