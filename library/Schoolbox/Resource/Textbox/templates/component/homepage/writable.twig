@@ -128,9 +128,9 @@
             
             //to start the Text Box editor automatically after creating a Text Box, 
             //previously users had to first select the #modifyButton to start editing
-            if ((window.newTextBoxId) && (window.newTextBoxId === '{{ component.instance.id }}')) { //check if a new Text Box has been created, and if so enable immediate focus within the relevant component
+            if ((document.body.hasAttribute('data-new-text-box-id')) && (document.body.getAttribute('data-new-text-box-id') === '{{ component.instance.id }}')) { //check if a new Text Box has been created, and if so enable immediate focus within the relevant component
                 inlineTextboxEditor.data('inlineTextboxEditor').onClickModify(); //implement the existing method within #jquery.inlineTextboxEditor.js used by #modifyButton to fire up the editor straight after creation
-                window.newTextBoxId = undefined; //clear the reference to ensure immediate focus only occurs after initial creation
+                document.body.removeAttribute('data-new-text-box-id'); //clear the reference to ensure immediate focus only occurs after initial creation
             } 
             
             // Before creating an editor: restore any placeholders, so that
@@ -226,8 +226,8 @@
                     ).done(function (response) {
                         
                         //to pass through that a new Text Box has been created, to allow the editor to start automatically
-                        window.newTextBoxId = '{{ component.instance.id }}';
-                        
+                        document.body.setAttribute('data-new-text-box-id', '{{ component.instance.id }}');
+
                         // Reload the component, close the dialog
                         addTextboxModal.foundation('reveal', 'close');
                         toast.toastTimeout({text: 'Created', css: 'success'});
