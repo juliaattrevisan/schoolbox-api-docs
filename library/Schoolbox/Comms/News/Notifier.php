@@ -24,6 +24,7 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
@@ -37,13 +38,14 @@ use Schoolbox\UserMapper;
 class Notifier extends AbstractModuleNotifier
 {
     public const TRIGGER_POSTED    = 'posted';
+    public const TRIGGER_UPDATED   = 'updated';
     public const TRIGGER_MODERATED = 'moderated';
     public const TRIGGER_SUBMITTED = 'submitted';
     public const TRIGGER_EXPIRED   = 'expired';
 
     // These patterns need to be consts to ensure consistency between methods (revocation relies on these strings matching)
 
-    private const PATTERN_POSTED_TITLE    = ':user posted :title';
+    private const PATTERN_POSTED_TITLE    = ':user :action :title';
     private const PATTERN_SUBMITTED_TITLE = ':user submitted an article, :title';
     private const PATTERN_POSTED_HREF     = '/news/%d?ref=' . Statistics\Mapper::REFERRER_EMAIL;
     private const PATTERN_ARTICLE_HREF    = '/news/%d';
@@ -245,13 +247,14 @@ class Notifier extends AbstractModuleNotifier
                         $bundle->detach(self::TRIGGER_EXPIRED);
                     }
                 }
-                // If there's any change to contents of posted notification, re-trigger posted
+                // If there's any change to contents of posted notification, trigger updated
                 if (!$retracted
                     && (($previous->getTitle() !== $article->getTitle())
                         || ($previous->getBlurb() !== $article->getBlurb())
                         || ($previous->getBody() !== $article->getBody())
+                        || (!($previous->getSticky()) && $article->getSticky())
                     )) {
-                    $bundle->attach(self::TRIGGER_POSTED, $publishAt->getUnixTimeStamp());
+                    $bundle->attach(self::TRIGGER_UPDATED, $publishAt->getUnixTimeStamp());
                 }
             }
             return;
@@ -489,9 +492,10 @@ class Notifier extends AbstractModuleNotifier
      * @param Article $article
      * @param User    $effector
      * @param array   $diff
+     * @param bool    $update
      * @return Envelope
      */
-    private function notifyPosted(string $roleType, Article $article, User $effector, array $diff): Envelope
+    private function notifyPosted(string $roleType, Article $article, User $effector, array $diff, bool $update): Envelope
     {
         $envelope = new Envelope();
 
@@ -547,13 +551,11 @@ class Notifier extends AbstractModuleNotifier
         $heading = $article->getTitle();
 
         // use the more recent of the two available dates
-        $activeDate = $article->getPublishAt() < $article->getCreatedAt()
-            ? $article->getCreatedAt()
-            : $article->getPublishAt();
+        $activeDate = $update ? $article->getUpdatedAt() : $article->getPublishAt();
 
         if (!$activeDate) {
             // oh noes
-            $this->log->warning('Attempted to process news article with no created_at OR published_at; ID is ' . $articleId);
+            $this->log->warning('Attempted to process news article with no updated_at OR published_at; ID is ' . $articleId);
             return $envelope;
         }
 
@@ -562,20 +564,22 @@ class Notifier extends AbstractModuleNotifier
 
 
         $bob = new Builder();
-        $previous = $this->buildPrevious($article, $diff);
 
         $notifBody = strlen($article->getBlurb()) > 0 ? $article->getBlurb() : $article->getBody();
 
         $bob->setTitle(self::PATTERN_POSTED_TITLE)
-            ->setParams([
-                'user'  => new UserParam($author),
-                'title' => new Param($heading, sprintf(self::PATTERN_ARTICLE_HREF, $articleId), Param::STACKING_APPEND),
-            ])
+            ->setParams(
+                [
+                    'user'   => new UserParam($update ? $effector : $author),
+                    'action' => new SimpleParam($update ? 'updated' : 'posted'),
+                    'title'  => new Param($heading, sprintf(self::PATTERN_ARTICLE_HREF, $articleId), Param::STACKING_REPLACE),
+                ]
+            )
             ->setIcon($icon)
             ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
-            ->addTopic("news.$articleId." . self::TRIGGER_POSTED)
+            ->addTopic("news.$articleId." . ($update ? self::TRIGGER_UPDATED : self::TRIGGER_POSTED))
             // body and byline are optional, but recommended since they render out in emails
             ->setMeta([
                 'title'  => $heading,
@@ -590,11 +594,6 @@ class Notifier extends AbstractModuleNotifier
             ->setTimestamp($activeDate->getUnixTimeStamp())
             // and then you build
             ->addFilter('roleType', [$roleType]);
-
-        if ($previous->isPublished()) {
-            // magical meta to delete messages related to object first.
-            $bob->setRetractFirst(true);
-        }
 
         $instance = $bob->build();
 
@@ -627,7 +626,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentPosted(Article $article, User $user, array $diff = []): Envelope
     {
-        return $this->notifyPosted(Role::STUDENT, $article, $user, $diff);
+        return $this->notifyPosted(Role::STUDENT, $article, $user, $diff, false);
     }
 
     /**
@@ -640,7 +639,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffPosted(Article $article, User $user, array $diff = []): Envelope
     {
-        return $this->notifyPosted(Role::STAFF, $article, $user, $diff);
+        return $this->notifyPosted(Role::STAFF, $article, $user, $diff, false);
     }
 
     /**
@@ -653,7 +652,46 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentPosted(Article $article, User $user, array $diff = []): Envelope
     {
-        return $this->notifyPosted(Role::PARENT, $article, $user, $diff);
+        return $this->notifyPosted(Role::PARENT, $article, $user, $diff, false);
     }
 
+
+    /**
+     * Notify students that news has been updated.
+     *
+     * @param Article $article
+     * @param User    $user
+     * @param array   $diff
+     * @return Envelope
+     */
+    public function notifyStudentUpdated(Article $article, User $user, array $diff = []): Envelope
+    {
+        return $this->notifyPosted(Role::STUDENT, $article, $user, $diff, true);
+    }
+
+    /**
+     * Notify staff that news has been updated.
+     *
+     * @param Article $article
+     * @param User    $user
+     * @param array   $diff
+     * @return Envelope
+     */
+    public function notifyStaffUpdated(Article $article, User $user, array $diff = []): Envelope
+    {
+        return $this->notifyPosted(Role::STAFF, $article, $user, $diff, true);
+    }
+
+    /**
+     * Notify parents that news has been updated.
+     *
+     * @param Article $article
+     * @param User    $user
+     * @param array   $diff
+     * @return Envelope
+     */
+    public function notifyParentUpdated(Article $article, User $user, array $diff = []): Envelope
+    {
+        return $this->notifyPosted(Role::PARENT, $article, $user, $diff, true);
+    }
 }
