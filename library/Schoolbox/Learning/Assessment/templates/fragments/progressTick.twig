@@ -12,7 +12,7 @@
  #}
 {% set postRoute = null %}
 
-{% if assessment is task %}
+{% if assessment is task and assessment.isImplementation %}
     {% set postRoute = routeLookupIfAuthorized('learningAssessment.postCreateResponse', {
         assessment:   assessment,
         assessmentId: assessment.id,
@@ -28,22 +28,22 @@
  # Feedback status happens to be
  #}
 {% set participant = assessment.participantIfExtant(student) %}
-{% set isOpenForStudent = (student.id == USER.id) and assessment.isOpen(USER) %}
+{% set isOpenForStudent = postRoute and (student.id == USER.id) and assessment.isOpen(USER) %}
 {# Tasks only #}
 {% if postRoute is not null %}
     <form action="{{ postRoute }}"
           method="POST"
           class="progress-tick-form"
           data-progress-tick-form="{{ assessment.isSelfAssessable ?? false ? 'selfAssessed' : 'teacherAssessed' }}">
-        {% if participant.isResponseRequired and (USER.role.isStaff or (isOpenForStudent and assessment.isSelfAssessable)) %}
+        {% if participant and participant.isResponseRequired and (USER.role.isStaff or (isOpenForStudent and assessment.isSelfAssessable)) %}
             <a class="no-text progress-tick"
                title="Incomplete"
                data-progress-tick-status="incomplete"></a>
-        {% elseif participant.isFeedbackRequired %}
+        {% elseif participant and participant.isFeedbackRequired %}
             <a class="no-text progress-tick pending"
                title="Self-assessed"
                data-progress-tick-status="selfAssessed"></a>
-        {% elseif participant.isReviewComplete %}
+        {% elseif participant and participant.isReviewComplete %}
             <a class="no-text progress-tick reviewed"
                title="Completed"
                data-progress-tick-status="teacherAssessed"></a>
