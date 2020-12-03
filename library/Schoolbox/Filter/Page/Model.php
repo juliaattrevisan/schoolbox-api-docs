@@ -28,6 +28,7 @@ class Model
     public const PAGE_LEARNING_ANALYTICS  = 'analytics';
     public const PAGE_UPCOMING_ASSESSMENTS= 'dueWorkCal';
     public const PAGE_ASSESSMENT_CALENDAR = 'assessmentCal';
+    public const PAGE_BADGE_LIST          = 'badgeList';
 
 
     /**
