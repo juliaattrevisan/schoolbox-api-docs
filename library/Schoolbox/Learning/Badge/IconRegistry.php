@@ -180,10 +180,30 @@ class IconRegistry
 
 
     /**
+     * Badge svgs live here
+     */
+    private const BADGE_ICON_ROOT = './images/badges';
+
+
+    /**
      * Check that each folder has the correct num specified
      * and that each of the files is named sequentially
+     *
+     * Usage: in a test.php, (new \Schoolbox\Learning\Badge\IconRegistry())->analyse();
      */
     public function analyse(): void
     {
+        $root = self::BADGE_ICON_ROOT;
+
+        foreach (self::BADGE_ICON_REGISTRY as $folder => $node) {
+            for ($i = 1; $i <= $node['num']; $i++) {
+
+                $path = "{$root}/{$folder}/{$i}.svg";
+
+                $exists = file_exists($path);
+
+                new \Alaress_Probe($path, $exists ? "<strong style='color:#0d0'>Exists</strong>" : "<strong style='color:#d00'>Missing</strong>");
+            }
+        }
     }
 }
