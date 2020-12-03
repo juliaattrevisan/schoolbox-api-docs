@@ -1412,7 +1412,8 @@ abstract class Kernel
                             $mapperFactory,
                             $di->get('l10n')
                         ),
-                        new Filter\Filters\Event\FactoryFactory($mapperFactory)
+                        new Filter\Filters\Event\FactoryFactory($mapperFactory),
+                        new Filter\Filters\Badge\FactoryFactory($mapperFactory),
                     );
                 }
             )
