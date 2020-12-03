@@ -87,6 +87,7 @@ In practise, developers don't need to know about this interface's methods, as
 all of them are implemented in the core abstract implementation
 `\Schoolbox\Filter\AbstractDefinition`. However, this class itself defines a set
 of methods which may be overridden, the most important being:
+* its name in the admin section (`NAME` constant)
 * addition of options from a database table (`insertDynamicOptions`)
   * maybe based on the page that the filter is on?
 * removal of options that cannot be selected (`unsetInvalidOptions`)
