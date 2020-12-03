@@ -29,16 +29,19 @@
 }
 
 /* Badge List uses data-equalizer to make everything the same height
+ * @stuart will need to fix these properly at some point so they render consistently
+ * throught all of badges
  */
-.badge-grid > li {
+.badge-grid > li,
+.badge-grid > .v-card {
     min-height: 12rem;
-}
 
-.badge-image, .badge-icon {
-    max-height: 8rem;
-}
+    .badge-image, .badge-icon {
+        width: auto !important;
+        max-height: 8rem;
+    }
 
-.badge-icon {
-    min-width: 8rem;
+    .badge-icon {
+        min-width: 8rem;
+    }
 }
-
