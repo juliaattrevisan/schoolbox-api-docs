@@ -31,6 +31,9 @@ namespace Schoolbox\Learning\Badge;
  * (svgs didn't come in a sprite sheet if that is even possible, they are individual files
  * so you're going to incur this cost at the minimum...)
  *
+ * Update: but apparently it's ok to just thrash the disk i/o so never mind anything I just said
+ * but I'll keep it around since it illustrates the idea
+ *
  * @package Schoolbox\Learning\Badge
  */
 class IconRegistry
