@@ -82,7 +82,7 @@ export default {
           -- on which fields were null
           -->
         <template v-if="badge.image">
-            <img :src="badge.image._links.image + '&size=constrain200'" :alt="badge.name" :class="'badge-image ' + css" />
+            <img :src="badge.image._links.image" :alt="badge.name" :class="'badge-image ' + css" />
         </template>
         <template v-else>
             <img :src="badge.icon" :alt="badge.name" :class="'badge-icon ' + css" />
