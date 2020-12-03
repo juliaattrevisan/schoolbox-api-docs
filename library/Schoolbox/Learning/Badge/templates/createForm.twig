@@ -32,11 +32,11 @@
                         <p class="meta">Choose a badge image from our existing set or upload your own.</p>
 
                         <fieldset class="radiolist" data-badge-avatar-options>
-                            <input id="badge-icon" type="radio" name="badge-avatar-selector" value="icon" data-icon />
-                            <label for="badge-icon">Choose an existing icon</label>
+                            <input id="badge-icon-option" type="radio" name="badge-avatar-selector" value="icon" data-icon-selector />
+                            <label for="badge-icon-option">Choose an existing icon</label>
 
-                            <input id="badge-image" type="radio" name="badge-avatar-selector" value="image" data-image/>
-                            <label for="badge-image">Upload from your device</label>
+                            <input id="badge-image-option" type="radio" name="badge-avatar-selector" value="image" data-image-selector/>
+                            <label for="badge-image-option">Upload from your device</label>
                         </fieldset>
 
                         <script src="/javascript/shared/badges/jquery.icon-modal.js"></script>
@@ -62,19 +62,19 @@
 
                                 /* Mutex div switch
                                  */
-                                $('[data-icon]').on('click', function(event) {
+                                $('[data-icon-selector]').on('click', function(event) {
                                     $('[data-image-container]').hide();
                                     $('[data-icon-container]').show();
                                 });
 
-                                $('[data-image]').on('click', function(event) {
+                                $('[data-image-selector]').on('click', function(event) {
                                     $('[data-image-container]').show();
                                     $('[data-icon-container]').hide();
                                 });
 
                                 /* Choose Icon on by default
                                  */
-                                $('[data-icon]').trigger('click');
+                                $('[data-icon-selector]').trigger('click');
                             });
                         </script>
                         <div class="row">
