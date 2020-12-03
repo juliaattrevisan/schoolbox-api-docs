@@ -116,15 +116,14 @@
             <ul class="information-list social-stream">
                 <li class="actions-small-2" v-for="(comment, index) in comments">
                     <div class="list-item">
-                        <div class="card small-12">
+                        <div class="card compact small-12">
                             <a :href="'/search/user/' + comment.author.id" title="View Profile">
-                                <img :src="'/portrait.php?userId=' + comment.author.externalId + '&size=square64'"></a>
-                            <p>
-                                <a :href="'/search/user/' + comment.author.id" title="View Profile">
+                                <img :src="'/portrait.php?userId=' + comment.author.externalId + '&size=square64'">
+                                <p class=""meta>
                                     ${ comment.author.title + ' ' + comment.author.firstname + ' ' + comment.author.lastname }
-                                </a>
-                            </p>
-                            <p class="meta" :title="comment.createdAt | fullString ">Posted ${ comment.createdAt | fromNow }</p>
+                                    <span class="pipe meta" :title="comment.createdAt | fullString ">Posted ${ comment.createdAt | fromNow }</span>
+                                </p>
+                            </a>
                         </div>
                     </div>
                     <nav>

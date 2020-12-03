@@ -205,14 +205,36 @@ export default {
 
 <template>
     <div>
-        <div v-for="evidenceGroup in groupedEvidence">
-            <h2 class="subheader feed no-margin">
-                <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
-                      :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
-                >{{ renderCreatedAt(evidenceGroup.date) }}</time>
-            </h2>
-
+        <section class="skeleton-feed" v-if="showSkeletonLoader">
+          <ul class="information-list">
+              <li class="row" v-for="n in 3">
+                  <div class="small-12 card skeleton">
+                      <div class="img"></div>
+                      <h3></h3>
+                      <p class="meta"></p>
+                  </div>
+              </li>
+          </ul>
+        </section>
+        <div class="row" v-else>
+            <div class="small-12 island">
+                <div v-if="metadata.count === 0" class="empty-state">
+                    <i class="icon-advanced-list"></i>
+                    <p>There is no activity yet. To get started you can <a href="#" title="Share something" @click="openShareLearningMomentModal">share something</a>.</p>
+                </div>
+                <button v-else-if="metadata.cursor.next && metadata.count > data.length" class="expand" @click.prevent="append(metadata.cursor.next)">
+                  Load more
+                </button>
+            </div>
+        </div>
+        <div class="feed" v-for="evidenceGroup in groupedEvidence">
+            <div class="feed-column left"></div>
             <section>
+                <h2 class="subheader no-margin">
+                  <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
+                        :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
+                  >{{ renderCreatedAt(evidenceGroup.date) }}</time>
+                </h2>
                 <ul class="information-list">
                     <li v-for="evidence in evidenceGroup.evidence" class="feed-item">
                         <!-- This evidence isn't necessarily editable -->
@@ -239,7 +261,7 @@ export default {
                             </ul>
                         </div>
 
-                        <div class="feed-body small-12 large-6 column">
+                        <div class="feed-body small-12 columns">
                             <!-- Is there an attachment? Display it appropriately -->
                             <article v-if="evidence.filename && evidence.storage">
                                 <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
@@ -249,13 +271,9 @@ export default {
                             <media-article v-if="evidence.body">
                                 <div v-html="evidence.body" />
                             </media-article>
-
-                            <div class="article-read-more">
-                                <a :href="evidence._links.detail">More Detail</a>
-                            </div>
                         </div>
 
-                        <div class="feed-comments small-12 large-6 column">
+                        <div class="feed-comments small-12 columns">
                             <comment-thread :thread="evidence.discussionThread"
                                             :create-thread-endpoint="evidence._links.createThread"
                             />
@@ -263,35 +281,13 @@ export default {
                     </li>
                 </ul>
             </section>
+            <div class="feed-column right"></div>
         </div>
-
-        <section v-if="showSkeletonLoader">
-            <div v-for="n in 3" class="list-item">
-                <div class="small-12 card skeleton">
-                    <div class="img"></div>
-                    <h3></h3>
-                    <p class="meta"></p>
-                </div>
-            </div>
-        </section>
-
-        <div class="row" v-else>
-            <div class="small-12 island">
-                <div v-if="metadata.count === 0" class="empty-state">
-                    <i class="icon-advanced-list"></i>
-                    <p>There is no activity yet. To get started you can <a href="#" title="Share something" @click="openShareLearningMomentModal">share something</a>.</p>
-                </div>
-                <button v-else-if="metadata.cursor.next && metadata.count > data.length" class="expand" @click.prevent="append(metadata.cursor.next)">
-                    Load more
-                </button>
-            </div>
-        </div>
-
 
         <!-- TODO create a Vue equivalent of $.confirmDialog -->
         <reveal-modal ref="deleteModal">
             <h2>Please confirm</h2>
-            <p>Are you sure you wish to delete this learning moment?</p>
+            <p>Are you sure you wish to delete this Learning Moment?</p>
             <ul class="flex-list buttons">
                 <li><a @click.prevent="deleteEvidence(currentlyDeletingEvidence)" class="button submit">Yes</a></li>
                 <li><a @click.prevent="$refs.deleteModal.close()" class="button">No</a></li>

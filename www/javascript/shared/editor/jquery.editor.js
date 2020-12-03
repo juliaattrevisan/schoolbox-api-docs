@@ -164,7 +164,7 @@
                 {name: 'insert', groups: ['insert']},
                 // {name: 'schoolbox', groups: ['schoolboxlink']},
             ],
-            height: '5rem',
+            height: '4rem',
             resize_enabled: false,
         });
     };
