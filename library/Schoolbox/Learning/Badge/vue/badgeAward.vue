@@ -1,6 +1,7 @@
 <script>
 
 import axios from "axios";
+import BadgeImage from './badge-image';
 import Toast from "@schoolbox/toast";
 
 // Vue-select boilerplate
@@ -34,7 +35,11 @@ const SEARCH_RESULT_RETRIEVE_DELAY = 350;
  * @emits cancel The award badge action was cancelled
  */
 export default {
-    components: {Toast, vSelect},
+    components: {
+        BadgeImage,
+        Toast,
+        vSelect
+    },
     props: {
         /**
          * The badge to display in this detail panel.
@@ -172,7 +177,7 @@ export default {
         <slot name="header" :badge="badge"></slot>
 
         <div class="card small-12 compact">
-            <img :src="badge.image._links.image" :alt="badge.name"/>
+            <badge-image :badge="badge"></badge-image>
             <h3>{{ badge.name }}</h3>
         </div>
 
