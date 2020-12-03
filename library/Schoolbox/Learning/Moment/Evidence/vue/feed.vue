@@ -9,6 +9,7 @@ import CommentThread from './commentThread';
 import RevealModal from "@schoolbox/reveal-modal";
 import Toast from "@schoolbox/toast";
 import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
+import BadgeImage from "../../../Badge/vue/badge-image";
 
 export default {
     components: {
@@ -18,6 +19,7 @@ export default {
         MediaArticle,
         Storage,
         CommentThread,
+        BadgeImage,
     },
     data() {
         return {
@@ -239,7 +241,7 @@ export default {
       </div>
         <div class="feed"  v-for="evidenceGroup in groupedEvidence">
           <div class="feed-column left"></div>
-          <section>
+          <section class="activity-feed">
             <h2 class="subheader no-margin">
                 <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
                       :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
@@ -293,7 +295,7 @@ export default {
                         <template v-if="evidence.discriminator === 'badgeAward'">
                             <div class="card small-12">
                                 <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">
-                                    <img :src="evidence.object.badge.image._links.image + '&size=square64'" :alt="evidence.object.badge.name" :class="{goal: evidence.object.status === 'goal'}">
+                                    <badge-image :badge="evidence.object.badge" :css=" evidence.object.status === 'goal' ? 'goal' : ''"></badge-image>
                                     <span>{{ evidence.object.badge.name }}</span>
                                     <p class="meta">
                                         <template v-if="evidence.object.status === 'achievement'">Achievement awarded</template>
