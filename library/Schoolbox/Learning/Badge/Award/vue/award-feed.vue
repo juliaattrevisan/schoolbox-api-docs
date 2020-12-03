@@ -175,7 +175,7 @@ export default {
                 <template v-for="category in this.data.categories">
                     <h2 class="subheader content">{{ category.name }}</h2>
 
-                    <div class="v-card-list">
+                    <div class="v-card-list badge-grid">
                         <div class="v-card card wrap-down" v-for="award in category.awards">
                             <div class="card-feature-image">
                                 <a href="#" @click.prevent="openDetailModal(award)">
