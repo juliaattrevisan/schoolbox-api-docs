@@ -11,9 +11,12 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Badge;
 
 
-use Schoolbox\Collection;use Schoolbox\Filter\AbstractIdFinder;use Schoolbox\Filter\BrokenFilterException;
+use Schoolbox\Filter\AbstractIdFinder;
 
 
+/**
+ * ID finder for the badge filter.
+ */
 class IdFinder extends AbstractIdFinder
 {
     /**
@@ -44,7 +47,7 @@ class IdFinder extends AbstractIdFinder
      * Retrieve ID of all badges which match the filters.
      *
      * @param array $completeFilters
-     * @param bool $deleted
+     * @param bool  $deleted
      * @return array
      */
     protected function buildQuery(array $completeFilters, bool $deleted) : array

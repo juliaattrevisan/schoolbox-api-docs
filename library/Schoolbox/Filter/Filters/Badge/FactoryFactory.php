@@ -11,7 +11,10 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Badge;
 
 
-use Schoolbox\Filter;use Schoolbox\Filter\IFactory;use Schoolbox\User;
+use InvalidArgumentException;use Schoolbox\Filter;
+use Schoolbox\Filter\IFactory;
+use Schoolbox\Learning\Badge;
+use Schoolbox\User;
 
 
 /**
@@ -19,9 +22,26 @@ use Schoolbox\Filter;use Schoolbox\Filter\IFactory;use Schoolbox\User;
  */
 class FactoryFactory extends Filter\AbstractFactoryFactory
 {
+    protected const ENTITY = Badge\Category\Mapper::class;
+
+
+    /**
+     * @inheritdoc
+     */
     public function buildFilterFactoryForFilter(string $filterDefinitionClass) : IFactory
     {
-        // TODO: Implement buildFilterFactoryForFilter() method.
+        switch ($filterDefinitionClass) {
+            case Category\Definition::class:
+                /** @var Badge\Category\Mapper $badgeMapper */
+                $badgeMapper = $this->getMapperFactory()->get(Badge\Category\Mapper::class);
+                return new Category\Factory(
+                    $this->getOptionMapper(),
+                    $this->getDefaultsMapper(),
+                    $this->getSelectionMapper(),
+                    $badgeMapper
+                );
+        }
+        throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
 
 
