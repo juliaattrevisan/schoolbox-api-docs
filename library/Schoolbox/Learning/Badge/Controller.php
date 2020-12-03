@@ -216,6 +216,10 @@ class Controller extends Base
                     'attachzone'               => $attachzone->getTwigContext(),
                     'categories'               => Category\Mapper::getInstance()->findAll(),
                     'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+                    'iconRegistry' => [
+                        'registry' => IconRegistry::BADGE_ICON_REGISTRY,
+                        'pageLength' => IconRegistry::BADGE_ICON_MODAL_PAGELENGTH
+                    ]
                 ],
                 'Create Badge'
             )
