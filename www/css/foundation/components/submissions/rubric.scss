@@ -89,6 +89,13 @@ table.rb {
         right: 3px;
     }
 
+        .rb-self-reflection-choice__in-blind-mode {
+            @extend .rb-self-reflection-choice;
+            width: 32px;
+            height: 32px;
+            background: #0066B0;
+        }
+
     a {
         white-space: nowrap;
         line-height: 2.75rem;

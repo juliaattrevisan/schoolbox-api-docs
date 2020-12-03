@@ -8,6 +8,7 @@
  # * markVisibility:          ? Should be inferred from grid's assessment (assessment.isVisibleTo(USER))
  # * useMarkRange:            ? Should be inferred from grid's assessment (assessment.markRange)
  # * showGroupTotal:          ? Should be inferred from grid's assessment (assessment.markPerCapability)
+ # * blindMode:                 whether you're reviewing in Blind Mode
  #                              Also depends if this is a self-reflection
  #}
 
@@ -79,6 +80,7 @@
                             {% set inputId %}{{ formField }}[{{ indicatorId }}][{{ level.id }}]{% endset %}
                             {% set isDescriptorSelected = indicatorMarkDescriptor == descriptor %}
                             {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
+                            {% set blindMode            = blindMode %}
 
                             <td>
                                 {% include '@rubric/descriptor-markable.twig' %}
