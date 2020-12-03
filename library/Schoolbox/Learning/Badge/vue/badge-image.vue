@@ -21,10 +21,16 @@ export default {
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-        'badge',
-        'css'
-    ],
+    props: {
+        badge: {
+            default: null,
+            type: Object
+        },
+        css: {
+            default: '',
+            type: String
+        }
+    },
 
     /**
      * Components.
