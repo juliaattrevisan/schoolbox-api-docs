@@ -219,10 +219,12 @@ Usage:
                                                 <ul class="information-list reply">
                                                     <li>
                                                         <div class="card small-12">
+                                                            {% if blindMode == false %}
                                                             <a href="/search/user/{{ participant.user.id }}">
                                                                 <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square32" title="{{ participant.user.fullname }}" />
                                                                 <p>{{ participant.user.fullname }}<span class="pipe meta">{{ selfAssessmentFeedback.publishedAt.short }}</span></p>
                                                             </a>
+                                                            {% endif %}
                                                         </div>
                                                         <article>{{ selfAssessmentFeedback.comment|nl2br }}</article>
                                                     </li>

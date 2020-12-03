@@ -59,7 +59,7 @@
 {# Self-assessment #}
 {% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}
     {% if blindMode %}
-        <div class="rb-self-reflection-choice__in-blind-mode"></div>
+        <p class="rb-self-reflection-choice__in-blind-mode">{% if selfAssessmentFeedback.isSelfGrading %}({{ selfAssessmentIndicatorMark.value }}) {{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice</p>
     {% else %}
         <img class="rb-self-reflection-choice"
          src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
