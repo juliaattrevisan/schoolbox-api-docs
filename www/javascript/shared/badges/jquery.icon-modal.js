@@ -113,7 +113,7 @@
 
             /* Reload icon set
              */
-            for (let i = start; i <= (start+config.pageLength) && i <= max; i++, imgIndex++) {
+            for (let i = start; i < (start+config.pageLength) && i < max; i++, imgIndex++) {
                 let src = '/images/badges/' + folder + '/' + config.registry[folder].files[i];
 
                 $(config.sockets[imgIndex]).attr('src', src).removeClass('hide');
