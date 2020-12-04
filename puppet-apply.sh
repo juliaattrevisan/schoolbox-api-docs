@@ -53,8 +53,7 @@ function main() {
 
   set_up_ip_based_web_request_routing
 
-  # TODO make this faster in IST-530
-  service "$(systemctl | grep -o 'php7\.[0-9]-fpm')" restart
+  service php7.4-fpm restart
 }
 
 

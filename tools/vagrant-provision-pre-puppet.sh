@@ -88,5 +88,6 @@ for service in socketd digestd routed scheduled; do
   find /etc/systemd/system/multi-user.target.wants/ -iname "schoolbox-$service.service" -delete
 done
 
-# TODO We could hook in here to switch PHP versions in puppet if desired
-# cat /etc/puppetlabs/code/hieradata/node/ubuntu-1804-php71.vagrant.yaml
+# Ensure puppet provisions a compatible PHP version
+echo "Setting Vagrant's schoolbox::set_packages::php_majver to '7.4'"
+sed -i "s/^schoolbox::set_packages::php_majver:.*/schoolbox::set_packages::php_majver: '7.4'/g" /etc/puppetlabs/code/hieradata/node/ubuntu-1804-php71.vagrant.yaml
