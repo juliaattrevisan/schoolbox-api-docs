@@ -33,7 +33,7 @@ class Mailer extends \Alaress\Mail\AbstractMailer
         if ($host) {
             $this->template->set_var('SITE_DOMAIN', $host);
         } else {
-            $this->template->set_var('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
+            $this->template->set_var('SITE_DOMAIN', $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? '');
         }
     }
 

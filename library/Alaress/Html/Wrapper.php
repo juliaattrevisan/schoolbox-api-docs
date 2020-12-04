@@ -82,7 +82,7 @@ HTML
      */
     public function loadBaseHrefFromServerVars($serverVars) {
         $protocol = !empty($serverVars['HTTPS']) ? 'https' : 'http';
-        $host     = $serverVars['HTTP_HOST'];
+        $host     = $serverVars['HTTP_X_FORWARDED_HOST'] ?? $serverVars['HTTP_HOST'];
         $baseHref = "$protocol://$host";
         // Don't set port if it's a standard port
         if (!in_array($serverVars['SERVER_PORT'], array(80, 443))) {

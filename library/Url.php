@@ -334,6 +334,6 @@ class Url
      */
     protected function getServerHost()
     {
-        return isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+        return $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? '';
     }
 }

@@ -76,7 +76,7 @@ class HeaderCheck
                 [$this, 'getHostName',],
                 [
                     $this->host,
-                    $this->serverVars['HTTP_HOST'] ?? $this->serverVars['HTTP_X_FORWARDED_HOST'] ?? null,
+                    $this->serverVars['HTTP_X_FORWARDED_HOST'] ?? $this->serverVars['HTTP_HOST'] ?? null,
                 ]
             )
         );

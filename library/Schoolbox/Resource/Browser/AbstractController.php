@@ -337,7 +337,7 @@ abstract class AbstractController extends BaseController
             'file'   => $file,
             'type'   => 'file',
             'tree'   => $this->getBreadcrumbs($file->getFolder()),
-            'host'   => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
+            'host'   => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_X_FORWARDED_HOST') ?? $server->get('HTTP_HOST')),
             'access' => $this->getAccess($folderId),
             'namespace' => $this->namespace,
             'RETURN_URL'=> Redirect::RETURN_URL . '=' . Redirect::encode("/resources/$folderId"),
