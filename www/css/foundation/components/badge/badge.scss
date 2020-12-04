@@ -1,9 +1,10 @@
 .badge-grid {
   .badge {
-    flex: 0 0 250px;
+    flex: 1 0 250px;
     border: 1px solid #EDEDED;
     padding: 0;
     margin: 0 1rem 1rem 0;
+    max-width: 250px;
 
     &:last-child {
       margin: 0 0 1rem 0;
@@ -16,16 +17,35 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 200px;
+        height: rem-calc(200);
       }
       img {
-        max-height: 11rem;
         margin: 0;
+      }
+      .badge-image {
+        max-height: rem-calc(200);
+        width: auto;
+      }
+      .badge-icon {
+        width: 11rem;
       }
     }
     .card-content {
-      padding: .75rem 0 .75rem .75rem;
+      padding: 1rem 1rem 0 1rem;
       overflow: inherit;
+
+      h3, p {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      h3 {
+        margin-bottom: .5rem;
+      }
+      nav {
+        top: 0;
+        right: -1rem;
+      }
     }
   }
 }

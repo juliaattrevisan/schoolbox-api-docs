@@ -205,9 +205,10 @@ export default {
                             </a>
                         </div>
                         <div class="card-content">
+                            <h3><a @click.prevent="openDetailModal(badge)" :title="badge.name">{{ badge.name }}</a></h3>
                             <div class="actions-small-1">
                                 <div class="list-item">
-                                    <h3><a @click.prevent="openDetailModal(badge)">{{ badge.name }}</a></h3>
+                                    <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">{{ badge.category.name }}</p>
                                 </div>
                                 <nav>
                                   <a href="#"
@@ -224,7 +225,6 @@ export default {
                                   <li><a href="#" class="icon-delete" title="Delete">Delete</a></li>
                                 </ul>
                             </div>
-                            <p class="meta" v-if="badge.category">{{ badge.category.name }}</p>
                         </div>
                     </div>
                 </div>
