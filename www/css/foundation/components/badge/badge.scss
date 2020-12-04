@@ -2,6 +2,7 @@
   .badge {
     flex: 1 0 250px;
     border: 1px solid #EDEDED;
+    box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.1);
     padding: 0;
     margin: 0 1rem 1rem 0;
     max-width: 250px;
@@ -50,32 +51,57 @@
   }
 }
 
-.awards, .activity-feed {
+// Badge Modal
+.badge-img-container {
+  background-color: $vapor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  max-height: rem-calc(300);
 
-    /* Goals are greyscaled
-     * Achievements are full colour
-     */
-    img.goal {
-      filter: grayscale(100%);
-    }
+  img {
+    max-height: rem-calc(300);
+    width: auto;
+  }
+  .badge-icon {
+    width: 17rem;
+    margin: 1rem 0;
+  }
+}
+
+// Create badge page
+[data-icon-selection] {
+  background-color: $vapor;
+  text-align: center;
+  padding: .5rem;
+  margin-bottom: .5rem;
+}
+
+.awards, .activity-feed {
+  /* Goals are greyscaled
+   * Achievements are full colour
+   */
+  img.goal {
+    filter: grayscale(100%);
+  }
 }
 
 /* Icon Picker Modal has a lot of categories in it, we need
  * to add some vertical scroll for small viewport guys
  */
 .icon-picker {
-    .icon-category-list-container {
-        max-height: 80vh;
-        overflow-y: auto;
-    }
+  .icon-category-list-container {
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  img {
+    margin-right: .5rem;
+    margin-bottom: .5rem;
 
-    img {
-        margin-right: 0.5rem;
-        margin-bottom: 0.5rem;
-        cursor: pointer;
+    &:hover {
+      background-color: $content-ui-hover;
+      cursor: pointer;
     }
-
-    img:hover {
-        outline: 4px solid $content-ui-hover;
-    }
+  }
 }

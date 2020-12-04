@@ -220,7 +220,7 @@ export default {
                                   <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase" title="Award">Award achievement</a></li>
                                   <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set as Goal">Set goal</a></li>
                                   <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-close" title="Withdraw awards" >Withdraw achievement</a></li>
-                                  <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-close" title="Unset goal" >Unset goal</a></li>
+                                  <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-undo" title="Remove goal" >Remove goal</a></li>
                                   <li><a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a></li>
                                   <li><a href="#" class="icon-delete" title="Delete">Delete</a></li>
                                 </ul>
