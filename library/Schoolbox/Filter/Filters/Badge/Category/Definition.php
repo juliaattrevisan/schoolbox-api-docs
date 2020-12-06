@@ -7,16 +7,13 @@
 
 declare(strict_types=1);
 
-
 namespace Schoolbox\Filter\Filters\Badge\Category;
-
 
 use Schoolbox\Filter\AbstractDefinition;
 use Schoolbox\Filter\Model;
 use Schoolbox\Filter\Page;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge\Category\Model as BadgeCategoryModel;
-
 
 /**
  * Definition for badge category filters.
@@ -58,7 +55,7 @@ class Definition extends AbstractDefinition
      *
      * @return array
      */
-    protected function getCustomKeys() : array
+    protected function getCustomKeys(): array
     {
         return [];
     }
@@ -69,7 +66,7 @@ class Definition extends AbstractDefinition
      *
      * @return array
      */
-    public static function getPages() : array
+    public static function getPages(): array
     {
         return [
             Page\Model::PAGE_BADGE_LIST,
@@ -80,8 +77,17 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getLabel(string $key) : string
+    public function getLabel(string $key): string
     {
         return $this->categories[$key]->getName();
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected static function getTemplatesDir(): string
+    {
+        return '@filterDefinitions/Badge/Category/templates';
     }
 }
