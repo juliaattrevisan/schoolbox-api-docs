@@ -7,28 +7,29 @@
 
 declare(strict_types=1);
 
-
 namespace Schoolbox\Filter\Filters\Badge;
 
-
-use InvalidArgumentException;use Schoolbox\Filter;
+use InvalidArgumentException;
+use Schoolbox\Filter;
 use Schoolbox\Filter\IFactory;
 use Schoolbox\Learning\Badge;
 use Schoolbox\User;
-
 
 /**
  * Factory class responsible for building badge filter factories.
  */
 class FactoryFactory extends Filter\AbstractFactoryFactory
 {
-    protected const ENTITY = Badge\Category\Mapper::class;
+    /**
+     * @inheritdoc
+     */
+    protected const ENTITY = Badge\Mapper::class;
 
 
     /**
      * @inheritdoc
      */
-    public function buildFilterFactoryForFilter(string $filterDefinitionClass) : IFactory
+    public function buildFilterFactoryForFilter(string $filterDefinitionClass): IFactory
     {
         switch ($filterDefinitionClass) {
             case Category\Definition::class:
@@ -53,7 +54,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
      * @param User  $viewee
      * @return array
      */
-    public function checkTeacherFolders(array $filters, User $viewee) : array
+    public function checkTeacherFolders(array $filters, User $viewee): array
     {
         return $filters;
     }
