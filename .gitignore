@@ -57,3 +57,4 @@ datepicker-fullcalendar.css
 # For now, these files exist in site root. In future will be moved to /etc/[package]/
 /config.ini
 /instances.ini
+.vscode/

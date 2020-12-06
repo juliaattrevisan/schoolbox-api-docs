@@ -1,12 +1,13 @@
 <script>
 
+import Vue from 'vue';
 import axios  from 'axios';
 import moment from 'moment';
 
 import MediaArticle from '@schoolbox/media-article';
 import Storage from '@schoolbox/storage';
 import Toast from '@schoolbox/toast';
-import CKEditor from 'ckeditor4-vue';
+// import CKEditor from 'ckeditor4-vue';
 import RevealModal from '@schoolbox/reveal-modal';
 
 export default {
@@ -14,7 +15,7 @@ export default {
         MediaArticle,
         Storage,
         Toast,
-        ckeditor: CKEditor.component,
+        // ckeditor: CKEditor.component,
         RevealModal
     },
     props: {
@@ -40,6 +41,7 @@ export default {
             pendingComment: '',
             saveInProgress: false,
             commentIndexToDelete: null,
+            isCKEditorLoaded: false
         }
     },
     computed: {
@@ -110,6 +112,23 @@ export default {
 
     },
     methods: {
+
+        /**
+         * Loads the editor only when requested
+         */
+        loadEditor () {
+            
+            //show loading 
+            
+            //linked with output.publicPath set in webpack.config.js : https://webpack.js.org/guides/public-path/ (code-splitting)
+            import(/* webpackChunkName: "ckeditor4-vue" */ 'ckeditor4-vue').then(({ default: CKEditor }) => {
+                console.log(CKEditor.component);
+                Vue.component('ckeditor', CKEditor.component);
+                this.isCKEditorLoaded = true;
+            });
+
+        },
+
         /**
          * Loads the next cursor of comments.
          */
@@ -227,12 +246,13 @@ export default {
         <section id="threads-section" class="discussion">
             <div class="discussion-threads">
                 <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
-
-                <ckeditor tag-name="textarea" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
-                <a class="button submit"
-                   @click="postComment"
-                   :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
-
+                <button @click="loadEditor">Show Editor</button>
+                <div v-if="isCKEditorLoaded">
+                    <ckeditor tag-name="textarea" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
+                    <a class="button submit"
+                    @click="postComment"
+                    :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
+                </div>
                 <template v-if="hasComments">
                     <ul class="information-list social-stream">
                         <li class="actions-small-1" v-for="(comment, index) in comments">
