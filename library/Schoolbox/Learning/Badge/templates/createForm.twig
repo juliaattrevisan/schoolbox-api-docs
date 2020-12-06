@@ -134,6 +134,7 @@
 <script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
 {% autoescape 'js' %}
 <script type="text/javascript">
+    let curriculumTaggingEnabled = Boolean('{{ curriculumTaggingEnabled }}');
     $(function () {
         // Set up editor
         let editorId = 'badge-body';
@@ -222,24 +223,28 @@
                         image:           formData.get('image'),
                         category:        null,
                         tags:            [],
-                        curriculumNodes: [],
                     },
                     categoryId      = formData.get('category'),
                     tags            = formData.get('tags'),
-                    curriculumNodes = form.querySelector('select[name="curriculumCodes[]"]').selectize.items,
                     toast           = $('#toast'),
                     submit          = $('#badge-submit');
+
 
                 if (categoryId) {
                     payload.category = {
                         id: categoryId
                     }
                 }
-                payload.curriculumNodes = curriculumNodes.map(
-                    (v) => {
-                        return {id: Number(v)}
-                    }
-                );
+
+                // Only save curriculum nodes if they are enabled
+                if (curriculumTaggingEnabled) {
+                    let curriculumNodes = form.querySelector('select[name="curriculumCodes[]"]').selectize.items;
+                    payload.curriculumNodes = curriculumNodes.map(
+                        (v) => {
+                            return {id: Number(v)}
+                        }
+                    );
+                }
 
                 // Toast then post
                 toast.toastActivate('Saving...')
