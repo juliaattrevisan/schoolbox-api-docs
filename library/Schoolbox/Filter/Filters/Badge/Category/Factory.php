@@ -7,9 +7,7 @@
 
 declare(strict_types=1);
 
-
 namespace Schoolbox\Filter\Filters\Badge\Category;
-
 
 use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\Filter\IDefinition;
@@ -19,14 +17,13 @@ use Schoolbox\Filter\Page;
 use Schoolbox\Filter\Selection;
 use Schoolbox\Learning\Badge\Category\Mapper;
 
-
 /**
  * Factory for building badge category filters.
  */
 class Factory extends AbstractFactory
 {
     /**
-     * Category mapper, for finding badge categroeis.
+     * Category mapper, for finding badge categories.
      */
     private Mapper $categoryMapper;
 
@@ -53,13 +50,13 @@ class Factory extends AbstractFactory
     /**
      * @inheritdoc
      */
-    public function buildDefinition(Model $filter) : IDefinition
+    public function buildDefinition(Model $filter): IDefinition
     {
         return new Definition(
             $filter,
             $this->getOptionMapper(),
             $this->getDefaultsMapper(),
-            $this->categoryMapper->findAll()
+            $this->categoryMapper->findAll()->indexBy('id')
         );
     }
 
@@ -67,7 +64,7 @@ class Factory extends AbstractFactory
     /**
      * @inheritdoc
      */
-    public function buildKeyConverter(Model $filter) : IKeyConverter
+    public function buildKeyConverter(Model $filter): IKeyConverter
     {
         return new KeyConverter($filter, $this->categoryMapper->findAllIds());
     }

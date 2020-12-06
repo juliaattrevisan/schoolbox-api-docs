@@ -75,11 +75,63 @@ class Definition extends AbstractDefinition
 
 
     /**
+     * @param GenericCollection|Page\Option\Model[] $options
+     * @return GenericCollection
+     */
+    protected function sortFilterOptions(GenericCollection $options): GenericCollection
+    {
+        return $options;
+    }
+
+
+    /**
+     * Return the set of possible keys for this filter's options
+     *
+     * @return string[]
+     */
+    public function getAbstractKeys(): array
+    {
+        // Ensure numeric ids are cast to string keys
+        return array_map(
+            static function (int $key) {
+                return (string)$key;
+            },
+            $this->categories->keys()
+        );
+    }
+
+
+    /**
      * @inheritdoc
      */
     public function getLabel(string $key): string
     {
         return $this->categories[$key]->getName();
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function insertDynamicOptions(Page\Model $pageFilter): GenericCollection
+    {
+        $options = $pageFilter->getOptions();
+
+        // Ensure it contains all categories
+        foreach ($this->categories as $category) {
+            $abstractKey = (string)$category->getId();
+
+            if (!$options->offsetExists($abstractKey)) {
+                $option = new Page\Option\Model();
+                $option
+                    ->setFilterPage($pageFilter)
+                    ->setKey($abstractKey)
+                    ->setAvailable($this->getInitialAvailability($abstractKey, $pageFilter))
+                    ->setDefaults(new GenericCollection(Page\Option\Defaults\Model::class));
+                $options->setOffset($option->getKey(), $option);
+            }
+        }
+        return $options;
     }
 
 
