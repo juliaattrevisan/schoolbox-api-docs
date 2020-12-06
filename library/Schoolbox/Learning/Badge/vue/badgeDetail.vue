@@ -33,7 +33,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div class="badge-modal">
         <badge-image :badge="badge" class="badge-img-container"></badge-image>
         <h2>{{ badge.name }}</h2>
         <p class="meta" v-if="badge.category">Category: {{ badge.category.name }}</p>
