@@ -25,9 +25,9 @@
         <div class="attachment-browser-filesystems icon-category-list-container">
             <ul class="side-nav">
                 {% for path, node in registry %}
-                    <li class="tab-title" data-icon-path="{{ path }}">
-                        <a>{{ node.name }} ({{ node.files|length }})</a>
-                    </li>
+                <li class="tab-title" data-icon-path="{{ path }}">
+                    <a>{{ node.name }} ({{ node.files|length }})</a>
+                </li>
                 {% endfor %}
             </ul>
         </div>
