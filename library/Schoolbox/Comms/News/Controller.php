@@ -223,7 +223,7 @@ class Controller extends Base
         /* Misc attached files
          */
         $fileZone = (new Zone('fileImage'))
-            ->setFileVar('attachedFiles')
+            ->setFileVar('attachedFiles[]')
             ->setMulti(true)
             ->setAttachPrompt('Attach files')
             ->setAttachmentsLabel('');
@@ -358,7 +358,7 @@ class Controller extends Base
         /* Misc attached files
          */
         $fileZone = (new Zone('file'))
-            ->setFileVar('attachedFiles')
+            ->setFileVar('attachedFiles[]')
             ->setMulti(true)
             ->setAttachPrompt('Attach files')
             ->setAttachmentsLabel('');
@@ -1457,6 +1457,14 @@ class Controller extends Base
         } else {
             $article->setFeatureImage(null);
         }
+
+        /* Associate any associated files that a user associated with this article
+         * These hashes might already exist but with a different filename so in this
+         * case we need to remember the filename of this version of the file and not
+         * use the one that already existed
+         */
+        new \Alaress_Probe($postData);
+        die();
     }
 
 
