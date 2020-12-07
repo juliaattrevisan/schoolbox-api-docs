@@ -22,6 +22,7 @@ use PDOException;
 use Schoolbox\Application\Exception\AccessDenied;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Discussion\ThreadLocator;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
@@ -1462,9 +1463,41 @@ class Controller extends Base
          * These hashes might already exist but with a different filename so in this
          * case we need to remember the filename of this version of the file and not
          * use the one that already existed
+         *
+         * Process each of attached files separately
          */
-        new \Alaress_Probe($postData);
-        die();
+        $newList = new Collection();
+
+        if (\is_array($postData['attachedFiles']) && \count($postData['attachedFiles'])) {
+
+            /* These are the task_file relations we already know about
+             */
+            $existing = $article->getAttachedFiles()->indexBy('hash')->getAll();
+
+            $factory = new CollectorFactory();
+            $attachedFiles = $factory->build($postData['attachedFiles'])->getAll();
+
+            /* Exclude any hashes that are no longer in the set
+             */
+            foreach ($attachedFiles as $attachedFile) {
+
+                /* If this was already in the $article model:
+                 *
+                 * Reuse the id in the comms_news_article_file table so we don't keep accumulating relations
+                 * Get its latest name and update that
+                 *
+                 * Otherwise insert it as a new comms_news_article_file relationship
+                 */
+                $articleFile = $existing[$attachedFile->getHash()] ?? new File\Model();
+
+                $articleFile->setStorage($attachedFile)
+                    ->setBasename($attachedFile->getBasename());
+
+                $newList->add($articleFile);
+            }
+        }
+
+        $article->setAttachedFiles($newList);
     }
 
 
