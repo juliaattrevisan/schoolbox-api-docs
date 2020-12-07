@@ -51,6 +51,8 @@ class Module extends BaseModule
             ),
         );
 
+        /* Get a list of badges that are available in the instance
+         */
         $this->register(
             self::METHOD_GET,
             '',
@@ -58,6 +60,8 @@ class Module extends BaseModule
             $baseRule
         );
 
+        /* Get a list of badges that were awarded to a particular person
+         */
         $this->register(
             self::METHOD_GET,
             '/{userId}/awarded',
@@ -66,6 +70,8 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadUser']),
         );
 
+        /* Get a list of people who have received an Achievement Badge
+         */
         $this->register(
             self::METHOD_GET,
             '/{badgeId}/achievement/recipients',
@@ -74,6 +80,8 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
+        /* Withdraw Achievements from awardees
+         */
         $this->register(
             self::METHOD_POST,
             '/{badgeId}/achievement/withdraw',
@@ -82,6 +90,8 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
+        /* Get a list of people who have received a Goal Badge
+         */
         $this->register(
             self::METHOD_GET,
             '/{badgeId}/goal/recipients',
@@ -90,6 +100,8 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
+        /* Withdraw Goals from awardees
+         */
         $this->register(
             self::METHOD_POST,
             '/{badgeId}/goal/withdraw',
@@ -98,12 +110,33 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
+        /* The form that people use to Create a Badge
+         */
         $this->register(
             self::METHOD_GET,
             '/create',
             'getCreateForm',
             $baseRule
         );
+
+        /* The form that people use to Update a Badge
+         */
+        $this->register(
+            self::METHOD_GET,
+            '/{badgeId}/update',
+            'getUpdateForm',
+            $baseRule
+        );
+
+        /* Update a Badge
+         */
+        $this->register(
+            self::METHOD_POST,
+            '/{badgeId}/update',
+            'postUpdateForm',
+            $baseRule
+        );
+
         $this->register(
             self::METHOD_POST,
             '',
