@@ -97,6 +97,9 @@ export default {
             if (cursor) {
                 params.cursor = cursor;
             }
+            if (this.selectedFilters) {
+                params.filters = this.selectedFilters;
+            }
             if (showToast) {
                 this.$refs.toast.activate('Loading...');
             }
