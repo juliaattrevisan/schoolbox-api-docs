@@ -217,12 +217,12 @@ export default {
                                      aria-expanded="false" title="Actions"></a>
                                 </nav>
                                 <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                  <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase" title="Award">Award achievement</a></li>
-                                  <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set as Goal">Set goal</a></li>
-                                  <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-close" title="Withdraw awards" >Withdraw achievement</a></li>
-                                  <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-undo" title="Remove goal" >Remove goal</a></li>
-                                  <li><a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a></li>
-                                  <li><a href="#" class="icon-delete" title="Delete">Delete</a></li>
+                                  <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase">Award achievement</a></li>
+                                  <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal">Set goal</a></li>
+                                  <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-close">Withdraw achievement</a></li>
+                                  <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-undo">Remove goal</a></li>
+                                  <li><a :href="badge._links.update" class="icon-modify">Modify</a></li>
+                                  <li><a href="#" class="icon-delete">Delete</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -240,7 +240,7 @@ export default {
             <badge-detail :badge="currentBadge" v-if="currentBadge"></badge-detail>
         </reveal-modal>
 
-        <reveal-modal size="large" ref="awardAsAchievementModal" :closeOnBackgroundClick="false">
+        <reveal-modal size="small" ref="awardAsAchievementModal" :closeOnBackgroundClick="false">
             <badge-award v-if="currentBadge"
                          :badge="currentBadge"
                          :endpoint="currentBadge._links.awardAsAchievement"
@@ -260,7 +260,7 @@ export default {
             </badge-award>
         </reveal-modal>
 
-        <reveal-modal size="large" ref="setAsGoalModal" :closeOnBackgroundClick="false">
+        <reveal-modal size="small" ref="setAsGoalModal" :closeOnBackgroundClick="false">
             <badge-award v-if="currentBadge"
                          :badge="currentBadge"
                          :endpoint="currentBadge._links.setAsGoal"

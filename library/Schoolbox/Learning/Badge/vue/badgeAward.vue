@@ -176,9 +176,11 @@ export default {
         -->
         <slot name="header" :badge="badge"></slot>
 
-        <div class="card small-12 compact">
-            <badge-image :badge="badge"></badge-image>
-            <h3>{{ badge.name }}</h3>
+        <div class="compact card small-12 badge-card">
+            <div>
+                <badge-image :badge="badge"></badge-image>
+                <h3>{{ badge.name }}</h3>
+            </div>
         </div>
 
         <v-select class="schoolbox-vue-selectize"
