@@ -209,6 +209,9 @@ body.login input[type=checkbox]:not(.plain):checked + label:after {
 .e-report #assessments .distribution {
   width: 60%;
 }
+.e-report #course-teacher {
+    display: none;
+}
 .e-report .card p {
   font-size: 1rem;
 }
