@@ -259,6 +259,29 @@ class Controller extends Base
 
 
     /**
+     * View the form for updating a badge
+     *
+     * @param Model $model
+     * @since 20.2
+     * @api   GET /learning/badge/{badgeId}/update
+     */
+    public function getUpdateForm(Model $model): void
+    {
+    }
+
+
+    /**
+     * Update a badge from POST data
+     *
+     * @api POST /learning/badge/{badgeId}/update
+     * @since 20.2
+     */
+    public function postUpdate(): void
+    {
+    }
+
+
+    /**
      * Award a badge as an achievement for a set of users in the request body.
      *
      * TODO consider moving to award controller?
