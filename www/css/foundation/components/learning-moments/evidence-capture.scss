@@ -98,6 +98,15 @@
 .feed-item {
   border: 2px solid #EDEDED;
 
+  .badge-card {
+    padding: 1rem;
+
+    img {
+      margin: 0 1rem 0 0;
+      width: 4rem;
+    }
+  }
+
   .article-read-more {
     margin-top: 0;
     padding-bottom: 1rem;

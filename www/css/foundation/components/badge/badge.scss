@@ -13,8 +13,9 @@
 
     .card-feature-image {
       background-color: $vapor;
+      position: relative;
 
-      div {
+      > a > div {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -51,6 +52,21 @@
   }
 }
 
+.award-count {
+  background-color: $white;
+  border-radius: 50%;
+  border: 1px solid $base;
+  box-shadow: 0px 0px 3px 0px rgba(0,0,0,.1);
+  position: absolute;
+  top: .35rem;
+  right: .35rem;
+  padding: .3rem 0;
+  font-size: rem-calc(12);
+  width: 30px;
+  height: 30px;
+  text-align: center;
+}
+
 // Badge Modal
 .badge-modal {
   h2, .meta {
@@ -60,17 +76,15 @@
     max-width: 100%;
     margin-bottom: .5rem;
   }
-  .meta {
-    margin-bottom: 1rem;
-  }
   article {
     max-width: 40rem;
-    margin: 0 auto;
+    margin: 1rem auto 0 auto;
   }
 }
 
 .badge-img-container {
   background-color: $vapor;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -85,9 +99,17 @@
     width: 17rem;
     margin: 1rem 0;
   }
+  .award-count {
+    font-size: rem-calc(13);
+    width: 35px;
+    height: 35px;
+    top: .5rem;
+    right: .5rem;
+    padding: .375rem 0;
+  }
 }
 
-.badge-card {
+.reveal-modal .badge-card {
   margin-bottom: 1rem;
 }
 
@@ -126,5 +148,15 @@
       background-color: $content-ui-hover;
       cursor: pointer;
     }
+  }
+}
+
+// Achievements - profile page
+#achievements {
+  .awards > div {
+    border-bottom: 2px solid #EDEDED;
+  }
+  .subheader {
+    color: $header-font-color;
   }
 }

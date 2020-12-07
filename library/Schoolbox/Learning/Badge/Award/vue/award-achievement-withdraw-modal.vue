@@ -140,14 +140,16 @@ export default {
 <template>
     <reveal-modal ref="modal">
         <template v-if="award.badge">
-            <h2>Withdraw <strong>{{ award.badge.name }}</strong></h2>
+            <h2>Withdraw <strong>'{{ award.badge.name }}'</strong></h2>
 
-            <div class="card small-12 compact">
-                <badge-image :badge="award.badge"></badge-image>
-                <h3>{{ award.badge.name }}</h3>
+            <div class="compact card small-12 badge-card">
+                <div>
+                    <badge-image :badge="award.badge"></badge-image>
+                    <h3>{{ award.badge.name }}</h3>
+                </div>
             </div>
 
-            <p>Are you sure you want to withdraw <strong>{{ award.badge.name }}</strong> from {{ award.recipient.fullName }}?</p>
+            <p>Are you sure you want to withdraw this achievement from {{ award.recipient.fullName }}?</p>
             <ul class="flex-list buttons">
                 <li><a @click.prevent="withdraw()" class="button submit">Yes</a></li>
                 <li><a @click.prevent="close()" class="button">No</a></li>

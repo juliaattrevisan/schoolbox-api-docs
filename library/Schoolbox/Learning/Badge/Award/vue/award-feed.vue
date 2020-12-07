@@ -173,58 +173,57 @@ export default {
         <template v-else-if="this.data.categories">
             <section class="awards">
                 <template v-for="category in this.data.categories">
-                    <h2 class="subheader content">{{ category.name }}</h2>
+                    <div class="content">
+                        <h2 class="subheader" :title="'Category: ' + category.name">{{ category.name }}</h2>
 
-                    <div class="badge-grid v-card-list">
-                        <div class="badge v-card" v-for="award in category.awards">
-                            <div class="card-feature-image">
-                                <a href="#" @click.prevent="openDetailModal(award)">
-                                    <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
-                                </a>
-                            </div>
-                            <div class="card-content">
-                                <div class="actions-small-1">
-                                    <div class="list-item">
-                                        <h3><a href="#" @click.prevent="openDetailModal(award)">{{ award.badge.name }} ({{ award.count }})</a></h3>
-                                    </div>
-                                    <template v-if="hasTot(award)">
-                                        <nav>
-                                          <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
-                                        </nav>
-                                        <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
-                                          <!-- Only show Withdraw button if you can actually do it
-                                            -- Students can't withdraw their own Achievement
-                                            -->
-                                            <template v-if="canWithdraw(award)">
-                                              <template v-if="!award.isGoal">
-                                                <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-close" title="Withdraw achievement">Withdraw achievement</a></li>
-                                              </template>
-                                              <template v-else>
-                                                <li><a @click.prevent="openGoalWithdrawModal(award)" class="icon-close" title="Unset goal">Unset goal</a></li>
-                                              </template>
-                                            </template>
-                                        </ul>
-                                    </template>
+                        <div class="badge-grid v-card-list">
+                            <div class="badge v-card" v-for="award in category.awards">
+                                <div class="card-feature-image">
+                                    <a href="#" @click.prevent="openDetailModal(award)">
+                                        <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
+                                    </a>
+                                    <div class="award-count" :title="'Awarded ' + award.count + ' time(s)'">x{{ award.count }}</div>
                                 </div>
-                                <p class="meta">
-
-                                    <!-- Change metadata text subtly depending on the Award status
-                                      -- Goals and Achievements, while badges, aren't the same thing
-                                      -->
-                                    <template v-if="award.isGoal">
-                                        Goal set
-                                    </template>
-                                    <template v-else>
-                                        Awarded
-                                    </template>
-
-                                    <relative-time :datetime="award.awardedAt"></relative-time>
-                                </p>
+                                <div class="card-content">
+                                    <h3><a href="#" @click.prevent="openDetailModal(award)">{{ award.badge.name }}</a></h3>
+                                    <div class="actions-small-1">
+                                        <div class="list-item">
+                                            <p class="meta">
+                                                <!-- Change metadata text subtly depending on the Award status
+                                                  -- Goals and Achievements, while badges, aren't the same thing
+                                                  -->
+                                                <template v-if="award.isGoal">
+                                                  Goal set
+                                                </template>
+                                                <template v-else>
+                                                  Awarded
+                                                </template>
+                                                <relative-time :datetime="award.awardedAt"></relative-time>
+                                            </p>
+                                        </div>
+                                        <template v-if="hasTot(award)">
+                                            <nav>
+                                              <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
+                                            </nav>
+                                            <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
+                                              <!-- Only show Withdraw button if you can actually do it
+                                                -- Students can't withdraw their own Achievement
+                                                -->
+                                                <template v-if="canWithdraw(award)">
+                                                  <template v-if="!award.isGoal">
+                                                    <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-close" title="Withdraw achievement">Withdraw achievement</a></li>
+                                                  </template>
+                                                  <template v-else>
+                                                    <li><a @click.prevent="openGoalWithdrawModal(award)" class="icon-close" title="Unset goal">Unset goal</a></li>
+                                                  </template>
+                                                </template>
+                                            </ul>
+                                        </template>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <hr />
                 </template>
             </section>
         </template>

@@ -252,7 +252,7 @@ export default {
                          toast-failure-message="Awarding achievement failed"
             >
                 <template v-slot:header="slotProps">
-                    <h2>Award &lsquo;<i>{{ slotProps.badge.name }}</i>&rsquo; as an Achievement</h2>
+                    <h2>Award &lsquo;<b>{{ slotProps.badge.name }}</b>&rsquo; as an Achievement</h2>
                 </template>
                 <template v-slot:confirmButton>
                     Award Achievement
@@ -272,7 +272,7 @@ export default {
                          toast-failure-message="Setting goal failed"
             >
                 <template v-slot:header="slotProps">
-                    <h2>Set &lsquo;<i>{{ slotProps.badge.name }}</i>&rsquo; as a Goal</h2>
+                    <h2>Set &lsquo;<b>{{ slotProps.badge.name }}</b>&rsquo; as a Goal</h2>
                 </template>
                 <template v-slot:confirmButton>
                     Set Goal

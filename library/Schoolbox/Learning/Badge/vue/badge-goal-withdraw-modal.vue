@@ -174,7 +174,7 @@ export default {
 
             /* A toast - to your valour, my sword, and our victory together
              */
-            self.toastActivate('Unsetting goal for ' + this.selected.length + ' student(s)');
+            self.toastActivate('Removing goal for ' + this.selected.length + ' student(s)');
 
             axios.request(request)
                 .then(function (response) {
@@ -185,7 +185,7 @@ export default {
 
                     /* Pop toast
                      */
-                    self.toastSuccess('Unset complete');
+                    self.toastSuccess('Removal complete');
                 })
                 .then(function() {
 
@@ -196,7 +196,7 @@ export default {
                 .catch(error => {
                     if (error.response) {
                         if (error.response) {
-                            self.toastError('Unable to unset goal; please try again.');
+                            self.toastError('Unable to remove goal; please try again.');
                         }
                     }
                 });
@@ -207,14 +207,16 @@ export default {
 <template>
     <reveal-modal ref="modal">
         <template v-if="badge">
-            <h2>Unset <strong>{{ badge.name }}</strong></h2>
+            <h2>Remove <strong>'{{ badge.name }}'</strong></h2>
 
-            <div class="card small-12 compact">
-                <badge-image :badge="badge"></badge-image>
-                <h3>{{ badge.name }}</h3>
+            <div class="card small-12 compact badge-card">
+                <div>
+                    <badge-image :badge="badge"></badge-image>
+                    <h3>{{ badge.name }}</h3>
+                </div>
             </div>
 
-            <p>Remove the student(s) allocated to this goal to unset it from them.</p>
+            <p>Remove the student(s) allocated to this goal to remove it from them.</p>
 
             <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Search for recipients of this badge" v-model="selected">
                 <template slot="option" slot-scope="option">

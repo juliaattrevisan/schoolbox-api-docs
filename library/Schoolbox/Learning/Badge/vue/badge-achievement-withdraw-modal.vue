@@ -207,11 +207,13 @@ export default {
 <template>
     <reveal-modal ref="modal">
         <template v-if="badge">
-            <h2>Withdraw <strong>{{ badge.name }}</strong></h2>
+            <h2>Withdraw <strong>'{{ badge.name }}'</strong></h2>
 
-            <div class="card small-12 compact">
-                <badge-image :badge="badge"></badge-image>
-                <h3>{{ badge.name }}</h3>
+            <div class="card small-12 compact badge-card">
+                <div>
+                    <badge-image :badge="badge"></badge-image>
+                    <h3>{{ badge.name }}</h3>
+                </div>
             </div>
 
             <p>Remove the student(s) allocated to this achievement to withdraw it from them.</p>
