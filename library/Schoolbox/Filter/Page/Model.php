@@ -18,6 +18,7 @@ use Schoolbox\Role;
  */
 class Model
 {
+    use Id;
 
     // Pages with configurable filters
     // These are enums in DB, you will need to update column definition if you add to this list
@@ -112,9 +113,6 @@ class Model
             ],
         ];
     }
-
-
-    use Id;
 
     /**
      * @var Filter\Model
