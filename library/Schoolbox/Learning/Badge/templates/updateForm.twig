@@ -104,7 +104,7 @@
                             <div class="small-12 medium-6 columns" data-icon-container>
                                 <div data-icon-selection>
                                     <img src="{{ badge.icon ? badge.icon : '' }}" width="64" height="64" />
-                                    <input id="badge-icon" name="icon" type="hidden" value="" />
+                                    <input id="badge-icon" name="icon" type="hidden" value="{{ badge.icon ? badge.icon : '' }}" />
                                 </div>
                                 <div>
                                     {% include '@learningBadge/icon-modal.twig' with {
