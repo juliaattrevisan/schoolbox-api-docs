@@ -116,24 +116,35 @@ class Controller extends Base
             $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
 
 
-            $cursor  = new MapperCursor(
-                $this->mapper,
-                self::BADGES_PER_PAGE,
-                [
-                    'name' => $this->mapper::SORT_ORDER_ASC,
-                    'id'   => $this->mapper::SORT_ORDER_ASC,
-                ],
-                $this->mapper->getPredicateBuilder()->in('id', $badgeIds)
-            );
-            $results = $cursor->retrieveResults($this->request->query->get('cursor'));
+            // Retrieve badges which match the filter
+            if (count($badgeIds) > 0) {
+                $cursor  = new MapperCursor(
+                    $this->mapper,
+                    self::BADGES_PER_PAGE,
+                    [
+                        'name' => $this->mapper::SORT_ORDER_ASC,
+                        'id'   => $this->mapper::SORT_ORDER_ASC,
+                    ],
+                    $this->mapper->getPredicateBuilder()->in('id', $badgeIds)
+                );
+                $results = $cursor->retrieveResults($this->request->query->get('cursor'));
+                $data    = $results->map($this->buildModelToArrayTranslator());
+                $count   = $cursor->retrieveResultCount();
+                $next    = $cursor->next($results);
+                $current = $cursor->current($results);
+            } else {
+                $data    = [];
+                $next    = null;
+                $current = null;
+            }
             $this->response->content->set(
                 $this->buildJsonOutput([
-                    'data'     => $results->map($this->buildModelToArrayTranslator()),
+                    'data'     => $data,
                     'metadata' => [
-                        'count'  => $cursor->retrieveResultCount(),
+                        'count'  => $count,
                         'cursor' => [
-                            'next'    => $cursor->next($results),
-                            'current' => $cursor->current($results),
+                            'next'    => $next,
+                            'current' => $current,
                         ],
                     ],
                 ])
