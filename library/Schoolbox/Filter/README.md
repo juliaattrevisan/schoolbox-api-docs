@@ -11,12 +11,43 @@ sub-system of Schoolbox, so that they may use filters in their own work.
 
 ## Overview
 
-In brief, filters are for letting the end user display a subset of the entire
-record set that would otherwise display on a page. This has the benefits of:
+Filters provide a user and developer interface for displaying a subset of the
+entire set of [Entities](#entity) that would otherwise display on a
+[Page](#page).
+
+This has the benefits of:
 * reducing page load time
 * reducing memory usage
-* reducing the amount of information displayed to only what is necessary for the
-  end user's purpose
+* reducing the information displayed to only what is necessary for the end
+  user's needs
+
+
+## Concepts
+
+### Filter
+
+A single option for reducing the set of [Entities](#entity) displayed on a
+[Page](#page) to a subset.
+
+A Filter may have one or more of its options selected: generally, an
+[Entity](#entity) must match at least one of the selected options in order to
+pass the Filter.
+
+### Filter Set
+
+The collection of [Filters](#filter) which are included on a single
+[Page](#page).
+
+Each [Entity](#entity) that would be displayed on the [Page](#page) must pass
+all [Filters](#filter) in the Filter Set in order to be displayed.
+
+### Entity
+
+A single object within Schoolbox, i.e. a single assessment or event.
+
+### Page
+
+A single location within Schoolbox, i.e. a report.
 
 
 ## Interfaces
@@ -31,18 +62,19 @@ In addition, it defines responsibilities for:
 * Building a set of [Key Converters](#key-converter)
 * Converting selections into a 2D array of IDs, for later passing into an
   [ID Finder](#id-finder)
-* Building the current state of Filters for a page
-* Building a [Panel](#panel) so that a page's Filters may be rendered
-* Checking whether any filters should be set to a default value based on the
-  user whose page is being viewed (`checkTeacherFolders`)
+* Building the current state of Filters for a [Page](#page)
+* Building a [Panel](#panel) so that a page's [Filter Set](#filter-set) may be
+  rendered
+* Checking whether any [Filters](#filter) should be set to a default value based
+  on the user whose [Page](#page) is being viewed (`checkTeacherFolders`)
 
 > Note that the above additional responsibilities are arguably not part of what
 > the Factory Factory should do, and developers will generally not have to worry
 > about them anyway: they are mostly handled in the core abstract implementation
 > `\Schoolbox\Filter\AbstractFactoryFactory`.
 
-It is expected there will only be one Factory Factory per type of entity that is
-being filtered.
+It is expected there will only be one Factory Factory per type of
+[Entity](#entity) that is being filtered.
 
 Developers will generally only need to know about `buildFilterFactoryForFilter`
 and its implementations: they will need to add a case to an implementation of
@@ -59,30 +91,35 @@ injection container, with the key `filters.factoryFactory`.
 ### Factory
 
 The Factory interface `\Schoolbox\Filter\IFactory` defines responsibilities for
-building the required objects for a particular filter implementation, these
-being:
-* Component
-* Definition
-* Key Converter
+building the required objects for a particular [Filter](#filter) implementation,
+these being:
+* [Component](#component)
+* [Definition](#definition)
+* [Key Converter](#key-converter)
 
-It is created by the Factory Factory's `buildFilterFactoryForFilter` method.
+It is created by the [Factory Factory](#factory-factory)'s
+`buildFilterFactoryForFilter` method.
 
 
 ### Component
 
 The Component interface `\Schoolbox\Filter\IComponent` defines the
-responsibilities required for rendering a filter in its panel.
+responsibilities required for rendering a [Filter](#filter) within its
+[Filter Set](#filter-set).
 
 Components are rendered using Twig, and thus need to define which variables are
-passed to the template, as defined in the filter's Definition.
+passed to the template, as defined in the [Filter](#filter)'s
+[Definition](#definition).
 
 
 ### Definition
 
 The Definition interface `\Schoolbox\Filter\IDefinition` defines the
 responsibilities for:
-* The pages on which the filter may live (`getPages`)
-* Whether a filter is necessary on a particular page (`isMandatory`)
+* The [Pages](#page) whose [Filter Set](#filter-set) contains the
+  [Filter](#filter) (`getPages`)
+* Whether a [Filter](#filter) is necessary on a particular [Pages](#page)
+  (`isMandatory`)
 * Other methods, used mainly by the filter administration page
 
 In practise, developers don't need to know about this interface's methods, as
@@ -300,7 +337,12 @@ of developing for filters.
     ```
 
 
-### Creating a new filter implementation
+### Implementing Filtering on an Entity
+
+> TODO write documentation on writing the Factory Factory
+
+
+### Implementing a new Filter
 
 * Determine the entity that the filter will actually operate on
   * if no Factory Factory or Filter Consumer exists for the entity:
@@ -389,7 +431,7 @@ The base Panel's Twig template (including JavaScript) may be found in
 `library/Schoolbox/Filter/templates/panel.twig`.
 
 
-### Adding an existing filter to a page which already supports filters
+### Adding an existing Filter to a Page's Filter Set
 
 * Update the Definition implementation's `getPages` to return the page's
   `\Schoolbox\Filter\Page\Model::PAGE_*` constant
