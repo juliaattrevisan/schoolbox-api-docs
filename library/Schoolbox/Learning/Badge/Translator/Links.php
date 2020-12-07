@@ -65,6 +65,13 @@ class Links
     {
         $translation = [];
 
+        /* Endpoint for updating this badge
+         */
+        $translation['update'] = $this->getRouteIfAuthorized(
+            'learningBadge.getUpdateForm', [
+                'badgeId' => $badge->getId()
+        ]);
+
         /* All the people who have received this badge as an achievement
          */
         $translation['achievementRecipients'] = $this->getRouteIfAuthorized(
