@@ -41,6 +41,15 @@ class MapperCursor implements ICursor
 
 
     /**
+     * This cursor will only fetch results which match this predicate builder.
+     *
+     * Defaults to a predicate builder with no predicates; in other words, the
+     * result set will not be filtered beyond the ordering applied.
+     */
+    private Builder $builder;
+
+
+    /**
      * A codec for encoding a result set into a cursor, and decoding a cursor
      * into a pointer to a result set.
      *
@@ -52,23 +61,27 @@ class MapperCursor implements ICursor
     /**
      * Constructor
      *
-     * @param Mapper      $mapper
-     * @param int         $limit
-     * @param array       $order
-     * @param ICodec|null $codec If provided, use this codec to translate the
-     *                           cursor.
-     *                           Defaults to `\Alaress\Codec\Json\Base64`.
+     * @param Mapper       $mapper
+     * @param int          $limit
+     * @param array        $order
+     * @param Builder|null $builder If provided, filter the result set to
+     *                              records which match this builder.
+     * @param ICodec|null  $codec   If provided, use this codec to translate the
+     *                              cursor.
+     *                              Defaults to `\Alaress\Codec\Json\Base64`.
      */
     public function __construct(
         Mapper $mapper,
         int $limit,
         array $order,
+        ?Builder $builder = null,
         ?ICodec $codec = null
     ) {
-        $this->mapper = $mapper;
-        $this->limit  = $limit;
-        $this->order  = $order;
-        $this->codec  = $codec ?? new Base64();
+        $this->mapper  = $mapper;
+        $this->limit   = $limit;
+        $this->order   = $order;
+        $this->builder = $builder ?? $this->mapper->getPredicateBuilder();
+        $this->codec   = $codec ?? new Base64();
     }
 
 
@@ -152,7 +165,7 @@ class MapperCursor implements ICursor
      */
     protected function buildPredicateBuilder(): Builder
     {
-        return $this->mapper->getPredicateBuilder();
+        return clone $this->builder;
     }
 
 

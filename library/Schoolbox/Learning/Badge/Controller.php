@@ -116,14 +116,14 @@ class Controller extends Base
             $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
 
 
-
             $cursor  = new MapperCursor(
                 $this->mapper,
                 self::BADGES_PER_PAGE,
                 [
                     'name' => $this->mapper::SORT_ORDER_ASC,
                     'id'   => $this->mapper::SORT_ORDER_ASC,
-                ]
+                ],
+                $this->mapper->getPredicateBuilder()->in('id', $badgeIds)
             );
             $results = $cursor->retrieveResults($this->request->query->get('cursor'));
             $this->response->content->set(
