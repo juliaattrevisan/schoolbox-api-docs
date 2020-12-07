@@ -7,12 +7,9 @@
 
 declare(strict_types=1);
 
-
 namespace Schoolbox\Filter\Filters\Badge;
 
-
 use Schoolbox\Filter\AbstractIdFinder;
-
 
 /**
  * ID finder for the badge filter.
@@ -25,7 +22,7 @@ class IdFinder extends AbstractIdFinder
      * @param array $completeFilters
      * @return bool
      */
-    protected function doFiltersGuaranteeEmptySet(array $completeFilters) : bool
+    protected function doFiltersGuaranteeEmptySet(array $completeFilters): bool
     {
         return false;
     }
@@ -37,7 +34,7 @@ class IdFinder extends AbstractIdFinder
      * @param array $completeFilters
      * @return array
      */
-    protected function simplifyFilters(array $completeFilters) : array
+    protected function simplifyFilters(array $completeFilters): array
     {
         return $completeFilters;
     }
@@ -50,13 +47,20 @@ class IdFinder extends AbstractIdFinder
      * @param bool  $deleted
      * @return array
      */
-    protected function buildQuery(array $completeFilters, bool $deleted) : array
+    protected function buildQuery(array $completeFilters, bool $deleted): array
     {
-        $categoryIds = $completeFilters[Category\Definition::class];
-        $pb          = $this->getMapper()->getPredicateBuilder()
-                                         ->in('category_id', $categoryIds);
+        $categoryIds = $completeFilters[Category\Definition::class] ?? null;
+        $pb          = $this->getMapper()->getPredicateBuilder();
+        $hasWhere    = false;
+        if (isset($categoryIds) && count($categoryIds) > 0) {
+            $hasWhere = true;
+            $pb = $pb->in('category_id', $categoryIds);
+        }
 
-        $query  = 'SELECT id FROM badge WHERE ' . $pb->getWhereIntersect();
+        $query = 'SELECT id FROM badge';
+        if ($hasWhere) {
+            $query .= ' WHERE ' . $pb->getWhereIntersect();
+        }
         $params = $pb->getParams();
         return [$query, $params];
     }
