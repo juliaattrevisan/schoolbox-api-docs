@@ -23,13 +23,13 @@ export default {
     ],
 
     components: {
-      BadgeAward,
-      BadgeDetail,
-      BadgeAchievementWithdrawModal,
-      BadgeGoalWithdrawModal,
-      BadgeImage,
-      RevealModal,
-      Toast
+        BadgeAward,
+        BadgeDetail,
+        BadgeAchievementWithdrawModal,
+        BadgeGoalWithdrawModal,
+        BadgeImage,
+        RevealModal,
+        Toast
     },
     props: {
         /**
@@ -60,12 +60,13 @@ export default {
                 cursor: null,
             },
             showSkeletonLoader: true,
+            selectedFilters: null,
         }
     },
     computed: {
     },
     mounted() {
-        this.load();
+        // this.load();
     },
     updated() {
     },
@@ -89,16 +90,16 @@ export default {
             if (cursor) {
                 params.cursor = cursor;
             }
-            this.$refs.toast.activate('Loading...');
+            // this.$refs.toast.activate('Loading...');
             axios
                 .get(this.getBadgesRoute, {params})
                 .then(response => {
                     this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
                     this.metadata.cursor = response?.data?.metadata?.cursor ? response.data.metadata.cursor : null;
-                    this.$refs.toast.timeout('Loaded', true);
+                    // this.$refs.toast.timeout('Loaded', true);
                 })
-                .catch(() => this.$refs.toast.timeout('Loading failed', false))
+                // .catch(() => this.$refs.toast.timeout('Loading failed', false))
                 .finally(() => this.showSkeletonLoader = false);
         },
 
@@ -164,6 +165,21 @@ export default {
          */
         closeSetAsGoalModal(badge) {
             this.$refs.setAsGoalModal.close();
+        },
+
+        /**
+         * Callback for when the filters for this badge list are updated.
+         *
+         * Fired from outer space (i.e. from the outside window).
+         *
+         * @param {object} selectedFilters The filters that were selected
+         */
+        onFilterChange(selectedFilters) {
+            this.selectedFilters = selectedFilters;
+
+            // TODO implement reload of filters
+            this.showSkeletonLoader = true;
+            this.load();
         },
     },
 }
