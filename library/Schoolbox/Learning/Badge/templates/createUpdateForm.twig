@@ -18,7 +18,7 @@
 {% else %}
     {{ bread.crumbs(
         ['Badges', routeLookup('learningBadge.getBadges') ],
-        ['Add new', routeLookup('learningBadge.getCreateForm')]
+        ['Create', routeLookup('learningBadge.getCreateForm')]
     ) }}
 {% endif %}
 
@@ -27,7 +27,7 @@
         {% if badge %}
             <h1>Modify Badge</h1>
         {% else %}
-            <h1>Add new Badge</h1>
+            <h1>Create Badge</h1>
         {% endif %}
     </div>
 </div>
@@ -162,7 +162,7 @@
             {% if badge %}
             <input type="submit" value="Modify Badge" id="badge-submit" />
             {% else %}
-            <input type="submit" value="Add new badge" id="badge-submit" />
+            <input type="submit" value="Create badge" id="badge-submit" />
             {% endif %}
         </form>
     </div>
