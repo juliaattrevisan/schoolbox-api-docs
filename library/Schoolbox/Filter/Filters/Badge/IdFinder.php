@@ -56,7 +56,7 @@ class IdFinder extends AbstractIdFinder
         $pb          = $this->getMapper()->getPredicateBuilder()
                                          ->in('category_id', $categoryIds);
 
-        $query  = 'SELECT b.id FROM badge b WHERE ' . $pb->getWhereIntersect();
+        $query  = 'SELECT id FROM badge WHERE ' . $pb->getWhereIntersect();
         $params = $pb->getParams();
         return [$query, $params];
     }
