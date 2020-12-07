@@ -371,6 +371,40 @@ of developing for filters.
   * implement `getCustomKeys`: return an empty array for now
   * implement `getPages`: return an empty array for now
   * implement `getLabel`: return an empty string for now
+  * implement `getTemplatesDir` with:
+    ```php
+    return '@filterDefinitions/{entityName}/{filterName}/templates';
+    ```
+  * consider the options which the Filter will display
+    * this Filter may display a set of options corresponding to a list of
+      entities which are related to the Entity being filtered. In this case:
+      * override the constructor to accept an additional
+        `\Schoolbox\GenericCollection` of related entities, and set that
+        collection into the Definition
+      * override `getAbstractKeys` to convert the collection into an array of
+        IDs, converted to string values
+      * override `getLabel` to lookup the string ID in the collection, and
+        return a human-readable label for the corresponding object
+      * override `insertDynamicOptions` with an implementation which adds an
+        option for every item in the collection:
+        ```php
+        $options = parent::insertDynamicOptions($pageFilter);
+
+        // Ensure it contains all items in the collection
+        foreach ($this->collection as $item) {
+            $abstractKey = (string)$item->getId();
+            if (!$options->offsetExists($abstractKey)) {
+                $option = new \Schoolbox\Filter\Page\Option\Model();
+                $option
+                    ->setFilterPage($pageFilter)
+                    ->setKey($abstractKey)
+                    ->setAvailable($this->getInitialAvailability($abstractKey, $pageFilter))
+                    ->setDefaults(new \Schoolbox\GenericCollection(\Schoolbox\Filter\Page\Option\Defaults\Model::class));
+                $options->setOffset($option->getKey(), $option);
+            }
+        }
+        return $options;
+        ```
 
   * Filters will often filter an Entity via a relation of that Entity: if this
     Filter is to do that, then the Definition's constructor should accept a
