@@ -134,6 +134,7 @@ class Controller extends Base
                 $current = $cursor->current($results);
             } else {
                 $data    = [];
+                $count   = 0;
                 $next    = null;
                 $current = null;
             }
