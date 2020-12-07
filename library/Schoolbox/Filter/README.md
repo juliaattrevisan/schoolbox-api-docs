@@ -340,7 +340,8 @@ of developing for filters.
 
 ### Implementing Filtering on an Entity
 
-* Create a [Factory Factory](#factory-factory), extending
+* Create a [Factory Factory](#factory-factory) in the namespace
+  `\Schoolbox\Filter\Filters\{entityName}`, extending
   `\Schoolbox\Filter\AbstractFactoryFactory`
   * define the `ENTITY` constant
   * implement `buildFilterFactoryForFilter`: just have it throw an
@@ -361,8 +362,24 @@ of developing for filters.
   * if no Factory Factory filters the Entity: follow the instructions to
     [implement Filtering on an Entity](#implementing-filtering-on-an-entity),
     and then return here
-* Create a Factory implementation for the new filter
-  * In practise, this will extend `\Schoolbox\Filter\AbstractFactory`
+* Determine a namespace for the new Filter's classes
+  * The Filter's namespace will be
+    `\Schoolbox\Filter\Filters\{entityName}\{filterName}`
+* Create a [Definition](#definition) in the namespace determined above,
+  extending `\Schoolbox\Filter\AbstractDefinition`
+  * implement `getCustomKeys`: return an empty array for now
+  * implement `getPages`: return an empty array for now
+  * implement `getLabel`: return an empty string for now
+
+  * Filters will often filter an Entity via a relation of that Entity: if this
+    Filter is to do that, then the Definition's constructor should accept a
+    `\Schoolbox\GenericCollection` of all the relations which may be filtered
+    upon.
+* Create a [Factory](#factory) in the namespace determined above, extending
+  `\Schoolbox\Filter\AbstractFactory`
+  * Filters will often filter an Entity via a relation of that Entity: if this
+    is the case, then the Factory's constructor should accept the Mapper for
+    that relation as a parameter
   * Depending on how closely related the new filter is to existing ones, its
     `buildComponent` might be able to create instances of already existing
     classes. `buildDefinition` and `buildKeyConverter` will have to create new
@@ -383,8 +400,6 @@ of developing for filters.
           );
       }
       ```
-* Create a Definition implementation for the new filter
-  * In practise, this will extend `\Schoolbox\Filter\AbstractDefinition`
 * Create a Component implementation (if a custom implementation is required)
 * Create a Key Converter implementation
   * In practise, this will extend `\Schoolbox\Filter\AbstractKeyConverter`
