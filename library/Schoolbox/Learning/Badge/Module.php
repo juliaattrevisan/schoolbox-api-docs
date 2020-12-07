@@ -125,7 +125,8 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{badgeId}/update',
             'getUpdateForm',
-            $baseRule
+            $baseRule,
+            Closure::fromCallable([$this, 'preloadBadge']),
         );
 
         /* Update a Badge

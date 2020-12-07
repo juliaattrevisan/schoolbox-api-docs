@@ -261,12 +261,34 @@ class Controller extends Base
     /**
      * View the form for updating a badge
      *
-     * @param Model $model
+     * @param Model $badge
      * @since 20.2
      * @api   GET /learning/badge/{badgeId}/update
      */
-    public function getUpdateForm(Model $model): void
+    public function getUpdateForm(Model $badge): void
     {
+        $attachzone = new GenericZone('image', Storage\Mapper::getInstance());
+        $attachzone
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('upload a badge')
+            ->setMimeFilter('image/*')
+            ->setFileVar('image')
+            ->setMulti(false)
+            ->setThumbnailSize(64)
+            ->setModalTitle('Select image');
+
+        $iconRegistry = (new IconRegistry())->prepare();
+
+        $this->response->content->set($this->buildHtmlOutput('@learningBadge/updateForm.twig', [
+            'badge' => $badge,
+            'attachzone' => $attachzone->getTwigContext(),
+            'categories' => Category\Mapper::getInstance()->findAll(),
+            'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+            'iconRegistry' => [
+                'registry' => $iconRegistry->getRegistry(),
+                'pageLength' => IconRegistry::BADGE_ICON_MODAL_PAGELENGTH
+            ]
+        ], 'Modify Badge'));
     }
 
 
