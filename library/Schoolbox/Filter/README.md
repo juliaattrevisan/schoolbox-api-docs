@@ -73,8 +73,7 @@ In addition, it defines responsibilities for:
 > about them anyway: they are mostly handled in the core abstract implementation
 > `\Schoolbox\Filter\AbstractFactoryFactory`.
 
-It is expected there will only be one Factory Factory per type of
-[Entity](#entity) that is being filtered.
+It is expected there will be at most one Factory Factory per [Entity](#entity).
 
 Developers will generally only need to know about `buildFilterFactoryForFilter`
 and its implementations: they will need to add a case to an implementation of
@@ -84,7 +83,7 @@ The Factory Factory is expected to be a singleton: it exists in the dependency
 injection container, with the key `filters.factoryFactory`.
 
 > The Factory Factory in the DI container is a composite of several predefined
-> Factory Factory instances; one for each type of entity the Filter system is
+> Factory Factory instances; one for each Entity the Filter system is
 > capable of filtering.
 
 
@@ -122,8 +121,8 @@ responsibilities for:
   (`isMandatory`)
 * Other methods, used mainly by the filter administration page
 
-In practise, developers don't need to know about this interface's methods, as
-all of them are implemented in the core abstract implementation
+In practise, developers don't need to define most of this interface's methods,
+as most are implemented in the core abstract implementation
 `\Schoolbox\Filter\AbstractDefinition`. However, this class itself defines a set
 of methods which may be overridden, the most important being:
 * its name in the admin section (`NAME` constant)
