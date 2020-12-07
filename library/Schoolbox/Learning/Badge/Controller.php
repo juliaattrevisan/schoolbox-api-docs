@@ -225,9 +225,13 @@ class Controller extends Base
      *
      * @api   POST /learning/badge/
      * @since 20.2
-     * @throws \Exception if the badge's name is empty
+     * @param Model|null $badge
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \Schoolbox\Resource\Exception
+     * @throws \UnexpectedValueException
      */
-    public function postBadge(): void
+    public function postBadge(?Model $badge): void
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
 
@@ -245,6 +249,12 @@ class Controller extends Base
         // Set an empty collection if so, as that is required to save the badge
         if (!$this->getConfigLoader()->get('curriculum_tagging_enabled')) {
             $model = $model->setCurriculumNodes(\Schoolbox\Curriculum\Node\Mapper::getInstance()->createCollection());
+        }
+
+        /* Update an existing instance, if you provided it
+         */
+        if ($badge) {
+            $model->setId($badge->getId());
         }
 
         $this->mapper->save($model);
@@ -306,33 +316,7 @@ class Controller extends Base
      */
     public function postUpdate(Model $badge): void
     {
-        $data = json_decode(json_encode($this->request->content->get()), true);
-
-        // TODO figure out a better way to handle backend validation than this
-        if (trim($data['name']) === '') {
-            throw $this->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
-        }
-
-        $translator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
-        $model      = $translator($data)
-            ->setCreatedBy($this->getUser())
-            ->setUpdatedBy($this->getUser());
-
-        // Is curriculum tagging disabled?
-        // Set an empty collection if so, as that is required to save the badge
-        if (!$this->getConfigLoader()->get('curriculum_tagging_enabled')) {
-            $model = $model->setCurriculumNodes(\Schoolbox\Curriculum\Node\Mapper::getInstance()->createCollection());
-        }
-
-        $model->setId($badge->getId());
-        $this->mapper->save($model);
-
-        // Return the badge just created
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $this->buildModelToArrayTranslator()($model)
-            )
-        );
+        $this->postBadge($badge);
     }
 
 
