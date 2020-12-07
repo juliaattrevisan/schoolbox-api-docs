@@ -90,7 +90,7 @@ table.rb {
         &.blind-mode { //can't show the students image, so just show a circle in place
             width: 2rem;
             height: 2rem;
-            background: #555555;
+            background: $content-ui-submit-background;
             text-indent: 100%; //to hide the text within the element
             white-space: nowrap;
             overflow: hidden;
