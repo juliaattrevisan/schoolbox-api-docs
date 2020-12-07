@@ -20,7 +20,7 @@ body {
 
 /** Otherwise the crest takes up an entire page **/
 .meriden-crest svg {
-    height: 5.75rem;
+    height: 5rem;
 }
 
 @media print {
