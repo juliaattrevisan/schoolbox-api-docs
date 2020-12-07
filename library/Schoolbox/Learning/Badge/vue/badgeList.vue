@@ -73,33 +73,48 @@ export default {
     methods: {
         /**
          * Load badges.
+         *
+         * @param {Boolean} showToast Should the toast be activated on load of
+         *                            badges?
+         *                            The filter calls `onFilterChange` when its
+         *                            selections change, and that has its own
+         *                            toast so don't show another.
          */
-        load() {
+        load(showToast) {
             this.data = [];
-            this.append(null);
+            this.append(null, showToast);
         },
 
         /**
          * Appends badges to the data list.
          *
          * @param {String|null} cursor
+         * @param {Boolean}     showToast
          */
-        append(cursor) {
+        append(cursor, showToast) {
             // TODO this is very generic, a candidate to be factored into its own place
             let params = {};
             if (cursor) {
                 params.cursor = cursor;
             }
-            // this.$refs.toast.activate('Loading...');
+            if (showToast) {
+                this.$refs.toast.activate('Loading...');
+            }
             axios
                 .get(this.getBadgesRoute, {params})
                 .then(response => {
                     this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
                     this.metadata.cursor = response?.data?.metadata?.cursor ? response.data.metadata.cursor : null;
-                    // this.$refs.toast.timeout('Loaded', true);
+                    if (showToast) {
+                        this.$refs.toast.timeout('Loaded', true);
+                    }
                 })
-                // .catch(() => this.$refs.toast.timeout('Loading failed', false))
+                .catch(() => {
+                    if (showToast) {
+                        this.$refs.toast.timeout('Loading failed', false);
+                    }
+                })
                 .finally(() => this.showSkeletonLoader = false);
         },
 
@@ -179,7 +194,7 @@ export default {
 
             // TODO implement reload of filters
             this.showSkeletonLoader = true;
-            this.load();
+            this.load(false);
         },
     },
 }
@@ -249,7 +264,7 @@ export default {
             </template>
 
             <!-- Load more button, if there are more to load -->
-            <a @click.prevent="append(metadata.cursor.next)"
+            <a @click.prevent="append(metadata.cursor.next, true)"
                class="button expand"
                v-if="metadata.cursor.next && data.length < metadata.count">Load more</a>
         </section>
