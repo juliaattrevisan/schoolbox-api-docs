@@ -204,7 +204,7 @@ class Controller extends Base
 
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@learningBadge/updateForm.twig',
+                '@learningBadge/createUpdateForm.twig',
                 [
                     'badge' => [],
                     'attachzone' => $attachzone->getTwigContext(),
@@ -291,7 +291,7 @@ class Controller extends Base
 
         $iconRegistry = (new IconRegistry())->prepare();
 
-        $this->response->content->set($this->buildHtmlOutput('@learningBadge/updateForm.twig', [
+        $this->response->content->set($this->buildHtmlOutput('@learningBadge/createUpdateForm.twig', [
             'badge' => $badge,
             'attachzone' => $attachzone->getTwigContext(),
             'categories' => Category\Mapper::getInstance()->findAll(),
