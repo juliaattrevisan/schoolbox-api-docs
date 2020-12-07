@@ -200,7 +200,7 @@ composer dump-autoload -o --no-interaction;
 
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing instance via 'schoolbox-data-refresh.sh'";
-INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
+if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --data-source "$data_source" \
 --dataset "$data_filename" \
 --s3-referer "$s3Referer" \
@@ -222,8 +222,10 @@ INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --config site_domain 'dev.schoolbox.cloud' \
 --config site_hostname 'vagrant' \
 --config site_school_code "vagrant" \
---config title 'Schoolbox [vagrant]';
-
+--config title 'Schoolbox [vagrant]'; then
+  error "Unable to install instance. Exiting."
+  exit 1
+fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox < /vagrant/sql/vagrant.sql
