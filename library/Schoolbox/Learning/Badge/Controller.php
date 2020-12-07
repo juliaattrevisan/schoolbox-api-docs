@@ -100,14 +100,21 @@ class Controller extends Base
      */
     public function getBadges(): void
     {
+        $page = Filter\Page\Model::PAGE_BADGE_LIST;
         if ($this->isJsonRequest()) {
-            // TODO inject filters into cursor
+            // Boilerplate for getting a set of badges which match filter
             $qsFilters      = $this->request->query->get('filters', []);
-            $page           = Filter\Page\Model::PAGE_BADGE_LIST;
             $codec          = new Codec($this->filterMapper, $this->filterSelectionMapper);
             $user           = $this->getUser();
             $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
             $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);
+            $idFinder       = Filter\Filters\Badge\IdFinder::getInstance($this->filterMapper, $this->mapper);
+            $badgeIds       = $idFinder->findIdsByFilters($filters);
+
+
+            // Save selected filters
+            $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
+
 
 
             $cursor  = new MapperCursor(
@@ -135,7 +142,6 @@ class Controller extends Base
         }
 
         // Output a Twig template
-        $page        = Filter\Page\Model::PAGE_BADGE_LIST;
         $filterPanel = $this->filterFactoryFactory->buildPanel(
             $this->getUser(),
             $page,
