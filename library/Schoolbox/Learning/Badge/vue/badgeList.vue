@@ -54,7 +54,7 @@ export default {
         return {
             currentBadge: null,
             data: [],
-            search: {},
+            // search: {},
             metadata: {
                 count: null,
                 cursor: null,
@@ -188,6 +188,7 @@ export default {
             <template v-else>
 
                 <!-- Search panel. Should this use the filters system? -->
+                <!--
                 <ul class="flex-list buttons">
                     <li><input type="text" placeholder="Badge Name" v-model="search.badgeName" /></li>
                     <li><input type="text" placeholder="Creator" v-model="search.creator" /></li>
@@ -195,6 +196,7 @@ export default {
                     <li><a href="#">Reset to defaults</a></li>
                     <li><a href="#" class="submit">Apply filters</a></li>
                 </ul>
+                -->
 
                 <div class="badge-grid v-card-list">
                     <div class="badge v-card" v-for="badge in data" :key="badge.id">
