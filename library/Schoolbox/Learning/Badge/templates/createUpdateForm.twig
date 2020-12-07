@@ -23,7 +23,7 @@
         {% if badge %}
             <h1>Modify Badge</h1>
         {% else %}
-            <h1>Add new badge</h1>
+            <h1>Add new Badge</h1>
         {% endif %}
     </div>
 </div>
@@ -40,7 +40,7 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label for="badge-name" class="required">Achievement Name</label>
+                        <label for="badge-name" class="required">Name</label>
                         <input name="name" type="text" id="badge-name" required value="{{ badge and badge.name ? badge.name : '' }}"/>
 
                         <label for="badge-body">
