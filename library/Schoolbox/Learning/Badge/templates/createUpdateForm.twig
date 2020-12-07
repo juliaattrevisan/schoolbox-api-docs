@@ -254,12 +254,13 @@
                 // Build a request to post the form
                 let formData = new FormData(form),
                     payload  = {
-                        name:            formData.get('name'),
-                        body:            formData.get('body'),
-                        icon:            formData.get('icon'),
-                        image:           formData.get('image'),
-                        category:        null,
-                        tags:            [],
+                        'name': formData.get('name'),
+                        'body': formData.get('body'),
+                        'icon': formData.get('icon'),
+                        'image': formData.get('image'),
+                        'category': null,
+                        'tags': [],
+                        'badge-avatar-selector': formData.get('badge-avatar-selector')
                     },
                     categoryId      = formData.get('category'),
                     tags            = formData.get('tags'),

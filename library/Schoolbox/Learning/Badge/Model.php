@@ -28,6 +28,14 @@ class Model implements ISoftDeletable
 
 
     /**
+     * These consts are used with frontend to decide whether users
+     * chose an icon or uploaded an image for their badge avatar
+     */
+    public const AVATAR_ICON = 'icon';
+    public const AVATAR_IMAGE = 'image';
+
+
+    /**
      * @var string
      */
     private string $name;

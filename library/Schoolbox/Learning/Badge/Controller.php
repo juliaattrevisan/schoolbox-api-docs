@@ -258,6 +258,14 @@ class Controller extends Base
             $model->setId($badge->getId());
         }
 
+        /* Explicitly and conclusively choose Icon or Image
+         */
+        if (Model::AVATAR_ICON === $data['badge-avatar-selector']) {
+            $model->setImage(null);
+        } else {
+            $model->setIcon(null);
+        }
+
         $this->mapper->save($model);
 
         // Return the badge just created
