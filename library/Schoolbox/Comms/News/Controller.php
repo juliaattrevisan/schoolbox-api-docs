@@ -430,6 +430,7 @@ class Controller extends Base
 
         // Persist article
         $this->newsMapper->save($article);
+        $this->newsMapper->saveFiles($article);
 
         // Restore existing audience onto article, and then update with posted audience
         $postedAudience = $article->getAudience()->shallowClone();
@@ -1491,7 +1492,9 @@ class Controller extends Base
                 $articleFile = $existing[$attachedFile->getHash()] ?? new File\Model();
 
                 $articleFile->setStorage($attachedFile)
-                    ->setBasename($attachedFile->getBasename());
+                    ->setArticle($article)
+                    ->setBasename($attachedFile->getBasename())
+                    ->setUpdatedAt(\Alaress_Date_Format::now());
 
                 $newList->add($articleFile);
             }
