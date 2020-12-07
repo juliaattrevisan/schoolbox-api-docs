@@ -225,9 +225,12 @@
 /* News Article Gallery of attached images
  */
 .article-gallery {
+    margin-left: 0;
+
     li {
         float: left;
         list-style: none;
+        padding-bottom: 1rem;
         padding-right: 1rem;
     }
 }
@@ -236,4 +239,12 @@
  */
 .article-gallery, .article-files {
     clear: both;
+}
+
+/* News File List
+ */
+.article-files {
+    li {
+        border: 1px solid $body-bg;
+    }
 }

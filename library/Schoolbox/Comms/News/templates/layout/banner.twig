@@ -104,7 +104,7 @@
                     });
                 </script>
 
-                <ul class="article-gallery no-margin" data-image-gallery>
+                <ul class="article-gallery" data-image-gallery>
                 {% for file in article.attachedFiles %}
                     {% if file.mimetype.isImage %}
                         <li>
@@ -121,10 +121,19 @@
              # Probably need special treatments for audio/video media etc.
              #}
             {% if hasFiles %}
-                <ul class="article-files no-margin">
+                <ul class="article-files grid small-block-grid-1 medium-block-grid-2">
                 {% for file in article.attachedFiles %}
                     {% if not file.mimetype.isImage %}
-                        <li>Other: {{ file.filename }}</li>
+                        <li>
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <a href="/storage/fetch.php?hash={{ file.hash }}">
+                                        <img src="/ajax/mime/{{ file.mime }}" alt="Download" class="mime" />
+                                        <p>{{ file.filename }}</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
                     {% endif %}
                 {% endfor %}
                 </ul>
