@@ -83,38 +83,38 @@
 /* Extremely specific to news on the dashboard,
    in the small right column on large only */
 @media #{$large-only} {
-  .column-right {
-    #news-component {
-      .card > a > img {
-        margin: 0 0 1rem 0;
-        float: none;
-      }
-      .v-card {
-        flex: 0 0 100%;
-      }
+    .column-right {
+        #news-component {
+            .card > a > img {
+                margin: 0 0 1rem 0;
+                float: none;
+            }
+            .v-card {
+                flex: 0 0 100%;
+            }
+        }
+        .skeleton.news-reversed > .img,
+        .skeleton.news > .img {
+            float: left;
+            margin: 0 0 1rem 0;
+        }
     }
-    .skeleton.news-reversed > .img,
-    .skeleton.news > .img {
-      float: left;
-      margin: 0 0 1rem 0;
-    }
-  }
 }
 
 @media #{$large-up} {
-  .column-right #news-component .card > a > img {
-    width: 6rem;
-  }
+    .column-right #news-component .card > a > img {
+        width: 6rem;
+    }
 }
 
 .skeleton.news > .img {
-  margin: 0 1rem 0 0;
-  width: rem-calc(200);
+      margin: 0 1rem 0 0;
+      width: rem-calc(200);
 }
 .skeleton.news-reversed > .img {
-  float: right;
-  margin: 0 0 0 1rem;
-  width: rem-calc(200);
+      float: right;
+      margin: 0 0 0 1rem;
+      width: rem-calc(200);
 }
 
 .news-post {
@@ -218,6 +218,22 @@
 }
 
 .article-read-more {
-  margin-top: .5rem;
-  text-transform: uppercase;
+      margin-top: .5rem;
+      text-transform: uppercase;
+}
+
+/* News Article Gallery of attached images
+ */
+.article-gallery {
+    li {
+        float: left;
+        list-style: none;
+        padding-right: 1rem;
+    }
+}
+
+/* Never wrap
+ */
+.article-gallery, .article-files {
+    clear: both;
 }

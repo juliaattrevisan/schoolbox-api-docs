@@ -95,26 +95,30 @@
              # Can probably split these attachedFiles further, but nobody's really sure
              #}
             {% if hasImages %}
+                <script>
+                    // start lightbox stuff here
+                </script>
+
+                <ul class="article-gallery no-margin">
                 {% for file in article.attachedFiles %}
-                    <ul>
                     {% if file.mimetype.isImage %}
-                        <li>Image: {{ file.filename }}</li>
+                        <li><img src="/storage/image.php?hash={{ file.hash }}&size=square64" title="{{ file.filename }}"></li>
                     {% endif %}
-                    </ul>
                 {% endfor %}
+                </ul>
             {% endif %}
 
             {# Other filetypes just stashed here, for now
              # Probably need special treatments for audio/video media etc.
              #}
             {% if hasFiles %}
+                <ul class="article-files no-margin">
                 {% for file in article.attachedFiles %}
-                    <ul>
                     {% if not file.mimetype.isImage %}
                         <li>Other: {{ file.filename }}</li>
                     {% endif %}
-                    </ul>
                 {% endfor %}
+                </ul>
             {% endif %}
         {% endif %}
     </section>
