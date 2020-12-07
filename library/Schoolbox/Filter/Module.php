@@ -1,12 +1,14 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Filter;
 
 use Alaress\Authorizer\Rule\IsSuperuser;
-use \Alaress\Module\Module as AlaressModule;
+use Alaress\Module\Module as AlaressModule;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Filters;

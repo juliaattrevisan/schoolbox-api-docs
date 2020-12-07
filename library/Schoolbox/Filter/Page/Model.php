@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -26,7 +27,7 @@ class Model
     public const PAGE_COURSE_MARK_BOOK    = 'courseMarkbook';
     public const PAGE_RUBRIC_MARK_BOOK    = 'rubricMarkbook';
     public const PAGE_LEARNING_ANALYTICS  = 'analytics';
-    public const PAGE_UPCOMING_ASSESSMENTS= 'dueWorkCal';
+    public const PAGE_UPCOMING_ASSESSMENTS = 'dueWorkCal';
     public const PAGE_ASSESSMENT_CALENDAR = 'assessmentCal';
     public const PAGE_BADGE_LIST          = 'badgeList';
 
@@ -261,5 +262,4 @@ class Model
         $this->options->replaceWith($options);
         return $this;
     }
-
 }

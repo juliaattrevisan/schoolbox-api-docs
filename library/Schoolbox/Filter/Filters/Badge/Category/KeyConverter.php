@@ -7,15 +7,12 @@
 
 declare(strict_types=1);
 
-
 namespace Schoolbox\Filter\Filters\Badge\Category;
-
 
 use InvalidArgumentException;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\User;
-
 
 /**
  * Key converter for the badge category filter.

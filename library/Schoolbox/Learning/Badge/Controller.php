@@ -199,7 +199,6 @@ class Controller extends Base
         /* Group by category
          */
         foreach ($awards as $award) {
-
             /* Force string indexes, otherwise the numeric values get inserted in-order
              * which isn't intended here; they are already in a particular order
              */
@@ -230,7 +229,6 @@ class Controller extends Base
              * in the list is the most recently awarded
              */
             if (!isset($stack['categories'][$categoryId]['awards'][$badgeId])) {
-
                 /* This is a set-based aggregation, not an individual model property
                  */
                 $badge['count'] = 0;
@@ -492,7 +490,6 @@ class Controller extends Base
      */
     public function setAsGoalForSelf(Model $badge): void
     {
-
     }
 
 

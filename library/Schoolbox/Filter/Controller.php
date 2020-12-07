@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -14,8 +15,8 @@ use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
-use function count;
 
+use function count;
 
 class Controller extends BaseController
 {
