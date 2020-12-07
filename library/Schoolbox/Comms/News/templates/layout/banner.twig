@@ -7,7 +7,6 @@
     {% endif %}
 
     <section class="detail content">
-
         <div class="title-section">
             <h1>{{ article.title |default("(untitled)") }}</h1>
             {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}
@@ -74,6 +73,50 @@
         <article>
             {{ article.body|purify }}
         </article>
+
+        {% if article.attachedFiles|length %}
+            <hr />
+
+            {# Inspect attachedFiles contents to see what kind of files we have in there
+             # It's just one big collection atm, but we can segregate here for special treatments
+             #}
+            {% set hasImages = false %}
+            {% set hasFiles = false %}
+
+            {% for file in article.attachedFiles %}
+                {% if file.mimetype.isImage %}
+                    {% set hasImages = true %}
+                {% else %}
+                    {% set hasFiles = true %}
+                {% endif %}
+            {% endfor %}
+
+            {# Images are processed first into their own little lightbox gallery
+             # Can probably split these attachedFiles further, but nobody's really sure
+             #}
+            {% if hasImages %}
+                {% for file in article.attachedFiles %}
+                    <ul>
+                    {% if file.mimetype.isImage %}
+                        <li>Image: {{ file.filename }}</li>
+                    {% endif %}
+                    </ul>
+                {% endfor %}
+            {% endif %}
+
+            {# Other filetypes just stashed here, for now
+             # Probably need special treatments for audio/video media etc.
+             #}
+            {% if hasFiles %}
+                {% for file in article.attachedFiles %}
+                    <ul>
+                    {% if not file.mimetype.isImage %}
+                        <li>Other: {{ file.filename }}</li>
+                    {% endif %}
+                    </ul>
+                {% endfor %}
+            {% endif %}
+        {% endif %}
     </section>
 </div>
 
