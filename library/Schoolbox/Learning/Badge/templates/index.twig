@@ -4,14 +4,6 @@
     ['Badges', routeLookup('learningBadge.getBadges') ],
 ) }}
 
-
-{% include '@filters/panel.twig' with {
-    contentId: 'filterPanel',
-    panel:     filterPanel,
-    quickload: false,
-} only %}
-
-
 <div class="row">
     <div class="button-action small-12 columns">
         <h1>Badges</h1>
@@ -20,6 +12,12 @@
         {% endif %}
     </div>
 </div>
+
+{% include '@filters/panel.twig' with {
+    contentId: 'filterPanel',
+    panel:     filterPanel,
+    quickload: false,
+} only %}
 
 <div class="row">
     <div class="small-12 island">
