@@ -181,7 +181,10 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     private $topics;
 
-    /** @var GenericCollection|Audience\Model[] */
+
+    /**
+     * @var GenericCollection|Audience\Model[]
+     */
     private $audience;
 
     /**
@@ -189,9 +192,23 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     private $metadata;
 
+
+    /**
+     * Optionally attached Files
+     *
+     * @var Collection|File\Model[]
+     */
+    protected $attachedFiles;
+
+
+    /**
+     * Model constructor.
+     */
     public function __construct()
     {
         $this->metadata = new Metadata();
+
+        $this->setAttachedFiles(new Collection());
     }
 
 
@@ -1097,5 +1114,25 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     public function getMetadata(): Metadata
     {
         return $this->metadata;
+    }
+
+
+    /**
+     * @return Collection|File\Model[]
+     */
+    public function getAttachedFiles()
+    {
+        return $this->attachedFiles;
+    }
+
+
+    /**
+     * @param Collection|File\Model[] $attachedFiles
+     * @return $this
+     */
+    public function setAttachedFiles($attachedFiles)
+    {
+        $this->attachedFiles = $attachedFiles;
+        return $this;
     }
 }

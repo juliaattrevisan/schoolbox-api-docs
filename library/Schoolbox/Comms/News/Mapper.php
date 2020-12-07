@@ -98,6 +98,16 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             self::COLUMN_JOIN_MULTI,
             'topics'
         );
+
+        $this->hasJoin(
+            'files',
+            [
+                'multiple'  => true,
+                'mapper'    => File\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'article_id',
+            ]
+        );
     }
 
 
@@ -207,6 +217,10 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                 if ($discussionThread) {
                     $article->setDiscussionThread($discussionThread);
                 }
+
+                /* Attach any associated files
+                 */
+                $article->setAttachedFiles($this->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
             }
 
             /* Attach topics
@@ -225,6 +239,16 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         }
 
         return $collection;
+    }
+
+    /**
+     * Persist News Article files.
+     *
+     * @param Model $article
+     */
+    public function saveFiles(Model $article): void
+    {
+        $this->cascadeJoin('files', ['article_id' => $article->getId()], $article->getAttachedFiles());
     }
 
 
