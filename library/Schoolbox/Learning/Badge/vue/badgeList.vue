@@ -9,7 +9,12 @@ import BadgeDetail from "./badgeDetail";
 import BadgeAchievementWithdrawModal from "./badge-achievement-withdraw-modal";
 import BadgeGoalWithdrawModal from "./badge-goal-withdraw-modal";
 import BadgeImage from './badge-image';
-import foundationMixin from '@schoolbox/foundation-mixin';
+
+// Foundation mixin is not required:
+// the filter panel calls `jQuery.fn.foundation` with the entire document as its
+// context.
+// Attempting to apply Foundation again causes the dropdown menus to not work.
+// import foundationMixin from '@schoolbox/foundation-mixin';
 
 export default {
 
@@ -19,9 +24,7 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [
-        foundationMixin
-    ],
+    mixins: [],
 
     components: {
         BadgeAward,
