@@ -204,10 +204,11 @@ class Controller extends Base
 
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@learningBadge/createForm.twig',
+                '@learningBadge/createUpdateForm.twig',
                 [
-                    'attachzone'               => $attachzone->getTwigContext(),
-                    'categories'               => Category\Mapper::getInstance()->findAll(),
+                    'badge' => [],
+                    'attachzone' => $attachzone->getTwigContext(),
+                    'categories' => Category\Mapper::getInstance()->findAll(),
                     'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                     'iconRegistry' => [
                         'registry' => $iconRegistry->getRegistry(),
@@ -225,9 +226,13 @@ class Controller extends Base
      *
      * @api   POST /learning/badge/
      * @since 20.2
-     * @throws \Exception if the badge's name is empty
+     * @param Model|null $badge
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \Schoolbox\Resource\Exception
+     * @throws \UnexpectedValueException
      */
-    public function postBadge(): void
+    public function postBadge(?Model $badge): void
     {
         $data = json_decode(json_encode($this->request->content->get()), true);
 
@@ -247,6 +252,20 @@ class Controller extends Base
             $model = $model->setCurriculumNodes(\Schoolbox\Curriculum\Node\Mapper::getInstance()->createCollection());
         }
 
+        /* Update an existing instance, if you provided it
+         */
+        if ($badge) {
+            $model->setId($badge->getId());
+        }
+
+        /* Explicitly and conclusively choose Icon or Image
+         */
+        if (Model::AVATAR_ICON === $data['badge-avatar-selector']) {
+            $model->setImage(null);
+        } else {
+            $model->setIcon(null);
+        }
+
         $this->mapper->save($model);
 
         // Return the badge just created
@@ -255,6 +274,58 @@ class Controller extends Base
                 $this->buildModelToArrayTranslator()($model)
             )
         );
+    }
+
+
+    /**
+     * View the form for updating a badge
+     *
+     * @param Model $badge
+     * @since 20.2
+     * @api   GET /learning/badge/{badgeId}/update
+     */
+    public function getUpdateForm(Model $badge): void
+    {
+        $attachzone = new GenericZone('image', Storage\Mapper::getInstance());
+        $attachzone
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('upload a badge')
+            ->setMimeFilter('image/*')
+            ->setFileVar('image')
+            ->setMulti(false)
+            ->setThumbnailSize(64)
+            ->setModalTitle('Select image')
+            ->attachFiles([$badge->getImage()]);
+
+        $iconRegistry = (new IconRegistry())->prepare();
+
+        $this->response->content->set($this->buildHtmlOutput('@learningBadge/createUpdateForm.twig', [
+            'badge' => $badge,
+            'attachzone' => $attachzone->getTwigContext(),
+            'categories' => Category\Mapper::getInstance()->findAll(),
+            'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+            'iconRegistry' => [
+                'registry' => $iconRegistry->getRegistry(),
+                'pageLength' => IconRegistry::BADGE_ICON_MODAL_PAGELENGTH
+            ]
+        ], 'Modify Badge'));
+    }
+
+
+    /**
+     * Update a badge from POST data
+     *
+     * @param Model $badge
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \Schoolbox\Resource\Exception
+     * @throws \UnexpectedValueException
+     * @since 20.2
+     * @api   POST /learning/badge/{badgeId}/update
+     */
+    public function postUpdate(Model $badge): void
+    {
+        $this->postBadge($badge);
     }
 
 

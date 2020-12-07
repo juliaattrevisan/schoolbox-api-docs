@@ -1,29 +1,56 @@
+{##
+ # Create/Update Form
+ #
+ # @param Model|null $badge               An instance of Badge\Model
+ # @param array $attachzone               A dropzone instance containing hashes of files, if any
+ # @param array $categories               A list of Badge Categories to choose
+ # @param bool $curriculumTaggingEnabled  A bool for whether curric nodes selection should be enabled
+ # @param array $iconRegistry             A tuple containing icon paths and page length const
+ #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
-{{ bread.crumbs(
-    ['Badges', routeLookup('learningBadge.getBadges') ],
-    ['Add new', routeLookup('learningBadge.getCreateForm')]
-) }}
+{% if badge %}
+    {{ bread.crumbs(
+        ['Badges', routeLookup('learningBadge.getBadges') ],
+        [badge.name],
+        ['Modify']
+    ) }}
+{% else %}
+    {{ bread.crumbs(
+        ['Badges', routeLookup('learningBadge.getBadges') ],
+        ['Create', routeLookup('learningBadge.getCreateForm')]
+    ) }}
+{% endif %}
 
 <div class="row">
     <div class="small-12 column">
-        <h1>Add new badge</h1>
+        {% if badge %}
+            <h1>Modify Badge</h1>
+        {% else %}
+            <h1>Create Badge</h1>
+        {% endif %}
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 island">
-        <form method="post" action="{{ routeLookup('learningBadge.postBadge') }}" id="badge-form">
+        {% if badge %}
+            {% set route = routeLookup('learningBadge.postUpdate', {badgeId: badge.id}) %}
+        {% else %}
+            {% set route = routeLookup('learningBadge.postBadge') %}
+        {% endif %}
+
+        <form method="post" action="{{ route }}" id="badge-form">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label for="badge-name" class="required">Achievement Name</label>
-                        <input name="name" type="text" id="badge-name" required />
+                        <label for="badge-name" class="required">Name</label>
+                        <input name="name" type="text" id="badge-name" required value="{{ badge and badge.name ? badge.name : '' }}"/>
 
                         <label for="badge-body">
                             Description
                         </label>
-                        <textarea name="body" id="badge-body" required></textarea>
+                        <textarea name="body" id="badge-body" required>{{ badge and badge.body ? badge.body|purify : '' }}</textarea>
                     </div>
                 </fieldset>
                 <fieldset class="content">
@@ -41,45 +68,53 @@
                                     <label for="badge-image">Upload from your device</label>
                                 </fieldset>
 
-                        <script src="/javascript/shared/badges/jquery.icon-modal.js"></script>
-                        <script>
-                            $(function() {
+                                <script src="/javascript/shared/badges/jquery.icon-modal.js"></script>
+                                <script>
+                                    $(function() {
 
-                                /* Shank twig data into js; I could probably skip this
-                                 * by providing the registry from backend instead
-                                 */
-                                $('#icon-modal').iconModal({
-                                    registry: $.parseJSON('{{ iconRegistry.registry|json_encode|escape('js') }}'),
-                                    pageLength: {{ iconRegistry.pageLength }},
+                                        /* Shank twig data into js; I could probably skip this
+                                         * by providing the registry from backend instead
+                                         */
+                                        $('#icon-modal').iconModal({
+                                            registry: $.parseJSON('{{ iconRegistry.registry|json_encode|escape('js') }}'),
+                                            pageLength: {{ iconRegistry.pageLength }},
 
-                                    /* Inflict it upon the form
-                                     */
-                                    onSelect: function(element) {
-                                        $('[data-icon-selection] img').attr('src', $(element).attr('src')).show();
-                                        $('input[name=icon]').val($(element).attr('src'));
+                                            /* Inflict it upon the form
+                                             */
+                                            onSelect: function(element) {
+                                                $('[data-icon-selection] img').attr('src', $(element).attr('src')).show();
+                                                $('input[name=icon]').val($(element).attr('src'));
 
-                                        $('#icon-modal').foundation('reveal', 'close');
-                                    }
-                                });
+                                                $('#icon-modal').foundation('reveal', 'close');
+                                            }
+                                        });
 
-                                /* Mutex div switch
-                                 */
-                                $('[data-icon-selector]').on('click', function(event) {
-                                    $('[data-image-container]').hide();
-                                    $('[data-icon-container]').show();
-                                });
+                                        /* Mutex div switch
+                                         */
+                                        $('[data-icon-selector]').on('click', function(event) {
+                                            $('[data-image-container]').hide();
+                                            $('[data-icon-container]').show();
+                                        });
 
-                                $('[data-image-selector]').on('click', function(event) {
-                                    $('[data-image-container]').show();
-                                    $('[data-icon-container]').hide();
-                                });
-                            });
-                        </script>
+                                        $('[data-image-selector]').on('click', function(event) {
+                                            $('[data-image-container]').show();
+                                            $('[data-icon-container]').hide();
+                                        });
+
+                                        {# Preselect "upload from your device" if there's a custom image
+                                         # given to this badge; otherwise it'll have "choose existing icon"
+                                         # selected instead and noop
+                                         #}
+                                        {% if badge and badge.image %}
+                                        $('[data-image-selector]').trigger('click');
+                                        {% endif %}
+                                    });
+                                </script>
                             </div>
                             <div class="small-12 medium-6 columns" data-icon-container>
                                 <div data-icon-selection>
-                                    <img src="" width="64" height="64" />
-                                    <input id="badge-icon" name="icon" type="hidden" value="" />
+                                    <img src="{{ badge and badge.icon ? badge.icon : '' }}" width="64" height="64" />
+                                    <input id="badge-icon" name="icon" type="hidden" value="{{ badge and badge.icon ? badge.icon : '' }}" />
                                 </div>
                                 <div>
                                     {% include '@learningBadge/icon-modal.twig' with {
@@ -102,27 +137,33 @@
                         <select name="category" id="badge-category" required>
                             <option disabled selected>-- select a category --</option>
                             {% for category in categories %}
-                                <option value="{{ category.id }}" label="{{ category.name }}">{{ category.name }}</option>
+                                {% set selected = '' %}
+
+                                {% if badge and badge.category.id == category.id %}
+                                    {% set selected = 'selected="selected"' %}
+                                {% endif %}
+                                <option value="{{ category.id }}" label="{{ category.name }}" {{ selected }}>{{ category.name }}</option>
                             {% endfor %}
                         </select>
 
                         {% if curriculumTaggingEnabled %}
                             <label for="curriculum-code-select">Curriculum Codes</label>
                             <div class="input-group">
-                                {%
-                                    include 'sub/curriculumCodeSelector.twig' with
-                                    {
-                                        codeList: [],
-                                        renderButton: true
-                                    }
-                                %}
+                                {% include 'sub/curriculumCodeSelector.twig' with {
+                                    codeList: badge and badge.curriculumNodes ? badge.curriculumNodes : [],
+                                    renderButton: true
+                                } %}
                             </div>
                         {% endif %}
                     </div>
                 </fieldset>
             </section>
 
-            <input type="submit" value="Add new badge" id="badge-submit" />
+            {% if badge %}
+            <input type="submit" value="Modify Badge" id="badge-submit" />
+            {% else %}
+            <input type="submit" value="Create badge" id="badge-submit" />
+            {% endif %}
         </form>
     </div>
 </div>
@@ -217,12 +258,13 @@
                 // Build a request to post the form
                 let formData = new FormData(form),
                     payload  = {
-                        name:            formData.get('name'),
-                        body:            formData.get('body'),
-                        icon:            formData.get('icon'),
-                        image:           formData.get('image'),
-                        category:        null,
-                        tags:            [],
+                        'name': formData.get('name'),
+                        'body': formData.get('body'),
+                        'icon': formData.get('icon'),
+                        'image': formData.get('image'),
+                        'category': null,
+                        'tags': [],
+                        'badge-avatar-selector': formData.get('badge-avatar-selector')
                     },
                     categoryId      = formData.get('category'),
                     tags            = formData.get('tags'),
