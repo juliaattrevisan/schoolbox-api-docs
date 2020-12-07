@@ -64,13 +64,13 @@ export default {
             selectedFilters: null,
         }
     },
-    computed: {
-    },
-    mounted() {
-        // this.load();
-    },
-    updated() {
-    },
+    // computed: {
+    // },
+    // mounted() {
+    //     this.load();
+    // },
+    // updated() {
+    // },
     methods: {
         /**
          * Load badges.
@@ -198,9 +198,7 @@ export default {
          * @param {object} selectedFilters The filters that were selected
          */
         onFilterChange(selectedFilters) {
-            this.selectedFilters = selectedFilters;
-
-            // TODO implement reload of filters
+            this.selectedFilters    = selectedFilters;
             this.showSkeletonLoader = true;
             this.load(false);
         },
