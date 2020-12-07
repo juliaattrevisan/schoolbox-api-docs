@@ -30,7 +30,13 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form method="post" action="{{ routeLookup('learningBadge.postBadge') }}" id="badge-form">
+        {% if badge %}
+            {% set route = routeLookup('learningBadge.postUpdate', {badgeId: badge.id}) %}
+        {% else %}
+            {% set route = routeLookup('learningBadge.postBadge') %}
+        {% endif %}
+
+        <form method="post" action="{{ route }}" id="badge-form">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">

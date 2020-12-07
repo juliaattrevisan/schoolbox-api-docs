@@ -134,8 +134,9 @@ class Module extends BaseModule
         $this->register(
             self::METHOD_POST,
             '/{badgeId}/update',
-            'postUpdateForm',
-            $baseRule
+            'postUpdate',
+            $baseRule,
+            Closure::fromCallable([$this, 'preloadBadge']),
         );
 
         $this->register(
