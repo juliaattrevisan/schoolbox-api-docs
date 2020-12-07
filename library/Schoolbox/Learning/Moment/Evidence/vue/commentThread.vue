@@ -41,14 +41,31 @@ export default {
             pendingComment: '',
             saveInProgress: false,
             commentIndexToDelete: null,
-            isCKEditorLoaded: false
+            isCKEditorLoaded: false,
+            ckeditorConfig: {
+                removePlugins: 'image,uploadimage,link,schoolboxanchor,elementspath,wordcount',
+                removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+                toolbarGroups: [
+                    {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                    {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
+                    {name: 'links', groups: ['links']},
+                    {name: 'insert', groups: ['insert']},
+                    // {name: 'schoolbox', groups: ['schoolboxlink']},
+                ],
+                contentsCss: [
+                    '/css/core/skin.css.php',
+                    '/css/core/editor.css',
+                ],
+                height: '4rem',
+                resize_enabled: false
+            }
         }
     },
     computed: {
         dateDisplayFormats: () => window.dateDisplayFormats,
-        ckeditorConfig () {
-            return window.jQuery.alaressEditorConfigForComments();
-        },
+        // ckeditorConfig () {
+        //     return window.jQuery.alaressEditorConfigForComments();
+        // },
 
         /**
          * Does this thread exist yet? If not, it will have to be created before
@@ -114,7 +131,7 @@ export default {
     methods: {
 
         /**
-         * Loads the editor only when requested
+         * Loads ckeditor only when required rather than on page load
          */
         loadEditor () {
             
