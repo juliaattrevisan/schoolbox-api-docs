@@ -38,8 +38,8 @@ In addition, it defines responsibilities for:
 
 > Note that the above additional responsibilities are arguably not part of what
 > the Factory Factory should do, and developers will generally not have to worry
-> about them anyway: they are mostly handled in the the core abstract
-> implementation `\Schoolbox\Filter\AbstractFactoryFactory`.
+> about them anyway: they are mostly handled in the core abstract implementation
+> `\Schoolbox\Filter\AbstractFactoryFactory`.
 
 It is expected there will only be one Factory Factory per type of entity that is
 being filtered.
@@ -97,10 +97,10 @@ of methods which may be overridden, the most important being:
 * addition of options from a database table (`getAbstractKeys`)
 * sorting of the filter's options (`sortFilterOptions`)
 * where the filter's template lives (`getTemplatesDir`)
-  * in practise, these will always be in the either the filter's `templates`
-    folder, or a `templates` folder of a superclass. It will always be defined
-    as part of the `@filterDefinitions` namespace, where `@filterDefinitions`
-    maps to `~/library/Schoolbox/Filter/Filters`
+  * in practise, these will always be in either the filter's `templates` folder,
+    or a `templates` folder of a superclass. It will always be defined as part
+    of the `@filterDefinitions` namespace, where `@filterDefinitions` maps to
+    `~/library/Schoolbox/Filter/Filters`
 
 > TODO figure out the difference between:
 > * `getAbstractKeys`
@@ -156,8 +156,8 @@ The ID Finder interface defines the responsibilities required for converting a
 list of selected filters into a list of IDs of items that match the filters.
 
 An ID Finder operates _before_ results are retrieved: it's intended to add a
-further filter (in the form of a list of IDs) to a search query, so that the
-query returns less data and runs more quickly.
+filter (in the form of a list of IDs) to a search query, so that the query
+returns a smaller data set and runs more quickly.
 (In practise, the list of IDs is passed to a mapper's `findByColumn` method, so
 that the set of models for these IDs is retrieved.)
 
@@ -191,7 +191,7 @@ is usable as a filter callback:
 
 > Only one of these exists: it exists for the event filter.
 >
-> The ID Finder paradigm was not viable for event filtering, because not all
+> The ID Finder paradigm was not viable for filtering events, because not all
 > events are from Schoolbox: this means they don't all have IDs, and we are not
 > able to pass a list of IDs to external sources even if they have IDs.
 
@@ -373,7 +373,7 @@ its Definition class.
 
 This template must extend `library/Schoolbox/Filter/templates/_component.twig`
 (alias: `@filters/_component.twig`).
-* The `filterName` block will alwys be extended, and will contain a label for
+* The `filterName` block will always be extended, and will contain a label for
 the component
 * the `userOptions` block may be extended if you wish to render the list of
   available options differently
