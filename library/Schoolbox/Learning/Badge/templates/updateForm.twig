@@ -42,40 +42,48 @@
                                     <label for="badge-image">Upload from your device</label>
                                 </fieldset>
 
-                        <script src="/javascript/shared/badges/jquery.icon-modal.js"></script>
-                        <script>
-                            $(function() {
+                                <script src="/javascript/shared/badges/jquery.icon-modal.js"></script>
+                                <script>
+                                    $(function() {
 
-                                /* Shank twig data into js; I could probably skip this
-                                 * by providing the registry from backend instead
-                                 */
-                                $('#icon-modal').iconModal({
-                                    registry: $.parseJSON('{{ iconRegistry.registry|json_encode|escape('js') }}'),
-                                    pageLength: {{ iconRegistry.pageLength }},
+                                        /* Shank twig data into js; I could probably skip this
+                                         * by providing the registry from backend instead
+                                         */
+                                        $('#icon-modal').iconModal({
+                                            registry: $.parseJSON('{{ iconRegistry.registry|json_encode|escape('js') }}'),
+                                            pageLength: {{ iconRegistry.pageLength }},
 
-                                    /* Inflict it upon the form
-                                     */
-                                    onSelect: function(element) {
-                                        $('[data-icon-selection] img').attr('src', $(element).attr('src')).show();
-                                        $('input[name=icon]').val($(element).attr('src'));
+                                            /* Inflict it upon the form
+                                             */
+                                            onSelect: function(element) {
+                                                $('[data-icon-selection] img').attr('src', $(element).attr('src')).show();
+                                                $('input[name=icon]').val($(element).attr('src'));
 
-                                        $('#icon-modal').foundation('reveal', 'close');
-                                    }
-                                });
+                                                $('#icon-modal').foundation('reveal', 'close');
+                                            }
+                                        });
 
-                                /* Mutex div switch
-                                 */
-                                $('[data-icon-selector]').on('click', function(event) {
-                                    $('[data-image-container]').hide();
-                                    $('[data-icon-container]').show();
-                                });
+                                        /* Mutex div switch
+                                         */
+                                        $('[data-icon-selector]').on('click', function(event) {
+                                            $('[data-image-container]').hide();
+                                            $('[data-icon-container]').show();
+                                        });
 
-                                $('[data-image-selector]').on('click', function(event) {
-                                    $('[data-image-container]').show();
-                                    $('[data-icon-container]').hide();
-                                });
-                            });
-                        </script>
+                                        $('[data-image-selector]').on('click', function(event) {
+                                            $('[data-image-container]').show();
+                                            $('[data-icon-container]').hide();
+                                        });
+
+                                        {# Preselect "upload from your device" if there's a custom image
+                                         # given to this badge; otherwise it'll have "choose existing icon"
+                                         # selected instead and noop
+                                         #}
+                                        {% if badge.image %}
+                                        $('[data-image-selector]').trigger('click');
+                                        {% endif %}
+                                    });
+                                </script>
                             </div>
                             <div class="small-12 medium-6 columns" data-icon-container>
                                 <div data-icon-selection>
