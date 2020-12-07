@@ -220,6 +220,14 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setMimeFilter('image/*');
 
+        /* Misc attached files
+         */
+        $fileZone = (new Zone('fileImage'))
+            ->setFileVar('attachedFiles')
+            ->setMulti(true)
+            ->setAttachPrompt('Attach files')
+            ->setAttachmentsLabel('');
+
         // Prefill audience
         $audienceSegments = [];
         $params = new Querystring($this->getRequest()->query);
@@ -254,6 +262,7 @@ class Controller extends Base
             'action'               => 'Create',
             'article'              => $article,
             'featureImageZone'     => $zone->getTwigContext(),
+            'fileZone'             => $fileZone->getTwigContext(),
             'isAutoSavable'        => true,
             'encodedSegments'      => $audienceSegments,
             'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
@@ -346,10 +355,19 @@ class Controller extends Base
             $zone->attachFiles([$article->getFeatureImage()]);
         }
 
+        /* Misc attached files
+         */
+        $fileZone = (new Zone('file'))
+            ->setFileVar('attachedFiles')
+            ->setMulti(true)
+            ->setAttachPrompt('Attach files')
+            ->setAttachmentsLabel('');
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action'                 => 'Update',
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
+            'fileZone'               => $fileZone->getTwigContext(),
             'encodedSegments'        => $this->getAudienceSegments($article),
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
             'returnUrl'              => $this->getExplicitReturnUrl(),
