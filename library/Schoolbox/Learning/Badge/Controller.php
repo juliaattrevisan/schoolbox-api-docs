@@ -275,7 +275,8 @@ class Controller extends Base
             ->setFileVar('image')
             ->setMulti(false)
             ->setThumbnailSize(64)
-            ->setModalTitle('Select image');
+            ->setModalTitle('Select image')
+            ->attachFiles([$badge->getImage()]);
 
         $iconRegistry = (new IconRegistry())->prepare();
 
