@@ -21,18 +21,18 @@ record set that would otherwise display on a page. This has the benefits of:
 
 ## Interfaces
 
-### Factory Factory (`\Schoolbox\Filter\IFactoryFactory`)
+### Factory Factory
 
-The Factory Factory interface defines a responsibility for building a Factory
-for a particular Definition (`buildFilterFactoryForFilter`).
+The Factory Factory interface `\Schoolbox\Filter\IFactoryFactory` defines a
+responsibility for building a Factory for a particular
+[Definition](#definition) via its `buildFilterFactoryForFilter` method.
 
 In addition, it defines responsibilities for:
-* Building Codecs
-* Building a set of Key Converters
+* Building a set of [Key Converters](#key-converter)
 * Converting selections into a 2D array of IDs, for later passing into an
-  ID Finder
+  [ID Finder](#id-finder)
 * Building the current state of Filters for a page
-* Building a Panel so that a page's Filters may be rendered
+* Building a [Panel](#panel) so that a page's Filters may be rendered
 * Checking whether any filters should be set to a default value based on the
   user whose page is being viewed (`checkTeacherFolders`)
 
@@ -56,10 +56,11 @@ injection container, with the key `filters.factoryFactory`.
 > capable of filtering.
 
 
-### Factory (`\Schoolbox\Filter\IFactory`)
+### Factory
 
-The Factory interface defines responsibilities for building the required objects
-for a particular filter implementation, these being:
+The Factory interface `\Schoolbox\Filter\IFactory` defines responsibilities for
+building the required objects for a particular filter implementation, these
+being:
 * Component
 * Definition
 * Key Converter
@@ -67,18 +68,19 @@ for a particular filter implementation, these being:
 It is created by the Factory Factory's `buildFilterFactoryForFilter` method.
 
 
-### Component (`\Schoolbox\Filter\IComponent`)
+### Component
 
-The Component interface defines the responsibilities required for rendering a
-filter in its panel.
+The Component interface `\Schoolbox\Filter\IComponent` defines the
+responsibilities required for rendering a filter in its panel.
 
 Components are rendered using Twig, and thus need to define which variables are
 passed to the template, as defined in the filter's Definition.
 
 
-### Definition (`\Schoolbox\Filter\IDefinition`)
+### Definition
 
-The Definition interface defines the responsibilities for a bunch of stuff:
+The Definition interface `\Schoolbox\Filter\IDefinition` defines the
+responsibilities for:
 * The pages on which the filter may live (`getPages`)
 * Whether a filter is necessary on a particular page (`isMandatory`)
 * Other methods, used mainly by the filter administration page
@@ -108,10 +110,11 @@ of methods which may be overridden, the most important being:
 > * `insertDynamicOptions`
 
 
-### Key Converter (`\Schoolbox\Filter\IKeyConverter`)
+### Key Converter
 
-The Key Converter interface defines the responsibilities a filter requires for
-converting a set of available options into a list of actual selections.
+The Key Converter interface `\Schoolbox\Filter\IKeyConverter` defines the
+responsibilities a filter requires for converting a set of available options
+into a list of actual selections.
 
 As with the Definition, it has a core abstract implementation
 (`\Schoolbox\Filter\AbstractKeyConverter`) which covers most of the interface,
@@ -122,11 +125,11 @@ and adds further interface requirements:
 * Assert whether a provided key is valid (`assertValidKey`)
 
 
-### Panel (`\Schoolbox\Filter\Panel`)
+### Panel
 
-The Panel class contains a set of Filter Components for rendering onto a page,
-as well as the route to which any AJAX requests to update the filtered contents
-will be sent.
+The Panel class `\Schoolbox\Filter\Panel` contains a set of Filter Components
+for rendering onto a page, as well as the route to which any AJAX requests to
+update the filtered contents will be sent.
 
 In practise: it is built using the Factory Factory's `buildPanel` method, and
 passed directly to a Twig template for rendering in a specific sub-template that
@@ -150,10 +153,11 @@ to them. This implies that they have some knowledge of filter implementations:
 arguably this knowledge could be moved to within individual implementations.
 
 
-#### ID Finder (`\Schoolbox\Filter\IdFinder`)
+#### ID Finder
 
-The ID Finder interface defines the responsibilities required for converting a
-list of selected filters into a list of IDs of items that match the filters.
+The ID Finder interface `\Schoolbox\Filter\IdFinder` defines the
+responsibilities required for converting a list of selected filters into a list
+of IDs of items that match the filters.
 
 An ID Finder operates _before_ results are retrieved: it's intended to add a
 filter (in the form of a list of IDs) to a search query, so that the query
