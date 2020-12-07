@@ -1,7 +1,11 @@
 {##
  # Create/Update Form
  #
- # @param Model|null $badge  An instance of Badge\Model
+ # @param Model|null $badge               An instance of Badge\Model
+ # @param array $attachzone               A dropzone instance containing hashes of files, if any
+ # @param array $categories               A list of Badge Categories to choose
+ # @param bool $curriculumTaggingEnabled  A bool for whether curric nodes selection should be enabled
+ # @param array $iconRegistry             A tuple containing icon paths and page length const
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
