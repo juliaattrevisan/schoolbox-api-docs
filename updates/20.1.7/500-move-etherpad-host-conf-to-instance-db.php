@@ -22,6 +22,11 @@ $app = new class extends CliTool\App {
             $etherPadHost = 'http://localhost:9001';
         }
 
+        // On some instances we have already inserted this value via Ansible.
+        // In this case retain `name`,`sequence` and reset other fields.
+        // Cloud instances should be fine to set this temporarily to localhost as the install process applies
+        // config again after running the upgrades.
+
         $sql = "
             INSERT INTO config (
                 name,
@@ -47,7 +52,17 @@ $app = new class extends CliTool\App {
                 :required,
                 :module,
                 (SELECT * FROM (SELECT MAX(sequence) + 1 FROM config WHERE type_id = (SELECT id FROM lu_config_type WHERE type = '3rd Party Services')) t1)
-            )";
+            ) ON DUPLICATE KEY UPDATE
+                -- retain name, sequence. Reset all other fields.
+                value       = :value,
+                title       = :title,
+                description = :description,
+                field_id    = (SELECT id FROM lu_config_field WHERE field = 'input'),
+                type_id     = (SELECT id FROM lu_config_type WHERE type = '3rd Party Services'),
+                editable    = :editable,
+                hidden      = :hidden,
+                required    = :required,
+                module      = :module";
         $this->getDatabaseInternal()->executeQuery(
             $sql,
             [
