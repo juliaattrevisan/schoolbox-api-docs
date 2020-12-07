@@ -279,7 +279,17 @@ export default {
                                 <article v-if="evidence.object.filename && evidence.object.storage">
                                     <storage :storage="evidence.object.storage" :filename="evidence.object.filename"></storage>
                                 </article>
-
+                                <!-- Display curriculum codes and tags -->
+                                <p class="meta" v-if="evidence.object.curriculumNodes.length > 0 || evidence.object.tags.length > 0">
+                                   Tags:
+                                <template v-for="(curriculumNode, index) in evidence.object.curriculumNodes">
+                                  <template v-if="index !== 0">, </template><span
+                                    :title="curriculumNode.name">{{ curriculumNode.code }}</span>
+                                </template><template v-if="evidence.object.curriculumNodes.length > 0 && evidence.object.tags.length > 0">, </template>
+                                <template v-for="(tag, index) in evidence.object.tags">
+                                  <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
+                                </template>
+                                </p>
                                 <!-- Display evidence body, with media players initialised -->
                                 <media-article v-if="evidence.object.body">
                                     <div v-html="evidence.object.body" />

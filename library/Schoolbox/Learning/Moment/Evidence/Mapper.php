@@ -152,8 +152,11 @@ class Mapper extends BaseMapper
 
             $collection[$model->getId()] = $model;
         }
-        $this->hydrateTagsIntoCollection($collection);
-        return $this->hydrateCurriculumNodesIntoCollection($collection);
+        $collection = $this->hydrateTagsIntoCollection($collection);
+        if ($this->getConfigLoader()->get('curriculum_tagging_enabled')) {
+            $collection = $this->hydrateCurriculumNodesIntoCollection($collection);
+        }
+        return $collection;
     }
 
 

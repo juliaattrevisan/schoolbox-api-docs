@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
 
 use Alaress\HTMLPurifier\IPurifier;
 use Error;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\Learning\Moment\Evidence;
 
 /**
@@ -97,6 +98,26 @@ class Base
             'storage'          => $model->getStorage()
                 ? call_user_func($this->storageTranslator, $model->getStorage())
                 : null,
+            'curriculumNodes' => $model->getCurriculumNodes()
+                                       ->map(
+                                           static function (Node\Model $node) {
+                                               return [
+                                                   'id'   => $node->getId(),
+                                                   'name' => $node->getName(),
+                                                   'code' => $node->getCode(),
+                                               ];
+                                           }
+                                       )
+                                       ->reindex(),
+            'tags'            => $model->getTags()
+                                       ->map(
+                                           static function (Evidence\Tag\Model $tag) {
+                                               return [
+                                                   'id'   => $tag->getId(),
+                                                   'name' => $tag->getName(),
+                                               ];
+                                           }
+                                       )->reindex(),
             '_links'           => [],
         ];
     }
