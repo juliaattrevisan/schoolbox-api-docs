@@ -19,6 +19,12 @@ class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
+    protected const NAME = 'Curriculum Code';
+
+
+    /**
+     * @inheritdoc
+     */
     protected function getCustomKeys(): array
     {
         return [];

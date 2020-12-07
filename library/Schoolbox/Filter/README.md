@@ -367,6 +367,7 @@ of developing for filters.
     `\Schoolbox\Filter\Filters\{entityName}\{filterName}`
 * Create a [Definition](#definition) in the namespace determined above,
   extending `\Schoolbox\Filter\AbstractDefinition`
+  * override the `NAME` constant to be a brief description of the Filter
   * implement `getCustomKeys`: return an empty array for now
   * implement `getPages`: return an empty array for now
   * implement `getLabel`: return an empty string for now
