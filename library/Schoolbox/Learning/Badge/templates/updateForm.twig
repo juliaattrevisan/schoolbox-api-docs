@@ -1,14 +1,30 @@
+{##
+ # Create/Update Form
+ #
+ # @param Model|null $badge  An instance of Badge\Model
+ #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
-{{ bread.crumbs(
-    ['Badges', routeLookup('learningBadge.getBadges') ],
-    [badge.name],
-    ['Modify']
-) }}
+{% if badge %}
+    {{ bread.crumbs(
+        ['Badges', routeLookup('learningBadge.getBadges') ],
+        [badge.name],
+        ['Modify']
+    ) }}
+{% else %}
+    {{ bread.crumbs(
+        ['Badges', routeLookup('learningBadge.getBadges') ],
+        ['Add new', routeLookup('learningBadge.getCreateForm')]
+    ) }}
+{% endif %}
 
 <div class="row">
     <div class="small-12 column">
-        <h1>Modify Badge</h1>
+        {% if badge %}
+            <h1>Modify Badge</h1>
+        {% else %}
+            <h1>Add new badge</h1>
+        {% endif %}
     </div>
 </div>
 
@@ -133,7 +149,11 @@
                 </fieldset>
             </section>
 
+            {% if badge %}
+            <input type="submit" value="Modify Badge" id="badge-submit" />
+            {% else %}
             <input type="submit" value="Add new badge" id="badge-submit" />
+            {% endif %}
         </form>
     </div>
 </div>
