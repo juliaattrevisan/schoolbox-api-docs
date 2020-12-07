@@ -204,10 +204,11 @@ class Controller extends Base
 
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@learningBadge/createForm.twig',
+                '@learningBadge/updateForm.twig',
                 [
-                    'attachzone'               => $attachzone->getTwigContext(),
-                    'categories'               => Category\Mapper::getInstance()->findAll(),
+                    'badge' => [],
+                    'attachzone' => $attachzone->getTwigContext(),
+                    'categories' => Category\Mapper::getInstance()->findAll(),
                     'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                     'iconRegistry' => [
                         'registry' => $iconRegistry->getRegistry(),

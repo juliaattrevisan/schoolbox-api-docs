@@ -41,12 +41,12 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label for="badge-name" class="required">Achievement Name</label>
-                        <input name="name" type="text" id="badge-name" required value="{{ badge.name }}"/>
+                        <input name="name" type="text" id="badge-name" required value="{{ badge and badge.name ?? '' }}"/>
 
                         <label for="badge-body">
                             Description
                         </label>
-                        <textarea name="body" id="badge-body" required>{{ badge.body|purify }}</textarea>
+                        <textarea name="body" id="badge-body" required>{{ badge and badge.body ? badge.body|purify : '' }}</textarea>
                     </div>
                 </fieldset>
                 <fieldset class="content">
@@ -101,7 +101,7 @@
                                          # given to this badge; otherwise it'll have "choose existing icon"
                                          # selected instead and noop
                                          #}
-                                        {% if badge.image %}
+                                        {% if badge and badge.image %}
                                         $('[data-image-selector]').trigger('click');
                                         {% endif %}
                                     });
@@ -109,8 +109,8 @@
                             </div>
                             <div class="small-12 medium-6 columns" data-icon-container>
                                 <div data-icon-selection>
-                                    <img src="{{ badge.icon ? badge.icon : '' }}" width="64" height="64" />
-                                    <input id="badge-icon" name="icon" type="hidden" value="{{ badge.icon ? badge.icon : '' }}" />
+                                    <img src="{{ badge and badge.icon ? badge.icon : '' }}" width="64" height="64" />
+                                    <input id="badge-icon" name="icon" type="hidden" value="{{ badge and badge.icon ? badge.icon : '' }}" />
                                 </div>
                                 <div>
                                     {% include '@learningBadge/icon-modal.twig' with {
@@ -135,7 +135,7 @@
                             {% for category in categories %}
                                 {% set selected = '' %}
 
-                                {% if category.id == badge.category.id %}
+                                {% if badge and badge.category.id == category.id %}
                                     {% set selected = 'selected="selected"' %}
                                 {% endif %}
                                 <option value="{{ category.id }}" label="{{ category.name }}" {{ selected }}>{{ category.name }}</option>
@@ -146,7 +146,7 @@
                             <label for="curriculum-code-select">Curriculum Codes</label>
                             <div class="input-group">
                                 {% include 'sub/curriculumCodeSelector.twig' with {
-                                    codeList: badge.curriculumNodes ?? [],
+                                    codeList: badge and badge.curriculumNodes ? badge.curriculumNodes : [],
                                     renderButton: true
                                 } %}
                             </div>
