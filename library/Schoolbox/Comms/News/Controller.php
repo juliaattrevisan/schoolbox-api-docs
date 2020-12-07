@@ -362,7 +362,12 @@ class Controller extends Base
             ->setFileVar('attachedFiles[]')
             ->setMulti(true)
             ->setAttachPrompt('Attach files')
+            ->setMimeFilter('*/*')
             ->setAttachmentsLabel('');
+
+        if (null !== $article->getAttachedFiles() && $article->getAttachedFiles()->count()) {
+            $fileZone->attachFiles($article->getAttachedFiles()->indexBy('hash')->keys());
+        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action'                 => 'Update',
