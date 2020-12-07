@@ -388,28 +388,34 @@ of developing for filters.
       * override `insertDynamicOptions` with an implementation which adds an
         option for every item in the collection:
         ```php
-        $options = parent::insertDynamicOptions($pageFilter);
+        protected function insertDynamicOptions(\Schoolbox\Filter\Page\Model $pageFilter): \Schoolbox\GGenericCollection
+        {
+            $options = parent::insertDynamicOptions($pageFilter);
 
-        // Ensure it contains all items in the collection
-        foreach ($this->collection as $item) {
-            $abstractKey = (string)$item->getId();
-            if (!$options->offsetExists($abstractKey)) {
-                $option = new \Schoolbox\Filter\Page\Option\Model();
-                $option
-                    ->setFilterPage($pageFilter)
-                    ->setKey($abstractKey)
-                    ->setAvailable($this->getInitialAvailability($abstractKey, $pageFilter))
-                    ->setDefaults(new \Schoolbox\GenericCollection(\Schoolbox\Filter\Page\Option\Defaults\Model::class));
-                $options->setOffset($option->getKey(), $option);
+            // Ensure it contains all items in the collection
+            foreach ($this->collection as $item) {
+                $abstractKey = (string)$item->getId();
+                if (!$options->offsetExists($abstractKey)) {
+                    $option = new \Schoolbox\Filter\Page\Option\Model();
+                    $option
+                        ->setFilterPage($pageFilter)
+                        ->setKey($abstractKey)
+                        ->setAvailable($this->getInitialAvailability($abstractKey, $pageFilter))
+                        ->setDefaults(
+                            new \Schoolbox\GenericCollection(\Schoolbox\Filter\Page\Option\Defaults\Model::class)
+                        );
+                    $options->setOffset($option->getKey(), $option);
+                }
             }
+            return $options;
         }
-        return $options;
         ```
+* Create a [Key Converter](#key-converter) in the namespace determined above,
+  extending `\Schoolbox\Filter\AbstractKeyConverter`
+  * implement `getItem`: have it `return (int)$key` for now
+  * implement `assertValidKey`: have it do nothing for now
+  * implement `possibleItemCount`: have it `return 0` for now
 
-  * Filters will often filter an Entity via a relation of that Entity: if this
-    Filter is to do that, then the Definition's constructor should accept a
-    `\Schoolbox\GenericCollection` of all the relations which may be filtered
-    upon.
 * Create a [Factory](#factory) in the namespace determined above, extending
   `\Schoolbox\Filter\AbstractFactory`
   * Filters will often filter an Entity via a relation of that Entity: if this
@@ -436,8 +442,6 @@ of developing for filters.
       }
       ```
 * Create a Component implementation (if a custom implementation is required)
-* Create a Key Converter implementation
-  * In practise, this will extend `\Schoolbox\Filter\AbstractKeyConverter`
 * Find the Factory Factory implementation which creates filters for the entity
   that is being filtered
   * Each Factory Factory has an `ENTITY` class constant: find the one that
