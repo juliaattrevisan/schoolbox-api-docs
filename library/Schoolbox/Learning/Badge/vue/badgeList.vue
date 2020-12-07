@@ -1,5 +1,6 @@
 <script>
 
+import {stringify} from 'qs';
 import axios from 'axios';
 import Toast from "@schoolbox/toast";
 import RevealModal from "@schoolbox/reveal-modal";
@@ -103,8 +104,12 @@ export default {
             if (showToast) {
                 this.$refs.toast.activate('Loading...');
             }
+            let config = {
+                params:           params,
+                paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
+            }
             axios
-                .get(this.getBadgesRoute, {params})
+                .get(this.getBadgesRoute, config)
                 .then(response => {
                     this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;

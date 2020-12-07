@@ -15,6 +15,7 @@ use Alaress_Date_Format;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Filter;
+use Schoolbox\Filter\Codec;
 use Schoolbox\Learning\Badge\Award\Model as AwardModel;
 use Schoolbox\Learning\Badge\Translator;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -52,20 +53,38 @@ class Controller extends Base
 
 
     /**
+     * Mapper for filters.
+     */
+    private Filter\Mapper $filterMapper;
+
+
+    /**
+     * Mapper for filter selections.
+     */
+    private Filter\Selection\Mapper $filterSelectionMapper;
+
+
+    /**
      * Constructor
      *
-     * @param Mapper                 $mapper
-     * @param Award\Mapper           $awardMapper
-     * @param Filter\IFactoryFactory $filterFactoryFactory
+     * @param Mapper                  $mapper
+     * @param Award\Mapper            $awardMapper
+     * @param Filter\IFactoryFactory  $filterFactoryFactory
+     * @param Filter\Mapper           $filterMapper
+     * @param Filter\Selection\Mapper $filterSelectionMapper
      */
     public function __construct(
         Mapper $mapper,
         Award\Mapper $awardMapper,
-        Filter\IFactoryFactory $filterFactoryFactory
+        Filter\IFactoryFactory $filterFactoryFactory,
+        Filter\Mapper $filterMapper,
+        Filter\Selection\Mapper $filterSelectionMapper
     ) {
-        $this->mapper               = $mapper;
-        $this->awardMapper          = $awardMapper;
-        $this->filterFactoryFactory = $filterFactoryFactory;
+        $this->mapper                = $mapper;
+        $this->awardMapper           = $awardMapper;
+        $this->filterFactoryFactory  = $filterFactoryFactory;
+        $this->filterMapper          = $filterMapper;
+        $this->filterSelectionMapper = $filterSelectionMapper;
     }
 
 
@@ -82,6 +101,15 @@ class Controller extends Base
     public function getBadges(): void
     {
         if ($this->isJsonRequest()) {
+            // TODO inject filters into cursor
+            $qsFilters      = $this->request->query->get('filters', []);
+            $page           = Filter\Page\Model::PAGE_BADGE_LIST;
+            $codec          = new Codec($this->filterMapper, $this->filterSelectionMapper);
+            $user           = $this->getUser();
+            $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
+            $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);
+
+
             $cursor  = new MapperCursor(
                 $this->mapper,
                 self::BADGES_PER_PAGE,
@@ -90,7 +118,7 @@ class Controller extends Base
                     'id'   => $this->mapper::SORT_ORDER_ASC,
                 ]
             );
-            $results = $cursor->retrieveResults($this->request->query->get('cursor', null));
+            $results = $cursor->retrieveResults($this->request->query->get('cursor'));
             $this->response->content->set(
                 $this->buildJsonOutput([
                     'data'     => $results->map($this->buildModelToArrayTranslator()),
