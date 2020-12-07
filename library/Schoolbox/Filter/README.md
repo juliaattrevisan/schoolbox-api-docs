@@ -73,7 +73,9 @@ In addition, it defines responsibilities for:
 > about them anyway: they are mostly handled in the core abstract implementation
 > `\Schoolbox\Filter\AbstractFactoryFactory`.
 
-It is expected there will be at most one Factory Factory per [Entity](#entity).
+It is expected there will be at most one Factory Factory per [Entity](#entity):
+for the standard `AbstractFactoryFactory` implementation, the Entity's Mapper
+class is in the `ENTITY` constant.
 
 Developers will generally only need to know about `buildFilterFactoryForFilter`
 and its implementations: they will need to add a case to an implementation of
@@ -338,21 +340,27 @@ of developing for filters.
 
 ### Implementing Filtering on an Entity
 
-> TODO write documentation on writing the Factory Factory
+* Create a [Factory Factory](#factory-factory), extending
+  `\Schoolbox\Filter\AbstractFactoryFactory`
+  * define the `ENTITY` constant
+  * implement `buildFilterFactoryForFilter`: just have it throw an
+    `\InvalidArgumentException` for now
+  * implement `checkTeacherFolders`: just have it return the first parameter
+  * add it to the `\Schoolbox\Filter\CompositeFactoryFactory` in the DI key
+    `filters.factoryFactory` in
+    `\Alaress\Application\Kernel::installDependencies`
+* create a [Filter Consumer](#filter-consumers)
+  * an [ID Finder](#id-finder) will be appropriate if the [Entity](#entity) is
+    contained within the Schoolbox database; otherwise a [Matcher](#matcher)
+    will be required
 
 
 ### Implementing a new Filter
 
-* Determine the entity that the filter will actually operate on
-  * if no Factory Factory or Filter Consumer exists for the entity:
-    * create a Factory Factory
-      (this should extend `\Schoolbox\Filter\AbstractFactoryFactory`)
-      * add it to the `\Schoolbox\Filter\CompositeFactoryFactory` in the DI key
-        `filters.factoryFactory` in
-        `\Alaress\Application\Kernel::installDependencies`
-    * create a Filter Consumer
-      * an ID Finder should be appropriate if the filtering will take place at a
-        query level, otherwise a Matcher will be required
+* Determine the Entity that the Filter will operate on
+  * if no Factory Factory filters the Entity: follow the instructions to
+    [implement Filtering on an Entity](#implementing-filtering-on-an-entity),
+    and then return here
 * Create a Factory implementation for the new filter
   * In practise, this will extend `\Schoolbox\Filter\AbstractFactory`
   * Depending on how closely related the new filter is to existing ones, its
