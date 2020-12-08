@@ -196,34 +196,38 @@ export default {
                     <li><a href="#" class="submit">Apply filters</a></li>
                 </ul>
 
-                <ul class="badge-grid grid small-block-grid-2 medium-block-grid-3 large-block-grid-4" data-equalizer>
-                    <li v-for="badge in data" :key="badge.id" data-equalizer-watch>
+                <div class="badge-grid v-card-list">
+                    <div class="badge v-card" v-for="badge in data" :key="badge.id">
                         <!-- I'd apply the click to the entire <li> but that intercepts dropdown clicks -->
-                        <a @click.prevent="openDetailModal(badge)">
-                            <badge-image :badge="badge"></badge-image>
-                        </a>
-                        <div class="actions-small-1">
-                            <div class="compact card list-item" @click.prevent="openDetailModal(badge)">
-                                <h3><a>{{ badge.name }}</a></h3>
-                                <p class="meta" v-if="badge.category">{{ badge.category.name }}</p>
-                            </div>
-                            <nav>
-                                <a href="#"
-                                   class="icon-overflow"
-                                   :data-dropdown="'badge-' + String(badge.id) + '-dropdown'"
-                                   aria-expanded="false" title="Actions"></a>
-                            </nav>
-                            <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase" title="Award">Award achievement</a></li>
-                                <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set as Goal">Set goal</a></li>
-                                <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-close" title="Withdraw awards" >Withdraw achievement</a></li>
-                                <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-close" title="Unset goal" >Unset goal</a></li>
-                                <li><a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a></li>
-                                <li><a href="#" class="icon-delete" title="Delete">Delete</a></li>
-                            </ul>
+                        <div class="card-feature-image">
+                            <a @click.prevent="openDetailModal(badge)">
+                                <badge-image :badge="badge"></badge-image>
+                            </a>
                         </div>
-                    </li>
-                </ul>
+                        <div class="card-content">
+                            <h3><a @click.prevent="openDetailModal(badge)" :title="badge.name">{{ badge.name }}</a></h3>
+                            <div class="actions-small-1">
+                                <div class="list-item">
+                                    <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">{{ badge.category.name }}</p>
+                                </div>
+                                <nav>
+                                  <a href="#"
+                                     class="icon-overflow"
+                                     :data-dropdown="'badge-' + String(badge.id) + '-dropdown'"
+                                     aria-expanded="false" title="Actions"></a>
+                                </nav>
+                                <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
+                                  <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase">Award achievement</a></li>
+                                  <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal">Set goal</a></li>
+                                  <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-close">Withdraw achievement</a></li>
+                                  <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-undo">Remove goal</a></li>
+                                  <li><a :href="badge._links.update" class="icon-modify">Modify</a></li>
+                                  <li><a href="#" class="icon-delete">Delete</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </template>
 
             <!-- Load more button, if there are more to load -->
@@ -236,7 +240,7 @@ export default {
             <badge-detail :badge="currentBadge" v-if="currentBadge"></badge-detail>
         </reveal-modal>
 
-        <reveal-modal size="large" ref="awardAsAchievementModal" :closeOnBackgroundClick="false">
+        <reveal-modal size="small" ref="awardAsAchievementModal" :closeOnBackgroundClick="false">
             <badge-award v-if="currentBadge"
                          :badge="currentBadge"
                          :endpoint="currentBadge._links.awardAsAchievement"
@@ -248,7 +252,7 @@ export default {
                          toast-failure-message="Awarding achievement failed"
             >
                 <template v-slot:header="slotProps">
-                    <h2>Award &lsquo;<i>{{ slotProps.badge.name }}</i>&rsquo; as an Achievement</h2>
+                    <h2>Award &lsquo;<b>{{ slotProps.badge.name }}</b>&rsquo; as an Achievement</h2>
                 </template>
                 <template v-slot:confirmButton>
                     Award Achievement
@@ -256,7 +260,7 @@ export default {
             </badge-award>
         </reveal-modal>
 
-        <reveal-modal size="large" ref="setAsGoalModal" :closeOnBackgroundClick="false">
+        <reveal-modal size="small" ref="setAsGoalModal" :closeOnBackgroundClick="false">
             <badge-award v-if="currentBadge"
                          :badge="currentBadge"
                          :endpoint="currentBadge._links.setAsGoal"
@@ -268,7 +272,7 @@ export default {
                          toast-failure-message="Setting goal failed"
             >
                 <template v-slot:header="slotProps">
-                    <h2>Set &lsquo;<i>{{ slotProps.badge.name }}</i>&rsquo; as a Goal</h2>
+                    <h2>Set &lsquo;<b>{{ slotProps.badge.name }}</b>&rsquo; as a Goal</h2>
                 </template>
                 <template v-slot:confirmButton>
                     Set Goal

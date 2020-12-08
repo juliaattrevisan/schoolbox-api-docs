@@ -90,41 +90,36 @@ export default {
 <template>
     <reveal-modal ref="modal">
         <template v-if="award.badge">
-            <div class="v-card-list awards">
-                <div class="v-card card wrap-down">
-                    <div class="card-feature-image">
-                        <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
-                    </div>
-                    <div class="card-content">
-                        <!-- Only show the count if one was provided in the award -->
-                        <h3 class="no-margin">{{ award.badge.name }} <template v-if="'count' in award">({{ award.count }})</template></h3>
-                        <p class="meta">Category: {{ award.badge.category.name }}</p>
-                        <p class="meta">
-                            <template v-if="award.isGoal">
-                                Goal set <relative-time :datetime="award.awardedAt"></relative-time> by
-                                <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
-                            </template>
-                            <template v-else>
-                                Awarded <relative-time :datetime="award.awardedAt"></relative-time> by
-                                <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
-                            </template>
-                        </p>
-
-                        <hr />
-
-                        <article v-html="award.badge.body"></article>
-
-                        <template v-if="award.badge.curriculumNodes.length">
-                            <hr />
-
-                            <p class="meta">
-                                <template v-for="curriculumNode in award.badge.curriculumNodes">
-                                    {{ curriculumNode.code }}
-                                </template>
-                            </p>
-                        </template>
-                    </div>
+            <div class="badge-modal">
+                <div class="badge-img-container">
+                    <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
+                    <template v-if="'count' in award"><div class="award-count" :title="'Awarded ' + award.count + ' time(s)'">x{{ award.count }}</div></template>
                 </div>
+                <!-- Only show the count if one was provided in the award -->
+                <h2>{{ award.badge.name }}</h2>
+                <p class="meta">Category: {{ award.badge.category.name }}</p>
+                <p class="meta">
+                    <template v-if="award.isGoal">
+                        Goal set <relative-time :datetime="award.awardedAt"></relative-time> by
+                        <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
+                    </template>
+                    <template v-else>
+                        Awarded <relative-time :datetime="award.awardedAt"></relative-time> by
+                        <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
+                    </template>
+                </p>
+
+                <article v-html="award.badge.body"></article>
+
+                <template v-if="award.badge.curriculumNodes.length">
+                    <hr />
+
+                    <p class="meta">
+                        <template v-for="curriculumNode in award.badge.curriculumNodes">
+                            {{ curriculumNode.code }}
+                        </template>
+                    </p>
+                </template>
             </div>
         </template>
     </reveal-modal>

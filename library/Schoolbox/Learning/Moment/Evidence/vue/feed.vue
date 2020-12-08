@@ -303,10 +303,10 @@ export default {
                             </div>
                         </template>
                         <template v-if="evidence.discriminator === 'badgeAward'">
-                            <div class="card small-12">
+                            <div class="card badge-card small-12">
                                 <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">
                                     <badge-image :badge="evidence.object.badge" :css=" evidence.object.status === 'goal' ? 'goal' : ''"></badge-image>
-                                    <span>{{ evidence.object.badge.name }}</span>
+                                    <h3>{{ evidence.object.badge.name }}</h3>
                                     <p class="meta">
                                         <template v-if="evidence.object.status === 'achievement'">Achievement awarded</template>
                                         <template v-if="evidence.object.status === 'goal'">Goal set</template>

@@ -1,47 +1,162 @@
-.awards, .activity-feed {
+.badge-grid {
+  .badge {
+    flex: 1 0 250px;
+    border: 1px solid #EDEDED;
+    box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.1);
+    padding: 0;
+    margin: 0 1rem 1rem 0;
+    max-width: 250px;
 
-    /* Goals are greyscaled
-     * Achievements are full colour
-     */
-    img.goal {
-      filter: grayscale(100%);
+    &:last-child {
+      margin: 0 0 1rem 0;
     }
+
+    .card-feature-image {
+      background-color: $vapor;
+      position: relative;
+
+      > a > div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: rem-calc(200);
+      }
+      img {
+        margin: 0;
+      }
+      .badge-image {
+        max-height: rem-calc(200);
+        width: auto;
+      }
+      .badge-icon {
+        width: 11rem;
+      }
+    }
+    .card-content {
+      padding: 1rem 1rem 0 1rem;
+      overflow: inherit;
+
+      h3, p {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      h3 {
+        margin-bottom: .5rem;
+      }
+      nav {
+        top: 0;
+        right: -1rem;
+      }
+    }
+  }
+}
+
+.award-count {
+  background-color: $white;
+  border-radius: 50%;
+  border: 1px solid $base;
+  box-shadow: 0px 0px 3px 0px rgba(0,0,0,.1);
+  position: absolute;
+  top: .35rem;
+  right: .35rem;
+  padding: .3rem 0;
+  font-size: rem-calc(12);
+  width: 30px;
+  height: 30px;
+  text-align: center;
+}
+
+// Badge Modal
+.badge-modal {
+  h2, .meta {
+    text-align: center;
+  }
+  h2 {
+    max-width: 100%;
+    margin-bottom: .5rem;
+  }
+  article {
+    max-width: 40rem;
+    margin: 1rem auto 0 auto;
+  }
+}
+
+.badge-img-container {
+  background-color: $vapor;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  max-height: rem-calc(300);
+
+  img {
+    max-height: rem-calc(300);
+    width: auto;
+  }
+  .badge-icon {
+    width: 17rem;
+    margin: 1rem 0;
+  }
+  .award-count {
+    font-size: 1rem;
+    width: 40px;
+    height: 40px;
+    top: .75rem;
+    right: .75rem;
+    padding: .35rem 0;
+  }
+}
+
+.reveal-modal .badge-card {
+  margin-bottom: 1rem;
+}
+
+// Create badge page
+[data-icon-selection] {
+  background-color: $vapor;
+  text-align: center;
+  padding: .5rem;
+  margin-bottom: .5rem;
+}
+
+.awards, .activity-feed {
+  /* Goals are greyscaled
+   * Achievements are full colour
+   */
+  img.goal {
+    filter: grayscale(100%);
+  }
 }
 
 /* Icon Picker Modal has a lot of categories in it, we need
  * to add some vertical scroll for small viewport guys
  */
 .icon-picker {
-    .icon-category-list-container {
-        max-height: 80vh;
-        overflow-y: auto;
-    }
+  .icon-category-list-container {
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  img {
+    margin-right: .5rem;
+    margin-bottom: .5rem;
+    padding: .25rem;
+    width: 4.5rem;
 
-    img {
-        margin-right: 0.5rem;
-        margin-bottom: 0.5rem;
-        cursor: pointer;
+    &:hover {
+      background-color: $content-ui-hover;
+      cursor: pointer;
     }
-
-    img:hover {
-        outline: 4px solid $content-ui-hover;
-    }
+  }
 }
 
-/* Badge List uses data-equalizer to make everything the same height
- * @stuart will need to fix these properly at some point so they render consistently
- * throught all of badges
- */
-.badge-grid > li,
-.badge-grid > .v-card {
-    min-height: 12rem;
-
-    .badge-image, .badge-icon {
-        width: auto !important;
-        max-height: 8rem;
-    }
-
-    .badge-icon {
-        min-width: 8rem;
-    }
+// Achievements - profile page
+#achievements {
+  .awards > div {
+    border-bottom: 2px solid #EDEDED;
+  }
+  .subheader {
+    color: $header-font-color;
+  }
 }

@@ -5,17 +5,13 @@
 ) }}
 
 
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>Badge List</h1>
-        </div>
-    </div>
-    <nav>
+<div class="row">
+    <div class="button-action small-12 columns">
+        <h1>Badges</h1>
         {% if routeLookupIfAuthorized('learningBadge.getCreateForm') %}
-            <a href="{{ routeLookup('learningBadge.getCreateForm') }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-add" title="Create Badge"></a>
+        <a href="{{ routeLookup('learningBadge.getCreateForm') }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-add button" title="Create Badge">Create Badge</a>
         {% endif %}
-    </nav>
+    </div>
 </div>
 
 <div class="row">

@@ -75,10 +75,6 @@ a[disabled], a.disabled {
 	flex-wrap: wrap;
 }
 
-.flex-wrap{
-	flex-wrap: wrap;
-}
-
 /* Splash effect when clicking buttons
 */
 .splash {
@@ -189,6 +185,18 @@ button.submit {
     button {
         width: 100%;
     }
+}
+
+.button-action {
+  display: flex;
+
+  h1 {
+    flex: 1 1 auto;
+  }
+  .button {
+    flex: 0 auto;
+    max-height: 2.5rem;
+  }
 }
 
 .close,
