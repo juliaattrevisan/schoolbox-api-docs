@@ -25,6 +25,8 @@
                     {% set entity = (pageFilters | first).entity %}
                     {%- if ENTITY_ASSESSMENTS == entity -%}
                         {% set icon = 'due-work' %}
+                    {%- elseif ENTITY_BADGES == entity -%}
+                        {% set icon = 'showcase' %}
                     {%- else -%}
                      {# Graceful degradation to generic filter icon if constant not injected into twig #}
                         {%- set icon = 'filter' -%}

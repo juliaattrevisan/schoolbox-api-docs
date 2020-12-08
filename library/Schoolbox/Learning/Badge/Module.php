@@ -14,6 +14,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Closure;
+use Schoolbox\Filter;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -267,8 +268,11 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'mapper' => $this->getMapperFactory()->getLazy(Mapper::class),
-                    'awardMapper' => $this->getMapperFactory()->getLazy(Award\Mapper::class)
+                    'mapper'                => $this->getMapperFactory()->getLazy(Mapper::class),
+                    'awardMapper'           => $this->getMapperFactory()->getLazy(Award\Mapper::class),
+                    'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
+                    'filterMapper'          => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
+                    'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
                 ]
             )
         );

@@ -1,5 +1,6 @@
 <script>
 
+import {stringify} from 'qs';
 import axios from 'axios';
 import Toast from "@schoolbox/toast";
 import RevealModal from "@schoolbox/reveal-modal";
@@ -8,7 +9,12 @@ import BadgeDetail from "./badgeDetail";
 import BadgeAchievementWithdrawModal from "./badge-achievement-withdraw-modal";
 import BadgeGoalWithdrawModal from "./badge-goal-withdraw-modal";
 import BadgeImage from './badge-image';
-import foundationMixin from '@schoolbox/foundation-mixin';
+
+// Foundation mixin is not required:
+// the filter panel calls `jQuery.fn.foundation` with the entire document as its
+// context.
+// Attempting to apply Foundation again causes the dropdown menus to not work.
+// import foundationMixin from '@schoolbox/foundation-mixin';
 
 export default {
 
@@ -18,18 +24,16 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [
-        foundationMixin
-    ],
+    mixins: [],
 
     components: {
-      BadgeAward,
-      BadgeDetail,
-      BadgeAchievementWithdrawModal,
-      BadgeGoalWithdrawModal,
-      BadgeImage,
-      RevealModal,
-      Toast
+        BadgeAward,
+        BadgeDetail,
+        BadgeAchievementWithdrawModal,
+        BadgeGoalWithdrawModal,
+        BadgeImage,
+        RevealModal,
+        Toast
     },
     props: {
         /**
@@ -54,51 +58,74 @@ export default {
         return {
             currentBadge: null,
             data: [],
-            search: {},
+            // search: {},
             metadata: {
                 count: null,
                 cursor: null,
             },
             showSkeletonLoader: true,
+            selectedFilters: null,
         }
     },
-    computed: {
-    },
-    mounted() {
-        this.load();
-    },
-    updated() {
-    },
+    // computed: {
+    // },
+    // mounted() {
+    //     this.load();
+    // },
+    // updated() {
+    // },
     methods: {
         /**
          * Load badges.
+         *
+         * @param {Boolean} showToast Should the toast be activated on load of
+         *                            badges?
+         *                            The filter calls `onFilterChange` when its
+         *                            selections change, and that has its own
+         *                            toast so don't show another.
          */
-        load() {
+        load(showToast) {
             this.data = [];
-            this.append(null);
+            this.append(null, showToast);
         },
 
         /**
          * Appends badges to the data list.
          *
          * @param {String|null} cursor
+         * @param {Boolean}     showToast
          */
-        append(cursor) {
+        append(cursor, showToast) {
             // TODO this is very generic, a candidate to be factored into its own place
             let params = {};
             if (cursor) {
                 params.cursor = cursor;
             }
-            this.$refs.toast.activate('Loading...');
+            if (this.selectedFilters) {
+                params.filters = this.selectedFilters;
+            }
+            if (showToast) {
+                this.$refs.toast.activate('Loading...');
+            }
+            let config = {
+                params:           params,
+                paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
+            }
             axios
-                .get(this.getBadgesRoute, {params})
+                .get(this.getBadgesRoute, config)
                 .then(response => {
                     this.data            = this.data.concat(response?.data?.data ? response.data.data : [])
                     this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
                     this.metadata.cursor = response?.data?.metadata?.cursor ? response.data.metadata.cursor : null;
-                    this.$refs.toast.timeout('Loaded', true);
+                    if (showToast) {
+                        this.$refs.toast.timeout('Loaded', true);
+                    }
                 })
-                .catch(() => this.$refs.toast.timeout('Loading failed', false))
+                .catch(() => {
+                    if (showToast) {
+                        this.$refs.toast.timeout('Loading failed', false);
+                    }
+                })
                 .finally(() => this.showSkeletonLoader = false);
         },
 
@@ -165,6 +192,19 @@ export default {
         closeSetAsGoalModal(badge) {
             this.$refs.setAsGoalModal.close();
         },
+
+        /**
+         * Callback for when the filters for this badge list are updated.
+         *
+         * Fired from outer space (i.e. from the outside window).
+         *
+         * @param {object} selectedFilters The filters that were selected
+         */
+        onFilterChange(selectedFilters) {
+            this.selectedFilters    = selectedFilters;
+            this.showSkeletonLoader = true;
+            this.load(false);
+        },
     },
 }
 </script>
@@ -188,6 +228,7 @@ export default {
             <template v-else>
 
                 <!-- Search panel. Should this use the filters system? -->
+                <!--
                 <ul class="flex-list buttons">
                     <li><input type="text" placeholder="Badge Name" v-model="search.badgeName" /></li>
                     <li><input type="text" placeholder="Creator" v-model="search.creator" /></li>
@@ -195,6 +236,7 @@ export default {
                     <li><a href="#">Reset to defaults</a></li>
                     <li><a href="#" class="submit">Apply filters</a></li>
                 </ul>
+                -->
 
                 <div class="badge-grid v-card-list">
                     <div class="badge v-card" v-for="badge in data" :key="badge.id">
@@ -231,7 +273,7 @@ export default {
             </template>
 
             <!-- Load more button, if there are more to load -->
-            <a @click.prevent="append(metadata.cursor.next)"
+            <a @click.prevent="append(metadata.cursor.next, true)"
                class="button expand"
                v-if="metadata.cursor.next && data.length < metadata.count">Load more</a>
         </section>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -17,6 +18,7 @@ use Schoolbox\Role;
  */
 class Model
 {
+    use Id;
 
     // Pages with configurable filters
     // These are enums in DB, you will need to update column definition if you add to this list
@@ -26,8 +28,9 @@ class Model
     public const PAGE_COURSE_MARK_BOOK    = 'courseMarkbook';
     public const PAGE_RUBRIC_MARK_BOOK    = 'rubricMarkbook';
     public const PAGE_LEARNING_ANALYTICS  = 'analytics';
-    public const PAGE_UPCOMING_ASSESSMENTS= 'dueWorkCal';
+    public const PAGE_UPCOMING_ASSESSMENTS = 'dueWorkCal';
     public const PAGE_ASSESSMENT_CALENDAR = 'assessmentCal';
+    public const PAGE_BADGE_LIST          = 'badgeList';
 
 
     /**
@@ -105,11 +108,11 @@ class Model
             self::PAGE_ASSESSMENT_CALENDAR => [
                 Role::STAFF,
             ],
+            self::PAGE_BADGE_LIST => [
+                Role::STAFF,
+            ],
         ];
     }
-
-
-    use Id;
 
     /**
      * @var Filter\Model
@@ -257,5 +260,4 @@ class Model
         $this->options->replaceWith($options);
         return $this;
     }
-
 }

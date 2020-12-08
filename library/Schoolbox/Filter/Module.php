@@ -1,12 +1,14 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Filter;
 
 use Alaress\Authorizer\Rule\IsSuperuser;
-use \Alaress\Module\Module as AlaressModule;
+use Alaress\Module\Module as AlaressModule;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Filters;
@@ -47,6 +49,7 @@ class Module extends AlaressModule
                 case Page\Model::PAGE_GRADES:
                 case Page\Model::PAGE_UPCOMING_ASSESSMENTS:
                 case Page\Model::PAGE_ASSESSMENT_CALENDAR:
+                case Page\Model::PAGE_BADGE_LIST:
                     return ['factoryFactory' => $this->getInjector()->get('filters.factoryFactory')];
                 // Other entity types can have their factory factories registered here
             }

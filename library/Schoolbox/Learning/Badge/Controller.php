@@ -14,6 +14,8 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\API\Translator\ModelToArray\Composite;
+use Schoolbox\Filter;
+use Schoolbox\Filter\Codec;
 use Schoolbox\Learning\Badge\Award\Model as AwardModel;
 use Schoolbox\Learning\Badge\Translator;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -45,15 +47,44 @@ class Controller extends Base
 
 
     /**
+     * Factory for filter factories: used to build each part of the filter.
+     */
+    private Filter\IFactoryFactory $filterFactoryFactory;
+
+
+    /**
+     * Mapper for filters.
+     */
+    private Filter\Mapper $filterMapper;
+
+
+    /**
+     * Mapper for filter selections.
+     */
+    private Filter\Selection\Mapper $filterSelectionMapper;
+
+
+    /**
      * Constructor
      *
-     * @param Mapper       $mapper
-     * @param Award\Mapper $awardMapper
+     * @param Mapper                  $mapper
+     * @param Award\Mapper            $awardMapper
+     * @param Filter\IFactoryFactory  $filterFactoryFactory
+     * @param Filter\Mapper           $filterMapper
+     * @param Filter\Selection\Mapper $filterSelectionMapper
      */
-    public function __construct(Mapper $mapper, Award\Mapper $awardMapper)
-    {
-        $this->mapper = $mapper;
-        $this->awardMapper = $awardMapper;
+    public function __construct(
+        Mapper $mapper,
+        Award\Mapper $awardMapper,
+        Filter\IFactoryFactory $filterFactoryFactory,
+        Filter\Mapper $filterMapper,
+        Filter\Selection\Mapper $filterSelectionMapper
+    ) {
+        $this->mapper                = $mapper;
+        $this->awardMapper           = $awardMapper;
+        $this->filterFactoryFactory  = $filterFactoryFactory;
+        $this->filterMapper          = $filterMapper;
+        $this->filterSelectionMapper = $filterSelectionMapper;
     }
 
 
@@ -69,24 +100,52 @@ class Controller extends Base
      */
     public function getBadges(): void
     {
+        $page = Filter\Page\Model::PAGE_BADGE_LIST;
         if ($this->isJsonRequest()) {
-            $cursor  = new MapperCursor(
-                $this->mapper,
-                self::BADGES_PER_PAGE,
-                [
-                    'name' => $this->mapper::SORT_ORDER_ASC,
-                    'id'   => $this->mapper::SORT_ORDER_ASC,
-                ]
-            );
-            $results = $cursor->retrieveResults($this->request->query->get('cursor', null));
+            // Boilerplate for getting a set of badges which match filter
+            $qsFilters      = $this->request->query->get('filters', []);
+            $codec          = new Codec($this->filterMapper, $this->filterSelectionMapper);
+            $user           = $this->getUser();
+            $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
+            $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);
+            $idFinder       = Filter\Filters\Badge\IdFinder::getInstance($this->filterMapper, $this->mapper);
+            $badgeIds       = $idFinder->findIdsByFilters($filters);
+
+
+            // Save selected filters
+            $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
+
+
+            // Retrieve badges which match the filter
+            if (count($badgeIds) > 0) {
+                $cursor  = new MapperCursor(
+                    $this->mapper,
+                    self::BADGES_PER_PAGE,
+                    [
+                        'name' => $this->mapper::SORT_ORDER_ASC,
+                        'id'   => $this->mapper::SORT_ORDER_ASC,
+                    ],
+                    $this->mapper->getPredicateBuilder()->in('id', $badgeIds)
+                );
+                $results = $cursor->retrieveResults($this->request->query->get('cursor'));
+                $data    = $results->map($this->buildModelToArrayTranslator());
+                $count   = $cursor->retrieveResultCount();
+                $next    = $cursor->next($results);
+                $current = $cursor->current($results);
+            } else {
+                $data    = [];
+                $count   = 0;
+                $next    = null;
+                $current = null;
+            }
             $this->response->content->set(
                 $this->buildJsonOutput([
-                    'data'     => $results->map($this->buildModelToArrayTranslator()),
+                    'data'     => $data,
                     'metadata' => [
-                        'count'  => $cursor->retrieveResultCount(),
+                        'count'  => $count,
                         'cursor' => [
-                            'next'    => $cursor->next($results),
-                            'current' => $cursor->current($results),
+                            'next'    => $next,
+                            'current' => $current,
                         ],
                     ],
                 ])
@@ -95,10 +154,18 @@ class Controller extends Base
         }
 
         // Output a Twig template
+        $filterPanel = $this->filterFactoryFactory->buildPanel(
+            $this->getUser(),
+            $page,
+            null,
+            $this->getUser(),
+            []
+        );
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningBadge/index.twig',
-                [],
+                ['filterPanel' => $filterPanel,],
                 'Badges'
             )
         );
@@ -132,7 +199,6 @@ class Controller extends Base
         /* Group by category
          */
         foreach ($awards as $award) {
-
             /* Force string indexes, otherwise the numeric values get inserted in-order
              * which isn't intended here; they are already in a particular order
              */
@@ -163,7 +229,6 @@ class Controller extends Base
              * in the list is the most recently awarded
              */
             if (!isset($stack['categories'][$categoryId]['awards'][$badgeId])) {
-
                 /* This is a set-based aggregation, not an individual model property
                  */
                 $badge['count'] = 0;
@@ -425,7 +490,6 @@ class Controller extends Base
      */
     public function setAsGoalForSelf(Model $badge): void
     {
-
     }
 
 

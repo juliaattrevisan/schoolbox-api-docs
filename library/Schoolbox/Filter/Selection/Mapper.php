@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -44,6 +45,7 @@ class Mapper extends \Schoolbox\Mapper
                 Filter\Page\Model::PAGE_LEARNING_ANALYTICS,
                 Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS,
                 Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR,
+                Filter\Page\Model::PAGE_BADGE_LIST,
             ]
         );
         $this->uses('key', self::TYPE_STRING);

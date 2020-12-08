@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Alaress\Application;
 
 use Alaress\Authorizer\Rule;
@@ -232,10 +234,9 @@ abstract class Kernel
     protected function setDependencyInjector(Di\Container $di): void
     {
         // only allow once
-        if($this->di === null) {
+        if ($this->di === null) {
             $this->di = $di;
-        }
-        else {
+        } else {
             throw new RuntimeException("Dependency injector has already been set, cannot set again");
         }
     }
@@ -244,7 +245,8 @@ abstract class Kernel
     /**
      * @return Di\Container
      */
-    public function getDependencyInjector() {
+    public function getDependencyInjector()
+    {
         return $this->di;
     }
 
@@ -272,8 +274,9 @@ abstract class Kernel
     /**
      * @param callable $callable
      */
-    public function registerCustomShutdown($callable) {
-        if(is_callable($callable)) {
+    public function registerCustomShutdown($callable)
+    {
+        if (is_callable($callable)) {
             $this->shutdown = $callable;
         }
     }
@@ -281,8 +284,9 @@ abstract class Kernel
     /**
      * @param callable $callable
      */
-    public function registerExceptionCallback($callable) {
-        if(is_callable($callable)) {
+    public function registerExceptionCallback($callable)
+    {
+        if (is_callable($callable)) {
             $this->exceptionCallbacks[] = $callable;
         }
     }
@@ -360,9 +364,10 @@ abstract class Kernel
         date_default_timezone_set($timezone = $di->get('config')->get('date_timezone'));
 
         // Notification factory
-        $di->set('notif',
+        $di->set(
+            'notif',
             $di->lazy(
-                function() {
+                function () {
                     // replace this with $di->lazyGetCall() once we upgrade Aura.Di
                     return Notifactory::create();
                 }
@@ -382,7 +387,7 @@ abstract class Kernel
         // Schoolbox internal database connection
         $di->set(
             'databaseInternal',
-            function() use ($di) {
+            function () use ($di) {
                 /** @var SchoolboxDatabaseFactory $factory */
                 $factory = $di->get('databaseFactory');
                 return $factory->getInternalDatabase();
@@ -393,7 +398,7 @@ abstract class Kernel
         $di->set(
             'databaseExternal',
             $di->lazy(
-                function() use ($di) {
+                function () use ($di) {
                     /** @var SchoolboxDatabaseFactory $factory */
                     $factory = $di->get('databaseFactory');
 
@@ -505,11 +510,11 @@ abstract class Kernel
         );
 
         // inject web params (yep, even Sitepage!)
-        $di->set('layoutEngine', $di->lazy(function() use ($di) {
+        $di->set('layoutEngine', $di->lazy(function () use ($di) {
             return new SitePage(false, $di);
         }));
 
-        $di->set('sitePage',     $di->lazy(function() use ($di) {
+        $di->set('sitePage', $di->lazy(function () use ($di) {
             return new SitePage(true, $di);
         }));
 
@@ -573,7 +578,7 @@ abstract class Kernel
         $di->set(
             'commsNewsUserResolver',
             $di->lazy(
-                static function() use ($di) {
+                static function () use ($di) {
 
                     /** @var IConnector $db */
                     $db = $di->get('databaseInternal');
@@ -682,7 +687,7 @@ abstract class Kernel
         $di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
         $di->setters[Output\Stream::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
         $di->set('webOutput:base', $di->lazyNew(Output\Base::class));
-        $di->set('webOutput:html', $di->lazy(function() use ($di, $mapperFactory) {
+        $di->set('webOutput:html', $di->lazy(function () use ($di, $mapperFactory) {
 
             /** @var IConfigLoader $config */
             $config  = $di->get('config');
@@ -779,9 +784,9 @@ abstract class Kernel
                     $chainLoader = new ChainLoader(new ModuleLoader($di, '[^@(?P<module>[^/]+)/]'), new \Twig\Loader\ChainLoader());
                     $baseLoader  = new FilesystemLoader(array());
                     // Paths: prefer templates/{site_location} over templates/core
-                    $basePath     = SITE_root.'/templates/';
-                    $overridePath = $basePath.$config->get('site_location');
-                    $corePath     = $basePath.'core';
+                    $basePath     = SITE_root . '/templates/';
+                    $overridePath = $basePath . $config->get('site_location');
+                    $corePath     = $basePath . 'core';
                     if (is_dir($overridePath)) {
                         $baseLoader->addPath($overridePath);
                     }
@@ -836,10 +841,10 @@ abstract class Kernel
 
                     $twig = new Environment($di->get('templateEngine:loader'), $options);
 
-//                    if($this->debugEnabled) {
-//                        $twig = new TraceableTwigEnvironment($twig);
-//                        DebugBar::getInstance()->addCollector(new TwigCollector($twig));
-//                    }
+                //                    if($this->debugEnabled) {
+                //                        $twig = new TraceableTwigEnvironment($twig);
+                //                        DebugBar::getInstance()->addCollector(new TwigCollector($twig));
+                //                    }
 
                     // HTML Purifier filter - known to output safe HTML
 
@@ -915,7 +920,7 @@ abstract class Kernel
                     // Global access to config object and localisation
                     // TODO capitalize globals
                     $twig->addGlobal('config', $config);
-                    $twig->addGlobal('locale',  $di->get('l10n'));
+                    $twig->addGlobal('locale', $di->get('l10n'));
                     $dateFormats = new Alaress_Date_Locale_Config();
                     $dateFormats->setConfig($config);
                     $twig->addGlobal('dateFormats', $dateFormats);
@@ -960,7 +965,7 @@ abstract class Kernel
                     $twig->addFunction(
                         new TwigFunction(
                             'getGuid',
-                            function() {
+                            function () {
                                 mt_srand((double)microtime() * 10000);
                                 return strtoupper(md5(uniqid((string)rand(), true)));
                             }
@@ -995,7 +1000,8 @@ abstract class Kernel
 
         // Build a user provisioner
         // TODO unify this definition and the one in Daemon\Bootstrap
-        $di->set('ups.logger',
+        $di->set(
+            'ups.logger',
             $di->lazyNew(
                 NotifStorefileLogger::class,
                 [
@@ -1026,7 +1032,7 @@ abstract class Kernel
                             'ruleMapper' => $di->lazyNew(SyncRuleMapper::class),
                         ]
                     ),
-                    'externalUserSource' => $di->lazy(function() use ($di) {
+                    'externalUserSource' => $di->lazy(function () use ($di) {
                         /** @var IConfigLoader $config */
                         $config = $di->get('config');
 
@@ -1055,7 +1061,7 @@ abstract class Kernel
         // Register External_Timetable service
         $di->set('externalTimetable', $di->lazyNew(External_Timetable::class));
 
-        $di->set('externalCommunityPortal', $di->lazy(function() use ($di) {
+        $di->set('externalCommunityPortal', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $config */
             $config = $di->get('config');
 
@@ -1093,7 +1099,8 @@ abstract class Kernel
 
         // Register external markbook service
         $di->set('externalMarkbook', $di->lazyNew(External_Markbook::class));
-        $di->set('externalMarkbookAdapter',
+        $di->set(
+            'externalMarkbookAdapter',
             $di->lazyNew(
                 MarkbookAdapter::class,
                 [
@@ -1295,15 +1302,19 @@ abstract class Kernel
         ]));
 
         // injectable module auth rules
-        $di->set('rule:isLoggedIn',  $di->lazyNew(Rule\IsLoggedIn::class));
+        $di->set('rule:isLoggedIn', $di->lazyNew(Rule\IsLoggedIn::class));
         $di->set('rule:isSuperuser', $di->lazyNew(Rule\IsSuperuser::class));
-        $di->set('rule:isStaff',     $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STAFF   ]));
-        $di->set('rule:isStudent',   $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STUDENT ]));
-        $di->set('rule:isParent',    $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::PARENT  ]));
+        $di->set('rule:isStaff', $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STAFF   ]));
+        $di->set('rule:isStudent', $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::STUDENT ]));
+        $di->set('rule:isParent', $di->lazyNew(Rule\HasRole::class, [ 'role' => Role::PARENT  ]));
 
         // composite rules
-        $di->set('rule:isStaffOrSuper',   $di->lazy(function () use ($di) { return new Rule\Any($di->get('rule:isSuperuser'), $di->get('rule:isStaff')); }));
-        $di->set('rule:isStaffOrStudent', $di->lazy(function () use ($di) { return new Rule\Any($di->get('rule:isStaff'),     $di->get('rule:isStudent')); }));
+        $di->set('rule:isStaffOrSuper', $di->lazy(function () use ($di) {
+            return new Rule\Any($di->get('rule:isSuperuser'), $di->get('rule:isStaff'));
+        }));
+        $di->set('rule:isStaffOrStudent', $di->lazy(function () use ($di) {
+            return new Rule\Any($di->get('rule:isStaff'), $di->get('rule:isStudent'));
+        }));
 
 
         // Calendar API factory - requires an assessment data source to build some types
@@ -1412,7 +1423,8 @@ abstract class Kernel
                             $mapperFactory,
                             $di->get('l10n')
                         ),
-                        new Filter\Filters\Event\FactoryFactory($mapperFactory)
+                        new Filter\Filters\Event\FactoryFactory($mapperFactory),
+                        new Filter\Filters\Badge\FactoryFactory($mapperFactory),
                     );
                 }
             )
@@ -1481,13 +1493,13 @@ abstract class Kernel
             require_once $routePath;
 
             // Get a route name out of this path
-            $path = preg_replace('/^'.preg_quote(SITE_root.'/conf/modules/', '/').'/', '', $routePath);
+            $path = preg_replace('/^' . preg_quote(SITE_root . '/conf/modules/', '/') . '/', '', $routePath);
             $path = preg_replace('/\\.php$/', '', $path);
             $path = preg_replace('/\\//', '\\', $path);
 
             $class = 'Config\\Modules\\' . $path;
 
-            if(class_exists($class, false)) {
+            if (class_exists($class, false)) {
                 /** @var ModuleConfigInterface $obj */
                 $obj = new $class();
                 $obj->configure($this);

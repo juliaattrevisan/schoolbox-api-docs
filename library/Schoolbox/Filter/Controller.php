@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -14,8 +15,9 @@ use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
-use function count;
+use Schoolbox\Learning\Badge;
 
+use function count;
 
 class Controller extends BaseController
 {
@@ -101,6 +103,7 @@ class Controller extends BaseController
             'pageLabels'         => $this->buildFilteredPageLabels(),
             'showCourseMarkbook' => $this->getConfigLoader()->get('course_markbook_enable'),
             'ENTITY_ASSESSMENTS' => Assessment\Mapper::class,
+            'ENTITY_BADGES'      => Badge\Mapper::class,
             'pageCurrent'        => basename($this->getRequest()->query->get('page')),
         ])->setTitle('Filterable pages'));
     }
@@ -151,7 +154,6 @@ class Controller extends BaseController
             'roleTypes'          => $roleTypes,
             'rolesForFilter'     => $rolesForFilter,
             'pageLabels'         => $this->buildFilteredPageLabels(),
-            'ENTITY_ASSESSMENTS' => Assessment\Mapper::class,
         ])->setTitle(ucfirst($page) . ' filters'));
     }
 
@@ -311,6 +313,7 @@ class Controller extends BaseController
             Page\Model::PAGE_LEARNING_ANALYTICS   => 'Learning Analytics',
             Page\Model::PAGE_UPCOMING_ASSESSMENTS => "Upcoming Due Work", // intentionally not localised.
             Page\Model::PAGE_ASSESSMENT_CALENDAR  => "{$assessmentLocalised} Calendar",
+            Page\Model::PAGE_BADGE_LIST           => "Badge List",
         ];
     }
 }
