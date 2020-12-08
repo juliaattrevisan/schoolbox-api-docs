@@ -76,8 +76,10 @@ class Learning extends ModuleLoader
             $this->loadModule($kernel, EvidenceCommentModule::class, "/discussion/evidence/{contextId}/comments");
         }
 
-        // Badge module: not behind a feature flag for now
-        $this->loadModule($kernel, BadgeModule::class, "/{$namespace}/badge");
+        // Badge module: behind a feature flag
+        if ($config->get(ConfigMapper::NAME_BADGES_ENABLED)) {
+            $this->loadModule($kernel, BadgeModule::class, "/{$namespace}/badge");
+        }
 
         // Feed module: not behind a feature flag
         $this->loadModule($kernel, FeedModule::class, "/{$namespace}/evidenceFeed");

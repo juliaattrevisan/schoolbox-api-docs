@@ -87,7 +87,7 @@ class Controller extends Base
     public function getFeedForUser(User $user): void
     {
         $encodedCursor = $this->request->query->get('cursor');
-        $cursor        = new Cursor($this->database, $user, 10);
+        $cursor        = new Cursor($this->database, $user, 10, $this->getConfigLoader());
         $hydrator      = new Hydrator($this->evidenceMapper, $this->badgeAwardMapper);
         $translator    = new ModelToArray(
             (new EvidenceTranslatorFactory(

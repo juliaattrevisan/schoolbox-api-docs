@@ -164,7 +164,11 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 $this->setVar('eportfolio_block', '');
             }
 
-            $this->parse('achievements_block', 'achievements');
+            if ($this->getConfigLoader()->get(ConfigMapper::NAME_BADGES_ENABLED)) {
+                $this->parse('achievements_block', 'achievements');
+            } else {
+                $this->setVar('achievements_block', '');
+            }
 
             /* Academic report link
             */

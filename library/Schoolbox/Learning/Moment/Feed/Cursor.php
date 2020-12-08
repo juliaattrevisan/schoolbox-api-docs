@@ -14,6 +14,8 @@ use Alaress\Codec\Json\Base64;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 
 /**
@@ -64,30 +66,46 @@ class Cursor implements ICursor
 
 
     /**
+     * Whether the learning moments module is enabled
+     */
+    private bool $learningMomentsEnabled;
+
+
+    /**
+     * Whether the badges module is enabled
+     */
+    private bool $badgesEnabled;
+
+
+    /**
      * Constructor
      *
-     * @param IConnector $database
-     * @param User $user
-     * @param int $limit
-     * @param ICodec|null $codec
+     * @param IConnector    $database
+     * @param User          $user
+     * @param int           $limit
+     * @param IConfigLoader $config
+     * @param ICodec|null   $codec
      */
     public function __construct(
         IConnector $database,
         User $user,
         int $limit,
+        IConfigLoader $config,
         ?ICodec $codec = null
     ) {
-        $this->database = $database;
-        $this->user     = $user;
-        $this->limit    = $limit;
-        $this->codec    = $codec ?? new Base64();
+        $this->database               = $database;
+        $this->user                   = $user;
+        $this->limit                  = $limit;
+        $this->codec                  = $codec ?? new Base64();
+        $this->learningMomentsEnabled = $config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED);
+        $this->badgesEnabled          = $config->get(ConfigMapper::NAME_BADGES_ENABLED);
     }
 
 
     /**
      * @inheritdoc
      */
-    public function next(Collection $collection) : ?string
+    public function next(Collection $collection): ?string
     {
         // As usual: if the collection is empty, there is no next
         if ($collection->count() === 0) {
@@ -106,7 +124,7 @@ class Cursor implements ICursor
      * @param Collection $collection
      * @return null
      */
-    public function current(Collection $collection) : ?string
+    public function current(Collection $collection): ?string
     {
         return null;
     }
@@ -115,19 +133,23 @@ class Cursor implements ICursor
     /**
      * @inheritdoc
      */
-    public function retrieveResultCount() : ?int
+    public function retrieveResultCount(): ?int
     {
         $count        = 0;
-        $countQueries = [
-            $this->database->executeQuery(
-            "SELECT COUNT(*) FROM evidence WHERE user_id = ? AND deleted_at IS NULL",
+        $countQueries = [];
+        if ($this->learningMomentsEnabled) {
+            $countQueries[] = $this->database->executeQuery(
+                "SELECT COUNT(*) FROM evidence WHERE user_id = ? AND deleted_at IS NULL",
                 [$this->user->getId()]
-            ),
-            $this->database->executeQuery(
-            "SELECT COUNT(*) FROM badge_user WHERE recipient_id = ? AND deleted_at IS NULL",
+            );
+        }
+        if ($this->badgesEnabled) {
+            $countQueries[] = $this->database->executeQuery(
+                "SELECT COUNT(*) FROM badge_user WHERE recipient_id = ? AND deleted_at IS NULL",
                 [$this->user->getId()]
-            ),
-        ];
+            );
+        };
+
         foreach ($countQueries as $countQuery) {
             $count += (int)$countQuery->fetchColumn();
         }
@@ -138,17 +160,13 @@ class Cursor implements ICursor
     /**
      * @inheritdoc
      */
-    public function retrieveResults(?string $encodedCursor) : Collection
+    public function retrieveResults(?string $encodedCursor): Collection
     {
         // Don't need to know the details of the badge:
         // just what it points to
         // There's a possible issue in that `badge_user.badge_id` is not unique
-        $params = [
-            'discriminatorEvidence'   => self::DISCRIMINATOR_EVIDENCE,
-            'discriminatorBadgeAward' => self::DISCRIMINATOR_BADGE_AWARD,
-            'userIdEvidence'          => $this->user->getId(),
-            'userIdBadgeAward'        => $this->user->getId(),
-            'limit'                   => $this->limit,
+        $params    = [
+            'limit' => $this->limit,
         ];
         $wherePart = '';
         if (isset($encodedCursor)) {
@@ -170,23 +188,38 @@ class Cursor implements ICursor
             $params['discriminator3'] = $cursor['discriminator'];
             $params['id3']            = $cursor['id'];
         }
-        $query  = "
-            SELECT id, discriminator, date FROM (
+        $queries = [];
+        if ($this->learningMomentsEnabled) {
+            $queries[]                       = '
                 SELECT
                     id,
                     :discriminatorEvidence AS discriminator,
                     created_at             AS date
                 FROM evidence
                 WHERE user_id = :userIdEvidence AND deleted_at IS NULL
-
-                UNION ALL
-
+            ';
+            $params['discriminatorEvidence'] = self::DISCRIMINATOR_EVIDENCE;
+            $params['userIdEvidence']        = $this->user->getId();
+        }
+        if ($this->badgesEnabled) {
+            $queries[]                         = '
                 SELECT
                     badge_id                 AS id,
                     :discriminatorBadgeAward AS discriminator,
                     awarded_at               AS date
                 FROM badge_user
                 WHERE recipient_id = :userIdBadgeAward AND deleted_at IS NULL
+            ';
+            $params['discriminatorBadgeAward'] = self::DISCRIMINATOR_BADGE_AWARD;
+            $params['userIdBadgeAward']        = $this->user->getId();
+        }
+
+        if (count($queries) === 0) {
+            return new Collection();
+        }
+
+        $query =
+            'SELECT id, discriminator, date FROM (' . implode(' UNION ALL ', $queries) . "
             ) AS combined
 
             {$wherePart}
