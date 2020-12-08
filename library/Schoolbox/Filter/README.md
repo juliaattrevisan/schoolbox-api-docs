@@ -410,6 +410,7 @@ of developing for filters.
             return $options;
         }
         ```
+
 * Create a [Key Converter](#key-converter) in the namespace determined above,
   extending `\Schoolbox\Filter\AbstractKeyConverter`
   * implement `getItem`: have it `return (int)$key` for now
@@ -418,6 +419,24 @@ of developing for filters.
 
 * Create a [Factory](#factory) in the namespace determined above, extending
   `\Schoolbox\Filter\AbstractFactory`
+  * implement `buildDefinition`:
+    ```php
+    public function buildDefinition(\Schoolbox\Filter\Model $filter): \Schoolbox\Filter\IDefinition
+    {
+        return new Definition(
+            $filter,
+            $this->getOptionMapper(),
+            $this->getDefaultsMapper()
+        );
+    }
+    ```
+  * implement `buildKeyConverter`:
+    ```php
+    public function buildKeyConverter(\Schoolbox\Filter\Model $filter): \Schoolbox\Filter\IKeyConverter
+    {
+        return new KeyConverter($filter);
+    }
+    ```
   * Filters will often filter an Entity via a relation of that Entity: if this
     is the case, then the Factory's constructor should accept the Mapper for
     that relation as a parameter
