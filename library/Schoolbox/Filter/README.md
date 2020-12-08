@@ -315,9 +315,16 @@ of developing for filters.
     $filterPanel = $this->filterFactoryFactory->buildPanel(
         $this->getUser(),
         $page,
+        // The alias of the Aura route which loads the filtered content, if any.
+        // If null, then the element's `filterContentLoaded` event is expected
+        // to handle rendering of the filtered content.
         null,
         $this->getUser(),
-        []
+        // If an Aura route is provided above: pass these parameters into it.
+        [],
+        // The query string params for this request:
+        // this contains the actually selected filters.
+        $this->request->query->getArrayCopy(),
     );
     ```
   * inject the Twig data into the controller action's Twig template
@@ -343,7 +350,7 @@ of developing for filters.
         quickload: false,
     } only %}
     ```
-* > TODO document how to write the inner template
+* > TODO document how to render the filtered content
 
 
 ### Implementing Filtering on an Entity

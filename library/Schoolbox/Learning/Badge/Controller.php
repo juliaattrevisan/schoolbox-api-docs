@@ -159,7 +159,8 @@ class Controller extends Base
             $page,
             null,
             $this->getUser(),
-            []
+            [],
+            $this->request->query->getArrayCopy(),
         );
 
         $this->response->content->set(
