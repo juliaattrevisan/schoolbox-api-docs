@@ -70,6 +70,17 @@ class Homepage extends Base
          */
         $attachmentCounts = \Schoolbox\Comms\News\File\Mapper::getInstance()->findCounts($articleIds);
 
+        /* Also happen to augment each article with its files when you're using the normal viewing mode
+         */
+        if (!(bool)$params->getCompactMode()) {
+            foreach ($articles as $article) {
+
+                /* Attach any associated files
+                 */
+                $article->setAttachedFiles($this->newsMapper->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
+            }
+        }
+
         /* Tremendous Assumption
          *
          * If Compact Mode is off, then someone read all these articles currently displaying
