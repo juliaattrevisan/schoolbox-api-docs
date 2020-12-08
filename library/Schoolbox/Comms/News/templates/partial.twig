@@ -62,7 +62,7 @@
                             {% endif %}
 
                             {# Attachment Count #}
-                            {% if attachmentCounts[article.id] %}
+                            {% if attachmentCounts[article.id] ?? false %}
                             <span>
                                 | <a href="{{ articleURL }}">{{ attachmentCounts[article.id] }} attachments</a>
                             </span>
