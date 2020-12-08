@@ -53,6 +53,13 @@
                                         {{ article.author.fullname }}
                                     {% endif %}
                                     <time title="{{ article.publishAt.long }}">{{ article.publishAt.relativeTime }}</time>
+
+                                    {# Attachment Count #}
+                                    {% if attachmentCounts[article.id] ?? false %}
+                                        <span>
+                                        | <a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}?ref={{ referrer }}">{{ attachmentCounts[article.id] }} attachments</a>
+                                    </span>
+                                    {% endif %}
                                 </p>
 
                                 {% if article.topics|length %}

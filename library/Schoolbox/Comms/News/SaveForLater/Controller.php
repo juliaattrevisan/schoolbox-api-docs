@@ -64,9 +64,14 @@ class Controller extends Base
 
         $sidebar = new News\Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
 
+        /* Attachment counts for each article in this set
+         */
+        $attachmentCounts = \Schoolbox\Comms\News\File\Mapper::getInstance()->findCounts($articles->getPropertyValues('id'));
+
         $data = array_merge(
             [
                 'articles' => $articles,
+                'attachmentCounts' => $attachmentCounts,
                 'referrer' => $params->getReferrer(),
                 'readMore' => $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
                 'fallbackImage' => [
