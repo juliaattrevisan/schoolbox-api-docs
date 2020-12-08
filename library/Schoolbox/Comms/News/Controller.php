@@ -864,6 +864,7 @@ class Controller extends Base
         $articleIds = $userFeed->find($this->getUser());
 
         $commentCounts = [];
+        $attachmentCounts = [];
 
         if (count($articleIds)) {
             $pb       = $this->newsMapper->getPredicatePublished()->in('id', $articleIds);
@@ -871,6 +872,7 @@ class Controller extends Base
 
             /* Attachment counts for each article in this set
              */
+            $attachmentCounts = \Schoolbox\Comms\News\File\Mapper::getInstance()->findCounts($articleIds);
 
         } else {
             $articles = $this->newsMapper->createCollection();
@@ -918,8 +920,7 @@ class Controller extends Base
                 new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
                 new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)),
                 new MetadataDecorator($commentCounts),
-                new ImagesDecorator(),
-                new FilesDecorator(),
+                new AttachmentDecorator($attachmentCounts)
             )
         );
 
