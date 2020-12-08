@@ -1,12 +1,9 @@
 #!/bin/bash
 
-for service in socketd digestd routed scheduled; do
-  if systemctl | grep -q "schoolbox-$service.service"; then
-    systemctl stop "schoolbox-$service.service";
-  fi
+# Stop all schoolbox notif daemons (supports both old+new single/multi instance style)
+for daemon in socketd digestd routed scheduled; do
+    for service in $(systemctl | grep -E "^schoolbox.*$daemon.*service" | awk '{print $1}'); do
+        echo "stopping $service"
+        systemctl stop "$service"
+    done
 done
-
-service schoolbox-cloud-scheduled@vagrantx stop;
-service schoolbox-cloud-routed@vagrantx    stop;
-service schoolbox-cloud-socketd@vagrantx   stop;
-service schoolbox-cloud-digestd@vagrantx   stop;
