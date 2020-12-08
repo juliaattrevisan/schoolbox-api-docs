@@ -386,6 +386,14 @@ of developing for filters.
     return '@filterDefinitions/{entityName}/{filterName}/templates';
     ```
 
+* Create a `templates` folder in the folder for the namespace determined above
+  * add a `component.twig` file:
+  ```twig
+  {% extends '@filters/_component.twig' %}
+
+  {% block filterName %}A human-readable name for the filter{% endblock %}
+  ```
+
 * Create a [Key Converter](#key-converter) in the namespace determined above,
   extending `\Schoolbox\Filter\AbstractKeyConverter`
   * implement `getItem`: have it `return (int)$key` for now
