@@ -1,0 +1,68 @@
+{##
+ # File List
+ #
+ # A list of files attached to this news article
+ #
+ # @param News\Model $article  An article instance
+ #}
+{% if article.attachedFiles|length %}
+    <hr />
+
+    {# Images are processed first into their own little lightbox gallery
+             # Can probably split these attachedFiles further, but nobody's really sure
+    #}
+    {% if article.getImages|length %}
+        <script>
+            $(function() {
+                $('[data-image-gallery] li').magnificPopup({
+                    delegate: 'a',
+                    type: 'image'
+                });
+            });
+        </script>
+
+        <ul class="article-gallery" data-image-gallery>
+            {% for file in article.getImages %}
+                <li>
+                    <a href="/storage/image.php?hash={{ file.hash }}&size=maxsize" rel="lightbox[news-detail]" title="{{ file.filename }}">
+                        <img src="/storage/image.php?hash={{ file.hash }}&size=square64" title="{{ file.filename }}">
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {# Other filetypes just stashed here, for now
+             # Probably need special treatments for audio/video media etc.
+    #}
+    {% if article.getFiles|length %}
+        <script>
+            $(function() {
+                $('[data-plugin="preview"]').preview();
+            });
+        </script>
+        <ul class="article-files grid small-block-grid-1 medium-block-grid-2">
+            {% for file in article.getFiles %}
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <a href="/storage/fetch.php?hash={{ file.hash }}&name={{ file.basename|url_encode }}" data-plugin="preview" title="{{ file.filename }}">
+                                {% if file.mimetype.image %}
+                                    <img src="/storage/image.php?hash={{ file.hash }}&size=square64" alt="Download" />
+                                {% else %}
+                                    <img src="/ajax/mime/{{ file.mime }}" alt="Download" />
+                                {% endif %}
+
+                                <p>{{ file.filename }}</p>
+                                <p class="meta">{{ file.size|bytes }}</p>
+                            </a>
+                        </div>
+                    </div>
+                    <nav>
+                        <a href="/storage/fetch.php?hash={{ file.hash }}&save=1&name={{ file.basename|url_encode }}" class="icon-download" title="Download"></a>
+                    </nav>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endif %}
