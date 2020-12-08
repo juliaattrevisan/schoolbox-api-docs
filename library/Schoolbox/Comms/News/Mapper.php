@@ -217,10 +217,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                 if ($discussionThread) {
                     $article->setDiscussionThread($discussionThread);
                 }
-
-                /* Attach any associated files
-                 */
-                $article->setAttachedFiles($this->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
             }
 
             /* Attach topics

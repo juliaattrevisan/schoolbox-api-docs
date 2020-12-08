@@ -274,6 +274,11 @@ class Module extends BaseModule
         } else {
             try {
                 $article = $this->getArticleMapper()->findById($params['articleId']);
+
+                /* Attach any associated files
+                 */
+                $article->setAttachedFiles($this->getArticleMapper()->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
+
             } catch (MapperException $e) {
                 throw new NotFound('Unknown news article.', 0, $e);
             }
