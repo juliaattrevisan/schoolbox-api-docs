@@ -469,6 +469,14 @@ of developing for filters.
         (likely fetched with `findAll`)
       * update `buildKeyConverter` to pass a collection of IDs
         (likely fetched with `findAllIds`)
+  * Another common example is that the Filter will contain meta-options: i.e.
+    "None" for matching Entities which match exactly none of a list of entities.
+    In this case:
+    * in the [Definition](#definition):
+      * define a class constant for the key for each meta-option
+      * update `getCustomKeys` to return the keys for the meta-options
+      * update `getLabel` to return a specific label for each meta-option
+
 
 * Create a [Component](#component) implementation
   (if a custom implementation is required)
