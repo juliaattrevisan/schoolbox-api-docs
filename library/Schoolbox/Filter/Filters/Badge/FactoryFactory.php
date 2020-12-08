@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Badge;
 
 use InvalidArgumentException;
+use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\IFactory;
 use Schoolbox\Learning\Badge;
@@ -43,10 +44,13 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                 );
 
             case CurriculumNode\Definition::class:
+                /** @var CurriculumNodeMapper $curriculumNodeMapper */
+                $curriculumNodeMapper = $this->getMapperFactory()->get(CurriculumNodeMapper::class);
                 return new CurriculumNode\Factory(
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),
+                    $curriculumNodeMapper
                 );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
