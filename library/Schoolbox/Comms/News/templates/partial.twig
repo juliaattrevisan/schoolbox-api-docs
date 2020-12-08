@@ -87,6 +87,8 @@
                                 {{ textToDisplay|purify }}
                             {% endif %}
                         </article>
+
+                        {% include ('@commsNews/layout/file-list.twig') with {article: article} %}
                     {% endspaceless %}
                 {% endif %}
             </li>
