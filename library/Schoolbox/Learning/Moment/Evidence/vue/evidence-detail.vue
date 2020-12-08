@@ -148,6 +148,18 @@ export default {
                                     </a>
                                     &mdash;
                                     <relative-time :datetime="this.evidence.createdAt"></relative-time>
+                                    <!-- Display curriculum codes and tags -->
+                                    <br>
+                                    <template v-if="this.evidence.curriculumNodes.length > 0 || this.evidence.tags.length > 0">
+                                      Tags:
+                                      <template v-for="(curriculumNode, index) in this.evidence.curriculumNodes">
+                                        <template v-if="index !== 0">, </template><span
+                                          :title="curriculumNode.name">{{ curriculumNode.code }}</span>
+                                      </template><template v-if="this.evidence.curriculumNodes.length > 0 && this.evidence.tags.length > 0">, </template>
+                                      <template v-for="(tag, index) in this.evidence.tags">
+                                        <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
+                                      </template>
+                                    </template>
                                 </p>
 
                                 <!-- Display evidence body, with media players initialised -->
