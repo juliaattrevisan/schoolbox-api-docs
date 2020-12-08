@@ -1,10 +1,30 @@
 #!/bin/bash
 
-scriptdir="$(command dirname -- "${0}")"
+file_path=$(readlink -f "$0");
+dir_path=${file_path%/*}
+site_root=$(readlink -f "$dir_path"/../../);
+conf_file="$site_root"/www/conf/conf.php
 
-$scriptdir/allstop
+# Stop all schoolbox notif daemons
+"$dir_path"/allstop
 
-service schoolbox-cloud-scheduled@vagrantx start;
-service schoolbox-cloud-routed@vagrantx    start;
-service schoolbox-cloud-socketd@vagrantx   start;
-service schoolbox-cloud-digestd@vagrantx   start;
+# On-Premise use old single-instance style
+# Vagrant + Cloud uses new multi-instance style
+if [[ $site_root == '/vagrant' ]] || [[ -d /etc/schoolbox/cloud ]] || [[ -d /etc/schoolboxdev/cloud ]]; then
+    # Multi-instance
+    instance_list=$(schoolbox-conf --conf="$conf_file" --option=instancelist | jq -r '.[]' | sort);
+    for daemon in socketd digestd routed scheduled; do
+        for instance_id in $instance_list; do
+            echo "starting schoolbox-cloud-$daemon@$instance_id"
+            service "schoolbox-cloud-$daemon@$instance_id" start;
+        done
+    done
+else
+    # Single-instance
+    for daemon in socketd digestd routed scheduled; do
+        echo "starting schoolbox-$daemon.service"
+        service "schoolbox-$daemon.service" start
+    done
+fi
+
+
