@@ -37,7 +37,7 @@ try {
          * what the filename was supposed to be, and it shall be so
          */
         if (isset($_GET['name'])) {
-            $basename = $_GET['name'];
+            $basename = urldecode($_GET['name']);
         }
 
         if (!$bypassPresignedUrls && $fileSystem instanceof Flysystem\Filesystem && $fileSystem->getAdapter() instanceof Flysystem\AwsS3v3\AwsS3Adapter) {
