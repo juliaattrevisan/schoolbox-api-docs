@@ -32,14 +32,23 @@ class Controller extends Base
 
 
     /**
-     * Controller constructor.
-     * @param Mapper $saveForLaterMapper
-     * @param News\Mapper $newsMapper
+     * @var News\File\Mapper
      */
-    public function __construct(Mapper $saveForLaterMapper, News\Mapper $newsMapper)
+    private News\File\Mapper $fileMapper;
+
+
+    /**
+     * Controller constructor.
+     *
+     * @param Mapper           $saveForLaterMapper
+     * @param News\Mapper      $newsMapper
+     * @param News\File\Mapper $fileMapper
+     */
+    public function __construct(Mapper $saveForLaterMapper, News\Mapper $newsMapper, News\File\Mapper $fileMapper)
     {
         $this->saveForLaterMapper = $saveForLaterMapper;
         $this->newsMapper         = $newsMapper;
+        $this->fileMapper         = $fileMapper;
     }
 
 
@@ -47,9 +56,9 @@ class Controller extends Base
      * A list of articles that you saved for later
      *
      * @api GET /news/saved
-     *
+     * @throws PDOException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \UnderflowException
      */
     public function getList(): void
     {
@@ -66,7 +75,7 @@ class Controller extends Base
 
         /* Attachment counts for each article in this set
          */
-        $attachmentCounts = \Schoolbox\Comms\News\File\Mapper::getInstance()->findCounts($articles->getPropertyValues('id'));
+        $attachmentCounts = $this->fileMapper->findCounts($articles->getPropertyValues('id'));
 
         $data = array_merge(
             [

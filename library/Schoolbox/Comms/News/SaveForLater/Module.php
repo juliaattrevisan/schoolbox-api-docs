@@ -107,6 +107,7 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'saveForLaterMapper' => $this->getMapperFactory()->getLazy(SaveForLaterMapper::class),
             'newsMapper' => $this->getMapperFactory()->getLazy(NewsMapper::class),
+            'fileMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\Comms\News\File\Mapper::class),
         ];
     }
 
