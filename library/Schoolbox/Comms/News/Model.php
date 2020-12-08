@@ -684,6 +684,68 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
         }
     }
 
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'id',
+            'title',
+            'blurb',
+            'body',
+            'sticky',
+            'author',
+            'featureImage',
+            'publishAt',
+            'topics' => [
+                'name',
+                'slug',
+            ],
+            'status',
+            'statusDate'
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getJsonApiLinks(): array
+    {
+        // Set auth to FALSE on 'commsNews.getDetail' as unlikely we'll have fetched this instance if the user is unable to see it
+        return [
+            'self'   => new AuraLink('commsNews.getDetail', [ 'article' => $this, 'articleId' => $this->getId() ], false),
+            'update' => new AuraLink('commsNews.getUpdate', [ 'article' => $this, 'articleId' => $this->getId() ]),
+            'saveForLater' => new AuraLink('commsNewsSaveForLater.postAdd', [ 'article' => $this, 'articleId' => $this->getId() ]),
+            'unsaveForLater' => new AuraLink('commsNewsSaveForLater.postRemove', [ 'article' => $this, 'articleId' => $this->getId() ])
+        ];
+    }
+
+
+    /**
+     * Get a list of image files that were attached to this instance, if any
+     */
+    public function getImages(): Collection
+    {
+        return $this->getAttachedFiles()->filter(static function(File\Model $model) {
+            return $model->getMimetype()->isImage();
+        });
+    }
+
+
+    /**
+     * Get a list of non-image files that were attached to this instance, if any
+     */
+    public function getFiles(): Collection
+    {
+        return $this->getAttachedFiles()->filter(static function(File\Model $model) {
+            return !$model->getMimetype()->isImage();
+        });
+    }
+
+
     /* Getters/Setters
      */
 
@@ -1046,45 +1108,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
         $audience->assertCollectionOf(Audience\Model::class);
         $this->audience = $audience;
         return $this;
-    }
-
-
-    /**
-     * @return array
-     */
-    public function getDefaultJsonMap(): array
-    {
-        return [
-            'id',
-            'title',
-            'blurb',
-            'body',
-            'sticky',
-            'author',
-            'featureImage',
-            'publishAt',
-            'topics' => [
-                'name',
-                'slug',
-            ],
-            'status',
-            'statusDate'
-        ];
-    }
-
-
-    /**
-     * @return array
-     */
-    public function getJsonApiLinks(): array
-    {
-        // Set auth to FALSE on 'commsNews.getDetail' as unlikely we'll have fetched this instance if the user is unable to see it
-        return [
-            'self'   => new AuraLink('commsNews.getDetail', [ 'article' => $this, 'articleId' => $this->getId() ], false),
-            'update' => new AuraLink('commsNews.getUpdate', [ 'article' => $this, 'articleId' => $this->getId() ]),
-            'saveForLater' => new AuraLink('commsNewsSaveForLater.postAdd', [ 'article' => $this, 'articleId' => $this->getId() ]),
-            'unsaveForLater' => new AuraLink('commsNewsSaveForLater.postRemove', [ 'article' => $this, 'articleId' => $this->getId() ])
-        ];
     }
 
 
