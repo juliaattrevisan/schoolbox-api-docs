@@ -47,6 +47,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         $this->setBlock('student_block', 'due_work', 'due_work_block');
         $this->setBlock('student_block', 'grades_button', 'grades_button_block');
         $this->setBlock('student_block', 'timetable', 'timetable_block');
+        $this->setBlock('student_block', 'achievements', 'achievements_block');
         $this->setBlock('student_block', 'custom_buttons', 'custom_buttons_block');
 
         $isParent = $this->getUser()->getRole()->isParent();
@@ -162,6 +163,8 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             } else {
                 $this->setVar('eportfolio_block', '');
             }
+
+            $this->parse('achievements_block', 'achievements');
 
             /* Academic report link
             */
