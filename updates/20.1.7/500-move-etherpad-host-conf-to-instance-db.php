@@ -15,10 +15,17 @@ $app = new class extends CliTool\App {
 
     public function run(): void
     {
-        if (!defined('ETHERPAD_HOST')) {
-            $this->getLogger()->error("ETHERPAD_HOST is not defined");
-            exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
+        if (defined('ETHERPAD_HOST')) {
+            $etherPadHost = ETHERPAD_HOST;
+        } else {
+            $this->getLogger()->warning("ETHERPAD_HOST is not defined, falling back to 'http://localhost:9001'");
+            $etherPadHost = 'http://localhost:9001';
         }
+
+        // On some instances we have already inserted this value via Ansible.
+        // In this case retain `name`,`sequence` and reset other fields.
+        // Cloud instances should be fine to set this temporarily to localhost as the install process applies
+        // config again after running the upgrades.
 
         $sql = "
             INSERT INTO config (
@@ -45,12 +52,22 @@ $app = new class extends CliTool\App {
                 :required,
                 :module,
                 (SELECT * FROM (SELECT MAX(sequence) + 1 FROM config WHERE type_id = (SELECT id FROM lu_config_type WHERE type = '3rd Party Services')) t1)
-            )";
+            ) ON DUPLICATE KEY UPDATE
+                -- retain name, sequence. Reset all other fields.
+                value       = :value,
+                title       = :title,
+                description = :description,
+                field_id    = (SELECT id FROM lu_config_field WHERE field = 'input'),
+                type_id     = (SELECT id FROM lu_config_type WHERE type = '3rd Party Services'),
+                editable    = :editable,
+                hidden      = :hidden,
+                required    = :required,
+                module      = :module";
         $this->getDatabaseInternal()->executeQuery(
             $sql,
             [
                 'name'        => ConfigMapper::NAME_ETHERPAD_HOST,
-                'value'       => ETHERPAD_HOST,
+                'value'       => $etherPadHost,
                 'title'       => "Etherpad host",
                 'description' => "Etherpad url including scheme and port",
                 'editable'    => 'false',
@@ -59,7 +76,7 @@ $app = new class extends CliTool\App {
                 'module'      => ConfigMapper::MODULE_SETTINGS,
             ]
         );
-        $this->getLogger()->notice(sprintf("Inserted new config 'Etherpad host' with value '%s'", ETHERPAD_HOST));
+        $this->getLogger()->notice(sprintf("Inserted new config 'Etherpad host' with value '%s'", $etherPadHost));
     }
 };
 
