@@ -79,7 +79,6 @@ class Component extends BaseComponent
             }
         }
 
-
         return $availableSelections;
     }
 
@@ -90,10 +89,12 @@ class Component extends BaseComponent
     public function toContext()
     {
         // Inject the URL overrides into the context
-        return array_merge(
-            parent::toContext(),
-            [
-            ]
+        $context = parent::toContext();
+        $context['selectedNodes'] = $this->curriculumNodeMapper->findByColumn(
+            'id',
+            $context['roleSelectionIds']
         );
+
+        return $context;
     }
 }
