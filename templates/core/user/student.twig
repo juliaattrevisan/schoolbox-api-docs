@@ -486,9 +486,9 @@
             {% endif %}
         </dl>
 
-        <div class="tabs-content no-pad">
+        <div class="profile-tabs tabs-content">
             {% if showActivityFeed %}
-            <div class="no-pad content active" id="activity">
+            <div class="content active" id="activity">
                 {# Vue component goes here #}
                 {% autoescape 'js' %}
                     <script type="text/javascript">
@@ -512,7 +512,7 @@
             </div>
             {% endif %}
 
-            <div class="content no-pad" id="achievements">
+            <div class="content" id="achievements">
                 {% autoescape 'js' %}
                     <script type="text/javascript">
                         window.learningBadgeAchievementFeedConfig = {
@@ -547,8 +547,8 @@
             </div>
 
             {% if showClasses %}
-            <div class="content no-pad" id="classes">
-                <div class="content">
+            <div class="content" id="classes">
+                <section class="content">
                     {% if showSubjects %}
                     {% for group, subjectGroup in subjects %}
                         {# Keep a running total of all teachers emails in this group #}
@@ -682,13 +682,13 @@
                             </div>
                         </div>
                     {% endif %}
-                </div>
+                </section>
             </div>
             {% endif %}
 
             {% if showContactsTab %}
-            <div class="content no-pad" id="contacts">
-                <div class="content">
+            <div class="content" id="contacts">
+                <section class="content">
                     {% block contacts_island %}
                         {% block contacts %}
                             <h2 class="subheader">Contact Information</h2>
@@ -908,7 +908,7 @@
                             </div>
                         </div>
                     {% endblock emergencyContacts_island %}
-                </div>
+                </section>
             </div>
             {% endif %}
         </div>
