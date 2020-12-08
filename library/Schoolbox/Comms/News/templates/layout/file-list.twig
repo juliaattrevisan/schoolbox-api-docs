@@ -21,7 +21,10 @@
             $(function() {
                 $('[data-image-gallery={{ identifier }}] li').magnificPopup({
                     delegate: 'a',
-                    type: 'image'
+                    type: 'image',
+                    gallery: {
+                        enabled:true
+                    }
                 });
             });
         </script>
