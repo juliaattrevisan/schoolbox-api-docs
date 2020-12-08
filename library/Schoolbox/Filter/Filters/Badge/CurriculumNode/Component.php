@@ -60,39 +60,44 @@ class Component extends BaseComponent
 
 
     /**
-     * This component has no role selections.
+     * The user selections for this component are the same ones as were passed
+     * via the URL.
      *
-     * @inheritdoc
-     * @param GenericCollection|Filter\Page\Option\Model[] $abstractOptions
-     * @throws \InvalidArgumentException If option key unrecognised
+     * This is because it is likely there are too many curriculum nodes in an
+     * instance to be able to load all of them before rendering this component.
+     *
+     * @param GenericCollection|Filter\Selection\Model[] $roleSelections
+     * @return Filter\Selection\Model[]|GenericCollection
      */
-    protected function buildRoleSelections(GenericCollection $abstractOptions)
+    protected function buildUserSelections(GenericCollection $roleSelections)
     {
-        // Standard selections
-        $availableSelections = parent::buildRoleSelections($abstractOptions);
+        $userSelections = parent::buildUserSelections($roleSelections);
 
-
-        // Add URL overrides
+        // Add the URL overrides and show them as user selections
         foreach (($this->getUrlOverrides() ?? []) as $key => $override) {
             if ($override instanceof Filter\Selection\Model) {
-                $availableSelections[$key] = $this->createSelection($key, $override->getSelected());
+                $userSelections[$key] = $this->createSelection($key, $override->getSelected());
             }
         }
 
-        return $availableSelections;
+        return $userSelections;
     }
 
 
     /**
-     * @inheritdoc
+     * Load the selected nodes into the template, so that they may be rendered
+     * in the selectize.
+     *
+     * @return array
      */
-    public function toContext()
+    public function toContext(): array
     {
-        // Inject the URL overrides into the context
         $context = parent::toContext();
+
+        // Load selected nodes into the Twig template
         $context['selectedNodes'] = $this->curriculumNodeMapper->findByColumn(
             'id',
-            $context['roleSelectionIds']
+            $context['userSelectionIds']
         );
 
         return $context;

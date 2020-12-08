@@ -35,8 +35,8 @@
         >
             {% for selectedNode in selectedNodes %}
                 {% include '@filters/_option.twig' with {
-                    roleSelection:      roleSelections[selectedNode.id],
-                    userSelection:      userSelections[selectedNode.id],
+                    roleSelection:      roleSelections[selectedNode.id] ?? null,
+                    userSelection:      userSelections[selectedNode.id] ?? null,
                     label:              selectedNode.code,
                     value:              selectedNode.id,
                     disabled:           isDisabled,
