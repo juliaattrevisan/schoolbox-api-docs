@@ -13,7 +13,9 @@ use Alaress\HTMLPurifier\Adapter\MockAdapter;
 use Alaress_Date_Format;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Collection;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Moment\Evidence\Model;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Base;
 use Schoolbox\Resource\Storage\Model as Storage;
@@ -35,7 +37,9 @@ class BaseTest extends TestCase
     public function getTestInvokeData(): iterable
     {
         yield 'empty fields' => [
-            new Model(),
+            (new Model())
+                ->setCurriculumNodes(new GenericCollection(new \Schoolbox\Curriculum\Node\Model()))
+                ->setTags(new GenericCollection(new \Schoolbox\Learning\Moment\Evidence\Tag\Model())),
             [
                 'id'               => null,
                 'body'             => null,
@@ -47,6 +51,8 @@ class BaseTest extends TestCase
                 'recipient'        => null,
                 'discussionThread' => null,
                 '_links'           => [],
+                'curriculumNodes'  => new Collection(),
+                'tags'             => new Collection(),
             ],
         ];
 
@@ -62,7 +68,9 @@ class BaseTest extends TestCase
                 ->setFilename('test.gif')
                 ->setCreator((new User())->setId(55))
                 ->setRecipient((new User())->setId(193))
-                ->setDiscussionThread((new DiscussionThread())->setId(14)),
+                ->setDiscussionThread((new DiscussionThread())->setId(14))
+                ->setCurriculumNodes(new GenericCollection(new \Schoolbox\Curriculum\Node\Model()))
+                ->setTags(new GenericCollection(new \Schoolbox\Learning\Moment\Evidence\Tag\Model())),
             [
                 'id'               => 3,
                 'body'             => 'something',
@@ -74,6 +82,8 @@ class BaseTest extends TestCase
                 'recipient'        => ['id' => 193],
                 'discussionThread' => ['id' => 14],
                 '_links'           => [],
+                'curriculumNodes'  => new Collection(),
+                'tags'             => new Collection(),
             ],
         ];
     }
