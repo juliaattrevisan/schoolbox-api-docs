@@ -1,7 +1,5 @@
 <?php
 /**
- * Archive
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -27,7 +25,11 @@ use function count;
 use function in_array;
 
 /**
- * Responsible for generating data to populate the news archive.
+ * Class Archive
+ *
+ * Get a list of articles for the News Archive
+ *
+ * @package Schoolbox\Comms\News\Lists
  */
 class Archive extends Base
 {

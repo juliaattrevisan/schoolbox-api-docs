@@ -1,12 +1,9 @@
 <?php
 /**
- * Homepage
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Comms\News\Lists;
 
 use Schoolbox\Comms\News\Audience;
@@ -19,6 +16,13 @@ use Schoolbox\Comms\News\Statistics\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
+/**
+ * Class Homepage
+ *
+ * Get a list of articles for Homepage Components
+ *
+ * @package Schoolbox\Comms\News\Lists
+ */
 class Homepage extends Base
 {
     /**
@@ -29,13 +33,15 @@ class Homepage extends Base
      * and article must have been audienced to this folder
      * and $user must have READ access to the folder specified in the article's audience
      *
-     * @param Querystring     $params
-     * @param User            $user
+     * @param Querystring $params
+     * @param User        $user
      * @return array
+     * @throws \Alaress\Database\Exception
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
