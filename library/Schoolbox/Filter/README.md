@@ -350,11 +350,19 @@ of developing for filters.
   * add it to the `\Schoolbox\Filter\CompositeFactoryFactory` in the DI key
     `filters.factoryFactory` in
     `\Alaress\Application\Kernel::installDependencies`
-* create a [Filter Consumer](#filter-consumers)
+* create a [Filter Consumer](#filter-consumers) in the namespace
+  `\Schoolbox\Filter\Filters\{entityName}`
   * an [ID Finder](#id-finder) will be appropriate if the [Entity](#entity) is
     contained within the Schoolbox database; otherwise a [Matcher](#matcher)
     will be required
-
+    * if creating an [ID Finder](#id-finder):
+      * extend `\Schoolbox\Filter\AbstractIdFinder`
+      * implement `doFiltersGuaranteeEmptySet`: return `false` for now
+      * implement `simplifyFilters`: return the first parameter for now
+      * implement `buildQuery`: return an empty array for now
+    * if creating a [Matcher](#matcher):
+      * implement `__invoke`, with an [Entity](#entity) class as its parameter:
+        return true for now
 
 ### Implementing a new Filter
 
@@ -362,9 +370,11 @@ of developing for filters.
   * if no Factory Factory filters the Entity: follow the instructions to
     [implement Filtering on an Entity](#implementing-filtering-on-an-entity),
     and then return here
+
 * Determine a namespace for the new Filter's classes
   * The Filter's namespace will be
     `\Schoolbox\Filter\Filters\{entityName}\{filterName}`
+
 * Create a [Definition](#definition) in the namespace determined above,
   extending `\Schoolbox\Filter\AbstractDefinition`
   * override the `NAME` constant to be a brief description of the Filter
@@ -375,41 +385,6 @@ of developing for filters.
     ```php
     return '@filterDefinitions/{entityName}/{filterName}/templates';
     ```
-  * consider the options which the Filter will display
-    * this Filter may display a set of options corresponding to a list of
-      entities which are related to the Entity being filtered. In this case:
-      * override the constructor to accept an additional
-        `\Schoolbox\GenericCollection` of related entities, and set that
-        collection into the Definition
-      * override `getAbstractKeys` to convert the collection into an array of
-        IDs, converted to string values
-      * override `getLabel` to lookup the string ID in the collection, and
-        return a human-readable label for the corresponding object
-      * override `insertDynamicOptions` with an implementation which adds an
-        option for every item in the collection:
-        ```php
-        protected function insertDynamicOptions(\Schoolbox\Filter\Page\Model $pageFilter): \Schoolbox\GGenericCollection
-        {
-            $options = parent::insertDynamicOptions($pageFilter);
-
-            // Ensure it contains all items in the collection
-            foreach ($this->collection as $item) {
-                $abstractKey = (string)$item->getId();
-                if (!$options->offsetExists($abstractKey)) {
-                    $option = new \Schoolbox\Filter\Page\Option\Model();
-                    $option
-                        ->setFilterPage($pageFilter)
-                        ->setKey($abstractKey)
-                        ->setAvailable($this->getInitialAvailability($abstractKey, $pageFilter))
-                        ->setDefaults(
-                            new \Schoolbox\GenericCollection(\Schoolbox\Filter\Page\Option\Defaults\Model::class)
-                        );
-                    $options->setOffset($option->getKey(), $option);
-                }
-            }
-            return $options;
-        }
-        ```
 
 * Create a [Key Converter](#key-converter) in the namespace determined above,
   extending `\Schoolbox\Filter\AbstractKeyConverter`
@@ -437,46 +412,96 @@ of developing for filters.
         return new KeyConverter($filter);
     }
     ```
-  * Filters will often filter an Entity via a relation of that Entity: if this
-    is the case, then the Factory's constructor should accept the Mapper for
-    that relation as a parameter
-  * Depending on how closely related the new filter is to existing ones, its
-    `buildComponent` might be able to create instances of already existing
-    classes. `buildDefinition` and `buildKeyConverter` will have to create new
-    classes though.
-    * if your component needs to pass any variables to its Twig template beyond
-      that the base component does, you need a custom `buildComponent` method.
-      which builds a component instance specific to this filter
-    * `buildDefinition`'s mapper parameters are properties of the Factory
-      itself:
-      ```php
-      public function buildDefinition(Filter\Model $filter): Filter\IDefinition
-      {
-          return new Definition(
-              $filter,
-              $this->getOptionMapper(),
-              $this->getDefaultsMapper(),
-              $this->getAssessmentTypes()
-          );
-      }
-      ```
-* Create a Component implementation (if a custom implementation is required)
-* Find the Factory Factory implementation which creates filters for the entity
-  that is being filtered
+
+* Consider the options which the Filter will display:
+  * A common example is that the Filter displays a set of options corresponding
+    to a list of entities which are related to the Entity being filtered.
+    In this case:
+    * in the [Definition](#definition):
+      * override the constructor to accept an additional
+        `\Schoolbox\GenericCollection` of related entities, and set that
+        collection as a private instance variable
+      * override `getAbstractKeys` to convert the collection into an array of
+        IDs, converted to string values
+      * override `getLabel` to lookup the string ID in the collection, and
+        return a human-readable label for the corresponding object
+      * override `insertDynamicOptions` with an implementation which adds an
+        option for every item in the collection:
+        ```php
+        protected function insertDynamicOptions(\Schoolbox\Filter\Page\Model $pageFilter): \Schoolbox\GenericCollection
+        {
+            $options = parent::insertDynamicOptions($pageFilter);
+
+            // Ensure it contains all items in the collection
+            foreach ($this->collection as $item) {
+                $abstractKey = (string)$item->getId();
+                if (!$options->offsetExists($abstractKey)) {
+                    $option = new \Schoolbox\Filter\Page\Option\Model();
+                    $option
+                        ->setFilterPage($pageFilter)
+                        ->setKey($abstractKey)
+                        ->setAvailable($this->getInitialAvailability($abstractKey, $pageFilter))
+                        ->setDefaults(
+                            new \Schoolbox\GenericCollection(\Schoolbox\Filter\Page\Option\Defaults\Model::class)
+                        );
+                    $options->setOffset($option->getKey(), $option);
+                }
+            }
+            return $options;
+        }
+        ```
+    * in the [Key Converter](#key-converter):
+      * override the constructor to accept an additional array of IDs, and set
+        that array as a private instance variable
+      * update `possibleItemCount` to return the number if items in the array
+      * update `assertValidKey` to verify that `$key` is in the array
+    * in the [Factory](#factory):
+      * override the constructor to accept the mapper for the related entity
+      * update `buildDefinition` to pass a collection of entities
+        (likely fetched with `findAll`)
+      * update `buildKeyConverter` to pass a collection of IDs
+        (likely fetched with `findAllIds`)
+
+* Create a [Component](#component) implementation
+  (if a custom implementation is required)
+  > TODO fill in more about whether a custom component is required
+
+* Find the [Factory Factory](#factory-factory) implementation for the
+  [Entity](#entity) being filtered
   * Each Factory Factory has an `ENTITY` class constant: find the one that
-    matches the entity's class name, or create a new Factory Factory if none
-    exists
-  * Update that implementation's `buildFilterFactoryForFilter` method to be able
-    to create an instance of the new filter
-* Add a case to the Filter Consumer for this entity
-  * ID Finders will need their `findIdsByFilters` method updated
-    * `\Schoolbox\Filter\AbstractIdFinder` already implements this method:
-      however, it requires that these abstract methods be implemented:
-      * `buildQuery`
-      * `doFiltersGuaranteeEmptySet`
-      * `simplifyFilters`
-  * Matchers are more freeform, but somehow their filter method must recognise
-    the new filter, and accept/reject the entity
+    matches the entity's mapper's class name
+  * Update that implementation's `buildFilterFactoryForFilter` method, so that
+    it may create an instance of the new [Filter](#filter)'s [Factory](#factory)
+
+* Add a case to the [Filter Consumer](#filter-consumers) for this entity
+  * [ID Finders](#id-finder) will need their `buildQuery` method updated, so
+    long as it extends `\Schoolbox\Filter\AbstractIdFinder`
+    ```php
+    protected function buildQuery(array $completeFilters, bool $deleted): array
+    {
+        $ids = $completeFilters[NewDefinition::class] ?? null;
+
+        // Create a query based upon the IDs in this filter.
+        // That query may be joined with queries for other filters in a UNION
+        $pb          = $this->getMapper()->getPredicateBuilder();
+        $hasWhere    = false;
+        if (isset($ids) && count($ids) > 0) {
+            $hasWhere = true;
+            $pb = $pb->in('related_id', $ids);
+        }
+
+        $query = 'SELECT id FROM table';
+        if ($hasWhere) {
+            $query .= ' WHERE ' . $pb->getWhereIntersect();
+        }
+        $params = $pb->getParams();
+        return [$query, $params];
+    }
+    ```
+  * [Matchers](#matchers) are more freeform, but somehow their filter method
+    must recognise the new [Filter](#filter), and accept/reject the
+    [Entity](#entity)
+
 * Insert a new row into the `filter` database table for the new filter
   * the `entity` column value needs to be the fully-qualified class name of the
     entity the filter will operate on

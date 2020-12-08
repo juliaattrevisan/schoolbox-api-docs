@@ -58,7 +58,7 @@ class IdFinder extends AbstractIdFinder
         }
         if (!$deleted) {
             $hasWhere = true;
-            $pb->notNull('deleted');
+            $pb->isNull('deleted_at');
         }
 
         $query = 'SELECT id FROM badge';
