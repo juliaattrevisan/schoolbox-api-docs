@@ -110,8 +110,8 @@ export default {
          * @returns {Boolean}
          */
         isSubmitBtnDisabled () {
-            if (this.isFormSubmitActive) return true;
             if (this.selected.length === 0) return true;
+            else if (this.isFormSubmitActive) return true;
             else return false;
         }
     },
