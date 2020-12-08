@@ -31,6 +31,7 @@ class Definition extends AbstractDefinition
      */
     public const KEY_ANY = 'any';
 
+
     /**
      * @inheritdoc
      */
@@ -61,10 +62,10 @@ class Definition extends AbstractDefinition
     public function getLabel(string $key): string
     {
         if ($key === self::KEY_NONE) {
-            return 'None';
+            return 'Badges with no curriculum code';
         }
         if ($key === self::KEY_ANY) {
-            return 'Any';
+            return 'Badges with at least one curriculum code';
         }
         return '';
     }
