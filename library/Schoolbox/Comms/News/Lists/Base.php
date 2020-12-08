@@ -7,7 +7,6 @@
 namespace Schoolbox\Comms\News\Lists;
 
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\IArticleResolver;
 use Schoolbox\Comms\News\Helper;
