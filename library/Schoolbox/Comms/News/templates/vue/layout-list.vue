@@ -93,8 +93,25 @@
                         </div>
                     </article>
 
-                    <template v-for="file in article.images">
-                        <img :src="'/storage/image.php?size=square64&hash=' + file.hash" :title="file.filename.original" />
+                    <template v-if="article.images.length">
+                        <hr />
+                        <template v-for="file in article.images">
+                            <img :src="'/storage/image.php?size=square64&hash=' + file.hash" :title="file.filename.original" />
+                        </template>
+                    </template>
+
+                    <template v-if="article.files.length">
+                        <hr />
+
+                        <ul>
+                        <template v-for="file in article.files">
+                            <li>
+                                <a :href="'/storage/fetch.php?&hash=' + file.hash + '&name=' + file.filename.encoded" :title="file.filename.original">
+                                    {{ file.filename.original }}
+                                </a>
+                            </li>
+                        </template>
+                        </ul>
                     </template>
                 </div>
             </div>
