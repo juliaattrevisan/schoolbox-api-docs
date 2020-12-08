@@ -216,9 +216,7 @@ export default {
                 </div>
             </div>
 
-            <p>Remove the student(s) allocated to this achievement to withdraw it from them.</p>
-
-            <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Search for recipients of this badge" v-model="selected">
+            <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Search for users to withdraw achievement from" v-model="selected">
                 <template slot="option" slot-scope="option">
                     <div class="d-center">
                         {{ option.name }}

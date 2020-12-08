@@ -185,7 +185,7 @@ export default {
 
                     /* Pop toast
                      */
-                    self.toastSuccess('Removal complete');
+                    self.toastSuccess('Goal has been removed');
                 })
                 .then(function() {
 
@@ -207,7 +207,7 @@ export default {
 <template>
     <reveal-modal ref="modal">
         <template v-if="badge">
-            <h2>Remove <strong>'{{ badge.name }}'</strong></h2>
+            <h2>Remove <strong>'{{ badge.name }}'</strong> goal</h2>
 
             <div class="card small-12 compact badge-card">
                 <div>
@@ -216,9 +216,7 @@ export default {
                 </div>
             </div>
 
-            <p>Remove the student(s) allocated to this goal to remove it from them.</p>
-
-            <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Search for recipients of this badge" v-model="selected">
+            <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Search for users to remove goal from" v-model="selected">
                 <template slot="option" slot-scope="option">
                     <div class="d-center">
                         {{ option.name }}
@@ -232,7 +230,7 @@ export default {
             </v-select>
 
             <ul class="flex-list buttons">
-                <li><a href="#" class="submit" @click.prevent="withdraw()" v-bind:class="{ disabled: !this.selected.length}">Unset Goal</a></li>
+                <li><a href="#" class="submit" @click.prevent="withdraw()" v-bind:class="{ disabled: !this.selected.length}">Remove Goal</a></li>
                 <li><a href="#" class="button" @click.prevent="close()">Cancel</a></li>
             </ul>
         </template>

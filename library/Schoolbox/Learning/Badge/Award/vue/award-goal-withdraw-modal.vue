@@ -111,7 +111,7 @@ export default {
 
             /* A toast - to your valour, my sword, and our victory together
              */
-            self.toastActivate('Unsetting goal...');
+            self.toastActivate('Removing goal...');
 
             axios.request(request)
                 .then(response => {
@@ -126,11 +126,11 @@ export default {
 
                     /* Pop toast
                      */
-                    self.toastSuccess('Unset complete');
+                    self.toastSuccess('Goal has been removed!');
                 })
                 .catch(error => {
                     if (error.response) {
-                        self.toastError('Unable to unset goal; please try again.');
+                        self.toastError('Unable to remove goal; please try again.');
                     }
                 });
         }
@@ -140,14 +140,14 @@ export default {
 <template>
     <reveal-modal ref="modal">
         <template v-if="award.badge">
-            <h2>Unset <strong>{{ award.badge.name }}</strong></h2>
+            <h2>Remove <strong>{{ award.badge.name }}</strong> goal</h2>
 
             <div class="card small-12 compact">
                 <badge-image :badge="award.badge"></badge-image>
                 <h3>{{ award.badge.name }}</h3>
             </div>
 
-            <p>Are you sure you want to unset <strong>{{ award.badge.name }}</strong> for {{ award.recipient.fullName }}?</p>
+            <p>Please confirm you wish to proceed with this goal removal?</p>
             <ul class="flex-list buttons">
                 <li><a @click.prevent="withdraw()" class="button submit">Yes</a></li>
                 <li><a @click.prevent="close()" class="button">No</a></li>

@@ -211,10 +211,10 @@ export default {
                                                 -->
                                                 <template v-if="canWithdraw(award)">
                                                   <template v-if="!award.isGoal">
-                                                    <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-close" title="Withdraw achievement">Withdraw achievement</a></li>
+                                                    <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-close">Withdraw achievement</a></li>
                                                   </template>
                                                   <template v-else>
-                                                    <li><a @click.prevent="openGoalWithdrawModal(award)" class="icon-close" title="Unset goal">Unset goal</a></li>
+                                                    <li><a @click.prevent="openGoalWithdrawModal(award)" class="icon-undo">Remove goal</a></li>
                                                   </template>
                                                 </template>
                                             </ul>
