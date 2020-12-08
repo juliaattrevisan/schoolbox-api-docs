@@ -14,9 +14,11 @@ use Alaress_Date_Format;
 use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Node\Model as CurriculumNode;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Moment\Evidence\Model;
+use Schoolbox\Learning\Moment\Evidence\Tag\Model as EvidenceTag;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Base;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
@@ -37,9 +39,7 @@ class BaseTest extends TestCase
     public function getTestInvokeData(): iterable
     {
         yield 'empty fields' => [
-            (new Model())
-                ->setCurriculumNodes(new GenericCollection(new \Schoolbox\Curriculum\Node\Model()))
-                ->setTags(new GenericCollection(new \Schoolbox\Learning\Moment\Evidence\Tag\Model())),
+            new Model(),
             [
                 'id'               => null,
                 'body'             => null,
@@ -51,8 +51,8 @@ class BaseTest extends TestCase
                 'recipient'        => null,
                 'discussionThread' => null,
                 '_links'           => [],
-                'curriculumNodes'  => new Collection(),
-                'tags'             => new Collection(),
+                'curriculumNodes'  => null,
+                'tags'             => null,
             ],
         ];
 
@@ -69,8 +69,10 @@ class BaseTest extends TestCase
                 ->setCreator((new User())->setId(55))
                 ->setRecipient((new User())->setId(193))
                 ->setDiscussionThread((new DiscussionThread())->setId(14))
-                ->setCurriculumNodes(new GenericCollection(new \Schoolbox\Curriculum\Node\Model()))
-                ->setTags(new GenericCollection(new \Schoolbox\Learning\Moment\Evidence\Tag\Model())),
+                ->setCurriculumNodes(
+                    (new GenericCollection(new CurriculumNode()))->add((new CurriculumNode())->setId(500)->setName('Test Curriculum')->setCode('TEST500'))
+                )
+                ->setTags((new GenericCollection(new EvidenceTag()))->add((new EvidenceTag())->setId(1)->setName('Class Work'))),
             [
                 'id'               => 3,
                 'body'             => 'something',
@@ -82,8 +84,8 @@ class BaseTest extends TestCase
                 'recipient'        => ['id' => 193],
                 'discussionThread' => ['id' => 14],
                 '_links'           => [],
-                'curriculumNodes'  => new Collection(),
-                'tags'             => new Collection(),
+                'curriculumNodes'  => new Collection([['id' => 500, 'name' => 'Test Curriculum', 'code' => 'TEST500']]),
+                'tags'             => new Collection([['id' => 1, 'name' => 'Class Work']]),
             ],
         ];
     }

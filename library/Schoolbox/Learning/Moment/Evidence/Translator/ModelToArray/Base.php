@@ -99,25 +99,29 @@ class Base
                 ? call_user_func($this->storageTranslator, $model->getStorage())
                 : null,
             'curriculumNodes' => $model->getCurriculumNodes()
-                                       ->map(
-                                           static function (Node\Model $node) {
-                                               return [
-                                                   'id'   => $node->getId(),
-                                                   'name' => $node->getName(),
-                                                   'code' => $node->getCode(),
-                                               ];
-                                           }
-                                       )
-                                       ->reindex(),
+                ? $model->getCurriculumNodes()
+                        ->map(
+                            static function (Node\Model $node) {
+                                return [
+                                    'id'   => $node->getId(),
+                                    'name' => $node->getName(),
+                                    'code' => $node->getCode(),
+                                ];
+                            }
+                        )
+                        ->reindex()
+                : null,
             'tags'            => $model->getTags()
-                                       ->map(
-                                           static function (Evidence\Tag\Model $tag) {
-                                               return [
-                                                   'id'   => $tag->getId(),
-                                                   'name' => $tag->getName(),
-                                               ];
-                                           }
-                                       )->reindex(),
+                ? $model->getTags()
+                        ->map(
+                            static function (Evidence\Tag\Model $tag) {
+                                return [
+                                    'id'   => $tag->getId(),
+                                    'name' => $tag->getName(),
+                                ];
+                            }
+                        )->reindex()
+                : null,
             '_links'           => [],
         ];
     }
