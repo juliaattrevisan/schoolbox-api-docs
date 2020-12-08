@@ -41,6 +41,13 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getSelectionMapper(),
                     $badgeMapper
                 );
+
+            case CurriculumNode\Definition::class:
+                return new CurriculumNode\Factory(
+                    $this->getOptionMapper(),
+                    $this->getDefaultsMapper(),
+                    $this->getSelectionMapper(),
+                );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }

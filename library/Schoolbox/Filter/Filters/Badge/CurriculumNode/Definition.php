@@ -18,6 +18,12 @@ use Schoolbox\Filter\Page;
 class Definition extends AbstractDefinition
 {
     /**
+     * Key for finding badges with no curriculum code.
+     */
+    public const KEY_NONE = 'none';
+
+
+    /**
      * @inheritdoc
      */
     protected const NAME = 'Curriculum Code';
@@ -28,7 +34,7 @@ class Definition extends AbstractDefinition
      */
     protected function getCustomKeys(): array
     {
-        return [];
+        return [self::KEY_NONE];
     }
 
 
@@ -37,9 +43,7 @@ class Definition extends AbstractDefinition
      */
     public static function getPages(): array
     {
-        return [
-            Page\Model::PAGE_BADGE_LIST,
-        ];
+        return [Page\Model::PAGE_BADGE_LIST,];
     }
 
 
