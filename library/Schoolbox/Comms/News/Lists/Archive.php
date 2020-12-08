@@ -122,6 +122,10 @@ class Archive extends Base
 
         $articles = $this->loadArticleByIds($articleIds);
 
+        /* Attachment counts for each article in this set
+         */
+        $attachmentCounts = \Schoolbox\Comms\News\File\Mapper::getInstance()->findCounts($articleIds);
+
         /* Disregard the sticky bit for each article in the Archive
          */
         foreach ($articles as $article) {
@@ -134,6 +138,7 @@ class Archive extends Base
         // These pieces are needed to represent an article, due to Save For Later
         return [
             'articles' => $this->populateMetadata($articles),
+            'attachmentCounts' => $attachmentCounts,
             'readMore' => $this->readMoreText,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $savedArticleIds,

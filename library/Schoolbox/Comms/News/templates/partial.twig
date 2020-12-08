@@ -4,13 +4,14 @@
  #
  # @deprecated use article-list.twig instead
  #
- # @param int $componentId
- # @param Collection|News\Model[] $articles
- # @param array|int[] $savedArticleIds
- # @param int $unsaved
- # @param int $compactMode
- # @param bool $hidePaginator
- # @param array $fallbackImage  a tuple containing (type, hash) keys
+ # @param int $componentId                    A component id in which this partial was spawned, if available (null otherwise)
+ # @param Collection|News\Model[] $articles   A set of article instances
+ # @param array $attachmentCounts             A set of (article_id, count) tuples
+ # @param array|int[] $savedArticleIds        A stack of article_id
+ # @param int $unsaved                        A const int indicating whether this article is in your Saved For Later list
+ # @param int $compactMode                    Whether the payload should be in compact mode or not
+ # @param bool $hidePaginator                 Optionally hide the paginator ui element
+ # @param array $fallbackImage                A tuple containing (type, hash) keys
  #}
 {% if articles|length %}
     {% import '@commsNews/macro/newsBlurb.twig' as macro %}
@@ -58,6 +59,13 @@
                             {% endif %}
                             {% if article.metadata and article.metadata.commentCount > 0 %}
                             <span> | <a href="{{ articleURL ~ '#discussion' }}">{{ article.metadata.commentCount }} comment{{ article.metadata.commentCount > 1 ? 's':'' }}</a></span>
+                            {% endif %}
+
+                            {# Attachment Count #}
+                            {% if attachmentCounts[article.id] %}
+                            <span>
+                                | <a href="{{ articleURL }}">{{ attachmentCounts[article.id] }} attachments</a>
+                            </span>
                             {% endif %}
                         </p>
                     </div>
