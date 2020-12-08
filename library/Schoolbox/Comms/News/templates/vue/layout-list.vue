@@ -85,17 +85,10 @@
                         | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">{{ article.metadata.commentCount | formatCommentCountMeta }}</a>
                         </span>
 
-                        <!-- Image Count -->
-                        <template v-if="article.images.length">
+                        <!-- Attachment Count -->
+                        <template v-if="article.images.length + article.files.length">
                             <span>
-                                | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{ article.images.length }} images</a>
-                            </span>
-                        </template>
-
-                        <!-- File Count -->
-                        <template v-if="article.files.length">
-                            <span>
-                                | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{ article.files.length }} files</a>
+                                | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{ article.images.length + article.files.length }} attachments</a>
                             </span>
                         </template>
                     </p>
