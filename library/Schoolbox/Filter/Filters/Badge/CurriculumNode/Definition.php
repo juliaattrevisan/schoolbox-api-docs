@@ -54,4 +54,13 @@ class Definition extends AbstractDefinition
     {
         return '';
     }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected static function getTemplatesDir(): string
+    {
+        return '@filterDefinitions/Badge/CurriculumNode/templates';
+    }
 }
