@@ -2,8 +2,13 @@
  # File List
  #
  # A list of files attached to this news article
+ # The identifier string is used to segregate one gallery from other galleries
+ #
+ # In homepages you can have multiple news components showing the same content so one gallery
+ # should be quarantined from other galleries
  #
  # @param News\Model $article  An article instance
+ # @param string $identifier   A string with namespaces each gallery instance from others
  #}
 {% if article.attachedFiles|length %}
     <hr />
@@ -24,7 +29,7 @@
         <ul class="article-gallery" data-image-gallery>
             {% for file in article.getImages %}
                 <li>
-                    <a href="/storage/image.php?hash={{ file.hash }}&size=maxsize" rel="lightbox[news-detail]" title="{{ file.filename }}">
+                    <a href="/storage/image.php?hash={{ file.hash }}&size=maxsize" rel="lightbox[{{ identifier }}]" title="{{ file.filename }}">
                         <img src="/storage/image.php?hash={{ file.hash }}&size=square64" title="{{ file.filename }}">
                     </a>
                 </li>

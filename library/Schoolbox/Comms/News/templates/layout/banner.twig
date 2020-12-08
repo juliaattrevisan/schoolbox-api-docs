@@ -74,7 +74,10 @@
             {{ article.body|purify }}
         </article>
 
-        {% include ('@commsNews/layout/file-list.twig') with {article: article} %}
+        {% include ('@commsNews/layout/file-list.twig') with {
+            article: article,
+            identifier: 'article-' ~ article.id
+        } %}
     </section>
 </div>
 
