@@ -22,6 +22,8 @@
                         value: {{ (selection ?? []) | json_encode | raw }}
                     });
                 });
+
+                // TODO set up the selectize renderer to make it show just the code in the panel
             </script>
         {% endautoescape %}
 

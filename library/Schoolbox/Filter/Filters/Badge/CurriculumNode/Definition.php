@@ -14,6 +14,9 @@ use Schoolbox\Filter\Page;
 
 /**
  * Definition for the badge curriculum node filter.
+ *
+ * Curriculum nodes will be displayed in a selectize, as the list of nodes is
+ * expected to be too large to load in a single dropdown.
  */
 class Definition extends AbstractDefinition
 {

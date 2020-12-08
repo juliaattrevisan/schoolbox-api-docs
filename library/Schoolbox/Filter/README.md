@@ -244,11 +244,18 @@ These guides are intended for getting a developer to understand the fundamentals
 of developing for filters.
 
 
-### Enabling filters on a page
+### Enabling Filters on a Page
 
-* Add a `\Schoolbox\Filter\Page\Model::PAGE_*` constant for the new page
-* Add the value above to the `filter_page.page` and `filter_selection.page`
-  enums in the Schoolbox database
+* Add a `\Schoolbox\Filter\Page\Model::PAGE_*` constant for the [Page](#page)
+* Add the value of that constant to the `filter_page.page` and
+  `filter_selection.page` enums in the Schoolbox database
+  ```sql
+  ALTER TABLE filter_page
+  MODIFY page ENUM(/* all existing values */, 'newPage') NULL;
+
+  ALTER TABLE filter_selection
+  MODIFY page ENUM(/* all existing values */, 'newPage') NULL;
+  ```
 * Add this constant to the `params` parameter for the `page` column mappings in
   `\Schoolbox\Filter\Page\Mapper::mapping` and
   `\Schoolbox\Filter\Selection\Mapper::mapping`
@@ -276,10 +283,10 @@ of developing for filters.
   * `\Schoolbox\Filter\Controller::buildFilteredPageLabels`
   * `\Schoolbox\Filter\Module::registerRoutes`
   * `\Schoolbox\Filter\Page\Model::getPageRoleTypes`
-* Update the `getPages` of each Definition implementation that you intend the
-  page to use
+* Update the `getPages` of each [Definition](#definition) implementation that
+  you intend the [Page](#page) to use
 * In your page's module:
-  * inject the Factory Factory as a controller parameter:
+  * inject the [Factory Factory](#factory-factory) as a controller parameter:
     ```php
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
@@ -290,7 +297,7 @@ of developing for filters.
     }
     ```
 * In your controller:
-  * inject a Factory Factory as a constructor param
+  * inject the [Factory Factory](#factory-factory) as a constructor parameter:
     ```php
     /**
      * @var \Schoolbox\Filter\IFactoryFactory
@@ -304,7 +311,7 @@ of developing for filters.
     ```
   * generate the filter panel's Twig data in a controller action:
     ```php
-    $page        = \Schoolbox\Filter\Page\Model::PAGE_NEW_FILTER;
+    $page        = \Schoolbox\Filter\Page\Model::PAGE_NEW_PAGE;
     $filterPanel = $this->filterFactoryFactory->buildPanel(
         $this->getUser(),
         $page,
@@ -336,6 +343,7 @@ of developing for filters.
         quickload: false,
     } only %}
     ```
+* > TODO document how to write the inner template
 
 
 ### Implementing Filtering on an Entity
@@ -363,6 +371,7 @@ of developing for filters.
     * if creating a [Matcher](#matcher):
       * implement `__invoke`, with an [Entity](#entity) class as its parameter:
         return true for now
+
 
 ### Implementing a new Filter
 
