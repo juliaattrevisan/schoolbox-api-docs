@@ -52,16 +52,39 @@ class IdFinder extends AbstractIdFinder
         $categoryIds = $completeFilters[Category\Definition::class] ?? null;
         $pb          = $this->getMapper()->getPredicateBuilder();
         $hasWhere    = false;
+
+        // Query for categories
         if (isset($categoryIds) && count($categoryIds) > 0) {
             $hasWhere = true;
-            $pb = $pb->in('category_id', $categoryIds);
-        }
-        if (!$deleted) {
-            $hasWhere = true;
-            $pb->isNull('deleted_at');
+            $pb = $pb->in('b.category_id', $categoryIds);
         }
 
-        $query = 'SELECT id FROM badge';
+        // Query for curriculum nodes
+        $curriculumNodes = $completeFilters[CurriculumNode\Definition::class] ?? null;
+        if (isset($curriculumNodes) && count($curriculumNodes) > 0) {
+            $hasWhere = true;
+            $subPb    = $this->getMapper()->getPredicateBuilder();
+            // is the NONE or ANY option set?
+            if (isset($curriculumNodes[CurriculumNode\Definition::KEY_NONE])) {
+                $subPb = $subPb->isNull('cb.badge_id');
+            }
+            if (isset($curriculumNodes[CurriculumNode\Definition::KEY_ANY])) {
+                $subPb = $subPb->notNull('cb.badge_id');
+            }
+            $pb = $pb->any($subPb);
+        }
+
+        // Filter out deleted badges
+        if (!$deleted) {
+            $hasWhere = true;
+            $pb->isNull('b.deleted_at');
+        }
+
+        // Build query
+        $query = 'SELECT DISTINCT
+            b.id FROM badge b
+            LEFT JOIN curriculum_badge cb on b.id = cb.badge_id
+        ';
         if ($hasWhere) {
             $query .= ' WHERE ' . $pb->getWhereIntersect();
         }

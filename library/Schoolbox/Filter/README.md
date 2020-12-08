@@ -476,7 +476,9 @@ of developing for filters.
       * define a class constant for the key for each meta-option
       * update `getCustomKeys` to return the keys for the meta-options
       * update `getLabel` to return a specific label for each meta-option
-
+    * in the [Factory Factory](#factory-factory) implementation:
+      * update `buildQuery` to recognise the meta-options in the filter, and
+        build a query appropriately
 
 * Create a [Component](#component) implementation
   (if a custom implementation is required)
