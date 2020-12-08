@@ -14,19 +14,19 @@
     <hr />
 
     {# Images are processed first into their own little lightbox gallery
-             # Can probably split these attachedFiles further, but nobody's really sure
-    #}
+     # Can probably split these attachedFiles further, but nobody's really sure
+     #}
     {% if article.getImages|length %}
         <script>
             $(function() {
-                $('[data-image-gallery] li').magnificPopup({
+                $('[data-image-gallery={{ identifier }}] li').magnificPopup({
                     delegate: 'a',
                     type: 'image'
                 });
             });
         </script>
 
-        <ul class="article-gallery" data-image-gallery>
+        <ul class="article-gallery" data-image-gallery="{{ identifier }}">
             {% for file in article.getImages %}
                 <li>
                     <a href="/storage/image.php?hash={{ file.hash }}&size=maxsize" rel="lightbox[{{ identifier }}]" title="{{ file.filename }}">
@@ -38,12 +38,12 @@
     {% endif %}
 
     {# Other filetypes just stashed here, for now
-             # Probably need special treatments for audio/video media etc.
-    #}
+     # Probably need special treatments for audio/video media etc.
+     #}
     {% if article.getFiles|length %}
         <script>
             $(function() {
-                $('[data-plugin="preview"]').preview();
+                $('[data-plugin="preview-{{ identifier }}"]').preview();
             });
         </script>
         <ul class="article-files grid small-block-grid-1 medium-block-grid-2">
@@ -51,7 +51,7 @@
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="card small-12">
-                            <a href="/storage/fetch.php?hash={{ file.hash }}&name={{ file.basename|url_encode }}" data-plugin="preview" title="{{ file.filename }}">
+                            <a href="/storage/fetch.php?hash={{ file.hash }}&name={{ file.basename|url_encode }}" data-plugin="preview-{{ identifier }}" title="{{ file.filename }}">
                                 {% if file.mimetype.image %}
                                     <img src="/storage/image.php?hash={{ file.hash }}&size=square64" alt="Download" />
                                 {% else %}

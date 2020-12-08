@@ -4,12 +4,13 @@
  #
  # @deprecated use article-list.twig instead
  #
- # @param Collection|News\Model[] articles
- # @param array|int[] savedArticleIds
- # @param int unsaved
- # @param int compactMode
- # @param bool hidePaginator
- # @param array fallbackImage  a tuple containing (type, hash) keys
+ # @param int $componentId
+ # @param Collection|News\Model[] $articles
+ # @param array|int[] $savedArticleIds
+ # @param int $unsaved
+ # @param int $compactMode
+ # @param bool $hidePaginator
+ # @param array $fallbackImage  a tuple containing (type, hash) keys
  #}
 {% if articles|length %}
     {% import '@commsNews/macro/newsBlurb.twig' as macro %}
@@ -90,7 +91,7 @@
 
                         {% include ('@commsNews/layout/file-list.twig') with {
                             article: article,
-                            identifier: 'article-' ~ article.id
+                            identifier: 'component-' ~ componentId ~ '-article-' ~ article.id
                         } %}
                     {% endspaceless %}
                 {% endif %}
