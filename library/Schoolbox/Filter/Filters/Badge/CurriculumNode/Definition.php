@@ -24,6 +24,11 @@ class Definition extends AbstractDefinition
 
 
     /**
+     * Key for finding badges with any curriculum code.
+     */
+    public const KEY_ANY = 'any';
+
+    /**
      * @inheritdoc
      */
     protected const NAME = 'Curriculum Code';
@@ -34,7 +39,7 @@ class Definition extends AbstractDefinition
      */
     protected function getCustomKeys(): array
     {
-        return [self::KEY_NONE];
+        return [self::KEY_NONE, self::KEY_ANY];
     }
 
 
@@ -52,6 +57,12 @@ class Definition extends AbstractDefinition
      */
     public function getLabel(string $key): string
     {
+        if ($key === self::KEY_NONE) {
+            return 'None';
+        }
+        if ($key === self::KEY_ANY) {
+            return 'Any';
+        }
         return '';
     }
 
