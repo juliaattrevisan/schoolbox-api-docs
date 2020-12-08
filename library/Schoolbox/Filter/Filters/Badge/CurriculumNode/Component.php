@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Badge\CurriculumNode;
 
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
+use Schoolbox\Curriculum\Node\Model as CurriculumNodeModel;
 use Schoolbox\Filter;
 use Schoolbox\Filter\BaseComponent;
 use Schoolbox\GenericCollection;
@@ -95,10 +96,14 @@ class Component extends BaseComponent
         $context = parent::toContext();
 
         // Load selected nodes into the Twig template
-        $context['selectedNodes'] = $this->curriculumNodeMapper->findByColumn(
-            'id',
-            $context['userSelectionIds']
-        );
+        $context['selectedNodes'] = $this->curriculumNodeMapper
+            ->findByColumn('id', $context['userSelectionIds'])
+            ->map(function (CurriculumNodeModel $model) {
+                // Load ancestors for each node, to maintain consistent
+                // rendering with the selectize.
+                // TODO consider if loading ancestors is really necessary
+                return $this->curriculumNodeMapper->loadAncestors($model, 'parent');
+            });
 
         return $context;
     }

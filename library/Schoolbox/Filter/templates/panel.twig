@@ -533,7 +533,12 @@ Usage:
                 // (i.e. "No course" checkbox, and a list of courses)
                 if (selectize) {
                     selectize.items.forEach(function (v) {
-                        componentsInUse[filterId]['labels'].push(selectize.options[v].name);
+                        // Hook into selectize's render method for determining
+                        // how to render the filter in use
+                        // TODO consider if it is overkill to hook into selectize's rendering
+                        componentsInUse[filterId]['labels'].push(
+                            $(selectize.render('option', selectize.options[v])).html()
+                        );
                     });
                 } else if ($selected.length !== 0) {
                     // Not a selectize, or it's not yet initialized
