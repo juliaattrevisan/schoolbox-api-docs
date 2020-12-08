@@ -87,6 +87,14 @@ table.rb {
         position: absolute;
         bottom: 3px;
         right: 3px;
+        &.blind-mode { //can't show the students image, so just show a circle in place
+            width: 2rem;
+            height: 2rem;
+            background: $content-ui-submit-background;
+            text-indent: 100%; //to hide the text within the element
+            white-space: nowrap;
+            overflow: hidden;
+        }
     }
 
     a {
