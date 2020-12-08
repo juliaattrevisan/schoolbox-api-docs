@@ -254,6 +254,7 @@ class Module extends BaseModule
             }),
             'threadMapper'               => $this->getMapperFactory()->getLazy(Thread\Mapper::class),
             'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+            'fileMapper'                 => $this->getMapperFactory()->getLazy(File\Mapper::class),
         ];
     }
 

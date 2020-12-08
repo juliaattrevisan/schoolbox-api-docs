@@ -120,6 +120,13 @@ class Controller extends Base
     /** @var CommentMapper */
     private $commentMapper;
 
+
+    /**
+     * @var File\Mapper
+     */
+    private File\Mapper $fileMapper;
+
+
     /**
      * Default number of items to display in case config is broken
      */
@@ -141,6 +148,7 @@ class Controller extends Base
      * @param Thread\Mapper                    $threadMapper
      * @param ErrorMapper                      $errorMapper
      * @param CommentMapper                    $commentMapper
+     * @param File\Mapper                      $fileMapper
      */
     public function __construct(
         Mapper $newsMapper,
@@ -156,7 +164,8 @@ class Controller extends Base
         Access $access,
         Thread\Mapper $threadMapper,
         ErrorMapper $errorMapper,
-        CommentMapper $commentMapper
+        CommentMapper $commentMapper,
+        File\Mapper $fileMapper
     ) {
         $this->newsMapper                 = $newsMapper;
         $this->topicMapper                = $topicMapper;
@@ -172,6 +181,7 @@ class Controller extends Base
         $this->threadMapper               = $threadMapper;
         $this->errorMapper                = $errorMapper;
         $this->commentMapper              = $commentMapper;
+        $this->fileMapper                 = $fileMapper;
     }
 
     /* CRUD actions */
@@ -872,7 +882,7 @@ class Controller extends Base
 
             /* Attachment counts for each article in this set
              */
-            $attachmentCounts = \Schoolbox\Comms\News\File\Mapper::getInstance()->findCounts($articleIds);
+            $attachmentCounts = $this->fileMapper->findCounts($articleIds);
 
         } else {
             $articles = $this->newsMapper->createCollection();
