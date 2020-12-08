@@ -74,7 +74,7 @@ class IdFinder extends AbstractIdFinder
                 $subPb = $subPb->notNull('cb.badge_id');
             }
             if (count($curriculumNodes) > 0) {
-                $subPb = $subPb->in('cb.badge_id', $curriculumNodes);
+                $subPb = $subPb->in('cb.curriculum_node_id', $curriculumNodes);
             }
 
             $pb = $pb->any($subPb);
