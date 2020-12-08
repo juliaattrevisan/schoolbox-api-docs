@@ -554,7 +554,7 @@
                         {# Keep a running total of all teachers emails in this group #}
                         {% set teacherEmails = [] %}
                         <div class="row divider">
-                            <div class="small-12">
+                            <div class="small-12 columns">
                                 <h2 class="subheader">{{ group }}</h2>
                                 <section>
                                     {% for subject in subjectGroup %}
@@ -629,7 +629,7 @@
 
                     {% if showGroups and groups is not empty %}
                         <div class="row divider">
-                            <div class="small-12">
+                            <div class="small-12 columns">
                                 <h2 class="subheader">Groups</h2>
                                 <section>
                                     {% for group in groups %}
