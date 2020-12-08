@@ -7,7 +7,6 @@ import moment from 'moment';
 import MediaArticle from '@schoolbox/media-article';
 import Storage from '@schoolbox/storage';
 import Toast from '@schoolbox/toast';
-// import CKEditor from 'ckeditor4-vue';
 import RevealModal from '@schoolbox/reveal-modal';
 
 export default {
@@ -15,7 +14,6 @@ export default {
         MediaArticle,
         Storage,
         Toast,
-        // ckeditor: CKEditor.component,
         RevealModal
     },
     props: {
@@ -41,31 +39,36 @@ export default {
             pendingComment: '',
             saveInProgress: false,
             commentIndexToDelete: null,
+            isCKEditorLoading: false,
             isCKEditorLoaded: false,
-            ckeditorConfig: {
+            isCKEditorReady: false,
+            ckeditorConfig: { 
                 removePlugins: 'image,uploadimage,link,schoolboxanchor,elementspath,wordcount',
                 removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
                 toolbarGroups: [
                     {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
                     {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
                     {name: 'links', groups: ['links']},
-                    {name: 'insert', groups: ['insert']},
-                    // {name: 'schoolbox', groups: ['schoolboxlink']},
+                    {name: 'insert', groups: ['insert']}
                 ],
                 contentsCss: [
                     '/css/core/skin.css.php',
                     '/css/core/editor.css',
                 ],
                 height: '4rem',
-                resize_enabled: false
+                resize_enabled: false,
+                startupFocus: true
             }
         }
     },
     computed: {
+
+        getInputPlaceholder () {
+            if (this.isCKEditorLoading) return 'Loading';
+            else return 'Add a Comment'
+        },
+
         dateDisplayFormats: () => window.dateDisplayFormats,
-        // ckeditorConfig () {
-        //     return window.jQuery.alaressEditorConfigForComments();
-        // },
 
         /**
          * Does this thread exist yet? If not, it will have to be created before
@@ -73,7 +76,7 @@ export default {
          *
          * @returns {Boolean}
          */
-        hasThread() {
+        hasThread () {
             return this?.commentThread?.id;
         },
 
@@ -133,19 +136,32 @@ export default {
         /**
          * Loads ckeditor only when required rather than on page load
          */
-        loadEditor () {
+        loadCKEditor () {
+
+            //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
+            this.isCKEditorLoading = true;
             
-            //show loading 
-            
-            //linked with output.publicPath set in webpack.config.js : https://webpack.js.org/guides/public-path/ (code-splitting)
-            import(/* webpackChunkName: "ckeditor4-vue" */ 'ckeditor4-vue').then(({ default: CKEditor }) => {
-                console.log(CKEditor.component);
-                Vue.component('ckeditor', CKEditor.component);
-                this.isCKEditorLoaded = true;
-            });
+            //file is referenced from /javascript/components/ckeditor4-vue.bundle.js according to the publicPath and filename props within output in webpack.config.js 
+            //see https://webpack.js.org/guides/code-splitting/ and https://webpack.js.org/guides/public-path/ (code-splitting) for further details
+            import(/* webpackChunkName: "ckeditor4-vue" */ 'ckeditor4-vue')
+                .then(({ default: CKEditor }) => {
+                    Vue.component('ckeditor', CKEditor.component); //register the component for use once ready
+                    this.isCKEditorLoaded = true;
+                })
+                .catch(err => {
+                    this.$refs.toast.timeout('Loading comments failed', false, 5000);
+                });
 
         },
 
+        /**
+         * Once CKEditor is ready, we can display it and hide the prompt button
+         */
+        onCKEditorReady (event) {
+            this.isCKEditorReady = true;
+            this.isCKEditorLoading = false;
+        },
+        
         /**
          * Loads the next cursor of comments.
          */
@@ -263,16 +279,17 @@ export default {
         <section id="threads-section" class="discussion">
             <div class="discussion-threads">
                 <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
-                <button @click="loadEditor">Show Editor</button>
-                <div v-if="isCKEditorLoaded">
-                    <ckeditor tag-name="textarea" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
+                <button class="btn-show-ckeditor" v-show="!isCKEditorReady" @click.once="loadCKEditor">{{ getInputPlaceholder }}</button>
+                <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
+                <div v-if="isCKEditorLoaded" :style="[isCKEditorReady ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
+                    <ckeditor tag-name="textarea" @ready="onCKEditorReady" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress" ></ckeditor>
                     <a class="button submit"
-                    @click="postComment"
+                    @click.once="postComment"
                     :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
                 </div>
                 <template v-if="hasComments">
                     <ul class="information-list social-stream">
-                        <li class="actions-small-1" v-for="(comment, index) in comments">
+                        <li class="actions-small-1" v-for="(comment, index) in comments" :key="index">
                             <div class="list-item">
                                 <div class="card small-12 compact">
                                     <a :href="comment.author._links.profile.href" title="View Profile">

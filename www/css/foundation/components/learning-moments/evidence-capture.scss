@@ -142,6 +142,20 @@
   .comment-count {
     font-weight: $font-weight-semibold;
   }
+  .btn-show-ckeditor {
+    width: 100%;
+    border: 1px solid $form-border-color;
+    padding: .625rem .625rem 1.25rem .625rem;
+    cursor: text;
+    background: $white;
+    text-align: left;
+    font-size: 0.8rem;
+    color: $content-ui-foreground;
+    transition: all 0.1s ease-out;
+    &:hover {
+      border-color: $content-ui-foreground;
+    }
+  }
   .discussion {
     border: 0;
   }
