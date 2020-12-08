@@ -66,11 +66,17 @@ class IdFinder extends AbstractIdFinder
             $subPb    = $this->getMapper()->getPredicateBuilder();
             // is the NONE or ANY option set?
             if (isset($curriculumNodes[CurriculumNode\Definition::KEY_NONE])) {
+                unset($curriculumNodes[CurriculumNode\Definition::KEY_NONE]);
                 $subPb = $subPb->isNull('cb.badge_id');
             }
             if (isset($curriculumNodes[CurriculumNode\Definition::KEY_ANY])) {
+                unset($curriculumNodes[CurriculumNode\Definition::KEY_ANY]);
                 $subPb = $subPb->notNull('cb.badge_id');
             }
+            if (count($curriculumNodes) > 0) {
+                $subPb = $subPb->in('cb.badge_id', $curriculumNodes);
+            }
+
             $pb = $pb->any($subPb);
         }
 
