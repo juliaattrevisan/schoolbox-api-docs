@@ -108,7 +108,7 @@
                 {% for file in article.attachedFiles %}
                     {% if file.mimetype.isImage %}
                         <li>
-                            <a href="/storage/image.php?hash={{ file.hash }}&size=maxsize" rel="lightbox[{{ file.hash }}]" title="{{ file.filename }}">
+                            <a href="/storage/image.php?hash={{ file.hash }}&size=maxsize" rel="lightbox[news-detail]" title="{{ file.filename }}">
                                 <img src="/storage/image.php?hash={{ file.hash }}&size=square64" title="{{ file.filename }}">
                             </a>
                         </li>
