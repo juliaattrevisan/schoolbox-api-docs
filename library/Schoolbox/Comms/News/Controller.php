@@ -52,6 +52,12 @@ use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use function array_keys;
 use function array_merge;
 
+
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Comms\News
+ */
 class Controller extends Base
 {
 
@@ -100,10 +106,6 @@ class Controller extends Base
      */
     private $articleResolver;
 
-    /**
-     * @var Audience\UserResolver
-     */
-    private $userResolver;
 
     /** @var Audience\Segment\StrategyFactory */
     private $strategyFactory;
