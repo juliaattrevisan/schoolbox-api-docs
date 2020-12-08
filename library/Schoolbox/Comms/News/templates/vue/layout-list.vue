@@ -84,6 +84,20 @@
                             <span v-if="article.metadata && article.metadata.commentCount > 0">
                         | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">{{ article.metadata.commentCount | formatCommentCountMeta }}</a>
                         </span>
+
+                        <!-- Image Count -->
+                        <template v-if="article.images.length">
+                            <span>
+                                | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{ article.images.length }} images</a>
+                            </span>
+                        </template>
+
+                        <!-- File Count -->
+                        <template v-if="article.files.length">
+                            <span>
+                                | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{ article.files.length }} files</a>
+                            </span>
+                        </template>
                     </p>
 
                     <article>
@@ -92,27 +106,6 @@
                             <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-if="!isCompactMode" v-html="article.readmore.string"></a>
                         </div>
                     </article>
-
-                    <template v-if="article.images.length">
-                        <hr />
-                        <template v-for="file in article.images">
-                            <img :src="'/storage/image.php?size=square64&hash=' + file.hash" :title="file.filename.original" />
-                        </template>
-                    </template>
-
-                    <template v-if="article.files.length">
-                        <hr />
-
-                        <ul>
-                        <template v-for="file in article.files">
-                            <li>
-                                <a :href="'/storage/fetch.php?&hash=' + file.hash + '&name=' + file.filename.encoded" :title="file.filename.original">
-                                    {{ file.filename.original }}
-                                </a>
-                            </li>
-                        </template>
-                        </ul>
-                    </template>
                 </div>
             </div>
 
