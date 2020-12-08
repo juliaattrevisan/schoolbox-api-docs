@@ -129,7 +129,7 @@
                 <ul class="article-files grid small-block-grid-1 medium-block-grid-2">
                 {% for file in article.attachedFiles %}
                     {% if not file.mimetype.isImage %}
-                        <li>
+                        <li class="actions-small-1">
                             <div class="list-item">
                                 <div class="card small-12">
                                     <a href="/storage/fetch.php?hash={{ file.hash }}&name={{ file.basename|url_encode }}" data-plugin="preview" title="{{ file.filename }}">
@@ -144,6 +144,9 @@
                                     </a>
                                 </div>
                             </div>
+                            <nav>
+                                <a href="/storage/fetch.php?hash={{ file.hash }}&save=1&name={{ file.basename|url_encode }}" class="icon-download" title="Download"></a>
+                            </nav>
                         </li>
                     {% endif %}
                 {% endfor %}
