@@ -63,7 +63,12 @@ export default {
     },
     computed: {
 
-        getInputPlaceholder () {
+         /**
+         * The text within the comment prompt button, will change to loading when selected to notify
+         *
+         * @returns {String}
+         */
+        getAddCommentButtonText () {
             if (this.isCKEditorLoading) return 'Loading';
             else return 'Add a Comment'
         },
@@ -279,7 +284,7 @@ export default {
         <section id="threads-section" class="discussion">
             <div class="discussion-threads">
                 <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
-                <button class="btn-show-ckeditor" v-show="!isCKEditorReady" @click.once="loadCKEditor">{{ getInputPlaceholder }}</button>
+                <button class="btn-show-ckeditor" v-show="!isCKEditorReady" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
                 <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
                 <div v-if="isCKEditorLoaded" :style="[isCKEditorReady ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
                     <ckeditor tag-name="textarea" @ready="onCKEditorReady" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress" ></ckeditor>
