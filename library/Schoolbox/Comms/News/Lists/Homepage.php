@@ -66,6 +66,10 @@ class Homepage extends Base
             $article->setAudience(new GenericCollection(Audience\Model::class));
         }
 
+        /* Attachment counts for each article in this set
+         */
+        $attachmentCounts = \Schoolbox\Comms\News\File\Mapper::getInstance()->findCounts($articleIds);
+
         /* Tremendous Assumption
          *
          * If Compact Mode is off, then someone read all these articles currently displaying
@@ -95,6 +99,7 @@ class Homepage extends Base
 
         return [
             'articles' => $this->populateMetadata($articles),
+            'attachmentCounts' => $attachmentCounts,
             'readMore' => $this->readMoreText,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $this->findSavedArticles($user, $this->saveForLaterEnabled),
