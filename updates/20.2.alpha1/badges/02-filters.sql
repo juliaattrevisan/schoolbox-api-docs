@@ -2,6 +2,9 @@ INSERT INTO filter (entity, class)
 VALUES (
    'Schoolbox\\Learning\\Badge\\Mapper',
    'Schoolbox\\Filter\\Filters\\Badge\\Category\\Definition'
+), (
+   'Schoolbox\\Learning\\Badge\\Mapper',
+   'Schoolbox\\Filter\\Filters\\Badge\\CurriculumNode\\Definition'
 );
 
 ALTER TABLE filter_page
