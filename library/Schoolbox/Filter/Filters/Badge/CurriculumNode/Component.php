@@ -96,14 +96,10 @@ class Component extends BaseComponent
         $context = parent::toContext();
 
         // Load selected nodes into the Twig template
-        $context['selectedNodes'] = $this->curriculumNodeMapper
-            ->findByColumn('id', $context['userSelectionIds'])
-            ->map(function (CurriculumNodeModel $model) {
-                // Load ancestors for each node, to maintain consistent
-                // rendering with the selectize.
-                // TODO consider if loading ancestors is really necessary
-                return $this->curriculumNodeMapper->loadAncestors($model, 'parent');
-            });
+        $context['selectedNodes'] = $this->curriculumNodeMapper->findByColumn(
+            'id',
+            $context['userSelectionIds']
+        );
 
         return $context;
     }
