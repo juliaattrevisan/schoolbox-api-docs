@@ -535,10 +535,16 @@ Usage:
                     selectize.items.forEach(function (v) {
                         // Hook into selectize's render method for determining
                         // how to render the filter in use
-                        // TODO consider if it is overkill to hook into selectize's rendering
-                        componentsInUse[filterId]['labels'].push(
-                            $(selectize.render('option', selectize.options[v])).html()
-                        );
+                        // TODO is it overkill to hook into selectize's rendering?
+                        let $selectizeItem = $(selectize.render('item', selectize.options[v])).clone();
+
+                        // Remove the anchor from the item, so it doesn't show
+                        // in the filter in use
+                        $selectizeItem = $selectizeItem
+                            .children()
+                            .remove('a')
+                            .end();
+                        componentsInUse[filterId]['labels'].push($selectizeItem.text());
                     });
                 } else if ($selected.length !== 0) {
                     // Not a selectize, or it's not yet initialized
