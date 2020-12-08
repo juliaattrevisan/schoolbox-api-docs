@@ -553,8 +553,8 @@
                     {% for group, subjectGroup in subjects %}
                         {# Keep a running total of all teachers emails in this group #}
                         {% set teacherEmails = [] %}
-                        <div class="row">
-                            <div class="small-12 island">
+                        <div class="row divider">
+                            <div class="small-12">
                                 <h2 class="subheader">{{ group }}</h2>
                                 <section>
                                     {% for subject in subjectGroup %}
@@ -628,8 +628,8 @@
                     {% endif %}
 
                     {% if showGroups and groups is not empty %}
-                        <div class="row">
-                            <div class="small-12 island">
+                        <div class="row divider">
+                            <div class="small-12">
                                 <h2 class="subheader">Groups</h2>
                                 <section>
                                     {% for group in groups %}
@@ -857,7 +857,7 @@
 
                     {% block emergencyContacts_island %}
                         <div class="row">
-                            <div class="small-12 island">
+                            <div class="small-12">
                                 {% block emergencyContacts %}
                                     {# up to 3 emergency contact blocks
                                      # show no header if no emergencies

@@ -2,4 +2,12 @@
   .subheader {
     color: $header-font-color
   }
+
+  .divider {
+    border-bottom: 2px solid #EDEDED;
+
+    &:last-child {
+      border: 0;
+    }
+  }
 }
