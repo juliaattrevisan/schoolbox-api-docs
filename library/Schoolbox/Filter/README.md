@@ -510,11 +510,12 @@ of developing for filters.
     must recognise the new [Filter](#filter), and accept/reject the
     [Entity](#entity)
 
-* Insert a new row into the `filter` database table for the new filter
+* Insert a new row into the `filter` database table for the new
+  [Filter](#filter) class
   * the `entity` column value needs to be the fully-qualified class name of the
-    entity the filter will operate on
-  * the `class` column is the fully-qualified class name of the new filter's
-    Definition class
+    [Entity](#entity) the [Filter](#filter) will operate on
+  * the `class` column is the fully-qualified class name of the new
+    [Filter](#filter)'s [Definition](#definition) class
   * leave the leading `\` character off both values
     * note that `\` is escaped by another `\` in MySQL/MariaDB queries:
     ```sql
@@ -524,6 +525,13 @@ of developing for filters.
         'Schoolbox\\Filter\\Filters\\Assessment\\NullableContext\\CourseImportSpec\\Definition'
     );
     ```
+
+### Adding an existing Filter to a Page's Filter Set
+
+* Update the [Filter](#filter)'s [Definition](#definition) implementation's
+  `getPages` method to return the `\Schoolbox\Filter\Page\Model::PAGE_*`
+  constant
+
 
 #### Frontend development for new filters
 
@@ -542,9 +550,3 @@ the component
 
 The base Panel's Twig template (including JavaScript) may be found in
 `library/Schoolbox/Filter/templates/panel.twig`.
-
-
-### Adding an existing Filter to a Page's Filter Set
-
-* Update the Definition implementation's `getPages` to return the page's
-  `\Schoolbox\Filter\Page\Model::PAGE_*` constant
