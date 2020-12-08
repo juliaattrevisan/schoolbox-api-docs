@@ -73,7 +73,7 @@ class Component extends BaseComponent
 
 
         // Add URL overrides
-        foreach ($this->getUrlOverrides() as $key => $override) {
+        foreach (($this->getUrlOverrides() ?? []) as $key => $override) {
             if ($override instanceof Filter\Selection\Model) {
                 $availableSelections[$key] = $this->createSelection($key, $override->getSelected());
             }
