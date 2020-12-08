@@ -1,3 +1,38 @@
 {% extends '@filters/_component.twig' %}
 
 {% block filterName %}Curriculum Codes{% endblock %}
+
+{% block userOptions %}
+    {# Empty input is required so that filter works if not user-configurable, or
+       nothing is selected #}
+    <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
+
+    {% if isUserConfigurable %}
+        {# Selectize is only created if the item is user-configurable #}
+        <script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+        <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+        <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+
+        {# Selectize for something #}
+        {% autoescape 'js' %}
+            <script type="text/javascript">
+                $(function () {
+                    var $filterSelector = $('#filter-selector-curriculum-node');
+                    $filterSelector.curriculumSelector({
+                        value: {{ (selection ?? []) | json_encode | raw }}
+                    });
+                });
+            </script>
+        {% endautoescape %}
+
+        <select id="filter-selector-curriculum-node"
+                name="filter_selection[{{ definition.filter.id }}][]"
+                multiple
+                placeholder="Enter one or more curriculum codes"
+                data-selectize
+        >
+        </select>
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock userOptions %}
