@@ -14,16 +14,6 @@
 
 {% set pageName = pageLabels[page]|default(page) %}
 
-{% set entity = (definitions | first).filter.entity %}
-{%- if ENTITY_ASSESSMENTS == entity -%}
-    {%- set entityName = locale.assessment -%}
-    {%- set entityIcon = 'due-work' -%}
-{%- else -%}
-    {# Graceful degradation to generic filter icon if constant not injected into twig #}
-    {%- set entityName = 'Entity' -%}
-    {%- set entityIcon = 'filter' -%}
-{%- endif -%}
-
 {{ bread.crumbs(
     [ 'Home', routeLookup('adminHome.getIndex') ],
     [ 'Filters', routeLookup('filters.getIndex') ],
@@ -222,10 +212,6 @@
 <div class="row actions-small-1">
     <div class="small-12">
         <h1>{{ pageName }}</h1>
-
-        <ul class="meta">
-            <li class="icon-{{ entityIcon }}">Filtered entity: {{ entityName }}</li>
-        </ul>
     </div>
     <nav>
         <a class="icon-more" data-dropdown="header-options" title="Actions"></a>

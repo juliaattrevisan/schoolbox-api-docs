@@ -15,6 +15,7 @@ use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
+use Schoolbox\Learning\Badge;
 
 use function count;
 
@@ -102,6 +103,7 @@ class Controller extends BaseController
             'pageLabels'         => $this->buildFilteredPageLabels(),
             'showCourseMarkbook' => $this->getConfigLoader()->get('course_markbook_enable'),
             'ENTITY_ASSESSMENTS' => Assessment\Mapper::class,
+            'ENTITY_BADGES'      => Badge\Mapper::class,
             'pageCurrent'        => basename($this->getRequest()->query->get('page')),
         ])->setTitle('Filterable pages'));
     }
@@ -152,7 +154,6 @@ class Controller extends BaseController
             'roleTypes'          => $roleTypes,
             'rolesForFilter'     => $rolesForFilter,
             'pageLabels'         => $this->buildFilteredPageLabels(),
-            'ENTITY_ASSESSMENTS' => Assessment\Mapper::class,
         ])->setTitle(ucfirst($page) . ' filters'));
     }
 
