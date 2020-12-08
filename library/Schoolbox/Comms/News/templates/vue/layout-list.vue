@@ -93,6 +93,9 @@
                         </div>
                     </article>
 
+                    <template v-for="file in article.images">
+                        <img :src="'/storage/image.php?size=square64&hash=' + file.hash" :title="file.filename.original" />
+                    </template>
                 </div>
             </div>
 

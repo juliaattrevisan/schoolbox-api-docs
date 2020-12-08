@@ -913,7 +913,9 @@ class Controller extends Base
                 $map,
                 new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
                 new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)),
-                new MetadataDecorator($commentCounts)
+                new MetadataDecorator($commentCounts),
+                new ImagesDecorator(),
+                new FilesDecorator(),
             )
         );
 
