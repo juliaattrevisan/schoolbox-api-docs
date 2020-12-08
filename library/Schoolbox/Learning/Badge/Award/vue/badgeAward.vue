@@ -99,6 +99,20 @@ export default {
         return {
             options: [],
             selected: [],
+            isFormSubmitActive: false
+        }
+    },
+    computed: {
+        /**
+         * Prevent rapid-fire clicks that may add more than one badge 
+         * and ensure at least one student is selected
+         *
+         * @returns {Boolean}
+         */
+        isSubmitBtnDisabled () {
+            if (this.isFormSubmitActive) return true;
+            if (this.selected.length === 0) return true;
+            else return false;
         }
     },
     methods: {
@@ -137,6 +151,7 @@ export default {
          *             achievement or a goal)
          */
         onSubmit() {
+            this.isFormSubmitActive = true;
             this.$refs.toast.activate(this.toastActivateMessage);
             axios.post(this.endpoint, {users: this.selected})
                 .then(() => {
@@ -152,6 +167,10 @@ export default {
                         Toast.DEFAULT_FADE_DURATION,
                         () => this.$emit(EVENTS.done)
                     );
+
+                    //can add another badge now, so the submit button can be clicked again
+                    this.isFormSubmitActive = false;
+
                 })
                 .catch(() => this.$refs.toast.timeout(this.toastFailureMessage, false))
         },
@@ -206,7 +225,7 @@ export default {
         </v-select>
         <ul class="flex-list buttons">
             <li>
-                <button @click.prevent="onSubmit" class="submit" :disabled="selected.length === 0">
+                <button @click.prevent="onSubmit" class="submit" :disabled="isSubmitBtnDisabled">
                     <!-- @slot The text for this badge award form's confirm button -->
                     <slot name="confirmButton">
                         Award Achievement
