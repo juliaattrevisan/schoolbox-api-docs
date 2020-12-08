@@ -126,7 +126,7 @@ class Archive extends Base
 
         /* Attachment counts for each article in this set
          */
-        $attachmentCounts = \Schoolbox\Comms\News\File\Mapper::getInstance()->findCounts($articleIds);
+        $attachmentCounts = $this->fileMapper->findCounts($articleIds);
 
         /* Disregard the sticky bit for each article in the Archive
          */

@@ -9,6 +9,7 @@ namespace Schoolbox\Comms\News\Lists;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\IArticleResolver;
+use Schoolbox\Comms\News\File;
 use Schoolbox\Comms\News\Helper;
 use Schoolbox\Comms\News\Mapper;
 use Schoolbox\Comms\News\Model;
@@ -112,6 +113,12 @@ abstract class Base
 
 
     /**
+     * @var File\Mapper
+     */
+    protected File\Mapper $fileMapper;
+
+
+    /**
      * Lists constructor.
      *
      * @param int                          $defaultLimit
@@ -127,6 +134,7 @@ abstract class Base
      * @param Comment\Mapper               $commentMapper
      * @param Audience\Mapper              $audienceMapper
      * @param bool                         $commentsIsEnabled
+     * @param File\Mapper                  $fileMapper
      */
     public function __construct(
         int $defaultLimit,
@@ -141,7 +149,8 @@ abstract class Base
         IArticleResolver $articleResolver,
         Comment\Mapper $commentMapper,
         Audience\Mapper $audienceMapper,
-        bool $commentsIsEnabled
+        bool $commentsIsEnabled,
+        File\Mapper $fileMapper
     ) {
         $this->defaultLimit               = $defaultLimit;
         $this->topicMapper                = $topicMapper;
@@ -156,6 +165,7 @@ abstract class Base
         $this->commentMapper              = $commentMapper;
         $this->audienceMapper             = $audienceMapper;
         $this->commentsIsEnabled          = $commentsIsEnabled;
+        $this->fileMapper                 = $fileMapper;
     }
 
 

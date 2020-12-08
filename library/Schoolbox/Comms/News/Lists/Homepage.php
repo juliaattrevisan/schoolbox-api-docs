@@ -74,7 +74,7 @@ class Homepage extends Base
 
         /* Attachment counts for each article in this set
          */
-        $attachmentCounts = \Schoolbox\Comms\News\File\Mapper::getInstance()->findCounts($articleIds);
+        $attachmentCounts = $this->fileMapper->findCounts($articleIds);
 
         /* Also happen to augment each article with its files when you're using the normal viewing mode
          */

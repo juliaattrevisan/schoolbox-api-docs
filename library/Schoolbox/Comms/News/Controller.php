@@ -757,7 +757,8 @@ class Controller extends Base
             $this->articleResolver,
             $this->commentMapper,
             $this->audienceMapper,
-            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
+            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
+            $this->fileMapper
         ))->find(
             $params,
             $this->getUser()
@@ -1080,7 +1081,8 @@ class Controller extends Base
             $this->articleResolver,
             $this->commentMapper,
             $this->audienceMapper,
-            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
+            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
+            $this->fileMapper
         ))->find(
             $urlPrefix,
             $params,
