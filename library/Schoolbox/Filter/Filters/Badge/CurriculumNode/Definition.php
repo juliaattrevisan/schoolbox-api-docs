@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Badge\CurriculumNode;
 
 use Schoolbox\Filter\AbstractDefinition;
+use Schoolbox\Filter\Page;
 
 /**
  * Definition for the badge curriculum node filter.
@@ -36,7 +37,9 @@ class Definition extends AbstractDefinition
      */
     public static function getPages(): array
     {
-        return [];
+        return [
+            Page\Model::PAGE_BADGE_LIST,
+        ];
     }
 
 
