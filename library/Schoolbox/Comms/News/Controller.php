@@ -868,6 +868,10 @@ class Controller extends Base
         if (count($articleIds)) {
             $pb       = $this->newsMapper->getPredicatePublished()->in('id', $articleIds);
             $articles = $this->newsMapper->findByPredicates($pb, ['order' => ['sticky' => 'DESC', 'publish_at' => 'DESC']]);
+
+            /* Attachment counts for each article in this set
+             */
+
         } else {
             $articles = $this->newsMapper->createCollection();
         }

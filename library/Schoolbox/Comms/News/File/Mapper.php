@@ -86,4 +86,44 @@ class Mapper extends \Schoolbox\Mapper
 
         return $resultSet;
     }
+
+
+    /**
+     * Find the count of attached files for each of $articleIds
+     * Returns a hash lookup of (articleId, count) tuples
+     *
+     * @param array $articleIds
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     * @throws \UnderflowException
+     */
+    public function findCounts(array $articleIds): array
+    {
+        $counts = [];
+
+        /* Only count non-deleted attachments in the set of $articleIds
+         */
+        $pb = $this->getPredicateBuilder()
+            ->isNull('deleted_at')
+            ->in('article_id', $articleIds);
+
+        $where = implode(' AND ', $pb->getWhere());
+
+        $query = "
+            SELECT article_id, COUNT(article_id) AS num
+            FROM {$this->getTable()}
+            WHERE {$where}
+            GROUP BY article_id
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($pb->getParams());
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $counts[$row['article_id']] = $row['num'];
+        }
+
+        return $counts;
+    }
 }
