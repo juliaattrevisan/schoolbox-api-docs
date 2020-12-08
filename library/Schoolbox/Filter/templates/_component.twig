@@ -53,7 +53,7 @@
                     {% for selection in roleSelections %}
                         {% include '@filters/_selectionCheckbox.twig' with {
                             roleSelection:      selection,
-                            userSelection:      userSelections[selection.key],
+                            userSelection:      userSelections[selection.key] ?? null,
                             label:              definition.label(selection.key),
                             disabled:           isDisabled
                         } only %}
