@@ -142,8 +142,7 @@ class Controller extends Base
     public function subject($year, User $student, $subjectCode)
     {
         try {
-            $reportData               = $this->buildReportData($year, $student, $subjectCode);
-            $reportData['graphWidth'] = $this->request->query->getInt('graph-width');
+            $reportData = $this->buildReportData($year, $student, $subjectCode);
             /** @var StudentInvolvement\Subject $subjectReport */
             $subjectReport = $reportData['report']['subjectReport'];
             $this->getResponse()->content->set(
@@ -218,16 +217,17 @@ class Controller extends Base
             }
             $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode, $roleTypeOverride);
         }
-        return array(
-            'report' => array(
+        return [
+            'report' => [
                 'student'          => $student,
                 'tutorGroupReport' => $tutorGroup,
                 'subjectReport'    => $subject,
                 'tutorGroupList'   => $tutorGroupList,
                 'subjectList'      => $subjectList,
                 'roleTypeOverride' => $roleTypeOverride,
-            )
-        );
+            ],
+            'graphWidth' => $this->request->query->getInt('graph-width'),
+        ];
     }
 
     /**
