@@ -102,6 +102,12 @@ class Mapper extends \Schoolbox\Mapper
     {
         $counts = [];
 
+        /* Ignore empty list of articleIds
+         */
+        if (!\count($articleIds)) {
+            return $counts;
+        }
+
         /* Only count non-deleted attachments in the set of $articleIds
          */
         $pb = $this->getPredicateBuilder()
