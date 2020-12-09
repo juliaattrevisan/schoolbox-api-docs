@@ -565,6 +565,7 @@
                                 {#                                                {{ tileContent }}#}
                                 {#                                            {% endif %}#}
                                 <a href="#">
+{#                                    <div class="card-class-image" style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{% if class.coverImage %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>#}
                                     <div class="card-class-image" style="background-color: #0a6aa1;">
                                         {% for teacher in subject.teachers %}
                                         <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="Teacher: {{ teacher.formatName }}" alt="Teacher: {{ teacher.formatName }}" />
@@ -595,7 +596,7 @@
                                             <li>
                                                 {% if not teacher.email is empty %}
                                                     {% set replyTo = teacher.getFormattedEmailDisplay %}
-                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
+                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ replyTo }}</a>
                                                 {% endif %}
                                             </li>
                                         </ul>
@@ -630,52 +631,46 @@
                     <div class="row divider content">
                         <div class="small-12 columns">
                             <h2 class="subheader">Groups</h2>
-                            <section>
+                            <section class="v-card-list">
                                 {% for group in groups %}
-                                    <ul class="subject-list group">
-                                        <li class="subject-group">
-                                            <div class="list-item">
-                                                <div class="content small-12 ">
-                                                    {% if group.perms > 0 %}
-                                                        <a href="/homepage/{{ group.id }}">
-                                                            <h3 class="no-margin">{{ group.name }}</h3>
-                                                        </a>
-                                                    {% else %}
-                                                        <h3 class="no-margin">{{ group.name }}</h3>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </li>
+                                <div class="v-card small-12">
+                                    <a href="#">
+{#                                        <div class="card-class-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImage %} background-image: url('/storage/image.php?hash={{ group.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>#}
+                                        <div class="card-class-image" style="background-color: #0a6aa1;">
+                                            {% if group.owners is defined %}
+                                            {% for owner in group.owners %}
+                                            <img src="/portrait.php?userId={{ owner.externalId }}&amp;size=square64" title="{{ owner.formatName }}" alt="{{ owner.formatName }}" />
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </a>
+                                    <div class="card-content classes groups actions-small-1">
+                                        <div class="list-item">
+                                        {% if group.perms > 0 %}
+                                            <a href="/homepage/{{ group.id }}">
+                                                <h3>{{ group.name }}</h3>
+                                            </a>
+                                        {% else %}
+                                            <h3>{{ group.name }}</h3>
+                                        {% endif %}
+                                        </div>
+                                        <nav>
+                                            <a class="icon-more" data-dropdown="group-options" title="Actions"></a>
+                                        </nav>
                                         {% if group.owners is defined %}
                                             {% for owner in group.owners %}
-                                                <li class="actions-small-1">
-                                                    <div class="list-item">
-                                                        <div class="compact card small-12">
-                                                            <a href="/search/user/{{ owner.id }}">
-                                                                <img src="/portrait.php?userId={{ owner.externalId }}&amp;size=square64" />
-                                                                <p>
-                                                                    {{ owner.formatName }}
-                                                                    <span class="pipe meta">
-                                                            {% if owner.positionTitle is empty %}
-                                                                {{ owner.role.name }}
-                                                            {% else %}
-                                                                {{ owner.positionTitle }}
-                                                            {% endif %}
-                                                        </span>
-                                                                </p>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                    <nav>
+                                                <ul id="group-options" class="f-dropdown" data-dropdown-content>
+                                                    <li>
                                                         {% if not owner.email is empty %}
                                                             {% set replyTo = owner.getFormattedEmailDisplay %}
-                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
+                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ replyTo }}</a>
                                                         {% endif %}
-                                                    </nav>
-                                                </li>
+                                                    </li>
+                                                </ul>
                                             {% endfor %}
                                         {% endif %}
-                                    </ul>
+                                    </div>
+                                </div>
                                 {% endfor %}
                             </section>
                         </div>
