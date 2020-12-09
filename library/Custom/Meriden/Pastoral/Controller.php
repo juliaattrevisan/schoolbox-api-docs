@@ -219,6 +219,7 @@ class Controller extends Base
         }
         return [
             'report' => [
+                'year'             => $year,
                 'student'          => $student,
                 'tutorGroupReport' => $tutorGroup,
                 'subjectReport'    => $subject,

@@ -15,3 +15,8 @@
         showSubjectSelector: true,
     } only %}
 </div>
+
+{# Printable report: hardcode a graph width of 450 if none is set #}
+<a href="{{ routeLookup('customMeridenPastoral.printableReport', {year: report.year, id: report.student.id}) }}?graph-width={{ graphWidth ?? 450 }}"
+   target="_blank"
+   class="button full-width">Print full report</a>
