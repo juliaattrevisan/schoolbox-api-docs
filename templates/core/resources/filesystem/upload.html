@@ -83,6 +83,8 @@ $(function () {
                 }
 
                 file.hash = data.hash;
+                file.imageUrl = data.meta.modelToArray._links.image;
+                
             });
 
             /* When you finish processing the queue of files you chose to upload
@@ -96,13 +98,14 @@ $(function () {
                     } catch (err) {
                         // noop
                     }
-
+                    
                     file.hash = msg.hash;
 
                     $(file.previewElement).find('span[data-dz-errormessage]').html(msg.hash.split(':')[1]);
 
                     // Don't need to show the progress bar once it's broken
                     $(file.previewElement).find('.dz-progress').hide();
+
                 }
 
                 checkState.call(this);
@@ -180,6 +183,7 @@ $(function () {
      * When the queue is completely processed, call this method.
      */
     function onQueueComplete() {
+        
         let successFiles = this.getFilesWithStatus(Dropzone.SUCCESS),
             errorFiles   = this.getFilesWithStatus(Dropzone.ERROR),
             data         = [],
@@ -202,12 +206,13 @@ $(function () {
         if (errorFiles.length) {
             return;
         }
-
+        
         // Finally post the message
         if (successFiles.length) {
             for (i = 0; i < successFiles.length; ++i) {
                 if (successFiles[i].hash) {
                     data.push({
+                        file: successFiles[i],
                         title: successFiles[i].name,
                         mimeType: successFiles[i].type,
                         filesize: successFiles[i].size,

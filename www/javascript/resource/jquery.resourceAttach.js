@@ -130,6 +130,7 @@
                 self.dropzone = this;
 
                 this.on('addedfile', function (file) {
+                    
                     self.renderFile({
                         previewElement: file.previewElement,
                         type: file.type
@@ -138,6 +139,7 @@
                 });
 
                 this.on('success', function (file, response) {
+                    
                     var data, inputValue;
 
                     try {
@@ -157,9 +159,9 @@
                         .find('input[data-az-attachment]')
                         .val(inputValue);
                     self.attach(data);
-
-
+                    
                     azone.trigger('success.attachzone', [data]);
+                    
                 });
 
                 this.on('error', function (file, errMsg, xhr) {
@@ -193,6 +195,7 @@
             },
 
             accept: function (file, done) {
+                
                 // no hash yet: treat as normal dz upload
                 if (file.hash === undefined) {
                     done();
@@ -209,6 +212,7 @@
 
                 this._updateMaxFilesReachedClass();
                 azone.trigger('accept.attachzone', [file]);
+                
             }
         });
 
@@ -548,10 +552,11 @@
 
 
     ResourceAttach.prototype.attach = function (list) {
+        
         var i, data, elems = [], self = this;
 
         this.close();
-
+        
         for (i = 0; i < list.length; ++i) {
             data = {
                 name: list[i].title,
@@ -559,10 +564,32 @@
                 size: list[i].filesize,
                 hash: list[i].hash
             };
-
+            
             if (this.dropzone) {
-                this.dropzone.addFile(data);
-                elems.push($(data.previewElement));
+                
+                const existingFile = list[i].file;
+                
+                if (existingFile) {
+
+                    existingFile.name = data.name;
+                    existingFile.type = data.type;
+                    existingFile.size = data.size;
+                    existingFile.hash = data.hash;
+
+                    const onExistingFileDisplayed = () => {
+                        $(this.element).addClass('dz-max-files-reached');
+                        $('body').find('.progress').hide();
+                    }
+    
+                    this.dropzone.displayExistingFile(existingFile, existingFile.imageUrl, onExistingFileDisplayed);
+
+                } else {
+
+                    this.dropzone.addFile(data);
+
+                }
+                
+
             } else {
                 data.previewElement = $(this.tpl.html());
 
@@ -637,6 +664,7 @@
             }
             elem.find('input[data-az-attachment]').val(hash);
         }
+        
         if (file.type) {
             elem.find('img[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
         }
