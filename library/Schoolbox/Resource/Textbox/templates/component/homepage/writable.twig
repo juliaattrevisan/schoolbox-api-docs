@@ -23,7 +23,7 @@
         </script>
         <div class='immersive-reader-button' data-immersive-reader="button"></div>
     {% endif %}
-    <div class="content">
+    <div class="content" data-textbox-exists>
         <article data-content
                  data-textbox-heading="{{ textbox.heading }}"
                  id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</article>
@@ -84,6 +84,7 @@
     <script type="text/javascript" src="/javascript/shared/textbox/jquery.inlineTextboxEditor.js"></script>
     <script type="text/javascript">
         $(function() {
+
             var component             = $('#component{{ component.instance.id }}'),
                 content               = component.find('.content'),
                 configForm            = component.find('[data-component-panel="settings"] form'),
@@ -115,72 +116,88 @@
                 }
             }
 
-            component
-                .inlineTextboxEditor({
-                    modifyButton:          '[data-action="modify"]',
-                    deleteButton:          '[data-action="delete"]',
-                    saveButton:            '[data-action="save"]',
-                    editorInstance:        '[data-content]',
-                    editorInstanceOptions: editorInstanceOptions,
-                    editorInline:          editorInline,
-                })
-                // Before creating an editor: restore any placeholders, so that
-                // the editor doesn't let you edit the mediaelement player
-                .on('inlineTextboxEditor.preEditorCreate', function () {
-                    $.fn.schoolboxResource_RestoreAllPlaceholders(component);
-                })
-                // On create/destroy of editor:
-                // add/remove no-pad class to its container, to offset padding
-                // Also: put the media players back when the editor is destroyed
-                .on('inlineTextboxEditor.editorCreate', function (event, inlineTextboxEditor) {
-                    content.addClass('no-pad');
+            const inlineTextboxEditor = component.inlineTextboxEditor({
+                modifyButton:          '[data-action="modify"]',
+                deleteButton:          '[data-action="delete"]',
+                saveButton:            '[data-action="save"]',
+                editorInstance:        '[data-content]',
+                editorInstanceOptions: editorInstanceOptions,
+                editorInline:          editorInline,
+            });
 
-                    // Add beforeUnload, which will trigger if this is dirty
-                    beforeUnloadListener = function (event) {
-                        if (inlineTextboxEditor.isDirty()) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            event.returnValue = '';
-                            return event.returnValue;
-                        }
-                    };
-                    window.addEventListener('beforeunload', beforeUnloadListener);
-                })
-                .on('inlineTextboxEditor.editorDestroy', function () {
-                    content.removeClass('no-pad');
-                    window.removeEventListener('beforeunload', beforeUnloadListener);
-                    $.fn.schoolboxResource_ProxyReplacement(component);
-                })
-                // Pre/post save/delete: apply toast
-                .on('inlineTextboxEditor.preSave', function () {
-                    toast.toastActivate({text: 'Saving...'});
-                })
-                .on('inlineTextboxEditor.preDelete', function () {
-                    toast.toastActivate({text: 'Deleting...'})
-                })
-                .on('inlineTextboxEditor.save', function () {
-                    toast.toastTimeout({text: 'Saved', css: 'success'});
-                })
-                .on('inlineTextboxEditor.delete', function () {
-                    toast.toastTimeout({text: 'Deleted', css: 'success'});
-                })
-                .on('inlineTextboxEditor.saveFail', function () {
-                    toast.toastTimeout({text: 'Could not save textbox', css: 'alert'});
-                })
-                .on('inlineTextboxEditor.deleteFail', function () {
-                    toast.toastTimeout({text: 'Could not delete textbox', css: 'alert'});
-                })
-                // Post-delete: set the textbox to empty and submit config
-                .on('inlineTextboxEditor.delete', function () {
-                    configForm
-                        .find('select[name="textbox"]')
-                        .val(0);
-                    configForm.submit();
-                })
-                .on('inlineTextboxEditor.change inlineTextboxEditor.save', function (event, inlineTextboxEditor) {
-                    dirtyIndicator.toggleClass('hide', !inlineTextboxEditor.isDirty());
-                });
-
+            
+            //to start the Text Box editor automatically after creating a Text Box, 
+            //previously users had to first select the #modifyButton to start editing
+            if ((document.body.hasAttribute('data-new-text-box-id')) && (document.body.getAttribute('data-new-text-box-id') === '{{ component.instance.id }}')) { //check if a new Text Box has been created, and if so enable immediate focus within the relevant component
+                inlineTextboxEditor.data('inlineTextboxEditor').onClickModify(); //implement the existing method within #jquery.inlineTextboxEditor.js used by #modifyButton to fire up the editor straight after creation
+                document.body.removeAttribute('data-new-text-box-id'); //clear the reference to ensure immediate focus only occurs after initial creation
+            } 
+            
+            // Before creating an editor: restore any placeholders, so that
+            // the editor doesn't let you edit the mediaelement player
+            component.on('inlineTextboxEditor.preEditorCreate', function () {
+                $.fn.schoolboxResource_RestoreAllPlaceholders(component);
+            })
+            // On create/destroy of editor:
+            // add/remove no-pad class to its container, to offset padding
+            // Also: put the media players back when the editor is destroyed
+            .on('inlineTextboxEditor.editorCreate', function (event, inlineTextboxEditor) {
+                content.addClass('no-pad');
+                // Add beforeUnload, which will trigger if this is dirty
+                beforeUnloadListener = function (event) {
+                    if (inlineTextboxEditor.isDirty()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        event.returnValue = '';
+                        return event.returnValue;
+                    }
+                };
+                window.addEventListener('beforeunload', beforeUnloadListener);
+            })
+            .on('inlineTextboxEditor.editorDestroy', function () {
+                content.removeClass('no-pad');
+                window.removeEventListener('beforeunload', beforeUnloadListener);
+                $.fn.schoolboxResource_ProxyReplacement(component);
+            })
+            // Pre/post save/delete: apply toast
+            .on('inlineTextboxEditor.preSave', function () {
+                toast.toastActivate({text: 'Saving...'});
+            })
+            .on('inlineTextboxEditor.preDelete', function () {
+                toast.toastActivate({text: 'Deleting...'})
+            })
+            .on('inlineTextboxEditor.save', function () {
+                toast.toastTimeout({text: 'Saved', css: 'success'});
+            })
+            .on('inlineTextboxEditor.delete', function () {
+                toast.toastTimeout({text: 'Deleted', css: 'success'});
+            })
+            .on('inlineTextboxEditor.saveFail', function () {
+                toast.toastTimeout({text: 'Could not save textbox', css: 'alert'});
+            })
+            .on('inlineTextboxEditor.deleteFail', function () {
+                toast.toastTimeout({text: 'Could not delete textbox', css: 'alert'});
+            })
+            // Post-delete: set the textbox to empty and submit config
+            .on('inlineTextboxEditor.delete', function () {
+                configForm
+                    .find('select[name="textbox"]')
+                    .val(0);
+                configForm.submit();
+            })
+            .on('inlineTextboxEditor.change inlineTextboxEditor.save', function (event, inlineTextboxEditor) {
+                dirtyIndicator.toggleClass('hide', !inlineTextboxEditor.isDirty());
+            });
+            
+            //when the 'Create Text Box' modal is opened, ensure the Title input field is given immediate focus to allow easier/faster Text Box creation
+            $(document).on('opened.fndtn.reveal', '[data-reveal]', function () { //referenced from Event Bindings at https://get.foundation/sites/docs-v5/components/reveal.html
+                const openedModalDOMElement = $(this)[0];
+                const openedModalDOMElementID = openedModalDOMElement.id;
+                if (openedModalDOMElementID.includes('{{ component.instance.id }}')) {  //ensure the id matches the currently active component which contains the 'Create Text Box' modal just opened
+                    const titleInputDOMElement = openedModalDOMElement.querySelector('#addTextboxModal-{{ component.instance.id }}-form-heading');
+                    titleInputDOMElement.focus(); 
+                }
+            });
 
             // Dialog for creation of a textbox
             addTextboxForm.alaressValidate({
@@ -207,6 +224,10 @@
                             contentType: 'application/json',
                         }
                     ).done(function (response) {
+                        
+                        //to pass through that a new Text Box has been created, to allow the editor to start automatically
+                        document.body.setAttribute('data-new-text-box-id', '{{ component.instance.id }}');
+
                         // Reload the component, close the dialog
                         addTextboxModal.foundation('reveal', 'close');
                         toast.toastTimeout({text: 'Created', css: 'success'});
@@ -225,6 +246,7 @@
                             .find('input[name="componentname"]')
                             .val(response.heading);
                         configForm.submit();
+                        
                     }).fail(function () {
                         toast.toastTimeout({text: 'Could not create text box', css: 'alert'});
                     }).always(function () {
