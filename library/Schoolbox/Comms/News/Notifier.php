@@ -203,7 +203,6 @@ class Notifier extends AbstractModuleNotifier
          * Approved (Awaiting Publication / Published / Expired)
          */
         if ($article->isApproved()) {
-
             $publishAt = $article->getPublishAt();
             $expiresAt = $article->getExpiresAt();
 
@@ -247,19 +246,22 @@ class Notifier extends AbstractModuleNotifier
                         $bundle->detach(self::TRIGGER_EXPIRED);
                     }
                 }
-                // If there's any change to contents of posted notification, trigger updated
-                if (!$retracted
+                // If there's any change to contents of *published* article, trigger updated
+                if (
+                    !$retracted
+                    && $article->isPublished()
+                    && !$article->isExpired()
                     && (($previous->getTitle() !== $article->getTitle())
                         || ($previous->getBlurb() !== $article->getBlurb())
                         || ($previous->getBody() !== $article->getBody())
                         || (!($previous->getSticky()) && $article->getSticky())
-                    )) {
-                    $bundle->attach(self::TRIGGER_UPDATED, $publishAt->getUnixTimeStamp());
+                    )
+                ) {
+                    $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
                 }
             }
             return;
         }
-
     }
 
     /**
