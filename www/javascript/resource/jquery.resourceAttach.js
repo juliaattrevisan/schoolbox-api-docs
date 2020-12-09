@@ -567,30 +567,30 @@
             
             if (this.dropzone) {
                 
-                const existingFile = list[i].file;
-                
-                if (existingFile) {
-
-                    existingFile.name = data.name;
-                    existingFile.type = data.type;
-                    existingFile.size = data.size;
-                    existingFile.hash = data.hash;
-
-                    const onExistingFileDisplayed = () => {
-                        $(this.element).addClass('dz-max-files-reached');
-                        $('body').find('.progress').hide();
+                //if the file was attached using 'Upload file' it's been uploaded, 
+                //so we can display the image in the drop zone when we return to the page
+                const getExistingFileUrl = () => {
+                    if (list[i].file) { //this file prop is set within templates/core/resources/filesystem/upload.html - onQueueComplete()
+                        return list[i].file.imageUrl;
+                    } else { //otherwise we'll just show the file type image
+                        return '/ajax/mime/' + data.type;
                     }
-    
-                    this.dropzone.displayExistingFile(existingFile, existingFile.imageUrl, onExistingFileDisplayed);
-
-                } else {
-
-                    this.dropzone.addFile(data);
-
                 }
                 
+                //once the files displayed, ensure the drop zone window and progress view are hidden
+                const onExistingFileDisplayed = () => {
+                    const elementDOM = $(this.element)[0];
+                    elementDOM.classList.add('dz-max-files-reached');
+                    elementDOM.querySelector('.progress').style.display = 'none';
+                    elems.push($(data.previewElement));
+                }
+
+                //to display an existing file within the drop zone view, as the file has already been loaded
+                //https://gitlab.com/meno/dropzone/-/wikis/FAQ#how-to-show-files-already-stored-on-server
+                this.dropzone.displayExistingFile(data, getExistingFileUrl(), onExistingFileDisplayed);
 
             } else {
+
                 data.previewElement = $(this.tpl.html());
 
                 this.renderFile(data);
@@ -610,6 +610,7 @@
                 this.fallbackFiles.push(data);
 
                 this.fallbackMaxFilesReached();
+
             }
 
             // now the file has been added...if it's buggy, take it out again
@@ -619,6 +620,7 @@
         }
 
         return elems;
+
     };
 
 

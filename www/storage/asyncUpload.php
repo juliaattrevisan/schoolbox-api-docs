@@ -101,6 +101,7 @@ function attemptStorage($fileData)
 
     $storage = StorageMapper::getInstance()->accept($fileData['name'], $fileData['tmp_name']);
 
+    //to also return the stored file location for possible reference / display
     $modelToArray = new ModelToArray();
 
     return [
