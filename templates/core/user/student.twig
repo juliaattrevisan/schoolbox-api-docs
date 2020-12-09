@@ -548,45 +548,118 @@
 
             {% if showClasses %}
             <div class="content" id="classes">
-                <section class="content">
+                <section>
                     {% if showSubjects %}
                     {% for group, subjectGroup in subjects %}
-                        {# Keep a running total of all teachers emails in this group #}
-                        {% set teacherEmails = [] %}
-                        <div class="row divider">
-                            <div class="small-12 columns">
-                                <h2 class="subheader">{{ group }}</h2>
-                                <section>
-                                    {% for subject in subjectGroup %}
-                                        <ul class="subject-list group">
-                                            <li class="subject-group {% block folderListItemClasses %}{% endblock %}">
-                                                <div class="content small-12">
-                                                    {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
-                                                    {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
-                                                        <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
-                                                            <h3 class="no-margin">{{ subject.name }} {% if subjectCode|length %}<span class="meta">({{ subjectCode }})</span>{% endif %}</h3>
+                    {# Keep a running total of all teachers emails in this group #}
+                    {% set teacherEmails = [] %}
+                    <div class="row divider content">
+                        <div class="small-12 columns">
+                        <h2 class="subheader">{{ group }}</h2>
+                        <section class="v-card-list">
+                            {% for subject in subjectGroup %}
+                            <div class="v-card small-12">
+                                {#                                            {% if homepageUrl %}#}
+                                {#                                                <a href="{{ homepageUrl }}">{{ tileContent }}</a>#}
+                                {#                                            {% else %}#}
+                                {#                                                {{ tileContent }}#}
+                                {#                                            {% endif %}#}
+                                <a href="#">
+                                    <div class="card-class-image" style="background-color: #0a6aa1;">
+                                        {% for teacher in subject.teachers %}
+                                        <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="Teacher: {{ teacher.formatName }}" alt="Teacher: {{ teacher.formatName }}" />
+                                        {% endfor %}
+                                    </div>
+                                </a>
+                                <div class="card-content classes actions-small-1 {% block folderListItemClasses %}{% endblock %}">
+                                    <div class="list-item">
+                                        {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
+                                        {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
+                                            <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
+                                                <h3>{{ subject.name }}</h3>
+                                                {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
+                                            </a>
+                                        {% else %}
+                                            <h3>{{ subject.name }}</h3>
+                                            {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
+                                        {% endif %}
+                                    </div>
+                                    {% block folderListItemActions %}{% endblock %}
+                                    <nav>
+                                        <a class="icon-more" data-dropdown="class-options" title="Actions"></a>
+                                    </nav>
+                                    {% for teacher in subject.teachers %}
+                                        {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
+                                        {% set teacherEmails = teacherEmails|merge([email]) %}
+                                        <ul id="class-options" class="f-dropdown" data-dropdown-content>
+                                            <li>
+                                                {% if not teacher.email is empty %}
+                                                    {% set replyTo = teacher.getFormattedEmailDisplay %}
+                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
+                                                {% endif %}
+                                            </li>
+                                        </ul>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% if session.user.role.staff and config.email_all_staff and config.mail_enable %}
+                                {% set teacherEmails = teacherEmails|join(emailSeparator)  %}
+                                {% set replyTo = session.user.getFormattedEmailDisplay %}
+                                <div class="component-action">
+                                    <section>
+                                        <form action="/mail/createMail.php" method="post">
+                                            <div class="row">
+                                                <div class="small-12 columns">
+                                                    <input type="hidden" name="replyto" value="{{ replyTo }}"/>
+                                                    <input type="hidden" name="cc" value="{{ teacherEmails }}"/>
+                                                    <button type="submit" class="button">Email All {{ group }} Teachers</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </section>
+                                </div>
+                            {% endif %}
+                        </section>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if showGroups and groups is not empty %}
+                    <div class="row divider content">
+                        <div class="small-12 columns">
+                            <h2 class="subheader">Groups</h2>
+                            <section>
+                                {% for group in groups %}
+                                    <ul class="subject-list group">
+                                        <li class="subject-group">
+                                            <div class="list-item">
+                                                <div class="content small-12 ">
+                                                    {% if group.perms > 0 %}
+                                                        <a href="/homepage/{{ group.id }}">
+                                                            <h3 class="no-margin">{{ group.name }}</h3>
                                                         </a>
                                                     {% else %}
-                                                        <h3 class="no-margin">{{ subject.name }} {% if subjectCode|length %}<span class="meta">({{ subjectCode }})</span>{% endif %}</h3>
+                                                        <h3 class="no-margin">{{ group.name }}</h3>
                                                     {% endif %}
                                                 </div>
-                                                {% block folderListItemActions %}{% endblock %}
-                                            </li>
-                                            {% for teacher in subject.teachers %}
-                                                {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
-                                                {% set teacherEmails = teacherEmails|merge([email]) %}
+                                            </div>
+                                        </li>
+                                        {% if group.owners is defined %}
+                                            {% for owner in group.owners %}
                                                 <li class="actions-small-1">
                                                     <div class="list-item">
                                                         <div class="compact card small-12">
-                                                            <a href="/search/user/{{ teacher.id }}">
-                                                                <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" />
+                                                            <a href="/search/user/{{ owner.id }}">
+                                                                <img src="/portrait.php?userId={{ owner.externalId }}&amp;size=square64" />
                                                                 <p>
-                                                                    {{ teacher.formatName }}
+                                                                    {{ owner.formatName }}
                                                                     <span class="pipe meta">
-                                                            {% if teacher.positionTitle is empty %}
-                                                                {{ teacher.role.name }}
+                                                            {% if owner.positionTitle is empty %}
+                                                                {{ owner.role.name }}
                                                             {% else %}
-                                                                {{ teacher.positionTitle }}
+                                                                {{ owner.positionTitle }}
                                                             {% endif %}
                                                         </span>
                                                                 </p>
@@ -594,93 +667,19 @@
                                                         </div>
                                                     </div>
                                                     <nav>
-
-                                                        {% if not teacher.email is empty %}
-                                                            {% set replyTo = teacher.getFormattedEmailDisplay %}
+                                                        {% if not owner.email is empty %}
+                                                            {% set replyTo = owner.getFormattedEmailDisplay %}
                                                             <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
                                                         {% endif %}
                                                     </nav>
                                                 </li>
                                             {% endfor %}
-                                        </ul>
-                                    {% endfor %}
-                                    {% if session.user.role.staff and config.email_all_staff and config.mail_enable %}
-                                        {% set teacherEmails = teacherEmails|join(emailSeparator)  %}
-                                        {% set replyTo = session.user.getFormattedEmailDisplay %}
-                                        <div class="component-action">
-                                            <section>
-                                                <form action="/mail/createMail.php" method="post">
-                                                    <div class="row">
-                                                        <div class="small-12 columns">
-                                                            <input type="hidden" name="replyto" value="{{ replyTo }}"/>
-                                                            <input type="hidden" name="cc" value="{{ teacherEmails }}"/>
-                                                            <button type="submit" class="button">Email All {{ group }} Teachers</button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </section>
-                                        </div>
-                                    {% endif %}
-                                </section>
-                            </div>
+                                        {% endif %}
+                                    </ul>
+                                {% endfor %}
+                            </section>
                         </div>
-                    {% endfor %}
-                    {% endif %}
-
-                    {% if showGroups and groups is not empty %}
-                        <div class="row divider">
-                            <div class="small-12 columns">
-                                <h2 class="subheader">Groups</h2>
-                                <section>
-                                    {% for group in groups %}
-                                        <ul class="subject-list group">
-                                            <li class="subject-group">
-                                                <div class="list-item">
-                                                    <div class="content small-12 ">
-                                                        {% if group.perms > 0 %}
-                                                            <a href="/homepage/{{ group.id }}">
-                                                                <h3 class="no-margin">{{ group.name }}</h3>
-                                                            </a>
-                                                        {% else %}
-                                                            <h3 class="no-margin">{{ group.name }}</h3>
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            {% if group.owners is defined %}
-                                                {% for owner in group.owners %}
-                                                    <li class="actions-small-1">
-                                                        <div class="list-item">
-                                                            <div class="compact card small-12">
-                                                                <a href="/search/user/{{ owner.id }}">
-                                                                    <img src="/portrait.php?userId={{ owner.externalId }}&amp;size=square64" />
-                                                                    <p>
-                                                                        {{ owner.formatName }}
-                                                                        <span class="pipe meta">
-                                                                {% if owner.positionTitle is empty %}
-                                                                    {{ owner.role.name }}
-                                                                {% else %}
-                                                                    {{ owner.positionTitle }}
-                                                                {% endif %}
-                                                            </span>
-                                                                    </p>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                        <nav>
-                                                            {% if not owner.email is empty %}
-                                                                {% set replyTo = owner.getFormattedEmailDisplay %}
-                                                                <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
-                                                            {% endif %}
-                                                        </nav>
-                                                    </li>
-                                                {% endfor %}
-                                            {% endif %}
-                                        </ul>
-                                    {% endfor %}
-                                </section>
-                            </div>
-                        </div>
+                    </div>
                     {% endif %}
                 </section>
             </div>

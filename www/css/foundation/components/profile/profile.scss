@@ -2,12 +2,24 @@
   .subheader {
     color: $header-font-color
   }
-
   .divider {
     border-bottom: 2px solid #EDEDED;
 
     &:last-child {
       border: 0;
+    }
+  }
+  #classes {
+    .v-card {
+      flex: 1 0 300px;
+      border: 1px solid #EDEDED;
+      margin: 0 1rem 1rem 0;
+      max-width: 300px;
+      padding: 0;
+
+      @media #{$medium-down} {
+        max-width: none;
+      }
     }
   }
 }
