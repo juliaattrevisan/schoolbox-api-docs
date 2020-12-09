@@ -85,7 +85,7 @@
                         <!-- Attachment Count -->
                         <template v-if="article.attachments">
                             <span>
-                                | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{ article.attachments }} attachments</a>
+                                | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#article-attachments'">{{ article.attachments }} attachments</a>
                             </span>
                         </template>
                     </p>

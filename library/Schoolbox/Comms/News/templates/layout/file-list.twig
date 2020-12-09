@@ -11,6 +11,7 @@
  # @param string $identifier   A string with namespaces each gallery instance from others
  #}
 {% if article.attachedFiles|length %}
+<div id="article-attachments">
     <hr />
 
     {# Images are processed first into their own little lightbox gallery
@@ -29,7 +30,7 @@
             });
         </script>
 
-        <ul class="article-gallery" data-image-gallery="{{ identifier }}">
+        <ul class="inline-list img-gallery" data-image-gallery="{{ identifier }}">
             {% for file in article.getImages %}
                 <li>
                     <a href="/storage/image.php?hash={{ file.hash }}&size=maxsize" rel="lightbox[{{ identifier }}]" title="{{ file.filename }}">
@@ -73,4 +74,5 @@
             {% endfor %}
         </ul>
     {% endif %}
+</div>
 {% endif %}

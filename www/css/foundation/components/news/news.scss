@@ -218,33 +218,17 @@
 }
 
 .article-read-more {
-      margin-top: .5rem;
-      text-transform: uppercase;
-}
-
-/* News Article Gallery of attached images
- */
-.article-gallery {
-    margin-left: 0;
-
-    li {
-        float: left;
-        list-style: none;
-        padding-bottom: 1rem;
-        padding-right: 1rem;
-    }
-}
-
-/* Never wrap
- */
-.article-gallery, .article-files {
-    clear: both;
+    margin-top: .5rem;
+    text-transform: uppercase;
 }
 
 /* News File List
  */
 .article-files {
-    li {
-        border: 1px solid $body-bg;
+  li {
+    border: 1px solid $body-bg;
+    &:only-child {
+      width: 100%;
     }
+  }
 }

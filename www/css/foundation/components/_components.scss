@@ -448,6 +448,7 @@ ul.tileList {
 .img-gallery {
     @extend .inline-list;
     margin-left: 0;
+    margin-bottom: 0;
 
     > a {
       display: $inline-list-display;
