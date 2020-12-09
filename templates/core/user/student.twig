@@ -559,7 +559,7 @@
                         <section class="v-card-list">
                             {% for subject in subjectGroup %}
                             <div class="v-card small-12">
-                                <a href="#">
+                                <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
 {#                                    <div class="card-class-image" style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{% if class.coverImage %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>#}
                                     <div class="card-class-image" style="background-color: #0a6aa1;">
                                         {% for teacher in subject.teachers %}
@@ -629,7 +629,7 @@
                             <section class="v-card-list">
                                 {% for group in groups %}
                                 <div class="v-card small-12">
-                                    <a href="#">
+                                    <a href="/homepage/{{ group.id }}">
 {#                                        <div class="card-class-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImage %} background-image: url('/storage/image.php?hash={{ group.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>#}
                                         <div class="card-class-image" style="background-color: #0a6aa1;">
                                             {% if group.owners is defined %}
