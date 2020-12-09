@@ -1,5 +1,11 @@
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
+<script type="text/javascript">
+    // Print immediately on load
+    $(function() {
+        window.print();
+    });
+</script>
 
 <div id="printable-report" class="e-report">
     {% include '@customMeridenPastoral/contents/index.twig'
