@@ -1,0 +1,57 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbs(
+    ['Badges', routeLookup('learningBadge.getBadges') ],
+    ['Award Achievement']
+) }}
+
+{% set reportContentId = 'badge-list-container' %}
+
+{% autoescape 'js' %}
+<script type="text/javascript">
+    $(function () {
+        // Filtered content has been [re]loaded
+        // (Shouldn't this trigger contain the filters that are selected?)
+        $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
+            // Pass the list of filters into the badge list
+            window.badgeList.$children[0].onFilterChange(selectedFilters);
+        });
+    });
+</script>
+{% endautoescape %}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Award Achievement</h1>
+
+        {% if users is not empty %}
+            <ul class="meta">
+                <li>
+                    {% include 'sub/sharingMetadata.twig'
+                        with {
+                            sharingForSelf: false,
+                            otherUsers:     users,
+                        } only
+                    %}
+                </li>
+            </ul>
+        {% endif %}
+    </div>
+</div>
+
+{% include '@filters/panel.twig' with {
+    contentId: reportContentId,
+    panel:     filterPanel,
+    quickload: false,
+} only %}
+
+<div class="row">
+    <div class="small-12 island">
+        <div id="{{ reportContentId }}">
+            <badge-list get-badges-route="{{ routeLookup('learningBadge.getBadges') }}">
+            </badge-list>
+        </div>
+        <script src="/javascript/components/badgeList.bundle.js"></script>
+    </div>
+</div>
+<div data-toast class="toast"></div>

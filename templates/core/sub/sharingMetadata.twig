@@ -1,0 +1,48 @@
+{##
+ # Display metadata about the users something is being shared on behalf of.
+ #
+ # Parameters:
+ # sharingForSelf: is the current user sharing content for themselves?
+ # otherUsers:     users other than the current user for whom content is being shared
+ #}
+
+{# Display differently if showing to other users #}
+{% if sharingForSelf %}
+    Sharing for myself, and also on behalf of
+{% else %}
+    Sharing on behalf of
+{% endif %}
+
+{##
+ # Presentation depends on how many others are being shared with.
+ # 1-3: just show their names
+ # 4+:  show the names of the first 3, and then "and x others"
+#}
+{% set otherUsersLength = otherUsers|length %}
+{% if otherUsersLength <= 3 %}
+    {% for user in otherUsers -%}
+        {% if not loop.first %}{{ loop.last ? ' and' : ',' }} {% endif %}<a href="/search/user/{{ user.id }}">{{ user.fullName }}</a>
+    {%- endfor %}
+{% else %}
+    {%- for user in otherUsers[0:2] -%}
+        {% if not loop.first %}, {% endif %}<a href="/search/user/{{ user.id }}">{{ user.fullName }}</a>
+    {%- endfor %}
+    and <a href="#" data-reveal-id="all-users">{{ otherUsersLength - 2 }} others</a>
+
+    <div data-reveal id="all-users" class="reveal-modal">
+        <h2>Sharing on behalf of {{ otherUsers|length }} users</h2>
+        <ul class="information-list">
+            {% for user in otherUsers %}
+                <li>
+                    <div class="compact card">
+                        <a href="/search/user/{{ user.id }}">
+                            <img src="/portrait.php?id={{ user.id }}&amp;size=square64">
+                            <p>{{ user.fullName }}</p>
+                        </a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        <a class="close-reveal-modal" aria-label="Close">×</a>
+    </div>
+{% endif %}
