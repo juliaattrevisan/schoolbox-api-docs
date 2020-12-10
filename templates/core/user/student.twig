@@ -460,6 +460,7 @@
                     case '#achievements':
                     case '#goals':
                     case '#classes':
+                    case '#groups':
                     case '#contacts':
                         $('[data-tab] a[href='+window.location.hash+']').trigger('click');
                         break;
@@ -479,7 +480,10 @@
             <dd><a href="#goals">Goals</a></dd>
             {% endif %}
             {% if showClasses %}
-            <dd><a href="#classes">Groups &amp; Classes</a></dd>
+            <dd><a href="#classes">Classes</a></dd>
+            {% endif %}
+            {% if showGroups %}
+                <dd><a href="#groups">Groups</a></dd>
             {% endif %}
             {% if showContactsTab %}
             <dd><a href="#contacts">Contacts</a></dd>
@@ -553,7 +557,7 @@
                     {% for group, subjectGroup in subjects %}
                     {# Keep a running total of all teachers emails in this group #}
                     {% set teacherEmails = [] %}
-                    <div class="row divider content">
+                    <div class="row content">
                         <div class="small-12 columns">
                         <h2 class="subheader">{{ group }}</h2>
                         <section class="v-card-list">
@@ -621,56 +625,60 @@
                     </div>
                     {% endfor %}
                     {% endif %}
+                </section>
+            </div>
+            {% endif %}
 
-                    {% if showGroups and groups is not empty %}
-                    <div class="row divider content">
+            {% if showGroups and groups is not empty %}
+            <div class="content" id="groups">
+                <section>
+                    <div class="row content">
                         <div class="small-12 columns">
                             <h2 class="subheader">Groups</h2>
                             <section class="v-card-list">
                                 {% for group in groups %}
-                                <div class="v-card small-12">
-                                    <a href="/homepage/{{ group.id }}">
-{#                                        <div class="card-class-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImage %} background-image: url('/storage/image.php?hash={{ group.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>#}
-                                        <div class="card-class-image" style="background-color: #0a6aa1;">
+                                    <div class="v-card small-12">
+                                        <a href="/homepage/{{ group.id }}">
+                                            {#                                        <div class="card-class-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImage %} background-image: url('/storage/image.php?hash={{ group.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>#}
+                                            <div class="card-class-image" style="background-color: #0a6aa1;">
+                                                {% if group.owners is defined %}
+                                                    {% for owner in group.owners %}
+                                                        <img src="/portrait.php?userId={{ owner.externalId }}&amp;size=square64" title="{{ owner.formatName }}" alt="{{ owner.formatName }}" />
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </a>
+                                        <div class="card-content classes groups actions-small-1">
+                                            <div class="list-item">
+                                                {% if group.perms > 0 %}
+                                                    <a href="/homepage/{{ group.id }}">
+                                                        <h3>{{ group.name }}</h3>
+                                                    </a>
+                                                {% else %}
+                                                    <h3>{{ group.name }}</h3>
+                                                {% endif %}
+                                            </div>
+                                            <nav>
+                                                <a class="icon-more" data-dropdown="group-options" title="Actions"></a>
+                                            </nav>
                                             {% if group.owners is defined %}
-                                            {% for owner in group.owners %}
-                                            <img src="/portrait.php?userId={{ owner.externalId }}&amp;size=square64" title="{{ owner.formatName }}" alt="{{ owner.formatName }}" />
-                                            {% endfor %}
+                                                {% for owner in group.owners %}
+                                                    <ul id="group-options" class="f-dropdown" data-dropdown-content>
+                                                        <li>
+                                                            {% if not owner.email is empty %}
+                                                                {% set replyTo = owner.getFormattedEmailDisplay %}
+                                                                <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ replyTo }}</a>
+                                                            {% endif %}
+                                                        </li>
+                                                    </ul>
+                                                {% endfor %}
                                             {% endif %}
                                         </div>
-                                    </a>
-                                    <div class="card-content classes groups actions-small-1">
-                                        <div class="list-item">
-                                        {% if group.perms > 0 %}
-                                            <a href="/homepage/{{ group.id }}">
-                                                <h3>{{ group.name }}</h3>
-                                            </a>
-                                        {% else %}
-                                            <h3>{{ group.name }}</h3>
-                                        {% endif %}
-                                        </div>
-                                        <nav>
-                                            <a class="icon-more" data-dropdown="group-options" title="Actions"></a>
-                                        </nav>
-                                        {% if group.owners is defined %}
-                                            {% for owner in group.owners %}
-                                                <ul id="group-options" class="f-dropdown" data-dropdown-content>
-                                                    <li>
-                                                        {% if not owner.email is empty %}
-                                                            {% set replyTo = owner.getFormattedEmailDisplay %}
-                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ replyTo }}</a>
-                                                        {% endif %}
-                                                    </li>
-                                                </ul>
-                                            {% endfor %}
-                                        {% endif %}
                                     </div>
-                                </div>
                                 {% endfor %}
                             </section>
                         </div>
                     </div>
-                    {% endif %}
                 </section>
             </div>
             {% endif %}
