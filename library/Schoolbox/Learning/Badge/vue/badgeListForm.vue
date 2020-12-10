@@ -1,13 +1,7 @@
 <script>
 
-// import {stringify} from 'qs';
 import axios from 'axios';
-// import Toast from "@schoolbox/toast";
 import RevealModal from "@schoolbox/reveal-modal";
-// import BadgeAward from "./badgeAward";
-// import BadgeDetail from "./badgeDetail";
-// import BadgeAchievementWithdrawModal from "./badge-achievement-withdraw-modal";
-// import BadgeGoalWithdrawModal from "./badge-goal-withdraw-modal";
 import BadgeImage from './badge-image';
 import BadgeList from './badgeList';
 import toastMixin from '@schoolbox/toast-mixin';
@@ -24,10 +18,6 @@ export default {
 
     components: {
         BadgeList,
-        // BadgeAward,
-        // BadgeDetail,
-        // BadgeAchievementWithdrawModal,
-        // BadgeGoalWithdrawModal,
         BadgeImage,
         RevealModal,
     },
@@ -70,7 +60,6 @@ export default {
             default: '/',
         },
 
-
         /**
          * Toast activation message
          */
@@ -78,7 +67,6 @@ export default {
             type: String,
             default: 'Awarding achievement...',
         },
-
 
         /**
          * Toast success message
@@ -111,7 +99,6 @@ export default {
             type: String,
             default: 'Awarding the following achievement(s):',
         },
-
 
         /**
          * Confirm button's text

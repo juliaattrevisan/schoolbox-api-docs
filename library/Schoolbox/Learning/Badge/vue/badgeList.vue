@@ -16,7 +16,6 @@ const EVENT_CHANGE = 'change';
 // the filter panel calls `jQuery.fn.foundation` with the entire document as its
 // context.
 // Attempting to apply Foundation again causes the dropdown menus to not work.
-// import foundationMixin from '@schoolbox/foundation-mixin';
 
 /**
  * @emits change The list of selected badges has changed
@@ -80,23 +79,14 @@ export default {
         return {
             currentBadge: null,
             data: [],
-            // search: {},
             metadata: {
                 count: null,
                 cursor: null,
             },
             showSkeletonLoader: true,
             selectedFilters: null,
-            // selections: [],
         }
     },
-    // computed: {
-    // },
-    // mounted() {
-    //     this.load();
-    // },
-    // updated() {
-    // },
     methods: {
         /**
          * Load badges.
@@ -237,9 +227,6 @@ export default {
          */
         selectedBadges() {
             return this.data.filter(v => v.selected === true);
-            // return this.data.filter(v => {
-            //     return this.selections[v.id];
-            // });
         },
 
         /**
@@ -270,18 +257,6 @@ export default {
                 <p>No badges have been created yet.</p>
             </div>
             <template v-else>
-
-                <!-- Search panel. Should this use the filters system? -->
-                <!--
-                <ul class="flex-list buttons">
-                    <li><input type="text" placeholder="Badge Name" v-model="search.badgeName" /></li>
-                    <li><input type="text" placeholder="Creator" v-model="search.creator" /></li>
-                    <li><input type="text" placeholder="Category" v-model="search.category" /></li>
-                    <li><a href="#">Reset to defaults</a></li>
-                    <li><a href="#" class="submit">Apply filters</a></li>
-                </ul>
-                -->
-
                 <div class="badge-grid v-card-list">
                     <div class="badge v-card" v-for="badge in data" :key="badge.id">
                         <!-- I'd apply the click to the entire <li> but that intercepts dropdown clicks -->
