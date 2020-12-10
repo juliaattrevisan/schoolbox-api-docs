@@ -82,6 +82,7 @@ export default {
             },
             showSkeletonLoader: true,
             selectedFilters: null,
+            // selections: [],
         }
     },
     // computed: {
@@ -222,6 +223,18 @@ export default {
             this.showSkeletonLoader = true;
             this.load(false);
         },
+
+        /**
+         * Which badges (if any) are selected?
+         *
+         * @return {Array}
+         */
+        selectedBadges() {
+            return this.data.filter(v => v.selected === true);
+            // return this.data.filter(v => {
+            //     return this.selections[v.id];
+            // });
+        }
     },
 }
 </script>
@@ -265,7 +278,7 @@ export default {
                         </div>
                         <div class="card-content">
                             <template v-if="allowSelection">
-                                <input type="checkbox" :id="'selectBadge-' + String(badge.id)">
+                                <input type="checkbox" :id="'selectBadge-' + String(badge.id)" v-model="badge.selected">
                                 <label :for="'selectBadge-' + String(badge.id)" class="checkbox-label">
                                     {{ badge.name }}
                                 </label>

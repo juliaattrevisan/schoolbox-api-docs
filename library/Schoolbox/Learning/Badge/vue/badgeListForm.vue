@@ -45,16 +45,20 @@ export default {
         }
     },
     methods: {
-      /**
-       * Callback for when the filters for the badge list form are updated:
-       * passed directly to the badge list.
-       *
-       * Fired from outer space (i.e. from the outside window).
-       *
-       * @param {object} selectedFilters The filters that were selected
-       */
+        /**
+         * Callback for when the filters for the badge list form are updated:
+         * passed directly to the badge list.
+         *
+         * Fired from outer space (i.e. from the outside window).
+         *
+         * @param {object} selectedFilters The filters that were selected
+         */
         onFilterChange(selectedFilters) {
             this.$refs.badgeList.onFilterChange(selectedFilters);
+        },
+
+        selectedBadges() {
+            return this.$refs.badgeList.selectedBadges();
         }
     },
 }
@@ -67,6 +71,10 @@ export default {
                     :allow-selection="true"
                     :show-badge-menus="false"
         ></badge-list>
+
+        <ul>
+            <li v-for="badge in selectedBadges">{{ badge.name }}</li>
+        </ul>
 
         <button class="submit full-width" >Award selected achievement(s)</button>
     </div>
