@@ -15,6 +15,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Closure;
 use Schoolbox\Filter;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -140,6 +141,7 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
+        // Create a badge
         $this->register(
             self::METHOD_POST,
             '',
@@ -201,6 +203,26 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             $preloadBadge
         );
+
+
+        // Forms for mass creation of goals/achievements
+        // /learning/badge/user/{userIds}/{achievement|goal}
+        $preloadUsers = Closure::fromCallable([$this, 'preloadUsers']);
+        $this->register(
+            self::METHOD_GET,
+            '/user/{userIds}/achievement',
+            'getBadgeAwardAsAchievementForm',
+            $baseRule,
+            $preloadUsers
+        );
+
+        $this->register(
+            self::METHOD_GET,
+            '/user/{userIds}/goal',
+            'getBadgeSetAsGoalForm',
+            $baseRule,
+            $preloadUsers
+        );
     }
 
 
@@ -237,6 +259,31 @@ class Module extends BaseModule
                 ->get(Mapper::class)
                 ->findById($params['badgeId']),
         ];
+    }
+
+
+    /**
+     * Preload the requested users.
+     *
+     * This is the same preloader that the learning moments form uses.
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function preloadUsers(array $params): array
+    {
+        $userIds = array_unique(explode(',', $params['userIds']));
+        $users   = $this->getMapperFactory()
+                        ->get(UserMapper::class)
+                        ->findByColumn('id', $userIds);
+
+        // Not found if any of the users in the list were not found
+        if (count($users) !== count($userIds)) {
+            throw new NotFound();
+        }
+
+        return ['users' => $users,];
     }
 
 

@@ -16,6 +16,7 @@ use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge\Award\Model as AwardModel;
 use Schoolbox\Learning\Badge\Translator;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -167,6 +168,38 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@learningBadge/index.twig',
                 ['filterPanel' => $filterPanel,],
+                'Badges'
+            )
+        );
+    }
+
+
+    /**
+     * Show a form for awarding a badge as an achievement to a set of users.
+     *
+     * @api GET /learning/badge/user/{userIds}/achievement
+     * @since 20.2
+     *
+     * @param GenericCollection $users
+     */
+    public function getBadgeAwardAsAchievementForm(GenericCollection $users)
+    {
+        $page        = Filter\Page\Model::PAGE_BADGE_LIST;
+        $filterPanel = $this->filterFactoryFactory->buildPanel(
+            $this->getUser(),
+            $page,
+            null,
+            $this->getUser(),
+            []
+        );
+
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningBadge/awardAsAchievementForm.twig',
+                [
+                    'users'       => $users,
+                    'filterPanel' => $filterPanel,
+                ],
                 'Badges'
             )
         );
