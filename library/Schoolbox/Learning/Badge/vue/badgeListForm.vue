@@ -39,6 +39,14 @@ export default {
             default: '',
             required: true,
         },
+
+        /**
+         * The planned recipients of the award.
+         */
+        users: {
+            type: Array,
+            required: true,
+        }
     },
     data() {
         return {
@@ -64,6 +72,16 @@ export default {
          */
         updateSelectedBadges() {
             this.selectedBadges = this.$refs.badgeList.selectedBadges();
+        },
+
+        /**
+         * Helper for rendering a user's full name
+         *
+         * @param {Object} user
+         * @return {String}
+         */
+        fullName(user) {
+            return (user.title + ' ' + user.firstname + ' ' + user.lastname).trim();
         }
     },
 }
@@ -96,6 +114,17 @@ export default {
                     </div>
                 </li>
             </ul>
+
+            <p class="meta">To the following user(s):</p>
+            <ul class="grid medium-block-grid-2 large-block-grid-4">
+                <li v-for="user in users">
+                    <div class="card small-12">
+                        <img :src="'/portrait.php?id=' + user.id + '&size=square32'" :alt="fullName(user)">
+                        <p>{{ fullName(user) }}</p>
+                    </div>
+                </li>
+            </ul>
+
         </reveal-modal>
     </div>
 </template>

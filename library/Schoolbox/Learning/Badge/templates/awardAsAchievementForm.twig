@@ -48,7 +48,8 @@
 <div class="row">
     <div class="small-12 island">
         <div id="{{ reportContentId }}">
-            <badge-list-form get-badges-route="{{ routeLookup('learningBadge.getBadges') }}">
+            <badge-list-form get-badges-route="{{ routeLookup('learningBadge.getBadges') }}"
+                             :users="{{ users | json_encode }}">
             </badge-list-form>
         </div>
         <script src="/javascript/components/badgeListForm.bundle.js"></script>
