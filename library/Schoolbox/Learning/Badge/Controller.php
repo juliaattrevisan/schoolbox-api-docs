@@ -207,6 +207,38 @@ class Controller extends Base
 
 
     /**
+     * Show a form for setting a goal for a set of users.
+     *
+     * @api GET /learning/badge/user/{userIds}/goal
+     * @since 20.2
+     *
+     * @param GenericCollection $users
+     */
+    public function getBadgeSetAsGoalForm(GenericCollection $users)
+    {
+        $page        = Filter\Page\Model::PAGE_BADGE_LIST;
+        $filterPanel = $this->filterFactoryFactory->buildPanel(
+            $this->getUser(),
+            $page,
+            null,
+            $this->getUser(),
+            []
+        );
+
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningBadge/setAsGoalForm.twig',
+                [
+                    'users'       => $users,
+                    'filterPanel' => $filterPanel,
+                ],
+                'Badges'
+            )
+        );
+    }
+
+
+    /**
      * Get a list of badges and their counts, awarded to $user
      *
      * @api GET /learning/badge/{userId}/awarded
