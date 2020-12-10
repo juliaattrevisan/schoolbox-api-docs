@@ -8,7 +8,7 @@ import RevealModal from "@schoolbox/reveal-modal";
 // import BadgeDetail from "./badgeDetail";
 // import BadgeAchievementWithdrawModal from "./badge-achievement-withdraw-modal";
 // import BadgeGoalWithdrawModal from "./badge-goal-withdraw-modal";
-// import BadgeImage from './badge-image';
+import BadgeImage from './badge-image';
 import BadgeList from './badgeList';
 
 export default {
@@ -27,7 +27,7 @@ export default {
         // BadgeDetail,
         // BadgeAchievementWithdrawModal,
         // BadgeGoalWithdrawModal,
-        // BadgeImage,
+        BadgeImage,
         RevealModal,
     },
     props: {
@@ -78,10 +78,24 @@ export default {
                     @change="updateSelectedBadges"
         ></badge-list>
 
-        <ul>
-            <li v-for="badge in selectedBadges">{{ badge.name }}</li>
-        </ul>
+        <button class="submit full-width"
+                @click.prevent="$refs.awardModal.open"
+                :disabled="selectedBadges.length === 0"
+        >Award selected achievement(s)</button>
 
-        <button class="submit full-width" >Award selected achievement(s)</button>
+        <reveal-modal ref="awardModal" size="large">
+            <h2>Confirm achievement(s)</h2>
+            <p class="meta">Awarding the following achievement(s):</p>
+            <ul class="grid medium-block-grid-2 large-block-grid-4">
+                <li v-for="badge in selectedBadges">
+                    <div class="compact card small-12 badge-card">
+                        <div>
+                            <badge-image :badge="badge"></badge-image>
+                            <h3>{{ badge.name }}</h3>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </reveal-modal>
     </div>
 </template>
