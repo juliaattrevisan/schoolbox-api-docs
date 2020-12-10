@@ -10,23 +10,16 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Badge\Award;
 
 use Alaress_Date_Format;
-use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
-use Schoolbox\API\Cursor\MapperCursor;
-use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Filter;
-use Schoolbox\Filter\Codec;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge\Award\Model as AwardModel;
 use Schoolbox\Learning\Badge\Category\Mapper as BadgeCategoryMapper;
-use Schoolbox\Learning\Badge\IconRegistry;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Learning\Badge\Model;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage;
-use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -39,10 +32,6 @@ use function in_array;
  */
 class Controller extends Base
 {
-    // How many badges show per page by default?
-    private const BADGES_PER_PAGE = 40;
-
-
     /**
      * The badge mapper.
      */
@@ -154,7 +143,7 @@ class Controller extends Base
 
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@learningBadge/awardAsAchievementForm.twig',
+                '@learningBadgeAward/awardAsAchievementForm.twig',
                 [
                     'users'       => $users,
                     'filterPanel' => $filterPanel,
@@ -186,7 +175,7 @@ class Controller extends Base
 
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@learningBadge/setAsGoalForm.twig',
+                '@learningBadgeAward/setAsGoalForm.twig',
                 [
                     'users'       => $users,
                     'filterPanel' => $filterPanel,
