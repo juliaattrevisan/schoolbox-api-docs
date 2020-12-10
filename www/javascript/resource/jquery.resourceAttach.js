@@ -3,7 +3,7 @@
  * @link        https://schoolbox.com.au/
  */
 ;(function ($, Dropzone, window, document, undefined) {
-
+    
     var pluginName = 'resourceAttach',
         singletonModal = null,
         modalCache = {},
@@ -56,7 +56,7 @@
     function ResourceAttach(element, options)
     {
         var self, opt, azone, dzone, prompt = '';
-
+        
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
         this.tpl = this.options.tplOverride || $(this.element).find('[data-template]').detach();
@@ -80,8 +80,14 @@
             var li = $(this).closest(opt.attachmentTag);
             self.detach(li);
             e.preventDefault();
-
-            opt.onDetach();
+            
+            //will not be a function if the file has been prevented from uploading
+            //for example if the file limit is 1, and the user dragged 2 files in, 
+            //the 2nd would error when its remove is selected
+            if (typeof opt.onDetach === 'function') {
+                opt.onDetach();
+            }
+            
         });
 
         if (opt.dictDefaultMessage) {
@@ -264,15 +270,6 @@
             });
         }
 
-        // $(this.element).on('click', opt.trigger, function (e) {
-        //     e.preventDefault();
-        //
-        //     if (opt.useModal) {
-        //         self.open();
-        //     } else {
-        //         azone.trigger('click');
-        //     }
-        // });
     }
 
 
@@ -328,31 +325,48 @@
 
 
     ResourceAttach.prototype.getCacheKey = function () {
-
-        return this.options.source + '?' + this.getQueryString();
+        // debugger;
+        return $(this)[0].element.id;
+        // return this.options.source + '?' + this.getQueryString();
     };
 
 
     ResourceAttach.prototype.cacheModal = function (callback) {
-
+        
         var key = this.getCacheKey(),
             self = this;
 
+        // debugger;
+
         if ('undefined' == typeof modalCache[key]) {
-            modalCache[key] = $.get(this.options.source, this.getQueryString()).promise();
+            // modalCache[key] = $.get(this.options.source, this.getQueryString()).promise();
+            console.log('fetch start - ' + this.options.source + '?' + this.getQueryString());
+            fetch(this.options.source + '?' + this.getQueryString(), { method: 'GET'})
+                .then(function(response) {
+                  return response.text();
+                }).then(function(data) {
+                    console.log('fetch returned - ' + self.options.source + '?' + self.getQueryString());
+                    // console.log(data);
+                    self.build.call(self, data);
+                });
+
         }
 
-        modalCache[key].done(function (data) {
-            // ensure we retain ResourceAttache context
-            self.build.call(self, data);
-        });
+        // modalCache[key].done(function (data) {
+        //     // ensure we retain ResourceAttache context
+        //     debugger;
+        //     self.build.call(self, data);
+        // });
 
-        if (callback) {
-            modalCache[key].done(function (data) {
-                // ensure we retain ResourceAttache context
-                callback.call(self, data);
-            });
-        }
+        // if (callback) {
+        //     modalCache[key].done(function (data) {
+        //         // ensure we retain ResourceAttache context
+        //         callback.call(self, data);
+        //     });
+        // }
+
+        
+
     };
 
 
@@ -362,6 +376,7 @@
         this.attachmentBrowserPanelContainerInnerHTML = $(data).find('#attachment-browser-panel-container')[0].innerHTML;
 
         if (singletonModal) {
+            debugger;
             // you've got a modal; don't try to make another one
             return;
         }
@@ -569,7 +584,7 @@
                 
                 //if the file was attached using 'Upload file' it's been uploaded, 
                 //so we can display the image in the drop zone when we return to the page
-                const getExistingFileUrl = () => {
+                let getExistingFileUrl = () => {
                     if (list[i].file) { //this file prop is set within templates/core/resources/filesystem/upload.html - onQueueComplete()
                         return list[i].file.imageUrl;
                     } else { //otherwise we'll just show the file type image
@@ -578,19 +593,22 @@
                 }
                 
                 //once the files displayed, ensure the drop zone window and progress view are hidden
-                const onExistingFileDisplayed = () => {
-                    const elementDOM = $(this.element)[0];
-                    elementDOM.classList.add('dz-max-files-reached');
+                let onExistingFileDisplayed = () => {
+                    let elementDOM = $(this.element)[0];
+                    if (this.dropzone.options.maxFiles == 1) { //^TODO - this aint good enough yet!
+                        elementDOM.classList.add('dz-max-files-reached');
+                    }
                     elementDOM.querySelector('.progress').style.display = 'none';
-                    elems.push($(data.previewElement));
                 }
 
                 //to display an existing file within the drop zone view, as the file has already been loaded
                 //https://gitlab.com/meno/dropzone/-/wikis/FAQ#how-to-show-files-already-stored-on-server
                 this.dropzone.displayExistingFile(data, getExistingFileUrl(), onExistingFileDisplayed);
 
-            } else {
+                elems.push($(data.previewElement));
 
+            } else {
+                
                 data.previewElement = $(this.tpl.html());
 
                 this.renderFile(data);
@@ -645,6 +663,7 @@
 
 
     ResourceAttach.prototype.renderFile = function (file) {
+        
         var elem;
 
         if (!file.previewElement) {
@@ -674,6 +693,7 @@
 
 
     ResourceAttach.prototype.fallbackMaxFilesReached = function () {
+        
         // if we accept multi, there's no limit to check
         if (this.options.multi) {
             return;
