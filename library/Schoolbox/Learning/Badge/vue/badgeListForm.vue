@@ -1,7 +1,7 @@
 <script>
 
 // import {stringify} from 'qs';
-// import axios from 'axios';
+import axios from 'axios';
 // import Toast from "@schoolbox/toast";
 import RevealModal from "@schoolbox/reveal-modal";
 // import BadgeAward from "./badgeAward";
@@ -10,6 +10,7 @@ import RevealModal from "@schoolbox/reveal-modal";
 // import BadgeGoalWithdrawModal from "./badge-goal-withdraw-modal";
 import BadgeImage from './badge-image';
 import BadgeList from './badgeList';
+import toastMixin from '@schoolbox/toast-mixin';
 
 export default {
 
@@ -19,7 +20,7 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [],
+    mixins: [toastMixin],
 
     components: {
         BadgeList,
@@ -36,7 +37,19 @@ export default {
          */
         getBadgesRoute: {
             type: String,
-            default: '',
+            required: true,
+        },
+
+        /**
+         * The key within each selected badge's `_links` list to which requests
+         * to create badges are posted.
+         *
+         * For example, if this is "awardAsAchievement", each selected badge's
+         * `_links["awardAsAchievement"]` will have this component's users
+         * posted to it.
+         */
+        postAwardRouteLookup: {
+            type: String,
             required: true,
         },
 
@@ -102,7 +115,23 @@ export default {
          * Award badges, and then go back to the return URL once done.
          */
         onSubmit() {
-            this.window.location.href = this.returnUrl;
+            this.toastActivate('Awarding achievements...');
+            this.$refs.awardModalSubmit.disabled = true;
+            Promise
+                .all(this.selectedBadges.map(v => {
+                    axios.post(v._links[this.postAwardRouteLookup], {users: this.users})
+                }))
+                .then(() => {
+                    this.toastSuccess('Awarded achievements');
+                    this.$refs.awardModal.close();
+                    this.window.location.href = this.returnUrl;
+                })
+                .catch(() => {
+                    this.toastError('Awarding achievement failed');
+                })
+                .finally(() => {
+                    this.$refs.awardModalSubmit.disabled = false;
+                });
         },
     },
 }
@@ -152,7 +181,7 @@ export default {
             </ul>
 
             <ul class="flex-list buttons">
-                <li><button @click.prevent="onSubmit" class="submit">Confirm</button></li>
+                <li><button ref="awardModalSubmit" @click.prevent="onSubmit" class="submit">Confirm</button></li>
                 <li><a @click.prevent="$refs.awardModal.close" class="button">Cancel</a></li>
             </ul>
         </reveal-modal>
