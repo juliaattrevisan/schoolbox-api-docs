@@ -46,6 +46,15 @@ export default {
         users: {
             type: Array,
             required: true,
+        },
+
+        /**
+         * Where does the user get redirected to on successful save or
+         * cancellation of the form?
+         */
+        returnUrl: {
+            type: String,
+            default: '/',
         }
     },
     data() {
@@ -108,9 +117,7 @@ export default {
                         :disabled="selectedBadges.length === 0"
                 >Award selected achievement(s)</button>
             </li>
-            <li>
-                <a href="#" class="button">Cancel</a>
-            </li>
+            <li><a :href="returnUrl" class="button">Cancel</a></li>
         </ul>
 
 
