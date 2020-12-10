@@ -5,7 +5,7 @@
     ['Award Achievement']
 ) }}
 
-{% set reportContentId = 'badge-list-container' %}
+{% set reportContentId = 'badge-list-form-container' %}
 
 {% autoescape 'js' %}
 <script type="text/javascript">
@@ -48,10 +48,10 @@
 <div class="row">
     <div class="small-12 island">
         <div id="{{ reportContentId }}">
-            <badge-list get-badges-route="{{ routeLookup('learningBadge.getBadges') }}">
-            </badge-list>
+            <badge-list-form get-badges-route="{{ routeLookup('learningBadge.getBadges') }}">
+            </badge-list-form>
         </div>
-        <script src="/javascript/components/badgeList.bundle.js"></script>
+        <script src="/javascript/components/badgeListForm.bundle.js"></script>
     </div>
 </div>
 <div data-toast class="toast"></div>
