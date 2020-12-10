@@ -2,8 +2,8 @@
 
 import axios from 'axios';
 import RevealModal from "@schoolbox/reveal-modal";
-import BadgeImage from './badge-image';
-import BadgeList from './badgeList';
+import BadgeImage from '../../vue/badge-image';
+import BadgeList from '../../vue/badgeList';
 import toastMixin from '@schoolbox/toast-mixin';
 
 export default {
