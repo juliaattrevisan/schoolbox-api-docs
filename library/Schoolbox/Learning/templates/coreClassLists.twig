@@ -18,7 +18,7 @@ Data:
 
             <ul class="flex-list buttons">
                 {% if badgesEnabled %}
-                    <li><a href="#" :class="{disabled: selectedStudentIds.length === 0}">Award Achievement</a></li>
+                    <li><a :href="buildAwardAchievementUrl()" :class="{disabled: selectedStudentIds.length === 0}">Award Achievement</a></li>
                     <li><a href="#" :class="{disabled: selectedStudentIds.length === 0}">Set Goal(s)</a></li>
                 {% endif %}
                 {% if pastoralEnabled %}
@@ -252,6 +252,12 @@ Data:
             },
             addPastoralRecord: function () {
                 window.location.href = '/pastoral/student/0/record/insert?' + this.returnUrlName + '=' + this.encodedReturnUrl + '&duplicates=' + this.selectedStudentIds.join(',');
+            },
+            buildAwardAchievementUrl() {
+                let url = new URL(window.location.href);
+                url.pathname = '/learning/badge/user/' + this.selectedStudentIds.join(',') + '/achievement';
+                url.searchParams.append(this.returnUrlName, this.encodedReturnUrl);
+                return url.toString();
             },
             openShareLearningMomentDialog: function() {
                 // Set each link's href to the selected users
