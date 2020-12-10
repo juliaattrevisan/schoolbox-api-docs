@@ -75,7 +75,7 @@ class Links
         /* All the people who have received this badge as an achievement
          */
         $translation['achievementRecipients'] = $this->getRouteIfAuthorized(
-            'learningBadge.getAchievementRecipients', [
+            'learningBadgeAward.getAchievementRecipients', [
                 'badgeId' => $badge->getId(),
             ]
         );
@@ -83,7 +83,7 @@ class Links
         /* All the people who have received this badge as a goal
          */
         $translation['goalRecipients'] = $this->getRouteIfAuthorized(
-            'learningBadge.getGoalRecipients', [
+            'learningBadgeAward.getGoalRecipients', [
                 'badgeId' => $badge->getId(),
             ]
         );
@@ -91,7 +91,7 @@ class Links
         /* Endpoint for withdrawing the awarding of this achievement
          */
         $translation['achievementWithdraw'] = $this->getRouteIfAuthorized(
-            'learningBadge.postAchievementWithdraw', [
+            'learningBadgeAward.postAchievementWithdraw', [
                 'badgeId' => $badge->getId(),
             ]
         );
@@ -99,7 +99,7 @@ class Links
         /* Endpoint for unsetting the goal
          */
         $translation['goalWithdraw'] = $this->getRouteIfAuthorized(
-            'learningBadge.postGoalWithdraw', [
+            'learningBadgeAward.postGoalWithdraw', [
                 'badgeId' => $badge->getId(),
             ]
         );
