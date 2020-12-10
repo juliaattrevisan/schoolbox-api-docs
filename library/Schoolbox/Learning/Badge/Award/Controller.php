@@ -96,7 +96,7 @@ class Controller extends Base
      * Constructor
      *
      * @param BadgeMapper             $mapper
-     * @param Mapper            $awardMapper
+     * @param Mapper                  $awardMapper
      * @param Filter\IFactoryFactory  $filterFactoryFactory
      * @param Filter\Mapper           $filterMapper
      * @param Filter\Selection\Mapper $filterSelectionMapper

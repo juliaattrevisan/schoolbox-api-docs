@@ -42,18 +42,18 @@ class Module extends BaseModule
             ),
         );
 
-        $viewAwardedBadges = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF),
-                new Rule\IsUserOrParentOfUser(
-                    $this->getExternalUser(),
-                    UserMapper::getInstance(),
-                    'userId'
-                )
-            ),
-        );
+//        $viewAwardedBadges = new Rule\All(
+//            new Rule\IsLoggedIn(),
+//            new Rule\Any(
+//                new Rule\IsSuperuser(),
+//                new Rule\HasRole(Role::STAFF),
+//                new Rule\IsUserOrParentOfUser(
+//                    $this->getExternalUser(),
+//                    UserMapper::getInstance(),
+//                    'userId'
+//                )
+//            ),
+//        );
 
         /* Get a list of badges that are available in the instance
          */
@@ -64,55 +64,55 @@ class Module extends BaseModule
             $baseRule
         );
 
-        /* Get a list of badges that were awarded to a particular person
-         */
-        $this->register(
-            self::METHOD_GET,
-            '/{userId}/awarded',
-            'getAwardedBadges',
-            $viewAwardedBadges,
-            Closure::fromCallable([$this, 'preloadUser']),
-        );
-
-        /* Get a list of people who have received an Achievement Badge
-         */
-        $this->register(
-            self::METHOD_GET,
-            '/{badgeId}/achievement/recipients',
-            'getAchievementRecipients',
-            $baseRule,
-            Closure::fromCallable([$this, 'preloadBadge']),
-        );
-
-        /* Withdraw Achievements from awardees
-         */
-        $this->register(
-            self::METHOD_POST,
-            '/{badgeId}/achievement/withdraw',
-            'postAchievementWithdraw',
-            $baseRule,
-            Closure::fromCallable([$this, 'preloadBadge']),
-        );
-
-        /* Get a list of people who have received a Goal Badge
-         */
-        $this->register(
-            self::METHOD_GET,
-            '/{badgeId}/goal/recipients',
-            'getGoalRecipients',
-            $baseRule,
-            Closure::fromCallable([$this, 'preloadBadge']),
-        );
-
-        /* Withdraw Goals from awardees
-         */
-        $this->register(
-            self::METHOD_POST,
-            '/{badgeId}/goal/withdraw',
-            'postGoalWithdraw',
-            $baseRule,
-            Closure::fromCallable([$this, 'preloadBadge']),
-        );
+//        /* Get a list of badges that were awarded to a particular person
+//         */
+//        $this->register(
+//            self::METHOD_GET,
+//            '/{userId}/awarded',
+//            'getAwardedBadges',
+//            $viewAwardedBadges,
+//            Closure::fromCallable([$this, 'preloadUser']),
+//        );
+//
+//        /* Get a list of people who have received an Achievement Badge
+//         */
+//        $this->register(
+//            self::METHOD_GET,
+//            '/{badgeId}/achievement/recipients',
+//            'getAchievementRecipients',
+//            $baseRule,
+//            Closure::fromCallable([$this, 'preloadBadge']),
+//        );
+//
+//        /* Withdraw Achievements from awardees
+//         */
+//        $this->register(
+//            self::METHOD_POST,
+//            '/{badgeId}/achievement/withdraw',
+//            'postAchievementWithdraw',
+//            $baseRule,
+//            Closure::fromCallable([$this, 'preloadBadge']),
+//        );
+//
+//        /* Get a list of people who have received a Goal Badge
+//         */
+//        $this->register(
+//            self::METHOD_GET,
+//            '/{badgeId}/goal/recipients',
+//            'getGoalRecipients',
+//            $baseRule,
+//            Closure::fromCallable([$this, 'preloadBadge']),
+//        );
+//
+//        /* Withdraw Goals from awardees
+//         */
+//        $this->register(
+//            self::METHOD_POST,
+//            '/{badgeId}/goal/withdraw',
+//            'postGoalWithdraw',
+//            $baseRule,
+//            Closure::fromCallable([$this, 'preloadBadge']),
+//        );
 
         /* The form that people use to Create a Badge
          */
@@ -180,69 +180,69 @@ class Module extends BaseModule
         // I think the disadvantage of {userIds} not being able to put in _links
         // overrules the advantage of checking permissions.
 
-        $preloadBadge = Closure::fromCallable([$this, 'preloadBadge']);
-        $this->register(
-            self::METHOD_POST,
-            '/{badgeId}/achievement',
-            'awardAsAchievement',
-            $baseRule,
-            $preloadBadge
-        );
-
-        // Only staff may set goals for arbitrary users:
-        // any user may set goals for themselves
-        $this->register(
-            self::METHOD_POST,
-            '/{badgeId}/goal',
-            'setAsGoal',
-            $baseRule,
-            $preloadBadge
-        );
-        $this->register(
-            self::METHOD_POST,
-            '/{badgeId}/setGoalForSelf',
-            'setAsGoalForSelf',
-            new Rule\IsLoggedIn(),
-            $preloadBadge
-        );
-
-
-        // Forms for mass creation of goals/achievements
-        // /learning/badge/user/{userIds}/{achievement|goal}
-        $preloadUsers = Closure::fromCallable([$this, 'preloadUsers']);
-        $this->register(
-            self::METHOD_GET,
-            '/user/{userIds}/achievement',
-            'getBadgeAwardAsAchievementForm',
-            $baseRule,
-            $preloadUsers
-        );
-
-        $this->register(
-            self::METHOD_GET,
-            '/user/{userIds}/goal',
-            'getBadgeSetAsGoalForm',
-            $baseRule,
-            $preloadUsers
-        );
+//        $preloadBadge = Closure::fromCallable([$this, 'preloadBadge']);
+//        $this->register(
+//            self::METHOD_POST,
+//            '/{badgeId}/achievement',
+//            'awardAsAchievement',
+//            $baseRule,
+//            $preloadBadge
+//        );
+//
+//        // Only staff may set goals for arbitrary users:
+//        // any user may set goals for themselves
+//        $this->register(
+//            self::METHOD_POST,
+//            '/{badgeId}/goal',
+//            'setAsGoal',
+//            $baseRule,
+//            $preloadBadge
+//        );
+//        $this->register(
+//            self::METHOD_POST,
+//            '/{badgeId}/setGoalForSelf',
+//            'setAsGoalForSelf',
+//            new Rule\IsLoggedIn(),
+//            $preloadBadge
+//        );
+//
+//
+//        // Forms for mass creation of goals/achievements
+//        // /learning/badge/user/{userIds}/{achievement|goal}
+//        $preloadUsers = Closure::fromCallable([$this, 'preloadUsers']);
+//        $this->register(
+//            self::METHOD_GET,
+//            '/user/{userIds}/achievement',
+//            'getBadgeAwardAsAchievementForm',
+//            $baseRule,
+//            $preloadUsers
+//        );
+//
+//        $this->register(
+//            self::METHOD_GET,
+//            '/user/{userIds}/goal',
+//            'getBadgeSetAsGoalForm',
+//            $baseRule,
+//            $preloadUsers
+//        );
     }
 
 
-    /**
-     * Preload the requested student
-     *
-     * @param array $params
-     * @return array
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    private function preloadUser(array $params): array
-    {
-        return [
-            'user' => $this->getMapperFactory()
-                           ->get(UserMapper::class)
-                           ->findById($params['userId']),
-        ];
-    }
+//    /**
+//     * Preload the requested student
+//     *
+//     * @param array $params
+//     * @return array
+//     * @throws \Schoolbox\Mapper\Exception
+//     */
+//    private function preloadUser(array $params): array
+//    {
+//        return [
+//            'user' => $this->getMapperFactory()
+//                           ->get(UserMapper::class)
+//                           ->findById($params['userId']),
+//        ];
+//    }
 
 
     /**
@@ -264,29 +264,29 @@ class Module extends BaseModule
     }
 
 
-    /**
-     * Preload the requested users.
-     *
-     * This is the same preloader that the learning moments form uses.
-     *
-     * @param array $params
-     * @return array
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    private function preloadUsers(array $params): array
-    {
-        $userIds = array_unique(explode(',', $params['userIds']));
-        $users   = $this->getMapperFactory()
-                        ->get(UserMapper::class)
-                        ->findByColumn('id', $userIds);
-
-        // Not found if any of the users in the list were not found
-        if (count($users) !== count($userIds)) {
-            throw new NotFound();
-        }
-
-        return ['users' => $users,];
-    }
+//    /**
+//     * Preload the requested users.
+//     *
+//     * This is the same preloader that the learning moments form uses.
+//     *
+//     * @param array $params
+//     * @return array
+//     * @throws \Schoolbox\Mapper\Exception
+//     */
+//    private function preloadUsers(array $params): array
+//    {
+//        $userIds = array_unique(explode(',', $params['userIds']));
+//        $users   = $this->getMapperFactory()
+//                        ->get(UserMapper::class)
+//                        ->findByColumn('id', $userIds);
+//
+//        // Not found if any of the users in the list were not found
+//        if (count($users) !== count($userIds)) {
+//            throw new NotFound();
+//        }
+//
+//        return ['users' => $users,];
+//    }
 
 
     /**

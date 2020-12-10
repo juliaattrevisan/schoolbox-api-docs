@@ -211,143 +211,143 @@ class Controller extends Base
     }
 
 
-    /**
-     * Show a form for awarding a badge as an achievement to a set of users.
-     *
-     * @api GET /learning/badge/user/{userIds}/achievement
-     * @since 20.2
-     *
-     * @param GenericCollection $users
-     */
-    public function getBadgeAwardAsAchievementForm(GenericCollection $users)
-    {
-        $page        = Filter\Page\Model::PAGE_BADGE_LIST;
-        $filterPanel = $this->filterFactoryFactory->buildPanel(
-            $this->getUser(),
-            $page,
-            null,
-            $this->getUser(),
-            []
-        );
-
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningBadge/awardAsAchievementForm.twig',
-                [
-                    'users'       => $users,
-                    'filterPanel' => $filterPanel,
-                ],
-                'Badges'
-            )
-        );
-    }
-
-
-    /**
-     * Show a form for setting a goal for a set of users.
-     *
-     * @api GET /learning/badge/user/{userIds}/goal
-     * @since 20.2
-     *
-     * @param GenericCollection $users
-     */
-    public function getBadgeSetAsGoalForm(GenericCollection $users)
-    {
-        $page        = Filter\Page\Model::PAGE_BADGE_LIST;
-        $filterPanel = $this->filterFactoryFactory->buildPanel(
-            $this->getUser(),
-            $page,
-            null,
-            $this->getUser(),
-            []
-        );
-
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningBadge/setAsGoalForm.twig',
-                [
-                    'users'       => $users,
-                    'filterPanel' => $filterPanel,
-                ],
-                'Badges'
-            )
-        );
-    }
-
-
-    /**
-     * Get a list of badges and their counts, awarded to $user
-     *
-     * @api GET /learning/badge/{userId}/awarded
-     *
-     * @param User $user
-     * @return void
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws MapperException
-     * @throws \UnexpectedValueException
-     */
-    public function getAwardedBadges(User $user): void
-    {
-        $awards = $this->awardMapper->findRecentForUser($user);
-
-        $stack = [];
-
-        /* Award translator; uses a Badge translator to convert one of
-         * the parts into a fully-fledged badge array representation
-         */
-        $translator = $this->buildBadgeAwardModelToArrayTranslator();
-
-        /* Group by category
-         */
-        foreach ($awards as $award) {
-            /* Force string indexes, otherwise the numeric values get inserted in-order
-             * which isn't intended here; they are already in a particular order
-             */
-            $badgeId = "badge-{$award->getBadge()->getId()}";
-            $categoryId = "category-{$award->getBadge()->getCategory()->getId()}";
-
-            /* Some inline hydration due to curriculum nodes no longer being included
-             * as part of the hydrateSelect in badge mapper
-             */
-            $award->getBadge()->setCurriculumNodes($this->mapper->findCurriculumNodes($award->getBadge()));
-
-            /* Convert to array format
-             */
-            $badge = $translator($award);
-
-            /* Init stack
-             *
-             * Remember one copy of the category
-             */
-            if (!isset($stack['categories'][$categoryId])) {
-                $stack['categories'][$categoryId] = $badge['badge']['category'];
-                $stack['categories'][$categoryId]['awards'] = [];
-            }
-
-            /* Init badge count
-             *
-             * findRecentForUser() is listed reverse chronologically so the first
-             * in the list is the most recently awarded
-             */
-            if (!isset($stack['categories'][$categoryId]['awards'][$badgeId])) {
-                /* This is a set-based aggregation, not an individual model property
-                 */
-                $badge['count'] = 0;
-
-                /* Stick it into the stack
-                 */
-                $stack['categories'][$categoryId]['awards'][$badgeId] = $badge;
-            }
-
-            /* Collapse duplicate badge ids with a count
-             */
-            $stack['categories'][$categoryId]['awards'][$badgeId]['count']++;
-        }
-
-        $this->response->content->set($this->buildJsonOutput($stack));
-    }
+//    /**
+//     * Show a form for awarding a badge as an achievement to a set of users.
+//     *
+//     * @api GET /learning/badge/user/{userIds}/achievement
+//     * @since 20.2
+//     *
+//     * @param GenericCollection $users
+//     */
+//    public function getBadgeAwardAsAchievementForm(GenericCollection $users)
+//    {
+//        $page        = Filter\Page\Model::PAGE_BADGE_LIST;
+//        $filterPanel = $this->filterFactoryFactory->buildPanel(
+//            $this->getUser(),
+//            $page,
+//            null,
+//            $this->getUser(),
+//            []
+//        );
+//
+//        $this->response->content->set(
+//            $this->buildHtmlOutput(
+//                '@learningBadge/awardAsAchievementForm.twig',
+//                [
+//                    'users'       => $users,
+//                    'filterPanel' => $filterPanel,
+//                ],
+//                'Badges'
+//            )
+//        );
+//    }
+//
+//
+//    /**
+//     * Show a form for setting a goal for a set of users.
+//     *
+//     * @api GET /learning/badge/user/{userIds}/goal
+//     * @since 20.2
+//     *
+//     * @param GenericCollection $users
+//     */
+//    public function getBadgeSetAsGoalForm(GenericCollection $users)
+//    {
+//        $page        = Filter\Page\Model::PAGE_BADGE_LIST;
+//        $filterPanel = $this->filterFactoryFactory->buildPanel(
+//            $this->getUser(),
+//            $page,
+//            null,
+//            $this->getUser(),
+//            []
+//        );
+//
+//        $this->response->content->set(
+//            $this->buildHtmlOutput(
+//                '@learningBadge/setAsGoalForm.twig',
+//                [
+//                    'users'       => $users,
+//                    'filterPanel' => $filterPanel,
+//                ],
+//                'Badges'
+//            )
+//        );
+//    }
+//
+//
+//    /**
+//     * Get a list of badges and their counts, awarded to $user
+//     *
+//     * @api GET /learning/badge/{userId}/awarded
+//     *
+//     * @param User $user
+//     * @return void
+//     * @throws \Alaress\Database\Predicate\InvalidColumnException
+//     * @throws \PDOException
+//     * @throws \Schoolbox\Mapper\DefinitionException
+//     * @throws MapperException
+//     * @throws \UnexpectedValueException
+//     */
+//    public function getAwardedBadges(User $user): void
+//    {
+//        $awards = $this->awardMapper->findRecentForUser($user);
+//
+//        $stack = [];
+//
+//        /* Award translator; uses a Badge translator to convert one of
+//         * the parts into a fully-fledged badge array representation
+//         */
+//        $translator = $this->buildBadgeAwardModelToArrayTranslator();
+//
+//        /* Group by category
+//         */
+//        foreach ($awards as $award) {
+//            /* Force string indexes, otherwise the numeric values get inserted in-order
+//             * which isn't intended here; they are already in a particular order
+//             */
+//            $badgeId = "badge-{$award->getBadge()->getId()}";
+//            $categoryId = "category-{$award->getBadge()->getCategory()->getId()}";
+//
+//            /* Some inline hydration due to curriculum nodes no longer being included
+//             * as part of the hydrateSelect in badge mapper
+//             */
+//            $award->getBadge()->setCurriculumNodes($this->mapper->findCurriculumNodes($award->getBadge()));
+//
+//            /* Convert to array format
+//             */
+//            $badge = $translator($award);
+//
+//            /* Init stack
+//             *
+//             * Remember one copy of the category
+//             */
+//            if (!isset($stack['categories'][$categoryId])) {
+//                $stack['categories'][$categoryId] = $badge['badge']['category'];
+//                $stack['categories'][$categoryId]['awards'] = [];
+//            }
+//
+//            /* Init badge count
+//             *
+//             * findRecentForUser() is listed reverse chronologically so the first
+//             * in the list is the most recently awarded
+//             */
+//            if (!isset($stack['categories'][$categoryId]['awards'][$badgeId])) {
+//                /* This is a set-based aggregation, not an individual model property
+//                 */
+//                $badge['count'] = 0;
+//
+//                /* Stick it into the stack
+//                 */
+//                $stack['categories'][$categoryId]['awards'][$badgeId] = $badge;
+//            }
+//
+//            /* Collapse duplicate badge ids with a count
+//             */
+//            $stack['categories'][$categoryId]['awards'][$badgeId]['count']++;
+//        }
+//
+//        $this->response->content->set($this->buildJsonOutput($stack));
+//    }
 
 
     /**
@@ -497,44 +497,44 @@ class Controller extends Base
     }
 
 
-    /**
-     * Award a badge as an achievement for a set of users in the request body.
-     *
-     * TODO consider moving to award controller?
-     *
-     * @api   POST /learning/badge/{badgeId}/achievement
-     * @since 20.2
-     *
-     * @param Model $badge The badge to award as an achievement.
-     * @throws MapperException
-     */
-    public function awardAsAchievement(Model $badge): void
-    {
-        $this->createAwardsFromRequestBody(
-            $badge,
-            AwardModel::AWARD_STATUS_ACHIEVEMENT
-        );
-    }
-
-
-    /**
-     * Set a badge as a goal for a set of users in the request body.
-     *
-     * TODO consider moving to award controller?
-     *
-     * @api   POST /learning/badge/{badgeId}/goal
-     * @since 20.2
-     *
-     * @param Model $badge The badge to set as a goal.
-     * @throws MapperException
-     */
-    public function setAsGoal(Model $badge): void
-    {
-        $this->createAwardsFromRequestBody(
-            $badge,
-            AwardModel::AWARD_STATUS_GOAL
-        );
-    }
+//    /**
+//     * Award a badge as an achievement for a set of users in the request body.
+//     *
+//     * TODO consider moving to award controller?
+//     *
+//     * @api   POST /learning/badge/{badgeId}/achievement
+//     * @since 20.2
+//     *
+//     * @param Model $badge The badge to award as an achievement.
+//     * @throws MapperException
+//     */
+//    public function awardAsAchievement(Model $badge): void
+//    {
+//        $this->createAwardsFromRequestBody(
+//            $badge,
+//            AwardModel::AWARD_STATUS_ACHIEVEMENT
+//        );
+//    }
+//
+//
+//    /**
+//     * Set a badge as a goal for a set of users in the request body.
+//     *
+//     * TODO consider moving to award controller?
+//     *
+//     * @api   POST /learning/badge/{badgeId}/goal
+//     * @since 20.2
+//     *
+//     * @param Model $badge The badge to set as a goal.
+//     * @throws MapperException
+//     */
+//    public function setAsGoal(Model $badge): void
+//    {
+//        $this->createAwardsFromRequestBody(
+//            $badge,
+//            AwardModel::AWARD_STATUS_GOAL
+//        );
+//    }
 
 
     /**
@@ -577,84 +577,84 @@ class Controller extends Base
     }
 
 
-    /**
-     * Set a badge as a goal for the current user.
-     *
-     * To be implemented when students are given the ability to set goals for
-     * themselves.
-     *
-     * TODO consider moving to award controller?
-     *
-     * @api   POST /learning/badge/{badgeId}/achievement
-     * @since 20.2
-     *
-     * @param Model $badge
-     */
-    public function setAsGoalForSelf(Model $badge): void
-    {
-    }
+//    /**
+//     * Set a badge as a goal for the current user.
+//     *
+//     * To be implemented when students are given the ability to set goals for
+//     * themselves.
+//     *
+//     * TODO consider moving to award controller?
+//     *
+//     * @api   POST /learning/badge/{badgeId}/achievement
+//     * @since 20.2
+//     *
+//     * @param Model $badge
+//     */
+//    public function setAsGoalForSelf(Model $badge): void
+//    {
+//    }
 
 
-    /**
-     * Find a list of guys who received $badge as an Achievement
-     *
-     * @param Model $badge
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \PDOException
-     */
-    public function getAchievementRecipients(Model $badge): void
-    {
-        $keyword = (string)($this->getRequest()->query['query'] ?? '');
-
-        /* For now, just search for student recipients
-         */
-        $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, \Schoolbox\Role::STUDENT);
-
-        $this->response->content->set($this->buildJsonOutput($users));
-    }
-
-
-    /**
-     * Find a list of guys who set $badge as a Goal
-     *
-     * @param Model $badge
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \PDOException
-     */
-    public function getGoalRecipients(Model $badge): void
-    {
-        $keyword = (string)($this->getRequest()->query['query'] ?? '');
-
-        /* For now, just search for student recipients
-         */
-        $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_GOAL, \Schoolbox\Role::STUDENT);
-
-        $this->response->content->set($this->buildJsonOutput($users));
-    }
-
-
-    /**
-     * Withdraw an achievement that aws set for a set of users
-     *
-     * @param Model $badge
-     * @throws \PDOException
-     */
-    public function postAchievementWithdraw(Model $badge): void
-    {
-        $this->postWithdraw($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT);
-    }
-
-
-    /**
-     * Withdraw a goal that aws set for a set of users
-     *
-     * @param Model $badge
-     * @throws \PDOException
-     */
-    public function postGoalWithdraw(Model $badge): void
-    {
-        $this->postWithdraw($badge, AwardModel::AWARD_STATUS_GOAL);
-    }
+//    /**
+//     * Find a list of guys who received $badge as an Achievement
+//     *
+//     * @param Model $badge
+//     * @throws \Alaress\Database\Predicate\InvalidColumnException
+//     * @throws \PDOException
+//     */
+//    public function getAchievementRecipients(Model $badge): void
+//    {
+//        $keyword = (string)($this->getRequest()->query['query'] ?? '');
+//
+//        /* For now, just search for student recipients
+//         */
+//        $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, \Schoolbox\Role::STUDENT);
+//
+//        $this->response->content->set($this->buildJsonOutput($users));
+//    }
+//
+//
+//    /**
+//     * Find a list of guys who set $badge as a Goal
+//     *
+//     * @param Model $badge
+//     * @throws \Alaress\Database\Predicate\InvalidColumnException
+//     * @throws \PDOException
+//     */
+//    public function getGoalRecipients(Model $badge): void
+//    {
+//        $keyword = (string)($this->getRequest()->query['query'] ?? '');
+//
+//        /* For now, just search for student recipients
+//         */
+//        $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_GOAL, \Schoolbox\Role::STUDENT);
+//
+//        $this->response->content->set($this->buildJsonOutput($users));
+//    }
+//
+//
+//    /**
+//     * Withdraw an achievement that aws set for a set of users
+//     *
+//     * @param Model $badge
+//     * @throws \PDOException
+//     */
+//    public function postAchievementWithdraw(Model $badge): void
+//    {
+//        $this->postWithdraw($badge, AwardModel::AWARD_STATUS_ACHIEVEMENT);
+//    }
+//
+//
+//    /**
+//     * Withdraw a goal that aws set for a set of users
+//     *
+//     * @param Model $badge
+//     * @throws \PDOException
+//     */
+//    public function postGoalWithdraw(Model $badge): void
+//    {
+//        $this->postWithdraw($badge, AwardModel::AWARD_STATUS_GOAL);
+//    }
 
 
     /**
