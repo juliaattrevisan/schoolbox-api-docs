@@ -14,6 +14,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Closure;
+use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -323,6 +324,8 @@ class Module extends BaseModule
                     'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
                     'storageMapper'         => $this->getMapperFactory()->getLazy(StorageMapper::class),
                     'userMapper'            => $this->getMapperFactory()->getLazy(UserMapper::class),
+                    'categoryMapper'        => $this->getMapperFactory()->getLazy(Category\Mapper::class),
+                    'curriculumNodeMapper'  => $this->getMapperFactory()->getLazy(CurriculumNodeMapper::class),
                 ]
             )
         );

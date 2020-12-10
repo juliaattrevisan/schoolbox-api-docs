@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\API\Translator\ModelToArray\Composite;
+use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\GenericCollection;
@@ -78,6 +79,18 @@ class Controller extends Base
 
 
     /**
+     * Mapper for badge categories.
+     */
+    private Category\Mapper $categoryMapper;
+
+
+    /**
+     * Mapper for curriculum nodes.
+     */
+    private CurriculumNodeMapper $curriculumNodeMapper;
+
+
+    /**
      * Constructor
      *
      * @param Mapper                  $mapper
@@ -87,6 +100,8 @@ class Controller extends Base
      * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param Storage\Mapper          $storageMapper
      * @param UserMapper              $userMapper
+     * @param Category\Mapper         $categoryMapper
+     * @param CurriculumNodeMapper    $curriculumNodeMapper
      */
     public function __construct(
         Mapper $mapper,
@@ -95,7 +110,9 @@ class Controller extends Base
         Filter\Mapper $filterMapper,
         Filter\Selection\Mapper $filterSelectionMapper,
         Storage\Mapper $storageMapper,
-        UserMapper $userMapper
+        UserMapper $userMapper,
+        Category\Mapper $categoryMapper,
+        CurriculumNodeMapper $curriculumNodeMapper
     ) {
         $this->mapper                = $mapper;
         $this->awardMapper           = $awardMapper;
@@ -104,6 +121,8 @@ class Controller extends Base
         $this->filterSelectionMapper = $filterSelectionMapper;
         $this->storageMapper         = $storageMapper;
         $this->userMapper            = $userMapper;
+        $this->categoryMapper        = $categoryMapper;
+        $this->curriculumNodeMapper  = $curriculumNodeMapper;
     }
 
 
@@ -357,7 +376,7 @@ class Controller extends Base
                 [
                     'badge' => [],
                     'attachzone' => $attachzone->getTwigContext(),
-                    'categories' => Category\Mapper::getInstance()->findAll(),
+                    'categories' => $this->categoryMapper->findAll(),
                     'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                     'iconRegistry' => [
                         'registry' => $iconRegistry->getRegistry(),
@@ -398,7 +417,7 @@ class Controller extends Base
         // Is curriculum tagging disabled?
         // Set an empty collection if so, as that is required to save the badge
         if (!$this->getConfigLoader()->get('curriculum_tagging_enabled')) {
-            $model = $model->setCurriculumNodes(\Schoolbox\Curriculum\Node\Mapper::getInstance()->createCollection());
+            $model = $model->setCurriculumNodes($this->curriculumNodeMapper->createCollection());
         }
 
         /* Update an existing instance, if you provided it
@@ -451,7 +470,7 @@ class Controller extends Base
         $this->response->content->set($this->buildHtmlOutput('@learningBadge/createUpdateForm.twig', [
             'badge' => $badge,
             'attachzone' => $attachzone->getTwigContext(),
-            'categories' => Category\Mapper::getInstance()->findAll(),
+            'categories' => $this->categoryMapper->findAll(),
             'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'iconRegistry' => [
                 'registry' => $iconRegistry->getRegistry(),
