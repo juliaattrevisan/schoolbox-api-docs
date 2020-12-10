@@ -16,7 +16,7 @@
     {% if otherUsers is not empty %}
     <ul class="meta">
         <li>
-            {% include 'sub/sharingMetadata.twig'
+            {% include 'sub/userListMetadata.twig'
                 with {
                     users:   otherUsers,
                     message: sharingForSelf ? 'Sharing for myself, and also on behalf of' : 'Sharing on behalf of'
