@@ -264,7 +264,15 @@ export default {
                             </a>
                         </div>
                         <div class="card-content">
-                            <h3><a @click.prevent="openDetailModal(badge)" :title="badge.name">{{ badge.name }}</a></h3>
+                            <template v-if="allowSelection">
+                                <input type="checkbox" :id="'selectBadge-' + String(badge.id)">
+                                <label :for="'selectBadge-' + String(badge.id)" class="checkbox-label">
+                                    {{ badge.name }}
+                                </label>
+                            </template>
+                            <h3 v-else>
+                                <a @click.prevent="openDetailModal(badge)" :title="badge.name">{{ badge.name }}</a>
+                            </h3>
                             <div :class="{'actions-small-0': !showBadgeMenus, 'actions-small-1': showBadgeMenus,}">
                                 <div class="list-item">
                                     <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">{{ badge.category.name }}</p>
