@@ -19,7 +19,7 @@ Data:
             <ul class="flex-list buttons">
                 {% if badgesEnabled %}
                     <li><a :href="buildAwardAchievementUrl()" :class="{disabled: selectedStudentIds.length === 0}">Award Achievement</a></li>
-                    <li><a href="#" :class="{disabled: selectedStudentIds.length === 0}">Set Goal(s)</a></li>
+                    <li><a :href="buildSetGoalUrl()" :class="{disabled: selectedStudentIds.length === 0}">Set Goal(s)</a></li>
                 {% endif %}
                 {% if pastoralEnabled %}
                     <li><a @click.prevent="addPastoralRecord"
@@ -254,8 +254,14 @@ Data:
                 window.location.href = '/pastoral/student/0/record/insert?' + this.returnUrlName + '=' + this.encodedReturnUrl + '&duplicates=' + this.selectedStudentIds.join(',');
             },
             buildAwardAchievementUrl() {
+                return this.buildAwardBadgeUrl('achievement');
+            },
+            buildSetGoalUrl() {
+                return this.buildAwardBadgeUrl('goal');
+            },
+            buildAwardBadgeUrl(awardType) {
                 let url = new URL(window.location.href);
-                url.pathname = '/learning/badge/user/' + this.selectedStudentIds.join(',') + '/achievement';
+                url.pathname = '/learning/badge/user/' + this.selectedStudentIds.join(',') + '/' + awardType;
                 url.searchParams.append(this.returnUrlName, this.encodedReturnUrl);
                 return url.toString();
             },
