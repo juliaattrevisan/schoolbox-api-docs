@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Module as DueworkFeedbackModu
 use Schoolbox\Learning\Assessment\DueWork\Response\Module as DueworkResponseModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
+use Schoolbox\Learning\Badge\Award\Module as BadgeAwardModule;
 use Schoolbox\Learning\Badge\Module as BadgeModule;
 use Schoolbox\Learning\Grades;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
@@ -79,6 +80,7 @@ class Learning extends ModuleLoader
         // Badge module: behind a feature flag
         if ($config->get(ConfigMapper::NAME_BADGES_ENABLED)) {
             $this->loadModule($kernel, BadgeModule::class, "/{$namespace}/badge");
+            $this->loadModule($kernel, BadgeAwardModule::class, "/{$namespace}/badge/award");
         }
 
         // Feed module: not behind a feature flag
