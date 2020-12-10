@@ -1,17 +1,19 @@
 {##
- # Display metadata about the users something is being shared on behalf of.
+ # Display metadata about a list of users.
  #
  # Parameters:
- # sharingForSelf: is the current user sharing content for themselves?
- # otherUsers:     users other than the current user for whom content is being shared
+ # includeSelf:            is the current user included in the metadata?
+ # otherUsers:             users other than the current user to include
+ # selfIncludedMessage:    the message if the current user is included.
+ #                         Will be in a sentence:
+ #                         "{{ selfIncludedMessage }} {{ otherUsers|length }} users"
+ # selfNotIncludedMessage: the message if the current user is not included.
+ #                         Will be in a sentence:
+ #                         "{{ selfNotIncludedMessage }} {{ otherUsers|length }} users"
  #}
 
-{# Display differently if showing to other users #}
-{% if sharingForSelf %}
-    Sharing for myself, and also on behalf of
-{% else %}
-    Sharing on behalf of
-{% endif %}
+{% set message = includeSelf ? selfIncludedMessage : selfNotIncludedMessage %}
+{{ message }}
 
 {##
  # Presentation depends on how many others are being shared with.
@@ -30,7 +32,7 @@
     and <a href="#" data-reveal-id="all-users">{{ otherUsersLength - 2 }} others</a>
 
     <div data-reveal id="all-users" class="reveal-modal">
-        <h2>Sharing on behalf of {{ otherUsers|length }} users</h2>
+        <h2>{{ message }} {{ otherUsers|length }} users</h2>
         <ul class="information-list">
             {% for user in otherUsers %}
                 <li>
