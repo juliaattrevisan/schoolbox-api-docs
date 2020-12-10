@@ -261,7 +261,7 @@ Data:
             },
             buildAwardBadgeUrl(awardType) {
                 let url = new URL(window.location.href);
-                url.pathname = '/learning/badge/user/' + this.selectedStudentIds.join(',') + '/' + awardType;
+                url.pathname = '/learning/badge/award/user/' + this.selectedStudentIds.join(',') + '/' + awardType;
                 url.searchParams.append(this.returnUrlName, this.encodedReturnUrl);
                 return url.toString();
             },
