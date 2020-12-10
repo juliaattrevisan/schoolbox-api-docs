@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Award;
 
+use Alaress_Date_Format;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Cursor\MapperCursor;
@@ -26,8 +27,12 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+
+use function count;
+use function in_array;
 
 /**
  * Controller for badge award requests.
@@ -519,8 +524,6 @@ class Controller extends Base
     /**
      * Set a badge as a goal for a set of users in the request body.
      *
-     * TODO consider moving to award controller?
-     *
      * @api   POST /learning/badge/{badgeId}/goal
      * @since 20.2
      *
@@ -605,7 +608,7 @@ class Controller extends Base
 
         /* For now, just search for student recipients
          */
-        $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, \Schoolbox\Role::STUDENT);
+        $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, Role::STUDENT);
 
         $this->response->content->set($this->buildJsonOutput($users));
     }
@@ -624,7 +627,7 @@ class Controller extends Base
 
         /* For now, just search for student recipients
          */
-        $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_GOAL, \Schoolbox\Role::STUDENT);
+        $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_GOAL, Role::STUDENT);
 
         $this->response->content->set($this->buildJsonOutput($users));
     }
@@ -667,13 +670,13 @@ class Controller extends Base
 
         /* Empty user list; nothing to do
          */
-        if (!\count($userIds)) {
+        if (!count($userIds)) {
             return;
         }
 
         /* Must be a valid status
          */
-        if (!\in_array($status, [AwardModel::AWARD_STATUS_ACHIEVEMENT, AwardModel::AWARD_STATUS_GOAL], true)) {
+        if (!in_array($status, [AwardModel::AWARD_STATUS_ACHIEVEMENT, AwardModel::AWARD_STATUS_GOAL], true)) {
             return;
         }
 
