@@ -133,94 +133,10 @@ class Controller extends Base
     }
 
 
-//    /**
-//     * Retrieve a list of badges.
-//     *
-//     * Depending on request type, this will fetch either a JSON or HTML result:
-//     * The HTML result will only contain a Vue component, the JSON will contain
-//     * the actual results.
-//     *
-//     * @api   GET /learning/badge/
-//     * @since 20.2
-//     */
-//    public function getBadges(): void
-//    {
-//        $page = Filter\Page\Model::PAGE_BADGE_LIST;
-//        if ($this->isJsonRequest()) {
-//            // Boilerplate for getting a set of badges which match filter
-//            $qsFilters      = $this->request->query->get('filters', []);
-//            $codec          = new Codec($this->filterMapper, $this->filterSelectionMapper);
-//            $user           = $this->getUser();
-//            $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
-//            $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);
-//            $idFinder       = Filter\Filters\Badge\IdFinder::getInstance($this->filterMapper, $this->mapper);
-//            $badgeIds       = $idFinder->findIdsByFilters($filters);
-//
-//
-//            // Save selected filters
-//            $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
-//
-//
-//            // Retrieve badges which match the filter
-//            if (count($badgeIds) > 0) {
-//                $cursor  = new MapperCursor(
-//                    $this->mapper,
-//                    self::BADGES_PER_PAGE,
-//                    [
-//                        'name' => $this->mapper::SORT_ORDER_ASC,
-//                        'id'   => $this->mapper::SORT_ORDER_ASC,
-//                    ],
-//                    $this->mapper->getPredicateBuilder()->in('id', $badgeIds)
-//                );
-//                $results = $cursor->retrieveResults($this->request->query->get('cursor'));
-//                $data    = $results->map($this->buildModelToArrayTranslator());
-//                $count   = $cursor->retrieveResultCount();
-//                $next    = $cursor->next($results);
-//                $current = $cursor->current($results);
-//            } else {
-//                $data    = [];
-//                $count   = 0;
-//                $next    = null;
-//                $current = null;
-//            }
-//            $this->response->content->set(
-//                $this->buildJsonOutput([
-//                                           'data'     => $data,
-//                                           'metadata' => [
-//                                               'count'  => $count,
-//                                               'cursor' => [
-//                                                   'next'    => $next,
-//                                                   'current' => $current,
-//                                               ],
-//                                           ],
-//                                       ])
-//            );
-//            return;
-//        }
-//
-//        // Output a Twig template
-//        $filterPanel = $this->filterFactoryFactory->buildPanel(
-//            $this->getUser(),
-//            $page,
-//            null,
-//            $this->getUser(),
-//            []
-//        );
-//
-//        $this->response->content->set(
-//            $this->buildHtmlOutput(
-//                '@learningBadge/index.twig',
-//                ['filterPanel' => $filterPanel,],
-//                'Badges'
-//            )
-//        );
-//    }
-
-
     /**
      * Show a form for awarding a badge as an achievement to a set of users.
      *
-     * @api GET /learning/badge/user/{userIds}/achievement
+     * @api GET /learning/badge/award/user/{userIds}/achievement
      * @since 20.2
      *
      * @param GenericCollection $users
@@ -252,7 +168,7 @@ class Controller extends Base
     /**
      * Show a form for setting a goal for a set of users.
      *
-     * @api GET /learning/badge/user/{userIds}/goal
+     * @api GET /learning/badge/award/user/{userIds}/goal
      * @since 20.2
      *
      * @param GenericCollection $users
@@ -284,7 +200,7 @@ class Controller extends Base
     /**
      * Get a list of badges and their counts, awarded to $user
      *
-     * @api GET /learning/badge/{userId}/awarded
+     * @api GET /learning/badge/award/{userId}/awarded
      *
      * @param User $user
      * @return void
@@ -356,157 +272,10 @@ class Controller extends Base
     }
 
 
-//    /**
-//     * View the form for creating a badge.
-//     *
-//     * @api   GET /learning/badge/create/
-//     * @since 20.2
-//     */
-//    public function getCreateForm(): void
-//    {
-//        $attachzone = new GenericZone('image', $this->storageMapper);
-//        $attachzone
-//            ->setAttachmentsLabel('')
-//            ->setAttachPrompt('upload a badge')
-//            ->setMimeFilter('image/*')
-//            ->setFileVar('image')
-//            ->setMulti(false)
-//            ->setThumbnailSize(64)
-//            ->setModalTitle('Select image');
-//
-//        $iconRegistry = (new IconRegistry())->prepare();
-//
-//        $this->response->content->set(
-//            $this->buildHtmlOutput(
-//                '@learningBadge/createUpdateForm.twig',
-//                [
-//                    'badge' => [],
-//                    'attachzone' => $attachzone->getTwigContext(),
-//                    'categories' => $this->categoryMapper->findAll(),
-//                    'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-//                    'iconRegistry' => [
-//                        'registry' => $iconRegistry->getRegistry(),
-//                        'pageLength' => IconRegistry::BADGE_ICON_MODAL_PAGELENGTH
-//                    ]
-//                ],
-//                'Create Badge'
-//            )
-//        );
-//    }
-//
-//
-//    /**
-//     * Create a badge from POST data.
-//     *
-//     * @api   POST /learning/badge/
-//     * @since 20.2
-//     * @param Model|null $badge
-//     * @throws MapperException
-//     * @throws \PDOException
-//     * @throws \Schoolbox\Resource\Exception
-//     * @throws \UnexpectedValueException
-//     */
-//    public function postBadge(?Model $badge): void
-//    {
-//        $data = json_decode(json_encode($this->request->content->get()), true);
-//
-//        // TODO figure out a better way to handle backend validation than this
-//        if (trim($data['name']) === '') {
-//            throw $this->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
-//        }
-//
-//        $translator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
-//        $model      = $translator($data)
-//            ->setCreatedBy($this->getUser())
-//            ->setUpdatedBy($this->getUser());
-//
-//        // Is curriculum tagging disabled?
-//        // Set an empty collection if so, as that is required to save the badge
-//        if (!$this->getConfigLoader()->get('curriculum_tagging_enabled')) {
-//            $model = $model->setCurriculumNodes($this->curriculumNodeMapper->createCollection());
-//        }
-//
-//        /* Update an existing instance, if you provided it
-//         */
-//        if ($badge) {
-//            $model->setId($badge->getId());
-//        }
-//
-//        /* Explicitly and conclusively choose Icon or Image
-//         */
-//        if (Model::AVATAR_ICON === $data['badge-avatar-selector']) {
-//            $model->setImage(null);
-//        } else {
-//            $model->setIcon(null);
-//        }
-//
-//        $this->mapper->save($model);
-//
-//        // Return the badge just created
-//        $this->response->content->set(
-//            $this->buildJsonOutput(
-//                $this->buildModelToArrayTranslator()($model)
-//            )
-//        );
-//    }
-//
-//
-//    /**
-//     * View the form for updating a badge
-//     *
-//     * @param Model $badge
-//     * @since 20.2
-//     * @api   GET /learning/badge/{badgeId}/update
-//     */
-//    public function getUpdateForm(Model $badge): void
-//    {
-//        $attachzone = new GenericZone('image', $this->storageMapper);
-//        $attachzone
-//            ->setAttachmentsLabel('')
-//            ->setAttachPrompt('upload a badge')
-//            ->setMimeFilter('image/*')
-//            ->setFileVar('image')
-//            ->setMulti(false)
-//            ->setThumbnailSize(64)
-//            ->setModalTitle('Select image')
-//            ->attachFiles([$badge->getImage()]);
-//
-//        $iconRegistry = (new IconRegistry())->prepare();
-//
-//        $this->response->content->set($this->buildHtmlOutput('@learningBadge/createUpdateForm.twig', [
-//            'badge' => $badge,
-//            'attachzone' => $attachzone->getTwigContext(),
-//            'categories' => $this->categoryMapper->findAll(),
-//            'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-//            'iconRegistry' => [
-//                'registry' => $iconRegistry->getRegistry(),
-//                'pageLength' => IconRegistry::BADGE_ICON_MODAL_PAGELENGTH
-//            ]
-//        ], 'Modify Badge'));
-//    }
-//
-//
-//    /**
-//     * Update a badge from POST data
-//     *
-//     * @param Model $badge
-//     * @throws MapperException
-//     * @throws \PDOException
-//     * @throws \Schoolbox\Resource\Exception
-//     * @throws \UnexpectedValueException
-//     * @since 20.2
-//     * @api   POST /learning/badge/{badgeId}/update
-//     */
-//    public function postUpdate(Model $badge): void
-//    {
-//        $this->postBadge($badge);
-//    }
-
-
     /**
      * Award a badge as an achievement for a set of users in the request body.
      *
-     * @api   POST /learning/badge/{badgeId}/achievement
+     * @api   POST /learning/badge/award/{badgeId}/achievement
      * @since 20.2
      *
      * @param Model $badge The badge to award as an achievement.
@@ -585,7 +354,7 @@ class Controller extends Base
      * To be implemented when students are given the ability to set goals for
      * themselves.
      *
-     * @api   POST /learning/badge/{badgeId}/achievement
+     * @api   POST /learning/badge/award/{badgeId}/achievement
      * @since 20.2
      *
      * @param Model $badge
@@ -597,6 +366,9 @@ class Controller extends Base
 
     /**
      * Find a list of guys who received $badge as an Achievement
+     *
+     * @api   GET /learning/badge/award/{badgeId}/achievement/recipients
+     * @since 20.2
      *
      * @param Model $badge
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -617,6 +389,9 @@ class Controller extends Base
     /**
      * Find a list of guys who set $badge as a Goal
      *
+     * @api   GET /learning/badge/award/{badgeId}/goal/recipients
+     * @since 20.2
+     *
      * @param Model $badge
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
@@ -634,7 +409,10 @@ class Controller extends Base
 
 
     /**
-     * Withdraw an achievement that aws set for a set of users
+     * Withdraw an achievement that was set for a set of users
+     *
+     * @api   POST /learning/badge/award/{badgeId}/achievement/withdraw
+     * @since 20.2
      *
      * @param Model $badge
      * @throws \PDOException
@@ -646,7 +424,10 @@ class Controller extends Base
 
 
     /**
-     * Withdraw a goal that aws set for a set of users
+     * Withdraw a goal that was set for a set of users
+     *
+     * @api   POST /learning/badge/award/{badgeId}/goal/withdraw
+     * @since 20.2
      *
      * @param Model $badge
      * @throws \PDOException
