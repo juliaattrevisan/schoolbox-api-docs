@@ -2,17 +2,15 @@
  # Display metadata about a list of users.
  #
  # Parameters:
- # includeSelf:            is the current user included in the metadata?
- # otherUsers:             users other than the current user to include
- # selfIncludedMessage:    the message if the current user is included.
- #                         Will be in a sentence:
- #                         "{{ selfIncludedMessage }} {{ otherUsers|length }} users"
- # selfNotIncludedMessage: the message if the current user is not included.
- #                         Will be in a sentence:
- #                         "{{ selfNotIncludedMessage }} {{ otherUsers|length }} users"
+ # users:   users to include in the metadata
+ # message: the stump of the message to show in the metadata.
+ #          Will be in sentences:
+ #          "{{ message }} and {{ users[0] }}"
+ #          "{{ message }}, {{ users[0] }} and {{ users[1] }}"
+ #          "{{ message }}, {{ users[0] }}, {{ users[1] }} and {{ users|length-2 }} others"
+ #          "{{ message }} {{ users|length }} users" in the modal
  #}
 
-{% set message = includeSelf ? selfIncludedMessage : selfNotIncludedMessage %}
 {{ message }}
 
 {##
@@ -20,21 +18,21 @@
  # 1-3: just show their names
  # 4+:  show the names of the first 3, and then "and x others"
 #}
-{% set otherUsersLength = otherUsers|length %}
-{% if otherUsersLength <= 3 %}
-    {% for user in otherUsers -%}
+{% set usersLength = users|length %}
+{% if usersLength <= 3 %}
+    {% for user in users -%}
         {% if not loop.first %}{{ loop.last ? ' and' : ',' }} {% endif %}<a href="/search/user/{{ user.id }}">{{ user.fullName }}</a>
     {%- endfor %}
 {% else %}
-    {%- for user in otherUsers[0:2] -%}
+    {%- for user in users[0:2] -%}
         {% if not loop.first %}, {% endif %}<a href="/search/user/{{ user.id }}">{{ user.fullName }}</a>
     {%- endfor %}
-    and <a href="#" data-reveal-id="all-users">{{ otherUsersLength - 2 }} others</a>
+    and <a href="#" data-reveal-id="all-users">{{ usersLength - 2 }} others</a>
 
     <div data-reveal id="all-users" class="reveal-modal">
-        <h2>{{ message }} {{ otherUsers|length }} users</h2>
+        <h2>{{ message }} {{ users|length }} users</h2>
         <ul class="information-list">
-            {% for user in otherUsers %}
+            {% for user in users %}
                 <li>
                     <div class="compact card">
                         <a href="/search/user/{{ user.id }}">

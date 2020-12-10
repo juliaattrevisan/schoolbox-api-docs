@@ -29,10 +29,8 @@
                 <li>
                     {% include 'sub/sharingMetadata.twig'
                         with {
-                            includeSelf:            false,
-                            otherUsers:             users,
-                            selfIncludedMessage:    'Awarding to myself, and also to',
-                            selfNotIncludedMessage: 'Awarding to',
+                            users:   users,
+                            message: 'Awarding to'
                         } only
                     %}
                 </li>

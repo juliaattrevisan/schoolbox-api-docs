@@ -18,10 +18,8 @@
         <li>
             {% include 'sub/sharingMetadata.twig'
                 with {
-                    includeSelf:            sharingForSelf,
-                    otherUsers:             otherUsers,
-                    selfIncludedMessage:    'Sharing for myself, and also on behalf of',
-                    selfNotIncludedMessage: 'Sharing on behalf of',
+                    users:   otherUsers,
+                    message: sharingForSelf ? 'Sharing for myself, and also on behalf of' : 'Sharing on behalf of'
                 } only
             %}
         </li>
