@@ -82,7 +82,12 @@ export default {
          */
         fullName(user) {
             return (user.title + ' ' + user.firstname + ' ' + user.lastname).trim();
-        }
+        },
+
+        confirmModal() {
+            // Start saving
+            // Once done go back to return URL
+        },
     },
 }
 </script>
@@ -96,10 +101,18 @@ export default {
                     @change="updateSelectedBadges"
         ></badge-list>
 
-        <button class="submit full-width"
-                @click.prevent="$refs.awardModal.open"
-                :disabled="selectedBadges.length === 0"
-        >Award selected achievement(s)</button>
+        <ul class="flex-list buttons">
+            <li>
+                <button class="submit full-width"
+                        @click.prevent="$refs.awardModal.open"
+                        :disabled="selectedBadges.length === 0"
+                >Award selected achievement(s)</button>
+            </li>
+            <li>
+                <a href="#" class="button">Cancel</a>
+            </li>
+        </ul>
+
 
         <reveal-modal ref="awardModal" size="large">
             <h2>Confirm achievement(s)</h2>
@@ -123,6 +136,11 @@ export default {
                         <p>{{ fullName(user) }}</p>
                     </div>
                 </li>
+            </ul>
+
+            <ul class="flex-list buttons">
+                <li><button class="submit">Confirm</button></li>
+                <li><a @click.prevent="$refs.awardModal.close" class="button">Cancel</a></li>
             </ul>
 
         </reveal-modal>
