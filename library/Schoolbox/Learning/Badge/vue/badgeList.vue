@@ -42,6 +42,7 @@ export default {
         getBadgesRoute: {
             type: String,
             default: '',
+            required: true,
         },
 
         /**
@@ -52,6 +53,22 @@ export default {
         postBadgeRoute: {
             type: String,
             default: '',
+        },
+
+        /**
+         * Is the menu shown for each badge?
+         */
+        showBadgeMenus: {
+            type: Boolean,
+            default: true,
+        },
+
+        /**
+         * Can badges be selected?
+         */
+        allowSelection: {
+            type: Boolean,
+            default: false,
         },
     },
     data() {
@@ -248,17 +265,17 @@ export default {
                         </div>
                         <div class="card-content">
                             <h3><a @click.prevent="openDetailModal(badge)" :title="badge.name">{{ badge.name }}</a></h3>
-                            <div class="actions-small-1">
+                            <div :class="{'actions-small-0': !showBadgeMenus, 'actions-small-1': showBadgeMenus,}">
                                 <div class="list-item">
                                     <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">{{ badge.category.name }}</p>
                                 </div>
-                                <nav>
+                                <nav v-if="showBadgeMenus">
                                   <a href="#"
                                      class="icon-overflow"
                                      :data-dropdown="'badge-' + String(badge.id) + '-dropdown'"
                                      aria-expanded="false" title="Actions"></a>
                                 </nav>
-                                <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
+                                <ul v-if="showBadgeMenus" :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
                                   <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase">Award achievement</a></li>
                                   <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal">Set goal</a></li>
                                   <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-close">Withdraw achievement</a></li>
