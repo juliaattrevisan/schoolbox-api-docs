@@ -62,6 +62,9 @@ export default {
             selectedBadges: [],
         }
     },
+    computed: {
+        window: () => window,
+    },
     methods: {
         /**
          * Callback for when the filters for the badge list form are updated:
@@ -93,9 +96,13 @@ export default {
             return (user.title + ' ' + user.firstname + ' ' + user.lastname).trim();
         },
 
-        confirmModal() {
-            // Start saving
-            // Once done go back to return URL
+        /**
+         * Submit action for this form.
+         *
+         * Award badges, and then go back to the return URL once done.
+         */
+        onSubmit() {
+            this.window.location.href = this.returnUrl;
         },
     },
 }
@@ -119,7 +126,6 @@ export default {
             </li>
             <li><a :href="returnUrl" class="button">Cancel</a></li>
         </ul>
-
 
         <reveal-modal ref="awardModal" size="large">
             <h2>Confirm achievement(s)</h2>
@@ -146,10 +152,9 @@ export default {
             </ul>
 
             <ul class="flex-list buttons">
-                <li><button class="submit">Confirm</button></li>
+                <li><button @click.prevent="onSubmit" class="submit">Confirm</button></li>
                 <li><a @click.prevent="$refs.awardModal.close" class="button">Cancel</a></li>
             </ul>
-
         </reveal-modal>
     </div>
 </template>
