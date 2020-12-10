@@ -42,6 +42,7 @@ export default {
     },
     data() {
         return {
+            selectedBadges: [],
         }
     },
     methods: {
@@ -57,8 +58,12 @@ export default {
             this.$refs.badgeList.onFilterChange(selectedFilters);
         },
 
-        selectedBadges() {
-            return this.$refs.badgeList.selectedBadges();
+        /**
+         * Listener for the badge list's change event, emitted when a badge is
+         * selected or deselected.
+         */
+        updateSelectedBadges() {
+            this.selectedBadges = this.$refs.badgeList.selectedBadges();
         }
     },
 }
@@ -70,6 +75,7 @@ export default {
                     :get-badges-route="getBadgesRoute"
                     :allow-selection="true"
                     :show-badge-menus="false"
+                    @change="updateSelectedBadges"
         ></badge-list>
 
         <ul>

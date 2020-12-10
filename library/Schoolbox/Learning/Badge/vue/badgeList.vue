@@ -10,12 +10,17 @@ import BadgeAchievementWithdrawModal from "./badge-achievement-withdraw-modal";
 import BadgeGoalWithdrawModal from "./badge-goal-withdraw-modal";
 import BadgeImage from './badge-image';
 
+const EVENT_CHANGE = 'change';
+
 // Foundation mixin is not required:
 // the filter panel calls `jQuery.fn.foundation` with the entire document as its
 // context.
 // Attempting to apply Foundation again causes the dropdown menus to not work.
 // import foundationMixin from '@schoolbox/foundation-mixin';
 
+/**
+ * @emits change The list of selected badges has changed
+ */
 export default {
 
     /**
@@ -222,6 +227,7 @@ export default {
             this.selectedFilters    = selectedFilters;
             this.showSkeletonLoader = true;
             this.load(false);
+            this.emitChange();
         },
 
         /**
@@ -234,6 +240,14 @@ export default {
             // return this.data.filter(v => {
             //     return this.selections[v.id];
             // });
+        },
+
+        /**
+         * Helper for emitting the change event: this happens when selecting a
+         * badge, or reloading the filter.
+         */
+        emitChange() {
+            this.$emit(EVENT_CHANGE);
         }
     },
 }
@@ -278,7 +292,11 @@ export default {
                         </div>
                         <div class="card-content">
                             <template v-if="allowSelection">
-                                <input type="checkbox" :id="'selectBadge-' + String(badge.id)" v-model="badge.selected">
+                                <input type="checkbox"
+                                       :id="'selectBadge-' + String(badge.id)"
+                                       v-model="badge.selected"
+                                       @change="emitChange"
+                                >
                                 <label :for="'selectBadge-' + String(badge.id)" class="checkbox-label">
                                     {{ badge.name }}
                                 </label>
