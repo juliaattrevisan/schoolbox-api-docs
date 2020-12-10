@@ -16,6 +16,7 @@ use Aura\Di\ContainerInterface;
 use Closure;
 use Schoolbox\Filter;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -320,6 +321,8 @@ class Module extends BaseModule
                     'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
                     'filterMapper'          => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
                     'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
+                    'storageMapper'         => $this->getMapperFactory()->getLazy(StorageMapper::class),
+                    'userMapper'            => $this->getMapperFactory()->getLazy(UserMapper::class),
                 ]
             )
         );

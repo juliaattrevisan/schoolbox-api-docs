@@ -66,6 +66,18 @@ class Controller extends Base
 
 
     /**
+     * Mapper for storage objects.
+     */
+    private Storage\Mapper $storageMapper;
+
+
+    /**
+     * Mapper for users.
+     */
+    private UserMapper $userMapper;
+
+
+    /**
      * Constructor
      *
      * @param Mapper                  $mapper
@@ -73,19 +85,25 @@ class Controller extends Base
      * @param Filter\IFactoryFactory  $filterFactoryFactory
      * @param Filter\Mapper           $filterMapper
      * @param Filter\Selection\Mapper $filterSelectionMapper
+     * @param Storage\Mapper          $storageMapper
+     * @param UserMapper              $userMapper
      */
     public function __construct(
         Mapper $mapper,
         Award\Mapper $awardMapper,
         Filter\IFactoryFactory $filterFactoryFactory,
         Filter\Mapper $filterMapper,
-        Filter\Selection\Mapper $filterSelectionMapper
+        Filter\Selection\Mapper $filterSelectionMapper,
+        Storage\Mapper $storageMapper,
+        UserMapper $userMapper
     ) {
         $this->mapper                = $mapper;
         $this->awardMapper           = $awardMapper;
         $this->filterFactoryFactory  = $filterFactoryFactory;
         $this->filterMapper          = $filterMapper;
         $this->filterSelectionMapper = $filterSelectionMapper;
+        $this->storageMapper         = $storageMapper;
+        $this->userMapper            = $userMapper;
     }
 
 
@@ -321,7 +339,7 @@ class Controller extends Base
      */
     public function getCreateForm(): void
     {
-        $attachzone = new GenericZone('image', Storage\Mapper::getInstance());
+        $attachzone = new GenericZone('image', $this->storageMapper);
         $attachzone
             ->setAttachmentsLabel('')
             ->setAttachPrompt('upload a badge')
@@ -417,7 +435,7 @@ class Controller extends Base
      */
     public function getUpdateForm(Model $badge): void
     {
-        $attachzone = new GenericZone('image', Storage\Mapper::getInstance());
+        $attachzone = new GenericZone('image', $this->storageMapper);
         $attachzone
             ->setAttachmentsLabel('')
             ->setAttachPrompt('upload a badge')
@@ -523,8 +541,7 @@ class Controller extends Base
         $collection = $this->awardMapper->createCollection();
         foreach ($data['users'] as $user) {
             $award = $this->awardMapper->createModel()
-                // TODO inject user mapper
-                ->setRecipient(UserMapper::getInstance()->findById($user['id']))
+                ->setRecipient($this->userMapper->findById($user['id']))
                 ->setBadge($badge)
                 ->setStatus($status)
                 ->setAwardedBy($this->getUser())
