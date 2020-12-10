@@ -444,21 +444,6 @@ ul.tileList {
     }
 }
 
-// Image gallery specific
-.img-gallery {
-    @extend .inline-list;
-    margin-left: 0;
-    margin-bottom: 0;
-
-    > a {
-      display: $inline-list-display;
-      float: $default-float;
-      list-style: none;
-      margin-right: $inline-list-default-float-list-margin;
-      margin-bottom: $inline-list-default-float-list-margin;
-    }
-}
-
 /**
  * Hide empty state message configs on components, these are only for use in templates
  */
