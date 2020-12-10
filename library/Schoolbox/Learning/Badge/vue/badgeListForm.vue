@@ -68,6 +68,57 @@ export default {
         returnUrl: {
             type: String,
             default: '/',
+        },
+
+
+        /**
+         * Toast activation message
+         */
+        toastActivateMessage: {
+            type: String,
+            default: 'Awarding achievement...',
+        },
+
+
+        /**
+         * Toast success message
+         */
+        toastSuccessMessage: {
+            type: String,
+            default: 'Awarded achievement',
+        },
+
+        /**
+         * Toast failure message
+         */
+        toastFailureMessage: {
+            type: String,
+            default: 'Awarding achievement failed',
+        },
+
+        /**
+         * Confirm modal's header
+         */
+        confirmModalHeader: {
+            type: String,
+            default: 'Confirm achievement(s)',
+        },
+
+        /**
+         * Confirm modal's meta
+         */
+        confirmModalMeta: {
+            type: String,
+            default: 'Awarding the following achievement(s):',
+        },
+
+
+        /**
+         * Confirm button's text
+         */
+        confirmButtonText: {
+            type: String,
+            default: 'Award selected achievement(s)',
         }
     },
     data() {
@@ -115,19 +166,19 @@ export default {
          * Award badges, and then go back to the return URL once done.
          */
         onSubmit() {
-            this.toastActivate('Awarding achievements...');
+            this.toastActivate(this.toastActivateMessage);
             this.$refs.awardModalSubmit.disabled = true;
             Promise
                 .all(this.selectedBadges.map(v => {
                     axios.post(v._links[this.postAwardRouteLookup], {users: this.users})
                 }))
                 .then(() => {
-                    this.toastSuccess('Awarded achievements');
+                    this.toastSuccess(this.toastSuccessMessage);
                     this.$refs.awardModal.close();
                     this.window.location.href = this.returnUrl;
                 })
                 .catch(() => {
-                    this.toastError('Awarding achievement failed');
+                    this.toastError(this.toastFailureMessage);
                 })
                 .finally(() => {
                     this.$refs.awardModalSubmit.disabled = false;
@@ -151,14 +202,14 @@ export default {
                 <button class="submit full-width"
                         @click.prevent="$refs.awardModal.open"
                         :disabled="selectedBadges.length === 0"
-                >Award selected achievement(s)</button>
+                >{{ confirmButtonText }}</button>
             </li>
             <li><a :href="returnUrl" class="button">Cancel</a></li>
         </ul>
 
         <reveal-modal ref="awardModal" size="large">
-            <h2>Confirm achievement(s)</h2>
-            <p class="meta">Awarding the following achievement(s):</p>
+            <h2>{{ confirmModalHeader }}</h2>
+            <p class="meta">{{ confirmModalMeta }}</p>
             <ul class="grid medium-block-grid-2 large-block-grid-4">
                 <li v-for="badge in selectedBadges">
                     <div class="compact card small-12 badge-card">

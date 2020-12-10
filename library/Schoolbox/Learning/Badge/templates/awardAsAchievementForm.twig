@@ -51,6 +51,12 @@
             <badge-list-form get-badges-route="{{ routeLookup('learningBadge.getBadges') }}"
                              :users="{{ users | json_encode }}"
                              post-award-route-lookup="awardAsAchievement"
+                             toast-activate-message="Awarding achievement..."
+                             toast-success-message="Awarded achievement"
+                             toast-failure-message="Awarding achievement failed"
+                             confirm-button-text="Award selected achievement(s)"
+                             confirm-modal-header="Confirm achievement(s)"
+                             confirm-modal-meta="Awarding the following achievement(s):"
                              return-url="{{ RETURN_URL.previous.decoded }}">
             </badge-list-form>
         </div>
