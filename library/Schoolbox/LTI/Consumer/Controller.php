@@ -109,7 +109,8 @@ class Controller extends Base
     {
         $this->componentConfigMapper           = Component_ConfigMapper::getInstance();
         $this->componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
-        $this->baseUrl                         = "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}";
+        $serverHost                            = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'];
+        $this->baseUrl                         = "{$_SERVER['REQUEST_SCHEME']}://{$serverHost}";
     }
 
     /**

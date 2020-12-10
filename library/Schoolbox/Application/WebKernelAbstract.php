@@ -216,9 +216,9 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         $error,
         int $code
     ): void {
-
-        if (isset($_SERVER['HTTP_HOST'])) {
-            $url = 'http' . (getenv("SERVER_PORT") === '443' ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        if (isset($_SERVER['HTTP_X_FORWARDED_HOST']) || isset($_SERVER['HTTP_HOST'])) {
+            $serverHost = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'];
+            $url        = 'http' . (getenv("SERVER_PORT") === '443' ? 's://' : '://') . $serverHost . $_SERVER['REQUEST_URI'];
         } else {
             $url = '';
         }

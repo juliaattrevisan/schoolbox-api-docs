@@ -58,13 +58,13 @@ class HeaderCheckTest extends TestCase
                 ],
                 'expectedResult' => true,
             ],
-            'preferMatchingHostToForwardedHost' => [
+            'preferForwardedHostToProxyHost' => [
                 'serverVars' => [
                     'HTTP_ORIGIN'           => 'http://192.168.36.10/adminv2/menu-top',
                     'HTTP_HOST'             => '192.168.36.10',
                     'HTTP_X_FORWARDED_HOST' => 'google.com',
                 ],
-                'expectedResult' => true,
+                'expectedResult' => false,
             ],
             'preferNonMatchingOriginToReferer' => [
                 'serverVars' => [
@@ -74,13 +74,13 @@ class HeaderCheckTest extends TestCase
                 ],
                 'expectedResult' => false,
             ],
-            'preferNonMatchingHostToForwardedHost' => [
+            'preferForwardedHostToNonMatchingProxyHost' => [
                 'serverVars' => [
                     'HTTP_ORIGIN'           => 'http://192.168.36.10/adminv2/menu-top',
                     'HTTP_HOST'             => 'google.com',
                     'HTTP_X_FORWARDED_HOST' => '192.168.36.10',
                 ],
-                'expectedResult' => false,
+                'expectedResult' => true,
             ],
             'noSource' => [
                 'serverVars' => [

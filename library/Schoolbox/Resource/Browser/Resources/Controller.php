@@ -60,7 +60,7 @@ class Controller extends AbstractController
             'file'       => $link,
             'type'       => 'link',
             'tree'       => $this->getBreadcrumbs($link->getFolder()),
-            'host'       => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_HOST')),
+            'host'       => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_X_FORWARDED_HOST') ?? $server->get('HTTP_HOST')),
             'access'     => Access::getInstance()->getFolderAccess($this->getUser(), $folderId),
             'namespace'  => $this->namespace,
         ];

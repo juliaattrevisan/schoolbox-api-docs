@@ -233,7 +233,8 @@ abstract class Alaress_Cache_Abstract
          * open relative urls
          */
         if (preg_match('#^/#', $this->url)) {
-            $url = "http://{$_SERVER['HTTP_HOST']}{$this->url}";
+            $serverHost = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? '';
+            $url = "http://{$serverHost}{$this->url}";
         } else {
             $url = $this->url;
         }

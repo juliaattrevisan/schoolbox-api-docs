@@ -26,7 +26,7 @@ if (isset($_GET['wikiID'])) {
 
     /* Enforce absolute paths in relative links when exported
      */
-    $hostURL = SitePage::conType() . $_SERVER['HTTP_HOST'];
+    $hostURL = SitePage::conType() . ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? '');
 
     $matches = [];
     $body    = $wikiContents['body'];
