@@ -144,16 +144,6 @@ export default {
         },
 
         /**
-         * Helper for rendering a user's full name
-         *
-         * @param {Object} user
-         * @return {String}
-         */
-        fullName(user) {
-            return (user.title + ' ' + user.firstname + ' ' + user.lastname).trim();
-        },
-
-        /**
          * Submit action for this form.
          *
          * Award badges, and then go back to the return URL once done.
@@ -217,9 +207,9 @@ export default {
             <p class="meta">To the following user(s):</p>
             <ul class="grid medium-block-grid-2 large-block-grid-4">
                 <li v-for="user in users">
-                    <div class="card small-12">
-                        <img :src="'/portrait.php?id=' + user.id + '&size=square32'" :alt="fullName(user)">
-                        <p>{{ fullName(user) }}</p>
+                    <div class="card small-12 compact">
+                        <img :src="user._links.avatar" :alt="user.fullName">
+                        <p>{{ user.fullName }}</p>
                     </div>
                 </li>
             </ul>

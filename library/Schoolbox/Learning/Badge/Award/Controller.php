@@ -116,10 +116,10 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@learningBadgeAward/awardAsAchievementForm.twig',
                 [
-                    'users'       => $users,
+                    'users'       => $users->map(new User\Translator\Author\ModelToArray()),
                     'filterPanel' => $filterPanel,
                 ],
-                'Badges'
+                'Award Achievement'
             )
         );
     }
@@ -167,10 +167,10 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@learningBadgeAward/setAsGoalForm.twig',
                 [
-                    'users'       => $users,
+                    'users'       => $users->map(new User\Translator\Author\ModelToArray()),
                     'filterPanel' => $filterPanel,
                 ],
-                'Badges'
+                'Set Goals'
             )
         );
     }
