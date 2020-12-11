@@ -1,0 +1,50 @@
+{% extends '@filters/_component.twig' %}
+
+{% block filterName %}Curriculum Codes{% endblock %}
+
+{% block userOptions %}
+    {# Empty input is required so that filter works if not user-configurable, or
+       nothing is selected #}
+    <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
+
+    {% if isUserConfigurable %}
+        {# Selectize is only created if the item is user-configurable #}
+        <script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+        <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+        <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+
+        {# Selectize for something #}
+        {% autoescape 'js' %}
+            <script type="text/javascript">
+                $(function () {
+                    var $filterSelector = $('#filter-selector-curriculum-node');
+                    $filterSelector.curriculumSelector({
+                        value: {{ (selectedNodes ?? []) | json_encode | raw }}
+                    });
+                });
+
+                // TODO set up the selectize renderer to make it show just the code in the panel
+            </script>
+        {% endautoescape %}
+
+        <select id="filter-selector-curriculum-node"
+                name="filter_selection[{{ definition.filter.id }}][]"
+                multiple
+                placeholder="Enter one or more curriculum codes"
+                data-selectize
+        >
+            {% for selectedNode in selectedNodes %}
+                {% include '@filters/_option.twig' with {
+                    roleSelection:      roleSelections[selectedNode.id] ?? null,
+                    userSelection:      userSelections[selectedNode.id] ?? null,
+                    label:              selectedNode.code,
+                    value:              selectedNode.id,
+                    disabled:           isDisabled,
+                    DEBUG_WRAP:         false,
+                } only %}
+            {% endfor %}
+        </select>
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock userOptions %}

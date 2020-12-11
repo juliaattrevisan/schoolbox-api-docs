@@ -75,16 +75,6 @@ class Definition extends AbstractDefinition
 
 
     /**
-     * @param GenericCollection|Page\Option\Model[] $options
-     * @return GenericCollection
-     */
-    protected function sortFilterOptions(GenericCollection $options): GenericCollection
-    {
-        return $options;
-    }
-
-
-    /**
      * Return the set of possible keys for this filter's options
      *
      * @return string[]
@@ -115,7 +105,7 @@ class Definition extends AbstractDefinition
      */
     protected function insertDynamicOptions(Page\Model $pageFilter): GenericCollection
     {
-        $options = $pageFilter->getOptions();
+        $options = parent::insertDynamicOptions($pageFilter);
 
         // Ensure it contains all categories
         foreach ($this->categories as $category) {

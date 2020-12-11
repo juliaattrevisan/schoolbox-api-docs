@@ -15,9 +15,12 @@ use Schoolbox\GenericCollection;
  */
 abstract class AbstractDefinition implements IDefinition
 {
-
-    // The name to expose in the UI
-    // @todo It should be a view-layer responsibility (eg twig macro) to map from filter definition to a human-readable name
+    /**
+     * The name to expose in the UI for this filter.
+     *
+     * @todo It should be a view-layer responsibility (eg twig macro)
+     *       to map from filter definition to a human-readable name
+     */
     protected const NAME = '';
 
     /** @var Model */
