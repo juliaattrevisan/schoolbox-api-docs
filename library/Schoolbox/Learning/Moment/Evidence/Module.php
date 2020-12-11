@@ -278,8 +278,10 @@ class Module extends BaseModule
                         ->get(UserMapper::class)
                         ->findByColumn('id', $userIds);
 
-        // Not found if any of the users in the list were not found
-        if (count($users) !== count($userIds)) {
+        // It's acceptable for some users in userIds to not be found.
+        // However, at least one user must be found for this form to have
+        // something to act upon.
+        if (count($users) === 0) {
             throw new NotFound();
         }
 
