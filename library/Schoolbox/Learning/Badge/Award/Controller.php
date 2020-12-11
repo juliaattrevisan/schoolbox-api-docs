@@ -11,15 +11,12 @@ namespace Schoolbox\Learning\Badge\Award;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge\Award\Model as AwardModel;
-use Schoolbox\Learning\Badge\Category\Mapper as BadgeCategoryMapper;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Learning\Badge\Model;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -51,74 +48,29 @@ class Controller extends Base
 
 
     /**
-     * Mapper for filters.
-     */
-    private Filter\Mapper $filterMapper;
-
-
-    /**
-     * Mapper for filter selections.
-     */
-    private Filter\Selection\Mapper $filterSelectionMapper;
-
-
-    /**
-     * Mapper for storage objects.
-     */
-    private Storage\Mapper $storageMapper;
-
-
-    /**
      * Mapper for users.
      */
     private UserMapper $userMapper;
 
 
     /**
-     * Mapper for badge categories.
-     */
-    private BadgeCategoryMapper $categoryMapper;
-
-
-    /**
-     * Mapper for curriculum nodes.
-     */
-    private CurriculumNodeMapper $curriculumNodeMapper;
-
-
-    /**
      * Constructor
      *
-     * @param BadgeMapper             $mapper
-     * @param Mapper                  $awardMapper
-     * @param Filter\IFactoryFactory  $filterFactoryFactory
-     * @param Filter\Mapper           $filterMapper
-     * @param Filter\Selection\Mapper $filterSelectionMapper
-     * @param Storage\Mapper          $storageMapper
-     * @param UserMapper              $userMapper
-     * @param BadgeCategoryMapper     $categoryMapper
-     * @param CurriculumNodeMapper    $curriculumNodeMapper
+     * @param BadgeMapper            $mapper
+     * @param Mapper                 $awardMapper
+     * @param Filter\IFactoryFactory $filterFactoryFactory
+     * @param UserMapper             $userMapper
      */
     public function __construct(
         BadgeMapper $mapper,
         Mapper $awardMapper,
         Filter\IFactoryFactory $filterFactoryFactory,
-        Filter\Mapper $filterMapper,
-        Filter\Selection\Mapper $filterSelectionMapper,
-        Storage\Mapper $storageMapper,
-        UserMapper $userMapper,
-        BadgeCategoryMapper $categoryMapper,
-        CurriculumNodeMapper $curriculumNodeMapper
+        UserMapper $userMapper
     ) {
-        $this->mapper                = $mapper;
-        $this->awardMapper           = $awardMapper;
-        $this->filterFactoryFactory  = $filterFactoryFactory;
-        $this->filterMapper          = $filterMapper;
-        $this->filterSelectionMapper = $filterSelectionMapper;
-        $this->storageMapper         = $storageMapper;
-        $this->userMapper            = $userMapper;
-        $this->categoryMapper        = $categoryMapper;
-        $this->curriculumNodeMapper  = $curriculumNodeMapper;
+        $this->mapper               = $mapper;
+        $this->awardMapper          = $awardMapper;
+        $this->filterFactoryFactory = $filterFactoryFactory;
+        $this->userMapper           = $userMapper;
     }
 
 
