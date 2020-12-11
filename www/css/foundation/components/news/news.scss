@@ -230,5 +230,29 @@
     &:only-child {
       width: 100%;
     }
+    .card {
+      padding: .5rem .25rem;
+      p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      img {
+        margin: 0 .5rem 0 0;
+      }
+    }
   }
 }
+
+/* News Homepage component specific
+ */
+div[id^='news-container'], div[id*='news-container']{
+  #article-attachments {
+    padding: 0 1rem 1rem 1rem;
+
+    hr {
+      margin-top: 0;
+    }
+  }
+}
+
