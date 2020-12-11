@@ -2,32 +2,40 @@
  # Display metadata about a list of users.
  #
  # Parameters:
- # users:   users to include in the metadata
- # message: the stump of the message to show in the metadata.
- #          Will be in sentences:
- #          "{{ message }} and {{ users[0] }}"
- #          "{{ message }}, {{ users[0] }} and {{ users[1] }}"
- #          "{{ message }}, {{ users[0] }}, {{ users[1] }} and {{ users|length-2 }} others"
- #          "{{ message }} {{ users|length }} users" in the modal
+ # users:        users to include in the metadata
+ # message:      the stump of the message to show in the metadata.
+ #               Will be in sentences:
+ #               "{{ message }} and {{ users[0] }}"
+ #               "{{ message }}, {{ users[0] }} and {{ users[1] }}"
+ #               "{{ message }}, {{ users[0] }}, {{ users[1] }} and {{ users|length-2 }} others"
+ #               "{{ message }} {{ users|length }} users" in the modal
+ # maxUserCount: The maximum number of users to show in the metadata, before
+ #               cutting off and showing "and x more"
+ #               If there are no more than maxUserCount users: show their names
+ #               If there are more:
+ #               show the names of the first (maxUserCount - 1),
+ #               and then "and (users|length - maxUserCount + 1) others"
  #}
 
 {{ message }}
 
 {##
  # Presentation depends on how many others are being shared with.
- # 1-3: just show their names
- # 4+:  show the names of the first 3, and then "and x others"
+ # <= maxUserCount: just show their names
+ # > maxUserCount:  show the names of the first 2, and then "and x others"
 #}
 {% set usersLength = users|length %}
-{% if usersLength <= 3 %}
+{% set maxUserCount = maxUserCount is defined ? maxUserCount : 3 %}
+{% if usersLength <= maxUserCount %}
     {% for user in users -%}
         {% if not loop.first %}{{ loop.last ? ' and' : ',' }} {% endif %}<a href="/search/user/{{ user.id }}">{{ user.fullName }}</a>
     {%- endfor %}
 {% else %}
-    {%- for user in users[0:2] -%}
+    {% set leftoverCount = maxUserCount - 1 %}
+    {%- for user in users[0:leftoverCount] -%}
         {% if not loop.first %}, {% endif %}<a href="/search/user/{{ user.id }}">{{ user.fullName }}</a>
     {%- endfor %}
-    and <a href="#" data-reveal-id="all-users">{{ usersLength - 2 }} others</a>
+    and <a href="#" data-reveal-id="all-users">{{ usersLength - leftoverCount }} others</a>
 
     <div data-reveal id="all-users" class="reveal-modal">
         <h2>{{ message }} {{ users|length }} users</h2>
