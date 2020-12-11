@@ -96,6 +96,16 @@ class Module extends BaseModule
 
 
         // Routes to register:
+
+        // Redirect to create form, given a set of user IDs in the query string
+        $this->register(
+            self::METHOD_GET,
+            '/user/create',
+            'redirectToCreateForm',
+            new Rule\IsLoggedIn()
+        );
+
+        // Create form for evidence
         $this->register(
             self::METHOD_GET,
             '/user/{userIds}/create',
@@ -104,6 +114,7 @@ class Module extends BaseModule
             $viewCreateFormPreloader
         );
 
+        // Post evidence to users
         $this->register(
             self::METHOD_POST,
             '/user/{userIds}/create',

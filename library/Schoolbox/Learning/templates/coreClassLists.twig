@@ -202,6 +202,7 @@ Data:
             encodedReturnUrl: '{{ encodedReturnUrl }}',
             getAwardAsAchievementFormEndpoint: '{{ routeLookup('learningBadgeAward.redirectToAwardAsAchievementForm') }}',
             getSetAsGoalFormEndpoint: '{{ routeLookup('learningBadgeAward.redirectToSetAsGoalForm') }}',
+            getCreateEvidenceFormEndpoint: '{{ routeLookup('learningMomentEvidence.redirectToCreateForm') }}'
         },
         mounted: function() {
             var self = this;
@@ -271,12 +272,14 @@ Data:
             openShareLearningMomentDialog: function() {
                 // Set each link's href to the selected users
                 let self     = this,
-                    dialog   = $('#classList-shareLearningMoment'),
-                    pathname = '/learning/evidence/user/' + self.selectedStudentIds.join(',') + '/create';
+                    dialog   = $('#classList-shareLearningMoment');
+                    // url      = new URL(window.location.href),
+                    // pathname = '/learning/evidence/user/' + self.selectedStudentIds.join(',') + '/create';
                 dialog.find('a[data-action="shareLearningMoment"]').each(function () {
                     let url      = new URL(this.href);
-                    url.pathname = pathname;
-                    this.href    = url.href;
+                    url.pathname = self.getCreateEvidenceFormEndpoint;
+                    url.searchParams.append('userIds', self.selectedStudentIds.join(','));
+                    this.href = url.href;
                 });
 
                 // Also update the "sharing on behalf of" part here

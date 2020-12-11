@@ -61,6 +61,25 @@ class Controller extends Base
 
 
     /**
+     * Redirect to the create form.
+     *
+     * This takes a list of user IDs in the 'userId' query string parameter.
+     *
+     * @api   GET /learning/evidence/user/create
+     * @since 20.2
+     */
+    public function redirectToCreateForm(): void
+    {
+        $this->response->redirect->to(
+            $this->router->generate(
+                'learningMomentEvidence.getCreateForm',
+                ['userIds' => $this->request->query->get('userIds')]
+            )
+        );
+    }
+
+
+    /**
      * Render a create form for a learning moment.
      *
      * @api   GET /learning/evidence/user/{userIds}/create
