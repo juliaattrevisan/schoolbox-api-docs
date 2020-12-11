@@ -308,9 +308,11 @@ class Controller extends Base
         // any other user.
         $data       = json_decode($this->request->content->getRaw(), true);
         $collection = $this->mapper->createCollection();
-        foreach ($data['users'] as $user) {
+        $userIds    = array_column($data['users'], 'id');
+        $users      = $this->userMapper->findByColumn('id', $userIds);
+        foreach ($users as $user) {
             $award = $this->mapper->createModel()
-                                  ->setRecipient($this->userMapper->findById($user['id']))
+                                  ->setRecipient($user)
                                   ->setBadge($badge)
                                   ->setStatus($status)
                                   ->setAwardedBy($this->getUser())
