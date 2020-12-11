@@ -138,12 +138,10 @@ class Module extends BaseModule
                 Controller::class,
                 [
                     'mapper'                => $this->getMapperFactory()->getLazy(Mapper::class),
-                    'awardMapper'           => $this->getMapperFactory()->getLazy(Award\Mapper::class),
                     'filterFactoryFactory'  => $injector->lazyGet('filters.factoryFactory'),
                     'filterMapper'          => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
                     'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
                     'storageMapper'         => $this->getMapperFactory()->getLazy(StorageMapper::class),
-                    'userMapper'            => $this->getMapperFactory()->getLazy(UserMapper::class),
                     'categoryMapper'        => $this->getMapperFactory()->getLazy(Category\Mapper::class),
                     'curriculumNodeMapper'  => $this->getMapperFactory()->getLazy(CurriculumNodeMapper::class),
                 ]

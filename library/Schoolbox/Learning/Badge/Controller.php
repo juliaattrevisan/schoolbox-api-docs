@@ -11,14 +11,11 @@ namespace Schoolbox\Learning\Badge;
 
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
-use Alaress_Date_Format;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
-use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Badge\Award\Model as AwardModel;
 use Schoolbox\Learning\Badge\Translator;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -40,12 +37,6 @@ class Controller extends Base
      * The badge mapper.
      */
     private Mapper $mapper;
-
-
-    /**
-     * @var Award\Mapper
-     */
-    private Award\Mapper $awardMapper;
 
 
     /**
@@ -73,12 +64,6 @@ class Controller extends Base
 
 
     /**
-     * Mapper for users.
-     */
-    private UserMapper $userMapper;
-
-
-    /**
      * Mapper for badge categories.
      */
     private Category\Mapper $categoryMapper;
@@ -94,33 +79,27 @@ class Controller extends Base
      * Constructor
      *
      * @param Mapper                  $mapper
-     * @param Award\Mapper            $awardMapper
      * @param Filter\IFactoryFactory  $filterFactoryFactory
      * @param Filter\Mapper           $filterMapper
      * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param Storage\Mapper          $storageMapper
-     * @param UserMapper              $userMapper
      * @param Category\Mapper         $categoryMapper
      * @param CurriculumNodeMapper    $curriculumNodeMapper
      */
     public function __construct(
         Mapper $mapper,
-        Award\Mapper $awardMapper,
         Filter\IFactoryFactory $filterFactoryFactory,
         Filter\Mapper $filterMapper,
         Filter\Selection\Mapper $filterSelectionMapper,
         Storage\Mapper $storageMapper,
-        UserMapper $userMapper,
         Category\Mapper $categoryMapper,
         CurriculumNodeMapper $curriculumNodeMapper
     ) {
         $this->mapper                = $mapper;
-        $this->awardMapper           = $awardMapper;
         $this->filterFactoryFactory  = $filterFactoryFactory;
         $this->filterMapper          = $filterMapper;
         $this->filterSelectionMapper = $filterSelectionMapper;
         $this->storageMapper         = $storageMapper;
-        $this->userMapper            = $userMapper;
         $this->categoryMapper        = $categoryMapper;
         $this->curriculumNodeMapper  = $curriculumNodeMapper;
     }
