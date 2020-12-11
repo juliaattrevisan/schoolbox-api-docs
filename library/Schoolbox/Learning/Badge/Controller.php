@@ -359,73 +359,6 @@ class Controller extends Base
 
 
     /**
-     * Creates badge awards from the request body.
-     *
-     * Users to award to will be in the "users" key, and each user will be
-     * identified by the "id" key of each item in "users".
-     *
-     * @param Model  $badge  The badge to award.
-     * @param string $status The status to award the badge with:
-     *                       * `AwardModel::AWARD_STATUS_ACHIEVEMENT` for
-     *                         awarding the badge as an achievement
-     *                       * `AwardModel::AWARD_STATUS_GOAL` for awarding the
-     *                         badge as a goal to be achieved
-     * @throws MapperException
-     */
-    private function createAwardsFromRequestBody(Model $badge, string $status): void
-    {
-        // Users are in the data.
-        // So far: it's assumed all staff may award or set a badge as a goal to
-        // any other user.
-        $data       = json_decode($this->request->content->getRaw(), true);
-        $collection = $this->awardMapper->createCollection();
-        foreach ($data['users'] as $user) {
-            $award = $this->awardMapper->createModel()
-                ->setRecipient($this->userMapper->findById($user['id']))
-                ->setBadge($badge)
-                ->setStatus($status)
-                ->setAwardedBy($this->getUser())
-                ->setAwardedAt(Alaress_Date_Format::now());
-            $collection->add($award);
-        }
-        $this->awardMapper->save($collection);
-
-        // Return what was just created
-        $translator = $this->buildBadgeAwardModelToArrayTranslator();
-        $this->response->content->set(
-            $this->buildJsonOutput($collection->map($translator))
-        );
-    }
-
-
-    /**
-     * Withdraw an Awarding of $badge to a specific set of users
-     *
-     * @param Model  $badge
-     * @param string $status
-     * @throws \PDOException
-     */
-    private function postWithdraw(Model $badge, string $status): void
-    {
-        $userIds = $this->getRequest()->post['userIds'] ?? [];
-
-        /* Empty user list; nothing to do
-         */
-        if (!\count($userIds)) {
-            return;
-        }
-
-        /* Must be a valid status
-         */
-        if (!\in_array($status, [AwardModel::AWARD_STATUS_ACHIEVEMENT, AwardModel::AWARD_STATUS_GOAL], true)) {
-            return;
-        }
-
-        $this->awardMapper->deleteMostRecentlyAwarded($userIds, $badge, $status);
-    }
-
-
-    /**
      * Builder for the model-to-array translator for badges.
      *
      * @return Composite
@@ -445,17 +378,5 @@ class Controller extends Base
                 $this->getUser()
             )
         );
-    }
-
-
-    /**
-     * Builder for the model-to-array translator for badge awards.
-     *
-     * @return Award\Translator\ModelToArray
-     */
-    private function buildBadgeAwardModelToArrayTranslator(): Award\Translator\ModelToArray
-    {
-        $factory = new Award\Translator\ModelToArray\Factory($this->router, $this->authorizer, $this->getUser());
-        return $factory->build();
     }
 }
