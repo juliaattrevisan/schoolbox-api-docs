@@ -21,6 +21,19 @@ const EVENT_CHANGE = 'change';
  * @emits change The list of selected badges has changed
  */
 export default {
+    /**
+     * Constant values which this component may expose. Generally, this includes
+     * information which a component including this component might want to know
+     * about:
+     * * sensible default values for this component
+     * * event names
+     *
+     * (This is not part of Vue, and isn't a convention yet: putting it out
+     *  there as an idea for discussion.)
+     */
+    constants: {
+        EVENT_CHANGE,
+    },
 
     /**
      * Mixins.

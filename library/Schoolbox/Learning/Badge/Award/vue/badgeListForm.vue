@@ -117,6 +117,7 @@ export default {
     data() {
         return {
             selectedBadges: [],
+            badgeListChangeEvent: BadgeList.constants.EVENT_CHANGE,
         }
     },
     computed: {
@@ -177,7 +178,7 @@ export default {
                     :get-badges-route="getBadgesRoute"
                     :allow-selection="true"
                     :show-badge-menus="false"
-                    @change="updateSelectedBadges"
+                    @[badgeListChangeEvent]="updateSelectedBadges"
         ></badge-list>
 
         <ul class="flex-list buttons">
