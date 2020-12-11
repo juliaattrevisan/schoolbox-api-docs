@@ -14,12 +14,8 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Closure;
-use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
-use Schoolbox\Filter;
-use Schoolbox\Learning\Badge\Category\Mapper as BadgeCategoryMapper;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Mapper\Exception\NotFound;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
