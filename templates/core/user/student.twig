@@ -56,7 +56,7 @@
 {% set showTitle = user.hasPositionTitle() %}
 
 {% set showActivityFeed = (isStaff or isSelf or isParentOfStudent) %}
-
+{% set showAchievementsTab = config.badges_enabled %}
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
     {
@@ -477,7 +477,9 @@
             {% if showActivityFeed %}
             <dd class="active"><a href="#activity">Activity Feed</a></dd>
             {% endif %}
+            {% if showAchievementsTab %}
             <dd class="{% if not showActivityFeed %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
+            {% endif %}
             {% if showClasses %}
             <dd><a href="#classes">Groups &amp; Classes</a></dd>
             {% endif %}

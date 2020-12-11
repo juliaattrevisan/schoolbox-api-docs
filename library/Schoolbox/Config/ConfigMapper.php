@@ -122,6 +122,7 @@ class ConfigMapper extends Mapper
     public const NAME_GRADES_ENABLED               = 'grades_enabled';
 
     public const NAME_LEARNING_MOMENTS_ENABLED = 'learning_moments_enabled';
+    public const NAME_BADGES_ENABLED           = 'badges_enabled';
 
     public const NAME_JWT_PUBLIC_KEY  = 'jwt_public_key';
     public const NAME_JWT_PRIVATE_KEY = 'jwt_private_key';

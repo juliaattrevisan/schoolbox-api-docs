@@ -16,8 +16,10 @@ Data:
         <h1>${ subject }</h1>
 
             <ul class="flex-list buttons">
-                <li><a href="#" class="disabled">Award Achievement</a></li>
-                <li><a href="#" class="disabled">Set Goal(s)</a></li>
+                {% if badgesEnabled %}
+                    <li><a href="#" class="disabled">Award Achievement</a></li>
+                    <li><a href="#" class="disabled">Set Goal(s)</a></li>
+                {% endif %}
                 {% if pastoralEnabled %}
                     <li><a @click.prevent="addPastoralRecord"
                            :class="{disabled: selectedStudentIds.length === 0}">Add {{ locale.pastoralCare.proper }} Record</a></li>
@@ -361,8 +363,10 @@ Data:
 </script>
 {% endautoescape %}
 
-{% include '@learningMomentEvidence/shareModal.twig' with {
-    id:                "classList-shareLearningMoment",
-    baseUrl:           '',
-    allowDynamicUsers: true,
-} only %}
+{% if learningMomentsEnabled %}
+    {% include '@learningMomentEvidence/shareModal.twig' with {
+        id:                "classList-shareLearningMoment",
+        baseUrl:           '',
+        allowDynamicUsers: true,
+    } only %}
+{% endif %}

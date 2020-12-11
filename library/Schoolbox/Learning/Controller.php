@@ -438,6 +438,7 @@ class Controller extends Base
                 'mailEnabled'            => $this->getConfigLoader()->get('mail_enable'),
                 'pastoralEnabled'        => $this->getConfigLoader()->get('pastoral_enabled'),
                 'learningMomentsEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
+                'badgesEnabled'          => $this->getConfigLoader()->get(ConfigMapper::NAME_BADGES_ENABLED),
                 'emailGroups'            => $this->getClassListsEmailGroups(),
                 'folder'                 => $folder,
                 'returnUrlName'          => Assessment\Redirect::RETURN_URL,

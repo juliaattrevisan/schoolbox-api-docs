@@ -17,9 +17,13 @@
             {% if createLearningMomentEvidenceUrl %}
                 <a class="button icon-share" href="#" data-reveal-id="component{{ component.instance.id }}-shareWork">Share Learning</a>
             {% endif %}
-            <a class="button icon-goal" href="#">Set my goals</a>
+            {% if config.badges_enabled %}
+                <a class="button icon-goal" href="#">Set my goals</a>
+            {% endif %}
             <a class="button icon-advanced-list" href="/search/user/{{ user.id }}#activity">My Activity</a>
-            <a class="button icon-trophy" href="/search/user/{{ user.id }}#achievements">My Achievements</a>
+            {% if config.badges_enabled %}
+                <a class="button icon-trophy" href="/search/user/{{ user.id }}#achievements">My Achievements</a>
+            {% endif %}
         </div>
     </div>
 </div>

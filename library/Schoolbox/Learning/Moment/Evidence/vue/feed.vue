@@ -232,7 +232,7 @@ export default {
         <div class="small-12 island">
           <div v-if="metadata.count === 0" class="empty-state">
             <i class="icon-advanced-list"></i>
-            <p>There is no activity yet. To get started you can <a href="#" title="Share something" @click="openShareLearningMomentModal">share something</a>.</p>
+            <p>There is no activity yet.</p>
           </div>
           <button v-else-if="metadata.cursor.next && metadata.count > data.length" class="expand" @click.prevent="append(metadata.cursor.next)">
             Load more
