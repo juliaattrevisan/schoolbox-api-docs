@@ -131,12 +131,12 @@ class Module extends BaseModule
 
 
         // Forms for mass creation of goals/achievements
-        // /learning/badge/user/{userIds}/{achievement|goal}
+        // /learning/badge/award/user/{userIds}/{achievement|goal}
         $preloadUsers = Closure::fromCallable([$this, 'preloadUsers']);
         $this->register(
             self::METHOD_GET,
             '/user/{userIds}/achievement',
-            'getBadgeAwardAsAchievementForm',
+            'getAwardAsAchievementForm',
             $baseRule,
             $preloadUsers
         );
@@ -144,7 +144,7 @@ class Module extends BaseModule
         $this->register(
             self::METHOD_GET,
             '/user/{userIds}/goal',
-            'getBadgeSetAsGoalForm',
+            'getSetAsGoalForm',
             $baseRule,
             $preloadUsers
         );

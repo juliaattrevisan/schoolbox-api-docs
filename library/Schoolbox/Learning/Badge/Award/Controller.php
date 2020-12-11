@@ -74,6 +74,8 @@ class Controller extends Base
     }
 
 
+
+
     /**
      * Show a form for awarding a badge as an achievement to a set of users.
      *
@@ -82,7 +84,7 @@ class Controller extends Base
      *
      * @param GenericCollection $users
      */
-    public function getBadgeAwardAsAchievementForm(GenericCollection $users)
+    public function getAwardAsAchievementForm(GenericCollection $users)
     {
         $page        = Filter\Page\Model::PAGE_BADGE_LIST;
         $filterPanel = $this->filterFactoryFactory->buildPanel(
@@ -114,7 +116,7 @@ class Controller extends Base
      *
      * @param GenericCollection $users
      */
-    public function getBadgeSetAsGoalForm(GenericCollection $users)
+    public function getSetAsGoalForm(GenericCollection $users)
     {
         $page        = Filter\Page\Model::PAGE_BADGE_LIST;
         $filterPanel = $this->filterFactoryFactory->buildPanel(
