@@ -22,6 +22,7 @@ use PDOException;
 use Schoolbox\Application\Exception\AccessDenied;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Discussion\ThreadLocator;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
@@ -51,6 +52,12 @@ use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use function array_keys;
 use function array_merge;
 
+
+/**
+ * Class Controller
+ *
+ * @package Schoolbox\Comms\News
+ */
 class Controller extends Base
 {
 
@@ -99,10 +106,6 @@ class Controller extends Base
      */
     private $articleResolver;
 
-    /**
-     * @var Audience\UserResolver
-     */
-    private $userResolver;
 
     /** @var Audience\Segment\StrategyFactory */
     private $strategyFactory;
@@ -118,6 +121,13 @@ class Controller extends Base
 
     /** @var CommentMapper */
     private $commentMapper;
+
+
+    /**
+     * @var File\Mapper
+     */
+    private File\Mapper $fileMapper;
+
 
     /**
      * Default number of items to display in case config is broken
@@ -140,6 +150,7 @@ class Controller extends Base
      * @param Thread\Mapper                    $threadMapper
      * @param ErrorMapper                      $errorMapper
      * @param CommentMapper                    $commentMapper
+     * @param File\Mapper                      $fileMapper
      */
     public function __construct(
         Mapper $newsMapper,
@@ -155,7 +166,8 @@ class Controller extends Base
         Access $access,
         Thread\Mapper $threadMapper,
         ErrorMapper $errorMapper,
-        CommentMapper $commentMapper
+        CommentMapper $commentMapper,
+        File\Mapper $fileMapper
     ) {
         $this->newsMapper                 = $newsMapper;
         $this->topicMapper                = $topicMapper;
@@ -171,6 +183,7 @@ class Controller extends Base
         $this->threadMapper               = $threadMapper;
         $this->errorMapper                = $errorMapper;
         $this->commentMapper              = $commentMapper;
+        $this->fileMapper                 = $fileMapper;
     }
 
     /* CRUD actions */
@@ -220,6 +233,14 @@ class Controller extends Base
             ->setAttachmentsLabel('')
             ->setMimeFilter('image/*');
 
+        /* Misc attached files
+         */
+        $fileZone = (new Zone('fileImage'))
+            ->setFileVar('attachedFiles[]')
+            ->setMulti(true)
+            ->setAttachPrompt('Attach files')
+            ->setAttachmentsLabel('');
+
         // Prefill audience
         $audienceSegments = [];
         $params = new Querystring($this->getRequest()->query);
@@ -254,6 +275,7 @@ class Controller extends Base
             'action'               => 'Create',
             'article'              => $article,
             'featureImageZone'     => $zone->getTwigContext(),
+            'fileZone'             => $fileZone->getTwigContext(),
             'isAutoSavable'        => true,
             'encodedSegments'      => $audienceSegments,
             'availableEntityTypes' => $this->getAvailableAudienceTypeStrategies(),
@@ -346,10 +368,24 @@ class Controller extends Base
             $zone->attachFiles([$article->getFeatureImage()]);
         }
 
+        /* Misc attached files
+         */
+        $fileZone = (new Zone('file'))
+            ->setFileVar('attachedFiles[]')
+            ->setMulti(true)
+            ->setAttachPrompt('Attach files')
+            ->setMimeFilter('*/*')
+            ->setAttachmentsLabel('');
+
+        if (null !== $article->getAttachedFiles() && $article->getAttachedFiles()->count()) {
+            $fileZone->attachFiles($article->getAttachedFiles()->indexBy('hash')->keys());
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNews/create.twig', [
             'action'                 => 'Update',
             'article'                => $article,
             'featureImageZone'       => $zone->getTwigContext(),
+            'fileZone'               => $fileZone->getTwigContext(),
             'encodedSegments'        => $this->getAudienceSegments($article),
             'isAutoSavable'          => !$article->isSubmitted() || $article->isRejected(),
             'returnUrl'              => $this->getExplicitReturnUrl(),
@@ -411,6 +447,7 @@ class Controller extends Base
 
         // Persist article
         $this->newsMapper->save($article);
+        $this->newsMapper->saveFiles($article);
 
         // Restore existing audience onto article, and then update with posted audience
         $postedAudience = $article->getAudience()->shallowClone();
@@ -722,7 +759,8 @@ class Controller extends Base
             $this->articleResolver,
             $this->commentMapper,
             $this->audienceMapper,
-            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
+            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
+            $this->fileMapper
         ))->find(
             $params,
             $this->getUser()
@@ -839,10 +877,16 @@ class Controller extends Base
         $articleIds = $userFeed->find($this->getUser());
 
         $commentCounts = [];
+        $attachmentCounts = [];
 
         if (count($articleIds)) {
             $pb       = $this->newsMapper->getPredicatePublished()->in('id', $articleIds);
             $articles = $this->newsMapper->findByPredicates($pb, ['order' => ['sticky' => 'DESC', 'publish_at' => 'DESC']]);
+
+            /* Attachment counts for each article in this set
+             */
+            $attachmentCounts = $this->fileMapper->findCounts($articleIds);
+
         } else {
             $articles = $this->newsMapper->createCollection();
         }
@@ -888,7 +932,8 @@ class Controller extends Base
                 $map,
                 new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
                 new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)),
-                new MetadataDecorator($commentCounts)
+                new MetadataDecorator($commentCounts),
+                new AttachmentDecorator($attachmentCounts)
             )
         );
 
@@ -1038,7 +1083,8 @@ class Controller extends Base
             $this->articleResolver,
             $this->commentMapper,
             $this->audienceMapper,
-            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
+            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
+            $this->fileMapper
         ))->find(
             $urlPrefix,
             $params,
@@ -1439,6 +1485,48 @@ class Controller extends Base
         } else {
             $article->setFeatureImage(null);
         }
+
+        /* Associate any associated files that a user associated with this article
+         * These hashes might already exist but with a different filename so in this
+         * case we need to remember the filename of this version of the file and not
+         * use the one that already existed
+         *
+         * Process each of attached files separately
+         */
+        $newList = new Collection();
+
+        if (\is_array($postData['attachedFiles']) && \count($postData['attachedFiles'])) {
+
+            /* These are the task_file relations we already know about
+             */
+            $existing = $article->getAttachedFiles()->indexBy('hash')->getAll();
+
+            $factory = new CollectorFactory();
+            $attachedFiles = $factory->build($postData['attachedFiles'])->getAll();
+
+            /* Exclude any hashes that are no longer in the set
+             */
+            foreach ($attachedFiles as $attachedFile) {
+
+                /* If this was already in the $article model:
+                 *
+                 * Reuse the id in the comms_news_article_file table so we don't keep accumulating relations
+                 * Get its latest name and update that
+                 *
+                 * Otherwise insert it as a new comms_news_article_file relationship
+                 */
+                $articleFile = $existing[$attachedFile->getHash()] ?? new File\Model();
+
+                $articleFile->setStorage($attachedFile)
+                    ->setArticle($article)
+                    ->setBasename($attachedFile->getBasename())
+                    ->setUpdatedAt(\Alaress_Date_Format::now());
+
+                $newList->add($articleFile);
+            }
+        }
+
+        $article->setAttachedFiles($newList);
     }
 
 

@@ -29,6 +29,17 @@ try {
         $cacheControl = ($_GET['cache'] ?? '0') ? 'private' : 'no-store';
         $bypassPresignedUrls = $resource->getMimetype()->getMime() === 'text/html' && !$attachmentType;
 
+        /* Optionally override filename
+         *
+         * fetch.php can't distinguish between identical files that were uploaded
+         * with different names; we also can't infer what those different names
+         * might have been or where they are located e.g. task_file - just tell me
+         * what the filename was supposed to be, and it shall be so
+         */
+        if (isset($_GET['name'])) {
+            $basename = urldecode($_GET['name']);
+        }
+
         if (!$bypassPresignedUrls && $fileSystem instanceof Flysystem\Filesystem && $fileSystem->getAdapter() instanceof Flysystem\AwsS3v3\AwsS3Adapter) {
             /** @var IConfigLoader $config */
             $config = $kernel->get('config');

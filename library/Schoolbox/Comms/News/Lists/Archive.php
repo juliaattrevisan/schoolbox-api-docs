@@ -1,7 +1,5 @@
 <?php
 /**
- * Archive
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -27,7 +25,11 @@ use function count;
 use function in_array;
 
 /**
- * Responsible for generating data to populate the news archive.
+ * Class Archive
+ *
+ * Get a list of articles for the News Archive
+ *
+ * @package Schoolbox\Comms\News\Lists
  */
 class Archive extends Base
 {
@@ -122,6 +124,10 @@ class Archive extends Base
 
         $articles = $this->loadArticleByIds($articleIds);
 
+        /* Attachment counts for each article in this set
+         */
+        $attachmentCounts = $this->fileMapper->findCounts($articleIds);
+
         /* Disregard the sticky bit for each article in the Archive
          */
         foreach ($articles as $article) {
@@ -134,6 +140,7 @@ class Archive extends Base
         // These pieces are needed to represent an article, due to Save For Later
         return [
             'articles' => $this->populateMetadata($articles),
+            'attachmentCounts' => $attachmentCounts,
             'readMore' => $this->readMoreText,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $savedArticleIds,

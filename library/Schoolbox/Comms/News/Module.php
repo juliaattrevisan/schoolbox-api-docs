@@ -254,6 +254,8 @@ class Module extends BaseModule
             }),
             'threadMapper'               => $this->getMapperFactory()->getLazy(Thread\Mapper::class),
             'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+            'commentMapper'              => $this->getMapperFactory()->getLazy(\Schoolbox\Discussion\Comment\Mapper::class),
+            'fileMapper'                 => $this->getMapperFactory()->getLazy(File\Mapper::class),
         ];
     }
 
@@ -274,6 +276,11 @@ class Module extends BaseModule
         } else {
             try {
                 $article = $this->getArticleMapper()->findById($params['articleId']);
+
+                /* Attach any associated files
+                 */
+                $article->setAttachedFiles($this->getArticleMapper()->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
+
             } catch (MapperException $e) {
                 throw new NotFound('Unknown news article.', 0, $e);
             }

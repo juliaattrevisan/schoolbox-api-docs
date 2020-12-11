@@ -84,6 +84,13 @@
                             <span v-if="article.metadata && article.metadata.commentCount > 0">
                         | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">{{ article.metadata.commentCount | formatCommentCountMeta }}</a>
                         </span>
+
+                        <!-- Attachment Count -->
+                        <template v-if="article.attachments">
+                            <span>
+                                | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#article-attachments'">{{ article.attachments }} attachments</a>
+                            </span>
+                        </template>
                     </p>
 
                     <article>
@@ -92,7 +99,6 @@
                             <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-if="!isCompactMode" v-html="article.readmore.string"></a>
                         </div>
                     </article>
-
                 </div>
             </div>
 

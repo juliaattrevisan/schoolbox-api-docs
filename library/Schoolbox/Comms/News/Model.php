@@ -181,7 +181,10 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     private $topics;
 
-    /** @var GenericCollection|Audience\Model[] */
+
+    /**
+     * @var GenericCollection|Audience\Model[]
+     */
     private $audience;
 
     /**
@@ -189,9 +192,23 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     private $metadata;
 
+
+    /**
+     * Optionally attached Files
+     *
+     * @var Collection|File\Model[]
+     */
+    protected $attachedFiles;
+
+
+    /**
+     * Model constructor.
+     */
     public function __construct()
     {
         $this->metadata = new Metadata();
+
+        $this->setAttachedFiles(new Collection());
     }
 
 
@@ -667,6 +684,68 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
         }
     }
 
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        return [
+            'id',
+            'title',
+            'blurb',
+            'body',
+            'sticky',
+            'author',
+            'featureImage',
+            'publishAt',
+            'topics' => [
+                'name',
+                'slug',
+            ],
+            'status',
+            'statusDate'
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getJsonApiLinks(): array
+    {
+        // Set auth to FALSE on 'commsNews.getDetail' as unlikely we'll have fetched this instance if the user is unable to see it
+        return [
+            'self'   => new AuraLink('commsNews.getDetail', [ 'article' => $this, 'articleId' => $this->getId() ], false),
+            'update' => new AuraLink('commsNews.getUpdate', [ 'article' => $this, 'articleId' => $this->getId() ]),
+            'saveForLater' => new AuraLink('commsNewsSaveForLater.postAdd', [ 'article' => $this, 'articleId' => $this->getId() ]),
+            'unsaveForLater' => new AuraLink('commsNewsSaveForLater.postRemove', [ 'article' => $this, 'articleId' => $this->getId() ])
+        ];
+    }
+
+
+    /**
+     * Get a list of image files that were attached to this instance, if any
+     */
+    public function getImages(): Collection
+    {
+        return $this->getAttachedFiles()->filter(static function(File\Model $model) {
+            return $model->getMimetype()->isImage();
+        });
+    }
+
+
+    /**
+     * Get a list of non-image files that were attached to this instance, if any
+     */
+    public function getFiles(): Collection
+    {
+        return $this->getAttachedFiles()->filter(static function(File\Model $model) {
+            return !$model->getMimetype()->isImage();
+        });
+    }
+
+
     /* Getters/Setters
      */
 
@@ -1033,45 +1112,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
 
     /**
-     * @return array
-     */
-    public function getDefaultJsonMap(): array
-    {
-        return [
-            'id',
-            'title',
-            'blurb',
-            'body',
-            'sticky',
-            'author',
-            'featureImage',
-            'publishAt',
-            'topics' => [
-                'name',
-                'slug',
-            ],
-            'status',
-            'statusDate'
-        ];
-    }
-
-
-    /**
-     * @return array
-     */
-    public function getJsonApiLinks(): array
-    {
-        // Set auth to FALSE on 'commsNews.getDetail' as unlikely we'll have fetched this instance if the user is unable to see it
-        return [
-            'self'   => new AuraLink('commsNews.getDetail', [ 'article' => $this, 'articleId' => $this->getId() ], false),
-            'update' => new AuraLink('commsNews.getUpdate', [ 'article' => $this, 'articleId' => $this->getId() ]),
-            'saveForLater' => new AuraLink('commsNewsSaveForLater.postAdd', [ 'article' => $this, 'articleId' => $this->getId() ]),
-            'unsaveForLater' => new AuraLink('commsNewsSaveForLater.postRemove', [ 'article' => $this, 'articleId' => $this->getId() ])
-        ];
-    }
-
-
-    /**
      * @inheritDoc
      */
     public function getCommentNotifier(): ?string
@@ -1097,5 +1137,25 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     public function getMetadata(): Metadata
     {
         return $this->metadata;
+    }
+
+
+    /**
+     * @return Collection|File\Model[]
+     */
+    public function getAttachedFiles()
+    {
+        return $this->attachedFiles;
+    }
+
+
+    /**
+     * @param Collection|File\Model[] $attachedFiles
+     * @return $this
+     */
+    public function setAttachedFiles($attachedFiles)
+    {
+        $this->attachedFiles = $attachedFiles;
+        return $this;
     }
 }

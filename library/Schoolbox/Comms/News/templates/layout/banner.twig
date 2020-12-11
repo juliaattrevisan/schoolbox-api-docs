@@ -7,7 +7,6 @@
     {% endif %}
 
     <section class="detail content">
-
         <div class="title-section">
             <h1>{{ article.title |default("(untitled)") }}</h1>
             {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}
@@ -74,6 +73,11 @@
         <article>
             {{ article.body|purify }}
         </article>
+
+        {% include ('@commsNews/layout/file-list.twig') with {
+            article: article,
+            identifier: 'article-' ~ article.id
+        } %}
     </section>
 </div>
 

@@ -83,38 +83,38 @@
 /* Extremely specific to news on the dashboard,
    in the small right column on large only */
 @media #{$large-only} {
-  .column-right {
-    #news-component {
-      .card > a > img {
-        margin: 0 0 1rem 0;
-        float: none;
-      }
-      .v-card {
-        flex: 0 0 100%;
-      }
+    .column-right {
+        #news-component {
+            .card > a > img {
+                margin: 0 0 1rem 0;
+                float: none;
+            }
+            .v-card {
+                flex: 0 0 100%;
+            }
+        }
+        .skeleton.news-reversed > .img,
+        .skeleton.news > .img {
+            float: left;
+            margin: 0 0 1rem 0;
+        }
     }
-    .skeleton.news-reversed > .img,
-    .skeleton.news > .img {
-      float: left;
-      margin: 0 0 1rem 0;
-    }
-  }
 }
 
 @media #{$large-up} {
-  .column-right #news-component .card > a > img {
-    width: 6rem;
-  }
+    .column-right #news-component .card > a > img {
+        width: 6rem;
+    }
 }
 
 .skeleton.news > .img {
-  margin: 0 1rem 0 0;
-  width: rem-calc(200);
+      margin: 0 1rem 0 0;
+      width: rem-calc(200);
 }
 .skeleton.news-reversed > .img {
-  float: right;
-  margin: 0 0 0 1rem;
-  width: rem-calc(200);
+      float: right;
+      margin: 0 0 0 1rem;
+      width: rem-calc(200);
 }
 
 .news-post {
@@ -218,6 +218,41 @@
 }
 
 .article-read-more {
-  margin-top: .5rem;
-  text-transform: uppercase;
+    margin-top: .5rem;
+    text-transform: uppercase;
 }
+
+/* News File List
+ */
+.article-files {
+  li {
+    border: 1px solid $body-bg;
+    &:only-child {
+      width: 100%;
+    }
+    .card {
+      padding: .5rem 0 .5rem .25rem;
+      p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      img {
+        margin: 0 .5rem 0 0;
+      }
+    }
+  }
+}
+
+/* News Homepage component specific
+ */
+div[id^='news-container'], div[id*='news-container']{
+  #article-attachments {
+    padding: 0 1rem 1rem 1rem;
+
+    hr {
+      margin-top: 0;
+    }
+  }
+}
+
