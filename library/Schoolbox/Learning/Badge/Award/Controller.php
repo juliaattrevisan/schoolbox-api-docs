@@ -30,15 +30,15 @@ use function in_array;
 class Controller extends Base
 {
     /**
-     * The badge mapper.
+     * The award mapper.
      */
-    private BadgeMapper $mapper;
+    private Mapper $mapper;
 
 
     /**
-     * @var Mapper
+     * The badge mapper.
      */
-    private Mapper $awardMapper;
+    private BadgeMapper $badgeMapper;
 
 
     /**
@@ -56,19 +56,19 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param BadgeMapper            $mapper
-     * @param Mapper                 $awardMapper
+     * @param Mapper                 $mapper
+     * @param BadgeMapper            $badgeMapper
      * @param Filter\IFactoryFactory $filterFactoryFactory
      * @param UserMapper             $userMapper
      */
     public function __construct(
-        BadgeMapper $mapper,
-        Mapper $awardMapper,
+        Mapper $mapper,
+        BadgeMapper $badgeMapper,
         Filter\IFactoryFactory $filterFactoryFactory,
         UserMapper $userMapper
     ) {
+        $this->badgeMapper          = $badgeMapper;
         $this->mapper               = $mapper;
-        $this->awardMapper          = $awardMapper;
         $this->filterFactoryFactory = $filterFactoryFactory;
         $this->userMapper           = $userMapper;
     }
@@ -153,7 +153,7 @@ class Controller extends Base
      */
     public function getAwardedBadges(User $user): void
     {
-        $awards = $this->awardMapper->findRecentForUser($user);
+        $awards = $this->mapper->findRecentForUser($user);
 
         $stack = [];
 
@@ -174,7 +174,7 @@ class Controller extends Base
             /* Some inline hydration due to curriculum nodes no longer being included
              * as part of the hydrateSelect in badge mapper
              */
-            $award->getBadge()->setCurriculumNodes($this->mapper->findCurriculumNodes($award->getBadge()));
+            $award->getBadge()->setCurriculumNodes($this->badgeMapper->findCurriculumNodes($award->getBadge()));
 
             /* Convert to array format
              */
@@ -269,17 +269,17 @@ class Controller extends Base
         // So far: it's assumed all staff may award or set a badge as a goal to
         // any other user.
         $data       = json_decode($this->request->content->getRaw(), true);
-        $collection = $this->awardMapper->createCollection();
+        $collection = $this->mapper->createCollection();
         foreach ($data['users'] as $user) {
-            $award = $this->awardMapper->createModel()
-                                       ->setRecipient($this->userMapper->findById($user['id']))
-                                       ->setBadge($badge)
-                                       ->setStatus($status)
-                                       ->setAwardedBy($this->getUser())
-                                       ->setAwardedAt(Alaress_Date_Format::now());
+            $award = $this->mapper->createModel()
+                                  ->setRecipient($this->userMapper->findById($user['id']))
+                                  ->setBadge($badge)
+                                  ->setStatus($status)
+                                  ->setAwardedBy($this->getUser())
+                                  ->setAwardedAt(Alaress_Date_Format::now());
             $collection->add($award);
         }
-        $this->awardMapper->save($collection);
+        $this->mapper->save($collection);
 
         // Return what was just created
         $translator = $this->buildBadgeAwardModelToArrayTranslator();
@@ -321,7 +321,7 @@ class Controller extends Base
 
         /* For now, just search for student recipients
          */
-        $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, Role::STUDENT);
+        $users = $this->mapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, Role::STUDENT);
 
         $this->response->content->set($this->buildJsonOutput($users));
     }
@@ -343,7 +343,7 @@ class Controller extends Base
 
         /* For now, just search for student recipients
          */
-        $users = $this->awardMapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_GOAL, Role::STUDENT);
+        $users = $this->mapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_GOAL, Role::STUDENT);
 
         $this->response->content->set($this->buildJsonOutput($users));
     }
@@ -402,7 +402,7 @@ class Controller extends Base
             return;
         }
 
-        $this->awardMapper->deleteMostRecentlyAwarded($userIds, $badge, $status);
+        $this->mapper->deleteMostRecentlyAwarded($userIds, $badge, $status);
     }
 
 

@@ -240,8 +240,8 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'mapper'               => $this->getMapperFactory()->getLazy(BadgeMapper::class),
-                    'awardMapper'          => $this->getMapperFactory()->getLazy(Mapper::class),
+                    'mapper'               => $this->getMapperFactory()->getLazy(Mapper::class),
+                    'badgeMapper'          => $this->getMapperFactory()->getLazy(BadgeMapper::class),
                     'filterFactoryFactory' => $injector->lazyGet('filters.factoryFactory'),
                     'userMapper'           => $this->getMapperFactory()->getLazy(UserMapper::class),
                 ]
