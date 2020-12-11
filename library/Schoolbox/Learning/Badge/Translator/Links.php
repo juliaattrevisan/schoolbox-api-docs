@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Translator;
@@ -68,14 +70,17 @@ class Links
         /* Endpoint for updating this badge
          */
         $translation['update'] = $this->getRouteIfAuthorized(
-            'learningBadge.getUpdateForm', [
+            'learningBadge.getUpdateForm',
+            [
                 'badgeId' => $badge->getId()
-        ]);
+            ]
+        );
 
         /* All the people who have received this badge as an achievement
          */
         $translation['achievementRecipients'] = $this->getRouteIfAuthorized(
-            'learningBadgeAward.getAchievementRecipients', [
+            'learningBadgeAward.getAchievementRecipients',
+            [
                 'badgeId' => $badge->getId(),
             ]
         );
@@ -83,7 +88,8 @@ class Links
         /* All the people who have received this badge as a goal
          */
         $translation['goalRecipients'] = $this->getRouteIfAuthorized(
-            'learningBadgeAward.getGoalRecipients', [
+            'learningBadgeAward.getGoalRecipients',
+            [
                 'badgeId' => $badge->getId(),
             ]
         );
@@ -91,7 +97,8 @@ class Links
         /* Endpoint for withdrawing the awarding of this achievement
          */
         $translation['achievementWithdraw'] = $this->getRouteIfAuthorized(
-            'learningBadgeAward.postAchievementWithdraw', [
+            'learningBadgeAward.postAchievementWithdraw',
+            [
                 'badgeId' => $badge->getId(),
             ]
         );
@@ -99,7 +106,8 @@ class Links
         /* Endpoint for unsetting the goal
          */
         $translation['goalWithdraw'] = $this->getRouteIfAuthorized(
-            'learningBadgeAward.postGoalWithdraw', [
+            'learningBadgeAward.postGoalWithdraw',
+            [
                 'badgeId' => $badge->getId(),
             ]
         );
