@@ -200,6 +200,8 @@ Data:
             noEmailsFoundText: 'Sorry we cannot send an email to the selected users as they do not have an email',
             returnUrlName: '{{ returnUrlName }}',
             encodedReturnUrl: '{{ encodedReturnUrl }}',
+            getAwardAsAchievementFormEndpoint: '{{ routeLookup('learningBadgeAward.redirectToAwardAsAchievementForm') }}',
+            getSetAsGoalFormEndpoint: '{{ routeLookup('learningBadgeAward.redirectToSetAsGoalForm') }}',
         },
         mounted: function() {
             var self = this;
@@ -254,15 +256,16 @@ Data:
                 window.location.href = '/pastoral/student/0/record/insert?' + this.returnUrlName + '=' + this.encodedReturnUrl + '&duplicates=' + this.selectedStudentIds.join(',');
             },
             buildAwardAchievementUrl() {
-                return this.buildAwardBadgeUrl('achievement');
+                return this.buildAwardBadgeUrl(this.getAwardAsAchievementFormEndpoint);
             },
             buildSetGoalUrl() {
-                return this.buildAwardBadgeUrl('goal');
+                return this.buildAwardBadgeUrl(this.getSetAsGoalFormEndpoint);
             },
-            buildAwardBadgeUrl(awardType) {
-                let url = new URL(window.location.href);
-                url.pathname = '/learning/badge/award/user/' + this.selectedStudentIds.join(',') + '/' + awardType;
+            buildAwardBadgeUrl(endpoint) {
+                let url      = new URL(window.location.href);
+                url.pathname = endpoint;
                 url.searchParams.append(this.returnUrlName, this.encodedReturnUrl);
+                url.searchParams.append('userIds', this.selectedStudentIds.join(','));
                 return url.toString();
             },
             openShareLearningMomentDialog: function() {

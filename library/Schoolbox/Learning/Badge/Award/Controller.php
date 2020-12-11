@@ -87,7 +87,7 @@ class Controller extends Base
         $this->response->redirect->to(
             $this->router->generate(
                 'learningBadgeAward.getAwardAsAchievementForm',
-                ['userIds' => implode(',', $this->request->query->get('userId'))]
+                ['userIds' => $this->request->query->get('userIds')]
             )
         );
     }
@@ -138,7 +138,7 @@ class Controller extends Base
         $this->response->redirect->to(
             $this->router->generate(
                 'learningBadgeAward.getSetAsGoalForm',
-                ['userIds' => implode(',', $this->request->query->get('userId'))]
+                ['userIds' => $this->request->query->get('userIds')]
             )
         );
     }
