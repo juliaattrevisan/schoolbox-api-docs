@@ -74,6 +74,23 @@ class Controller extends Base
     }
 
 
+    /**
+     * Redirect to the user achievement form.
+     *
+     * This takes a list of user IDs in the 'userId' query string parameter.
+     *
+     * @api GET /learning/badge/award/user/achievement
+     * @since 20.2
+     */
+    public function redirectToAwardAsAchievementForm(): void
+    {
+        $this->response->redirect->to(
+            $this->router->generate(
+                'learningBadgeAward.getAwardAsAchievementForm',
+                ['userIds' => implode(',', $this->request->query->get('userId'))]
+            )
+        );
+    }
 
 
     /**
@@ -103,6 +120,25 @@ class Controller extends Base
                     'filterPanel' => $filterPanel,
                 ],
                 'Badges'
+            )
+        );
+    }
+
+
+    /**
+     * Redirect to the user goal form.
+     *
+     * This takes a list of user IDs in the 'userId' query string parameter.
+     *
+     * @api GET /learning/badge/award/user/goal
+     * @since 20.2
+     */
+    public function redirectToSetAsGoalForm(): void
+    {
+        $this->response->redirect->to(
+            $this->router->generate(
+                'learningBadgeAward.getSetAsGoalForm',
+                ['userIds' => implode(',', $this->request->query->get('userId'))]
             )
         );
     }

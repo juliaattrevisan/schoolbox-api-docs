@@ -135,12 +135,24 @@ class Module extends BaseModule
         $preloadUsers = Closure::fromCallable([$this, 'preloadUsers']);
         $this->register(
             self::METHOD_GET,
+            '/user/achievement',
+            'redirectToAwardAsAchievementForm',
+            $baseRule,
+        );
+        $this->register(
+            self::METHOD_GET,
             '/user/{userIds}/achievement',
             'getAwardAsAchievementForm',
             $baseRule,
             $preloadUsers
         );
 
+        $this->register(
+            self::METHOD_GET,
+            '/user/goal',
+            'redirectToSetAsGoalForm',
+            $baseRule,
+        );
         $this->register(
             self::METHOD_GET,
             '/user/{userIds}/goal',
