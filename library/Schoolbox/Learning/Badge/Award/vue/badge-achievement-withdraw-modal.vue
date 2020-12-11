@@ -1,6 +1,6 @@
 <script>
 import axios from "axios";
-import BadgeImage from './badge-image';
+import BadgeImage from '../../vue/badge-image';
 import RevealModal from '@schoolbox/reveal-modal'
 import toastMixin from '@schoolbox/toast-mixin';
 
@@ -17,6 +17,9 @@ import Deselect from '@schoolbox/selectize/Deselect';
 import qs from "qs";
 vSelect.props.components.default = () => ({ Deselect });
 
+/**
+ * Modal for withdrawing a single achievement from a single student.
+ */
 export default {
 
     /**
@@ -24,7 +27,7 @@ export default {
      * The name of the component that we have here. This name will be used in the container
      * to spawn this component.
      */
-    name: "badge-goal-withdraw-modal",
+    name: "badge-achievement-withdraw-modal",
 
     /**
      * Mixins.
@@ -131,7 +134,7 @@ export default {
          * Perform async request and load results into component
          */
         search: _.debounce(function(loading, query, vm) {
-            axios.get(this.badge._links.goalRecipients, {
+            axios.get(this.badge._links.achievementRecipients, {
                 params: {
                     query: query
                 }
@@ -143,7 +146,7 @@ export default {
         }, 350),
 
         /**
-         * Perform goal withdrawal from selected users
+         * Perform achievement withdrawal from selected users
          */
         withdraw() {
 
@@ -166,7 +169,7 @@ export default {
             /* Pack it up and send it
              */
             let request = {
-                url: this.badge._links.goalWithdraw,
+                url: this.badge._links.achievementWithdraw,
                 data:  qs.stringify({userIds: userIds}),
                 method: 'post',
                 responseType: 'json'
@@ -174,7 +177,7 @@ export default {
 
             /* A toast - to your valour, my sword, and our victory together
              */
-            self.toastActivate('Removing goal for ' + this.selected.length + ' student(s)');
+            self.toastActivate('Withdrawing achievements from ' + this.selected.length + ' student(s)');
 
             axios.request(request)
                 .then(function (response) {
@@ -185,7 +188,7 @@ export default {
 
                     /* Pop toast
                      */
-                    self.toastSuccess('Goal has been removed');
+                    self.toastSuccess('Withdraw complete');
                 })
                 .then(function() {
 
@@ -196,7 +199,7 @@ export default {
                 .catch(error => {
                     if (error.response) {
                         if (error.response) {
-                            self.toastError('Unable to remove goal; please try again.');
+                            self.toastError('Unable to withdraw achievement; please try again.');
                         }
                     }
                 });
@@ -207,7 +210,7 @@ export default {
 <template>
     <reveal-modal ref="modal">
         <template v-if="badge">
-            <h2>Remove <strong>'{{ badge.name }}'</strong> goal</h2>
+            <h2>Withdraw <strong>'{{ badge.name }}'</strong></h2>
 
             <div class="card small-12 compact badge-card">
                 <div>
@@ -216,7 +219,7 @@ export default {
                 </div>
             </div>
 
-            <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Search for users to remove goal from" v-model="selected">
+            <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Search for users to withdraw achievement from" v-model="selected">
                 <template slot="option" slot-scope="option">
                     <div class="d-center">
                         {{ option.name }}
@@ -230,7 +233,7 @@ export default {
             </v-select>
 
             <ul class="flex-list buttons">
-                <li><a href="#" class="submit" @click.prevent="withdraw()" v-bind:class="{ disabled: !this.selected.length}">Remove Goal</a></li>
+                <li><a href="#" class="submit" @click.prevent="withdraw()" v-bind:class="{ disabled: !this.selected.length}">Withdraw Achievement</a></li>
                 <li><a href="#" class="button" @click.prevent="close()">Cancel</a></li>
             </ul>
         </template>

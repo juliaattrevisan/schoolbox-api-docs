@@ -6,6 +6,9 @@ import BadgeImage from '../../vue/badge-image';
 import BadgeList from '../../vue/badgeList';
 import toastMixin from '@schoolbox/toast-mixin';
 
+/**
+ * Form for awarding badges to users, by selecting them from a list of badges.
+ */
 export default {
 
     /**
@@ -37,6 +40,9 @@ export default {
          * For example, if this is "awardAsAchievement", each selected badge's
          * `_links["awardAsAchievement"]` will have this component's users
          * posted to it.
+         *
+         * This is used to determine whether submitting the form awards
+         * achievements or sets goals.
          */
         postAwardRouteLookup: {
             type: String,

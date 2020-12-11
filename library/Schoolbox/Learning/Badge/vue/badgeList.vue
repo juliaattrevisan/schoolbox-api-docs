@@ -4,10 +4,10 @@ import {stringify} from 'qs';
 import axios from 'axios';
 import Toast from "@schoolbox/toast";
 import RevealModal from "@schoolbox/reveal-modal";
-import BadgeAward from "./badgeAward";
+import BadgeAward from "../Award/vue/badgeAward";
 import BadgeDetail from "./badgeDetail";
-import BadgeAchievementWithdrawModal from "./badge-achievement-withdraw-modal";
-import BadgeGoalWithdrawModal from "./badge-goal-withdraw-modal";
+import BadgeAchievementWithdrawModal from "../Award/vue/badge-achievement-withdraw-modal";
+import BadgeGoalWithdrawModal from "../Award/vue/badge-goal-withdraw-modal";
 import BadgeImage from './badge-image';
 
 const EVENT_CHANGE = 'change';
