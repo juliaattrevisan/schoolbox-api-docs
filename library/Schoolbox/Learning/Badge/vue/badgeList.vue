@@ -249,6 +249,45 @@ export default {
         emitChange() {
             this.$emit(EVENT_CHANGE);
         }
+
+        /**
+         * Opens a modal window for deleting this badge.
+         *
+         * @param {Object} badge
+         */
+        openDeleteModal(badge) {
+          this.currentBadge = badge;
+          this.$refs.deleteModal.open();
+        },
+
+        /**
+         * Closes a modal window for deleting this badge.
+         */
+        closeDeleteModal() {
+          this.$refs.deleteModal.close();
+        },
+
+        /**
+         * Perform withdrawal
+         */
+        deleteBadge() {
+          this.$refs.toast.activate('Deleting badge...');
+          axios.delete(this.currentBadge._links.delete, {})
+              .then(response => {
+                /* Close this modal
+                 */
+                this.closeDeleteModal();
+
+                /* Pop toast
+                 */
+                this.$refs.toast.success('Delete complete');
+              })
+              .catch(error => {
+                if (error.response) {
+                  this.$refs.toast.error('Unable to delete badge; please try again.');
+                }
+              });
+        }
     },
 }
 </script>
@@ -308,7 +347,7 @@ export default {
                                   <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-close">Withdraw achievement</a></li>
                                   <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-undo">Remove goal</a></li>
                                   <li><a :href="badge._links.update" class="icon-modify">Modify</a></li>
-                                  <li><a href="#" class="icon-delete">Delete</a></li>
+                                  <li><a @click.prevent="openDeleteModal(badge)" class="icon-delete">Delete</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -364,6 +403,17 @@ export default {
                     Set Goal
                 </template>
             </badge-award>
+        </reveal-modal>
+
+        <reveal-modal ref="deleteModal">
+          <template v-if="currentBadge">
+            <h2>Delete <strong>&lsquo;{{ currentBadge.name }}&lsquo;</strong></h2>
+            <p>Are you sure you want to delete {{ currentBadge.name }}?</p>
+            <ul class="flex-list buttons">
+              <li><a @click.prevent="deleteBadge()" class="button submit">Yes</a></li>
+              <li><a @click.prevent="closeDeleteModal()" class="button">No</a></li>
+            </ul>
+          </template>
         </reveal-modal>
 
         <badge-achievement-withdraw-modal ref="achievementWithdrawModal"></badge-achievement-withdraw-modal>
