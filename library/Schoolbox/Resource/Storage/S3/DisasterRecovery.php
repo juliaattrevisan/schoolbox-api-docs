@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\S3;
@@ -21,6 +23,7 @@ use Schoolbox\Resource\FilesystemFactory;
 use SplFileInfo;
 use Throwable;
 use UnexpectedValueException;
+
 use function array_merge;
 use function dirname;
 use function filesize;
@@ -44,7 +47,7 @@ class DisasterRecovery extends CliTool\App
      *
      * @var string
      */
-    public const PREFIX_BACKUPS = 'backups/';
+    public const PREFIX_BACKUPS = 'instance/' . INSTANCE_ID . '/backups/';
 
     public const CONFIG_DR_VISIBILITY = 'aws_s3_dr_backup_visibility';
     public const CONFIG_DR_SYNC_STATUS = 'aws_s3_dr_sync_status';
@@ -97,7 +100,7 @@ class DisasterRecovery extends CliTool\App
      */
     private function execute(): void
     {
-        $fileSystemAwsS3 = (new FilesystemFactory())->buildAwsS3FileSystem();
+        $fileSystemAwsS3Backups = (new FilesystemFactory())->buildAwsS3FileSystem(null, self::PREFIX_BACKUPS);
 
         $dailyBackupDir = $this->getOpt(self::OPT_LONG_BACKUP_DIR);
         if (!$dailyBackupDir || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $dailyBackupDir)) {
@@ -109,8 +112,8 @@ class DisasterRecovery extends CliTool\App
             $this->getLogger()->error($message);
             throw new UnexpectedValueException("Daily backup dir appeared invalid: '$dailyBackupDir'");
         }
-        $this->addNewBackup($fileSystemAwsS3, $dailyBackupDir);
-        $this->deleteStaleBackups($fileSystemAwsS3, $dailyBackupDir);
+        $this->addNewBackup($fileSystemAwsS3Backups, $dailyBackupDir);
+        $this->deleteStaleBackups($fileSystemAwsS3Backups, $dailyBackupDir);
     }
 
 
@@ -133,30 +136,30 @@ class DisasterRecovery extends CliTool\App
     /**
      * Copies a daily backup directory from local to S3
      *
-     * @param Filesystem $fileSystemAwsS3
+     * @param Filesystem $fileSystemAwsS3Backups
      * @param string     $dailyBackupDir
      * @throws UnexpectedValueException
      */
-    private function addNewBackup(Filesystem $fileSystemAwsS3, string $dailyBackupDir): void
+    private function addNewBackup(Filesystem $fileSystemAwsS3Backups, string $dailyBackupDir): void
     {
-        $storageDir = rtrim($this->getConfig()->get('storage_dir'), '\\/');
-        $backupDir  = dirname($storageDir) . "/backups/daily/$dailyBackupDir";
+        $storageDirLocal = rtrim($this->getConfig()->get('storage_dir'), '\\/');
+        $backupDirLocal  = dirname($storageDirLocal) . "/backups/daily/$dailyBackupDir";
 
-        if (!is_dir($backupDir)) {
-            $message = "Daily backup dir does not appear to be a directory: '$backupDir'";
+        if (!is_dir($backupDirLocal)) {
+            $message = "Daily backup dir does not appear to be a directory: '$backupDirLocal'";
             $this->getLogger()->error($message);
             throw new UnexpectedValueException($message);
         }
         $itr = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($backupDir, RecursiveDirectoryIterator::SKIP_DOTS)
+            new RecursiveDirectoryIterator($backupDirLocal, RecursiveDirectoryIterator::SKIP_DOTS)
         );
         /** @var SplFileInfo $fileInfo */
         foreach ($itr as $fileInfo) {
             $localPath = $fileInfo->getPathname();
 
-            $s3Path = str_replace($backupDir, "backups/$dailyBackupDir", $localPath);
+            $s3Path = str_replace($backupDirLocal, $dailyBackupDir, $localPath);
 
-            $file = new Flysystem\File($fileSystemAwsS3, $s3Path);
+            $file = new Flysystem\File($fileSystemAwsS3Backups, $s3Path);
             if ($file->exists()) {
                 if ($file->getSize() === filesize($localPath)) {
                     $this->getLogger()->info("File already in S3 and size matches: '$s3Path'");

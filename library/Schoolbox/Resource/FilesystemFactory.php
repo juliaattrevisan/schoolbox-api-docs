@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -18,6 +19,7 @@ use LogicException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage\Manager;
 use UnexpectedValueException;
+
 use function trim;
 
 /**
@@ -67,7 +69,7 @@ class FilesystemFactory
                 break;
             case self::FILE_SYSTEM_ADAPTER_AWS_S3:
                 // Use AWS S3 for storage
-                $fs_storage = $this->buildAwsS3FileSystem($fsConfig);
+                $fs_storage = $this->buildAwsS3FileSystem($fsConfig, self::PREFIX_STORAGE);
                 break;
             default:
                 throw new UnexpectedValueException("Unrecognised filesystem adapter: '$adapter'");
@@ -81,11 +83,14 @@ class FilesystemFactory
 
 
     /**
+     * Returns an AWS S3 file system, optionally with root set to $prefix
+     *
      * @param array|null $fsConfig
+     * @param string     $prefix
      * @return Filesystem
      * @throws InvalidArgumentException
      */
-    public function buildAwsS3FileSystem(array $fsConfig = null): Filesystem
+    public function buildAwsS3FileSystem(array $fsConfig = null, string $prefix = ''): Filesystem
     {
         $config              = new \Schoolbox\Config\Loader();
         $otfs_s3_cred_key    = trim($config->get('otfs_s3_cred_key') ?? "");
@@ -103,6 +108,6 @@ class FilesystemFactory
             'version'     => $otfs_s3_version,
         ]);
 
-        return new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket, self::PREFIX_STORAGE), $fsConfig);
+        return new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket, $prefix), $fsConfig);
     }
 }

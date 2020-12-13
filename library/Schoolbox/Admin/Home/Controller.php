@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -23,6 +24,7 @@ use Proxy\Server as ProxyServer;
 use Healthcheck;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
+
 use function array_column;
 use function array_map;
 use function array_merge;
@@ -71,7 +73,7 @@ class Controller extends Base
             $disk_total      = disk_total_space($this->getConfigLoader()->get('storage_dir'));
             $disk_free       = disk_free_space($this->getConfigLoader()->get('storage_dir'));
             $disk_used       = Alaress_Byte_Format::bytesToString($disk_total - $disk_free);
-            $disk_percentage = round((($disk_total - $disk_free) / $disk_total) * 100);;
+            $disk_percentage = round((($disk_total - $disk_free) / $disk_total) * 100);
         } else {
             $disk_total      = null;
             $disk_free       = null;
@@ -152,7 +154,7 @@ class Controller extends Base
         $ldap_alt_status = 'Disabled';
 
         if ($this->getConfigLoader()->get('ldap_enable')) {
-            $tempsession = new \Session;
+            $tempsession = new \Session();
 
             // Check primary LDAP server bind
 
@@ -197,7 +199,7 @@ class Controller extends Base
 
         // Check WWW
 
-        $context = ProxyServer::getInstance()->getContext('http',true);
+        $context = ProxyServer::getInstance()->getContext('http', true);
         $context['http']['timeout'] = 1;
 
         if (@file_get_contents('https://schoolbox.com.au/schoolboxinstaller/status.html', null, stream_context_create($context))) {
@@ -217,10 +219,10 @@ class Controller extends Base
             $action = '';
 
             switch ($log['login']) {
-                case '1' :
+                case '1':
                     $action = 'Logged in';
                     break;
-                case '0' :
+                case '0':
                     $action = 'Failed login';
                     break;
                 case 'modify':
@@ -232,10 +234,10 @@ class Controller extends Base
                 case 'access':
                     $action = 'Accessed ' . $log['ip'];
                     break;
-                case 'create' :
+                case 'create':
                     $action = 'Added ' . $log['ip'];
                     break;
-                case 'delete' :
+                case 'delete':
                     $action = 'Deleted ' . $log['ip'];
                     break;
 
@@ -244,7 +246,6 @@ class Controller extends Base
             }
 
             if ($action != '') {
-
                 $date = new Alaress_Date_Format($log['occurred'], Alaress_Date_Format::DATABASE_FORMAT);
 
                 $logs[] = [
@@ -266,7 +267,7 @@ class Controller extends Base
                     'pageCurrent' => basename($this->getRequest()->query->get('page')),
                     'usageInGraph' => $usageInGraph,
                     'disk_used' => $disk_used,
-//                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
+            //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
                     'disk_total' => Alaress_Byte_Format::bytesToString($disk_total),
                     'disk_percentage' => Alaress_Byte_Format::bytesToString($disk_percentage),
                     'memory_used' => Alaress_Byte_Format::bytesToString($memory_used),
@@ -303,7 +304,7 @@ class Controller extends Base
             $healthCheck = new Healthcheck($this->databaseExternal, $this->databaseFactory, $this->getConfigLoader());
             $healthCheck->run();
             $output = $healthCheck->results();
-        } catch (InvalidArgumentException|AlaressDatabaseException $e) {
+        } catch (InvalidArgumentException | AlaressDatabaseException $e) {
             $output = [
                 'errors' => [
                     $e->getMessage()
@@ -455,7 +456,8 @@ class Controller extends Base
         foreach ($objects as $object) {
             $backupFileCount++;
             $backupFileUsage += $object['Size'];
-            $date            = preg_filter('/backups\/(\d{4}-\d{2}-\d{2})\/.+/', '$1', $object['Key']);
+            $prefix          = DisasterRecovery::PREFIX_BACKUPS;
+            $date            = preg_filter("#$prefix(\d{4}-\d{2}-\d{2})/.+#", '$1', $object['Key']);
 
             if (strpos($object['Key'], "conf_{$date}.php") !== false) {
                 $files[$date]['conf'] = $object['Size'];
@@ -488,6 +490,11 @@ class Controller extends Base
                 return Alaress_Byte_Format::bytesToString($size);
             }, $dateFiles);
         }
+
+        // Sort most recent backup first
+        uksort($files, static function (string $left, string $right): int {
+            return strcmp($right, $left);
+        });
 
         $enabledData['backupFiles']      = $files;
         $enabledData['backupFileTotals'] = $fileTotals;
