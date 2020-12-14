@@ -302,7 +302,7 @@ export default {
         </div>
         <div v-else>
             <div v-if="data.length === 0" class="empty-state">
-                <i class="icon-schoolbox"></i>
+                <i class="icon-badge"></i>
               <p>No Badges have been created. Start by <a href="#" title="Create the first Badge">creating the first Badge</a>.</p>
             </div>
 <!--            <div class="empty-state">-->
