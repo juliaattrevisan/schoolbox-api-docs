@@ -281,49 +281,33 @@ class Mapper extends \Schoolbox\Mapper
     {
 
         /* Find a list of the most recent instances of $badge given
-         * to the selected users
+         * to the selected users and update their deleted_at via join
+         * and a groupwise maximum
+         *
+         * https://stackoverflow.com/questions/15209414/how-to-do-3-table-join-in-update-query
          */
         $query = "
-            SELECT
-                bu.recipient_id,
-                bu.badge_id,
-                MAX(awarded_at) AS awarded_at
-            FROM {$this->getTable()} bu
-            WHERE badge_id = :badgeId
-            AND status = :status
-            AND deleted_at IS NULL
-            AND recipient_id IN {$this->getPredicateBuilder()->getArrayPlaceholders($userIds, 'recipient_id')}
-            GROUP BY recipient_id
+            UPDATE badge_user bu1
+            LEFT JOIN badge_user bu2 
+                ON bu1.recipient_id = bu2.recipient_id 
+                AND bu1.badge_id = bu2.badge_id 
+                AND bu1.awarded_at < bu2.awarded_at
+                AND bu1.status = :status
+                AND bu1.deleted_at IS NULL
+                AND bu2.deleted_at IS NULL
+            SET bu1.deleted_at = NOW()
+            WHERE bu1.badge_id = :badgeId
+            AND bu1.status = :status
+            AND bu1.deleted_at IS NULL
+            AND bu1.recipient_id IN {$this->getPredicateBuilder()->getArrayPlaceholders($userIds, 'recipient_id')}
+            AND bu2.id IS NULL
         ";
 
         $params = $this->getPredicateBuilder()->getArrayParameters($userIds, 'recipient_id');
         $params['badgeId'] = $badge->getId();
-
-        /* Only withdraw Achievements for now, not Goals
-         */
         $params['status'] = $status;
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
-
-        /* Delete one particular row at a time based on multiple columns
-         */
-        $deleteQuery = $this->getDatabase()->prepare("
-            UPDATE {$this->getTable()}
-            SET deleted_at = NOW()
-            WHERE recipient_id = :recipientId
-            AND badge_id = :badgeId
-            AND awarded_at = :awardedAt
-            AND deleted_at IS NULL
-            LIMIT 1
-        ");
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $deleteQuery->execute([
-                'recipientId' => $row['recipient_id'],
-                'badgeId' => $row['badge_id'],
-                'awardedAt' => $row['awarded_at']
-            ]);
-        }
     }
 }
