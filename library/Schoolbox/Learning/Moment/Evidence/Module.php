@@ -96,6 +96,16 @@ class Module extends BaseModule
 
 
         // Routes to register:
+
+        // Redirect to create form, given a set of user IDs in the query string
+        $this->register(
+            self::METHOD_GET,
+            '/user/create',
+            'redirectToCreateForm',
+            new Rule\IsLoggedIn()
+        );
+
+        // Create form for evidence
         $this->register(
             self::METHOD_GET,
             '/user/{userIds}/create',
@@ -104,6 +114,7 @@ class Module extends BaseModule
             $viewCreateFormPreloader
         );
 
+        // Post evidence to users
         $this->register(
             self::METHOD_POST,
             '/user/{userIds}/create',
@@ -267,8 +278,10 @@ class Module extends BaseModule
                         ->get(UserMapper::class)
                         ->findByColumn('id', $userIds);
 
-        // Not found if any of the users in the list were not found
-        if (count($users) !== count($userIds)) {
+        // It's acceptable for some users in userIds to not be found.
+        // However, at least one user must be found for this form to have
+        // something to act upon.
+        if (count($users) === 0) {
             throw new NotFound();
         }
 

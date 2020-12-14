@@ -1,0 +1,66 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbs(
+    ['Badges', routeLookup('learningBadge.getBadges') ],
+    [messages.pageHeader]
+) }}
+
+{% set reportContentId = 'badge-list-form-container' %}
+
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function () {
+            // Filtered content has been [re]loaded
+            // (Shouldn't this trigger contain the filters that are selected?)
+            $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
+                // Pass the list of filters into the badge list
+                window.badgeList.$children[0].onFilterChange(selectedFilters);
+            });
+        });
+    </script>
+{% endautoescape %}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{{ messages.pageHeader }}</h1>
+
+        {% if users is not empty %}
+            <ul class="meta">
+                <li>
+                    {% include 'sub/userListMetadata.twig'
+                        with {
+                        users:   users,
+                        message: 'Awarding to'
+                    } only
+                    %}
+                </li>
+            </ul>
+        {% endif %}
+    </div>
+</div>
+
+{% include '@filters/panel.twig' with {
+    contentId: reportContentId,
+    panel:     filterPanel,
+    quickload: false,
+} only %}
+
+<div class="row">
+    <div class="small-12 island">
+        <div id="{{ reportContentId }}">
+            <badge-list-form get-badges-route="{{ routeLookup('learningBadge.getBadges') }}"
+                             :users="{{ users | json_encode }}"
+                             post-award-route-lookup="{{ postAwardRouteLookup }}"
+                             toast-activate-message="{{ messages.toastActivate }}"
+                             toast-success-message="{{ messages.toastSuccess }}"
+                             toast-failure-message="{{ messages.toastFailure }}"
+                             confirm-button-text="{{ messages.confirmButtonText }}"
+                             confirm-modal-header="{{ messages.confirmModalHeader }}"
+                             confirm-modal-meta="{{ messages.confirmModalMeta }}"
+                             return-url="{{ RETURN_URL.previous.decoded }}">
+            </badge-list-form>
+        </div>
+        <script src="/javascript/components/badgeListForm.bundle.js"></script>
+    </div>
+</div>
+<div data-toast class="toast"></div>

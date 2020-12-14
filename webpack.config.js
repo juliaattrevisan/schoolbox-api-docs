@@ -23,6 +23,7 @@ module.exports = {
         learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/evidence-detail.js',
         badgeAwardFeed: './library/Schoolbox/Learning/Badge/Award/vue/award-feed.js',
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.main.js',
+        badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.main.js',
     },
     output: {
         path: path.resolve(__dirname, "www/javascript/components"),

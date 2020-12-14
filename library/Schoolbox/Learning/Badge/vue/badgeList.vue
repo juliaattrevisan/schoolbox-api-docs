@@ -4,19 +4,36 @@ import {stringify} from 'qs';
 import axios from 'axios';
 import Toast from "@schoolbox/toast";
 import RevealModal from "@schoolbox/reveal-modal";
-import BadgeAward from "./badgeAward";
+import BadgeAward from "../Award/vue/badgeAward";
 import BadgeDetail from "./badgeDetail";
-import BadgeAchievementWithdrawModal from "./badge-achievement-withdraw-modal";
-import BadgeGoalWithdrawModal from "./badge-goal-withdraw-modal";
+import BadgeAchievementWithdrawModal from "../Award/vue/badge-achievement-withdraw-modal";
+import BadgeGoalWithdrawModal from "../Award/vue/badge-goal-withdraw-modal";
 import BadgeImage from './badge-image';
+
+const EVENT_CHANGE = 'change';
 
 // Foundation mixin is not required:
 // the filter panel calls `jQuery.fn.foundation` with the entire document as its
 // context.
 // Attempting to apply Foundation again causes the dropdown menus to not work.
-// import foundationMixin from '@schoolbox/foundation-mixin';
 
+/**
+ * @emits change The list of selected badges has changed
+ */
 export default {
+    /**
+     * Constant values which this component may expose. Generally, this includes
+     * information which a component including this component might want to know
+     * about:
+     * * sensible default values for this component
+     * * event names
+     *
+     * (This is not part of Vue, and isn't a convention yet: putting it out
+     *  there as an idea for discussion.)
+     */
+    constants: {
+        EVENT_CHANGE,
+    },
 
     /**
      * Mixins.
@@ -42,6 +59,7 @@ export default {
         getBadgesRoute: {
             type: String,
             default: '',
+            required: true,
         },
 
         /**
@@ -53,12 +71,27 @@ export default {
             type: String,
             default: '',
         },
+
+        /**
+         * Is the menu shown for each badge?
+         */
+        showBadgeMenus: {
+            type: Boolean,
+            default: true,
+        },
+
+        /**
+         * Can badges be selected?
+         */
+        allowSelection: {
+            type: Boolean,
+            default: false,
+        },
     },
     data() {
         return {
             currentBadge: null,
             data: [],
-            // search: {},
             metadata: {
                 count: null,
                 cursor: null,
@@ -67,13 +100,6 @@ export default {
             selectedFilters: null,
         }
     },
-    // computed: {
-    // },
-    // mounted() {
-    //     this.load();
-    // },
-    // updated() {
-    // },
     methods: {
         /**
          * Load badges.
@@ -204,7 +230,25 @@ export default {
             this.selectedFilters    = selectedFilters;
             this.showSkeletonLoader = true;
             this.load(false);
+            this.emitChange();
         },
+
+        /**
+         * Which badges (if any) are selected?
+         *
+         * @return {Array}
+         */
+        selectedBadges() {
+            return this.data.filter(v => v.selected === true);
+        },
+
+        /**
+         * Helper for emitting the change event: this happens when selecting a
+         * badge, or reloading the filter.
+         */
+        emitChange() {
+            this.$emit(EVENT_CHANGE);
+        }
     },
 }
 </script>
@@ -226,18 +270,6 @@ export default {
                 <p>No badges have been created yet.</p>
             </div>
             <template v-else>
-
-                <!-- Search panel. Should this use the filters system? -->
-                <!--
-                <ul class="flex-list buttons">
-                    <li><input type="text" placeholder="Badge Name" v-model="search.badgeName" /></li>
-                    <li><input type="text" placeholder="Creator" v-model="search.creator" /></li>
-                    <li><input type="text" placeholder="Category" v-model="search.category" /></li>
-                    <li><a href="#">Reset to defaults</a></li>
-                    <li><a href="#" class="submit">Apply filters</a></li>
-                </ul>
-                -->
-
                 <div class="badge-grid v-card-list">
                     <div class="badge v-card" v-for="badge in data" :key="badge.id">
                         <!-- I'd apply the click to the entire <li> but that intercepts dropdown clicks -->
@@ -247,18 +279,30 @@ export default {
                             </a>
                         </div>
                         <div class="card-content">
-                            <h3><a @click.prevent="openDetailModal(badge)" :title="badge.name">{{ badge.name }}</a></h3>
-                            <div class="actions-small-1">
+                            <template v-if="allowSelection">
+                                <input type="checkbox"
+                                       :id="'selectBadge-' + String(badge.id)"
+                                       v-model="badge.selected"
+                                       @change="emitChange"
+                                >
+                                <label :for="'selectBadge-' + String(badge.id)" class="checkbox-label">
+                                    {{ badge.name }}
+                                </label>
+                            </template>
+                            <h3 v-else>
+                                <a @click.prevent="openDetailModal(badge)" :title="badge.name">{{ badge.name }}</a>
+                            </h3>
+                            <div :class="{'actions-small-0': !showBadgeMenus, 'actions-small-1': showBadgeMenus,}">
                                 <div class="list-item">
                                     <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">{{ badge.category.name }}</p>
                                 </div>
-                                <nav>
+                                <nav v-if="showBadgeMenus">
                                   <a href="#"
                                      class="icon-overflow"
                                      :data-dropdown="'badge-' + String(badge.id) + '-dropdown'"
                                      aria-expanded="false" title="Actions"></a>
                                 </nav>
-                                <ul :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
+                                <ul v-if="showBadgeMenus" :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
                                   <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase">Award achievement</a></li>
                                   <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal">Set goal</a></li>
                                   <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-close">Withdraw achievement</a></li>

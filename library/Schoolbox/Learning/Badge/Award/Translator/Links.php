@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Award\Translator;
@@ -68,15 +70,17 @@ class Links
         /* Endpoint for withdrawing the awarding of this achievement
          */
         $translation['achievementWithdraw'] = $this->getRouteIfAuthorized(
-            'learningBadge.postAchievementWithdraw', [
+            'learningBadgeAward.postAchievementWithdraw',
+            [
                'badgeId' => $award->getBadge()->getId(),
-           ]
+            ]
         );
 
         /* Endpoint for unsetting the goal
          */
         $translation['goalWithdraw'] = $this->getRouteIfAuthorized(
-            'learningBadge.postGoalWithdraw', [
+            'learningBadgeAward.postGoalWithdraw',
+            [
                 'badgeId' => $award->getBadge()->getId(),
             ]
         );

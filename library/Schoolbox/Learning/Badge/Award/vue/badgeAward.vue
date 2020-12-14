@@ -1,7 +1,7 @@
 <script>
 
 import axios from "axios";
-import BadgeImage from './badge-image';
+import BadgeImage from '../../vue/badge-image';
 import Toast from "@schoolbox/toast";
 
 // Vue-select boilerplate
