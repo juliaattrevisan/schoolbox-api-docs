@@ -845,6 +845,11 @@
     font-family: $font-family-icon;
 }
 
+.icon-withdraw-achievement:before {
+    content: "\e91c";
+    font-family: $font-family-icon;
+}
+
 .icon-wolfram-alpha:before {
     content: '\e64d';
     font-family: $font-family-icon;
