@@ -93,6 +93,7 @@ COLLATE = utf8mb4_unicode_ci;
 -- Table `badge_user`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `badge_user` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
     `recipient_id` INT UNSIGNED NOT NULL,
     `badge_id` INT UNSIGNED NOT NULL,
     `status` ENUM('goal', 'achievement') NOT NULL,
@@ -102,6 +103,7 @@ CREATE TABLE IF NOT EXISTS `badge_user` (
     INDEX `fk_badge_user_recipient_id_idx` (`recipient_id` ASC),
     INDEX `fk_badge_user_badge_id_idx` (`badge_id` ASC),
     INDEX `fk_badge_user_awarded_by_id_idx` (`awarded_by` ASC),
+    PRIMARY KEY (`id`),
     CONSTRAINT `fk_badge_user_recipient_id`
         FOREIGN KEY (`recipient_id`)
             REFERENCES `user` (`id`)
