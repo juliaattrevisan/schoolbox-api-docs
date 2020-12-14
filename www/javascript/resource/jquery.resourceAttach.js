@@ -60,6 +60,8 @@
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
         this.tpl = this.options.tplOverride || $(this.element).find('[data-template]').detach();
+        this.attachmentBrowserFilesystemsInnerHTML = ''; //to store the list options for this drop zone, to insert into the singleton modal on click
+        this.attachmentBrowserPanelContainerInnerHTML = ''; //to store the list options for this drop zone, to insert into the singleton modal on click
 
         self = this;
         opt = self.options;
@@ -352,6 +354,8 @@
 
     ResourceAttach.prototype.build = function (data) {
 
+        this.attachmentBrowserFilesystemsInnerHTML = $(data).find('#attachment-browser-filesystems')[0].innerHTML;
+        this.attachmentBrowserPanelContainerInnerHTML = $(data).find('#attachment-browser-panel-container')[0].innerHTML;
 
         if (singletonModal) {
             // you've got a modal; don't try to make another one
@@ -388,7 +392,6 @@
 
     ResourceAttach.prototype.open = function () {
 
-
         var self = this;
 
         if (singletonModal == null) {
@@ -410,8 +413,59 @@
                 .on('closed.fndtn.reveal.attach', self.reopenParentReveal.bind(self));
         }
 
-        // for iframe communication
+        // debugger;
+        
+        singletonModal.find('#attachment-browser-filesystems')[0].innerHTML = this.attachmentBrowserFilesystemsInnerHTML;
+        singletonModal.find('#attachment-browser-panel-container')[0].innerHTML = this.attachmentBrowserPanelContainerInnerHTML;
 
+        let filesystems = $('#attachment-browser-filesystems');
+
+        filesystems.find('[data-source]').on('click', function(event) {
+            const MAX_IFRAME_HEIGHT = 350;
+
+            let source = $(this).attr('data-source');
+            let panel = $('#' + source + '-panel');
+
+            /* Decide if source was already load previously;
+            * If it wasn't previously loaded, do so asynchronously
+            * Otherwise just show the tab
+            */
+            // if (!filesystems.data(source)) {
+
+                /* Remember we loaded this source previously
+                */
+                // filesystems.data(source, {loaded: true});
+
+                let url = $(this).attr('data-url');
+                let method = $(this).attr('data-method');
+
+                /* Use the $method var to decide whether this is inline content
+                * such as all our internal file upload dropzone options, recorder
+                * my files, resources, etc.
+                *
+                * or whether it should be loaded into an iframe, such as with third
+                * parties like ms teams, goggle drive, office 365 etc.
+                *
+                * Inline content starts with a preloader class which should be removed
+                * once content has loaded
+                */
+                if (method === 'inline') {
+                    panel.load(url, null);
+                } else if (method === 'iframe') {
+                    panel.html($('<iframe/>').attr('src', url).height(MAX_IFRAME_HEIGHT));
+                }
+            // }
+        });
+
+        /* Activate default tab
+        */
+        $('#attachment-browser-filesystems a').first().trigger('click');
+
+
+
+
+        // for iframe communication
+        
         $(window).unbind('message').on('message', function (e) {
             var message,
                 modal = singletonModal,
