@@ -49,7 +49,8 @@
 
             // callbacks
             onSelect: noop,
-            onDetach: noop
+            onDetach: noop,
+
     };
 
 
@@ -325,7 +326,6 @@
 
 
     ResourceAttach.prototype.getCacheKey = function () {
-        // debugger;
         return $(this)[0].element.id;
         // return this.options.source + '?' + this.getQueryString();
     };
@@ -336,17 +336,16 @@
         var key = this.getCacheKey(),
             self = this;
 
-        // debugger;
-
         if ('undefined' == typeof modalCache[key]) {
             // modalCache[key] = $.get(this.options.source, this.getQueryString()).promise();
-            console.log('fetch start - ' + this.options.source + '?' + this.getQueryString());
             fetch(this.options.source + '?' + this.getQueryString(), { method: 'GET'})
-                .then(function(response) {
-                  return response.text();
-                }).then(function(data) {
+                .then((response) => {
+                    return response.text();
+                })
+                .then((data) => {
                     console.log('fetch returned - ' + self.options.source + '?' + self.getQueryString());
-                    // console.log(data);
+                    console.log(data);
+                    debugger;
                     self.build.call(self, data);
                 });
 
@@ -376,7 +375,6 @@
         this.attachmentBrowserPanelContainerInnerHTML = $(data).find('#attachment-browser-panel-container')[0].innerHTML;
 
         if (singletonModal) {
-            debugger;
             // you've got a modal; don't try to make another one
             return;
         }
@@ -433,6 +431,8 @@
         }
         
         this.initAttachmentBrowser();
+
+        debugger;
 
         // for iframe communication
         
