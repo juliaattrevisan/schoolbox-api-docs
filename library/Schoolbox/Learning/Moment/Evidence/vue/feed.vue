@@ -183,7 +183,7 @@ export default {
             // next tick.
             let newData = this.data.filter((v) => v.id !== evidence.id);
             axios
-                .delete(evidence._links.delete)
+                .delete(evidence.object._links.delete)
                 .then(() => {
                     this.data = [];
                     this.$refs.toast.timeout('Deleted', true);
