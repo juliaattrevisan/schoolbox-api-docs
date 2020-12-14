@@ -96,6 +96,15 @@ export default {
         },
 
         /**
+         * Convert an goal into an achievement
+         *
+         * @param award
+         */
+        awardAchievement(award) {
+
+        },
+
+        /**
          * Open a confirmDialog for withdrawing a badge
          *
          * @param award
@@ -214,6 +223,7 @@ export default {
                                                     <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-close">Withdraw achievement</a></li>
                                                   </template>
                                                   <template v-else>
+                                                    <li><a @click.prevent="awardAchievement(award)" class="icon-showcase">Award achievement</a></li>
                                                     <li><a @click.prevent="openGoalWithdrawModal(award)" class="icon-undo">Remove goal</a></li>
                                                   </template>
                                                 </template>
