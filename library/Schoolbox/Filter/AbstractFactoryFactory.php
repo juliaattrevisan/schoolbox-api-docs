@@ -9,18 +9,15 @@
 namespace Schoolbox\Filter;
 
 use Schoolbox\IConfigLoader;
-
-use function count;
-
 use DomainException;
-
-use function in_array;
-
 use Schoolbox\Collection;
 use Schoolbox\MapperFactory;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Alaress\Database\Predicate\InvalidColumnException;
+
+use function count;
+use function in_array;
 
 abstract class AbstractFactoryFactory implements IFactoryFactory
 {
