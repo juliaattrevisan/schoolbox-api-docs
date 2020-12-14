@@ -293,19 +293,17 @@ export default {
 
 <template>
     <div>
-        <section v-if="showSkeletonLoader">
-            <div v-for="n in 3" class="list-item">
-                <div class="small-12 card skeleton">
-                    <div class="img"></div>
-                    <h3></h3>
-                    <p class="meta"></p>
-                </div>
+        <div v-if="showSkeletonLoader">
+            <div v-for="n in 3" class="card badge skeleton">
+                <div class="img"></div>
+                <h3></h3>
+                <p class="meta"></p>
             </div>
-        </section>
-        <section v-else class="content">
+        </div>
+        <div v-else>
             <div v-if="data.length === 0" class="empty-state">
                 <i class="icon-schoolbox"></i>
-                <p>No badges have been created yet.</p>
+              <p>No Badges have been created. Start by <a href="#" title="Create the first Badge">creating the first Badge</a>.</p>
             </div>
             <template v-else>
                 <div class="badge-grid v-card-list">
@@ -358,7 +356,7 @@ export default {
             <a @click.prevent="append(metadata.cursor.next, true)"
                class="button expand"
                v-if="metadata.cursor.next && data.length < metadata.count">Load more</a>
-        </section>
+        </div>
 
         <reveal-modal ref="detailModal">
             <badge-detail :badge="currentBadge" v-if="currentBadge"></badge-detail>

@@ -151,6 +151,24 @@
   }
 }
 
+.badge.skeleton {
+  display: inline-block;
+  margin-bottom: 1rem;
+
+  > .img {
+    width: 12rem;
+    height: 8rem;
+    float: none;
+    margin-bottom: 1rem;
+    margin-right: 0;
+
+    @media #{$small-only} {
+      width: 8rem;
+      height: 5rem;
+    }
+  }
+}
+
 // Achievements - profile page
 #achievements {
   .awards > div {
