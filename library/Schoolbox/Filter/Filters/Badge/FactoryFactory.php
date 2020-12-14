@@ -44,16 +44,14 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                 );
 
             case CurriculumNode\Definition::class:
-                if (!$this->configLoader->get('curriculum_tagging_enabled')) {
-                    break;
-                }
                 /** @var CurriculumNodeMapper $curriculumNodeMapper */
                 $curriculumNodeMapper = $this->getMapperFactory()->get(CurriculumNodeMapper::class);
                 return new CurriculumNode\Factory(
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),
-                    $curriculumNodeMapper
+                    $curriculumNodeMapper,
+                    (bool)$this->configLoader->get('curriculum_tagging_enabled')
                 );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);

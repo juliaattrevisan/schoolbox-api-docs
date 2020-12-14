@@ -32,21 +32,32 @@ class Factory extends Filter\AbstractFactory
 
 
     /**
+     * Is curriculum tagging enabled?
+     *
+     * If not, this filter won't be available on pages.
+     */
+    private bool $curriculumTaggingEnabled;
+
+
+    /**
      * Constructor
      *
      * @param Page\Option\Mapper          $optionMapper
      * @param Page\Option\Defaults\Mapper $defaultMapper
      * @param Selection\Mapper            $selectionMapper
      * @param CurriculumNodeMapper        $curriculumNodeMapper
+     * @param bool                        $curriculumTaggingEnabled
      */
     public function __construct(
         Page\Option\Mapper $optionMapper,
         Page\Option\Defaults\Mapper $defaultMapper,
         Selection\Mapper $selectionMapper,
-        CurriculumNodeMapper $curriculumNodeMapper
+        CurriculumNodeMapper $curriculumNodeMapper,
+        bool $curriculumTaggingEnabled
     ) {
         parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
-        $this->curriculumNodeMapper = $curriculumNodeMapper;
+        $this->curriculumNodeMapper     = $curriculumNodeMapper;
+        $this->curriculumTaggingEnabled = $curriculumTaggingEnabled;
     }
 
 
