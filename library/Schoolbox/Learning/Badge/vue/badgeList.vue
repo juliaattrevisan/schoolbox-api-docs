@@ -305,6 +305,10 @@ export default {
                 <i class="icon-schoolbox"></i>
               <p>No Badges have been created. Start by <a href="#" title="Create the first Badge">creating the first Badge</a>.</p>
             </div>
+<!--            <div class="empty-state">-->
+<!--                <i class="icon-search"></i>-->
+<!--                <p>No Badges were found. Please check your filters and try again.</p>-->
+<!--            </div>-->
             <template v-else>
                 <div class="badge-grid v-card-list">
                     <div class="badge v-card" v-for="badge in data" :key="badge.id">
