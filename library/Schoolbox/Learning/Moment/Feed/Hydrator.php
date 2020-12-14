@@ -79,8 +79,7 @@ class Hydrator
                     $hasBadgeAwards = true;
                     $badgeAwardPb->all(
                         $this->badgeAwardMapper->getPredicateBuilder()
-                            ->equals('badge_id', $result['id'])
-                            ->equals('awarded_at', $result['date'])
+                            ->equals('id', $result['id'])
                             ->isNull('deleted_at')
                     );
                     break;
@@ -104,14 +103,12 @@ class Hydrator
                 $this->badgeAwardMapper->getPredicateBuilder()->any($badgeAwardPb)
             )
             : $this->badgeAwardMapper->createCollection();
-        $badgeAwardResults = $badgeAwardResults->indexByCallback(
-            function (BadgeAwardModel $model) {
-                return $this->createBadgeAwardKey($model->getBadge()->getId(), $model->getAwardedAt()->getDatabase());
-            }
-        );
+
+        $badgeAwardResults = $badgeAwardResults->indexBy('id');
 
         // Insert matching results into the collection
         $return = new Collection();
+
         foreach ($results as $i => $result) {
             switch ($result['discriminator'] ?? null) {
                 case Cursor::DISCRIMINATOR_EVIDENCE:
@@ -126,7 +123,7 @@ class Hydrator
                     // find the badge award
                     $return[$i] = [
                         'discriminator' => $result['discriminator'],
-                        'object'        => $badgeAwardResults[$this->createBadgeAwardKey((int)$result['id'], $result['date'])],
+                        'object'        => $badgeAwardResults[(int)$result['id']],
                     ];
                     break;
 
@@ -137,20 +134,5 @@ class Hydrator
         }
 
         return $return;
-    }
-
-
-    /**
-     * Helper method for determining the key of a badge award.
-     *
-     * Required because badge awards don't have an ID field.
-     *
-     * @param int    $badgeId
-     * @param string $date
-     * @return string
-     */
-    private function createBadgeAwardKey(int $badgeId, string $date): string
-    {
-        return sprintf('%d-%s', $badgeId, $date);
     }
 }

@@ -31,6 +31,20 @@ use Schoolbox\User;
  */
 class Controller extends Base
 {
+
+    /**
+     * Number of feed items to display before prompting user
+     * with Load More button
+     */
+    private const FEED_ITEMS_PER_PAGE = 10;
+
+
+    /**
+     * Number of comments to show for per feed item
+     */
+    private const FEED_COMMENTS_PER_ITEM = 2;
+
+
     /**
      * Mapper used to retrieve learning moment evidence.
      */
@@ -87,7 +101,7 @@ class Controller extends Base
     public function getFeedForUser(User $user): void
     {
         $encodedCursor = $this->request->query->get('cursor');
-        $cursor        = new Cursor($this->database, $user, 10, $this->getConfigLoader());
+        $cursor        = new Cursor($this->database, $user, self::FEED_ITEMS_PER_PAGE, $this->getConfigLoader());
         $hydrator      = new Hydrator($this->evidenceMapper, $this->badgeAwardMapper);
         $translator    = new ModelToArray(
             (new EvidenceTranslatorFactory(
@@ -95,11 +109,12 @@ class Controller extends Base
                 $this->authorizer,
                 $this->getUser(),
                 $this->commentMapper
-            ))->buildWithComments(2),
+            ))->buildWithComments(self::FEED_COMMENTS_PER_ITEM),
             (new BadgeAwardTranslatorFactory($this->router, $this->authorizer, $this->getUser()))->build()
         );
 
         $data       = $cursor->retrieveResults($encodedCursor);
+
         $mappedData = $hydrator->hydrateResults($data)
             ->map($translator)
             ->reindex();
@@ -118,3 +133,4 @@ class Controller extends Base
         );
     }
 }
+
