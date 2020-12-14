@@ -10,6 +10,8 @@ namespace Schoolbox\Filter\Filters\Assessment\TemporalState;
 use InvalidArgumentException;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
+
 use function array_merge;
 use function in_array;
 
@@ -86,7 +88,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         return [
             Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,

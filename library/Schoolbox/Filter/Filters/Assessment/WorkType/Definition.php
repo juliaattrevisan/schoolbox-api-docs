@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\WorkType;
 use function array_map;
 use function array_merge;
@@ -69,7 +70,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         return [
             Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR,

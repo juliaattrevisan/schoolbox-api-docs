@@ -11,6 +11,7 @@ use InvalidArgumentException;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 
 /**
  * Displays a list of projects.
@@ -74,7 +75,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         // For now, not available on any pages - purely used for internal query building
         return [

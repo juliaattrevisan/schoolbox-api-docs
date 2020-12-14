@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\Term\Close;
 
 use \Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
+use Schoolbox\IConfigLoader;
 
 
 /**
@@ -34,7 +35,7 @@ class Definition extends AssessmentTermFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         // Not currently exposed in the UI - used just for internal query building
         return [];

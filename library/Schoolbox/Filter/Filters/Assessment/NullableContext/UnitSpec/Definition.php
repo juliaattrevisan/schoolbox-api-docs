@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitSpec;
 
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
+use Schoolbox\IConfigLoader;
 
 /**
  * List of unit specs, grouped by Course
@@ -33,7 +34,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         // Does not appear on any pages yet - exists for now just to enable query building
         return [

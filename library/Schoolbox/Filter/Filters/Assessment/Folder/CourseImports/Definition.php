@@ -10,6 +10,7 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder\CourseImports;
 use InvalidArgumentException;
 use Schoolbox\Filter\Page;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
+use Schoolbox\IConfigLoader;
 
 /**
  * Displays a list of folders where the courseSpec has been imported
@@ -27,7 +28,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         return [
             Page\Model::PAGE_COURSE_MARK_BOOK,

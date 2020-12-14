@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\Term\Due;
 
 use Schoolbox\Filter\Page;
 use \Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
+use Schoolbox\IConfigLoader;
 
 /**
  * Available Term options:
@@ -30,7 +31,7 @@ class Definition extends AssessmentTermFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         return [
             Page\Model::PAGE_PENDING_ASSESSMENTS,

@@ -11,6 +11,7 @@ use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\AssessmentType;
 
 
@@ -59,7 +60,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         return [
             Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,

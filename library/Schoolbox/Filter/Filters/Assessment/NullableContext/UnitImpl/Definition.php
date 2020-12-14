@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImpl;
 
 use InvalidArgumentException;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
+use Schoolbox\IConfigLoader;
 
 /**
  * List of unit impls, grouped by Course Impl
@@ -34,7 +35,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         // Does not appear on any pages yet - exists for now just to enable query building
         return [

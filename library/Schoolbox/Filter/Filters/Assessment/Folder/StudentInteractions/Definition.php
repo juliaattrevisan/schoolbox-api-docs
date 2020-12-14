@@ -10,6 +10,7 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 use Schoolbox\Filter\Page;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 
 /**
  * Display a list of folders (either classes, groups or both) where the student has submitted IResponses or received IFeedback.
@@ -33,7 +34,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         return [
 //            Option\Model::PAGE_GRADES,

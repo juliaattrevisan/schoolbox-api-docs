@@ -11,6 +11,7 @@ use InvalidArgumentException;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
 use Schoolbox\Filter\Page;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 
 /**
  * The unit-spec that an an assessment-impl's unit-impl was imported from.
@@ -74,7 +75,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         return [
             Page\Model::PAGE_CLASS_MARK_BOOK,

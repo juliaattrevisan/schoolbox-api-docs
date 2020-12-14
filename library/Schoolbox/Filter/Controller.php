@@ -279,16 +279,16 @@ class Controller extends BaseController
     private function findAvailableFiltersPerPage(): array
     {
         /** @var GenericCollection|Model[] $visibleFilters */
-        $visibleFilters = $this->filterMapper->findAll()->filter(static function (Model $instance) {
+        $visibleFilters = $this->filterMapper->findAll()->filter(function (Model $instance) {
             $definitionClass = $instance->getClass();
-            return count($definitionClass::getPages()) > 0;
+            return count($definitionClass::getPages($this->getConfigLoader())) > 0;
         });
 
         // Group filters by which pages they appear on
         $filtersPerPage = [];
         foreach ($visibleFilters as $instance) {
             $class = $instance->getClass();
-            foreach ($class::getPages() as $page) {
+            foreach ($class::getPages($this->getConfigLoader()) as $page) {
                 $filtersPerPage[$page][$class::getName()] = $instance;
             }
         }

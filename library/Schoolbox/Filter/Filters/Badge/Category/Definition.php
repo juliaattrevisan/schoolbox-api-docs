@@ -13,6 +13,7 @@ use Schoolbox\Filter\AbstractDefinition;
 use Schoolbox\Filter\Model;
 use Schoolbox\Filter\Page;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Badge\Category\Model as BadgeCategoryModel;
 
 /**
@@ -64,9 +65,10 @@ class Definition extends AbstractDefinition
     /**
      * This filter is available on the badge list page.
      *
+     * @param IConfigLoader $config
      * @return array
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         return [
             Page\Model::PAGE_BADGE_LIST,

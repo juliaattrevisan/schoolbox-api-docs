@@ -114,11 +114,11 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
         $definitions = $this->createDefinitionCollection();
 
-        foreach($entityFilters as $filter){
+        foreach ($entityFilters as $filter) {
             $class = $filter->getClass();
 
             // Can this filter never appear on this page?
-            if (!in_array($page, $class::getPages(), true)) {
+            if (!in_array($page, $class::getPages($this->configLoader), true)) {
                 continue;
             }
             $filterId = $filter->getId();
@@ -302,7 +302,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
         /** @var GenericCollection|Model[] $availableFilters */
         $availableFilters = $this->getFilterMapper()->findForEntity(static::getEntity())->filter(function (Model $instance) use ($page) {
             $definitionClass = $instance->getClass();
-            return in_array($page, $definitionClass::getPages(), true);
+            return in_array($page, $definitionClass::getPages($this->configLoader), true);
         });
 
         $pageFilterMapper = $this->getPageMapper();

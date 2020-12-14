@@ -11,6 +11,7 @@ namespace Schoolbox\Filter\Filters\Badge\CurriculumNode;
 
 use Schoolbox\Filter\AbstractDefinition;
 use Schoolbox\Filter\Page;
+use Schoolbox\IConfigLoader;
 
 /**
  * Definition for the badge curriculum node filter.
@@ -48,11 +49,17 @@ class Definition extends AbstractDefinition
 
 
     /**
-     * @inheritdoc
+     * This definition is available on the badge list page, but only if
+     * curriculum tagging is enabled.
+     *
+     * @param IConfigLoader $config
+     * @return array
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
-        return [Page\Model::PAGE_BADGE_LIST,];
+        return $config->get('curriculum_tagging_enabled')
+            ? [Page\Model::PAGE_BADGE_LIST,]
+            : [];
     }
 
 

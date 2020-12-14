@@ -10,6 +10,7 @@ namespace Schoolbox\Filter\Filters\Assessment\FolderYearLevel;
 use InvalidArgumentException;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\YearLevel;
 use UnexpectedValueException;
 use function array_merge;
@@ -47,7 +48,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         return [
             Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR,

@@ -12,6 +12,7 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Model;
 use Schoolbox\Filter\Page;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 use function sprintf;
 
@@ -65,7 +66,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         return [
 //            Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,   // TODO remove when finished testing

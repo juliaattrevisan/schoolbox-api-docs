@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\YearDue;
 
 use Schoolbox\Filter;
+use Schoolbox\IConfigLoader;
 
 /**
  * Available options:
@@ -31,7 +32,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         return [];
     }

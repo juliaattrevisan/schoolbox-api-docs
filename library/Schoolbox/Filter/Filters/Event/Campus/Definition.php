@@ -12,6 +12,7 @@ use Schoolbox\Campus as CampusModel;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 
 /**
  * Definition for the campus filter.
@@ -47,7 +48,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $config): array
     {
         return [
             Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR,
