@@ -274,7 +274,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         $student   = $award->getRecipient();
-        $awardHref = sprintf(self::PATTERN_BADGE_HREF, 'xxx');
+        $awardHref = sprintf(self::PATTERN_BADGE_HREF, $student->getId());
 
         $bob = new Builder();
         $bob->setIcon($award->getBadge()->getIcon())
