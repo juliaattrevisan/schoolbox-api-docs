@@ -169,6 +169,7 @@ class Cursor implements ICursor
             'limit' => $this->limit,
         ];
         $wherePart = '';
+        
         if (isset($encodedCursor)) {
             // the cursor contains 'date', 'id', 'discriminator' fields
             $cursor = $this->codec->decode($encodedCursor);
@@ -188,7 +189,9 @@ class Cursor implements ICursor
             $params['discriminator3'] = $cursor['discriminator'];
             $params['id3']            = $cursor['id'];
         }
+        
         $queries = [];
+        
         if ($this->learningMomentsEnabled) {
             $queries[]                       = '
                 SELECT
@@ -204,7 +207,7 @@ class Cursor implements ICursor
         if ($this->badgesEnabled) {
             $queries[]                         = '
                 SELECT
-                    badge_id                 AS id,
+                    id                       AS id,
                     :discriminatorBadgeAward AS discriminator,
                     awarded_at               AS date
                 FROM badge_user

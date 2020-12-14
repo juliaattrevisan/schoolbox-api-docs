@@ -100,6 +100,7 @@ class Controller extends Base
         );
 
         $data       = $cursor->retrieveResults($encodedCursor);
+
         $mappedData = $hydrator->hydrateResults($data)
             ->map($translator)
             ->reindex();
@@ -118,3 +119,4 @@ class Controller extends Base
         );
     }
 }
+
