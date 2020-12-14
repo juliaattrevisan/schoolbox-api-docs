@@ -44,6 +44,9 @@ export default {
         currentCount () {
             return data.length;
         },
+        returnUrl() {
+            return btoa(window.location.pathname)
+        }
     },
     mounted() {
         this.load();
@@ -269,7 +272,7 @@ export default {
                                        aria-expanded="false" title="Actions"></a>
                                 </nav>
                                 <ul v-if="hasMenu(evidence.object)" :id="'evidence-' + String(evidence.object.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                    <li><a v-if="evidence.object._links.modifyForm" :href="evidence.object._links.modifyForm" class="icon-modify" title="Modify">Modify</a></li>
+                                    <li><a v-if="evidence.object._links.modifyForm" :href="evidence.object._links.modifyForm + '?returnUrl=' + returnUrl " class="icon-modify" title="Modify">Modify</a></li>
                                     <li><a @click.prevent="showDeleteModal(evidence)" v-if="evidence.object._links.delete" class="icon-delete" title="Delete">Delete</a></li>
                                 </ul>
                             </div>
