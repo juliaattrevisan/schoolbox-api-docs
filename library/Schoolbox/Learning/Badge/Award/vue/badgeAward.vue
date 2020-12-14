@@ -109,7 +109,7 @@ export default {
          *
          * @returns {Boolean}
          */
-        isSubmitButtonEnabled () {
+        isSubmitButtonDisabled () {
             if (this.selected.length === 0) {
                 return true;
             } else if (this.isFormSubmitActive) {
@@ -232,7 +232,7 @@ export default {
         </v-select>
         <ul class="flex-list buttons">
             <li>
-                <button @click.prevent="onSubmit" class="submit" :disabled="isSubmitButtonEnabled">
+                <button @click.prevent="onSubmit" class="submit" :disabled="isSubmitButtonDisabled">
                     <!-- @slot The text for this badge award form's confirm button -->
                     <slot name="confirmButton">
                         Award Achievement
