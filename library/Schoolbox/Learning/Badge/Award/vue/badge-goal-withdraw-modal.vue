@@ -233,7 +233,7 @@ export default {
             </v-select>
 
             <ul class="flex-list buttons">
-                <li><a href="#" class="submit" @click.prevent="withdraw()" v-bind:class="{ disabled: !this.selected.length}">Remove Goal</a></li>
+                <li><a href="#" class="submit" @click.prevent="withdraw()" v-bind:class="{ disabled: !this.selected.length}">Remove goal</a></li>
                 <li><a href="#" class="button" @click.prevent="close()">Cancel</a></li>
             </ul>
         </template>

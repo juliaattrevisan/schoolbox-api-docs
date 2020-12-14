@@ -208,15 +208,15 @@ export default {
                         <div class="badge-grid v-card-list">
                             <div class="badge v-card" v-for="award in category.awards">
                                 <div class="card-feature-image">
-                                    <a href="#" @click.prevent="openDetailModal(award)">
+                                    <a href="#" @click.prevent="openDetailModal(award)" :title="award.badge.name">
                                         <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
                                     </a>
                                     <template v-if="award.count > 1">
-                                        <div class="award-count" :title="'Awarded ' + award.count + ' time(s)'">x{{ award.count }}</div>
+                                        <div class="award-count" :title="'Awarded ' + award.count + ' times'">x{{ award.count }}</div>
                                     </template>
                                 </div>
                                 <div class="card-content">
-                                    <h3><a href="#" @click.prevent="openDetailModal(award)">{{ award.badge.name }}</a></h3>
+                                    <h3><a href="#" @click.prevent="openDetailModal(award)" :title="award.badge.name">{{ award.badge.name }}</a></h3>
                                     <div class="actions-small-1">
                                         <div class="list-item">
                                             <p class="meta">
@@ -234,7 +234,7 @@ export default {
                                         </div>
                                         <template v-if="hasTot(award)">
                                             <nav>
-                                                <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
+                                              <a class="icon-more" title="Actions" :data-dropdown="generateIdentifier(award)"></a>
                                             </nav>
                                             <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
 
@@ -243,11 +243,11 @@ export default {
                                                   -->
                                                 <template v-if="canWithdraw(award)">
                                                   <template v-if="!award.isGoal">
-                                                    <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-close">Withdraw achievement</a></li>
+                                                    <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-withdraw-achievement" title="Withdraw achievement">Withdraw achievement</a></li>
                                                   </template>
                                                   <template v-else>
-                                                    <li><a @click.prevent="awardAchievement(award)" class="icon-showcase">Award achievement</a></li>
-                                                    <li><a @click.prevent="openGoalWithdrawModal(award)" class="icon-undo">Remove goal</a></li>
+                                                    <li><a @click.prevent="awardAchievement(award)" class="icon-showcase" title="Award achievement">Award achievement</a></li>
+                                                    <li><a @click.prevent="openGoalWithdrawModal(award)" class="icon-close" title="Remove goal">Remove goal</a></li>
                                                   </template>
                                                 </template>
                                             </ul>
@@ -262,7 +262,7 @@ export default {
         </template>
         <template v-else>
             <div class="empty-state">
-                <i class="icon-advanced-list"></i>
+                <i class="icon-showcase"></i>
                 <p>There haven't been any goals set nor any achievements received.</p>
             </div>
         </template>
