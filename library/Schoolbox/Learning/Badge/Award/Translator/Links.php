@@ -84,6 +84,17 @@ class Links
                 'badgeId' => $award->getBadge()->getId(),
             ]
         );
+
+
+        /* End point for awarding goal
+        */
+        $translation['goalAward'] = $this->getRouteIfAuthorized(
+            'learningBadgeAward.awardAsAchievement',
+            [
+                'badgeId' => $award->getBadge()->getId(),
+            ]
+        );
+
         return $translation;
     }
 

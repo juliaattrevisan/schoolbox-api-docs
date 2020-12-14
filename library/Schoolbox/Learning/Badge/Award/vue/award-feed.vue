@@ -7,6 +7,8 @@ import GoalWithdrawModal from "./award-goal-withdraw-modal";
 import foundationMixin from '@schoolbox/foundation-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
+import toastMixin from '@schoolbox/toast-mixin';
+import qs from "qs";
 
 export default {
 
@@ -25,7 +27,8 @@ export default {
      */
     mixins: [
         foundationMixin,
-        goalMixin
+        goalMixin,
+        toastMixin
     ],
 
     /**
@@ -96,11 +99,28 @@ export default {
         },
 
         /**
-         * Convert an goal into an achievement
+         * Convert a goal into an achievement
          *
          * @param award
          */
         awardAchievement(award) {
+          let self = this;
+
+          let request = {
+            url: award._links.goalAward,
+            data: {users: [award.recipient]},
+            method: 'post',
+            responseType: 'json'
+          }
+
+          self.toastActivate('Awarding...');
+          axios
+              .request(request)
+              .then(() => {
+                self.toastSuccess('Achievement awarded');
+                self.updateAwards();
+              })
+              .catch(() => self.toastError('Failed to award achievement'))
 
         },
 
