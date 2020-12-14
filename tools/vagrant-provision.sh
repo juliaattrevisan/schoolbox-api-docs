@@ -492,6 +492,12 @@ then
             # Technically this is redundant for 'vagrant' sessions, but it required for vagrant sudo and root session
             echo "export PHP_IDE_CONFIG=\"serverName=10.0.2.15\"" >> ${bashrcFile};
         fi
+
+        if [[ -z `grep -E '^export\s+INSTANCE_ID\s*=\s*"vagrantx"' ${bashrcFile}` ]];
+        then
+            # Ensure that we always run tools with vagrant instance
+            echo "export INSTANCE_ID=\"vagrantx\"" >> ${bashrcFile};
+        fi
     done
 
     # Need to preserve these ENV vars for vagrant's sudo session
