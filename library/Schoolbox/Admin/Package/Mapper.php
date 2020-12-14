@@ -22,7 +22,7 @@ class Mapper extends BaseMapper
      *
      * @throws BaseMapper\DefinitionException
      */
-    protected function mapping()
+    protected function mapping(): void
     {
         $this->hasTable('package');
         $this->hasModel(Model::class);

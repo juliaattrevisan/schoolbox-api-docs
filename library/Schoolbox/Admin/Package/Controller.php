@@ -8,7 +8,6 @@
 namespace Schoolbox\Admin\Package;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Collection;
 
 class Controller extends Base
 {
@@ -35,7 +34,6 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@adminPackage/index.twig',

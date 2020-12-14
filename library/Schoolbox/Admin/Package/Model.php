@@ -20,18 +20,18 @@ class Model
     /**
      * @var string|null
      */
-    protected $title;
+    protected ?string $title;
 
 
     /**
      * @var string|null
      */
-    protected $description;
+    protected ?string $description;
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    protected bool $installed;
+    protected ?bool $installed;
 
     /**
      * @return string|null
@@ -90,13 +90,13 @@ class Model
     }
 
     /**
-     * @param bool|null $intalled
+     * @param bool|null $installed
      *
      * @return self|$this
      */
-    public function setInstalled(?bool $intalled): self
+    public function setInstalled(?bool $installed): self
     {
-        $this->installed = $intalled;
+        $this->installed = $installed;
 
         return $this;
     }

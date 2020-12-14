@@ -33,8 +33,8 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        $this->register('GET', '', 'getIndex', $isAdmin, null);
-        $this->register('POST', '', 'installPackage', $isAdmin, null);
+        $this->register('GET', '', 'getIndex', $isAdmin);
+        $this->register('POST', '', 'installPackage', $isAdmin);
     }
 
 
