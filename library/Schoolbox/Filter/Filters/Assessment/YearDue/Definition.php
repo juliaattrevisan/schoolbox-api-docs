@@ -32,7 +32,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages(IConfigLoader $config): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
         return [];
     }

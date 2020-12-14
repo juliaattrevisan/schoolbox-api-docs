@@ -65,10 +65,10 @@ class Definition extends AbstractDefinition
     /**
      * This filter is available on the badge list page.
      *
-     * @param IConfigLoader $config
+     * @param IConfigLoader $configLoader
      * @return array
      */
-    public static function getPages(IConfigLoader $config): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
         return [
             Page\Model::PAGE_BADGE_LIST,

@@ -75,7 +75,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(IConfigLoader $config): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
         // For now, not available on any pages - purely used for internal query building
         return [

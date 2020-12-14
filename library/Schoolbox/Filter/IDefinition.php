@@ -82,14 +82,14 @@ interface IDefinition
     /**
      * Return an ordered list of pages where this filter is available
      *
-     * @param IConfigLoader $config  This Schoolbox instance's configuration.
-     *                               (Filters may be enabled or disabled by
-     *                               particular configuration settings.)
+     * @param IConfigLoader $configLoader Schoolbox instance configuration.
+     *                                    (Filters may be enabled or disabled by
+     *                                     particular configuration settings.)
      * @return string[]|array
      * @see Page\Model::PAGE_* constants
      *
      */
-    public static function getPages(IConfigLoader $config): array;
+    public static function getPages(IConfigLoader $configLoader): array;
 
 
     /**

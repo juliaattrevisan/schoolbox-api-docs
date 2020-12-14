@@ -35,7 +35,7 @@ class Definition extends AssessmentTermFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(IConfigLoader $config): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
         // Not currently exposed in the UI - used just for internal query building
         return [];

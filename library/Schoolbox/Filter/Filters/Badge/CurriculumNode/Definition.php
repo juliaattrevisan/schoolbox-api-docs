@@ -52,12 +52,12 @@ class Definition extends AbstractDefinition
      * This definition is available on the badge list page, but only if
      * curriculum tagging is enabled.
      *
-     * @param IConfigLoader $config
+     * @param IConfigLoader $configLoader
      * @return array
      */
-    public static function getPages(IConfigLoader $config): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
-        return $config->get('curriculum_tagging_enabled')
+        return $configLoader->get('curriculum_tagging_enabled')
             ? [Page\Model::PAGE_BADGE_LIST,]
             : [];
     }

@@ -28,7 +28,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(IConfigLoader $config): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
         return [
             Page\Model::PAGE_COURSE_MARK_BOOK,

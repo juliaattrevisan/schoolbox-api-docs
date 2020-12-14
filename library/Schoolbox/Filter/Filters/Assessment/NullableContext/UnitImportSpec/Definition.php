@@ -75,7 +75,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(IConfigLoader $config): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
         return [
             Page\Model::PAGE_CLASS_MARK_BOOK,
