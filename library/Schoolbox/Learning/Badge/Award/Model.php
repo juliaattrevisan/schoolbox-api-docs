@@ -20,6 +20,7 @@ use Schoolbox\User;
  */
 class Model implements ISoftDeletable
 {
+    use ModelTrait\Id;
     use ModelTrait\DeletedAtDate;
 
 

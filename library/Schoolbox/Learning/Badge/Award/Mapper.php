@@ -40,6 +40,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasTable('badge_user');
         $this->hasModel(Model::class);
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('recipient_id', UserMapper::class, 'id', null, null, 'recipient', 'recipient');
         $this->joins('badge_id', \Schoolbox\Learning\Badge\Mapper::class, 'id', null, null, 'badge', 'badge');
         $this->uses('status', self::TYPE_STRING);
