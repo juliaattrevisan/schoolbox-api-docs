@@ -1,0 +1,27 @@
+{# Shared navigation menu #}
+{{ renderAdminNavigation(pageCurrent) }}
+
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <ul class="information-list">
+                {% for package in packages %}
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="card small-12">
+                                <h3>{{ package.title }}</h3>
+                            </div>
+                        </div>
+                        <nav>
+                            <a href="#" class="icon-download" title="Install"></a>
+                        </nav>
+                        <article>{{ package.description }}</article>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
+<div id='toaster' class="toast" data-toast></div>
+
