@@ -32,6 +32,8 @@
                 multiple
                 placeholder="Enter one or more curriculum codes"
                 data-selectize
+                data-value-original="{{ userSelectionIds | json_encode | e('html_attr') }}"
+                data-value-default="{{ roleSelectionIds | json_encode | e('html_attr') }}"
         >
             {% for selectedNode in selectedNodes %}
                 {% include '@filters/_option.twig' with {
