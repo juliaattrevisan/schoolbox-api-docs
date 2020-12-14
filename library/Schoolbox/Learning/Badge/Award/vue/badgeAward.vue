@@ -104,15 +104,19 @@ export default {
     },
     computed: {
         /**
-         * Prevent rapid-fire clicks that may add more than one badge 
-         * and ensure at least one student is selected
+         * Is the badge form's submit button disabled?
+         * It is disabled if there are no users to submit, or a form submission is already in progress.
          *
          * @returns {Boolean}
          */
-        isSubmitBtnDisabled () {
-            if (this.selected.length === 0) return true;
-            else if (this.isFormSubmitActive) return true;
-            else return false;
+        isSubmitButtonEnabled () {
+            if (this.selected.length === 0) {
+                return true;
+            } else if (this.isFormSubmitActive) {
+                return true;
+            } else {
+                return false;
+            }
         }
     },
     methods: {
@@ -168,11 +172,14 @@ export default {
                         () => this.$emit(EVENTS.done)
                     );
 
+                })
+                .catch(() => {
+                    this.$refs.toast.timeout(this.toastFailureMessage, false);
+                })
+                .finally(() => {
                     //can add another badge now, so the submit button can be clicked again
                     this.isFormSubmitActive = false;
-
-                })
-                .catch(() => this.$refs.toast.timeout(this.toastFailureMessage, false))
+                });
         },
 
 
@@ -225,7 +232,7 @@ export default {
         </v-select>
         <ul class="flex-list buttons">
             <li>
-                <button @click.prevent="onSubmit" class="submit" :disabled="isSubmitBtnDisabled">
+                <button @click.prevent="onSubmit" class="submit" :disabled="isSubmitButtonEnabled">
                     <!-- @slot The text for this badge award form's confirm button -->
                     <slot name="confirmButton">
                         Award Achievement
