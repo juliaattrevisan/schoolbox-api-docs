@@ -123,12 +123,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
--- A badge awarded multiple times to a particular guy at the same time with the same status
--- by the same person...is probably an anomaly resulting from submission via multiple forms,
--- devices, double-clicks, etc and shouldn't be treated as individual awardings
-ALTER TABLE `badge_user`
-    ADD UNIQUE INDEX `fk_unique_award` (`recipient_id` ASC, `badge_id` ASC, `status` ASC, `awarded_by` ASC, `awarded_at` ASC);
-
 -- Badge Category sequence
 ALTER TABLE `badge_category`
     ADD COLUMN `sequence` INT(10) UNSIGNED NOT NULL AFTER `name`;
