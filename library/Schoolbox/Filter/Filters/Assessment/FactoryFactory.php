@@ -1,10 +1,12 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment;
 
@@ -229,7 +231,6 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
         // No teacher-folder filter ? (Either not defined or set to NULL)
         if (!isset($filters[Filters\Assessment\Folder\TeacherInvolved\Definition::class])) {
-
             // Insert all involved folders for the specified viewee
             $filters[Filters\Assessment\Folder\TeacherInvolved\Definition::class] = new Collection();
             $involvedFolders                                                      = $folderMapper->findForUser($viewee, true, UserAccess::ACCESS_WRITE);

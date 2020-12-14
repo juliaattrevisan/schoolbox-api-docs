@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -8,9 +9,13 @@
 namespace Schoolbox\Filter;
 
 use Schoolbox\IConfigLoader;
+
 use function count;
+
 use DomainException;
+
 use function in_array;
+
 use Schoolbox\Collection;
 use Schoolbox\MapperFactory;
 use Schoolbox\GenericCollection;
@@ -124,7 +129,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
             $filterId = $filter->getId();
 
             // Do we have admin-configured data?
-            if($savedPageFilters[$filterId]){
+            if ($savedPageFilters[$filterId]) {
                 $pageFilter = $savedPageFilters[$filterId];
             } else {
                 $pageFilter = $this->getPageMapper()->createModel();
@@ -189,7 +194,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
         // Which of the enabled page-filters are configurable by the end user?
         /** @var GenericCollection|Page\Model[] $userConfigurablePageFilters */
-        $userConfigurablePageFilters = $enabledPageFilters->filter(function(Page\Model $pageFilter){
+        $userConfigurablePageFilters = $enabledPageFilters->filter(function (Page\Model $pageFilter) {
             return $pageFilter->getUserConfigurable();
         });
 
@@ -338,7 +343,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
                 continue;
             }
             // Skip if not user-configurable
-            if($userConfigurableOnly && !$pageFilter->getUserConfigurable()){
+            if ($userConfigurableOnly && !$pageFilter->getUserConfigurable()) {
                 continue;
             }
             $pageFilters[$filterId]      = $pageFilter;

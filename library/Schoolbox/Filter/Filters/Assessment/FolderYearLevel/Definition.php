@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\FolderYearLevel;
@@ -13,6 +15,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\YearLevel;
 use UnexpectedValueException;
+
 use function array_merge;
 
 class Definition extends Filter\AbstractDefinition

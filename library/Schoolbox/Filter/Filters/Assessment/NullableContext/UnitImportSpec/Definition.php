@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
@@ -104,7 +106,7 @@ class Definition extends NullableContext\Definition
         // This prevents us filtering to assessments that reside directly on the class folder.
         // ie this will ensure we only ever see assessments on the course markbook if they have been
         // imported from a course.
-        if(Page\Model::PAGE_COURSE_MARK_BOOK === $pageFilter->getPage()){
+        if (Page\Model::PAGE_COURSE_MARK_BOOK === $pageFilter->getPage()) {
             $options->offsetUnset(self::KEY_NONE);
         }
         return $options;
