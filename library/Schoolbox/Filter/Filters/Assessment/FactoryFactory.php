@@ -12,6 +12,7 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\IFactory;
 use Schoolbox\Assessment\Term;
+use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\MapperFactory;
@@ -43,12 +44,15 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
+     * Constructor
+     *
      * @param MapperFactory $mapperFactory
+     * @param IConfigLoader $configLoader
      * @param RosettaStone  $rosettaStone
      */
-    public function __construct(MapperFactory $mapperFactory, RosettaStone $rosettaStone)
+    public function __construct(MapperFactory $mapperFactory, IConfigLoader $configLoader, RosettaStone $rosettaStone)
     {
-        parent::__construct($mapperFactory);
+        parent::__construct($mapperFactory, $configLoader);
         $this->rosettaStone = $rosettaStone;
     }
 

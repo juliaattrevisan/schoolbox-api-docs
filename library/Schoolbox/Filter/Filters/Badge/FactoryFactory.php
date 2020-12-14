@@ -44,6 +44,9 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                 );
 
             case CurriculumNode\Definition::class:
+                if (!$this->configLoader->get('curriculum_tagging_enabled')) {
+                    break;
+                }
                 /** @var CurriculumNodeMapper $curriculumNodeMapper */
                 $curriculumNodeMapper = $this->getMapperFactory()->get(CurriculumNodeMapper::class);
                 return new CurriculumNode\Factory(

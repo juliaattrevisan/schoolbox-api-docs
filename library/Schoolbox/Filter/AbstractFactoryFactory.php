@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter;
 
+use Schoolbox\IConfigLoader;
 use function count;
 use DomainException;
 use function in_array;
@@ -29,11 +30,22 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @param MapperFactory $mapperFactory
+     * Config loader: may be required for determining if a particular filter
+     * is even able to be created.
      */
-    public function __construct(MapperFactory $mapperFactory)
+    protected IConfigLoader $configLoader;
+
+
+    /**
+     * Constructor
+     *
+     * @param MapperFactory $mapperFactory
+     * @param IConfigLoader $configLoader
+     */
+    public function __construct(MapperFactory $mapperFactory, IConfigLoader $configLoader)
     {
         $this->mapperFactory = $mapperFactory;
+        $this->configLoader  = $configLoader;
     }
 
 

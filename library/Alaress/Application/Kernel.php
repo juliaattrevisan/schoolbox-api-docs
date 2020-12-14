@@ -59,6 +59,7 @@ use Schoolbox\Filter;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
@@ -1418,13 +1419,16 @@ abstract class Kernel
             'filters.factoryFactory',
             $di->lazy(
                 static function () use ($di, $mapperFactory) {
+                    /** @var IConfigLoader $config */
+                    $config = $di->get('config');
+
+                    /** @var RosettaStone $rosettaStone */
+                    $rosettaStone = $di->get('l10n');
+
                     return new Filter\CompositeFactoryFactory(
-                        new Filter\Filters\Assessment\FactoryFactory(
-                            $mapperFactory,
-                            $di->get('l10n')
-                        ),
-                        new Filter\Filters\Event\FactoryFactory($mapperFactory),
-                        new Filter\Filters\Badge\FactoryFactory($mapperFactory),
+                        new Filter\Filters\Assessment\FactoryFactory($mapperFactory, $config, $rosettaStone),
+                        new Filter\Filters\Event\FactoryFactory($mapperFactory, $config),
+                        new Filter\Filters\Badge\FactoryFactory($mapperFactory, $config),
                     );
                 }
             )
