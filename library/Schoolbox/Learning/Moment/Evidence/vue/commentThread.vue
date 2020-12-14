@@ -39,10 +39,12 @@ export default {
             pendingComment: '',
             saveInProgress: false,
             commentIndexToDelete: null,
+            editorUrl: "/javascript/ckeditor/ckeditor.js",
             isCKEditorLoading: false,
             isCKEditorLoaded: false,
             isCKEditorReady: false,
             ckeditorConfig: { 
+                embed_provider: '//iframe.ly/api/oembed?url={url}&callback={callback}&api_key=94aa8fc28ac1089a2dfb28',
                 removePlugins: 'image,uploadimage,link,schoolboxanchor,elementspath,wordcount',
                 removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
                 toolbarGroups: [
@@ -166,7 +168,7 @@ export default {
             this.isCKEditorReady = true;
             this.isCKEditorLoading = false;
         },
-        
+
         /**
          * Loads the next cursor of comments.
          */
@@ -287,7 +289,7 @@ export default {
                 <button class="btn-show-ckeditor" v-show="!isCKEditorReady" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
                 <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
                 <div v-if="isCKEditorLoaded" :style="[isCKEditorReady ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
-                    <ckeditor tag-name="textarea" @ready="onCKEditorReady" v-model="pendingComment" :config="ckeditorConfig" :read-only="saveInProgress" ></ckeditor>
+                    <ckeditor tag-name="textarea" v-model="pendingComment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
                     <a class="button submit"
                     @click.once="postComment"
                     :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
