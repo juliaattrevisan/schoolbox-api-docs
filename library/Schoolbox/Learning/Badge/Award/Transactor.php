@@ -15,7 +15,7 @@ use Schoolbox\Learning\Badge;
  * Class Transactor
  *
  * Goals need a special treatment based on what was previously awarded
- * I foresaw $badgeHistory as the complete transactional history originally
+ * I foresaw $history as the complete transactional history originally
  * but I think we can get away with $badgeHistory being just the most recently
  * awarded instance of $badge
  *
@@ -32,10 +32,10 @@ use Schoolbox\Learning\Badge;
  * (new Transactor($history, $awardMapper))->award($award);
  *
  *
- * If you're assigning to multiple, you could fetch the $badgeHistory set for all those guys in
+ * If you're assigning to multiple, you could fetch the $history set for all those guys in
  * one collection, then manually filter it out in php town as required, so you can iterate ->award()
  *
- * This will save you on smashing the db for a $badgeHistory collection for each user; instead, you
+ * This will save you on smashing the db for a $history collection for each user; instead, you
  * can get everyone's history in one query...but you'll consume more memory
  *
  * @package Schoolbox\Learning\Badge\Award
@@ -61,7 +61,7 @@ class Transactor
     /**
      * Transactor constructor.
      *
-     * $badgeHistory is a set of Awards given to a user, but it's calculated outside
+     * $history is a set of Awards given to a user, but it's calculated outside
      * this class so I can unit test this
      *
      * @param GenericCollection $history
@@ -75,7 +75,7 @@ class Transactor
 
 
     /**
-     * Award a $badge to the person in $badgeHistory
+     * Award a $badge to the person in $history
      *
      * You could perhaps specify $user explicitly here, but you don't need to do that
      * if you rely on $badgeHistory being correctly obtained
@@ -138,7 +138,7 @@ class Transactor
             if ($this->history->first()->isGoal()) {
 
                 /* If the most recent awarding of $badge is a goal,
-                 * set its badge_user_id field to the current award's id; the goal was reached
+                 * set its award_id field to the current award's id; the goal was reached
                  * since we are giving them the achievement. We need to save that first.
                  */
                 $this->awardMapper->save($award);
