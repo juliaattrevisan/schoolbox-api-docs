@@ -493,8 +493,7 @@ then
             echo "export PHP_IDE_CONFIG=\"serverName=10.0.2.15\"" >> ${bashrcFile};
         fi
 
-        if [[ -z `grep -E '^export\s+INSTANCE_ID\s*=\s*"vagrantx"' ${bashrcFile}` ]];
-        then
+        if ! grep -qE '^export\s+INSTANCE_ID\s*=\s*"vagrantx"' ${bashrcFile}; then
             # Ensure that we always run tools with vagrant instance
             echo "export INSTANCE_ID=\"vagrantx\"" >> ${bashrcFile};
         fi
