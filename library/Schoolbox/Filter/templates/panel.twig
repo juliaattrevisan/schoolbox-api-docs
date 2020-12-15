@@ -524,13 +524,14 @@ Usage:
                     selectize  = $selectize.length > 0 ? $selectize[0].selectize : null;
 
                 // These will be deleted if the filter's not in use
-                componentsInUse[filterId]           = {};
-                componentsInUse[filterId]['name']   = $component.find('[data-filter-name]').html();
-                componentsInUse[filterId]['labels'] = [];
+                componentsInUse[filterId]         = {};
+                componentsInUse[filterId]['name'] = $component.find('[data-filter-name]').html();
 
-                // Maybe this is a selectize?
-                // TODO figure out how to handle combination selectize/checkbox lists
-                // (i.e. "No course" checkbox, and a list of courses)
+                // Labels are keyed by value for now, because the label could
+                // be in both a selectize and a standard option.
+                componentsInUse[filterId]['labels'] = {};
+
+                // Build list of labels from the selectize, if there is one
                 if (selectize) {
                     selectize.items.forEach(function (v) {
                         // Hook into selectize's render method for determining
@@ -544,28 +545,38 @@ Usage:
                             .children()
                             .remove('a')
                             .end();
-                        componentsInUse[filterId]['labels'].push($selectizeItem.text());
+                        componentsInUse[filterId]['labels'][v] = $selectizeItem.text();
                     });
-                } else if ($selected.length !== 0) {
+                }
+
+                // Build list of labels from selected options or checkboxes,
+                // if there are any.
+                if ($selected.length !== 0) {
                     // Not a selectize, or it's not yet initialized
                     // Filter is being applied, add its name and selected option labels.
                     $selected.each(function(idx, elem) {
                         var $elem = $(elem),
-                            label = null;
+                            label = null,
+                            value = $elem.val()
                         if ($elem.is('option')) {
                             label = $elem.text();
                         } else {
-                            label = $component.find('label[for='+$(elem).attr('id')+']').html();
+                            label = $component.find('label[for='+$elem.attr('id')+']').html();
                         }
-                        componentsInUse[filterId]['labels'].push(label);
+                        componentsInUse[filterId]['labels'][value] = label;
                     });
 
                     // Hide the filter in use if all its options are selected
                     // (all options is functionally equivalent to none selected)
                     if ($selected.length === $available.length) {
-                        componentsInUse[filterId]['labels'] = [];
+                        componentsInUse[filterId]['labels'] = {};
                     }
                 }
+
+                // Flatten the list of selected labels into an array
+                componentsInUse[filterId]['labels'] = Array.from(
+                    Object.values(componentsInUse[filterId]['labels'])
+                );
 
                 // Remove components with no selected options
                 if (componentsInUse[filterId].labels.length === 0) {
