@@ -65,17 +65,6 @@ class IdFinder extends AbstractIdFinder
             $hasWhere                = true;
             $hasCurriculumNodeFilter = false;
             $subPb                   = $this->getMapper()->getPredicateBuilder();
-            // is the NONE or ANY option set?
-            if (isset($curriculumNodes[CurriculumNode\Definition::KEY_NONE])) {
-                $hasCurriculumNodeFilter = true;
-                unset($curriculumNodes[CurriculumNode\Definition::KEY_NONE]);
-                $subPb = $subPb->isNull('cb.badge_id');
-            }
-            if (isset($curriculumNodes[CurriculumNode\Definition::KEY_ANY])) {
-                $hasCurriculumNodeFilter = true;
-                unset($curriculumNodes[CurriculumNode\Definition::KEY_ANY]);
-                $subPb = $subPb->notNull('cb.badge_id');
-            }
 
             // Is the ALL option set?
             // (This is a proxy for not filtering this list at all.)
