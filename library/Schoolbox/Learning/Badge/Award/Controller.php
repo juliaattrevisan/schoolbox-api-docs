@@ -103,25 +103,7 @@ class Controller extends Base
      */
     public function getAwardAsAchievementForm(GenericCollection $users)
     {
-        $page        = Filter\Page\Model::PAGE_BADGE_LIST;
-        $filterPanel = $this->filterFactoryFactory->buildPanel(
-            $this->getUser(),
-            $page,
-            null,
-            $this->getUser(),
-            []
-        );
-
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningBadgeAward/awardAsAchievementForm.twig',
-                [
-                    'users'       => $users->map(new User\Translator\Author\ModelToArray()),
-                    'filterPanel' => $filterPanel,
-                ],
-                'Award Achievement'
-            )
-        );
+        $this->getAwardBadgeForm($users, '@learningBadgeAward/awardAsAchievementForm.twig', 'Award Achievement');
     }
 
 
@@ -154,6 +136,20 @@ class Controller extends Base
      */
     public function getSetAsGoalForm(GenericCollection $users)
     {
+        $this->getAwardBadgeForm($users, '@learningBadgeAward/setAsGoalForm.twig', 'Set Goals');
+    }
+
+
+    /**
+     * Show a form for awarding a badge as an achievement or goal to a set of
+     * users.
+     *
+     * @param GenericCollection|User[] $users
+     * @param string                   $template The template to display
+     * @param string                   $title    The title of this page
+     */
+    private function getAwardBadgeForm(GenericCollection $users, string $template, string $title): void
+    {
         $page        = Filter\Page\Model::PAGE_BADGE_LIST;
         $filterPanel = $this->filterFactoryFactory->buildPanel(
             $this->getUser(),
@@ -163,14 +159,29 @@ class Controller extends Base
             []
         );
 
+        // Segment users into users which are and are not this user
+        $otherUsers     = $users->emptyClone();
+        $thisUserId     = $this->getUser()->getId();
+        $settingForSelf = false;
+        foreach ($users as $user) {
+            if ($user->getId() === $thisUserId) {
+                $settingForSelf = true;
+            } else {
+                $otherUsers->add($user);
+            }
+        }
+
+        $translator = new User\Translator\Author\ModelToArray();
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@learningBadgeAward/setAsGoalForm.twig',
+                $template,
                 [
-                    'users'       => $users->map(new User\Translator\Author\ModelToArray()),
-                    'filterPanel' => $filterPanel,
+                    'settingForSelf' => $settingForSelf,
+                    'users'          => $users->map($translator),
+                    'otherUsers'     => $otherUsers->map($translator),
+                    'filterPanel'    => $filterPanel,
                 ],
-                'Set Goals'
+                $title
             )
         );
     }

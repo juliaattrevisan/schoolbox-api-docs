@@ -24,14 +24,14 @@
     <div class="small-12 columns">
         <h1>{{ messages.pageHeader }}</h1>
 
-        {% if users is not empty %}
+        {% if otherUsers is not empty %}
             <ul class="meta">
                 <li>
                     {% include 'sub/userListMetadata.twig'
                         with {
-                        users:   users,
-                        message: 'Awarding to'
-                    } only
+                            users:   otherUsers,
+                            message: settingForSelf ? 'Awarding to myself, and also to' : 'Awarding to'
+                        } only
                     %}
                 </li>
             </ul>
