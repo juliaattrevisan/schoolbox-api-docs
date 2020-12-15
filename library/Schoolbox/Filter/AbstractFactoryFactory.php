@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -7,14 +8,16 @@
 
 namespace Schoolbox\Filter;
 
-use function count;
+use Schoolbox\IConfigLoader;
 use DomainException;
-use function in_array;
 use Schoolbox\Collection;
 use Schoolbox\MapperFactory;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Alaress\Database\Predicate\InvalidColumnException;
+
+use function count;
+use function in_array;
 
 abstract class AbstractFactoryFactory implements IFactoryFactory
 {
@@ -29,11 +32,22 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @param MapperFactory $mapperFactory
+     * Config loader: may be required for determining if a particular filter
+     * is even able to be created.
      */
-    public function __construct(MapperFactory $mapperFactory)
+    protected IConfigLoader $configLoader;
+
+
+    /**
+     * Constructor
+     *
+     * @param MapperFactory $mapperFactory
+     * @param IConfigLoader $configLoader
+     */
+    public function __construct(MapperFactory $mapperFactory, IConfigLoader $configLoader)
     {
         $this->mapperFactory = $mapperFactory;
+        $this->configLoader  = $configLoader;
     }
 
 
@@ -102,17 +116,17 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
         $definitions = $this->createDefinitionCollection();
 
-        foreach($entityFilters as $filter){
+        foreach ($entityFilters as $filter) {
             $class = $filter->getClass();
 
             // Can this filter never appear on this page?
-            if (!in_array($page, $class::getPages(), true)) {
+            if (!in_array($page, $class::getPages($this->configLoader), true)) {
                 continue;
             }
             $filterId = $filter->getId();
 
             // Do we have admin-configured data?
-            if($savedPageFilters[$filterId]){
+            if ($savedPageFilters[$filterId]) {
                 $pageFilter = $savedPageFilters[$filterId];
             } else {
                 $pageFilter = $this->getPageMapper()->createModel();
@@ -177,7 +191,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
         // Which of the enabled page-filters are configurable by the end user?
         /** @var GenericCollection|Page\Model[] $userConfigurablePageFilters */
-        $userConfigurablePageFilters = $enabledPageFilters->filter(function(Page\Model $pageFilter){
+        $userConfigurablePageFilters = $enabledPageFilters->filter(function (Page\Model $pageFilter) {
             return $pageFilter->getUserConfigurable();
         });
 
@@ -290,7 +304,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
         /** @var GenericCollection|Model[] $availableFilters */
         $availableFilters = $this->getFilterMapper()->findForEntity(static::getEntity())->filter(function (Model $instance) use ($page) {
             $definitionClass = $instance->getClass();
-            return in_array($page, $definitionClass::getPages(), true);
+            return in_array($page, $definitionClass::getPages($this->configLoader), true);
         });
 
         $pageFilterMapper = $this->getPageMapper();
@@ -326,7 +340,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
                 continue;
             }
             // Skip if not user-configurable
-            if($userConfigurableOnly && !$pageFilter->getUserConfigurable()){
+            if ($userConfigurableOnly && !$pageFilter->getUserConfigurable()) {
                 continue;
             }
             $pageFilters[$filterId]      = $pageFilter;

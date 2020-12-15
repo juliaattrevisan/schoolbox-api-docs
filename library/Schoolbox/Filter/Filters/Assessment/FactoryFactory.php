@@ -1,10 +1,12 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment;
 
@@ -12,6 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\IFactory;
 use Schoolbox\Assessment\Term;
+use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\MapperFactory;
@@ -43,12 +46,15 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
+     * Constructor
+     *
      * @param MapperFactory $mapperFactory
+     * @param IConfigLoader $configLoader
      * @param RosettaStone  $rosettaStone
      */
-    public function __construct(MapperFactory $mapperFactory, RosettaStone $rosettaStone)
+    public function __construct(MapperFactory $mapperFactory, IConfigLoader $configLoader, RosettaStone $rosettaStone)
     {
-        parent::__construct($mapperFactory);
+        parent::__construct($mapperFactory, $configLoader);
         $this->rosettaStone = $rosettaStone;
     }
 
@@ -225,7 +231,6 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
         // No teacher-folder filter ? (Either not defined or set to NULL)
         if (!isset($filters[Filters\Assessment\Folder\TeacherInvolved\Definition::class])) {
-
             // Insert all involved folders for the specified viewee
             $filters[Filters\Assessment\Folder\TeacherInvolved\Definition::class] = new Collection();
             $involvedFolders                                                      = $folderMapper->findForUser($viewee, true, UserAccess::ACCESS_WRITE);

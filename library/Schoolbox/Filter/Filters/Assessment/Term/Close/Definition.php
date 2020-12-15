@@ -1,14 +1,16 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Term\Close;
 
-use \Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
-
+use Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
+use Schoolbox\IConfigLoader;
 
 /**
  * Filter to assessments that *CLOSE* in this term.
@@ -34,7 +36,7 @@ class Definition extends AssessmentTermFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
         // Not currently exposed in the UI - used just for internal query building
         return [];

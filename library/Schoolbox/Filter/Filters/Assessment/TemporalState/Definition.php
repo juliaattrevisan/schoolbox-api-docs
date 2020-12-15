@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\TemporalState;
@@ -10,9 +12,10 @@ namespace Schoolbox\Filter\Filters\Assessment\TemporalState;
 use InvalidArgumentException;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
+
 use function array_merge;
 use function in_array;
-
 
 /**
  * Filters assessments by their publish, open, due and close dates.
@@ -86,7 +89,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
         return [
             Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
@@ -133,7 +136,6 @@ class Definition extends Filter\AbstractDefinition
         foreach ($cleanedPageOptions as $idx => $option) {
             $key = $option->getKey();
             switch ($pageFilter->getPage()) {
-
                 case Filter\Page\Model::PAGE_GRADES:
                     // Do not permit 'unpublished' on the 'grades' page
                     if ($key === self::KEY_CUSTOM_UNPUBLISHED || !in_array($key, self::getCapTemporalStates(), true)) {
@@ -142,12 +144,18 @@ class Definition extends Filter\AbstractDefinition
                     break;
                 case Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS:
                     // 'Upcoming Assessments' only supports these 3 options
-                    if (!in_array($key, [
-                        self::KEY_CUSTOM_UPCOMING,
-                        self::KEY_CUSTOM_OPEN,
-                        self::KEY_CUSTOM_OVERDUE,
-                        self::KEY_CUSTOM_CLOSED,
-                    ], true)) {
+                    if (
+                        !in_array(
+                            $key,
+                            [
+                                self::KEY_CUSTOM_UPCOMING,
+                                self::KEY_CUSTOM_OPEN,
+                                self::KEY_CUSTOM_OVERDUE,
+                                self::KEY_CUSTOM_CLOSED,
+                            ],
+                            true
+                        )
+                    ) {
                         $cleanedPageOptions->offsetUnset($idx);
                     }
                     break;

@@ -1,14 +1,17 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Term\Due;
 
 use Schoolbox\Filter\Page;
-use \Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
+use Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
+use Schoolbox\IConfigLoader;
 
 /**
  * Available Term options:
@@ -30,7 +33,7 @@ class Definition extends AssessmentTermFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
         return [
             Page\Model::PAGE_PENDING_ASSESSMENTS,

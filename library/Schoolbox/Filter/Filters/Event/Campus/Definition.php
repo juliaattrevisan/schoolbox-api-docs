@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Event\Campus;
@@ -12,6 +14,7 @@ use Schoolbox\Campus as CampusModel;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 
 /**
  * Definition for the campus filter.
@@ -47,7 +50,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
         return [
             Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR,

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\Readable;
@@ -10,6 +12,7 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder\Readable;
 use InvalidArgumentException;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 use Schoolbox\Filter\Page;
+use Schoolbox\IConfigLoader;
 
 /**
  * Display a list of folders (either classes, groups or both) which the current
@@ -33,7 +36,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
         return [
             Page\Model::PAGE_ASSESSMENT_CALENDAR,

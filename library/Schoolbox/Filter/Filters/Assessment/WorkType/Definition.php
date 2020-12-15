@@ -1,18 +1,21 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\WorkType;
+
 use function array_map;
 use function array_merge;
-
 
 /**
  * Available options:
@@ -69,7 +72,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
         return [
             Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR,
@@ -128,7 +131,6 @@ class Definition extends Filter\AbstractDefinition
 
         // Ensure it contains all WorkTypes
         foreach ($this->workTypes as $workType) {
-
             $abstractKey = (string)$workType->getId();
 
             if (!$options->offsetExists($abstractKey)) {

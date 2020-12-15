@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -8,6 +9,7 @@
 namespace Schoolbox\Filter;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 
 /**
  * All filter definitions must provide an implementation that adheres to this interface.
@@ -81,10 +83,14 @@ interface IDefinition
     /**
      * Return an ordered list of pages where this filter is available
      *
+     * @param IConfigLoader $configLoader Schoolbox instance configuration.
+     *                                    (Filters may be enabled or disabled by
+     *                                     particular configuration settings.)
+     * @return string[]|array
      * @see Page\Model::PAGE_* constants
-     * @return string[]
+     *
      */
-    public static function getPages(): array;
+    public static function getPages(IConfigLoader $configLoader): array;
 
 
     /**

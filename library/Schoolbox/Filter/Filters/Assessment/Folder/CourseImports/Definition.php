@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\CourseImports;
@@ -10,6 +12,7 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder\CourseImports;
 use InvalidArgumentException;
 use Schoolbox\Filter\Page;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
+use Schoolbox\IConfigLoader;
 
 /**
  * Displays a list of folders where the courseSpec has been imported
@@ -27,7 +30,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
         return [
             Page\Model::PAGE_COURSE_MARK_BOOK,

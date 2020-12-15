@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\CourseImportSpec;
@@ -10,6 +12,7 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\CourseImportSpec;
 use InvalidArgumentException;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
 use Schoolbox\Filter\Page;
+use Schoolbox\IConfigLoader;
 
 /**
  * The course spec that an an assessment's course implementation was imported
@@ -39,7 +42,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages(): array
+    public static function getPages(IConfigLoader $configLoader): array
     {
         return [
             Page\Model::PAGE_ASSESSMENT_CALENDAR,

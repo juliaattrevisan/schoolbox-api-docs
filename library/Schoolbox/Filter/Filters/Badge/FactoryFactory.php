@@ -50,7 +50,8 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),
-                    $curriculumNodeMapper
+                    $curriculumNodeMapper,
+                    (bool)$this->configLoader->get('curriculum_tagging_enabled')
                 );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
