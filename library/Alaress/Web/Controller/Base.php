@@ -21,7 +21,6 @@ use Aura\Router\Router;
 use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\User;
 use Sentry\State\HubInterface;
 use Throwable;
@@ -322,22 +321,26 @@ abstract class Base
 
 
     /**
-     * Add this request's return URL to the given path.
+     * Add given query string params from this request URL into the given path.
      *
-     * @param string $path A path, possibly generated with
-     *                     `getRouteIfAuthorized` or similar.
-     * @return string `$path` with this request's return URL injected.
+     * @param string $path             A path, possibly generated with
+     *                                `getRouteIfAuthorized` or similar.
+     * @param array  $queryStringKeys  A list of keys to preserve from the
+     *                                 current request's query string.
+     *
+     * @return string `$path` with this request's query string params injected.
      */
-    protected function addReturnUrlToPath(string $path): string
+    protected function addQueryStringParamsToPath(string $path, array $queryStringKeys): string
     {
-        $url       = new Uri($path);
-        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
-        if (isset($returnUrl)) {
-            $query = $url->getQueryAsArray();
-            $query[Redirect::RETURN_URL] = $returnUrl;
-            $url->setQuery($query);
+        $url   = new Uri($path);
+        $query = $url->getQueryAsArray();
+        foreach ($queryStringKeys as $queryStringKey) {
+            $queryStringValue = $this->request->query->get($queryStringKey);
+            if (isset($queryStringValue)) {
+                $query[$queryStringKey] = $queryStringValue;
+            }
         }
-        return $url->toString();
+        return $url->setQuery($query)->toString();
     }
 
 
