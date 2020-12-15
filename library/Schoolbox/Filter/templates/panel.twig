@@ -570,9 +570,12 @@ Usage:
                         }
                     });
 
-                    // Hide the filter in use if all its options are selected
-                    // (all options is functionally equivalent to none selected)
-                    if ($selected.length === $available.length) {
+                    // Hide the filter in use if all its options are selected,
+                    // and there is no selectize
+                    // (all options is functionally equivalent to none selected,
+                    //  but it's impossible to tell if all are selected if there
+                    //  is a selectize in play)
+                    if (!selectize && $selected.length === $available.length) {
                         componentsInUse[filterId]['labels'] = {};
                     }
                 }
