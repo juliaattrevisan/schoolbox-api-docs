@@ -373,16 +373,26 @@ class Controller extends Base
     /**
      * Set a badge as a goal for the current user.
      *
-     * To be implemented when students are given the ability to set goals for
-     * themselves.
-     *
      * @api   POST /learning/badge/award/{badgeId}/achievement
      * @since 20.2
      *
      * @param Model $badge
+     * @throws MapperException if somehow the save fails
      */
     public function setAsGoalForSelf(Model $badge): void
     {
+        $award = $this->mapper->createModel()
+                              ->setRecipient($this->getUser())
+                              ->setBadge($badge)
+                              ->setStatus(AwardModel::AWARD_STATUS_GOAL)
+                              ->setAwardedBy($this->getUser())
+                              ->setAwardedAt(Alaress_Date_Format::now());
+        $this->mapper->save($award);
+
+        $translator = $this->buildBadgeAwardModelToArrayTranslator();
+        $this->response->content->set(
+            $this->buildJsonOutput($translator($award))
+        );
     }
 
 
