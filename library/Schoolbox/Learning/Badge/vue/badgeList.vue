@@ -268,7 +268,7 @@ export default {
         },
 
         /**
-         * Perform withdrawal
+         * Perform delete
          */
         deleteBadge() {
             this.$refs.toast.activate('Deleting badge...');
