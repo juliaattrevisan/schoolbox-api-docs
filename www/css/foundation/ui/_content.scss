@@ -332,6 +332,11 @@ $container-bg: white !default;
 
 @include selection;
 
+// if an image has no src, hide it.
+img[src=""] {
+  display: none;
+}
+
 .align-bottom {
     vertical-align: bottom;
 }

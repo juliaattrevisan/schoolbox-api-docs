@@ -180,8 +180,11 @@
 [data-icon-selection] {
   background-color: $vapor;
   text-align: center;
-  padding: .5rem;
   margin-bottom: .5rem;
+
+  img {
+    margin: .5rem;
+  }
 }
 
 .awards, .activity-feed, .badge-modal {

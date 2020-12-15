@@ -82,7 +82,6 @@
                                             /* Inflict it upon the form
                                              */
                                             onSelect: function(element) {
-                                                $('[data-icon-selection]').removeClass('hide');
                                                 $('[data-icon-selection] img').attr('src', $(element).attr('src')).show();
                                                 $('input[name=icon]').val($(element).attr('src'));
 
@@ -113,7 +112,7 @@
                                 </script>
                             </div>
                             <div class="small-12 medium-6 columns" data-icon-container>
-                                <div data-icon-selection class="hide">
+                                <div data-icon-selection>
                                     <img src="{{ badge and badge.icon ? badge.icon : '' }}" width="128" height="128" />
                                     <input id="badge-icon" name="icon" type="hidden" value="{{ badge and badge.icon ? badge.icon : '' }}" />
                                 </div>
