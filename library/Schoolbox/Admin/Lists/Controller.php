@@ -858,7 +858,7 @@ class Controller extends Base
         ];
 
         $return['achievement-category'] = [
-            'title'             => 'Achievement Categories',
+            'title'             => 'Badge Categories',
             'mapper'            => \Schoolbox\Learning\Badge\Category\Mapper::class,
             'delete'            => true,
             'fields'            => [

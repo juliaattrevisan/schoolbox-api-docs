@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,10 +9,10 @@
 
 namespace Schoolbox\Realtime\Message;
 
-
 use Schoolbox\Mapper;
 
-class NSMapper extends Mapper {
+class NSMapper extends Mapper
+{
 
     const NS_PASTORAL                = 'pastoral';
     const NS_PASTORAL_COMMENT        = 'pastoral_comment';
@@ -39,41 +40,51 @@ class NSMapper extends Mapper {
     const NS_UPS                     = 'ups';
     const NS_NEWS_DISCUSSION_COMMENT = 'news_discussion_comment';
     const NS_EVIDENCE                = 'evidence';
+    const NS_BADGE                   = 'badge';
 
 
-    protected function mapping() {
+    /**
+     * @inheritDoc
+     */
+    protected function mapping()
+    {
         $this->hasTable('msg_namespace');
         $this->hasModel(NS::class);
 
-        $this->hasMap(array(
-            'column'     => 'id',
-            'property'   => 'id',
-            'type'       => self::TYPE_INTEGER,
-            'identifier' => true,
-        ));
-        $this->hasMap(array(
-            'column'     => 'slug',
-            'property'   => 'slug',
-            'type'       => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'     => 'label',
-            'property'   => 'label',
-            'type'       => self::TYPE_STRING,
-        ));
+        $this->hasMap(
+            [
+                'column'     => 'id',
+                'property'   => 'id',
+                'type'       => self::TYPE_INTEGER,
+                'identifier' => true,
+            ]
+        );
+        $this->hasMap(
+            [
+                'column'   => 'slug',
+                'property' => 'slug',
+                'type'     => self::TYPE_STRING,
+            ]
+        );
+        $this->hasMap(
+            [
+                'column'   => 'label',
+                'property' => 'label',
+                'type'     => self::TYPE_STRING,
+            ]
+        );
     }
 
     /**
      * @param string $slug
-     * @return NS
+     * @return null|NS
      */
-    public function findOneBySlug($slug) {
+    public function findOneBySlug(string $slug): ?NS
+    {
         try {
             return $this->findOneByColumn('slug', $slug);
-        }
-        catch(Mapper\Exception $e) {
+        } catch (Mapper\Exception $e) {
             return null;
         }
     }
-
 }

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence;
@@ -38,7 +40,7 @@ class Notifier extends AbstractModuleNotifier
     private const PATTERN_EVIDENCE_HREF = '/learning/evidence/%d';
 
     /** @var UserMapper */
-    private $userMapper;
+    private UserMapper $userMapper;
 
     /**
      * @inheritdoc
@@ -95,7 +97,6 @@ class Notifier extends AbstractModuleNotifier
          * Deleted
          */
         if ($crudMethod === \Schoolbox\Mapper::METHOD_DELETE) {
-            // Evidence deleted; revoke that bad boy
             $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
             $bundle->detach(self::TRIGGER_POSTED);
             return;
@@ -105,7 +106,6 @@ class Notifier extends AbstractModuleNotifier
          * Created
          */
         if ($crudMethod === \Schoolbox\Mapper::METHOD_CREATE) {
-            // Evidence deleted; revoke that bad boy
             $bundle->attach(self::TRIGGER_POSTED, self::IMMEDIATELY);
         }
     }
