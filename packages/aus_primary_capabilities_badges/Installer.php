@@ -36,7 +36,11 @@ class Installer implements IPackageInstall {
             $curriculumCodes = explode(',',$row['Curriculum']);
             $nodeCollection = new GenericCollection(Node\Model::class);
             foreach($curriculumCodes as $code) {
-                $nodeCollection->add($nodeMapper->findOneByColumn('code', $code));
+                try {
+                    $nodeCollection->add($nodeMapper->findOneByColumn('code', $code));
+                } catch (Exception $e) {
+                    throw $e;
+                }
             }
             $badge->setCurriculumNodes($nodeCollection);
 
