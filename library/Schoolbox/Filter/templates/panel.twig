@@ -512,19 +512,15 @@ Usage:
          * would be rendered in the selectize, then uses that same rendering in
          * the filter panel.
          *
-         * TODO consider if is it overkill to hook into selectize's rendering
-         *
          * @param {Object} selectize A selectize instance
          * @param {String} key       The key of an option in the selectize
          */
         function determineLabelFromSelectize(selectize, key) {
-            // Hook into selectize's render method for determining
-            // how to render the filter in use
-            //
+            // Hook into selectize's rendering
+            // TODO is it overkill to hook into selectize's rendering?
             let $selectizeItem = $(selectize.render('item', selectize.options[key])).clone();
 
-            // Remove the anchor from the item, so it doesn't show
-            // in the filter in use
+            // Remove the anchor from the item, so it doesn't show in the filter
             $selectizeItem = $selectizeItem
                 .children()
                 .remove('a')
