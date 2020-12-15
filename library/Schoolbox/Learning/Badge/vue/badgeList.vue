@@ -360,7 +360,7 @@ export default {
                v-if="metadata.cursor.next && data.length < metadata.count">Load more</a>
         </div>
 
-        <reveal-modal ref="detailModal">
+        <reveal-modal size="medium" ref="detailModal">
             <badge-detail :badge="currentBadge" v-if="currentBadge"></badge-detail>
         </reveal-modal>
 

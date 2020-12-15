@@ -100,12 +100,25 @@
     text-align: center;
   }
   h2 {
+    font-size: $h1-font-size;
     max-width: 100%;
     margin-bottom: .5rem;
   }
   article {
     max-width: 40rem;
     margin: 1rem auto 0 auto;
+  }
+  .meta, p, article {
+    font-size: $base-font-size;
+  }
+  // replicate heading font reduction
+  @media #{$medium-down} {
+    h2 {
+      font-size: 1.25rem;
+    }
+    .meta, p, article {
+      font-size: $paragraph-font-size;
+    }
   }
 }
 
