@@ -149,7 +149,7 @@ export default {
          * @returns {string}
          */
         generateIdentifier(award) {
-            return 'header-options-' + award.badge.category.id + '-' + award.badge.id;
+            return 'header-options-' + award.badge.category.id + '-' + award.badge.id + '-' + award.status;
         },
 
         /**
