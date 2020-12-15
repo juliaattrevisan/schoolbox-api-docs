@@ -7,6 +7,8 @@ import GoalWithdrawModal from "./award-goal-withdraw-modal";
 import foundationMixin from '@schoolbox/foundation-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
+import toastMixin from '@schoolbox/toast-mixin';
+import qs from "qs";
 
 export default {
 
@@ -25,7 +27,8 @@ export default {
      */
     mixins: [
         foundationMixin,
-        goalMixin
+        goalMixin,
+        toastMixin
     ],
 
     /**
@@ -93,6 +96,32 @@ export default {
          */
         openDetailModal(award) {
             this.$refs.awardDetailModal.open(award);
+        },
+
+        /**
+         * Convert a goal into an achievement
+         *
+         * @param award
+         */
+        awardAchievement(award) {
+          let self = this;
+
+          let request = {
+            url: award._links.goalAward,
+            data: {users: [award.recipient]},
+            method: 'post',
+            responseType: 'json'
+          }
+
+          self.toastActivate('Awarding...');
+          axios
+              .request(request)
+              .then(() => {
+                self.toastSuccess('Achievement awarded');
+                self.updateAwards();
+              })
+              .catch(() => self.toastError('Failed to award achievement'))
+
         },
 
         /**
@@ -214,6 +243,7 @@ export default {
                                                     <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-close">Withdraw achievement</a></li>
                                                   </template>
                                                   <template v-else>
+                                                    <li><a @click.prevent="awardAchievement(award)" class="icon-showcase">Award achievement</a></li>
                                                     <li><a @click.prevent="openGoalWithdrawModal(award)" class="icon-undo">Remove goal</a></li>
                                                   </template>
                                                 </template>
