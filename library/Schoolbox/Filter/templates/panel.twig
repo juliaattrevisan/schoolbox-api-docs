@@ -516,12 +516,13 @@ Usage:
         function updateFiltersInUseLabel() {
             var componentsInUse = {};
             $panelComponents.each(function (idx, component) {
-                var $component = $(component),
-                    filterId   = $component.data('component'),
-                    $available = $component.find('input[type=checkbox]'),
-                    $selected  = $component.find('input:checked[type=checkbox], :selected'),
-                    $selectize = $component.find('select[data-selectize]'),
-                    selectize  = $selectize.length > 0 ? $selectize[0].selectize : null;
+                var $component   = $(component),
+                    filterId     = $component.data('component'),
+                    $available   = $component.find('input[type=checkbox]'),
+                    $selected    = $component.find('input:checked[type=checkbox], :selected'),
+                    $selectize   = $component.find('select[data-selectize]'),
+                    hasSelectize = $selectize.length > 0,
+                    selectize    = hasSelectize ? $selectize[0].selectize : null;
 
                 // These will be deleted if the filter's not in use
                 componentsInUse[filterId]         = {};
@@ -571,11 +572,12 @@ Usage:
                     });
 
                     // Hide the filter in use if all its options are selected,
-                    // and there is no selectize
-                    // (all options is functionally equivalent to none selected,
-                    //  but it's impossible to tell if all are selected if there
-                    //  is a selectize in play)
-                    if (!selectize && $selected.length === $available.length) {
+                    // and the filter has no selectize (whether or not it is
+                    // initialized yet).
+                    // All options is functionally equivalent to none selected,
+                    // but it's impossible to tell if all are selected if there
+                    // is a selectize, so keep the filter in that case.
+                    if (!hasSelectize && $selected.length === $available.length) {
                         componentsInUse[filterId]['labels'] = {};
                     }
                 }
