@@ -86,17 +86,14 @@ class Controller extends Base
      */
     public function redirectToAwardAsAchievementForm(): void
     {
-        $url = new Uri(
-            $this->router->generate(
-                'learningBadgeAward.getAwardAsAchievementForm',
-                ['userIds' => $this->request->query->get('userIds')]
+        $this->response->redirect->to(
+            $this->addReturnUrlToPath(
+                $this->router->generate(
+                    'learningBadgeAward.getAwardAsAchievementForm',
+                    ['userIds' => $this->request->query->get('userIds')]
+                )
             )
         );
-        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
-        if (isset($returnUrl)) {
-            $url->setQuery([Redirect::RETURN_URL => $returnUrl]);
-        }
-        $this->response->redirect->to($url->toString());
     }
 
 
@@ -142,17 +139,14 @@ class Controller extends Base
      */
     public function redirectToSetAsGoalForm(): void
     {
-        $url = new Uri(
-            $this->router->generate(
-                'learningBadgeAward.getSetAsGoalForm',
-                ['userIds' => $this->request->query->get('userIds')]
+        $this->response->redirect->to(
+            $this->addReturnUrlToPath(
+                $this->router->generate(
+                    'learningBadgeAward.getSetAsGoalForm',
+                    ['userIds' => $this->request->query->get('userIds')]
+                )
             )
         );
-        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
-        if (isset($returnUrl)) {
-            $url->setQuery([Redirect::RETURN_URL => $returnUrl]);
-        }
-        $this->response->redirect->to($url->toString());
     }
 
 
@@ -185,6 +179,26 @@ class Controller extends Base
                 'Set Goals'
             )
         );
+    }
+
+
+    /**
+     * Redirect to the given path, with this request's return URL query string
+     * parameter intact.
+     *
+     * @param string $path
+     * @return string
+     */
+    private function addReturnUrlToPath(string $path): string
+    {
+        $url       = new Uri($path);
+        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        if (isset($returnUrl)) {
+            $query = $url->getQueryAsArray();
+            $query[Redirect::RETURN_URL] = $returnUrl;
+            $url->setQuery($query);
+        }
+        return $url->toString();
     }
 
 
