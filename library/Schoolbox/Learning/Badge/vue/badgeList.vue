@@ -248,7 +248,7 @@ export default {
          */
         emitChange() {
             this.$emit(EVENT_CHANGE);
-        }
+        },
 
         /**
          * Opens a modal window for deleting this badge.
@@ -271,22 +271,21 @@ export default {
          * Perform withdrawal
          */
         deleteBadge() {
-          this.$refs.toast.activate('Deleting badge...');
-          axios.delete(this.currentBadge._links.delete, {})
-              .then(response => {
-                /* Close this modal
-                 */
-                this.closeDeleteModal();
-
-                /* Pop toast
-                 */
-                this.$refs.toast.success('Delete complete');
-              })
-              .catch(error => {
-                if (error.response) {
-                  this.$refs.toast.error('Unable to delete badge; please try again.');
-                }
-              });
+            this.$refs.toast.activate('Deleting badge...');
+            let newData = this.data.filter((v) => v.id !== this.currentBadge.id);
+            axios.delete(this.currentBadge._links.delete)
+                .then(() => {
+                    this.data = [];
+                    this.$refs.toast.timeout('Deleted', true);
+                    this.$nextTick(() => {
+                        this.data = newData;
+                        this.metadata.count -= 1;
+                    });
+                })
+                .catch(() => this.$refs.toast.timeout('Could not delete', false))
+                .finally(() => {
+                    this.closeDeleteModal()
+                })
         }
     },
 }
