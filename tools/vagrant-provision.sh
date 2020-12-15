@@ -492,10 +492,15 @@ then
             # Technically this is redundant for 'vagrant' sessions, but it required for vagrant sudo and root session
             echo "export PHP_IDE_CONFIG=\"serverName=10.0.2.15\"" >> ${bashrcFile};
         fi
+
+        if ! grep -qE '^export\s+INSTANCE_ID\s*=\s*"vagrantx"' ${bashrcFile}; then
+            # Ensure that we always run tools with vagrant instance
+            echo "export INSTANCE_ID=\"vagrantx\"" >> ${bashrcFile};
+        fi
     done
 
     # Need to preserve these ENV vars for vagrant's sudo session
-    for envVar in XDEBUG_CONFIG PHP_IDE_CONFIG; do
+    for envVar in XDEBUG_CONFIG PHP_IDE_CONFIG INSTANCE_ID; do
         if [[ -z `grep -E "^Defaults\s+env_keep\s*\+=\s*\".*$envVar" /etc/sudoers.d/vagrant` ]];
         then
             chmod a+w /etc/sudoers.d/vagrant;
