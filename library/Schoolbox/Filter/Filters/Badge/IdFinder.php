@@ -62,23 +62,15 @@ class IdFinder extends AbstractIdFinder
         // Query for curriculum nodes
         $curriculumNodes = $completeFilters[CurriculumNode\Definition::class] ?? null;
         if (isset($curriculumNodes) && count($curriculumNodes) > 0) {
-            $hasWhere                = true;
-            $hasCurriculumNodeFilter = false;
-            $subPb                   = $this->getMapper()->getPredicateBuilder();
-
-            // Is the ALL option set?
-            // (This is a proxy for not filtering this list at all.)
-            if (isset($curriculumNodes[CurriculumNode\Definition::KEY_ALL])) {
-                unset($curriculumNodes[CurriculumNode\Definition::KEY_ALL]);
-            }
-
+            // Are any codes other than KEY_ALL set?
+            // If so, filter on those.
+            unset($curriculumNodes[CurriculumNode\Definition::KEY_ALL]);
             if (count($curriculumNodes) > 0) {
-                $hasCurriculumNodeFilter = true;
-                $subPb = $subPb->in('cb.curriculum_node_id', $curriculumNodes);
-            }
-
-            if ($hasCurriculumNodeFilter) {
-                $pb = $pb->any($subPb);
+                $hasWhere = true;
+                $pb       = $pb->any(
+                    $this->getMapper()->getPredicateBuilder()
+                                      ->in('cb.curriculum_node_id', $curriculumNodes)
+                );
             }
         }
 
