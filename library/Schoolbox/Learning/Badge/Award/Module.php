@@ -148,29 +148,28 @@ class Module extends BaseModule
             $preloadUsers
         );
 
-
-        // Goal routes are a little different: any user may set goals, but only
-        // for themselves.
-        $setGoalsRule = new Rule\IsLoggedIn();
         $this->register(
             self::METHOD_GET,
             '/user/goal',
             'redirectToSetAsGoalForm',
-            $setGoalsRule,
+            $manageBadgesRule,
         );
         $this->register(
             self::METHOD_GET,
             '/user/{userIds}/goal',
             'getSetAsGoalForm',
-            new Rule\All(
-                $setGoalsRule,
-                new Rule\LazyCallback(function () {
-                    return new Rule\Callback(function (array $params, User $user) {
-                        $this->authorizeOnlyUserIsSelf($params, $user);
-                    });
-                })
-            ),
+            $manageBadgesRule,
             $preloadUsers
+        );
+
+        // Set as goal for self is a little different:
+        // any user may set goals, but only for themselves.
+        $setGoalForSelfRule = new Rule\IsLoggedIn();
+        $this->register(
+            self::METHOD_GET,
+            '/user/goalForSelf',
+            'getSetAsGoalForSelfForm',
+            $setGoalForSelfRule
         );
     }
 

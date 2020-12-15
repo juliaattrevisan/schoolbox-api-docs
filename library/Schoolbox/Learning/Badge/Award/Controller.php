@@ -141,6 +141,18 @@ class Controller extends Base
 
 
     /**
+     * Show a form for setting a goal for yourself.
+     *
+     * @api GET /learning/badge/award/user/goalForSelf
+     * @since 20.2
+     */
+    public function getSetAsGoalForSelfForm()
+    {
+
+    }
+
+
+    /**
      * Show a form for awarding a badge as an achievement or goal to a set of
      * users.
      *
