@@ -19,13 +19,7 @@
             {% endif %}
             {% if config.badges_enabled %}
                 <a class="button icon-goal"
-                   href="{{ routeLookupIfAuthorized(
-                       'learningBadgeAward.getSetAsGoalForm',
-                        {
-                            users:   [user],
-                            userIds: user.id
-                        }
-                   ) }}">Set my goals</a>
+                   href="{{ routeLookupIfAuthorized('learningBadgeAward.getSetAsGoalForSelfForm') }}">Set my goals</a>
             {% endif %}
             <a class="button icon-advanced-list" href="/search/user/{{ user.id }}#activity">My Activity</a>
             {% if config.badges_enabled %}
