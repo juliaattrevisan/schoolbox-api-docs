@@ -312,4 +312,37 @@ class Mapper extends \Schoolbox\Mapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
     }
+
+
+    /**
+     * Get a set of award histories for everyone in $userIds, indexed by $userId
+     *
+     * This creates a hash lookup so you can use this in iterations without incurring
+     * a lot of db requests
+     *
+     * @param array       $userIds
+     * @param Badge\Model $badge
+     * @return array
+     */
+    public function findHistories(array $userIds, \Schoolbox\Learning\Badge\Model $badge): array
+    {
+        $history = $this->findByColumnList([
+            'recipient_id' => $userIds,
+            'badge_id' => $badge->getId()
+        ], [
+            'order' => [
+                'awarded_at' => 'desc'
+            ]
+        ]);
+
+        /* Index histories by user id
+         */
+        $stack = array_fill_keys($userIds, new GenericCollection(Model::class));
+
+        foreach ($history as $item) {
+            $stack[$item->getRecipient()->getId()]->add($item);
+        }
+
+        return $stack;
+    }
 }

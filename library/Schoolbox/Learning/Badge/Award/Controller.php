@@ -313,6 +313,15 @@ class Controller extends Base
         $collection = $this->mapper->createCollection();
         $userIds    = array_column($data['users'], 'id');
         $users      = $this->userMapper->findByColumn('id', $userIds);
+
+        /* Need a badge history for a particular user to decide how goals
+         * and achievements are persisted
+         *
+         * This section can be optimised further in any number of ways
+         */
+        $userIds = $users->getPropertyValues('id');
+        $histories = $this->mapper->findHistories($userIds, $badge);
+
         foreach ($users as $user) {
             $award = $this->mapper->createModel()
                 ->setRecipient($user)
@@ -321,19 +330,7 @@ class Controller extends Base
                 ->setAwardedBy($this->getUser())
                 ->setAwardedAt(Alaress_Date_Format::now());
 
-            /* Need a badge history for a particular user to decide how goals
-             * and achievements are persisted
-             *
-             * This section can be optimised further in any number of ways
-             */
-            $history = $this->mapper->findByColumnList([
-                'recipient_id' => $user->getId(),
-                'badge_id' => $badge->getId()
-            ], [
-                'order' => [
-                    'awarded_at' => 'desc'
-                ]
-            ]);
+            $history = $histories[$user->getId()];
 
             (new Transactor($history, $this->mapper))->award($award);
         }
