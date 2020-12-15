@@ -34,6 +34,14 @@ class Definition extends AbstractDefinition
 
 
     /**
+     * Key for finding any badge at all, whether or not it has a code.
+     *
+     * Required so that the curriculum code selector is even configurable.
+     */
+    public const KEY_ALL = 'all';
+
+
+    /**
      * @inheritdoc
      */
     protected const NAME = 'Curriculum Code';
@@ -44,7 +52,7 @@ class Definition extends AbstractDefinition
      */
     protected function getCustomKeys(): array
     {
-        return [self::KEY_NONE, self::KEY_ANY];
+        return [self::KEY_ALL];
     }
 
 
@@ -73,6 +81,9 @@ class Definition extends AbstractDefinition
         }
         if ($key === self::KEY_ANY) {
             return 'Badges with at least one curriculum code';
+        }
+        if ($key === self::KEY_ALL) {
+            return 'All badges';
         }
         return '';
     }
