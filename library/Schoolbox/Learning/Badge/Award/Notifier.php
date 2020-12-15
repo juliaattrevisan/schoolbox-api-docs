@@ -33,11 +33,11 @@ use Schoolbox\UserMapper;
  */
 class Notifier extends AbstractModuleNotifier
 {
-    public const TRIGGER_SET     = 'set';
-    public const TRIGGER_AWARDED = 'awarded';
+    public const TRIGGER_GOAL_SET = 'goalSet';
+    public const TRIGGER_AWARDED  = 'awarded';
 
-    private const PATTERN_STAFF_SET_TITLE             = ':teacher has set :badge as a goal for :student';
-    private const PATTERN_STUDENT_SET_TITLE           = ':student has set :badge as a goal';
+    private const PATTERN_STAFF_GOAL_SET_TITLE        = ':teacher has set :badge as a goal for :student';
+    private const PATTERN_STUDENT_GOAL_SET_TITLE      = ':student has set :badge as a goal';
     private const PATTERN_STAFF_AWARDED_TITLE_STUDENT = ':teacher has awarded you :badge, :message!';
     private const PATTERN_STAFF_AWARDED_TITLE         = ':teacher has awarded :badge to :student';
     private const PATTERN_STUDENT_AWARDED_TITLE       = ':student has achieved :badge';
@@ -111,16 +111,14 @@ class Notifier extends AbstractModuleNotifier
          */
         if ($crudMethod === \Schoolbox\Mapper::METHOD_DELETE) {
             $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
-            $bundle->detach(self::TRIGGER_SET);
+            $bundle->detach(self::TRIGGER_GOAL_SET);
             $bundle->detach(self::TRIGGER_AWARDED);
             return;
         }
 
 
         /** @var Award $badge */
-        $badge    = $bundle->getEvent()->getObject();
-        $diff     = $bundle->getEvent()->getDiff();
-        $previous = $this->buildPrevious($badge, $diff);
+        $badge = $bundle->getEvent()->getObject();
 
         /**
          * Created
@@ -129,7 +127,7 @@ class Notifier extends AbstractModuleNotifier
             if ($badge->isAchievement()) {
                 $bundle->attach(self::TRIGGER_AWARDED, self::IMMEDIATELY);
             } elseif ($badge->isGoal()) {
-                $bundle->attach(self::TRIGGER_SET, self::IMMEDIATELY);
+                $bundle->attach(self::TRIGGER_GOAL_SET, self::IMMEDIATELY);
             }
         }
     }
@@ -168,21 +166,12 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    private function notifySet(string $roleType, Award $model, User $effector, ?array $diff): Envelope
+    private function notifyGoalset(string $roleType, Award $model, User $effector, ?array $diff): Envelope
     {
         $envelope = new Envelope();
 
         try {
-// TODO: SA-11375   $award = $this->mapper->findById($model->getId());
-            /** @var Award $award */
-            $award    = $this->mapper->findOneByColumnList(
-                [
-                    'recipient_id' => $model->getRecipient()->getId(),
-                    'badge_id'     => $model->getBadge()->getId(),
-                    'status'       => Award::AWARD_STATUS_GOAL,
-                ],
-                ['order' => ['awarded_at' => 'DESC']]
-            );
+            $award    = $this->mapper->findById($model->getId());
             $effector = $this->userMapper->findById($effector->getId());
         } catch (MapperException $e) {
             return $envelope;
@@ -197,17 +186,17 @@ class Notifier extends AbstractModuleNotifier
         $awardHref = sprintf(self::PATTERN_BADGE_HREF, $student->getId());
 
         $bob = new Builder();
-        $bob->setIcon($this->getUserIcon($effector))
+        $bob->setIcon($award->getBadge()->getIcon())
             ->setHref($awardHref)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
-            ->addTopic("{$this->getSlug()}.{$award->getBadge()->getId()}." . self::TRIGGER_SET)
+            ->addTopic("{$this->getSlug()}.{$award->getBadge()->getId()}." . self::TRIGGER_GOAL_SET)
             ->setTimestamp($award->getAwardedAt()->getUnixTimeStamp())
             ->addFilter(RoletypeFilter::NAME, [$roleType]);
 
         if ($effector->getRole()->isStaff()) {
             // a teacher set a goal for a student - to the student, the teachers of the student and parents of the student
-            $bob->setTitle(self::PATTERN_STAFF_SET_TITLE)
+            $bob->setTitle(self::PATTERN_STAFF_GOAL_SET_TITLE)
                 ->setParams(
                     [
                         'teacher' => new UserParam($effector),
@@ -218,7 +207,7 @@ class Notifier extends AbstractModuleNotifier
                 );
         } elseif ($effector->getRole()->isStudent() && $student->getId() === $effector->getId()) {
             // a student posts - to the parent and teachers of the student
-            $bob->setTitle(self::PATTERN_STUDENT_SET_TITLE)
+            $bob->setTitle(self::PATTERN_STUDENT_GOAL_SET_TITLE)
                 ->setParams(
                     [
                         'student' => new UserParam($effector),
@@ -253,16 +242,7 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
 
         try {
-// TODO: SA-11375   $award = $this->mapper->findById($model->getId());
-            /** @var Award $award */
-            $award    = $this->mapper->findOneByColumnList(
-                [
-                    'recipient_id' => $model->getRecipient()->getId(),
-                    'badge_id'     => $model->getBadge()->getId(),
-                    'status'       => Award::AWARD_STATUS_ACHIEVEMENT,
-                ],
-                ['order' => ['awarded_at' => 'DESC']]
-            );
+            $award    = $this->mapper->findById($model->getId());
             $effector = $this->userMapper->findById($effector->getId());
         } catch (MapperException $e) {
             return $envelope;
@@ -286,7 +266,7 @@ class Notifier extends AbstractModuleNotifier
             ->addFilter(RoletypeFilter::NAME, [$roleType]);
 
         if ($effector->getRole()->isStaff() && Role::STUDENT === $roleType) {
-            // a teacher awarded a student - to the student, the teachers of the student and parents of the student
+            // a teacher awarded a student - to the student
             $bob->setTitle(self::PATTERN_STAFF_AWARDED_TITLE_STUDENT)
                 ->setParams(
                     [
@@ -296,7 +276,7 @@ class Notifier extends AbstractModuleNotifier
                     ]
                 );
         } elseif ($effector->getRole()->isStaff() && Role::STUDENT !== $roleType) {
-            // a teacher awarded a student - to the student, the teachers of the student and parents of the student
+            // a teacher awarded a student - to the teachers of the student and parents of the student
             $bob->setTitle(self::PATTERN_STAFF_AWARDED_TITLE)
                 ->setParams(
                     [
@@ -306,7 +286,7 @@ class Notifier extends AbstractModuleNotifier
                     ]
                 );
         } elseif ($effector->getRole()->isStudent() && $student->getId() === $effector->getId()) {
-            // a student posts - to the parent and teachers of the student
+            // a student awarded self - to the parent and teachers of the student
             $bob->setTitle(self::PATTERN_STUDENT_AWARDED_TITLE)
                 ->setParams(
                     [
@@ -376,9 +356,9 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentSet(Award $award, User $user, ?array $diff): Envelope
+    public function notifyStudentGoalset(Award $award, User $user, ?array $diff): Envelope
     {
-        return $this->notifySet(Role::STUDENT, $award, $user, $diff);
+        return $this->notifyGoalSet(Role::STUDENT, $award, $user, $diff);
     }
 
     /**
@@ -389,9 +369,9 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStaffSet(Award $award, User $user, ?array $diff): Envelope
+    public function notifyStaffGoalset(Award $award, User $user, ?array $diff): Envelope
     {
-        return $this->notifySet(Role::STAFF, $award, $user, $diff);
+        return $this->notifyGoalSet(Role::STAFF, $award, $user, $diff);
     }
 
     /**
@@ -402,8 +382,8 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentSet(Award $award, User $user, ?array $diff): Envelope
+    public function notifyParentGoalset(Award $award, User $user, ?array $diff): Envelope
     {
-        return $this->notifySet(Role::PARENT, $award, $user, $diff);
+        return $this->notifyGoalSet(Role::PARENT, $award, $user, $diff);
     }
 }

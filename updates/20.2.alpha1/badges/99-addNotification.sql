@@ -10,11 +10,11 @@ VALUES ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'badge'),
        ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'badge'),
         'awarded', 'parent', 'your child has been awarded an achievement'),
        ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'badge'),
-        'set', 'staff', 'a student has a new goal'),
+        'goalSet', 'staff', 'a student has a new goal'),
        ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'badge'),
-        'set', 'student', 'a goal is set for you'),
+        'goalSet', 'student', 'a goal is set for you'),
        ((SELECT `id` FROM `msg_namespace` WHERE `slug` = 'badge'),
-        'set', 'parent', 'your child has a new goal');
+        'goalSet', 'parent', 'your child has a new goal');
 -- Set role defaults for awarded
 INSERT INTO `msg_route_perm` (`msg_source_id`, `role_id`, `mask`, `role_default`)
 SELECT src.id           AS `msg_source_id`,
@@ -25,4 +25,4 @@ FROM msg_source src
          LEFT JOIN groups g ON src.`role_type` = g.`group_type`
 WHERE namespace = (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'badge')
   AND src.role_type IN ('staff', 'student', 'parent')
-  AND src.`key` IN ('awarded', 'set');
+  AND src.`key` IN ('awarded', 'goalSet');

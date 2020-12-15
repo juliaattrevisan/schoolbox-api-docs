@@ -244,13 +244,15 @@
 
                     // All stack items must be HTML-escaped
                     stack = stack.map(escapeHtmlChars);
-                    if (plain) {
-                        string = string.replace(':'+token, stack.join(', '));
-                    } else {
-                        string = string.replace(':'+token, b + stack.join(_b + ', ' + b) + _b);
+                    if (!plain) {
+                        stack = stack.map(function (val) {
+                            return b + val + _b;
+                        })
                     }
+                    var joinedStack = stack.length === 1 ? stack[0] : stack.slice(0, -1).join(', ') + ' ' + settings.dictItemAnd + ' ' + stack.slice(-1);
+                    string = string.replace(':' + token, joinedStack);
                 });
-                return string.replaceLast(_b + ',', b + ' ' + settings.dictItemAnd);
+                return string;
             }
 
 
