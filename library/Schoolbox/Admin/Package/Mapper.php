@@ -10,7 +10,6 @@ namespace Schoolbox\Admin\Package;
 
 use Schoolbox\Mapper as BaseMapper;
 
-
 /**
  * Mapper for Schoolbox Installation Packages
  *

@@ -1,5 +1,7 @@
 <?php
 
+namespace AusGeneralCapabilities;
+
 use Schoolbox\Admin\Package\IPackageInstall;
 use Schoolbox\Curriculum\Node;
 use Alaress\Csv\Reader as CsvReader;
@@ -13,6 +15,10 @@ class Installer implements IPackageInstall
 
     private const SOURCE_FILE = 'curriculum.csv';
 
+    /**
+     * @param User $user
+     * @throws \Schoolbox\Mapper\Exception
+     */
     public function install(User $user): void
     {
         if (!(is_file(__DIR__ . '/' . self::SOURCE_FILE) && is_readable(__DIR__ . '/' . self::SOURCE_FILE))) {

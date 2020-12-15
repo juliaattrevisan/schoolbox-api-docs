@@ -61,7 +61,7 @@ class Controller extends Base
 
         if (!$package->isInstalled()) {
             include(SITE_root . '/packages/' . $package->getLocation() . '/Installer.php');
-            $installer = new \Installer();
+            $installer = new Installer();
 
             $db = $this->packageMapper->getDatabase();
             $db->beginTransaction();

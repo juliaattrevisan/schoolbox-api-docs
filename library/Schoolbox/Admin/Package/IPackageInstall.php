@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2020, Alaress Pty Ltd
