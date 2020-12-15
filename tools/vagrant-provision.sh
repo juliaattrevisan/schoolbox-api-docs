@@ -501,7 +501,7 @@ then
     done
 
     # Need to preserve these ENV vars for vagrant's sudo session
-    for envVar in XDEBUG_CONFIG PHP_IDE_CONFIG; do
+    for envVar in XDEBUG_CONFIG PHP_IDE_CONFIG INSTANCE_ID; do
         if [[ -z `grep -E "^Defaults\s+env_keep\s*\+=\s*\".*$envVar" /etc/sudoers.d/vagrant` ]];
         then
             chmod a+w /etc/sudoers.d/vagrant;
