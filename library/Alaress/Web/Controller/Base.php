@@ -21,9 +21,11 @@ use Aura\Router\Router;
 use Alaress\Session\Session;
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\User;
 use Sentry\State\HubInterface;
 use Throwable;
+use Zend\Uri\Uri;
 
 abstract class Base
 {
@@ -316,6 +318,26 @@ abstract class Base
             return $this->getRouter()->generate($name, $params);
         }
         return false;
+    }
+
+
+    /**
+     * Add this request's return URL to the given path.
+     *
+     * @param string $path A path, possibly generated with
+     *                     `getRouteIfAuthorized` or similar.
+     * @return string `$path` with this request's return URL injected.
+     */
+    protected function addReturnUrlToPath(string $path): string
+    {
+        $url       = new Uri($path);
+        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        if (isset($returnUrl)) {
+            $query = $url->getQueryAsArray();
+            $query[Redirect::RETURN_URL] = $returnUrl;
+            $url->setQuery($query);
+        }
+        return $url->toString();
     }
 
 

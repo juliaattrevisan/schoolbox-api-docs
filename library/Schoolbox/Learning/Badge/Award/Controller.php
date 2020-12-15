@@ -13,7 +13,6 @@ use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Badge\Award\Model as AwardModel;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Learning\Badge\Model;
@@ -21,7 +20,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Zend\Uri\Uri;
 
 use function count;
 use function in_array;
@@ -179,26 +177,6 @@ class Controller extends Base
                 'Set Goals'
             )
         );
-    }
-
-
-    /**
-     * Redirect to the given path, with this request's return URL query string
-     * parameter intact.
-     *
-     * @param string $path
-     * @return string
-     */
-    private function addReturnUrlToPath(string $path): string
-    {
-        $url       = new Uri($path);
-        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
-        if (isset($returnUrl)) {
-            $query = $url->getQueryAsArray();
-            $query[Redirect::RETURN_URL] = $returnUrl;
-            $url->setQuery($query);
-        }
-        return $url->toString();
     }
 
 
