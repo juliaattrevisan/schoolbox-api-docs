@@ -99,6 +99,24 @@ export default {
         return {
             options: [],
             selected: [],
+            isFormSubmitActive: false
+        }
+    },
+    computed: {
+        /**
+         * Is the badge form's submit button disabled?
+         * It is disabled if there are no users to submit, or a form submission is already in progress.
+         *
+         * @returns {Boolean}
+         */
+        isSubmitButtonDisabled () {
+            if (this.selected.length === 0) {
+                return true;
+            } else if (this.isFormSubmitActive) {
+                return true;
+            } else {
+                return false;
+            }
         }
     },
     methods: {
@@ -137,6 +155,7 @@ export default {
          *             achievement or a goal)
          */
         onSubmit() {
+            this.isFormSubmitActive = true;
             this.$refs.toast.activate(this.toastActivateMessage);
             axios.post(this.endpoint, {users: this.selected})
                 .then(() => {
@@ -152,8 +171,15 @@ export default {
                         Toast.DEFAULT_FADE_DURATION,
                         () => this.$emit(EVENTS.done)
                     );
+
                 })
-                .catch(() => this.$refs.toast.timeout(this.toastFailureMessage, false))
+                .catch(() => {
+                    this.$refs.toast.timeout(this.toastFailureMessage, false);
+                })
+                .finally(() => {
+                    //can add another badge now, so the submit button can be clicked again
+                    this.isFormSubmitActive = false;
+                });
         },
 
 
@@ -206,7 +232,7 @@ export default {
         </v-select>
         <ul class="flex-list buttons">
             <li>
-                <button @click.prevent="onSubmit" class="submit" :disabled="selected.length === 0">
+                <button @click.prevent="onSubmit" class="submit" :disabled="isSubmitButtonDisabled">
                     <!-- @slot The text for this badge award form's confirm button -->
                     <slot name="confirmButton">
                         Award Achievement
