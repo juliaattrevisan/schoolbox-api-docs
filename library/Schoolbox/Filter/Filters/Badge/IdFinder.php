@@ -62,22 +62,16 @@ class IdFinder extends AbstractIdFinder
         // Query for curriculum nodes
         $curriculumNodes = $completeFilters[CurriculumNode\Definition::class] ?? null;
         if (isset($curriculumNodes) && count($curriculumNodes) > 0) {
-            $hasWhere = true;
-            $subPb    = $this->getMapper()->getPredicateBuilder();
-            // is the NONE or ANY option set?
-            if (isset($curriculumNodes[CurriculumNode\Definition::KEY_NONE])) {
-                unset($curriculumNodes[CurriculumNode\Definition::KEY_NONE]);
-                $subPb = $subPb->isNull('cb.badge_id');
-            }
-            if (isset($curriculumNodes[CurriculumNode\Definition::KEY_ANY])) {
-                unset($curriculumNodes[CurriculumNode\Definition::KEY_ANY]);
-                $subPb = $subPb->notNull('cb.badge_id');
-            }
+            // Are any codes other than KEY_ALL set?
+            // If so, filter on those.
+            unset($curriculumNodes[CurriculumNode\Definition::KEY_ALL]);
             if (count($curriculumNodes) > 0) {
-                $subPb = $subPb->in('cb.curriculum_node_id', $curriculumNodes);
+                $hasWhere = true;
+                $pb       = $pb->any(
+                    $this->getMapper()->getPredicateBuilder()
+                                      ->in('cb.curriculum_node_id', $curriculumNodes)
+                );
             }
-
-            $pb = $pb->any($subPb);
         }
 
         // Filter out deleted badges

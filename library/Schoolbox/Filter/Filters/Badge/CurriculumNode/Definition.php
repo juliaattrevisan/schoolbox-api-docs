@@ -22,15 +22,11 @@ use Schoolbox\IConfigLoader;
 class Definition extends AbstractDefinition
 {
     /**
-     * Key for finding badges with no curriculum code.
+     * Key for finding all badges, whether or not they have a code.
+     *
+     * Required so that the curriculum code selector is even configurable.
      */
-    public const KEY_NONE = 'none';
-
-
-    /**
-     * Key for finding badges with any curriculum code.
-     */
-    public const KEY_ANY = 'any';
+    public const KEY_ALL = 'all';
 
 
     /**
@@ -44,7 +40,7 @@ class Definition extends AbstractDefinition
      */
     protected function getCustomKeys(): array
     {
-        return [self::KEY_NONE, self::KEY_ANY];
+        return [self::KEY_ALL];
     }
 
 
@@ -68,11 +64,8 @@ class Definition extends AbstractDefinition
      */
     public function getLabel(string $key): string
     {
-        if ($key === self::KEY_NONE) {
-            return 'Badges with no curriculum code';
-        }
-        if ($key === self::KEY_ANY) {
-            return 'Badges with at least one curriculum code';
+        if ($key === self::KEY_ALL) {
+            return 'All badges';
         }
         return '';
     }

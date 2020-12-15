@@ -2,6 +2,11 @@
 
 {% block filterName %}Curriculum Codes{% endblock %}
 
+{% block filterComponent %}
+    {% set isDisabled = false %}
+    {{ parent() }}
+{% endblock filterComponent %}
+
 {% block userOptions %}
     {# Empty input is required so that filter works if not user-configurable, or
        nothing is selected #}
@@ -19,7 +24,10 @@
                 $(function () {
                     var $filterSelector = $('#filter-selector-curriculum-node');
                     $filterSelector.curriculumSelector({
-                        value: {{ (selectedNodes ?? []) | json_encode | raw }}
+                        value: {{ (selectedNodes ?? []) | json_encode | raw }},
+                        selectize: {
+                            maxOptions: 10,
+                        },
                     });
                 });
 
@@ -32,6 +40,8 @@
                 multiple
                 placeholder="Enter one or more curriculum codes"
                 data-selectize
+                data-value-original="{{ userSelectionIds | json_encode | e('html_attr') }}"
+                data-value-default="{{ roleSelectionIds | json_encode | e('html_attr') }}"
         >
             {% for selectedNode in selectedNodes %}
                 {% include '@filters/_option.twig' with {

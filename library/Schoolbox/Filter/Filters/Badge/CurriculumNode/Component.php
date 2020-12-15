@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Badge\CurriculumNode;
 
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
-use Schoolbox\Curriculum\Node\Model as CurriculumNodeModel;
 use Schoolbox\Filter;
 use Schoolbox\Filter\BaseComponent;
 use Schoolbox\GenericCollection;
