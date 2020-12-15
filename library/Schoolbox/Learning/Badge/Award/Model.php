@@ -64,6 +64,15 @@ class Model implements ISoftDeletable
 
 
     /**
+     * A corresponding Award instance. This correlates a specific usage of a Goal
+     * and its corresponding Achievement, if any
+     *
+     * @var Model|null
+     */
+    private ?Model $award = null;
+
+
+    /**
      * Decide whether this awarding was a Goal
      *
      * @return bool
@@ -180,6 +189,26 @@ class Model implements ISoftDeletable
     public function setAwardedAt(\Alaress_Date_Format $awardedAt): self
     {
         $this->awardedAt = $awardedAt;
+        return $this;
+    }
+
+
+    /**
+     * @return Model|null
+     */
+    public function getAward(): ?Model
+    {
+        return $this->award;
+    }
+
+
+    /**
+     * @param Model|null $award
+     * @return $this
+     */
+    public function setAward(?Model $award): self
+    {
+        $this->award = $award;
         return $this;
     }
 }

@@ -46,6 +46,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('status', self::TYPE_STRING);
         $this->joins('awarded_by', UserMapper::class, 'id', null, null, 'awardedBy', 'awardedBy');
         $this->uses('awarded_at', self::TYPE_DATETIME);
+        $this->joins('award_id', static::class, 'id');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
