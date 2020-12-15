@@ -293,11 +293,13 @@ export default {
 
 <template>
     <div>
-        <div v-if="showSkeletonLoader">
-            <div v-for="n in 3" class="card badge skeleton">
-                <div class="img"></div>
-                <h3></h3>
-                <p class="meta"></p>
+        <div v-if="showSkeletonLoader" class="row">
+            <div class="small-12 columns">
+                <div v-for="n in 3" class="card badge skeleton">
+                    <div class="img"></div>
+                    <h3></h3>
+                    <p class="meta"></p>
+                </div>
             </div>
         </div>
         <div v-else>
@@ -343,12 +345,12 @@ export default {
                                      aria-expanded="false" title="Actions"></a>
                                 </nav>
                                 <ul v-if="showBadgeMenus" :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                  <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-achievement" title="Award achievement">Award achievement</a></li>
-                                  <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set goal">Set goal</a></li>
-                                  <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-withdraw-achievement" title="Withdraw achievement">Withdraw achievement</a></li>
-                                  <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-close" title="Remove goal">Remove goal</a></li>
-                                  <li><a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a></li>
-                                  <li><a @click.prevent="openDeleteModal(badge)" class="icon-delete">Delete</a></li>
+                                    <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-achievement" title="Award achievement">Award achievement</a></li>
+                                    <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set goal">Set goal</a></li>
+                                    <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-withdraw-achievement" title="Withdraw achievement">Withdraw achievement</a></li>
+                                    <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-close" title="Remove goal">Remove goal</a></li>
+                                    <li><a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a></li>
+                                    <li><a @click.prevent="openDeleteModal(badge)" class="icon-delete">Delete</a></li>
                                 </ul>
                             </div>
                         </div>

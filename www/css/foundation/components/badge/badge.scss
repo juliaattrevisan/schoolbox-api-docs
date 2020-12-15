@@ -139,11 +139,34 @@
 #badge-list-form-container {
   .flex-list.buttons li {
     flex: 1 50%;
+
+    @media #{$small-only} {
+      flex: 1 auto;
+    }
   }
 }
 
-.reveal-modal .badge-card {
-  margin-bottom: 1rem;
+.reveal-modal {
+  .badge-card {
+    margin-bottom: 1rem;
+  }
+  .achievements-grid {
+    margin-bottom: 1rem;
+    li {
+      border: 0;
+
+      p {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+    }
+  }
+  @media #{$small-only} {
+    .achievements-grid li {
+      width: 50%;
+    }
+  }
 }
 
 // Create badge page
