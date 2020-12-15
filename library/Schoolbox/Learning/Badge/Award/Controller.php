@@ -293,13 +293,15 @@ class Controller extends Base
      * Users to award to will be in the "users" key, and each user will be
      * identified by the "id" key of each item in "users".
      *
-     * @param Model  $badge  The badge to award.
-     * @param string $status The status to award the badge with:
-     *                       * `AwardModel::AWARD_STATUS_ACHIEVEMENT` for
+     * @param Model  $badge    The badge to award.
+     * @param string $status   The status to award the badge with:
+     *                         * `AwardModel::AWARD_STATUS_ACHIEVEMENT` for
      *                         awarding the badge as an achievement
-     *                       * `AwardModel::AWARD_STATUS_GOAL` for awarding the
+     *                         * `AwardModel::AWARD_STATUS_GOAL` for awarding the
      *                         badge as a goal to be achieved
      * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     private function createAwardsFromRequestBody(Model $badge, string $status): void
     {
@@ -312,14 +314,28 @@ class Controller extends Base
         $users      = $this->userMapper->findByColumn('id', $userIds);
         foreach ($users as $user) {
             $award = $this->mapper->createModel()
-                                  ->setRecipient($user)
-                                  ->setBadge($badge)
-                                  ->setStatus($status)
-                                  ->setAwardedBy($this->getUser())
-                                  ->setAwardedAt(Alaress_Date_Format::now());
-            $collection->add($award);
+                ->setRecipient($user)
+                ->setBadge($badge)
+                ->setStatus($status)
+                ->setAwardedBy($this->getUser())
+                ->setAwardedAt(Alaress_Date_Format::now());
+
+            /* Need a badge history for a particular user to decide how goals
+             * and achievements are persisted
+             *
+             * This section can be optimised further in any number of ways
+             */
+            $history = $this->mapper->findByColumnList([
+                'recipient_id' => $user->getId(),
+                'badge_id' => $badge->getId()
+            ], [
+                'order' => [
+                    'awarded_at' => 'desc'
+                ]
+            ]);
+
+            (new Transactor($history, $this->mapper))->award($award);
         }
-        $this->mapper->save($collection);
 
         // Return what was just created
         $translator = $this->buildBadgeAwardModelToArrayTranslator();
