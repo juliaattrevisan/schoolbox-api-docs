@@ -30,7 +30,7 @@ class Installer implements IPackageInstall {
             $badge = new Badge\Model();
             $badge->setName($row['Title']);
             $badge->setBody('<p>'.$row['Description'].'</p>');
-            $badge->setIcon($row['Image']);
+            $badge->setIcon('/images/badges'.$row['Image']);
             $badge->setCategory($badgeCatMapper->findOneByColumn('name', $row['Category']));
 
             $curriculumCodes = explode(',',$row['Curriculum']);
