@@ -276,13 +276,13 @@ export default {
             axios.delete(this.currentBadge._links.delete)
                 .then(() => {
                     this.data = [];
-                    this.$refs.toast.timeout('Deleted', true);
+                    this.$refs.toast.timeout('Badge successfully deleted', true);
                     this.$nextTick(() => {
                         this.data = newData;
                         this.metadata.count -= 1;
                     });
                 })
-                .catch(() => this.$refs.toast.timeout('Could not delete', false))
+                .catch(() => this.$refs.toast.timeout('Failed to delete badge', false))
                 .finally(() => {
                     this.closeDeleteModal()
                 })
@@ -405,14 +405,15 @@ export default {
         </reveal-modal>
 
         <reveal-modal ref="deleteModal">
-          <template v-if="currentBadge">
-            <h2>Delete <strong>&lsquo;{{ currentBadge.name }}&lsquo;</strong></h2>
-            <p>Are you sure you want to delete {{ currentBadge.name }}?</p>
-            <ul class="flex-list buttons">
-              <li><a @click.prevent="deleteBadge()" class="button submit">Yes</a></li>
-              <li><a @click.prevent="closeDeleteModal()" class="button">No</a></li>
-            </ul>
-          </template>
+            <template v-if="currentBadge">
+                <h2>Delete <strong>&lsquo;{{ currentBadge.name }}&lsquo;</strong></h2>
+                <p>WARNING! Any users who have been awarded this badge will have it removed from their collection.
+                    Are you sure you wish to delete the badge {{ currentBadge.name }}?</p>
+                <ul class="flex-list buttons">
+                    <li><a @click.prevent="deleteBadge()" class="button submit">Yes</a></li>
+                    <li><a @click.prevent="closeDeleteModal()" class="button">No</a></li>
+                </ul>
+            </template>
         </reveal-modal>
 
         <badge-achievement-withdraw-modal ref="achievementWithdrawModal"></badge-achievement-withdraw-modal>
