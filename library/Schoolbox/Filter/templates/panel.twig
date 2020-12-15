@@ -503,6 +503,37 @@ Usage:
             $serverErrorFeedback.show();
         }
 
+
+        /**
+         * Use selectize's rendering to determine how a label should be rendered
+         * in the filter.
+         *
+         * This hooks into selectize's item rendering to figure out how the item
+         * would be rendered in the selectize, then uses that same rendering in
+         * the filter panel.
+         *
+         * TODO consider if is it overkill to hook into selectize's rendering
+         *
+         * @param {Object} selectize A selectize instance
+         * @param {String} key       The key of an option in the selectize
+         */
+        function determineLabelFromSelectize(selectize, key) {
+            // Hook into selectize's render method for determining
+            // how to render the filter in use
+            //
+            let $selectizeItem = $(selectize.render('item', selectize.options[key])).clone();
+
+            // Remove the anchor from the item, so it doesn't show
+            // in the filter in use
+            $selectizeItem = $selectizeItem
+                .children()
+                .remove('a')
+                .end();
+
+            return $selectizeItem.text();
+        }
+
+
         /**
          * Update the 'in-use' filter label according to current filter option selections
          *
@@ -535,18 +566,7 @@ Usage:
                 // Build list of labels from the selectize, if there is one
                 if (selectize) {
                     selectize.items.forEach(function (v) {
-                        // Hook into selectize's render method for determining
-                        // how to render the filter in use
-                        // TODO is it overkill to hook into selectize's rendering?
-                        let $selectizeItem = $(selectize.render('item', selectize.options[v])).clone();
-
-                        // Remove the anchor from the item, so it doesn't show
-                        // in the filter in use
-                        $selectizeItem = $selectizeItem
-                            .children()
-                            .remove('a')
-                            .end();
-                        componentsInUse[filterId]['labels'][v] = $selectizeItem.text();
+                        componentsInUse[filterId]['labels'][v] = determineLabelFromSelectize(selectize, v);
                     });
                 }
 
@@ -652,8 +672,12 @@ Usage:
                 if (Number(decodedData[key]) === 1) {
                     // This key is selected: use it
                     var label = null;
-                    if (selectize) {
-                        label = selectize.options[key].name;
+
+                    // Look up the selectize for this label first,
+                    // then look for an actual label corresponding to this
+                    // selection
+                    if (selectize && (key in selectize.options)) {
+                        label = determineLabelFromSelectize(selectize, key);
                     } else {
                         label = $component.find('label[for=filter_selection_' +filterId+ '_'+key+']').html()
                     }
