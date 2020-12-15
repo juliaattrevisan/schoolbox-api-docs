@@ -71,9 +71,11 @@ class Controller extends Base
     public function redirectToCreateForm(): void
     {
         $this->response->redirect->to(
-            $this->router->generate(
-                'learningMomentEvidence.getCreateForm',
-                ['userIds' => $this->request->query->get('userIds')]
+            $this->addReturnUrlToPath(
+                $this->router->generate(
+                    'learningMomentEvidence.getCreateForm',
+                    ['userIds' => $this->request->query->get('userIds')]
+                )
             )
         );
     }
