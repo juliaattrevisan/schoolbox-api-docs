@@ -565,7 +565,7 @@ Usage:
                             label = $component.find('label[for='+$elem.attr('id')+']').html();
                             value = $elem.attr('data-key');
                         }
-                        if (value) {
+                        if (value && !(value in componentsInUse[filterId]['labels'])) {
                             componentsInUse[filterId]['labels'][value] = label;
                         }
                     });
