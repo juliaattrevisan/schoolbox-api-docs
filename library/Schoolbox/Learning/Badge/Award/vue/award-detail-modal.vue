@@ -115,6 +115,7 @@ export default {
                     <hr />
 
                     <p class="meta">
+                        Curriculum Codes:
                         <template v-for="curriculumNode in award.badge.curriculumNodes">
                             {{ curriculumNode.code }}
                         </template>
