@@ -88,7 +88,7 @@ export default {
 }
 </script>
 <template>
-    <reveal-modal ref="modal">
+    <reveal-modal ref="modal" size="medium">
         <template v-if="award.badge">
             <div class="badge-modal">
                 <div class="badge-img-container">
