@@ -30,7 +30,7 @@
                     {% include 'sub/userListMetadata.twig'
                         with {
                             users:   otherUsers,
-                            message: settingForSelf ? 'Awarding to myself, and also to' : 'Awarding to'
+                            message: messages.userListMetadataPrefix,
                         } only
                     %}
                 </li>
