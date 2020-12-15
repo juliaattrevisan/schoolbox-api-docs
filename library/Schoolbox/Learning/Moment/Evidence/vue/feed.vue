@@ -220,36 +220,14 @@ export default {
 
 <template>
     <div>
-      <section class="skeleton-feed" v-if="showSkeletonLoader">
-        <ul class="information-list">
-          <li class="row" v-for="n in 3">
-            <div class="small-12 card skeleton">
-              <div class="img"></div>
-              <h3></h3>
-              <p class="meta"></p>
-            </div>
-          </li>
-        </ul>
-      </section>
-      <div class="row" v-else>
-        <div class="small-12 island">
-          <div v-if="metadata.count === 0" class="empty-state">
-            <i class="icon-advanced-list"></i>
-            <p>There is no activity yet.</p>
-          </div>
-          <button v-else-if="metadata.cursor.next && metadata.count > data.length" class="expand" @click.prevent="append(metadata.cursor.next)">
-            Load more
-          </button>
-        </div>
-      </div>
-        <div class="feed"  v-for="evidenceGroup in groupedEvidence">
-          <div class="feed-column left"></div>
-          <section class="activity-feed">
-            <h2 class="subheader no-margin">
-                <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
-                      :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
-                >{{ renderCreatedAt(evidenceGroup.date) }}</time>
-            </h2>
+        <div class="feed" v-for="evidenceGroup in groupedEvidence">
+            <div class="feed-column left"></div>
+            <section class="activity-feed">
+                <h2 class="subheader no-margin">
+                    <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
+                          :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
+                    >{{ renderCreatedAt(evidenceGroup.date) }}</time>
+                </h2>
                 <ul class="information-list">
                     <li v-for="evidence in evidenceGroup.evidence" class="feed-item">
                         <template v-if="evidence.discriminator === 'evidence'">
@@ -282,21 +260,26 @@ export default {
                                 <article v-if="evidence.object.filename && evidence.object.storage">
                                     <storage :storage="evidence.object.storage" :filename="evidence.object.filename"></storage>
                                 </article>
-                                <!-- Display curriculum codes and tags -->
-                                <p class="meta" v-if="evidence.object.curriculumNodes.length > 0 || evidence.object.tags.length > 0">
-                                   Tags:
-                                <template v-for="(curriculumNode, index) in evidence.object.curriculumNodes">
-                                  <template v-if="index !== 0">, </template><span
-                                    :title="curriculumNode.name">{{ curriculumNode.code }}</span>
-                                </template><template v-if="evidence.object.curriculumNodes.length > 0 && evidence.object.tags.length > 0">, </template>
-                                <template v-for="(tag, index) in evidence.object.tags">
-                                  <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
-                                </template>
-                                </p>
+
                                 <!-- Display evidence body, with media players initialised -->
                                 <media-article v-if="evidence.object.body">
                                     <div v-html="evidence.object.body" />
                                 </media-article>
+
+                                <!-- Display curriculum codes and tags -->
+                                <div class="tags">
+                                  <p class="meta" v-if="evidence.object.curriculumNodes.length > 0 || evidence.object.tags.length > 0">
+                                      Tags:
+                                      <template v-for="(curriculumNode, index) in evidence.object.curriculumNodes">
+                                          <template v-if="index !== 0">, </template><span
+                                            :title="curriculumNode.name">{{ curriculumNode.code }}</span>
+                                      </template>
+                                      <template v-if="evidence.object.curriculumNodes.length > 0 && evidence.object.tags.length > 0">, </template>
+                                      <template v-for="(tag, index) in evidence.object.tags">
+                                          <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
+                                      </template>
+                                  </p>
+                                </div>
                             </div>
 
                             <div class="feed-comments small-12 columns">
@@ -328,6 +311,28 @@ export default {
                 </ul>
             </section>
             <div class="feed-column right"></div>
+        </div>
+        <div class="skeleton-feed" v-if="showSkeletonLoader">
+            <ul class="information-list">
+                <li class="row" v-for="n in 3">
+                    <div class="small-12 card skeleton">
+                        <div class="img"></div>
+                        <h3></h3>
+                        <p class="meta"></p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="feed-load-more" v-else>
+            <div>
+                <div v-if="metadata.count === 0" class="empty-state">
+                    <i class="icon-advanced-list"></i>
+                    <p>There is no activity yet.</p>
+                </div>
+                <button v-else-if="metadata.cursor.next && metadata.count > data.length" class="expand" @click.prevent="append(metadata.cursor.next)">
+                  Load more
+                </button>
+            </div>
         </div>
 
         <!-- TODO create a Vue equivalent of $.confirmDialog -->

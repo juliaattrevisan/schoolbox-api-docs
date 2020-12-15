@@ -310,11 +310,11 @@ export default {
 <!--                <p>No Badges were found. Please check your filters and try again.</p>-->
 <!--            </div>-->
             <template v-else>
-                <div class="badge-grid v-card-list">
+                <section class="content badge-grid v-card-list">
                     <div class="badge v-card" v-for="badge in data" :key="badge.id">
                         <!-- I'd apply the click to the entire <li> but that intercepts dropdown clicks -->
                         <div class="card-feature-image">
-                            <a @click.prevent="openDetailModal(badge)">
+                            <a @click.prevent="openDetailModal(badge)" :title="badge.name">
                                 <badge-image :badge="badge"></badge-image>
                             </a>
                         </div>
@@ -343,17 +343,17 @@ export default {
                                      aria-expanded="false" title="Actions"></a>
                                 </nav>
                                 <ul v-if="showBadgeMenus" :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                  <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-showcase">Award achievement</a></li>
-                                  <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal">Set goal</a></li>
-                                  <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-close">Withdraw achievement</a></li>
-                                  <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-undo">Remove goal</a></li>
-                                  <li><a :href="badge._links.update" class="icon-modify">Modify</a></li>
+                                  <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-achievement" title="Award achievement">Award achievement</a></li>
+                                  <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set goal">Set goal</a></li>
+                                  <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-withdraw-achievement" title="Withdraw achievement">Withdraw achievement</a></li>
+                                  <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-close" title="Remove goal">Remove goal</a></li>
+                                  <li><a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a></li>
                                   <li><a @click.prevent="openDeleteModal(badge)" class="icon-delete">Delete</a></li>
                                 </ul>
                             </div>
                         </div>
                     </div>
-                </div>
+                </section>
             </template>
 
             <!-- Load more button, if there are more to load -->
@@ -398,10 +398,10 @@ export default {
                          toast-failure-message="Setting goal failed"
             >
                 <template v-slot:header="slotProps">
-                    <h2>Set &lsquo;<b>{{ slotProps.badge.name }}</b>&rsquo; as a Goal</h2>
+                    <h2>Set &lsquo;<b>{{ slotProps.badge.name }}</b>&rsquo; as a goal</h2>
                 </template>
                 <template v-slot:confirmButton>
-                    Set Goal
+                    Set goal
                 </template>
             </badge-award>
         </reveal-modal>
