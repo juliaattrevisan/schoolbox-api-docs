@@ -161,6 +161,7 @@ class Mapper extends \Schoolbox\Mapper
 
         $pb = $this->getPredicateBuilder()
             ->equals('recipient_id', $user->getId())
+            ->isNull('award_id')
             ->betweenDates('awarded_at', $from, $to);
 
         return $this->findByPredicates($pb, [

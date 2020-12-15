@@ -206,7 +206,7 @@ class Controller extends Base
             /* Force string indexes, otherwise the numeric values get inserted in-order
              * which isn't intended here; they are already in a particular order
              */
-            $badgeId = "badge-{$award->getBadge()->getId()}";
+            $badgeId = "badge-{$award->getStatus()}-{$award->getBadge()->getId()}";
             $categoryId = "category-{$award->getBadge()->getCategory()->getId()}";
 
             /* Some inline hydration due to curriculum nodes no longer being included
@@ -233,6 +233,7 @@ class Controller extends Base
              * in the list is the most recently awarded
              */
             if (!isset($stack['categories'][$categoryId]['awards'][$badgeId])) {
+
                 /* This is a set-based aggregation, not an individual model property
                  */
                 $badge['count'] = 0;
