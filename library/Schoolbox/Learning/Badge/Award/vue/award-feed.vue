@@ -211,7 +211,9 @@ export default {
                                     <a href="#" @click.prevent="openDetailModal(award)">
                                         <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
                                     </a>
-                                    <div class="award-count" :title="'Awarded ' + award.count + ' time(s)'">x{{ award.count }}</div>
+                                    <template v-if="award.count > 1">
+                                        <div class="award-count" :title="'Awarded ' + award.count + ' time(s)'">x{{ award.count }}</div>
+                                    </template>
                                 </div>
                                 <div class="card-content">
                                     <h3><a href="#" @click.prevent="openDetailModal(award)">{{ award.badge.name }}</a></h3>
