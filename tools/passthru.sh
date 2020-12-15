@@ -14,6 +14,6 @@ then
 	echo "Passing command \"$*\" through to Vagrant box."
 	vagrant ssh-config | ssh default -q -F /dev/stdin "cd /vagrant/; $*"
 else
-	echo "This is either inside a Vagrant box, or no Vagrant box is available in this directory."
+	echo "This is either inside a Vagrant box, or no Vagrant box is available in this directory." >&2
 	exit 1
 fi
