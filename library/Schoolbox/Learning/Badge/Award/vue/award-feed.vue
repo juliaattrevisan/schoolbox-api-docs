@@ -215,44 +215,42 @@ export default {
                                         <div class="award-count" :title="'Awarded ' + award.count + ' times'">x{{ award.count }}</div>
                                     </template>
                                 </div>
-                                <div class="card-content">
-                                    <h3><a href="#" @click.prevent="openDetailModal(award)" :title="award.badge.name">{{ award.badge.name }}</a></h3>
-                                    <div class="actions-small-1">
-                                        <div class="list-item">
-                                            <p class="meta">
-                                                <!-- Change metadata text subtly depending on the Award status
-                                                  -- Goals and Achievements, while badges, aren't the same thing
-                                                  -->
-                                                <template v-if="award.isGoal">
-                                                    Goal set
-                                                </template>
-                                                <template v-else>
-                                                    Awarded
-                                                </template>
-                                                <relative-time :datetime="award.awardedAt"></relative-time>
-                                            </p>
-                                        </div>
-                                        <template v-if="hasTot(award)">
-                                            <nav>
-                                              <a class="icon-more" title="Actions" :data-dropdown="generateIdentifier(award)"></a>
-                                            </nav>
-                                            <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
-
-                                                <!-- Only show Withdraw button if you can actually do it
-                                                  -- Students can't withdraw their own Achievement
-                                                  -->
-                                                <template v-if="canWithdraw(award)">
-                                                  <template v-if="!award.isGoal">
-                                                    <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-withdraw-achievement" title="Withdraw achievement">Withdraw achievement</a></li>
-                                                  </template>
-                                                  <template v-else>
-                                                    <li><a @click.prevent="awardAchievement(award)" class="icon-showcase" title="Award achievement">Award achievement</a></li>
-                                                    <li><a @click.prevent="openGoalWithdrawModal(award)" class="icon-close" title="Remove goal">Remove goal</a></li>
-                                                  </template>
-                                                </template>
-                                            </ul>
-                                        </template>
+                                <div class="actions-small-1 card-content">
+                                    <div class="list-item">
+                                        <h3><a href="#" @click.prevent="openDetailModal(award)" :title="award.badge.name">{{ award.badge.name }}</a></h3>
                                     </div>
+                                    <template v-if="hasTot(award)">
+                                    <nav>
+                                      <a class="icon-more" title="Actions" :data-dropdown="generateIdentifier(award)"></a>
+                                    </nav>
+                                    <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
+
+                                      <!-- Only show Withdraw button if you can actually do it
+                                        -- Students can't withdraw their own Achievement
+                                        -->
+                                      <template v-if="canWithdraw(award)">
+                                        <template v-if="!award.isGoal">
+                                          <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-withdraw-achievement" title="Withdraw achievement">Withdraw achievement</a></li>
+                                        </template>
+                                        <template v-else>
+                                          <li><a @click.prevent="awardAchievement(award)" class="icon-showcase" title="Award achievement">Award achievement</a></li>
+                                          <li><a @click.prevent="openGoalWithdrawModal(award)" class="icon-close" title="Remove goal">Remove goal</a></li>
+                                        </template>
+                                      </template>
+                                    </ul>
+                                    </template>
+                                    <p class="meta">
+                                        <!-- Change metadata text subtly depending on the Award status
+                                          -- Goals and Achievements, while badges, aren't the same thing
+                                          -->
+                                        <template v-if="award.isGoal">
+                                          Goal set
+                                        </template>
+                                        <template v-else>
+                                          Awarded
+                                        </template>
+                                        <relative-time :datetime="award.awardedAt"></relative-time>
+                                    </p>
                                 </div>
                             </div>
                         </div>
