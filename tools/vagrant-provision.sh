@@ -529,5 +529,5 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
 if [ -f /vagrant/post-provision.sh ];
 then
     echo "[SB][`date +%Y-%m-%d\ %X`] Running custom post provisioning";
-    /vagrant/post-provision.sh 2>&1;
+    /vagrant/post-provision.sh;
 fi
