@@ -1,0 +1,14 @@
+{% include '@learningBadgeAward/awardBadgeForm.twig' with {
+    postAwardRouteLookup: 'setAsGoalForSelf',
+    awardToSelfOnly: true,
+    messages: {
+        userListMetadataPrefix: (settingForSelf ? 'Setting for myself, and also for' : 'Setting for'),
+        pageHeader: 'Set Goal',
+        toastActivate: 'Setting goal...',
+        toastSuccess: 'Set goal',
+        toastFailure: 'Setting goal failed',
+        confirmButtonText: 'Set selected goal(s)',
+        confirmModalHeader: 'Confirm goal(s)',
+        confirmModalMeta: 'Setting the following goal(s) for yourself:',
+    },
+} %}

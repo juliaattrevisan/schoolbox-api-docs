@@ -50,6 +50,7 @@
         <div id="{{ reportContentId }}">
             <badge-list-form get-badges-route="{{ routeLookup('learningBadge.getBadges') }}"
                              :users="{{ users | json_encode }}"
+                             :award-to-self-only="Boolean('{{ awardToSelfOnly }}')"
                              post-award-route-lookup="{{ postAwardRouteLookup }}"
                              toast-activate-message="{{ messages.toastActivate }}"
                              toast-success-message="{{ messages.toastSuccess }}"

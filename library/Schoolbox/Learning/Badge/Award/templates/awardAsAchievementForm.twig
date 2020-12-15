@@ -1,6 +1,6 @@
 {% include '@learningBadgeAward/awardBadgeForm.twig' with {
     postAwardRouteLookup: 'awardAsAchievement',
-    displayUserListInConfirmModal: true,
+    awardToSelfOnly: false,
     messages: {
         userListMetadataPrefix: (settingForSelf ? 'Awarding to myself, and also to' : 'Awarding to'),
         pageHeader: 'Award Achievement',

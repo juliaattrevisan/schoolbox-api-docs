@@ -58,6 +58,19 @@ export default {
         },
 
         /**
+         * Are the badges being awarded to the current user only?
+         *
+         * If so:
+         * * do not show `this.users` in the confirm modal, even if they are set
+         * * post to `this.postAwardRouteLookup` only once, instead of once for
+         *   each `this.users`.
+         */
+        awardToSelfOnly: {
+            type: Boolean,
+            default: false,
+        },
+
+        /**
          * Where does the user get redirected to on successful save or
          * cancellation of the form?
          */
@@ -204,18 +217,21 @@ export default {
                     </div>
                 </li>
             </ul>
-            <hr />
-            <p class="meta">To the following user(s):</p>
-            <ul class="grid achievements-grid medium-block-grid-2 large-block-grid-4">
-                <li v-for="user in users">
-                    <div class="card small-12 compact">
-                        <div>
-                            <img :src="user._links.avatar" :alt="user.fullName">
-                            <p>{{ user.fullName }}</p>
+
+            <template v-if="!awardToSelfOnly">
+                <hr />
+                <p class="meta">To the following user(s):</p>
+                <ul class="grid achievements-grid medium-block-grid-2 large-block-grid-4">
+                    <li v-for="user in users">
+                        <div class="card small-12 compact">
+                            <div>
+                                <img :src="user._links.avatar" :alt="user.fullName">
+                                <p>{{ user.fullName }}</p>
+                            </div>
                         </div>
-                    </div>
-                </li>
-            </ul>
+                    </li>
+                </ul>
+            </template>
 
             <ul class="flex-list buttons">
                 <li><button ref="awardModalSubmit" @click.prevent="onSubmit" class="submit">Confirm</button></li>
