@@ -222,22 +222,23 @@ export default {
                                                   -- Goals and Achievements, while badges, aren't the same thing
                                                   -->
                                                 <template v-if="award.isGoal">
-                                                  Goal set
+                                                    Goal set
                                                 </template>
                                                 <template v-else>
-                                                  Awarded
+                                                    Awarded
                                                 </template>
                                                 <relative-time :datetime="award.awardedAt"></relative-time>
                                             </p>
                                         </div>
                                         <template v-if="hasTot(award)">
                                             <nav>
-                                              <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
+                                                <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
                                             </nav>
                                             <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
-                                              <!-- Only show Withdraw button if you can actually do it
-                                                -- Students can't withdraw their own Achievement
-                                                -->
+
+                                                <!-- Only show Withdraw button if you can actually do it
+                                                  -- Students can't withdraw their own Achievement
+                                                  -->
                                                 <template v-if="canWithdraw(award)">
                                                   <template v-if="!award.isGoal">
                                                     <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-close">Withdraw achievement</a></li>
