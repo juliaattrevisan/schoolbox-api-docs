@@ -149,7 +149,7 @@ export default {
          * @returns {string}
          */
         generateIdentifier(award) {
-            return 'header-options-' + award.badge.category.id + '-' + award.badge.id;
+            return 'header-options-' + award.badge.category.id + '-' + award.badge.id + '-' + award.status;
         },
 
         /**
@@ -211,7 +211,9 @@ export default {
                                     <a href="#" @click.prevent="openDetailModal(award)">
                                         <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
                                     </a>
-                                    <div class="award-count" :title="'Awarded ' + award.count + ' time(s)'">x{{ award.count }}</div>
+                                    <template v-if="award.count > 1">
+                                        <div class="award-count" :title="'Awarded ' + award.count + ' time(s)'">x{{ award.count }}</div>
+                                    </template>
                                 </div>
                                 <div class="card-content">
                                     <h3><a href="#" @click.prevent="openDetailModal(award)">{{ award.badge.name }}</a></h3>
@@ -222,22 +224,23 @@ export default {
                                                   -- Goals and Achievements, while badges, aren't the same thing
                                                   -->
                                                 <template v-if="award.isGoal">
-                                                  Goal set
+                                                    Goal set
                                                 </template>
                                                 <template v-else>
-                                                  Awarded
+                                                    Awarded
                                                 </template>
                                                 <relative-time :datetime="award.awardedAt"></relative-time>
                                             </p>
                                         </div>
                                         <template v-if="hasTot(award)">
                                             <nav>
-                                              <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
+                                                <a class="icon-more" title="More" :data-dropdown="generateIdentifier(award)"></a>
                                             </nav>
                                             <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
-                                              <!-- Only show Withdraw button if you can actually do it
-                                                -- Students can't withdraw their own Achievement
-                                                -->
+
+                                                <!-- Only show Withdraw button if you can actually do it
+                                                  -- Students can't withdraw their own Achievement
+                                                  -->
                                                 <template v-if="canWithdraw(award)">
                                                   <template v-if="!award.isGoal">
                                                     <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-close">Withdraw achievement</a></li>

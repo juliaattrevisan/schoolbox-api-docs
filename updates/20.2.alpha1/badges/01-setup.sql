@@ -99,6 +99,7 @@ CREATE TABLE IF NOT EXISTS `badge_user` (
     `status` ENUM('goal', 'achievement') NOT NULL,
     `awarded_by` INT UNSIGNED NOT NULL,
     `awarded_at` DATETIME NOT NULL,
+    `award_id` INT(11),
     `deleted_at` DATETIME NULL,
     INDEX `fk_badge_user_recipient_id_idx` (`recipient_id` ASC),
     INDEX `fk_badge_user_badge_id_idx` (`badge_id` ASC),

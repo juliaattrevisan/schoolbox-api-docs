@@ -206,7 +206,7 @@ class Controller extends Base
             /* Force string indexes, otherwise the numeric values get inserted in-order
              * which isn't intended here; they are already in a particular order
              */
-            $badgeId = "badge-{$award->getBadge()->getId()}";
+            $badgeId = "badge-{$award->getStatus()}-{$award->getBadge()->getId()}";
             $categoryId = "category-{$award->getBadge()->getCategory()->getId()}";
 
             /* Some inline hydration due to curriculum nodes no longer being included
@@ -233,6 +233,7 @@ class Controller extends Base
              * in the list is the most recently awarded
              */
             if (!isset($stack['categories'][$categoryId]['awards'][$badgeId])) {
+
                 /* This is a set-based aggregation, not an individual model property
                  */
                 $badge['count'] = 0;
@@ -293,13 +294,15 @@ class Controller extends Base
      * Users to award to will be in the "users" key, and each user will be
      * identified by the "id" key of each item in "users".
      *
-     * @param Model  $badge  The badge to award.
-     * @param string $status The status to award the badge with:
-     *                       * `AwardModel::AWARD_STATUS_ACHIEVEMENT` for
+     * @param Model  $badge    The badge to award.
+     * @param string $status   The status to award the badge with:
+     *                         * `AwardModel::AWARD_STATUS_ACHIEVEMENT` for
      *                         awarding the badge as an achievement
-     *                       * `AwardModel::AWARD_STATUS_GOAL` for awarding the
+     *                         * `AwardModel::AWARD_STATUS_GOAL` for awarding the
      *                         badge as a goal to be achieved
      * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     private function createAwardsFromRequestBody(Model $badge, string $status): void
     {
@@ -310,16 +313,27 @@ class Controller extends Base
         $collection = $this->mapper->createCollection();
         $userIds    = array_column($data['users'], 'id');
         $users      = $this->userMapper->findByColumn('id', $userIds);
+
+        /* Need a badge history for a particular user to decide how goals
+         * and achievements are persisted
+         *
+         * This section can be optimised further in any number of ways
+         */
+        $userIds = $users->getPropertyValues('id');
+        $histories = $this->mapper->findHistories($userIds, $badge);
+
         foreach ($users as $user) {
             $award = $this->mapper->createModel()
-                                  ->setRecipient($user)
-                                  ->setBadge($badge)
-                                  ->setStatus($status)
-                                  ->setAwardedBy($this->getUser())
-                                  ->setAwardedAt(Alaress_Date_Format::now());
-            $collection->add($award);
+                ->setRecipient($user)
+                ->setBadge($badge)
+                ->setStatus($status)
+                ->setAwardedBy($this->getUser())
+                ->setAwardedAt(Alaress_Date_Format::now());
+
+            $history = $histories[$user->getId()];
+
+            (new Transactor($history, $this->mapper))->award($award);
         }
-        $this->mapper->save($collection);
 
         // Return what was just created
         $translator = $this->buildBadgeAwardModelToArrayTranslator();
