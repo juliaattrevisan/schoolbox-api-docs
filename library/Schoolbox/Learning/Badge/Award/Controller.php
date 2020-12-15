@@ -101,7 +101,7 @@ class Controller extends Base
      *
      * @param GenericCollection $users
      */
-    public function getAwardAsAchievementForm(GenericCollection $users)
+    public function getAwardAsAchievementForm(GenericCollection $users): void
     {
         $this->getAwardBadgeForm($users, '@learningBadgeAward/awardAsAchievementForm.twig', 'Award Achievement');
     }
@@ -134,7 +134,7 @@ class Controller extends Base
      *
      * @param GenericCollection $users
      */
-    public function getSetAsGoalForm(GenericCollection $users)
+    public function getSetAsGoalForm(GenericCollection $users): void
     {
         $this->getAwardBadgeForm($users, '@learningBadgeAward/setAsGoalForm.twig', 'Set Goals');
     }
@@ -146,9 +146,13 @@ class Controller extends Base
      * @api GET /learning/badge/award/user/goalForSelf
      * @since 20.2
      */
-    public function getSetAsGoalForSelfForm()
+    public function getSetAsGoalForSelfForm(): void
     {
-
+        $this->getAwardBadgeForm(
+            new GenericCollection(User::class),
+            '@learningBadgeAward/setAsGoalForSelfForm.twig',
+            'Set Goals'
+        );
     }
 
 
