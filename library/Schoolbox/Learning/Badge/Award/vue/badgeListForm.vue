@@ -165,9 +165,10 @@ export default {
         onSubmit() {
             this.toastActivate(this.toastActivateMessage);
             this.$refs.awardModalSubmit.disabled = true;
+            let payload = this.awardToSelfOnly ? null : {users: this.users};
             Promise
                 .all(this.selectedBadges.map(v => {
-                    axios.post(v._links[this.postAwardRouteLookup], {users: this.users})
+                    axios.post(v._links[this.postAwardRouteLookup], payload)
                 }))
                 .then(() => {
                     this.toastSuccess(this.toastSuccessMessage);
