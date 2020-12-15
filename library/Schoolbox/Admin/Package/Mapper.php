@@ -30,6 +30,7 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER_UUID);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('description', self::TYPE_STRING);
+        $this->uses('location', self::TYPE_STRING);
         $this->uses('installed', self::TYPE_BOOLEAN);
 
     }

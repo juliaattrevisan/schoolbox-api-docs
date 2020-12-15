@@ -8,6 +8,8 @@
 namespace Schoolbox\Admin\Package;
 
 use Alaress\Web\Controller\Base;
+use Crell\ApiProblem\ApiProblem;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Controller extends Base
 {
@@ -49,11 +51,37 @@ class Controller extends Base
     /**
      * Install a package
      *
-     * @api   POST /adminv2/package
+     * @api   POST /adminv2/package/install
      * @since 20.2
      */
-    public function postInstall(): void
+    public function installPackage(): void
     {
+        $post = $this->getRequest()->post;
+
+        $package = $this->packageMapper->findById($post['id']);
+
+        if(!$package->isInstalled()) {
+            include(SITE_root . '/packages/' . $package->getLocation() . '/Installer.php');
+            $installer = new \Installer;
+
+            $db = $this->packageMapper->getDatabase();
+            $db->beginTransaction();
+            try {
+                $installer->install();
+            } catch (\Throwable $e) {
+                $db->rollBack();
+                throw $this->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to install package, rolling back.");
+            }
+            $db->commit();
+
+            $package->setInstalled(true);
+            $this->packageMapper->save($package);
+        }
+        else {
+            throw $this->generateException(ErrorMapper::ERROR_PROCESSING, null, "Package is already installed.");
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
 
     }
 }

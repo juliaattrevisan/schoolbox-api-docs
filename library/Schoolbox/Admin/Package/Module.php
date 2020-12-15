@@ -34,7 +34,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getIndex', $isAdmin);
-        $this->register('POST', '', 'installPackage', $isAdmin);
+        $this->register('POST', '/install', 'installPackage', $isAdmin);
     }
 
 

@@ -1,22 +1,63 @@
 {# Shared navigation menu #}
 {{ renderAdminNavigation(pageCurrent) }}
 
+<script type="application/javascript">
+    $(function() {
+        var $toast = $('[data-toast]');
+
+        $('[data-install-package]').click(function(event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to install this package?',
+                confirmEvent: function() {
+                    var config = {text: 'Installing package...'};
+                    $toast.toastActivate(config);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ routeLookup('adminPackage.installPackage') }}",
+                        dataType: 'json',
+                        data: {
+                            id: $(event.target).attr('data-install-package')
+                        }
+                    })
+                    .success(function() {
+                        $toast.toastTimeout({
+                            text: 'Package has been successfully installed!',
+                            css: 'success'
+                        });
+                        $(event.target).prop('checked', true).prop('disabled', true);
+                    })
+                    .error(function(response) {
+                        var temp = $.parseJSON(response.responseText);
+
+                        $toast.toastTimeout({
+                            text: temp.message,
+                            css: 'alert'
+                        });
+                    });
+                }
+            });
+        });
+    });
+</script>
 
 <div class="row">
     <div class="small-12 island">
         <section>
-            <ul class="information-list">
+            <ul class="information-list card-selectable">
                 {% for package in packages %}
-                    <li class="actions-small-1">
-                        <div class="list-item">
+                    <li>
+                        <div>
+                            <div class="selector">
+                                <input id="chk-{{ package.id }}" data-install-package="{{ package.id }}" type="checkbox" {{  package.isInstalled ? 'checked disabled' : '' }}>
+                                <label for="chk-{{ package.id }}" class="checkbox-label"></label>
+                            </div>
                             <div class="card small-12">
                                 <h3>{{ package.title }}</h3>
+                                <article>{{ package.description }}</article>
                             </div>
                         </div>
-                        <nav>
-                            <a href="#" class="icon-download" title="Install"></a>
-                        </nav>
-                        <article>{{ package.description }}</article>
                     </li>
                 {% endfor %}
             </ul>

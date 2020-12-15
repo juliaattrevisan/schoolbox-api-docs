@@ -9,15 +9,16 @@ use Alaress\Csv\Reader as CsvReader;
 
 class Installer implements IPackageInstall {
 
-    const SOURCE_FILE = 'curriculum.csv';
+    private const SOURCE_FILE = 'curriculum.csv';
 
     public function install() {
 
-        if (!(is_file(SOURCE_FILE) && is_readable(SOURCE_FILE))) {
-            throw \Exception('Package source file not found');
+        if (!(is_file(__DIR__ . '/' . self::SOURCE_FILE) && is_readable(__DIR__ . '/' . self::SOURCE_FILE))) {
+            throw new \RuntimeException('Package source file not found: '. __DIR__ . '/' . self::SOURCE_FILE);
         }
 
-        $csv = new CsvReader(SOURCE_FILE);
+        $csv = new CsvReader(__DIR__ .'/'. self::SOURCE_FILE);
+        $csv->setLoadFromFirst(true);
         $curriculumMapper = Node\Mapper::getInstance();
         $parentLookup = [];
 

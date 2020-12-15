@@ -29,6 +29,11 @@ class Model
     protected ?string $description;
 
     /**
+     * @var string|null
+     */
+    protected ?string $location;
+
+    /**
      * @var bool|null
      */
     protected ?bool $installed;
@@ -72,6 +77,27 @@ class Model
 
         return $this;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getLocation(): ?string
+    {
+        return $this->location;
+    }
+
+    /**
+     * @param string|null $location
+     *
+     * @return self
+     */
+    public function setLocation(?string $location): self
+    {
+        $this->location = $location;
+
+        return $this;
+    }
+
 
     /**
      * @return bool|null
