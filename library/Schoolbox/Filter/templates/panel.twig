@@ -557,13 +557,17 @@ Usage:
                     $selected.each(function(idx, elem) {
                         var $elem = $(elem),
                             label = null,
-                            value = $elem.val()
+                            value = null;
                         if ($elem.is('option')) {
                             label = $elem.text();
+                            value = $elem.val();
                         } else {
                             label = $component.find('label[for='+$elem.attr('id')+']').html();
+                            value = $elem.attr('data-key');
                         }
-                        componentsInUse[filterId]['labels'][value] = label;
+                        if (value) {
+                            componentsInUse[filterId]['labels'][value] = label;
+                        }
                     });
 
                     // Hide the filter in use if all its options are selected
