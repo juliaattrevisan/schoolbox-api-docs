@@ -8,7 +8,6 @@
 namespace Schoolbox\Admin\Package;
 
 use Alaress\Web\Controller\Base;
-use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Controller extends Base
@@ -25,13 +24,13 @@ class Controller extends Base
      */
     public function __construct(Mapper $packageMapper)
     {
-        $this->packageMapper      = $packageMapper;
+        $this->packageMapper = $packageMapper;
     }
 
     /**
      * Get index all available packages and their installation state
      *
-     * @api   GET /adminv2/grades
+     * @api   GET /adminv2/package
      * @since 20.2
      */
     public function getIndex(): void
@@ -41,7 +40,7 @@ class Controller extends Base
                 '@adminPackage/index.twig',
                 [
                     'pageCurrent' => self::PAGE_CURRENT,
-                    'packages' => $this->packageMapper->findAll(),
+                    'packages'    => $this->packageMapper->findAll(),
                 ]
             )
         );
@@ -60,14 +59,14 @@ class Controller extends Base
 
         $package = $this->packageMapper->findById($post['id']);
 
-        if(!$package->isInstalled()) {
+        if (!$package->isInstalled()) {
             include(SITE_root . '/packages/' . $package->getLocation() . '/Installer.php');
-            $installer = new \Installer;
+            $installer = new \Installer();
 
             $db = $this->packageMapper->getDatabase();
             $db->beginTransaction();
             try {
-                $installer->install();
+                $installer->install($this->getUser());
             } catch (\Throwable $e) {
                 $db->rollBack();
                 throw $this->generateException(ErrorMapper::ERROR_PROCESSING, $e, "Unable to install package, rolling back.");
@@ -76,12 +75,10 @@ class Controller extends Base
 
             $package->setInstalled(true);
             $this->packageMapper->save($package);
-        }
-        else {
+        } else {
             throw $this->generateException(ErrorMapper::ERROR_PROCESSING, null, "Package is already installed.");
         }
 
-        $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
-
+        $this->getResponse()->content->set($this->buildJsonOutput(['success' => true]));
     }
 }

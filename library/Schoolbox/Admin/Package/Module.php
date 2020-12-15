@@ -57,7 +57,7 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'packageMapper'      => $this->getMapperFactory()->getLazy(Mapper::class),
+                    'packageMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
                 ]
             )
         );

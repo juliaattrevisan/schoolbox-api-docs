@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      James Leckie <james.leckie@schoolbox.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -7,15 +8,18 @@
 
 namespace Schoolbox\Admin\Package;
 
+use Schoolbox\IModel;
+use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
  * Represents an installable package via the admin system
  * @package Schoolbox\Admin\Package
  */
-class Model
+class Model implements IModel
 {
     use Id;
+    use CreateCollection;
 
     /**
      * @var string|null

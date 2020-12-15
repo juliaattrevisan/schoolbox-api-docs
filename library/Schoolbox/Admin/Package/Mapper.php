@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      James Leckie <james.leckie@schoolbox.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -32,6 +33,5 @@ class Mapper extends BaseMapper
         $this->uses('description', self::TYPE_STRING);
         $this->uses('location', self::TYPE_STRING);
         $this->uses('installed', self::TYPE_BOOLEAN);
-
     }
 }

@@ -7,14 +7,17 @@
 
 namespace Schoolbox\Admin\Package;
 
+use Schoolbox\User;
+
 /**
  * All installable packages should implement this interface to ensure they can be run
  * @package Schoolbox\Admin\Package
  */
 interface IPackageInstall
 {
-    /*
+    /**
      * This function is called to install a package
+     * @param User $user
      */
-    public function install();
+    public function install(User $user): void;
 }
