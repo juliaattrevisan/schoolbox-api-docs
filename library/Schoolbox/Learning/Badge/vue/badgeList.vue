@@ -318,7 +318,7 @@ export default {
                                 <badge-image :badge="badge"></badge-image>
                             </a>
                         </div>
-                        <div class="card-content">
+                        <div :class="{'checkbox-content': !showBadgeMenus, 'card-content': true}">
                             <template v-if="allowSelection">
                                 <input type="checkbox"
                                        :id="'selectBadge-' + String(badge.id)"
@@ -332,7 +332,7 @@ export default {
                             <h3 v-else>
                                 <a @click.prevent="openDetailModal(badge)" :title="badge.name">{{ badge.name }}</a>
                             </h3>
-                            <div :class="{'actions-small-0': !showBadgeMenus, 'actions-small-1': showBadgeMenus,}">
+                            <div :class="{'': !showBadgeMenus, 'actions-small-1': showBadgeMenus,}">
                                 <div class="list-item">
                                     <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">{{ badge.category.name }}</p>
                                 </div>

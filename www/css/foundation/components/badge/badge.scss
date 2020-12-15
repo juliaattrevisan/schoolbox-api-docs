@@ -37,7 +37,11 @@
       padding: 1rem 1rem 0 1rem;
       overflow: inherit;
 
-      h3, p {
+      &.checkbox-content {
+        padding: 1rem;
+      }
+
+      h3, p, .checkbox-label {
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
@@ -49,6 +53,9 @@
         top: 0;
         right: -1rem;
       }
+    }
+    .checkbox-label {
+      font-size: $h3-font-size;
     }
   }
 }
@@ -126,6 +133,12 @@
     top: .75rem;
     right: .75rem;
     padding: .35rem 0;
+  }
+}
+
+#badge-list-form-container {
+  .flex-list.buttons li {
+    flex: 1 50%;
   }
 }
 
