@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Badge\Award\Model as AwardModel;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Learning\Badge\Model;
@@ -20,6 +21,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Zend\Uri\Uri;
 
 use function count;
 use function in_array;
@@ -84,12 +86,17 @@ class Controller extends Base
      */
     public function redirectToAwardAsAchievementForm(): void
     {
-        $this->response->redirect->to(
+        $url = new Uri(
             $this->router->generate(
                 'learningBadgeAward.getAwardAsAchievementForm',
                 ['userIds' => $this->request->query->get('userIds')]
             )
         );
+        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        if (isset($returnUrl)) {
+            $url->setQuery([Redirect::RETURN_URL => $returnUrl]);
+        }
+        $this->response->redirect->to($url->toString());
     }
 
 
@@ -135,12 +142,17 @@ class Controller extends Base
      */
     public function redirectToSetAsGoalForm(): void
     {
-        $this->response->redirect->to(
+        $url = new Uri(
             $this->router->generate(
                 'learningBadgeAward.getSetAsGoalForm',
                 ['userIds' => $this->request->query->get('userIds')]
             )
         );
+        $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        if (isset($returnUrl)) {
+            $url->setQuery([Redirect::RETURN_URL => $returnUrl]);
+        }
+        $this->response->redirect->to($url->toString());
     }
 
 
