@@ -186,7 +186,7 @@ class Controller extends Base
 
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@learningBadge/index.twig',
+                '@learningBadge/list.twig',
                 ['filterPanel' => $filterPanel,],
                 'Badges'
             )
