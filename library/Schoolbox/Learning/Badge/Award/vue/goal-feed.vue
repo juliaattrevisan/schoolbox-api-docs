@@ -205,7 +205,6 @@ export default {
                     <div class="content">
                         <h2 class="subheader" :title="'Category: ' + category.name">{{ category.name }}</h2>
 
-                        These are goals only
                         <div class="badge-grid v-card-list">
                             <div class="badge v-card" v-for="award in category.awards">
                                 <div class="card-feature-image">
