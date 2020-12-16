@@ -1,7 +1,7 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
 {% if not bulkCreate %}
-<h2 class="subheader">Create Duplicate Record</h2>
+<h2 class="subheader">Create Linked Record</h2>
 {% endif %}
 <section>
     <fieldset class="content">
@@ -13,23 +13,16 @@
             </label>
 
             {% if record.relatedRecords | length %}
-                <label>Existing Duplicate Records</label>
+                <label>Linked Records</label>
                 <ul class="action-list">
                     {% for related in record.relatedRecords %}
                         {% if related.student.id != record.student.id %}
-                            <li class="actions-small-1">
+                            <li>
                                 <div class="list-item">
-                                    <div class="small-12 card wrap-down">
-                                        <a href="{{ profile.link(related.student) }}">{{ profile.imageSquare64(related.student) }}</a>
-                                        <p>
-                                            <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">
-                                                {{ related.heading }}
-                                            </a>
-                                        </p>
-                                        <p class="meta">{{ related.student.fullName }}</p>
-                                        <p>
-                                            Posted by <a href="{{ profile.link(related.owner) }}">{{ related.owner.fullName }}</a> {{ related.createdAt.relativeDay }}
-                                        </p>
+                                    <div class="small-12 compact card">
+                                        <a title="View Record" href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': related.student.id, 'recordId': related.id}) }}">{{ profile.imageSquare64(related.student) }}
+                                            <p>{{ related.student.fullName }}</p>
+                                        </a>
                                     </div>
                                 </div>
                             </li>

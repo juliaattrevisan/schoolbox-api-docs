@@ -19,7 +19,6 @@
                             <p>
                                 {{ record.owner.firstname }} {{ record.owner.lastname }}
                             </p>
-                        </a>
                         <p class="meta">Author</p>
                     {% else %}
                         <a href="{{ profile.link(record.owner) }}">
@@ -46,7 +45,7 @@
                     <li>
                         <div class="small-12 card wrap-down">
                             <div class="icon-teacher size-48" title="Pastoral Group"></div>
-                            <span class="neutral label right">{{ locale.pastoralPrivate.proper }} Content Visible</span>
+                            <span class="neutral label right">{{ locale.pastoralPrivate.proper }}</span>
 
                             {# Display link to group if the user is a pastoral moderator #}
 
@@ -83,7 +82,7 @@
                     <li>
                         <div class="small-12 card wrap-down">
                             <div class="icon-group size-48" title="User Role"></div>
-                            <span class="neutral label right">{{ locale.pastoralPrivate.proper }} Content Visible</span>
+                            <span class="neutral label right">{{ locale.pastoralPrivate.proper }}</span>
                             <p>{{ access.role.name }}</p>
                             {% if access.role.isParent %}
                                 {% for parent in record.student.parents %}
@@ -105,7 +104,7 @@
                         <div class="small-12 card wrap-down">
                             {% if access.user.isDeleted() %}
                                 {{ profile.imageSquare64(access.user) }}
-                                <span class="neutral label right">{{ locale.pastoralPrivate.proper }} Content Visible</span>
+                                <span class="neutral label right">{{ locale.pastoralPrivate.proper }}</span>
                                 <p>
                                     {{ access.user.firstname }} {{ access.user.lastname }}
                                 </p>
@@ -115,7 +114,7 @@
                             {% else %}
                                 <a href="{{ profile.link(access.user) }}">
                                     {{ profile.imageSquare64(access.user) }}
-                                    <span class="neutral label right">{{ locale.pastoralPrivate.proper }} Content Visible</span>
+                                    <span class="neutral label right">{{ locale.pastoralPrivate.proper }}</span>
                                     <p>
                                         {{ access.user.firstname }} {{ access.user.lastname }}
                                     </p>
