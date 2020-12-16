@@ -337,7 +337,14 @@ export default {
         <div v-else>
             <div v-if="metadata.count === 0" class="empty-state">
                 <i class="icon-advanced-list"></i>
-                <p>There is no activity yet.</p>
+                <!--  Teacher/Admin -->
+                <p>'Student name' doesn't have any activity yet.</p>
+                <p><a href="" title="Share a Learning Moment">Share a Learning Moment</a>, <a href="" title="Set a goal">set a goal</a> or <a href="" title="Award an achievement">award an achievement</a> to see it appear here.</p>
+                <!--  Parent -->
+                <p>'Student name' doesn't have any activity yet. When 'firstname' or their teacher shares learning, it will appear here.</p>
+                <!--  Student -->
+                <p>You don't have any activity yet.</p>
+                <p><a href="" title="Share your learning">Share your learning</a> to see it appear in the activity feed.</p>
             </div>
             <div class="feed-load-more content" v-else-if="metadata.cursor.next && metadata.count > data.length">
                 <button class="load-more expand" @click.prevent="append(metadata.cursor.next)" title="Load more">
