@@ -24,14 +24,14 @@
     <div class="small-12 columns">
         <h1>{{ messages.pageHeader }}</h1>
 
-        {% if users is not empty %}
+        {% if otherUsers is not empty %}
             <ul class="meta">
                 <li>
                     {% include 'sub/userListMetadata.twig'
                         with {
-                        users:   users,
-                        message: 'Awarding to'
-                    } only
+                            users:   otherUsers,
+                            message: messages.userListMetadataPrefix,
+                        } only
                     %}
                 </li>
             </ul>
@@ -50,13 +50,20 @@
         <div id="{{ reportContentId }}">
             <badge-list-form get-badges-route="{{ routeLookup('learningBadge.getBadges') }}"
                              :users="{{ users | json_encode }}"
+                             :award-to-self-only="Boolean('{{ awardToSelfOnly }}')"
                              post-award-route-lookup="{{ postAwardRouteLookup }}"
-                             toast-activate-message="{{ messages.toastActivate }}"
-                             toast-success-message="{{ messages.toastSuccess }}"
-                             toast-failure-message="{{ messages.toastFailure }}"
-                             confirm-button-text="{{ messages.confirmButtonText }}"
-                             confirm-modal-header="{{ messages.confirmModalHeader }}"
-                             confirm-modal-meta="{{ messages.confirmModalMeta }}"
+                             toast-activate-message-singular="{{ messages.toastActivate.singular }}"
+                             toast-success-message-singular="{{ messages.toastSuccess.singular }}"
+                             toast-failure-message-singular="{{ messages.toastFailure.singular }}"
+                             confirm-button-text-singular="{{ messages.confirmButtonText.singular }}"
+                             confirm-modal-header-singular="{{ messages.confirmModalHeader.singular }}"
+                             confirm-modal-badge-list-meta-singular="{{ messages.confirmModalMeta.singular }}"
+                             toast-activate-message-plural="{{ messages.toastActivate.plural }}"
+                             toast-success-message-plural="{{ messages.toastSuccess.plural }}"
+                             toast-failure-message-plural="{{ messages.toastFailure.plural }}"
+                             confirm-button-text-plural="{{ messages.confirmButtonText.plural }}"
+                             confirm-modal-header-plural="{{ messages.confirmModalHeader.plural }}"
+                             confirm-modal-badge-list-meta-plural="{{ messages.confirmModalMeta.plural }}"
                              return-url="{{ RETURN_URL.previous.decoded }}">
             </badge-list-form>
         </div>

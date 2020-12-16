@@ -17,6 +17,7 @@ use Closure;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -29,7 +30,7 @@ class Module extends BaseModule
      */
     public function registerRoutes(): void
     {
-        $baseRule = new Rule\All(
+        $manageBadgesRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
@@ -66,7 +67,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{badgeId}/achievement/recipients',
             'getAchievementRecipients',
-            $baseRule,
+            $manageBadgesRule,
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
@@ -76,7 +77,7 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/{badgeId}/achievement/withdraw',
             'postAchievementWithdraw',
-            $baseRule,
+            $manageBadgesRule,
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
@@ -86,7 +87,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{badgeId}/goal/recipients',
             'getGoalRecipients',
-            $baseRule,
+            $manageBadgesRule,
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
@@ -96,7 +97,7 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/{badgeId}/goal/withdraw',
             'postGoalWithdraw',
-            $baseRule,
+            $manageBadgesRule,
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
@@ -107,7 +108,7 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/{badgeId}/achievement',
             'awardAsAchievement',
-            $baseRule,
+            $manageBadgesRule,
             $preloadBadge
         );
 
@@ -116,7 +117,7 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/{badgeId}/goal',
             'setAsGoal',
-            $baseRule,
+            $manageBadgesRule,
             $preloadBadge
         );
 
@@ -137,13 +138,13 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/user/achievement',
             'redirectToAwardAsAchievementForm',
-            $baseRule,
+            $manageBadgesRule,
         );
         $this->register(
             self::METHOD_GET,
             '/user/{userIds}/achievement',
             'getAwardAsAchievementForm',
-            $baseRule,
+            $manageBadgesRule,
             $preloadUsers
         );
 
@@ -151,15 +152,42 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/user/goal',
             'redirectToSetAsGoalForm',
-            $baseRule,
+            $manageBadgesRule,
         );
         $this->register(
             self::METHOD_GET,
             '/user/{userIds}/goal',
             'getSetAsGoalForm',
-            $baseRule,
+            $manageBadgesRule,
             $preloadUsers
         );
+
+        // Set as goal for self is a little different:
+        // any user may set goals, but only for themselves.
+        $setGoalForSelfRule = new Rule\IsLoggedIn();
+        $this->register(
+            self::METHOD_GET,
+            '/goal',
+            'getSetAsGoalForSelfForm',
+            $setGoalForSelfRule
+        );
+    }
+
+
+    /**
+     * Authorizes that the only user in the URL is the current user.
+     *
+     * @param array $params
+     * @param User  $currentUser
+     */
+    private function authorizeOnlyUserIsSelf(array $params, User $currentUser): void
+    {
+        $isUserRule = new Rule\IsUser('userId');
+        // Coalesce to empty list as the preloader may have returned not found,
+        // and thus not populated $params['users']
+        foreach ($params['users'] ?? [] as $user) {
+            $isUserRule->authorize(['userId' => $user->getId()], $currentUser);
+        }
     }
 
 

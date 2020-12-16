@@ -1,12 +1,32 @@
 {% include '@learningBadgeAward/awardBadgeForm.twig' with {
     postAwardRouteLookup: 'setAsGoal',
+    awardToSelfOnly: false,
     messages: {
-        pageHeader: 'Set Goal',
-        toastActivate: 'Setting goal...',
-        toastSuccess: 'Set goal',
-        toastFailure: 'Setting goal failed',
-        confirmButtonText: 'Set selected goal(s)',
-        confirmModalHeader: 'Confirm goal(s)',
-        confirmModalMeta: 'Setting the following goal(s):',
+        userListMetadataPrefix: (settingForSelf ? 'Setting for myself, and also for' : 'Setting for'),
+        pageHeader: 'Set Goals',
+        toastActivate: {
+            singular: 'Setting goal...',
+            plural: 'Setting goals...',
+        },
+        toastSuccess: {
+            singular: 'Set goal',
+            plural: 'Set goals'
+        },
+        toastFailure: {
+            singular: 'Setting goal failed',
+            plural: 'Setting goals failed'
+        },
+        confirmButtonText: {
+            singular: 'Set selected goal',
+            plural: 'Set selected goals'
+        },
+        confirmModalHeader: {
+            singular: 'Confirm goal',
+            plural: 'Confirm goals'
+        },
+        confirmModalMeta: {
+            singular: 'Setting the following goal:',
+            plural: 'Setting the following goals:'
+        },
     },
 } %}

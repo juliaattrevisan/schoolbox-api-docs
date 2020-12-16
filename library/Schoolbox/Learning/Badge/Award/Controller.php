@@ -105,26 +105,12 @@ class Controller extends Base
      *
      * @param GenericCollection $users
      */
-    public function getAwardAsAchievementForm(GenericCollection $users)
+    public function getAwardAsAchievementForm(GenericCollection $users): void
     {
-        $page        = Filter\Page\Model::PAGE_BADGE_LIST;
-        $filterPanel = $this->filterFactoryFactory->buildPanel(
-            $this->getUser(),
-            $page,
-            null,
-            $this->getUser(),
-            []
-        );
-
-        $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningBadgeAward/awardAsAchievementForm.twig',
-                [
-                    'users'       => $users->map(new User\Translator\Author\ModelToArray()),
-                    'filterPanel' => $filterPanel,
-                ],
-                'Award Achievement'
-            )
+        $this->getAwardBadgeForm(
+            $users,
+            '@learningBadgeAward/awardAsAchievementForm.twig',
+            'Award Achievements'
         );
     }
 
@@ -159,7 +145,41 @@ class Controller extends Base
      *
      * @param GenericCollection $users
      */
-    public function getSetAsGoalForm(GenericCollection $users)
+    public function getSetAsGoalForm(GenericCollection $users): void
+    {
+        $this->getAwardBadgeForm(
+            $users,
+            '@learningBadgeAward/setAsGoalForm.twig',
+            'Set Goals'
+        );
+    }
+
+
+    /**
+     * Show a form for setting a goal for yourself.
+     *
+     * @api GET /learning/badge/award/goal
+     * @since 20.2
+     */
+    public function getSetAsGoalForSelfForm(): void
+    {
+        $this->getAwardBadgeForm(
+            new GenericCollection(User::class),
+            '@learningBadgeAward/setAsGoalForSelfForm.twig',
+            'Set Goals'
+        );
+    }
+
+
+    /**
+     * Show a form for awarding a badge as an achievement or goal to a set of
+     * users.
+     *
+     * @param GenericCollection|User[] $users
+     * @param string                   $template The template to display
+     * @param string                   $title    The title of this page
+     */
+    private function getAwardBadgeForm(GenericCollection $users, string $template, string $title): void
     {
         $page        = Filter\Page\Model::PAGE_BADGE_LIST;
         $filterPanel = $this->filterFactoryFactory->buildPanel(
@@ -170,14 +190,29 @@ class Controller extends Base
             []
         );
 
+        // Segment users into users which are and are not this user
+        $otherUsers     = $users->emptyClone();
+        $thisUserId     = $this->getUser()->getId();
+        $settingForSelf = false;
+        foreach ($users as $user) {
+            if ($user->getId() === $thisUserId) {
+                $settingForSelf = true;
+            } else {
+                $otherUsers->add($user);
+            }
+        }
+
+        $translator = new User\Translator\Author\ModelToArray();
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@learningBadgeAward/setAsGoalForm.twig',
+                $template,
                 [
-                    'users'       => $users->map(new User\Translator\Author\ModelToArray()),
-                    'filterPanel' => $filterPanel,
+                    'settingForSelf' => $settingForSelf,
+                    'users'          => $users->map($translator),
+                    'otherUsers'     => $otherUsers->map($translator),
+                    'filterPanel'    => $filterPanel,
                 ],
-                'Set Goals'
+                $title
             )
         );
     }
@@ -352,16 +387,32 @@ class Controller extends Base
     /**
      * Set a badge as a goal for the current user.
      *
-     * To be implemented when students are given the ability to set goals for
-     * themselves.
-     *
      * @api   POST /learning/badge/award/{badgeId}/achievement
      * @since 20.2
-     *
      * @param Model $badge
+     * @throws MapperException if somehow the save fails
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function setAsGoalForSelf(Model $badge): void
     {
+        $histories = $this->mapper->findHistories([$this->getUser()->getId()], $badge);
+        $history = $histories[$this->getUser()->getId()];
+
+        $award = $this->mapper->createModel()
+            ->setRecipient($this->getUser())
+            ->setBadge($badge)
+            ->setStatus(AwardModel::AWARD_STATUS_GOAL)
+            ->setAwardedBy($this->getUser())
+            ->setAwardedAt(Alaress_Date_Format::now());
+
+        (new Transactor($history, $this->mapper))->award($award);
+
+        $translator = $this->buildBadgeAwardModelToArrayTranslator();
+
+        $this->response->content->set(
+            $this->buildJsonOutput($translator($award))
+        );
     }
 
 

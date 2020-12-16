@@ -110,6 +110,8 @@ class Model
             ],
             self::PAGE_BADGE_LIST => [
                 Role::STAFF,
+                Role::PARENT,
+                Role::STUDENT,
             ],
         ];
     }

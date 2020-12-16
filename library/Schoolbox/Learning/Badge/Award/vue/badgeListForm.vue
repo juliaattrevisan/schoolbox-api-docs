@@ -58,6 +58,19 @@ export default {
         },
 
         /**
+         * Are the badges being awarded to the current user only?
+         *
+         * If so:
+         * * do not show `this.users` in the confirm modal, even if they are set
+         * * post to `this.postAwardRouteLookup` only once, instead of once for
+         *   each `this.users`.
+         */
+        awardToSelfOnly: {
+            type: Boolean,
+            default: false,
+        },
+
+        /**
          * Where does the user get redirected to on successful save or
          * cancellation of the form?
          */
@@ -67,52 +80,116 @@ export default {
         },
 
         /**
-         * Toast activation message
+         * Toast activation message (when only one badge is selected)
          */
-        toastActivateMessage: {
+        toastActivateMessageSingular: {
             type: String,
             default: 'Awarding achievement...',
         },
 
         /**
-         * Toast success message
+         * Toast success message (when only one badge is selected)
          */
-        toastSuccessMessage: {
+        toastSuccessMessageSingular: {
             type: String,
             default: 'Awarded achievement',
         },
 
         /**
-         * Toast failure message
+         * Toast failure message (when only one badge is selected)
          */
-        toastFailureMessage: {
+        toastFailureMessageSingular: {
             type: String,
             default: 'Awarding achievement failed',
         },
 
         /**
-         * Confirm modal's header
+         * Confirm modal's header (when only one badge is selected)
          */
-        confirmModalHeader: {
+        confirmModalHeaderSingular: {
             type: String,
-            default: 'Confirm achievement(s)',
+            default: 'Confirm achievement',
         },
 
         /**
-         * Confirm modal's meta
+         * Confirm modal's badge list meta (when only one badge is selected)
          */
-        confirmModalMeta: {
+        confirmModalBadgeListMetaSingular: {
             type: String,
-            default: 'Awarding the following achievement(s):',
+            default: 'Awarding the following achievement:',
         },
 
         /**
-         * Confirm button's text
+         * Confirm modal's user list meta (when only one user is selected)
          */
-        confirmButtonText: {
+        confirmModalUserListMetaSingular: {
             type: String,
-            default: 'Award selected achievement(s)',
-        }
+            default: 'To the following user:',
+        },
+
+        /**
+         * Confirm button's text (when only one badge is selected)
+         */
+        confirmButtonTextSingular: {
+            type: String,
+            default: 'Award selected achievement',
+        },
+
+        /**
+         * Toast activation message (when more than one badge is selected)
+         */
+        toastActivateMessagePlural: {
+            type: String,
+            default: 'Awarding achievements...',
+        },
+
+        /**
+         * Toast success message (when more than one badge is selected)
+         */
+        toastSuccessMessagePlural: {
+            type: String,
+            default: 'Awarded achievements',
+        },
+
+        /**
+         * Toast failure message (when more than one badge is selected)
+         */
+        toastFailureMessagePlural: {
+            type: String,
+            default: 'Awarding achievements failed',
+        },
+
+        /**
+         * Confirm modal's header (when more than one badge is selected)
+         */
+        confirmModalHeaderPlural: {
+            type: String,
+            default: 'Confirm achievements',
+        },
+
+        /**
+         * Confirm modal's badge list meta (when more than one badge is selected)
+         */
+        confirmModalBadgeListMetaPlural: {
+            type: String,
+            default: 'Awarding the following achievements:',
+        },
+
+        /**
+         * Confirm modal's user list meta (when more than one user is selected)
+         */
+        confirmModalUserListMetaPlural: {
+            type: String,
+            default: 'To the following users:',
+        },
+
+        /**
+         * Confirm button's text (when more than one badge is selected)
+         */
+        confirmButtonTextPlural: {
+            type: String,
+            default: 'Award selected achievements',
+        },
     },
     data() {
         return {
@@ -122,6 +199,43 @@ export default {
     },
     computed: {
         window: () => window,
+
+        // Messages are computed depending on how many badges are selected
+        toastActivateMessage() {
+            return this.selectedBadges.length === 1
+                ? this.toastActivateMessageSingular
+                : this.toastActivateMessagePlural;
+        },
+        toastSuccessMessage() {
+            return this.selectedBadges.length === 1
+                ? this.toastSuccessMessageSingular
+                : this.toastSuccessMessagePlural;
+        },
+        toastFailureMessage() {
+            return this.selectedBadges.length === 1
+                ? this.toastFailureMessageSingular
+                : this.toastFailureMessagePlural;
+        },
+        confirmModalHeader() {
+            return this.selectedBadges.length === 1
+                ? this.confirmModalHeaderSingular
+                : this.confirmModalHeaderPlural;
+        },
+        confirmModalBadgeListMeta() {
+            return this.selectedBadges.length === 1
+                ? this.confirmModalBadgeListMetaSingular
+                : this.confirmModalBadgeListMetaPlural;
+        },
+        confirmModalUserListMeta() {
+            return this.users.length === 1
+                ? this.confirmModalUserListMetaSingular
+                : this.confirmModalUserListMetaPlural;
+        },
+        confirmButtonText() {
+            return this.selectedBadges.length === 1
+                ? this.confirmButtonTextSingular
+                : this.confirmButtonTextPlural;
+        },
     },
     methods: {
         /**
@@ -152,9 +266,10 @@ export default {
         onSubmit() {
             this.toastActivate(this.toastActivateMessage);
             this.$refs.awardModalSubmit.disabled = true;
+            let payload = this.awardToSelfOnly ? null : {users: this.users};
             Promise
                 .all(this.selectedBadges.map(v => {
-                    axios.post(v._links[this.postAwardRouteLookup], {users: this.users})
+                    axios.post(v._links[this.postAwardRouteLookup], payload)
                 }))
                 .then(() => {
                     this.toastSuccess(this.toastSuccessMessage);
@@ -193,7 +308,7 @@ export default {
 
         <reveal-modal ref="awardModal" size="large">
             <h2>{{ confirmModalHeader }}</h2>
-            <p class="meta">{{ confirmModalMeta }}</p>
+            <p class="meta">{{ confirmModalBadgeListMeta }}</p>
             <ul class="grid achievements-grid medium-block-grid-2 large-block-grid-4">
                 <li v-for="badge in selectedBadges">
                     <div class="compact card small-12 badge-card">
@@ -204,18 +319,21 @@ export default {
                     </div>
                 </li>
             </ul>
-            <hr />
-            <p class="meta">To the following user(s):</p>
-            <ul class="grid achievements-grid medium-block-grid-2 large-block-grid-4">
-                <li v-for="user in users">
-                    <div class="card small-12 compact">
-                        <div>
-                            <img :src="user._links.avatar" :alt="user.fullName">
-                            <p>{{ user.fullName }}</p>
+
+            <template v-if="!awardToSelfOnly">
+                <hr />
+                <p class="meta">{{ confirmModalUserListMeta }}</p>
+                <ul class="grid achievements-grid medium-block-grid-2 large-block-grid-4">
+                    <li v-for="user in users">
+                        <div class="card small-12 compact">
+                            <div>
+                                <img :src="user._links.avatar" :alt="user.fullName">
+                                <p>{{ user.fullName }}</p>
+                            </div>
                         </div>
-                    </div>
-                </li>
-            </ul>
+                    </li>
+                </ul>
+            </template>
 
             <ul class="flex-list buttons">
                 <li><button ref="awardModalSubmit" @click.prevent="onSubmit" class="submit">Confirm</button></li>
