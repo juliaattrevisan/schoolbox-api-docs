@@ -22,7 +22,6 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 /**
  * Controller for badge requests.
@@ -114,74 +113,54 @@ class Controller extends Base
     public function getBadgeJsonFeed(): void
     {
         $page = Filter\Page\Model::PAGE_BADGE_LIST;
-        if ($this->isJsonRequest()) {
-            // Boilerplate for getting a set of badges which match filter
-            $qsFilters      = $this->request->query->get('filters', []);
-            $codec          = new Codec($this->filterMapper, $this->filterSelectionMapper);
-            $user           = $this->getUser();
-            $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
-            $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);
-            $idFinder       = Filter\Filters\Badge\IdFinder::getInstance($this->filterMapper, $this->mapper);
-            $badgeIds       = $idFinder->findIdsByFilters($filters);
+
+        // Boilerplate for getting a set of badges which match filter
+        $qsFilters      = $this->request->query->get('filters', []);
+        $codec          = new Codec($this->filterMapper, $this->filterSelectionMapper);
+        $user           = $this->getUser();
+        $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
+        $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);
+        $idFinder       = Filter\Filters\Badge\IdFinder::getInstance($this->filterMapper, $this->mapper);
+        $badgeIds       = $idFinder->findIdsByFilters($filters);
 
 
-            // Save selected filters
-            $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
+        // Save selected filters
+        $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
 
 
-            // Retrieve badges which match the filter
-            if (count($badgeIds) > 0) {
-                $cursor  = new MapperCursor(
-                    $this->mapper,
-                    self::BADGES_PER_PAGE,
-                    [
-                        'name' => $this->mapper::SORT_ORDER_ASC,
-                        'id'   => $this->mapper::SORT_ORDER_ASC,
-                    ],
-                    $this->mapper->getPredicateBuilder()->in('id', $badgeIds)
-                );
-                $results = $cursor->retrieveResults($this->request->query->get('cursor'));
-                $data    = $results->map($this->buildModelToArrayTranslator());
-                $count   = $cursor->retrieveResultCount();
-                $next    = $cursor->next($results);
-                $current = $cursor->current($results);
-            } else {
-                $data    = [];
-                $count   = 0;
-                $next    = null;
-                $current = null;
-            }
-            $this->response->content->set(
-                $this->buildJsonOutput([
-                    'data'     => $data,
-                    'metadata' => [
-                        'count'  => $count,
-                        'cursor' => [
-                            'next'    => $next,
-                            'current' => $current,
-                        ],
-                    ],
-                ])
+        // Retrieve badges which match the filter
+        if (count($badgeIds) > 0) {
+            $cursor  = new MapperCursor(
+                $this->mapper,
+                self::BADGES_PER_PAGE,
+                [
+                    'name' => $this->mapper::SORT_ORDER_ASC,
+                    'id'   => $this->mapper::SORT_ORDER_ASC,
+                ],
+                $this->mapper->getPredicateBuilder()->in('id', $badgeIds)
             );
-            return;
+            $results = $cursor->retrieveResults($this->request->query->get('cursor'));
+            $data    = $results->map($this->buildModelToArrayTranslator());
+            $count   = $cursor->retrieveResultCount();
+            $next    = $cursor->next($results);
+            $current = $cursor->current($results);
+        } else {
+            $data    = [];
+            $count   = 0;
+            $next    = null;
+            $current = null;
         }
-
-        // Output a Twig template
-        $filterPanel = $this->filterFactoryFactory->buildPanel(
-            $this->getUser(),
-            $page,
-            null,
-            $this->getUser(),
-            [],
-            $this->request->query->getArrayCopy(),
-        );
-
         $this->response->content->set(
-            $this->buildHtmlOutput(
-                '@learningBadge/index.twig',
-                ['filterPanel' => $filterPanel,],
-                'Badges'
-            )
+            $this->buildJsonOutput([
+                'data'     => $data,
+                'metadata' => [
+                    'count'  => $count,
+                    'cursor' => [
+                        'next'    => $next,
+                        'current' => $current,
+                    ],
+                ],
+            ])
         );
     }
 
