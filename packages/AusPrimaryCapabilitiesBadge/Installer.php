@@ -10,7 +10,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
 /**
- * Script for installing a curriculum CSV file into the curriculum_node table
+ * Script for installing a badge CSV file into the badge table
  */
 class Installer implements IPackageInstall
 {
