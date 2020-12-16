@@ -651,8 +651,20 @@
                                 {% for groupKey, group in groups %}
                                     <div class="v-card small-12">
                                         <a href="/homepage/{{ group.id }}">
-                                            {#                                        <div class="card-class-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImage %} background-image: url('/storage/image.php?hash={{ group.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>#}
-                                            <div class="card-class-image" style="background-color: #0a6aa1;">
+                                            <div class="card-class-image"
+                                                 style="border-bottom-width: 10px;
+                                                        border-bottom-style: solid;
+                                                        {% if group.folder is defined and group.folder.colour %}
+                                                        background-color:{{ group.folder.colour }};
+                                                        border-bottom-color: {{ group.folder.colour }};
+                                                        {% endif %}
+                                                        {% if group.folder is defined and group.folder.coverImage %}
+                                                        background-image: url('/storage/image.php?hash={{ group.folder.coverImage.hash }}&size=cardImageLarge');
+                                                        background-size: cover;
+                                                        background-repeat: no-repeat;
+                                                        background-position: center;
+                                                        {% endif %}"
+                                            >
                                                 {% if group.owners is defined %}
                                                     {% for owner in group.owners %}
                                                         <img src="/portrait.php?userId={{ owner.externalId }}&amp;size=square64" title="{{ owner.formatName }}" alt="{{ owner.formatName }}" />
