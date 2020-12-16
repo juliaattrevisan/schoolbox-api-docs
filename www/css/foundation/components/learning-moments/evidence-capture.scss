@@ -169,18 +169,9 @@
 .feed-load-more {
   background-color: $white;
   width: 100%;
-  border-top: 2px solid #EDEDED;
-
-  > div {
-    max-width: 45rem;
-    margin: 0 auto;
-  }
-  button {
-    margin: 1rem 0;
-  }
 }
 
-@media only screen and (max-width: 769px) {
+@media only screen and (max-width: 769px) {b
   .feed-item,
   .feed .subheader {
     border-left: 0;

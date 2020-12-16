@@ -349,13 +349,14 @@ export default {
                             <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">{{ badge.category.name }}</p>
                         </div>
                     </div>
+
+                    <!-- Load more button, if there are more to load -->
+                    <a @click.prevent="append(metadata.cursor.next, true)"
+                       class="button load-more expand"
+                       title="Load more"
+                       v-if="metadata.cursor.next && data.length < metadata.count">Load more</a>
                 </section>
             </template>
-
-            <!-- Load more button, if there are more to load -->
-            <a @click.prevent="append(metadata.cursor.next, true)"
-               class="button expand"
-               v-if="metadata.cursor.next && data.length < metadata.count">Load more</a>
         </div>
 
         <reveal-modal size="medium" ref="detailModal">
