@@ -22,7 +22,6 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 /**
  * Controller for badge requests.
@@ -106,74 +105,79 @@ class Controller extends Base
 
 
     /**
-     * Retrieve a list of badges.
+     * Retrieve a list of badges as a JSON feed.
      *
-     * Depending on request type, this will fetch either a JSON or HTML result:
-     * The HTML result will only contain a Vue component, the JSON will contain
-     * the actual results.
+     * @api   GET /learning/badge/list/
+     * @since 20.2
+     */
+    public function getBadgeJsonList(): void
+    {
+        $page = Filter\Page\Model::PAGE_BADGE_LIST;
+
+        // Boilerplate for getting a set of badges which match filter
+        $qsFilters      = $this->request->query->get('filters', []);
+        $codec          = new Codec($this->filterMapper, $this->filterSelectionMapper);
+        $user           = $this->getUser();
+        $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
+        $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);
+        $idFinder       = Filter\Filters\Badge\IdFinder::getInstance($this->filterMapper, $this->mapper);
+        $badgeIds       = $idFinder->findIdsByFilters($filters);
+
+
+        // Save selected filters
+        $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
+
+
+        // Retrieve badges which match the filter
+        if (count($badgeIds) > 0) {
+            $cursor  = new MapperCursor(
+                $this->mapper,
+                self::BADGES_PER_PAGE,
+                [
+                    'name' => $this->mapper::SORT_ORDER_ASC,
+                    'id'   => $this->mapper::SORT_ORDER_ASC,
+                ],
+                $this->mapper->getPredicateBuilder()->in('id', $badgeIds)
+            );
+            $results = $cursor->retrieveResults($this->request->query->get('cursor'));
+            $data    = $results->map($this->buildModelToArrayTranslator());
+            $count   = $cursor->retrieveResultCount();
+            $next    = $cursor->next($results);
+            $current = $cursor->current($results);
+        } else {
+            $data    = [];
+            $count   = 0;
+            $next    = null;
+            $current = null;
+        }
+        $this->response->content->set(
+            $this->buildJsonOutput([
+                'data'     => $data,
+                'metadata' => [
+                    'count'  => $count,
+                    'cursor' => [
+                        'next'    => $next,
+                        'current' => $current,
+                    ],
+                ],
+            ])
+        );
+    }
+
+
+    /**
+     * View the list of badges as a HTML page.
+     *
+     * This page will contain a Vue  component, which loads the badge JSON feed.
      *
      * @api   GET /learning/badge/
      * @since 20.2
      */
-    public function getBadges(): void
+    public function getBadgeListPage(): void
     {
-        $page = Filter\Page\Model::PAGE_BADGE_LIST;
-        if ($this->isJsonRequest()) {
-            // Boilerplate for getting a set of badges which match filter
-            $qsFilters      = $this->request->query->get('filters', []);
-            $codec          = new Codec($this->filterMapper, $this->filterSelectionMapper);
-            $user           = $this->getUser();
-            $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
-            $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);
-            $idFinder       = Filter\Filters\Badge\IdFinder::getInstance($this->filterMapper, $this->mapper);
-            $badgeIds       = $idFinder->findIdsByFilters($filters);
-
-
-            // Save selected filters
-            $this->filterSelectionMapper->updateSelections($user, $page, $userSelections);
-
-
-            // Retrieve badges which match the filter
-            if (count($badgeIds) > 0) {
-                $cursor  = new MapperCursor(
-                    $this->mapper,
-                    self::BADGES_PER_PAGE,
-                    [
-                        'name' => $this->mapper::SORT_ORDER_ASC,
-                        'id'   => $this->mapper::SORT_ORDER_ASC,
-                    ],
-                    $this->mapper->getPredicateBuilder()->in('id', $badgeIds)
-                );
-                $results = $cursor->retrieveResults($this->request->query->get('cursor'));
-                $data    = $results->map($this->buildModelToArrayTranslator());
-                $count   = $cursor->retrieveResultCount();
-                $next    = $cursor->next($results);
-                $current = $cursor->current($results);
-            } else {
-                $data    = [];
-                $count   = 0;
-                $next    = null;
-                $current = null;
-            }
-            $this->response->content->set(
-                $this->buildJsonOutput([
-                    'data'     => $data,
-                    'metadata' => [
-                        'count'  => $count,
-                        'cursor' => [
-                            'next'    => $next,
-                            'current' => $current,
-                        ],
-                    ],
-                ])
-            );
-            return;
-        }
-
-        // Output a Twig template
         $filterPanel = $this->filterFactoryFactory->buildPanel(
             $this->getUser(),
-            $page,
+            Filter\Page\Model::PAGE_BADGE_LIST,
             null,
             $this->getUser(),
             [],
@@ -182,12 +186,13 @@ class Controller extends Base
 
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@learningBadge/index.twig',
+                '@learningBadge/list.twig',
                 ['filterPanel' => $filterPanel,],
                 'Badges'
             )
         );
     }
+
 
 
     /**
