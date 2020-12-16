@@ -143,7 +143,7 @@ class Controller extends Base
     /**
      * Show a form for setting a goal for yourself.
      *
-     * @api GET /learning/badge/award/user/goalForSelf
+     * @api GET /learning/badge/award/goal
      * @since 20.2
      */
     public function getSetAsGoalForSelfForm(): void

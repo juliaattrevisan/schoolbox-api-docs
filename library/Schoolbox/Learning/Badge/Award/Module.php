@@ -167,7 +167,7 @@ class Module extends BaseModule
         $setGoalForSelfRule = new Rule\IsLoggedIn();
         $this->register(
             self::METHOD_GET,
-            '/user/goalForSelf',
+            '/goal',
             'getSetAsGoalForSelfForm',
             $setGoalForSelfRule
         );
