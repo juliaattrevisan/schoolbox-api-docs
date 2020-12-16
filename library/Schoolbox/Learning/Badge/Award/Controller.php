@@ -260,7 +260,6 @@ class Controller extends Base
              * in the list is the most recently awarded
              */
             if (!isset($stack['categories'][$categoryId]['awards'][$badgeId])) {
-
                 /* This is a set-based aggregation, not an individual model property
                  */
                 $badge['count'] = 0;
