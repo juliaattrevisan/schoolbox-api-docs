@@ -88,12 +88,12 @@ export default {
 }
 </script>
 <template>
-    <reveal-modal ref="modal">
+    <reveal-modal ref="modal" size="medium">
         <template v-if="award.badge">
             <div class="badge-modal">
                 <div class="badge-img-container">
                     <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
-                    <template v-if="'count' in award"><div class="award-count" :title="'Awarded ' + award.count + ' time(s)'">x{{ award.count }}</div></template>
+                    <template v-if="'count' in award"><div class="award-count" :title="'Awarded ' + award.count + ' times'">x{{ award.count }}</div></template>
                 </div>
                 <!-- Only show the count if one was provided in the award -->
                 <h2>{{ award.badge.name }}</h2>
@@ -115,6 +115,7 @@ export default {
                     <hr />
 
                     <p class="meta">
+                        Curriculum Codes:
                         <template v-for="curriculumNode in award.badge.curriculumNodes">
                             {{ curriculumNode.code }}
                         </template>

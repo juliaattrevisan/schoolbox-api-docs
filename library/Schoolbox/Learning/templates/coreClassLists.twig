@@ -11,29 +11,29 @@ Data:
 
 {% include '@learning/component/classLists/breadcrumbs.twig' %}
 
-<div class="row" id="email-class-lists">
+<div class="row class-list" id="email-class-lists">
     <div class="small-12 island">
         {% block header %}
         <h1>${ subject }</h1>
-
-            <ul class="flex-list buttons">
+        <section class="content">
+            <ul class="flex-list flex-wrap buttons">
                 {% if badgesEnabled %}
-                    <li><a :href="buildAwardAchievementUrl()" :class="{disabled: selectedStudentIds.length === 0}">Award Achievement</a></li>
-                    <li><a :href="buildSetGoalUrl()" :class="{disabled: selectedStudentIds.length === 0}">Set Goal(s)</a></li>
+                    <li><a :href="buildAwardAchievementUrl()" :class="{disabled: selectedStudentIds.length === 0, 'icon-achievement': true}">Award Achievement</a></li>
+                    <li><a :href="buildSetGoalUrl()" :class="{disabled: selectedStudentIds.length === 0, 'icon-goal': true}">Set Goal(s)</a></li>
                 {% endif %}
                 {% if pastoralEnabled %}
                     <li><a @click.prevent="addPastoralRecord"
-                           :class="{disabled: selectedStudentIds.length === 0}">Add {{ locale.pastoralCare.proper }} Record</a></li>
+                           :class="{disabled: selectedStudentIds.length === 0, 'icon-user': true}">Add {{ locale.pastoralCare.proper }} Record</a></li>
                 {% endif %}
                 {% if learningMomentsEnabled %}
                     <li><a @click.prevent="openShareLearningMomentDialog"
-                           :class="{disabled: selectedStudentIds.length === 0}">Share Learning Moment</a></li>
+                           :class="{disabled: selectedStudentIds.length === 0, 'icon-share': true}">Share Learning Moment</a></li>
                 {% endif %}
                 {% if mailEnabled %}
-                    <li><a href="#" class="disabled">Email</a></li>
+                    <li><a href="#" class="disabled icon-email">Email</a></li>
                 {% endif %}
             </ul>
-
+        </section>
         <template v-if="showSkeletonLoader" v-for="n in 3">
             <div class="list-item">
                 <div class="small-12 card skeleton">

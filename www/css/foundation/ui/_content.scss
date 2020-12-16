@@ -332,6 +332,11 @@ $container-bg: white !default;
 
 @include selection;
 
+// if an image has no src, hide it.
+img[src=""] {
+  display: none;
+}
+
 .align-bottom {
     vertical-align: bottom;
 }
@@ -353,9 +358,12 @@ $container-bg: white !default;
 
     [class^="icon-"],
     [class*=" icon-"]{
-        @extend .size-32;
+        @extend .size-48;
         color: $aluminum;
-        &:before{ padding: 0; }
+        margin-bottom: .5rem;
+        display: block;
+
+        &:before { padding: 0; }
     }
     img{
         margin-bottom: 1rem;
@@ -365,6 +373,7 @@ $container-bg: white !default;
         color: $aluminum;
     }
     p,a{
+        font-size: 0.875rem;
         font-weight: 400;
         margin-bottom: 0;
     }

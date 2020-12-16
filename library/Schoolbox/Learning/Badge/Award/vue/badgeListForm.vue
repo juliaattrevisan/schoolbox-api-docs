@@ -194,7 +194,7 @@ export default {
         <reveal-modal ref="awardModal" size="large">
             <h2>{{ confirmModalHeader }}</h2>
             <p class="meta">{{ confirmModalMeta }}</p>
-            <ul class="grid medium-block-grid-2 large-block-grid-4">
+            <ul class="grid achievements-grid medium-block-grid-2 large-block-grid-4">
                 <li v-for="badge in selectedBadges">
                     <div class="compact card small-12 badge-card">
                         <div>
@@ -204,13 +204,15 @@ export default {
                     </div>
                 </li>
             </ul>
-
+            <hr />
             <p class="meta">To the following user(s):</p>
-            <ul class="grid medium-block-grid-2 large-block-grid-4">
+            <ul class="grid achievements-grid medium-block-grid-2 large-block-grid-4">
                 <li v-for="user in users">
                     <div class="card small-12 compact">
-                        <img :src="user._links.avatar" :alt="user.fullName">
-                        <p>{{ user.fullName }}</p>
+                        <div>
+                            <img :src="user._links.avatar" :alt="user.fullName">
+                            <p>{{ user.fullName }}</p>
+                        </div>
                     </div>
                 </li>
             </ul>

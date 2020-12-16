@@ -99,6 +99,11 @@
     font-family: $font-family-icon;
 }
 
+.icon-badge:before {
+    content: "\e91d";
+    font-family: $font-family-icon;
+}
+
 .icon-boarder-leave:before {
     content: '\e607';
     font-family: $font-family-icon;
@@ -671,6 +676,7 @@
     font-family: $font-family-icon;
 }
 
+.icon-achievement:before,
 .icon-showcase:before,
 .icon-trophy:before {
     content: '\e662';
@@ -842,6 +848,11 @@
 
 .icon-wiki:before {
     content: '\e678';
+    font-family: $font-family-icon;
+}
+
+.icon-withdraw-achievement:before {
+    content: "\e91c";
     font-family: $font-family-icon;
 }
 

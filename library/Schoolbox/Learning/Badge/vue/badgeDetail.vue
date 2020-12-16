@@ -37,13 +37,17 @@ export default {
         <badge-image :badge="badge" class="badge-img-container"></badge-image>
         <h2>{{ badge.name }}</h2>
         <p class="meta" v-if="badge.category">Category: {{ badge.category.name }}</p>
-        <p class="meta" v-if="badge.curriculumNodes.length">
-            Curriculum Codes:
-            <template v-for="(curriculumNode, index) in curriculumNodesWithCode">
-                <span :title="curriculumNode.name">{{ curriculumNode.code }}</span><template v-if="(index + 1) < curriculumNodesWithCode.length">, </template>
-            </template>
-        </p>
         <p class="meta" v-if="badgeTagNames.length > 0">Tags: {{ badgeTagNames }}</p>
         <article v-html="badge.body"></article>
+        <div v-if="badge.curriculumNodes.length">
+            <hr />
+
+            <p class="meta">
+                Curriculum Codes:
+                <template v-for="(curriculumNode, index) in curriculumNodesWithCode">
+                    <span :title="curriculumNode.name">{{ curriculumNode.code }}</span><template v-if="(index + 1) < curriculumNodesWithCode.length">, </template>
+                </template>
+            </p>
+        </div>
     </div>
 </template>

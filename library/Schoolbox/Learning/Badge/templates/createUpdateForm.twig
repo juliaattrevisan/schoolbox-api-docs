@@ -113,7 +113,7 @@
                             </div>
                             <div class="small-12 medium-6 columns" data-icon-container>
                                 <div data-icon-selection>
-                                    <img src="{{ badge and badge.icon ? badge.icon : '' }}" width="64" height="64" />
+                                    <img src="{{ badge and badge.icon ? badge.icon : '' }}" width="128" height="128" />
                                     <input id="badge-icon" name="icon" type="hidden" value="{{ badge and badge.icon ? badge.icon : '' }}" />
                                 </div>
                                 <div>
@@ -124,6 +124,7 @@
                                 </div>
                             </div>
                             <div class="small-12 medium-6 columns" style="display:none;" data-image-container>
+                                <p class="meta">Badge images are recommended to be SVG or a minimum of 250x250</p>
                                 {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
                             </div>
                         </div>
@@ -135,7 +136,7 @@
                             Category
                         </label>
                         <select name="category" id="badge-category" required>
-                            <option disabled selected>-- select a category --</option>
+                            <option disabled selected>-- Select a category --</option>
                             {% for category in categories %}
                                 {% set selected = '' %}
 

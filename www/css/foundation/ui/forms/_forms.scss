@@ -657,9 +657,11 @@ ul.filters {
       &.btn {
         border: 0;
         flex: 2 auto;
+        max-width: rem-calc(300);
 
         @media #{$medium-down} {
           flex: 0 0 100%;
+          max-width: none;
         }
       }
 
@@ -928,6 +930,11 @@ fieldset {
 	min-width: 0;
 }
 
+.class-list {
+  section {
+    margin-bottom: 2px;
+  }
+}
 .class-list-form {
 	margin-bottom: 0;
 

@@ -125,6 +125,9 @@
       max-height: rem-calc(500);
     }
   }
+  .tags {
+    margin-bottom: 1rem;
+  }
 }
 
 .feed-comments {
@@ -160,6 +163,20 @@
   }
   .information-list {
     margin-top: 1rem;
+  }
+}
+
+.feed-load-more {
+  background-color: $white;
+  width: 100%;
+  border-top: 2px solid #EDEDED;
+
+  > div {
+    max-width: 45rem;
+    margin: 0 auto;
+  }
+  button {
+    margin: 1rem 0;
   }
 }
 
