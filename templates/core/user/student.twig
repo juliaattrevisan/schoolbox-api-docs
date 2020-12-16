@@ -561,7 +561,7 @@
                         <div class="small-12 columns">
                         <h2 class="subheader">{{ group }}</h2>
                         <section class="v-card-list">
-                            {% for subject in subjectGroup %}
+                            {% for subjectKey, subject in subjectGroup %}
                             <div class="v-card small-12">
                                 <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
                                     <div class="card-class-image"
@@ -598,12 +598,12 @@
                                     </div>
                                     {% block folderListItemActions %}{% endblock %}
                                     <nav>
-                                        <a class="icon-more" data-dropdown="class-options" title="Actions"></a>
+                                        <a class="icon-more" data-dropdown="class-options-{{ subjectKey }}" title="Actions"></a>
                                     </nav>
                                     {% for teacher in subject.teachers %}
                                         {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
                                         {% set teacherEmails = teacherEmails|merge([email]) %}
-                                        <ul id="class-options" class="f-dropdown" data-dropdown-content>
+                                        <ul id="class-options-{{ subjectKey }}" class="f-dropdown" data-dropdown-content>
                                             <li>
                                                 {% if not teacher.email is empty %}
                                                     {% set replyTo = teacher.getFormattedEmailDisplay %}
@@ -648,7 +648,7 @@
                         <div class="small-12 columns">
                             <h2 class="subheader">Groups</h2>
                             <section class="v-card-list">
-                                {% for group in groups %}
+                                {% for groupKey, group in groups %}
                                     <div class="v-card small-12">
                                         <a href="/homepage/{{ group.id }}">
                                             {#                                        <div class="card-class-image" style="background-color:{{ group.colour }}; border-bottom: 10px solid {{ group.colour }};{%  if group.coverImage %} background-image: url('/storage/image.php?hash={{ group.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>#}
@@ -671,11 +671,11 @@
                                                 {% endif %}
                                             </div>
                                             <nav>
-                                                <a class="icon-more" data-dropdown="group-options" title="Actions"></a>
+                                                <a class="icon-more" data-dropdown="group-options-{{ groupKey }}" title="Actions"></a>
                                             </nav>
                                             {% if group.owners is defined %}
                                                 {% for owner in group.owners %}
-                                                    <ul id="group-options" class="f-dropdown" data-dropdown-content>
+                                                    <ul id="group-options-{{ groupKey }}" class="f-dropdown" data-dropdown-content>
                                                         <li>
                                                             {% if not owner.email is empty %}
                                                                 {% set replyTo = owner.getFormattedEmailDisplay %}
