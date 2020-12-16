@@ -522,7 +522,7 @@
                             routes: {
                                 getAwardFeed: '{{ routeLookupIfAuthorized(
                                     'learningBadgeAward.getAwardedBadges',
-                                    {user: user, userId: user.id}
+                                    {user: user, userId: user.id, awardStatus: 'achievement'}
                                 ) }}'
                             },
                         };
@@ -539,7 +539,7 @@
                             routes: {
                                 getAwardFeed: '{{ routeLookupIfAuthorized(
                                     'learningBadgeAward.getAwardedBadges',
-                                    {user: user, userId: user.id}
+                                    {user: user, userId: user.id, awardStatus: 'goal'}
                                 ) }}'
                             },
                         };
