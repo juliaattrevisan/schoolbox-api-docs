@@ -46,7 +46,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '',
             'getBadges',
-            new Rule\IsLoggedIn()
+            $baseRule
         );
 
         /* The form that people use to Create a Badge
