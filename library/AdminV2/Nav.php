@@ -56,6 +56,8 @@ class AdminV2_Nav
             'filters'                  => ['name' => 'Filters',                     'visible' => true],
             'feature-tours'            => ['name' => 'Feature Tours',               'visible' => true],
             'restore'                  => ['name' => 'Restore',                     'visible' => true],
+            'package'                 => ['name' => 'Packages',                    'visible' => true],
+
 
         ];
     }

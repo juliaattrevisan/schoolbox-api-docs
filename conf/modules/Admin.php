@@ -70,6 +70,9 @@ class Admin implements ModuleConfigInterface
         // SHAPS
         (new \Schoolbox\Admin\SHAPS\Module($di))->init('/adminv2/shaps');
 
+        // Package Installer
+        (new \Schoolbox\Admin\Package\Module($di))->init('/adminv2/package');
+
         // Custom Terminology
         (new \Schoolbox\Admin\Terminology\Module($di))->init('/adminv2/terminology');
 
