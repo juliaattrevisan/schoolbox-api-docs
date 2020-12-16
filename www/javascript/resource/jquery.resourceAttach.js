@@ -486,23 +486,35 @@
             let source = $(this).attr('data-source');
             let panel = $('#' + source + '-panel');
 
-            let url = $(this).attr('data-url');
-            let method = $(this).attr('data-method');
+            /* Decide if source was already load previously;
+             * If it wasn't previously loaded, do so asynchronously
+             * Otherwise just show the tab
+             */
+            if (!filesystems.data(source)) {
 
-            /* Use the $method var to decide whether this is inline content
-            * such as all our internal file upload dropzone options, recorder
-            * my files, resources, etc.
-            *
-            * or whether it should be loaded into an iframe, such as with third
-            * parties like ms teams, goggle drive, office 365 etc.
-            *
-            * Inline content starts with a preloader class which should be removed
-            * once content has loaded
-            */
-            if (method === 'inline') {
-                panel.load(url, null);
-            } else if (method === 'iframe') {
-                panel.html($('<iframe/>').attr('src', url).height(MAX_IFRAME_HEIGHT));
+                /* Remember we loaded this source previously
+                 */
+                filesystems.data(source, {loaded: true});
+
+                let url = $(this).attr('data-url');
+                let method = $(this).attr('data-method');
+
+                /* Use the $method var to decide whether this is inline content
+                * such as all our internal file upload dropzone options, recorder
+                * my files, resources, etc.
+                *
+                * or whether it should be loaded into an iframe, such as with third
+                * parties like ms teams, goggle drive, office 365 etc.
+                *
+                * Inline content starts with a preloader class which should be removed
+                * once content has loaded
+                */
+                if (method === 'inline') {
+                    panel.load(url, null);
+                } else if (method === 'iframe') {
+                    panel.html($('<iframe/>').attr('src', url).height(MAX_IFRAME_HEIGHT));
+                }
+
             }
 
         });
