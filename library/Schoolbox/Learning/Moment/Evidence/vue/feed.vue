@@ -324,24 +324,15 @@ export default {
             </ul>
         </div>
         <div v-else>
-<!--            <div v-if="metadata.count === 0" class="empty-state">-->
-<!--                <i class="icon-advanced-list"></i>-->
-<!--                <p>There is no activity yet.</p>-->
-<!--            </div>-->
-<!--            <div class="feed-load-more" v-else-if="metadata.cursor.next && metadata.count > data.length">-->
-<!--                <button class="load-more expand" @click.prevent="append(metadata.cursor.next)">-->
-<!--                    Load more-->
-<!--                </button>-->
-<!--            </div>-->
-          <div class="empty-state">
-            <i class="icon-advanced-list"></i>
-            <p>There is no activity yet.</p>
-          </div>
-          <div class="feed-load-more content">
-            <button class="load-more expand" @click.prevent="append(metadata.cursor.next)" title="Load more">
-              Load more
-            </button>
-          </div>
+            <div v-if="metadata.count === 0" class="empty-state">
+                <i class="icon-advanced-list"></i>
+                <p>There is no activity yet.</p>
+            </div>
+            <div class="feed-load-more" v-else-if="metadata.cursor.next && metadata.count > data.length">
+                <button class="load-more expand" @click.prevent="append(metadata.cursor.next)" title="Load more">
+                    Load more
+                </button>
+            </div>
         </div>
 
         <!-- TODO create a Vue equivalent of $.confirmDialog -->
