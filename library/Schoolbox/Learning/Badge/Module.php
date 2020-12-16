@@ -40,12 +40,20 @@ class Module extends BaseModule
             ),
         );
 
-        /* Get a list of badges that are available in the instance
+        /* Get a JSON feed of badges that are available in the instance
          */
         $this->register(
             self::METHOD_GET,
             '',
             'getBadges',
+            new Rule\IsLoggedIn()
+        );
+
+        // HTML view of a list of badges
+        $this->register(
+            self::METHOD_GET,
+            '/list',
+            'getBadgeListPage',
             $baseRule
         );
 

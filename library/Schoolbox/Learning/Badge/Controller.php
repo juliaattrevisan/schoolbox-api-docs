@@ -106,11 +106,7 @@ class Controller extends Base
 
 
     /**
-     * Retrieve a list of badges.
-     *
-     * Depending on request type, this will fetch either a JSON or HTML result:
-     * The HTML result will only contain a Vue component, the JSON will contain
-     * the actual results.
+     * Retrieve a list of badges as a JSON feed.
      *
      * @api   GET /learning/badge/
      * @since 20.2
@@ -188,6 +184,36 @@ class Controller extends Base
             )
         );
     }
+
+
+    /**
+     * View the list of badges as a HTML page.
+     *
+     * This page will contain a Vue  component, which loads the badge JSON feed.
+     *
+     * @api   GET /learning/badge/list/
+     * @since 20.2
+     */
+    public function getBadgeListPage(): void
+    {
+        $filterPanel = $this->filterFactoryFactory->buildPanel(
+            $this->getUser(),
+            Filter\Page\Model::PAGE_BADGE_LIST,
+            null,
+            $this->getUser(),
+            [],
+            $this->request->query->getArrayCopy(),
+        );
+
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningBadge/index.twig',
+                ['filterPanel' => $filterPanel,],
+                'Badges'
+            )
+        );
+    }
+
 
 
     /**
