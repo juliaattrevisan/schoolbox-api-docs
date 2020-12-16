@@ -246,10 +246,13 @@ function renderStudent(
         $subjects[$group][] = $subject;
     }
 
-    // Load the list of groups, and their owner.
-    $groups = $groupHandler->involvedInCategoryList($user['uid'], false, UserAccess::ACCESS_READ, true);
+    // Load the list of groups, and their owner and folder.
+    $groups         = $groupHandler->involvedInCategoryList($user['uid'], false, UserAccess::ACCESS_READ, true);
+    $groupFolderIds = array_column($groups, 'id');
+    $groupFolders   = $folderMapper->findByColumn('id', $groupFolderIds)->indexBy('id');
     foreach ($groups as &$group) {
-        $group['perms'] = $groupHandler->getPermission($group['id']);
+        $group['perms']  = $groupHandler->getPermission($group['id']);
+        $group['folder'] = $groupFolders[$group['id']] ?? null;
 
         $owners = $groupHandler->getOwner($group['id']);
         if (is_array($owners)) {
