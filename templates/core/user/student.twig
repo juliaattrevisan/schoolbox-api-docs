@@ -565,8 +565,12 @@
                             <div class="v-card small-12">
                                 <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
                                     <div class="card-class-image"
-                                         style="background-color:{{ subject.folder.colour }};
-                                                border-bottom: 10px solid {{ subject.folder.colour }};
+                                         style="border-bottom-width: 10px;
+                                                border-bottom-style: solid;
+                                                {% if subject.folder.colour %}
+                                                background-color:{{ subject.folder.colour }};
+                                                border-bottom-color: {{ subject.folder.colour }};
+                                                {% endif %}
                                                 {% if subject.folder.coverImage %}
                                                 background-image: url('/storage/image.php?hash={{ subject.folder.coverImage.hash }}&size=cardImageLarge');
                                                 background-size: cover;
