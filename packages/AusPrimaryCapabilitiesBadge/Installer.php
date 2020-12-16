@@ -20,7 +20,7 @@ class Installer implements IPackageInstall
     public function install(User $user): void
     {
         if (!(is_file(__DIR__ . '/' . self::SOURCE_FILE) && is_readable(__DIR__ . '/' . self::SOURCE_FILE))) {
-            throw new RuntimeException('Package source file not found: ' . __DIR__ . '/' . self::SOURCE_FILE);
+            throw new \RuntimeException('Package source file not found: ' . __DIR__ . '/' . self::SOURCE_FILE);
         }
 
         $csv = new CsvReader(__DIR__ . '/' . self::SOURCE_FILE);
@@ -42,7 +42,7 @@ class Installer implements IPackageInstall
             foreach ($curriculumCodes as $code) {
                 try {
                     $nodeCollection->add($nodeMapper->findOneByColumn('code', $code));
-                } catch (Exception $e) {
+                } catch (\Schoolbox\Mapper\Exception $e) {
                     throw $e;
                 }
             }
