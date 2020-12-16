@@ -310,7 +310,7 @@ export default {
 
                 <!-- If there are no badges in the system at all -->
                 <i class="icon-badge"></i>
-                <p>No badges have been created. Start by <a href="#" title="Create the first Badge">creating the first badge</a>.</p>
+                <p>No badges have been created. Start by <a href="#" title="Create the first badge">creating the first badge</a>.</p>
             </div>
             <template v-else>
                 <section class="content">
