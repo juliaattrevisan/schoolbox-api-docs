@@ -9,6 +9,14 @@
       border: 0;
     }
   }
+  /* Achievements feed via the Achievements tab on student profile
+   * Also, the Goals feed via the Goals tab on student profile
+   */
+  #achievements, #goals {
+    .awards > div {
+      border-bottom: 2px solid #EDEDED;
+    }
+  }
   #classes,
   #groups {
     .v-card {
