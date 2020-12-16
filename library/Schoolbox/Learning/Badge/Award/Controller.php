@@ -382,21 +382,27 @@ class Controller extends Base
      *
      * @api   POST /learning/badge/award/{badgeId}/achievement
      * @since 20.2
-     *
      * @param Model $badge
      * @throws MapperException if somehow the save fails
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function setAsGoalForSelf(Model $badge): void
     {
+        $histories = $this->mapper->findHistories([$this->getUser()->getId()], $badge);
+        $history = $histories[$this->getUser()->getId()];
+
         $award = $this->mapper->createModel()
-                              ->setRecipient($this->getUser())
-                              ->setBadge($badge)
-                              ->setStatus(AwardModel::AWARD_STATUS_GOAL)
-                              ->setAwardedBy($this->getUser())
-                              ->setAwardedAt(Alaress_Date_Format::now());
-        $this->mapper->save($award);
+            ->setRecipient($this->getUser())
+            ->setBadge($badge)
+            ->setStatus(AwardModel::AWARD_STATUS_GOAL)
+            ->setAwardedBy($this->getUser())
+            ->setAwardedAt(Alaress_Date_Format::now());
+
+        (new Transactor($history, $this->mapper))->award($award);
 
         $translator = $this->buildBadgeAwardModelToArrayTranslator();
+
         $this->response->content->set(
             $this->buildJsonOutput($translator($award))
         );
