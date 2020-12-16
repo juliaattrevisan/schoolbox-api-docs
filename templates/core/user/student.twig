@@ -680,7 +680,16 @@
                                                 {% endif %}
                                             </div>
                                         </a>
-                                        <div class="card-content classes groups actions-small-1">
+
+                                        {% set hasOwnersWithEmail = false %}
+                                        {% if group.owners is defined %}
+                                            {% for owner in group.owners %}
+                                                {% if not owner.email is empty %}
+                                                    {% set hasOwnersWithEmail = true %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                        <div class="card-content classes groups actions-small-{{ hasOwnersWithEmail ? '1' : '0' }}">
                                             <div class="list-item">
                                                 {% if group.perms > 0 %}
                                                     <a href="/homepage/{{ group.id }}">
@@ -690,20 +699,20 @@
                                                     <h3>{{ group.name }}</h3>
                                                 {% endif %}
                                             </div>
-                                            <nav>
-                                                <a class="icon-more" data-dropdown="group-options-{{ groupKey }}" title="Actions"></a>
-                                            </nav>
-                                            {% if group.owners is defined %}
-                                                {% for owner in group.owners %}
-                                                    <ul id="group-options-{{ groupKey }}" class="f-dropdown" data-dropdown-content>
+                                            {% if hasOwnersWithEmail %}
+                                                <nav>
+                                                    <a class="icon-more" data-dropdown="group-options-{{ groupKey }}" title="Actions"></a>
+                                                </nav>
+                                                <ul id="group-options-{{ groupKey }}" class="f-dropdown" data-dropdown-content>
+                                                    {% for owner in group.owners %}
+                                                        {% if not owner.email is empty %}
                                                         <li>
-                                                            {% if not owner.email is empty %}
-                                                                {% set replyTo = owner.getFormattedEmailDisplay %}
-                                                                <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ replyTo }}</a>
-                                                            {% endif %}
+                                                            {% set replyTo = owner.getFormattedEmailDisplay %}
+                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ replyTo }}</a>
                                                         </li>
-                                                    </ul>
-                                                {% endfor %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </ul>
                                             {% endif %}
                                         </div>
                                     </div>
