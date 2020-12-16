@@ -18,8 +18,8 @@ Data:
         <section class="content">
             <ul class="flex-list flex-wrap buttons">
                 {% if badgesEnabled %}
-                    <li><a :href="buildAwardAchievementUrl()" :class="{disabled: selectedStudentIds.length === 0, 'icon-achievement': true}">Award Achievement</a></li>
-                    <li><a :href="buildSetGoalUrl()" :class="{disabled: selectedStudentIds.length === 0, 'icon-goal': true}">Set Goal(s)</a></li>
+                    <li><a :href="buildAwardAchievementUrl()" :class="{disabled: selectedStudentIds.length === 0, 'icon-achievement': true}">Award Achievements</a></li>
+                    <li><a :href="buildSetGoalUrl()" :class="{disabled: selectedStudentIds.length === 0, 'icon-goal': true}">Set Goals</a></li>
                 {% endif %}
                 {% if pastoralEnabled %}
                     <li><a @click.prevent="addPastoralRecord"
