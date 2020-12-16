@@ -328,7 +328,7 @@ export default {
                 <i class="icon-advanced-list"></i>
                 <p>There is no activity yet.</p>
             </div>
-            <div class="feed-load-more" v-else-if="metadata.cursor.next && metadata.count > data.length">
+            <div class="feed-load-more content" v-else-if="metadata.cursor.next && metadata.count > data.length">
                 <button class="load-more expand" @click.prevent="append(metadata.cursor.next)" title="Load more">
                     Load more
                 </button>

@@ -308,45 +308,47 @@ export default {
                 <p>No Badges have been created.</p>
             </div>
             <template v-else>
-                <section class="content badge-grid v-card-list">
-                    <div class="badge v-card" v-for="badge in data" :key="badge.id">
-                        <!-- I'd apply the click to the entire <li> but that intercepts dropdown clicks -->
-                        <div class="card-feature-image">
-                            <a @click.prevent="openDetailModal(badge)" :title="badge.name">
-                                <badge-image :badge="badge"></badge-image>
-                            </a>
-                        </div>
-                        <div :class="{'': !showBadgeMenus, 'actions-small-1': showBadgeMenus,'checkbox-content': !showBadgeMenus, 'card-content': true}">
-                            <div class="list-item">
-                                <template v-if="allowSelection">
-                                    <input type="checkbox"
-                                           :id="'selectBadge-' + String(badge.id)"
-                                           v-model="badge.selected"
-                                           @change="emitChange"
-                                    >
-                                    <label :for="'selectBadge-' + String(badge.id)" class="checkbox-label">
-                                        {{ badge.name }}
-                                    </label>
-                                </template>
-                                <h3 v-else>
-                                    <a @click.prevent="openDetailModal(badge)" :title="badge.name">{{ badge.name }}</a>
-                                </h3>
+                <section class="content">
+                    <div class="badge-grid v-card-list">
+                        <div class="badge v-card" v-for="badge in data" :key="badge.id">
+                            <!-- I'd apply the click to the entire <li> but that intercepts dropdown clicks -->
+                            <div class="card-feature-image">
+                                <a @click.prevent="openDetailModal(badge)" :title="badge.name">
+                                    <badge-image :badge="badge"></badge-image>
+                                </a>
                             </div>
-                            <nav v-if="showBadgeMenus">
-                              <a href="#"
-                                 class="icon-overflow"
-                                 :data-dropdown="'badge-' + String(badge.id) + '-dropdown'"
-                                 aria-expanded="false" title="Actions"></a>
-                            </nav>
-                            <ul v-if="showBadgeMenus" :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-achievement" title="Award achievement">Award achievement</a></li>
-                                <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set goal">Set goal</a></li>
-                                <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-withdraw-achievement" title="Withdraw achievement">Withdraw achievement</a></li>
-                                <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-close" title="Remove goal">Remove goal</a></li>
-                                <li><a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a></li>
-                              <li><a @click.prevent="openDeleteModal(badge)" class="icon-delete">Delete</a></li>
-                            </ul>
-                            <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">{{ badge.category.name }}</p>
+                            <div :class="{'': !showBadgeMenus, 'actions-small-1': showBadgeMenus,'checkbox-content': !showBadgeMenus, 'card-content': true}">
+                                <div class="list-item">
+                                    <template v-if="allowSelection">
+                                        <input type="checkbox"
+                                               :id="'selectBadge-' + String(badge.id)"
+                                               v-model="badge.selected"
+                                               @change="emitChange"
+                                        >
+                                        <label :for="'selectBadge-' + String(badge.id)" class="checkbox-label">
+                                            {{ badge.name }}
+                                        </label>
+                                    </template>
+                                    <h3 v-else>
+                                        <a @click.prevent="openDetailModal(badge)" :title="badge.name">{{ badge.name }}</a>
+                                    </h3>
+                                </div>
+                                <nav v-if="showBadgeMenus">
+                                  <a href="#"
+                                     class="icon-overflow"
+                                     :data-dropdown="'badge-' + String(badge.id) + '-dropdown'"
+                                     aria-expanded="false" title="Actions"></a>
+                                </nav>
+                                <ul v-if="showBadgeMenus" :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
+                                    <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-achievement" title="Award achievement">Award achievement</a></li>
+                                    <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set goal">Set goal</a></li>
+                                    <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-withdraw-achievement" title="Withdraw achievement">Withdraw achievement</a></li>
+                                    <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-close" title="Remove goal">Remove goal</a></li>
+                                    <li><a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a></li>
+                                  <li><a @click.prevent="openDeleteModal(badge)" class="icon-delete">Delete</a></li>
+                                </ul>
+                                <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">{{ badge.category.name }}</p>
+                            </div>
                         </div>
                     </div>
 
