@@ -583,7 +583,13 @@
                                         {% endfor %}
                                     </div>
                                 </a>
-                                <div class="card-content classes actions-small-1 {% block folderListItemClasses %}{% endblock %}">
+                                {% set hasTeachersWithEmail = false %}
+                                {% for teacher in subject.teachers %}
+                                    {% if not teacher.email is empty %}
+                                        {% set hasTeachersWithEmail = true %}
+                                    {% endif %}
+                                {% endfor %}
+                                <div class="card-content classes actions-small-{{ hasTeachersWithEmail ? '1' : '0'}} {% block folderListItemClasses %}{% endblock %}">
                                     <div class="list-item">
                                         {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
                                         {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
@@ -597,21 +603,23 @@
                                         {% endif %}
                                     </div>
                                     {% block folderListItemActions %}{% endblock %}
-                                    <nav>
-                                        <a class="icon-more" data-dropdown="class-options-{{ subjectKey }}" title="Actions"></a>
-                                    </nav>
-                                    {% for teacher in subject.teachers %}
-                                        {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
-                                        {% set teacherEmails = teacherEmails|merge([email]) %}
+                                    {% if hasTeachersWithEmail %}
+                                        <nav>
+                                            <a class="icon-more" data-dropdown="class-options-{{ subjectKey }}" title="Actions"></a>
+                                        </nav>
                                         <ul id="class-options-{{ subjectKey }}" class="f-dropdown" data-dropdown-content>
-                                            <li>
+                                            {% for teacher in subject.teachers %}
                                                 {% if not teacher.email is empty %}
-                                                    {% set replyTo = teacher.getFormattedEmailDisplay %}
-                                                    <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ replyTo }}</a>
+                                                    {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
+                                                    {% set teacherEmails = teacherEmails|merge([email]) %}
+                                                    <li>
+                                                        {% set replyTo = teacher.getFormattedEmailDisplay %}
+                                                        <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ replyTo }}</a>
+                                                    </li>
                                                 {% endif %}
-                                            </li>
+                                            {% endfor %}
                                         </ul>
-                                    {% endfor %}
+                                    {% endif %}
                                 </div>
                             </div>
                             {% endfor %}
