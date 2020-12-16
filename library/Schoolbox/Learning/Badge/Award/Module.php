@@ -55,7 +55,7 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_GET,
-            '/{userId}/awarded',
+            '/{userId}/awarded/{awardStatus}',
             'getAwardedBadges',
             $viewAwardedBadges,
             Closure::fromCallable([$this, 'preloadUser']),

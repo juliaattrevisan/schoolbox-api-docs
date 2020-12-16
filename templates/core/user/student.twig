@@ -56,7 +56,7 @@
 {% set showTitle = user.hasPositionTitle() %}
 
 {% set showActivityFeed = (isStaff or isSelf or isParentOfStudent) %}
-{% set showAchievementsTab = config.badges_enabled %}
+{% set showAchievementsTab = config.badges_enabled and (isStaff or isSelf or isParentOfStudent) %}
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
     {
@@ -458,6 +458,7 @@
                 switch (window.location.hash) {
                     case '#activity':
                     case '#achievements':
+                    case '#goals':
                     case '#classes':
                     case '#contacts':
                         $('[data-tab] a[href='+window.location.hash+']').trigger('click');
@@ -475,6 +476,7 @@
             {% endif %}
             {% if showAchievementsTab %}
             <dd class="{% if not showActivityFeed %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
+            <dd><a href="#goals">Goals</a></dd>
             {% endif %}
             {% if showClasses %}
             <dd><a href="#classes">Groups &amp; Classes</a></dd>
@@ -513,18 +515,35 @@
             <div class="content no-pad" id="achievements">
                 {% autoescape 'js' %}
                     <script type="text/javascript">
-                        window.learningBadgeAwardFeedConfig = {
+                        window.learningBadgeAchievementFeedConfig = {
                             routes: {
                                 getAwardFeed: '{{ routeLookupIfAuthorized(
                                     'learningBadgeAward.getAwardedBadges',
-                                    {user: user, userId: user.id}
+                                    {user: user, userId: user.id, awardStatus: 'achievement'}
                                 ) }}'
                             },
                         };
                     </script>
                 {% endautoescape %}
-                <div id="award-feed"></div>
-                <script type="text/javascript" src="/javascript/components/badgeAwardFeed.bundle.js"></script>
+                <div id="achievement-feed"></div>
+                <script type="text/javascript" src="/javascript/components/badgeAchievementFeed.bundle.js"></script>
+            </div>
+
+            <div class="content no-pad" id="goals">
+                {% autoescape 'js' %}
+                    <script type="text/javascript">
+                        window.learningBadgeGoalFeedConfig = {
+                            routes: {
+                                getAwardFeed: '{{ routeLookupIfAuthorized(
+                                    'learningBadgeAward.getAwardedBadges',
+                                    {user: user, userId: user.id, awardStatus: 'goal'}
+                                ) }}'
+                            },
+                        };
+                    </script>
+                {% endautoescape %}
+                <div id="goal-feed"></div>
+                <script type="text/javascript" src="/javascript/components/badgeGoalFeed.bundle.js"></script>
             </div>
 
             {% if showClasses %}

@@ -8,7 +8,6 @@ import foundationMixin from '@schoolbox/foundation-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import toastMixin from '@schoolbox/toast-mixin';
-import qs from "qs";
 
 export default {
 
@@ -17,7 +16,7 @@ export default {
      * The name of the component that we have here. This name will be used in the container
      * to spawn this component.
      */
-    name: "award-feed",
+    name: "achievement-feed",
 
     /**
      * Mixins.
@@ -79,7 +78,7 @@ export default {
      * Access the results of a function as if they were a property of an object.
      */
     computed: {
-        config: () => window.learningBadgeAwardFeedConfig
+        config: () => window.learningBadgeAchievementFeedConfig
     },
 
     /**

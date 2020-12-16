@@ -231,9 +231,9 @@ class Controller extends Base
      * @throws MapperException
      * @throws \UnexpectedValueException
      */
-    public function getAwardedBadges(User $user): void
+    public function getAwardedBadges(User $user, string $awardStatus): void
     {
-        $awards = $this->mapper->findRecentForUser($user);
+        $awards = $this->mapper->findRecentForUser($user, $awardStatus);
 
         $stack = [];
 
@@ -245,6 +245,7 @@ class Controller extends Base
         /* Group by category
          */
         foreach ($awards as $award) {
+
             /* Force string indexes, otherwise the numeric values get inserted in-order
              * which isn't intended here; they are already in a particular order
              */

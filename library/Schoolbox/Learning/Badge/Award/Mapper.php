@@ -150,17 +150,27 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Find awarded badges in the last year (the most recent rolling 12 months)
      *
-     * @param User $user
+     * @param User   $user
+     * @param string $awardStatus
      * @return GenericCollection
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function findRecentForUser(User $user): GenericCollection
+    public function findRecentForUser(User $user, string $awardStatus): GenericCollection
     {
+        /* Ensure $awardStatus is one we allow; empty collection returned if invalid
+         */
+        if (!in_array($awardStatus, [ Model::AWARD_STATUS_GOAL, Model::AWARD_STATUS_ACHIEVEMENT ], true)) {
+            return $this->createCollection();
+        }
+
+        /* Otherwise get the $awardStatus records
+         */
         $from = \Alaress_Date_Format::now()->addYears(-1);
         $to = \Alaress_Date_Format::now();
 
         $pb = $this->getPredicateBuilder()
             ->equals('recipient_id', $user->getId())
+            ->equals('status', $awardStatus)
             ->isNull('award_id')
             ->betweenDates('awarded_at', $from, $to);
 
