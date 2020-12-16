@@ -80,52 +80,100 @@ export default {
         },
 
         /**
-         * Toast activation message
+         * Toast activation message (when only one badge is selected)
          */
-        toastActivateMessage: {
+        toastActivateMessageSingular: {
             type: String,
             default: 'Awarding achievement...',
         },
 
         /**
-         * Toast success message
+         * Toast success message (when only one badge is selected)
          */
-        toastSuccessMessage: {
+        toastSuccessMessageSingular: {
             type: String,
             default: 'Awarded achievement',
         },
 
         /**
-         * Toast failure message
+         * Toast failure message (when only one badge is selected)
          */
-        toastFailureMessage: {
+        toastFailureMessageSingular: {
             type: String,
             default: 'Awarding achievement failed',
         },
 
         /**
-         * Confirm modal's header
+         * Confirm modal's header (when only one badge is selected)
          */
-        confirmModalHeader: {
+        confirmModalHeaderSingular: {
             type: String,
-            default: 'Confirm achievement(s)',
+            default: 'Confirm achievement',
         },
 
         /**
-         * Confirm modal's meta
+         * Confirm modal's meta (when only one badge is selected)
          */
-        confirmModalMeta: {
+        confirmModalMetaSingular: {
             type: String,
-            default: 'Awarding the following achievement(s):',
+            default: 'Awarding the following achievement:',
         },
 
         /**
-         * Confirm button's text
+         * Confirm button's text (when only one badge is selected)
          */
-        confirmButtonText: {
+        confirmButtonTextSingular: {
             type: String,
-            default: 'Award selected achievement(s)',
-        }
+            default: 'Award selected achievement',
+        },
+
+        /**
+         * Toast activation message (when more than one badge is selected)
+         */
+        toastActivateMessagePlural: {
+            type: String,
+            default: 'Awarding achievements...',
+        },
+
+        /**
+         * Toast success message (when more than one badge is selected)
+         */
+        toastSuccessMessagePlural: {
+            type: String,
+            default: 'Awarded achievements',
+        },
+
+        /**
+         * Toast failure message (when more than one badge is selected)
+         */
+        toastFailureMessagePlural: {
+            type: String,
+            default: 'Awarding achievements failed',
+        },
+
+        /**
+         * Confirm modal's header (when more than one badge is selected)
+         */
+        confirmModalHeaderPlural: {
+            type: String,
+            default: 'Confirm achievements',
+        },
+
+        /**
+         * Confirm modal's meta (when more than one badge is selected)
+         */
+        confirmModalMetaPlural: {
+            type: String,
+            default: 'Awarding the following achievements:',
+        },
+
+        /**
+         * Confirm button's text (when more than one badge is selected)
+         */
+        confirmButtonTextPlural: {
+            type: String,
+            default: 'Award selected achievements',
+        },
     },
     data() {
         return {
@@ -135,6 +183,38 @@ export default {
     },
     computed: {
         window: () => window,
+
+        // Messages are computed depending on how many badges are selected
+        toastActivateMessage() {
+            return this.selectedBadges.length === 1
+                ? this.toastActivateMessageSingular
+                : this.toastActivateMessagePlural;
+        },
+        toastSuccessMessage() {
+            return this.selectedBadges.length === 1
+                ? this.toastSuccessMessageSingular
+                : this.toastSuccessMessagePlural;
+        },
+        toastFailureMessage() {
+            return this.selectedBadges.length === 1
+                ? this.toastFailureMessageSingular
+                : this.toastFailureMessagePlural;
+        },
+        confirmModalHeader() {
+            return this.selectedBadges.length === 1
+                ? this.confirmModalHeaderSingular
+                : this.confirmModalHeaderPlural;
+        },
+        confirmModalMeta() {
+            return this.selectedBadges.length === 1
+                ? this.confirmModalMetaSingular
+                : this.confirmModalMetaPlural;
+        },
+        confirmButtonText() {
+            return this.selectedBadges.length === 1
+                ? this.confirmButtonTextSingular
+                : this.confirmButtonTextPlural;
+        },
     },
     methods: {
         /**
