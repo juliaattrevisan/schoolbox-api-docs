@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Badge\Award\Model as AwardModel;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Learning\Badge\Model;
@@ -85,9 +86,12 @@ class Controller extends Base
     public function redirectToAwardAsAchievementForm(): void
     {
         $this->response->redirect->to(
-            $this->router->generate(
-                'learningBadgeAward.getAwardAsAchievementForm',
-                ['userIds' => $this->request->query->get('userIds')]
+            $this->addQueryStringParamsToPath(
+                $this->router->generate(
+                    'learningBadgeAward.getAwardAsAchievementForm',
+                    ['userIds' => $this->request->query->get('userIds')]
+                ),
+                [Redirect::RETURN_URL]
             )
         );
     }
@@ -136,9 +140,12 @@ class Controller extends Base
     public function redirectToSetAsGoalForm(): void
     {
         $this->response->redirect->to(
-            $this->router->generate(
-                'learningBadgeAward.getSetAsGoalForm',
-                ['userIds' => $this->request->query->get('userIds')]
+            $this->addQueryStringParamsToPath(
+                $this->router->generate(
+                    'learningBadgeAward.getSetAsGoalForm',
+                    ['userIds' => $this->request->query->get('userIds')]
+                ),
+                [Redirect::RETURN_URL]
             )
         );
     }
@@ -233,7 +240,6 @@ class Controller extends Base
              * in the list is the most recently awarded
              */
             if (!isset($stack['categories'][$categoryId]['awards'][$badgeId])) {
-
                 /* This is a set-based aggregation, not an individual model property
                  */
                 $badge['count'] = 0;

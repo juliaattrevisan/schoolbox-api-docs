@@ -24,6 +24,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Sentry\State\HubInterface;
 use Throwable;
+use Zend\Uri\Uri;
 
 abstract class Base
 {
@@ -316,6 +317,30 @@ abstract class Base
             return $this->getRouter()->generate($name, $params);
         }
         return false;
+    }
+
+
+    /**
+     * Add given query string params from this request URL into the given path.
+     *
+     * @param string $path             A path, possibly generated with
+     *                                `getRouteIfAuthorized` or similar.
+     * @param array  $queryStringKeys  A list of keys to preserve from the
+     *                                 current request's query string.
+     *
+     * @return string `$path` with this request's query string params injected.
+     */
+    protected function addQueryStringParamsToPath(string $path, array $queryStringKeys): string
+    {
+        $url   = new Uri($path);
+        $query = $url->getQueryAsArray();
+        foreach ($queryStringKeys as $queryStringKey) {
+            $queryStringValue = $this->request->query->get($queryStringKey);
+            if (isset($queryStringValue)) {
+                $query[$queryStringKey] = $queryStringValue;
+            }
+        }
+        return $url->setQuery($query)->toString();
     }
 
 

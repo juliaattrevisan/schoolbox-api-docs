@@ -375,6 +375,14 @@ Usage:
                 }
             }
 
+            // Preserve the return URL, if there is one
+            let searchParams  = new URLSearchParams(window.location.search),
+                returnUrlName = '{{ RETURN_URL.name }}',
+                returnUrl     = searchParams.get(returnUrlName);
+            if (returnUrl !== null) {
+                queryArgs.push(encodeURIComponent(returnUrlName) + '=' + encodeURIComponent(returnUrl));
+            }
+
             var url = window.location.origin + window.location.pathname + '?' + queryArgs.join('&');
             history.replaceState({}, '', url);
         }

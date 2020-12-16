@@ -16,6 +16,7 @@ use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Collection;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Json\Decorator\LinkDecorator;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -71,9 +72,12 @@ class Controller extends Base
     public function redirectToCreateForm(): void
     {
         $this->response->redirect->to(
-            $this->router->generate(
-                'learningMomentEvidence.getCreateForm',
-                ['userIds' => $this->request->query->get('userIds')]
+            $this->addQueryStringParamsToPath(
+                $this->router->generate(
+                    'learningMomentEvidence.getCreateForm',
+                    ['userIds' => $this->request->query->get('userIds')]
+                ),
+                [Redirect::RETURN_URL, 'momentType']
             )
         );
     }
