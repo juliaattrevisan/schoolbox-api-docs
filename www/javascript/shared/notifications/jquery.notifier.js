@@ -296,6 +296,10 @@
                     msg = applyTokens(data.body, data.params);
 
                 element.attr('id', 'm-' + data.id).attr('data-status', data.status).addClass('status-' + data.status);
+                var hashPos = data.href.lastIndexOf('#');
+                if (hashPos > 1 && data.href.substr(0, hashPos) === location.pathname) {
+                    element.find('[data-' + settings.tplItemHref + ']').attr('onclick', 'location.reload()');
+                }
 
                 element.find('[data-' + settings.tplItemHref + ']').attr('href', data.href);
                 element.find('[data-' + settings.tplItemTitle + ']').html(msg);
