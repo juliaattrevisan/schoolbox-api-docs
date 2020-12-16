@@ -76,6 +76,13 @@ class Links
             ]
         );
 
+        /* Endpoint for deleting the badge
+        */
+        $translation['delete'] = $this->getRouteIfAuthorized(
+            'learningBadge.deleteBadge', [
+            'badgeId' => $badge->getId()
+        ]);
+
         /* All the people who have received this badge as an achievement
          */
         $translation['achievementRecipients'] = $this->getRouteIfAuthorized(

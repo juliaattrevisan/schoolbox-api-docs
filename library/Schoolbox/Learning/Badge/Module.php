@@ -79,6 +79,16 @@ class Module extends BaseModule
         );
 
         // Create a badge
+        /* Delete a Badge
+         */
+        $this->register(
+            self::METHOD_DELETE,
+            '/{badgeId}',
+            'deleteBadge',
+            $baseRule,
+            Closure::fromCallable([$this, 'preloadBadge']),
+        );
+
         $this->register(
             self::METHOD_POST,
             '',

@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Badge;
 use PDOStatement;
 use Schoolbox\File\Mimetype;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -64,6 +65,8 @@ class Mapper extends \Schoolbox\Mapper
             null,
             'curriculumNodes'
         );
+
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'deleteAwards']);
     }
 
 
@@ -102,7 +105,7 @@ class Mapper extends \Schoolbox\Mapper
      * @return GenericCollection
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      * @throws \UnexpectedValueException
      */
     public function findCurriculumNodes(Model $badge): GenericCollection
@@ -140,7 +143,7 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param PDOStatement $statement
      * @return GenericCollection|Model[]
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      * @throws \UnexpectedValueException
      */
     protected function hydrateSelect(PDOStatement $statement)
@@ -211,6 +214,19 @@ class Mapper extends \Schoolbox\Mapper
 
         // Fetch curriculum nodes in a separate query
         return $this->hydrateCurriculumNodesIntoCollection($collection);
+    }
+
+
+    /**
+     * Pre-delete hook - soft deletes awards associated to this badge.
+     *
+     * @param Model $model
+     */
+    public function deleteAwards(Model $model)
+    {
+        // using mapper to retract related messages
+        $awardMapper = Award\Mapper::getInstance();
+        $awardMapper->deleteByColumn('badge_id', $model->getId(), ['deleted' => true]);
     }
 
 

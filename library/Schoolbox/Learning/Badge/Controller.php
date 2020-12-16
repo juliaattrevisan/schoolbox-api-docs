@@ -336,6 +336,18 @@ class Controller extends Base
         $this->postBadge($badge);
     }
 
+    /**
+     * Delete a badge.
+     *
+     * @param Model $badge
+     * @throws MapperException
+     * @api   DELETE /learning/badge/{badgeId}
+     * @since 20.2
+     */
+    public function deleteBadge(Model $badge): void
+    {
+        $this->mapper->delete($badge);
+    }
 
     /**
      * Builder for the model-to-array translator for badges.
