@@ -44,15 +44,15 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_GET,
-            '',
-            'getBadgeJsonFeed',
+            '/list',
+            'getBadgeJsonList',
             new Rule\IsLoggedIn()
         );
 
         // HTML view of a list of badges
         $this->register(
             self::METHOD_GET,
-            '/list',
+            '',
             'getBadgeListPage',
             $baseRule
         );

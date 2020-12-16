@@ -107,10 +107,10 @@ class Controller extends Base
     /**
      * Retrieve a list of badges as a JSON feed.
      *
-     * @api   GET /learning/badge/
+     * @api   GET /learning/badge/list/
      * @since 20.2
      */
-    public function getBadgeJsonFeed(): void
+    public function getBadgeJsonList(): void
     {
         $page = Filter\Page\Model::PAGE_BADGE_LIST;
 
@@ -170,7 +170,7 @@ class Controller extends Base
      *
      * This page will contain a Vue  component, which loads the badge JSON feed.
      *
-     * @api   GET /learning/badge/list/
+     * @api   GET /learning/badge/
      * @since 20.2
      */
     public function getBadgeListPage(): void
