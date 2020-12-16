@@ -27,6 +27,7 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, "www/javascript/components"),
+        publicPath: "/javascript/components/",
         filename: "[name].bundle.js"
     },
     devtool: "source-map",
@@ -56,7 +57,7 @@ module.exports = {
                         plugins: [
                             "@babel/plugin-proposal-optional-chaining",
                             "@babel/plugin-transform-object-assign",
-                            "@babel/plugin-transform-shorthand-properties"
+                            "@babel/plugin-transform-shorthand-properties"                        
                         ]
                     }
                 }

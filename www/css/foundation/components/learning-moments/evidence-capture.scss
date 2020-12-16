@@ -3,13 +3,13 @@
     display: flex;
     align-items: center;
     height: rem-calc(58);
-    padding: 0 .875rem;
+    padding: 0 0.875rem;
     margin-bottom: 1rem;
     color: $anchor-font-color;
 
     &:before {
       font-size: 2rem;
-      padding-right: .875rem;
+      padding-right: 0.875rem;
     }
     &:hover {
       color: $white;
@@ -20,28 +20,48 @@
   }
   .share-photo {
     border: 1px solid $icon-color-image;
-    &:before { color: $icon-color-image; }
-    &:hover { background-color: $icon-color-image; }
+    &:before {
+      color: $icon-color-image;
+    }
+    &:hover {
+      background-color: $icon-color-image;
+    }
   }
   .share-video {
     border: 1px solid $icon-color-video-player;
-    &:before { color: $icon-color-video-player; }
-    &:hover { background-color: $icon-color-video-player; }
+    &:before {
+      color: $icon-color-video-player;
+    }
+    &:hover {
+      background-color: $icon-color-video-player;
+    }
   }
   .share-audio {
     border: 1px solid $icon-color-audio;
-    &:before { color: $icon-color-audio; }
-    &:hover { background-color: $icon-color-audio; }
+    &:before {
+      color: $icon-color-audio;
+    }
+    &:hover {
+      background-color: $icon-color-audio;
+    }
   }
   .share-file {
     border: 1px solid $icon-color-files;
-    &:before { color: $icon-color-files; }
-    &:hover { background-color: $icon-color-files; }
+    &:before {
+      color: $icon-color-files;
+    }
+    &:hover {
+      background-color: $icon-color-files;
+    }
   }
   .share-text {
     border: 1px solid $emotion;
-    &:before { color: $emotion; }
-    &:hover { background-color: $emotion; }
+    &:before {
+      color: $emotion;
+    }
+    &:hover {
+      background-color: $emotion;
+    }
   }
 }
 
@@ -50,7 +70,7 @@
     max-height: rem-calc(500);
     margin-bottom: 1rem;
   }
-  label[for=evidence-body] {
+  label[for="evidence-body"] {
     display: block;
   }
 }
@@ -81,22 +101,22 @@
   .subheader {
     background-color: $ghost;
     color: $header-font-color;
-    padding: .5rem 1rem;
+    padding: 0.5rem 1rem;
     margin: 0;
-    border-top: 2px solid #EDEDED;
-    border-left: 2px solid #EDEDED;
-    border-right: 2px solid #EDEDED;
+    border-top: 2px solid #ededed;
+    border-left: 2px solid #ededed;
+    border-right: 2px solid #ededed;
   }
 
   > section {
-    border-bottom: 2px solid #EDEDED;
+    border-bottom: 2px solid #ededed;
     width: 100%;
     max-width: 45rem;
   }
 }
 
 .feed-item {
-  border: 2px solid #EDEDED;
+  border: 2px solid #ededed;
 
   .badge-card {
     padding: 1rem;
@@ -134,7 +154,7 @@
   padding-bottom: 1rem;
 
   .island {
-    border-top: 1px solid #EDEDED;
+    border-top: 1px solid #ededed;
     padding: 1rem 0 0 0;
   }
   .discussion-threads {
@@ -144,6 +164,20 @@
   }
   .comment-count {
     font-weight: $font-weight-semibold;
+  }
+  .btn-show-ckeditor {
+    width: 100%;
+    border: 1px solid $form-border-color;
+    padding: 0.625rem 0.625rem 1.25rem 0.625rem;
+    cursor: text;
+    background: $white;
+    text-align: left;
+    font-size: 0.8rem;
+    color: $content-ui-foreground;
+    transition: all 0.1s ease-out;
+    &:hover {
+      border-color: $content-ui-foreground;
+    }
   }
   .discussion {
     border: 0;
@@ -190,12 +224,12 @@
 
 @media #{$medium-only} {
   .subheader.feed {
-    padding: .5rem .75rem;
+    padding: 0.5rem 0.75rem;
   }
 }
 
 @media #{$small-only} {
   .subheader.feed {
-    padding: .5rem;
+    padding: 0.5rem;
   }
 }
