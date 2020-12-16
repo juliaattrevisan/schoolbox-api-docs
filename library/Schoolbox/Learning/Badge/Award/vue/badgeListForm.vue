@@ -112,11 +112,19 @@ export default {
         },
 
         /**
-         * Confirm modal's meta (when only one badge is selected)
+         * Confirm modal's badge list meta (when only one badge is selected)
          */
-        confirmModalMetaSingular: {
+        confirmModalBadgeListMetaSingular: {
             type: String,
             default: 'Awarding the following achievement:',
+        },
+
+        /**
+         * Confirm modal's user list meta (when only one user is selected)
+         */
+        confirmModalUserListMetaSingular: {
+            type: String,
+            default: 'To the following user:',
         },
 
         /**
@@ -160,11 +168,19 @@ export default {
         },
 
         /**
-         * Confirm modal's meta (when more than one badge is selected)
+         * Confirm modal's badge list meta (when more than one badge is selected)
          */
-        confirmModalMetaPlural: {
+        confirmModalBadgeListMetaPlural: {
             type: String,
             default: 'Awarding the following achievements:',
+        },
+
+        /**
+         * Confirm modal's user list meta (when more than one user is selected)
+         */
+        confirmModalUserListMetaPlural: {
+            type: String,
+            default: 'To the following users:',
         },
 
         /**
@@ -205,10 +221,15 @@ export default {
                 ? this.confirmModalHeaderSingular
                 : this.confirmModalHeaderPlural;
         },
-        confirmModalMeta() {
+        confirmModalBadgeListMeta() {
             return this.selectedBadges.length === 1
-                ? this.confirmModalMetaSingular
-                : this.confirmModalMetaPlural;
+                ? this.confirmModalBadgeListMetaSingular
+                : this.confirmModalBadgeListMetaPlural;
+        },
+        confirmModalUserListMeta() {
+            return this.users.length === 1
+                ? this.confirmModalUserListMetaSingular
+                : this.confirmModalUserListMetaPlural;
         },
         confirmButtonText() {
             return this.selectedBadges.length === 1
@@ -287,7 +308,7 @@ export default {
 
         <reveal-modal ref="awardModal" size="large">
             <h2>{{ confirmModalHeader }}</h2>
-            <p class="meta">{{ confirmModalMeta }}</p>
+            <p class="meta">{{ confirmModalBadgeListMeta }}</p>
             <ul class="grid achievements-grid medium-block-grid-2 large-block-grid-4">
                 <li v-for="badge in selectedBadges">
                     <div class="compact card small-12 badge-card">
@@ -301,7 +322,7 @@ export default {
 
             <template v-if="!awardToSelfOnly">
                 <hr />
-                <p class="meta">To the following user(s):</p>
+                <p class="meta">{{ confirmModalUserListMeta }}</p>
                 <ul class="grid achievements-grid medium-block-grid-2 large-block-grid-4">
                     <li v-for="user in users">
                         <div class="card small-12 compact">
