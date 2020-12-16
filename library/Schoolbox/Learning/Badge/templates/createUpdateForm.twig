@@ -11,13 +11,13 @@
 
 {% if badge %}
     {{ bread.crumbs(
-        ['Badges', routeLookup('learningBadge.getBadges') ],
+        ['Badges', routeLookup('learningBadge.getBadgeListPage') ],
         [badge.name],
         ['Modify']
     ) }}
 {% else %}
     {{ bread.crumbs(
-        ['Badges', routeLookup('learningBadge.getBadges') ],
+        ['Badges', routeLookup('learningBadge.getBadgeListPage') ],
         ['Create', routeLookup('learningBadge.getCreateForm')]
     ) }}
 {% endif %}
@@ -297,7 +297,7 @@
                     .post(form.action, payload)
                     .then(() => {
                         toast.toastTimeout({text: 'Saved'});
-                        window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadges') }}';
+                        window.location.href = '{{ RETURN_URL.previous.decoded ?? routeLookup('learningBadge.getBadgeListPage') }}';
                     })
                     .catch(() => {
                         toast.toastTimeout({text: 'Save failed', css: 'alert'});
