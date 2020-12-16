@@ -45,7 +45,7 @@ class Module extends BaseModule
         $this->register(
             self::METHOD_GET,
             '',
-            'getBadges',
+            'getBadgeJsonFeed',
             new Rule\IsLoggedIn()
         );
 

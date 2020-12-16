@@ -111,7 +111,7 @@ class Controller extends Base
      * @api   GET /learning/badge/
      * @since 20.2
      */
-    public function getBadges(): void
+    public function getBadgeJsonFeed(): void
     {
         $page = Filter\Page\Model::PAGE_BADGE_LIST;
         if ($this->isJsonRequest()) {
