@@ -564,8 +564,16 @@
                             {% for subject in subjectGroup %}
                             <div class="v-card small-12">
                                 <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
-{#                                    <div class="card-class-image" style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{% if class.coverImage %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>#}
-                                    <div class="card-class-image" style="background-color: #0a6aa1;">
+                                    <div class="card-class-image"
+                                         style="background-color:{{ subject.folder.colour }};
+                                                border-bottom: 10px solid {{ subject.folder.colour }};
+                                                {% if subject.folder.coverImage %}
+                                                background-image: url('/storage/image.php?hash={{ subject.folder.coverImage.hash }}&size=cardImageLarge');
+                                                background-size: cover;
+                                                background-repeat: no-repeat;
+                                                background-position: center;
+                                                {% endif %}"
+                                    >
                                         {% for teacher in subject.teachers %}
                                         <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="Teacher: {{ teacher.formatName }}" alt="Teacher: {{ teacher.formatName }}" />
                                         {% endfor %}
