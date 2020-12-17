@@ -298,7 +298,10 @@
                 element.attr('id', 'm-' + data.id).attr('data-status', data.status).addClass('status-' + data.status);
                 var hashPos = data.href.lastIndexOf('#');
                 if (hashPos > 1 && data.href.substr(0, hashPos) === location.pathname) {
-                    element.find('[data-' + settings.tplItemHref + ']').attr('onclick', 'location.reload()');
+                    element.find('[data-' + settings.tplItemHref + ']').on('click', function () {
+                        location.href = this.href;
+                        location.reload();
+                    });
                 }
 
                 element.find('[data-' + settings.tplItemHref + ']').attr('href', data.href);
