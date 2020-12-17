@@ -180,11 +180,19 @@ export default {
         deleteEvidence(evidence) {
             this.$refs.toast.activate('Deleting...');
 
+            
+            //awards, other things may also be deleted in the future, so ensure this is also the right data type
+            const removeEvidenceToDelete = (data) => {
+                if ((data.object.id !== evidence.object.id) && (evidence.discriminator === 'evidence')) {
+                    return data;
+                }
+            }
+            let newData = this.data.filter(removeEvidenceToDelete);
+            
             // Replacing the data in place in the same tick causes issues with
             // the MediaElement player and Foundation dropdowns for some reason.
             // Clear it first; then replace it with the filtered data in the
             // next tick.
-            let newData = this.data.filter((v) => v.id !== evidence.id);
             axios
                 .delete(evidence.object._links.delete)
                 .then(() => {
