@@ -1,6 +1,6 @@
 <?php
 
-namespace AusPrimaryCapabilitiesBadge;
+namespace AusGeneralCapabilitiesBadge;
 
 use Schoolbox\Admin\Package\IPackageInstall;
 use Schoolbox\Learning\Badge;
