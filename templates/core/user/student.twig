@@ -460,6 +460,7 @@
                     case '#achievements':
                     case '#goals':
                     case '#classes':
+                    case '#groups':
                     case '#contacts':
                         $('[data-tab] a[href='+window.location.hash+']').trigger('click');
                         break;
@@ -479,16 +480,19 @@
             <dd><a href="#goals">Goals</a></dd>
             {% endif %}
             {% if showClasses %}
-            <dd><a href="#classes">Groups &amp; Classes</a></dd>
+            <dd><a href="#classes">Classes</a></dd>
+            {% endif %}
+            {% if showGroups %}
+                <dd><a href="#groups">Groups</a></dd>
             {% endif %}
             {% if showContactsTab %}
             <dd><a href="#contacts">Contacts</a></dd>
             {% endif %}
         </dl>
 
-        <div class="tabs-content no-pad">
+        <div class="profile-tabs tabs-content">
             {% if showActivityFeed %}
-            <div class="no-pad content active" id="activity">
+            <div class="content active" id="activity">
                 {# Vue component goes here #}
                 {% autoescape 'js' %}
                     <script type="text/javascript">
@@ -512,7 +516,7 @@
             </div>
             {% endif %}
 
-            <div class="content no-pad" id="achievements">
+            <div class="content" id="achievements">
                 {% autoescape 'js' %}
                     <script type="text/javascript">
                         window.learningBadgeAchievementFeedConfig = {
@@ -547,148 +551,182 @@
             </div>
 
             {% if showClasses %}
-            <div class="content no-pad" id="classes">
-                <div class="content">
+            <div class="content" id="classes">
+                <section>
                     {% if showSubjects %}
                     {% for group, subjectGroup in subjects %}
-                        {# Keep a running total of all teachers emails in this group #}
-                        {% set teacherEmails = [] %}
-                        <div class="row">
-                            <div class="small-12 island">
-                                <h2 class="subheader">{{ group }}</h2>
-                                <section>
-                                    {% for subject in subjectGroup %}
-                                        <ul class="subject-list group">
-                                            <li class="subject-group {% block folderListItemClasses %}{% endblock %}">
-                                                <div class="content small-12">
-                                                    {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
-                                                    {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
-                                                        <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
-                                                            <h3 class="no-margin">{{ subject.name }} {% if subjectCode|length %}<span class="meta">({{ subjectCode }})</span>{% endif %}</h3>
-                                                        </a>
-                                                    {% else %}
-                                                        <h3 class="no-margin">{{ subject.name }} {% if subjectCode|length %}<span class="meta">({{ subjectCode }})</span>{% endif %}</h3>
-                                                    {% endif %}
-                                                </div>
-                                                {% block folderListItemActions %}{% endblock %}
-                                            </li>
+                    {# Keep a running total of all teachers emails in this group #}
+                    {% set teacherEmails = [] %}
+                    <div class="row content">
+                        <div class="small-12 columns">
+                        <h2 class="subheader">{{ group }}</h2>
+                        <section class="v-card-list">
+                            {% for subjectKey, subject in subjectGroup %}
+                            <div class="v-card small-12">
+                                <a href="{% if subject.folder.id %}/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}{% else %}#{% endif %}">
+                                    <div class="card-class-image"
+                                         style="border-bottom-width: 10px;
+                                                border-bottom-style: solid;
+                                                {% if subject.folder is defined and subject.folder.colour %}
+                                                background-color:{{ subject.folder.colour }};
+                                                border-bottom-color: {{ subject.folder.colour }};
+                                                {% endif %}
+                                                {% if subject.folder is defined and subject.folder.coverImage %}
+                                                background-image: url('/storage/image.php?hash={{ subject.folder.coverImage.hash }}&size=cardImageLarge');
+                                                background-size: cover;
+                                                background-repeat: no-repeat;
+                                                background-position: center;
+                                                {% endif %}"
+                                    >
+                                        {% for teacher in subject.teachers %}
+                                        <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="Teacher: {{ teacher.formatName }}" alt="Teacher: {{ teacher.formatName }}" />
+                                        {% endfor %}
+                                    </div>
+                                </a>
+                                {% set hasTeachersWithEmail = false %}
+                                {% for teacher in subject.teachers %}
+                                    {% if not teacher.email is empty %}
+                                        {% set hasTeachersWithEmail = true %}
+                                    {% endif %}
+                                {% endfor %}
+                                <div class="card-content classes actions-small-{{ hasTeachersWithEmail ? '1' : '0'}} {% block folderListItemClasses %}{% endblock %}">
+                                    <div class="list-item">
+                                        {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
+                                        {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
+                                            <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
+                                                <h3>{{ subject.name }}</h3>
+                                                {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
+                                            </a>
+                                        {% else %}
+                                            <h3>{{ subject.name }}</h3>
+                                            {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
+                                        {% endif %}
+                                    </div>
+                                    {% block folderListItemActions %}{% endblock %}
+                                    {% if hasTeachersWithEmail %}
+                                        <nav>
+                                            <a class="icon-more" data-dropdown="class-options-{{ subjectKey }}" title="Actions"></a>
+                                        </nav>
+                                        <ul id="class-options-{{ subjectKey }}" class="f-dropdown" data-dropdown-content>
                                             {% for teacher in subject.teachers %}
-                                                {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
-                                                {% set teacherEmails = teacherEmails|merge([email]) %}
-                                                <li class="actions-small-1">
-                                                    <div class="list-item">
-                                                        <div class="compact card small-12">
-                                                            <a href="/search/user/{{ teacher.id }}">
-                                                                <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" />
-                                                                <p>
-                                                                    {{ teacher.formatName }}
-                                                                    <span class="pipe meta">
-                                                            {% if teacher.positionTitle is empty %}
-                                                                {{ teacher.role.name }}
-                                                            {% else %}
-                                                                {{ teacher.positionTitle }}
-                                                            {% endif %}
-                                                        </span>
-                                                                </p>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                    <nav>
-
-                                                        {% if not teacher.email is empty %}
-                                                            {% set replyTo = teacher.getFormattedEmailDisplay %}
-                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
-                                                        {% endif %}
-                                                    </nav>
-                                                </li>
+                                                {% if not teacher.email is empty %}
+                                                    {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
+                                                    {% set teacherEmails = teacherEmails|merge([email]) %}
+                                                    <li>
+                                                        {% set replyTo = teacher.getFormattedEmailDisplay %}
+                                                        <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ teacher.formatName }}</a>
+                                                    </li>
+                                                {% endif %}
                                             {% endfor %}
                                         </ul>
-                                    {% endfor %}
-                                    {% if session.user.role.staff and config.email_all_staff and config.mail_enable %}
-                                        {% set teacherEmails = teacherEmails|join(emailSeparator)  %}
-                                        {% set replyTo = session.user.getFormattedEmailDisplay %}
-                                        <div class="component-action">
-                                            <section>
-                                                <form action="/mail/createMail.php" method="post">
-                                                    <div class="row">
-                                                        <div class="small-12 columns">
-                                                            <input type="hidden" name="replyto" value="{{ replyTo }}"/>
-                                                            <input type="hidden" name="cc" value="{{ teacherEmails }}"/>
-                                                            <button type="submit" class="button">Email All {{ group }} Teachers</button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </section>
-                                        </div>
                                     {% endif %}
-                                </section>
+                                </div>
                             </div>
+                            {% endfor %}
+                            {% if session.user.role.staff and config.email_all_staff and config.mail_enable %}
+                                {% set teacherEmails = teacherEmails|join(emailSeparator)  %}
+                                {% set replyTo = session.user.getFormattedEmailDisplay %}
+                                <div class="component-action">
+                                    <section>
+                                        <form action="/mail/createMail.php" method="post">
+                                            <div class="row">
+                                                <div class="small-12 columns">
+                                                    <input type="hidden" name="replyto" value="{{ replyTo }}"/>
+                                                    <input type="hidden" name="cc" value="{{ teacherEmails }}"/>
+                                                    <button type="submit" class="button">Email All {{ group }} Teachers</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </section>
+                                </div>
+                            {% endif %}
+                        </section>
                         </div>
+                    </div>
                     {% endfor %}
                     {% endif %}
+                </section>
+            </div>
+            {% endif %}
 
-                    {% if showGroups and groups is not empty %}
-                        <div class="row">
-                            <div class="small-12 island">
-                                <h2 class="subheader">Groups</h2>
-                                <section>
-                                    {% for group in groups %}
-                                        <ul class="subject-list group">
-                                            <li class="subject-group">
-                                                <div class="list-item">
-                                                    <div class="content small-12 ">
-                                                        {% if group.perms > 0 %}
-                                                            <a href="/homepage/{{ group.id }}">
-                                                                <h3 class="no-margin">{{ group.name }}</h3>
-                                                            </a>
-                                                        {% else %}
-                                                            <h3 class="no-margin">{{ group.name }}</h3>
+            {% if showGroups and groups is not empty %}
+            <div class="content" id="groups">
+                <section>
+                    <div class="row content">
+                        <div class="small-12 columns">
+                            <h2 class="subheader">Groups</h2>
+                            <section class="v-card-list">
+                                {% for groupKey, group in groups %}
+                                    <div class="v-card small-12">
+                                        <a href="/homepage/{{ group.id }}">
+                                            <div class="card-class-image"
+                                                 style="border-bottom-width: 10px;
+                                                        border-bottom-style: solid;
+                                                        {% if group.folder is defined and group.folder.colour %}
+                                                        background-color:{{ group.folder.colour }};
+                                                        border-bottom-color: {{ group.folder.colour }};
                                                         {% endif %}
-                                                    </div>
-                                                </div>
-                                            </li>
-                                            {% if group.owners is defined %}
-                                                {% for owner in group.owners %}
-                                                    <li class="actions-small-1">
-                                                        <div class="list-item">
-                                                            <div class="compact card small-12">
-                                                                <a href="/search/user/{{ owner.id }}">
-                                                                    <img src="/portrait.php?userId={{ owner.externalId }}&amp;size=square64" />
-                                                                    <p>
-                                                                        {{ owner.formatName }}
-                                                                        <span class="pipe meta">
-                                                                {% if owner.positionTitle is empty %}
-                                                                    {{ owner.role.name }}
-                                                                {% else %}
-                                                                    {{ owner.positionTitle }}
-                                                                {% endif %}
-                                                            </span>
-                                                                    </p>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                        <nav>
-                                                            {% if not owner.email is empty %}
-                                                                {% set replyTo = owner.getFormattedEmailDisplay %}
-                                                                <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}"></a>
-                                                            {% endif %}
-                                                        </nav>
-                                                    </li>
-                                                {% endfor %}
+                                                        {% if group.folder is defined and group.folder.coverImage %}
+                                                        background-image: url('/storage/image.php?hash={{ group.folder.coverImage.hash }}&size=cardImageLarge');
+                                                        background-size: cover;
+                                                        background-repeat: no-repeat;
+                                                        background-position: center;
+                                                        {% endif %}"
+                                            >
+                                                {% if group.owners is defined %}
+                                                    {% for owner in group.owners %}
+                                                        <img src="/portrait.php?userId={{ owner.externalId }}&amp;size=square64" title="{{ owner.formatName }}" alt="{{ owner.formatName }}" />
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </a>
+
+                                        {% set hasOwnersWithEmail = false %}
+                                        {% if group.owners is defined %}
+                                            {% for owner in group.owners %}
+                                                {% if not owner.email is empty %}
+                                                    {% set hasOwnersWithEmail = true %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                        <div class="card-content classes groups actions-small-{{ hasOwnersWithEmail ? '1' : '0' }}">
+                                            <div class="list-item">
+                                                {% if group.perms > 0 %}
+                                                    <a href="/homepage/{{ group.id }}">
+                                                        <h3>{{ group.name }}</h3>
+                                                    </a>
+                                                {% else %}
+                                                    <h3>{{ group.name }}</h3>
+                                                {% endif %}
+                                            </div>
+                                            {% if hasOwnersWithEmail %}
+                                                <nav>
+                                                    <a class="icon-more" data-dropdown="group-options-{{ groupKey }}" title="Actions"></a>
+                                                </nav>
+                                                <ul id="group-options-{{ groupKey }}" class="f-dropdown" data-dropdown-content>
+                                                    {% for owner in group.owners %}
+                                                        {% if not owner.email is empty %}
+                                                        <li>
+                                                            {% set replyTo = owner.getFormattedEmailDisplay %}
+                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ owner.formatName }}</a>
+                                                        </li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </ul>
                                             {% endif %}
-                                        </ul>
-                                    {% endfor %}
-                                </section>
-                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </section>
                         </div>
-                    {% endif %}
-                </div>
+                    </div>
+                </section>
             </div>
             {% endif %}
 
             {% if showContactsTab %}
-            <div class="content no-pad" id="contacts">
-                <div class="content">
+            <div class="content" id="contacts">
+                <section class="content">
                     {% block contacts_island %}
                         {% block contacts %}
                             <h2 class="subheader">Contact Information</h2>
@@ -856,59 +894,55 @@
                     {% endblock contacts_island %}
 
                     {% block emergencyContacts_island %}
-                        <div class="row">
-                            <div class="small-12 island">
-                                {% block emergencyContacts %}
-                                    {# up to 3 emergency contact blocks
-                                     # show no header if no emergencies
-                                    #}
-                                    {% if showEmergencyContacts %}
-                                        <h2 class="subheader">Emergency Contact Information</h2>
-                                        <section>
-                                            <ul class="information-list expandable-card">
-                                                {% for i in 1..3 %}
-                                                    {% set index = (i == 1 ? '' : i) %}
-                                                    {% if externalUser["StudentEmergency#{index}Name"] %}
-                                                        <li>
-                                                            <!-- Expander -->
-                                                            <div>
-                                                                <div class="expander" data-collapser="collap-emergency-{{ i }}"></div>
-                                                                <div class="content small-12">
-                                                                    {{ externalUser["StudentEmergency#{index}Name"] }}
-                                                                </div>
-                                                            </div>
+                    {% block emergencyContacts %}
+                        {# up to 3 emergency contact blocks
+                         # show no header if no emergencies
+                        #}
+                        {% if showEmergencyContacts %}
+                            <h2 class="subheader">Emergency Contact Information</h2>
+                            <section>
+                                <ul class="information-list expandable-card">
+                                    {% for i in 1..3 %}
+                                        {% set index = (i == 1 ? '' : i) %}
+                                        {% if externalUser["StudentEmergency#{index}Name"] %}
+                                            <li>
+                                                <!-- Expander -->
+                                                <div>
+                                                    <div class="expander" data-collapser="collap-emergency-{{ i }}"></div>
+                                                    <div class="content small-12">
+                                                        {{ externalUser["StudentEmergency#{index}Name"] }}
+                                                    </div>
+                                                </div>
 
-                                                            <!-- Collapseable content -->
-                                                            <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-emergency-{{ i }}">
-                                                                <div class="row">
-                                                                    <div class="column small-12 medium-5"><strong>Primary Phone: </strong></div>
-                                                                    <div class="column small-12 medium-7">
-                                                                        <a href="tel:{{ externalUser["StudentEmergency#{index}Phone"] }}">
-                                                                            {{ externalUser["StudentEmergency#{index}Phone"] }}
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
+                                                <!-- Collapseable content -->
+                                                <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-emergency-{{ i }}">
+                                                    <div class="row">
+                                                        <div class="column small-12 medium-5"><strong>Primary Phone: </strong></div>
+                                                        <div class="column small-12 medium-7">
+                                                            <a href="tel:{{ externalUser["StudentEmergency#{index}Phone"] }}">
+                                                                {{ externalUser["StudentEmergency#{index}Phone"] }}
+                                                            </a>
+                                                        </div>
+                                                    </div>
 
-                                                                <div class="row">
-                                                                    <div class="column small-12 medium-5"><strong>Alternate Phone: </strong></div>
-                                                                    <div class="column small-12 medium-7">
-                                                                        <a href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
-                                                                            {{ externalUser["StudentEmergency#{index}PhoneAlt"] }}
-                                                                        </a>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </li>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </ul>
-                                        </section>
-                                    {% endif %}
-                                {% endblock emergencyContacts %}
-                            </div>
-                        </div>
+                                                    <div class="row">
+                                                        <div class="column small-12 medium-5"><strong>Alternate Phone: </strong></div>
+                                                        <div class="column small-12 medium-7">
+                                                            <a href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
+                                                                {{ externalUser["StudentEmergency#{index}PhoneAlt"] }}
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </section>
+                        {% endif %}
+                    {% endblock emergencyContacts %}
                     {% endblock emergencyContacts_island %}
-                </div>
+                </section>
             </div>
             {% endif %}
         </div>

@@ -223,7 +223,7 @@ export default {
         <template v-else-if="this.data.categories">
             <section class="awards">
                 <template v-for="category in this.data.categories">
-                    <div class="content">
+                    <div class="content divider">
                         <h2 class="subheader" :title="'Category: ' + category.name">{{ category.name }}</h2>
 
                         <div class="badge-grid v-card-list">
