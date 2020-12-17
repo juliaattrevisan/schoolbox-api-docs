@@ -117,7 +117,16 @@ export default {
               .request(request)
               .then(() => {
                 self.toastSuccess('Achievement awarded');
-                self.updateAwards();
+
+                  /* Temporarily replaced implementation of self.updateAwards()
+                   * achievement-feed.vue can't tell goal-feed.vue to update itself; they don't
+                   * share a common parent. They're entirely separate vue apps. An action inside
+                   * achievement-feed affects the data in goal-feed, but I can't talk to
+                   * goal-feed from achievement-feed.
+                   *
+                   * The forced reload will cause goal-feed to seem updated, for now
+                   */
+                  window.location.reload();
               })
               .catch(() => self.toastError('Failed to award achievement'))
 
@@ -185,9 +194,22 @@ export default {
          */
         canWithdraw(award) {
             return Boolean(award._links.goalWithdraw) || Boolean(award._links.achievementWithdraw);
+        },
+
+        /* Temporarily replaced implementation of self.updateAwards()
+         * achievement-feed.vue can't tell goal-feed.vue to update itself; they don't
+         * share a common parent. They're entirely separate vue apps. An action inside
+         * achievement-feed affects the data in goal-feed, but I can't talk to
+         * goal-feed from achievement-feed.
+         *
+         * The forced reload will cause goal-feed to seem updated, for now
+         */
+        reload() {
+            window.location.reload();
         }
     }
 }
+
 </script>
 <template>
     <div>
@@ -266,7 +288,15 @@ export default {
 
         <award-detail-modal ref="awardDetailModal"></award-detail-modal>
 
-        <achievement-withdraw-modal ref="achievementWithdrawModal" v-on:withdraw-complete="updateAwards()"></achievement-withdraw-modal>
-        <goal-withdraw-modal ref="goalWithdrawModal" v-on:withdraw-complete="updateAwards()"></goal-withdraw-modal>
+        <!-- Temporarily replaced implementation of self.updateAwards()
+        -- achievement-feed.vue can't tell goal-feed.vue to update itself; they don't
+        -- share a common parent. They're entirely separate vue apps. An action inside
+        -- achievement-feed affects the data in goal-feed, but I can't talk to
+        -- goal-feed from achievement-feed.
+        --
+        -- The forced reload will cause goal-feed to seem updated, for now
+        -->
+        <achievement-withdraw-modal ref="achievementWithdrawModal" v-on:withdraw-complete="reload()"></achievement-withdraw-modal>
+        <goal-withdraw-modal ref="goalWithdrawModal" v-on:withdraw-complete="reload();"></goal-withdraw-modal>
     </div>
 </template>
