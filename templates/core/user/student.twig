@@ -579,7 +579,9 @@
                                                 {% endif %}"
                                     >
                                         {% for teacher in subject.teachers %}
-                                        <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="Teacher: {{ teacher.formatName }}" alt="Teacher: {{ teacher.formatName }}" />
+                                            <div class="owner">
+                                                <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="Teacher: {{ teacher.formatName }}" alt="Teacher: {{ teacher.formatName }}" />
+                                            </div>
                                         {% endfor %}
                                     </div>
                                 </a>
@@ -674,9 +676,11 @@
                                                         {% endif %}"
                                             >
                                                 {% if group.owners is defined %}
+                                                    <div class="owner">
                                                     {% for owner in group.owners %}
                                                         <img src="/portrait.php?userId={{ owner.externalId }}&amp;size=square64" title="{{ owner.formatName }}" alt="{{ owner.formatName }}" />
                                                     {% endfor %}
+                                                    </div>
                                                 {% endif %}
                                             </div>
                                         </a>
