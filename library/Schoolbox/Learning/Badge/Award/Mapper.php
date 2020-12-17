@@ -322,8 +322,14 @@ class Mapper extends \Schoolbox\Mapper
         $statement->execute($params);
         $awardIdsToDelete = $statement->fetchAll(\PDO::FETCH_COLUMN);
 
+        /* Deleting awards using mapper, so that awarded notification will be retracted.
+         */
         $this->deleteByColumn('id', $awardIdsToDelete);
 
+        /* When an achievement is withdrawn, reset any goals to their unreached state.
+         * A goal that was reached is associated with an achievement via the award_id column,
+         * but if that achievement is withdrawn, then its goal should become reachable again.
+         */
         if ($status === Award\Model::AWARD_STATUS_ACHIEVEMENT) {
             // Unset award_id
             $query  = "UPDATE badge_user SET award_id = NULL
