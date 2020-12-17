@@ -578,11 +578,11 @@
                                                 background-position: center;
                                                 {% endif %}"
                                     >
+                                        <div class="owner">
                                         {% for teacher in subject.teachers %}
-                                            <div class="owner">
-                                                <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="Teacher: {{ teacher.formatName }}" alt="Teacher: {{ teacher.formatName }}" />
-                                            </div>
+                                            <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="Teacher: {{ teacher.formatName }}" alt="Teacher: {{ teacher.formatName }}" />
                                         {% endfor %}
+                                        </div>
                                     </div>
                                 </a>
                                 {% set hasTeachersWithEmail = false %}
