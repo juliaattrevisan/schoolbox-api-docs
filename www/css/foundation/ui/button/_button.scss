@@ -70,6 +70,19 @@ a[disabled], a.disabled {
 	}
 }
 
+// style for 'Load more' buttons
+button.load-more, .button.load-more {
+  background-color: transparent;
+  border: 1px solid $content-ui-foreground;
+  display: block;
+  margin: 0 auto;
+  max-width: 250px;
+
+  &:hover {
+    background-color: $content-ui-background;
+  }
+}
+
 // flex buttons that wrap
 .flex-wrap{
 	flex-wrap: wrap;
