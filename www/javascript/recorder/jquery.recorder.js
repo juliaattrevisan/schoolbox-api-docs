@@ -321,12 +321,14 @@
                 function(e) {
                     // Overrides any previous blob
                     self.media.blob = e.data;
-                    self.media.audioElement
-                        .attr('src', window.URL.createObjectURL(e.data))
-                    ;
-                    // Trigger an event saying I'm ready for play and upload.
-                    self.triggerEvent('playbackReady', []);
-                    self.triggerEvent('uploadReady', []);
+                    let reader      = new FileReader();
+                    reader.addEventListener('load', function () {
+                        self.media.audioElement.attr('src', this.result)
+                        // Trigger an event saying I'm ready for play and upload.
+                        self.triggerEvent('playbackReady', []);
+                        self.triggerEvent('uploadReady', []);
+                    });
+                    reader.readAsDataURL(e.data);
                 }
             ;
             self.triggerEvent('recordingStop', []);
@@ -338,12 +340,14 @@
                 function(blob) {
                     // Overrides any previous blob
                     self.webrtc.blob = blob;
-                    self.webrtc.audioElement
-                        .attr('src', window.URL.createObjectURL(blob))
-                    ;
-                    // Trigger an event saying I'm ready for play and upload.
-                    self.triggerEvent('playbackReady', []);
-                    self.triggerEvent('uploadReady', []);
+                    let reader       = new FileReader();
+                    reader.addEventListener('load', function () {
+                        self.webrtc.audioElement.attr('src', this.result)
+                        // Trigger an event saying I'm ready for play and upload.
+                        self.triggerEvent('playbackReady', []);
+                        self.triggerEvent('uploadReady', []);
+                    });
+                    reader.readAsDataURL(e.data);
                 }
             );
             self.triggerEvent('recordingStop', []);
