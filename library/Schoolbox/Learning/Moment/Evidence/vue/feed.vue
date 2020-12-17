@@ -10,7 +10,6 @@ import RevealModal from "@schoolbox/reveal-modal";
 import Toast from "@schoolbox/toast";
 import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
 import BadgeImage from "../../../Badge/vue/badge-image";
-import foundationMixin from "@schoolbox/foundation-mixin";
 
 export default {
     components: {
@@ -21,7 +20,6 @@ export default {
         Storage,
         CommentThread,
         BadgeImage,
-        foundationMixin
     },
     data() {
         return {
@@ -55,7 +53,7 @@ export default {
     },
     updated() {
         // Re-apply Foundation dropdowns
-        // this.$nextTick(() => this.jQuery(this.$el).foundation('dropdown', 'reflow'));
+        this.$nextTick(() => this.jQuery(this.$el).foundation('dropdown', 'reflow'));
     },
     methods: {
         /**
