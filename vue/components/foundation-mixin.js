@@ -16,8 +16,13 @@ export default {
      */
     updated() {
         this.$nextTick(() => {
-            this.jQuery(this.$el).foundation('dropdown', 'reflow');
-            this.jQuery(this.$el).foundation('equalizer', 'reflow');
+
+            if (!reflow_occurred) {
+                this.jQuery(this.$el).foundation('dropdown', 'reflow');
+                this.jQuery(this.$el).foundation('equalizer', 'reflow');
+
+                reflow_occurred = true;
+            }
         });
     },
 }
