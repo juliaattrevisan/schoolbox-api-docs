@@ -268,14 +268,14 @@ export default {
         </template>
         <template v-else>
             <div class="empty-state">
-                <i class="icon-showcase"></i>
+                <i class="icon-goal"></i>
                 <!--  Teacher/Admin -->
-                <p>'Student name' doesn't have any goals or achievements yet.</p>
-                <p><a href="" title="Set a goal">Set a goal</a> or <a href="" title="Award an achievement">award an achievement</a> for 'firstname'.</p>
+                <p>'Student name' doesn't have any goals yet.</p>
+                <p><a href="" title="Set a goal">Set a goal</a> for 'firstname'.</p>
                 <!--  Parent -->
-                <p>'Student name' doesn't have any goals or achievements yet.</p>
+                <p>'Student name' doesn't have any goals yet.</p>
                 <!--  Student -->
-                <p>You don't have any achievements or goals yet.</p>
+                <p>You don't have any goals yet.</p>
                 <p><a href="" title="Set a goal">Set a goal</a> to see it appear here.</p>
             </div>
         </template>

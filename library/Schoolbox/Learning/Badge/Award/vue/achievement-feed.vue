@@ -282,7 +282,13 @@ export default {
         <template v-else>
             <div class="empty-state">
                 <i class="icon-showcase"></i>
-                <p>There haven't been any goals set nor any achievements received.</p>
+                <!--  Teacher/Admin -->
+                <p>'Student name' doesn't have any achievements yet.</p>
+                <p><a href="" title="Award an achievement">Award an achievement</a> for 'firstname'.</p>
+                <!--  Parent -->
+                <p>'Student name' doesn't have any achievements yet.</p>
+                <!--  Student -->
+                <p>You don't have any achievements yet.</p>
             </div>
         </template>
 
