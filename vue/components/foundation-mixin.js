@@ -11,18 +11,21 @@ export default {
     },
 
     /**
-     * Reflow everything
+     * Switch off and then reflow everything
      *  - Re-apply Foundation dropdowns
+     *  - Re-apply equalizer
+     *
+     * The dropdowns need to be switched off, because applying a dropdown twice
+     * to the same DOM node applies two click events; this causes the dropdown
+     * to open and immediately close on click.
      */
     updated() {
         this.$nextTick(() => {
-
-            if (!reflow_occurred) {
-                this.jQuery(this.$el).foundation('dropdown', 'reflow');
-                this.jQuery(this.$el).foundation('equalizer', 'reflow');
-
-                reflow_occurred = true;
-            }
+            this.jQuery(this.$el)
+                .foundation('dropdown', 'off')
+                .foundation('equalizer', 'off')
+                .foundation('dropdown', 'reflow')
+                .foundation('equalizer', 'reflow');
         });
     },
 }
