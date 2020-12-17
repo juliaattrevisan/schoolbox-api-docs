@@ -24,7 +24,7 @@ INSERT INTO package (title,description,location, installed) VALUES
      'AusGeneralCapabilitiesBadge',
      0),
     ('Personal Development Badges',
-     'A badge set with codes attached to the Australian Curriculum Personal and Social Capability, and Intercultural and Ethical Understandings, to allow you track the personal development of students.',
+     'A badge set with codes attached to the Australian Curriculum Personal and Social Capability, and Intercultural and Ethical Understandings, to allow you track the personal development of students. The General Capabilities package must be installed for these badges to be installed.',
      'AusPersonalDevelopmentBadge',
      0),
     ('Extra Curricular Badges',
