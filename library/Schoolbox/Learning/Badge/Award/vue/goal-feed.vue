@@ -117,7 +117,16 @@ export default {
               .request(request)
               .then(() => {
                 self.toastSuccess('Achievement awarded');
-                self.updateAwards();
+
+                /* Temporarily replaced implementation of self.updateAwards()
+                 * goal-feed.vue can't tell achievement-feed.vue to update itself; they don't
+                 * share a common parent. They're entirely separate vue apps. An action inside
+                 * goal-feed affects the data in achievement-feed, but I can't talk to
+                 * achievement-feed from goal-feed.
+                 *
+                 * The forced reload will cause achievement-feed to seem updated, for now
+                 */
+                window.location.reload();
               })
               .catch(() => self.toastError('Failed to award achievement'))
 
