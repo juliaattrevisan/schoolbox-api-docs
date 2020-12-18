@@ -1,5 +1,7 @@
 <?php
 
+use Alaress\Color\Color;
+use Alaress\Color\ColorFactory;
 use Schoolbox\Collection;
 use Alaress\Mail\AbstractMailer;
 use Schoolbox\Config\Loader as ConfigLoader;
@@ -193,6 +195,14 @@ function renderStudent(
 
     $student = $userMapper->findById($user['uid']);
 
+
+    // Wrangle default colors
+    $colors       = Timetable_ColourMapper::getInstance()->findAll()->reindex();
+    $colorCount   = count($colors);
+    $colorManager = new Timetable_ColourManager($colors);
+    $colorFactory = new ColorFactory();
+
+
     // Load the list of subjects, and their teacher.
     // Then group by subject type?
     $subjects      = [];
@@ -233,6 +243,15 @@ function renderStudent(
             continue;
         }
 
+        // Apply a color if there is none
+        if ($colorCount > 0 && !$subject['folder']->getColour()) {
+            $subject['folder']->setColour(
+                $colorFactory->build(
+                    $colorManager->getColour($subject['folder']->getCodeString())
+                )
+            );
+        }
+
         $teacherCodes = $classHandler->getTeachers($taughtFolderCodes);
         if (count($teacherCodes) > 0) {
             $subject['teachers'] = $userMapper->findByColumnList([
@@ -253,6 +272,15 @@ function renderStudent(
     foreach ($groups as &$group) {
         $group['perms']  = $groupHandler->getPermission($group['id']);
         $group['folder'] = $groupFolders[$group['id']] ?? null;
+
+        // Apply a color if there is none
+        if ($colorCount > 0 && !$group['folder']->getColour()) {
+            $group['folder']->setColour(
+                $colorFactory->build(
+                    $colorManager->getColour($group['folder']->getId())
+                )
+            );
+        }
 
         $owners = $groupHandler->getOwner($group['id']);
         if (is_array($owners)) {
