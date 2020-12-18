@@ -1,6 +1,5 @@
 <?php
 
-use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Schoolbox\Collection;
 use Alaress\Mail\AbstractMailer;
@@ -197,10 +196,11 @@ function renderStudent(
 
 
     // Wrangle default colors
-    $colors       = Timetable_ColourMapper::getInstance()->findAll()->reindex();
-    $colorCount   = count($colors);
-    $colorManager = new Timetable_ColourManager($colors);
-    $colorFactory = new ColorFactory();
+    $colors              = Timetable_ColourMapper::getInstance()->findAll()->reindex();
+    $colorCount          = count($colors);
+    $colorFactory        = new ColorFactory();
+    $subjectColorManager = new Timetable_ColourManager($colors);
+    $groupColorManager   = new Timetable_ColourManager($colors);
 
 
     // Load the list of subjects, and their teacher.
@@ -247,7 +247,7 @@ function renderStudent(
         if ($colorCount > 0 && !$subject['folder']->getColour()) {
             $subject['folder']->setColour(
                 $colorFactory->build(
-                    $colorManager->getColour($subject['folder']->getCodeString())
+                    $subjectColorManager->getColour($subject['folder']->getCodeString())
                 )
             );
         }
@@ -277,7 +277,7 @@ function renderStudent(
         if ($colorCount > 0 && !$group['folder']->getColour()) {
             $group['folder']->setColour(
                 $colorFactory->build(
-                    $colorManager->getColour($group['folder']->getId())
+                    $groupColorManager->getColour($group['folder']->getId())
                 )
             );
         }
