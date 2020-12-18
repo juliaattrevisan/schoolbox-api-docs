@@ -66,8 +66,9 @@
 }
 
 #evidence-form {
-  #evidence-storage-preview {
+  .evidence-storage-preview {
     max-height: rem-calc(500);
+    max-width: rem-calc(500);
     margin-bottom: 1rem;
   }
   label[for="evidence-body"] {
