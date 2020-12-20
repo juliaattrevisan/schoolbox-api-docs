@@ -91,8 +91,7 @@ class DigestScheduler extends CronScheduler
         foreach ($this->roleMapper->findAll() as $role) {
             $schedule = $role->getDigestSchedule();
 
-            // cast 0 to "0", because loose typing equality because PHP -_-
-            if ((string)$schedule === (string)Role::DIGEST_NEVER) {
+            if ($schedule === null || $schedule === Role::DIGEST_NEVER) {
                 continue;
             }
 

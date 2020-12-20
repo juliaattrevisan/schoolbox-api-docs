@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -54,8 +55,8 @@ $app = new class extends CliTool\App {
          * This is the last known name of the file and applies to existing storage links
          */
         $query = '
-            INSERT INTO task_file (storage_id, task_id, realname)
-            VALUES (:storageId, :taskId, :realname)
+            INSERT INTO task_file (storage_id, task_id, realname, created_at, updated_at)
+            VALUES (:storageId, :taskId, :realname, NOW(), NOW())
         ';
 
         $insertStatement = $this->getDatabaseInternal()->prepareQuery($query);
@@ -79,13 +80,13 @@ $app = new class extends CliTool\App {
         /* Clear task.link of any contents that contained STORAGE_LINK_PREFIX
          * since those were supposed to have migrated to task_link
          */
-        $query = "
+        $updateQuery = "
             UPDATE task
             SET link = ''
             WHERE link LIKE '" . self::STORAGE_LINK_PREFIX . "%'
         ";
 
-        $statement = $this->getDatabaseInternal()->executeQuery($query);
+        $this->getDatabaseInternal()->executeQuery($updateQuery);
     }
 };
 
