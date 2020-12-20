@@ -1,26 +1,27 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\S3;
 
 use Alaress_Byte_Format;
-use Aura\Di\Exception\ServiceNotFound;
+use Alaress\Database as AlaressDatabase;
 use Aws\S3\S3Client;
 use InvalidArgumentException;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem;
 use League\Flysystem\Filesystem;
-use LogicException;
 use Monolog\Logger;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\MapperFactory;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
+
 use function array_filter;
 use function array_key_exists;
 use function basename;
@@ -46,6 +47,7 @@ use function strlen;
 use function strpos;
 use function trim;
 use function unlink;
+
 use const DIRECTORY_SEPARATOR;
 
 /**
@@ -53,10 +55,6 @@ use const DIRECTORY_SEPARATOR;
  */
 class Migration extends CliTool\App
 {
-
-    /** @var Storage\Mapper */
-    private $storageMapper;
-
     /**
      * Configured local storage directory. No trailing slash.
      *
@@ -90,18 +88,21 @@ class Migration extends CliTool\App
      */
     private $filesInS3;
 
+    /** @var bool */
+    private $quiet;
+
 
     /** @inheritDoc */
     public function getShortOpts(): array
     {
-        return ['h', 'd'];
+        return ['h', 'd', 'q'];
     }
 
 
     /** @inheritDoc */
     public function getLongOpts(): array
     {
-        return ['help', 'delete'];
+        return ['help', 'delete', 'quiet'];
     }
 
     /** @var Filesystem */
@@ -109,9 +110,10 @@ class Migration extends CliTool\App
 
     /**
      * @inheritDoc
-     * @throws ServiceNotFound
+     * @throws AlaressDatabase\Exception
+     * @throws Flysystem\FileExistsException
      * @throws InvalidArgumentException
-     * @throws LogicException
+     * @throws \Psr\Log\InvalidArgumentException
      */
     public function run(): void
     {
@@ -121,13 +123,11 @@ class Migration extends CliTool\App
             $this->printHelp();
             exit(CliTool\Kernel::EXIT_STATUS_OK);
         }
+        $this->quiet           = $this->getOpt('q') || $this->getOpt('quiet');
         $this->deleteLocalCopy = $this->getOpt('d') || $this->getOpt('delete');
         $level                 = $this->deleteLocalCopy ? Logger::WARNING : Logger::NOTICE;
         $this->getLogger()->log($level, ($this->deleteLocalCopy ? 'Deleting' : 'Keeping') . ' local storage files');
 
-        /** @var MapperFactory $mapperFactory */
-        $mapperFactory       = $this->getDi()->get('mapperFactory');
-        $this->storageMapper = $mapperFactory->get(Storage\Mapper::class);
         $this->storageDir    = rtrim($this->getConfig()->get('storage_dir'), DIRECTORY_SEPARATOR);
         $this->byteFormat    = new Alaress_Byte_Format();
 
@@ -194,55 +194,63 @@ class Migration extends CliTool\App
 
     /**
      * Retrieves and migrates all local storage files to S3
+     * @throws Flysystem\FileExistsException
+     * @throws AlaressDatabase\Exception
+     * @throws \Psr\Log\InvalidArgumentException
      */
     private function migrateFiles(): void
     {
         // Reset counts for logging
         $countFilesInS3        = $count = $this->countStorageFilesUploaded = $this->countTranscodeFilesUploaded = $this->countBytesUploaded = 0;
-        $storageBeforeTransfer = $this->getDirectorySize($this->storageDir);
+        $storageBeforeTransfer = $this->quiet ? null : $this->getDirectorySize($this->storageDir);
 
         // Retrieve and iterate all files referenced by `storage` table in database
         $this->getLogger()->notice("Fetching storage models from database, this may take a while on large datasets...");
-        $files    = $this->storageMapper->findAll();
-        $countAll = $files->count();
+        $files    = $this->getDatabaseInternal()->executeQuery("SELECT hash, filename, ext FROM storage")->fetchAll(\PDO::FETCH_ASSOC);
+        $countAll = count($files);
         foreach ($files as $file) {
-            // Set file to use AWS S3 filesystem, regardless of Schoolbox's currently configured file system
-            $file->setFilesystem($this->fileSystemAwsS3);
             $count++;
-            $this->getLogger()->notice("Checking file $count/$countAll  {$file->getHash()}, '{$file->getBasename()}'");
-            if ($this->migrateFile($file)) {
+            $baseName = "{$file['filename']}.{$file['extension']}";
+            $this->getLogger()->notice("Checking file $count/$countAll  {$file['hash']}, '$baseName'");
+            if ($this->migrateFile($file['hash'])) {
                 $countFilesInS3++;
             }
         }
 
-        $remainingFiles = $this->getRemainingFiles();
+        $remainingFiles = $this->quiet ? [] : $this->getRemainingFiles();
         if ($this->deleteLocalCopy && !$this->perform()) {
             $storageAfterTransfer = 0;
             // Directories also take up storage space
             $directories = [];
-            foreach ($remainingFiles as $remainingFile) {
-                $storageAfterTransfer += filesize($remainingFile);
-                $directories          = $this->addFileDirectoryAncestors($directories, $remainingFile);
-            }
-            foreach ($directories as $directory => $_) {
-                $storageAfterTransfer += shell_exec("stat -c%s $directory");
+            if (!$this->quiet) {
+                foreach ($remainingFiles as $remainingFile) {
+                    $storageAfterTransfer += filesize($remainingFile);
+                    $directories          = $this->addFileDirectoryAncestors($directories, $remainingFile);
+                }
+                foreach ($directories as $directory => $_) {
+                    $storageAfterTransfer += shell_exec("stat -c%s $directory");
+                }
             }
         } else {
-            $storageAfterTransfer = $this->getDirectorySize($this->storageDir);
+            $storageAfterTransfer = $this->quiet ? null : $this->getDirectorySize($this->storageDir);
         }
         $this->getLogger()->notice(sprintf("Files in storage table:     %d", $countAll));
         $this->getLogger()->notice(sprintf("Files in s3 storage:        %d", count($this->filesInS3)));
         $this->getLogger()->notice(sprintf("Storage files uploaded:     %d", $this->countStorageFilesUploaded));
         $this->getLogger()->notice(sprintf("Transcode files uploaded:   %d", $this->countTranscodeFilesUploaded));
         $this->getLogger()->notice(sprintf("Data transferred:           %s", $this->byteFormat::bytesToString($this->countBytesUploaded)));
-        $this->getLogger()->notice(sprintf("Storage before transfer:    %s", $this->byteFormat::bytesToString($storageBeforeTransfer)));
-        $this->getLogger()->notice(sprintf("Storage after transfer:     %s", $this->byteFormat::bytesToString($storageAfterTransfer)));
+        if (!$this->quiet) {
+            $this->getLogger()->notice(sprintf("Storage before transfer:    %s", $this->byteFormat::bytesToString($storageBeforeTransfer)));
+            $this->getLogger()->notice(sprintf("Storage after transfer:     %s", $this->byteFormat::bytesToString($storageAfterTransfer)));
+        }
         $this->getLogger()->notice(sprintf("Storage files in S3:        %d", $countFilesInS3));
         $countNotInS3 = $countAll - $countFilesInS3;
         $this->getLogger()->log($countNotInS3 ? Logger::WARNING : Logger::NOTICE, sprintf("Storage files not in S3:    %d", $countNotInS3));
-        $this->getLogger()->log(count($remainingFiles) ? Logger::WARNING : Logger::NOTICE, sprintf("Files in local storage but not in S3: %d", count($remainingFiles)));
-        foreach ($remainingFiles as $remainingFile) {
-            $this->getLogger()->debug($remainingFile);
+        if (!$this->quiet) {
+            $this->getLogger()->log(count($remainingFiles) ? Logger::WARNING : Logger::NOTICE, sprintf("Files in local storage but not in S3: %d", count($remainingFiles)));
+            foreach ($remainingFiles as $remainingFile) {
+                $this->getLogger()->debug($remainingFile);
+            }
         }
     }
 
@@ -307,17 +315,19 @@ class Migration extends CliTool\App
     /**
      * Migrate a file from local storage to S3
      *
-     * @param Storage\Model $file
+     * @param string $hash
      * @return bool Whether the file is now in S3 (either previously or newly uploaded)
+     * @throws Flysystem\FileExistsException
      */
-    private function migrateFile(Storage\Model $file): bool
+    private function migrateFile(string $hash): bool
     {
+        $relativePath = Storage\Manager::getPathFromHash($hash);
         // Does file exist locally?
-        $filepath     = "{$this->storageDir}/{$file->getPath()}";
+        $filepath     = "{$this->storageDir}/{$relativePath}";
         $foundLocally = file_exists($filepath);
 
         // Does file already exist in S3?
-        $foundInS3 = array_key_exists(FilesystemFactory::PREFIX_STORAGE . $file->getPath(), $this->filesInS3);
+        $foundInS3 = array_key_exists(FilesystemFactory::PREFIX_STORAGE . $relativePath, $this->filesInS3);
 
         // Handle each of four possible scenarios re: file's presence on local and S3 filesystems:
         if (!$foundLocally) {
@@ -328,7 +338,7 @@ class Migration extends CliTool\App
             }
         } elseif (!$foundInS3) {
             $this->getLogger()->info("File on local disk but not in S3, uploading... (" . $this->byteFormat::bytesToString(filesize($filepath)) . ")");
-            if ($this->moveFileToS3($filepath, $file)) {
+            if ($this->moveFileToS3($filepath)) {
                 $foundInS3 = true;
                 $this->countStorageFilesUploaded++;
             }
@@ -349,20 +359,26 @@ class Migration extends CliTool\App
     /**
      * Moves file from local to S3 filesystem, deleting local copy
      *
-     * @param string         $filepath
-     * @param Flysystem\File $file
+     * @param string         $filepathLocalAbsolute
      * @return bool Whether the move was successful
+     * @throws Flysystem\FileExistsException
      */
-    private function moveFileToS3(string $filepath, Flysystem\File $file): bool
+    private function moveFileToS3(string $filepathLocalAbsolute): bool
     {
-        $fp = fopen($filepath, 'rb');
+        $fp = fopen($filepathLocalAbsolute, 'rb');
         if (!is_resource($fp)) {
             $this->getLogger()->error("Cannot open file for reading, skipping");
             return false;
         }
 
+        $relativeLocalPath = $this->getRelativeLocalPath($filepathLocalAbsolute);
         if ($this->perform()) {
-            $writeSucceeded = $file->writeStream($fp);
+            try {
+                $writeSucceeded = $this->fileSystemAwsS3->writeStream($relativeLocalPath, $fp);
+            } catch (InvalidArgumentException $e) {
+                $this->getLogger()->error("Cannot write file to S3, skipping: '{$e->getMessage()}'");
+                return false;
+            }
         } else {
             $writeSucceeded = true;
         }
@@ -370,20 +386,34 @@ class Migration extends CliTool\App
 
         if ($writeSucceeded) {
             $this->getLogger()->debug("Upload completed");
-            $this->countBytesUploaded += filesize($filepath);
+            $this->countBytesUploaded += filesize($filepathLocalAbsolute);
         } else {
             $this->getLogger()->warning("Upload failed");
             return false;
         }
 
         if ($this->deleteLocalCopy) {
-            $this->getLogger()->debug("Deleting local file '$filepath'");
+            $this->getLogger()->debug("Deleting local file '$filepathLocalAbsolute'");
             if ($this->perform()) {
-                unlink($filepath);
+                unlink($filepathLocalAbsolute);
             }
         }
 
         return true;
+    }
+
+
+    /**
+     * Convert a local absolute path to a path relative to the storage dir
+     *
+     * eg '/var/lib/schoolbox/vagrantx/storage/h/a/s/h/hash' => 'h/a/s/h/hash'
+     *
+     * @param string $filePathLocalAbsolute
+     * @return string
+     */
+    private function getRelativeLocalPath(string $filePathLocalAbsolute): string
+    {
+        return str_replace("{$this->storageDir}/", '', $filePathLocalAbsolute);
     }
 
 
@@ -425,7 +455,7 @@ class Migration extends CliTool\App
                 continue;
             }
             $this->getLogger()->info("Transcode file '$entry' found locally but not in S3, uploading...");
-            if ($this->moveFileToS3($transcodeFilePath, $transcodeFile)) {
+            if ($this->moveFileToS3($transcodeFilePath)) {
                 $this->countTranscodeFilesUploaded++;
             }
         }
@@ -497,6 +527,8 @@ Options:
         Print help message and exit.
     -d, --delete
         If present, delete files from local storage
+    -q, --quiet
+        Don't derive or print file system usage (faster tool execution)
     -p, --perform
         Without this flag, tool will not persist files to S3 or delete from local storage
 ";
