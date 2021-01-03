@@ -14,7 +14,7 @@ Depends: ${misc:Depends}
 Provides: schoolbox-mobile, schoolbox-leave, schoolbox-resource, schoolbox-eotc
 Replaces: schoolbox-mobile, schoolbox-leave, schoolbox-resource, schoolbox-eotc
 Conflicts: javascript-common, schoolbox-mobile, schoolbox-leave, schoolbox-resource, schoolbox-eotc
-Description: Schoolbox LMS by Alaress Pty. Ltd.
+Description: Schoolbox LMS by Schoolbox Pty. Ltd.
  Schoolbox is at the leading edge of eLearning solutions for the K-12
  education market. The Schoolbox system is carefully integrated with school
  data-stores and into each unique existing infrastructure to provide an
