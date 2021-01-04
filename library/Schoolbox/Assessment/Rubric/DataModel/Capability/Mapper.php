@@ -8,8 +8,8 @@ namespace Schoolbox\Assessment\Rubric\DataModel\Capability;
 
 use PDOStatement;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Mapper as CapabilityUsageMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
 use Schoolbox\Assessment\Rubric\Util;
+use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -246,10 +246,11 @@ class Mapper extends BaseMapper
      * Joins hydrated:
      *  * Curriculum nodes
      *
-     * @param int    $parentId
-     * @param string $parentType
-     * @param string $name
-     * @param bool   $cache
+     * @param int                    $parentId
+     * @param string                 $parentType
+     * @param string                 $name
+     * @param bool                   $cache
+     * @param Collection|null $curriculumNodes
      * @return Model
      * @throws MapperException if for some reason it can't be created
      */
@@ -257,7 +258,8 @@ class Mapper extends BaseMapper
         int $parentId,
         string $parentType,
         string $name,
-        bool $cache = true
+        bool $cache = true,
+        ?Collection $curriculumNodes = null
     ): Model
     {
         // Try to find a capability with this name
@@ -267,14 +269,19 @@ class Mapper extends BaseMapper
             return $existing;
         }
 
+        // If curriculum nodes are not provided, just set empty collection.
+        if (null === $curriculumNodes) {
+            /** @var NodeMapper $nodeMapper */
+            $nodeMapper      = $this->getJoinMapper('curriculum_node_for_rubric_capability');
+            $curriculumNodes = $nodeMapper->createCollection();
+        }
+
         // Couldn't find. Create one
-        /** @var NodeMapper $nodeMapper */
-        $nodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_capability');
-        $item       = $this->createModel()
-                           ->setParentId($parentId)
-                           ->setParentType($parentType)
-                           ->setName($name)
-                           ->setCurriculumNodes($nodeMapper->createCollection());
+        $item = $this->createModel()
+                     ->setParentId($parentId)
+                     ->setParentType($parentType)
+                     ->setName($name)
+                     ->setCurriculumNodes($curriculumNodes);
         $this->save($item);
         return $item;
     }

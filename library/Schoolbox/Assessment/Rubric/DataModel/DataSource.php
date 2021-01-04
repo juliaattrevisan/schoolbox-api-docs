@@ -1483,7 +1483,9 @@ class DataSource
             if ($duplicateCapability) {
                 $dstCapability = $existingCapabilityMap[$capabilityName];
             } else {
-                $dstCapability = clone $srcDescriptor->getIndicator()->getCapability();
+                // hydrate to get curriculum nodes
+                $srcCapability = $capabilityMapper->findById($srcDescriptor->getIndicator()->getCapability()->getId());
+                $dstCapability = clone $srcCapability;
                 $dstCapability->setId(null);
                 $dstCapability->setParentId($dstBox->getCategory()->getId());
                 $existingCapabilityMap[$capabilityName] = $dstCapability;
@@ -1495,7 +1497,9 @@ class DataSource
             if ($duplicateIndicator) {
                 $dstIndicator = $existingIndicatorMap[$capabilityName][$indicatorName];
             } else {
-                $dstIndicator = clone $srcDescriptor->getIndicator();
+                // hydrate to get curriculum nodes
+                $srcIndicator = $indicatorMapper->findById($srcDescriptor->getIndicator()->getId());
+                $dstIndicator = clone $srcIndicator;
                 $dstIndicator->setId(null);
                 $dstIndicator->setCapability($dstCapability);
                 $existingIndicatorMap[$capabilityName][$indicatorName] = $dstIndicator;
