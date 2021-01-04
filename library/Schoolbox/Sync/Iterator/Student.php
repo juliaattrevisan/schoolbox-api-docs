@@ -86,11 +86,11 @@ class Student extends IteratorIterator
 
         $student->getCampus()->add($campus);
 
-        $student->setCustomField1((string)$currentResult['customField1']);
-        $student->setCustomField2((string)$currentResult['customField2']);
-        $student->setCustomField3((string)$currentResult['customField3']);
-        $student->setCustomField4((string)$currentResult['customField4']);
-        $student->setCustomField5((string)$currentResult['customField5']);
+        $student->setCustomField1((string)$currentResult['custom_field1']);
+        $student->setCustomField2((string)$currentResult['custom_field2']);
+        $student->setCustomField3((string)$currentResult['custom_field3']);
+        $student->setCustomField4((string)$currentResult['custom_field4']);
+        $student->setCustomField5((string)$currentResult['custom_field5']);
 
         return $student;
     }

@@ -61,7 +61,6 @@ class Guardian extends IteratorIterator
             ->setGivenName($currentResult['student_contact_given_name'])
             ->setPreferredName($currentResult['student_contact_preferred'])
             ->setLastname($currentResult['student_contact_surname'])
-            ->setGender($currentResult['student_gender'])
         ;
 
         if (array_key_exists('student_contact_type', $currentResult)) {
@@ -93,10 +92,7 @@ class Guardian extends IteratorIterator
                 ->setGender($row['student_gender'])
             ;
 
-            $student
-                ->getYear()
-                ->setLevel($row['student_year_level'])
-            ;
+            $student->getYear()->setLevel($row['student_year_level']);
 
             /* Campus
              */
@@ -106,18 +102,15 @@ class Guardian extends IteratorIterator
 
             /* House
              */
-            $student
-                ->getHouse()
-                ->setCode($row['student_house'])
-            ;
+            $student->getHouse()->setCode($row['student_house']);
 
             $guardian->addStudent($student);
 
-            $guardian->setCustomField1((string)$currentResult['customField1']);
-            $guardian->setCustomField2((string)$currentResult['customField2']);
-            $guardian->setCustomField3((string)$currentResult['customField3']);
-            $guardian->setCustomField4((string)$currentResult['customField4']);
-            $guardian->setCustomField5((string)$currentResult['customField5']);
+            $guardian->setCustomField1((string)$currentResult['custom_field1']);
+            $guardian->setCustomField2((string)$currentResult['custom_field2']);
+            $guardian->setCustomField3((string)$currentResult['custom_field3']);
+            $guardian->setCustomField4((string)$currentResult['custom_field4']);
+            $guardian->setCustomField5((string)$currentResult['custom_field5']);
         }
         return $guardian;
     }

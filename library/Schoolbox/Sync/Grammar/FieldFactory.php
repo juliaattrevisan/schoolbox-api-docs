@@ -34,24 +34,17 @@ class FieldFactory
             'givenName'     => 'Given Name',
             'lastname'      => 'Last Name',
 
-            'publiclyVisible'     => 'Visibility',
-            'gender'              => 'Gender',
             'email[].address'     => 'Default Email Address(es)',
             'workEmail[].address' => 'Work Email Address(es)',
             'homeEmail[].address' => 'Home Email Address(es)',
 
-            'phoneHome.number'   => 'Home Phone Number',
-            'phoneHome.silent'   => 'Home Phone Silent Status',
-            'phoneMobile.number' => 'Mobile Phone Number',
-            'phoneMobile.silent' => 'Mobile Phone Silent Status',
-
             'campus[].code' => 'Campus(es) Code(s)',
 
-            'customField1[]' => 'Custom Field 1',
-            'customField2[]' => 'Custom Field 2',
-            'customField3[]' => 'Custom Field 3',
-            'customField4[]' => 'Custom Field 4',
-            'customField5[]' => 'Custom Field 5',
+            'customField1' => 'Custom Field 1',
+            'customField2' => 'Custom Field 2',
+            'customField3' => 'Custom Field 3',
+            'customField4' => 'Custom Field 4',
+            'customField5' => 'Custom Field 5',
         ];
 
         switch ($roleType) {
@@ -59,8 +52,6 @@ class FieldFactory
                 $augment = [
                     'year.level'                => 'Year Level',
                     'house.code'                => 'House Code',
-                    'phoneWork.number'          => 'Work Phone Number',
-                    'phoneWork.silent'          => 'Work Phone Silent Status',
                     'meta.department'           => 'Department',
                     'meta.position'             => 'Position(s)',
                     'meta.position.description' => 'Position Description(s)',
@@ -75,14 +66,11 @@ class FieldFactory
                     'form.level'         => 'Form Level',
                     'house.code'         => 'House Code',
                     'boardingHouse.code' => 'Boarding House Code',
+                    'gender'             => 'Gender',
                 ];
                 break;
             case Role::PARENT:
                 $augment = [
-                    'phoneWork.number'         => 'Work Phone Number',
-                    'phoneWork.silent'         => 'Work Phone Silent Status',
-                    'type'                     => 'Contact Type',
-                    'role'                     => 'Guardian Role',
                     'students[].campus[].code' => 'Student Campus(es) Code(s)',
                     'students[].year.level'    => 'Student Year',
                     'students[].house.code'    => 'Student House Code(s)',
