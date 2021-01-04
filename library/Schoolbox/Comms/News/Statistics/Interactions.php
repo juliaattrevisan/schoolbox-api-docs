@@ -182,8 +182,7 @@ class Interactions
     public function fetchCumulative(News\Model $article): array
     {
         $pb = $this->statisticsCumulativeMapper->getPredicateBuilder()
-            ->equals('article_id', $article->getId())
-            ->lessThanOrEqualTo('date', \Alaress_Date_Format::now()->getDatabaseDate());
+            ->equals('article_id', $article->getId());
 
         $statistics = $this->statisticsCumulativeMapper->findByPredicates($pb, [
             'order' => [
@@ -200,6 +199,8 @@ class Interactions
             /* Total number of Opens across all time
              */
             'numOpens' => $this->calculateNumOpens($statistics),
+
+            'numUniqueOpens' => $this->uniqueOpens($article),
 
             /* Total number of Comments
              */
@@ -476,6 +477,21 @@ class Interactions
         }
 
         return $numOpens;
+    }
+
+    /**
+     * Calculate the amount of unique visitors to an article
+     *
+     * @param Collection $statistics
+     * @return int
+     */
+    private function uniqueOpens(News\Model $article): int
+    {
+        $query = "SELECT COUNT(DISTINCT(user_id)) as views FROM comms_news_article_statistics
+                    WHERE article_id = :articleId";
+        $stmt = $this->database->prepareQuery($query);
+        $stmt->execute(['articleId'=>$article->getId()]);
+        return $stmt->fetchColumn();
     }
 
 

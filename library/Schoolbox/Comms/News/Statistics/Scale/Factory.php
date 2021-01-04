@@ -35,7 +35,7 @@ class Factory
     /**
      * Default scale when the specified one doesn't exist
      */
-    private const DEFAULT_SCALE = 'day';
+    private const DEFAULT_SCALE = 'hour';
 
 
     /**

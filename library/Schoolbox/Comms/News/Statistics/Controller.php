@@ -100,6 +100,8 @@ class Controller extends Base
              */
             'cumulative' => $interactions->fetchCumulative($article),
 
+            'audience' => count($this->userResolver->findUsersForArticle($article)),
+
             /* Overall Referrer Demographics
              */
              'referrerDemographic' => $interactions->fetchReferrerDemographic($article),
