@@ -71,6 +71,7 @@ class FieldFactory
                 break;
             case Role::PARENT:
                 $augment = [
+                    'type'                     => 'Contact Type',
                     'students[].campus[].code' => 'Student Campus(es) Code(s)',
                     'students[].year.level'    => 'Student Year',
                     'students[].house.code'    => 'Student House Code(s)',
