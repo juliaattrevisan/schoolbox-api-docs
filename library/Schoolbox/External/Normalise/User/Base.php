@@ -1,4 +1,5 @@
 <?php
+
 /**
  * User
  *
@@ -8,6 +9,7 @@
  */
 
 namespace Schoolbox\External\Normalise\User;
+
 use Schoolbox\External\Normalise\User\Common\Account;
 use Schoolbox\External\Normalise\User\Common\Address;
 use Schoolbox\External\Normalise\User\Common\Phone;
@@ -15,7 +17,8 @@ use Schoolbox\External\Normalise\User\Common\Email;
 use Schoolbox\External\Normalise\User\Common\BoardingHouse;
 use Schoolbox\Collection;
 
-abstract class Base {
+abstract class Base
+{
 
     /* Personal
      */
@@ -185,7 +188,8 @@ abstract class Base {
      *
      * @return bool
      */
-    public function isBoarder() {
+    public function isBoarder()
+    {
         return (!empty($this->getBoardingHouse()->getId()));
     }
 
@@ -197,7 +201,8 @@ abstract class Base {
      * @param Email $email
      * @return $this
      */
-    public function addEmail($email) {
+    public function addEmail($email)
+    {
         if (strlen(trim($email->getAddress()))) {
             $this->getEmail()->add($email);
         }
