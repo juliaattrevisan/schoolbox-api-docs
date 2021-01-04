@@ -21,13 +21,13 @@ class Timetable extends Base implements ITimetable
      */
     public function getCurrentSemester($externalId = null)
     {
-        if (!empty($externalUserId)) {
+        if (!empty($externalId)) {
 
             // Get user specific file semester
 
             $semesterStatement = $this->databaseExternal->executeStoredProcedure(
                 'spsConfigUserDefaultYearSemester',
-                ['ID', $externalUserId]
+                ['ID', $externalId]
             );
 
             if ($row = $semesterStatement->fetch()) {
@@ -38,8 +38,8 @@ class Timetable extends Base implements ITimetable
         // Get current default file semester
 
         $semesterStatement = $this->databaseExternal->executeQuery("
-            SELECT    FileSemester 
-            FROM      FileSemesters   
+            SELECT    FileSemester
+            FROM      FileSemesters
             WHERE     SystemCurrentFlag = 1
         ");
 
@@ -55,13 +55,13 @@ class Timetable extends Base implements ITimetable
      */
     public function getCurrentYear($externalId = null)
     {
-        if (!empty($externalUserId)) {
+        if (!empty($externalId)) {
 
             // Get user specific file year
 
             $semesterStatement = $this->databaseExternal->executeStoredProcedure(
                 'spsConfigUserDefaultYearSemester',
-                ['ID', $externalUserId]
+                ['ID', $externalId]
             );
 
             if ($row = $semesterStatement->fetch()) {
@@ -73,7 +73,7 @@ class Timetable extends Base implements ITimetable
 
         $semesterStatement = $this->databaseExternal->executeQuery("
             SELECT    FileYear
-            FROM      FileSemesters   
+            FROM      FileSemesters
             WHERE     SystemCurrentFlag = 1
         ");
 
@@ -111,15 +111,15 @@ class Timetable extends Base implements ITimetable
                                 Semester.FileSemester = StudentClasses.FileSemester AND
                                 Semester.FileYear = StudentClasses.FileYear AND
                                 Semester.SystemCurrentFlag = 1
-                                    
+
                 LEFT JOIN       luFileType ON StudentClasses.FileType = luFileType.Code
                 WHERE           StudentClasses.StartDate <= getdate() AND
                                 (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
-                ORDER BY        SubjectClasses.FileType ASC, 
+                ORDER BY        SubjectClasses.FileType ASC,
                                 SubjectClasses.Description ASC
-                
-                UNION ALL 
-                
+
+                UNION ALL
+
                 SELECT DISTINCT c2.SubjectClassesSeq AS id,
                                 c1.ClassCode AS code,
                                 c1.ClassCampus AS campus,
@@ -138,7 +138,7 @@ class Timetable extends Base implements ITimetable
                                 Semester.FileYear = c1.FileYear AND
                                 Semester.SystemCurrentFlag = 1
                 LEFT JOIN       luFileType ON c2.FileType = luFileType.Code
-                ORDER BY        luFileType.Description ASC, 
+                ORDER BY        luFileType.Description ASC,
                                 c2.Description ASC
             ",
             array_merge

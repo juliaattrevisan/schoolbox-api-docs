@@ -144,7 +144,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 // This makes assumptions that Synergetic setup correctly with either D=D# or D#=D#, and the explode doesn't get a row without =
                 if (!empty($overrideDay) && is_numeric($overrideDay)) {
                     // Yep, found overriding day number. Use this instead
-                    $day = $overrideDay;
+                    $day = (int)$overrideDay;
                 }
             }
         }
