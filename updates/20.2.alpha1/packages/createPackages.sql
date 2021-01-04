@@ -15,7 +15,7 @@ INSERT INTO package (title,description,location, installed) VALUES
      'Attaches codes to the Australian Curriculum General Capabilities, to allow for the mapping of these to learning resources.  This is required to install the General Capability Badge set.',
      'AusGeneralCapabilities',
      0),
-    ('Australian Curriculum - Cross Curricular Priorities',
+    ('Australian Curriculum - Cross-curriculum Priorities',
      'Attaches codes to the Australian Curriculum Cross-curriculum priorities, to allow for the mapping of these to learning resources.',
      'AusCrossCurricular',
      0),
