@@ -103,6 +103,13 @@ class Student extends IteratorIterator
             ->getCampus()
             ->add($campus)
         ;
+
+        $student->setCustomField1($currentResult['customField1']);
+        $student->setCustomField2($currentResult['customField2']);
+        $student->setCustomField3($currentResult['customField3']);
+        $student->setCustomField4($currentResult['customField4']);
+        $student->setCustomField5($currentResult['customField5']);
+
         return $student;
     }
 }

@@ -46,6 +46,12 @@ class FieldFactory
             'phoneMobile.silent'     => 'Mobile Phone Silent Status',
 
             'campus[].code'          => 'Campus(es) Code(s)',
+
+            'customField1[]'        => 'Custom Field 1',
+            'customField2[]'        => 'Custom Field 2',
+            'customField3[]'        => 'Custom Field 3',
+            'customField4[]'        => 'Custom Field 4',
+            'customField5[]'        => 'Custom Field 5',
         ];
 
         switch($roleType) {
