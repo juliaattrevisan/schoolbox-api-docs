@@ -108,7 +108,8 @@
         "symfony/lock": "^4.4",
         "dragonmantank/cron-expression": "^3.0",
         "ext-simplexml": "*",
-        "enshrined/svg-sanitize": "^0.13.3"
+        "enshrined/svg-sanitize": "^0.13.3",
+        "symfony/yaml": "^5.2"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
