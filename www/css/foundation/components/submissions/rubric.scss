@@ -144,6 +144,7 @@ table.rb {
     line-height: $form-label-line-height;
     span{
       margin: $table-row-padding;
+      margin-right: 2.25rem; // to avoid descriptor text getting hidden under the student's self reflection choice icon
     }
   }
     textarea {
