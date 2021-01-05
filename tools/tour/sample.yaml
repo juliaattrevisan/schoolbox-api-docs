@@ -13,7 +13,7 @@ tour:
         title: Step 1 Title
         type: modal
         content: "<p>Some Text that goes into a modal</p>"
-        css_class: special_css
+        class: special_css
     - step:
         title: Step 2 Title
         type: tooltip
