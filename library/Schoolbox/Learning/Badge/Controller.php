@@ -279,6 +279,10 @@ class Controller extends Base
             $model->setIcon(null);
         }
 
+        if (!$model->getImage() && !$model->getIcon()) {
+            throw $this->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
+
         $this->mapper->save($model);
 
         // Return the badge just created
