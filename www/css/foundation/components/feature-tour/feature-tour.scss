@@ -87,6 +87,12 @@ $tooltip-padding: 1rem;
   min-width: $modal-width;
 }
 
+.introjs-newsmodal {
+  min-width: 40rem;
+  .introjs-tooltiptext {
+    padding-right: 0;
+  }
+}
 
 // ----------------------------------------------------------------
 // Highlighted area
