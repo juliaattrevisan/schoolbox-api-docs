@@ -155,6 +155,7 @@ class Controller extends Base
             'schoolName' => $this->getConfigLoader()->get('school_name'),
             'baseUrl'    => $this->getRequest()->url->get(PHP_URL_SCHEME) . '://' . $this->getRequest()->url->get(PHP_URL_HOST),
             'url'        => $this->getRequest()->url->get(),
+            'referrer'   => News\Statistics\Mapper::REFERRER_RSS,
             'articles'   => $articles,
         ]));
     }

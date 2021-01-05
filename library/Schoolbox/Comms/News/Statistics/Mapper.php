@@ -26,8 +26,11 @@ class Mapper extends \Schoolbox\Mapper
     public const REFERRER_EMAIL = 'email';
     public const REFERRER_HOMEPAGE = 'homepage';
     public const REFERRER_INDEX = 'index';
+    public const REFERRER_RSS = 'rss';
     public const REFERRER_SAVED = 'saved';
     public const REFERRER_SEARCH = 'search';
+
+
 
 
     /**
@@ -45,6 +48,7 @@ class Mapper extends \Schoolbox\Mapper
         self::REFERRER_HOMEPAGE,
         self::REFERRER_EMAIL,
         self::REFERRER_INDEX,
+        self::REFERRER_RSS,
         self::REFERRER_SAVED,
         self::REFERRER_SEARCH,
         self::REFERRER_EMPTY

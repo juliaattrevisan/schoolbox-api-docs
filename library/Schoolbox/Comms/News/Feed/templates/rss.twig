@@ -20,7 +20,7 @@
                 {# image|raw is okay, as it's outputting only a single <img> tag #}
                 <![CDATA[{{ image|raw }}{{ article.body|purify }}]]>
             </description>
-            <link>{{ baseUrl }}{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}</link>
+            <link>{{ baseUrl }}{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}?ref={{ referrer }}</link>
             <pubDate>{{ article.publishAt|date('r') }}</pubDate>
             <guid>{{ baseUrl }}{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}</guid>
         </item>
