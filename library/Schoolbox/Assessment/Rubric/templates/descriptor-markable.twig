@@ -57,7 +57,7 @@
 {% endif %}
 
 {# Self-assessment #}
-{% if selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading %}
+{% if selfAssessmentFeedback and selfAssessmentIndicatorMark and selfAssessmentFeedback.isSelfGrading %}
     {% set tooltip = '(' ~ selfAssessmentIndicatorMark.value ~ ') ' ~ locale.selfAssessment.proper %}
 {% else %}
     {% set tooltip = locale.selfReflection.proper %}
@@ -70,5 +70,5 @@
          src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
          title="{{ tooltip }} choice" />
     {% endif %}
-    
+
 {% endif %}
