@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -28,6 +29,7 @@ use const PHP_URL_SCHEME;
 
 class Controller extends Base
 {
+
     /** @var News\Mapper */
     private $newsMapper;
 

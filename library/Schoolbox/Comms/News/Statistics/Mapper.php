@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Comms\News\Statistics;
 
 /**
@@ -12,7 +14,7 @@ namespace Schoolbox\Comms\News\Statistics;
  * @package Schoolbox\Comms\News\Statistics
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
- * @method Model findOneByColumnList($columnList, array $options = array());
+ * @method Model findOneByColumnList($columnList, array $options = []);
  */
 class Mapper extends \Schoolbox\Mapper
 {
@@ -20,17 +22,15 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Consts to match schema enums
      */
-    public const TYPE_OPEN = 'open';
-    public const REFERRER_ARCHIVE = 'archive';
+    public const TYPE_OPEN          = 'open';
+    public const REFERRER_ARCHIVE   = 'archive';
     public const REFERRER_DASHBOARD = 'dashboard';
-    public const REFERRER_EMAIL = 'email';
-    public const REFERRER_HOMEPAGE = 'homepage';
-    public const REFERRER_INDEX = 'index';
-    public const REFERRER_RSS = 'rss';
-    public const REFERRER_SAVED = 'saved';
-    public const REFERRER_SEARCH = 'search';
-
-
+    public const REFERRER_EMAIL     = 'email';
+    public const REFERRER_HOMEPAGE  = 'homepage';
+    public const REFERRER_INDEX     = 'index';
+    public const REFERRER_RSS       = 'rss';
+    public const REFERRER_SAVED     = 'saved';
+    public const REFERRER_SEARCH    = 'search';
 
 
     /**
@@ -51,7 +51,7 @@ class Mapper extends \Schoolbox\Mapper
         self::REFERRER_RSS,
         self::REFERRER_SAVED,
         self::REFERRER_SEARCH,
-        self::REFERRER_EMPTY
+        self::REFERRER_EMPTY,
     ];
 
 

@@ -4,6 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Comms\News\Statistics;
 
 use Alaress\Database\Connector\IConnector;
@@ -71,8 +72,8 @@ class Interactions
         Mapper $statisticsMapper,
         Cumulative\Mapper $statisticsCumulativeMapper
     ) {
-        $this->database = $databaseInternal;
-        $this->statisticsMapper = $statisticsMapper;
+        $this->database                   = $databaseInternal;
+        $this->statisticsMapper           = $statisticsMapper;
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
     }
 
@@ -124,14 +125,16 @@ class Interactions
          * increment cumulative total if (and only if) a unique Open was made
          */
         try {
-            $open = $this->statisticsMapper->findOneByColumnList([
-                'article_id' => $article->getId(),
-                'type'       => Mapper::TYPE_OPEN,
-                'user_id'    => $userId,
-                'referrer'   => $referrer,
-                'role_type'  => $roleType,
-                'role_id'    => $roleId,
-            ]);
+            $open = $this->statisticsMapper->findOneByColumnList(
+                [
+                    'article_id' => $article->getId(),
+                    'type'       => Mapper::TYPE_OPEN,
+                    'user_id'    => $userId,
+                    'referrer'   => $referrer,
+                    'role_type'  => $roleType,
+                    'role_id'    => $roleId,
+                ]
+            );
 
             /* If this (user, referrer) combination already exists, don't record duplicate data; just leave
              * Otherwise, this (user, referrer) combination indicates a new Open for this particular user
@@ -141,12 +144,12 @@ class Interactions
             }
         } catch (NotFound $e) {
             $open = $this->statisticsMapper->createModel()
-                ->setArticleId($article->getId())
-                ->setUserId($userId)
-                ->setReferrer($referrer)
-                ->setRoleType($roleType)
-                ->setRoleId($roleId)
-                ->setType(Mapper::TYPE_OPEN);
+                                           ->setArticleId($article->getId())
+                                           ->setUserId($userId)
+                                           ->setReferrer($referrer)
+                                           ->setRoleType($roleType)
+                                           ->setRoleId($roleId)
+                                           ->setType(Mapper::TYPE_OPEN);
         }
 
         /* It's a valid referrer and $user hasn't Opened this period
@@ -157,7 +160,6 @@ class Interactions
         try {
             return $this->statisticsMapper->save($open->setOccursAt($date));
         } catch (PDOException $e) {
-
             /* noop
              *
              * A race condition occurs when multiple opens are made by the same user
@@ -182,19 +184,21 @@ class Interactions
     public function fetchCumulative(News\Model $article): array
     {
         $pb = $this->statisticsCumulativeMapper->getPredicateBuilder()
-            ->equals('article_id', $article->getId());
+                                               ->equals('article_id', $article->getId());
 
-        $statistics = $this->statisticsCumulativeMapper->findByPredicates($pb, [
+        $statistics = $this->statisticsCumulativeMapper->findByPredicates(
+            $pb, [
             'order' => [
-                'date' => 'asc'
-            ]
-        ]);
+                'date' => 'asc',
+            ],
+        ]
+        );
 
         $summary = [
 
             /* First open (a specific alteration for this data set)
              */
-            'date' => $statistics->count() ? $statistics->first()->getDate() : null,
+            'date'     => $statistics->count() ? $statistics->first()->getDate() : null,
 
             /* Total number of Opens across all time
              */
@@ -204,11 +208,11 @@ class Interactions
 
             /* Total number of Comments
              */
-            'numComments' => $this->calculateNumComments($article),
+            'numComments'    => $this->calculateNumComments($article),
 
             /* Total number of times this article got Saved For Later
              */
-            'numSaved' => $this->calculateNumSaved($article)
+            'numSaved'       => $this->calculateNumSaved($article),
         ];
 
         return $summary;
@@ -223,11 +227,13 @@ class Interactions
      */
     public function fetchReferrerDemographic(News\Model $article): array
     {
-        $statistics = $this->statisticsCumulativeMapper->findByColumn('article_id', $article->getId(), [
+        $statistics = $this->statisticsCumulativeMapper->findByColumn(
+            'article_id', $article->getId(), [
             'order' => [
-                'date' => 'asc'
-            ]
-        ]);
+                'date' => 'asc',
+            ],
+        ]
+        );
 
         $summary = $this->summariseDailyStatistics($statistics);
 
@@ -257,7 +263,7 @@ class Interactions
         }
 
         return [
-            'date' => $statistics->count() ? $statistic->getDate() : null,
+            'date'      => $statistics->count() ? $statistic->getDate() : null,
             'breakdown' => [
                 'grid' => $breakdown,
             ],
@@ -276,7 +282,8 @@ class Interactions
     {
         $breakdown = $this->generateDefaultBreakdown(Role::getRoleTypes());
 
-        $statement = $this->database->prepareQuery("
+        $statement = $this->database->prepareQuery(
+            "
             SELECT
                 SUM(num) AS num,
                 `type`,
@@ -285,11 +292,14 @@ class Interactions
             WHERE article_id = :articleId
             GROUP BY `type`, role_type
             ORDER BY role_type;
-        ");
+        "
+        );
 
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
+        $statement->execute(
+            [
+                'articleId' => $article->getId(),
+            ]
+        );
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $breakdown[$row['type']][$row['role_type']] += $row['num'];
@@ -310,7 +320,8 @@ class Interactions
      */
     private function generatePlaceholders(News\Statistics\Scale\IScale $strat, News\Model $article)
     {
-        $statement = $this->database->prepareQuery("
+        $statement = $this->database->prepareQuery(
+            "
             SELECT
                 ROUND(MIN(nodes.timestamp))/1000 AS min_timestamp,
                 ROUND(MAX(nodes.timestamp))/1000 AS max_timestamp
@@ -325,11 +336,14 @@ class Interactions
                 GROUP BY timestamp, role_type
                 ORDER BY timestamp ASC
             ) nodes
-        ");
+        "
+        );
 
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
+        $statement->execute(
+            [
+                'articleId' => $article->getId(),
+            ]
+        );
 
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
 
@@ -362,7 +376,8 @@ class Interactions
          */
         $strat = (new Factory())->produce($scale);
 
-        $statement = $this->database->prepareQuery("
+        $statement = $this->database->prepareQuery(
+            "
             SELECT
                 {$strat->getSql()}
                 role_type,
@@ -372,11 +387,14 @@ class Interactions
             AND deleted_at IS NULL
             GROUP BY timestamp, role_type
             ORDER BY role_type, timestamp ASC
-        ");
+        "
+        );
 
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
+        $statement->execute(
+            [
+                'articleId' => $article->getId(),
+            ]
+        );
 
         /* Data container containing placeholder elements
          */
@@ -387,7 +405,7 @@ class Interactions
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $data[$row['role_type']][$row['datetime']] = [
                 (int)$row['timestamp'],
-                (int)$row['num']
+                (int)$row['num'],
             ];
 
             /* Have Total series data in the same format
@@ -409,9 +427,11 @@ class Interactions
              * First encountered setting the period to be longer than 30 days and using the Month scale
              * option but may occur if we misconfigured something
              */
-            usort($data[$roleType], function ($a, $b) {
+            usort(
+                $data[$roleType], function ($a, $b) {
                 return $a[0] > $b[0];
-            });
+            }
+            );
         }
 
         return $data;
@@ -429,14 +449,16 @@ class Interactions
     public function fetchHistoric(News\Model $article): array
     {
         $pb = $this->statisticsCumulativeMapper->getPredicateBuilder()
-            ->equals('article_id', $article->getId())
-            ->lessThan('date', \Alaress_Date_Format::now()->getDatabaseDate());
+                                               ->equals('article_id', $article->getId())
+                                               ->lessThan('date', \Alaress_Date_Format::now()->getDatabaseDate());
 
-        $dailyStatistics = $this->statisticsCumulativeMapper->findByPredicates($pb, [
+        $dailyStatistics = $this->statisticsCumulativeMapper->findByPredicates(
+            $pb, [
             'order' => [
-                'date' => 'asc'
-            ]
-        ]);
+                'date' => 'asc',
+            ],
+        ]
+        );
 
         /* Group by date
          */
@@ -448,9 +470,9 @@ class Interactions
 
             if (!isset($historic[$date])) {
                 $historic[$date] = [
-                    'date' => $date,
-                    'numOpens' => 0,
-                    'numComments' => $this->calculateNumComments($article, $dailyStatistic->getDate()->getDatabaseDate())
+                    'date'        => $date,
+                    'numOpens'    => 0,
+                    'numComments' => $this->calculateNumComments($article, $dailyStatistic->getDate()->getDatabaseDate()),
                 ];
             }
 
@@ -482,15 +504,15 @@ class Interactions
     /**
      * Calculate the amount of unique visitors to an article
      *
-     * @param Collection $statistics
+     * @param News\Model $article
      * @return int
      */
     private function uniqueOpens(News\Model $article): int
     {
         $query = "SELECT COUNT(DISTINCT(user_id)) as views FROM comms_news_article_statistics
                     WHERE article_id = :articleId";
-        $stmt = $this->database->prepareQuery($query);
-        $stmt->execute(['articleId'=>$article->getId()]);
+        $stmt  = $this->database->prepareQuery($query);
+        $stmt->execute(['articleId' => $article->getId()]);
         return $stmt->fetchColumn();
     }
 
@@ -521,9 +543,11 @@ class Interactions
 
         $statement = $this->database->prepareQuery($query);
 
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
+        $statement->execute(
+            [
+                'articleId' => $article->getId(),
+            ]
+        );
 
         return (int)$statement->fetch(\PDO::FETCH_ASSOC)['numComments'];
     }
@@ -547,30 +571,13 @@ class Interactions
 
         $statement = $this->database->prepareQuery($query);
 
-        $statement->execute([
-            'articleId' => $article->getId()
-        ]);
+        $statement->execute(
+            [
+                'articleId' => $article->getId(),
+            ]
+        );
 
         return (int)$statement->fetch(\PDO::FETCH_ASSOC)['numSaved'];
-    }
-
-
-    /**
-     * Calculate a integer percentage, but you can specify precision
-     *
-     * I think this will end up being used to calculate percentage of
-     * audience that read the article so don't worry about codeclimax
-     *
-     * @param null|int $numerator
-     * @param null|int $denominator
-     * @param int      $precision
-     * @return float
-     */
-    private function percentage(?int $numerator, ?int $denominator, int $precision = 0): float
-    {
-        $percentage = $denominator ? round(100*$numerator/$denominator, $precision) : 0;
-
-        return $percentage > 100 ? 100 : $percentage;
     }
 
 

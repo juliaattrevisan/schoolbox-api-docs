@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory
  *
@@ -26,9 +27,9 @@ class Factory
      * @var array
      */
     public const SCALE_OPTIONS = [
-        'hour'      => 60,
-        'day'       => 60*24,
-        'month'     => 60*24*31,
+        'hour'  => 60,
+        'day'   => 60 * 24,
+        'month' => 60 * 24 * 31,
     ];
 
 
