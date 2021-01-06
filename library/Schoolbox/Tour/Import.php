@@ -18,6 +18,9 @@ class Import extends CliTool\App
     /** @var bool */
     private $dryRun;
 
+    /**
+     * @return string[]
+     */
     public function getLongOpts(): array
     {
         return ['dry-run'];
@@ -127,10 +130,10 @@ HELP
     }
 
     /**
-     * @param       $tourID
-     * @param array $roleTypes
+     * @param string $tourID
+     * @param array  $roleTypes
      */
-    private function createAudience($tourID, array $roleTypes): void
+    private function createAudience(string $tourID, array $roleTypes): void
     {
         $statement = $this->getDatabaseInternal()->prepareQuery(
             "
@@ -273,10 +276,10 @@ HELP
     }
 
     /**
-     * @param $stepID
-     * @param $title
-     * @param $body
-     * @param $class
+     * @param string $stepID
+     * @param string $title
+     * @param string $body
+     * @param ?string $class
      */
     private function createModalStep(string $stepID, string $title, string $body, ?string $class): void
     {
@@ -313,10 +316,10 @@ HELP
     }
 
     /**
-     * @param $stepID
-     * @param $body
-     * @param $selector
-     * @param $class
+     * @param string $stepID
+     * @param string $body
+     * @param string $selector
+     * @param ?string $class
      */
     private function createTooltipStep(string $stepID, string $body, string $selector, ?string $class): void
     {
@@ -353,11 +356,11 @@ HELP
     }
 
     /**
-     * @param $stepID
-     * @param $selector
-     * @param $event
-     * @param $when
-     * @param $order
+     * @param string $stepID
+     * @param string $selector
+     * @param string $event
+     * @param string $when
+     * @param int    $order
      */
     private function createStepEvent(string $stepID, string $selector, string $event, string $when, int $order): void
     {
