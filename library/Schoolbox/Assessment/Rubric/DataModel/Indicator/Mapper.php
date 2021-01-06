@@ -11,6 +11,7 @@ use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper as IndicatorUsageMapper;
 use Schoolbox\Assessment\Rubric\Util;
+use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -340,11 +341,13 @@ class Mapper extends BaseMapper {
      * * capability
      * * capability.curriculumNodes
      *
-     * @param int    $parentId
-     * @param string $parentType
-     * @param string $name
-     * @param string $capabilityName
-     * @param bool   $cache
+     * @param int                    $parentId
+     * @param string                 $parentType
+     * @param string                 $name
+     * @param string                 $capabilityName
+     * @param Collection|null $capabilityCurriculumNodes
+     * @param Collection|null $indicatorCurriculumNodes
+     * @param bool                   $cache
      * @return Model
      * @throws MapperException
      */
@@ -353,7 +356,9 @@ class Mapper extends BaseMapper {
         string $parentType,
         string $name,
         string $capabilityName,
-        bool $cache = true
+        bool $cache = true,
+        ?Collection $capabilityCurriculumNodes = null,
+        ?Collection $indicatorCurriculumNodes = null
     ): Model
     {
         // Try to find an indicator with the "same" name and capability name
@@ -366,14 +371,19 @@ class Mapper extends BaseMapper {
         // Couldn't find. Let's create one.
         /** @var CapabilityMapper $capabilityMapper */
         $capabilityMapper = $this->getJoinMapper('capability');
-        /** @var NodeMapper $nodeMapper */
-        $nodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_indicator');
+
+        // If curriculum nodes are not provided, just set empty collection.
+        if (null === $indicatorCurriculumNodes) {
+            /** @var NodeMapper $nodeMapper */
+            $nodeMapper               = $this->getJoinMapper('curriculum_node_for_rubric_indicator');
+            $indicatorCurriculumNodes = $nodeMapper->createCollection();
+        }
         // Get a capability under which this indicator should be created
-        $capability = $capabilityMapper->findOrCreateOneForParentByName($parentId, $parentType, $capabilityName, $cache);
+        $capability = $capabilityMapper->findOrCreateOneForParentByName($parentId, $parentType, $capabilityName, $cache, $capabilityCurriculumNodes);
         $indicator  = $this->createModel()
                            ->setCapability($capability)
                            ->setName($name)
-                           ->setCurriculumNodes($nodeMapper->createCollection());
+                           ->setCurriculumNodes($indicatorCurriculumNodes);
         $this->save($indicator);
         return $indicator;
     }
@@ -385,10 +395,12 @@ class Mapper extends BaseMapper {
      *
      * If none exists: create it
      *
-     * @param int    $folderId
-     * @param string $name
-     * @param string $capabilityName
-     * @param bool   $cache
+     * @param int             $folderId
+     * @param string          $name
+     * @param string          $capabilityName
+     * @param bool            $cache
+     * @param Collection|null $capabilityCurriculumNodes
+     * @param Collection|null $indicatorCurriculumNodes
      * @return Model
      * @throws MapperException
      */
@@ -396,10 +408,20 @@ class Mapper extends BaseMapper {
         int $folderId,
         string $name,
         string $capabilityName,
-        bool $cache = true
+        bool $cache = true,
+        ?Collection $capabilityCurriculumNodes = null,
+        ?Collection $indicatorCurriculumNodes = null
     ): Model
     {
-        return $this->findOrCreateOneForParentByKey($folderId, CapabilityModel::PARENT_TYPE_CATEGORY, $name, $capabilityName, $cache);
+        return $this->findOrCreateOneForParentByKey(
+            $folderId,
+            CapabilityModel::PARENT_TYPE_CATEGORY,
+            $name,
+            $capabilityName,
+            $cache,
+            $capabilityCurriculumNodes,
+            $indicatorCurriculumNodes
+        );
     }
 
 

@@ -17,7 +17,7 @@ use Component_ConfigMapper;
 use Component_Definition;
 use Component_Instance;
 use Component_InstanceMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineComponentController;
@@ -966,21 +966,26 @@ class Controller extends Base\Base
 
 
     /**
+     * Copies indicators and capabilities from units which are not existing in the destination folder
+     *
      * @param int[] $sourceIds
      * @param int   $destinationId
      * @return static
+     * @throws MapperException
      */
-    private function copyCriteria(array $sourceIds, int $destinationId): self
+    private function copyIndicator(array $sourceIds, int $destinationId): self
     {
-        $criteriaMapper = Mapper::getInstance();
+        $indicatorMapper = IndicatorMapper::getInstance();
 
-        // Save copy of criteria with class page as parent
-        foreach ($criteriaMapper->findForFolder($sourceIds) as $criteria) {
-            $criteriaMapper->findOrCreateOneForFolderByKey(
+        // Save copy of indicators with class page as parent
+        foreach ($indicatorMapper->findForFolder($sourceIds) as $indicator) {
+            $indicatorMapper->findOrCreateOneForFolderByKey(
                 $destinationId,
-                $criteria->getName(),
-                $criteria->getCapability()->getName(),
-                false
+                $indicator->getName(),
+                $indicator->getCapability()->getName(),
+                false,
+                $indicator->getCapability()->getCurriculumNodes(),
+                $indicator->getCurriculumNodes()
             );
         }
 
@@ -1115,7 +1120,7 @@ class Controller extends Base\Base
 
                 //Save unit criteria to class page
                 $allFolders = array_merge($courseFolder, $unitFolders);
-                $this->copyCriteria($allFolders, $classFolderId);
+                $this->copyIndicator($allFolders, $classFolderId);
             }
         } else {
             // We are modifying an existing import
@@ -1134,7 +1139,7 @@ class Controller extends Base\Base
             //Save unit criteria to class page
             $classFolderId = $folderIds[0];
 
-            $this->copyCriteria($unitFolders, $classFolderId);
+            $this->copyIndicator($unitFolders, $classFolderId);
         }
 
         // Delete de-selected Units and Assessments
