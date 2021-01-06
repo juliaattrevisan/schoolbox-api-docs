@@ -85,5 +85,4 @@ class FieldFactory
 
         return array_merge($map, $augment);
     }
-
 }

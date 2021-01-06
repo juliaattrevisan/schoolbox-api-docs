@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Iterator over a `External_UserInterface->getParentUserAccountIterator()` -
  * maps each result to a `Schoolbox\External\Normalise\User\Guardian` object.
