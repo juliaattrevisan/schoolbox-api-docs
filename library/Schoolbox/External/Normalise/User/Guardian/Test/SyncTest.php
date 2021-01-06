@@ -18,7 +18,7 @@ class SyncTest extends TestCase
 {
 
     /**
-     * @dataProvider provider_multi_row
+     * @dataProvider providerMultiRow
      * @param Iterator $iterator
      * @param int[]    $ids
      */
@@ -32,7 +32,7 @@ class SyncTest extends TestCase
     }
 
 
-    public function provider_multi_row()
+    public function providerMultiRow()
     {
         $keys = [
             'student_contact_id',
