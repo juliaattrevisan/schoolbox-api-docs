@@ -83,6 +83,7 @@
                                              */
                                             onSelect: function(element) {
                                                 $('[data-icon-selection] img').attr('src', $(element).attr('src')).show();
+                                                $('#badge-icon-file-error').remove();
                                                 $('input[name=icon]').val($(element).attr('src'));
 
                                                 $('#icon-modal').foundation('reveal', 'close');
@@ -108,13 +109,17 @@
                                         {% if badge and badge.image %}
                                         $('[data-image-selector]').trigger('click');
                                         {% endif %}
+                                        $('#{{ attachzone.id }}-zone').on('success.attachzone', function(event, file) {
+                                            $('#badge-icon-file-error').remove();
+                                        });
+
                                     });
                                 </script>
                             </div>
                             <div class="small-12 medium-6 columns" data-icon-container>
                                 <div data-icon-selection>
                                     <img src="{{ badge and badge.icon ? badge.icon : '' }}" width="128" height="128" />
-                                    <input id="badge-icon" name="icon" type="hidden" value="{{ badge and badge.icon ? badge.icon : '' }}" />
+                                    <input id="badge-icon-file" name="icon" type="hidden" value="{{ badge and badge.icon ? badge.icon : '' }}" />
                                 </div>
                                 <div>
                                     {% include '@learningBadge/icon-modal.twig' with {
@@ -192,6 +197,35 @@
 
         // Set up validation and save
         let $form = $('#badge-form');
+        $.validator.addMethod(
+                "hasImage",
+                function (value, element) {
+                    let selectedOption = $('input[name=badge-avatar-selector]:checked').val();
+
+                    /* At least one element must be chosen
+                     */
+                    if (selectedOption === undefined) {
+                        return false;
+                    }
+
+                    /* Depending on the radio element you chose,
+                     * require a specific input element's value
+                     */
+                    if ('icon' === selectedOption) {
+                        return $form.find('input[name="icon"]').val().length > 0;
+                    }
+
+                    /* Attachzones don't have any particular input field upon which you can
+                     * statically check like other form fields. The presence of one or more
+                     * <input data-az-attachment> elements, which spawn when you add files
+                     * etc., help you conclude whether at least one file was supplied.
+                     * These spawn in data-dz-previews
+                     */
+                    if ('image' === selectedOption) {
+                        return $form.find('input[name="image"]').length > 0;
+                    }
+                    return false;
+                }, 'Please choose a badge image.');
         $form.alaressValidate({
             rules: {
                 name: {
@@ -205,36 +239,7 @@
                  * Attachzones spawn an input element
                  */
                 icon: {
-                    required: {
-                        depends: function(element) {
-                            let selectedOption = $('input[name=badge-avatar-selector]:checked').val();
-
-                            /* At least one element must be chosen
-                             */
-                            if (selectedOption === undefined) {
-                                return true;
-                            }
-
-                            /* Depending on the radio element you chose,
-                             * require a specific input element's value
-                             */
-                            if ('icon' === selectedOption) {
-                                return $form.find('input[name="icon"]').val().length === 0;
-                            }
-
-                            /* Attachzones don't have any particular input field upon which you can
-                             * statically check like other form fields. The presence of one or more
-                             * <input data-az-attachment> elements, which spawn when you add files
-                             * etc., help you conclude whether at least one file was supplied.
-                             * These spawn in data-dz-previews
-                             */
-                            if ('image' === selectedOption) {
-                                return $form.find('input[name="image"]').length === 0;
-                            }
-
-                            return false;
-                        }
-                    }
+                    hasImage: true,
                 }
             },
             errorPlacement: function(error, element) {

@@ -80,7 +80,9 @@ $data = {
                     thumbnailSize: '{{ attachzone.size }}',
                     fallbackButtonSelector: 'a[data-attach-fallback]',
                     previewsContainerSelector: '[data-dz-previews]',
-                    onDetach: {{ onDetach is defined and onDetach ? onDetach|raw : 'null' }},
+                    {% if onDetach is defined %}
+                    onDetach: {{ onDetach|raw }},
+                    {% endif %}
                     useFolder: false,
                     useModal: {{ attachzone.useModal ? 'true' : 'false' }},
                     capture: {{ attachzone.capture ? 'true' : 'false' }},
