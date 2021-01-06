@@ -214,7 +214,7 @@ class Bulk_Folder
             try {
                 $newFolder->setColour((new ColorFactory())->build($folderColour));
             } catch (InvalidArgumentException $e) {
-                $warnings[] = "Colour {$folderColour} is not valid.";
+                $warnings[] = "{$folderColour} is not a valid RGB or HEX colour.";
             }
         }
 
@@ -226,8 +226,11 @@ class Bulk_Folder
                 if ($file->getMimetype()->isImage()) {
                     $newFolder->setCoverImage($file);
                 }
+                else {
+                    $warnings[] = "Provided hash is not an image: {$folderImageHash}.";
+                }
             } catch (MapperException $e) {
-                $warnings[] = "Image hash {$folderImageHash} is not valid.";
+                $warnings[] = "Unable to find image {$folderImageHash}.";
             }
         }
 
