@@ -5,6 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Color\ColorFactory;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
@@ -15,6 +16,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageConfigMapper;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\YearLevel;
 
@@ -63,6 +65,8 @@ class Bulk_Folder
     /** @var YearLevel\Mapper */
     private $yearLevelMapper;
 
+    /** @var StorageMapper */
+    private $storageMapper;
 
     /**
      * Constructor
@@ -88,6 +92,7 @@ class Bulk_Folder
         $this->roleMapper           = RoleMapper::getInstance();
         $this->homepageConfigMapper = HomepageConfigMapper::getInstance();
         $this->yearLevelMapper      = YearLevel\Mapper::getInstance();
+        $this->storageMapper        = StorageMapper::getInstance();
     }
 
 
@@ -111,10 +116,12 @@ class Bulk_Folder
         $headerRow = fgetcsv($this->fp, 1000, ",");
 
         // Determine column semantics from header values
-        $parentColumn      = $this->determineColumnIndex($headerRow, 'parent');
-        $folderNameColumn  = $this->determineColumnIndex($headerRow, 'name');
-        $folderCodeColumns = $this->determineColumnIndexes($headerRow, 'code');
-        $yearLevelColumns  = $this->determineColumnIndexes($headerRow, 'year');
+        $parentColumn       = $this->determineColumnIndex($headerRow, 'parent');
+        $folderNameColumn   = $this->determineColumnIndex($headerRow, 'name');
+        $folderColourColumn = $this->determineColumnIndex($headerRow, 'colour', false);
+        $folderImageColumn  = $this->determineColumnIndex($headerRow, 'image', false);
+        $folderCodeColumns  = $this->determineColumnIndexes($headerRow, 'code');
+        $yearLevelColumns   = $this->determineColumnIndexes($headerRow, 'year');
 
         // Check no overlapping matches
         $this->assertColumnIndexesAreUnique([$parentColumn, $folderNameColumn], $folderCodeColumns, $yearLevelColumns);
@@ -128,6 +135,8 @@ class Bulk_Folder
                 $row,
                 $parentColumn,
                 $folderNameColumn,
+                $folderColourColumn,
+                $folderImageColumn,
                 $folderCodeColumns,
                 $yearLevelColumns,
                 $yearLevels,
@@ -146,6 +155,8 @@ class Bulk_Folder
      * @param array                               $row
      * @param int                                 $parentColumnIndex
      * @param int                                 $folderNameColumnIndex
+     * @param int                                 $folderColourColumnIndex
+     * @param int                                 $folderImageColumnIndex
      * @param int[]                               $folderCodeColumnIndexes
      * @param int[]                               $yearLevelColumnIndexes
      * @param GenericCollection|YearLevel\Model[] $yearLevels Indexed by yearLevel.name
@@ -162,6 +173,8 @@ class Bulk_Folder
         array $row,
         int $parentColumnIndex,
         int $folderNameColumnIndex,
+        int $folderColourColumnIndex,
+        int $folderImageColumnIndex,
         array $folderCodeColumnIndexes,
         array $yearLevelColumnIndexes,
         GenericCollection $yearLevels,
@@ -193,6 +206,31 @@ class Bulk_Folder
             ->setHomepage($homepageConfig);
         $homepageConfig->setCategory($newFolder);
 
+        $warnings = [];
+
+        // Folder Colour
+        $folderColour = $folderColourColumnIndex >= 0 ? trim($row[$folderColourColumnIndex]) : '';
+        if (!empty($folderColour)) {
+            try {
+                $newFolder->setColour((new ColorFactory())->build($folderColour));
+            } catch (InvalidArgumentException $e) {
+                $warnings[] = "Colour {$folderColour} is not valid.";
+            }
+        }
+
+        // Folder Image
+        $folderImageHash = $folderImageColumnIndex >= 0 ? trim($row[$folderImageColumnIndex]) : '';
+        if (!empty($folderImageHash)) {
+            try {
+                $file = $this->storageMapper->findByHash($folderImageHash);
+                if ($file->getMimetype()->isImage()) {
+                    $newFolder->setCoverImage($file);
+                }
+            } catch (MapperException $e) {
+                $warnings[] = "Image hash {$folderImageHash} is not valid.";
+            }
+        }
+
         // Folder Codes
         $result = $this->processFolderCodes($rowIdx, $row, $newFolder, $folderCodeColumnIndexes);
         if ($result) {
@@ -208,7 +246,7 @@ class Bulk_Folder
         // Persist models to DB.
         $newFolder->setInherit($this->inherit && count($newFolder->getCodes()) === 0);
         if (!$perform) {
-            return $this->buildRowResult($rowIdx, '', $newFolder->getNameWithCodes(), 'Would Add', 'OK');
+            return $this->buildRowResult($rowIdx, '', $newFolder->getNameWithCodes(), 'Would Add', !empty($warnings) ? implode(' ', $warnings) : 'OK');
         }
 
         try {
@@ -221,7 +259,7 @@ class Bulk_Folder
         $this->saveHomepageConfig($newFolder->getHomepage());
         $this->saveRolePermissions($newFolder);
 
-        return $this->buildRowResult($rowIdx, (string)$newFolder->getId(), $newFolder->getNameWithCodes(), 'Added', 'OK');
+        return $this->buildRowResult($rowIdx, (string)$newFolder->getId(), $newFolder->getNameWithCodes(), 'Added', !empty($warnings) ? implode(' ', $warnings) : 'OK');
     }
 
 
@@ -396,10 +434,11 @@ class Bulk_Folder
      *
      * @param array  $headerRow
      * @param string $search
+     * @param bool   $required
      * @return int
      * @throws UnexpectedValueException
      */
-    private function determineColumnIndex(array $headerRow, string $search): int
+    private function determineColumnIndex(array $headerRow, string $search, bool $required = true): int
     {
         $parentIdColumns = [];
         foreach ($headerRow as $idx => $value) {
@@ -409,6 +448,10 @@ class Bulk_Folder
         }
         if (count($parentIdColumns) === 1) {
             return reset($parentIdColumns);
+        }
+
+        if (!$required) {
+            return -1;
         }
 
         $headerRowValues = implode(',', $headerRow);
