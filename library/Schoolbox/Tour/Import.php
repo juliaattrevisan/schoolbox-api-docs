@@ -14,18 +14,6 @@ use Schoolbox\Application\CliTool;
  */
 class Import extends CliTool\App
 {
-
-    /** @var bool */
-    private $dryRun;
-
-    /**
-     * @return string[]
-     */
-    public function getLongOpts(): array
-    {
-        return ['dry-run'];
-    }
-
     public function run(): void
     {
         global $argv;
@@ -36,16 +24,14 @@ class Import extends CliTool\App
             <<<HELP
 Imports a tour written in YAML format
 
-Usage: $filename [--dry-run] [FILE]
+Usage: $filename [--perform] [FILE]
 
-    --dry-run: if set, don't update anything, but show what would be updated.
+    --perform: use this flag to ensure changes are persisted, otherwise just shows what would happen
 
 HELP
             ;
             exit;
         }
-
-        $this->dryRun = $this->getOpt('dry-run');
 
         $file = array_pop($argv);
         if (!(is_file($file) && is_readable($file))) {
@@ -97,7 +83,7 @@ HELP
 
         $tourID = $this->generateGUID();
 
-        if (!$this->dryRun) {
+        if ($this->perform()) {
             $statement = $this->getDatabaseInternal()->prepareQuery(
                 "
             INSERT INTO tour (
@@ -152,7 +138,7 @@ HELP
 
         foreach ($roleTypes as $type) {
             $this->getLogger()->info('Making tour visible for: ' . $type);
-            if (!$this->dryRun) {
+            if ($this->perform()) {
                 $statement->execute(
                     [
                         'tour_uuid' => $tourID,
@@ -195,7 +181,7 @@ HELP
                         NOW()
                 )"
         );
-        if (!$this->dryRun) {
+        if ($this->perform()) {
             $statement->execute(
                 [
                     'trigger_uuid' => $this->generateGUID(),
@@ -245,7 +231,7 @@ HELP
 
         $stepID = $this->generateGUID();
 
-        if (!$this->dryRun) {
+        if ($this->perform()) {
             $statement->execute(
                 [
                     'uuid'           => $stepID,

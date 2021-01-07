@@ -8,5 +8,5 @@
 
 declare(strict_types=1);
 
-passthru('php '. __DIR__ .  '/../../tools/tour/install.php '.__DIR__.'/202tour.yaml', $returnVar);
+passthru('php '. __DIR__ .  '/../../tools/tour/install.php --perform '.__DIR__.'/202tour.yaml', $returnVar);
 exit($returnVar);
