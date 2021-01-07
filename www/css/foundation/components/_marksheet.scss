@@ -21,23 +21,40 @@
 #courseMarkbookContent, .marksheet, #report_content {
     // Legend
     .legend {
+        .indicators {
+          display: flex;
+          justify-content: flex-end;
+          flex-wrap: wrap;
+        }
         .indicator {
             position: relative;
             top: .75rem;
             margin-right: .5rem;
         }
-        p {
+        .meta {
             display: inline-block;
             margin-right: 2rem;
-        }
-        .checklist {
-            display: inline-block;
-            margin-right: 2rem;
+
+            @media #{$small-only} {
+                margin-right: 1rem;
+            }
         }
     }
-    .actions-small-1 .legend {
-      margin-right: 3rem;
-      margin-top: .5rem;
+    .actions-small-1 {
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+      flex-wrap: wrap;
+
+      > div, nav {
+        flex: 0 1 auto;
+      }
+      .checklist {
+        margin-right: 1rem;
+      }
+      nav {
+        position: relative;
+      }
     }
 
     // Indicators: used in legend, so don't put in .marksheet
