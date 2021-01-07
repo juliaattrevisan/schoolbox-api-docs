@@ -476,8 +476,8 @@
             <dd class="active"><a href="#activity">Activity Feed</a></dd>
             {% endif %}
             {% if showAchievementsTab %}
-            <dd class="{% if not showActivityFeed %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
             <dd><a href="#goals">Goals</a></dd>
+            <dd class="{% if not showActivityFeed %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
             {% endif %}
             {% if showClasses %}
             <dd><a href="#classes">Classes</a></dd>
@@ -515,24 +515,6 @@
                 <script type="text/javascript" src="/javascript/components/learningMomentsFeed.bundle.js"></script>
             </div>
             {% endif %}
-
-            <div class="content" id="achievements">
-                {% autoescape 'js' %}
-                    <script type="text/javascript">
-                        window.learningBadgeAchievementFeedConfig = {
-                            routes: {
-                                getAwardFeed: '{{ routeLookupIfAuthorized(
-                                    'learningBadgeAward.getAwardedBadges',
-                                    {user: user, userId: user.id, awardStatus: 'achievement'}
-                                ) }}'
-                            },
-                        };
-                    </script>
-                {% endautoescape %}
-                <div id="achievement-feed"></div>
-                <script type="text/javascript" src="/javascript/components/badgeAchievementFeed.bundle.js"></script>
-            </div>
-
             <div class="content no-pad" id="goals">
                 {% autoescape 'js' %}
                     <script type="text/javascript">
@@ -549,7 +531,22 @@
                 <div id="goal-feed"></div>
                 <script type="text/javascript" src="/javascript/components/badgeGoalFeed.bundle.js"></script>
             </div>
-
+            <div class="content" id="achievements">
+                {% autoescape 'js' %}
+                    <script type="text/javascript">
+                        window.learningBadgeAchievementFeedConfig = {
+                            routes: {
+                                getAwardFeed: '{{ routeLookupIfAuthorized(
+                                    'learningBadgeAward.getAwardedBadges',
+                                    {user: user, userId: user.id, awardStatus: 'achievement'}
+                                ) }}'
+                            },
+                        };
+                    </script>
+                {% endautoescape %}
+                <div id="achievement-feed"></div>
+                <script type="text/javascript" src="/javascript/components/badgeAchievementFeed.bundle.js"></script>
+            </div>
             {% if showClasses %}
             <div class="content" id="classes">
                 <section>
