@@ -1,0 +1,72 @@
+config:
+
+  #Modules
+  boarder_leave_enable: false
+  teams_enabled: true
+  curriculum_tagging_enabled: false
+  eotc_enabled: false
+  learning_moments_enable : true
+  badges_enable : true
+  fixtures_enabled: true
+  pastoral_enabled : false
+  resource_booking_enabled: true
+  webdav_enable: true
+
+  #LMS
+  grades_comments_enable: false
+  custom_assessment_participation: false
+  self_assessment_enabled: false
+  course_markbook_enable: false
+  assessment_calendar_enabled: false
+  class_markbook_enable: false
+  rubric_markbook_enable: false
+  upcoming_assessments_enabled : false
+  grades_enabled: false
+
+  #Comms
+  comms_comments_enabled: true
+  comms_statistics_enable : false
+  global_moderation: true
+  messaging_enabled: true
+  push_notifications_enabled: true
+  external_document_report_enabled: false
+  ups_groups_enabled: true
+  eportfolio_enable: true
+  staff_directory_enable: true
+  parent_directory_enable: true
+
+  # APIs
+  weather_api_key: false
+  googledrive_enabled: true
+  cyberhound_api_url: false
+  clickview_school_id: true
+  plagscan_client_id: false
+  kami_api_key: false
+  rubicon_atlas_api_token: false
+  canvas_data_api_key: false
+  office365_tenant: true
+  googleapps_api_key: true
+
+topMenu:
+  hide:
+    - /learning/pending
+    - /learning/due
+    - /learning/grades
+    - /course/list
+    - /pastoral
+  show:
+    - /eportfolio
+    - /fixtures
+components:
+  hide:
+   - Schoolbox_Learning_Component_Dashboard_UpcomingWorkController
+   - Component_Dashboard_RecentSubmissionsController
+   - Schoolbox\Learning\Assessment\DueWork\Component\Homepage\Controller
+   - Schoolbox\Learning\Assessment\Quiz\Component\Homepage\Controller
+   - Component_Homepage_WolframController
+   - Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller
+   - Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller
+   - Component_Homepage_RubricController
+   - Schoolbox\Curriculum\Component\CurriculumDetailsController
+   - Schoolbox\Curriculum\Component\CurriculumOverviewController
+   - Schoolbox\Learning\Assessment\Task\Component\Homepage\Controller

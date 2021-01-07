@@ -1,11 +1,77 @@
 config:
+
+  #Modules
   boarder_leave_enable: false
-  googledrive_enabled: true
+  teams_enabled: true
+  curriculum_tagging_enabled: false
+  eotc_enabled: false
+  learning_moments_enable : false
+  badges_enable : false
+  fixtures_enabled: false
+  pastoral_enabled : false
+  resource_booking_enabled: false
+  webdav_enable: false
+
+  #LMS
   grades_comments_enable: false
+  custom_assessment_participation: false
+  self_assessment_enabled: false
+  course_markbook_enable: false
+  assessment_calendar_enabled: false
+  class_markbook_enable: false
+  rubric_markbook_enable: false
+  upcoming_assessments_enabled : false
+  grades_enabled: false
+
+  #Comms
+  comms_comments_enabled: true
+  comms_statistics_enable : false
+  global_moderation: true
+  messaging_enabled: true
+  push_notifications_enabled: true
+  external_document_report_enabled: false
+  ups_groups_enabled: true
+  eportfolio_enable: false
+  staff_directory_enable: false
+  parent_directory_enable: false
+
+  # APIs
+  weather_api_key: false
+  googledrive_enabled: true
+  cyberhound_api_url: false
+  clickview_school_id: false
+  plagscan_client_id: false
+  kami_api_key: false
+  rubicon_atlas_api_token: false
+  canvas_data_api_key: false
+  office365_tenant: true
+  googleapps_api_key: true
+
 topMenu:
   hide:
     - /learning/pending
     - /learning/due
+    - /learning/grades
+    - /course/list
+    - /eportfolio
+    - /fixtures
+    - /pastoral
 components:
   hide:
    - Schoolbox_Learning_Component_Dashboard_UpcomingWorkController
+   - Component_Dashboard_RecentSubmissionsController
+   - Component_Homepage_ClickviewController
+   - Schoolbox\Learning\Assessment\DueWork\Component\Homepage\Controller
+   - Schoolbox\Learning\Assessment\Quiz\Component\Homepage\Controller
+   - Component_Homepage_ChatController
+   - Component_Homepage_WolframController
+   - Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller
+   - Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller
+   - Component_Homepage_RubricController
+   - Component_Homepage_EtherpadController
+   - Schoolbox\Curriculum\Component\CurriculumDetailsController
+   - Schoolbox\Curriculum\Component\CurriculumOverviewController
+   - Schoolbox\LTI\Component\Homepage\Controller
+   - Schoolbox\Fixtures\Component\Homepage\Controller
+   - Schoolbox\Fixtures\Component\Dashboard\Controller
+   - Schoolbox\Learning\Assessment\Task\Component\Homepage\Controller
