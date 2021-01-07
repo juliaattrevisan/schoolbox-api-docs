@@ -1,0 +1,11 @@
+config:
+  boarder_leave_enable: false
+  googledrive_enabled: true
+  grades_comments_enable: false
+topMenu:
+  hide:
+    - /learning/pending
+    - /learning/due
+components:
+  hide:
+   - Schoolbox_Learning_Component_Dashboard_UpcomingWorkController
