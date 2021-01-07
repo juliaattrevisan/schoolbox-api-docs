@@ -107,8 +107,9 @@ abstract class Broker implements IBroker
                             $consumer->onException(new PayloadBrokenException($key, $resolve));
                             return;
                         }
-                    } catch (\Throwable $e) {
-                        $consumer->onException(new PayloadBrokenException($key, $resolve, intval($e->getCode()), $e));
+                    }
+                    catch (\Throwable $e) {
+                        $consumer->onException($e);
                         return;
                     }
 
