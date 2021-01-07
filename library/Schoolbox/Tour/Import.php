@@ -55,20 +55,22 @@ HELP
             $stepID = $this->createStep($tourID, $stepID, $step['type'], $step['title'], $step['content'], $step['class'], $step['selector'], $step['events']);
         }
 
-        // Update the tour table with the first step uuid
-        $statement = $this->getDatabaseInternal()->prepareQuery(
-            "
+        if ($this->perform()) {
+            // Update the tour table with the first step uuid
+            $statement = $this->getDatabaseInternal()->prepareQuery(
+                "
             UPDATE          `tour`
             SET             `first_step_uuid` = :first_step_uuid
             WHERE           `uuid` = :uuid
         "
-        );
-        $statement->execute(
-            [
-                'uuid'            => $tourID,
-                'first_step_uuid' => $stepID,
-            ]
-        );
+            );
+            $statement->execute(
+                [
+                    'uuid'            => $tourID,
+                    'first_step_uuid' => $stepID,
+                ]
+            );
+        }
     }
 
     /**
@@ -398,5 +400,3 @@ HELP
             substr($uuid, 20, 12);
     }
 }
-
-?>
