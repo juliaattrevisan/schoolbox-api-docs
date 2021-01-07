@@ -1,0 +1,27 @@
+tour:
+  title: Demo Tour
+  description: A description of my tour
+  roles:
+    - staff
+    - student
+  trigger:
+    urlRegex: ^/demo/page
+    selector: body
+    event: tourReady
+  steps:
+    - step:
+        title: Step 1 Title
+        type: modal
+        content: "<p>Some Text that goes into a modal</p>"
+        class: special_css
+    - step:
+        title: Step 2 Title
+        type: tooltip
+        selector: '#unique-page-id'
+        content: "<p>Lots of text about this thing on the page<i class='icon-grip'></i>. Some more html to demonstrate a<i class='icon-settings'></i> button.</p>"
+        events:
+          - event:
+              selector: '#object-to-fire-event'
+              call: accordion.open
+              when: open
+

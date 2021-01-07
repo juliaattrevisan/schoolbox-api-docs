@@ -170,9 +170,9 @@ class Mapper extends BaseMapper
         // We have the basic audience query, onto this we need to append the regular expression URL filter
         $userQuery['bindings']['url'] = $url;
 
-        $sql = " 
-            {$this->getSelectString()} 
-            WHERE       {$userQuery['query']} AND 
+        $sql = "
+            {$this->getSelectString()}
+            WHERE       {$userQuery['query']} AND
                         :url REGEXP `t`.`url_regex` AND
                         `{$this->getTable()}`.`active` = 1
         ";
@@ -186,6 +186,8 @@ class Mapper extends BaseMapper
                             FROM tour_status
                             WHERE user_id = :user_id)";
         }
+
+        $sql .= ' ORDER BY updated_at';
 
         $statement = $this->getDatabase()->prepare($sql);
         $statement->execute($userQuery['bindings']);
@@ -218,9 +220,9 @@ class Mapper extends BaseMapper
         // --------------------------------------------------------------------------------------------------------
 
         $audiencedRoleClause = "
-            {$this->getTable()}.`uuid` IN 
+            {$this->getTable()}.`uuid` IN
             (
-                SELECT  `tar`.`tour_uuid` 
+                SELECT  `tar`.`tour_uuid`
                 FROM    `tour_audience_role` `tar`
                 WHERE   `tar`.`role_id` = (:roleId)
             )
