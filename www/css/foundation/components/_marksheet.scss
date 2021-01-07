@@ -50,7 +50,11 @@
         flex: 0 1 auto;
       }
       .checklist {
-        margin-right: 1rem;
+        margin-right: 2rem;
+
+        @media #{$small-only} {
+          margin-right: 1rem;
+        }
       }
       nav {
         position: relative;
