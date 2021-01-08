@@ -74,14 +74,14 @@ config:
 
   #Comms
   comms_comments_enabled: { hide: false }
-  comms_statistics_enable : {value: false, hide: true}
+  comms_statistics_enabled : {value: false, hide: true}
   global_moderation: { hide: false }
   messaging_enabled: { hide: false }
   push_notifications_enabled: { hide: false }
   ups_groups_enabled: { value: true, hide: false }
-  eportfolio_enable: {value: false, hide: true}
-  staff_directory_enable: {value: false, hide: true}
-  parent_directory_enable: {value: false, hide: true}
+  eportfolio_enabled: {value: false, hide: true}
+  staff_directory_enabled: {value: false, hide: true}
+  parent_directory_enabled: {value: false, hide: true}
 
   # APIs
   weather_api_key: { hide: true }
