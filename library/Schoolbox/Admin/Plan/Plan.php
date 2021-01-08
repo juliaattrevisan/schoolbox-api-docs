@@ -83,11 +83,22 @@ class Plan extends CliTool\App
      */
     private function setTopMenu(array $menu)
     {
+
+        // Hide any menu items that match the hide URL string
         $statement = $this->getDatabaseInternal()->prepareQuery("
             UPDATE menu_top SET deleted_at = NOW() WHERE url like :url AND deleted_at IS NULL
         ");
         foreach ($menu['hide'] as $url) {
             $this->getLogger()->info("Disabling menu items containing the url: '$url'");
+            $statement->execute(['url' => $url . '%']);
+        }
+
+        // Undelete any menu items that match the show string
+        $statement = $this->getDatabaseInternal()->prepareQuery("
+            UPDATE menu_top SET deleted_at = NULL WHERE url like :url AND deleted_at IS NOT NULL
+        ");
+        foreach ($menu['show'] as $url) {
+            $this->getLogger()->info("Enabling menu items containing the url: '$url'");
             $statement->execute(['url' => $url . '%']);
         }
     }
