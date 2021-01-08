@@ -10,6 +10,7 @@ config:
   fixtures_enabled: {value: false, hide: true}
   pastoral_enabled : {value: false, hide: true}
   resource_booking_enabled: {value: false, hide: true}
+  external_document_report_enabled : { value : false, hide : true }
   webdav_enable: {value: false, hide: true}
 
   #Pastoral
@@ -77,7 +78,6 @@ config:
   global_moderation: { hide: false }
   messaging_enabled: { hide: false }
   push_notifications_enabled: { hide: false }
-  external_document_report_enabled: { hide: false }
   ups_groups_enabled: { value: true, hide: false }
   eportfolio_enable: {value: false, hide: true}
   staff_directory_enable: {value: false, hide: true}
