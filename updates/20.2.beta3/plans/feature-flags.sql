@@ -56,7 +56,7 @@ INSERT INTO `config`
 VALUES (
            'parent_directory_enabled',
            'true',
-           'Enable ePortfolio',
+           'Enable Parent Directory',
            'If ON, parent directory feature will be available for users to visit',
            (SELECT id FROM `lu_config_field` WHERE `field` = 'boolean'),
            null,
