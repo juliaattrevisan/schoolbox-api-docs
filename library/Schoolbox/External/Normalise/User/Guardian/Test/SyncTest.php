@@ -18,7 +18,7 @@ class SyncTest extends TestCase
 {
 
     /**
-     * @dataProvider provider_multi_row
+     * @dataProvider providerMultiRow
      * @param Iterator $iterator
      * @param int[]    $ids
      */
@@ -32,7 +32,7 @@ class SyncTest extends TestCase
     }
 
 
-    public function provider_multi_row()
+    public function providerMultiRow()
     {
         $keys = [
             'student_contact_id',
@@ -52,6 +52,11 @@ class SyncTest extends TestCase
             'student_year_level',
             'student_campus',
             'student_house',
+            'custom_field1',
+            'custom_field2',
+            'custom_field3',
+            'custom_field4',
+            'custom_field5',
         ];
 
         $values = [
@@ -73,6 +78,11 @@ class SyncTest extends TestCase
                 '9',
                 'JUN',
                 'Fox',
+                'Custom User Data 1',
+                'Custom User Data 2',
+                'Custom User Data 3',
+                'Custom User Data 4',
+                'Custom User Data 5',
             ],
             [
                 '1',
@@ -92,6 +102,11 @@ class SyncTest extends TestCase
                 '10',
                 'JUN',
                 'Fox',
+                'Custom User Data 1',
+                'Custom User Data 2',
+                'Custom User Data 3',
+                'Custom User Data 4',
+                'Custom User Data 5',
             ],
             [
                 '1',
@@ -111,6 +126,11 @@ class SyncTest extends TestCase
                 '11',
                 'SEN',
                 'Fox',
+                'Custom User Data 1',
+                'Custom User Data 2',
+                'Custom User Data 3',
+                'Custom User Data 4',
+                'Custom User Data 5',
             ],
             [
                 '1',
@@ -130,6 +150,11 @@ class SyncTest extends TestCase
                 '12',
                 'SEN',
                 'Fox',
+                'Custom User Data 1',
+                'Custom User Data 2',
+                'Custom User Data 3',
+                'Custom User Data 4',
+                'Custom User Data 5',
             ],
             [
                 '2',
@@ -149,6 +174,11 @@ class SyncTest extends TestCase
                 '8',
                 'JUN',
                 'Beaver',
+                'Custom User Data 1',
+                'Custom User Data 2',
+                'Custom User Data 3',
+                'Custom User Data 4',
+                'Custom User Data 5',
             ],
         ];
 

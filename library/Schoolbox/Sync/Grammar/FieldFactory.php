@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Sync\Grammar;
-
 
 use Schoolbox\Role;
 
@@ -24,37 +24,34 @@ class FieldFactory
          * Construct it here and pass it all the way down to Tokenizer
          */
         $map = [
-            'id'                     => ucfirst($roleType) . ' ID',
+            'id' => ucfirst($roleType) . ' ID',
 
-            'account.login'          => 'Account Username',
-            'account.active'         => 'Account Activation Status',
+            'account.login'  => 'Account Username',
+            'account.active' => 'Account Activation Status',
 
-            'title'                  => 'Title',
-            'preferredName'          => 'Preferred Name',
-            'givenName'              => 'Given Name',
-            'lastname'               => 'Last Name',
+            'title'         => 'Title',
+            'preferredName' => 'Preferred Name',
+            'givenName'     => 'Given Name',
+            'lastname'      => 'Last Name',
 
-            'publiclyVisible'        => 'Visibility',
-            'gender'                 => 'Gender',
-            'email[].address'        => 'Default Email Address(es)',
-            'workEmail[].address'    => 'Work Email Address(es)',
-            'homeEmail[].address'    => 'Home Email Address(es)',
+            'email[].address'     => 'Default Email Address(es)',
+            'workEmail[].address' => 'Work Email Address(es)',
+            'homeEmail[].address' => 'Home Email Address(es)',
 
-            'phoneHome.number'       => 'Home Phone Number',
-            'phoneHome.silent'       => 'Home Phone Silent Status',
-            'phoneMobile.number'     => 'Mobile Phone Number',
-            'phoneMobile.silent'     => 'Mobile Phone Silent Status',
+            'campus[].code' => 'Campus(es) Code(s)',
 
-            'campus[].code'          => 'Campus(es) Code(s)',
+            'customField1' => 'Custom Field 1',
+            'customField2' => 'Custom Field 2',
+            'customField3' => 'Custom Field 3',
+            'customField4' => 'Custom Field 4',
+            'customField5' => 'Custom Field 5',
         ];
 
-        switch($roleType) {
+        switch ($roleType) {
             case Role::STAFF:
                 $augment = [
                     'year.level'                => 'Year Level',
                     'house.code'                => 'House Code',
-                    'phoneWork.number'          => 'Work Phone Number',
-                    'phoneWork.silent'          => 'Work Phone Silent Status',
                     'meta.department'           => 'Department',
                     'meta.position'             => 'Position(s)',
                     'meta.position.description' => 'Position Description(s)',
@@ -65,18 +62,16 @@ class FieldFactory
                 break;
             case Role::STUDENT:
                 $augment = [
-                    'year.level' => 'Year Level',
-                    'form.level' => 'Form Level',
-                    'house.code' => 'House Code',
+                    'year.level'         => 'Year Level',
+                    'form.level'         => 'Form Level',
+                    'house.code'         => 'House Code',
                     'boardingHouse.code' => 'Boarding House Code',
+                    'gender'             => 'Gender',
                 ];
                 break;
             case Role::PARENT:
                 $augment = [
-                    'phoneWork.number'         => 'Work Phone Number',
-                    'phoneWork.silent'         => 'Work Phone Silent Status',
                     'type'                     => 'Contact Type',
-                    'role'                     => 'Guardian Role',
                     'students[].campus[].code' => 'Student Campus(es) Code(s)',
                     'students[].year.level'    => 'Student Year',
                     'students[].house.code'    => 'Student House Code(s)',
@@ -90,5 +85,4 @@ class FieldFactory
 
         return array_merge($map, $augment);
     }
-
 }

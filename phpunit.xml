@@ -31,4 +31,7 @@
         <!--        See https://github.com/paratestphp/paratest/issues/282 -->
         <listener class="Alaress\Test\MakeWarningErrorAgainTestListener"></listener>
     </listeners>
+    <php>
+        <env name="INSTANCE_ID" value="vagrantx" force="true" />
+    </php>
 </phpunit>

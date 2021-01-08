@@ -1,4 +1,5 @@
 <?php
+
 /**
  * User
  *
@@ -8,6 +9,7 @@
  */
 
 namespace Schoolbox\External\Normalise\User;
+
 use Schoolbox\External\Normalise\User\Common\Account;
 use Schoolbox\External\Normalise\User\Common\Address;
 use Schoolbox\External\Normalise\User\Common\Phone;
@@ -15,7 +17,8 @@ use Schoolbox\External\Normalise\User\Common\Email;
 use Schoolbox\External\Normalise\User\Common\BoardingHouse;
 use Schoolbox\Collection;
 
-abstract class Base {
+abstract class Base
+{
 
     /* Personal
      */
@@ -151,6 +154,22 @@ abstract class Base {
      */
     protected $boardingHouse = null;
 
+    /** @var string */
+    protected $customField1;
+
+    /** @var string */
+    protected $customField2;
+
+    /** @var string */
+    protected $customField3;
+
+    /** @var string */
+    protected $customField4;
+
+    /** @var string */
+    protected $customField5;
+
+
     /* Publicity
      */
 
@@ -169,7 +188,8 @@ abstract class Base {
      *
      * @return bool
      */
-    public function isBoarder() {
+    public function isBoarder()
+    {
         return (!empty($this->getBoardingHouse()->getId()));
     }
 
@@ -181,7 +201,8 @@ abstract class Base {
      * @param Email $email
      * @return $this
      */
-    public function addEmail($email) {
+    public function addEmail($email)
+    {
         if (strlen(trim($email->getAddress()))) {
             $this->getEmail()->add($email);
         }
@@ -221,7 +242,7 @@ abstract class Base {
         }
 
         return $this;
-    }    
+    }
 
     /* Getters/Setters
      */
@@ -644,5 +665,104 @@ abstract class Base {
         // during UPS provisioning
 
         return ($this->boardingHouse instanceof BoardingHouse) ? $this->boardingHouse : new BoardingHouse();
+    }
+
+    /**
+     * @return string
+     */
+    public function getCustomField1()
+    {
+        return $this->customField1;
+    }
+
+
+    /**
+     * @param string $customField1
+     * @return Base
+     */
+    public function setCustomField1(string $customField1)
+    {
+        $this->customField1 = $customField1;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getCustomField2()
+    {
+        return $this->customField2;
+    }
+
+
+    /**
+     * @param string $customField2
+     * @return $this
+     */
+    public function setCustomField2(string $customField2)
+    {
+        $this->customField2 = $customField2;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getCustomField3()
+    {
+        return $this->customField3;
+    }
+
+
+    /**
+     * @param string $customField3
+     * @return static
+     */
+    public function setCustomField3($customField3)
+    {
+        $this->customField3 = $customField3;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getCustomField4()
+    {
+        return $this->customField4;
+    }
+
+
+    /**
+     * @param string $customField4
+     * @return static
+     */
+    public function setCustomField4($customField4)
+    {
+        $this->customField4 = $customField4;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getCustomField5()
+    {
+        return $this->customField5;
+    }
+
+
+    /**
+     * @param string $customField5
+     * @return static
+     */
+    public function setCustomField5($customField5)
+    {
+        $this->customField5 = $customField5;
+        return $this;
     }
 }

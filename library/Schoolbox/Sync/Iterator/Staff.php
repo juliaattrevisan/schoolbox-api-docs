@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Iterator over a `External_UserInterface->getStaffUserAccountIterator()` -
  * maps each result to a `Schoolbox\External\Normalise\User\Staff` object.
@@ -38,7 +39,7 @@ class Staff extends IteratorIterator
     }
 
     /**
-     * @param  array $preStack
+     * @param array $preStack
      * @return User\Staff
      */
     public function buildFromStack(array $preStack)
@@ -54,32 +55,17 @@ class Staff extends IteratorIterator
             ->setGivenName($currentResult['staff_given_name'])
             ->setLastname($currentResult['staff_surname'])
             ->getMeta()
-            ->setDepartment($currentResult['staff_department'])
-        ;
+            ->setDepartment($currentResult['staff_department']);
 
-        $staff
-            ->getYear()
-            ->setLevel($currentResult['staff_year_level'])
-            ->setDescription($currentResult['staff_year_level_description']);
+        $staff->getYear()->setLevel($currentResult['staff_year_level'])->setDescription($currentResult['staff_year_level_description']);
 
-        $staff
-            ->getMeta()
-            ->getCategory()
-            ->setCode($currentResult['staff_category'])
-            ->setType($currentResult['staff_category_type'])
-        ;
+        $staff->getMeta()->getCategory()->setCode($currentResult['staff_category'])->setType($currentResult['staff_category_type']);
 
         /* Account
          */
-        $staff
-            ->getAccount()
-            ->setLogin($currentResult['network_login'])
-            ->setActive($currentResult['active_flag'])
-        ;
+        $staff->getAccount()->setLogin($currentResult['network_login'])->setActive($currentResult['active_flag']);
 
-        $staff
-            ->getHouse()
-            ->setCode($currentResult['staff_house']);
+        $staff->getHouse()->setCode($currentResult['staff_house']);
 
         /* Email - one for every item in stack
          */
@@ -100,14 +86,16 @@ class Staff extends IteratorIterator
         /* Campus
          */
         $campus = new User\Common\Campus();
-        $campus
-            ->setCode($currentResult['staff_campus'])
-        ;
+        $campus->setCode($currentResult['staff_campus']);
 
-        $staff
-            ->getCampus()
-            ->add($campus)
-        ;
+        $staff->getCampus()->add($campus);
+
+        $staff->setCustomField1((string)$currentResult['custom_field1']);
+        $staff->setCustomField2((string)$currentResult['custom_field2']);
+        $staff->setCustomField3((string)$currentResult['custom_field3']);
+        $staff->setCustomField4((string)$currentResult['custom_field4']);
+        $staff->setCustomField5((string)$currentResult['custom_field5']);
+
         return $staff;
     }
 }

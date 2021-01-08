@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Iterator over a `External_UserInterface->getStudentUserAccountIterator()` -
  * maps each result to a `Schoolbox\External\Normalise\User\Student` object.
@@ -38,7 +39,7 @@ class Student extends IteratorIterator
     }
 
     /**
-     * @param  array $preStack
+     * @param array $preStack
      * @return User\Student
      */
     public function buildFromStack(array $preStack)
@@ -51,23 +52,13 @@ class Student extends IteratorIterator
             ->setGivenName($currentResult['student_given_name'])
             ->setPreferredName($currentResult['student_preferred'])
             ->setLastname($currentResult['student_surname'])
-            ->setGender($currentResult['student_gender'])
-        ;
+            ->setGender($currentResult['student_gender']);
 
-        $student
-            ->getYear()
-            ->setLevel($currentResult['student_year_level'])
-        ;
+        $student->getYear()->setLevel($currentResult['student_year_level'])->setDescription($currentResult['student_year_level_description']);
 
-        $student
-            ->getHouse()
-            ->setCode($currentResult['student_house'])
-        ;
+        $student->getHouse()->setCode($currentResult['student_house']);
 
-        $student
-            ->getAccount()
-            ->setLogin($currentResult['network_login'])
-        ;
+        $student->getAccount()->setLogin($currentResult['network_login']);
 
         /* Emails - one for every item in stack
          */
@@ -83,26 +74,24 @@ class Student extends IteratorIterator
          */
         if (strlen($currentResult['student_boarding_house'])) {
             $boardingHouse = new User\Common\BoardingHouse();
-            $boardingHouse
-                ->setCode($currentResult['student_boarding_house'])
-            ;
+            $boardingHouse->setCode($currentResult['student_boarding_house']);
 
-            $student
-                ->setBoardingHouse($boardingHouse)
-            ;
+            $student->setBoardingHouse($boardingHouse);
         }
 
         /* Campus
          */
         $campus = new User\Common\Campus();
-        $campus
-            ->setCode($currentResult['student_campus'])
-        ;
+        $campus->setCode($currentResult['student_campus']);
 
-        $student
-            ->getCampus()
-            ->add($campus)
-        ;
+        $student->getCampus()->add($campus);
+
+        $student->setCustomField1((string)$currentResult['custom_field1']);
+        $student->setCustomField2((string)$currentResult['custom_field2']);
+        $student->setCustomField3((string)$currentResult['custom_field3']);
+        $student->setCustomField4((string)$currentResult['custom_field4']);
+        $student->setCustomField5((string)$currentResult['custom_field5']);
+
         return $student;
     }
 }
