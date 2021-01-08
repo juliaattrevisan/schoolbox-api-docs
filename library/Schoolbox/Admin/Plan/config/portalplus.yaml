@@ -97,6 +97,8 @@ config:
   rubicon_atlas_api_token: {value: '', hide: true}
   canvas_data_api_key: {value: '', hide: true}
   office365_tenant: { hide: false }
+  office365_tenant_id : { hide : false }
+  office365_immersive_reader_name : { hide : false }
   googleapps_api_key: { hide: false }
 
 topMenu:
