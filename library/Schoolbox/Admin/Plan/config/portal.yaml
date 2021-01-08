@@ -81,6 +81,7 @@ config:
   ups_groups_enabled: { value: true, hide: false }
   eportfolio_enabled: {value: false, hide: true}
   staff_directory_enabled: {value: false, hide: true}
+  report_staff_access: {hide: true }
   parent_directory_enabled: {value: false, hide: true}
 
   # APIs
