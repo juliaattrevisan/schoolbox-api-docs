@@ -3,7 +3,9 @@
 namespace Schoolbox\Admin\Plan;
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Mapper\Exception\NotFound;
 use Symfony\Component\Yaml\Yaml;
+use Schoolbox\Config\ConfigMapper;
 
 /**
  * CLI tool for setting the plan of a server
@@ -41,7 +43,6 @@ class Plan extends CliTool\App
             $this->setComponents($planConfig['components']);
         } else {
             // Setting plans for all instances
-
         }
     }
 
@@ -52,12 +53,26 @@ class Plan extends CliTool\App
      */
     private function setConfig(array $configList)
     {
-        $statement = $this->getDatabaseInternal()->prepareQuery("
-            UPDATE config SET value = :value WHERE name = :name
-        ");
-        foreach ($configList as $configName => $value) {
-            $this->getLogger()->info("Setting config '$configName' to '$value'");
-            $statement->execute(['name' => $configName, 'value' => $value ]);
+        $configMapper = ConfigMapper::getInstance();
+
+        foreach ($configList as $configName => $item) {
+            $this->getLogger()->info("Setting config for '$configName'");
+
+            try {
+                $config = $configMapper->findOneByColumn(ConfigMapper::COL_NAME, $configName);
+
+                if (isset($item['hide'])) {
+                    $config->setHidden($item['hide']);
+                }
+
+                if (isset($item['value'])) {
+                    $config->setValue($item['value']);
+                }
+
+                $configMapper->save($config);
+            } catch (NotFound $e) {
+                $this->getLogger()->warning("Setting '$configName' not found");
+            }
         }
     }
 
