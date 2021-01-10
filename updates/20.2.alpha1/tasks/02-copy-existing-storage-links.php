@@ -24,6 +24,9 @@ $app = new class extends CliTool\App {
      */
     private const STORAGE_LINK_PREFIX = '/storage/fetch.php?hash=';
 
+    /* Name of the temporal table */
+    private const TEMP_TABLE = '_task_hash_tmp';
+
     /** @inheritDoc */
     public function runAsRoot(): ?bool
     {
@@ -36,46 +39,26 @@ $app = new class extends CliTool\App {
     {
         /* Find all the task ids which had a storage link in it
          * Extract the hash
-         * Find the realname of this hash
          */
-        $query = "
-            SELECT
-                id,
-                link,
-                REPLACE(link, '" . self::STORAGE_LINK_PREFIX . "', '') AS hash,
-                `storage`.filename
-            FROM task
-            INNER JOIN `storage` ON `storage`.`hash` = REPLACE(link, '". self::STORAGE_LINK_PREFIX . "', '')
-            WHERE link LIKE '". self::STORAGE_LINK_PREFIX . "%'
-        ";
+        $query = "CREATE TABLE " . self::TEMP_TABLE . " (
+                        task_id int(11),
+                        hash varchar(100),
+                        PRIMARY KEY task_hash_tmp_pkey(task_id),
+                        INDEX task_hash_tmp_index (hash))
+                      SELECT id AS task_id, REPLACE(link, '" . self::STORAGE_LINK_PREFIX . "', '') AS hash
+                      FROM task
+                      WHERE link LIKE '" . self::STORAGE_LINK_PREFIX . "%'";
 
-        $statement = $this->getDatabaseInternal()->executeQuery($query);
+        $this->getDatabaseInternal()->executeQuery($query);
 
         /* Save the hash and the realname into the new task_file relational table
          * This is the last known name of the file and applies to existing storage links
          */
-        $query = '
-            INSERT INTO task_file (storage_id, task_id, realname, created_at, updated_at)
-            VALUES (:storageId, :taskId, :realname, NOW(), NOW())
-        ';
+        $insertQuery = 'INSERT INTO task_file (storage_id, task_id, realname, created_at, updated_at)
+                        SELECT ' . self::TEMP_TABLE . '.hash, ' . self::TEMP_TABLE . '.task_id, storage.filename, now(), now()
+                        FROM ' . self::TEMP_TABLE . ' JOIN storage ON ' . self::TEMP_TABLE . '.hash=storage.hash';
 
-        $insertStatement = $this->getDatabaseInternal()->prepareQuery($query);
-
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $insertStatement->execute([
-                'storageId' => $row['hash'],
-                'taskId' => $row['id'],
-                'realname' => $row['filename']
-            ]);
-
-            $this->getLogger()->notice(sprintf(
-                'Assigning (%s, %s, %s) to task id %s',
-                $row['hash'],
-                $row['id'],
-                $row['filename'],
-                $row['id']
-            ));
-        }
+        $this->getDatabaseInternal()->executeQuery($insertQuery);
 
         /* Clear task.link of any contents that contained STORAGE_LINK_PREFIX
          * since those were supposed to have migrated to task_link
@@ -87,6 +70,10 @@ $app = new class extends CliTool\App {
         ";
 
         $this->getDatabaseInternal()->executeQuery($updateQuery);
+
+        /* Finally drop the temporal table
+        */
+        $this->getDatabaseInternal()->executeQuery("DROP TABLE " . self::TEMP_TABLE);
     }
 };
 
