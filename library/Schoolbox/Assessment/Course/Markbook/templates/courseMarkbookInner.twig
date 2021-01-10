@@ -18,8 +18,8 @@
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% import '@learning/macro/markDecorator.twig' as decorator %}
 
-<div class="row">
-    <div class="actions-small-1">
+
+    <div class="actions-small-1 small-12 columns">
         {% if not courseSpec.courseImplementations|length %}
         {% set importUrl = routeLookup('courseImport.getImport', {courseSpecId: courseSpec.id, folderId: 0, componentId: 0}) %}
         <div class="empty-state">
@@ -36,27 +36,29 @@
             </p>
         </div>
         {% else %}
-        <nav>
-            <div class="legend right">
+        <div class="legend">
+            <div class="indicators">
                 <p class="meta"><span class="indicator indicator-none"></span>No mark</p>
                 <p class="meta"><span class="indicator indicator-pending"></span>Unpublished draft</p>
                 <p class="meta"><span class="indicator indicator-resubmit"></span>Resubmit</p>
                 <p class="meta"><span class="indicator indicator-published"></span>Mark Published</p>
-                <div class="checklist">
-                    <input type="checkbox" id="show-drafts">
-                    <label for="show-drafts">
-                        Show Drafts
-                    </label>
-                </div>
-                <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
             </div>
+        </div>
+        <div class="checklist">
+            <input type="checkbox" id="show-drafts">
+            <label for="show-drafts">
+                Show Drafts
+            </label>
+        </div>
+        <nav>
+            <a class="icon-more" data-dropdown="header-options" title="Actions"></a>
         </nav>
         <ul id="header-options" class="f-dropdown" data-dropdown-content="">
             <li class="separator">Report</li>
             <li><a href='{{ routeLookup('courseMarkbook.getMarkbookExport', {courseSpecId: courseSpec.id} ) }}?{{ queryArgs }}' class='icon-download'>Download Spreadsheet</a></li>
         </ul>
     </div>
-    <div class="small-12 island" style="overflow-x: scroll;">
+    <div class="small-12 columns" style="overflow-x: scroll;">
         <table class="square-grid marksheet" data-mark-sheet>
             <thead>
             <tr class="rotate-headers">
@@ -235,4 +237,3 @@
         </table>
         {% endif %}
     </div>
-</div>
