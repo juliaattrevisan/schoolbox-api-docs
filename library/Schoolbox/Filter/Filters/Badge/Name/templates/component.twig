@@ -1,3 +1,8 @@
 {% extends '@filters/_component.twig' %}
 
 {% block filterName %}Name{% endblock %}
+
+{% block filterComponent %}
+    {% set isDisabled = false %}
+    {{ parent() }}
+{% endblock filterComponent %}
