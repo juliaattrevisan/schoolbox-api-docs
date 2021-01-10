@@ -347,7 +347,7 @@
                         self.triggerEvent('playbackReady', []);
                         self.triggerEvent('uploadReady', []);
                     });
-                    reader.readAsDataURL(e.data);
+                    reader.readAsDataURL(blob);
                 }
             );
             self.triggerEvent('recordingStop', []);
