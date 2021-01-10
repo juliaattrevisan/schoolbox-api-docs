@@ -552,6 +552,11 @@ of developing for filters.
     );
     ```
 
+* Now you will want to add this filter to a page: to accomplish that, follow the
+  instructions in the
+  [Adding an existing Filter to a Page's Filter Set](#adding-an-existing-filter-to-a-pages-filter-set)
+  section below
+
 ### Adding an existing Filter to a Page's Filter Set
 
 * Update the [Filter](#filter)'s [Definition](#definition) implementation's
@@ -559,7 +564,7 @@ of developing for filters.
   constant
 
 
-#### Frontend development for new filters
+### Frontend development for new filters
 
 The Filter's Twig template is a `templates/component.twig` in the same folder as
 its Definition class.
