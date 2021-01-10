@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Badge\Name;
 
 use Schoolbox\Filter\AbstractDefinition;
+use Schoolbox\Filter\Page;
 use Schoolbox\IConfigLoader;
 
 /**
@@ -18,6 +19,13 @@ use Schoolbox\IConfigLoader;
  */
 class Definition extends AbstractDefinition
 {
+    /**
+     * Key for finding all badges.
+     *
+     * Required so that the badge list filter is even configurable.
+     */
+    public const KEY_ALL = 'all';
+
     /**
      * @inheritdoc
      */
@@ -28,15 +36,18 @@ class Definition extends AbstractDefinition
      */
     protected function getCustomKeys(): array
     {
-        return [];
+        return [self::KEY_ALL];
     }
 
     /**
-     * @inheritdoc
+     * This filter is available on the badge list page.
+     *
+     * @param IConfigLoader $configLoader
+     * @return array
      */
     public static function getPages(IConfigLoader $configLoader): array
     {
-        return [];
+        return [Page\Model::PAGE_BADGE_LIST,];
     }
 
     /**
@@ -44,6 +55,9 @@ class Definition extends AbstractDefinition
      */
     public function getLabel(string $key): string
     {
+        if ($key === self::KEY_ALL) {
+            return 'All badges';
+        }
         return '';
     }
 
