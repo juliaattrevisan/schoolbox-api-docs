@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Renderer
  *
@@ -76,7 +77,6 @@ class Renderer extends Handler
             $currentUserIsParent    = $currentUser->getRole()->isParent();
 
             foreach ($result as $user) {
-
                 /* Remember if any actions were available to render in a tot
                 * If the`re were no actions, hide the tot
                 * because phplib, have to do it here
@@ -112,7 +112,8 @@ class Renderer extends Handler
                  */
                 $this->getPage()->setVar('due_work_block', '');
                 if (Config::get(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED)) {
-                    if ($currentUserIsStaff
+                    if (
+                        $currentUserIsStaff
                         || ($currentUserIsStudent && $currentUserIsResult)
                         || ($currentUserIsParent
                             && $currentUserIsParentOfResult
@@ -124,7 +125,8 @@ class Renderer extends Handler
                     }
                 }
 
-                if ($resultIsStudent
+                if (
+                    $resultIsStudent
                     && ($currentUserIsStaff || $currentUserIsParentOfResult)
                     && Config::get('external_document_report_enabled')
                 ) {
@@ -135,7 +137,8 @@ class Renderer extends Handler
                 // Hide grades from parents, if grades access is restricted or module is disabled
                 $this->getPage()->setVar('grades_button_block', '');
                 if (Config::get(ConfigMapper::NAME_GRADES_ENABLED)) {
-                    if ($currentUserIsStaff
+                    if (
+                        $currentUserIsStaff
                         || ($currentUserIsStudent && $currentUserIsResult)
                         || ($currentUserIsParent
                             && $currentUserIsParentOfResult
@@ -149,7 +152,8 @@ class Renderer extends Handler
 
                 // Show this student's pastoral link to staff, or parents if config allows.
                 $this->getPage()->setVar('pastoral_block', '');
-                if ($resultIsStudent
+                if (
+                    $resultIsStudent
                     && Config::get('pastoral_enabled')
                     && (
                         $currentUserIsStaff
@@ -187,7 +191,8 @@ class Renderer extends Handler
                 }
 
                 // Boarder Leave: only show to res house students if enabled
-                if ($resultIsStudent
+                if (
+                    $resultIsStudent
                     && $currentUserIsStaff
                     && $user['residential_house_id']
                     && Config::get('boarder_leave_enabled')
@@ -223,7 +228,8 @@ class Renderer extends Handler
                 /* Calendar link
                  * Calendar only exist for students' parents, staff, supers, and themselves
                  */
-                if ($currentUserIsParentOfResult
+                if (
+                    $currentUserIsParentOfResult
                     || $currentUserIsSuperuser
                     || $currentUserIsStaff
                     || $currentUserIsResult

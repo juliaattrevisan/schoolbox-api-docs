@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 require_once __DIR__ . '/../../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -19,58 +21,57 @@ $componentInstanceId = $_REQUEST['componentInstanceId'];
 $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
 
 if ($authenticator->canModify()) {
+    /* Add a list item
+     */
+    if ($action == 'addItem') {
+        $title = $_POST['title'];
+        $content = $_POST['content'];
 
-	/* Add a list item
-	 */
-	if ($action == 'addItem') {
-		$title = $_POST['title'];
-		$content = $_POST['content'];
+        /* Check if it's a valid url before putting in db
+         */
+        $url = new Url($content);
 
-		/* Check if it's a valid url before putting in db
-		 */
-		$url = new Url($content);
+        if (!$url->isLocalUrl()) {
+            $url->prependScheme();
+        }
 
-		if(!$url->isLocalUrl()){
-			$url->prependScheme();
-		}
+        $listItem = new \Component\Eportfolio\LinkList();
+        $listItem->setComponentInstanceId($componentInstanceId);
+        $listItem->setTitle($title);
+        $listItem->setContent($url->getUrl());
+        $listItem->setSequence(1);
 
-		$listItem = new \Component\Eportfolio\LinkList();
-		$listItem->setComponentInstanceId($componentInstanceId);
-		$listItem->setTitle($title);
-		$listItem->setContent($url->getUrl());
-		$listItem->setSequence(1);
+        \Component\Eportfolio\LinkListMapper::getInstance()->save($listItem);
+    }
+    /* Update a list item
+     */
+    elseif ($action == 'updateItem') {
+        $listItemId = $_POST['listItemId'];
+        $title = $_POST['title'];
+        $content = $_POST['content'];
 
-		\Component\Eportfolio\LinkListMapper::getInstance()->save($listItem);
-	}
-	/* Update a list item
-	 */
-	else if ($action == 'updateItem') {
-		$listItemId = $_POST['listItemId'];
-		$title = $_POST['title'];
-		$content = $_POST['content'];
+        /* Check if it's a valid url before putting in db
+         */
+        $url = new Url($content);
 
-		/* Check if it's a valid url before putting in db
-		 */
-		$url = new Url($content);
+        if (!$url->isLocalUrl()) {
+            $url->prependScheme();
+        }
 
-		if(!$url->isLocalUrl()){
-			$url->prependScheme();
-		}
+        $listItem = \Component\Eportfolio\LinkListMapper::getInstance()->findById($listItemId);
+        $listItem->setTitle($title);
+        $listItem->setContent($url->getUrl());
 
-		$listItem = \Component\Eportfolio\LinkListMapper::getInstance()->findById($listItemId);
-		$listItem->setTitle($title);
-		$listItem->setContent($url->getUrl());
+        \Component\Eportfolio\LinkListMapper::getInstance()->save($listItem);
+    }
+    /* Delete a list item
+     */
+    elseif ($action == 'removeItem') {
+        $listItemId = $_GET['listItemId'];
 
-		\Component\Eportfolio\LinkListMapper::getInstance()->save($listItem);
-	}
-	/* Delete a list item
-	 */
-	else if ($action == 'removeItem') {
-		$listItemId = $_GET['listItemId'];
+        $listItem = \Component\Eportfolio\LinkListMapper::getInstance()->findById($listItemId);
+        \Component\Eportfolio\LinkListMapper::getInstance()->delete($listItem);
+    }
 
-		$listItem = \Component\Eportfolio\LinkListMapper::getInstance()->findById($listItemId);
-		\Component\Eportfolio\LinkListMapper::getInstance()->delete($listItem);
-	}
-
-	SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");
+    SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");
 }

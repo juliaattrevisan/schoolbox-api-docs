@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -6,7 +7,6 @@
 
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
-
 use Custom\Diocesan\ValidJuniorSchoolStudent;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
@@ -63,7 +63,6 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         );
 
         foreach ($this->children as $child) {
-
             // Check if the current child's timetable is viewable and hide if necessary
             try {
                 $userChild = $userMapper->findById($child['id']);
@@ -87,9 +86,11 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             $this->setVar('TRAVEL_LOG', $travelLogRenderer->render($this->getSitePage()->getTwig(), $userChild->getExternalId(), true));
 
 
-            if ($this->getConfigLoader()->get('pastoral_enabled') &&
+            if (
+                $this->getConfigLoader()->get('pastoral_enabled') &&
                 $this->getUser()->isParentOf($userChild) &&
-                $this->getConfigLoader()->get('pastoral_parent_access')) {
+                $this->getConfigLoader()->get('pastoral_parent_access')
+            ) {
                 $this->parse('pastoral_block', 'pastoral');
             } else {
                 $this->setVar('pastoral_block', '');
@@ -102,7 +103,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                         // TODO We'll need to provide fallback in case this array key does not exist.
                         // TODO Remove this in 19.1
                         $matchedCode = $subject['matchedCode'] ?? null;
-                        if($matchedCode){
+                        if ($matchedCode) {
                             $folderCode = $matchedCode;
                         } else {
                             $folder = $this->getFolderMapper()->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
@@ -131,7 +132,8 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
             /* Hide Due Work link from parents, if Due Work access is restricted and module is disabled
              */
-            if (!$this->getConfigLoader()->get(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED)
+            if (
+                !$this->getConfigLoader()->get(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED)
                 || ($isParent && $this->getConfigLoader()->get('restrict_parent_duework_access'))
             ) {
                 $this->setVar('due_work_block', '');
@@ -140,7 +142,8 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             }
 
             // Hide grades from parents, if grades access is restricted or module is disabled
-            if (!$this->getConfigLoader()->get(ConfigMapper::NAME_GRADES_ENABLED)
+            if (
+                !$this->getConfigLoader()->get(ConfigMapper::NAME_GRADES_ENABLED)
                 || ($isParent && $this->getConfigLoader()->get('restrict_parent_grades'))
             ) {
                 $this->setVar('grades_button_block', '');
@@ -172,8 +175,10 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
             /* Academic report link
             */
-            if ($this->getConfigLoader()->get('external_document_report_enabled')
-                && $this->getConfigLoader()->get('external_document_button_enable')) {
+            if (
+                $this->getConfigLoader()->get('external_document_report_enabled')
+                && $this->getConfigLoader()->get('external_document_button_enable')
+            ) {
                 $this->parse('reports_block', 'reports');
             } else {
                 $this->setVar('reports_block');
@@ -222,7 +227,6 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 'due_work_block' => '',
                 'custom_buttons_block' => ''
             ]);
-
         }
 
 
@@ -231,7 +235,5 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         } else {
             return false;
         }
-
     }
-
 }

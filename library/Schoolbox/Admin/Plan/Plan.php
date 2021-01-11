@@ -41,9 +41,7 @@ class Plan extends CliTool\App
             $this->setConfig($planConfig['config']);
             $this->setTopMenu($planConfig['topMenu']);
             $this->setComponents($planConfig['components']);
-        }
-        else {
-
+        } else {
         }
     }
 
@@ -84,7 +82,7 @@ class Plan extends CliTool\App
      */
     private function setTopMenu(array $menu)
     {
-        if(isset($menu['hide'])) {
+        if (isset($menu['hide'])) {
             // Hide any menu items that match the hide URL string
             $statement = $this->getDatabaseInternal()->prepareQuery(
                 "
@@ -97,7 +95,7 @@ class Plan extends CliTool\App
             }
         }
 
-        if(isset($menu['show'])) {
+        if (isset($menu['show'])) {
             // Undelete any menu items that match the show string
             $statement = $this->getDatabaseInternal()->prepareQuery(
                 "
@@ -141,8 +139,7 @@ class Plan extends CliTool\App
                 $statement->execute(['component' => $component]);
             }
             $this->getDatabaseInternal()->commit();
-        }
-        catch (\PDOException $e) {
+        } catch (\PDOException $e) {
             $this->getDatabaseInternal()->rollBack();
         }
     }

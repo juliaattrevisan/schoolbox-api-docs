@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Eportfolio_Page_Profile
  *
@@ -84,7 +85,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         $this->getPage()->setBlock(TEMPLATE_content, 'no_showcased_work', 'no_showcased_work_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_showcased_work', 'has_showcased_work_block');
         $this->getPage()->setBlock('has_showcased_work', 'showcased_work', 'showcased_work_block');
-        $this->getPage()->setBlock('has_showcased_work', 'edit_showcase_work','edit_showcase_work_block');
+        $this->getPage()->setBlock('has_showcased_work', 'edit_showcase_work', 'edit_showcase_work_block');
         $this->getPage()->setBlock('showcased_work', 'submission_file_list', 'submission_file_list_block');
 
         $this->getPage()->setBlock(TEMPLATE_content, 'no_recent_blog', 'no_recent_blog_block');
@@ -126,9 +127,9 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         $this->getPage()->setVar(array(
             'USER_EXTERNAL_ID' => $this->getExternalUserId(),
             'USER_FULLNAME' => $this->getUserName(),
-            'USER_CAMPUS' => Scrub::text(' '.$this->getUserCampusName()),
+            'USER_CAMPUS' => Scrub::text(' ' . $this->getUserCampusName()),
             'USER_YEAR_LEVEL' => $this->getUserYear() != '' ? Scrub::text($this->getUserYear()) : '',
-            'USER_HOUSE' => $house != '' ? Scrub::text(', '.$this->getUserHouse()) : '' ,
+            'USER_HOUSE' => $house != '' ? Scrub::text(', ' . $this->getUserHouse()) : '' ,
         ));
     }
 
@@ -191,7 +192,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         }
 
         if ($allShowcasedItems->count() && $assessments->count()) {
-
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 $currentBox = $currentShowcasedItem->getSubmissionBox();
                 /** @var IAssessable $assessment */
@@ -223,7 +223,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                 /* Show submitted work information (if available)
                  */
                 if ($latestSubmission) {
-                    foreach($latestSubmission->getAllFiles() as $currentFile) {
+                    foreach ($latestSubmission->getAllFiles() as $currentFile) {
                         $this->getPage()->setVar([
                             'SHOWCASED_WORK_SUBMISSION_ID'        => $currentFile->getId(),
                             'SHOWCASED_WORK_FILE_NAME'            => $currentFile->getFilename(),
@@ -233,7 +233,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                             'SHOWCASED_WORK_MIMETYPE_ICONFILE'    => $currentFile->getMimetype()->getIconFile(),
                         ]);
 
-                        $this->getPage()->parse('submission_file_list_block', 'submission_file_list',true);
+                        $this->getPage()->parse('submission_file_list_block', 'submission_file_list', true);
                     }
                 } else {
                     $this->getPage()->setVar(array(
@@ -263,10 +263,11 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
                 /* Clear children after parsing out the parent
                  */
-                $this->getPage()->setVar('submission_file_list_block','');
+                $this->getPage()->setVar('submission_file_list_block', '');
             }
 
-            if ($this->getUser()->getId() == $this->getCurrentUser()->getId()
+            if (
+                $this->getUser()->getId() == $this->getCurrentUser()->getId()
                 && Config::get(ConfigMapper::NAME_GRADES_ENABLED)
             ) {
                 $this->getPage()->parse('edit_showcase_work_block', 'edit_showcase_work');
@@ -296,7 +297,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
             $this->getNumRecentPhotos() * 2
         );
 
-        $allImages = $allImages->filter(function($image) {
+        $allImages = $allImages->filter(function ($image) {
             /** @var \Component\Eportfolio\FileList $image */
             return $this->canUserViewPage($image->getPageId());
         });
@@ -326,9 +327,9 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
     {
         //  TODO do this properly instead of by fetching amount*2 then filtering
         $allBlogs = \Schoolbox\Blog\Eportfolio\Post\Mapper::getInstance()
-            ->findForPortfolioOwner($this->getUser(),$this->getNumRecentBlogs() * 2);
+            ->findForPortfolioOwner($this->getUser(), $this->getNumRecentBlogs() * 2);
 
-        $allBlogs = $allBlogs->filter(function($blog) {
+        $allBlogs = $allBlogs->filter(function ($blog) {
             /** @var Schoolbox\Blog\Eportfolio\Post\Model $blog */
             return $this->canUserViewPage($blog->getPage()->getPageId());
         });
@@ -380,7 +381,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
         if ($allGroups->count() > 0) {
             foreach ($allGroups as $currentGroup) {
-
                 /* Check permissions on whether you can view this subject's homepage
                  * If you can get there, you can see it, otherwise it's hidden
                  */
@@ -418,10 +418,9 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
     {
         $groupHandler = new Group();
 
-        if(!$this->getUser()->getHideTimetable()) {
+        if (!$this->getUser()->getHideTimetable()) {
             $allSubjects = $this->getGroupHandler()->involvedInSubjects($this->getUserId());
-        }
-        else {
+        } else {
             $allSubjects = false;
         }
 
@@ -469,7 +468,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
      */
     private function getUserHouse()
     {
-        if($this->user->getSchoolHouse() instanceof House) {
+        if ($this->user->getSchoolHouse() instanceof House) {
             return $this->user->getSchoolHouse()->getHouse();
         }
 

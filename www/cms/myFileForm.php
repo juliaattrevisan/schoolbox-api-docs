@@ -1,10 +1,11 @@
 <?php
+
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 use Schoolbox\Resource\File\IFile;
-use \Schoolbox\Resource\My\File\Mapper as MyFileMapper;
-use \Schoolbox\Resource\My\File\Model as MyFile;
+use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
+use Schoolbox\Resource\My\File\Model as MyFile;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
@@ -46,12 +47,10 @@ if (isset($_POST['description'])) {
         $file = null;
 
         // if we're editing an existing file, ensure the file exists
-        if (is_numeric($_POST['fileID'])) {
-            $file = MyFileMapper::getInstance()->findById($_POST['fileID']);
-
-        } else {
-
-            try {
+    if (is_numeric($_POST['fileID'])) {
+        $file = MyFileMapper::getInstance()->findById($_POST['fileID']);
+    } else {
+        try {
             $file = MyFileMapper::getInstance()->createModel();
 
             if (isset($_POST['attachment'])) {
@@ -65,8 +64,8 @@ if (isset($_POST['description'])) {
 
                 // Yes, we may have just overridden the result of findById(), but that was also for additional safety checks
                 $file = $result;
-            } // if file was synchronously uploaded
-            else if ($_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
+            } elseif ($_FILES['file']['name'] && is_uploaded_file($_FILES['file']['tmp_name'])) {
+                // if file was synchronously uploaded
                 try {
                     // fake this momentarily
                     $file->setFilename($_FILES['file']['name']);
@@ -82,16 +81,14 @@ if (isset($_POST['description'])) {
             } else {
                 throw new InvalidArgumentException('No file attachment supplied');
             }
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            error(ErrorMapper::ERROR_FILE_NOT_FOUND);
+            exit; // shut UP, storm.
+        } catch (\InvalidArgumentException $e) {
+            error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
+            exit;
         }
-        catch
-            (\Schoolbox\Mapper\Exception $e) {
-                error(ErrorMapper::ERROR_FILE_NOT_FOUND);
-                exit; // shut UP, storm.
-            } catch (\InvalidArgumentException $e) {
-                error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
-                exit;
-            }
-        }
+    }
 
     // set attributes
     if (is_null($file->getFilename())) {
@@ -104,13 +101,11 @@ if (isset($_POST['description'])) {
     $file->setFolder(\Schoolbox\Resource\My\Folder\Mapper::getInstance()->createModel()->setId($_POST['parent']));
 
     try {
-
         /* Spawn a new file if creating; reuse the existing one if modifying
          */
         if (!is_numeric($file->getId())) {
             $affectedIds = MyFileMapper::getInstance()->create($file);
-        }
-        else {
+        } else {
             $affectedIds = array($file->getId());
             MyFileMapper::getInstance()->save($file);
         }
@@ -140,7 +135,8 @@ if (isset($_POST['description'])) {
                     $componentId = $_POST['component_instance_id'];
                     if (!empty($componentId)) {
                         $component = Component_InstanceMapper::getInstance()->findByInstanceId($componentId);
-                        if ($component instanceof Component_Instance
+                        if (
+                            $component instanceof Component_Instance
                             && in_array($component->getIdentifier(), array_keys($pageIds))
                             && $component->getDefinition()->getClass() == 'Component_Eportfolio_ImageController'
                         ) {
@@ -164,11 +160,9 @@ if (isset($_POST['description'])) {
 
         if (isset($_POST['return'])) {
             SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
-
         } elseif ($ajax) {
             http_response_code(201);
             die(json_encode(array('id' => $affectedIds[0])));
-
         } else {
             $page->backToTheFuture(2);
         }
@@ -262,18 +256,17 @@ function deleteMyFile($fileId)
  * @param IFile     $file
  * @param bool      $ajax
  */
-function outputException(Exception $e, IFile $file, $ajax = false) {
+function outputException(Exception $e, IFile $file, $ajax = false)
+{
 
     // Output errors
-    if ($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
+    if ($e->getCode() === \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
         $code = 11;
         $msg  = "Your file, '{$file->getFilename()}' is not a valid filetype";
-
-    } elseif ($e->getCode() == \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE) {
+    } elseif ($e->getCode() === \Schoolbox\File\Exception::CODE_FILE_TOO_LARGE) {
         $code = 10;
         $msg  = 'The size of the uploaded file exceeds the file size restrictions of '
             . Alaress_Byte_Format::bytesToString($file->getMimetype()->getActualMaxFileSize()) . '.';
-
     } else {
         $code = 9;
         $msg  = $e->getMessage();
@@ -285,5 +278,4 @@ function outputException(Exception $e, IFile $file, $ajax = false) {
     } else {
         error($code, $msg);
     }
-
 }
