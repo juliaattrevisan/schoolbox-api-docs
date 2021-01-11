@@ -81,7 +81,13 @@ class IdFinder extends AbstractIdFinder
             foreach ($nameSearch as $nameSearchString => $_) {
                 $names = array_map('trim', preg_split('/\\s+/', (string)$nameSearchString));
                 foreach ($names as $name) {
-                    $pb = $pb->like('b.name', '%' . $this->getMapper()->getDatabase()->escapeForLike($name) . '%');
+                    if (strlen($name) > 0) {
+                        $hasWhere = true;
+                        $pb = $pb->like(
+                            'b.name',
+                            '%' . $this->getMapper()->getDatabase()->escapeForLike($name) . '%'
+                        );
+                    }
                 }
             }
         }
