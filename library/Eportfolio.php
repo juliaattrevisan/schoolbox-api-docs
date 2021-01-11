@@ -60,6 +60,11 @@ class Eportfolio
     private $pageMapper;
 
     /**
+     * @var array;
+     */
+    private array $allTemplates;
+
+    /**
      * Constructor
      *
      * @param int $userId
@@ -197,9 +202,13 @@ class Eportfolio
      * Get a template name by its id, from the entire set
      *
      * @param int $id
+     * @return string
      */
-    public function getTemplateNameById($id)
+    public function getTemplateNameById($id): string
     {
+        if (!isset($this->allTemplates)) {
+            $this->allTemplates = $this->fetchAllTemplates();
+        }
         return $this->allTemplates[$id];
     }
 
