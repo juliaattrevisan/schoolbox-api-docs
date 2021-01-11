@@ -8,7 +8,6 @@
 namespace Schoolbox\Pastoral;
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
-use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use House;
@@ -441,12 +440,11 @@ class Mapper extends BaseMapper
 
         $words = [];
 
-        /** @var IQuoter $database */
         $database = $this->getDatabase();
 
         foreach (explode(' ', $search) as $word) {
             if (strlen($word) >= Results::MIN_SEARCH_LENGTH) {
-                $words[] = "%{$database->escapeForLike($word)}%";
+                $words[] = "%{$database->getQuoter()->escapeForLike($word)}%";
             }
         }
 

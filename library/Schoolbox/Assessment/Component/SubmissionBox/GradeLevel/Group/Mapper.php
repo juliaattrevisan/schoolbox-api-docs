@@ -80,7 +80,7 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('levels', 'l')}
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('levels', '', 'l')}
         ";
     }

@@ -202,7 +202,7 @@ class Mapper extends BaseMapper implements Receiver
      */
     protected function getSelectString()
     {
-        $table = $this->database->quoteIdentifier($this->table);
+        $table = $this->database->getQuoter()->quoteIdentifier($this->table);
 
         return "
           SELECT {$this->getColumnString()},

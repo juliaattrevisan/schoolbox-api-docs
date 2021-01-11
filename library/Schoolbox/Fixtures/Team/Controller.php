@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Fixtures\Team;
 
-use Alaress\Database\Quoter\IQuoter;
 use Alaress\Web\Controller\Exception;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
@@ -336,10 +335,9 @@ class Controller extends AbstractController
         $query = $this->getRequest()->query->get('query');
 
         if ($context === null) {
-            /** @var IQuoter $database */
             $database = $this->getMapper()->getDatabase();
             $pb       = $this->getMapper()->getPredicateBuilder();
-            $pb->like('name', "%{$database->escapeForLike($query)}%");
+            $pb->like('name', "%{$database->getQuoter()->escapeForLike($query)}%");
             $allTeams = $this->getMapper()->findByPredicates($pb);
         } else {
             $allTeams = $this->getMapper()->findByName($context->getId(), $query);

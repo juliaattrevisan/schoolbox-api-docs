@@ -871,8 +871,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         $subBuilder = $this->getPredicateBuilder();
         $subBuilder
-            ->like("{$this->getTable()}.name", "%{$this->database->escapeForLike($keyword)}%")
-            ->like('cc.code', "%{$this->database->escapeForLike($keyword)}%");
+            ->like("{$this->getTable()}.name", "%{$this->database->getQuoter()->escapeForLike($keyword)}%")
+            ->like('cc.code', "%{$this->database->getQuoter()->escapeForLike($keyword)}%");
 
         $builder->any($subBuilder);
 
@@ -1111,7 +1111,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         foreach ($classCodes as $classCode) {
             // Always return exact matches
             $codePb->equals('fc.code', $classCode);
-            $codePb->like('fc.code', "%/{$this->database->escapeForLike($classCode)}");
+            $codePb->like('fc.code', "%/{$this->database->getQuoter()->escapeForLike($classCode)}");
         }
 
         $folderPb = $this->getPredicateBuilder()
@@ -1223,7 +1223,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $params["code_{$i}"] = $code;
             if (strlen($campusCode) === 0) {
                 $whereParts[]             = "cc.code LIKE :fullCode_{$i}";
-                $params[":fullCode_{$i}"] = '%/' . $this->database->escapeForLike($code);
+                $params[":fullCode_{$i}"] = '%/' . $this->database->getQuoter()->escapeForLike($code);
             } else {
                 $whereParts[]             = "cc.code = :fullCode_{$i}";
                 $params[":fullCode_{$i}"] = $campusCode . '/' . $code;
@@ -1287,7 +1287,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $statement = $this->database->prepare($query);
         $statement->execute(
             array(
-                'code' => '%[%' . $this->database->escapeForLike($code) . '%]',
+                'code' => '%[%' . $this->database->getQuoter()->escapeForLike($code) . '%]',
             )
         );
         return $this->hydrateList($statement);

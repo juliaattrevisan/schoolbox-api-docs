@@ -112,7 +112,7 @@ class Component_InstanceMapper extends BaseMapper
      */
     public function getSelectString()
     {
-        $componentInstanceTable           = $this->database->quoteIdentifier($this->getTable());
+        $componentInstanceTable           = $this->database->getQuoter()->quoteIdentifier($this->getTable());
         $componentDefinitionColumns       = $this->componentDefinitionMapper->getColumnString('cd');
         $componentConfigDefinitionColumns = $this->componentConfigDefinitionMapper->getColumnString('ccd');
         $componentConfigColumns           = $this->componentConfigMapper->getColumnString('cci');
@@ -144,7 +144,7 @@ class Component_InstanceMapper extends BaseMapper
      */
     public function findByDefinition($module, $definitionId)
     {
-        $componentInstanceTable = $this->database->quoteIdentifier($this->getTable());
+        $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`module` = :module AND
@@ -168,7 +168,7 @@ class Component_InstanceMapper extends BaseMapper
      */
     public function findByModule($module)
     {
-        $componentInstanceTable = $this->database->quoteIdentifier($this->getTable());
+        $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`module` = :module
@@ -190,7 +190,7 @@ class Component_InstanceMapper extends BaseMapper
      */
     public function findByContext($module, $identifier)
     {
-        $componentInstanceTable = $this->database->quoteIdentifier($this->getTable());
+        $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`module` = :module AND
@@ -238,7 +238,7 @@ class Component_InstanceMapper extends BaseMapper
      */
     public function findByContextAndClass($module, $identifier, $class)
     {
-        $componentInstanceTable = $this->database->quoteIdentifier($this->getTable());
+        $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
         $sql = $this->getSelectString() . "
             WHERE       {$componentInstanceTable}.`module` = :module AND
@@ -263,7 +263,7 @@ class Component_InstanceMapper extends BaseMapper
      */
     public function findByInstanceId($id)
     {
-        $componentInstanceTable = $this->database->quoteIdentifier($this->getTable());
+        $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`id` = :id
@@ -546,7 +546,7 @@ class Component_InstanceMapper extends BaseMapper
      */
     private function resequenceColumn($module, $identifier, $protect, $position)
     {
-        $componentInstanceTable = $this->database->quoteIdentifier($this->getTable());
+        $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
         // Extract the current listing
 
@@ -621,7 +621,7 @@ class Component_InstanceMapper extends BaseMapper
      */
     public function cascadeSequence($identifier, $position = 'left', $module = 'homepage')
     {
-        $componentInstanceTable = $this->database->quoteIdentifier($this->getTable());
+        $componentInstanceTable = $this->database->getQuoter()->quoteIdentifier($this->getTable());
 
         $stmt = $this->database->prepare("
 			UPDATE    {$componentInstanceTable}

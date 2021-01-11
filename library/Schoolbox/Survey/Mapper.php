@@ -127,7 +127,7 @@ class Mapper extends BaseMapper
     {
         $pb = $this->getPredicateBuilder();
         $pb->in('aa.user_id', $userIds);
-        $pb->like('title', '%'.$this->database->escapeForLike($name).'%');
+        $pb->like('title', '%'.$this->database->getQuoter()->escapeForLike($name).'%');
         $pb->isNull("{$this->getTable()}.deleted_at" );
 
         $sql = $this->getSelectString() . " WHERE ".implode(' AND ',$pb->getWhere());

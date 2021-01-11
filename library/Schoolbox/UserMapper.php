@@ -618,8 +618,8 @@ class UserMapper extends Mapper
 
                     $foundValidKeyword = true;
 
-                    $pb->like('firstname', "%{$this->getDatabase()->escapeForLike($keyword)}%")
-                        ->like('lastname', "%{$this->getDatabase()->escapeForLike($keyword)}%");
+                    $pb->like('firstname', "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%")
+                        ->like('lastname', "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%");
 
                 }
             }
@@ -681,7 +681,7 @@ class UserMapper extends Mapper
         if (is_array($order) && !empty($order)) {
             $order_parts = Array();
             foreach ($order as $column => $direction) {
-                $order_parts[] = $this->database->quoteIdentifier($column).(strtoupper($direction) == 'DESC'? ' DESC' : ' ASC');
+                $order_parts[] = $this->database->getQuoter()->quoteIdentifier($column).(strtoupper($direction) == 'DESC'? ' DESC' : ' ASC');
             }
             $query .= ' ORDER BY ' . (implode(', ', $order_parts));
         }

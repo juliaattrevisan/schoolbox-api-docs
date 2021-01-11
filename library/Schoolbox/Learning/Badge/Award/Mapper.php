@@ -69,7 +69,7 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('award.recipient.role', 'awrr')},
                 {$this->getJoinColumnString('award.awardedBy', 'awa')},
                 {$this->getJoinColumnString('award.awardedBy.role', 'awar')}
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('recipient', '', 'r', true)}
             INNER JOIN {$this->getJoinSql('recipient.role', 'r', 'rr')}
             INNER JOIN {$this->getJoinSql('awardedBy', '', 'a', true)}

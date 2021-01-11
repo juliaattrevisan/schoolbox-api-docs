@@ -132,7 +132,7 @@ class QueueMapper extends Mapper {
      */
     protected function getSelectString()
     {
-        $table = $this->database->quoteIdentifier($this->table);
+        $table = $this->database->getQuoter()->quoteIdentifier($this->table);
 
         $storageMapper = $this->getJoinMapper('storage');
 

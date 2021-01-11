@@ -99,7 +99,7 @@ class ValidCodesSpec extends Leaf
 
         foreach ($rawCodes as $code) {
             $innerPb->equals('code', $code);
-            $innerPb->like('code', "%/" . $this->folderCodeMapper->getDatabase()->escapeForLike($code));
+            $innerPb->like('code', "%/" . $this->folderCodeMapper->getDatabase()->getQuoter()->escapeForLike($code));
         }
         foreach ($prefixedCodes as $prefixedCode) {
             $innerPb->equals('code', $prefixedCode);

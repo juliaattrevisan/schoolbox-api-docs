@@ -1670,7 +1670,7 @@ abstract class Mapper implements IMapper, Serializable
         foreach ($pbs as $pb) {
             // Build query
 
-            $query     = "UPDATE `{$this->getTable()}` SET {$this->database->quoteIdentifier($field)} = :value WHERE " . implode(' AND ', $pb->getWhere());
+            $query     = "UPDATE `{$this->getTable()}` SET {$this->database->getQuoter()->quoteIdentifier($field)} = :value WHERE " . implode(' AND ', $pb->getWhere());
             $statement = $this->database->prepare($query);
             $statement->bindValue('value', $value);
             foreach ($pb->getParams() as $key => $id) {
@@ -2203,7 +2203,7 @@ abstract class Mapper implements IMapper, Serializable
             'order'   => $this->getDefaultOrderByParams(),
         );
         $options      = array_merge($defaults, $options);
-        $quoted_table = $this->database->quoteIdentifier($this->table);
+        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
 
         // filter on soft-deletions if this mapper supports them
         if (isset($this->soft_delete_column) && $options['deleted'] == false) {
@@ -2325,7 +2325,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function getDeleteString()
     {
-        $quoted_table = $this->database->quoteIdentifier($this->table);
+        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
 
         // only soft-delete if this is a soft-deletable model
         if ($softDelete = $this->getSoftDeleteUpdateSql()) {
@@ -2343,7 +2343,7 @@ abstract class Mapper implements IMapper, Serializable
     protected function getSelectString()
     {
         // in the core mapper this is quite trivial, but implementing classes can override
-        $quoted_table = $this->database->quoteIdentifier($this->table);
+        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
         return "SELECT {$this->getColumnString()} FROM $quoted_table";
     }
 
@@ -2706,7 +2706,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         $selection = implode(', ', array_map(function ($column) {
             return implode('.', array_map(function ($v) {
-                return $this->database->quoteIdentifier($v);
+                return $this->database->getQuoter()->quoteIdentifier($v);
             }, [ $this->getTable(), $column ]));
         }, $columnList));
 

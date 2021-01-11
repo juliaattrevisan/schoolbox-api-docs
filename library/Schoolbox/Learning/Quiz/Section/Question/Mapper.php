@@ -60,7 +60,7 @@ class Mapper extends BaseMapper
     protected function getFromString()
     {
         return "
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('solution', '', 's')}
         ";
     }

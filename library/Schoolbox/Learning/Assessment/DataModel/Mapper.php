@@ -357,7 +357,7 @@ class Mapper extends BaseMapper
         $where = implode(' AND ', $pb->getWhere());
         $query = "
             SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('task', 'a', 't', true)}
             JOIN  {$this->getJoinSql('task.completion', 't', 'tc')} AND tc.student_id = :userId
                   {$planJoin}
@@ -366,7 +366,7 @@ class Mapper extends BaseMapper
             UNION
 
             SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
             JOIN  {$this->getJoinSql('duework.submission', 'd', 'ds')} AND ds.owner = :userId
                   {$planJoin}
@@ -375,7 +375,7 @@ class Mapper extends BaseMapper
             UNION
 
             SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
             JOIN  {$this->getJoinSql('duework.return', 'd', 'dr')} AND dr.owner = :userId
                   {$planJoin}
@@ -384,7 +384,7 @@ class Mapper extends BaseMapper
             UNION
 
             SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('quiz', 'a', 'q', true)}
             JOIN  {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
                   {$planJoin}
@@ -430,7 +430,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('project_assessment', 'pa')},
                 {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
 
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             -- Allow join onto deleted sub-objects
             LEFT JOIN {$this->getJoinSql('task', '', 't', true)}
             LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}

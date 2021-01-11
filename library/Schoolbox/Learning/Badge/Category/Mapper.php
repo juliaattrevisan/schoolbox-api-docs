@@ -60,7 +60,7 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('createdBy', 'c')},
                 {$this->getJoinColumnString('createdBy.role', 'cr')}
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('createdBy', '', 'c', true)}
             INNER JOIN {$this->getJoinSql('createdBy.role', 'c', 'cr')}
         ";

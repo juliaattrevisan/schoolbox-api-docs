@@ -55,7 +55,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('user.role', 'ur')},
                 {$this->getJoinColumnString('team', 't')},
                 {$this->getJoinColumnString('team.division', 'td')}
-            FROM {$this->database->quoteIdentifier($this->table)}
+            FROM {$this->database->getQuoter()->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
             INNER JOIN {$this->getJoinSql('user.role', 'u', 'ur')}
             INNER JOIN {$this->getJoinSql('team', '', 't')}

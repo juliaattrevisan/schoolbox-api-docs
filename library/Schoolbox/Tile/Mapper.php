@@ -83,7 +83,7 @@ class Mapper extends BaseMapper
      */
     protected function getFromString()
     {
-        $table = $this->database->quoteIdentifier($this->table);
+        $table = $this->database->getQuoter()->quoteIdentifier($this->table);
         return "
             FROM $table
             LEFT JOIN {$this->getJoinSql('backgroundImage', '', 'bi', true)}

@@ -52,7 +52,7 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('user', 'u')}
-            FROM {$this->database->quoteIdentifier($this->table)}
+            FROM {$this->database->getQuoter()->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
         ";
     }

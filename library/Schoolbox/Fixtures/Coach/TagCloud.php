@@ -180,7 +180,7 @@ class TagCloud implements BaseMapper\UsableAsTagSource
             $query .= ' LIMIT :limit';
         }
         $statement = $this->mapper->getDatabase()->prepare($query);
-        $statement->bindValue('search', '%'.$this->mapper->getDatabase()->escapeForLike($keyword).'%', \PDO::PARAM_STR);
+        $statement->bindValue('search', '%'.$this->mapper->getDatabase()->getQuoter()->escapeForLike($keyword).'%', \PDO::PARAM_STR);
         if ($offset > 0) {
             $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
             $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);

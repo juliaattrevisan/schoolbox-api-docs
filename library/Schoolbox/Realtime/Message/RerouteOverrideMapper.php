@@ -139,7 +139,7 @@ class RerouteOverrideMapper extends Mapper
             AND `user_id` IN $placeholders
             AND `delivery` = :delivery
         ";
-        $quotedKey = $this->getDatabase()->escapeForLike($routeKey);
+        $quotedKey = $this->getDatabase()->getQuoter()->escapeForLike($routeKey);
         $params    = array(
             'delivery'  => $delivery,
             'routeKey'  => $routeKey,

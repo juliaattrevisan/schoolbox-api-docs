@@ -98,7 +98,7 @@ class UserProfileMapper extends Schoolbox\Mapper
     protected function getFromString()
     {
         return "
-            FROM {$this->database->quoteIdentifier($this->getTable())}
+            FROM {$this->database->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
         ";
     }

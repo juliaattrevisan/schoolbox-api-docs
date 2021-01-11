@@ -52,7 +52,7 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('storage', 'f')},
                 {$this->getJoinColumnString('storage.allowedFileExtension', 'm')}
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('storage', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'f', 'm', true)}
         ";

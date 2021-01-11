@@ -66,7 +66,7 @@ class Mapper extends BaseMapper
     protected function getSelectString()
     {
         return "
-            SELECT 
+            SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('sportsfixtures_team_coach', 'coaches')},
                 {$this->getJoinColumnString('division', 'd')},
@@ -141,7 +141,7 @@ class Mapper extends BaseMapper
     {
         $pb = $this->getPredicateBuilder();
         $pb->equals('division_id', $divisionId);
-        $pb->like('name', "%{$this->getDatabase()->escapeForLike($keyword)}%");
+        $pb->like('name', "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%");
         return $this->findByPredicates($pb);
     }
 

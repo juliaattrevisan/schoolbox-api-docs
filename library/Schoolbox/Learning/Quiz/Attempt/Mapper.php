@@ -148,7 +148,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('user', 'u')},
 
                 {$this->getJoinColumnString('quiz', 'a')}
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('reviewer', '', 'r', true)}
             INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
             INNER JOIN {$this->getJoinSql('quiz', '', 'a', true)}
