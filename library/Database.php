@@ -22,7 +22,7 @@ use DebugBar\DataCollector\PDO as DebugPDO;
  *
  * @deprecated use IConnector objects instead
  */
-class Database implements IDatabase, Serializable, IQuoter
+class Database implements IDatabase, Serializable
 {
     /**
      * An instance of database

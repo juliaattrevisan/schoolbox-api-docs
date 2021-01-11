@@ -136,7 +136,7 @@ abstract class Mapper implements IMapper, Serializable
     public const SORT_ORDER_DESC = 'desc';
 
     /**
-     * @var IDatabase|IQuoter
+     * @var IDatabase
      */
     protected $database;
 
@@ -618,7 +618,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @return IDatabase|IQuoter
+     * @return IDatabase
      */
     public function getDatabase()
     {
