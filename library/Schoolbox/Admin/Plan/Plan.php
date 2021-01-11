@@ -134,9 +134,11 @@ class Plan extends CliTool\App
                 UPDATE component_definition SET enabled='false', visible='false' WHERE class = :component
             "
             );
-            foreach ($components['hide'] as $component) {
-                $this->getLogger()->info("Disabling the component: '$component' ");
-                $statement->execute(['component' => $component]);
+            if (isset($components['hide'])) {
+                foreach ($components['hide'] as $component) {
+                    $this->getLogger()->info("Disabling the component: '$component' ");
+                    $statement->execute(['component' => $component]);
+                }
             }
             $this->getDatabaseInternal()->commit();
         } catch (\PDOException $e) {

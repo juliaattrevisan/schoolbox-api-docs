@@ -1,5 +1,7 @@
 config:
 
+  site_plan: {value: Basic}
+
   #Modules
   boarder_leave_enabled: {value: false, hide: true}
   teams_enabled: {value: false, hide: false}

@@ -1,5 +1,7 @@
 config:
 
+  site_plan : { value : PortalPlus }
+
   #Modules
   boarder_leave_enabled: {value: false, hide: true}
   teams_enabled: {hide: false}

@@ -1,5 +1,7 @@
 config:
 
+  site_plan : { value : Elite }
+
   #Modules
   boarder_leave_enabled: {hide: false}
   teams_enabled: {hide: false}

@@ -1,3 +1,24 @@
+UPDATE config SET sequence=sequence+1 WHERE type_id =  (SELECT id FROM `lu_config_type` WHERE `type` = 'Site') AND sequence >= 10;
+
+INSERT INTO `config`
+(`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
+VALUES (
+           'site_plan',
+           '',
+           'Schoolbox Plan',
+           'The current plan running on this server, controls what features are available. To see more information about plans visit: https://schoolbox.com.au/pricing. To upgrade or alter your plan please contact your account manager.',
+           (SELECT id FROM `lu_config_field` WHERE `field` = 'input'),
+           null,
+           (SELECT id FROM `lu_config_type` WHERE `type` = 'Site'),
+           'false',
+           'false',
+           'false',
+           'settings',
+           10
+       );
+
+
+
 INSERT INTO `config`
 (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
