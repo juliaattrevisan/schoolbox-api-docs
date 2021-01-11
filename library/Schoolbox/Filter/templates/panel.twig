@@ -97,16 +97,26 @@ Usage:
 
         // Reset to role-specific default selections
         $resetToDefaultsBtn.on('click', function (){
+            // Reset checkboxes
             $filterPanel.find('input[type=checkbox][data-value-default]').each(function(idx, elem){
-                var $checkbox = $(elem);
+                let $checkbox = $(elem);
                 $checkbox.prop('checked', $checkbox.data('value-default'));
             });
+
+            // Reset text inputs
+            $filterPanel.find('input[type=text][data-value-default]').each(function(idx, elem){
+                let $input = $(elem);
+                $input.val($input.data('value-default'));
+            });
+
+            // Reset selectizes
             $filterPanel.find('[data-selectize]').each(function () {
-                var selectize = this.selectize;
+                let selectize = this.selectize;
                 if (selectize) {
                     selectize.setValue(JSON.parse(this.dataset.valueDefault));
                 }
             });
+
             updateFiltersInUseLabel();
         });
 

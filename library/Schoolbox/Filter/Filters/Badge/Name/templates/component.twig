@@ -16,7 +16,8 @@
         <input type="text"
                placeholder="Enter a full or partial badge name"
                name="filter_selection[{{ definition.filter.id }}][]"
-               value="{{ searchQuery }}" />
+               value="{{ searchQuery }}"
+               data-value-default="" />
     {% else %}
         {{ parent() }}
     {% endif %}
