@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -54,8 +55,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             //Avoid saving duplicates if possible
             $result = $this->findOneByColumn('reference', $model->getReference(), ["deleted" => false]);
             $model->setId($result->getId());
-        }
-        catch(\Schoolbox\Mapper\Exception $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
             $this->save($model);
         }
 
@@ -171,15 +171,17 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         $curriculumNode = $this->hydrate($row, $alias);
         if ($curriculumNode) {
             $curriculumNode->setLearningArea($this->getJoinMapper('area')->hydrate($row, $areaAlias));
-            if($curriculumNode->getLearningArea() instanceof LearningArea\Model) {
+            if ($curriculumNode->getLearningArea() instanceof LearningArea\Model) {
                 $curriculumNode->getLearningArea()->setSource(
-                    $this->getJoinMapper('area.source')->hydrate($row, $areaSourceAlias));
+                    $this->getJoinMapper('area.source')->hydrate($row, $areaSourceAlias)
+                );
             }
 
             $curriculumNode->setLearningLevel($this->getJoinMapper('level')->hydrate($row, $levelAlias));
-            if($curriculumNode->getLearningLevel() instanceof LearningLevel\Model) {
+            if ($curriculumNode->getLearningLevel() instanceof LearningLevel\Model) {
                 $curriculumNode->getLearningLevel()->setSource(
-                    $this->getJoinMapper('level.source')->hydrate($row, $levelSourceAlias));
+                    $this->getJoinMapper('level.source')->hydrate($row, $levelSourceAlias)
+                );
             }
         }
         return $curriculumNode;

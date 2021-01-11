@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Realtime\Message;
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
@@ -23,7 +25,8 @@ class RerouteOverrideMapper extends Mapper
      * @throws Mapper\DefinitionException
      * @throws \InvalidArgumentException
      */
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('msg_reroute_override');
         $this->hasModel(RerouteOverride::class);
 
@@ -73,7 +76,7 @@ class RerouteOverrideMapper extends Mapper
 
         // don't SQL-filter the route key, we'll do it manually here
         $routeKey = $columnList['msg_route_key'];
-        unset ($columnList['msg_route_key']);
+        unset($columnList['msg_route_key']);
 
         $results = parent::findByColumnList($columnList, $options);
 
@@ -143,9 +146,9 @@ class RerouteOverrideMapper extends Mapper
         $params    = array(
             'delivery'  => $delivery,
             'routeKey'  => $routeKey,
-            'startKey'  => $quotedKey.'.%',
-            'middleKey' => '%.'.$quotedKey.'.%',
-            'endKey'    => '%.'.$quotedKey,
+            'startKey'  => $quotedKey . '.%',
+            'middleKey' => '%.' . $quotedKey . '.%',
+            'endKey'    => '%.' . $quotedKey,
         );
         $params = array_merge($params, $parameters);
         $statement = $this->getDatabase()->prepare($query);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for normal (non-eportfolio) images
  *

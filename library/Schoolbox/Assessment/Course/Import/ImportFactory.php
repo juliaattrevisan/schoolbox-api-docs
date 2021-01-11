@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Assessment\Course\Import;
 
 use Alaress\Database\Predicate\Builder;
@@ -71,7 +73,7 @@ class ImportFactory
         $assessmentPairs = new GenericCollection(GenericCollection::class);
 
         // Instantiate empty sets for each UnitSpecId
-        foreach($unitImpls as $unitImpl){
+        foreach ($unitImpls as $unitImpl) {
             $courseSpecId = $unitImpl->getSpecification()->getId();
             $unitSpecCache[$courseSpecId] = $unitImpl->getSpecification();
             $assessmentSpecs->setOffset($courseSpecId, new GenericCollection(IAssessable::class));
@@ -123,7 +125,7 @@ class ImportFactory
             $unitSpecId = $row['us.id'];
 
             // Is is the first time this UnitSpec has been seen?
-            if(!$unitSpecDBCache[$unitSpecId] instanceof UnitSpecification){
+            if (!$unitSpecDBCache[$unitSpecId] instanceof UnitSpecification) {
                 // Add a Folder and name it so we can later render out this UnitSpec's name.
                 $unitSpecDBCache[$unitSpecId] = $unitSpecCache[$unitSpecId];
                 $folder = new Folder();
@@ -199,7 +201,7 @@ class ImportFactory
         $unitImplIds = [];
 
         // Instantiate empty sets for each UnitSpecId
-        foreach($unitImpls as $unitImpl){
+        foreach ($unitImpls as $unitImpl) {
             $unitSpecId = $unitImpl->getSpecification()->getId();
             $unitSpecCache[$unitSpecId] = $unitImpl->getSpecification();
             $assessmentSpecs->setOffset($unitSpecId, new GenericCollection(IAssessable::class));
@@ -207,7 +209,7 @@ class ImportFactory
             $assessmentPairs->setOffset($unitSpecId, new GenericCollection(AssessmentPair::class));
 
             // Is this UnitImpl already imported?
-            if($unitImpl->getId()){
+            if ($unitImpl->getId()) {
                 $unitImplIds[$unitSpecId] = $unitImpl->getId();
             }
         }
@@ -330,7 +332,7 @@ class ImportFactory
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $unitSpecId = $row['us.id'];
             // Is is the first time this UnitSpec has been seen?
-            if(!$unitSpecDBCache[$unitSpecId] instanceof UnitSpecification){
+            if (!$unitSpecDBCache[$unitSpecId] instanceof UnitSpecification) {
                 // Add a Folder and name it so we can later render out this UnitSpec's name.
                 $unitSpecDBCache[$unitSpecId] = $unitSpecCache[$unitSpecId];
                 $folder = new Folder();
@@ -344,15 +346,15 @@ class ImportFactory
             // Create corresponding AssessmentImpl (if one exists). This may be valid null, eg if assessment has not been imported.
             $assessmentImpl = $this->buildAssessmentImplFromRow($row);
 
-            if($assessmentSpec instanceof IAssessable && $assessmentImpl instanceof IAssessable){
+            if ($assessmentSpec instanceof IAssessable && $assessmentImpl instanceof IAssessable) {
                 $assessmentImpl->setSpecificationAssessment($assessmentSpec);
                 $assessmentPairs->getOffset($unitSpecId)->add(new AssessmentPair($assessmentSpec, $assessmentImpl));
-            } else if($assessmentSpec instanceof IAssessable) {
+            } else if ($assessmentSpec instanceof IAssessable) {
                 // Don't add deleted AssessmentSpecs
-                if(!$assessmentSpec->isDeleted()){
+                if (!$assessmentSpec->isDeleted()) {
                     $assessmentSpecs->getOffset($unitSpecId)->setOffset($assessmentSpec->getId(), $assessmentSpec);
                 }
-            } else if ($assessmentImpl instanceof IAssessable){
+            } else if ($assessmentImpl instanceof IAssessable) {
                 $assessmentImpls->getOffset($unitSpecId)->setOffset($assessmentImpl->getId(), $assessmentImpl);
             } else {
                 // If unable to build a pair, spec-only, or impl-only, something has gone wrong!
@@ -386,14 +388,14 @@ class ImportFactory
 
         /** @var Project[] $projectSpecs */
         $projectSpecs = new GenericCollection(Project::class);
-        foreach($assessmentSpecs as $unitSpecId => $unitAssessmentSpecs){
-            foreach($unitAssessmentSpecs as $specId => $assessmentSpec){
-                if($assessmentSpec instanceof Project){
+        foreach ($assessmentSpecs as $unitSpecId => $unitAssessmentSpecs) {
+            foreach ($unitAssessmentSpecs as $specId => $assessmentSpec) {
+                if ($assessmentSpec instanceof Project) {
                     $projectSpecs->setOffset($specId, $assessmentSpec);
                 }
             }
         }
-        if(!$projectSpecs->count()){
+        if (!$projectSpecs->count()) {
             return $assessmentSpecs;
         }
         $query = "
@@ -429,7 +431,7 @@ class ImportFactory
             $deletedAt           = $row['sa.deleted_at'];
 
             // Only add deleted specs if they are linked to from a current Impl
-            if(is_null($deletedAt) || array_key_exists($assessmentId, $specToImplMap)){
+            if (is_null($deletedAt) || array_key_exists($assessmentId, $specToImplMap)) {
                 // This call should never return NULL - see above SQL query
                 $assessmentSpec = $this->buildAssessmentSpecFromRow($row);
                 if (!$assessmentSpec instanceof IAssessable) {
@@ -462,14 +464,14 @@ class ImportFactory
          * @var Project[] $projectImpls
          */
         $projectImpls = new GenericCollection(Project::class);
-        foreach($assessmentImpls as $unitSpecId => $unitAssessmentImpls){
-            foreach($unitAssessmentImpls as $implId => $assessmentImpl){
-                if($assessmentImpl instanceof Project){
+        foreach ($assessmentImpls as $unitSpecId => $unitAssessmentImpls) {
+            foreach ($unitAssessmentImpls as $implId => $assessmentImpl) {
+                if ($assessmentImpl instanceof Project) {
                     $projectImpls->setOffset($implId, $assessmentImpl);
                 }
             }
         }
-        if(!$projectImpls->count()){
+        if (!$projectImpls->count()) {
             return $assessmentImpls;
         }
         $query = "
@@ -520,7 +522,7 @@ class ImportFactory
 
             // Link AssessmentImpl to AssessmentSpec
             $assessmentSpecId = $row['asi.specification_assessment_id'];
-            if($assessmentSpecId){
+            if ($assessmentSpecId) {
                 $assessmentSpec = $this->assessmentCache->getOffset($assessmentImplToSpecMap[$assessmentImpl->getId()]);
                 $assessmentImpl->setSpecificationAssessment($assessmentSpec);
             }
@@ -567,24 +569,24 @@ class ImportFactory
         $projectImpls = new GenericCollection(Project::class);
 
 
-        foreach($assessmentPairs as $unitSpecId => $unitAssessmentPairs){
+        foreach ($assessmentPairs as $unitSpecId => $unitAssessmentPairs) {
             $unitProjectSpecs->setOffset($unitSpecId, new GenericCollection(Project::class));
             $unitProjectImpls->setOffset($unitSpecId, new GenericCollection(Project::class));
 
-            foreach($unitAssessmentPairs as $unitAssessmentPair){
+            foreach ($unitAssessmentPairs as $unitAssessmentPair) {
                 $spec = $unitAssessmentPair->getSpecification();
                 $impl = $unitAssessmentPair->getImplementation();
-                if($spec instanceof Project){
+                if ($spec instanceof Project) {
                     $unitProjectSpecs->getOffset($unitSpecId)->setOffset($spec->getId(), $spec);
                     $projectSpecs->setOffset($spec->getId(), $spec);
                 }
-                if($impl instanceof Project){
+                if ($impl instanceof Project) {
                     $unitProjectImpls->getOffset($unitSpecId)->setOffset($impl->getId(), $impl);
                     $projectImpls->setOffset($impl->getId(), $impl);
                 }
             }
         }
-        if(!$projectSpecs->count()){
+        if (!$projectSpecs->count()) {
             return $assessmentPairs;
         }
 
@@ -665,7 +667,7 @@ class ImportFactory
     protected function createDate($dateString)
     {
 
-        if(is_null($dateString)){
+        if (is_null($dateString)) {
             return new \Alaress_Date_NullDate();
         } else {
             return new \Alaress_Date_Format($dateString, \Alaress_Date_Format::DATABASE_FORMAT);
@@ -701,16 +703,12 @@ class ImportFactory
                 $row['sdw.accept_submission'],
                 $row['sdw.multi_submission']
             );
-
         } elseif ($row['sqz.id']) {
             $assessmentSpec = new QuizAssessment();
-
         } elseif ($row['stk.id']) {
             $assessmentSpec = new TaskAssessment();
-
         } elseif ($row['spr.id']) {
             $assessmentSpec = new Project();
-
         } else {
             throw new InvalidDataStateException("Broken data detected. Unknown assessment type. id: {$row['sa.id']}");
         }
@@ -719,7 +717,7 @@ class ImportFactory
         $assessmentSpec->setTitle($row['sa.title']);
         $assessmentSpec->setSequence($row['sa.sequence']);
         $assessmentSpec->setDefaultOpenSpan($row['sa.default_open_span']);
-        if(is_null($row['sa.deleted_at'])){
+        if (is_null($row['sa.deleted_at'])) {
             $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
         } else {
             $assessmentSpec->setDeletedAt($this->createDate($row['sa.deleted_at']));
@@ -754,16 +752,12 @@ class ImportFactory
                 $row['idw.accept_submission'],
                 $row['idw.multi_submission']
             );
-
         } elseif ($row['iqz.id']) {
             $assessmentImpl = new QuizAssessment();
-
         } elseif ($row['itk.id']) {
             $assessmentImpl = new TaskAssessment();
-
         } elseif ($row['ipr.id']) {
             $assessmentImpl = new Project();
-
         } else {
             throw new InvalidDataStateException("Broken data detected. Unknown assessment type. id: {$row['ia.id']}");
         }

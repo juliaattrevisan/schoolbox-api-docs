@@ -1,18 +1,24 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Permission\Access;
 
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Resource\Folder\NNIAN;
+
 use function count;
+
 use External_Class;
+
 use function implode;
 use function in_array;
+
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -52,7 +58,7 @@ class UserAccessMapper extends Mapper
         $this->uses('sid', self::TYPE_INTEGER, null, 'serviceIdentifier');
         $this->uses('type', self::TYPE_INTEGER, null, 'accessLevel');
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE,   [ $this, 'calculateUserSubscription' ]);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'calculateUserSubscription' ]);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this, 'calculateUserSubscription' ]);
     }
 
@@ -201,7 +207,6 @@ class UserAccessMapper extends Mapper
             }
 
             $external->add($ua);
-
         }
 
         $access = $access->merge($external);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -17,6 +18,7 @@ use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\User;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use PDO;
+
 use function array_merge;
 use function count;
 
@@ -168,7 +170,6 @@ class DataSource
 
         /** @var Model $linkedRecord */
         foreach ($linkedRecords as $linkedRecord) {
-
             // attach current linked record to a proper student record
             if ($linkedRecord->getParent() && $studentRecords->keyExists($linkedRecord->getParent()->getId())) {
                 // parent of the current linked record is a student record

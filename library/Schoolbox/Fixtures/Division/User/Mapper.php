@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -9,7 +10,7 @@ namespace Schoolbox\Fixtures\Division\User;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Role as Role;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;

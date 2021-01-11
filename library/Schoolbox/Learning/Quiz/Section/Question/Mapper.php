@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -9,7 +10,7 @@ namespace Schoolbox\Learning\Quiz\Section\Question;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
-use \Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestion;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\QuestionType\Mapper as QuizQuestionTypeMapper;
@@ -74,8 +75,7 @@ class Mapper extends BaseMapper
         /** @var Model[]|GenericCollection $questions */
         $questions = $this->createCollection();
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC))
-        {
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $question = $this->hydrate($row);
 
             /** @var QuizSolution $solution */

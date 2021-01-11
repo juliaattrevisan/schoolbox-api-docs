@@ -261,5 +261,4 @@ class Mapper extends BaseMapper
 
         return $nodes;
     }
-
 }

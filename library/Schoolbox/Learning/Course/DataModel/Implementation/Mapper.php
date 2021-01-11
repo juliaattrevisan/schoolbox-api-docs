@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -136,7 +137,7 @@ class Mapper extends AbstractCourseMapper
     {
         $courseImpls = $this->findByColumn('course_specification_id', $courseSpecId, $options);
 
-        if($loadUnits){
+        if ($loadUnits) {
             $courseImpls = $this->loadUnitsForCollection($courseImpls);
         }
         return $courseImpls;

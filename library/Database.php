@@ -29,7 +29,7 @@ class Database implements IDatabase, Serializable
      *
      * @var Database
      */
-    static private $instance;
+    private static $instance;
 
     /**
      * Database source name
@@ -85,7 +85,7 @@ class Database implements IDatabase, Serializable
      * @static
      * @return Database
      */
-    static public function getInstance()
+    public static function getInstance()
     {
         if (!self::$instance) {
             self::$instance = new self();
@@ -97,7 +97,7 @@ class Database implements IDatabase, Serializable
     /**
      * Explicitly dis- and re-connect the singleton database connection
      */
-    static public function reinitialise()
+    public static function reinitialise()
     {
         self::$instance->reconnect();
     }
@@ -141,7 +141,10 @@ class Database implements IDatabase, Serializable
         /* Create PDO connection */
         try {
             $this->connection = new PDO(
-                $dsn, $username, $password, array(
+                $dsn,
+                $username,
+                $password,
+                array(
                     PDO::ATTR_PERSISTENT         => empty($options['debug']),
                     PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
                 )
@@ -360,7 +363,6 @@ class Database implements IDatabase, Serializable
     {
 
         return $this->connection->lastInsertId($name);
-
     }
 
     /**
@@ -415,7 +417,6 @@ class Database implements IDatabase, Serializable
     public function commit()
     {
         return $this->transactor->commit();
-
     }
 
     /**

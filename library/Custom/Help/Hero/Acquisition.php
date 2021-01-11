@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Acquisition
  *
@@ -82,8 +83,7 @@ class Acquisition
         foreach ($stack2 as $id => $data) {
             if (array_key_exists($id, $stack1)) {
                 $stack1[$id] = array_merge($stack1[$id], $data);
-            }
-            else {
+            } else {
                 $stack1[$id] = $data;
             }
         }
@@ -230,7 +230,6 @@ class Acquisition
         /* A hashtable of tuples for a user, their highest-marked Feedback for each of the mandatory assessments
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-
             /* Figure out the normalised mark for each attempt
              */
             $normalisedMark = 100.00000 * (float)$row['mark'] / (float)$availableMarks[$row['userId']][$row['attemptId']]['availableMarks'];

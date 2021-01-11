@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Schoolbox user role mapper
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * NESA Report Data Acquisition
  *
@@ -122,7 +123,7 @@ class Acquisition
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      */
-    private function findHierarchy() :array
+    private function findHierarchy(): array
     {
 
         /* Dynamically assemble WHERE clause
@@ -207,7 +208,7 @@ class Acquisition
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      */
-    private function findRoster() :array
+    private function findRoster(): array
     {
         $pb = new Builder($this->userMapper->getDatabase()->getQuoter(), 'upd');
         $pb->in('registration_state', $this->states);
@@ -261,7 +262,7 @@ class Acquisition
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      */
-    private function findInvolvement() :array
+    private function findInvolvement(): array
     {
         $involvement =  [
             'hierarchy' => $this->findHierarchy(),
@@ -287,7 +288,7 @@ class Acquisition
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
-    public function generate() :array
+    public function generate(): array
     {
         /* Results of investigation into each user's assessment participation
          */
@@ -327,9 +328,7 @@ class Acquisition
                         $this->indicators
                     );
                 }
-            }
-            catch (Mapper\Exception $e) {
-
+            } catch (Mapper\Exception $e) {
                 /* Assessment not found; rubric not found
                  * Skip, because nothing can be done about them
                  */
@@ -356,30 +355,26 @@ class Acquisition
         User $user,
         IAssessable $assessment,
         array $rubric,
-        array $indicators) :array
-    {
+        array $indicators
+    ): array {
         $condensed = [];
 
         foreach ((array)$rubric['groups'] as $groupId => $groupData) {
             foreach ((array)$groupData['criteria'] as $criterionId => $criterionData) {
                 if (\in_array($criterionData['name'], $indicators, true)) {
                     foreach ((array)$criterionData['descriptors'] as $levelId => $levelData) {
-
                         /* Only collate the ones we selected; condense this for rendering
                          * array key 'outcome' used for rendering 3 states: demonstrated, not demonstrated, unknown
                          */
                         if ($levelData['selected']) {
                             if ($levelData['text'] === 'Not shown.') {
-
                                 /* User did not demonstrate what was required
                                  */
                                 $val = [
                                     'text' => $levelData['text'],
                                     'outcome' => false
                                 ];
-                            }
-                            else {
-
+                            } else {
                                 /* User demonstrated what was required
                                  */
                                 $val = [

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ParticipantMapper
  *
@@ -12,7 +13,7 @@ namespace Schoolbox\Fixtures\Team\Player\Participant;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;

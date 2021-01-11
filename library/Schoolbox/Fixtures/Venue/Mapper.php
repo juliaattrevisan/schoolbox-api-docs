@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -8,7 +9,7 @@
 namespace Schoolbox\Fixtures\Venue;
 
 use Schoolbox\Column\Decimal;
-use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Fixtures\Venue\Model as Venue;
 use Schoolbox\Mapper\Exception as MapperException;
 

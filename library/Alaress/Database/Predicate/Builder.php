@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -13,6 +14,7 @@ use Traversable;
 use Alaress_Date_Format;
 use UnderflowException;
 use TypeError;
+
 use function implode;
 
 class Builder implements IBuilder

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file provides abstraction of the database.
  *
@@ -31,7 +32,7 @@ class DeprecatedDatabase implements Serializable
     public $databaseResult;
 
     /** @var self */
-    static private $instance = false;
+    private static $instance = false;
 
     /**
      * Constuctor sets up variables and connects to database
@@ -312,7 +313,6 @@ class DeprecatedDatabase implements Serializable
         $cols = '`' . implode('`,`', $names) . '`';
         $rows = array();
         foreach ($array as $row) {
-
             $values = '(';
 
             foreach ($row as $key => $value) {

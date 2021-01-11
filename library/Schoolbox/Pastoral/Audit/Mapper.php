@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This maintains an audit trail of every record a staff member views, and all the searches that they perform (and the
  * results that these searches returned)

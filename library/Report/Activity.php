@@ -48,7 +48,6 @@ class Report_Activity extends Report_Abstract implements Report_IReport
 
         if (!$this->checkPermissions()) {
             error(19);
-
         } else {
             $this->setPage($page);
             $this->setUserHandler(new User());
@@ -271,7 +270,6 @@ OR ml.name        LIKE :keyword
 
         // render users
         if (!empty($this->dataSet)) {
-
             $page->setVar(
                 array(
                     'COUNTABLE_COUNT' => $this->dataCount,
@@ -282,7 +280,6 @@ OR ml.name        LIKE :keyword
             );
 
             foreach ($this->dataSet as $log) {
-
                 $actionString = '';
                 $locationPrefix = 'in';
                 $moveSuffix = '';
@@ -296,13 +293,13 @@ OR ml.name        LIKE :keyword
                         $locationPrefix = 'to';
                         $moveSuffix = ' to <a href=/homepage/' . $log['cf_id'] . '>' . $log['cf_name'] . '</a>';
                         break;
-                    case 'create' :
+                    case 'create':
                         $actionString .= 'Added ';
                         break;
-                    case 'delete' :
+                    case 'delete':
                         $actionString .= 'Deleted ';
                         break;
-                    case 'access' :
+                    case 'access':
                         $actionString .= 'Accessed ';
                         break;
                 }
@@ -356,7 +353,6 @@ OR ml.name        LIKE :keyword
 
             // set up filtering
             $this->displayFilterBlock();
-
         } else {
             $page->setVar(
                 array(
@@ -414,7 +410,6 @@ OR ml.name        LIKE :keyword
         $page = $this->getPage();
 
         foreach ($this->filterable as $field) {
-
             $output = array(
                 'FILTER_ID'          => $field,
                 'FILTER_NAME'        => $field,

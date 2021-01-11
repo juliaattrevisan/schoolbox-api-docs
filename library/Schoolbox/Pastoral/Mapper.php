@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -350,8 +351,7 @@ class Mapper extends BaseMapper
             ], [
                     'order' => ['created_at' => 'DESC'],
                     'limit' => $limit,
-                ]
-            );
+                ]);
     }
 
     /**
@@ -889,7 +889,7 @@ class Mapper extends BaseMapper
 
         $criteriaParts = [];
         foreach ($this->filters as $filter) {
-            $criteriaParts[] = '(' . $filter .')';
+            $criteriaParts[] = '(' . $filter . ')';
         }
 
         $criteriaSql = ' WHERE pastoral.deleted_at IS NULL ';

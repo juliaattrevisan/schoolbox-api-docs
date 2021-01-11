@@ -62,7 +62,6 @@ class Report_Login extends Report_Abstract implements Report_IReport
 
         if (!$this->checkPermissions()) {
             error(19);
-
         } else {
             $this->setPage($page);
             $this->setUserHandler(new User());
@@ -163,7 +162,6 @@ class Report_Login extends Report_Abstract implements Report_IReport
         $params = array();
         foreach ($resultFilter as $key => $value) {
             if (in_array($key, $this->getFilterFields())) {
-
                 if ($key == 'role') {
                     $key = 'name'; //convert role to group name
                 }
@@ -300,7 +298,6 @@ class Report_Login extends Report_Abstract implements Report_IReport
 
             // set up filtering
             $this->displayFilterBlock();
-
         } // else empty data set
         else {
             $page->setVar(

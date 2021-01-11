@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A mapper for bookable resources.
  *
@@ -6,7 +7,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 
 namespace Schoolbox\ResourceBooking\Item;
 
@@ -34,8 +34,15 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('resource_category_id', Category\Mapper::class, 'id', null, null, 'category', 'category');
         $this->joins('image_hash', Storage\Mapper::class, 'hash', null, null, 'image', 'image');
-        $this->joins('resource_moderation_type_id', ModerationType\Mapper::class, 'id', null, null, 'moderationType',
-            'moderation_type');
+        $this->joins(
+            'resource_moderation_type_id',
+            ModerationType\Mapper::class,
+            'id',
+            null,
+            null,
+            'moderationType',
+            'moderation_type'
+        );
         $this->uses('name', self::TYPE_STRING);
         $this->uses('room_code', self::TYPE_STRING);
         $this->uses('description', self::TYPE_STRING);
@@ -56,11 +63,11 @@ class Mapper extends BaseMapper
                 'other_key' => 'resource_id',
                 'multiple'  => true,
                 // Better M2M joins:
-//                'mapper'    => '\\Schoolbox\\User',
-//                'this_key'  => 'id',
-//                'other_key' => 'id',
-//                'multiple'  => true,
-//                'through'   => '\\Schoolbox\\ResourceBooking\\Item\\Moderator\\Mapper',
+            //                'mapper'    => '\\Schoolbox\\User',
+            //                'this_key'  => 'id',
+            //                'other_key' => 'id',
+            //                'multiple'  => true,
+            //                'through'   => '\\Schoolbox\\ResourceBooking\\Item\\Moderator\\Mapper',
             ]
         );
         $this->hasJoin(
@@ -303,7 +310,8 @@ class Mapper extends BaseMapper
                 $statement->execute([$model->getId()]);
                 $model->setRelatedResourceList(
                     $relatedModelMapper->hydrateList(
-                        $statement, 'm',
+                        $statement,
+                        'm',
                         function ($mapper, $model) {
                             return $model;
                         }

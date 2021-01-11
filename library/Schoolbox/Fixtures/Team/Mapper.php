@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Team Mapper
  *
@@ -12,7 +13,7 @@ namespace Schoolbox\Fixtures\Team;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Fixtures\Coach;
 use Schoolbox\Fixtures\Division;
 use Schoolbox\Fixtures\Season;
@@ -105,7 +106,6 @@ class Mapper extends BaseMapper
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($r = $statement->fetch(\PDO::FETCH_ASSOC)) {
-
             $teamId = $r['id'];
 
             if (empty($cache[$teamId])) {

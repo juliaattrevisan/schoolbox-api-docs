@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -10,7 +11,7 @@ namespace Schoolbox\Fixtures\Team\Position;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Role as Role;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;
@@ -115,7 +116,7 @@ class Mapper extends BaseMapper
      */
     public function findForUserInDivision(User $user, Division $division)
     {
-        $query = $this->getSelectString().' WHERE td.id = :divisionId AND u.id = :userId';
+        $query = $this->getSelectString() . ' WHERE td.id = :divisionId AND u.id = :userId';
         $stmt  = $this->getDatabase()->prepare($query);
         $stmt->execute(['userId' => $user->getId(), 'divisionId' => $division->getId(),]);
         return $this->hydrateList($stmt);

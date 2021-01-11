@@ -1,12 +1,14 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\TagCloud;
 
-use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\Collection;
@@ -67,7 +69,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      */
     public static function getInstanceByName($tableName, $fieldId, $fieldName)
     {
-        $instance_name = get_called_class()."_".$tableName."_".$fieldId."_".$fieldName;
+        $instance_name = get_called_class() . "_" . $tableName . "_" . $fieldId . "_" . $fieldName;
 
         if (!isset(self::$instance[$instance_name])) {
             self::$instance[$instance_name] = new static($tableName, $fieldId, $fieldName);
@@ -116,7 +118,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
             $query .= ' LIMIT :limit';
         }
         $statement = $this->getDatabase()->prepare($query);
-        $statement->bindValue('search', '%'.$this->getDatabase()->getQuoter()->escapeForLike($string).'%', \PDO::PARAM_STR);
+        $statement->bindValue('search', '%' . $this->getDatabase()->getQuoter()->escapeForLike($string) . '%', \PDO::PARAM_STR);
         if ($offset > 0) {
             $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
             $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
@@ -143,7 +145,8 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      * @param int $id
      * @return null|string
      */
-    public function getTagName($id) {
+    public function getTagName($id)
+    {
         try {
             /** @var Model $row */
             $row = self::findOneByColumn($this->fieldId, $id);
@@ -163,15 +166,17 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function getTagId($string, $create = true) {
+    public function getTagId($string, $create = true)
+    {
 
         try {
             /** @var Model $row */
             $row = self::findOneByColumnList(
                 array(
                     $this->fieldName => $string,
-                    'deleted_at' => NULL,
-                ));
+                    'deleted_at' => null,
+                )
+            );
             return $row->getId();
         } catch (MapperException $e) {
             if ($create) {

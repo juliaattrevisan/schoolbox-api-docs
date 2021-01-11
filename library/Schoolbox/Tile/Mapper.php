@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for tile items in Schoolbox.
  *
@@ -39,8 +40,15 @@ class Mapper extends BaseMapper
         $this->uses('link_target', self::TYPE_STRING);
 
         // Background related fields
-        $this->joins('background_image_hash', StorageMapper::class, 'hash', null, null, 'backgroundImage',
-            'backgroundImage');
+        $this->joins(
+            'background_image_hash',
+            StorageMapper::class,
+            'hash',
+            null,
+            null,
+            'backgroundImage',
+            'backgroundImage'
+        );
         $this->uses('background_image_contained', self::TYPE_BOOLEAN);
         $this->uses('background_color', self::TYPE_COLOR);
         $this->uses('background_position', self::TYPE_INTEGER);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -45,6 +46,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function array_map;
 use function array_unique;
 use function in_array;
@@ -388,8 +390,10 @@ class Notifier extends AbstractModuleNotifier
         /** @var User $commentAuthor */
         // send to users who have ever made comments and are not the author of the article
         foreach ($commentAuthors as $commentAuthor) {
-            if (!\in_array($commentAuthor->getId(), $recipientIds)
-                && ($commentAuthor->getId() !== $article->getAuthor()->getId())) {
+            if (
+                !\in_array($commentAuthor->getId(), $recipientIds)
+                && ($commentAuthor->getId() !== $article->getAuthor()->getId())
+            ) {
                 $recipientIds[] = $commentAuthor->getId();
             }
         }

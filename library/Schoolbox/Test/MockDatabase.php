@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A mock database, compatible with Schoolbox\Mapper.
  *
@@ -106,10 +107,10 @@ class MockDatabase implements IDatabase, IQuoter
         $this->mock_statement->expects($this->test_case->any())
                              ->method('fetch')
                              ->will($this->test_case->returnCallback(function () {
-                                 if ($val = current($this->resultSet)) {
-                                     next($this->resultSet);
-                                     return $val;
-                                 }
+                                if ($val = current($this->resultSet)) {
+                                    next($this->resultSet);
+                                    return $val;
+                                }
                                  return null;
                              }));
 

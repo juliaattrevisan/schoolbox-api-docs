@@ -1,17 +1,21 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Folder;
 
 use Alaress\Specification\Leaf;
+
 use function array_unique;
 use function count;
 use function strpos;
 use function substr;
+
 use Alaress\Database;
 
 /**

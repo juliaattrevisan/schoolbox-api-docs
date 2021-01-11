@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -87,8 +88,10 @@ class Component_InstanceMapper extends BaseMapper
 
         $classInstanceOverride = str_replace('Controller', 'Instance', $row['cd.class']);
 
-        if (class_exists($classInstanceOverride) &&
-            is_subclass_of($classInstanceOverride, Component_Instance::class)) {
+        if (
+            class_exists($classInstanceOverride) &&
+            is_subclass_of($classInstanceOverride, Component_Instance::class)
+        ) {
             $this->hasModel($classInstanceOverride);
         } else {
             $this->hasModel(Component_Instance::class);
@@ -400,7 +403,8 @@ class Component_InstanceMapper extends BaseMapper
                 $cleanInstance = new Component_Instance();
             }
 
-            if ($dirtyInstance->getPosition() != $cleanInstance->getPosition() ||
+            if (
+                $dirtyInstance->getPosition() != $cleanInstance->getPosition() ||
                 $dirtyInstance->getSequence() != $cleanInstance->getSequence()
             ) {
                 // Resequence source components
@@ -444,7 +448,6 @@ class Component_InstanceMapper extends BaseMapper
                 }
 
                 parent::save($destinationInstanceCollection);
-
             }
         }
 
