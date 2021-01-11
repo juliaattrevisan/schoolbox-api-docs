@@ -638,10 +638,13 @@ Usage:
                 // Build list of labels from text inputs, if they are there
                 if (!hasSelectize && $textInputs.length !== 0) {
                     $textInputs.each(function () {
-                        let value = this.value;
-                        if (value.length > 0) {
-                            componentsInUse[filterId]['labels'][this.value] = this.value;
-                        }
+                        let values = this.value.split(/\s+/);
+                        // Try splitting on space
+                        values.forEach(function (value) {
+                            if (value.length > 0) {
+                                componentsInUse[filterId]['labels'][value] = value;
+                            }
+                        });
                     });
                 }
 
