@@ -8,6 +8,7 @@
 
 namespace Alaress;
 
+use Alaress\Database\Quoter\IQuoter;
 use PDO;
 use PDOStatement;
 
@@ -44,6 +45,13 @@ interface IDatabase
      * @return string
      */
     public function quote($string, $parameter_type = PDO::PARAM_STR);
+
+    /**
+     * Returns the quoter that has been set up for this database connection.
+     *
+     * @return IQuoter
+     */
+    public function getQuoter(): IQuoter;
 
     /**
      * Wraps `$callback` in a transaction.

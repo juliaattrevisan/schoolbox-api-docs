@@ -85,7 +85,7 @@ class IdFinder extends AbstractIdFinder
                         $hasWhere = true;
                         $pb = $pb->like(
                             'b.name',
-                            '%' . $this->getMapper()->getDatabase()->escapeForLike($name) . '%'
+                            '%' . $this->getMapper()->getDatabase()->getQuoter()->escapeForLike($name) . '%'
                         );
                     }
                 }

@@ -170,6 +170,18 @@ class MockDatabase implements IDatabase, IQuoter
 
 
     /**
+     * This object has itself been set up as an `IQuoter` implementation, so it
+     * may just return itself.
+     *
+     * @return IQuoter
+     */
+    public function getQuoter(): IQuoter
+    {
+        return $this;
+    }
+
+
+    /**
      * Mock of escapeForLike
      *
      * @param  string $string

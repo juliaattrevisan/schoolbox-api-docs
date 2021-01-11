@@ -277,6 +277,14 @@ class Database implements IDatabase, Serializable, IQuoter
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getQuoter(): IQuoter
+    {
+        return $this->quoter;
+    }
+
+    /**
      * Quotes column, table, etc. names so they may be safely used in queries.
      * For MySQL: ` in an identifier is replaced with ``, and the string is
      * wrapped with ` characters.
