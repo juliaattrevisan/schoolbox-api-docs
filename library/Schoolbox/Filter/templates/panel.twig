@@ -277,15 +277,13 @@ Usage:
          *                           `jQuery.serializeArray`.
          * @return {Object}
          */
-        function deserialize(serialised){
-            let // decodedData    = decodeURIComponent(serialised),
-                // flatArray      = decodedData.split('&'),
-                nestedObj      = {},
+        function deserialize(serialised) {
+            let nestedObj      = {},
                 regEx          = /^filter_selection\[(\d+)]\[(\w+)]$/, // eg 'filter_selection[1][task]'
                 emptyRegEx     = /^filter_selection\[(\d+)]$/,         // eg 'filter_selection[17]'
                 selectizeRegEx = /^filter_selection\[(\d+)]\[]$/;      // eg 'filter_selection[17][]'
 
-            // Convert flat string array to nested object
+            // Convert serialized array to nested object
             serialised.forEach(function (item) {
                 let keyValue  = item.name,
                     filterId  = null,
@@ -293,35 +291,39 @@ Usage:
                     optionVal = item.value,
                     result    = regEx.exec(keyValue);
 
-                // First: try the main regex
+                // First: try the main regex (as used by checkboxes)
                 if (result) {
-                    // Exit early if the value doesn't match the old regex
+                    // Exit early if this isn't an expected value for a checkbox
                     if (!optionVal in ['0', '1']) {
                         return;
                     }
                     filterId  = result[1];
                     optionKey = result[2];
-                } else {
-                    // Second: try the selectize regex
+                }
+
+                // Second: try the selectize regex (also used by text inputs)
+                if (filterId === null) {
                     result = selectizeRegEx.exec(keyValue);
                     if (result) {
-                        // Exit early if the value doesn't match the old regex
+                        // Exit early if the input has no value
                         if (optionVal === '') {
                             return;
                         }
                         filterId  = result[1];
                         optionKey = optionVal;
                         optionVal = 1;
-                    } else {
-                        // Finally: try the empty regex
-                        result = emptyRegEx.exec(keyValue);
-                        if (result) {
-                            // Exit early if the value doesn't match the old regex
-                            if (optionVal !== '') {
-                                return;
-                            }
-                            filterId = result[1];
+                    }
+                }
+
+                // Finally: try the empty regex
+                if (filterId === null) {
+                    result = emptyRegEx.exec(keyValue);
+                    if (result) {
+                        // Exit early if somehow the value is not empty
+                        if (optionVal !== '') {
+                            return;
                         }
+                        filterId = result[1];
                     }
                 }
 
