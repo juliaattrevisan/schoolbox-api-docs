@@ -81,7 +81,7 @@ class IdFinder extends AbstractIdFinder
             foreach ($nameSearch as $nameSearchString => $_) {
                 $names = array_map('trim', preg_split('/\\s+/', (string)$nameSearchString));
                 foreach ($names as $name) {
-                    if (strlen($name) > 0) {
+                    if (strlen($name) > 0 && $name !== Name\Definition::KEY_ALL) {
                         $hasWhere = true;
                         $pb = $pb->like(
                             'b.name',

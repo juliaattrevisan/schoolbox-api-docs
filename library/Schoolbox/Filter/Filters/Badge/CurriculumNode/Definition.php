@@ -25,8 +25,11 @@ class Definition extends AbstractDefinition
      * Key for finding all badges, whether or not they have a code.
      *
      * Required so that the curriculum code selector is even configurable.
+     *
+     * Must be empty, so that the ID finder knows that an empty string is
+     * distinct from an actual search term.
      */
-    public const KEY_ALL = 'all';
+    public const KEY_ALL = '';
 
 
     /**
