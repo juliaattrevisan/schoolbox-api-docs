@@ -181,7 +181,7 @@ Usage:
             $toast.toastActivate({text: 'Requesting report...'});
             showFilterLoader();
             var href        = $submitButton.data('href'),
-                data        = $optionInputs.serialize(),
+                data        = $optionInputs.serializeArray(),
                 decodedData = deserialize(data);
             $submitButton.val($submitButton.data('working'));
 
@@ -273,40 +273,53 @@ Usage:
          *
          * TODO consider replacing with qs.parse
          *
-         * @param {string} serialised
-         * @return {object}
+         * @param {Array} serialised The panel's form inputs, as fetched by
+         *                           `jQuery.serializeArray`.
+         * @return {Object}
          */
         function deserialize(serialised){
-            var decodedData    = decodeURIComponent(serialised),
-                flatArray      = decodedData.split('&'),
+            let // decodedData    = decodeURIComponent(serialised),
+                // flatArray      = decodedData.split('&'),
                 nestedObj      = {},
-                regEx          = /^filter_selection\[(\d+)]\[(\w+)]=([01])$/, // eg 'filter_selection[1][task]=1'
-                emptyRegEx     = /^filter_selection\[(\d+)]=$/,               // eg 'filter_selection[17]='
-                selectizeRegEx = /^filter_selection\[(\d+)]\[]=(.+)$/;        // eg 'filter_selection[17][]=22'
+                regEx          = /^filter_selection\[(\d+)]\[(\w+)]$/, // eg 'filter_selection[1][task]'
+                emptyRegEx     = /^filter_selection\[(\d+)]$/,         // eg 'filter_selection[17]'
+                selectizeRegEx = /^filter_selection\[(\d+)]\[]$/;      // eg 'filter_selection[17][]'
 
             // Convert flat string array to nested object
-            flatArray.forEach(function (keyValue) {
-                var filterId  = null,
+            serialised.forEach(function (item) {
+                let keyValue  = item.name,
+                    filterId  = null,
                     optionKey = null,
-                    optionVal = null,
+                    optionVal = item.value,
                     result    = regEx.exec(keyValue);
 
                 // First: try the main regex
                 if (result) {
+                    // Exit early if the value doesn't match the old regex
+                    if (!optionVal in ['0', '1']) {
+                        return;
+                    }
                     filterId  = result[1];
                     optionKey = result[2];
-                    optionVal = result[3];
                 } else {
                     // Second: try the selectize regex
                     result = selectizeRegEx.exec(keyValue);
                     if (result) {
+                        // Exit early if the value doesn't match the old regex
+                        if (optionVal === '') {
+                            return;
+                        }
                         filterId  = result[1];
-                        optionKey = result[2];
+                        optionKey = optionVal;
                         optionVal = 1;
                     } else {
                         // Finally: try the empty regex
                         result = emptyRegEx.exec(keyValue);
                         if (result) {
+                            // Exit early if the value doesn't match the old regex
+                            if (optionVal !== '') {
+                                return;
+                            }
                             filterId = result[1];
                         }
                     }
@@ -689,7 +702,7 @@ Usage:
         function updateCountMoreModal(filterId)
         {
             var $component  = $panelComponents.filter('[data-component=' + filterId + ']'),
-                decodedData = deserialize($optionInputs.serialize())[filterId],
+                decodedData = deserialize($optionInputs.serializeArray())[filterId],
                 $selectize  = $component.find('[data-selectize]'),
                 selectize   = $selectize.length ? $selectize[0].selectize : null;
 
