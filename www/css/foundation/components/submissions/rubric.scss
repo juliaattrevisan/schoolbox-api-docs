@@ -74,7 +74,6 @@ table.rb {
         position: relative;
         span {
             margin: $table-row-padding;
-            margin-right: 2.25rem; // to avoid descriptor text getting hidden under the student's self reflection choice icon
         }
 
         &.error {
@@ -86,7 +85,7 @@ table.rb {
     .rb-self-reflection-choice {
         border-radius: 50%;
         position: absolute;
-        top: 3px;
+        top: 0px;
         right: 3px;
         &.blind-mode { //can't show the students image, so just show a circle in place
             width: 2rem;
@@ -144,7 +143,6 @@ table.rb {
     line-height: $form-label-line-height;
     span{
       margin: $table-row-padding;
-      margin-right: 2.25rem; // to avoid descriptor text getting hidden under the student's self reflection choice icon
     }
   }
     textarea {
