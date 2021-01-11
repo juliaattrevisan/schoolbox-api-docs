@@ -88,7 +88,7 @@ class Plan extends CliTool\App
             // Hide any menu items that match the hide URL string
             $statement = $this->getDatabaseInternal()->prepareQuery(
                 "
-            UPDATE menu_top SET deleted_at = NOW() WHERE url like :url AND deleted_at IS NULL
+            UPDATE menu_top SET plan_hide = 1 WHERE url like :url AND plan_hide = 0
         "
             );
             foreach ($menu['hide'] as $url) {
@@ -101,7 +101,7 @@ class Plan extends CliTool\App
             // Undelete any menu items that match the show string
             $statement = $this->getDatabaseInternal()->prepareQuery(
                 "
-                UPDATE menu_top SET deleted_at = NULL WHERE url like :url AND deleted_at IS NOT NULL
+                UPDATE menu_top SET plan_hide = 0 WHERE url like :url AND plan_hide = 1
             "
             );
             foreach ($menu['show'] as $url) {
@@ -118,20 +118,32 @@ class Plan extends CliTool\App
     private function setComponents(array $components)
     {
 
-        $this->getLogger()->info("Enabling all components");
-        // Enable all components
-        $statement = $this->getDatabaseInternal()->prepareQuery("
-            UPDATE component_definition SET enabled='true'
-        ");
-        $statement->execute();
+        $this->getDatabaseInternal()->beginTransaction();
 
-        // Disable all the components that are not meant to be available
-        $statement = $this->getDatabaseInternal()->prepareQuery("
-            UPDATE component_definition SET enabled='false', visible='false' WHERE class = :component
-        ");
-        foreach ($components['hide'] as $component) {
-            $this->getLogger()->info("Disabling the component: '$component' ");
-            $statement->execute(['component' => $component]);
+        try {
+            $this->getLogger()->info("Enabling all components");
+            // Enable all components
+            $statement = $this->getDatabaseInternal()->prepareQuery(
+                "
+                UPDATE component_definition SET enabled='true'
+            "
+            );
+            $statement->execute();
+
+            // Disable all the components that are not meant to be available
+            $statement = $this->getDatabaseInternal()->prepareQuery(
+                "
+                UPDATE component_definition SET enabled='false', visible='false' WHERE class = :component
+            "
+            );
+            foreach ($components['hide'] as $component) {
+                $this->getLogger()->info("Disabling the component: '$component' ");
+                $statement->execute(['component' => $component]);
+            }
+            $this->getDatabaseInternal()->commit();
+        }
+        catch (\PDOException $e) {
+            $this->getDatabaseInternal()->rollBack();
         }
     }
 }

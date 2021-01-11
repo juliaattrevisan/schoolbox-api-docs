@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -11,7 +12,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Menu\Icon\Mapper as MenuIconMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Menu\Top\Campus\Mapper as MenuTopCampusMapper;
-use \Schoolbox\Menu\Top\Role\Mapper as MenuTopRoleMapper;
+use Schoolbox\Menu\Top\Role\Mapper as MenuTopRoleMapper;
 use Schoolbox\Menu\Top\Campus\Model as MenuTopCampus;
 use Schoolbox\Menu\Top\Role\Model as MenuTopRole;
 use Schoolbox\Menu\Top\Mapper as MenuTopMapper;
@@ -68,7 +69,7 @@ class Controller extends Base
             'template' => '@adminMenuTop/index.twig',
             'data'     => [
                 'pageCurrent' => self::PAGE_CURRENT,
-                'menu' => $this->getMenuTopMapper()->findAll()->sortBy('sortOrder', 'asc')
+                'menu' => $this->getMenuTopMapper()->findByColumn('plan_hide', 0, ['order' => ['sort_order' => 'ASC']])
             ],
             'title' => 'Admin - Top Menu'
         ]);
@@ -109,11 +110,11 @@ class Controller extends Base
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => self::PAGE_CURRENT,
-                'item' => $this->getMenuTopMapper()->findOneByColumn($this->getMenuTopMapper()->getIdentifierColumn(), $id, ['cache'=>false]),
-                'icons' => $this->getMenuIconMapper()->findAll()->sortBy('title', 'asc'),
-                'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
+                'item' => $this->getMenuTopMapper()->findOneByColumn($this->getMenuTopMapper()->getIdentifierColumn(), $id, ['cache' => false]),
+                'icons' => $this->getMenuIconMapper()->findAll(['order' => ['title' => 'ASC']]),
+                'roles' => $this->getRoleMapper()->findAll(['order' => ['sequence' => 'ASC']]),
                 'rolesSelected' => $rolesSelected,
-                'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc'),
+                'campuses' => $this->getCampusMapper()->findAll(['order' => ['sequence' => 'ASC']]),
                 'campusesSelected' => $campusesSelected
             ],
             'title' => 'Admin - Top Menu'
@@ -133,9 +134,9 @@ class Controller extends Base
             'template' => '@adminMenuTop/modify.twig',
             'data'     => [
                 'pageCurrent' => self::PAGE_CURRENT,
-                'icons' => $this->getMenuIconMapper()->findAll()->sortBy('title', 'asc'),
-                'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
-                'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
+                'icons' => $this->getMenuIconMapper()->findAll(['order' => ['title' => 'ASC']]),
+                'roles' => $this->getRoleMapper()->findAll(['order' => ['sequence' => 'ASC']]),
+                'campuses' => $this->getCampusMapper()->findAll(['order' => ['sequence' => 'ASC']])
             ],
             'title' => 'Admin - Top Menu'
         ]);
@@ -217,25 +218,25 @@ class Controller extends Base
 
         if (stripos($post['url'], '/learning/classes') === 0) {
             $item->setToken('CLASSES');
-        } else if (stripos($post['url'], '/learning/due') === 0) {
+        } elseif (stripos($post['url'], '/learning/due') === 0) {
             $item->setToken('SUBMISSION');
-        } else if (stripos($post['url'], '/timetable') === 0) {
+        } elseif (stripos($post['url'], '/timetable') === 0) {
             $item->setToken('TIMETABLE');
-        } else if (stripos($post['url'], '/calendar/week') === 0) {
+        } elseif (stripos($post['url'], '/calendar/week') === 0) {
             $item->setToken('CALENDAR');
-        } else if (stripos($post['url'], '/news') === 0) {
+        } elseif (stripos($post['url'], '/news') === 0) {
             $item->setToken('NEWS');
-        } else if (stripos($post['url'], '/learning/grades') === 0) {
+        } elseif (stripos($post['url'], '/learning/grades') === 0) {
             $item->setToken('GRADE');
-        } else if (stripos($post['url'], '/course/list') === 0) {
+        } elseif (stripos($post['url'], '/course/list') === 0) {
             $item->setToken('COURSE');
-        } else if (stripos($post['url'], '/resources') === 0) {
+        } elseif (stripos($post['url'], '/resources') === 0) {
             $item->setToken('RESOURCES');
-        } else if (stripos($post['url'], '/eportfolio') === 0) {
+        } elseif (stripos($post['url'], '/eportfolio') === 0) {
             $item->setToken('EPORTFOLIO');
-        } else if (stripos($post['url'], '/my-files') === 0) {
+        } elseif (stripos($post['url'], '/my-files') === 0) {
             $item->setToken('MYFILES');
-        } else if (stripos($post['url'], '/drives') === 0) {
+        } elseif (stripos($post['url'], '/drives') === 0) {
             $item->setToken('NETWORK');
         } else {
             $item->setToken('');
