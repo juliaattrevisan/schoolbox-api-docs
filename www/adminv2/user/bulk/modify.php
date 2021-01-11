@@ -141,6 +141,7 @@ foreach ($allBoolean as $currentEportfolio) {
     $this->setVar(
         array(
             'APPLY_EPORTFOLIO_ID' => $currentEportfolio['key'],
+            'APPLY_EPORTFOLIO_DISABLED' => $this->getDi()->get('config')->get('eportfolio_enabled') ? '' : 'disabled',
             'APPLY_EPORTFOLIO_NAME' => $currentEportfolio['label'],
         )
     );
