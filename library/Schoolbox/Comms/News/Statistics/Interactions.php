@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -33,7 +34,6 @@ class Interactions
      */
     public const PERIOD_LENGTH = 30;
 
-
     /**
      * This threshold indicates how long to wait before we can record more data for this open, in days
      *
@@ -41,24 +41,20 @@ class Interactions
      */
     private const UNIQUE_VISIT_THRESHOLD = 1;
 
-
     /**
      * @var IConnector
      */
     private $database;
-
 
     /**
      * @var Mapper
      */
     private $statisticsMapper;
 
-
     /**
      * @var Cumulative\Mapper
      */
     private $statisticsCumulativeMapper;
-
 
     /**
      * Interactions constructor.
@@ -187,11 +183,8 @@ class Interactions
                                                ->equals('article_id', $article->getId());
 
         $statistics = $this->statisticsCumulativeMapper->findByPredicates(
-            $pb, [
-            'order' => [
-                'date' => 'asc',
-            ],
-        ]
+            $pb,
+            ['order' => ['date' => 'asc',],]
         );
 
         $summary = [
@@ -228,11 +221,13 @@ class Interactions
     public function fetchReferrerDemographic(News\Model $article): array
     {
         $statistics = $this->statisticsCumulativeMapper->findByColumn(
-            'article_id', $article->getId(), [
+            'article_id',
+            $article->getId(),
+            [
             'order' => [
                 'date' => 'asc',
             ],
-        ]
+            ]
         );
 
         $summary = $this->summariseDailyStatistics($statistics);
@@ -270,55 +265,16 @@ class Interactions
         ];
     }
 
-
-    /**
-     * Fetch RoleType demographics across the entire lifetime of an article
-     *
-     * @param News\Model $article
-     * @return array
-     * @throws \Alaress\Database\Exception
-     */
-    public function fetchRoleTypeDemographic(News\Model $article): array
-    {
-        $breakdown = $this->generateDefaultBreakdown(Role::getRoleTypes());
-
-        $statement = $this->database->prepareQuery(
-            "
-            SELECT
-                SUM(num) AS num,
-                `type`,
-                role_type
-            FROM {$this->statisticsCumulativeMapper->getTable()}
-            WHERE article_id = :articleId
-            GROUP BY `type`, role_type
-            ORDER BY role_type;
-        "
-        );
-
-        $statement->execute(
-            [
-                'articleId' => $article->getId(),
-            ]
-        );
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $breakdown[$row['type']][$row['role_type']] += $row['num'];
-        }
-
-        return $breakdown;
-    }
-
-
     /**
      * Generate placeholder timestamps, superimpose actual data on top of placeholders
      * Find the earliest and latest data points and generate a range between them
      *
      * @param Scale\IScale $strat
      * @param News\Model   $article
-     * @return mixed
+     * @return array
      * @throws \Alaress\Database\Exception
      */
-    private function generatePlaceholders(News\Statistics\Scale\IScale $strat, News\Model $article)
+    private function generatePlaceholders(News\Statistics\Scale\IScale $strat, News\Model $article): array
     {
         $statement = $this->database->prepareQuery(
             "
@@ -428,60 +384,15 @@ class Interactions
              * option but may occur if we misconfigured something
              */
             usort(
-                $data[$roleType], function ($a, $b) {
-                return $a[0] > $b[0];
-            }
+                $data[$roleType],
+                function ($a, $b) {
+                    return $a[0] > $b[0];
+                }
             );
         }
 
         return $data;
     }
-
-
-    /**
-     * Fetch Cumulative data per day during the lifetime of an article
-     *
-     * @param News\Model $article
-     * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Alaress\Database\Exception
-     */
-    public function fetchHistoric(News\Model $article): array
-    {
-        $pb = $this->statisticsCumulativeMapper->getPredicateBuilder()
-                                               ->equals('article_id', $article->getId())
-                                               ->lessThan('date', \Alaress_Date_Format::now()->getDatabaseDate());
-
-        $dailyStatistics = $this->statisticsCumulativeMapper->findByPredicates(
-            $pb, [
-            'order' => [
-                'date' => 'asc',
-            ],
-        ]
-        );
-
-        /* Group by date
-         */
-        $historic = [];
-
-        /** @var Cumulative\Model $dailyStatistic */
-        foreach ($dailyStatistics as $dailyStatistic) {
-            $date = $dailyStatistic->getDate()->getDatabase();
-
-            if (!isset($historic[$date])) {
-                $historic[$date] = [
-                    'date'        => $date,
-                    'numOpens'    => 0,
-                    'numComments' => $this->calculateNumComments($article, $dailyStatistic->getDate()->getDatabaseDate()),
-                ];
-            }
-
-            $historic[$date]['numOpens'] += $this->calculateNumOpens((new Collection())->add($dailyStatistic));
-        }
-
-        return array_values($historic);
-    }
-
 
     /**
      * Aggregate the number of Opens from a collection of statistic records

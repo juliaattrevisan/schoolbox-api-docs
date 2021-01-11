@@ -24,6 +24,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
+
 use const PHP_URL_HOST;
 use const PHP_URL_SCHEME;
 
