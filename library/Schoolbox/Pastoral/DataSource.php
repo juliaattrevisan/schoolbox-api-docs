@@ -283,7 +283,7 @@ class DataSource
                 if (empty($recordIds)) {
                     $recordIds = [0];
                 }
-                $limitPb          = (new Builder($this->mapper->getDatabase(), "pl{$i}"))
+                $limitPb          = (new Builder($this->mapper->getDatabase()->getQuoter(), "pl{$i}"))
                     ->setParamPrefix("ln{$i}")
                     ->in('id', $recordIds);
                 $whereClauses[$i] .= " AND {$limitPb->getWhere()[0]} ";
@@ -343,7 +343,7 @@ class DataSource
 
         /**
          * Pastoral records that we are interested in */
-        $validPb = (new Builder($this->mapper->getDatabase(), $alias))->setParamPrefix("{$alias}v");
+        $validPb = (new Builder($this->mapper->getDatabase()->getQuoter(), $alias))->setParamPrefix("{$alias}v");
         if (null !== $studentId) {
             $validPb->equals("{$alias}.student_id", $studentId);
         }
@@ -359,20 +359,20 @@ class DataSource
         if (!$this->accessLevelCensor->isPastoralModerator($viewer)) {
             /**
              * Owner */
-            $ownerPb = (new Builder($this->mapper->getDatabase(), $alias))
+            $ownerPb = (new Builder($this->mapper->getDatabase()->getQuoter(), $alias))
                 ->setParamPrefix("{$alias}o")
                 ->equals("{$alias}.owner_id", $viewer->getId());
 
             /**
              * Allowed by pastoral access */
-            $paInnerPb1 = (new Builder($this->mapper->getDatabase(), "{$alias}a1"))
+            $paInnerPb1 = (new Builder($this->mapper->getDatabase()->getQuoter(), "{$alias}a1"))
                 ->setParamPrefix("{$alias}a1")
                 ->equals('user_id', $viewer->getId())
                 ->equals('role_id', $viewer->getRole()->getId());
             if (!empty($pastoralGroupIds)) {
                 $paInnerPb1->in('group_id', $pastoralGroupIds);
             }
-            $hasAccessPb    = (new Builder($this->mapper->getDatabase(), "{$alias}a1"))
+            $hasAccessPb    = (new Builder($this->mapper->getDatabase()->getQuoter(), "{$alias}a1"))
                 ->setParamPrefix("{$alias}a1")
                 ->any($paInnerPb1)
                 ->isNull('deleted_at')
@@ -381,14 +381,14 @@ class DataSource
 
             /**
              * Rejected by pastoral access */
-            $paInnerPb2 = (new Builder($this->mapper->getDatabase(), "{$alias}a2"))
+            $paInnerPb2 = (new Builder($this->mapper->getDatabase()->getQuoter(), "{$alias}a2"))
                 ->setParamPrefix("{$alias}a2")
                 ->equals('user_id', $viewer->getId())
                 ->equals('role_id', $viewer->getRole()->getId());
             if (!empty($pastoralGroupIds)) {
                 $paInnerPb2->in('group_id', $pastoralGroupIds);
             }
-            $noAccessPb    = (new Builder($this->mapper->getDatabase(), "{$alias}a2"))
+            $noAccessPb    = (new Builder($this->mapper->getDatabase()->getQuoter(), "{$alias}a2"))
                 ->setParamPrefix("{$alias}a2")
                 ->any($paInnerPb2)
                 ->isNull('deleted_at')

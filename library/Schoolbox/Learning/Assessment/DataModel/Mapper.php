@@ -823,7 +823,7 @@ class Mapper extends BaseMapper
         $statement = $this->prepareSelect(
             $this->getSelectString(),
             $this->getFromString(),
-            new Builder($this->getDatabase(), $this->getTable()),
+            new Builder($this->getDatabase()->getQuoter(), $this->getTable()),
             ['v_pa.project_id' => $projectIds],
             ['order' => ['sequence' => 'asc']]
         );
@@ -1198,7 +1198,7 @@ class Mapper extends BaseMapper
         $thisKey   = $multiJoin['this_key'];
         $otherKey  = $multiJoin['other_key'];
 
-        $pb = new Builder($this->database, $this->table);
+        $pb = new Builder($this->database->getQuoter(), $this->table);
         $query = "
             SELECT COALESCE(max(`a`.`sequence`), 0) + 1
             FROM `{$this->getTable()}` `a`

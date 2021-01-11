@@ -475,7 +475,7 @@ class Notifier extends AbstractModuleNotifier
 
         // Fetch folder mute settings from DB
         $db             = $this->mapper->getDatabase();
-        $pb             = (new Predicate\Builder($db, 'msg_reroute_override'))
+        $pb             = (new Predicate\Builder($db->getQuoter(), 'msg_reroute_override'))
             ->equals('user_id', $article->getAuthor()->getId())
             ->in('msg_route_key', array_map(static function (string $folderId) {
                 return sprintf('service.%s.%s', UserAccess::SERVICE_HOMEPAGE, $folderId);

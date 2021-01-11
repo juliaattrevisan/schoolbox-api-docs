@@ -346,7 +346,7 @@ class UserAccessMapper extends Mapper
         $userAccessJoinType = 'INNER';
 
         // Group members (always part of ultimate query)
-        $groupPb = (new Predicate\Builder($this->getDatabase(), 'u'))
+        $groupPb = (new Predicate\Builder($this->getDatabase()->getQuoter(), 'u'))
             ->equals('ua.service', UserAccess::SERVICE_HOMEPAGE)
             ->equals('ua.sid', $folder->getId());
         if ($exactAccess) {
@@ -354,7 +354,7 @@ class UserAccessMapper extends Mapper
         } else {
             $groupPb->greaterThanOrEqualTo('ua.type', $accessType);
         }
-        $outerPb = (new Predicate\Builder($this->getDatabase(), 'u'))->all($groupPb);
+        $outerPb = (new Predicate\Builder($this->getDatabase()->getQuoter(), 'u'))->all($groupPb);
 
         if ($includeSynergy) {
             // Include students if no role filter, or filtering to students, and caller requested exact READ perm, or at least READ perm or below.
@@ -384,7 +384,7 @@ class UserAccessMapper extends Mapper
                     // We'll need to change this to a LEFT join to include class members who lack userAccess records.
                     $userAccessJoinType = 'LEFT';
                     $outerPb->in('u.synergy_id', $externalIds);
-                    $outerPb = (new Predicate\Builder($this->getDatabase(), 'u'))->any($outerPb);
+                    $outerPb = (new Predicate\Builder($this->getDatabase()->getQuoter(), 'u'))->any($outerPb);
                 }
             }
         }
@@ -444,7 +444,7 @@ class UserAccessMapper extends Mapper
         $userMapper = $this->getJoinMapper('user');
         $roleMapper = $userMapper->getJoinMapper('role');
 
-        $pb = new Builder($userMapper->getDatabase(), 'u');
+        $pb = new Builder($userMapper->getDatabase()->getQuoter(), 'u');
         $pb->equals('ua.service', $service);
         $pb->greaterThanOrEqualTo('ua.type', $accessType);
 

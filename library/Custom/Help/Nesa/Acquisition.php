@@ -127,7 +127,7 @@ class Acquisition
 
         /* Dynamically assemble WHERE clause
          */
-        $pb = new Builder($this->userMapper->getDatabase(), 'upd');
+        $pb = new Builder($this->userMapper->getDatabase()->getQuoter(), 'upd');
         $pb->in('registration_state', $this->states);
         $pb->equals('cs.id', $this->courseSpecId);
         $pb->isNull('cs.deleted_at');
@@ -209,7 +209,7 @@ class Acquisition
      */
     private function findRoster() :array
     {
-        $pb = new Builder($this->userMapper->getDatabase(), 'upd');
+        $pb = new Builder($this->userMapper->getDatabase()->getQuoter(), 'upd');
         $pb->in('registration_state', $this->states);
 
         /* Show only unaccredited users

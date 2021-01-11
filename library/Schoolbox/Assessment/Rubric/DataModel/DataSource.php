@@ -1160,7 +1160,7 @@ class DataSource
         }
 
         // Find rubric used in the assessments
-        $pb = new Builder($this->database, '');
+        $pb = new Builder($this->database->getQuoter(), '');
         $pb->in('assessment_id', array_keys($feedbackIds));
 
         $where               = implode(' AND ', $pb->getWhere());
@@ -1219,7 +1219,7 @@ class DataSource
 
         if (count($feedbackIds) > 0) {
             // Find the descriptors selected for each of these feedback IDs
-            $pb = new Builder($this->database, '');
+            $pb = new Builder($this->database->getQuoter(), '');
             $pb->in('sr.id', $feedbackIds);
 
             $where            = implode(' AND ', $pb->getWhere());
@@ -1276,7 +1276,7 @@ class DataSource
 
         if (count($allFeedbackIds) > 0) {
             //Find all students results across all indicators in all activities
-            $pb = new Builder($this->database, '');
+            $pb = new Builder($this->database->getQuoter(), '');
             $pb->in('sr.id', $allFeedbackIds);
 
             $where            = implode(' AND ', $pb->getWhere());
@@ -1592,7 +1592,7 @@ class DataSource
 
 
         // Step 1: figure out the due works in the term for the given folders
-        $pb = new Builder($this->database, '');
+        $pb = new Builder($this->database->getQuoter(), '');
         $pb->in('rg.parent_id', $folderIds)
            ->equals('rg.parent_type', CapabilityModel::PARENT_TYPE_CATEGORY)
            ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase())
@@ -1646,7 +1646,7 @@ class DataSource
 
         // Step 2: Get max mark per indicator and dueWork for each due work
         $results = [];
-        $pb = new Builder($this->database, '');
+        $pb = new Builder($this->database->getQuoter(), '');
         $pb->in('rg.parent_id', $folderIds)
            ->equals('rg.parent_type', CapabilityModel::PARENT_TYPE_CATEGORY)
            ->greaterThan('rd.max_value', 0.0);
@@ -1685,7 +1685,7 @@ class DataSource
 
 
         // Step 3: pass to getLongitudinal or similar?
-        $pb = new Builder($this->database, '');
+        $pb = new Builder($this->database->getQuoter(), '');
         $pb->in('sr.id', $feedbackIds);
 
         $where               = implode(' AND ', $pb->getWhere());
@@ -1750,7 +1750,7 @@ class DataSource
             return [];
         }
 
-        $pb = new Builder($this->database, '');
+        $pb = new Builder($this->database->getQuoter(), '');
         $pb->in('rg.parent_id', $parentIds)
            ->equals('rg.parent_type', $parentType);
 

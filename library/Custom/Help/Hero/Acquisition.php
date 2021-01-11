@@ -45,19 +45,19 @@ class Acquisition
     ';
 
     /**
-     * Builder expects an IQuoter
-     * prepare() available on IDatabase
+     * Builder expects an IQuoter: pass in `getQuoter` from this object
      *
-     * @var IQuoter|IDatabase
+     * @var IDatabase
      */
     private $db;
 
     /**
      * Acquisition constructor.
      *
-     * @param IQuoter|IDatabase $db
+     * @param IDatabase $db
      */
-    public function __construct(IDatabase $db) {
+    public function __construct(IDatabase $db)
+    {
         $this->db = $db;
     }
 
@@ -101,7 +101,7 @@ class Acquisition
      */
     private function makeDefaultBuilder(): Builder
     {
-        $pb = new Builder($this->db, 'upd');
+        $pb = new Builder($this->db->getQuoter(), 'upd');
         $pb->equals('cs.id', self::HERO_COURSE_SPEC_ID);
         $pb->isNull('cs.deleted_at');
         $pb->isNull('ci.deleted_at');
@@ -135,9 +135,9 @@ class Acquisition
          * This is a list of all the people who qualify for Hero status
          */
         $query = "
-            SELECT 
+            SELECT
                 u.id AS userId,
-                u.firstname, 
+                u.firstname,
                 u.lastname,
                 f.id AS folderId,
                 f.name AS folderName,
@@ -198,9 +198,9 @@ class Acquisition
          * Unfortunately need to do postprocessing, because the attempts' totals are derived and not cached anywhere
          */
         $query = "
-            SELECT 
+            SELECT
                 u.id AS userId,
-                u.firstname, 
+                u.firstname,
                 u.lastname,
                 f.id AS folderId,
                 f.name AS folderName,
@@ -268,9 +268,9 @@ class Acquisition
         /* Find all the Quizzes and the Questions contained in each Attempt
          */
         $query = "
-            SELECT 
+            SELECT
                 u.id AS userId,
-                u.firstname, 
+                u.firstname,
                 u.lastname,
                 f.id AS folderId,
                 f.name AS folderName,
@@ -282,7 +282,7 @@ class Acquisition
             INNER JOIN assess ass ON a.`id` = ass.`assessment_id`
             INNER JOIN assess_attempt aa ON ass.`assess_id` = aa.`assess_id` AND aa.`user_id` = u.`id`
             INNER JOIN assess_response ar ON aa.`attempt_id` = ar.`attempt_id`
-            INNER JOIN assess_question aq ON ar.`question_id` = aq.`question_id` 
+            INNER JOIN assess_question aq ON ar.`question_id` = aq.`question_id`
             WHERE {$where}
             GROUP BY ar.attempt_id
             ORDER BY u.id, u.lastname, asi.specification_assessment_id, ar.attempt_id

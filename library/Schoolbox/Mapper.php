@@ -1517,7 +1517,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function deleteByColumnList($columnList, array $options = [])
     {
-        return $this->executeDelete($this->getDeleteString(), new Builder($this->getDatabase(), $this->getTable()), $columnList, $options);
+        return $this->executeDelete($this->getDeleteString(), new Builder($this->getDatabase()->getQuoter(), $this->getTable()), $columnList, $options);
     }
 
 
@@ -2042,7 +2042,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function findByColumnList($columnList, $options = array())
     {
-        return $this->executeSelect($this->getSelectString(), $this->getFromString(), new Builder($this->getDatabase(), $this->getTable()), $columnList, $options);
+        return $this->executeSelect($this->getSelectString(), $this->getFromString(), new Builder($this->getDatabase()->getQuoter(), $this->getTable()), $columnList, $options);
     }
 
     /**
@@ -2128,7 +2128,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getPredicateBuilder()
     {
-        return new Builder($this->getDatabase(), $this->getTable());
+        return new Builder($this->getDatabase()->getQuoter(), $this->getTable());
     }
 
     /**
@@ -2229,7 +2229,7 @@ abstract class Mapper implements IMapper, Serializable
 
         // Build ORDER BY part
         if (isset($options['order']) && \is_array($options['order']) && count($options['order'])) {
-            $query .= self::buildOrderByClause($quoted_table, $options['order'], $this->database);
+            $query .= self::buildOrderByClause($quoted_table, $options['order'], $this->database->getQuoter());
         }
 
         // Build LIMIT and OFFSET part (should bind as parameters instead)
@@ -2506,7 +2506,7 @@ abstract class Mapper implements IMapper, Serializable
             $from = "FROM {$this->getTable()}";
         }
 
-        $statement = $this->prepareSelect($select, $from, new Builder($this->getDatabase(), $this->getTable()), $columnList, $options);
+        $statement = $this->prepareSelect($select, $from, new Builder($this->getDatabase()->getQuoter(), $this->getTable()), $columnList, $options);
 
         $statement->execute();
 

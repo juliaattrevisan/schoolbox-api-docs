@@ -314,7 +314,7 @@ abstract class AbstractMapperProxy
      */
     public function getPredicateBuilder()
     {
-        return new Builder($this->database, $this->mapper->getTable());
+        return new Builder($this->database->getQuoter(), $this->mapper->getTable());
     }
 
     /* Getters / Setters
