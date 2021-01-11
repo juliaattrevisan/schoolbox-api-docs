@@ -9,6 +9,7 @@
  */
 
 use Eportfolio\Permission;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
@@ -47,6 +48,12 @@ class Eportfolio_Authenticator
     private $publicPages = ['profile', 'showcase'];
 
     /**
+     * Feature flag to enable or disable ePortfolio globally
+     */
+    private bool $featureEnabled;
+
+
+    /**
      * Constructor
      *
      * @param User $currentUser
@@ -58,6 +65,7 @@ class Eportfolio_Authenticator
 
         $this->owner = UserMapper::getInstance()->findById($ownerId);
         $this->currentUser = $currentUser;
+        $this->featureEnabled = (bool)ConfigLoader::getInstance()->get('eportfolio_enabled');
 
         $this->pageId = $pageId;
     }
@@ -73,7 +81,7 @@ class Eportfolio_Authenticator
 
         /* Check whether eportfolio is even enabled in the first place
          */
-        if (!$this->owner->getEportfolioEnable()) {
+        if (!$this->featureEnabled || !$this->owner->getEportfolioEnable()) {
             return false;
         } elseif (in_array($this->getPageId(), $this->getPublicPages()) || ($this->getPageId() == 'create')) {
             return true;
@@ -112,7 +120,7 @@ class Eportfolio_Authenticator
 
         /* Check whether eportfolio is even enabled in the first place
          */
-        if (!$this->owner->getEportfolioEnable()) {
+        if (!$this->featureEnabled || !$this->owner->getEportfolioEnable()) {
             return false;
         }
 
@@ -157,7 +165,7 @@ class Eportfolio_Authenticator
 
         /* Check whether eportfolio is even enabled in the first place
          */
-        if (!$this->owner->getEportfolioEnable()) {
+        if (!$this->featureEnabled || !$this->owner->getEportfolioEnable()) {
             return false;
         }
 
@@ -273,7 +281,7 @@ class Eportfolio_Authenticator
 
         /* Check whether eportfolio is even enabled in the first place
          */
-        if (!$this->owner->getEportfolioEnable()) {
+        if (!$this->featureEnabled || !$this->owner->getEportfolioEnable()) {
             return false;
         }
 
