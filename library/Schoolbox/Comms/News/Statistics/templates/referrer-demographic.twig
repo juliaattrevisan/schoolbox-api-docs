@@ -44,7 +44,7 @@
             },
 
             xAxis: {
-                categories: ['Origin']
+                categories: ['Source']
             },
 
             yAxis: {
@@ -73,7 +73,7 @@
                 },
                 {
                     color: '#0a437c',
-                    name: 'Email',
+                    name: 'Notification',
                     data: [
                         {{ referrerDemographic['open']['email'] }}
                     ]
@@ -87,20 +87,27 @@
                 },
                 {
                     color: '#ba43a9',
-                    name: 'Feed',
+                    name: '{{ locale.news.proper }} Feed',
                     data: [
                         {{ referrerDemographic['open']['index'] }}
                     ]
                 },
                 {
                     color: '#c1263c',
+                    name: 'RSS',
+                    data: [
+                        {{ referrerDemographic['open']['rss'] }}
+                    ]
+                },
+                {
+                    color: '#f86727',
                     name: 'Saved',
                     data: [
                         {{ referrerDemographic['open']['saved'] }}
                     ]
                 },
                 {
-                    color: '#f86727',
+                    color: '#f8ce27',
                     name: 'Search',
                     data: [
                         {{ referrerDemographic['open']['search'] }}
@@ -108,7 +115,7 @@
                 },
                 {
                     color: '#888888',
-                    name: 'Direct',
+                    name: 'Unknown',
                     data: [
                         {{ referrerDemographic['open']['none'] }}
                     ]

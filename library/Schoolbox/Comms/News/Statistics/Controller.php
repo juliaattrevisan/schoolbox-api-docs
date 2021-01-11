@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Comms\News\Statistics;
 
 use Alaress\Database\Connector\IConnector;
@@ -99,6 +101,8 @@ class Controller extends Base
             /* Overall Cumulative summary
              */
             'cumulative' => $interactions->fetchCumulative($article),
+
+            'audience' => count($this->userResolver->findUsersForArticle($article)),
 
             /* Overall Referrer Demographics
              */

@@ -1,0 +1,66 @@
+<script>
+    $(function() {
+        var chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'audienceViews',
+                plotBorderWidth: null,
+                type: 'pie',
+                height: 180,
+                marginTop: 0,
+                marginBottom: 35
+            },
+
+            credits: {
+                enabled: false
+            },
+
+            time: {
+                useUTC: false
+            },
+
+            title: {
+                text: ''
+            },
+            tooltip: {
+                pointFormat: '<b>{point.percentage:.1f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    point: {
+                        events: {
+                            legendItemClick: function () {
+                                return false; // <== returning false will cancel the default action
+                            }
+                        }
+                    },
+                    dataLabels: {
+                        enabled: false,
+                    },
+                    showInLegend: true
+                }
+            },
+            legend: {
+                padding: 0
+            },
+            series: [
+                {
+                    name: 'Audience',
+                    data: [{
+                        name: 'Visited',
+                        y: {{ cumulative.numUniqueOpens }}
+                    }, {
+                        name: 'Yet to visit',
+                        y: {{ audience - cumulative.numUniqueOpens }}
+                    }]
+                }
+            ]
+        });
+
+        {# Because Foundation... #}
+        setTimeout(function() {
+            chart.reflow();
+        }, 250)
+    });
+</script>
+
+<div id="audienceViews"></div>

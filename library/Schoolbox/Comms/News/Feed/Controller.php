@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -23,11 +24,13 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
+
 use const PHP_URL_HOST;
 use const PHP_URL_SCHEME;
 
 class Controller extends Base
 {
+
     /** @var News\Mapper */
     private $newsMapper;
 
@@ -155,6 +158,7 @@ class Controller extends Base
             'schoolName' => $this->getConfigLoader()->get('school_name'),
             'baseUrl'    => $this->getRequest()->url->get(PHP_URL_SCHEME) . '://' . $this->getRequest()->url->get(PHP_URL_HOST),
             'url'        => $this->getRequest()->url->get(),
+            'referrer'   => News\Statistics\Mapper::REFERRER_RSS,
             'articles'   => $articles,
         ]));
     }

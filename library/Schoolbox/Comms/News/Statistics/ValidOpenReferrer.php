@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ValidOpenReferrer
  *
@@ -20,6 +21,7 @@ class ValidOpenReferrer
         Mapper::REFERRER_INDEX,
         Mapper::REFERRER_ARCHIVE,
         Mapper::REFERRER_EMAIL,
+        Mapper::REFERRER_RSS,
         Mapper::REFERRER_SAVED,
         Mapper::REFERRER_SEARCH,
     ];
