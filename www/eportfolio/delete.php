@@ -10,7 +10,7 @@ $currentUserId = $_SESSION['id'];
 $ownerId = $this->arg[0];
 $pageId = $this->arg[1];
 
-$authenticator = new Eportfolio_Authenticator($currentUserId, $ownerId, $pageId);
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
 
 if ($authenticator->canModify()) {
 	if (is_numeric($pageId)) {

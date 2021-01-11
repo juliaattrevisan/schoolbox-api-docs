@@ -16,7 +16,7 @@ $ownerId = $_REQUEST['userId'];
 $pageId = $_REQUEST['pageId'];
 $componentInstanceId = $_REQUEST['componentInstanceId'];
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
 
 if ($authenticator->canModify()) {
 

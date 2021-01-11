@@ -15,7 +15,7 @@ $action = $_POST['action'];
 $ownerId = $_POST['userId'];
 $pageId = 'showcase';
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
 
 if ($authenticator->canModify()) {
     if ($action == 'unpublish') {

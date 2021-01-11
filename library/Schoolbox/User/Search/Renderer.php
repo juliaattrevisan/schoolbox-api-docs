@@ -213,7 +213,7 @@ class Renderer extends Handler
 
                 /* ePortfolio link
                  */
-                $authenticator = new Eportfolio_Authenticator($currentUser->getId(), $user['id'], 'profile');
+                $authenticator = new Eportfolio_Authenticator($currentUser, $user['id'], 'profile');
 
                 if ($authenticator->canView()) {
                     $this->getPage()->parse('eportfolio_block', 'eportfolio');

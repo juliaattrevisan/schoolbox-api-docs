@@ -15,7 +15,7 @@ $action = $_POST['action'];
 $ownerId = $_POST['userId'];
 $pageId = 'profile';
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
 
 $message = 'Bad Request';
 $hash    = null;

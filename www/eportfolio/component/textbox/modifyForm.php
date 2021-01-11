@@ -16,7 +16,7 @@ $ownerId = $_POST['userId'];
 $pageId = $_POST['pageId'];
 $componentInstanceId = $_POST['componentInstanceId'];
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
 
 if ($authenticator->canModify()) {
 	$content = $_POST['content'];

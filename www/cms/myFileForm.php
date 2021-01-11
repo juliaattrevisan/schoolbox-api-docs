@@ -123,7 +123,7 @@ if (isset($_POST['description'])) {
             foreach ($_POST['published'] as $ownerId => $pageIds) {
                 if (is_array($pageIds) && count($pageIds)) {
                     foreach ($pageIds as $currentPageId => $unused) {
-                        $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $currentPageId);
+                        $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $currentPageId);
                         if ($authenticator->canModify()) {
                             $publishedFile = new \Component\Eportfolio\FileList();
                             $publishedFile->setPageId($currentPageId);

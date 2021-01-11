@@ -13,11 +13,6 @@ use Schoolbox\UserMapper;
 class Eportfolio
 {
 
-    /* Used to remove homepage components and reset template
-     */
-    const REMOVE_EPORTFOLIO_TEMPLATE_ID = -1;
-    const KEEP_EXISTING_EPORTFOLIO      = 0;
-
     /**
      * An instance of dbManager
      *
@@ -55,13 +50,6 @@ class Eportfolio
     private $context = 'eportfolio';
 
     /**
-     * All eportfolio_template records
-     *
-     * @var array
-     */
-    private $allTemplates = [];
-
-    /**
      * @var UserMapper
      */
     private $userMapper;
@@ -96,11 +84,10 @@ class Eportfolio
             $pageInstance = $this->pageMapper->findById($pageId);
 
             $this->setPageInstance($pageInstance);
-            $this->setAllTemplates($this->fetchAllTemplates());
-        } /* Spawn a stub one to make the interfaces happy
-		 * (was easier, but dirtier, to use an empty array)
-		 */
-        else {
+        } else {
+            /* Spawn a stub one to make the interfaces happy
+             * (was easier, but dirtier, to use an empty array)
+             */
             $user = $this->userMapper->createModel($userId);
             $page = $this->pageMapper->createModel($pageId);
             $page->setOwner($user);
@@ -611,21 +598,5 @@ class Eportfolio
     public function getPageInstance()
     {
         return $this->pageInstance;
-    }
-
-    /**
-     * @param array $allTemplates
-     */
-    private function setAllTemplates($allTemplates)
-    {
-        $this->allTemplates = $allTemplates;
-    }
-
-    /**
-     * @return array
-     */
-    private function getAllTemplates()
-    {
-        return $this->allTemplates;
     }
 }

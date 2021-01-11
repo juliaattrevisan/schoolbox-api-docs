@@ -17,7 +17,7 @@ $action = $_GET['action'];
 $ownerId = $_GET['userId'];
 $pageId = $_GET['pageId'];
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
 
 if ($authenticator->canModify()) {
 

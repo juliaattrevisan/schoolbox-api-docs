@@ -11,7 +11,7 @@ $ownerId       = is_numeric($this->arg[0]) ? $this->arg[0] : $_SESSION['id'];
 
 $pageId = $this->arg[1]? $this->arg[1]:'profile';
 
-$authenticator = new Eportfolio_Authenticator($currentUserId, $ownerId, $pageId);
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
 
 if ($authenticator->pageExists()) {
     if ($authenticator->canCreate() || $authenticator->canModify()) {

@@ -552,7 +552,7 @@ if (is_numeric($this->arg[0])) {
             $user,
             $synUserHandler,
             UserMapper::getInstance(),
-            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile'),
+            new Eportfolio_Authenticator($_SESSION['user'], $user['uid'], 'profile'),
             $config
         );
     } elseif ($groupHandler->isStudent($user['uid'])) {
@@ -564,7 +564,7 @@ if (is_numeric($this->arg[0])) {
             new External_Class(),
             UserMapper::getInstance(),
             FolderMapper::getInstance(),
-            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile'),
+            new Eportfolio_Authenticator($_SESSION['user'], $user['uid'], 'profile'),
             ProfessionalDevelopmentMapper::getInstance(),
             $config
         );
@@ -574,7 +574,7 @@ if (is_numeric($this->arg[0])) {
             $user,
             $synUserHandler,
             UserMapper::getInstance(),
-            new Eportfolio_Authenticator($_SESSION['user']->getId(), $user['uid'], 'profile'),
+            new Eportfolio_Authenticator($_SESSION['user'], $user['uid'], 'profile'),
             $config
         );
     } else {

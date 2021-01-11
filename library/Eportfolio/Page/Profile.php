@@ -361,7 +361,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
      */
     private function canUserViewPage($pageId)
     {
-        $auth = new Eportfolio_Authenticator($this->getCurrentUser()->getId(), $this->getUserId(), $pageId);
+        $auth = new Eportfolio_Authenticator($this->getCurrentUser(), $this->getUserId(), $pageId);
         return $auth->canView();
     }
 
