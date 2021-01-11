@@ -555,6 +555,7 @@ Usage:
                     filterId     = $component.data('component'),
                     $available   = $component.find('input[type=checkbox]'),
                     $selected    = $component.find('input:checked[type=checkbox], :selected'),
+                    $textInputs  = $component.find('input[type=text]'),
                     $selectize   = $component.find('select[data-selectize]'),
                     hasSelectize = $selectize.length > 0,
                     selectize    = hasSelectize ? $selectize[0].selectize : null;
@@ -604,6 +605,16 @@ Usage:
                     if (!hasSelectize && $selected.length === $available.length) {
                         componentsInUse[filterId]['labels'] = {};
                     }
+                }
+
+                // Build list of labels from text inputs, if they are there
+                if (!hasSelectize && $textInputs.length !== 0) {
+                    $textInputs.each(function () {
+                        let value = this.value;
+                        if (value.length > 0) {
+                            componentsInUse[filterId]['labels'][this.value] = this.value;
+                        }
+                    });
                 }
 
                 // Flatten the list of selected labels into an array
