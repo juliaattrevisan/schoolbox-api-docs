@@ -35,7 +35,7 @@ Usage:
         var $panelComponents     = $filterPanel.find('[data-component]');
         var $appliedFilters      = $filterPanel.find('[data-applied-filters]');
         var $submitButton        = $('#submit_button');
-        var $optionCheckboxes    = $filterPanel.find('input[type=checkbox], input[type=hidden], select');
+        var $optionInputs        = $filterPanel.find('input[type=checkbox], input[type=hidden], input[type=text], select');
         var $toast               = $('[data-relation="submit-label"]');
         var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
         var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
@@ -68,7 +68,7 @@ Usage:
         });
 
         // Listen for user checking filter options
-        $optionCheckboxes.on('change', function(){
+        $optionInputs.on('change', function(){
             updateFiltersInUseLabel();
         });
 
@@ -168,7 +168,7 @@ Usage:
             $toast.toastActivate({text: 'Requesting report...'});
             showFilterLoader();
             var href        = $submitButton.data('href'),
-                data        = $optionCheckboxes.serialize(),
+                data        = $optionInputs.serialize(),
                 decodedData = deserialize(data);
             $submitButton.val($submitButton.data('working'));
 
@@ -443,7 +443,7 @@ Usage:
             $submitButton.attr('disabled', false);
             $clearAllBtn.attr('disabled', false);
             $resetToDefaultsBtn.attr('disabled', false);
-            $optionCheckboxes.filter(':not([data-disabled])').attr('disabled', false);
+            $optionInputs.filter(':not([data-disabled])').attr('disabled', false);
         }
 
         /**
@@ -453,7 +453,7 @@ Usage:
             $submitButton.attr('disabled', true);
             $clearAllBtn.attr('disabled', true);
             $resetToDefaultsBtn.attr('disabled', true);
-            $optionCheckboxes.attr('disabled', true);
+            $optionInputs.attr('disabled', true);
         }
 
         /**
@@ -665,7 +665,7 @@ Usage:
         function updateCountMoreModal(filterId)
         {
             var $component  = $panelComponents.filter('[data-component=' + filterId + ']'),
-                decodedData = deserialize($optionCheckboxes.serialize())[filterId],
+                decodedData = deserialize($optionInputs.serialize())[filterId],
                 $selectize  = $component.find('[data-selectize]'),
                 selectize   = $selectize.length ? $selectize[0].selectize : null;
 
