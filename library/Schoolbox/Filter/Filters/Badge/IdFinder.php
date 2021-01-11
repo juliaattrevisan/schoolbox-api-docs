@@ -79,7 +79,7 @@ class IdFinder extends AbstractIdFinder
         if (isset($nameSearch) && count($nameSearch) > 0) {
             // Just use the first one, and split it into tokens
             foreach ($nameSearch as $nameSearchString => $_) {
-                $names = array_map('trim', preg_split('/\\s+/', $nameSearchString));
+                $names = array_map('trim', preg_split('/\\s+/', (string)$nameSearchString));
                 foreach ($names as $name) {
                     $pb = $pb->like('b.name', '%' . $this->getMapper()->getDatabase()->escapeForLike($name) . '%');
                 }
