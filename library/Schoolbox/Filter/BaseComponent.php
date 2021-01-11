@@ -227,7 +227,7 @@ class BaseComponent implements IComponent
 
 
     /**
-     * @return null|GenericCollection
+     * @return null|GenericCollection|Selection\Model[]
      */
     protected function getUrlOverrides(): ?GenericCollection
     {
