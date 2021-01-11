@@ -16,7 +16,7 @@
         <input type="text"
                placeholder="Enter a full or partial badge name"
                name="filter_selection[{{ definition.filter.id }}][]"
-               value="{{ (selectedNodes ?? []) | column('code') | join(' ') }}" />
+               value="{{ searchQuery }}" />
     {% else %}
         {{ parent() }}
     {% endif %}
