@@ -1,0 +1,127 @@
+config:
+
+  #Modules
+  boarder_leave_enabled: {value: false, hide: true}
+  teams_enabled: {hide: false}
+  curriculum_tagging_enabled: {value: false, hide: true}
+  eotc_enabled: {value: false, hide: true}
+  learning_moments_enabled : {hide: false}
+  badges_enabled : {value: false, hide: true}
+  fixtures_enabled: {hide: false}
+  pastoral_enabled : {hide: false}
+  resource_booking_enabled: {hide: false}
+  external_document_report_enabled : { value : false, hide : true }
+  webdav_enable: {hide: false}
+
+  #Pastoral
+  external_pastoral: {hide: false}
+  pastoral_external_delete: {hide: false}
+  external_pastoral_upload: {hide: false}
+  pastoral_upload_timeout: {hide: false}
+  pastoral_severity: {hide: false}
+  pastoral_individual_access: {hide: false}
+  pastoral_parent_access: {hide: false}
+  pastoral_page_size: {hide: false}
+  pastoral_create_tag_enable: {hide: false}
+
+  #Boarder Leave
+  debug_email_address: {hide: true}
+  boarder_leave_parent_notification_enabled: {hide: true}
+  terms_and_conditions: {hide: true}
+  boarder_breakfast_start: {hide: true}
+  boarder_breakfast_end: {hide: true}
+  boarder_lunch_start: {hide: true}
+  boarder_lunch_end: {hide: true}
+  boarder_dinner_start: {hide: true}
+  boarder_dinner_end: {hide: true}
+  boarder_leave_creation_threshold: {hide: true}
+
+  #LMS
+  grade_comments_enable: {value: false, hide: true}
+  custom_assessment_participation: {value: false, hide: true}
+  self_assessment_enabled: {value: false, hide: true}
+  course_markbook_enable: {value: false, hide: true}
+  assessment_calendar_enabled: {value: false, hide: true}
+  class_markbook_enable: {value: false, hide: true}
+  rubric_markbook_enable: {value: false, hide: true}
+  upcoming_assessments_enabled : {value: false, hide: true}
+  grades_enabled: {value: false, hide: true}
+  course_homepage: {hide: true}
+  destructive_activity_export_enabled: {hide: true}
+  lms_permit_staff_feedback_delete: {hide: true}
+  rubric_show_points: {hide: true}
+  rubric_max_levels: {hide: true}
+  lms_student_policy: {hide: true}
+  submission_window: {hide: true}
+  lms_resubmit_window: {hide: true}
+  restrict_parent_duework_access: {value: true, hide: true}
+  restrict_student_submissions: {value: true, hide: true}
+  submission_visibility_max: {hide: true}
+  submission_access: {hide: true}
+  plagscan_student_visible: {hide: true}
+  plagscan_allow_students_report_access: {hide: true}
+  restrict_parent_grades: {value: true, hide: true}
+  default_grade_group: {hide: true}
+  show_overall_grade: { hide: true }
+  overall_grade: {hide: true }
+  grade_gradient_enable: {hide: true }
+  display_grade_graph: {hide: true }
+  grade_progression_display: { hide: true }
+  enable_grades_criteria: {hide: true }
+  grade_capability_display: { hide: true }
+  lms_cohort_comparison: {hide: true }
+  lms_duetime_default: {hide: true }
+
+  #Comms
+  comms_comments_enabled: { hide: false }
+  comms_statistics_enabled : {value: true, hide: true}
+  global_moderation: { hide: false }
+  messaging_enabled: { hide: false }
+  push_notifications_enabled: { hide: false }
+  ups_groups_enabled: { value: true, hide: false }
+  eportfolio_enabled: {hide: false}
+  staff_directory_enabled: {hide: false}
+  report_staff_access : { hide : false }
+  parent_directory_enabled: {hide: false}
+
+  # APIs
+  weather_api_key: { hide: true }
+  googledrive_enabled: { hide: false }
+  cyberhound_api_url: {value: '', hide: true}
+  cyberhound_api_shared_key: {value: '', hide: true }
+  cyberhound_whitelist: {value: '', hide: true }
+  clickview_school_id: {hide: false}
+  plagscan_client_id: {value: '', hide: true}
+  plagscan_api_key: {value: '', hide: true }
+  plagscan_username: { value: '', hide: true }
+  kami_api_key: {value: '', hide: true}
+  rubicon_atlas_api_token: {value: '', hide: true}
+  canvas_data_api_key: {value: '', hide: true}
+  office365_tenant: { hide: false }
+  office365_tenant_id : { hide : false }
+  office365_immersive_reader_name : { hide : false }
+  googleapps_api_key: { hide: false }
+
+topMenu:
+  hide:
+    - /learning/pending
+    - /learning/due
+    - /learning/grades
+    - /course/list
+  show:
+    - /eportfolio
+    - /fixtures
+    - /pastoral
+components:
+  hide:
+   - Schoolbox_Learning_Component_Dashboard_UpcomingWorkController
+   - Component_Dashboard_RecentSubmissionsController
+   - Schoolbox\Learning\Assessment\DueWork\Component\Homepage\Controller
+   - Schoolbox\Learning\Assessment\Quiz\Component\Homepage\Controller
+   - Component_Homepage_WolframController
+   - Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller
+   - Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller
+   - Component_Homepage_RubricController
+   - Schoolbox\Curriculum\Component\CurriculumDetailsController
+   - Schoolbox\Curriculum\Component\CurriculumOverviewController
+   - Schoolbox\Learning\Assessment\Task\Component\Homepage\Controller

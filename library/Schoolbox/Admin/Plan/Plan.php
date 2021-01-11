@@ -41,8 +41,9 @@ class Plan extends CliTool\App
             $this->setConfig($planConfig['config']);
             $this->setTopMenu($planConfig['topMenu']);
             $this->setComponents($planConfig['components']);
-        } else {
-            // Setting plans for all instances
+        }
+        else {
+
         }
     }
 
