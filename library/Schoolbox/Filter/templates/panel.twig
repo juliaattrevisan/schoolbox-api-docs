@@ -146,15 +146,18 @@ Usage:
         }
 
         /**
-         * Clears checkboxes for the specified filter
+         * Clears checkboxes, selectize and text inputs for the specified
+         * filter.
          *
          * @param {int} filterId
          */
         function clearFilter(filterId) {
-            var $panelComponent = $panelComponents.filter('[data-component='+filterId+']'),
+            let $panelComponent = $panelComponents.filter('[data-component='+filterId+']'),
                 $selectize      = $panelComponent.find('[data-selectize]'),
-                selectize       = $selectize.length ? $selectize[0].selectize : null;
+                selectize       = ($selectize.length ? $selectize[0].selectize : null),
+                $textInput      = $panelComponent.find('input[type=text]');
             $panelComponent.find('input[type=checkbox]').prop('checked', false);
+            $textInput.val('');
             if (selectize) {
                 selectize.clear(true);
             }
