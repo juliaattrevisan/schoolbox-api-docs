@@ -18,11 +18,6 @@ use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
-
-use function array_key_exists;
-use function count;
-use function explode;
-
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -67,6 +62,9 @@ use Schoolbox\YearLevel;
 use Alaress\Database\Predicate;
 use Schoolbox\Error;
 
+use function array_key_exists;
+use function count;
+use function explode;
 use function strnatcasecmp;
 
 /**

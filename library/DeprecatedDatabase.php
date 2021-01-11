@@ -42,7 +42,7 @@ class DeprecatedDatabase implements Serializable
      * @param string $db
      * @param int    $debug
      */
-    function __construct($db = SQL_db, $debug = 1)
+    public function __construct($db = SQL_db, $debug = 1)
     {
         $this->connect();
     }
@@ -81,7 +81,7 @@ class DeprecatedDatabase implements Serializable
      * @deprecated
      * @return bool
      */
-    function reconnect()
+    public function reconnect()
     {
         unset($this->database);
         $this->connect();
@@ -93,7 +93,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @deprecated
      */
-    function connect()
+    public function connect()
     {
         // Assuming all DeprecatedDatabase instances use the same connection string
         $this->database = Database::getInstance();
@@ -117,7 +117,7 @@ class DeprecatedDatabase implements Serializable
      * @deprecated
      * @return bool
      */
-    function close()
+    public function close()
     {
     }
 
@@ -130,7 +130,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @return bool
      */
-    function changeDb($db)
+    public function changeDb($db)
     {
     }
 
@@ -145,7 +145,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @return PDOStatement
      */
-    function query($sql_q, $retry = true)
+    public function query($sql_q, $retry = true)
     {
         $this->databaseResult = $this->database->query($sql_q);
         return $this->databaseResult;
@@ -161,7 +161,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @return array|bool|null
      */
-    function getRow($sql_q)
+    public function getRow($sql_q)
     {
         $result = $this->query($sql_q);
         $row    = $this->getNextArray($result);
@@ -178,7 +178,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @return mixed
      */
-    function getOne($sql_q)
+    public function getOne($sql_q)
     {
         $result = $this->query($sql_q);
         return $result->fetchColumn();
@@ -192,7 +192,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @return array|bool
      */
-    function getAll($sql_q)
+    public function getAll($sql_q)
     {
         $result  = $this->query($sql_q);
         $table   = array();
@@ -219,7 +219,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @return array|bool|null
      */
-    function getNextArray($result = null)
+    public function getNextArray($result = null)
     {
         if ($result instanceof PDOStatement) {
             $return_array = $result->fetch(PDO::FETCH_ASSOC);
@@ -240,7 +240,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @return bool|int
      */
-    function countRows($result = null)
+    public function countRows($result = null)
     {
         if ($result instanceof PDOStatement) {
             $return_count = $result->rowCount();
@@ -262,7 +262,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @return bool
      */
-    function insert($table, $array)
+    public function insert($table, $array)
     {
         if (!($table && is_array($array))) {
             return false;
@@ -300,7 +300,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @return bool
      */
-    function insertMultiRow($table, $array, $names = false)
+    public function insertMultiRow($table, $array, $names = false)
     {
         if (!($table && is_array($array))) {
             return false;
@@ -344,7 +344,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @return bool
      */
-    function update($table, $identifier, $array)
+    public function update($table, $identifier, $array)
     {
         if (!$table) {
             return false;
@@ -394,7 +394,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @return bool
      */
-    function delete($table, $identifier, $value)
+    public function delete($table, $identifier, $value)
     {
         $query = "DELETE FROM `$table` WHERE 1 != 1 ";
         if (is_array($value)) {
@@ -415,7 +415,7 @@ class DeprecatedDatabase implements Serializable
      * @deprecated use \Schoolbox\Mapper::getDatabase()->lastInsertId()
      * @return int|string
      */
-    function insertID()
+    public function insertID()
     {
         return $this->database->lastInsertId();
     }
@@ -426,7 +426,7 @@ class DeprecatedDatabase implements Serializable
      * @deprecated
      * @return int
      */
-    function affectedRows()
+    public function affectedRows()
     {
         return $this->databaseResult->rowCount();
     }
@@ -440,7 +440,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @return bool
      */
-    function endQuery($result = null)
+    public function endQuery($result = null)
     {
         return true;
     }
@@ -472,7 +472,7 @@ class DeprecatedDatabase implements Serializable
      *
      * @return string
      */
-    function smartQuote($value)
+    public function smartQuote($value)
     {
         $mysqlFuncs = array(
             'NULL',

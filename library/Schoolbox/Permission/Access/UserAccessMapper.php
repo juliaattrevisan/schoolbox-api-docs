@@ -9,17 +9,12 @@
 
 namespace Schoolbox\Permission\Access;
 
+use Alaress\Database\Predicate;
 use Alaress\Database\Predicate\Builder;
-use Schoolbox\Resource\Folder\NNIAN;
-
-use function count;
-
 use External_Class;
-
-use function implode;
-use function in_array;
-
+use InvalidArgumentException;
 use PDO;
+use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
@@ -29,10 +24,11 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Alaress\Database\Predicate;
-use PDOException;
 use UnderflowException;
-use InvalidArgumentException;
+
+use function count;
+use function implode;
+use function in_array;
 
 /**
  * Class UserAccessMapper

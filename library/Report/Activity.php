@@ -146,15 +146,15 @@ class Report_Activity extends Report_Abstract implements Report_IReport
 
         foreach ($resultFilter as $key => $value) {
             if (in_array($key, $this->filterable)) {
-                // custom filter by user
                 if ($key == 'user') {
+                    // custom filter by user
                     $sqlFilter[] = "(username LIKE :user OR firstname LIKE :user OR lastname LIKE :user)";
                     $params['user'] = $value;
                 } else if ($key == 'action') {
                     $sqlFilter[] = "cl.action = :action";
                     $params['action'] = $value;
-                } // custom filter by keyword
-                else if ($key == 'keyword') {
+                } else if ($key == 'keyword') {
+                    // custom filter by keyword
                     $sqlFilter[] =
                         "(
    c.name         LIKE :keyword
@@ -181,8 +181,8 @@ OR ml.name        LIKE :keyword
                         $sqlFilter[] = "`time` <= :before";
                         $params['before'] = $date;
                     }
-                } // default filter key
-                else {
+                } else {
+                    // default filter key
                     $sqlFilter[] = $this->db->getQuoter()->quoteIdentifier($key) . " LIKE :$key";
                     $params[$key] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
                 }

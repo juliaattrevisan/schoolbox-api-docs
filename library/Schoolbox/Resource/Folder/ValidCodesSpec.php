@@ -9,14 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Folder;
 
+use Alaress\Database;
 use Alaress\Specification\Leaf;
 
 use function array_unique;
 use function count;
 use function strpos;
 use function substr;
-
-use Alaress\Database;
 
 /**
  * Efficiently validates that a folder's codes are valid compared to:

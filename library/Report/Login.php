@@ -298,8 +298,8 @@ class Report_Login extends Report_Abstract implements Report_IReport
 
             // set up filtering
             $this->displayFilterBlock();
-        } // else empty data set
-        else {
+        } else {
+            // else empty data set
             $page->setVar(
                 array(
                     'RESULT'                => 'No results.',
