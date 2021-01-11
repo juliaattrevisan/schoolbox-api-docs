@@ -324,7 +324,7 @@ class Builder implements IBuilder
     /**
      * @param string|ISqlFunc $columnName
      * @param string          $columnValue Used directly in LIKE statement.
-     * @see \Database::escapeForLike for escaping user input.
+     * @see IQuoter::escapeForLike for escaping user input.
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */
@@ -341,7 +341,7 @@ class Builder implements IBuilder
      *
      * @param string|ISqlFunc $columnName
      * @param string[]        $columnValues Used directly in LIKE statement.
-     * @see \Database::escapeForLike for escaping user input.
+     * @see IQuoter::escapeForLike for escaping user input.
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */
@@ -358,7 +358,7 @@ class Builder implements IBuilder
     /**
      * @param string|ISqlFunc $columnName
      * @param string          $columnValue Used directly in NOT LIKE statement.
-     * @see \Database::escapeForLike for escaping user input.
+     * @see IQuoter::escapeForLike for escaping user input.
      * @return $this
      * @throws InvalidColumnException If unable to parse column name
      */

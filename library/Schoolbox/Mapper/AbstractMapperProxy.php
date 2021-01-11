@@ -264,7 +264,7 @@ abstract class AbstractMapperProxy
 
         $query = "
             {$this->getSelectString()}
-            WHERE {$this->getDatabase()->quoteIdentifier($this->getExternalColumnName())} IN {$placeholders}
+            WHERE {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getExternalColumnName())} IN {$placeholders}
         ";
 
         $statement = $this->getDatabase()->query($query, Builder::getArrayParameters($externalValues));

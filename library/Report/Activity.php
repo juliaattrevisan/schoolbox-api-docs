@@ -169,7 +169,7 @@ OR mf.description LIKE :keyword
 OR mf.realname    LIKE :keyword
 OR ml.name        LIKE :keyword
 )";
-                    $params['keyword'] = '%' . $this->db->escapeForLike($value) . '%';
+                    $params['keyword'] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
                 } else if ($key == 'after') {
                     if ($date = strtotime($value)) {
                         $date = date('Y-m-d H:i:s', $date);
@@ -184,8 +184,8 @@ OR ml.name        LIKE :keyword
                     }
                 } // default filter key
                 else {
-                    $sqlFilter[] = $this->db->quoteIdentifier($key) . " LIKE :$key";
-                    $params[$key] = '%' . $this->db->escapeForLike($value) . '%';
+                    $sqlFilter[] = $this->db->getQuoter()->quoteIdentifier($key) . " LIKE :$key";
+                    $params[$key] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
                 }
             }
         }

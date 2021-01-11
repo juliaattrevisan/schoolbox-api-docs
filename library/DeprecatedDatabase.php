@@ -65,7 +65,7 @@ class DeprecatedDatabase implements Serializable
      */
     public function quoteIdentifier($string)
     {
-        return $this->database->quoteIdentifier($string);
+        return $this->database->getQuoter()->quoteIdentifier($string);
     }
 
     /**
