@@ -32,6 +32,13 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         ];
     }
 
+    /** @inheritDoc */
+    public function runAsRoot(): ?bool
+    {
+        return true;
+    }
+
+
     public function run(): void
     {
         $this->hash = $this->getOpt(self::HASH);
