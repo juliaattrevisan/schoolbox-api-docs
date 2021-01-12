@@ -144,7 +144,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 // This makes assumptions that Synergetic setup correctly with either D=D# or D#=D#, and the explode doesn't get a row without =
                 if (!empty($overrideDay) && is_numeric($overrideDay)) {
                     // Yep, found overriding day number. Use this instead
-                    $day = $overrideDay;
+                    $day = (int)$overrideDay;
                 }
             }
         }
@@ -288,7 +288,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         return 'Day ' . $dayNumber;
     }
 
-
     /**
      * @inheritDoc
      */
@@ -301,35 +300,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $campusString = $campus->getExtTimetableCode();
 
         // firstly, what day number is it?
-        $targetDay = $this->getDayNumber($campus);
-
-        // get the day numbers used for this campus
-        $query = "
-            SELECT DISTINCT DayNumber
-            FROM TimetableDefinition t
-            WHERE t.FileSemester = '%s'
-            AND t.FileYear = '%s'
-            AND t.TimetableGroup = '%s'
-        ";
+        $day = $this->getDayNumber($campus, $now);
 
         // get available day numbers
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
-        $dayNumbers   = array_map(
-            function ($r) {
-                return $r['DayNumber'];
-            },
-            $this->getDatabase()->getAll(
-                sprintf(
-                    $query,
-                    $fileSemester,
-                    $fileYear,
-                    $campusString
-                )
-            )
-        );
-
-        $day = in_array($targetDay, $dayNumbers) ? $targetDay : 0;
 
         // cannot believe the something like 'LEFT(CONVERT(VARCHAR...' is needed
         $query = "
