@@ -7,6 +7,7 @@
  */
 
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Code\SubjectCodeMatchFactory;
 use Schoolbox\Role;
 
 class Component_Homepage_TeachersController extends Component_Homepage_ControllerAbstract
@@ -121,16 +122,22 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                 // of the class they are actually enrolled in.
                 $classCodeString    = $this->getContext()->getCodeString();
                 $classCodesRetained = [];
-                if ($user->getRole()->isStudent()
+                if (
+                    $user->getRole()->isStudent()
                     && $this->getConfigLoader()->get('student_teacher_class_visibility')
                 ) {
-
                     $classCodesRetained = [];
                     $classCodesComplete = explode(",", $classCodeString);
+                    $codeMatcher        = (new SubjectCodeMatchFactory())->build(
+                        $this->getConfigLoader()->get('external_type')
+                    );
 
-                    foreach ($user->getSubjectCollection() as $subjectCurrent) {
-                        if (in_array($subjectCurrent['code'], $classCodesComplete)) {
-                            $classCodesRetained[] = $subjectCurrent['code'];
+                    foreach ($classCodesComplete as $classCode) {
+                        foreach ($user->getSubjectCollection() as $subjectCurrent) {
+                            if ($codeMatcher->isMatch($classCode, $subjectCurrent['campusCode'], $subjectCurrent['code'])) {
+                                $classCodesRetained[] = $classCode;
+                                break;
+                            }
                         }
                     }
                 }
