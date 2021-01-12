@@ -2,7 +2,6 @@
 updates/sql_updates.sql
 data/
 /dynamic/
-www/conf/conf.php
 /www/test*.php
 www/test.xml
 .vagrant
