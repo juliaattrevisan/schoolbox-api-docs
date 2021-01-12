@@ -206,7 +206,7 @@ EOL;
         // not much point going on if we've got nothing to do
         if (!is_callable($callable)) {
             $this->logger()->critical("No daemon to launch, aborting");
-            return;
+            exit(self::EXIT_STATUS_KERNEL_ERROR);
         }
 
         try {
@@ -229,8 +229,10 @@ EOL;
             $this->logger()->notice($this->name . " daemon loop ended; preparing to terminate");
         } catch (PDOException $e) {
             $this->logger()->emergency($e->getMessage(), ['exception' => $e]);
+            exit(self::EXIT_STATUS_APP_ERROR);
         } catch (\Schoolbox\External\Exception $e) {
             $this->logger()->emergency($e->getMessage(), ['exception' => $e]);
+            exit(self::EXIT_STATUS_APP_ERROR);
         } catch (Exception $e) {
             $this->logger()->critical(
                 sprintf(
@@ -241,6 +243,7 @@ EOL;
                 ),
                 ['exception' => $e]
             );
+            exit(self::EXIT_STATUS_APP_ERROR);
         }
     }
 
