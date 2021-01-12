@@ -3,7 +3,7 @@ config:
   site_plan: {value: Basic}
 
   #Modules
-  boarder_leave_enabled: {value: false, edit: false}
+  boarder_leave_enabled: {value: false, hide: true}
   teams_enabled: {value: false, edit: false}
   curriculum_tagging_enabled: {value: false, edit: false}
   eotc_enabled: {value: false, edit: false}

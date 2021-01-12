@@ -88,3 +88,9 @@ VALUES (
            'settings',
            (SELECT MAX(sequence)+1 FROM config c WHERE type_id = (SELECT id FROM lu_config_type WHERE `type` = 'External DB'))
        );
+
+UPDATE config SET type_id =  (SELECT id FROM `lu_config_type` WHERE `type` = 'Modules') WHERE name like 'pastoral_enabled';
+
+UPDATE config SET type_id = (SELECT id FROM `lu_config_type` WHERE `type` = 'Modules'), sequence = 6  WHERE name like 'boarder_leave_enabled';
+
+UPDATE config SET title = 'Enable Notifications'  WHERE name like 'messaging_enabled';
