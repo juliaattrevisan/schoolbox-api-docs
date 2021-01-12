@@ -64,6 +64,10 @@ class Plan extends CliTool\App
                     $config->setHidden($item['hide']);
                 }
 
+                if (isset($item['edit'])) {
+                    $config->setEditable($item['edit']);
+                }
+
                 if (isset($item['value'])) {
                     $config->setValue($item['value']);
                 }

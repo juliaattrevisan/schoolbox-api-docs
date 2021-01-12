@@ -3,17 +3,17 @@ config:
   site_plan : { value : Elite }
 
   #Modules
-  boarder_leave_enabled: {hide: false}
-  teams_enabled: {hide: false}
-  curriculum_tagging_enabled: {hide: false}
-  eotc_enabled: {hide: false}
-  learning_moments_enabled : {hide: false}
-  badges_enabled : {hide: false}
-  fixtures_enabled: {hide: false}
-  pastoral_enabled : {hide: false}
-  resource_booking_enabled: { hide: false}
-  external_document_report_enabled : { hide : false }
-  webdav_enable: {hide: false}
+  boarder_leave_enabled: {edit: true}
+  teams_enabled: {edit: true}
+  curriculum_tagging_enabled: {edit: true}
+  eotc_enabled: {edit: true}
+  learning_moments_enabled : {edit: true}
+  badges_enabled : {edit: true}
+  fixtures_enabled: {edit: true}
+  pastoral_enabled : {edit: true}
+  resource_booking_enabled: { edit: true}
+  external_document_report_enabled : { edit : true }
+  webdav_enable: {edit: true}
 
   #Pastoral
   external_pastoral: {hide: false}
@@ -79,12 +79,12 @@ config:
   comms_statistics_enabled : {value: true, hide: true}
   global_moderation: { hide: false }
   messaging_enabled: { hide: false }
-  push_notifications_enabled: { hide: false }
-  ups_groups_enabled: { value: true, hide: false }
-  eportfolio_enabled: {hide: false}
-  staff_directory_enabled: {hide: false}
+  push_notifications_enabled: { edit: true }
+  ups_groups_enabled: { value: true, hide: true }
+  eportfolio_enabled: {edit: true}
+  staff_directory_enabled: {edit: true}
   report_staff_access : { hide : false }
-  parent_directory_enabled: {hide: false}
+  parent_directory_enabled: {edit: true}
 
   # APIs
   weather_api_key: { hide: true }
@@ -98,7 +98,7 @@ config:
   plagscan_username: {hide: false }
   kami_api_key: { hide: true }
   rubicon_atlas_api_token: { hide: false }
-  canvas_data_api_key: {value: '', hide: true}
+  canvas_data_api_key: {hide: false}
   office365_tenant: { hide: false }
   office365_tenant_id: {hide: false}
   office365_immersive_reader_name: {hide: false}

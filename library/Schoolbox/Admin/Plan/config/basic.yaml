@@ -3,17 +3,17 @@ config:
   site_plan: {value: Basic}
 
   #Modules
-  boarder_leave_enabled: {value: false, hide: true}
-  teams_enabled: {value: false, hide: false}
-  curriculum_tagging_enabled: {value: false, hide: true}
-  eotc_enabled: {value: false, hide: true}
-  learning_moments_enabled : {value: false, hide: true}
-  badges_enabled : {value: false, hide: true}
-  fixtures_enabled: {value: false, hide: true}
-  pastoral_enabled : {value: false, hide: true}
-  resource_booking_enabled: {value: false, hide: true}
-  external_document_report_enabled : { value : false, hide : true }
-  webdav_enable: {value: false, hide: true}
+  boarder_leave_enabled: {value: false, edit: false}
+  teams_enabled: {value: false, edit: false}
+  curriculum_tagging_enabled: {value: false, edit: false}
+  eotc_enabled: {value: false, edit: false}
+  learning_moments_enabled : {value: false, edit: false}
+  badges_enabled : {value: false, edit: false}
+  fixtures_enabled: {value: false, edit: false}
+  pastoral_enabled : {value: false, edit: false}
+  resource_booking_enabled: {value: false, edit: false}
+  external_document_report_enabled : { value : false, edit : false }
+  webdav_enable: {value: false, edit: false}
 
   #Pastoral
   external_pastoral: {value: false, hide: true}
@@ -79,12 +79,12 @@ config:
   comms_statistics_enabled : {value: false, hide: true}
   global_moderation: { hide: false }
   messaging_enabled: { hide: false }
-  push_notifications_enabled: { value: false, hide: true }
+  push_notifications_enabled: { value: false, edit: false }
   ups_groups_enabled: { value: false, hide: true }
-  eportfolio_enabled: {value: false, hide: true}
-  staff_directory_enabled: {value: false, hide: true}
+  eportfolio_enabled: {value: false, edit: false}
+  staff_directory_enabled: {value: false, edit: false}
   report_staff_access : { hide : true }
-  parent_directory_enabled: {value: false, hide: true}
+  parent_directory_enabled: {value: false, edit: false}
 
   # APIs
   weather_api_key: {value: '', hide: true }
