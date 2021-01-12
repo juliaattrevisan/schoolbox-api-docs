@@ -4,7 +4,7 @@
     <label class="required" for="evidence-body">
         Write something
     </label>
-    <textarea name="body" id="evidence-body" required></textarea>
+    <textarea name="body" id="evidence-body" required>{{ isCreate ? '' : evidence.body }}</textarea>
 {% endblock formInputBody %}
 
 {% block formJs %}

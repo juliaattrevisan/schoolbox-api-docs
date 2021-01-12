@@ -68,6 +68,7 @@ class BaseTest extends TestCase
                 ->setFilename('test.gif')
                 ->setCreator((new User())->setId(55))
                 ->setRecipient((new User())->setId(193))
+                ->setType('upload')
                 ->setDiscussionThread((new DiscussionThread())->setId(14))
                 ->setCurriculumNodes(
                     (new GenericCollection(new CurriculumNode()))->add((new CurriculumNode())->setId(500)->setName('Test Curriculum')->setCode('TEST500'))

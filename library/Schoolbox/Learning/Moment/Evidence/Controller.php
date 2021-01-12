@@ -10,12 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment\Evidence;
 
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
-use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Collection;
 use Schoolbox\Discussion\Comment;
-use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -52,7 +50,8 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param Mapper         $mapper
+     * @param Comment\Mapper $commentMapper
      */
     public function __construct(Mapper $mapper, Comment\Mapper $commentMapper)
     {
@@ -109,58 +108,17 @@ class Controller extends Base
         // * text
         // * upload
         $momentType = $this->request->query->get('momentType');
-        $template   = '@learningMomentEvidence/form/text.twig';
+        $template   = $this->getTemplateFromType($momentType);
         $params = [
             'users'                    => $users,
             'userIds'                  => $users->getPropertyValues('id'),
             'otherUsers'               => $otherUsers,
             'sharingForSelf'           => $sharingForSelf,
             'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
+            'isCreate'                 => true,
+            'momentType'               => $momentType,
+            'zone'                     => $this->buildAttachzone($momentType)->getTwigContext()
         ];
-        switch ($momentType) {
-            case self::MOMENT_TYPE_PHOTO:
-                $template       = '@learningMomentEvidence/form/photo.twig';
-                $params['zone'] = $this->buildAttachzone()
-                                       ->setAttachPrompt('take a picture')
-                                       ->setIconClass('icon-camera')
-                                       ->setUseModal(false)
-                                       ->setCapture(true)
-                                       ->setMimeFilter('image/*')
-                                       ->getTwigContext();
-                break;
-
-            case self::MOMENT_TYPE_AUDIO:
-                $template       = '@learningMomentEvidence/form/audio.twig';
-                $params['zone'] = $this->buildAttachzone()
-                                       ->setAttachPrompt('record audio')
-                                       ->setIconClass('icon-audio')
-                                       ->setUseModal(false)
-                                       ->setCapture(true)
-                                       ->setMimeFilter('audio/*')
-                                       ->getTwigContext();
-                break;
-
-            case self::MOMENT_TYPE_VIDEO:
-                $template       = '@learningMomentEvidence/form/video.twig';
-                $params['zone'] = $this->buildAttachzone()
-                                       ->setAttachPrompt('record video')
-                                       ->setIconClass('icon-video')
-                                       ->setUseModal(false)
-                                       ->setCapture(true)
-                                       ->setMimeFilter('video/*')
-                                       ->getTwigContext();
-                break;
-
-            case self::MOMENT_TYPE_UPLOAD:
-                $template       = '@learningMomentEvidence/form/upload.twig';
-                $params['zone'] = $this->buildAttachzone()
-                                       ->getTwigContext();
-                break;
-
-            case self::MOMENT_TYPE_TEXT:
-            default:
-                break;
-        }
 
         $this->response->content->set(
             $this->buildHtmlOutput($template, $params)
@@ -320,18 +278,31 @@ class Controller extends Base
      */
     public function getModifyForm(Model $evidence): void
     {
-        $zone = $this->buildAttachzone();
+        // Which variant is being shown?
+        // * text
+        // * upload
+        $momentType = $evidence->getType();
+        $template   = $this->getTemplateFromType($momentType);
+        $params     = [
+            'users'                    => $evidence->getRecipient(),
+            'userIds'                  => $evidence->getRecipient()->getId(),
+            'otherUsers'               => [],
+            'sharingForSelf'           => $this->getUser() === $evidence->getRecipient(),
+            'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
+            'isCreate'                 => false,
+            'momentType'               => $momentType,
+        ];
+        $zone       = $this->buildAttachzone($momentType);
         if ($evidence->getStorage()) {
             $zone->attachFiles([$evidence->getStorage()->getHash()]);
         }
+        $params['zone']     = $zone->getTwigContext();
+        $params['evidence'] = $evidence;
+
         $this->response->content->set(
             $this->buildHtmlOutput(
-                '@learningMomentEvidence/modifyForm.twig',
-                [
-                    'evidence'                 => $evidence,
-                    'zone'                     => $zone->getTwigContext(),
-                    'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
-                ]
+                $template,
+                $params
             )
         );
     }
@@ -406,9 +377,10 @@ class Controller extends Base
     /**
      * Helper for building an attachzone for this controller.
      *
+     * @param string $momentType
      * @return GenericZone
      */
-    private function buildAttachzone(): GenericZone
+    private function buildAttachzone(string $momentType): GenericZone
     {
         $zone = new GenericZone('storage', StorageMapper::getInstance());
         $zone->setAttachmentsLabel('')
@@ -418,7 +390,57 @@ class Controller extends Base
              ->setMulti(false)
              ->setThumbnailSize(64)
              ->setModalTitle('Select file');
+        switch ($momentType) {
+            case self::MOMENT_TYPE_PHOTO:
+                $zone->setAttachPrompt('take a picture')
+                     ->setIconClass('icon-camera')
+                     ->setUseModal(false)
+                     ->setCapture(true)
+                     ->setMimeFilter('image/*');
+                break;
+            case self::MOMENT_TYPE_AUDIO:
+                $zone->setAttachPrompt('record audio')
+                     ->setIconClass('icon-audio')
+                     ->setUseModal(false)
+                     ->setCapture(true)
+                     ->setMimeFilter('audio/*');
+                break;
+            case self::MOMENT_TYPE_VIDEO:
+                $zone->setAttachPrompt('record video')
+                     ->setIconClass('icon-video')
+                     ->setUseModal(false)
+                     ->setCapture(true)
+                     ->setMimeFilter('video/*');
+                break;
+            case self::MOMENT_TYPE_UPLOAD:
+            case self::MOMENT_TYPE_TEXT:
+            default:
+                break;
+        }
         return $zone;
+    }
+
+
+    /**
+     * Finds template name from moment type
+     * @param string $momentType
+     * @return string
+     */
+    private function getTemplateFromType(string $momentType): string
+    {
+        switch ($momentType) {
+            case self::MOMENT_TYPE_PHOTO:
+                return '@learningMomentEvidence/form/photo.twig';
+            case self::MOMENT_TYPE_AUDIO:
+                return '@learningMomentEvidence/form/audio.twig';
+            case self::MOMENT_TYPE_VIDEO:
+                return '@learningMomentEvidence/form/video.twig';
+            case self::MOMENT_TYPE_UPLOAD:
+                return '@learningMomentEvidence/form/upload.twig';
+            case self::MOMENT_TYPE_TEXT:
+            default:
+                return '@learningMomentEvidence/form/text.twig';
+        }
     }
 
 
