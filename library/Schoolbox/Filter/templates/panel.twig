@@ -577,9 +577,60 @@ Usage:
          * This is because otherwise we would need to store selection order to ensure we could re-create layout on page reload.
          */
         function updateFiltersInUseLabel() {
-            var componentsInUse = {};
+            let componentsInUse = deriveComponentsInUse();
+
+            // Are any filters being used?
+            if(Object.keys(componentsInUse).length){
+                $appliedFilters.html('');
+                for (var filterId in componentsInUse) {
+                    if (componentsInUse.hasOwnProperty(filterId)) {
+                        $interactionContainer.removeClass('hide');
+                        // Create a new brick
+                        var $newTab = $tabAppliedFilter.clone();
+                        // Set the filter id and name
+                        $newTab.attr('data-applied-filter-tab', filterId).find('[data-filter-name]').html(componentsInUse[filterId]['name']);
+                        // Get handle to selected option list and option
+                        var $selectedOptionList = $newTab.find('[data-selected-list]'),
+                            $selectedOption     = $newTab.find('[data-selected-item]').remove();
+                        // Add selected options to list
+                        var labels = componentsInUse[filterId]['labels'];
+                        for(var i in labels){
+                            if(!labels.hasOwnProperty(i)){
+                                continue;
+                            }
+                            if(i >= MAX_VISIBLE_SELECTIONS){
+                                break;
+                            }
+                            $selectedOptionList.append($selectedOption.clone().html(labels[i]));
+                        }
+                        // Configure 'more' count
+                        var $moreCount = $newTab.find('[data-more-count]');
+                        if(labels.length <= MAX_VISIBLE_SELECTIONS){
+                            $moreCount.addClass('hide');
+                        } else {
+                            var moreCountText = '+ '+(labels.length - MAX_VISIBLE_SELECTIONS)+' more';
+                            $moreCount.find('[data-count]').attr('title', moreCountText).html(moreCountText);
+                        }
+                        $appliedFilters.append($newTab);
+                    }
+                }
+            } else {
+                $interactionContainer.addClass('hide');
+            }
+        }
+
+
+        /**
+         * Derives the components which are in use across all filters on this
+         * panel.
+         *
+         * @return {Object}
+         */
+        function deriveComponentsInUse()
+        {
+            let componentsInUse = {};
             $panelComponents.each(function (idx, component) {
-                var $component   = $(component),
+                let $component   = $(component),
                     filterId     = $component.data('component'),
                     $available   = $component.find('input[type=checkbox]'),
                     $selected    = $component.find('input:checked[type=checkbox], :selected'),
@@ -609,7 +660,7 @@ Usage:
                     // Not a selectize, or it's not yet initialized
                     // Filter is being applied, add its name and selected option labels.
                     $selected.each(function(idx, elem) {
-                        var $elem = $(elem),
+                        let $elem = $(elem),
                             label = null,
                             value = null;
                         if ($elem.is('option')) {
@@ -658,46 +709,9 @@ Usage:
                     delete componentsInUse[filterId];
                 }
             });
-
-            // Are any filters being used?
-            if(Object.keys(componentsInUse).length){
-                $appliedFilters.html('');
-                for (var filterId in componentsInUse) {
-                    if (componentsInUse.hasOwnProperty(filterId)) {
-                        $interactionContainer.removeClass('hide');
-                        // Create a new brick
-                        var $newTab = $tabAppliedFilter.clone();
-                        // Set the filter id and name
-                        $newTab.attr('data-applied-filter-tab', filterId).find('[data-filter-name]').html(componentsInUse[filterId]['name']);
-                        // Get handle to selected option list and option
-                        var $selectedOptionList = $newTab.find('[data-selected-list]'),
-                            $selectedOption     = $newTab.find('[data-selected-item]').remove();
-                        // Add selected options to list
-                        var labels = componentsInUse[filterId]['labels'];
-                        for(var i in labels){
-                            if(!labels.hasOwnProperty(i)){
-                                continue;
-                            }
-                            if(i >= MAX_VISIBLE_SELECTIONS){
-                                break;
-                            }
-                            $selectedOptionList.append($selectedOption.clone().html(labels[i]));
-                        }
-                        // Configure 'more' count
-                        var $moreCount = $newTab.find('[data-more-count]');
-                        if(labels.length <= MAX_VISIBLE_SELECTIONS){
-                            $moreCount.addClass('hide');
-                        } else {
-                            var moreCountText = '+ '+(labels.length - MAX_VISIBLE_SELECTIONS)+' more';
-                            $moreCount.find('[data-count]').attr('title', moreCountText).html(moreCountText);
-                        }
-                        $appliedFilters.append($newTab);
-                    }
-                }
-            } else {
-                $interactionContainer.addClass('hide');
-            }
+            return componentsInUse;
         }
+
 
         /**
          * Updates the modal with all selected options for this filter
