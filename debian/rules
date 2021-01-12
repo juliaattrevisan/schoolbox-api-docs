@@ -21,13 +21,11 @@ export DH_OPTIONS
 
 
 %:
-	dh $@ 
+	dh $@
 
 override_dh_install:
 	# Start install
 	dh_install
-	# Remove moved files
-	rm -rf debian/schoolbox/usr/share/schoolbox/www/conf
 
 override_dh_fixperms:
 	dh_fixperms -X var/lib/schoolbox
