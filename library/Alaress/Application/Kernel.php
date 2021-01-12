@@ -1476,7 +1476,9 @@ abstract class Kernel
     /**
      * Globs over the Modules directory and initialises them so their routes can be used
      *
-     * @throws Di\Exception\ServiceNotFound
+     * @throws \Throwable Module initialization may raise any error: the first
+     *                    one raised will be rethrown, but all modules will
+     *                    attempt to initialize.
      */
     protected function initModules(): void
     {
@@ -1493,6 +1495,7 @@ abstract class Kernel
             glob(SITE_root . $customModuleLocation . '*.php')
         );
 
+        $firstError = null;
         foreach ($modulePaths as $routePath) {
             require_once $routePath;
 
@@ -1505,9 +1508,17 @@ abstract class Kernel
 
             if (class_exists($class, false)) {
                 /** @var ModuleConfigInterface $obj */
-                $obj = new $class();
-                $obj->configure($this);
+                try {
+                    $obj = new $class();
+                    $obj->configure($this);
+                } catch (\Throwable $e) {
+                    $firstError = $firstError ?? $e;
+                }
             }
+        }
+
+        if ($firstError) {
+            throw $firstError;
         }
     }
 }
