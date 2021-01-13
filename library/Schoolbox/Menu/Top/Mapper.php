@@ -29,7 +29,7 @@ class Mapper extends BaseMapper
         $this->uses('icon', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);
         $this->uses('target', self::TYPE_STRING);
-        $this->uses('plan_hide', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE);
+        $this->uses('plan_hide', self::TYPE_BOOLEAN);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 

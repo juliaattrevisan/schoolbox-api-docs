@@ -127,7 +127,7 @@ class Plan extends CliTool\App
             // Enable all components
             $statement = $this->getDatabaseInternal()->prepareQuery(
                 "
-                UPDATE component_definition SET enabled='true'
+                UPDATE component_definition SET enabled=TRUE
             "
             );
             $statement->execute();
@@ -135,7 +135,7 @@ class Plan extends CliTool\App
             // Disable all the components that are not meant to be available
             $statement = $this->getDatabaseInternal()->prepareQuery(
                 "
-                UPDATE component_definition SET enabled='false', visible='false' WHERE class = :component
+                UPDATE component_definition SET enabled=FALSE, visible='false' WHERE class = :component
             "
             );
             if (isset($components['hide'])) {

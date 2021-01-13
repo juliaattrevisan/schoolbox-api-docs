@@ -150,7 +150,7 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
         }
 
         // Only components that are enabled can be seen ever, this allows plans to turn off components
-        $predicate->equals('enabled', 'true');
+        $predicate->isTrue('enabled');
 
         return parent::buildWherePart($predicate, $columnList, $options);
     }

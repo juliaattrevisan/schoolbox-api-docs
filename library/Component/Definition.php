@@ -286,7 +286,7 @@ class Component_Definition
     /**
      * @return bool
      */
-    public function isEnabled(): bool
+    public function getEnabled(): bool
     {
         return $this->enabled;
     }

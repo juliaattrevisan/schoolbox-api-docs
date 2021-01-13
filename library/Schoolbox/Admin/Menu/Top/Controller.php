@@ -19,6 +19,7 @@ use Schoolbox\Menu\Top\Mapper as MenuTopMapper;
 use Schoolbox\Menu\Top\Model as MenuTop;
 use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
+use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Controller for managing school terms through the admin section.
@@ -69,7 +70,7 @@ class Controller extends Base
             'template' => '@adminMenuTop/index.twig',
             'data'     => [
                 'pageCurrent' => self::PAGE_CURRENT,
-                'menu' => $this->getMenuTopMapper()->findByColumn('plan_hide', 0, ['order' => ['sort_order' => 'ASC']])
+                'menu' => $this->getMenuTopMapper()->findByColumn('plan_hide', 0, ['order' => ['sort_order' => BaseMapper::SORT_ORDER_ASC]])
             ],
             'title' => 'Admin - Top Menu'
         ]);
@@ -111,10 +112,10 @@ class Controller extends Base
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => self::PAGE_CURRENT,
                 'item' => $this->getMenuTopMapper()->findOneByColumn($this->getMenuTopMapper()->getIdentifierColumn(), $id, ['cache' => false]),
-                'icons' => $this->getMenuIconMapper()->findAll(['order' => ['title' => 'ASC']]),
-                'roles' => $this->getRoleMapper()->findAll(['order' => ['sequence' => 'ASC']]),
+                'icons' => $this->getMenuIconMapper()->findAll(['order' => ['title' => BaseMapper::SORT_ORDER_ASC]]),
+                'roles' => $this->getRoleMapper()->findAll(['order' => ['sequence' => BaseMapper::SORT_ORDER_ASC]]),
                 'rolesSelected' => $rolesSelected,
-                'campuses' => $this->getCampusMapper()->findAll(['order' => ['sequence' => 'ASC']]),
+                'campuses' => $this->getCampusMapper()->findAll(['order' => ['sequence' => BaseMapper::SORT_ORDER_ASC]]),
                 'campusesSelected' => $campusesSelected
             ],
             'title' => 'Admin - Top Menu'
@@ -134,9 +135,9 @@ class Controller extends Base
             'template' => '@adminMenuTop/modify.twig',
             'data'     => [
                 'pageCurrent' => self::PAGE_CURRENT,
-                'icons' => $this->getMenuIconMapper()->findAll(['order' => ['title' => 'ASC']]),
-                'roles' => $this->getRoleMapper()->findAll(['order' => ['sequence' => 'ASC']]),
-                'campuses' => $this->getCampusMapper()->findAll(['order' => ['sequence' => 'ASC']])
+                'icons' => $this->getMenuIconMapper()->findAll(['order' => ['title' => BaseMapper::SORT_ORDER_ASC]]),
+                'roles' => $this->getRoleMapper()->findAll(['order' => ['sequence' => BaseMapper::SORT_ORDER_ASC]]),
+                'campuses' => $this->getCampusMapper()->findAll(['order' => ['sequence' => BaseMapper::SORT_ORDER_ASC]])
             ],
             'title' => 'Admin - Top Menu'
         ]);
@@ -196,7 +197,7 @@ class Controller extends Base
             $itemOrder = $this->getMenuTopMapper()->findAll([
                 'limit' => 1,
                 'order' => [
-                    'sort_order' => 'DESC'
+                    'sort_order' => BaseMapper::SORT_ORDER_DESC
                 ]
             ]);
 
