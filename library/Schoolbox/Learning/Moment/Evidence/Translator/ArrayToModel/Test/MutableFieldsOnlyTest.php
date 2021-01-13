@@ -127,6 +127,7 @@ class MutableFieldsOnlyTest extends TestCase
             ->setBody('test')
             ->setCreator((new User())->setId($oldId))
             ->setRecipient((new User())->setId($oldId))
+            ->setType(Model::MOMENT_TYPE_UPLOAD)
             ->setDiscussionThread((new DiscussionThread())->setId($oldId))
             ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
             ->setFilename('test.gif');

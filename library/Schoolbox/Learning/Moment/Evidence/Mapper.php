@@ -39,6 +39,7 @@ class Mapper extends BaseMapper
         $this->uses('body', self::TYPE_STRING);
         $this->joins('discussion_thread_id', ThreadMapper::class, 'id', null, null, 'discussionThread');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'recipient', 'recipient');
+        $this->uses('type', self::TYPE_STRING);
         $this->joins('created_by', UserMapper::class, 'id', null, null, 'creator', 'creator');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);

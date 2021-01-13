@@ -119,6 +119,10 @@ class AllFields extends Base
             }
         }
 
+        if (array_key_exists('type', $json)) {
+            $model->setType($json['type']);
+        }
+
         if (array_key_exists('discussionThread', $json)) {
             if (isset($json['discussionThread'])) {
                 if (is_array($json['discussionThread']) && array_key_exists('id', $json['discussionThread'])) {

@@ -27,6 +27,7 @@ class MutableFieldsOnly extends AllFields
         'storage'  => true,
         'filename' => true,
         'tags'     => true,
+        'type'     => true,
     ];
 
     private bool $curriculumTaggingEnabled = true;

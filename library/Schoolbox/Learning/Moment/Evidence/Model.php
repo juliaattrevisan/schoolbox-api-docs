@@ -27,6 +27,14 @@ class Model implements ISoftDeletable, IThreadLocation
     use ModelTraits\UpdatedAtDate;
     use ModelTraits\DeletedAtDate;
 
+    /**
+     * The types of evidence
+     */
+    public const MOMENT_TYPE_TEXT   = 'text';
+    public const MOMENT_TYPE_UPLOAD = 'upload';
+    public const MOMENT_TYPE_PHOTO  = 'photo';
+    public const MOMENT_TYPE_AUDIO  = 'audio';
+    public const MOMENT_TYPE_VIDEO  = 'video';
 
     /**
      * The file content (if any) that was uploaded to the learning moment.
@@ -77,6 +85,10 @@ class Model implements ISoftDeletable, IThreadLocation
      */
     private User $creator;
 
+    /**
+     * The type of evidence: photo/text/upload/video/audio
+     */
+    private string $type;
 
     /**
      * @var GenericCollection|null
@@ -89,7 +101,7 @@ class Model implements ISoftDeletable, IThreadLocation
      */
     private ?GenericCollection $tags = null;
 
-    
+
     /**
      * @return IStorage|null
      */
@@ -209,6 +221,23 @@ class Model implements ISoftDeletable, IThreadLocation
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     * @return $this
+     */
+    public function setType(string $type): self
+    {
+        $this->type = $type;
+        return $this;
+    }
 
     /**
      * @return GenericCollection|null

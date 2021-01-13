@@ -1,10 +1,20 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
+{% if isCreate %}
 {{ bread.crumbs(
     [ 'Share Learning' ]
 ) }}
+    {% set formAction = routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) %}
+{% else %}
+    {{ bread.crumbs(
+        [evidence.recipient.fullName, '/search/user/' ~ evidence.recipient.id],
+        ['Learning Moment', routeLookup('@learningMomentEvidence.getEvidenceDetail', {evidenceId: evidence.id})],
+        ['Modify']
+    ) }}
+    {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
+{% endif %}
 
 <div class="small-12 column">
-    <h1>Share a Learning Moment</h1>
+    <h1>{{ isCreate ? 'Share a' : 'Modify' }} Learning Moment</h1>
     {##
      # How does the "sharing on behalf of" metadata show?
      # That depends on who the learning moment is being created for:
@@ -30,7 +40,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form action="{{ routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) }}" method="post" id="evidence-form">
+        <form action="{{ formAction }}" method="post" id="evidence-form">
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
@@ -45,7 +55,7 @@
                                 <div class="input-group">
                                     {% include 'sub/curriculumCodeSelector.twig' with
                                         {
-                                            codeList: [],
+                                            codeList: isCreate ? [] : evidence.curriculumNodes,
                                             renderButton: true
                                         } %}
                                 </div>
@@ -84,6 +94,7 @@
                     file: formData.get('file'),
                     curriculumNodes: [],
                     tags: [],
+                    type: '{{ momentType }}',
                 };
         let tags = form.querySelector('#evidence-tags').selectize.items;
         payload.tags = tags.map(
@@ -127,7 +138,7 @@
                 submit.prop('disabled', true);
 
                 // Redirect to the return URL provided
-                axios.post(form.action, payload)
+                axios.{{ isCreate ? 'post' : 'put' }}(form.action, payload)
                     .then(() => {
                         toast.toastTimeout({text: 'Saved'});
                         window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
@@ -165,7 +176,11 @@
                             })
                 }
             },
-            value: [],
+            value: [
+                {% for tag in (isCreate ? [] : evidence.tags) %}
+                {'id': '{{ tag.id }}', 'name': '{{ tag.name | escape('js') }}'},
+                {% endfor %}
+            ],
             multiple: true
         });
     });
