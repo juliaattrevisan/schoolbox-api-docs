@@ -1,4 +1,5 @@
 <?php
+
 /**
  * If you authenticated via saml, you don't have the password set in
  * the session, so ask people to enter it again from here before
