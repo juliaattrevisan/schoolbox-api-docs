@@ -18,27 +18,25 @@ if (strlen($_POST['password'])) {
      */
     $redir = isset($this->arg[0]) && $this->arg[0] == 'lite'
         ? '/ajax/resource/tree/webdav'
-        : $_POST['iframe'] == 1
-            ? '/drives/picker/webdav'
-            : '/drives';
+        : ($_POST['iframe'] == 1 ? '/drives/picker/webdav' : '/drives');
 
     $this->localRedir($redir);
 } else {
     $this->setFile(TEMPLATE_content, 'cms/networkLogin.html');
     $this->setBlock(TEMPLATE_content, 'lite', 'lite_block');
 
-    $this->setVar(array(
-        'NETWORK_DRIVES_USERNAME' => $_SESSION['username'],
-        'SELF' => '/cms/networkLogin/' . implode('/', $this->arg)
-    ));
+    $this->setVar(
+        [
+            'NETWORK_DRIVES_USERNAME' => $_SESSION['username'],
+            'SELF'                    => '/cms/networkLogin/' . implode('/', $this->arg),
+        ]
+    );
 
     if (isset($this->arg[0]) && $this->arg[0] == 'lite') {
         $this->parse('lite_block', 'lite');
         $this->setAjax();
         $this->template->pparse('finaloutput', TEMPLATE_content);
-
     } else {
         $this->setVar('lite_block', '');
     }
-
 }
