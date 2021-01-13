@@ -318,15 +318,10 @@
             self.media.recorder.stop();
             // At this point I have a blob. Put it in the audio element.
             self.media.recorder.ondataavailable =
-                function(e) {
+                function (e) {
                     // Overrides any previous blob
                     self.media.blob = e.data;
-                    self.media.audioElement
-                        .attr('src', window.URL.createObjectURL(e.data))
-                    ;
-                    // Trigger an event saying I'm ready for play and upload.
-                    self.triggerEvent('playbackReady', []);
-                    self.triggerEvent('uploadReady', []);
+                    self._readBlobIntoAudioElement(e.data, self.media.audioElement);
                 }
             ;
             self.triggerEvent('recordingStop', []);
@@ -335,20 +330,36 @@
             self.webrtc.recorder.stop();
             // At this point I have a blob. Put it in the audio element.
             self.webrtc.recorder.exportWAV(
-                function(blob) {
+                function (blob) {
                     // Overrides any previous blob
                     self.webrtc.blob = blob;
-                    self.webrtc.audioElement
-                        .attr('src', window.URL.createObjectURL(blob))
-                    ;
-                    // Trigger an event saying I'm ready for play and upload.
-                    self.triggerEvent('playbackReady', []);
-                    self.triggerEvent('uploadReady', []);
+                    self._readBlobIntoAudioElement(blob, self.webrtc.audioElement);
                 }
             );
             self.triggerEvent('recordingStop', []);
         }
         return this;
+    };
+
+    /**
+     * Reads the given blob: once done, sets it as the source of the given audio
+     * element.
+     *
+     * @param {Object} blob         a Blob object containing the recorded audio
+     * @param {Object} audioElement a jQuery object pointing to the audio
+     *                              element to inject the blob into
+     * @private
+     */
+    RecorderPlugin.prototype._readBlobIntoAudioElement = function (blob, audioElement) {
+        let self   = this,
+            reader = new FileReader();
+        reader.addEventListener('load', function () {
+            audioElement.attr('src', this.result)
+            // Trigger an event saying I'm ready for play and upload.
+            self.triggerEvent('playbackReady', []);
+            self.triggerEvent('uploadReady', []);
+        });
+        reader.readAsDataURL(blob);
     };
 
     /**
