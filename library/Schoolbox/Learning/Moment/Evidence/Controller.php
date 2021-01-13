@@ -28,12 +28,6 @@ use Schoolbox\User;
  */
 class Controller extends Base
 {
-    private const MOMENT_TYPE_TEXT   = 'text';
-    private const MOMENT_TYPE_UPLOAD = 'upload';
-    private const MOMENT_TYPE_PHOTO  = 'photo';
-    private const MOMENT_TYPE_AUDIO  = 'audio';
-    private const MOMENT_TYPE_VIDEO  = 'video';
-
 
     /**
      * @var Mapper
@@ -391,29 +385,29 @@ class Controller extends Base
              ->setThumbnailSize(64)
              ->setModalTitle('Select file');
         switch ($momentType) {
-            case self::MOMENT_TYPE_PHOTO:
+            case Model::MOMENT_TYPE_PHOTO:
                 $zone->setAttachPrompt('take a picture')
                      ->setIconClass('icon-camera')
                      ->setUseModal(false)
                      ->setCapture(true)
                      ->setMimeFilter('image/*');
                 break;
-            case self::MOMENT_TYPE_AUDIO:
+            case Model::MOMENT_TYPE_AUDIO:
                 $zone->setAttachPrompt('record audio')
                      ->setIconClass('icon-audio')
                      ->setUseModal(false)
                      ->setCapture(true)
                      ->setMimeFilter('audio/*');
                 break;
-            case self::MOMENT_TYPE_VIDEO:
+            case Model::MOMENT_TYPE_VIDEO:
                 $zone->setAttachPrompt('record video')
                      ->setIconClass('icon-video')
                      ->setUseModal(false)
                      ->setCapture(true)
                      ->setMimeFilter('video/*');
                 break;
-            case self::MOMENT_TYPE_UPLOAD:
-            case self::MOMENT_TYPE_TEXT:
+            case Model::MOMENT_TYPE_UPLOAD:
+            case Model::MOMENT_TYPE_TEXT:
             default:
                 break;
         }
@@ -429,15 +423,15 @@ class Controller extends Base
     private function getTemplateFromType(string $momentType): string
     {
         switch ($momentType) {
-            case self::MOMENT_TYPE_PHOTO:
+            case Model::MOMENT_TYPE_PHOTO:
                 return '@learningMomentEvidence/form/photo.twig';
-            case self::MOMENT_TYPE_AUDIO:
+            case Model::MOMENT_TYPE_AUDIO:
                 return '@learningMomentEvidence/form/audio.twig';
-            case self::MOMENT_TYPE_VIDEO:
+            case Model::MOMENT_TYPE_VIDEO:
                 return '@learningMomentEvidence/form/video.twig';
-            case self::MOMENT_TYPE_UPLOAD:
+            case Model::MOMENT_TYPE_UPLOAD:
                 return '@learningMomentEvidence/form/upload.twig';
-            case self::MOMENT_TYPE_TEXT:
+            case Model::MOMENT_TYPE_TEXT:
             default:
                 return '@learningMomentEvidence/form/text.twig';
         }

@@ -27,6 +27,14 @@ class Model implements ISoftDeletable, IThreadLocation
     use ModelTraits\UpdatedAtDate;
     use ModelTraits\DeletedAtDate;
 
+    /**
+     * The types of evidence
+     */
+    public const MOMENT_TYPE_TEXT   = 'text';
+    public const MOMENT_TYPE_UPLOAD = 'upload';
+    public const MOMENT_TYPE_PHOTO  = 'photo';
+    public const MOMENT_TYPE_AUDIO  = 'audio';
+    public const MOMENT_TYPE_VIDEO  = 'video';
 
     /**
      * The file content (if any) that was uploaded to the learning moment.
