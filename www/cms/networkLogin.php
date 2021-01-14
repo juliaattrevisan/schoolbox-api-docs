@@ -15,8 +15,11 @@
 if (strlen($_POST['password'])) {
     $_SESSION['password'] = $_POST['password'];
 
-    /* Redirect
-     */
+    // Redirect
+    // * no lite, no iframe: /drives
+    // * no lite, iframe:    /drives/picker/webdav
+    // * lite, no iframe:    /ajax/resource/tree/webdav
+    // * lite, iframe:       /ajax/resource/tree/webdav
     $redir = '/drives';
     if (isset($this->arg[0]) && $this->arg[0] === 'lite') {
         $redir = '/ajax/resource/tree/webdav';
