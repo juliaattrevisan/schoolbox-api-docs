@@ -285,6 +285,24 @@ export default {
                 .finally(() => {
                     this.closeDeleteModal()
                 })
+        },
+
+        /**
+         * Is the current filter set empty? This changes the empty state which
+         * is displayed.
+         *
+         * @return {Boolean}
+         */
+        isSelectedFiltersEmpty() {
+            let nonEmptyFilters = Object.values(this.selectedFilters).filter(function (v1) {
+                if (v1 instanceof Object) {
+                    // Each value in this object will be either a string 0 or 1:
+                    // 1 if it is selected, 0 if it is not
+                    return Object.values(v1).some(v2 => Number(v2) === 1);
+                }
+                return false;
+            });
+            return nonEmptyFilters.length > 0;
         }
     },
 }
@@ -304,18 +322,22 @@ export default {
         <div v-else>
             <div v-if="data.length === 0" class="empty-state">
                 <!-- If no badges were found in the search query -->
-                <i class="icon-search"></i>
-                <p>
-                    No badges were found.
-                    <a href="" title="Reset filters">Reset filters</a> to see all available badges.
-                </p>
+                <template v-if="isSelectedFiltersEmpty()">
+                    <i class="icon-search"></i>
+                    <p>
+                        No badges were found.
+                        <a href="" title="Reset filters">Reset filters</a> to see all available badges.
+                    </p>
+                </template>
 
                 <!-- If there are no badges in the system at all -->
-                <i class="icon-badge"></i>
-                <p>
-                    No badges have been created. Start by
-                    <a :href="getBadgeCreateFormRoute" title="Create the first badge">creating the first badge</a>.
-                </p>
+                <template v-else>
+                    <i class="icon-badge"></i>
+                    <p>
+                        No badges have been created. Start by
+                        <a :href="getBadgeCreateFormRoute" title="Create the first badge">creating the first badge</a>.
+                    </p>
+                </template>
             </div>
             <template v-else>
                 <section class="content">
