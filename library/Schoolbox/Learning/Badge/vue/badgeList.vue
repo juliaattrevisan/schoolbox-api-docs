@@ -63,6 +63,15 @@ export default {
         },
 
         /**
+         * The route which shows the badge create form.
+         */
+        getBadgeCreateFormRoute: {
+            type: String,
+            default: '',
+            required: true,
+        },
+
+        /**
          * The route via which new badges are posted.
          *
          * TODO remove as this seems unused
@@ -306,11 +315,17 @@ export default {
             <div v-if="data.length === 0" class="empty-state">
                 <!-- If no badges were found in the search query -->
                 <i class="icon-search"></i>
-                <p>No badges were found. <a href="" title="Reset filters">Reset filters</a> to see all available badges.</p>
+                <p>
+                    No badges were found.
+                    <a href="" title="Reset filters">Reset filters</a> to see all available badges.
+                </p>
 
                 <!-- If there are no badges in the system at all -->
                 <i class="icon-badge"></i>
-                <p>No badges have been created. Start by <a href="#" title="Create the first badge">creating the first badge</a>.</p>
+                <p>
+                    No badges have been created. Start by
+                    <a :href="getBadgeCreateFormRoute" title="Create the first badge">creating the first badge</a>.
+                </p>
             </div>
             <template v-else>
                 <section class="content">
