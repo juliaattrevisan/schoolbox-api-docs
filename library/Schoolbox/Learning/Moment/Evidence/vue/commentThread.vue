@@ -291,7 +291,7 @@ export default {
                 <div v-if="isCKEditorLoaded" :style="[isCKEditorReady ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
                     <ckeditor tag-name="textarea" v-model="pendingComment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
                     <a class="button submit"
-                    @click.once="postComment"
+                    @click="postComment"
                     :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
                 </div>
                 <template v-if="hasComments">
