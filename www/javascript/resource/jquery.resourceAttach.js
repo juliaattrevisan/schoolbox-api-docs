@@ -391,7 +391,7 @@
 
 
     ResourceAttach.prototype.open = function () {
-
+        
         var self = this;
 
         if (singletonModal == null) {
@@ -449,12 +449,12 @@
      * There can be several DropZone instances on a page, one could allow multi uploads, another just single.
      * Due to the use of singletonModal, this is an issue. Refer to SA-1464 for further details.
      * Essentially though, both the relevant menu ('#attachment-browser-filesystems') and panel ('#attachment-browser-panel-container') 
-     * are injected into the modal window when the DropZone is clicked. 
+     * are injected into the modal window when the Modal Window is clicked. 
      * This ensures that the appropriate upload count / mime types are respected
      * The relevant code/events are then set up once again - these being pulled out of templates/core/resources/attach-browser.html
      */
     ResourceAttach.prototype.initAttachmentBrowser = function () {
-
+        
         singletonModal.find('#attachment-browser-filesystems')[0].innerHTML = this.attachmentBrowserFilesystemsInnerHTML;
         singletonModal.find('#attachment-browser-panel-container')[0].innerHTML = this.attachmentBrowserPanelContainerInnerHTML;
 
@@ -482,39 +482,27 @@
         const MAX_IFRAME_HEIGHT = 350;
 
         filesystems.find('[data-source]').on('click', function(event) {
-            
+        
             let source = $(this).attr('data-source');
             let panel = $('#' + source + '-panel');
 
-            /* Decide if source was already load previously;
-             * If it wasn't previously loaded, do so asynchronously
-             * Otherwise just show the tab
-             */
-            if (!filesystems.data(source)) {
+            let url = $(this).attr('data-url');
+            let method = $(this).attr('data-method');
 
-                /* Remember we loaded this source previously
-                 */
-                filesystems.data(source, {loaded: true});
-
-                let url = $(this).attr('data-url');
-                let method = $(this).attr('data-method');
-
-                /* Use the $method var to decide whether this is inline content
-                * such as all our internal file upload dropzone options, recorder
-                * my files, resources, etc.
-                *
-                * or whether it should be loaded into an iframe, such as with third
-                * parties like ms teams, goggle drive, office 365 etc.
-                *
-                * Inline content starts with a preloader class which should be removed
-                * once content has loaded
-                */
-                if (method === 'inline') {
-                    panel.load(url, null);
-                } else if (method === 'iframe') {
-                    panel.html($('<iframe/>').attr('src', url).height(MAX_IFRAME_HEIGHT));
-                }
-
+            /* Use the $method var to decide whether this is inline content
+            * such as all our internal file upload dropzone options, recorder
+            * my files, resources, etc.
+            *
+            * or whether it should be loaded into an iframe, such as with third
+            * parties like ms teams, goggle drive, office 365 etc.
+            *
+            * Inline content starts with a preloader class which should be removed
+            * once content has loaded
+            */
+            if (method === 'inline') {
+                panel.load(url, null);
+            } else if (method === 'iframe') {
+                panel.html($('<iframe/>').attr('src', url).height(MAX_IFRAME_HEIGHT));
             }
 
         });
@@ -522,7 +510,7 @@
         /* Activate default tab
         */
         $('#attachment-browser-filesystems a').first().trigger('click');
-       
+
     };
 
 
