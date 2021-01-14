@@ -144,6 +144,17 @@ section > .dropzone-wrap {
     }
 }
 
+.dz-button {
+  background-color: transparent;
+  margin: 0;
+  font-size: $paragraph-font-size;
+
+  &:hover {
+    background-color: transparent;
+    cursor: default;
+  }
+}
+
 .explorer .file-browser {
     overflow-y: auto;
     height: calc(100% - 26px);
