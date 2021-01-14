@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -18,7 +19,6 @@ use Alaress\Async\Stomp\IAckResolver;
 use Alaress\Async\Stomp\IClient;
 use Alaress\Async\Stomp\IFrame;
 use Predis\ClientInterface;
-
 
 /**
  * A STOMP-Redis implementation of the Broker. Data payloads are stored in Redis,
@@ -80,7 +80,6 @@ abstract class Broker implements IBroker
 
                     try {
                         [ $key, $context ] = json_decode($frame->getBody(), true);
-
                     } catch (\Throwable $e) {
                         // if the JSON decode fails, fall back to assuming frame.body == key
                         $key     = $frame->getBody();
@@ -107,15 +106,14 @@ abstract class Broker implements IBroker
                             $consumer->onException(new PayloadBrokenException($key, $resolve));
                             return;
                         }
-                    }
-                    catch (\Throwable $e) {
+                    } catch (\Exception $e) {
                         $consumer->onException($e);
                         return;
                     }
 
                     $consumer->onMessage($payload, $resolve, $context);
-                });
-
+                }
+            );
         } catch (\Exception $e) {
             $consumer->onException($e);
         }
@@ -166,17 +164,17 @@ abstract class Broker implements IBroker
      * @param string $hash
      * @return string
      */
-    protected abstract function getStorageKey($serializable, $hash);
+    abstract protected function getStorageKey($serializable, $hash);
 
 
     /**
      * @return string
      */
-    protected abstract function getRoutingKey();
+    abstract protected function getRoutingKey();
 
 
     /**
      * @return string
      */
-    protected abstract function getExchangeName();
+    abstract protected function getExchangeName();
 }
