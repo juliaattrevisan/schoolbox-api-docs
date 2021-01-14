@@ -10,8 +10,7 @@
 
 use Eportfolio\Permission;
 use Schoolbox\Config\Loader as ConfigLoader;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -223,10 +222,10 @@ class Eportfolio_Authenticator
             if (!$youCanView) {
                 $permittedGroups = [];
 
-                $allGroups = UserAccessMapper::getInstance()->findAllForUser($this->currentUser);
+                $allGroups = FolderMapper::getInstance()->findForUser($this->currentUser);
 
                 foreach ($allGroups as $currentGroup) {
-                    $permittedGroups[] = $currentGroup->getServiceIdentifier();
+                    $permittedGroups[] = $currentGroup->getId();
                 }
 
                 $groupSettingCollection = \Eportfolio\PermissionMapper::getInstance()->findValues(
