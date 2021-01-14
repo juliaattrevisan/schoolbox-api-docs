@@ -17,9 +17,12 @@ if (strlen($_POST['password'])) {
 
     /* Redirect
      */
-    $redir = isset($this->arg[0]) && $this->arg[0] == 'lite'
-        ? '/ajax/resource/tree/webdav'
-        : ($_POST['iframe'] == 1 ? '/drives/picker/webdav' : '/drives');
+    $redir = '/drives';
+    if (isset($this->arg[0]) && $this->arg[0] === 'lite') {
+        $redir = '/ajax/resource/tree/webdav';
+    } elseif ((int)$_POST['iframe'] === 1) {
+        $redir = '/drives/picker/webdav';
+    }
 
     $this->localRedir($redir);
 } else {
