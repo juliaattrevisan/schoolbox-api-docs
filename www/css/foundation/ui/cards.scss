@@ -7,20 +7,28 @@
   // card "extends" column
   float: left;
   position: relative;
-  padding: 0.5rem 1rem 0 1rem;
+  padding: .5rem 1rem 0 1rem;
 
   img,
   .img, // for placeholder cards
   [class^="icon-"],
   [class*=" icon-"] {
     float: left;
-    margin: -0.5rem 1rem 0 -1rem;
+    margin: -.5rem 1rem 0 -1rem;
   }
 
-  img,
-  .img {
-    @media #{$medium-down} {
+  @media #{$small-only} {
+    padding: .25rem 1rem 0 1rem;
+
+    img, .img {
       width: (3 * rem-calc($base-font-size));
+    }
+
+    img,
+    .img,
+    [class^="icon-"],
+    [class*=" icon-"] {
+      margin: -.25rem 1rem 0 -1rem;
     }
   }
   .card-content {
@@ -362,7 +370,10 @@
 
   // if a <p/> is the last child of a card, whack a little spacing on the bottom
   > p:last-child {
-    padding-bottom: 0.5rem;
+    padding-bottom: .5rem;
+    @media #{$small-only} {
+      padding-bottom: .25rem;
+    }
   }
 
   textarea {
