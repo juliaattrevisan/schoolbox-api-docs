@@ -173,11 +173,10 @@ class Interactions
      * Fetch Cumulative data across the lifetime of an article
      *
      * @param News\Model $article
+     * @param array      $audience
      * @return array
-     * @throws \Alaress\Database\Exception
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function fetchCumulative(News\Model $article): array
+    public function fetchCumulative(News\Model $article, array $audience): array
     {
         $pb = $this->statisticsCumulativeMapper->getPredicateBuilder()
                                                ->equals('article_id', $article->getId());
@@ -197,7 +196,7 @@ class Interactions
              */
             'numOpens' => $this->calculateNumOpens($statistics),
 
-            'numUniqueOpens' => $this->uniqueOpens($article),
+            'numUniqueOpens' => $this->uniqueOpens($article, $audience),
 
             /* Total number of Comments
              */
@@ -416,14 +415,20 @@ class Interactions
      * Calculate the amount of unique visitors to an article
      *
      * @param News\Model $article
+     * @param array      $audience
      * @return int
      */
-    private function uniqueOpens(News\Model $article): int
+    private function uniqueOpens(News\Model $article, array $audience): int
     {
+        $pb = $this->database->buildPredicateBuilder('comms_news_article_statistics');
+        $pb->equals('article_id', $article->getId());
+        $pb->in('user_id', $audience);
+
         $query = "SELECT COUNT(DISTINCT(user_id)) as views FROM comms_news_article_statistics
-                    WHERE article_id = :articleId";
+                    WHERE " . $pb->getWhereIntersect();
+
         $stmt  = $this->database->prepareQuery($query);
-        $stmt->execute(['articleId' => $article->getId()]);
+        $stmt->execute($pb->getParams());
         return $stmt->fetchColumn();
     }
 
