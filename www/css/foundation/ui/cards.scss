@@ -368,11 +368,12 @@
     list-style: none;
   }
 
-  // if a <p/> is the last child of a card, whack a little spacing on the bottom
+  // if a <p> is the last child of a card, add a little spacing on the bottom
   > p:last-child {
-    padding-bottom: .5rem;
+    margin-bottom: .5rem;
+
     @media #{$small-only} {
-      padding-bottom: .25rem;
+      margin-bottom: 0;
     }
   }
 
