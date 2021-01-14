@@ -100,10 +100,10 @@
                             {% set activity = indicator.activities[activity_id] is defined ? indicator.activities[activity_id] : null %}
                             {% if activity.max_value ?? 0 > 0  %}
                             {
-                                y: {{ activity.value ? ((activity.value / activity.max_value) * 100) : 'null' }},
-                                desc: "{{ activity.descriptor |nl2br | escape('js') }}",
+                                y: {{ activity.value is defined ? ((activity.value / activity.max_value) * 100) : 'null' }},
+                                desc: "{{ (activity.descriptor ?? '') |nl2br | escape('js') }}",
                                 title: "{{ activity_name }}",
-                                level: "{{ activity.level }}"
+                                level: "{{ activity.level ?? '' }}"
                             },
                             {% else %}
                             '',
