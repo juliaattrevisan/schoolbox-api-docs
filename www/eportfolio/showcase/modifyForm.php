@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -15,7 +17,7 @@ $action = $_POST['action'];
 $ownerId = $_POST['userId'];
 $pageId = 'showcase';
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
 
 if ($authenticator->canModify()) {
     if ($action == 'unpublish') {
@@ -32,7 +34,7 @@ if ($authenticator->canModify()) {
                 error(17);
                 exit;
             }
-        } elseif(isset($_POST['assessmentId'])) {
+        } elseif (isset($_POST['assessmentId'])) {
             try {
                 $box = Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $_POST['assessmentId']);
             } catch (\Schoolbox\Mapper\Exception $e) {
@@ -40,8 +42,7 @@ if ($authenticator->canModify()) {
                 error(17);
                 exit;
             }
-        }
-        else {
+        } else {
             error(2);
         }
 
@@ -70,7 +71,6 @@ if ($authenticator->canModify()) {
     }
 
     $page->backToTheFuture(1);
-}
-else {
+} else {
     error(19);
 }

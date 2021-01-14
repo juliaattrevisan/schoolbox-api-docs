@@ -8,11 +8,13 @@
 namespace Schoolbox\Menu\Top;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 class Model implements ISoftDeletable
 {
-    /** @var int */
-    protected $id;
+    use Id;
+    use DeletedAtDate;
 
     /** @var int */
     protected $sortOrder;
@@ -38,26 +40,9 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $target;
 
-    /** @var \Alaress_Date_Format */
-    protected $deletedAt;
+    /** @var boolean */
+    protected $planHide;
 
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * @param string $title
@@ -165,7 +150,7 @@ class Model implements ISoftDeletable
     public function getWebmail()
     {
         return $this->webmail;
-    }    
+    }
 
     /**
      * @param string $target
@@ -204,30 +189,22 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param \Alaress_Date_Format $deletedAt
+     * @return bool
+     */
+    public function getPlanHide(): bool
+    {
+        return $this->planHide;
+    }
+
+    /**
+     * @param bool $planHide
      * @return self
      */
-    public function setDeletedAt($deletedAt)
+    public function setPlanHide(bool $planHide): self
     {
-        $this->deletedAt = $deletedAt;
+        $this->planHide = $planHide;
         return $this;
     }
 
-    /**
-     * @return \Alaress_Date_Format $deletedAt
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
 
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
-    }
 }

@@ -1,4 +1,10 @@
 <?php
+
+// Check if module is enabled
+if( !Config::get('parent_directory_enabled')) {
+    $this->pageNotFound();
+}
+
 $searchName = '';
 $searchBoardingStatus = '';
 $searchForm = '';

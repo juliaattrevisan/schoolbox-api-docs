@@ -6,6 +6,11 @@ if(!isset($this)){
     SitePage::localRedir(\preg_replace('/.php$/', '', $_SERVER['SCRIPT_NAME']));
 }
 
+// Check if module is enabled
+if( !Config::get('staff_directory_enabled')) {
+    $this->pageNotFound();
+}
+
 $groupHandler = new Group();
 
 // If policy allows parents let them in, else only allow staff

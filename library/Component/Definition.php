@@ -30,6 +30,9 @@ class Component_Definition
     /** @var string $module */
     protected $module;
 
+    /** @var boolean $visible */
+    protected $enabled;
+
     /** @var string $visible */
     protected $visible;
 
@@ -277,6 +280,24 @@ class Component_Definition
     public function setName($name)
     {
         $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * @param bool $enabled
+     * @return self
+     */
+    public function setEnabled(bool $enabled): self
+    {
+        $this->enabled = $enabled;
         return $this;
     }
 

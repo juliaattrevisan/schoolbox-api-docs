@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Authorizer;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
@@ -44,6 +45,7 @@ class Module extends BaseModule
         $viewStats = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
+                new Rule\IsConfigOn(ConfigMapper::COMMS_STATISTICS_ENABLED, $this->getConfig()),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),

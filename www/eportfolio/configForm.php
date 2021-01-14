@@ -21,7 +21,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
     // Check permissions
 
     $eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
-    $authenticator     = new Eportfolio_Authenticator($_SESSION['id'], $eportfolioHandler->getSettingsPageOwner(), $_POST['page_id']);
+    $authenticator     = new Eportfolio_Authenticator($_SESSION['user'], $eportfolioHandler->getSettingsPageOwner(), $_POST['page_id']);
 
     if ($authenticator->canModify()) {
         $componentInstanceMapper       = Component_InstanceMapper::getInstance();
@@ -319,7 +319,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
     $pageTitle  = $_POST['page_title'];
     $templateId = $_POST['page_template'];
 
-    $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $userId, null);
+    $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $userId, null);
 
     if ($authenticator->canCreate()) {
         // Create page and apply components (a page_id is generated)

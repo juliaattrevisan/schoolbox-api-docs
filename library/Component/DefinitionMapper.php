@@ -33,6 +33,7 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
         $this->uses('description', self::TYPE_STRING);
         $this->uses('module', self::TYPE_STRING);
         $this->uses('config_copy', self::TYPE_STRING);
+        $this->uses('enabled', self::TYPE_BOOLEAN);
         $this->uses('visible', self::TYPE_STRING);
         $this->uses('multiple', self::TYPE_STRING);
         $this->uses('component_category', self::TYPE_STRING);
@@ -147,6 +148,9 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
         if (!(isset($options['hidden']) && $options['hidden'])) {
             $predicate->equals('visible', 'true');
         }
+
+        // Only components that are enabled can be seen ever, this allows plans to turn off components
+        $predicate->isTrue('enabled');
 
         return parent::buildWherePart($predicate, $columnList, $options);
     }
