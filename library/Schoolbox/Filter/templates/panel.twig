@@ -35,7 +35,7 @@ Usage:
         var $panelComponents     = $filterPanel.find('[data-component]');
         var $appliedFilters      = $filterPanel.find('[data-applied-filters]');
         var $submitButton        = $('#submit_button');
-        var $optionCheckboxes    = $filterPanel.find('input[type=checkbox], input[type=hidden], select');
+        var $optionInputs        = $filterPanel.find('input[type=checkbox], input[type=hidden], input[type=text], select');
         var $toast               = $('[data-relation="submit-label"]');
         var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
         var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
@@ -68,7 +68,7 @@ Usage:
         });
 
         // Listen for user checking filter options
-        $optionCheckboxes.on('change', function(){
+        $optionInputs.on('change', function(){
             updateFiltersInUseLabel();
         });
 
@@ -97,16 +97,26 @@ Usage:
 
         // Reset to role-specific default selections
         $resetToDefaultsBtn.on('click', function (){
+            // Reset checkboxes
             $filterPanel.find('input[type=checkbox][data-value-default]').each(function(idx, elem){
-                var $checkbox = $(elem);
+                let $checkbox = $(elem);
                 $checkbox.prop('checked', $checkbox.data('value-default'));
             });
+
+            // Reset text inputs
+            $filterPanel.find('input[type=text][data-value-default]').each(function(idx, elem){
+                let $input = $(elem);
+                $input.val($input.data('value-default'));
+            });
+
+            // Reset selectizes
             $filterPanel.find('[data-selectize]').each(function () {
-                var selectize = this.selectize;
+                let selectize = this.selectize;
                 if (selectize) {
                     selectize.setValue(JSON.parse(this.dataset.valueDefault));
                 }
             });
+
             updateFiltersInUseLabel();
         });
 
@@ -146,15 +156,18 @@ Usage:
         }
 
         /**
-         * Clears checkboxes for the specified filter
+         * Clears checkboxes, selectize and text inputs for the specified
+         * filter.
          *
          * @param {int} filterId
          */
         function clearFilter(filterId) {
-            var $panelComponent = $panelComponents.filter('[data-component='+filterId+']'),
+            let $panelComponent = $panelComponents.filter('[data-component='+filterId+']'),
                 $selectize      = $panelComponent.find('[data-selectize]'),
-                selectize       = $selectize.length ? $selectize[0].selectize : null;
+                selectize       = ($selectize.length ? $selectize[0].selectize : null),
+                $textInput      = $panelComponent.find('input[type=text]');
             $panelComponent.find('input[type=checkbox]').prop('checked', false);
+            $textInput.val('');
             if (selectize) {
                 selectize.clear(true);
             }
@@ -168,7 +181,7 @@ Usage:
             $toast.toastActivate({text: 'Requesting report...'});
             showFilterLoader();
             var href        = $submitButton.data('href'),
-                data        = $optionCheckboxes.serialize(),
+                data        = $optionInputs.serializeArray(),
                 decodedData = deserialize(data);
             $submitButton.val($submitButton.data('working'));
 
@@ -260,42 +273,57 @@ Usage:
          *
          * TODO consider replacing with qs.parse
          *
-         * @param {string} serialised
-         * @return {object}
+         * @param {Array} serialised The panel's form inputs, as fetched by
+         *                           `jQuery.serializeArray`.
+         * @return {Object}
          */
-        function deserialize(serialised){
-            var decodedData    = decodeURIComponent(serialised),
-                flatArray      = decodedData.split('&'),
-                nestedObj      = {},
-                regEx          = /^filter_selection\[(\d+)]\[(\w+)]=([01])$/, // eg 'filter_selection[1][task]=1'
-                emptyRegEx     = /^filter_selection\[(\d+)]=$/,               // eg 'filter_selection[17]='
-                selectizeRegEx = /^filter_selection\[(\d+)]\[]=(\w+)$/;       // eg 'filter_selection[17][]=22'
+        function deserialize(serialised) {
+            let nestedObj      = {},
+                regEx          = /^filter_selection\[(\d+)]\[(\w+)]$/, // eg 'filter_selection[1][task]'
+                emptyRegEx     = /^filter_selection\[(\d+)]$/,         // eg 'filter_selection[17]'
+                selectizeRegEx = /^filter_selection\[(\d+)]\[]$/;      // eg 'filter_selection[17][]'
 
-            // Convert flat string array to nested object
-            flatArray.forEach(function (keyValue) {
-                var filterId  = null,
+            // Convert serialized array to nested object
+            serialised.forEach(function (item) {
+                let keyValue  = item.name,
+                    filterId  = null,
                     optionKey = null,
-                    optionVal = null,
+                    optionVal = item.value,
                     result    = regEx.exec(keyValue);
 
-                // First: try the main regex
+                // First: try the main regex (as used by checkboxes)
                 if (result) {
+                    // Exit early if this isn't an expected value for a checkbox
+                    if (!optionVal in ['0', '1']) {
+                        return;
+                    }
                     filterId  = result[1];
                     optionKey = result[2];
-                    optionVal = result[3];
-                } else {
-                    // Second: try the selectize regex
+                }
+
+                // Second: try the selectize regex (also used by text inputs)
+                if (filterId === null) {
                     result = selectizeRegEx.exec(keyValue);
                     if (result) {
-                        filterId  = result[1];
-                        optionKey = result[2];
-                        optionVal = 1;
-                    } else {
-                        // Finally: try the empty regex
-                        result = emptyRegEx.exec(keyValue);
-                        if (result) {
-                            filterId = result[1];
+                        // Exit early if the input has no value
+                        if (optionVal === '') {
+                            return;
                         }
+                        filterId  = result[1];
+                        optionKey = optionVal;
+                        optionVal = 1;
+                    }
+                }
+
+                // Finally: try the empty regex
+                if (filterId === null) {
+                    result = emptyRegEx.exec(keyValue);
+                    if (result) {
+                        // Exit early if somehow the value is not empty
+                        if (optionVal !== '') {
+                            return;
+                        }
+                        filterId = result[1];
                     }
                 }
 
@@ -443,7 +471,7 @@ Usage:
             $submitButton.attr('disabled', false);
             $clearAllBtn.attr('disabled', false);
             $resetToDefaultsBtn.attr('disabled', false);
-            $optionCheckboxes.filter(':not([data-disabled])').attr('disabled', false);
+            $optionInputs.filter(':not([data-disabled])').attr('disabled', false);
         }
 
         /**
@@ -453,7 +481,7 @@ Usage:
             $submitButton.attr('disabled', true);
             $clearAllBtn.attr('disabled', true);
             $resetToDefaultsBtn.attr('disabled', true);
-            $optionCheckboxes.attr('disabled', true);
+            $optionInputs.attr('disabled', true);
         }
 
         /**
@@ -549,73 +577,7 @@ Usage:
          * This is because otherwise we would need to store selection order to ensure we could re-create layout on page reload.
          */
         function updateFiltersInUseLabel() {
-            var componentsInUse = {};
-            $panelComponents.each(function (idx, component) {
-                var $component   = $(component),
-                    filterId     = $component.data('component'),
-                    $available   = $component.find('input[type=checkbox]'),
-                    $selected    = $component.find('input:checked[type=checkbox], :selected'),
-                    $selectize   = $component.find('select[data-selectize]'),
-                    hasSelectize = $selectize.length > 0,
-                    selectize    = hasSelectize ? $selectize[0].selectize : null;
-
-                // These will be deleted if the filter's not in use
-                componentsInUse[filterId]         = {};
-                componentsInUse[filterId]['name'] = $component.find('[data-filter-name]').html();
-
-                // Labels are keyed by value for now, because the label could
-                // be in both a selectize and a standard option.
-                componentsInUse[filterId]['labels'] = {};
-
-                // Build list of labels from the selectize, if there is one
-                if (selectize) {
-                    selectize.items.forEach(function (v) {
-                        componentsInUse[filterId]['labels'][v] = determineLabelFromSelectize(selectize, v);
-                    });
-                }
-
-                // Build list of labels from selected options or checkboxes,
-                // if there are any.
-                if ($selected.length !== 0) {
-                    // Not a selectize, or it's not yet initialized
-                    // Filter is being applied, add its name and selected option labels.
-                    $selected.each(function(idx, elem) {
-                        var $elem = $(elem),
-                            label = null,
-                            value = null;
-                        if ($elem.is('option')) {
-                            label = $elem.text();
-                            value = $elem.val();
-                        } else {
-                            label = $component.find('label[for='+$elem.attr('id')+']').html();
-                            value = $elem.attr('data-key');
-                        }
-                        if (value && !(value in componentsInUse[filterId]['labels'])) {
-                            componentsInUse[filterId]['labels'][value] = label;
-                        }
-                    });
-
-                    // Hide the filter in use if all its options are selected,
-                    // and the filter has no selectize (whether or not it is
-                    // initialized yet).
-                    // All options is functionally equivalent to none selected,
-                    // but it's impossible to tell if all are selected if there
-                    // is a selectize, so keep the filter in that case.
-                    if (!hasSelectize && $selected.length === $available.length) {
-                        componentsInUse[filterId]['labels'] = {};
-                    }
-                }
-
-                // Flatten the list of selected labels into an array
-                componentsInUse[filterId]['labels'] = Array.from(
-                    Object.values(componentsInUse[filterId]['labels'])
-                );
-
-                // Remove components with no selected options
-                if (componentsInUse[filterId].labels.length === 0) {
-                    delete componentsInUse[filterId];
-                }
-            });
+            let componentsInUse = deriveComponentsInUse();
 
             // Are any filters being used?
             if(Object.keys(componentsInUse).length){
@@ -657,6 +619,100 @@ Usage:
             }
         }
 
+
+        /**
+         * Derives the components which are in use across all filters on this
+         * panel.
+         *
+         * @return {Object}
+         */
+        function deriveComponentsInUse()
+        {
+            let componentsInUse = {};
+            $panelComponents.each(function (idx, component) {
+                let $component   = $(component),
+                    filterId     = $component.data('component'),
+                    $available   = $component.find('input[type=checkbox]'),
+                    $selected    = $component.find('input:checked[type=checkbox], :selected'),
+                    $textInputs  = $component.find('input[type=text]'),
+                    $selectize   = $component.find('select[data-selectize]'),
+                    hasSelectize = $selectize.length > 0,
+                    selectize    = hasSelectize ? $selectize[0].selectize : null;
+
+                // These will be deleted if the filter's not in use
+                componentsInUse[filterId]         = {};
+                componentsInUse[filterId]['name'] = $component.find('[data-filter-name]').html();
+
+                // Labels are keyed by value for now, because the label could
+                // be in both a selectize and a standard option.
+                componentsInUse[filterId]['labels'] = {};
+
+                // Build list of labels from the selectize, if there is one
+                if (selectize) {
+                    selectize.items.forEach(function (v) {
+                        componentsInUse[filterId]['labels'][v] = determineLabelFromSelectize(selectize, v);
+                    });
+                }
+
+                // Build list of labels from selected options or checkboxes,
+                // if there are any.
+                if ($selected.length !== 0) {
+                    // Not a selectize, or it's not yet initialized
+                    // Filter is being applied, add its name and selected option labels.
+                    $selected.each(function(idx, elem) {
+                        let $elem = $(elem),
+                            label = null,
+                            value = null;
+                        if ($elem.is('option')) {
+                            label = $elem.text();
+                            value = $elem.val();
+                        } else {
+                            label = $component.find('label[for='+$elem.attr('id')+']').html();
+                            value = $elem.attr('data-key');
+                        }
+                        if (value && !(value in componentsInUse[filterId]['labels'])) {
+                            componentsInUse[filterId]['labels'][value] = label;
+                        }
+                    });
+
+                    // Hide the filter in use if all its options are selected,
+                    // and the filter has no selectize (whether or not it is
+                    // initialized yet).
+                    // All options is functionally equivalent to none selected,
+                    // but it's impossible to tell if all are selected if there
+                    // is a selectize, so keep the filter in that case.
+                    if (!hasSelectize && $selected.length === $available.length) {
+                        componentsInUse[filterId]['labels'] = {};
+                    }
+                }
+
+                // Build list of labels from text inputs, if they are there
+                if (!hasSelectize && $textInputs.length !== 0) {
+                    $textInputs.each(function () {
+                        let values = this.value.split(/\s+/);
+                        // Try splitting on space
+                        values.forEach(function (value) {
+                            if (value.length > 0) {
+                                componentsInUse[filterId]['labels'][value] = value;
+                            }
+                        });
+                    });
+                }
+
+                // Flatten the list of selected labels into an array
+                componentsInUse[filterId]['labels'] = Array.from(
+                    Object.values(componentsInUse[filterId]['labels'])
+                );
+
+                // Remove components with no selected options
+                if (componentsInUse[filterId].labels.length === 0) {
+                    delete componentsInUse[filterId];
+                }
+            });
+            return componentsInUse;
+        }
+
+
         /**
          * Updates the modal with all selected options for this filter
          *
@@ -664,30 +720,17 @@ Usage:
          */
         function updateCountMoreModal(filterId)
         {
-            var $component  = $panelComponents.filter('[data-component=' + filterId + ']'),
-                decodedData = deserialize($optionCheckboxes.serialize())[filterId],
-                $selectize  = $component.find('[data-selectize]'),
-                selectize   = $selectize.length ? $selectize[0].selectize : null;
+            let componentsInUse = deriveComponentsInUse(),
+                $component      = $panelComponents.filter('[data-component=' + filterId + ']');
 
             $countMoreModalName.html($component.find('[data-filter-name]').html());
             $countMoreModalList.html('');
 
-            Object.keys(decodedData).forEach(function (key) {
-                if (Number(decodedData[key]) === 1) {
-                    // This key is selected: use it
-                    var label = null;
-
-                    // Look up the selectize for this label first,
-                    // then look for an actual label corresponding to this
-                    // selection
-                    if (selectize && (key in selectize.options)) {
-                        label = determineLabelFromSelectize(selectize, key);
-                    } else {
-                        label = $component.find('label[for=filter_selection_' +filterId+ '_'+key+']').html()
-                    }
-                    $countMoreModalList.append($modalListItem.clone().html(label));
-                }
-            });
+            if (componentsInUse[filterId]) {
+                componentsInUse[filterId].labels.forEach(function (val) {
+                    $countMoreModalList.append($modalListItem.clone().text(val));
+                });
+            }
         }
 
         /**

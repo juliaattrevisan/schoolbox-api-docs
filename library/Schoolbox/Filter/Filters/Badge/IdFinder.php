@@ -74,6 +74,24 @@ class IdFinder extends AbstractIdFinder
             }
         }
 
+        // Query for name search
+        $nameSearch = $completeFilters[Name\Definition::class] ?? null;
+        if (isset($nameSearch) && count($nameSearch) > 0) {
+            // Just use the first one, and split it into tokens
+            foreach ($nameSearch as $nameSearchString => $_) {
+                $names = array_map('trim', preg_split('/\\s+/', (string)$nameSearchString));
+                foreach ($names as $name) {
+                    if (strlen($name) > 0 && $name !== Name\Definition::KEY_ALL) {
+                        $hasWhere = true;
+                        $pb = $pb->like(
+                            'b.name',
+                            '%' . $this->getMapper()->getDatabase()->getQuoter()->escapeForLike($name) . '%'
+                        );
+                    }
+                }
+            }
+        }
+
         // Filter out deleted badges
         if (!$deleted) {
             $hasWhere = true;

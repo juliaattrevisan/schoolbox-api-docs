@@ -146,7 +146,7 @@ class Mapper extends \Schoolbox\Mapper
             $option = $options[$optionKey];
 
             $defaultRoleType = $row['d.role_type'];
-            if ($defaultRoleType && !$option->getDefaults()->offsetExists($defaultRoleType)) {
+            if ($option && $defaultRoleType && !$option->getDefaults()->offsetExists($defaultRoleType)) {
                 $roleDefault                             = $defaultsMapper->hydrate($row, 'd');
                 $option->getDefaults()[$defaultRoleType] = $roleDefault;
                 $roleDefault->setFilterOption($option);
