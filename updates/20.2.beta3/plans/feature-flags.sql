@@ -23,7 +23,7 @@ INSERT INTO `config`
 (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
            'comms_statistics_enabled',
-           'true',
+           '1',
            'Enable News Statistics',
            'If ON, the news statistics will be available to view',
            (SELECT id FROM `lu_config_field` WHERE `field` = 'boolean'),
@@ -40,7 +40,7 @@ INSERT INTO `config`
 (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
            'eportfolio_enabled',
-           'true',
+           '1',
            'Enable ePortfolio',
            'If ON, eportfolio feature will be available for users to enable',
            (SELECT id FROM `lu_config_field` WHERE `field` = 'boolean'),
@@ -58,7 +58,7 @@ INSERT INTO `config`
 (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
            'staff_directory_enabled',
-           'true',
+           '1',
            'Enable Staff Directory',
            'If ON, staff directory feature will be available for users to visit',
            (SELECT id FROM `lu_config_field` WHERE `field` = 'boolean'),
@@ -76,7 +76,7 @@ INSERT INTO `config`
 (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
            'parent_directory_enabled',
-           'true',
+           '1',
            'Enable Parent Directory',
            'If ON, parent directory feature will be available for users to visit',
            (SELECT id FROM `lu_config_field` WHERE `field` = 'boolean'),
