@@ -72,16 +72,6 @@ export default {
         },
 
         /**
-         * The route via which new badges are posted.
-         *
-         * TODO remove as this seems unused
-         */
-        postBadgeRoute: {
-            type: String,
-            default: '',
-        },
-
-        /**
          * Is the menu shown for each badge?
          */
         showBadgeMenus: {
