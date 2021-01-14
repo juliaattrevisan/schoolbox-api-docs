@@ -146,6 +146,7 @@ class Full
                 WHERE u.id IN ({$tempIds})
             ");
 
+
             $tempUsers->execute();
         }
 
@@ -155,7 +156,7 @@ class Full
         $users = [];
 
         foreach ($tempUsers as $tempUser) {
-            $users[] = [
+            $users[$tempUser['id']] = [
                 'id' => $tempUser['id'],
                 'occursAt' => null,
                 'title' => $tempUser['title'],

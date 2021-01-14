@@ -90,6 +90,7 @@ class Controller extends Base
     public function getOverview(News\Model $article): void
     {
         $interactions = new Interactions($this->database, $this->statisticsMapper, $this->statisticsCumulativeMapper);
+        $audience = $this->userResolver->findUsersForArticle($article);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsStatistics/index.twig', [
             'article' => $article,
@@ -100,9 +101,9 @@ class Controller extends Base
 
             /* Overall Cumulative summary
              */
-            'cumulative' => $interactions->fetchCumulative($article),
+            'cumulative' => $interactions->fetchCumulative($article, $audience),
 
-            'audience' => count($this->userResolver->findUsersForArticle($article)),
+            'audience' => count($audience),
 
             /* Overall Referrer Demographics
              */
