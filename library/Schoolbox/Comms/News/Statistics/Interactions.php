@@ -420,7 +420,7 @@ class Interactions
      */
     private function uniqueOpens(News\Model $article, array $audience): int
     {
-        $pb = $this->database->buildPredicateBuilder('comms_news_article_statistics');
+        $pb = $this->statisticsMapper->getPredicateBuilder();
         $pb->equals('article_id', $article->getId());
         $pb->in('user_id', $audience);
 
