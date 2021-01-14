@@ -303,7 +303,19 @@ export default {
                 return false;
             });
             return nonEmptyFilters.length > 0;
-        }
+        },
+
+
+        /**
+         * Generate a URL which references this page with all filters cleared.
+         *
+         * @return {String}
+         */
+        generateResetFilterUrl() {
+            let emptyQueryString = {};
+            Object.keys(this.selectedFilters).forEach(k => emptyQueryString[k] = '');
+            return "?" + new URLSearchParams(emptyQueryString).toString();
+        },
     },
 }
 </script>
@@ -326,7 +338,7 @@ export default {
                     <i class="icon-search"></i>
                     <p>
                         No badges were found.
-                        <a href="" title="Reset filters">Reset filters</a> to see all available badges.
+                        <a :href="generateResetFilterUrl()" title="Reset filters">Reset filters</a> to see all available badges.
                     </p>
                 </template>
 
