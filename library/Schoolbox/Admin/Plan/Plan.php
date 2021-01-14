@@ -42,6 +42,15 @@ class Plan extends CliTool\App
             $this->setTopMenu($planConfig['topMenu']);
             $this->setComponents($planConfig['components']);
         } else {
+            echo
+            <<<HELP
+Updates instance dataset to reflect the appropriate features available for the plan provided
+
+Usage: set-plan.php --plan [portal,portalplus,basic,pro,elite]
+
+HELP
+            ;
+            exit;
         }
     }
 
