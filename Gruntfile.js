@@ -1,8 +1,6 @@
 const sass  = require('sass');
 const jsSrc = {
     main: [
-        // Modernizr
-        'www/javascript/components/modernizr/modernizr.js',
 
         // Fastclick
         'www/javascript/components/fastclick/lib/fastclick.js',
