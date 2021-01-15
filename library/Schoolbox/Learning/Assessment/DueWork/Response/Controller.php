@@ -235,8 +235,8 @@ class Controller extends Base
      *
      * @param DueWork    $assessment
      * @param User       $student
-     * @param bool       $blindMode
      * @param Model|null $response
+     * @param bool       $blindMode
      * @throws ApplicationException\Exception When trying to access a draft Response when you shouldn't
      * @throws \Aura\Router\Exception\RouteNotFound If cannot generate a requested route
      * @throws \InvalidArgumentException If assessment due date is null.
@@ -249,7 +249,7 @@ class Controller extends Base
         DueWork $assessment,
         User $student,
         Model $response = null,
-        bool $blindMode = null 
+        bool $blindMode = false 
     ): void {
 
         $participant = $assessment->getParticipant($student);
