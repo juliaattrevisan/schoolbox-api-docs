@@ -229,12 +229,12 @@ class Blind
      */
     private function getUrl(User $user): string
     {
-        $url = $this->router->generate('learningDueWorkResponse.getParticularResponse', [
+        $url = $this->router->generate('learningDueWorkResponse.getParticularResponseBlind', [
             'assessmentId' => $this->assessment->getId(),
             'studentId'    => $user->getId(),
             'assessment'   => $this->assessment
         ]);
 
-        return "{$url}{$this->blindModeParams}";
+        return (string)$url;
     }
 }

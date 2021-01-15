@@ -5,6 +5,7 @@
  # @param Participant participant
  # @param IResponse response
  # @param Collection|IResponse[] responseList
+ # @param bool blindMode
  #}
 
 {% if responseList|length > 1 %}
@@ -21,6 +22,16 @@
     <div class="small-12 columns">
         <select id="response-selector" title="Select a Submission">
             {% for currentResponse in responseList %}
+                {% if blindMode %}
+                {% set viewRoute = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponseBlind', {
+                    assessmentId: assessment.id,
+                    assessment: assessment,
+                    studentId: participant.user.id,
+                    student: participant.user,
+                    responseId: currentResponse.id,
+                    response: currentResponse
+                }) %}
+                {% else %}
                 {% set viewRoute = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {
                     assessmentId: assessment.id,
                     assessment: assessment,
@@ -29,6 +40,7 @@
                     responseId: currentResponse.id,
                     response: currentResponse
                 }) %}
+                {% endif %}
 
                 {% if viewRoute %}
                     <option value="{{ currentResponse.id }}" {% if currentResponse.id == response.id %}selected="selected"{% endif %} data-url="{{ viewRoute }}">#{{ loop.revindex }}. Submission at {{ currentResponse.submittedAt.local }}</option>
