@@ -200,15 +200,37 @@ button.submit {
     }
 }
 
+// button or link actions that display inline with headings
 .button-action {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 
-  h1 {
+  h1, h2 {
     flex: 1 1 auto;
+    margin-right: 1rem;
   }
-  .button {
+  form {
+    display: flex;
+  }
+  .button, [type="submit"] {
     flex: 0 auto;
     max-height: 2.5rem;
+  }
+  .txt-only {
+    background-color: transparent;
+    color: $anchor-font-color;
+    font-weight: $font-weight-normal;
+    margin: 0;
+  }
+
+  &.beside {
+    h1, h2 {
+      flex: 0 1 auto;
+    }
+    .button, [type="submit"] {
+      flex: 0 auto;
+    }
   }
 }
 

@@ -1,6 +1,7 @@
 .profile-tabs {
   .subheader {
-    color: $header-font-color
+    color: $header-font-color;
+    margin-left: 0 !important;
   }
   .divider {
     border-bottom: 2px solid #EDEDED;
