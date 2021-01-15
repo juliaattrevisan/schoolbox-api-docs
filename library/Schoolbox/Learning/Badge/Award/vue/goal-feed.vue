@@ -269,14 +269,21 @@ export default {
         <template v-else>
             <div class="empty-state">
                 <i class="icon-goal"></i>
-                <!--  Teacher/Admin -->
-                <p>'Student name' doesn't have any goals yet.</p>
-                <p><a href="" title="Set a goal">Set a goal</a> for 'firstname'.</p>
-                <!--  Parent -->
-                <p>'Student name' doesn't have any goals yet.</p>
-                <!--  Student -->
-                <p>You don't have any goals yet.</p>
-                <p><a href="" title="Set a goal">Set a goal</a> to see it appear here.</p>
+
+                <template v-if="config.currentUser.id === config.student.id">
+                    <!-- Current user -->
+                    <p>You don't have any goals yet.</p>
+                    <p v-if="config.routes.getSetAsGoalForSelfForm">
+                        <a :href="config.routes.getSetAsGoalForSelfForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current" title="Set a goal">Set a goal</a> to see it appear here.
+                    </p>
+                </template>
+                <template v-else>
+                    <!-- Parent or student -->
+                    <p>{{ config.student.firstname }} doesn't have any goals yet.</p>
+                    <p v-if="config.routes.getSetAsGoalForm">
+                        <a :href="config.routes.getSetAsGoalForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current" title="Set a goal">Set a goal</a> for {{ config.student.firstname }}.
+                    </p>
+                </template>
             </div>
         </template>
 
