@@ -23,8 +23,11 @@ class Definition extends AbstractDefinition
      * Key for finding all badges.
      *
      * Required so that the badge list filter is even configurable.
+     *
+     * Must be empty, so that the ID finder knows that an empty string is
+     * distinct from an actual search term.
      */
-    public const KEY_ALL = 'all';
+    public const KEY_ALL = '';
 
     /**
      * @inheritdoc
