@@ -1159,7 +1159,7 @@ class DataSource
             return [];
         }
 
-        // Find the descriptors selected for each of these feedback IDs
+        // Find rubric used in the assessments
         $pb = new Builder($this->database, '');
         $pb->in('assessment_id', array_keys($feedbackIds));
 
@@ -1176,7 +1176,7 @@ class DataSource
                     assessment_title,
                     capability_mark_type_id AS rubric_capability_mark_type_id,
                     assessment_mark_type AS mark_type,
-                    capability_max_value AS max_value
+                    indicator_max_value AS max_value
                 FROM v_rubric
                 JOIN assessment ON v_rubric.assessment_id = assessment.id
                 WHERE {$where}
@@ -1275,7 +1275,7 @@ class DataSource
         $allResults = [];
 
         if (count($allFeedbackIds) > 0) {
-            // Find the descriptors selected for each of these feedback IDs
+            //Find all students results across all indicators in all activities
             $pb = new Builder($this->database, '');
             $pb->in('sr.id', $allFeedbackIds);
 
@@ -1799,7 +1799,8 @@ class DataSource
         }
 
         $where             = implode(' AND ', $pb->getWhere());
-        $feedbackStatement = $this->database->prepare("
+        $feedbackStatement = $this->database->prepare(
+            "
             SELECT
                 sr.id    AS feedbackId,
                 a.id     AS assessmentId,
@@ -1809,7 +1810,8 @@ class DataSource
             INNER JOIN assessment      a ON sb.assessment_id = a.id
             WHERE {$where}
             ORDER BY sr.published_at ASC
-        ");
+        "
+        );
         $feedbackStatement->execute($pb->getParams());
 
         $allFeedbackIds     = [];
