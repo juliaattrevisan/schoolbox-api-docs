@@ -1826,16 +1826,4 @@ class DataSource
         }
         return [$studentFeedbackIds, $allFeedbackIds];
     }
-
-    /**
-     * Quick alpha sort function for indicators and capabilities summary section
-     * (From Rubric Markbook Controller)
-     * @param array $a
-     * @param array $b
-     * @return int
-     */
-    private function sortByName($a, $b)
-    {
-        return strnatcasecmp($a['name'], $b['name']);
-    }
 }
