@@ -4,9 +4,6 @@ const jsSrc = {
         // Modernizr
         'www/javascript/components/modernizr/modernizr.js',
 
-        // Modernizr custom tests
-        'www/javascript/shared/modernizr/custom-tests.js',
-
         // Fastclick
         'www/javascript/components/fastclick/lib/fastclick.js',
 
