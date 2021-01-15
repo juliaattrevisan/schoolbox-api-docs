@@ -23,7 +23,7 @@ $(function () {
     };
 
     // Only show tours windows larger than medium (has sidebar showing)
-    if (typeof(window.tourData) !== 'undefined' && window.tourData.length > 0 && !windowIsMediumWideDown()) {
+    if (typeof(window.tourData) !== 'undefined' && window.tourData.length > 0 && (window.innerWidth >= 1024)) {
         // Function to initiate a joyride
 
         window.tourStart = function (uuid) {

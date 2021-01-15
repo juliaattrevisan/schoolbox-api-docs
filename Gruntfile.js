@@ -82,9 +82,6 @@ const jsSrc = {
         // Confirm Dialog
         'www/javascript/shared/jquery.confirm-dialog.js',
 
-        // Device Dimensions
-        'www/javascript/shared/jquery.device.js',
-
         // Data tables
         'www/javascript/components/datatables/media/js/jquery.dataTables.min.js',
         'www/javascript/components/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js',
