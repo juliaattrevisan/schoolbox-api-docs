@@ -282,13 +282,20 @@ export default {
         <template v-else>
             <div class="empty-state">
                 <i class="icon-showcase"></i>
-                <!--  Teacher/Admin -->
-                <p>'Student name' doesn't have any achievements yet.</p>
-                <p><a href="" title="Award an achievement">Award an achievement</a> for 'firstname'.</p>
-                <!--  Parent -->
-                <p>'Student name' doesn't have any achievements yet.</p>
-                <!--  Student -->
-                <p>You don't have any achievements yet.</p>
+
+
+                <template v-if="config.currentUser.id === config.student.id">
+                    <!-- Current user -->
+                    <p>You don't have any achievements yet.</p>
+                </template>
+                <template v-else>
+                    <!-- Parent or student -->
+                    <p>{{ config.student.firstname }} doesn't have any achievements yet.</p>
+                    <p v-if="config.routes.getAwardAsAchievementForm">
+                        <a :href="config.routes.getAwardAsAchievementForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
+                           title="Award an achievement">Award an achievement</a> for {{ config.student.firstname }}.
+                    </p>
+                </template>
             </div>
         </template>
 
