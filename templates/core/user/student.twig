@@ -534,7 +534,10 @@
                                     'learningBadgeAward.getSetAsGoalForSelfForm'
                                 ) }}',
                             },
-                            returnUrl: {{ RETURN_URL | json_encode | raw }},
+                            returnUrl: {
+                                name: '{{ RETURN_URL.name }}',
+                                current: '{{ RETURN_URL.current }}',
+                            } ,
                         };
                     </script>
                 {% endautoescape %}
