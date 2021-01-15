@@ -9,8 +9,26 @@
        {% if isDescriptorSelected %}checked="checked"{% endif %}
 />
 
+{# Set up self-assessment student choice tooltip #}
+{% if selfAssessmentFeedback and selfAssessmentIndicatorMark and selfAssessmentFeedback.isSelfGrading %}
+    {% set tooltip = '(' ~ selfAssessmentIndicatorMark.value ~ ') ' ~ locale.selfAssessment.proper %}
+{% else %}
+    {% set tooltip = locale.selfReflection.proper %}
+{% endif %}
+
 <label for="{{ inputId }}">
     <span class="rb-description">
+        {# Self assessment student icon #}
+        {% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}
+            {% if blindMode %}
+                <p class="rb-self-reflection-choice blind-mode" title="{{ tooltip }} choice"></p>
+            {% else %}
+                <img class="rb-self-reflection-choice"
+                     src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
+                     title="{{ tooltip }} choice" />
+            {% endif %}
+        {% endif %}
+
         {{- descriptor.description|nl2br -}}
     </span>
 
@@ -56,19 +74,4 @@
     </select>
 {% endif %}
 
-{# Self-assessment #}
-{% if selfAssessmentFeedback and selfAssessmentIndicatorMark and selfAssessmentFeedback.isSelfGrading %}
-    {% set tooltip = '(' ~ selfAssessmentIndicatorMark.value ~ ') ' ~ locale.selfAssessment.proper %}
-{% else %}
-    {% set tooltip = locale.selfReflection.proper %}
-{% endif %}
-{% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}
-    {% if blindMode %}
-        <p class="rb-self-reflection-choice blind-mode" title="{{ tooltip }} choice"></p>
-    {% else %}
-        <img class="rb-self-reflection-choice"
-         src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
-         title="{{ tooltip }} choice" />
-    {% endif %}
 
-{% endif %}
