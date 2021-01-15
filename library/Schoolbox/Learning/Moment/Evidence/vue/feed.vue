@@ -358,12 +358,16 @@ export default {
                     <!-- Can share moments? -->
                     <p v-if="config.routes.getCreateEvidenceForm || config.routes.getSetAsGoalForm || config.routes.getAwardAsAchievementForm">
                         <template v-if="config.routes.getCreateEvidenceForm">
-                            <a href="#" title="Share a learning moment" data-reveal-id="shareLearningMoment">Share a learning moment</a>,
+                            <!--
+                                All these tags need to be on the same line,
+                                because otherwise there will be a space between
+                                the link and the comma -->
+                            <a href="#" title="Share a learning moment" data-reveal-id="shareLearningMoment">Share a learning moment</a><template v-if="config.routes.getSetAsGoalForm && config.routes.getAwardAsAchievementForm">, </template><template v-else-if="config.routes.getSetAsGoalForm || config.routes.getAwardAsAchievementForm"> or </template>
                         </template>
 
                         <template v-if="config.routes.getSetAsGoalForm">
                             <a :href="config.routes.getSetAsGoalForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
-                               title="Set a goal">set a goal</a> or
+                               title="Set a goal">set a goal</a><template v-if="config.routes.getAwardAsAchievementForm"> or </template>
                         </template>
 
                         <template v-if="config.routes.getAwardAsAchievementForm">
