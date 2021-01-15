@@ -1,72 +1,74 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <script type="text/javascript">
-    window.gpick = {
-      picked: function (docs) {
-        var i;
-        for(i = 0; i < docs.length; ++i) {
-          var doc = docs[i];
-          fiil();
+    <script type="text/javascript">
 
-        }
-      },
-      cancel: function () { /* noop */ },
-      needAuth: function () { /* noop */ },
-      loaded: function () {
-        $('#external-google-panel')
-            .find('div.explorer')
-            .removeClass('preload');
-      }
-    };
+        window.gpick = {
+            picked: function (docs) {
+                var i;
+                for (i = 0; i < docs.length; ++i) {
+                    var doc = docs[i];
+                    fiil();
 
-    $(document).foundation();
-
-    $(function() {
-        let filesystems = $('#attachment-browser-filesystems');
-
-        filesystems.find('[data-source]').on('click', function(event) {
-            const MAX_IFRAME_HEIGHT = 350;
-
-            let source = $(this).attr('data-source');
-            let panel = $('#' + source + '-panel');
-
-            /* Decide if source was already load previously;
-             * If it wasn't previously loaded, do so asynchronously
-             * Otherwise just show the tab
-             */
-            if (!filesystems.data(source)) {
-
-                /* Remember we loaded this source previously
-                 */
-                filesystems.data(source, {loaded: true});
-
-                let url = $(this).attr('data-url');
-                let method = $(this).attr('data-method');
-
-                /* Use the $method var to decide whether this is inline content
-                 * such as all our internal file upload dropzone options, recorder
-                 * my files, resources, etc.
-                 *
-                 * or whether it should be loaded into an iframe, such as with third
-                 * parties like ms teams, goggle drive, office 365 etc.
-                 *
-                 * Inline content starts with a preloader class which should be removed
-                 * once content has loaded
-                 */
-                if (method === 'inline') {
-                    panel.load(url, null);
-                } else if (method === 'iframe') {
-                    panel.html($('<iframe/>').attr('src', url).height(MAX_IFRAME_HEIGHT));
                 }
+            },
+            cancel: function () { /* noop */ },
+            needAuth: function () { /* noop */ },
+            loaded: function () {
+                $('#external-google-panel')
+                    .find('div.explorer')
+                    .removeClass('preload');
             }
-        });
+        };
 
-        /* Activate default tab
-         */
-        $('#attachment-browser-filesystems a').first().trigger('click');
-    });
-</script>
+        $(document).foundation();
+
+        $(function () {
+            let filesystems = $('#attachment-browser-filesystems');
+
+            filesystems.find('[data-source]').on('click', function (event) {
+                const MAX_IFRAME_HEIGHT = 350;
+
+                let source = $(this).attr('data-source');
+                let panel = $('#' + source + '-panel');
+
+                /* Decide if source was already load previously;
+                 * If it wasn't previously loaded, do so asynchronously
+                 * Otherwise just show the tab
+                 */
+                if (!filesystems.data(source)) {
+
+                    /* Remember we loaded this source previously
+                     */
+                    filesystems.data(source, { loaded: true });
+
+                    let url = $(this).attr('data-url');
+                    let method = $(this).attr('data-method');
+
+                    /* Use the $method var to decide whether this is inline content
+                     * such as all our internal file upload dropzone options, recorder
+                     * my files, resources, etc.
+                     *
+                     * or whether it should be loaded into an iframe, such as with third
+                     * parties like ms teams, goggle drive, office 365 etc.
+                     *
+                     * Inline content starts with a preloader class which should be removed
+                     * once content has loaded
+                     */
+                    if (method === 'inline') {
+                        panel.load(url, null);
+                    } else if (method === 'iframe') {
+                        panel.html($('<iframe/>').attr('src', url).height(MAX_IFRAME_HEIGHT));
+                    }
+                }
+            });
+
+            /* Activate default tab
+             */
+            $('#attachment-browser-filesystems a').first().trigger('click');
+
+        });
+    </script>
 </head>
 <body>
     <div class="attachment-browser-container">
