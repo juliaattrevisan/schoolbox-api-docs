@@ -135,7 +135,13 @@ Usage:
             <div class="small-12 columns">
                 <div class="alert-box warning">
                     This is not the most recent response for this due work.
-                    {% set mostRecentResponseRoute = routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id}) %}
+
+                    {% if blindMode %}
+                        {% set mostRecentResponseRoute = routeLookup('learningDueWorkResponse.getParticularResponseBlind', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id}) %}
+                    {% else %}
+                        {% set mostRecentResponseRoute = routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id}) %}
+                    {% endif %}
+
                     {% if not readonly %}
                         You should consider giving feedback for <a href="{{ mostRecentResponseRoute }}">the most recent response</a> instead.
                     {% else %}
