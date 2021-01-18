@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Zip;
 
-use Config;
 use Group;
 use RuntimeException;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder as ResourceFolder;
 use Schoolbox\Resource\File as ResourceFile;
@@ -24,24 +24,6 @@ use ZipStream;
  */
 class Folder
 {
-    /**
-     * @var false|string
-     */
-    private $tmpName;
-
-
-    /**
-     * @var string
-     */
-    private $tmpFolder;
-
-
-    /**
-     * @var string
-     */
-    private $tmpZip;
-
-
     /**
      * @var string
      */
@@ -87,11 +69,7 @@ class Folder
      */
     public function __construct(int $folder)
     {
-        $this->tmpName   = tempnam(Config::get('zip_dir'), 'zip');
-        $this->tmpFolder = $this->tmpName . 'dir';
-        $this->tmpZip    = $this->tmpName . '.zip';
-
-        $this->groupHandler  = new Group;
+        $this->groupHandler  = new Group();
         $this->folderMapper  = new ResourceFolder\Mapper();
         $this->fileMapper    = new ResourceFile\Mapper();
         $this->folderDetails = $this->getFolderDetails($folder);
@@ -148,19 +126,24 @@ class Folder
 
 
     /**
-     * @param string $fileName
+     * Create a filename that is guaranteed to not be in `$uniqueFileNames`.
+     *
+     * @param string $basename
+     * @param array  $uniqueFileNames
      * @param int    $depth
-     * @return mixed
+     * @return string
      */
-    private function uniqueFileName($fileName, $depth = 1)
+    private function uniqueFileName(string $basename, array $uniqueFileNames, int $depth = 1): string
     {
-        if (is_file($fileName)) {
-            $pathParts = pathinfo($fileName);
-            $newName   = $pathParts['dirname'] . '/' . $pathParts['filename'] . '_' . $depth . '.' . $pathParts['extension'];
-            return $this->uniqueFileName($newName, ++$depth);
-        } else {
-            return $fileName;
+        if (in_array($basename, $uniqueFileNames)) {
+            $pathParts = pathinfo($basename);
+            $newName   = $pathParts['filename'] . '_' . $depth;
+            if (isset($pathParts['extension'])) {
+                $newName .= '.' . $pathParts['extension'];
+            }
+            return $this->uniqueFileName($newName, $uniqueFileNames, ++$depth);
         }
+        return $basename;
     }
 
 
@@ -193,14 +176,18 @@ class Folder
      */
     private function iterateFolder(ZipStream\ZipStream $zipStream, ?ResourceFolder\Model $folder, array $pathParts)
     {
-        $path = implode(DIRECTORY_SEPARATOR, $pathParts);
+        $path        = implode(DIRECTORY_SEPARATOR, $pathParts);
+        $uniqueNames = [];
 
         // Load all files
         $fileList = $this->getResources($folder->getId(), $this->getPermission($folder->getId()));
         foreach ($fileList as $file) {
+            // Ensure filenames are unique
             if ($file->getStorage()->exists()) {
+                $uniqueName    = $this->uniqueFileName($file->getBasename(), $uniqueNames);
+                $uniqueNames[] = $uniqueName;
                 $zipStream->addFileFromStream(
-                    $path . DIRECTORY_SEPARATOR . $file->getBasename(),
+                    $path . DIRECTORY_SEPARATOR . $uniqueName,
                     $file->readStream()
                 );
             }
@@ -213,10 +200,12 @@ class Folder
             foreach ($childFolderList as $childFolder) {
                 $permission = $this->getPermission($childFolder->getId());
                 if ($permission > UserAccess::ACCESS_DENY) {
+                    $uniqueName    = $this->uniqueFileName($childFolder->getName(), $uniqueNames);
+                    $uniqueNames[] = $uniqueName;
                     $this->iterateFolder(
                         $zipStream,
                         $childFolder,
-                        array_merge($pathParts, [$this->cleanName($childFolder->getName())])
+                        array_merge($pathParts, [$uniqueName])
                     );
                 }
             }
@@ -229,16 +218,14 @@ class Folder
      *
      * @param int $folder_id
      * @return ResourceFolder\Model
-     * @throws \Schoolbox\Mapper\DefinitionException
      */
     protected function getFolderDetails(int $folder_id): ?ResourceFolder\Model
     {
         try {
             return $this->folderMapper->findById($folder_id);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (Exception $e) {
+            return null;
         }
-
-        return null;
     }
 
     /**
@@ -250,19 +237,5 @@ class Folder
     protected function getPermission($folder_id)
     {
         return $this->groupHandler->getPermission($folder_id);
-    }
-
-
-    /**
-     * Gets a target path the file should be copied to
-     *
-     * @param string $currentDir Parent directory the file should be copied to
-     * @param string $file       Real full filename
-     * @return string
-     */
-    protected function getTargetPath($currentDir, $file)
-    {
-        $fileName = $currentDir . '/' . $file;
-        return $this->uniqueFileName($fileName); //ensure filename is unique else puts numbers in filename
     }
 }
