@@ -22,6 +22,13 @@ Data:
     reportDate              null|string
 #}
 {% import '@tigsSubjectReport/student-attributes-macro.twig' as macro %}
+
+<style type="text/css">
+    .continuous-report .header .meta {
+        font-size: 1.25rem;
+    }
+</style>
+
 <div class="tigs-crp continuous-report {{ macro.cssClasses(attributes) }}">
     <div class="row header">
         <div class="island small-12">
