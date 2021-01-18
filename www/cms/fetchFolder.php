@@ -14,5 +14,5 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page = new SitePage();
 $zip  = new Folder($_GET['folder']);
-ShutdownHandler::instance()->registerFunction([$zip, 'cleanUp'], 10000);
+//ShutdownHandler::instance()->registerFunction([$zip, 'cleanUp'], 10000);
 $zip->sendZip();
