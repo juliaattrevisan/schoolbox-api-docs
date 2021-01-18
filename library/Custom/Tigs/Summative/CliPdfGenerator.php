@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative;
 
 use Aura\Router\Router;
+use Schoolbox\YearLevel;
 use function count;
 use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use External_UserInterface;
@@ -469,12 +470,18 @@ class CliPdfGenerator extends CliTool\App
         $pb           = $this->userMapper->getPredicateBuilder();
         $messageParts = [];
 
+
+        /* Year Levels are now joined objects, not scalars
+         */
+        $yearLevelMapper = YearLevel\Mapper::getInstance();
+        $yearLevels = $yearLevelMapper->findByColumn('name', ['7', '8', '9', '10', '11', '12']);
+
         // Only students
         $pb->equals('g.group_type', Role::STUDENT);
         $messageParts[] = \sprintf("role type of '%s'", Role::STUDENT);
 
         // Years 7-12 (Cannot use BETWEEN as `user`.`year` is stored as a VARCHAR in database)
-        $pb->in('u.year', ['7', '8', '9', '10', '11', '12']);
+        $pb->in('u.year_id', $yearLevels->getPropertyValues('id'));
         $messageParts[] = "user.year between 7 and 12";
 
         // optional user.synergy_id filter
@@ -492,7 +499,9 @@ class CliPdfGenerator extends CliTool\App
 
         // optional year level filter
         if ($this->yearLevel) {
-            $pb->equals('u.year', $this->yearLevel);
+            $specificYearLevel = $yearLevels->filterBy('name', $this->yearLevel)->first();
+
+            $pb->equals('u.year_id', $specificYearLevel->getId());
             $messageParts[] = \sprintf("user.year of '%s'", $this->yearLevel);
         }
 
@@ -503,6 +512,7 @@ class CliPdfGenerator extends CliTool\App
         $sql = "
             SELECT u.id
             FROM `user` u
+            INNER JOIN lu_year_level lyl ON u.year_id = lyl.id
             JOIN `groups` g on u.group_id = g.id
             WHERE {$whereClause}
         ";

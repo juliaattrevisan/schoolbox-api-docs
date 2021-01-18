@@ -18,14 +18,21 @@ Data:
     subjects[idx].codes     string[]
     subjects[idx].folderId  int
     subjects[idx].teachers  User[]
-    explanation             null|string         - Explanation of the student's grades
     reportDate              null|string
+    moreInfoID              string              - A homepage id from a config var, for a special page in TIGS instance
 #}
 {% import '@tigsSubjectReport/student-attributes-macro.twig' as macro %}
+
+<style type="text/css">
+    .continuous-report .header .meta {
+        font-size: 1.25rem;
+    }
+</style>
+
 <div class="tigs-crp continuous-report {{ macro.cssClasses(attributes) }}">
     <div class="row header">
         <div class="island small-12">
-            <h1>Continuous Report: {{ user.fullName }}</h1>
+            <h1>{{ user.fullName }} - Progress Report</h1>
             <p class="meta">Curriculum Year {{ attributes.curriculumYearLevel }}, Semester {{ attributes.curriculumSemester }}</p>
             {% if not isEnabled %}
                 <div data-alert class="alert-box highlight">
@@ -36,7 +43,7 @@ Data:
     </div>
 
     <div class="row student">
-        <div class="column small-12">
+        <div class="column small-12 medium-6">
             <h2 class="subheader">Student</h2>
             <div class="card small-12">
                 <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" alt="View Profile">
@@ -44,6 +51,12 @@ Data:
                 <p class="meta">{{ user.role.name }}</p>
                 <p class="meta">Unapproved absences: Semester 1 <span class="label neutral">{{ absences[1] }}</span> Semester 2 <span class="label neutral">{{ absences[2] }}</span></p>
             </div>
+        </div>
+        <div class="column small-12 medium-6">
+            <h2 class="subheader">Understanding your report</h2>
+            <p>
+                <a href="/homepage/{{ moreInfoId }}">Click here for more information</a>
+            </p>
         </div>
     </div>
 
@@ -88,14 +101,22 @@ Data:
 
     {% if hasDeansComments %}
         <div class="row dean-comments">
-            {% for i in 1..2 %}
+
+            {# Render semester 2's comments if it exists
+             # Otherwise try falling back to semester 1's comments
+             #}
+            {% set break = false %}
+
+            {% for i in 2..1 if not break %}
                 {% if deansComments[i] %}
-                <div class="dean-comment semester-{{ i }} small-12 medium-6 island">
-                    <h2 class="subheader">Dean's Comment - Semester {{ i }}</h2>
-                    <section class="content">
-                        {{ deansComments[i] | purify }}
-                    </section>
-                </div>
+                    <div class="dean-comment semester-{{ i }} small-12 medium-6 island">
+                        <h2 class="subheader">Dean's Comment - Semester {{ i }}</h2>
+                        <section class="content">
+                            {{ deansComments[i] | purify }}
+                        </section>
+                    </div>
+
+                    {% set break = true %}
                 {% endif %}
             {% endfor %}
         </div>
@@ -155,15 +176,4 @@ Data:
             } only %}
         </div>
     </div>
-
-    {% if explanation is not null %}
-    <div class="row explanation-grades">
-        <div class="small-12 island">
-            <h2 class="subheader">Explanation of Grades</h2>
-            <section class="content">
-                {{ explanation | purify }}
-            </section>
-        </div>
-    </div>
-    {% endif %}
 </div>

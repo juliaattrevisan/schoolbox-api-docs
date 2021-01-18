@@ -157,6 +157,18 @@ class StudentAttributes
 
 
     /**
+     * Returns whether the student is in the Middle Year range
+     * Although this was the same as isMyp, that terminology is being phased out
+     *
+     * @return bool
+     */
+    public function isMiddleYear(): bool
+    {
+        return $this->yearLevel >= 7 && $this->yearLevel <= 10;
+    }
+
+
+    /**
      * Returns whether the student is MYP (IB Middle Years Programme)
      *
      * @return bool
