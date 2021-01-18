@@ -129,7 +129,7 @@ if (!$attempt['finish']) {
  * teachers to customise response marks without being overwritten again.
  *
  * Once automated marking has been performed, remember which responses were
- * affected so we don't refetch them the next time the page loads
+ * affected so we don't refetch them the next time the page loads.
  */
 $allAttempts = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $attemptId);
 $markedResponseIDs = [];
