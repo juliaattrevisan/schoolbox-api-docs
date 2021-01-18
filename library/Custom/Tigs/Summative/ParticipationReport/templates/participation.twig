@@ -20,6 +20,7 @@ Data:
     subjects[idx].teachers  User[]
     explanation             null|string         - Explanation of the student's grades
     reportDate              null|string
+    moreInfoID              string              - A homepage id from a config var, for a special page in TIGS instance
 #}
 {% import '@tigsSubjectReport/student-attributes-macro.twig' as macro %}
 
@@ -43,7 +44,7 @@ Data:
     </div>
 
     <div class="row student">
-        <div class="column small-12">
+        <div class="column small-12 medium-6">
             <h2 class="subheader">Student</h2>
             <div class="card small-12">
                 <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" alt="View Profile">
@@ -51,6 +52,12 @@ Data:
                 <p class="meta">{{ user.role.name }}</p>
                 <p class="meta">Unapproved absences: Semester 1 <span class="label neutral">{{ absences[1] }}</span> Semester 2 <span class="label neutral">{{ absences[2] }}</span></p>
             </div>
+        </div>
+        <div class="column small-12 medium-6">
+            <h2 class="subheader">Understanding your report</h2>
+            <p>
+                <a href="/homepage/{{ moreInfoId }}">Click here for more information</a>
+            </p>
         </div>
     </div>
 

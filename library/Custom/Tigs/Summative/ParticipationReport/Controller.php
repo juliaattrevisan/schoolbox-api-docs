@@ -178,6 +178,7 @@ class Controller extends Web\Controller\Base
             'reportDate'         => $reportDate,
             'dataAttributeError' => Config::ERROR_DATA_ATTRIBUTE,
             'showErrors'         => ($roleTypeOverride ?? $this->getUser()->getRole()->getType()) === Role::STAFF,
+            'moreInfoId'         => $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_7_10),
         ];
 
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Continuous Report");
