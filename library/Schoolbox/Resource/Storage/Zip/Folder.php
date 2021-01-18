@@ -73,21 +73,6 @@ class Folder
         $this->folderMapper = new ResourceFolder\Mapper();
         $this->fileMapper   = new ResourceFile\Mapper();
         $this->folder       = $folder;
-
-//        /* If you can't get details about $folder (it might not exist/be deleted)
-//         * then folderDetails will be null; prevent NPE in following statements
-//         */
-//        if (null === $this->folder) {
-//            error(13);
-//        }
-//
-//        if (is_numeric($this->folder->getId())) {
-//            if ($this->getPermission($this->folder->getId()) < UserAccess::ACCESS_READ) {
-//                error(5);
-//            }
-//        } else {
-//            error(13);
-//        }
     }
 
 

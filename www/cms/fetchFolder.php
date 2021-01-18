@@ -7,6 +7,8 @@
  */
 
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\Zip\Folder;
 
@@ -19,6 +21,12 @@ try {
 } catch (Schoolbox\Mapper\Exception $e) {
     error(ErrorMapper::ERROR_PERM_DOWNLOAD_FILE);
 }
+
+$access = Access::getInstance();
+if ($access->getFolderAccess($_SESSION['user'], $folder->getId()) > UserAccess::ACCESS_READ) {
+    error(ErrorMapper::ERROR_CATEGORY_DELETED);
+}
+
 $zip = new Folder($folder);
 //ShutdownHandler::instance()->registerFunction([$zip, 'cleanUp'], 10000);
 $zip->sendZip();
