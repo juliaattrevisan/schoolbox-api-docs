@@ -190,7 +190,7 @@
                             <label for="year">Year</label>
                             <select name="year_id">
                                 <option value="" selected="selected">Not Set</option>
-                                {% for yearLevel in yearLevels %}
+                                {% for yearLevel in yearLevels ?? [] %}
                                     {% set selected = '' %}
 
                                     {% if user.year is not null and yearLevel.id == user.year.id %}

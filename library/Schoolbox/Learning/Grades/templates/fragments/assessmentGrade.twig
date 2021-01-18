@@ -39,7 +39,7 @@
             } only %}
             <span class="{{ participant ? 'pipe' : '' }} meta">{{ assessment.typeName }}</span>
             <span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
-            {% if assessment is quiz and summaryRoute and participant.allResponses | length %}
+            {% if assessment is quiz and summaryRoute and participant and participant.allResponses | length %}
             <span class="pipe meta">
                 <a href="{{ summaryRoute }}" title="View Attempts">View Attempts</a>
             </span>

@@ -732,7 +732,7 @@
                         {% block contacts %}
                             <h2 class="subheader">Contact Information</h2>
 
-                            {% for message in externalUser.AlertMessages %}
+                            {% for message in externalUser.AlertMessages ?? [] %}
                                 {% block contacts_alert %}
                                     {# Only staff may view contact alerts #}
                                     {% if showContactsAlert %}
