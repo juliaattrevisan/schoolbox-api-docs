@@ -23,7 +23,7 @@ try {
 }
 
 $access = Access::getInstance();
-if ($access->getFolderAccess($_SESSION['user'], $folder->getId()) > UserAccess::ACCESS_READ) {
+if ($access->getFolderAccess($_SESSION['user'], $folder->getId()) < UserAccess::ACCESS_READ) {
     error(ErrorMapper::ERROR_CATEGORY_DELETED);
 }
 
