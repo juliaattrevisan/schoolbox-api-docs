@@ -81,40 +81,6 @@ class Folder
     }
 
     /**
-     * Ensures that file and folder names contain only characters in
-     * `self::ALLOWED_CHARS`.
-     *
-     * @param string $name
-     * @return string
-     */
-    private function cleanName(string $name): string
-    {
-        return preg_replace(self::ALLOWED_CHARS_REGEX, '_', $name);
-    }
-
-    /**
-     * Create a filename that is guaranteed to not be in `$uniqueFileNames`.
-     *
-     * @param string $basename
-     * @param array  $uniqueFileNames
-     * @param int    $depth
-     * @return string
-     */
-    private function uniqueFileName(string $basename, array $uniqueFileNames, int $depth = 1): string
-    {
-        if (in_array($basename, $uniqueFileNames)) {
-            $pathParts = pathinfo($basename);
-            $newName   = $pathParts['filename'] . '_' . $depth;
-            if (isset($pathParts['extension'])) {
-                $newName .= '.' . $pathParts['extension'];
-            }
-            return $this->uniqueFileName($newName, $uniqueFileNames, ++$depth);
-        }
-        return $basename;
-    }
-
-
-    /**
      * Recursively adds files and sub-folders in `$this->folder` to the ZIP, and
      * then streams that ZIP to the browser.
      *
@@ -139,7 +105,7 @@ class Folder
      *
      * @param ZipStream\ZipStream  $zipStream The ZIP to add files to
      * @param ResourceFolder\Model $folder    The folder to add files from
-     * @param array $pathParts                The path within the ZIP to add
+     * @param array                $pathParts The path within the ZIP to add
      *                                        `$folder`'s files and sub-folders
      */
     private function iterateFolder(ZipStream\ZipStream $zipStream, ResourceFolder\Model $folder, array $pathParts)
@@ -195,5 +161,42 @@ class Folder
     private function getPermission(int $folderId): int
     {
         return $this->access->getFolderAccess($this->currentUser, $folderId);
+    }
+
+    /**
+     * Ensures that file and folder names contain only characters in
+     * `self::ALLOWED_CHARS`.
+     *
+     * TODO determine if name even needs to be cleaned: the previous version of
+     *      this class actually created temp files, this one doesn't so this
+     *      may not be needed
+     *
+     * @param string $name
+     * @return string
+     */
+    private function cleanName(string $name): string
+    {
+        return preg_replace(self::ALLOWED_CHARS_REGEX, '_', $name);
+    }
+
+    /**
+     * Create a filename that is guaranteed to not be in `$uniqueFileNames`.
+     *
+     * @param string $basename
+     * @param array  $uniqueFileNames
+     * @param int    $depth
+     * @return string
+     */
+    private function uniqueFileName(string $basename, array $uniqueFileNames, int $depth = 1): string
+    {
+        if (in_array($basename, $uniqueFileNames)) {
+            $pathParts = pathinfo($basename);
+            $newName   = $pathParts['filename'] . '_' . $depth;
+            if (isset($pathParts['extension'])) {
+                $newName .= '.' . $pathParts['extension'];
+            }
+            return $this->uniqueFileName($newName, $uniqueFileNames, ++$depth);
+        }
+        return $basename;
     }
 }
