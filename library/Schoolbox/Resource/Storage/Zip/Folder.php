@@ -10,12 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage\Zip;
 
 use Group;
-use RuntimeException;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder as ResourceFolder;
 use Schoolbox\Resource\File as ResourceFile;
-use UnexpectedValueException;
 use ZipStream;
 
 /**
@@ -29,43 +26,36 @@ class Folder
      */
     private $allowedChars = '[^0-9a-zA-Z()_-]';
 
-
     /**
      * Max folder depth of zip
      * @var int
      */
     private $maxDepth = 5;
 
-
     /**
      * @var Group
      */
     private $groupHandler;
-
 
     /**
      * @var ResourceFolder\Mapper
      */
     private $folderMapper;
 
-
     /**
      * @var ResourceFile\Mapper
      */
     private $fileMapper;
 
-
     /**
-     * @var ResourceFolder\Model
+     * The folder to download.
      */
-    private $folder;
-
+    private ResourceFolder\Model $folder;
 
     /**
-     * ZipFolder constructor.
+     * Constructor
      *
      * @param ResourceFolder\Model $folder
-     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function __construct(ResourceFolder\Model $folder)
     {
@@ -75,40 +65,14 @@ class Folder
         $this->folder       = $folder;
     }
 
-
-    /**
-     * @param int $folder
-     * @param int $permission
-     * @return \Schoolbox\Collection|ResourceFile\Model[]
-     */
-    private function getResources($folder, $permission)
-    {
-        return $this->fileMapper->findForFolders(
-            [$folder],
-            ['getHidden' => ($permission >= UserAccess::ACCESS_WRITE)]
-        );
-    }
-
-
-    /**
-     * @param int $folderId
-     * @return \Schoolbox\GenericCollection|ResourceFolder\Model[]
-     */
-    private function getFolders($folderId)
-    {
-        return $this->folderMapper->findByParent($folderId);
-    }
-
-
     /**
      * @param string $name
-     * @return string|string[]|null
+     * @return string
      */
-    private function cleanName($name)
+    private function cleanName(string $name): string
     {
         return preg_replace("/{$this->allowedChars}/", '_', $name);
     }
-
 
     /**
      * Create a filename that is guaranteed to not be in `$uniqueFileNames`.
@@ -133,10 +97,12 @@ class Folder
 
 
     /**
-     * @throws RuntimeException
-     * @throws UnexpectedValueException
+     * Recursively adds files and sub-folders in `$this->folder` to the ZIP, and
+     * then streams that ZIP to the browser.
+     *
+     * @throws ZipStream\Exception\OverflowException
      */
-    public function sendZip()
+    public function sendZip(): void
     {
         $zipOptions = new ZipStream\Option\Archive();
         $zipOptions->setSendHttpHeaders(true);
@@ -153,19 +119,25 @@ class Folder
      * Iterate the given folder, and add any files and sub-folders which the
      * user has permission to view into the ZIP stream.
      *
-     * @param ZipStream\ZipStream       $zipStream The ZIP to add files to
-     * @param ResourceFolder\Model|null $folder    The Schoolbox folder to add
-     *                                             files from
-     * @param array                     $pathParts The path in the ZIP to add
-     *                                             files to
+     * @param ZipStream\ZipStream  $zipStream The ZIP to add files to
+     * @param ResourceFolder\Model $folder    The folder to add files from
+     * @param array $pathParts                The path within the ZIP to add
+     *                                        `$folder`'s files and sub-folders
      */
-    private function iterateFolder(ZipStream\ZipStream $zipStream, ?ResourceFolder\Model $folder, array $pathParts)
+    private function iterateFolder(ZipStream\ZipStream $zipStream, ResourceFolder\Model $folder, array $pathParts)
     {
         $path        = implode(DIRECTORY_SEPARATOR, $pathParts);
         $uniqueNames = [];
 
         // Load all files
-        $fileList = $this->getResources($folder->getId(), $this->getPermission($folder->getId()));
+        $permission = $this->getPermission($folder->getId());
+        if ($permission < UserAccess::ACCESS_READ) {
+            return;
+        }
+        $fileList = $this->fileMapper->findForFolders(
+            [$folder->getId()],
+            ['getHidden' => $permission >= UserAccess::ACCESS_WRITE]
+        );
         foreach ($fileList as $file) {
             // Ensure filenames are unique
             if ($file->getStorage()->exists()) {
@@ -180,9 +152,8 @@ class Folder
 
         // dont recurse deeper than max depth
         if ($this->maxDepth >= count($pathParts)) {
-            // get subfolders and recurse through them
-            $childFolderList = $this->getFolders($folder->getId());
-            foreach ($childFolderList as $childFolder) {
+            // get sub-folders and recurse through them
+            foreach ($this->folderMapper->findByParent($folder->getId()) as $childFolder) {
                 $permission = $this->getPermission($childFolder->getId());
                 if ($permission > UserAccess::ACCESS_DENY) {
                     $uniqueName    = $this->uniqueFileName($childFolder->getName(), $uniqueNames);
@@ -200,11 +171,11 @@ class Folder
     /**
      * Gets a Group permission level for the given folder
      *
-     * @param int $folderid
+     * @param int $folderId
      * @return int UserAccess::ACCESS_DENY|UserAccess::ACCESS_READ|UserAccess::ACCESS_WRITE|UserAccess::ACCESS_FULL
      */
-    private function getPermission(int $folderid): int
+    private function getPermission(int $folderId): int
     {
-        return $this->groupHandler->getPermission($folderid);
+        return $this->groupHandler->getPermission($folderId);
     }
 }
