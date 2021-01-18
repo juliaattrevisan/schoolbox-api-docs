@@ -56,38 +56,38 @@ class Folder
 
 
     /**
-     * @var ResourceFolder\Model|null
+     * @var ResourceFolder\Model
      */
-    private $folderDetails;
+    private $folder;
 
 
     /**
      * ZipFolder constructor.
      *
-     * @param int $folder
+     * @param ResourceFolder\Model $folder
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function __construct(int $folder)
+    public function __construct(ResourceFolder\Model $folder)
     {
-        $this->groupHandler  = new Group();
-        $this->folderMapper  = new ResourceFolder\Mapper();
-        $this->fileMapper    = new ResourceFile\Mapper();
-        $this->folderDetails = $this->getFolderDetails($folder);
+        $this->groupHandler = new Group();
+        $this->folderMapper = new ResourceFolder\Mapper();
+        $this->fileMapper   = new ResourceFile\Mapper();
+        $this->folder       = $folder;
 
-        /* If you can't get details about $folder (it might not exist/be deleted)
-         * then folderDetails will be null; prevent NPE in following statements
-         */
-        if (null === $this->folderDetails) {
-            error(13);
-        }
-
-        if (is_numeric($this->folderDetails->getId())) {
-            if ($this->getPermission($this->folderDetails->getId()) < UserAccess::ACCESS_READ) {
-                error(5);
-            }
-        } else {
-            error(13);
-        }
+//        /* If you can't get details about $folder (it might not exist/be deleted)
+//         * then folderDetails will be null; prevent NPE in following statements
+//         */
+//        if (null === $this->folder) {
+//            error(13);
+//        }
+//
+//        if (is_numeric($this->folder->getId())) {
+//            if ($this->getPermission($this->folder->getId()) < UserAccess::ACCESS_READ) {
+//                error(5);
+//            }
+//        } else {
+//            error(13);
+//        }
     }
 
 
@@ -155,10 +155,10 @@ class Folder
     {
         $zipOptions = new ZipStream\Option\Archive();
         $zipOptions->setSendHttpHeaders(true);
-        $zipStream = new ZipStream\ZipStream($this->cleanName($this->folderDetails->getName()) . '.zip', $zipOptions);
+        $zipStream = new ZipStream\ZipStream($this->cleanName($this->folder->getName()) . '.zip', $zipOptions);
 
         // Iterate the folder, its sub-folders and its files
-        $this->iterateFolder($zipStream, $this->folderDetails, []);
+        $this->iterateFolder($zipStream, $this->folder, []);
 
         $zipStream->finish();
     }
@@ -212,30 +212,14 @@ class Folder
         }
     }
 
-
-    /**
-     * Gets a db row representing the given category id
-     *
-     * @param int $folder_id
-     * @return ResourceFolder\Model
-     */
-    protected function getFolderDetails(int $folder_id): ?ResourceFolder\Model
-    {
-        try {
-            return $this->folderMapper->findById($folder_id);
-        } catch (Exception $e) {
-            return null;
-        }
-    }
-
     /**
      * Gets a Group permission level for the given folder
      *
-     * @param int $folder_id
+     * @param int $folderid
      * @return int UserAccess::ACCESS_DENY|UserAccess::ACCESS_READ|UserAccess::ACCESS_WRITE|UserAccess::ACCESS_FULL
      */
-    protected function getPermission($folder_id)
+    private function getPermission(int $folderid): int
     {
-        return $this->groupHandler->getPermission($folder_id);
+        return $this->groupHandler->getPermission($folderid);
     }
 }
