@@ -27,6 +27,5 @@ if ($access->getFolderAccess($_SESSION['user'], $folder->getId()) > UserAccess::
     error(ErrorMapper::ERROR_CATEGORY_DELETED);
 }
 
-$zip = new Folder($folder);
-//ShutdownHandler::instance()->registerFunction([$zip, 'cleanUp'], 10000);
+$zip = new Folder($folder, $_SESSION['user'], $access);
 $zip->sendZip();

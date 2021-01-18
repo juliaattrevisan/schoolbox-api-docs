@@ -9,10 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Zip;
 
-use Group;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder as ResourceFolder;
 use Schoolbox\Resource\File as ResourceFile;
+use Schoolbox\User;
 use ZipStream;
 
 /**
@@ -22,30 +23,24 @@ use ZipStream;
 class Folder
 {
     /**
-     * @var string
+     * Allowable characters in file and folder names.
      */
-    private $allowedChars = '[^0-9a-zA-Z()_-]';
+    private const ALLOWED_CHARS = '[^0-9a-zA-Z()_-]';
 
     /**
-     * Max folder depth of zip
-     * @var int
+     * Max folder depth of zip that this class may create.
      */
-    private $maxDepth = 5;
-
-    /**
-     * @var Group
-     */
-    private $groupHandler;
+    private const MAX_DEPTH = 5;
 
     /**
      * @var ResourceFolder\Mapper
      */
-    private $folderMapper;
+    private ResourceFolder\Mapper $folderMapper;
 
     /**
      * @var ResourceFile\Mapper
      */
-    private $fileMapper;
+    private ResourceFile\Mapper $fileMapper;
 
     /**
      * The folder to download.
@@ -53,25 +48,41 @@ class Folder
     private ResourceFolder\Model $folder;
 
     /**
+     * The currently logged-in user.
+     */
+    private User $currentUser;
+
+    /**
+     * The folder permission access class.
+     */
+    private Access $access;
+
+    /**
      * Constructor
      *
      * @param ResourceFolder\Model $folder
+     * @param User                 $currentUser
+     * @param Access               $access
      */
-    public function __construct(ResourceFolder\Model $folder)
+    public function __construct(ResourceFolder\Model $folder, User $currentUser, Access $access)
     {
-        $this->groupHandler = new Group();
         $this->folderMapper = new ResourceFolder\Mapper();
         $this->fileMapper   = new ResourceFile\Mapper();
         $this->folder       = $folder;
+        $this->currentUser  = $currentUser;
+        $this->access       = $access;
     }
 
     /**
+     * Ensures that file and folder names contain only characters in
+     * `self::ALLOWED_CHARS`.
+     *
      * @param string $name
      * @return string
      */
     private function cleanName(string $name): string
     {
-        return preg_replace("/{$this->allowedChars}/", '_', $name);
+        return preg_replace("/" . self::ALLOWED_CHARS . "/", '_', $name);
     }
 
     /**
@@ -151,7 +162,7 @@ class Folder
         }
 
         // dont recurse deeper than max depth
-        if ($this->maxDepth >= count($pathParts)) {
+        if (self::MAX_DEPTH >= count($pathParts)) {
             // get sub-folders and recurse through them
             foreach ($this->folderMapper->findByParent($folder->getId()) as $childFolder) {
                 $permission = $this->getPermission($childFolder->getId());
@@ -172,10 +183,10 @@ class Folder
      * Gets a Group permission level for the given folder
      *
      * @param int $folderId
-     * @return int UserAccess::ACCESS_DENY|UserAccess::ACCESS_READ|UserAccess::ACCESS_WRITE|UserAccess::ACCESS_FULL
+     * @return int One of the `UserAccess::ACCESS_*` constants
      */
     private function getPermission(int $folderId): int
     {
-        return $this->groupHandler->getPermission($folderId);
+        return $this->access->getFolderAccess($this->currentUser, $folderId);
     }
 }
