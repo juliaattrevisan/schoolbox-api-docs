@@ -138,7 +138,7 @@
             {% spaceless %}
             {% for student in markbook.students %}
             <tr data-student="{{ student.id }}">
-                <td class="no-pad">
+                <td class="profile-cell">
                     <div class="compact card no-pad small-12">
                         <a href="/search/user/{{ student.id }}" title="View Profile">
                             {% if studentCount < functionDegradeLimit %}

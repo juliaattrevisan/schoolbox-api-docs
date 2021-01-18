@@ -69,7 +69,7 @@
                     </tr>
                     {% for student in markbook.students %}
                         <tr data-id="{{ student.id }}">
-                            <th class="no-pad">
+                            <th class="profile-cell">
                                 <div class="compact card no-pad small-12">
                                     <a href="/search/user/{{ student.id }}" title="View Profile">
                                         <img src="/portrait.php?userId={{ student.externalId }}&size=square64" alt="View Profile"/>

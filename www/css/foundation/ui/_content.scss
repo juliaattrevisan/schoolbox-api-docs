@@ -458,7 +458,7 @@ section {
 }
 
 // Tables
-table{
+table {
     border-collapse: collapse;
     width: 100%;
     line-height: 1.4;
@@ -468,10 +468,13 @@ table{
             margin: -0.6rem 1rem 0 -0.6rem;
         }
     }
-    .no-pad{
-        .card img{
-            margin: 0 1rem 0 0;
-        }
+    .profile-cell {
+      min-width: 160px;
+      padding: 0;
+
+      .card img {
+          margin: 0 .5rem 0 0;
+      }
     }
     tr.alert {
         background-color: tint($alert-color, 74%);
