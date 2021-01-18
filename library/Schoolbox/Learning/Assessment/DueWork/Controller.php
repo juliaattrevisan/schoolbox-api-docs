@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -233,7 +234,9 @@ class Controller extends Assessment\Controller
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessment/dueWork/status.twig',
-                $twigData, "Status of {$assessment->getTitle()}", 'submission'
+                $twigData,
+                "Status of {$assessment->getTitle()}",
+                'submission'
             )
         );
     }
@@ -329,7 +332,9 @@ class Controller extends Assessment\Controller
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessment/dueWork/summary/student.twig',
-                $twigData, "{$assessment->getTitle()} - {$student->getFullName()}", 'submission'
+                $twigData,
+                "{$assessment->getTitle()} - {$student->getFullName()}",
+                'submission'
             )
         );
     }
@@ -466,10 +471,11 @@ class Controller extends Assessment\Controller
             $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
             $data = array_merge(
-                $data, [
+                $data,
+                [
                 'headers' => $this->getRubricHeaders($rubricGrid),
                 'marks'   => $this->getMarks($assessment->getAllParticipants()),
-            ]
+                ]
             );
         }
 
@@ -745,7 +751,8 @@ class Controller extends Assessment\Controller
         $this->getSession()->getSegment(static::class)->set('errorMessage', null);
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@learningAssessment/dueWork/createSubmission.twig', [
+                '@learningAssessment/dueWork/createSubmission.twig',
+                [
                 'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
                     [
                         'Create Response for ' . $assessment->getTitle(),
@@ -760,7 +767,7 @@ class Controller extends Assessment\Controller
                 'editorContents' => $editorContents,
                 'policy'         => $this->getConfigLoader()->get('lms_student_policy'),
                 'errorMessage'   => $errorMessage,
-            ]
+                ]
             )
         );
     }
@@ -1149,10 +1156,11 @@ class Controller extends Assessment\Controller
             $participant = $assessment->getParticipant($student);
             $this->getResponse()->content->set(
                 $this->buildUnthemedHtmlOutput(
-                    '@learning/fragments/toMarkParticipant.twig', [
+                    '@learning/fragments/toMarkParticipant.twig',
+                    [
                     'participant' => $participant,
                     'assessment'  => $participant->getAssessable(),
-                ]
+                    ]
                 )
             );
             $code = 200;

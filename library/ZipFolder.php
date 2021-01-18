@@ -1,11 +1,13 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 use Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\Resource\Folder;
-use \Schoolbox\Resource\File;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\File;
 
 /**
  * Puts all resources from a folder into a zip
@@ -96,7 +98,7 @@ class ZipFolder
         $this->tmpFolder = $this->tmpName . 'dir';
         $this->tmpZip    = $this->tmpName . '.zip';
 
-        $this->groupHandler  = new Group;
+        $this->groupHandler  = new Group();
         $this->folderMapper  = new Folder\Mapper();
         $this->fileMapper    = new File\Mapper();
         $this->folderDetails = $this->getFolderDetails($folder);
@@ -241,7 +243,7 @@ class ZipFolder
                 if ($permission > UserAccess::ACCESS_DENY) {
                     $folderName     = $this->cleanName($folder->getName());
                     $folderLocation = $currentDir . '/' . $folderName;
-                    if(!is_dir($folderLocation)) {
+                    if (!is_dir($folderLocation)) {
                         if (!mkdir($folderLocation) && !is_dir($folderLocation)) {
                             throw new \RuntimeException(sprintf('Directory "%s" was not created', $folderLocation));
                         }

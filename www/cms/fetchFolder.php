@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Script to put all resources from a folder into a zip and send to client.
  *
