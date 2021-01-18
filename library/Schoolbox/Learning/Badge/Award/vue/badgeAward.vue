@@ -86,8 +86,8 @@ export default {
          */
         userSearchAdditionalParams: {
             type: Object,
-            default: {
-                roleTypeID: 'student',
+            default: () => {
+                return {roleTypeID: 'student',};
             },
         },
 
