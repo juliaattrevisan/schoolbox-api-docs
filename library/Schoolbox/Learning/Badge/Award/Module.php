@@ -51,6 +51,11 @@ class Module extends BaseModule
             ),
         );
 
+        $setGoalForSelfRule = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\HasRole(Role::STUDENT)
+        );
+
         /* Get a list of badges that were awarded to a particular person
          */
         $this->register(
@@ -126,10 +131,7 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/{badgeId}/setGoalForSelf',
             'setAsGoalForSelf',
-            new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\HasRole(Role::STUDENT)
-            ),
+            $setGoalForSelfRule,
             $preloadBadge
         );
 
@@ -165,9 +167,6 @@ class Module extends BaseModule
             $preloadUsers
         );
 
-        // Set as goal for self is a little different:
-        // any user may set goals, but only for themselves.
-        $setGoalForSelfRule = new Rule\IsLoggedIn();
         $this->register(
             self::METHOD_GET,
             '/goal',
