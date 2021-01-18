@@ -18,8 +18,8 @@ class ValidScheduleExecution
     /**
      * Hours when twice-daily and daily occurs successfully
      */
-    private const TWICE_DAILY_HOUR = 4;
-    private const DAILY_HOUR = 1;
+    private const TWICE_DAILY_HOUR = 6;
+    private const DAILY_HOUR = 21;
 
 
     /**
