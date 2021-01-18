@@ -95,15 +95,16 @@ class ModelToArray
         }
 
         return [
-            'badge' => call_user_func($this->badgeTranslator ,$model->getBadge()),
-            'status' => $model->getStatus(),
-            'isGoal' => $model->isGoal(),
+            'id'        => $model->getId(),
+            'badge'     => call_user_func($this->badgeTranslator, $model->getBadge()),
+            'status'    => $model->getStatus(),
+            'isGoal'    => $model->isGoal(),
             'recipient' => $recipient,
             'awardedBy' => $awardedBy,
             'awardedAt' => $model->getAwardedAt() && !$model->getAwardedAt()->isNull()
                 ? $model->getAwardedAt()->getUsingFormat(DATE_ATOM)
                 : null,
-            '_links' => call_user_func($this->linkTranslator, $model)
+            '_links'    => call_user_func($this->linkTranslator, $model),
         ];
     }
 }
