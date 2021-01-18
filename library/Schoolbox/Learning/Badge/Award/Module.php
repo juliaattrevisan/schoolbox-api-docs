@@ -121,12 +121,15 @@ class Module extends BaseModule
             $preloadBadge
         );
 
-        // any user may set goals for themselves
+        // Only students may set goals for themselves
         $this->register(
             self::METHOD_POST,
             '/{badgeId}/setGoalForSelf',
             'setAsGoalForSelf',
-            new Rule\IsLoggedIn(),
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\HasRole(Role::STUDENT)
+            ),
             $preloadBadge
         );
 
