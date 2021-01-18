@@ -19,10 +19,7 @@ Data:
     subjects[idx].folderId  int
     subjects[idx].teachers  User[]
     reportDate              null|string
-
-    isMiddleYear            bool                - Whether this student is in middle year range
     moreInfoID              string              - A homepage id from a config var, for a special page in TIGS instance
-    explanation             null|string         - Explanation of the student's grades
 #}
 {% import '@tigsSubjectReport/student-attributes-macro.twig' as macro %}
 
@@ -55,14 +52,12 @@ Data:
                 <p class="meta">Unapproved absences: Semester 1 <span class="label neutral">{{ absences[1] }}</span> Semester 2 <span class="label neutral">{{ absences[2] }}</span></p>
             </div>
         </div>
-        {% if isMiddleYear %}
         <div class="column small-12 medium-6">
             <h2 class="subheader">Understanding your report</h2>
             <p>
                 <a href="/homepage/{{ moreInfoId }}">Click here for more information</a>
             </p>
         </div>
-        {% endif %}
     </div>
 
     <div class="row dean-mentor">
@@ -173,15 +168,4 @@ Data:
             } only %}
         </div>
     </div>
-
-    {% if not isMiddleYear and explanation is not null %}
-    <div class="row explanation-grades">
-        <div class="small-12 island">
-            <h2 class="subheader">Explanation of Grades</h2>
-            <section class="content">
-                {{ explanation | purify }}
-            </section>
-        </div>
-    </div>
-    {% endif %}
 </div>

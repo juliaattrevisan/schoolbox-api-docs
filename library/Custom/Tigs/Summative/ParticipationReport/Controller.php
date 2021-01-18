@@ -160,7 +160,6 @@ class Controller extends Web\Controller\Base
         $subjectList   = $this->getSubjectList($user, $attributes, $reportDate, $roleTypeOverride);
         $academicTranscript = $this->getAcademicTranscript($user, $attributes, $subjectList, $roleTypeOverride);
         $deansComments = $this->getDeansComment($user, $attributes);
-        $explanation   = $this->getExplanation($attributes, (bool)$this->getRequest()->query->get('inline'));
 
         $data = [
             'user'               => $user,
@@ -177,13 +176,7 @@ class Controller extends Web\Controller\Base
             'reportDate'         => $reportDate,
             'dataAttributeError' => Config::ERROR_DATA_ATTRIBUTE,
             'showErrors'         => ($roleTypeOverride ?? $this->getUser()->getRole()->getType()) === Role::STAFF,
-
-            /* Middle School get a special homepage for explaining their report
-             * Everyone else presumably gets it in the same way as it always did
-             */
-            'isMiddleYear'       => $attributes->isMiddleYear(),
-            'moreInfoId'         => $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_7_10),
-            'explanation'        => $explanation,
+            'moreInfoId'         => $this->getExplanationOfGradesHomepageId($attributes),
         ];
 
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Continuous Report");
@@ -523,51 +516,6 @@ class Controller extends Web\Controller\Base
             }
         }
         return $deansComment;
-    }
-
-
-    /**
-     * Returns explanation of grade which matches the given attribute.
-     *
-     * Will either be link to homepage, or inline content, depending of flag
-     *
-     * @param StudentAttributes $attributes
-     * @param bool              $renderExplanationOfGradesInline
-     * @return null|string
-     * @throws InvalidColumnException
-     */
-    private function getExplanation(StudentAttributes $attributes, bool $renderExplanationOfGradesInline): ?string
-    {
-        $textboxHeading = $this->getConfigLoader()->get(Config::_TIGS_TEXTBOX_HEADING_EXPLANATION_OF_GRADES);
-        if (null === $textboxHeading) {
-            return null;
-        }
-        $homepageId = $this->getExplanationOfGradesHomepageId($attributes);
-        if (null === $homepageId) {
-            return null;
-        }
-
-        $pb = $this->textBoxMapper->getPredicateBuilder()
-                                  ->equals('categoryId', $homepageId)
-                                  ->equals('heading', $textboxHeading);
-
-        $textBoxes = $this->textBoxMapper->findByPredicates($pb, ['order' => ['textBoxID' => 'ASC'],]);
-
-        if (0 === $textBoxes->count()) {
-            // Render no link or inline content
-            return null;
-        }
-
-        if (!$renderExplanationOfGradesInline) {
-            // Render link to homepage
-            return "Explanation of grades for {$attributes->getExplanationOfGradesType()} can be found <a href=\"/homepage/$homepageId\">here.</a>";
-        }
-
-        // Render content of first-textbox on homepage
-        /** @var Textbox\Model $firstTextbox */
-        $firstTextbox = $textBoxes->first();
-
-        return $firstTextbox->getBody();
     }
 
 
