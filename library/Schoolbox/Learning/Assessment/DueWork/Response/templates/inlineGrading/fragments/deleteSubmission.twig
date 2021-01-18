@@ -38,12 +38,15 @@
                             var destination;
                             if ($('#response-selector').find('option').length < 2) {
                                 destination = nextUrl;
-                            }
-                            else {
+                            } else {
                                 {# Reload summary screen to find what is now the most
                                  # recent submission
                                  #}
-                                destination = '{{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id}) }}'
+                                {% if blindMode %}
+                                    destination = '{{ routeLookup('learningDueWorkResponse.getParticularResponseBlind', {assessmentId: assessment.id, studentId: participant.user.id}) }}'
+                                {% else %}
+                                    destination = '{{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: assessment.id, studentId: participant.user.id}) }}'
+                                {% endif %}
                             }
 
                             {# Go to next available person in the carousel
