@@ -84,7 +84,7 @@ abstract class Evaluation_Response extends DeprecatedModel
      * @param array $markedResponseIDs
      * @return void
      */
-    public function updatedAutomatedMarks($markedResponseIDs)
+    public function updatedAutomatedMarks(array $markedResponseIDs)
     {
         if (count($markedResponseIDs)) {
             $ids = implode(',', $markedResponseIDs);

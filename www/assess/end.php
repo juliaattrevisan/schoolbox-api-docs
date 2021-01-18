@@ -132,7 +132,7 @@ if (!$attempt['finish']) {
  * affected so we don't refetch them the next time the page loads.
  */
 $allAttempts = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $attemptId);
-
+$markedResponseIDs = [];
 $factory = new Assess_Factory();
 
 if ($allAttempts) {
