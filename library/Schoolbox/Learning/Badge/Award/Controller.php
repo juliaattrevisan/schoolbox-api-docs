@@ -249,7 +249,6 @@ class Controller extends Base
         /* Group by category
          */
         foreach ($awards as $award) {
-
             /* Force string indexes, otherwise the numeric values get inserted in-order
              * which isn't intended here; they are already in a particular order
              */
