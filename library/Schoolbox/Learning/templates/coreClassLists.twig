@@ -30,7 +30,8 @@ Data:
                            :class="{disabled: selectedStudentIds.length === 0, 'icon-share': true}">Share Learning Moment</a></li>
                 {% endif %}
                 {% if mailEnabled %}
-                    <li><a href="#" class="disabled icon-email">Email</a></li>
+                    <li><a href="#"
+                           :class="{disabled: selectedStudentExternalIds.length === 0, 'icon-email': true}">Email</a></li>
                 {% endif %}
             </ul>
         </section>
