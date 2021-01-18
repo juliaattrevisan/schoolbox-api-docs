@@ -6,6 +6,7 @@
  # IResponse response
  # Participant participant
  # bool kamiEnabled Schoolbox-configured var that determines whether kami export is available
+ # @param bool blindMode
  #}
 {% if response and response.allFiles.count %}
     {% if kamiEnabled %}
@@ -33,7 +34,13 @@
                     <li class="actions-small-2 {{ selected }} inline-grader-file">
                         <div class="list-item">
                             <div class="card small-12">
-                                <a href="{{ routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response}) }}?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
+                                {% if blindMode %}
+                                    {% set responseRoute = routeLookup('learningDueWorkResponse.getParticularResponseBlind', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response}) %}
+                                {% else %}
+                                    {% set responseRoute = routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id, responseId: response.id, response: response}) %}
+                                {% endif %}
+
+                                <a href="{{ responseRoute }}?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}">
                                     <img src="/ajax/mime/{{ currentFile.mime }}" alt="Download" class="mime" />
                                     <p>{{ currentFile.filename }}</p>
                                 </a>

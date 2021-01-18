@@ -37,14 +37,6 @@ class Blind
 {
 
     /**
-     * The querystring parameter corresponding to Blind Marking
-     * If it's set, presume that Blind Marking was desired; starts the
-     * Student Carousel in a special way if set int he url
-     */
-    public const QUERYSTRING_BLIND_MARKING = 'b';
-
-
-    /**
      * @var Router
      */
     private $router;
@@ -63,12 +55,6 @@ class Blind
 
 
     /**
-     * @var string
-     */
-    private $blindModeParams = '';
-
-
-    /**
      * Blind constructor.
      *
      * @param Router    $router
@@ -80,12 +66,6 @@ class Blind
         $this->router     = $router;
         $this->student    = $student;
         $this->assessment = $assessment;
-
-        /* Work with Blind Mode querystring params
-         */
-        $this->blindModeParams = '?' . http_build_query([
-            self::QUERYSTRING_BLIND_MARKING => 1
-        ]);
     }
 
 
@@ -229,12 +209,12 @@ class Blind
      */
     private function getUrl(User $user): string
     {
-        $url = $this->router->generate('learningDueWorkResponse.getParticularResponse', [
+        $url = $this->router->generate('learningDueWorkResponse.getParticularResponseBlind', [
             'assessmentId' => $this->assessment->getId(),
             'studentId'    => $user->getId(),
             'assessment'   => $this->assessment
         ]);
 
-        return "{$url}{$this->blindModeParams}";
+        return (string)$url;
     }
 }

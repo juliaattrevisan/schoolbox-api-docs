@@ -66,7 +66,8 @@ Usage:
         response: response,
         readonly: readonly,
         summaryRoute: routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: participant.user.id}),
-        deleteRoute: routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id ?? null, response: response })
+        deleteRoute: routeLookupIfAuthorized('learningDueWorkResponse.deleteParticularResponse', { assessmentId: assessment.id, responseId: response.id ?? null, response: response }),
+        blindMode: blindMode ?? false
     } only %}
 {% endblock %}
 
@@ -85,7 +86,8 @@ Usage:
         assessment: assessment,
         participant: participant,
         responseList: responseList,
-        response: response
+        response: response,
+        blindMode: blindMode ?? false
     } only %}
 {% endblock %}
 
@@ -110,7 +112,8 @@ Usage:
         latestFeedback: feedback,
         kamiEnabled: true,
         plagscanEnabled: plagscanEnabled,
-        selectedFileHash: selectedFileHash
+        selectedFileHash: selectedFileHash,
+        blindMode: blindMode ?? false
     } only %}
 {% endblock %}
 
@@ -133,7 +136,13 @@ Usage:
             <div class="small-12 columns">
                 <div class="alert-box warning">
                     This is not the most recent response for this due work.
-                    {% set mostRecentResponseRoute = routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id}) %}
+
+                    {% if blindMode %}
+                        {% set mostRecentResponseRoute = routeLookup('learningDueWorkResponse.getParticularResponseBlind', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id}) %}
+                    {% else %}
+                        {% set mostRecentResponseRoute = routeLookup('learningDueWorkResponse.getParticularResponse', {assessmentId: response.assessable.id, studentId: response.submittedOnBehalfOf.id}) %}
+                    {% endif %}
+
                     {% if not readonly %}
                         You should consider giving feedback for <a href="{{ mostRecentResponseRoute }}">the most recent response</a> instead.
                     {% else %}

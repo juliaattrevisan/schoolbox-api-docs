@@ -6,12 +6,14 @@
  # IResponse response
  # Collection|IResponse[] responseList
  # string deleteRoute
+ # @param bool blindMode
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
 {% include '@learningDueWorkResponse/inlineGrading/fragments/deleteSubmission.twig' with {
     assessment: assessment,
-    participant: participant
+    participant: participant,
+    blindMode: blindMode ?? false
 } only %}
 
 <div class="actions-small-1 row">

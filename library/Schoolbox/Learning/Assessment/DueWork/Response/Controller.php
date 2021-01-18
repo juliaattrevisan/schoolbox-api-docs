@@ -199,6 +199,32 @@ class Controller extends Base
         }
     }
 
+
+    /**
+     * An alias for getParticularResponse but with blind mode activated
+     * There are too many little twig subcomponents to justify propagating the querystring param
+     * being built in twig separately from backend
+     *
+     * @param DueWork    $assessment
+     * @param User       $student
+     * @param Model|null $response
+     * @throws ApplicationException\Exception
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function getParticularResponseBlind(
+        DueWork $assessment,
+        User $student,
+        Model $response = null
+    ): void {
+        $this->getParticularResponse($assessment, $student, $response, true);
+    }
+
+
     /**
      * Get the contents of a particular $response for instructor marking.
      *
@@ -210,8 +236,8 @@ class Controller extends Base
      * @param DueWork    $assessment
      * @param User       $student
      * @param Model|null $response
+     * @param bool|null  $blindMode
      * @throws ApplicationException\Exception When trying to access a draft Response when you shouldn't
-     * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws \Aura\Router\Exception\RouteNotFound If cannot generate a requested route
      * @throws \InvalidArgumentException If assessment due date is null.
      * @throws \LogicException If attempting to update the status of a kami doc that is not processing.
@@ -222,7 +248,8 @@ class Controller extends Base
     public function getParticularResponse(
         DueWork $assessment,
         User $student,
-        Model $response = null
+        Model $response = null,
+        ?bool $blindMode = false 
     ): void {
 
         $participant = $assessment->getParticipant($student);
@@ -276,7 +303,7 @@ class Controller extends Base
 
         /* Decide which StudentCarousel to show
         */
-        $carousel = $this->getRequest()->query[StudentCarousel\Blind::QUERYSTRING_BLIND_MARKING] ?
+        $carousel = $blindMode ?
             (new StudentCarousel\Blind(
                 $this->getRouter(),
                 $participant->getUser(),
@@ -313,7 +340,7 @@ class Controller extends Base
             /* This is passed through standard.twig into comment.twig, where a placeholder text
              * identifies the current guy you're marking
              */
-            'blindMode' => $this->getRequest()->query[StudentCarousel\Blind::QUERYSTRING_BLIND_MARKING],
+            'blindMode' => $blindMode,
 
             /* A list of all the Responses that the participant has spawned
              */
