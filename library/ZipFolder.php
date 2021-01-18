@@ -9,6 +9,8 @@ use \Schoolbox\Resource\File;
 
 /**
  * Puts all resources from a folder into a zip
+ *
+ * @deprecated use `\Schoolbox\Resource\Storage\Zip\Folder` instead
  */
 class ZipFolder
 {
