@@ -23,11 +23,6 @@ use ZipStream;
 class Folder
 {
     /**
-     * Allowable characters in file and folder names.
-     */
-    private const ALLOWED_CHARS_REGEX = '/[^0-9\s\\.a-zA-Z()_-]/';
-
-    /**
      * Max folder depth of zip that this class may create.
      */
     private const MAX_DEPTH = 5;
@@ -90,7 +85,7 @@ class Folder
     {
         $zipOptions = new ZipStream\Option\Archive();
         $zipOptions->setSendHttpHeaders(true);
-        $zipStream = new ZipStream\ZipStream($this->cleanName($this->folder->getName()) . '.zip', $zipOptions);
+        $zipStream = new ZipStream\ZipStream($this->folder->getName() . '.zip', $zipOptions);
 
         // Iterate the folder, its sub-folders and its files
         $this->iterateFolder($zipStream, $this->folder, []);
@@ -125,7 +120,7 @@ class Folder
         foreach ($fileList as $file) {
             // Ensure filenames are unique
             if ($file->getStorage()->exists()) {
-                $uniqueName    = $this->uniqueFileName($this->cleanName($file->getBasename()), $uniqueNames);
+                $uniqueName    = $this->uniqueFileName($file->getBasename(), $uniqueNames);
                 $uniqueNames[] = $uniqueName;
                 $zipStream->addFileFromStream(
                     $path . DIRECTORY_SEPARATOR . $uniqueName,
@@ -140,7 +135,7 @@ class Folder
             foreach ($this->folderMapper->findByParent($folder->getId()) as $childFolder) {
                 $permission = $this->getPermission($childFolder->getId());
                 if ($permission > UserAccess::ACCESS_DENY) {
-                    $uniqueName    = $this->uniqueFileName($this->cleanName($childFolder->getName()), $uniqueNames);
+                    $uniqueName    = $this->uniqueFileName($childFolder->getName(), $uniqueNames);
                     $uniqueNames[] = $uniqueName;
                     $this->iterateFolder(
                         $zipStream,
@@ -161,22 +156,6 @@ class Folder
     private function getPermission(int $folderId): int
     {
         return $this->access->getFolderAccess($this->currentUser, $folderId);
-    }
-
-    /**
-     * Ensures that file and folder names contain only characters in
-     * `self::ALLOWED_CHARS`.
-     *
-     * TODO determine if name even needs to be cleaned: the previous version of
-     *      this class actually created temp files, this one doesn't so this
-     *      may not be needed
-     *
-     * @param string $name
-     * @return string
-     */
-    private function cleanName(string $name): string
-    {
-        return preg_replace(self::ALLOWED_CHARS_REGEX, '_', $name);
     }
 
     /**
