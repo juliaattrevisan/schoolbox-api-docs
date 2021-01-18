@@ -161,6 +161,17 @@
             init: function() {
                 self.checkState();
 
+                //fileDrop instances should not be clickable, as they weren't before
+                //it appears an update to DropZone has added in a <button class='dz-button> 
+                //and the options.clickable property is not being considered, so the
+                //button still appears despite it being set to false on all fileDrop instances
+                if (!this.options.clickable) {
+                    const dzMessage = this.element.querySelector('.dz-message');
+                    const dzButton = this.element.querySelector('.dz-button');
+                    dzMessage.removeChild(dzButton);
+                    dzMessage.textContent = dzButton.textContent;
+                }
+
                 this.on('sending',        function() { self.options.sending.apply(this, arguments) });
                 this.on('uploadprogress', function() { self.options.uploadprogress.apply(this, arguments); });
                 this.on('success',        function() { self.options.success.apply(this, arguments); });
@@ -201,6 +212,7 @@
                     }
 
                     self.options.queuecomplete.apply(this, arguments);
+
                 });
 
                 // affect global state
