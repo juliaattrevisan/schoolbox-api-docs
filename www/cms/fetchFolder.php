@@ -9,6 +9,7 @@
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\Zip\Folder;
 
@@ -27,5 +28,11 @@ if ($access->getFolderAccess($_SESSION['user'], $folder->getId()) < UserAccess::
     error(ErrorMapper::ERROR_CATEGORY_DELETED);
 }
 
-$zip = new Folder($folder, $_SESSION['user'], $access);
+$zip = new Folder(
+    $folder,
+    $_SESSION['user'],
+    $access,
+    FolderMapper::getInstance(),
+    FileMapper::getInstance(),
+);
 $zip->sendZip();

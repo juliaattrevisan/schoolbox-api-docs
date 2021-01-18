@@ -33,12 +33,12 @@ class Folder
     private const MAX_DEPTH = 5;
 
     /**
-     * @var ResourceFolder\Mapper
+     * Folder mapper: this class needs to load sub-folders of `$this->folder`.
      */
     private ResourceFolder\Mapper $folderMapper;
 
     /**
-     * @var ResourceFile\Mapper
+     * File mapper: this class needs to load files within `$this->folder`.
      */
     private ResourceFile\Mapper $fileMapper;
 
@@ -60,17 +60,24 @@ class Folder
     /**
      * Constructor
      *
-     * @param ResourceFolder\Model $folder
-     * @param User                 $currentUser
-     * @param Access               $access
+     * @param ResourceFolder\Model  $folder
+     * @param User                  $currentUser
+     * @param Access                $access
+     * @param ResourceFolder\Mapper $folderMapper
+     * @param ResourceFile\Mapper   $fileMapper
      */
-    public function __construct(ResourceFolder\Model $folder, User $currentUser, Access $access)
-    {
-        $this->folderMapper = new ResourceFolder\Mapper();
-        $this->fileMapper   = new ResourceFile\Mapper();
+    public function __construct(
+        ResourceFolder\Model $folder,
+        User $currentUser,
+        Access $access,
+        ResourceFolder\Mapper $folderMapper,
+        ResourceFile\Mapper $fileMapper
+    ) {
         $this->folder       = $folder;
         $this->currentUser  = $currentUser;
         $this->access       = $access;
+        $this->folderMapper = $folderMapper;
+        $this->fileMapper   = $fileMapper;
     }
 
     /**
