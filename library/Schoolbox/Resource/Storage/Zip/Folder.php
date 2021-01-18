@@ -24,7 +24,12 @@ use Schoolbox\Resource\File as ResourceFile;
 use SplFileInfo;
 use UnexpectedValueException;
 use ZipArchive;
+use ZipStream;
 
+/**
+ * Load all resources from a folder into a ZIP file, and then stream that ZIP to
+ * standard output.
+ */
 class Folder
 {
     /**
@@ -102,7 +107,7 @@ class Folder
      * @param int $folder
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function __construct($folder)
+    public function __construct(int $folder)
     {
         $this->tmpName   = tempnam(Config::get('zip_dir'), 'zip');
         $this->tmpFolder = $this->tmpName . 'dir';
@@ -198,20 +203,56 @@ class Folder
      */
     public function sendZip()
     {
-        if ($this->createZip()) {
-            $filename = $this->cleanName($this->folderDetails->getName());
+        $zipOptions = new ZipStream\Option\Archive();
+        $zipOptions->setSendHttpHeaders(true);
+        $zipStream = new ZipStream\ZipStream($this->cleanName($this->folderDetails->getName()) . '.zip', $zipOptions);
 
-            $filesize = filesize($this->tmpZip);
-            header("Pragma: ");
-            header("Cache-control: ");
-            header("Content-Type: application/x-zip-compressed");
-            header("Content-Disposition: attachment; filename=\"" . $filename . ".zip\"");
-            header("Content-Length: $filesize");
-            readfile($this->tmpZip);
+        // Iterate the folder, its sub-folders and its files
+        $this->iterateFolder($zipStream, $this->folderDetails, []);
 
-            $this->cleanUp();
-        } else {
-            error(49);
+        $zipStream->finish();
+    }
+
+
+    /**
+     * Iterate the given folder, and add any files and sub-folders which the
+     * user has permission to view into the ZIP stream.
+     *
+     * @param ZipStream\ZipStream       $zipStream The ZIP to add files to
+     * @param ResourceFolder\Model|null $folder    The Schoolbox folder to add
+     *                                             files from
+     * @param array                     $pathParts The path in the ZIP to add
+     *                                             files to
+     */
+    private function iterateFolder(ZipStream\ZipStream $zipStream, ?ResourceFolder\Model $folder, array $pathParts)
+    {
+        $path = implode(DIRECTORY_SEPARATOR, $pathParts);
+
+        // Load all files
+        $fileList = $this->getResources($folder->getId(), $this->getPermission($folder->getId()));
+        foreach ($fileList as $file) {
+            if ($file->getStorage()->exists()) {
+                $zipStream->addFileFromStream(
+                    $path . DIRECTORY_SEPARATOR . $file->getBasename(),
+                    $file->readStream()
+                );
+            }
+        }
+
+        // dont recurse deeper than max depth
+        if ($this->maxDepth >= count($pathParts)) {
+            // get subfolders and recurse through them
+            $childFolderList = $this->getFolders($folder->getId());
+            foreach ($childFolderList as $childFolder) {
+                $permission = $this->getPermission($childFolder->getId());
+                if ($permission > UserAccess::ACCESS_DENY) {
+                    $this->iterateFolder(
+                        $zipStream,
+                        $childFolder,
+                        array_merge($pathParts, [$this->cleanName($childFolder->getName())])
+                    );
+                }
+            }
         }
     }
 
