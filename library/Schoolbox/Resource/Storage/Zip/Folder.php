@@ -25,7 +25,7 @@ class Folder
     /**
      * Allowable characters in file and folder names.
      */
-    private const ALLOWED_CHARS = '[^0-9a-zA-Z()_-]';
+    private const ALLOWED_CHARS = '[^0-9a-zA-Z()_-\\.]';
 
     /**
      * Max folder depth of zip that this class may create.
