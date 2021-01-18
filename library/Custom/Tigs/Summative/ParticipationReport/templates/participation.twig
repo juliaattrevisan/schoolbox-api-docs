@@ -101,14 +101,22 @@ Data:
 
     {% if hasDeansComments %}
         <div class="row dean-comments">
-            {% for i in 1..2 %}
+
+            {# Render semester 2's comments if it exists
+             # Otherwise try falling back to semester 1's comments
+             #}
+            {% set break = false %}
+
+            {% for i in 2..1 if not break %}
                 {% if deansComments[i] %}
-                <div class="dean-comment semester-{{ i }} small-12 medium-6 island">
-                    <h2 class="subheader">Dean's Comment - Semester {{ i }}</h2>
-                    <section class="content">
-                        {{ deansComments[i] | purify }}
-                    </section>
-                </div>
+                    <div class="dean-comment semester-{{ i }} small-12 medium-6 island">
+                        <h2 class="subheader">Dean's Comment - Semester {{ i }}</h2>
+                        <section class="content">
+                            {{ deansComments[i] | purify }}
+                        </section>
+                    </div>
+
+                    {% set break = true %}
                 {% endif %}
             {% endfor %}
         </div>
