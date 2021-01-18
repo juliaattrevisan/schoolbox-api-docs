@@ -137,7 +137,7 @@ export default {
                 .get('/ajax/user.php', {
                     params: {
                         query: query,
-                        groupID: 0,
+                        roleTypeID: 'student',
                     }
                 })
                 .then(response => this.options = response.data)
