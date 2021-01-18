@@ -174,11 +174,16 @@ class Controller extends Web\Controller\Base
             'academicTranscript' => $academicTranscript,
             'subjects'           => $subjectList,
             'deansComments'      => $deansComments,
-            'explanation'        => $explanation,
             'reportDate'         => $reportDate,
             'dataAttributeError' => Config::ERROR_DATA_ATTRIBUTE,
             'showErrors'         => ($roleTypeOverride ?? $this->getUser()->getRole()->getType()) === Role::STAFF,
+
+            /* Middle School get a special homepage for explaining their report
+             * Everyone else presumably gets it in the same way as it always did
+             */
+            'isMiddleYear'       => $attributes->isMiddleYear(),
             'moreInfoId'         => $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_7_10),
+            'explanation'        => $explanation,
         ];
 
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Continuous Report");
