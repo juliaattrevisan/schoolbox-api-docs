@@ -23,8 +23,20 @@ class Definition extends AbstractDefinition
      * Key for finding all badges.
      *
      * Required so that the badge list filter is even configurable.
+     *
+     * This must be a term that will not be readily searched for, as entering
+     * this string as an actual search term will bypass the name filter
+     * completely.
+     *
+     * Setting this to an empty string does not currently work, for two reasons:
+     * * the filter option with an empty string key is not inserted properly
+     *   into a collection object
+     *   (this is fixable by modifying the collection's `offsetSet` method)
+     * * the empty string key, when used in an input's name, is translated to 0
+     *   when deserialized into a POST var
+     *   (not fixable without reworking the filter admin form)
      */
-    public const KEY_ALL = 'all';
+    public const KEY_ALL = '---';
 
     /**
      * @inheritdoc
