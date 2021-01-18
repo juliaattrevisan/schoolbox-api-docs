@@ -393,6 +393,7 @@ class Controller extends Base
                 'pageCurrent' => 'user',
                 'method'    => 'Create',
                 'user' => $user,
+                'yearLevels' => $this->yearLevelMapper->findAll(),
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),
                 'externalDatabase' => ucfirst($this->getConfigLoader()->get('external_type')),
