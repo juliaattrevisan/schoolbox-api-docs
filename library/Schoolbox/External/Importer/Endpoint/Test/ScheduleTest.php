@@ -79,7 +79,7 @@ class ScheduleTest extends TestCase
 
 
     /**
-     * Twice Daily: task runs at 4am and 4pm
+     * Twice Daily: task runs at 6am and 6pm
      *
      * @return array
      */
@@ -88,49 +88,49 @@ class ScheduleTest extends TestCase
         return [
             'Twice Daily 1' => [
                 Scheduler::TWICE_DAILY,
-                strtotime('2019-12-02 03:59:59'),
+                strtotime('2019-12-02 05:59:59'),
                 false
             ],
 
             'Twice Daily 2' => [
                 Scheduler::TWICE_DAILY,
-                strtotime('2019-12-02 04:00:00'),
+                strtotime('2019-12-02 06:00:00'),
                 true
             ],
 
             'Twice Daily 3' => [
                 Scheduler::TWICE_DAILY,
-                strtotime('2019-12-02 04:59:59'),
+                strtotime('2019-12-02 06:59:59'),
                 true
             ],
 
             'Twice Daily 4' => [
                 Scheduler::TWICE_DAILY,
-                strtotime('2019-12-02 05:00:00'),
+                strtotime('2019-12-02 07:00:00'),
                 false
             ],
 
             'Twice Daily 5' => [
                 Scheduler::TWICE_DAILY,
-                strtotime('2019-12-02 15:59:59'),
+                strtotime('2019-12-02 17:59:59'),
                 false
             ],
 
             'Twice Daily 6' => [
                 Scheduler::TWICE_DAILY,
-                strtotime('2019-12-02 16:00:00'),
+                strtotime('2019-12-02 18:00:00'),
                 true
             ],
 
             'Twice Daily 7' => [
                 Scheduler::TWICE_DAILY,
-                strtotime('2019-12-02 16:59:59'),
+                strtotime('2019-12-02 18:59:59'),
                 true
             ],
 
             'Twice Daily 8' => [
                 Scheduler::TWICE_DAILY,
-                strtotime('2019-12-02 17:00:00'),
+                strtotime('2019-12-02 19:00:00'),
                 false
             ],
         ];
@@ -153,7 +153,7 @@ class ScheduleTest extends TestCase
 
 
     /**
-     * Daily: task runs at 1am
+     * Daily: task runs at 9pm
      *
      * @return array
      */
@@ -162,49 +162,49 @@ class ScheduleTest extends TestCase
         return [
             'Daily 1' => [
                 Scheduler::DAILY,
-                strtotime('2019-12-02 00:59:59'),
+                strtotime('2019-12-02 20:59:59'),
                 false
             ],
 
             'Daily 2' => [
                 Scheduler::DAILY,
-                strtotime('2019-12-02 01:00:00'),
+                strtotime('2019-12-02 21:00:00'),
                 true
             ],
 
             'Daily 3' => [
                 Scheduler::DAILY,
-                strtotime('2019-12-02 01:59:59'),
+                strtotime('2019-12-02 21:59:59'),
                 true
             ],
 
             'Daily 4' => [
                 Scheduler::DAILY,
-                strtotime('2019-12-02 02:00:00'),
+                strtotime('2019-12-02 22:00:00'),
                 false
             ],
 
             'Daily 5' => [
                 Scheduler::DAILY,
-                strtotime('2019-12-02 12:59:59'),
+                strtotime('2019-12-02 08:59:59'),
                 false
             ],
 
             'Daily 6' => [
                 Scheduler::DAILY,
-                strtotime('2019-12-02 13:00:00'),
+                strtotime('2019-12-02 09:00:00'),
                 false
             ],
 
             'Daily 7' => [
                 Scheduler::DAILY,
-                strtotime('2019-12-02 13:59:59'),
+                strtotime('2019-12-02 09:59:59'),
                 false
             ],
 
             'Daily 8' => [
                 Scheduler::DAILY,
-                strtotime('2019-12-02 14:00:00'),
+                strtotime('2019-12-02 10:00:00'),
                 false
             ],
         ];
