@@ -61,11 +61,11 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\Storage\Zip\Zip;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Sentry\State\HubInterface;
 use UnexpectedValueException;
+use ZipStream;
 
 /**
  * Class Controller
@@ -357,12 +357,14 @@ class Controller extends Assessment\Controller
         /** @var User[] $users */
         $users = [];
 
-        // Create a zip file to hold the downloaded submissions
+        // Create a zip stream to hold the downloaded submissions
 
         $titleSanitized = $this->sanitizeForFilename($assessment->getTitle());
         $dateNow = Alaress_Date_Format::now()->getUsingFormat('Ymd-His');
 
-        $zip = new Zip($this->getConfigLoader(), "{$titleSanitized}-{$dateNow}.zip");
+        $zipOptions = new ZipStream\Option\Archive();
+        $zipOptions->setSendHttpHeaders(true);
+        $zipStream = new ZipStream\ZipStream("{$titleSanitized}-{$dateNow}.zip", $zipOptions);
 
         // Iterate participants and get their responses
 
@@ -401,25 +403,19 @@ class Controller extends Assessment\Controller
                     $files = $response->getAllFiles();
 
                     /** @var SubmissionFile $file */
-                    foreach ($files as $file)
-                    {
+                    foreach ($files as $file) {
                         if ($file->exists()) {
                             $filenameSanitized = $this->sanitizeForFilename($file->getBasename());
                             $zipFilename = sprintf("%s/%s", $directory, $filenameSanitized);
-                            $zip->addStream($file->readStream(), $zipFilename);
+                            $zipStream->addFileFromStream($zipFilename, $file->readStream());
                         }
                     }
                 }
             }
         }
 
-        // Flush the ZIP file to before deleting the temporary files- otherwise we end up with an empty file
-
-        $zip->persist();
-
-        // Download the sucker
-
-        $zip->download();
+        // Stream the zip archive
+        $zipStream->finish();
     }
 
 
