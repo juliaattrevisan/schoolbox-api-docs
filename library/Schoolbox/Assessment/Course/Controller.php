@@ -230,7 +230,21 @@ class Controller extends Base\Base
 
         // Create Unit if required
         if (!$unitExists) {
-            $unit = $this->unitSpecificationMapper->createModel();
+
+            /* Unit folder might have been deleted at some point in the past
+             * See if there's a deleted row we can recycle since foreign keys
+             * will stop us from inserting a tuple that already exists
+             */
+            try {
+                $unit = $this->unitSpecificationMapper->findOneByColumn('folder_id', $unitFolder->getId(), [
+                    'deleted' => true
+                ]);
+            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                $unit = $e->getDeletedObject()->setDeletedAt(null);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $unit = $this->unitSpecificationMapper->createModel();
+            }
+
             $unit->setFolder($unitFolder);
         }
 
