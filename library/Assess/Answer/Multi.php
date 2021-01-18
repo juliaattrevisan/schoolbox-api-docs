@@ -52,7 +52,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
          * the marks, otherwise penalise them. The teacher can review and
          * adjust the mark accordingly
          */
-        if ($response && ($numCorrect == count($response))) {
+        if (is_array($response) && ($numCorrect == count($response))) {
             if ($i) {
                 $marksPerAnswer = $currentResponse['marks'] / $i;
                 $total = $marksPerAnswer * $numCorrect;
