@@ -124,7 +124,11 @@ Data:
     </div>
 
     <div v-if="mailEnabled" id="classList-email" data-reveal aria-hidden="true" class="reveal-modal small">
-        <h2>Email Students</h2>
+        <h2>Email</h2>
+
+        <ul class="meta">
+            <li>Emailing for <span data-relation="dynamicUsersSlot"></span></li>
+        </ul>
 
         <fieldset class="checklist">
             <template v-for="(group, index) in groups">
@@ -268,7 +272,21 @@ Data:
                 return url.toString();
             },
             openMailDialog: function () {
-                $('#classList-email').foundation('reveal', 'open');
+                let self             = this,
+                    dialog           = $('#classList-email'),
+                    selectedStudents = [];
+
+                // Load selected students into the dynamic user slot of this dialog
+                this.studentLists.forEach(function (student) {
+                    if (student.synergy_id && self.selectedStudentExternalIds.includes(student.synergy_id)) {
+                        selectedStudents.push(student);
+                    }
+                });
+
+                dialog.find('[data-relation="dynamicUsersSlot"]')
+                    .empty()
+                    .append(self.buildSelectedStudentsLinkList(selectedStudents));
+                dialog.foundation('reveal', 'open');
             },
             openShareLearningMomentDialog: function() {
                 // Set each link's href to the selected users
@@ -292,9 +310,25 @@ Data:
                 });
 
                 // Create the list of links
+                let parts = self.buildSelectedStudentsLinkList(selectedStudents);
+
+                // Shove it in the dynamic users slot
+                dialog.find('[data-relation="dynamicUsersSlot"]').empty().append(parts);
+                dialog.foundation('reveal', 'open');
+            },
+
+            /**
+             * Build a list of links to the students in `students`.
+             *
+             * @param {Array} students
+             * @return {Array}
+             */
+            buildSelectedStudentsLinkList: function (students) {
+                // Create the list of links
                 let parts = [];
-                selectedStudents.forEach(function (student) {
-                    parts.push($('<a>')
+                students.forEach(function (student) {
+                    parts
+                        .push($('<a>')
                         .attr('href', '/search/user/' + student.id)
                         .text(student.firstname + ' ' + student.lastname));
                     parts.push(', ');
@@ -307,10 +341,7 @@ Data:
                 if (parts.length > 1) {
                     parts.splice(-2, 1, ' and ');
                 }
-
-                // Shove it in the dynamic users slot
-                dialog.find('[data-relation="dynamicUsersSlot"]').empty().append(parts);
-                dialog.foundation('reveal', 'open');
+                return parts;
             },
         },
         computed: {
