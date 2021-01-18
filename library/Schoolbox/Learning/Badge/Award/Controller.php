@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Badge\Award;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -349,12 +350,23 @@ class Controller extends Base
     private function createAwardsFromRequestBody(Model $badge, string $status): void
     {
         // Users are in the data.
-        // So far: it's assumed all staff may award or set a badge as a goal to
-        // any other user.
+        // For now: badges may only be awarded to or set as goals for students.
         $data       = json_decode($this->request->content->getRaw(), true);
         $collection = $this->mapper->createCollection();
         $userIds    = array_column($data['users'], 'id');
         $users      = $this->userMapper->findByColumn('id', $userIds);
+
+        // Are any of those users not students? Error out
+        foreach ($users as $user) {
+            if (!$user->getRole()->isStudent()) {
+                throw $this->generateException(
+                    ErrorMapper::ERROR_BADGE_AWARD_TO_NON_STUDENT_USER,
+                    null,
+                    '',
+                    403
+                );
+            }
+        }
 
         /* Need a badge history for a particular user to decide how goals
          * and achievements are persisted
