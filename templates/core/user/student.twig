@@ -55,7 +55,7 @@
 {% set showClasses = showClasses and showDetails %}
 {% set showTitle = user.hasPositionTitle() %}
 
-{% set showActivityFeed = (isStaff or isSelf or isParentOfStudent) %}
+{% set showActivityFeed = (config.learning_moments_enabled or config.badges_enabled) and (isStaff or isSelf or isParentOfStudent) %}
 {% set showAchievementsTab = config.badges_enabled and (isStaff or isSelf or isParentOfStudent) %}
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
@@ -491,55 +491,56 @@
         </dl>
 
         <div class="profile-tabs tabs-content">
+            {% autoescape 'js' %}
+                {# Configuration for various Vue components #}
+                <script type="text/javascript">
+                    let baseConfig = {
+                        currentUser: {{ USER | json_encode | raw }},
+                        student: {{ user | json_encode | raw }},
+                        routes: {
+                            getCreateEvidenceForm: '{{ routeLookupIfAuthorized(
+                                'learningMomentEvidence.getCreateForm',
+                                {users: [user], userIds: user.id}
+                            ) }}',
+                            getSetAsGoalForm: '{{ routeLookupIfAuthorized(
+                                'learningBadgeAward.getSetAsGoalForm',
+                                {users: [user], userIds: user.id}
+                            ) }}',
+                            getSetAsGoalForSelfForm: '{{ routeLookupIfAuthorized(
+                                'learningBadgeAward.getSetAsGoalForSelfForm'
+                            ) }}',
+                            getAwardAsAchievementForm: '{{ routeLookupIfAuthorized(
+                                'learningBadgeAward.getAwardAsAchievementForm',
+                                {users: [user], userIds: user.id}
+                            ) }}',
+                        },
+                        returnUrl: {
+                            name: '{{ RETURN_URL.name }}',
+                            current: '{{ RETURN_URL.current }}',
+                        },
+                    };
+                    window.learningEvidenceFeedConfig = $.extend(true, {}, baseConfig);
+                    window.learningEvidenceFeedConfig.routes.getFeed = '{{ routeLookupIfAuthorized(
+                        'learningMomentFeed.getFeedForUser',
+                        {user: user, userId: user.id}
+                    ) }}';
+
+                    window.learningBadgeGoalFeedConfig = $.extend(true, {}, baseConfig);
+                    window.learningBadgeGoalFeedConfig.routes.getAwardFeed = '{{ routeLookupIfAuthorized(
+                        'learningBadgeAward.getAwardedBadges',
+                        {user: user, userId: user.id, awardStatus: 'goal'}
+                    ) }}';
+
+                    window.learningBadgeAchievementFeedConfig = $.extend(true, {}, baseConfig);
+                    window.learningBadgeAchievementFeedConfig.routes.getAwardFeed = '{{ routeLookupIfAuthorized(
+                        'learningBadgeAward.getAwardedBadges',
+                        {user: user, userId: user.id, awardStatus: 'achievement'}
+                    ) }}';
+                </script>
+            {% endautoescape %}
+
             {% if showActivityFeed %}
             <div class="content active" id="activity">
-                {# Vue component goes here #}
-                {% autoescape 'js' %}
-                    <script type="text/javascript">
-                        let baseConfig = {
-                            currentUser: {{ USER | json_encode | raw }},
-                            student: {{ user | json_encode | raw }},
-                            routes: {
-                                getCreateEvidenceForm: '{{ routeLookupIfAuthorized(
-                                    'learningMomentEvidence.getCreateForm',
-                                    {users: [user], userIds: user.id}
-                                ) }}',
-                                getSetAsGoalForm: '{{ routeLookupIfAuthorized(
-                                    'learningBadgeAward.getSetAsGoalForm',
-                                    {users: [user], userIds: user.id}
-                                ) }}',
-                                getSetAsGoalForSelfForm: '{{ routeLookupIfAuthorized(
-                                    'learningBadgeAward.getSetAsGoalForSelfForm'
-                                ) }}',
-                                getAwardAsAchievementForm: '{{ routeLookupIfAuthorized(
-                                    'learningBadgeAward.getAwardAsAchievementForm',
-                                    {users: [user], userIds: user.id}
-                                ) }}',
-                            },
-                            returnUrl: {
-                                name: '{{ RETURN_URL.name }}',
-                                current: '{{ RETURN_URL.current }}',
-                            },
-                        };
-                        window.learningEvidenceFeedConfig = $.extend(true, {}, baseConfig);
-                        window.learningEvidenceFeedConfig.routes.getFeed = '{{ routeLookupIfAuthorized(
-                            'learningMomentFeed.getFeedForUser',
-                            {user: user, userId: user.id}
-                        ) }}';
-
-                        window.learningBadgeGoalFeedConfig = $.extend(true, {}, baseConfig);
-                        window.learningBadgeGoalFeedConfig.routes.getAwardFeed = '{{ routeLookupIfAuthorized(
-                            'learningBadgeAward.getAwardedBadges',
-                            {user: user, userId: user.id, awardStatus: 'goal'}
-                        ) }}';
-
-                        window.learningBadgeAchievementFeedConfig = $.extend(true, {}, baseConfig);
-                        window.learningBadgeAchievementFeedConfig.routes.getAwardFeed = '{{ routeLookupIfAuthorized(
-                            'learningBadgeAward.getAwardedBadges',
-                            {user: user, userId: user.id, awardStatus: 'achievement'}
-                        ) }}';
-                    </script>
-                {% endautoescape %}
                 <div id="activity-feed"></div>
                 <script type="text/javascript" src="/javascript/components/learningMomentsFeed.bundle.js"></script>
             </div>
