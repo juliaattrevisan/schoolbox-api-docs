@@ -567,18 +567,22 @@
                 //if the file was attached using 'Upload file(s)' it's been uploaded, 
                 //so we can display the image in the drop zone when we return to the page
                 let getExistingFileUrl = () => {
-                    if (list[i].file) { //this file prop is set within templates/core/resources/filesystem/upload.html - onQueueComplete()
+                    if (list[i].file && list[i].file.imageUrl) { //this file prop is set within templates/core/resources/filesystem/upload.html - onQueueComplete()
                         return list[i].file.imageUrl;
                     } else { //otherwise we'll just show the file type image
                         return '/ajax/mime/' + data.type;
                     }
                 }
                 
-                //once the files displayed, ensure the drop zone window and progress view are hidden
+                //once the files displayed, ensure the drop zone window and progress view are hidden depending on max uploads
                 let onExistingFileDisplayed = () => {
                     let elementDOM = $(this.element)[0];
-                    if (this.dropzone.options.maxFiles === 1) { //^TODO - this aint good enough yet!
-                        elementDOM.classList.add('dz-max-files-reached');
+                    if (elementDOM.id === 'cover-photo-zone') {
+                        elementDOM.querySelector('.az-list').style.display = 'none';
+                    } else {
+                        if (this.dropzone.options.maxFiles === 1) {
+                            elementDOM.classList.add('dz-max-files-reached');
+                        }
                     }
                     elementDOM.querySelector('.progress').style.display = 'none';
                 }

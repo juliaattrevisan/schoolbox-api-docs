@@ -16,8 +16,8 @@
         });
 
         dropzone.on('accept.attachzone success.attachzone', function(event, file) {
-
-            if (!file.hash) {
+            
+            if (!file['data'][0].hash) {
                 return;
             }
 
@@ -30,7 +30,7 @@
                 data: {
                     action: 'addCoverPhoto',
                     userId: '{USER_ID}',
-                    imagehash: file.hash
+                    imagehash: file['data'][0].hash
                 },
                 dataType: 'json'
             })
