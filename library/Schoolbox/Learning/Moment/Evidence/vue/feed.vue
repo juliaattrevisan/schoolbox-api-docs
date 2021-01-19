@@ -337,8 +337,62 @@ export default {
         <div v-else>
             <div v-if="metadata.count === 0" class="empty-state">
                 <i class="icon-advanced-list"></i>
-                <p>There is no activity yet.</p>
+
+                <template v-if="config.currentUser.id === config.student.id">
+                    <!-- Current user -->
+                    <p>You don't have any activity yet.</p>
+
+                    <!-- This opens a dialog instead of a link -->
+                    <p v-if="config.routes.getCreateEvidenceForm">
+                        <a href="#" title="Share your learning" data-reveal-id="shareLearningMoment">Share your learning</a>
+                        to see it appear in the activity feed.
+                    </p>
+                </template>
+
+                <template v-else>
+                    <!-- Parent or student -->
+                    <p>{{ config.student.firstname }} doesn't have any activity yet.</p>
+
+                    <!-- What can the current user do? -->
+
+                    <!-- Can share moments? -->
+                    <p v-if="config.routes.getCreateEvidenceForm || config.routes.getSetAsGoalForm || config.routes.getAwardAsAchievementForm">
+                        <template v-if="config.routes.getCreateEvidenceForm">
+                            <!--
+                                All these tags need to be on the same line,
+                                because otherwise there will be a space between
+                                the link and the comma -->
+                            <a href="#" title="Share a learning moment" data-reveal-id="shareLearningMoment">Share a learning moment</a><template v-if="config.routes.getSetAsGoalForm && config.routes.getAwardAsAchievementForm">, </template><template v-else-if="config.routes.getSetAsGoalForm || config.routes.getAwardAsAchievementForm"> or </template>
+                        </template>
+
+                        <template v-if="config.routes.getSetAsGoalForm">
+                            <a :href="config.routes.getSetAsGoalForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
+                               title="Set a goal">
+                                <!-- Different capitalization for if this is start or middle of a sentence -->
+                                <template v-if="config.routes.getCreateEvidenceForm">set a goal</template>
+                                <template v-else>Set a goal</template>
+                            </a><template v-if="config.routes.getAwardAsAchievementForm"> or </template>
+                        </template>
+
+                        <template v-if="config.routes.getAwardAsAchievementForm">
+                            <a :href="config.routes.getAwardAsAchievementForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
+                               title="Award an achievement">
+                                <template v-if="config.routes.getCreateEvidenceForm || config.routes.getSetAsGoalForm">award an achievement</template>
+                                <template v-else>Award an achievement</template>
+                            </a>
+                        </template>
+
+                        to see it appear here.
+                    </p>
+
+                    <!-- Can't share moments? -->
+                    <p v-else>
+                        {{ config.student.firstname }} doesn't have any activity yet. When {{ config.student.firstname }} or their teacher shares learning, it will appear here.
+                    </p>
+
+                </template>
             </div>
+
             <div class="feed-load-more content" v-else-if="metadata.cursor.next && metadata.count > data.length">
                 <button class="load-more expand" @click.prevent="append(metadata.cursor.next)" title="Load more">
                     Load more

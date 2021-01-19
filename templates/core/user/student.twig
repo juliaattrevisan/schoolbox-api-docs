@@ -55,7 +55,7 @@
 {% set showClasses = showClasses and showDetails %}
 {% set showTitle = user.hasPositionTitle() %}
 
-{% set showActivityFeed = (isStaff or isSelf or isParentOfStudent) %}
+{% set showActivityFeed = (config.learning_moments_enabled or config.badges_enabled) and (isStaff or isSelf or isParentOfStudent) %}
 {% set showAchievementsTab = config.badges_enabled and (isStaff or isSelf or isParentOfStudent) %}
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
@@ -471,84 +471,102 @@
                 }
             });
         </script>
+
         <dl class="tabs" data-tab>
+            {# Tab activation logic: activate the first one that is rendered #}
+            {% set activeTab = null %}
             {% if showActivityFeed %}
-            <dd class="active"><a href="#activity">Activity Feed</a></dd>
+                <dd class="active"><a href="#activity">Activity Feed</a></dd>
+                {% set activeTab = activeTab ?? 'activity' %}
             {% endif %}
             {% if showAchievementsTab %}
-            <dd><a href="#goals">Goals</a></dd>
-            <dd class="{% if not showActivityFeed %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
+                <dd><a href="#goals">Goals</a></dd>
+                <dd class="{% if not activeTab %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
+                {% set activeTab = activeTab ?? 'achievements' %}
             {% endif %}
             {% if showClasses %}
-            <dd><a href="#classes">Classes</a></dd>
+                <dd class="{% if not activeTab %}active{% endif %}"><a href="#classes">Classes</a></dd>
+                {% set activeTab = activeTab ?? 'classes' %}
             {% endif %}
             {% if showGroups %}
-                <dd><a href="#groups">Groups</a></dd>
+                <dd class="{% if not activeTab %}active{% endif %}"><a href="#groups">Groups</a></dd>
+                {% set activeTab = activeTab ?? 'groups' %}
             {% endif %}
             {% if showContactsTab %}
-            <dd><a href="#contacts">Contacts</a></dd>
+                <dd class="{% if not activeTab %}active{% endif %}"><a href="#contacts">Contacts</a></dd>
+                {% set activeTab = activeTab ?? 'contacts' %}
             {% endif %}
         </dl>
 
         <div class="profile-tabs tabs-content">
+            {% autoescape 'js' %}
+                {# Configuration for various Vue components #}
+                <script type="text/javascript">
+                    let baseConfig = {
+                        currentUser: {{ USER | json_encode | raw }},
+                        student: {{ user | json_encode | raw }},
+                        routes: {
+                            getCreateEvidenceForm: '{{ routeLookupIfAuthorized(
+                                'learningMomentEvidence.getCreateForm',
+                                {users: [user], userIds: user.id}
+                            ) }}',
+                            getSetAsGoalForm: '{{ routeLookupIfAuthorized(
+                                'learningBadgeAward.getSetAsGoalForm',
+                                {users: [user], userIds: user.id}
+                            ) }}',
+                            getSetAsGoalForSelfForm: '{{ routeLookupIfAuthorized(
+                                'learningBadgeAward.getSetAsGoalForSelfForm'
+                            ) }}',
+                            getAwardAsAchievementForm: '{{ routeLookupIfAuthorized(
+                                'learningBadgeAward.getAwardAsAchievementForm',
+                                {users: [user], userIds: user.id}
+                            ) }}',
+                        },
+                        returnUrl: {
+                            name: '{{ RETURN_URL.name }}',
+                            current: '{{ RETURN_URL.current }}',
+                        },
+                    };
+                    window.learningEvidenceFeedConfig = $.extend(true, {}, baseConfig);
+                    window.learningEvidenceFeedConfig.routes.getFeed = '{{ routeLookupIfAuthorized(
+                        'learningMomentFeed.getFeedForUser',
+                        {user: user, userId: user.id}
+                    ) }}';
+
+                    window.learningBadgeGoalFeedConfig = $.extend(true, {}, baseConfig);
+                    window.learningBadgeGoalFeedConfig.routes.getAwardFeed = '{{ routeLookupIfAuthorized(
+                        'learningBadgeAward.getAwardedBadges',
+                        {user: user, userId: user.id, awardStatus: 'goal'}
+                    ) }}';
+
+                    window.learningBadgeAchievementFeedConfig = $.extend(true, {}, baseConfig);
+                    window.learningBadgeAchievementFeedConfig.routes.getAwardFeed = '{{ routeLookupIfAuthorized(
+                        'learningBadgeAward.getAwardedBadges',
+                        {user: user, userId: user.id, awardStatus: 'achievement'}
+                    ) }}';
+                </script>
+            {% endautoescape %}
+
             {% if showActivityFeed %}
-            <div class="content active" id="activity">
-                {# Vue component goes here #}
-                {% autoescape 'js' %}
-                    <script type="text/javascript">
-                        window.learningEvidenceFeedConfig = {
-                            student: {{ user | json_encode | raw }},
-                            routes: {
-                                getFeed: '{{ routeLookupIfAuthorized(
-                                    'learningMomentFeed.getFeedForUser',
-                                    {user: user, userId: user.id}
-                                ) }}',
-                                getCreateEvidenceForm: '{{ routeLookupIfAuthorized(
-                                    'learningMomentEvidence.getCreateForm',
-                                    {users: [user], userIds: user.id}
-                                ) }}',
-                            },
-                        };
-                    </script>
-                {% endautoescape %}
+            <div class="content {% if activeTab == 'activity' %}active{% endif %}" id="activity">
                 <div id="activity-feed"></div>
                 <script type="text/javascript" src="/javascript/components/learningMomentsFeed.bundle.js"></script>
             </div>
             {% endif %}
-            <div class="content no-pad" id="goals">
-                {% autoescape 'js' %}
-                    <script type="text/javascript">
-                        window.learningBadgeGoalFeedConfig = {
-                            routes: {
-                                getAwardFeed: '{{ routeLookupIfAuthorized(
-                                    'learningBadgeAward.getAwardedBadges',
-                                    {user: user, userId: user.id, awardStatus: 'goal'}
-                                ) }}'
-                            },
-                        };
-                    </script>
-                {% endautoescape %}
+
+            {% if showAchievementsTab %}
+            <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="goals">
                 <div id="goal-feed"></div>
                 <script type="text/javascript" src="/javascript/components/badgeGoalFeed.bundle.js"></script>
             </div>
-            <div class="content" id="achievements">
-                {% autoescape 'js' %}
-                    <script type="text/javascript">
-                        window.learningBadgeAchievementFeedConfig = {
-                            routes: {
-                                getAwardFeed: '{{ routeLookupIfAuthorized(
-                                    'learningBadgeAward.getAwardedBadges',
-                                    {user: user, userId: user.id, awardStatus: 'achievement'}
-                                ) }}'
-                            },
-                        };
-                    </script>
-                {% endautoescape %}
+            <div class="content {% if activeTab == 'achievements' %}active{% endif %}" id="achievements">
                 <div id="achievement-feed"></div>
                 <script type="text/javascript" src="/javascript/components/badgeAchievementFeed.bundle.js"></script>
             </div>
+            {% endif %}
+
             {% if showClasses %}
-            <div class="content" id="classes">
+            <div class="content {% if activeTab == 'classes' %}active{% endif %}" id="classes">
                 <section>
                     {% if showSubjects %}
                     {% for group, subjectGroup in subjects %}
@@ -649,7 +667,7 @@
             {% endif %}
 
             {% if showGroups and groups is not empty %}
-            <div class="content" id="groups">
+            <div class="content {% if activeTab == 'groups' %}active{% endif %}" id="groups">
                 <section>
                     <div class="row content">
                         <div class="small-12 columns">
@@ -726,7 +744,7 @@
             {% endif %}
 
             {% if showContactsTab %}
-            <div class="content" id="contacts">
+            <div class="content {% if activeTab == 'contacts' %}active{% endif %}" id="contacts">
                 <section class="content">
                     {% block contacts_island %}
                         {% block contacts %}

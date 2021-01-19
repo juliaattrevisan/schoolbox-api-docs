@@ -63,13 +63,12 @@ export default {
         },
 
         /**
-         * The route via which new badges are posted.
-         *
-         * TODO remove as this seems unused
+         * The route which shows the badge create form.
          */
-        postBadgeRoute: {
+        getBadgeCreateFormRoute: {
             type: String,
             default: '',
+            required: true,
         },
 
         /**
@@ -286,7 +285,37 @@ export default {
                 .finally(() => {
                     this.closeDeleteModal()
                 })
-        }
+        },
+
+        /**
+         * Is the current filter set empty? This changes the empty state which
+         * is displayed.
+         *
+         * @return {Boolean}
+         */
+        isSelectedFiltersEmpty() {
+            let nonEmptyFilters = Object.values(this.selectedFilters).filter(function (v1) {
+                if (v1 instanceof Object) {
+                    // Each value in this object will be either a string 0 or 1:
+                    // 1 if it is selected, 0 if it is not
+                    return Object.values(v1).some(v2 => Number(v2) === 1);
+                }
+                return false;
+            });
+            return nonEmptyFilters.length > 0;
+        },
+
+
+        /**
+         * Generate a URL which references this page with all filters cleared.
+         *
+         * @return {String}
+         */
+        generateResetFilterUrl() {
+            let emptyQueryString = {};
+            Object.keys(this.selectedFilters).forEach(k => emptyQueryString[k] = '');
+            return "?" + new URLSearchParams(emptyQueryString).toString();
+        },
     },
 }
 </script>
@@ -304,8 +333,23 @@ export default {
         </div>
         <div v-else>
             <div v-if="data.length === 0" class="empty-state">
-                <i class="icon-badge"></i>
-                <p>No Badges have been created.</p>
+                <!-- If no badges were found in the search query -->
+                <template v-if="isSelectedFiltersEmpty()">
+                    <i class="icon-search"></i>
+                    <p>
+                        No badges were found.
+                        <a :href="generateResetFilterUrl()" title="Reset filters">Reset filters</a> to see all available badges.
+                    </p>
+                </template>
+
+                <!-- If there are no badges in the system at all -->
+                <template v-else>
+                    <i class="icon-badge"></i>
+                    <p>
+                        No badges have been created. Start by
+                        <a :href="getBadgeCreateFormRoute" title="Create the first badge">creating the first badge</a>.
+                    </p>
+                </template>
             </div>
             <template v-else>
                 <section class="content">
