@@ -63,6 +63,16 @@
                 calendarStartTime: "{{ config.calendar_start_time }}",
                 localTime:         "{{ config.date_time }}",
             };
+
+            // This schoolboxUser is here for custom scripts.
+            // TODO consider expanding Schoolbox json-serialized user so these fields get output
+            var schoolboxUser            = {{ user.current | json_encode | raw }};
+            schoolboxUser.name           = "{{ user.current.formatName }}";
+            schoolboxUser.email          = "{{ user.current.email }}";
+            schoolboxUser.year           = "{{ user.current.year }}";
+            schoolboxUser.role           = {{ user.current.role | json_encode | raw }};
+            schoolboxUser.impersonated   = Boolean('{{ user.impersonated }}');
+            schoolboxUser.communityLogin = Boolean('{{ user.communityLogin }}');
         </script>
         {% endautoescape %}
 
