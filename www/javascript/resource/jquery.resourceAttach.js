@@ -326,8 +326,7 @@
 
 
     ResourceAttach.prototype.getCacheKey = function () {
-        return $(this)[0].element.id;
-        // return this.options.source + '?' + this.getQueryString();
+        return this.options.source + '?' + this.getQueryString();
     };
 
 
