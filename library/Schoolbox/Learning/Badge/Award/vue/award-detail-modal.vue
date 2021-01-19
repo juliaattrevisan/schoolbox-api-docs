@@ -105,7 +105,11 @@ export default {
 
                     // And post a message to the other components that this goal
                     // has been upgraded to an achievement
-                    self.$root.$emit('awards-updated');
+                    // TODO make this trigger on EVERY vue root on the page
+                    // Don't do this at home though
+                    window.achievementFeed.$emit('awards-updated');
+                    window.goalFeed.$emit('awards-updated');
+                    window.activityFeed.$emit('awards-updated');
                 })
                 .catch(() => self.toastError('Failed to award achievement'))
         }
