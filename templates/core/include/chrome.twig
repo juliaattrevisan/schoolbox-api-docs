@@ -65,7 +65,6 @@
             };
 
             // This schoolboxUser is here for custom scripts.
-            // TODO consider expanding Schoolbox json-serialized user so these fields get output
             var schoolboxUser            = {{ user.current | json_encode | raw }};
             schoolboxUser.name           = "{{ user.current.formatName }}";
             schoolboxUser.email          = "{{ user.current.email }}";
