@@ -582,7 +582,7 @@
             
             if (this.dropzone) {
                 
-                //if the file was attached using 'Upload file' it's been uploaded, 
+                //if the file was attached using 'Upload file(s)' it's been uploaded, 
                 //so we can display the image in the drop zone when we return to the page
                 let getExistingFileUrl = () => {
                     if (list[i].file) { //this file prop is set within templates/core/resources/filesystem/upload.html - onQueueComplete()
@@ -595,7 +595,7 @@
                 //once the files displayed, ensure the drop zone window and progress view are hidden
                 let onExistingFileDisplayed = () => {
                     let elementDOM = $(this.element)[0];
-                    if (this.dropzone.options.maxFiles == 1) { //^TODO - this aint good enough yet!
+                    if (this.dropzone.options.maxFiles === 1) { //^TODO - this aint good enough yet!
                         elementDOM.classList.add('dz-max-files-reached');
                     }
                     elementDOM.querySelector('.progress').style.display = 'none';
