@@ -3,6 +3,8 @@ import BadgeImage from './../../vue/badge-image';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
+import axios from "axios";
+import toastMixin from '@schoolbox/toast-mixin';
 
 export default {
 
@@ -20,7 +22,8 @@ export default {
      * be superpositioned on top of this javascript here, inside export default {}
      */
     mixins: [
-        goalMixin
+        goalMixin,
+        toastMixin,
     ],
 
     /**
@@ -83,6 +86,36 @@ export default {
             this.award = award;
 
             this.$refs.modal.open();
+        },
+
+        awardAchievement () {
+            // Post to goalAward
+            let self  = this,
+                award = this.award,
+                request = {
+                    url: award._links.goalAward,
+                    data: {users: [award.recipient]},
+                    method: 'post',
+                    responseType: 'json'
+                };
+
+            self.toastActivate('Awarding...');
+            axios
+                .request(request)
+                .then(() => {
+                    self.toastSuccess('Achievement awarded');
+
+                    /* Temporarily replaced implementation of self.updateAwards()
+                     * achievement-feed.vue can't tell goal-feed.vue to update itself; they don't
+                     * share a common parent. They're entirely separate vue apps. An action inside
+                     * achievement-feed affects the data in goal-feed, but I can't talk to
+                     * goal-feed from achievement-feed.
+                     *
+                     * The forced reload will cause goal-feed to seem updated, for now
+                     */
+                    // window.location.reload();
+                })
+                .catch(() => self.toastError('Failed to award achievement'))
         }
     }
 }
@@ -123,6 +156,14 @@ export default {
                         </template>
                     </p>
                 </template>
+
+                <div class="component-action">
+                    <section>
+                        <a v-if="award._links.goalAward && award.isGoal"
+                           class="button"
+                           @click.prevent="awardAchievement">Award Achievement</a>
+                    </section>
+                </div>
             </div>
         </template>
     </reveal-modal>
