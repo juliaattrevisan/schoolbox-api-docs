@@ -46,7 +46,7 @@ abstract class AbstractCsvImporterFactory
         // useMarkRange:       On/Off
         // capabilityMarkType: string (a MarkType::SLUG_* constant), followed by an int grade group
         $useMarkRange           = false;
-        $capabilityMarkTypeSlug = null;
+        $capabilityMarkTypeSlug = MarkType::SLUG_NONE;
         $capabilityGradeGroup   = null;
         $settingCells           = [$headerRow[0], $headerRow[1]];
         foreach ($settingCells as $settingCell) {
