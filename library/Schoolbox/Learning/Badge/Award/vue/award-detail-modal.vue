@@ -3,7 +3,6 @@ import BadgeImage from './../../vue/badge-image';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
-import axios from "axios";
 import toastMixin from '@schoolbox/toast-mixin';
 
 export default {
@@ -89,31 +88,14 @@ export default {
         },
 
         awardAchievement () {
-            // Post to goalAward
-            let self  = this,
-                award = this.award,
-                request = {
-                    url: award._links.goalAward,
-                    data: {users: [award.recipient]},
-                    method: 'post',
-                    responseType: 'json'
-                };
-
+            let self = this;
             self.toastActivate('Awarding...');
-            axios
-                .request(request)
-                .then(() => {
+            self.convertToAchievement(self.award)
+                .then((response) => {
+                    console.log(response);
                     self.toastSuccess('Achievement awarded');
 
-                    /* Temporarily replaced implementation of self.updateAwards()
-                     * achievement-feed.vue can't tell goal-feed.vue to update itself; they don't
-                     * share a common parent. They're entirely separate vue apps. An action inside
-                     * achievement-feed affects the data in goal-feed, but I can't talk to
-                     * goal-feed from achievement-feed.
-                     *
-                     * The forced reload will cause goal-feed to seem updated, for now
-                     */
-                    // window.location.reload();
+                    // Once awarded: update the award within this object
                 })
                 .catch(() => self.toastError('Failed to award achievement'))
         }

@@ -104,17 +104,8 @@ export default {
          */
         awardAchievement(award) {
           let self = this;
-
-          let request = {
-            url: award._links.goalAward,
-            data: {users: [award.recipient]},
-            method: 'post',
-            responseType: 'json'
-          }
-
           self.toastActivate('Awarding...');
-          axios
-              .request(request)
+          self.convertToAchievement(award)
               .then(() => {
                 self.toastSuccess('Achievement awarded');
 
