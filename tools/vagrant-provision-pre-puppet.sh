@@ -36,12 +36,6 @@ mysql --defaults-extra-file=/root/.my.cnf -e "DROP USER IF EXISTS 'schoolboxvagr
 echo "[SB][$(date +%Y-%m-%d\ %X)] Removing current Schoolbox Data directory";
 rm /var/lib/schoolbox/vagrantx/* -fR;
 
-# TODO - pretty sure this is no longer used?
-if [[ ! -f /etc/schoolbox/conf.php ]]; then
-    mkdir -p /etc/schoolbox;
-    ln -sf /vagrant/www/conf/conf.php /etc/schoolbox/conf.php;
-fi;
-
 # We want to be able to reference schoolbox code at the standard location,
 # but have the disks on the shared mount se we can directly manipulate from the host
 rm -rf /usr/share/schoolbox

@@ -52,9 +52,6 @@ else
         fi
 fi
 
-echo "Preparing conf.php"
-cp -f www/conf/tarball.conf.php www/conf/conf.php;
-
 echo "Gather changed files"
 chmod 777 .git/resource/metadata.json ##We need a peak at the metadata for the test.
 BASESHA=$(cat .git/resource/metadata.json | jq -r ' .[] | select(.name=="base_sha") | .value')
