@@ -456,17 +456,17 @@ class Controller extends Base
         // LABEL_VALUE must match createMail
         $availableEmailGroups = [
             'email_all_parents'  => [
-                self::LABEL_KEY   => 'Parents',
+                self::LABEL_KEY   => 'Parents of selected students',
                 self::LABEL_VALUE => 'parents',
             ],
             'email_housemasters' => [
-                self::LABEL_KEY   => 'Head of House',
+                self::LABEL_KEY   => 'Head of House for selected students',
                 self::LABEL_VALUE => 'housemasters',
             ],
         ];
 
         $result[] = [
-            self::LABEL_KEY     => 'Students',
+            self::LABEL_KEY     => 'Selected students',
             self::LABEL_VALUE   => 'students',
             self::ISCHECKED_KEY => true,
         ];
