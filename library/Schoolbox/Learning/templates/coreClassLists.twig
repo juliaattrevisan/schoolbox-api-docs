@@ -31,7 +31,7 @@ Data:
                 {% endif %}
                 {% if mailEnabled %}
                     <li><a @click.prevent="openMailDialog"
-                           :class="{disabled: selectedStudentExternalIds.length === 0, 'icon-email': true}">Email</a></li>
+                           :class="{disabled: selectedStudentExternalIds.length === 0, 'icon-email': true}">Compose Email</a></li>
                 {% endif %}
             </ul>
         </section>
