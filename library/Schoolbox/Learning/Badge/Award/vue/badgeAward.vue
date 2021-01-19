@@ -62,6 +62,36 @@ export default {
         },
 
         /**
+         * The endpoint to which user search requests are submitted.
+         */
+        userSearchEndpoint: {
+            type: String,
+            default: '/ajax/user.php',
+        },
+
+        /**
+         * The query string parameter to submit the user search parameter
+         * within, when performing a user search.
+         */
+        userSearchQueryParam: {
+            type: String,
+            default: 'query',
+        },
+
+        /**
+         * Any additional query string parameters to submit to the user search
+         * endpoint.
+         *
+         * By default, the user search shows students only.
+         */
+        userSearchAdditionalParams: {
+            type: Object,
+            default: () => {
+                return {roleTypeID: 'student',};
+            },
+        },
+
+        /**
          * Placeholder text to display in the form's v-select input, before any
          * users are selected.
          */
@@ -133,13 +163,10 @@ export default {
          */
         onSearch: debounce(function(query, loading) {
             loading(true);
+            let params = this.userSearchAdditionalParams;
+            params[this.userSearchQueryParam] = query;
             axios
-                .get('/ajax/user.php', {
-                    params: {
-                        query: query,
-                        groupID: 0,
-                    }
-                })
+                .get(this.userSearchEndpoint, {params: params})
                 .then(response => this.options = response.data)
                 .finally(() => loading(false))
         }, SEARCH_RESULT_RETRIEVE_DELAY),

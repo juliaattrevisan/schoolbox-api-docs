@@ -11,6 +11,9 @@ namespace Schoolbox\Learning\Badge\Award;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
+use Exception;
+use PDOException;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -21,6 +24,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 use function count;
 use function in_array;
@@ -226,10 +230,10 @@ class Controller extends Base
      * @param User $user
      * @return void
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \PDOException
+     * @throws PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws MapperException
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     public function getAwardedBadges(User $user, string $awardStatus): void
     {
@@ -245,7 +249,6 @@ class Controller extends Base
         /* Group by category
          */
         foreach ($awards as $award) {
-
             /* Force string indexes, otherwise the numeric values get inserted in-order
              * which isn't intended here; they are already in a particular order
              */
@@ -342,19 +345,29 @@ class Controller extends Base
      *                         awarding the badge as an achievement
      *                         * `AwardModel::AWARD_STATUS_GOAL` for awarding the
      *                         badge as a goal to be achieved
-     * @throws MapperException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @throws MapperException if for some reason a query fails
+     * @throws Exception       if attempting to award to a non-student
      */
     private function createAwardsFromRequestBody(Model $badge, string $status): void
     {
         // Users are in the data.
-        // So far: it's assumed all staff may award or set a badge as a goal to
-        // any other user.
+        // For now: badges may only be awarded to or set as goals for students.
         $data       = json_decode($this->request->content->getRaw(), true);
         $collection = $this->mapper->createCollection();
         $userIds    = array_column($data['users'], 'id');
         $users      = $this->userMapper->findByColumn('id', $userIds);
+
+        // Are any of those users not students? Error out
+        foreach ($users as $user) {
+            if (!$user->getRole()->isStudent()) {
+                throw $this->generateException(
+                    ErrorMapper::ERROR_BADGE_AWARD_TO_NON_STUDENT_USER,
+                    null,
+                    '',
+                    403
+                );
+            }
+        }
 
         /* Need a badge history for a particular user to decide how goals
          * and achievements are persisted
@@ -392,8 +405,8 @@ class Controller extends Base
      * @since 20.2
      * @param Model $badge
      * @throws MapperException if somehow the save fails
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     public function setAsGoalForSelf(Model $badge): void
     {
@@ -425,7 +438,7 @@ class Controller extends Base
      *
      * @param Model $badge
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \PDOException
+     * @throws PDOException
      */
     public function getAchievementRecipients(Model $badge): void
     {
@@ -447,7 +460,7 @@ class Controller extends Base
      *
      * @param Model $badge
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \PDOException
+     * @throws PDOException
      */
     public function getGoalRecipients(Model $badge): void
     {
@@ -468,7 +481,7 @@ class Controller extends Base
      * @since 20.2
      *
      * @param Model $badge
-     * @throws \PDOException
+     * @throws PDOException
      */
     public function postAchievementWithdraw(Model $badge): void
     {
@@ -483,7 +496,7 @@ class Controller extends Base
      * @since 20.2
      *
      * @param Model $badge
-     * @throws \PDOException
+     * @throws PDOException
      */
     public function postGoalWithdraw(Model $badge): void
     {
@@ -496,7 +509,7 @@ class Controller extends Base
      *
      * @param Model  $badge
      * @param string $status
-     * @throws \PDOException
+     * @throws PDOException
      */
     private function postWithdraw(Model $badge, string $status): void
     {

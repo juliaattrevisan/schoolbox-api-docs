@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Error messages
  *
@@ -200,6 +201,7 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     public const ERROR_EVENT_ATTENDANCE_MAX_REACHED = 227;
     public const ERROR_CALENDAR_IMPORT_FILE_REQUIRED = 228;
 
+    public const ERROR_BADGE_AWARD_TO_NON_STUDENT_USER = 229;
 
     /**
      * Setup mapping
