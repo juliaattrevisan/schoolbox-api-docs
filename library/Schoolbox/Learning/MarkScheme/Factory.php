@@ -33,8 +33,8 @@ class Factory
      * @var string[]
      */
     private static $markTypesProject = [
-        MarkType::TYPE_PERCENT => Percentage::TITLE,
         MarkType::TYPE_NONE    => None::TITLE,
+        MarkType::TYPE_PERCENT => Percentage::TITLE,
         MarkType::TYPE_LETTER  => LetterGrade::TITLE
     ];
 
@@ -45,8 +45,8 @@ class Factory
      * @var string[]
      */
     private static $markTypesDueWork = [
-        MarkType::TYPE_PERCENT => Percentage::TITLE,
         MarkType::TYPE_NONE    => None::TITLE,
+        MarkType::TYPE_PERCENT => Percentage::TITLE,
         MarkType::TYPE_TOTAL   => TotalMarkFractional::TITLE,
         MarkType::TYPE_LETTER  => LetterGrade::TITLE
     ];
