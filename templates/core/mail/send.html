@@ -174,40 +174,28 @@ $(function() {
         <form action="send.php" method="post" enctype="multipart/form-data" id="mailForm">
             <section>
                 <fieldset class="content">
-                    <div class="small-10 large-11 columns">
+                    <div class="small-12 columns">
                         <label for="to" class="required">To</label>
-                        <input name="to" id="to"/>
-                    </div>
-                    <div class="small-2 large-1 columns">
-                        <label for="to">
-                            Copy
-                            <a data-role="copy-emails" data-copy-emails-for="to" class="button icon-copy" title="Show addresses for copy"></a>
-                        </label>
+                        <div class="input-group">
+                            <input name="to" id="to"/>
+                            <a data-role="copy-emails" data-copy-emails-for="to" class="button icon-copy" title="Show addresses to copy">Copy</a>
+                        </div>
                     </div>
                 </fieldset>
                 <fieldset class="content">
-                    <div class="small-10 large-11 columns">
-                        <label>CC
+                    <div class="small-12 columns">
+                        <label for="cc">CC</label>
+                        <div class="input-group">
                             <input name="cc" id="cc" />
-                        </label>
+                            <a data-role="copy-emails" data-copy-emails-for="cc" class="button icon-copy" title="Show addresses to copy">Copy</a>
+                        </div>
                     </div>
-                    <div class="small-2 large-1 columns">
-                        <label for="cc">
-                            Copy
-                            <a data-role="copy-emails" data-copy-emails-for="cc" class="button icon-copy" title="Show addresses for copy"></a>
-                        </label>
-                    </div>
-                    <div class="small-10 large-11 columns">
-                        <label>
-                            BCC
+                    <div class="small-12 columns">
+                        <label for="bcc">BCC</label>
+                        <div class="input-group">
                             <input name="bcc" id="bcc" />
-                        </label>
-                    </div>
-                    <div class="small-2 large-1 columns">
-                        <label for="bcc">
-                            Copy
-                            <a data-role="copy-emails" data-copy-emails-for="bcc" class="button icon-copy" title="Show addresses for copy"></a>
-                        </label>
+                            <a data-role="copy-emails" data-copy-emails-for="bcc" class="button icon-copy" title="Show addresses to copy">Copy</a>
+                        </div>
                     </div>
                 </fieldset>
                 <fieldset class="content">
