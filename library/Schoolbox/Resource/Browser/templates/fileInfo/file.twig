@@ -24,9 +24,13 @@
          # ModifiedAt actually exists in the absence of ModifiedBy if you upload this file somewhere,
          # which isn't something I expected to find
          #}
-        {% if file.modifiedBy and file.createdAt.unixTimestamp != file.modifiedAt.unixTimestamp %}
+        {% if file.createdAt.unixTimestamp != file.modifiedAt.unixTimestamp %}
             <dt class="small-12 medium-4">Last modified</dt>
-            <dd class="small-12 medium-8">{{ file.modifiedAt.short }} by <a href="/search/user/{{ file.modifiedBy.id }}" title="{{ file.modifiedBy.formatName }}">{{ file.modifiedBy.formatName }}</a></dd>
+            <dd class="small-12 medium-8">{{ file.modifiedAt.short }}
+                {% if file.modifiedBy %}
+                by <a href="/search/user/{{ file.modifiedBy.id }}" title="{{ file.modifiedBy.formatName }}">{{ file.modifiedBy.formatName }}</a>
+                {% endif %}
+            </dd>
         {% endif %}
     {% endif %}
 
