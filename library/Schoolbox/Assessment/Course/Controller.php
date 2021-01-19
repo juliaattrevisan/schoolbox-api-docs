@@ -240,7 +240,11 @@ class Controller extends Base\Base
                     'deleted' => true
                 ]);
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-                $unit = $e->getDeletedObject()->setDeletedAt(null);
+
+                /** @var UnitSpecification $deletedUnit */
+                $deletedUnit = $e->getDeletedObject();
+
+                $unit = $deletedUnit->setDeletedAt(null);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $unit = $this->unitSpecificationMapper->createModel();
             }
