@@ -25,7 +25,7 @@ class Folder
     /**
      * Max folder depth of zip that this class may create.
      */
-    private const MAX_DEPTH = 5;
+    private const MAX_DEPTH = 10;
 
     /**
      * Folder mapper: this class needs to load sub-folders of `$this->folder`.
