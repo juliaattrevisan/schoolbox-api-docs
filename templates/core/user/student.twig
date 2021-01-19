@@ -480,7 +480,7 @@
             <dd class="{% if not showActivityFeed %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
             {% endif %}
             {% if showClasses %}
-            <dd><a href="#classes">Classes</a></dd>
+            <dd class="{% if not (showActivityFeed or showAchievementsTab) %}active{% endif %}"><a href="#classes">Classes</a></dd>
             {% endif %}
             {% if showGroups %}
                 <dd><a href="#groups">Groups</a></dd>
@@ -545,7 +545,9 @@
                 <script type="text/javascript" src="/javascript/components/learningMomentsFeed.bundle.js"></script>
             </div>
             {% endif %}
-            <div class="content no-pad" id="goals">
+
+            {% if showAchievementsTab %}
+            <div class="content no-pad {% if not showActivityFeed %}active{% endif %}" id="goals">
                 <div id="goal-feed"></div>
                 <script type="text/javascript" src="/javascript/components/badgeGoalFeed.bundle.js"></script>
             </div>
@@ -553,8 +555,10 @@
                 <div id="achievement-feed"></div>
                 <script type="text/javascript" src="/javascript/components/badgeAchievementFeed.bundle.js"></script>
             </div>
+            {% endif %}
+
             {% if showClasses %}
-            <div class="content" id="classes">
+            <div class="content {% if not (showActivityFeed or showAchievementsTab) %}active{% endif %}" id="classes">
                 <section>
                     {% if showSubjects %}
                     {% for group, subjectGroup in subjects %}
