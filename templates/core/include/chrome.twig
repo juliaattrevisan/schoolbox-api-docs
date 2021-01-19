@@ -69,7 +69,7 @@
             var schoolboxUser            = {{ user.current | json_encode | raw }};
             schoolboxUser.name           = "{{ user.current.formatName }}";
             schoolboxUser.email          = "{{ user.current.email }}";
-            schoolboxUser.year           = "{{ user.current.year }}";
+            schoolboxUser.year           = "{{ user.current.year.name ?? '' }}";
             schoolboxUser.role           = {{ user.current.role | json_encode | raw }};
             schoolboxUser.impersonated   = Boolean('{{ user.impersonated }}');
             schoolboxUser.communityLogin = Boolean('{{ user.communityLogin }}');
