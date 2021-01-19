@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -61,11 +62,11 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\Storage\Zip\Zip;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Sentry\State\HubInterface;
 use UnexpectedValueException;
+use ZipStream;
 
 /**
  * Class Controller
@@ -89,10 +90,10 @@ class Controller extends Assessment\Controller
     /** @var SingleFile\Mapper */
     private $submissionFileMapper;
 
-    /** @var Kami\Connector  */
+    /** @var Kami\Connector */
     private $kamiConnector;
 
-    /** @var Kami\Mapper  */
+    /** @var Kami\Mapper */
     private $kamiMapper;
 
     /**
@@ -149,7 +150,8 @@ class Controller extends Assessment\Controller
             $participantDataSource,
             $courseSpecificationMapper,
             $unitSpecificationMapper,
-            $replicator);
+            $replicator
+        );
         $this->resultSetMapper       = $resultSetMapper;
         $this->rubricMapper          = $rubricMapper;
         $this->dueWorkResponseMapper = $dueWorkResponseMapper;
@@ -195,11 +197,11 @@ class Controller extends Assessment\Controller
      *
      * This place is Staff Only
      *
-     * @api GET /learning/assessment/:assessmentId/status
      * @param IAssessable $assessment
      * @throws InvalidArgumentException If assessment due date is null.
      * @throws PDOException
      * @throws UnexpectedValueException
+     * @api GET /learning/assessment/:assessmentId/status
      */
     public function getStatus(IAssessable $assessment): void
     {
@@ -209,7 +211,12 @@ class Controller extends Assessment\Controller
             'errors'            => StateMapper::getInstance()->listDisplayValues(),
             'type'              => Assessment\AssessmentType::objectToString($assessment),
             'markSchemeName'    => $this->deriveSchemeName($assessment->getMarkScheme()),
-            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
+            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
+                [
+                    $assessment->getTitle(),
+                    '',
+                ]
+            ),
             'assessment'        => $assessment,
             'download'          => $this->hasDownloadableSubmissionFiles($assessment),
             'rubricMarks'       => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
@@ -217,32 +224,34 @@ class Controller extends Assessment\Controller
 
             /* Find the first valid Blind Review url
              */
-            'blindReviewUrl' => (new StudentCarousel\Blind(
+            'blindReviewUrl'    => (new StudentCarousel\Blind(
                 $this->getRouter(),
                 null,
                 $assessment
-            ))->getFirstUrl()
+            ))->getFirstUrl(),
         ];
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessment/dueWork/status.twig',
-                $twigData, "Status of {$assessment->getTitle()}", 'submission'
+                $twigData,
+                "Status of {$assessment->getTitle()}",
+                'submission'
             )
         );
     }
 
 
     /**
-     * @api   GET /learning/assessments/:assessmentId/:userId
-     * @since 165
-     *
      * @param IAssessable|Model $assessment
      * @param User              $student
      * @throws MapperException
      * @throws PDOException
      * @throws RouteNotFound
      * @throws UnexpectedValueException
+     * @api   GET /learning/assessments/:assessmentId/:userId
+     * @since 165
+     *
      */
     public function getSummary(IAssessable $assessment, User $student): void
     {
@@ -267,10 +276,12 @@ class Controller extends Assessment\Controller
          * Order them by submitted time to find the most recent, and use that
          */
         $twigData = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([
-                $assessment->getTitle(),
-                '',
-            ]),
+            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
+                [
+                    $assessment->getTitle(),
+                    '',
+                ]
+            ),
             'assessment'  => $assessment,
             'student'     => $student,
             'participant' => $participant,
@@ -287,17 +298,17 @@ class Controller extends Assessment\Controller
 
             /* Eportfolio Showcase - whether to show the "send to showcase" trophy button
              */
-            'canShowcase' => $student->getEportfolioEnable() && $assessment->isImplementation() && ($this->getUser()->getRole()->isStaff() || $this->getUser()->getId() === $student->getId()),
+            'canShowcase'            => $student->getEportfolioEnable() && $assessment->isImplementation() && ($this->getUser()->getRole()->isStaff() || $this->getUser()->getId() === $student->getId()),
             /* Whether or not this assessment is showcased on the user's eportfolio
              */
-            'isShowcased' => ShowcaseMapper::getInstance()->isShowcased((int)$assessment->getId(), (int)$student->getId()),
+            'isShowcased'            => ShowcaseMapper::getInstance()->isShowcased((int)$assessment->getId(), (int)$student->getId()),
         ];
 
         $routeArgs = [
-            'assessment' => $assessment,
+            'assessment'   => $assessment,
             'assessmentId' => $assessment->getId(),
-            'student' => $student,
-            'studentId' => $student->getId()
+            'student'      => $student,
+            'studentId'    => $student->getId(),
         ];
 
         if ($assessment->isSelfAssessable()) {
@@ -321,7 +332,9 @@ class Controller extends Assessment\Controller
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessment/dueWork/summary/student.twig',
-                $twigData, "{$assessment->getTitle()} - {$student->getFullName()}", 'submission'
+                $twigData,
+                "{$assessment->getTitle()} - {$student->getFullName()}",
+                'submission'
             )
         );
     }
@@ -341,10 +354,10 @@ class Controller extends Assessment\Controller
 
     /**
      * Download all student submissions for a given assessable
-     * @api   GET /learning/assessments/:assessmentId/submissions/download
-     * @since 165
      * @param IAssessable $assessment
      * @throws MapperException
+     * @api   GET /learning/assessments/:assessmentId/submissions/download
+     * @since 165
      */
     public function downloadSubmissions(IAssessable $assessment): void
     {
@@ -357,18 +370,19 @@ class Controller extends Assessment\Controller
         /** @var User[] $users */
         $users = [];
 
-        // Create a zip file to hold the downloaded submissions
+        // Create a zip stream to hold the downloaded submissions
 
         $titleSanitized = $this->sanitizeForFilename($assessment->getTitle());
-        $dateNow = Alaress_Date_Format::now()->getUsingFormat('Ymd-His');
+        $dateNow        = Alaress_Date_Format::now()->getUsingFormat('Ymd-His');
 
-        $zip = new Zip($this->getConfigLoader(), "{$titleSanitized}-{$dateNow}.zip");
+        $zipOptions = new ZipStream\Option\Archive();
+        $zipOptions->setSendHttpHeaders(true);
+        $zipStream = new ZipStream\ZipStream("{$titleSanitized}-{$dateNow}.zip", $zipOptions);
 
         // Iterate participants and get their responses
 
         /** @var Participant $participant */
-        foreach ($participants as $participant)
-        {
+        foreach ($participants as $participant) {
             // Get the users details and generate an appropriate folder name with the date/time stamp of the submission
 
             if (!isset($users[$participant->getUser()->getId()])) {
@@ -380,16 +394,15 @@ class Controller extends Assessment\Controller
             // Iterate all their responses
 
             /** @var Submission $response */
-            foreach ($responses as $response)
-            {
+            foreach ($responses as $response) {
                 // If the response is a submission...
 
-                if ($response instanceof Submission && !$response->isDraft())
-                {
-                    $lastNameSanitized = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getLastname());
+                if ($response instanceof Submission && !$response->isDraft()) {
+                    $lastNameSanitized  = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getLastname());
                     $firstNameSanitized = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getFirstname());
 
-                    $directory = sprintf("%s_%s_%s-%s",
+                    $directory = sprintf(
+                        "%s_%s_%s-%s",
                         $lastNameSanitized,
                         $firstNameSanitized,
                         $users[$participant->getUser()->getId()]->getId(),
@@ -401,82 +414,84 @@ class Controller extends Assessment\Controller
                     $files = $response->getAllFiles();
 
                     /** @var SubmissionFile $file */
-                    foreach ($files as $file)
-                    {
+                    foreach ($files as $file) {
                         if ($file->exists()) {
                             $filenameSanitized = $this->sanitizeForFilename($file->getBasename());
-                            $zipFilename = sprintf("%s/%s", $directory, $filenameSanitized);
-                            $zip->addStream($file->readStream(), $zipFilename);
+                            $zipFilename       = sprintf("%s/%s", $directory, $filenameSanitized);
+                            $zipStream->addFileFromStream($zipFilename, $file->readStream());
                         }
                     }
                 }
             }
         }
 
-        // Flush the ZIP file to before deleting the temporary files- otherwise we end up with an empty file
-
-        $zip->persist();
-
-        // Download the sucker
-
-        $zip->download();
+        // Stream the zip archive
+        $zipStream->finish();
     }
 
 
     /**
      * Shows a rubric overview
      *
-     * @api   GET /learning/assessments/:assessmentId/overview
-     * @since 165
      * @param IAssessable|Model $assessment
      * @throws DomainException
      * @throws MapperException
      * @throws RouteNotFound
      * @throws UnexpectedValueException
      * @throws DefinitionException
+     * @api   GET /learning/assessments/:assessmentId/overview
+     * @since 165
      */
     public function getOverview(IAssessable $assessment): void
     {
         // Sort participant by lastname, firstname, and id
-        $participants = $assessment->getParticipantUsers()->sortByCallback(static function (User $participantA, User $participantB) {
-            return     strnatcasecmp($participantA->getLastname(), $participantB->getLastname())
+        $participants = $assessment->getParticipantUsers()->sortByCallback(
+            static function (User $participantA, User $participantB) {
+                return strnatcasecmp($participantA->getLastname(), $participantB->getLastname())
                     ?: strnatcasecmp($participantA->getFirstname(), $participantB->getFirstname())
-                    ?: strnatcasecmp($participantA->getId(), $participantB->getId());
-        });
+                        ?: strnatcasecmp($participantA->getId(), $participantB->getId());
+            }
+        );
 
         $data = [
-            'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
-                ->add([
-                    $assessment->getTitle(),
-                    $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getId() ]) ])
-                ->add(['Rubric Report','']),
-            'dueWork'     => $assessment,
-            'participants'=> $participants,
+            'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
+                                   ->add(
+                                       [
+                                           $assessment->getTitle(),
+                                           $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]),
+                                       ]
+                                   )
+                                   ->add(['Rubric Report', '']),
+            'dueWork'      => $assessment,
+            'participants' => $participants,
         ];
 
         if ($assessment->getUseRubric()) {
             $rubricGrid = $this->rubricMapper->retrieveGrid($assessment, false);
             $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
-            $data = array_merge($data, [
-                'headers'  => $this->getRubricHeaders($rubricGrid),
-                'marks'    => $this->getMarks($assessment->getAllParticipants()),
-            ]);
+            $data = array_merge(
+                $data,
+                [
+                'headers' => $this->getRubricHeaders($rubricGrid),
+                'marks'   => $this->getMarks($assessment->getAllParticipants()),
+                ]
+            );
         }
 
-        $this->getResponse()->content->set([
-            'title'       => 'Rubric Report',
-            'template'    => '@learningAssessment/dueWork/overview.twig',
-            'data'        => $data
-        ]);
+        $this->getResponse()->content->set(
+            [
+                'title'    => 'Rubric Report',
+                'template' => '@learningAssessment/dueWork/overview.twig',
+                'data'     => $data,
+            ]
+        );
     }
 
 
     /**
      * Downloads a rubric overview
      *
-     * @api   GET /learning/assessments/:assessmentId/overview/export?format=csv
-     * @since 165
      * @param IAssessable|Model $assessment
      * @throws DefinitionException
      * @throws DomainException
@@ -484,10 +499,12 @@ class Controller extends Assessment\Controller
      * @throws MapperException
      * @throws UnexpectedValueException
      * @throws Exception
+     * @since 165
+     * @api   GET /learning/assessments/:assessmentId/overview/export?format=csv
      */
     public function downloadOverview(IAssessable $assessment): void
     {
-        if(!$assessment->getUseRubric()) {
+        if (!$assessment->getUseRubric()) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
@@ -495,8 +512,8 @@ class Controller extends Assessment\Controller
         $assessment = $this->participantMapper->loadParticipationIntoAssessment($assessment);
 
         $basename = (new \Url($assessment->getTitle()))->getSlug();
-        $content = $this->array2csv($this->collateResultSquare($rubricGrid, $assessment->getAllParticipants()));
-        $headers = $this->getResponse()->headers;
+        $content  = $this->array2csv($this->collateResultSquare($rubricGrid, $assessment->getAllParticipants()));
+        $headers  = $this->getResponse()->headers;
 
         $headers->set('Pragma', ' ');
         $headers->set('Cache-Control', ' ');
@@ -505,10 +522,12 @@ class Controller extends Assessment\Controller
 
         $headers->set('Content-Disposition', "attachment; filename=\"$basename-results.csv\"");
 
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $content
-        ]);
+        $this->getResponse()->content->set(
+            [
+                'format' => 'file',
+                'data'   => $content,
+            ]
+        );
     }
 
 
@@ -523,8 +542,8 @@ class Controller extends Assessment\Controller
         $headers = [];
         foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
-                $capability = $capabilityUsage->getCapability();
-                $indicator  = $indicatorUsage->getIndicator();
+                $capability                                           = $capabilityUsage->getCapability();
+                $indicator                                            = $indicatorUsage->getIndicator();
                 $headers[$capability->getName()][$indicator->getId()] = $indicator->getName();
             }
         }
@@ -599,9 +618,11 @@ class Controller extends Assessment\Controller
          *
          * @var Collection[] $participantsGrouped
          */
-        $participantsGrouped = $participants->groupByCallback(function(Participant $participant){
-            return $participant->getUser()->getId();
-        })->getAll();
+        $participantsGrouped = $participants->groupByCallback(
+            function (Participant $participant) {
+                return $participant->getUser()->getId();
+            }
+        )->getAll();
         foreach ($this->getMarks($participants) as $studentId => $marks) {
             // array of all marked indicator ids of the participant
             $markedIndicatorIds = array_keys($marks);
@@ -618,9 +639,9 @@ class Controller extends Assessment\Controller
                     if (in_array($indicatorUsageId, $markedIndicatorIds, true)) {
                         if ($marks[$indicatorUsageId] instanceof IndicatorMark) {
                             $descriptor = $marks[$indicatorUsageId]->getDescriptor();
-                            $row[] = $descriptor ? $descriptor->getDescription() : '';
-                            $row[] = $marks[$indicatorUsageId]->getValue();
-                            $sum += $marks[$indicatorUsageId]->getValue();
+                            $row[]      = $descriptor ? $descriptor->getDescription() : '';
+                            $row[]      = $marks[$indicatorUsageId]->getValue();
+                            $sum        += $marks[$indicatorUsageId]->getValue();
                         } else {
                             $row[] = $marks[$indicatorUsageId];
                             $row[] = '';
@@ -633,7 +654,7 @@ class Controller extends Assessment\Controller
             } else {
                 $row = array_merge($row, array_pad([], count($data[0]) - 1, ''));
             }
-            $row[] = $sum;
+            $row[]  = $sum;
             $data[] = $row;
         }
         return $data;
@@ -662,11 +683,11 @@ class Controller extends Assessment\Controller
     /**
      * Displays a form enabling a student to create Submission for a Due Work
      *
-     * @api   GET /learning/assessment/:assessmentId/:participantId/submit
-     * @since 165
      * @param IAssessable|Model $assessment
      * @param User              $student
      * @throws ServiceNotFound If unable to locate HTML web Output in DI
+     * @since 165
+     * @api   GET /learning/assessment/:assessmentId/:participantId/submit
      */
     public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
@@ -683,7 +704,7 @@ class Controller extends Assessment\Controller
          */
         $latestResponse = null;
         $editorContents = '';
-        $dangerZone = null;
+        $dangerZone     = null;
 
         $attachZoneFactory = new Assessment\Attachzone\Factory();
 
@@ -696,7 +717,6 @@ class Controller extends Assessment\Controller
             /* If the latest response is a draft, collect all its contents for editing
              */
             if ($latestResponse->isDraft()) {
-
                 /* Files attached to the draft submission
                  * Attach files if any exist
                  */
@@ -710,18 +730,14 @@ class Controller extends Assessment\Controller
                         $editorContents = $file->read();
                     }
                 }
-            }
-            else {
-
+            } else {
                 /* Otherwise, spawn an entirely new draft
                  * I would not expect it to recycle files from my previous Submitted submission
                  */
                 $latestResponse = null;
-                $dangerZone = $attachZoneFactory->buildForDueWorkResponse(new Submission());
+                $dangerZone     = $attachZoneFactory->buildForDueWorkResponse(new Submission());
             }
-        }
-        else {
-
+        } else {
             /* Init a dangerZone that is ready to accept files for
              * the first ever draft
              */
@@ -733,17 +749,27 @@ class Controller extends Assessment\Controller
         // For some reason I can't use get/setFlash?
         $errorMessage = $this->getSession()->getSegment(static::class)->get('errorMessage');
         $this->getSession()->getSegment(static::class)->set('errorMessage', null);
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/dueWork/createSubmission.twig', [
-            'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(['Create Response for ' . $assessment->getTitle(), '']),
-            'assessment'     => $assessment,
-            'student'        => $student,
-            'participant'    => $participant,
-            'attachzone'     => $dangerZone ? $dangerZone->getTwigContext() : null,
-            'response'       => $latestResponse,
-            'editorContents' => $editorContents,
-            'policy'         => $this->getConfigLoader()->get('lms_student_policy'),
-            'errorMessage'   => $errorMessage,
-        ]));
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@learningAssessment/dueWork/createSubmission.twig',
+                [
+                'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add(
+                    [
+                        'Create Response for ' . $assessment->getTitle(),
+                        '',
+                    ]
+                ),
+                'assessment'     => $assessment,
+                'student'        => $student,
+                'participant'    => $participant,
+                'attachzone'     => $dangerZone ? $dangerZone->getTwigContext() : null,
+                'response'       => $latestResponse,
+                'editorContents' => $editorContents,
+                'policy'         => $this->getConfigLoader()->get('lms_student_policy'),
+                'errorMessage'   => $errorMessage,
+                ]
+            )
+        );
     }
 
 
@@ -776,7 +802,6 @@ class Controller extends Assessment\Controller
     /**
      * Save a Response, on behalf of a User, for a particular Assessment
      *
-     * @api POST /learning/assessments/:assessmentId/:studentId/submit
      * @param IAssessable|Model $assessment
      * @param User              $student
      * @return void
@@ -790,6 +815,7 @@ class Controller extends Assessment\Controller
      * @throws UnexpectedValueException
      * @throws LogicException If files are not saved prior to insertion into kami upload queue
      * @throws \Schoolbox\File\Exception
+     * @api POST /learning/assessments/:assessmentId/:studentId/submit
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
@@ -809,7 +835,6 @@ class Controller extends Assessment\Controller
             try {
                 (new ValidFinalisedSubmission())->isSatisfiedBy($assessment, $student, $this->getConfigLoader()->get('submission_window'));
             } catch (DomainException $e) {
-
                 // Report errors in this thing
                 if ($this->getDi()->has('sentry')) {
                     /** @var HubInterface $sentry */
@@ -831,14 +856,13 @@ class Controller extends Assessment\Controller
                 //cannot update
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_WORK_SUBMITTED);
             }
-
         } else {
             // Create a new response
             $response = $this->dueWorkResponseMapper->createModel()
-                ->setSubmittedBy($this->getUser())
-                ->setSubmittedOnBehalfOf($student)
-                ->setCreatedAt(Alaress_Date_Format::now())
-                ->setUpdatedAt(Alaress_Date_Format::now());
+                                                    ->setSubmittedBy($this->getUser())
+                                                    ->setSubmittedOnBehalfOf($student)
+                                                    ->setCreatedAt(Alaress_Date_Format::now())
+                                                    ->setUpdatedAt(Alaress_Date_Format::now());
         }
         $response->setAssessable($assessment);
 
@@ -855,13 +879,12 @@ class Controller extends Assessment\Controller
         // Make one of those factories that builds storages from hashes
         $factory = new CollectorFactory();
         if (!empty($rq->post['attachment'])) {
-
             // Validate attachment list can actually be built
             try {
                 $attachments = $factory->build($rq->post['attachment'])->getAll();
             } catch (InvalidArgumentException $e) {
                 $errorMessage = 'One or more files were not able to be attached';
-                $redirect = $this->getRouter()->generate(
+                $redirect     = $this->getRouter()->generate(
                     'learningAssessment.getCreateResponseForm',
                     [
                         'assessmentId' => $assessment->getId(),
@@ -874,15 +897,14 @@ class Controller extends Assessment\Controller
             }
 
             foreach ($attachments as $attachment) {
-
                 /* Don't stack the online-submission.html file here, it should never
                  * appear in the attached files list at all (it should always be
                  * loaded into the wizzywig)
                  */
                 $attachedFile = $this->submissionFileMapper->createModel()
-                    ->setStorage($attachment)
-                    ->setFilename($attachment->getFilename())
-                    ->setEditableInline(false);
+                                                           ->setStorage($attachment)
+                                                           ->setFilename($attachment->getFilename())
+                                                           ->setEditableInline(false);
 
                 /* Stack it up
                  */
@@ -903,7 +925,7 @@ class Controller extends Assessment\Controller
             // verify that there should be any files attached; if not, that's a fail case
             if ($validateSubmission && $response->getAllFiles()->count() === 0) {
                 $errorMessage = 'One or more files failed to attach to your submission; please try again.';
-                $redirect = $this->getRouter()->generate(
+                $redirect     = $this->getRouter()->generate(
                     'learningAssessment.getCreateResponseForm',
                     [
                         'assessmentId' => $assessment->getId(),
@@ -956,20 +978,22 @@ class Controller extends Assessment\Controller
         /* Asynchronously shove it into plagscan so we don't make the user wait ages
          * for it to read 1 byte at a time >_<
          */
-        $this->getResponse()->content->set([
-            'format' => 'noContent',
-            'postOutput' => [
-                function () use ($plagscanMapper, $isFinal, $selfAssessable, $response, $assessment) {
-                    if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
-                        foreach ($response->getAllFiles() as $currentFile) {
-                            $filename = $plagscanMapper->plagscanFilename($currentFile);
+        $this->getResponse()->content->set(
+            [
+                'format'     => 'noContent',
+                'postOutput' => [
+                    function () use ($plagscanMapper, $isFinal, $selfAssessable, $response, $assessment) {
+                        if ($isFinal && !$selfAssessable && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
+                            foreach ($response->getAllFiles() as $currentFile) {
+                                $filename = $plagscanMapper->plagscanFilename($currentFile);
 
-                            $plagscanMapper->saveNewPlagscan($currentFile, $filename);
+                                $plagscanMapper->saveNewPlagscan($currentFile, $filename);
+                            }
                         }
-                    }
-                }
-            ],
-        ]);
+                    },
+                ],
+            ]
+        );
 
         /* Saving drafts from the wizzywig
          */
@@ -980,9 +1004,7 @@ class Controller extends Assessment\Controller
 
             $rs->status->setCode(200);
             $rs->content->set($this->buildJsonOutput($result));
-
         } else {
-
             /* Go to the next step of Self-Assessment/Self-Reflection if appropriate
              */
             if ($selfAssessable) {
@@ -992,12 +1014,11 @@ class Controller extends Assessment\Controller
                         [
                             'assessmentId' => $assessment->getId(),
                             'studentId'    => $student->getId(),
-                            'responseId'   => $response->getId()
+                            'responseId'   => $response->getId(),
                         ]
                     )
                 );
-            }
-            else {
+            } else {
                 // redirect after saving to Due Work Summary For Particular Student
                 $rs->redirect->to(
                     $this->getRouter()->generate(
@@ -1028,12 +1049,12 @@ class Controller extends Assessment\Controller
     {
         try {
             $response = $this->persistAcknowledgementResponse($assessment, $student, Alaress_Date_Format::now());
-            $data = [
+            $data     = [
                 'success'       => true,
                 'id'            => $response->getId(),
                 'submittedLate' => $assessment->isOverdue() || $assessment->isPastClose(),
             ];
-            $code = 200;
+            $code     = 200;
         } catch (PDOException $e) {
             $data = [
                 'success' => false,
@@ -1075,8 +1096,8 @@ class Controller extends Assessment\Controller
         $selfReview  = $assessment instanceof Model && $assessment->isSelfAssessable();
 
         // Route and arguments for location to redirect to once acknowledged.
-        $route      = 'learningAssessment.getSummary';
-        $params     = [
+        $route  = 'learningAssessment.getSummary';
+        $params = [
             'assessment'   => $assessment,
             'assessmentId' => $assessment->getId(),
             'student'      => $student,
@@ -1093,7 +1114,6 @@ class Controller extends Assessment\Controller
                 $route                = 'learningDueWorkResponse.getParticularResponseForSelfReflection';
                 $params['response']   = $response;
                 $params['responseId'] = $response->getId();
-
             } else {
                 $response = $this->persistAcknowledgementResponse($assessment, $student, Alaress_Date_Format::now());
             }
@@ -1134,16 +1154,25 @@ class Controller extends Assessment\Controller
         try {
             $this->persistAcknowledgementResponse($assessment, $student, Alaress_Date_Format::now());
             $participant = $assessment->getParticipant($student);
-            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learning/fragments/toMarkParticipant.twig', [
-                'participant' => $participant,
-                'assessment'  => $participant->getAssessable(),
-            ]));
+            $this->getResponse()->content->set(
+                $this->buildUnthemedHtmlOutput(
+                    '@learning/fragments/toMarkParticipant.twig',
+                    [
+                    'participant' => $participant,
+                    'assessment'  => $participant->getAssessable(),
+                    ]
+                )
+            );
             $code = 200;
         } catch (PDOException $e) {
-            $this->getResponse()->content->set($this->buildJsonOutput([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ]));
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput(
+                    [
+                        'success' => false,
+                        'message' => $e->getMessage(),
+                    ]
+                )
+            );
             $code = 403;
         }
         $this->getResponse()->status->set($code);
@@ -1163,12 +1192,12 @@ class Controller extends Assessment\Controller
     private function persistAcknowledgementResponse(Model $dueWork, User $student, ?Alaress_Date_Format $submittedDate): Response\Model
     {
         $response = $this->dueWorkResponseMapper->createModel()
-            ->setAssessable($dueWork)
-            ->setSubmittedBy($this->getUser())
-            ->setSubmittedOnBehalfOf($student)
-            ->setSubmittedAt($submittedDate)
-            ->setCreatedAt(Alaress_Date_Format::now())
-            ->setUpdatedAt(Alaress_Date_Format::now());
+                                                ->setAssessable($dueWork)
+                                                ->setSubmittedBy($this->getUser())
+                                                ->setSubmittedOnBehalfOf($student)
+                                                ->setSubmittedAt($submittedDate)
+                                                ->setCreatedAt(Alaress_Date_Format::now())
+                                                ->setUpdatedAt(Alaress_Date_Format::now());
 
         $this->dueWorkResponseMapper->save($response);
 
@@ -1202,7 +1231,7 @@ class Controller extends Assessment\Controller
             'attachzone'         => $zoneFactory->buildForAssessment($assessment)->getTwigContext(),
             'allMarkTypes'       => $this->getAllMarkTypes($assessment),
             'allGradeSchemes'    => $this->getAllGradeSchemes(),
-            'selfReviewTypes' => [
+            'selfReviewTypes'    => [
                 'none'    => SubmissionBox::SELF_REVIEWABILITY_NONE,
                 'reflect' => SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY,
                 'full'    => SubmissionBox::SELF_REVIEWABILITY_FULL,
@@ -1250,10 +1279,12 @@ class Controller extends Assessment\Controller
         // Do any students have marks for this rubric?
         $levelIds      = RubricLevelMapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
         $descriptorIds = RubricDescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
-        $countMarkIds  = RubricIndicatorMarkMapper::getInstance()->countByColumnList([
-            'descriptor_id' => $descriptorIds,
-            'valid'         => true
-        ]);
+        $countMarkIds  = RubricIndicatorMarkMapper::getInstance()->countByColumnList(
+            [
+                'descriptor_id' => $descriptorIds,
+                'valid'         => true,
+            ]
+        );
 
         $data['rubricHasMarks'] = $countMarkIds > 0;
 
@@ -1289,8 +1320,7 @@ class Controller extends Assessment\Controller
         if ((int)$this->getRequest()->post['showSubmittedOnly']) {
             $assessment->showOnlySubmittedStudents();
             $skipUnsubmitted = true;
-        }
-        else {
+        } else {
             $assessment->showAllSubmissibleStudents();
             $skipUnsubmitted = false;
         }
@@ -1301,8 +1331,7 @@ class Controller extends Assessment\Controller
             $submitBox = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $assessment->getId());
             $submitBox->setSkipUnsubmitted($skipUnsubmitted);
             SubmissionBoxMapper::getInstance()->save($submitBox);
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             // noop - submission box doesn't exist
         }
 
@@ -1333,18 +1362,22 @@ class Controller extends Assessment\Controller
         }
 
         // Check files have been saved so Kami docs can point to them
-        $fileIds = $files->map(function (SubmissionFile $file) {
-            if (empty($file->getId())) {
-                throw new LogicException("File '{$file->getBasename()}' has not been saved, cannot process");
+        $fileIds = $files->map(
+            function (SubmissionFile $file) {
+                if (empty($file->getId())) {
+                    throw new LogicException("File '{$file->getBasename()}' has not been saved, cannot process");
+                }
+                return $file->getId();
             }
-            return $file->getId();
-        });
+        );
 
         // Check if any files have already been queued for kami upload
         $existingKamiModels = $this->kamiMapper->findByColumn('student_submission_file_id', $fileIds);
-        $existingFileIds    = $existingKamiModels->map(function (Kami\Model $kamiModel) {
-            return $kamiModel->getStudentSubmissionFile()->getId();
-        })->getAll();
+        $existingFileIds    = $existingKamiModels->map(
+            function (Kami\Model $kamiModel) {
+                return $kamiModel->getStudentSubmissionFile()->getId();
+            }
+        )->getAll();
         $existingFileIds    = array_combine($existingFileIds, $existingFileIds);
 
         foreach ($files as $file) {
