@@ -60,6 +60,7 @@ if [[ -n $instance_registry_url_override ]]; then
 else
   echo "Using default instance registry URL";
 fi
+mkdir -p /etc/schoolbox
 echo "{\"instance_registry_url_override\": \"${instance_registry_url_override}\"}" > $instance_registry_conf_file
 
 # This is needed by the puppet Instance Registry API integration
