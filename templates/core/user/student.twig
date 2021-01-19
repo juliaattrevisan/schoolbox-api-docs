@@ -471,22 +471,30 @@
                 }
             });
         </script>
+
         <dl class="tabs" data-tab>
+            {# Tab activation logic: activate the first one that is rendered #}
+            {% set activeTab = null %}
             {% if showActivityFeed %}
-            <dd class="active"><a href="#activity">Activity Feed</a></dd>
+                <dd class="active"><a href="#activity">Activity Feed</a></dd>
+                {% set activeTab = activeTab ?? 'activity' %}
             {% endif %}
             {% if showAchievementsTab %}
-            <dd><a href="#goals">Goals</a></dd>
-            <dd class="{% if not showActivityFeed %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
+                <dd><a href="#goals">Goals</a></dd>
+                <dd class="{% if not activeTab %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
+                {% set activeTab = activeTab ?? 'achievements' %}
             {% endif %}
             {% if showClasses %}
-            <dd class="{% if not (showActivityFeed or showAchievementsTab) %}active{% endif %}"><a href="#classes">Classes</a></dd>
+                <dd class="{% if not activeTab %}active{% endif %}"><a href="#classes">Classes</a></dd>
+                {% set activeTab = activeTab ?? 'classes' %}
             {% endif %}
             {% if showGroups %}
-                <dd><a href="#groups">Groups</a></dd>
+                <dd class="{% if not activeTab %}active{% endif %}"><a href="#groups">Groups</a></dd>
+                {% set activeTab = activeTab ?? 'groups' %}
             {% endif %}
             {% if showContactsTab %}
-            <dd><a href="#contacts">Contacts</a></dd>
+                <dd class="{% if not activeTab %}active{% endif %}"><a href="#contacts">Contacts</a></dd>
+                {% set activeTab = activeTab ?? 'contacts' %}
             {% endif %}
         </dl>
 
@@ -540,25 +548,25 @@
             {% endautoescape %}
 
             {% if showActivityFeed %}
-            <div class="content active" id="activity">
+            <div class="content {% if activeTab == 'activity' %}active{% endif %}" id="activity">
                 <div id="activity-feed"></div>
                 <script type="text/javascript" src="/javascript/components/learningMomentsFeed.bundle.js"></script>
             </div>
             {% endif %}
 
             {% if showAchievementsTab %}
-            <div class="content no-pad {% if not showActivityFeed %}active{% endif %}" id="goals">
+            <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="goals">
                 <div id="goal-feed"></div>
                 <script type="text/javascript" src="/javascript/components/badgeGoalFeed.bundle.js"></script>
             </div>
-            <div class="content" id="achievements">
+            <div class="content {% if activeTab == 'achievements' %}active{% endif %}" id="achievements">
                 <div id="achievement-feed"></div>
                 <script type="text/javascript" src="/javascript/components/badgeAchievementFeed.bundle.js"></script>
             </div>
             {% endif %}
 
             {% if showClasses %}
-            <div class="content {% if not (showActivityFeed or showAchievementsTab) %}active{% endif %}" id="classes">
+            <div class="content {% if activeTab == 'classes' %}active{% endif %}" id="classes">
                 <section>
                     {% if showSubjects %}
                     {% for group, subjectGroup in subjects %}
@@ -659,7 +667,7 @@
             {% endif %}
 
             {% if showGroups and groups is not empty %}
-            <div class="content" id="groups">
+            <div class="content {% if activeTab == 'groups' %}active{% endif %}" id="groups">
                 <section>
                     <div class="row content">
                         <div class="small-12 columns">
@@ -736,7 +744,7 @@
             {% endif %}
 
             {% if showContactsTab %}
-            <div class="content" id="contacts">
+            <div class="content {% if activeTab == 'contacts' %}active{% endif %}" id="contacts">
                 <section class="content">
                     {% block contacts_island %}
                         {% block contacts %}
