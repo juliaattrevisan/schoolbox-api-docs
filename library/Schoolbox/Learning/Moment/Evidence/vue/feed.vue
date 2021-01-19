@@ -367,12 +367,19 @@ export default {
 
                         <template v-if="config.routes.getSetAsGoalForm">
                             <a :href="config.routes.getSetAsGoalForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
-                               title="Set a goal">set a goal</a><template v-if="config.routes.getAwardAsAchievementForm"> or </template>
+                               title="Set a goal">
+                                <!-- Different capitalization for if this is start or middle of a sentence -->
+                                <template v-if="config.routes.getCreateEvidenceForm">set a goal</template>
+                                <template v-else>Set a goal</template>
+                            </a><template v-if="config.routes.getAwardAsAchievementForm"> or </template>
                         </template>
 
                         <template v-if="config.routes.getAwardAsAchievementForm">
                             <a :href="config.routes.getAwardAsAchievementForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
-                               title="Award an achievement">award an achievement</a>
+                               title="Award an achievement">
+                                <template v-if="config.routes.getCreateEvidenceForm || config.routes.getSetAsGoalForm">award an achievement</template>
+                                <template v-else>Award an achievement</template>
+                            </a>
                         </template>
 
                         to see it appear here.
