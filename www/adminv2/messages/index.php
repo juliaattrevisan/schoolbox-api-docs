@@ -7,6 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Cron\CronExpression;
 use Schoolbox\IConfigLoader;
 
 if (!isset($this)) {
@@ -90,23 +91,26 @@ if ($enabled) {
         // \Schoolbox\Realtime\Digest\DigestScheduler::NEVER takes forever.
         $datecron = null;
         $timecron = null;
-        try {
-            $datecron = \Cron\CronExpression::factory($schedule)
-                ->setPart(\Cron\CronExpression::MINUTE, '*')
-                ->setPart(Cron\CronExpression::HOUR, '*');
 
-            $timecron = \Cron\CronExpression::factory($schedule)
-                ->setPart(\Cron\CronExpression::DAY, '*')
-                ->setPart(\Cron\CronExpression::MONTH, '*')
-                ->setPart(\Cron\CronExpression::WEEKDAY, '*');
-        } catch (InvalidArgumentException $e) {
-            // no schedule for group
+        if ($schedule) {
+            try {
+                $datecron = CronExpression::factory($schedule)
+                                          ->setPart(CronExpression::MINUTE, '*')
+                                          ->setPart(CronExpression::HOUR, '*');
+
+                $timecron = CronExpression::factory($schedule)
+                                          ->setPart(CronExpression::DAY, '*')
+                                          ->setPart(CronExpression::MONTH, '*')
+                                          ->setPart(CronExpression::WEEKDAY, '*');
+            } catch (InvalidArgumentException $e) {
+                // no schedule for group
+            }
         }
 
         foreach ($dayTests as $i => $date) {
             $checked = false;
             try {
-                if ($datecron instanceof \Cron\CronExpression) {
+                if ($datecron instanceof CronExpression) {
                     $checked = $datecron->isDue($date);
                 }
             } catch (RuntimeException $e) {
@@ -129,7 +133,7 @@ if ($enabled) {
         $hr = '00';
         $mi = '00';
         try {
-            if ($timecron instanceof \Cron\CronExpression) {
+            if ($timecron instanceof CronExpression) {
                 $nextTime = $timecron->getNextRunDate();
                 $hr = $nextTime->format('H');
                 $mi = $nextTime->format('i');
