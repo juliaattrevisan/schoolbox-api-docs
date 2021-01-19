@@ -124,13 +124,14 @@ Data:
     </div>
 
     <div v-if="mailEnabled" id="classList-email" data-reveal aria-hidden="true" class="reveal-modal small">
-        <h2>Email</h2>
+        <h2>Compose Email</h2>
 
         <ul class="meta">
-            <li>Emailing for <span data-relation="dynamicUsersSlot"></span></li>
+            <li>Composing for <span data-relation="dynamicUsersSlot"></span></li>
         </ul>
 
         <fieldset class="checklist">
+            <legend>Recipients</legend>
             <template v-for="(group, index) in groups">
                 <input :id="group.label"
                        name="groups[]"
@@ -193,7 +194,7 @@ Data:
             studentsCheckboxElements: undefined,
             groups: {{ emailGroups | raw }},
             groupsCheckboxElements: [],
-            sendEmailButtonDefaultText: 'Email Selected',
+            sendEmailButtonDefaultText: 'Compose Email',
             sendEmailButtonText: null,
             getStudentListsEndpoint: '{{ routeLookup('learning.getStudentListByClassId', {folderId: folder.getId, folder: folder}) }}',
             formIsReady: false,
