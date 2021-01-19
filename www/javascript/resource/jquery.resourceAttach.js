@@ -337,35 +337,20 @@
             self = this;
 
         if ('undefined' == typeof modalCache[key]) {
-            // modalCache[key] = $.get(this.options.source, this.getQueryString()).promise();
-            fetch(this.options.source + '?' + this.getQueryString(), { method: 'GET'})
-                .then((response) => {
-                    return response.text();
-                })
-                .then((data) => {
-                    console.log('fetch returned - ' + self.options.source + '?' + self.getQueryString());
-                    console.log(data);
-                    debugger;
-                    self.build.call(self, data);
-                });
-
+            modalCache[key] = $.get(this.options.source, this.getQueryString()).promise();
         }
 
-        // modalCache[key].done(function (data) {
-        //     // ensure we retain ResourceAttache context
-        //     debugger;
-        //     self.build.call(self, data);
-        // });
+        modalCache[key].done(function (data) {
+            // ensure we retain ResourceAttache context
+            self.build.call(self, data);
+        });
 
-        // if (callback) {
-        //     modalCache[key].done(function (data) {
-        //         // ensure we retain ResourceAttache context
-        //         callback.call(self, data);
-        //     });
-        // }
-
-        
-
+        if (callback) {
+            modalCache[key].done(function (data) {
+                // ensure we retain ResourceAttache context
+                callback.call(self, data);
+            });
+        }
     };
 
 
@@ -431,8 +416,6 @@
         }
         
         this.initAttachmentBrowser();
-
-        debugger;
 
         // for iframe communication
         
