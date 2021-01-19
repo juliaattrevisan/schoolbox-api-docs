@@ -8,7 +8,8 @@ import toastMixin from '@schoolbox/toast-mixin';
 /**
  * Award detail modal.
  *
- * @emits achievement-awarded When a goal is upgraded to an achievement.
+ * @emits awards-updated When a goal is upgraded to an achievement.
+ *                       (This is raised on the root Vue instance.)
  */
 export default {
 
@@ -104,7 +105,7 @@ export default {
 
                     // And post a message to the other components that this goal
                     // has been upgraded to an achievement
-                    self.$emit('achievement-awarded');
+                    self.$root.$emit('awards-updated');
                 })
                 .catch(() => self.toastError('Failed to award achievement'))
         }

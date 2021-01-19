@@ -51,6 +51,7 @@ export default {
         }
     },
     mounted() {
+        this.$root.$on('awards-updated', () => this.load());
         this.load();
     },
     updated() {

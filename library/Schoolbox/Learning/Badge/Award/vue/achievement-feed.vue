@@ -70,6 +70,7 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
+        this.$root.$on('awards-updated', () => this.updateAwards());
         this.updateAwards();
     },
 
