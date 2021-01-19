@@ -287,7 +287,7 @@ export default {
             </div>
         </template>
 
-        <award-detail-modal ref="awardDetailModal"></award-detail-modal>
+        <award-detail-modal ref="awardDetailModal" @achievement-awarded="updateAwards"></award-detail-modal>
 
         <achievement-withdraw-modal ref="achievementWithdrawModal" v-on:withdraw-complete="updateAwards()"></achievement-withdraw-modal>
         <goal-withdraw-modal ref="goalWithdrawModal" v-on:withdraw-complete="updateAwards()"></goal-withdraw-modal>

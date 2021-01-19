@@ -5,6 +5,11 @@ import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
 import toastMixin from '@schoolbox/toast-mixin';
 
+/**
+ * Award detail modal.
+ *
+ * @emits achievement-awarded When a goal is upgraded to an achievement.
+ */
 export default {
 
     /**
@@ -87,7 +92,7 @@ export default {
             this.$refs.modal.open();
         },
 
-        awardAchievement () {
+        awardAchievement() {
             let self = this;
             self.toastActivate('Awarding...');
             self.convertToAchievement(self.award)
@@ -96,6 +101,10 @@ export default {
 
                     // Once awarded: update the award within this object
                     self.award = response.data[0];
+
+                    // And post a message to the other components that this goal
+                    // has been upgraded to an achievement
+                    self.$emit('achievement-awarded');
                 })
                 .catch(() => self.toastError('Failed to award achievement'))
         }
