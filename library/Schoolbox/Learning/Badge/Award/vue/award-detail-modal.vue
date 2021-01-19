@@ -92,10 +92,10 @@ export default {
             self.toastActivate('Awarding...');
             self.convertToAchievement(self.award)
                 .then((response) => {
-                    console.log(response);
                     self.toastSuccess('Achievement awarded');
 
                     // Once awarded: update the award within this object
+                    self.award = response.data[0];
                 })
                 .catch(() => self.toastError('Failed to award achievement'))
         }
