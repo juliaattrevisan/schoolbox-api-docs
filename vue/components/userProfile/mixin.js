@@ -1,22 +1,15 @@
 /**
- * Mixin for code which needs to apply to all feeds.
+ * Mixin for code which needs to apply to all Vue instances on the user profile.
  */
 export default {
-    /**
-     * Events that any user profile feed may emit.
-     */
-    events: {
-        AWARDS_UPDATED: 'awards-updated'
-    },
-
     methods: {
         /**
-         * Emit an event to all feeds.
+         * Emit an event to all user profile feeds.
          *
          * @param {String} event The name of the event that is being raised
          * @param {Array}  args  Any additional args for this event's listeners
          */
-        emitToAllFeeds(event, ...args) {
+        emitToAllUserProfileFeeds(event, ...args) {
             window.achievementFeed.$emit(event, ...args);
             window.goalFeed.$emit(event, ...args);
             window.activityFeed.$emit(event, ...args);

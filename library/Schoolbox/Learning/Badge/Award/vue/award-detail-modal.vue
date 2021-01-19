@@ -1,10 +1,11 @@
 <script>
 import BadgeImage from './../../vue/badge-image';
-import awardMixin from './award-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
 import toastMixin from '@schoolbox/toast-mixin';
+import userProfileMixin from '@schoolbox/userProfile/mixin';
+import userProfileConstants from '@schoolbox/userProfile/constants';
 
 /**
  * Award detail modal.
@@ -30,6 +31,7 @@ export default {
     mixins: [
         goalMixin,
         toastMixin,
+        userProfileMixin
     ],
 
     /**
@@ -104,11 +106,15 @@ export default {
                     // Once awarded: update the award within this object
                     self.award = response.data[0];
 
-                    // And post a message to the other components that this goal
-                    // has been upgraded to an achievement
-                    this.emitToAllFeeds(awardMixin.events.AWARDS_UPDATED);
+                    // And post a message to the other components that this
+                    // user's awards have updated
+                    // TODO investigate Vuex state management
+                    self.emitToAllUserProfileFeeds(userProfileConstants.events.AWARDS_UPDATED);
                 })
-                .catch(() => self.toastError('Failed to award achievement'))
+                .catch(() => {
+                    console.log(arguments);
+                    self.toastError('Failed to award achievement')
+                })
         }
     }
 }
