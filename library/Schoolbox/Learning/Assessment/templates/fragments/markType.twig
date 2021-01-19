@@ -18,9 +18,11 @@
 
 {# Letter Grade enables Grading Scheme
  # Total Mark enables Maximum Available Marks
+ # None turns off mark-per-capability
  #}
 {% set markTypeLetterGrade = 2 %}
 {% set markTypeTotalMark = 3 %}
+{% set markTypeNone = 6 %}
 
 {# Suffix the context with a hyphen, if context was specified
  # This makes ids more bearable to read
@@ -46,7 +48,7 @@
             {{ markTypeLabel | default('Mark Type') }}
             <select id="{{ context }}markType" name="{{ context }}markType">
                 {% for index, title in allMarkTypes %}
-                    <option value="{{ index }}"{% if index == (selectedMarkType ?? '') %} selected{% endif %}>{{ title }}</option>
+                    <option value="{{ index }}"{% if index == (selectedMarkType ?? markTypeNone) %} selected{% endif %}>{{ title }}</option>
                 {% endfor %}
             </select>
         </label>
