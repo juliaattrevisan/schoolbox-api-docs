@@ -1,5 +1,6 @@
 <script>
 import BadgeImage from './../../vue/badge-image';
+import awardMixin from './award-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
@@ -105,11 +106,7 @@ export default {
 
                     // And post a message to the other components that this goal
                     // has been upgraded to an achievement
-                    // (Can't use self.$root.$emit as each component has its own
-                    //  root)
-                    window.achievementFeed.$emit('awards-updated');
-                    window.goalFeed.$emit('awards-updated');
-                    window.activityFeed.$emit('awards-updated');
+                    this.emitToAllFeeds(awardMixin.events.AWARDS_UPDATED);
                 })
                 .catch(() => self.toastError('Failed to award achievement'))
         }
