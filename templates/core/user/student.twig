@@ -579,8 +579,7 @@
                                 {% for subject in subjectGroup %}
                                     {% for teacher in subject.teachers %}
                                         {% if not teacher.email is empty %}
-                                            {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
-                                            {% set teacherEmails = teacherEmails|merge([email]) %}
+                                            {% set teacherEmails = teacherEmails|merge([teacher.getFormattedEmailDisplay]) %}
                                         {% endif %}
                                     {% endfor %}
                                 {% endfor %}
