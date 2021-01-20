@@ -21,11 +21,7 @@ export default {
      */
     updated() {
         this.$nextTick(() => {
-            this.jQuery(this.$el)
-                .foundation('dropdown', 'off')
-                // Equalizer doesn't have an 'off' event for some reason.
-                // Attempting to call it raises an error.
-                // .foundation('equalizer', 'off')
+            this.jQuery(document)
                 .foundation('dropdown', 'reflow')
                 .foundation('equalizer', 'reflow');
         });
