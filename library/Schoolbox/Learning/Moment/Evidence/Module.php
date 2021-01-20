@@ -49,14 +49,17 @@ class Module extends BaseModule
             $this->authorizeAllUsersAreSelfOrStudent($params, $user);
         });
 
+        // If evidence_parent_create is ON, parents can create on behalf of the student
+        $createRule = $this->getConfig()->get('evidence_parent_create') ? $isParentOrUserRule : new Rule\IsUser('userId');
+
         $viewCreateFormRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
-                new Rule\LazyCallback(function () use ($isParentOrUserRule) {
-                    return new Rule\Callback(function (array $params, User $user) use ($isParentOrUserRule) {
-                        $this->authorizeAllUsersAreSelfOrParentOfSelf($params, $user, $isParentOrUserRule);
+                new Rule\LazyCallback(function () use ($createRule) {
+                    return new Rule\Callback(function (array $params, User $user) use ($createRule) {
+                        $this->authorizeAllUsers($params, $user, $createRule);
                     });
                 })
             ),
@@ -290,23 +293,21 @@ class Module extends BaseModule
 
 
     /**
-     * Authorizes that for ALL users in the URL that the current user is either:
-     * * that user
-     * * a parent of that user
+     * Authorizes ALL users in the URL against the authorizationRule provided
      *
      * @param array                   $params
      * @param User                    $currentUser
-     * @param Rule\IAuthorizationRule $isParentOrUserRule The auth rule used to authorize the user
+     * @param Rule\IAuthorizationRule $authorizationRule The auth rule used to authorize the user
      */
-    private function authorizeAllUsersAreSelfOrParentOfSelf(
+    private function authorizeAllUsers(
         array $params,
         User $currentUser,
-        Rule\IAuthorizationRule $isParentOrUserRule
+        Rule\IAuthorizationRule $authorizationRule
     ): void {
         // Coalesce to empty list as the preloader may have returned not found,
         // and thus not populated $params['users']
         foreach ($params['users'] ?? [] as $user) {
-            $isParentOrUserRule->authorize(['userId' => $user->getId()], $currentUser);
+            $authorizationRule->authorize(['userId' => $user->getId()], $currentUser);
         }
     }
 
