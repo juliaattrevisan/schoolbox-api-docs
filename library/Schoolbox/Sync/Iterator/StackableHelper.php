@@ -72,7 +72,7 @@ trait StackableHelper
      * @param string $columnName
      * @return string
      */
-    public function columnValuesAsCSV($rows, $columnName): string
+    public function columnValuesAsCSV(array $rows, string $columnName): string
     {
         $values = [];
 
