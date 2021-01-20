@@ -388,6 +388,9 @@ class Controller extends Base
             $history = $histories[$user->getId()];
 
             (new Transactor($history, $this->mapper))->award($award);
+
+            // For now: assume that the current award is being saved as-is
+            $collection->add($award);
         }
 
         // Return what was just created

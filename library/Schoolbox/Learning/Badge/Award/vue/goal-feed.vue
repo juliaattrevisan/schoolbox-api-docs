@@ -8,6 +8,7 @@ import foundationMixin from '@schoolbox/foundation-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import toastMixin from '@schoolbox/toast-mixin';
+import userProfileConstants from '@schoolbox/userProfile/constants';
 
 export default {
 
@@ -70,6 +71,7 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
+        this.$root.$on(userProfileConstants.events.AWARDS_UPDATED, () => this.updateAwards());
         this.updateAwards();
     },
 

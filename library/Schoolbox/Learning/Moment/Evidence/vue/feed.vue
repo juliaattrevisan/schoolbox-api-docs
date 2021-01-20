@@ -11,6 +11,7 @@ import Toast from "@schoolbox/toast";
 import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
 import BadgeImage from "../../../Badge/vue/badge-image";
 import foundationMixin from "@schoolbox/foundation-mixin";
+import userProfileConstants from '@schoolbox/userProfile/constants';
 
 export default {
     components: {
@@ -51,6 +52,7 @@ export default {
         }
     },
     mounted() {
+        this.$root.$on(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
         this.load();
     },
     updated() {

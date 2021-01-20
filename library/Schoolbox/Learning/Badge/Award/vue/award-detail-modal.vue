@@ -3,7 +3,16 @@ import BadgeImage from './../../vue/badge-image';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
+import toastMixin from '@schoolbox/toast-mixin';
+import userProfileMixin from '@schoolbox/userProfile/mixin';
+import userProfileConstants from '@schoolbox/userProfile/constants';
 
+/**
+ * Award detail modal.
+ *
+ * @emits awards-updated When a goal is upgraded to an achievement.
+ *                       (This is raised on the root Vue instance.)
+ */
 export default {
 
     /**
@@ -20,7 +29,9 @@ export default {
      * be superpositioned on top of this javascript here, inside export default {}
      */
     mixins: [
-        goalMixin
+        goalMixin,
+        toastMixin,
+        userProfileMixin
     ],
 
     /**
@@ -83,6 +94,27 @@ export default {
             this.award = award;
 
             this.$refs.modal.open();
+        },
+
+        awardAchievement() {
+            let self = this;
+            self.toastActivate('Awarding...');
+            self.convertToAchievement(self.award)
+                .then((response) => {
+                    self.toastSuccess('Achievement awarded');
+
+                    // Once awarded: update the award within this object
+                    self.award = response.data[0];
+
+                    // And post a message to the other components that this
+                    // user's awards have updated
+                    // TODO investigate Vuex state management
+                    self.emitToAllUserProfileFeeds(userProfileConstants.events.AWARDS_UPDATED);
+                })
+                .catch(() => {
+                    console.log(arguments);
+                    self.toastError('Failed to award achievement')
+                })
         }
     }
 }
@@ -123,6 +155,14 @@ export default {
                         </template>
                     </p>
                 </template>
+
+                <div class="component-action">
+                    <section>
+                        <a v-if="award._links.goalAward && award.isGoal"
+                           class="button"
+                           @click.prevent="awardAchievement">Award Achievement</a>
+                    </section>
+                </div>
             </div>
         </template>
     </reveal-modal>
