@@ -71,8 +71,8 @@ trait StackableTrait
      */
     protected function buildStack()
     {
-        $id               = null;
-        $discreteSubItems = [];
+        $id       = null;
+        $preStack = [];
 
         while ($this->getInnerIterator()->valid() && $row = $this->getInnerIterator()->current()) {
             $thisId = $row[$this->getIdField()];
@@ -87,15 +87,15 @@ trait StackableTrait
             if ($thisId != $id) {
                 break;
             }
-            $discreteSubItems[] = $row;
+            $preStack[] = $row;
             $this->getInnerIterator()->next();
         }
-        if (empty($discreteSubItems)) {
+        if (empty($preStack)) {
             // At the end of the result set
             $this->consolidatedItem = null;
             return;
         }
-        $this->consolidatedItem = $this->buildFromStack($discreteSubItems);
+        $this->consolidatedItem = $this->buildFromStack($preStack);
     }
 
     /**
