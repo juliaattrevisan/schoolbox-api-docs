@@ -104,6 +104,7 @@ class Sync extends Base implements ISync
                       sups.campus_name       AS staff_campus,
                       ''                     AS staff_category_type,
                       sups.category          AS staff_category,
+                      ''                     AS staff_position_code,
                       sups.position_title    AS staff_position,
                       sups.department        AS staff_department,
                       ''                     AS staff_year_level,
