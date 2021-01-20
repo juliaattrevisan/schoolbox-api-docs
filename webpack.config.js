@@ -5,7 +5,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 module.exports = {
     entry: {
 
-        test: './www/css/test.scss',
+        chromeFoundation: './www/css/foundation/chrome-foundation.scss',
 
         // Libraries
         clipboard: "./www/javascript/shared/clipboard/clipboard.main.js",
@@ -82,7 +82,7 @@ module.exports = {
                     'vue-style-loader',
                     'css-loader',
                     'sass-loader'
-                ]
+                ],
             },
             {
                 test: /\.s[ac]ss$/i,
@@ -95,8 +95,7 @@ module.exports = {
                     },
                     "css-loader",
                     "sass-loader",
-                ],
-                include: path.resolve(__dirname, 'www/css')
+                ]
             },
         ]
     },
@@ -116,7 +115,7 @@ module.exports = {
         new MiniCssExtractPlugin({
             // Options similar to the same options in webpackOptions.output
             // both options are optional
-            filename: "[name].css",
+            filename: "../../css/[name].css",
             chunkFilename: "[id].css",
         })
     ]
