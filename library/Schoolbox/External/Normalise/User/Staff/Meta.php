@@ -131,26 +131,6 @@ class Meta {
         return $this->position;
     }
 
-    /**
-     * Get comma separated position descriptions.
-     * Used for meta.positionName token.
-     * @return string
-     */
-    public function getPositionName(): string
-    {
-        if (!$this->position) {
-            return '';
-        }
-        $positionNames = [];
-        foreach ($this->position as $pos) {
-            /** @var Position $pos */
-            if (empty($pos->getDescription())) {
-                continue;
-            }
-            $positionNames[] = $pos->getDescription();
-        }
-        return implode(',', $positionNames);
-    }
 
     /**
      * Set type
