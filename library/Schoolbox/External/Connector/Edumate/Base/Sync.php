@@ -107,8 +107,7 @@ class Sync extends Base implements ISync
                 NULL          AS "staff_year_level",
                 NULL          AS "staff_year_level_description",
                 NULL          AS staff_position_code,
-                NULL          AS staff_position,
-
+                NULL          AS staff_position
             FROM SCHOOLBOX_STAFF
             WHERE USERNAME IS NOT NULL
         ';
