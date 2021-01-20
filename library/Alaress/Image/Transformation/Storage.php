@@ -57,7 +57,7 @@ class Storage
                 return new Rectangle(300, 300);
             case 'eportfolioImageGalleryThumbnail':
                 // ePortfolio Image Gallery list needs to be a square
-                return new Rectangle(80, 80);
+                return new Rectangle(100, 100);
             case 'cardImageLarge':
                 // Card images are 2:1 ratio.  So this is used on class card
                 return new Rectangle(800, 400);
