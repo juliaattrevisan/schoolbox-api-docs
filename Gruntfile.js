@@ -36,16 +36,16 @@ const jsSrc = {
         // Reforge The Shards of Foundation
         // Choose the specific things we are utilising, rather
         // than just including everything
-        'www/javascript/components/foundation/js/foundation/foundation.js',
-        'www/javascript/components/foundation/js/foundation/foundation.accordion.js',
-        'www/javascript/components/foundation/js/foundation/foundation.alert.js',
-        'www/javascript/components/foundation/js/foundation/foundation.equalizer.js',
-        'www/javascript/components/foundation/js/foundation/foundation.offcanvas.js',
-        'www/javascript/components/foundation/js/foundation/foundation.reveal.js',
-        'www/javascript/components/foundation/js/foundation/foundation.slider.js',
-        'www/javascript/components/foundation/js/foundation/foundation.tab.js',
-        'www/javascript/components/foundation/js/foundation/foundation.tooltip.js',
-        'www/javascript/shared/foundation.dropdown.js',
+        'www/javascript/shared/foundation/foundation/foundation.js',
+        'www/javascript/shared/foundation/foundation/foundation.accordion.js',
+        'www/javascript/shared/foundation/foundation/foundation.alert.js',
+        'www/javascript/shared/foundation/foundation/foundation.equalizer.js',
+        'www/javascript/shared/foundation/foundation/foundation.offcanvas.js',
+        'www/javascript/shared/foundation/foundation/foundation.reveal.js',
+        'www/javascript/shared/foundation/foundation/foundation.slider.js',
+        'www/javascript/shared/foundation/foundation/foundation.tab.js',
+        'www/javascript/shared/foundation/foundation/foundation.tooltip.js',
+        'www/javascript/shared/foundation/foundation.dropdown.js',
         'www/javascript/shared/jquery.tab-activator.js',
         'www/javascript/shared/jquery.collapsable.js',
 
