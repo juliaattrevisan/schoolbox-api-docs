@@ -18,7 +18,7 @@ class Position {
      *
      * @var string
      */
-    private $description = '';
+    private string $description = '';
 
 
     /**
@@ -28,7 +28,7 @@ class Position {
      *
      * @var string
      */
-    private $code = '';
+    private string $code = '';
 
 
     /**
@@ -147,13 +147,5 @@ class Position {
     public function getStartDate()
     {
         return $this->startDate;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->description ?: '';
     }
 }
