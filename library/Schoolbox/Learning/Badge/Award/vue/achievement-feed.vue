@@ -302,7 +302,7 @@ export default {
         --
         -- The forced reload will cause goal-feed to seem updated, for now
         -->
-        <achievement-withdraw-modal ref="achievementWithdrawModal" v-on:withdraw-complete="reload()"></achievement-withdraw-modal>
-        <goal-withdraw-modal ref="goalWithdrawModal" v-on:withdraw-complete="reload();"></goal-withdraw-modal>
+        <achievement-withdraw-modal ref="achievementWithdrawModal" v-on:withdraw-complete="updateAwards()"></achievement-withdraw-modal>
+        <goal-withdraw-modal ref="goalWithdrawModal" v-on:withdraw-complete="updateAwards();"></goal-withdraw-modal>
     </div>
 </template>
