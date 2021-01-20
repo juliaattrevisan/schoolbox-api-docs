@@ -40,4 +40,6 @@ class Config
     public const _TIGS_START_TERM_3 = self::PREFIX_TIGS_CRP . 'start_term_3';
     public const _TIGS_START_TERM_4 = self::PREFIX_TIGS_CRP . 'start_term_4';
     public const _TIGS_TEXTBOX_HEADING_EXPLANATION_OF_GRADES = self::PREFIX_TIGS_CRP . 'textbox_heading_explanation_of_grades';
+    public const _TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK = self::PREFIX_TIGS_CRP . 'work_type_nesa_report_grade_and_report_mark';
+    public const _TIGS_WORK_TYPE_7_10_ASSESSMENT_TASK = self::PREFIX_TIGS_CRP . 'work_type_7_10_assessment_task';
 }
