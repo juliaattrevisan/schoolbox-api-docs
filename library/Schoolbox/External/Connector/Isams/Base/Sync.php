@@ -112,6 +112,7 @@ class Sync extends Base implements ISync
                         Campus                              AS staff_campus,
                         DivisionID                          AS staff_category_type,
                         ''                                  AS staff_category,
+                        ''                                  AS staff_position_code,
                         ''                                  AS staff_position,
                         ''                                  AS staff_department,
                         ''                                  AS staff_year_level,
