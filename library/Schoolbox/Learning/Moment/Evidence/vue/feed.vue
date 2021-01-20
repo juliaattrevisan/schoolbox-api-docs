@@ -11,7 +11,7 @@ import Toast from "@schoolbox/toast";
 import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
 import BadgeImage from "../../../Badge/vue/badge-image";
 import foundationMixin from "@schoolbox/foundation-mixin";
-import userProfileConstants from '@schoolbox/userProfile/constants';
+import userProfileConstants from '../../../vue/user-profile/constants';
 
 export default {
     components: {

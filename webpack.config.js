@@ -19,10 +19,14 @@ module.exports = {
         visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/visitation-list-full.js',
         articleList: './library/Schoolbox/Comms/News/templates/vue/article-list.js',
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js',
-        learningMomentsFeed: './library/Schoolbox/Learning/Moment/Evidence/vue/feed.main.js',
         learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/evidence-detail.js',
+
+        userProfileFeeds: './library/Schoolbox/Learning/vue/user-profile/feeds.main.js',
+
+        learningMomentsFeed: './library/Schoolbox/Learning/Moment/Evidence/vue/feed.main.js',
         badgeAchievementFeed: './library/Schoolbox/Learning/Badge/Award/vue/achievement-feed.js',
         badgeGoalFeed: './library/Schoolbox/Learning/Badge/Award/vue/goal-feed.js',
+
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.main.js',
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.main.js',
     },
@@ -58,7 +62,7 @@ module.exports = {
                         plugins: [
                             "@babel/plugin-proposal-optional-chaining",
                             "@babel/plugin-transform-object-assign",
-                            "@babel/plugin-transform-shorthand-properties"                        
+                            "@babel/plugin-transform-shorthand-properties"
                         ]
                     }
                 }

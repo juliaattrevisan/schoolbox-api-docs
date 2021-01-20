@@ -4,8 +4,8 @@ import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
 import toastMixin from '@schoolbox/toast-mixin';
-import userProfileMixin from '@schoolbox/userProfile/mixin';
-import userProfileConstants from '@schoolbox/userProfile/constants';
+import userProfileMixin from '../../../vue/user-profile/mixin';
+import userProfileConstants from '../../../vue/user-profile/constants';
 
 /**
  * Award detail modal.
