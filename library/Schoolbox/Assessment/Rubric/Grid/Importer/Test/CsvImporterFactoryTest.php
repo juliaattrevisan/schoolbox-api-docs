@@ -99,7 +99,7 @@ TEST;
             $emptyDescriptorTestLevels,
             $emptyDescriptorTestCapabilities,
             false,
-            null,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_NONE],
             null
         ];
 
@@ -418,7 +418,7 @@ TEST;
             $standardTestLevels,
             $standardTestCapabilities,
             false,
-            null,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_NONE],
             null,
         ];
 
@@ -439,7 +439,7 @@ TEST;
             $standardTestLevels,
             $standardTestCapabilities,
             false,
-            null,
+            MockCsvImporterFactory::MAPPING[MarkType::SLUG_NONE],
             null,
         ];
     }
