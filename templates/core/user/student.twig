@@ -573,24 +573,27 @@
                     {# Keep a running total of all teachers emails in this group #}
                     {% set teacherEmails = [] %}
                     <div class="row content">
+
                         <div class="button-action beside small-12 columns">
                             <h2 class="subheader">{{ group }}</h2>
-                            <form action="/mail/createMail.php" method="post">
-                                <input type="hidden" name="replyto" value="replyTo"/>
-                                <input type="hidden" name="cc" value="teacherEmails"/>
-                                <input type="submit" value="(Email all group teachers)" class="txt-only" />
-                            </form>
-
-{#                            {% if session.user.role.staff and config.email_all_staff and config.mail_enable %}#}
-{#                                {% set teacherEmails = teacherEmails|join(emailSeparator)  %}#}
-{#                                {% set replyTo = session.user.getFormattedEmailDisplay %}#}
-{#                                <form action="/mail/createMail.php" method="post">#}
-{#                                    <input type="hidden" name="replyto" value="{{ replyTo }}"/>#}
-{#                                    <input type="hidden" name="cc" value="{{ teacherEmails }}"/>#}
-{#                                    <input type="submit" value="(Email all {{ group }} teachers)" class="txt-only" />#}
-{#                                </form>#}
-{#                            {% endif %}#}
+                            {% if isStaff and config.email_all_staff and config.mail_enable %}
+                                {% for subjectKey, subject in subjectGroup %}
+                                    {% for teacher in subject.teachers %}
+                                        {% if not teacher.email is empty %}
+                                            {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
+                                            {% set teacherEmails = teacherEmails|merge([email]) %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                                {% set replyTo = session.user.getFormattedEmailDisplay %}
+                                <form action="/mail/createMail.php" method="post">
+                                    <input type="hidden" name="replyto" value="{{ replyTo }}"/>
+                                    <input type="hidden" name="cc" value="{{ teacherEmails|join(emailSeparator) }}"/>
+                                    <input type="submit" value="(Email all {{ group }} teachers)" class="txt-only" />
+                                </form>
+                            {% endif %}
                         </div>
+
                         <div class="small-12 columns">
                             <section class="v-card-list">
                                 {% for subjectKey, subject in subjectGroup %}
@@ -644,8 +647,6 @@
                                             <ul id="class-options-{{ subjectKey }}" class="f-dropdown" data-dropdown-content>
                                                 {% for teacher in subject.teachers %}
                                                     {% if not teacher.email is empty %}
-                                                        {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
-                                                        {% set teacherEmails = teacherEmails|merge([email]) %}
                                                         <li>
                                                             {% set replyTo = teacher.getFormattedEmailDisplay %}
                                                             <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ teacher.formatName }}</a>
