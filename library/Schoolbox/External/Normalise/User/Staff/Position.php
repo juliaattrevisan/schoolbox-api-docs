@@ -13,10 +13,23 @@ class Position {
 
     /**
      * Job position description
+     * This is usually a nice human-readable format of a person's position
+     * e.g. "Human Resources"
      *
      * @var string
      */
     private $description = '';
+
+
+    /**
+     * Job position code
+     * This is some abbreviated format of a person's position
+     * e.g. "HR", which is the short format of "Human Resources"
+     *
+     * @var string
+     */
+    private $code = '';
+
 
     /**
      * Position start date
@@ -49,6 +62,26 @@ class Position {
 
     /* Getters/Setters
      */
+
+    /**
+     * @return string
+     */
+    public function getCode(): string
+    {
+        return $this->code;
+    }
+
+
+    /**
+     * @param string $code
+     * @return $this
+     */
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
+        return $this;
+    }
+
 
     /**
      * Set description
