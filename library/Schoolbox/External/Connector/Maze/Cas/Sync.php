@@ -67,8 +67,9 @@ class Sync extends BaseSync
                 ''         AS staff_house,
                 NULL       AS staff_department,
                 ''         AS staff_year_level,
-                ''         AS staff_year_level_description
-
+                ''         AS staff_year_level_description,
+                ''         AS staff_position_code,
+                ''         AS staff_position
             FROM SF
             WHERE FINISH IS NULL
             AND STAFF_TYPE != 'L'
