@@ -152,7 +152,8 @@ class Sync extends Base implements ISync
                             vStaff.StaffCampus                            AS staff_campus,
                             vStaff.StaffCategoryType                      AS staff_category_type,
                             vStaff.StaffCategory                          AS staff_category,
-                            JobPositions.StaffJobPositionCode             AS staff_position,
+                            JobPositions.StaffJobPositionCode             AS staff_position_code
+                            JobPositions.JobPositionDescription           AS staff_position,
                             vStaff.StaffDepartment                        AS staff_department,
                             vStaff.StaffYearLevel                         AS staff_year_level,
                             luYearLevel.Description                       AS staff_year_level_description,
