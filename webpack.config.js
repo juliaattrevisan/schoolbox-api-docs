@@ -1,8 +1,12 @@
 const path              = require('path');
-const {VueLoaderPlugin} = require('vue-loader');
+const { VueLoaderPlugin } = require('vue-loader');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
     entry: {
+
+        test: './www/css/test.scss',
+
         // Libraries
         clipboard: "./www/javascript/shared/clipboard/clipboard.main.js",
         strtotime: "./www/javascript/shared/alaress-datetime-picker/strtotime.main.js",
@@ -59,7 +63,7 @@ module.exports = {
                             "@babel/plugin-proposal-optional-chaining",
                         ]
                     }
-                }
+                },
             },
             {
                 test: /\.vue$/,
@@ -70,7 +74,7 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: ['vue-style-loader', 'css-loader']
+                use: ['vue-style-loader', 'css-loader'],
             },
             {
                 test: /\.scss$/,
@@ -79,7 +83,21 @@ module.exports = {
                     'css-loader',
                     'sass-loader'
                 ]
-            }
+            },
+            {
+                test: /\.s[ac]ss$/i,
+                use: [
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                        options: {
+                            publicPath: path.resolve(__dirname, 'www/css')
+                        },
+                    },
+                    "css-loader",
+                    "sass-loader",
+                ],
+                include: path.resolve(__dirname, 'www/css')
+            },
         ]
     },
     resolve: {
@@ -94,6 +112,12 @@ module.exports = {
         extensions: ['*', '.js', '.vue', '.json']
     },
     plugins: [
-        new VueLoaderPlugin()
+        new VueLoaderPlugin(),
+        new MiniCssExtractPlugin({
+            // Options similar to the same options in webpackOptions.output
+            // both options are optional
+            filename: "[name].css",
+            chunkFilename: "[id].css",
+        })
     ]
 };
