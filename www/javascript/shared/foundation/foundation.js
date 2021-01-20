@@ -8,6 +8,16 @@
 
 (function ($, window, document, undefined) {
   'use strict';
+  
+  //as no longer using Modernizr, ensure the .touch class Foundation css uses is still added
+  function isTouchDevice() {
+      return (('ontouchstart' in window) ||
+      (navigator.maxTouchPoints > 0) ||
+      (navigator.msMaxTouchPoints > 0));
+  }
+  if (isTouchDevice()) {
+    document.documentElement.classList.add('touch');
+  } 
 
   var header_helpers = function (class_array) {
     var head = $('head');

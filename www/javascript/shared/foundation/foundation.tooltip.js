@@ -101,14 +101,14 @@
           }
           
           if ($this.hasClass('open')) {
-            if (isTouchDevice && /touchstart|MSPointerDown/i.test(e.type)) {
+            if (isTouchDevice() && /touchstart|MSPointerDown/i.test(e.type)) {
               e.preventDefault();
             }
             self.hide($this);
           } else {
-            if (settings.disable_for_touch && isTouchDevice && /touchstart|MSPointerDown/i.test(e.type)) {
+            if (settings.disable_for_touch && isTouchDevice() && /touchstart|MSPointerDown/i.test(e.type)) {
               return;
-            } else if (!settings.disable_for_touch && isTouchDevice && /touchstart|MSPointerDown/i.test(e.type)) {
+            } else if (!settings.disable_for_touch && isTouchDevice() && /touchstart|MSPointerDown/i.test(e.type)) {
               e.preventDefault();
               S(settings.tooltip_class + '.open').hide();
               is_touch = true;
@@ -199,7 +199,7 @@
 
       $tip.addClass(classes).appendTo(settings.append_to);
 
-      if (isTouchDevice) {
+      if (isTouchDevice()) {
         $tip.append('<span class="tap-to-close">' + settings.touch_close_text + '</span>');
         $tip.on('touchstart.fndtn.tooltip MSPointerDown.fndtn.tooltip', function (e) {
           self.hide($target);
