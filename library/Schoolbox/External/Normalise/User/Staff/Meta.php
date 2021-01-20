@@ -30,9 +30,9 @@ class Meta {
     /**
      * Job position
      *
-     * @var GenericCollection
+     * @var Position
      */
-    private $position = null;
+    private Position $position;
 
     /**
      * Room
@@ -80,7 +80,7 @@ class Meta {
      * Hook method
      */
     protected function setup() {
-        $this->setPosition(new GenericCollection(Position::class));
+        $this->setPosition(new Position());
         $this->setCategory(new Category());
     }
 
@@ -112,10 +112,10 @@ class Meta {
     /**
      * Set position
      *
-     * @param GenericCollection $position
+     * @param Position $position
      * @return $this
      */
-    public function setPosition($position)
+    public function setPosition(Position $position): self
     {
         $this->position = $position;
         return $this;
@@ -124,9 +124,9 @@ class Meta {
     /**
      * Get position
      *
-     * @return GenericCollection
+     * @return Position
      */
-    public function getPosition()
+    public function getPosition(): Position
     {
         return $this->position;
     }

@@ -78,14 +78,11 @@ class Staff extends IteratorIterator
         $positionCodes = $this->columnValuesAsCSV($preStack, 'staff_position_code');
         $positionDescriptions = $this->columnValuesAsCSV($preStack, 'staff_position');
 
-        /* Position - one for every item in stack
+        /* Position - csv strings for multiple positions
          */
-        $positions = $this->columnValuesAsArray($preStack, 'staff_position');
-        foreach ($positions as $position) {
-            $staff->getMeta()->getPosition()->add(
-                (new User\Staff\Position())->setDescription($position)
-            );
-        }
+        $staff->getMeta()->getPosition()
+            ->setCode($positionCodes)
+            ->setDescription($positionDescriptions);
 
         /* Campus
          */
