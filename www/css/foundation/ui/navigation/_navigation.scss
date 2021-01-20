@@ -603,7 +603,6 @@ $allow-sidebar-stash: $large-up;
     }
 
     .card {
-      padding: 0.5rem 0rem 0rem 1rem;
       .meta {
         // DONE alpha of foreground is fine
         color: css-scale-color($accounts-menu-foreground, $alpha: -65%);
