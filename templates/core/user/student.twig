@@ -573,11 +573,10 @@
                     {# Keep a running total of all teachers emails in this group #}
                     {% set teacherEmails = [] %}
                     <div class="row content">
-
                         <div class="button-action beside small-12 columns">
                             <h2 class="subheader">{{ group }}</h2>
                             {% if isStaff and config.email_all_staff and config.mail_enable %}
-                                {% for subjectKey, subject in subjectGroup %}
+                                {% for subject in subjectGroup %}
                                     {% for teacher in subject.teachers %}
                                         {% if not teacher.email is empty %}
                                             {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
@@ -585,12 +584,14 @@
                                         {% endif %}
                                     {% endfor %}
                                 {% endfor %}
-                                {% set replyTo = session.user.getFormattedEmailDisplay %}
-                                <form action="/mail/createMail.php" method="post">
-                                    <input type="hidden" name="replyto" value="{{ replyTo }}"/>
-                                    <input type="hidden" name="cc" value="{{ teacherEmails|join(emailSeparator) }}"/>
-                                    <input type="submit" value="(Email all {{ group }} teachers)" class="txt-only" />
-                                </form>
+                                {% set replyTo = USER.getFormattedEmailDisplay %}
+                                {% if teacherEmails|length > 0 %}
+                                    <form action="/mail/createMail.php" method="post">
+                                        <input type="hidden" name="replyto" value="{{ replyTo }}"/>
+                                        <input type="hidden" name="cc" value="{{ teacherEmails|join(emailSeparator) }}"/>
+                                        <input type="submit" value="(Email all {{ group }} teachers)" class="txt-only" />
+                                    </form>
+                                {% endif %}
                             {% endif %}
                         </div>
 
