@@ -69,10 +69,14 @@ class Staff extends IteratorIterator
 
         /* Email - one for every item in stack
          */
-
         array_map([$staff, "addEmail"], $this->columnValuesAsEmail($preStack, 'default_email'));
         array_map([$staff, "addWorkEmail"], $this->columnValuesAsEmail($preStack, 'work_email'));
         array_map([$staff, "addHomeEmail"], $this->columnValuesAsEmail($preStack, 'home_email'));
+
+        /* Collate every position into a csv string
+         */
+        $positionCodes = $this->columnValuesAsCSV($preStack, 'staff_position_code');
+        $positionDescriptions = $this->columnValuesAsCSV($preStack, 'staff_position');
 
         /* Position - one for every item in stack
          */
