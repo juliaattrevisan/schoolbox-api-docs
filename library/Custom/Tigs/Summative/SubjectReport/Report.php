@@ -621,7 +621,7 @@ class Report
         $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, $semesterFrom, $semesterTo);
 
         $semesters = [];
-        foreach ([2, 1] as $candidate) {
+        foreach ([1, 2] as $candidate) {
             if ($candidate === $semesterFrom || $candidate === $semesterTo) {
                 $semesters[] = $candidate;
             }
