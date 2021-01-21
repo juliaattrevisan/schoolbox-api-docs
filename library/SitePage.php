@@ -120,6 +120,10 @@ class SitePage extends Page
      */
     public static function conType()
     {
+        // If HTTPS is terminated upstream, then site is still on HTTPS
+        if (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https') {
+            return "https://";
+        }
         $type = "http://";
         if (getenv("SERVER_PORT") == 443) {
             $type = "https://";
@@ -518,7 +522,7 @@ class SitePage extends Page
      */
     public static function localRedir($file, $keepProcessing = false, $responseCode = null)
     {
-        header('Location: ' . SitePage::conType() . ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST']) . $file, null, $responseCode);
+        header('Location: ' . self::conType() . ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST']) . $file, null, $responseCode);
         self::disableXssProtectionAfterForm();
         // don't quit
         if ($keepProcessing) {
