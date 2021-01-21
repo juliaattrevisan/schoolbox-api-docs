@@ -480,44 +480,39 @@
          # and the booleans which determine if they're currently available
          #
          # The Activity Feed, if available, is always selected by default
+         #
          # activeTab setting will override it later if appropriate to do so
-         # based on the anchor in the url
+         # based on the anchor in the url via javascript
          #}
         {% set possibleTabs = [
             {
                 label: 'Activity Feed',
                 anchor: 'activity',
-                defaultCss: 'active',
                 visible: showActivityFeed
             },
             {
                 label: 'Goals',
                 anchor: 'goals',
-                defaultCss: '',
                 visible: showAchievementsTab
             },
             {
                 label: 'Achievements',
                 anchor: 'achievements',
-                defaultCss: '',
                 visible: showAchievementsTab
             },
             {
                 label: 'Classes',
                 anchor: 'classes',
-                defaultCss: '',
                 visible: showClasses
             },
             {
                 label: 'Groups',
                 anchor: 'groups',
-                defaultCss: '',
                 visible: showGroups
             },
             {
                 label: 'Contacts',
                 anchor: 'contacts',
-                defaultCss: '',
                 visible: showContactsTab
             }
         ] %}
@@ -544,9 +539,16 @@
          #}
         {% if activeTab %}
             <dl class="tabs" data-tab>
+
+                {# First visible tab is active by default #}
+                {% set defaultCss = 'active' %}
+
                 {% for tab in possibleTabs %}
                     {% if tab.visible %}
-                        <dd class="{{ tab.defaultCss }}"><a href="#{{ tab.anchor }}">{{ tab.label }}</a></dd>
+                        <dd class="{{ defaultCss }}"><a href="#{{ tab.anchor }}">{{ tab.label }}</a></dd>
+
+                        {# All subsequent tabs are not active by default #}
+                        {% set defaultCss = '' %}
                     {% endif %}
                 {% endfor %}
             </dl>
