@@ -168,7 +168,13 @@ class External_Tass_User implements External_UserInterface
             '' AS StudentMobilePhone,
             '' AS StudentSpecialNeedsFlag,
             '' AS EnglishSecondFlag,
-            '' AS StudentStudiesCode,
+            COALESCE(
+                studnswbos.bos_id,
+                studqcaa.learner_id,
+                studscsa.scsa_number,
+                studvsn.vsn,
+                ''
+            ) AS StudentStudiesCode,
             '' AS AlertMessage,
             '' AS CourtOrderType,
             boarder AS StudentBoarder,
@@ -181,6 +187,10 @@ class External_Tass_User implements External_UserInterface
         LEFT JOIN house AS h ON s.house=h.hse_code AND s.cmpy_code=h.cmpy_code
         -- LEFT JOIN parent AS p ON s.par_code=p.par_code AND s.cmpy_code=p.cmpy_code
         LEFT JOIN teacher AS t ON s.pctut_grp=t.pctut_grp AND t.curr_flg = 'Y' AND s.cmpy_code=t.cmpy_code
+        LEFT JOIN studnswbos ON s.stud_code = studnswbos.stud_code
+        LEFT JOIN studqcaa ON s.stud_code = studqcaa.stud_code
+        LEFT JOIN studscsa ON s.stud_code = studscsa.stud_code
+        LEFT JOIN studvsn ON s.stud_code = studvsn.stud_code
         WHERE stud_code = '{$this->database->quote($externalUserId)}'
         ";
         $student = $this->database->trimRow($this->database->getRow($query));
