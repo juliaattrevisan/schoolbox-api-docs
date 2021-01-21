@@ -347,6 +347,7 @@ export default {
                     <i class="icon-badge"></i>
                     <p>
                         No badges have been created. Start by
+                       aaaaa {{ this.getBadgeCreateFormRoute }} xxxxxx
                         <a :href="getBadgeCreateFormRoute" title="Create the first badge">creating the first badge</a>.
                     </p>
                 </template>
