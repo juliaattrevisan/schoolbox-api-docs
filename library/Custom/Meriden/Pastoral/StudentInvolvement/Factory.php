@@ -221,6 +221,11 @@ class Factory
             $subject->setNamedGrade('courseGrade', $courseGrade);
         }
 
+        $lateralLearningCapabilityMark = $subject->retrieveLateralLearningCapabilityMark();
+        if ($lateralLearningCapabilityMark) {
+            new \Alaress_Probe($lateralLearningCapabilityMark);
+        }
+
         return $subject;
     }
 

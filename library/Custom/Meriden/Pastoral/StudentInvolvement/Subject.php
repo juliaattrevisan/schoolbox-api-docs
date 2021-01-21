@@ -9,12 +9,19 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
+use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
+use Schoolbox\Assessment\Rubric\RowSet\Capability;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\User;
 
 class Subject extends Involvement
 {
+    /**
+     * Regular expression for lateral learning capabilities: used to identify if
+     * this subject should display as a lateral learning report.
+     */
     private const LATERAL_LEARNING_CAPABILITY_REGEX = '/Lateral\\s+Learning\\s+Skills/i';
 
     /**
@@ -91,9 +98,9 @@ class Subject extends Involvement
      * Retrieves the most recently given feedback for a lateral learning
      * assessment.
      *
-     * @return IFeedback|null
+     * @return Model|null
      */
-    public function retrieveLateralLearningFeedback(): ?IFeedback
+    public function retrieveLateralLearningFeedback(): ?Model
     {
         $mostRecentFeedback = null;
         foreach ($this->iterateLateralLearningMarks() as $feedback) {
@@ -102,6 +109,21 @@ class Subject extends Involvement
             }
         }
         return $mostRecentFeedback;
+    }
+
+
+    public function retrieveLateralLearningCapabilityMark(): ?CapabilityMark
+    {
+        $feedback = $this->retrieveLateralLearningFeedback();
+        if ($feedback) {
+            foreach ($feedback->getRubricMarkedGrid()->getCapabilityMarks() as $capabilityMark) {
+                if ($this->isCapabilityLateralLearning($capabilityMark->getCapabilityUsage()->getCapability())) {
+                    // do something
+                    return $capabilityMark;
+                }
+            }
+        }
+        return null;
     }
 
 
@@ -118,11 +140,17 @@ class Subject extends Involvement
                 continue;
             }
             foreach ($rubric->iterateCapabilityUsages() as $capabilityUsage) {
-                if (preg_match(self::LATERAL_LEARNING_CAPABILITY_REGEX, $capabilityUsage->getCapability()->getName())) {
+                if ($this->isCapabilityLateralLearning($capabilityUsage->getCapability())) {
                     yield $rubric->getFeedback();
                     break;
                 }
             }
         }
+    }
+
+
+    private function isCapabilityLateralLearning(Capability $capability): bool
+    {
+        return preg_match(self::LATERAL_LEARNING_CAPABILITY_REGEX, $capability->getName());
     }
 }
