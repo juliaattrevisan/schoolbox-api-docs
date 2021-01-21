@@ -32,24 +32,29 @@
 </div>
 
 {# Lateral Learning - a rubric rendered somehow #}
-<div class="row">
-    <h2 class="subheader">Lateral Learning</h2>
-</div>
-{#
-{% if report.subjectReport.namedGrades.learningApproaches %}
-    <div class="row" id="learning-approaches">
-        <div class="small-12 column">
-            <dl class="small-gap">
-                <dt>Approaches to Learning</dt>
-                <dd class="explanation hide-for-print"><a href="/homepage/3462">[{{ locale.grades.proper }} Description]</a></dd>
-            </dl>
-        </div>
-        <div class="small-12 column">
-            {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.learningApproaches} %}
-        </div>
+<div class="row" id="lateral-learning-skills">
+    <div class="small-12 column">
+        <dl class="small-gap">
+            <dt>Lateral Learning Skills</dt>
+        </dl>
     </div>
-{% endif %}
-#}
+    <div class="small-12 column">
+        {% set capabilityMark = report.subjectReport.retrieveLateralLearningCapabilityMark %}
+        {% set indicatorMarks = (capabilityMark is defined) ? capabilityMark.indicatorMarks : [] %}
+        {% if indicatorMarks is not empty %}
+            <table class="width-auto bordered-table">
+                {% for indicatorMark in indicatorMarks %}
+                    <tr>
+                        <td>{{ indicatorMark.indicatorUsage.indicator.name }}</td>
+                        <td>{{ indicatorMark.descriptor.description }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No lateral learning marks have been given for this student yet.</p>
+        {% endif %}
+    </div>
+</div>
 
 {# Class Teacher(s) #}
 {% if report.subjectReport.teachers is not empty %}

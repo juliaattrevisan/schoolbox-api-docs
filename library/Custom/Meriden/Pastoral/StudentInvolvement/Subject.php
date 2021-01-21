@@ -117,7 +117,6 @@ class Subject extends Involvement
         return false;
     }
 
-
     /**
      * Retrieves the most recently given feedback for a lateral learning
      * assessment.
@@ -134,7 +133,6 @@ class Subject extends Involvement
         }
         return $mostRecentFeedback;
     }
-
 
     /**
      * Retrieves the most recently given capability mark for a lateral learning
@@ -155,7 +153,6 @@ class Subject extends Involvement
         }
         return null;
     }
-
 
     /**
      * Iterator for feedback from lateral learning assessments.
@@ -178,7 +175,31 @@ class Subject extends Involvement
         }
     }
 
+    /**
+     * Iterator for lateral learning indicators.
+     *
+     * @return iterable|RowSet\Indicator[]
+     */
+    private function iterateLateralLearningIndicators(): iterable
+    {
+        if ($this->rubricRowSet) {
+            foreach ($this->rubricRowSet->getCapabilities() as $capability) {
+                if ($this->isCapabilityLateralLearning($capability)) {
+                    foreach ($capability->getIndicators() as $indicator) {
+                        yield $indicator;
+                    }
+                }
+            }
+        }
+    }
 
+    /**
+     * Does the given capability identify its container folder as a lateral
+     * learning class?
+     *
+     * @param RowSet\Capability $capability
+     * @return bool
+     */
     private function isCapabilityLateralLearning(RowSet\Capability $capability): bool
     {
         return preg_match(self::LATERAL_LEARNING_CAPABILITY_REGEX, $capability->getName());
