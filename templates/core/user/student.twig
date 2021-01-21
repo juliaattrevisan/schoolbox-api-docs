@@ -479,8 +479,7 @@
         {# These are all the possible tab buttons that could exist
          # and the booleans which determine if they're currently available
          #
-         # The Activity Feed, if available, is always selected by default
-         #
+         # The first button in the list is always selected by default
          # activeTab setting will override it later if appropriate to do so
          # based on the anchor in the url via javascript
          #}
@@ -517,8 +516,8 @@
             }
         ] %}
 
-        {# Out of all the tabs that could possibly exist here,
-         # figure out which one is currently active and remember it
+        {# Out of all the tabs that could possibly exist here, figure out
+         # which one is currently active by default and remember it
          #}
         {% set activeTab = null %}
 
