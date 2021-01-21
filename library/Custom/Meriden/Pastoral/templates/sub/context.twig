@@ -19,6 +19,8 @@
         {% if report.tutorGroupReport.subjectCode %}
             {{ report.tutorGroupReport.year }} eReport
         {% elseif report.subjectReport.subjectCode %}
+            {{ report.subjectReport.year }} eReport:
+            <br />
             {{ report.subjectReport.name }}
             <br />
             ({{ report.subjectReport.subjectCode }})
