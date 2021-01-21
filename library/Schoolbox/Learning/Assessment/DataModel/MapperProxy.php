@@ -525,7 +525,7 @@ class MapperProxy
         return $this->loadParticipantsIntoAssessmentCollection(
             $this->translateToDomainModelCollection($assessments),
             $student,
-            false,
+            true,
             false
         );
     }
