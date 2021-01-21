@@ -221,6 +221,11 @@ class Factory
             $subject->setNamedGrade('courseGrade', $courseGrade);
         }
 
+        // Is this a lateral learning grade?
+        if ($subject->getFolder()->getId()) {
+            $subject->setRubricRowSet($this->rubricMapper->retrieveRowSet($subject->getFolder(), false));
+        }
+
         $lateralLearningCapabilityMark = $subject->retrieveLateralLearningCapabilityMark();
         if ($lateralLearningCapabilityMark) {
             new \Alaress_Probe($lateralLearningCapabilityMark);

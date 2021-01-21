@@ -11,7 +11,7 @@ namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
-use Schoolbox\Assessment\Rubric\RowSet\Capability;
+use Schoolbox\Assessment\Rubric\RowSet;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\User;
@@ -37,6 +37,11 @@ class Subject extends Involvement
      * @var array|User[]
      */
     protected $teachers;
+
+    /**
+     * This subject's rubric rowset, if it has one.
+     */
+    private ?RowSet\RowSet $rubricRowSet;
 
     /**
      * @return array
@@ -76,6 +81,21 @@ class Subject extends Involvement
         return $this;
     }
 
+    /**
+     * @return RowSet\RowSet|null
+     */
+    public function getRubricRowSet(): ?RowSet\RowSet
+    {
+        return $this->rubricRowSet;
+    }
+
+    /**
+     * @param RowSet\RowSet|null $rubricRowSet
+     */
+    public function setRubricRowSet(?RowSet\RowSet $rubricRowSet): void
+    {
+        $this->rubricRowSet = $rubricRowSet;
+    }
 
     /**
      * Is this subject a Lateral Learning report?
@@ -149,7 +169,7 @@ class Subject extends Involvement
     }
 
 
-    private function isCapabilityLateralLearning(Capability $capability): bool
+    private function isCapabilityLateralLearning(RowSet\Capability $capability): bool
     {
         return preg_match(self::LATERAL_LEARNING_CAPABILITY_REGEX, $capability->getName());
     }
