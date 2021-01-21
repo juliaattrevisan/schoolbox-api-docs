@@ -346,9 +346,11 @@ export default {
                 <template v-else>
                     <i class="icon-badge"></i>
                     <p>
-                        No badges have been created. Start by
-                       aaaaa {{ this.getBadgeCreateFormRoute }} xxxxxx
-                        <a :href="getBadgeCreateFormRoute" title="Create the first badge">creating the first badge</a>.
+                        No badges have been created.
+
+                       <template v-if="getBadgeCreateFormRoute !== ''">
+                           Start by <a :href="getBadgeCreateFormRoute" title="Create the first badge">creating the first badge</a>.
+                       </template>
                     </p>
                 </template>
             </div>
