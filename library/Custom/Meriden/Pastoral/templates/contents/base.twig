@@ -1,0 +1,28 @@
+{##
+ # Contents of the eReport index page (i.e. the tutor group report).
+ #
+ # Parameters:
+ # * report.student:          the student whose report this is
+ # * report.subjectList:      the list of the student's subjects
+ # * report.tutorGroupReport: the tutor group report for this student
+ # * showSubjectSelector:     is the subject selector shown?
+ #}
+{% block header %}
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="meriden-crest">
+                {% include '@customMeridenPastoral/sub/crestSvg.twig' %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="context">
+        {% include '@customMeridenPastoral/sub/context.twig' with {report: report, showSubjectSelector: showSubjectSelector ?? true} %}
+    </div>
+{% endblock header %}
+
+{% block contents %}
+{% endblock contents %}
+
+{% block footer %}
+{% endblock footer %}
