@@ -389,7 +389,7 @@ export default {
 
                     <!-- Can't share moments? -->
                     <p v-else>
-                        {{ config.student.firstname }} doesn't have any activity yet. When {{ config.student.firstname }} or their teacher shares learning, it will appear here.
+                        When {{ config.student.firstname }} or their teacher shares learning, it will appear here.
                     </p>
 
                 </template>
