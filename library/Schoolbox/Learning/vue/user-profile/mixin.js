@@ -1,8 +1,17 @@
+import constants from "./constants";
+
 /**
  * Mixin for code which needs to apply to all Vue instances on the user profile.
  */
 export default {
     methods: {
+        /**
+         * Emit an update event to all user profile feeds.
+         */
+        emitUpdateToAllUserProfileFeeds() {
+            this.emitToAllUserProfileFeeds(constants.events.AWARDS_UPDATED);
+        },
+
         /**
          * Emit an event to all user profile feeds.
          *

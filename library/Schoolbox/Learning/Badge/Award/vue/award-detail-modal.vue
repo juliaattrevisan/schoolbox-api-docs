@@ -4,8 +4,7 @@ import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
 import toastMixin from '@schoolbox/toast-mixin';
-import userProfileMixin from '@schoolbox/userProfile/mixin';
-import userProfileConstants from '@schoolbox/userProfile/constants';
+import userProfileMixin from '../../../vue/user-profile/mixin';
 
 /**
  * Award detail modal.
@@ -109,7 +108,7 @@ export default {
                     // And post a message to the other components that this
                     // user's awards have updated
                     // TODO investigate Vuex state management
-                    self.emitToAllUserProfileFeeds(userProfileConstants.events.AWARDS_UPDATED);
+                    self.emitUpdateToAllUserProfileFeeds();
                 })
                 .catch(() => {
                     console.log(arguments);

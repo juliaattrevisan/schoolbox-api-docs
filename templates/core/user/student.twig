@@ -499,6 +499,22 @@
         </dl>
 
         <div class="profile-tabs tabs-content">
+
+            {% if showActivityFeed %}
+            <div class="content {% if activeTab == 'activity' %}active{% endif %}" id="activity">
+                <div id="activity-feed"></div>
+            </div>
+            {% endif %}
+
+            {% if showAchievementsTab %}
+            <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="goals">
+                <div id="goal-feed"></div>
+            </div>
+            <div class="content {% if activeTab == 'achievements' %}active{% endif %}" id="achievements">
+                <div id="achievement-feed"></div>
+            </div>
+            {% endif %}
+
             {% autoescape 'js' %}
                 {# Configuration for various Vue components #}
                 <script type="text/javascript">
@@ -546,24 +562,7 @@
                     ) }}';
                 </script>
             {% endautoescape %}
-
-            {% if showActivityFeed %}
-            <div class="content {% if activeTab == 'activity' %}active{% endif %}" id="activity">
-                <div id="activity-feed"></div>
-                <script type="text/javascript" src="/javascript/components/learningMomentsFeed.bundle.js"></script>
-            </div>
-            {% endif %}
-
-            {% if showAchievementsTab %}
-            <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="goals">
-                <div id="goal-feed"></div>
-                <script type="text/javascript" src="/javascript/components/badgeGoalFeed.bundle.js"></script>
-            </div>
-            <div class="content {% if activeTab == 'achievements' %}active{% endif %}" id="achievements">
-                <div id="achievement-feed"></div>
-                <script type="text/javascript" src="/javascript/components/badgeAchievementFeed.bundle.js"></script>
-            </div>
-            {% endif %}
+            <script type="text/javascript" src="/javascript/components/userProfileFeeds.bundle.js"></script>
 
             {% if showClasses %}
             <div class="content {% if activeTab == 'classes' %}active{% endif %}" id="classes">
