@@ -1319,7 +1319,7 @@ class External_Synergetic_User implements External_UserInterface
             // No relationships were found, use the default values we had before introducing this feature
             $studentContactTypes = ['SC1', 'SC2', 'SC3'];
         } else {
-            $studentContactTypes = explode(',', $this->config->get('external_synergetic_student_contact_types'));
+            $studentContactTypes = array_map('trim', explode(',', $this->config->get('external_synergetic_student_contact_types')));
         }
 
         $contactTypes = Builder::getArrayBindings($studentContactTypes, 'types');
@@ -1336,7 +1336,7 @@ class External_Synergetic_User implements External_UserInterface
             // No relationships were found, use the default values we had before introducing this feature
             $relationships = ['SN', 'STSN', 'DR', 'STDR', 'WD', 'GRASN', 'GRADR', 'FOCD', 'HOPT', 'HOCD', 'HS', 'HOMES', 'HSS'];
         } else {
-            $relationships = explode(',', $this->config->get('external_synergetic_student_relationships'));
+            $relationships = array_map('trim', explode(',', $this->config->get('external_synergetic_student_relationships')));
         }
         $relationshipBindings = Builder::getArrayBindings($relationships, 'relationship');
         return $relationshipBindings;
