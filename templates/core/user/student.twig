@@ -453,6 +453,10 @@
 {# Tabs #}
 <div class="row">
     <div class="small-12 island">
+        {# Programmatically detect the anchor value and select that tab via foundation
+         # This allows you to link /search/user/...#classes to open the Classes tab initially
+         # upon visiting that url
+         #}
         <script>
             $(function() {
                 switch (window.location.hash) {
