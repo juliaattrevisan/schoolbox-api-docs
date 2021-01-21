@@ -22,7 +22,6 @@ use Custom\Tigs\Summative\SubjectReport\Components\FinalAchievementLevels;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentMatrix;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
-use Custom\Tigs\Summative\SubjectReport\Components\InternationalBaccalaureateGraph;
 use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraph;
 use DomainException;
 use External_ClassInterface;
@@ -190,7 +189,7 @@ class Report
             }
             $errors[]  = $error;
             $unitSpecsWithData = $aamData = $aasData = $hscTaskMarks = $hscTaskMatrix = [];
-            $falData   = $ibGraphData = $nesaGraphData = $courseSpec = $hscRankData = $courseDescription = null;
+            $falData = $nesaGraphData = $courseSpec = $hscRankData = $courseDescription = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
             $unitSpecs = $this->getUnitSpecs($courseImplsWithUnits);
@@ -200,7 +199,6 @@ class Report
 
             // Build component data
             $courseDescription = $this->buildCourseDescription($courseSpec);
-            $ibGraphData   = $this->buildInternationalBaccalaureateGraphData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $nesaGraphData = $this->buildNesaScoreGraphData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $falData       = $this->buildFinalAchievementLevelsData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
             $aamData       = $this->buildAcademicAchievementMatrixData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
@@ -273,7 +271,6 @@ class Report
             'falData'                   => $falData,
             'aamData'                   => $aamData,
             'aasData'                   => $aasData,
-            'ibGraphData'               => $ibGraphData,
             'nesaGraphData'             => $nesaGraphData,
             'hscTaskMarks'              => $hscTaskMarks,
             'hscTaskMatrix'             => $hscTaskMatrix,
@@ -595,116 +592,6 @@ class Report
         $textbox = $textBoxes->first();
 
         return $textbox->getBody();
-    }
-
-
-    /**
-     * Returns IB Grade Graph report data for Sem1 and optionally Sem2.
-     *
-     * Returns null if not relevant to student.
-     *
-     * Return structure:
-     * @internal string     return['error']                       Optional. Info about why this component could not be built
-     * @internal array      return['data']
-     * @internal null|array return['data'][idx]                   Where idx is [1,2] and represents data for a semester. Null if don't show component
-     * @internal string     return['data'][idx]['header']
-     * @internal string     return['data'][idx]['data']           Mark data
-     * @internal string     return['data'][idx]['studentMark']    Student's mark
-     * @internal string     return['data'][idx]['studentComment'] Student's comment
-     * @internal string     return['data'][idx]['useComment']     Whether we should just render the student comment instead of the graph
-     * @internal int        return['data'][idx]['semester']       The semester the data belongs to
-     *
-     * @param Folder\Model      $folder
-     * @param StudentAttributes $attributes
-     * @param CourseSpec\Model  $courseSpec
-     * @param User              $student
-     * @param string|null       $roleTypeOverride
-     * @return null|array
-     * @throws InvalidArgumentException
-     * @throws InvalidColumnException
-     * @throws UnexpectedValueException
-     * @throws RouteNotFound
-     * @throws DomainException
-     * @throws LogicException
-     * @throws DefinitionException
-     * @throws UnderflowException
-     * @throws Database\Exception
-     */
-    private function buildInternationalBaccalaureateGraphData(
-        Folder\Model $folder,
-        StudentAttributes $attributes,
-        CourseSpec\Model $courseSpec,
-        User $student,
-        ?string $roleTypeOverride
-    ): ?array {
-        // Only relevant for:
-        // * MYP-S2
-        // * DP-Y11-S2, DP-Y12-S1 + DP-Y12-S2
-        $yearLevel = $attributes->getCurriculumYearLevel();
-        $semester  = $attributes->getCurriculumSemester();
-        if (2 === $semester && $attributes->isMyp()) {
-            $configName   = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
-            $errorMsg     = 'Cannot render MYP Report components. Work type not set.';
-            $errorMsgLink = 'Set MYP Final Achievement Levels Work Type';
-            // Only ever interested in Sem2 for MYP FAL
-            $semesterFrom = 2;
-            $semesterTo   = 2;
-        } elseif ((12 === $yearLevel || 2 === $semester) && $attributes->isDp()) {
-            $configName   = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
-            $errorMsg     = 'Cannot render DP Report components. Work type not set.';
-            $errorMsgLink = 'Set DP Report Work Type';
-            if(11 === $yearLevel){
-                // Only interested in Sem2 for Yr 11 DP
-                $semesterFrom = 2;
-                $semesterTo   = 2;
-            } else {
-                // Always show Sem1, show Sem2 if report is for Sem2
-                $semesterFrom = 1;
-                $semesterTo   = $semester;
-            }
-        } else {
-            // Component is not relevant for this report.
-            return null;
-        }
-
-        try {
-            $workTypeId = $this->checkWorkType($configName, $errorMsg, $errorMsgLink);
-        } catch (UnexpectedValueException $e) {
-            return $this->showErrorsToViewer($roleTypeOverride) ? ['error' => $e->getMessage()] : null;
-        }
-
-        $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
-        $this->loadAssessmentsAndParticipation($courseSpec, [$workTypeId], $attributes, $semesterFrom, $semesterTo);
-
-        $semesters = [];
-        foreach([2,1] as $candidate){
-            if($candidate === $semesterFrom || $candidate === $semesterTo){
-                $semesters[] = $candidate;
-            }
-        }
-
-        $reports = [];
-        foreach($semesters as $semester){
-            $ib = new InternationalBaccalaureateGraph(
-                $cohortUnitImpls,
-                $student,
-                $attributes,
-                $this->visibility,
-                $this->viewer,
-                $workTypeId,
-                $this->rubricMapper,
-                $this->authorizer,
-                $this->router,
-                $folder,
-                $roleTypeOverride
-            );
-            $context = $ib->toContext($semester);
-            if ($context) {
-                $reports['data'][$semester] = $context;
-            }
-        }
-
-        return $reports;
     }
 
 
