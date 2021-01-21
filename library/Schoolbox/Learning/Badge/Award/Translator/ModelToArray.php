@@ -70,9 +70,13 @@ class ModelToArray
 
     /**
      * @param Model $model
+     * @param bool  $translateParentAward If true, translate this award's
+     *                                    parent award (if there is one).
+     *                                    Don't attempt to translate an award
+     *                                    which is already a parent.
      * @return array
      */
-    public function __invoke(Model $model): array
+    public function __invoke(Model $model, bool $translateParentAward = true): array
     {
 
         /* Convert a User instance to its array equivalent
@@ -99,6 +103,9 @@ class ModelToArray
             'badge'     => call_user_func($this->badgeTranslator, $model->getBadge()),
             'status'    => $model->getStatus(),
             'isGoal'    => $model->isGoal(),
+            'award'     => $translateParentAward && $model->getAward()
+                ? $this->__invoke($model->getAward(), false)
+                : null,
             'recipient' => $recipient,
             'awardedBy' => $awardedBy,
             'awardedAt' => $model->getAwardedAt() && !$model->getAwardedAt()->isNull()
