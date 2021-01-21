@@ -26,6 +26,11 @@ if (PHP_SAPI === 'cli') {
     // CLI invocation.
     $instanceOpt = getopt('', ['instance:']);
     $instanceId  = $instanceOpt['instance'] ?? (getenv('INSTANCE_ID', true) ?: null);
+
+    // TODO temp hack while we back-port multi-instance arch.
+    if (!$instanceId && count($instances) === 1) {
+        $instanceId = array_keys($instances)[0];
+    }
     if ($instanceId) {
         if (array_key_exists($instanceId, $instances)) {
             $dbHost   = $instances[$instanceId]['db_host'] ?? null;
