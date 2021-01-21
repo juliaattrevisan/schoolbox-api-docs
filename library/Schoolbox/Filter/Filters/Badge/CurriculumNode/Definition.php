@@ -54,7 +54,10 @@ class Definition extends AbstractDefinition
     public static function getPages(IConfigLoader $configLoader): array
     {
         return $configLoader->get('curriculum_tagging_enabled')
-            ? [Page\Model::PAGE_BADGE_LIST,]
+            ? [
+                Page\Model::PAGE_BADGE_LIST,
+                Page\Model::PAGE_BADGE_SET_AS_GOAL,
+            ]
             : [];
     }
 

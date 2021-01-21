@@ -64,6 +64,12 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Flag to control if a badge can be set as a goal
+     */
+    private bool $allowSetAsGoal;
+
+
+    /**
      * The Badge's Category
      *
      * @var Category\Model
@@ -165,6 +171,26 @@ class Model implements ISoftDeletable
     public function setImage(?Storage\Model $image): self
     {
         $this->image = $image;
+        return $this;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function getAllowSetAsGoal(): bool
+    {
+        return $this->allowSetAsGoal;
+    }
+
+
+    /**
+     * @param bool $allowSetAsGoal
+     * @return static
+     */
+    public function setAllowSetAsGoal(bool $allowSetAsGoal): self
+    {
+        $this->allowSetAsGoal = $allowSetAsGoal;
         return $this;
     }
 

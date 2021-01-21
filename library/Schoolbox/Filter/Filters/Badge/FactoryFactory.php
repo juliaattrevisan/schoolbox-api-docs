@@ -60,6 +60,13 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper()
                 );
+
+            case AllowSetAsGoal\Definition::class:
+                return new AllowSetAsGoal\Factory(
+                    $this->getOptionMapper(),
+                    $this->getDefaultsMapper(),
+                    $this->getSelectionMapper()
+                );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }

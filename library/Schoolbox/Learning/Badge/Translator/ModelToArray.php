@@ -133,6 +133,7 @@ class ModelToArray
                 ? call_user_func($this->storageTranslator, $model->getImage())
                 : null,
             'icon'            => $model->getIcon(),
+            'allowSetAsGoal'  => $model->getAllowSetAsGoal(),
             'category'        => $category
                 ? [
                     'id'   => $category->getId(),

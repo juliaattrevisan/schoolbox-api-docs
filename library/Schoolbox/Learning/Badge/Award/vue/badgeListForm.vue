@@ -34,6 +34,14 @@ export default {
         },
 
         /**
+         * The route which shows the badge create form.
+         */
+        getBadgeCreateFormRoute: {
+            type: String,
+            default: '',
+            required: true,
+        },
+        /**
          * The key within each selected badge's `_links` list to which requests
          * to create badges are posted.
          *
@@ -291,6 +299,7 @@ export default {
     <div>
         <badge-list ref="badgeList"
                     :get-badges-route="getBadgesRoute"
+                    :get-badge-create-form-route="getBadgeCreateFormRoute"
                     :allow-selection="true"
                     :show-badge-menus="false"
                     @[badgeListChangeEvent]="updateSelectedBadges"

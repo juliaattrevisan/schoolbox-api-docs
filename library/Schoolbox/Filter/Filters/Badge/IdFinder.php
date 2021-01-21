@@ -92,6 +92,18 @@ class IdFinder extends AbstractIdFinder
             }
         }
 
+        $allowSetAsGoal = $completeFilters[AllowSetAsGoal\Definition::class] ?? null;
+        if (isset($allowSetAsGoal) && count($allowSetAsGoal) === 1) {
+            foreach ($allowSetAsGoal as $isAllowed => $_) {
+                $hasWhere = true;
+                $pb       = $pb->equals(
+                    'b.allow_set_as_goal',
+                    (int)$isAllowed
+                );
+                break;
+            }
+        }
+
         // Filter out deleted badges
         if (!$deleted) {
             $hasWhere = true;
