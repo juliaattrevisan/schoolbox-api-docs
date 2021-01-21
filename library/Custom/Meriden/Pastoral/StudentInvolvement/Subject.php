@@ -145,7 +145,7 @@ class Subject extends Involvement
     public function retrieveLateralLearningCapabilityMark(): ?CapabilityMark
     {
         $feedback = $this->retrieveLateralLearningFeedback();
-        if ($feedback) {
+        if ($feedback && $feedback->getRubricMarkedGrid()) {
             foreach ($feedback->getRubricMarkedGrid()->getCapabilityMarks() as $capabilityMark) {
                 if ($this->isCapabilityLateralLearning($capabilityMark->getCapabilityUsage()->getCapability())) {
                     // do something

@@ -445,6 +445,7 @@ class Factory
                     && $assessment->getUseRubric()
                 ) {
                     $rubric = $this->rubricMapper->retrieveMarkedGrid($feedback);
+                    $feedback->setRubricMarkedGrid($rubric);
                 }
                 if ($feedback) {
                     $allGrades['a' . $assessment->getId()] = [
