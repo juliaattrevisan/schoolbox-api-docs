@@ -108,6 +108,7 @@ Data:
         </div>
     </div>
     <hr/>
+
     {% if courseDescription %}
     <div class="row course-description">
         <div class="island small-12">
@@ -120,28 +121,29 @@ Data:
     {% endif %}
 
     <div class="row">
-        <div class="column small-12 medium-6">
-            {% if hscRankData %}
-                {% include '@tigsSubjectReport/components/hscAssessmentRank.twig' with hscRankData|merge(extraComponentData) only %}
-            {% else %}
-                <p></p>
-            {% endif %}
+        {% if hscRankData %}
+        <div class="column small-12">
+            {% include '@tigsSubjectReport/components/hscAssessmentRank.twig' with hscRankData|merge(extraComponentData) only %}
         </div>
+        {% endif %}
 
-        <div class="column small-12 medium-6 nesa">
-            {% if nesaGraphData.error|default(null) %}
-                <div data-alert {{ dataAttributeError }} class="alert-box alert">{{ nesaGraphData.error|raw }}</div>
-            {% else %}
-                {% if nesaGraphData.data is defined %}
-                    {% for semester, nesaGraphDatum in nesaGraphData.data %}
-                        <div class="semester-{{ semester }}">
-                        <h2 class="subheader">NESA Grade (Semester {{ semester }})</h2>
-                            {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphDatum|merge(extraComponentData) only %}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endif %}
+        {# Show a meaningful error message for the user, if needed #}
+        {% if nesaGraphData.error|default(null) %}
+        <div class="column small-12 nesa">
+            <div data-alert {{ dataAttributeError }} class="alert-box alert">{{ nesaGraphData.error|raw }}</div>
         </div>
+        {% elseif nesaGraphData.data is defined %}
+
+            {# Display NESA graphs side by side, where possible #}
+            {% for semester, nesaGraphDatum in nesaGraphData.data %}
+            <div class="column small-12 medium-6 nesa">
+                <div class="semester-{{ semester }}">
+                <h2 class="subheader">NESA Grade (Semester {{ semester }})</h2>
+                    {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphDatum|merge(extraComponentData) only %}
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
 
         {% for unitSpec in unitSpecs %}
             {% set unitSpecId = unitSpec.id %}
