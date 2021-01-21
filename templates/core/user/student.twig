@@ -472,31 +472,77 @@
             });
         </script>
 
-        <dl class="tabs" data-tab>
-            {# Tab activation logic: activate the first one that is rendered #}
-            {% set activeTab = null %}
-            {% if showActivityFeed %}
-                <dd class="active"><a href="#activity">Activity Feed</a></dd>
-                {% set activeTab = activeTab ?? 'activity' %}
+        {# These are all the possible tab buttons that could exist
+         # and the booleans which determine if they're currently available
+         #}
+        {% set possibleTabs = [
+            {
+                tab: 'activity',
+                visible: showActivityFeed
+            },
+            {
+                tab: 'achievements',
+                visible: showAchievementsTab
+            },
+            {
+                tab: 'classes',
+                visible: showClasses
+            },
+            {
+                tab: 'groups',
+                visible: showGroups
+            },
+            {
+                tab: 'contacts',
+                visible: showContactsTab
+            }
+        ] %}
+
+        {# Out of all the tabs that could possibly exist here,
+         # figure out which one is currently active and remember it
+         #}
+        {% set activeTab = null %}
+
+        {% for data in possibleTabs if not activeTab %}
+            {% if data.visible %}
+                {% set activeTab = data.tab %}
             {% endif %}
-            {% if showAchievementsTab %}
-                <dd><a href="#goals">Goals</a></dd>
-                <dd class="{% if not activeTab %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
-                {% set activeTab = activeTab ?? 'achievements' %}
-            {% endif %}
-            {% if showClasses %}
-                <dd class="{% if not activeTab %}active{% endif %}"><a href="#classes">Classes</a></dd>
-                {% set activeTab = activeTab ?? 'classes' %}
-            {% endif %}
-            {% if showGroups %}
-                <dd class="{% if not activeTab %}active{% endif %}"><a href="#groups">Groups</a></dd>
-                {% set activeTab = activeTab ?? 'groups' %}
-            {% endif %}
-            {% if showContactsTab %}
-                <dd class="{% if not activeTab %}active{% endif %}"><a href="#contacts">Contacts</a></dd>
-                {% set activeTab = activeTab ?? 'contacts' %}
-            {% endif %}
-        </dl>
+        {%  endfor %}
+
+        {# If activeTab was set, then at least one of the tabs was available
+         # and we can show the whole island. We can also preselect a default
+         # tab so it appears active, which will happen when you visit a profile
+         # screen via /search/user/...
+         #
+         # Visiting that url with a hash /search/user/...#classes for example,
+         # will cause a javascript to run and switch the foundation tabs to the
+         # one represented by the hash (in this case, #classes)
+         #}
+        {% if activeTab %}
+            <dl class="tabs" data-tab>
+
+                {# The Activity Feed, if available, is always selected by default
+                 # activeTab setting will override it later if appropriate to do so
+                 # based on the anchor in the url
+                 #}
+                {% if showActivityFeed %}
+                    <dd class="active"><a href="#activity">Activity Feed</a></dd>
+                {% endif %}
+                {% if showAchievementsTab %}
+                    <dd><a href="#goals">Goals</a></dd>
+                    <dd class="{% if activeTab == 'achievements' %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
+                {% endif %}
+                {% if showClasses %}
+                    <dd class="{% if activeTab == 'classes' %}active{% endif %}"><a href="#classes">Classes</a></dd>
+                {% endif %}
+                {% if showGroups %}
+                    <dd class="{% if activeTab == 'groups' %}active{% endif %}"><a href="#groups">Groups</a></dd>
+                {% endif %}
+                {% if showContactsTab %}
+                    <dd class="{% if activeTab == 'contacts' %}active{% endif %}"><a href="#contacts">Contacts</a></dd>
+                {% endif %}
+            </dl>
+        {% endif %}
 
         <div class="profile-tabs tabs-content">
             {% autoescape 'js' %}
