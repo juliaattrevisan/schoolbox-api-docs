@@ -12,15 +12,16 @@
             tutorGroupReport: report.tutorGroupReport,
             roleTypeOverride: report.roleTypeOverride,
         } %}
-    {% else %}
-        <p>
-            {% if report.tutorGroupReport.subjectCode %}
-                {{ report.tutorGroupReport.year }} eReport
-            {% elseif report.subjectReport.subjectCode %}
-                {{ report.subjectReport.name }}
-                <br />
-                ({{ report.subjectReport.subjectCode }})
-            {% endif %}
-        </p>
     {% endif %}
+
+    {# Print-only heading #}
+    <p class="print-only">
+        {% if report.tutorGroupReport.subjectCode %}
+            {{ report.tutorGroupReport.year }} eReport
+        {% elseif report.subjectReport.subjectCode %}
+            {{ report.subjectReport.name }}
+            <br />
+            ({{ report.subjectReport.subjectCode }})
+        {% endif %}
+    </p>
 </div>
