@@ -126,7 +126,7 @@ class Subject extends Involvement
     public function retrieveLateralLearningFeedback(): ?Model
     {
         $mostRecentFeedback = null;
-        foreach ($this->iterateLateralLearningMarks() as $feedback) {
+        foreach ($this->iterateLateralLearningFeedback() as $feedback) {
             if (!$mostRecentFeedback || $mostRecentFeedback->getPublishedAt()->lt($feedback->getPublishedAt())) {
                 $mostRecentFeedback = $feedback;
             }
@@ -135,8 +135,11 @@ class Subject extends Involvement
     }
 
     /**
-     * Retrieves the most recently given capability mark for a lateral learning
-     * assessment.
+     * Retrieves the lateral learning capability mark for the most recent
+     * lateral learning feedback.
+     *
+     * The capability mark will contain the indicator marks which are displayed
+     * on the lateral learning report.
      *
      * @return CapabilityMark|null
      */
@@ -146,7 +149,6 @@ class Subject extends Involvement
         if ($feedback && $feedback->getRubricMarkedGrid()) {
             foreach ($feedback->getRubricMarkedGrid()->getCapabilityMarks() as $capabilityMark) {
                 if ($this->isCapabilityLateralLearning($capabilityMark->getCapabilityUsage()->getCapability())) {
-                    // do something
                     return $capabilityMark;
                 }
             }
@@ -159,7 +161,7 @@ class Subject extends Involvement
      *
      * @return iterable|IFeedback[]
      */
-    private function iterateLateralLearningMarks(): iterable
+    private function iterateLateralLearningFeedback(): iterable
     {
         foreach ($this->getGrades() as $grade) {
             $rubric = $grade['rubric'] ?? null;
@@ -170,24 +172,6 @@ class Subject extends Involvement
                 if ($this->isCapabilityLateralLearning($capabilityUsage->getCapability())) {
                     yield $rubric->getFeedback();
                     break;
-                }
-            }
-        }
-    }
-
-    /**
-     * Iterator for lateral learning indicators.
-     *
-     * @return iterable|RowSet\Indicator[]
-     */
-    private function iterateLateralLearningIndicators(): iterable
-    {
-        if ($this->rubricRowSet) {
-            foreach ($this->rubricRowSet->getCapabilities() as $capability) {
-                if ($this->isCapabilityLateralLearning($capability)) {
-                    foreach ($capability->getIndicators() as $indicator) {
-                        yield $indicator;
-                    }
                 }
             }
         }

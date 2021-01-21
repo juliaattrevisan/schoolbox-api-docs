@@ -438,6 +438,8 @@ class Factory
                     && $assessment->getUseRubric()
                 ) {
                     $rubric = $this->rubricMapper->retrieveMarkedGrid($feedback);
+                    // Install the marked grid into the feedback, so that it is
+                    // accessible by the lateral learning methods.
                     $feedback->setRubricMarkedGrid($rubric);
                 }
                 if ($feedback) {
