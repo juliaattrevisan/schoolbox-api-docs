@@ -205,6 +205,8 @@ body.login input[type=checkbox]:not(.plain):checked + label:after {
 }
 .e-report #learning-approaches table th:first-child,
 .e-report #learning-approaches table td:first-child,
+.e-report #lateral-learning-skills table th:first-child,
+.e-report #lateral-learning-skills table td:first-child,
 .e-report #assessments table th:first-child,
 .e-report #assessments table td:first-child {
   text-align: left;
