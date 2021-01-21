@@ -18,7 +18,6 @@ use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementMatrix;
 use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementSummary;
-use Custom\Tigs\Summative\SubjectReport\Components\FinalAchievementLevels;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentMatrix;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
@@ -189,7 +188,7 @@ class Report
             }
             $errors[]  = $error;
             $unitSpecsWithData = $aamData = $aasData = $hscTaskMarks = $hscTaskMatrix = [];
-            $falData = $nesaGraphData = $courseSpec = $hscRankData = $courseDescription = null;
+            $nesaGraphData = $courseSpec = $hscRankData = $courseDescription = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
             $unitSpecs = $this->getUnitSpecs($courseImplsWithUnits);
@@ -200,7 +199,6 @@ class Report
             // Build component data
             $courseDescription = $this->buildCourseDescription($courseSpec);
             $nesaGraphData = $this->buildNesaScoreGraphData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
-            $falData       = $this->buildFinalAchievementLevelsData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
             $aamData       = $this->buildAcademicAchievementMatrixData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
             $aasData       = $this->buildAcademicAchievementSummaryData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
             $hscTaskMarks  = $this->buildHscTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
@@ -268,7 +266,6 @@ class Report
             'errors'                    => $errors,
             'unitSpecs'                 => $unitSpecsWithData,
             'courseDescription'         => $courseDescription,
-            'falData'                   => $falData,
             'aamData'                   => $aamData,
             'aasData'                   => $aasData,
             'nesaGraphData'             => $nesaGraphData,
@@ -509,60 +506,6 @@ class Report
             $roleTypeOverride
         );
         return $aas->toContext();
-    }
-
-
-    /**
-     * Build data for the MYP-FAL component.
-     *
-     * @param Folder\Model                       $folder
-     * @param StudentAttributes                  $attributes
-     * @param GenericCollection|UnitSpec\Model[] $unitSpecs
-     * @param User                               $student
-     * @param string|null                        $roleTypeOverride
-     * @return array|null
-     * @throws InvalidArgumentException
-     * @throws UnexpectedValueException
-     * @throws RouteNotFound
-     * @throws MapperException
-     */
-    private function buildFinalAchievementLevelsData(
-        Folder\Model $folder,
-        StudentAttributes $attributes,
-        GenericCollection $unitSpecs,
-        User $student,
-        ?string $roleTypeOverride
-    ): ?array {
-        // Only relevant for MYP students in Curriculum Semester 2
-        if (!$attributes->isMyp() || $attributes->getCurriculumSemester() !== 2) {
-            return null;
-        }
-
-        try {
-            $workTypeId = $this->checkWorkType(
-                Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS,
-                'Cannot render Final Achievement Levels component. Work type not set.',
-                'Set MYP Final Achievement Levels Work Type'
-            );
-        } catch (UnexpectedValueException $e) {
-            return ['error' => $e->getMessage()];
-        }
-
-        $fal = new FinalAchievementLevels(
-            $attributes,
-            $unitSpecs,
-            $student,
-            $folder,
-            $this->visibility,
-            $this->viewer,
-            $workTypeId,
-            $this->rubricMapper,
-            $this->authorizer,
-            $this->router,
-            $roleTypeOverride
-        );
-
-        return $fal->toContext();
     }
 
 

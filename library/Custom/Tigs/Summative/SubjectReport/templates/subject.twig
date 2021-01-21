@@ -18,7 +18,6 @@ Data:
     hscTaskMarks['error']     string                - Optional. If present, the reason we can't render these components
     hscTaskMarks['data']      array                 - Optional. If present, the per-unit data. Indexed by unitSpec.id
     hscRankData               array                 - Data to render the 'HSC Assessment Rank' component
-    falData                   array|null            - Data to render the Final Achievement Level component
     nesaGraphData             array                 - Data to render the NESA Grade Graph component
     showErrors                bool                  - Should we render errors?
     dataAttributeError      string                - A string to apply as a data attribute to error alerts
@@ -144,11 +143,6 @@ Data:
             {% endif %}
         </div>
 
-        {% if falData %}
-        <div class="column small-12 final-achievement-levels">
-            {% include '@tigsSubjectReport/components/finalAchievementLevels.twig' with falData|merge(extraComponentData) only %}
-        </div>
-        {% endif %}
         {% for unitSpec in unitSpecs %}
             {% set unitSpecId = unitSpec.id %}
             <div class="column small-12 unit">
