@@ -157,7 +157,7 @@ export default {
 
                 <div class="component-action">
                     <section>
-                        <a v-if="award._links.goalAward && award.isGoal"
+                        <a v-if="award._links.goalAward && award.isGoal && !award.award"
                            class="button"
                            @click.prevent="awardAchievement">Award Achievement</a>
                     </section>
