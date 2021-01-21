@@ -100,15 +100,19 @@ class Subject extends Involvement
     /**
      * Is this subject a Lateral Learning report?
      *
-     * If the student has been marked for at least one lateral learning
-     * assessment, then it is a lateral learning report.
+     * If the subject has a rubric rowset, and that rowset contains a capability
+     * that is lateral learning, then this shows the lateral learning report.
      *
      * @return bool
      */
     public function isLateralLearning(): bool
     {
-        foreach ($this->iterateLateralLearningMarks() as $feedback) {
-            return true;
+        if ($this->rubricRowSet) {
+            foreach ($this->rubricRowSet->getCapabilities() as $capability) {
+                if ($this->isCapabilityLateralLearning($capability)) {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -132,6 +136,12 @@ class Subject extends Involvement
     }
 
 
+    /**
+     * Retrieves the most recently given capability mark for a lateral learning
+     * assessment.
+     *
+     * @return CapabilityMark|null
+     */
     public function retrieveLateralLearningCapabilityMark(): ?CapabilityMark
     {
         $feedback = $this->retrieveLateralLearningFeedback();

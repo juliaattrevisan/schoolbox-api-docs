@@ -226,6 +226,8 @@ class Factory
             $subject->setRubricRowSet($this->rubricMapper->retrieveRowSet($subject->getFolder(), false));
         }
 
+        new \Alaress_Probe($subject->isLateralLearning());
+
         $lateralLearningCapabilityMark = $subject->retrieveLateralLearningCapabilityMark();
         if ($lateralLearningCapabilityMark) {
             new \Alaress_Probe($lateralLearningCapabilityMark);
