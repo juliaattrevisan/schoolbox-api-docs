@@ -474,26 +474,40 @@
 
         {# These are all the possible tab buttons that could exist
          # and the booleans which determine if they're currently available
+         #
+         # The Activity Feed, if available, is always selected by default
+         # activeTab setting will override it later if appropriate to do so
+         # based on the anchor in the url
          #}
         {% set possibleTabs = [
             {
-                tab: 'activity',
+                label: 'Activity Feed',
+                anchor: 'activity',
+                defaultCss: 'active',
                 visible: showActivityFeed
             },
             {
-                tab: 'achievements',
+                label: 'Achievements',
+                anchor: 'achievements',
+                defaultCss: '',
                 visible: showAchievementsTab
             },
             {
-                tab: 'classes',
+                label: 'Classes',
+                anchor: 'classes',
+                defaultCss: '',
                 visible: showClasses
             },
             {
-                tab: 'groups',
+                label: 'Groups',
+                anchor: 'groups',
+                defaultCss: '',
                 visible: showGroups
             },
             {
-                tab: 'contacts',
+                label: 'Contacts',
+                anchor: 'contacts',
+                defaultCss: '',
                 visible: showContactsTab
             }
         ] %}
@@ -505,7 +519,7 @@
 
         {% for data in possibleTabs if not activeTab %}
             {% if data.visible %}
-                {% set activeTab = data.tab %}
+                {% set activeTab = data.anchor %}
             {% endif %}
         {%  endfor %}
 
@@ -520,27 +534,11 @@
          #}
         {% if activeTab %}
             <dl class="tabs" data-tab>
-
-                {# The Activity Feed, if available, is always selected by default
-                 # activeTab setting will override it later if appropriate to do so
-                 # based on the anchor in the url
-                 #}
-                {% if showActivityFeed %}
-                    <dd class="active"><a href="#activity">Activity Feed</a></dd>
-                {% endif %}
-                {% if showAchievementsTab %}
-                    <dd><a href="#goals">Goals</a></dd>
-                    <dd class="{% if activeTab == 'achievements' %}active{% endif %}"><a href="#achievements">Achievements</a></dd>
-                {% endif %}
-                {% if showClasses %}
-                    <dd class="{% if activeTab == 'classes' %}active{% endif %}"><a href="#classes">Classes</a></dd>
-                {% endif %}
-                {% if showGroups %}
-                    <dd class="{% if activeTab == 'groups' %}active{% endif %}"><a href="#groups">Groups</a></dd>
-                {% endif %}
-                {% if showContactsTab %}
-                    <dd class="{% if activeTab == 'contacts' %}active{% endif %}"><a href="#contacts">Contacts</a></dd>
-                {% endif %}
+                {% for tab in possibleTabs %}
+                    {% if tab.visible %}
+                        <dd class="{{ tab.defaultCss }}"><a href="#{{ tab.anchor }}">{{ tab.label }}</a></dd>
+                    {% endif %}
+                {% endfor %}
             </dl>
         {% endif %}
 
