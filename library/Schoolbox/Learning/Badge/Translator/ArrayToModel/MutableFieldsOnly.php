@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Translator\ArrayToModel;
 
-
 /**
  * Array-to-model translator which filters out fields which may not be mutated
  * by the create or update API calls.
