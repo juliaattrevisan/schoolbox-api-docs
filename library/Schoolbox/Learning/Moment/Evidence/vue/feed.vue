@@ -344,9 +344,25 @@ export default {
                     <!-- Current user -->
                     <p>You don't have any activity yet.</p>
 
-                    <!-- This opens a dialog instead of a link -->
-                    <p v-if="config.routes.getCreateEvidenceForm">
-                        <a href="#" title="Share your learning" data-reveal-id="shareLearningMoment">Share your learning</a>
+                    <!-- Can share moments? -->
+                    <p v-if="config.routes.getCreateEvidenceForm || config.routes.getSetAsGoalForSelfForm">
+                        <template v-if="config.routes.getCreateEvidenceForm">
+                            <!--
+                                All these tags need to be on the same line,
+                                because otherwise there will be a space between
+                                the link and the comma -->
+                            <a href="#" title="Share a learning moment" data-reveal-id="shareLearningMoment">Share your learning</a><template v-if="config.routes.getSetAsGoalForm && config.routes.getAwardAsAchievementForm">, </template><template v-else-if="config.routes.getSetAsGoalForSelfForm"> or </template>
+                        </template>
+
+                        <template v-if="config.routes.getSetAsGoalForSelfForm">
+                            <a :href="config.routes.getSetAsGoalForSelfForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
+                               title="Set a goal">
+                                <!-- Different capitalization for if this is start or middle of a sentence -->
+                                <template v-if="config.routes.getCreateEvidenceForm">set a goal</template>
+                                <template v-else>Set a goal</template>
+                            </a><template v-if="config.routes.getAwardAsAchievementForm"> or </template>
+                        </template>
+
                         to see it appear in the activity feed.
                     </p>
                 </template>
