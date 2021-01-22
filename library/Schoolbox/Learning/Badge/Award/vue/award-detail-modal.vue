@@ -111,7 +111,6 @@ export default {
                     self.emitUpdateToAllUserProfileFeeds();
                 })
                 .catch(() => {
-                    console.log(arguments);
                     self.toastError('Failed to award achievement')
                 })
         }
