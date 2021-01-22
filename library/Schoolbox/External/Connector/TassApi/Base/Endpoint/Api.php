@@ -191,4 +191,16 @@ class Api implements IApi
     {
         return $this->apiUsage;
     }
+
+
+    /**
+     * Get the token we're using in this tass product api.
+     * Used for debugging 401 Unauthorized.
+     *
+     * @return string
+     */
+    public function getToken(): string
+    {
+        return $this->credentials['token'];
+    }
 }

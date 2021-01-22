@@ -8,6 +8,8 @@ import foundationMixin from '@schoolbox/foundation-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import toastMixin from '@schoolbox/toast-mixin';
+import userProfileConstants from '../../../vue/user-profile/constants';
+import userProfileMixin from '../../../vue/user-profile/mixin';
 
 export default {
 
@@ -27,7 +29,8 @@ export default {
     mixins: [
         foundationMixin,
         goalMixin,
-        toastMixin
+        toastMixin,
+        userProfileMixin,
     ],
 
     /**
@@ -70,6 +73,7 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
+        this.$root.$on(userProfileConstants.events.AWARDS_UPDATED, () => this.updateAwards());
         this.updateAwards();
     },
 
@@ -87,7 +91,6 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
         /**
          * Open a modal to show the badge that was given as an award
          *
@@ -289,7 +292,7 @@ export default {
 
         <award-detail-modal ref="awardDetailModal"></award-detail-modal>
 
-        <achievement-withdraw-modal ref="achievementWithdrawModal" v-on:withdraw-complete="updateAwards()"></achievement-withdraw-modal>
-        <goal-withdraw-modal ref="goalWithdrawModal" v-on:withdraw-complete="updateAwards()"></goal-withdraw-modal>
+        <achievement-withdraw-modal ref="achievementWithdrawModal" v-on:withdraw-complete="emitUpdateToAllUserProfileFeeds"></achievement-withdraw-modal>
+        <goal-withdraw-modal ref="goalWithdrawModal" v-on:withdraw-complete="emitUpdateToAllUserProfileFeeds"></goal-withdraw-modal>
     </div>
 </template>

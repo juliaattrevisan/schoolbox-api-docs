@@ -8,6 +8,8 @@ import foundationMixin from '@schoolbox/foundation-mixin';
 import goalMixin from './goal-mixin';
 import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import toastMixin from '@schoolbox/toast-mixin';
+import userProfileConstants from '../../../vue/user-profile/constants';
+import userProfileMixin from '../../../vue/user-profile/mixin';
 
 export default {
 
@@ -27,7 +29,8 @@ export default {
     mixins: [
         foundationMixin,
         goalMixin,
-        toastMixin
+        toastMixin,
+        userProfileMixin,
     ],
 
     /**
@@ -70,6 +73,7 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
+        this.$root.$on(userProfileConstants.events.AWARDS_UPDATED, () => this.updateAwards());
         this.updateAwards();
     },
 
@@ -87,7 +91,6 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
         /**
          * Open a modal to show the badge that was given as an award
          *
@@ -104,17 +107,8 @@ export default {
          */
         awardAchievement(award) {
           let self = this;
-
-          let request = {
-            url: award._links.goalAward,
-            data: {users: [award.recipient]},
-            method: 'post',
-            responseType: 'json'
-          }
-
           self.toastActivate('Awarding...');
-          axios
-              .request(request)
+          self.convertToAchievement(award)
               .then(() => {
                 self.toastSuccess('Achievement awarded');
 
@@ -301,15 +295,7 @@ export default {
 
         <award-detail-modal ref="awardDetailModal"></award-detail-modal>
 
-        <!-- Temporarily replaced implementation of self.updateAwards()
-        -- achievement-feed.vue can't tell goal-feed.vue to update itself; they don't
-        -- share a common parent. They're entirely separate vue apps. An action inside
-        -- achievement-feed affects the data in goal-feed, but I can't talk to
-        -- goal-feed from achievement-feed.
-        --
-        -- The forced reload will cause goal-feed to seem updated, for now
-        -->
-        <achievement-withdraw-modal ref="achievementWithdrawModal" v-on:withdraw-complete="reload()"></achievement-withdraw-modal>
-        <goal-withdraw-modal ref="goalWithdrawModal" v-on:withdraw-complete="reload();"></goal-withdraw-modal>
+        <achievement-withdraw-modal ref="achievementWithdrawModal" v-on:withdraw-complete="emitUpdateToAllUserProfileFeeds"></achievement-withdraw-modal>
+        <goal-withdraw-modal ref="goalWithdrawModal" v-on:withdraw-complete="emitUpdateToAllUserProfileFeeds"></goal-withdraw-modal>
     </div>
 </template>

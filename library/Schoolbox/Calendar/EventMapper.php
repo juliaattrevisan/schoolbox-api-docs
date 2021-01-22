@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Calendar;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
 use Event\Source\Mapper as EventSourceMapper;
 use InvalidArgumentException;
@@ -14,8 +15,6 @@ use PDOException;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Calendar\Event\Attendance\Mapper as AttendanceMapper;
-use Schoolbox\Calendar\Relation\Category;
-use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Calendar\Relation\Campus as RelationCampus;
@@ -55,13 +54,13 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->hasTable('event');
         $this->hasModel(Event::class);
 
-        $this->uses('access',self::TYPE_INTEGER);
-        $this->uses('attendance',self::TYPE_INTEGER);
-        $this->uses('max_attendees',self::TYPE_INTEGER);
-        $this->uses('show_attendees',self::TYPE_BOOLEAN);
-        $this->uses('completed',self::TYPE_INTEGER);
-        $this->uses('publish_date',self::TYPE_DATETIME,null,'publishDateTime');
-        $this->joins('owner', UserMapper::class,'id',self::TYPE_MODEL, null, 'owner','owner');
+        $this->uses('access', self::TYPE_INTEGER);
+        $this->uses('attendance', self::TYPE_INTEGER);
+        $this->uses('max_attendees', self::TYPE_INTEGER);
+        $this->uses('show_attendees', self::TYPE_BOOLEAN);
+        $this->uses('completed', self::TYPE_INTEGER);
+        $this->uses('publish_date', self::TYPE_DATETIME, null, 'publishDateTime');
+        $this->joins('owner', UserMapper::class, 'id', self::TYPE_MODEL, null, 'owner', 'owner');
         $this->uses(
             'variant',
             self::TYPE_STRING,
@@ -83,16 +82,16 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     */
     protected function coreMapping()
     {
-        $this->uses('id',self::TYPE_INTEGER,self::COLUMN_IDENTIFIER);
-        $this->uses('series_id',self::TYPE_INTEGER,null,'seriesId');
+        $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('series_id', self::TYPE_INTEGER, null, 'seriesId');
         $this->joins('author_id', UserMapper::class, 'id', null, null, 'author', 'author');
         $this->joins('type', EventTypeMapper::class, 'eventTypeID', null, null, 'type', 'eventType');
-        $this->uses('title',self::TYPE_STRING);
-        $this->uses('detail',self::TYPE_STRING);
-        $this->uses('location',self::TYPE_STRING);
-        $this->uses('start_datetime',self::TYPE_DATETIME,null,'startDateTime');
-        $this->uses('end_datetime',self::TYPE_DATETIME,null,'endDateTime');
-        $this->uses('allday',self::TYPE_INTEGER,null,'allDay');
+        $this->uses('title', self::TYPE_STRING);
+        $this->uses('detail', self::TYPE_STRING);
+        $this->uses('location', self::TYPE_STRING);
+        $this->uses('start_datetime', self::TYPE_DATETIME, null, 'startDateTime');
+        $this->uses('end_datetime', self::TYPE_DATETIME, null, 'endDateTime');
+        $this->uses('allday', self::TYPE_INTEGER, null, 'allDay');
 
         $this->hasJoin('author', array(
             'mapper'    => UserMapper::class,
@@ -147,10 +146,11 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback('postSave', array($this, 'postSave'));
-
-
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function getSelectString()
     {
         $ownerMapper = $this->getJoinMapper('owner');
@@ -177,6 +177,9 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         ";
     }
 
+    /**
+     * @inheritDoc
+     */
     protected function getFromString()
     {
         return "
@@ -643,28 +646,36 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     }
 
     /**
-     * Removes all events from this folder ID
+     * Deletes event folder association of this folder and soft deletes event which are only for this folder
      *
      * @param int $fid
-     * @throws MapperException
-     * @throws MapperException\Deleted
      * @throws Schoolbox\Mapper\DefinitionException
      */
     public function homepageClean($fid)
     {
-        // Get ids of all events which do not belong to
-        // any other folder other than the current one
-        $folderSpecificEventIds = $this->getFolderSpecificEventIds($fid);
+        // Find events of this folder
+        $folderEventQuery = "SELECT id FROM {$this->getTable()}
+                        JOIN event_folder ON event_folder.event_id = event.id
+                        WHERE event.deleted_at IS NULL AND folder_id = :folderId";
 
-        // deleteByColumn doesn't work as expected when querying a join column,
-        // because the delete string doesn't contain the joins the select does.
-        // Fortunately delete(findByColumn()) works.
-        $this->getJoinMapper('category')->deleteByColumn('folder_id', $fid);
+        $folderEvents = $this->database->query($folderEventQuery, ['folderId' => $fid])->fetchAll(\PDO::FETCH_COLUMN);
+        $bindings     = Builder::getArrayBindings($folderEvents);
 
-        if (!empty($folderSpecificEventIds)) {
-            // soft delete events do not belong to any folder; if there is any
-            $this->deleteEvents($folderSpecificEventIds);
-        }
+        // Find events which is associated to this folder only
+        $folderOnlyEventQuery = "SELECT event_id, count(*) AS cnt FROM {$this->getTable()}
+                        JOIN event_folder ON event_folder.event_id = event.id
+                        AND event.id IN ({$bindings['placeholders']})
+                        GROUP BY event_id HAVING cnt = 1";
+
+        $folderOnlyEvents = $this->database->query($folderOnlyEventQuery, $bindings['bindings'])->fetchAll(\PDO::FETCH_ASSOC);
+        $eventsToDelete   = array_column($folderOnlyEvents, 'event_id');
+
+        // Delete them
+        $this->deleteByColumn('id', $eventsToDelete);
+
+        // Delete associations
+        $deleteJoinQuery = "DELETE FROM event_folder WHERE folder_id = :folderId";
+        $this->database->query($deleteJoinQuery, ['folderId' => $fid]);
     }
 
     /**
@@ -693,53 +704,5 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             $diff['guests'] = [$objectA->getGuests(), $objectB->getGuests()];
         }
         return $diff;
-    }
-
-    /**
-     * Returns ids of events which only belong to the
-     * folder and not any other ones (if there is any).
-     *
-     * @param int $folderId
-     * @return array
-     * @throws Schoolbox\Mapper\DefinitionException
-     */
-    private function getFolderSpecificEventIds(int $folderId): array
-    {
-        $folderSpecificEventIds = [];
-        $eventIds               = [];
-
-        /** @var CategoryMapper $folderEventMapper */
-        $folderEventMapper = $this->getJoinMapper('category');
-
-        $folderEventsForFolder = $folderEventMapper->findByColumn('folder_id', $folderId);
-        foreach ($folderEventsForFolder as $folderEvent) {
-            /** @var Category $folderEvent */
-            $eventIds[] = $folderEvent->getEventId();
-        }
-
-        $folderEvents = $folderEventMapper->findByColumn('event_id', $eventIds);
-
-        $folderEventsPerFolder = $folderEvents->groupByCallback(static function (Category $folderEvent) {
-            return $folderEvent->getEventId();
-        });
-
-        foreach ($folderEventsPerFolder as $eventId => $folderEventsForFolder) {
-            if ($folderEventsForFolder->count() === 1) {
-                $folderSpecificEventIds[] = $eventId;
-            }
-        }
-
-        return $folderSpecificEventIds;
-    }
-
-    /**
-     * @param array $eventIds
-     * @throws MapperException
-     */
-    private function deleteEvents(array $eventIds): void
-    {
-        foreach ($eventIds as $eventId) {
-            $this->softDelete($this->findById($eventId));
-        }
     }
 }

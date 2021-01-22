@@ -498,14 +498,31 @@ class Profile implements IStrategy
      *
      * @param string $studentCode
      * @return string|null
-     * @throws RuntimeException
      * @throws DomainException
      */
     private function findMedicalAlert(string $studentCode): ?string
     {
-        $medicalConditions = $this->api[DSNCodec::MODULE_STUDENT_DETAILS]->retrieveDocument('getMedicalConditions', [
-            'studcode' => $studentCode,
-        ]);
+
+        /* Specifically handle a 401 Unauthorized which occurred unexpectedly at shalom
+         */
+        try {
+            $medicalConditions = $this->api[DSNCodec::MODULE_STUDENT_DETAILS]->retrieveDocument('getMedicalConditions', [
+                'studcode' => $studentCode,
+            ]);
+        } catch (\RuntimeException $e) {
+            $this->log->warning(sprintf(
+                "Skipping medical data for student %s.",
+                $studentCode
+            ));
+
+            $this->log->warning(sprintf(
+                "When getting medical conditions info, TASS unexpectedly responded with %s. We used this (endpoint, token) combination: (getMedicalConditions, %s)",
+                $e->getMessage(),
+                $this->api[DSNCodec::MODULE_STUDENT_DETAILS]->getToken()
+            ));
+
+            return null;
+        }
 
         /* Count the number of medical conditions that afflict this student
          *

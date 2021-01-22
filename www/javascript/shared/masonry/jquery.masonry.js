@@ -152,6 +152,20 @@
         this.palette  = null;
         this.spectrum = null;
 
+        /**
+        * Decide whether the current page is being displayed on a
+        * device with a small screen. 
+        *
+        * 40em marks Small breakpoint
+        * Multiply by 16px base font size, js doesn't support em units
+        */
+        function isSmallDevice() {
+            if (window.innerWidth <= 40*16) {
+                return true;
+            }
+            return false;
+        }
+
         /* Disable dragon drop for small devices
          */
         if (!isSmallDevice()) {

@@ -135,7 +135,7 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 	.progress-tick {
 		margin-top: 1rem;
 
-        @media #{$medium-down} {
+        @media #{$small-only} {
             margin-top: .5rem;
         }
 	}

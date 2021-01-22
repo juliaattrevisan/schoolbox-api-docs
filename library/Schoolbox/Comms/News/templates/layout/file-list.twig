@@ -30,11 +30,11 @@
             });
         </script>
 
-        <ul class="inline-list img-gallery" data-image-gallery="{{ identifier }}">
+        <ul class="img-gallery" data-image-gallery="{{ identifier }}">
             {% for file in article.getImages %}
                 <li>
                     <a href="/storage/image.php?hash={{ file.hash }}&size=maxsize" rel="lightbox[{{ identifier }}]" title="{{ file.filename }}">
-                        <img src="/storage/image.php?hash={{ file.hash }}&size=square64" title="{{ file.filename }}">
+                        <img src="/storage/image.php?hash={{ file.hash }}&size=square128" title="{{ file.filename }}">
                     </a>
                 </li>
             {% endfor %}

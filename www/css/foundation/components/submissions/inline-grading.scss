@@ -30,7 +30,7 @@
     a {
       height: 4.10rem !important;
 
-      @media #{$medium-down} {
+      @media #{$small-only} {
         height: rem-calc(50) !important;
       }
     }

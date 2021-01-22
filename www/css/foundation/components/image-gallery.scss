@@ -3,11 +3,11 @@
   margin-left: 0;
   margin-bottom: 0;
 
-  > a {
+  a {
     display: $inline-list-display;
     float: $default-float;
     list-style: none;
-    margin-right: $inline-list-default-float-list-margin;
-    margin-bottom: $inline-list-default-float-list-margin;
+    max-height: 100px;
+    max-width: 100px;
   }
 }
