@@ -810,7 +810,12 @@ class Profile implements IStrategy
                 $staffBaseProfile = $staffProfile->getBaseProfile();
             } catch (Exception $e) {
                 $staffProfile = $this->staffProfileMapper->createModel();
-                $staffBaseProfile = $this->baseProfileMapper->createModel();
+
+                try {
+                    $staffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                } catch (Exception $e) {
+                    $staffBaseProfile = $this->baseProfileMapper->createModel();
+                }
 
                 $staffProfile->setBaseProfile($staffBaseProfile);
             }
