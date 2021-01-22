@@ -112,7 +112,7 @@ class Controller extends Base
      */
     public function getBadgeJsonList(): void
     {
-        $page = $this->request->query->get('sag') ? Filter\Page\Model::PAGE_BADGE_SET_AS_GOAL : Filter\Page\Model::PAGE_BADGE_LIST;
+        $page = $this->request->query->get('sag') ? Filter\Page\Model::PAGE_BADGE_ALLOW_AS_GOAL : Filter\Page\Model::PAGE_BADGE_LIST;
 
         // Boilerplate for getting a set of badges which match filter
         $qsFilters      = $this->request->query->get('filters', []);

@@ -68,7 +68,7 @@ class Model implements ISoftDeletable
     /**
      * Flag to control if a badge can be set as a goal
      */
-    private bool $allowSetAsGoal;
+    private bool $allowAsGoal;
 
 
     /**
@@ -180,19 +180,19 @@ class Model implements ISoftDeletable
     /**
      * @return bool
      */
-    public function getAllowSetAsGoal(): bool
+    public function getAllowAsGoal(): bool
     {
-        return $this->allowSetAsGoal;
+        return $this->allowAsGoal;
     }
 
 
     /**
-     * @param bool $allowSetAsGoal
+     * @param bool $allowAsGoal
      * @return static
      */
-    public function setAllowSetAsGoal(bool $allowSetAsGoal): self
+    public function setAllowAsGoal(bool $allowAsGoal): self
     {
-        $this->allowSetAsGoal = $allowSetAsGoal;
+        $this->allowAsGoal = $allowAsGoal;
         return $this;
     }
 

@@ -7,14 +7,14 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Filter\Filters\Badge\AllowSetAsGoal;
+namespace Schoolbox\Filter\Filters\Badge\AllowAsGoal;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\Filter;
 
 /**
- * A factory for building 'AllowSetAsGoal' filter objects
+ * A factory for building 'AllowAsGoal' filter objects
  */
 class Factory extends AbstractFactory
 {
@@ -30,7 +30,7 @@ class Factory extends AbstractFactory
             $filter,
             $this->getOptionMapper(),
             $this->getDefaultsMapper(),
-            $this->getAllowSetAsGoal()
+            $this->getAllowAsGoal()
         );
     }
 
@@ -42,14 +42,14 @@ class Factory extends AbstractFactory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        return new KeyConverter($filter, $this->getAllowSetAsGoal());
+        return new KeyConverter($filter, $this->getAllowAsGoal());
     }
 
 
     /**
      * @return Collection|string[]
      */
-    private function getAllowSetAsGoal()
+    private function getAllowAsGoal()
     {
         return new Collection(
             [

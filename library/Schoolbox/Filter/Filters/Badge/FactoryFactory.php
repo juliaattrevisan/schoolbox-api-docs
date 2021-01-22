@@ -61,8 +61,8 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getSelectionMapper()
                 );
 
-            case AllowSetAsGoal\Definition::class:
-                return new AllowSetAsGoal\Factory(
+            case AllowAsGoal\Definition::class:
+                return new AllowAsGoal\Factory(
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper()

@@ -31,11 +31,12 @@ class Model
     public const PAGE_UPCOMING_ASSESSMENTS = 'dueWorkCal';
     public const PAGE_ASSESSMENT_CALENDAR = 'assessmentCal';
     public const PAGE_BADGE_LIST          = 'badgeList';
-    public const PAGE_BADGE_SET_AS_GOAL   = 'badgeListSetAsGoal';
+    public const PAGE_BADGE_ALLOW_AS_GOAL   = 'badgeListSetAsGoal';
 
 
     /**
-     * Returns the set of pages that display a list of folders related to the viewee
+     * Returns the set of pages that display
+     * a list of folders related to the viewee
      *
      * @return string[]
      */
@@ -114,7 +115,7 @@ class Model
                 Role::PARENT,
                 Role::STUDENT,
             ],
-            self::PAGE_BADGE_SET_AS_GOAL => [
+            self::PAGE_BADGE_ALLOW_AS_GOAL => [
                 Role::STAFF,
                 Role::PARENT,
                 Role::STUDENT,

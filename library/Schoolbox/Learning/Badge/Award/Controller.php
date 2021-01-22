@@ -156,7 +156,7 @@ class Controller extends Base
             $users,
             '@learningBadgeAward/setAsGoalForm.twig',
             'Set Goals',
-            Filter\Page\Model::PAGE_BADGE_SET_AS_GOAL
+            Filter\Page\Model::PAGE_BADGE_ALLOW_AS_GOAL
         );
     }
 
@@ -173,7 +173,7 @@ class Controller extends Base
             new GenericCollection(User::class),
             '@learningBadgeAward/setAsGoalForSelfForm.twig',
             'Set Goals',
-            Filter\Page\Model::PAGE_BADGE_SET_AS_GOAL
+            Filter\Page\Model::PAGE_BADGE_ALLOW_AS_GOAL
         );
     }
 

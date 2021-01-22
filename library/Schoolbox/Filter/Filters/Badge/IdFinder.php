@@ -92,12 +92,12 @@ class IdFinder extends AbstractIdFinder
             }
         }
 
-        $allowSetAsGoal = $completeFilters[AllowSetAsGoal\Definition::class] ?? null;
+        $allowSetAsGoal = $completeFilters[AllowAsGoal\Definition::class] ?? null;
         if (isset($allowSetAsGoal) && count($allowSetAsGoal) === 1) {
             foreach ($allowSetAsGoal as $isAllowed => $_) {
                 $hasWhere = true;
                 $pb       = $pb->equals(
-                    'b.allow_set_as_goal',
+                    'b.allow_as_goal',
                     (int)$isAllowed
                 );
                 break;

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Filter\Filters\Badge\AllowSetAsGoal;
+namespace Schoolbox\Filter\Filters\Badge\AllowAsGoal;
 
 use InvalidArgumentException;
 use Schoolbox\Collection;
@@ -15,36 +15,36 @@ use Schoolbox\Filter;
 use Schoolbox\IConfigLoader;
 
 /**
- * Hidden filter to filter badges by allow set as goal
+ * Hidden filter to filter badges to those that are allowed to be goals
  */
 class Definition extends Filter\AbstractDefinition
 {
 
     // The name to expose in the UI
-    protected const NAME = 'AllowSetAsGoal';
+    protected const NAME = 'AllowAsGoal';
 
-    const KEY_ALLOWED     = '1';
-    const KEY_NOT_ALLOWED = '0';
+    public const KEY_ALLOWED     = '1';
+    public const KEY_NOT_ALLOWED = '0';
 
 
     /** @var Collection|string[] */
-    private $allowSetAsGoal;
+    private $allowAsGoal;
 
 
     /**
      * @param Filter\Model                       $filter
      * @param Filter\Page\Option\Mapper          $filterOptionMapper
      * @param Filter\Page\Option\Defaults\Mapper $filterDefaultMapper
-     * @param Collection                         $allowSetAsGoal
+     * @param Collection                         $allowAsGoal
      */
     public function __construct(
         Filter\Model $filter,
         Filter\Page\Option\Mapper $filterOptionMapper,
         Filter\Page\Option\Defaults\Mapper $filterDefaultMapper,
-        Collection $allowSetAsGoal
+        Collection $allowAsGoal
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
-        $this->allowSetAsGoal = $allowSetAsGoal->shallowClone();
+        $this->allowAsGoal = $allowAsGoal->shallowClone();
     }
 
 
@@ -53,7 +53,7 @@ class Definition extends Filter\AbstractDefinition
      */
     protected function getCustomKeys(): array
     {
-        return $this->allowSetAsGoal->getAll();
+        return $this->allowAsGoal->getAll();
     }
 
 
@@ -63,7 +63,7 @@ class Definition extends Filter\AbstractDefinition
     public static function getPages(IConfigLoader $configLoader): array
     {
         return [
-            Filter\Page\Model::PAGE_BADGE_SET_AS_GOAL,
+            Filter\Page\Model::PAGE_BADGE_ALLOW_AS_GOAL,
         ];
     }
 
@@ -79,7 +79,7 @@ class Definition extends Filter\AbstractDefinition
         if (self::KEY_NOT_ALLOWED === $key) {
             return 'Not allowed';
         }
-        throw new InvalidArgumentException("Unknown AllowSetAsGoal key: $key");
+        throw new InvalidArgumentException("Unknown AllowAsGoal key: $key");
     }
 
 
@@ -88,7 +88,7 @@ class Definition extends Filter\AbstractDefinition
      */
     protected static function getTemplatesDir(): string
     {
-        return '@filterDefinitions/Badge/AllowSetAsGoal/templates';
+        return '@filterDefinitions/Badge/AllowAsGoal/templates';
     }
 
 

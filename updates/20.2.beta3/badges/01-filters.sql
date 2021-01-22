@@ -5,5 +5,5 @@ VALUES (
 ),
 (
     'Schoolbox\\Learning\\Badge\\Mapper',
-    'Schoolbox\\Filter\\Filters\\Badge\\AllowSetAsGoal\\Definition'
+    'Schoolbox\\Filter\\Filters\\Badge\\AllowAsGoal\\Definition'
 );

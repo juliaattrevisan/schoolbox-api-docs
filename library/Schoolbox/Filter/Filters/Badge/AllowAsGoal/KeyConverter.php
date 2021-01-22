@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Filter\Filters\Badge\AllowSetAsGoal;
+namespace Schoolbox\Filter\Filters\Badge\AllowAsGoal;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
@@ -15,29 +15,29 @@ use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\User;
 
 /**
- * Converts between AllowSetAsGoal concrete keys and AllowSetAsGoal strings
+ * Converts between AllowAsGoal concrete keys and AllowAsGoal strings
  */
 class KeyConverter extends AbstractKeyConverter
 {
 
     /**
-     * All 'AllowSetAsGoal' values known to the system (regardless of whether they are available)
+     * All 'AllowAsGoal' values known to the system (regardless of whether they are available)
      *
      * Simply the set [0, 1]
      *
      * @var Collection|string[]
      */
-    private $allowSetAsGoal;
+    private $allowAsGoal;
 
 
     /**
      * @param Filter\Model        $filter
-     * @param Collection|string[] $allowSetAsGoal
+     * @param Collection|string[] $allowAsGoal
      */
-    public function __construct(Filter\Model $filter, Collection $allowSetAsGoal)
+    public function __construct(Filter\Model $filter, Collection $allowAsGoal)
     {
         parent::__construct($filter);
-        $this->allowSetAsGoal = $allowSetAsGoal;
+        $this->allowAsGoal = $allowAsGoal;
     }
 
 
@@ -57,7 +57,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function possibleItemCount(): int
     {
-        return $this->allowSetAsGoal->count();
+        return $this->allowAsGoal->count();
     }
 
 
@@ -66,8 +66,8 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey(string $key, User $user, string $page): void
     {
-        if (!in_array($key, $this->allowSetAsGoal->getAll(), true)) {
-            throw new \InvalidArgumentException('AllowSetAsGoal Key is invalid: ' . $key);
+        if (!in_array($key, $this->allowAsGoal->getAll(), true)) {
+            throw new \InvalidArgumentException('AllowAsGoal Key is invalid: ' . $key);
         }
     }
 }

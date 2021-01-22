@@ -72,7 +72,7 @@ class Definition extends AbstractDefinition
     {
         return [
             Page\Model::PAGE_BADGE_LIST,
-            Page\Model::PAGE_BADGE_SET_AS_GOAL,
+            Page\Model::PAGE_BADGE_ALLOW_AS_GOAL,
         ];
     }
 
