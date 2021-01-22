@@ -1,0 +1,20 @@
+{##
+ # Class teacher list for subject and lateral learning reports.
+ #
+ # Parameters:
+ # * teachers: the list of teachers for the given subject
+#}
+{% if teachers is not empty %}
+    <div class="row teacher-list" id="course-teacher">
+        <div class="small-12 column">
+            <section>
+                {% for teacher in teachers %}
+                    <div class="small-12 card">
+                        <img class="teacher-image" src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="{{ teacher.formatName }}">
+                        <p class="teacher-name">{{ teacher.formatName }}</p>
+                    </div>
+                {% endfor %}
+            </section>
+        </div>
+    </div>
+{% endif %}
