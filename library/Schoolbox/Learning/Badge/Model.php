@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge;
@@ -61,6 +63,12 @@ class Model implements ISoftDeletable
      * @var Storage\Model|null
      */
     private ?Storage\Model $image = null;
+
+
+    /**
+     * Flag to control if a badge can be set as a goal
+     */
+    private bool $allowAsGoal;
 
 
     /**
@@ -165,6 +173,26 @@ class Model implements ISoftDeletable
     public function setImage(?Storage\Model $image): self
     {
         $this->image = $image;
+        return $this;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function getAllowAsGoal(): bool
+    {
+        return $this->allowAsGoal;
+    }
+
+
+    /**
+     * @param bool $allowAsGoal
+     * @return static
+     */
+    public function setAllowAsGoal(bool $allowAsGoal): self
+    {
+        $this->allowAsGoal = $allowAsGoal;
         return $this;
     }
 

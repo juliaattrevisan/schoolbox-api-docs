@@ -385,9 +385,9 @@ export default {
                                 </nav>
                                 <ul v-if="showBadgeMenus" :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
                                     <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-achievement" title="Award achievement">Award achievement</a></li>
-                                    <li><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set goal">Set goal</a></li>
+                                    <li v-if="badge.allowAsGoal"><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set goal">Set goal</a></li>
                                     <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-withdraw-achievement" title="Withdraw achievement">Withdraw achievement</a></li>
-                                    <li><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-close" title="Remove goal">Remove goal</a></li>
+                                    <li v-if="badge.allowAsGoal"><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-close" title="Remove goal">Remove goal</a></li>
                                     <li><a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a></li>
                                   <li><a @click.prevent="openDeleteModal(badge)" class="icon-delete">Delete</a></li>
                                 </ul>

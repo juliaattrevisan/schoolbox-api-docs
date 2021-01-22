@@ -47,6 +47,7 @@ class Mapper extends \Schoolbox\Mapper
                 Model::PAGE_UPCOMING_ASSESSMENTS,
                 Model::PAGE_ASSESSMENT_CALENDAR,
                 Model::PAGE_BADGE_LIST,
+                Model::PAGE_BADGE_ALLOW_AS_GOAL,
             ]
         );
         $this->uses('enabled', self::TYPE_BOOLEAN);
