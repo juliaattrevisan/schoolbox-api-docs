@@ -21,7 +21,7 @@ class Definition extends Filter\AbstractDefinition
 {
 
     // The name to expose in the UI
-    protected const NAME = 'AllowAsGoal';
+    protected const NAME = 'Allow Goals';
 
     public const KEY_ALLOWED     = '1';
     public const KEY_NOT_ALLOWED = '0';
