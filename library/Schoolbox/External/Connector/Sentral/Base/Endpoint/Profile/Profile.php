@@ -231,7 +231,7 @@ class Profile implements IStrategy
                  * base profile (e.g. parent has same external id as student)
                  *
                  * This is not usually supposed to happen.
-                 * sentral lets you have broken data in this way
+                 * some sis implementations let you have broken data in this way
                  *
                  * Try and load a student profile based on external id. If it exists, just reuse
                  * those pieces. If it doesn't exist, first check if there's an existing base
