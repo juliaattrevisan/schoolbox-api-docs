@@ -125,13 +125,13 @@ class Sync extends Base implements ISync
                           IsTeacher = 1 THEN 'Teaching' 
                           ELSE 'Non Teaching' 
                         END AS staff_category,
-			            
-			            ''                    AS staff_house,
-			            cat.Description	      AS staff_position,
+
+                        ''                    AS staff_house,
                         ''                    AS staff_department,
                         ''                    AS staff_year_level,
                         ''                    AS staff_year_level_description                
-                        
+                        ''                    AS staff_position_code,
+                        cat.Description       AS staff_position
                         
             FROM        StaffPersonalDetails  spd
             JOIN        CurrentStaff cs ON cs.StaffID = spd.StaffID
