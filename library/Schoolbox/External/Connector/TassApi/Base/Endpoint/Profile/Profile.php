@@ -631,8 +631,7 @@ class Profile implements IStrategy
                     ->setPhoneHome($phoneHome)
                     ->setPhoneWork($phoneWork)
                     ->setMobile($phoneMobile)
-                    ->setEmail($email)
-                    ->setUsername($username);
+                    ->setEmail($email);
 
                 /* Log it
                  */
