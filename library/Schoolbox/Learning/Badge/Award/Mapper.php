@@ -152,29 +152,31 @@ class Mapper extends \Schoolbox\Mapper
 
             // If there is a parent award:
             // Hydrate it, and its awarded by and recipient
-            $parentAward = $this->hydrateJoin($row, 'award', 'aw');
-            if ($parentAward instanceof Model) {
-                $parentAwardedBy = $this->hydrateJoin($row, 'award.awardedBy', 'awa');
-                if ($parentAwardedBy instanceof User) {
-                    $parentAwardedByRole = $this->hydrateJoin($row, 'award.awardedBy.role', 'awar');
-                    if ($parentAwardedByRole instanceof Role) {
-                        $parentAwardedBy->setRole($parentAwardedByRole);
+            if ($row['aw.id']) {
+                $parentAward = $this->hydrateJoin($row, 'award', 'aw');
+                if ($parentAward instanceof Model) {
+                    $parentAwardedBy = $this->hydrateJoin($row, 'award.awardedBy', 'awa');
+                    if ($parentAwardedBy instanceof User) {
+                        $parentAwardedByRole = $this->hydrateJoin($row, 'award.awardedBy.role', 'awar');
+                        if ($parentAwardedByRole instanceof Role) {
+                            $parentAwardedBy->setRole($parentAwardedByRole);
+                        }
+                        $parentAward->setAwardedBy($parentAwardedBy);
                     }
-                    $parentAward->setAwardedBy($parentAwardedBy);
-                }
 
-                // Parent recipient will usually be the same as this award's:
-                // however, don't assume that
-                $parentRecipient = $this->hydrateJoin($row, 'award.recipient', 'awr');
-                if ($parentRecipient instanceof User) {
-                    $parentRecipientRole = $this->hydrateJoin($row, 'award.recipient.role', 'awrr');
-                    if ($parentRecipientRole instanceof Role) {
-                        $parentRecipient->setRole($parentRecipientRole);
+                    // Parent recipient will usually be the same as this award's:
+                    // however, don't assume that
+                    $parentRecipient = $this->hydrateJoin($row, 'award.recipient', 'awr');
+                    if ($parentRecipient instanceof User) {
+                        $parentRecipientRole = $this->hydrateJoin($row, 'award.recipient.role', 'awrr');
+                        if ($parentRecipientRole instanceof Role) {
+                            $parentRecipient->setRole($parentRecipientRole);
+                        }
+                        $parentAward->setRecipient($parentRecipient);
                     }
-                    $parentAward->setRecipient($parentRecipient);
-                }
 
-                $award->setAward($parentAward);
+                    $award->setAward($parentAward);
+                }
             }
 
             $collection->add($award);
