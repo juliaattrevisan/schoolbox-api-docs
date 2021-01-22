@@ -55,6 +55,7 @@ class FieldFactory
                     'meta.department'           => 'Department',
                     'meta.position.code'        => 'Position Code(s)',
                     'meta.position.description' => 'Position Description(s)',
+                    'meta.position'             => 'Position Title(s) (deprecated)',
                     'meta.category.code'        => 'Category Code',
                     'meta.category.type'        => 'Category Type',
                 ];

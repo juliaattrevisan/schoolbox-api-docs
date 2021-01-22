@@ -148,4 +148,19 @@ class Position {
     {
         return $this->startDate;
     }
+
+
+    /**
+     * This magic method shouldn't exist when meta.position token is removed
+     *
+     * It bandaided over a wonky implementation of multiple position descriptions
+     * and shouldn't really be here
+     *
+     * @return string
+     *@deprecated
+     */
+    public function __toString()
+    {
+        return $this->description ?: '';
+    }
 }
