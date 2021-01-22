@@ -64,7 +64,14 @@
 
         var height = null;
 
-        if (isSmallDevice()) {
+       /**
+        * Decide whether the current page is being displayed on a
+        * device with a small screen. 
+        *
+        * 40em marks Small breakpoint
+        * Multiply by 16px base font size, js doesn't support em units
+        */
+        if (window.innerWidth <= 40*16) {
             height = 'auto';
         }
 
