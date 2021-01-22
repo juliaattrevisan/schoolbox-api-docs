@@ -626,28 +626,36 @@
                     {% for group, subjectGroup in subjects %}
                     {# Keep a running total of all teachers emails in this group #}
                     {% set teacherEmails = [] %}
-                    <div class="row content">
-                        <div class="button-action beside small-12 columns">
-                            <h2 class="subheader">{{ group }}</h2>
-                            {% if isStaff and config.email_all_staff and config.mail_enable %}
-                                {% for subject in subjectGroup %}
-                                    {% for teacher in subject.teachers %}
-                                        {% if not teacher.email is empty %}
-                                            {% set teacherEmails = teacherEmails|merge([teacher.getFormattedEmailDisplay]) %}
-                                        {% endif %}
-                                    {% endfor %}
+                    <div class="actions-small-1 content">
+                        <div class="list-item">
+                            <div>
+                                <h2 class="subheader">{{ group }}</h2>
+                            </div>
+                        </div>
+                        {% if isStaff and config.email_all_staff and config.mail_enable %}
+                            {% for subject in subjectGroup %}
+                                {% for teacher in subject.teachers %}
+                                    {% if not teacher.email is empty %}
+                                        {% set teacherEmails = teacherEmails|merge([teacher.getFormattedEmailDisplay]) %}
+                                    {% endif %}
                                 {% endfor %}
-                                {% set replyTo = USER.getFormattedEmailDisplay %}
-                                {% if teacherEmails|length > 0 %}
+                            {% endfor %}
+                            {% set replyTo = USER.getFormattedEmailDisplay %}
+                            {% if teacherEmails|length > 0 %}
+                            <nav><a href="#" class="icon-overflow" data-dropdown="email-teachers"></a></nav>
+                            <ul class="f-dropdown" data-dropdown-content id="email-teachers">
+                                <li>
                                     <form action="/mail/createMail.php" method="post">
                                         <input type="hidden" name="replyto" value="{{ replyTo }}"/>
                                         <input type="hidden" name="cc" value="{{ teacherEmails|join(emailSeparator) }}"/>
-                                        <input type="submit" value="(Email all {{ group }} teachers)" class="txt-only" />
+                                        <input type="submit" value="Email all {{ group }} teachers" class="icon-email" />
                                     </form>
-                                {% endif %}
+                                </li>
+                            </ul>
                             {% endif %}
-                        </div>
-
+                        {% endif %}
+                    </div>
+                    <div class="row content">
                         <div class="small-12 columns">
                             <section class="v-card-list">
                                 {% for subjectKey, subject in subjectGroup %}
