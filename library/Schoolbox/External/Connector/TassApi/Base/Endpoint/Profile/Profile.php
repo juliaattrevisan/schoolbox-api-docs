@@ -677,7 +677,7 @@ class Profile implements IStrategy
      * who need user accounts but don't teach students
      *
      * @throws DomainException
-     * @throws RuntimeException
+     * @throws RuntimeException|InvalidArgumentException
      */
     private function findStaff()
     {
@@ -700,6 +700,33 @@ class Profile implements IStrategy
         $employeeSetDedupe = [];
 
         foreach ($employees['employees'] as $employee) {
+            $value = trim($employee['end_date']);
+
+            /* getEmployees gives you *everyone* that ever existed as an employee
+             * even employees who are no longer active - so we have to filter them
+             * away based on their end_date field. Anyone who ended in the past
+             * should be skipped
+             *
+             * Empty string assumed to mean they are still active, they haven't ended yet
+             */
+            if ('' !== $value) {
+
+                /* Trim away microseconds
+                 */
+                $endDate = new \Alaress_Date_Format(substr($employee['end_date'], 0, 19), \Alaress_Date_Format::DATABASE_FORMAT);
+
+                /* A date in the past means this guy's inactive now; skip him
+                 *
+                 * It might be possible to set an end date in the future when a person
+                 * is scheduled to end their tenure
+                 */
+                if ($endDate->isPast()) {
+                    continue;
+                }
+            }
+
+            /* Otherwise you're assumed to be current
+             */
             $employeeSetDedupe[$employee['user_code']] = $employee;
         }
 
