@@ -141,8 +141,7 @@ export default {
                     </template>
                 </p>
                 <p class="meta" v-if="award.isGoal && award.award">
-                    Goal awarded as achievement <relative-time :datetime="award.award.awardedAt"></relative-time> by
-                    <a :href="award.award.awardedBy._links.profile">{{ award.award.awardedBy.fullName }}</a>
+                    Goal has been achieved <relative-time :datetime="award.award.awardedAt"></relative-time>
                 </p>
 
                 <article v-html="award.badge.body"></article>
