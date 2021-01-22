@@ -29,7 +29,7 @@ class MutableFieldsOnly extends AllFields
         'body'            => true,
         'icon'            => true,
         'image'           => true,
-        'allow-set-as-goal' => true,
+        'allow-as-goal'   => true,
         'category'        => true,
         'tags'            => true,
         'curriculumNodes' => true,

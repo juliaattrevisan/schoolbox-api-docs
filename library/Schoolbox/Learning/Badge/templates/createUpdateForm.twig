@@ -137,10 +137,10 @@
                 </fieldset>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label for="badge-allow-set-as-goal">Allow Use as Goal</label>
+                        <label for="badge-allow-as-goal">Allow Use as Goal</label>
                         <div class="switch">
-                            <input id="badge-allow-set-as-goal" type="checkbox" name="allow-set-as-goal" {% if not badge or badge.allowSetAsGoal %}checked="checked"{% endif %}>
-                            <label for="badge-allow-set-as-goal">
+                            <input id="badge-allow-as-goal" type="checkbox" name="allow-as-goal" {% if not badge or badge.allowAsGoal %}checked="checked"{% endif %}>
+                            <label for="badge-allow-as-goal">
                                 <span>On</span>
                                 <span>Off</span>
                             </label>
@@ -280,7 +280,7 @@
                         'body': formData.get('body'),
                         'icon': formData.get('icon'),
                         'image': formData.get('image'),
-                        'allow-set-as-goal': !!formData.get('allow-set-as-goal'),
+                        'allow-as-goal': !!formData.get('allow-as-goal'),
                         'category': null,
                         'tags': [],
                         'badge-avatar-selector': formData.get('badge-avatar-selector')
