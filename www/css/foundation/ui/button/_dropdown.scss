@@ -62,8 +62,8 @@ $f-dropdown-icon-align: 0.25rem;
     }
     // if a submit button exists in f-dropdown, fake the look of a usual button
     [type="submit"] {
-      background-color: $content-ui-background;
-      color: $content-ui-foreground;
+      background-color: $f-dropdown-bg;
+      color: $f-dropdown-font-color;
       font-weight: normal;
       font-size: $f-dropdown-font-size;
       margin: 0;
@@ -71,7 +71,7 @@ $f-dropdown-icon-align: 0.25rem;
 
       &:hover {
         background-color: $content-ui-hover;
-        color: $content-ui-foreground;
+        color: $f-dropdown-font-color;
       }
     }
 }
