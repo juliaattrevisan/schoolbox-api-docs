@@ -360,7 +360,7 @@ export default {
                                 <!-- Different capitalization for if this is start or middle of a sentence -->
                                 <template v-if="config.routes.getCreateEvidenceForm">set a goal</template>
                                 <template v-else>Set a goal</template>
-                            </a><template v-if="config.routes.getAwardAsAchievementForm"> or </template>
+                            </a>
                         </template>
 
                         to see it appear in the activity feed.
