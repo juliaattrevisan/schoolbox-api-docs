@@ -70,7 +70,7 @@ $f-dropdown-icon-align: 0.25rem;
       text-align: left;
 
       &:hover {
-        background-color: $content-ui-hover;
+        background-color: $f-dropdown-list-hover-bg;
         color: $f-dropdown-font-color;
       }
     }
