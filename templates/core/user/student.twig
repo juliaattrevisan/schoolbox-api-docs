@@ -466,17 +466,20 @@
                     case '#classes':
                     case '#groups':
                     case '#contacts':
+                        $.fn.scrollToTop({
+                            scrollOnInit: true,
+                            scrollTo: '[data-tab]',
+                            velocity: 250
+                        });
+
                         $('[data-tab] a[href=#tab-'+window.location.hash.substring(1)+']').trigger('click');
-                        $('html, body').animate({
-                            scrollTop: $('[data-tab]').offset().top
-                        }, 250);
                         break;
 
+                    {# If you visit this url directly without a hash, just do default behaviour
+                     # Don't try to preselect any tabs, because you might not be here for the tabs
+                     #}
                     default:
                         $('[data-tab] a[href=#tab-activity]').trigger('click');
-                        $('html, body').animate({
-                            scrollTop: $('[data-tab]').offset().top
-                        }, 250);
                         break;
                 }
             });
