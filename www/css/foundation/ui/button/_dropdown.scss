@@ -57,23 +57,6 @@ $f-dropdown-icon-align: 0.25rem;
 	[class*="icon-"]:before {
 		padding-right: .8125rem;
 	}
-    form {
-      margin: 0;
-    }
-    // if a submit button exists in f-dropdown, fake the look of a usual button
-    [type="submit"] {
-      background-color: $f-dropdown-bg;
-      color: $f-dropdown-font-color;
-      font-weight: normal;
-      font-size: $f-dropdown-font-size;
-      margin: 0;
-      text-align: left;
-
-      &:hover {
-        background-color: $f-dropdown-list-hover-bg;
-        color: $f-dropdown-font-color;
-      }
-    }
 }
 
 #tab-control {

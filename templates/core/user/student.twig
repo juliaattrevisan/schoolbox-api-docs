@@ -645,13 +645,21 @@
                             <nav><a href="#" class="icon-overflow" data-dropdown="email-teachers"></a></nav>
                             <ul class="f-dropdown" data-dropdown-content id="email-teachers">
                                 <li>
-                                    <form action="/mail/createMail.php" method="post">
-                                        <input type="hidden" name="replyto" value="{{ replyTo }}"/>
-                                        <input type="hidden" name="cc" value="{{ teacherEmails|join(emailSeparator) }}"/>
-                                        <input type="submit" value="Email all {{ group }} teachers" class="icon-email" />
-                                    </form>
+                                    <a id="email-all" class="icon-email" href="#" title="Email all {{ group }} teachers">Email all {{ group }} teachers</a>
                                 </li>
                             </ul>
+                            <form id="email-all-form" action="/mail/createMail.php" method="post">
+                                <input type="hidden" name="replyto" value="{{ replyTo }}"/>
+                                <input type="hidden" name="cc" value="{{ teacherEmails|join(emailSeparator) }}"/>
+                                {# <input type="submit" value="Email all {{ group }} teachers" /> #}
+                            </form>
+                            {% autoescape 'js' %}
+                                <script type="text/javascript">
+                                    $('#email-all').on('click',function(){
+                                        $('#email-all-form').submit();
+                                    });
+                                </script>
+                            {% endautoescape %}
                             {% endif %}
                         {% endif %}
                     </div>
