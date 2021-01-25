@@ -146,7 +146,7 @@ class Factory
 
         // Add write level staff as coordinators
         $folder = $tutorGroup->getFolder();
-        if ($folder instanceof Folder) {
+        if ($folder instanceof Folder && $folder->getId()) {
             $tutorGroup->setCoordinators(
                 $this->userAccessMapper->findUsersInCategory(
                     $folder,

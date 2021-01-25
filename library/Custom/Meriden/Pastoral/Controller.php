@@ -12,7 +12,9 @@ namespace Custom\Meriden\Pastoral;
 
 use Alaress\Web\Controller\Base;
 use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
+use Custom\Meriden\Pastoral\StudentInvolvement\Subject;
 use Custom\Meriden\Pastoral\StudentInvolvement\TutorGroup;
+use RangeException;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -77,10 +79,58 @@ class Controller extends Base
                     'title'    => 'School Report - ' . $year . ' - ' . $student->formatName()
                 )
             );
-        } catch (\RangeException $e) {
+        } catch (RangeException $e) {
             $this->getResponse()->status->setCode(404);
         }
     }
+
+
+    /**
+     * Output a printable version of the report for this student.
+     *
+     * @api   GET /modules/custom/meriden/pastoral/{studentId}/print/{year}
+     * @since 20.1.6
+     *
+     * @param int  $year
+     * @param User $student
+     */
+    public function printableReport(int $year, User $student): void
+    {
+        // Figure out the data for the base report
+        try {
+            $baseReportData = $this->buildReportData($year, $student);
+        } catch (RangeException $e) {
+            $this->response->status->setCode(404);
+            return;
+        }
+
+        $subjectReportDataList = [];
+        foreach ($baseReportData['report']['subjectList'] as $subject) {
+            /** @var Subject $subject */
+            try {
+                $subjectReportDataList[$subject->getSubjectCode()] = $this->buildReportData(
+                    $year,
+                    $student,
+                    $subject->getSubjectCode()
+                );
+            } catch (RangeException $e) {
+                // Skip this one
+                continue;
+            }
+        }
+
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@customMeridenPastoral/printableReport.twig',
+                [
+                    'baseReport'     => $baseReportData,
+                    'subjectReports' => $subjectReportDataList,
+                ],
+                'School Report - ' . $year . ' - ' . $student->formatName()
+            )
+        );
+    }
+
 
     /**
      * Meriden's subject page
@@ -92,8 +142,7 @@ class Controller extends Base
     public function subject($year, User $student, $subjectCode)
     {
         try {
-            $reportData               = $this->buildReportData($year, $student, $subjectCode);
-            $reportData['graphWidth'] = $this->request->query->getInt('graph-width');
+            $reportData = $this->buildReportData($year, $student, $subjectCode);
             /** @var StudentInvolvement\Subject $subjectReport */
             $subjectReport = $reportData['report']['subjectReport'];
             $this->getResponse()->content->set(
@@ -103,7 +152,7 @@ class Controller extends Base
                     'title'    => $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName(),
                 ]
             );
-        } catch (\RangeException $e) {
+        } catch (RangeException $e) {
             $this->getResponse()->status->setCode(404);
         }
     }
@@ -118,7 +167,7 @@ class Controller extends Base
      *
      * @return array
      *
-     * @throws \RangeException if student isn't in year or subject
+     * @throws RangeException if student isn't in year or subject
      */
     protected function buildReportData($year, User $student, $subjectCode = null)
     {
@@ -135,7 +184,7 @@ class Controller extends Base
         if ($this->getUser()->getRole()->isStaff()) {
             $roleTypeOverride = $this->request->query->get('role-type');
             if (isset($roleTypeOverride) && !in_array($roleTypeOverride, $roleTypes, true)) {
-                throw new \RangeException(
+                throw new RangeException(
                     sprintf("If role type is overridden, it must be one of: %s", implode(', ', $roleTypes))
                 );
             }
@@ -151,7 +200,7 @@ class Controller extends Base
                 }
             }
             if (!$exists) {
-                throw new \RangeException("Student has no tutor group in $year");
+                throw new RangeException("Student has no tutor group in $year");
             }
             $tutorGroup = $this->getStudentInvolvementFactory()->buildTutorGroup($year, $student, $roleTypeOverride);
         } else {
@@ -164,20 +213,22 @@ class Controller extends Base
                 }
             }
             if (!$exists) {
-                throw new \RangeException("Student was not in subject $subjectCode in $year");
+                throw new RangeException("Student was not in subject $subjectCode in $year");
             }
             $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode, $roleTypeOverride);
         }
-        return array(
-            'report' => array(
+        return [
+            'report' => [
+                'year'             => $year,
                 'student'          => $student,
                 'tutorGroupReport' => $tutorGroup,
                 'subjectReport'    => $subject,
                 'tutorGroupList'   => $tutorGroupList,
                 'subjectList'      => $subjectList,
                 'roleTypeOverride' => $roleTypeOverride,
-            )
-        );
+            ],
+            'graphWidth' => $this->request->query->getInt('graph-width'),
+        ];
     }
 
     /**
@@ -213,7 +264,7 @@ class Controller extends Base
                 try {
                     $this->assertValidYearForReport($tutorGroup->getYear(), $student);
                     return true;
-                } catch (\RangeException $e) {
+                } catch (RangeException $e) {
                     return false;
                 }
             }
@@ -244,19 +295,19 @@ class Controller extends Base
      *
      * @param int  $year
      * @param User $student
-     * @throws \RangeException if it's not valid
+     * @throws RangeException if it's not valid
      */
     private function assertValidYearForReport($year, User $student): void
     {
         $thisYear  = (int)date('Y');
         $startYear = $thisYear + 7 - (int)$student->getYear()->getName();
         if ($startYear < 2015) {
-            throw new \RangeException("Reports are only for students who started year 7 in 2015 or later for now");
+            throw new RangeException("Reports are only for students who started year 7 in 2015 or later for now");
         }
 
         $reportYearLevel = ((int)$student->getYear()->getName()) - ($thisYear - $year);
         if ($reportYearLevel >= 10) {
-            throw new \RangeException("Reports are only for years 7, 8 and 9 for now");
+            throw new RangeException("Reports are only for years 7, 8 and 9 for now");
         }
     }
 }
