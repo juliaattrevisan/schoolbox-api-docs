@@ -298,6 +298,7 @@ class Sync extends Base implements ISync
                         ELSE 'TEACHER'
                     END                 AS staff_category_type,
                     ''                  AS staff_category,
+                    ''                  AS staff_position_code,
                     t.position_title    AS staff_position,
                     td.tch_dept         AS staff_department,
                     tc.campus_code      AS staff_campus
