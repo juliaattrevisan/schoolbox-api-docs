@@ -466,11 +466,20 @@
                     case '#classes':
                     case '#groups':
                     case '#contacts':
-                        $('[data-tab] a[href='+window.location.hash+']').trigger('click');
+                        $.fn.scrollToTop({
+                            scrollOnInit: true,
+                            scrollTo: '[data-tab]',
+                            velocity: 250
+                        });
+
+                        $('[data-tab] a[href=#tab-'+window.location.hash.substring(1)+']').trigger('click');
                         break;
 
+                    {# If you visit this url directly without a hash, just do default behaviour
+                     # Don't try to preselect any tabs, because you might not be here for the tabs
+                     #}
                     default:
-                        $('[data-tab] a[href=#activity]').trigger('click');
+                        $('[data-tab] a[href=#tab-activity]').trigger('click');
                         break;
                 }
             });
@@ -486,32 +495,32 @@
         {% set possibleTabs = [
             {
                 label: 'Activity Feed',
-                anchor: 'activity',
+                anchor: 'tab-activity',
                 visible: showActivityFeed
             },
             {
                 label: 'Goals',
-                anchor: 'goals',
+                anchor: 'tab-goals',
                 visible: showAchievementsTab
             },
             {
                 label: 'Achievements',
-                anchor: 'achievements',
+                anchor: 'tab-achievements',
                 visible: showAchievementsTab
             },
             {
                 label: 'Classes',
-                anchor: 'classes',
+                anchor: 'tab-classes',
                 visible: showClasses
             },
             {
                 label: 'Groups',
-                anchor: 'groups',
+                anchor: 'tab-groups',
                 visible: showGroups
             },
             {
                 label: 'Contacts',
-                anchor: 'contacts',
+                anchor: 'tab-contacts',
                 visible: showContactsTab
             }
         ] %}
@@ -556,16 +565,16 @@
         <div class="profile-tabs tabs-content">
 
             {% if showActivityFeed %}
-            <div class="content {% if activeTab == 'activity' %}active{% endif %}" id="activity">
+            <div class="content {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
                 <div id="activity-feed"></div>
             </div>
             {% endif %}
 
             {% if showAchievementsTab %}
-            <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="goals">
+            <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
                 <div id="goal-feed"></div>
             </div>
-            <div class="content {% if activeTab == 'achievements' %}active{% endif %}" id="achievements">
+            <div class="content {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
                 <div id="achievement-feed"></div>
             </div>
             {% endif %}
@@ -620,7 +629,7 @@
             <script type="text/javascript" src="/javascript/components/userProfileFeeds.bundle.js"></script>
 
             {% if showClasses %}
-            <div class="content {% if activeTab == 'classes' %}active{% endif %}" id="classes">
+            <div class="content {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
                 <section>
                     {% if showSubjects %}
                     {% for group, subjectGroup in subjects %}
@@ -721,7 +730,7 @@
             {% endif %}
 
             {% if showGroups and groups is not empty %}
-            <div class="content {% if activeTab == 'groups' %}active{% endif %}" id="groups">
+            <div class="content {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
                 <section>
                     <div class="row content">
                         <div class="small-12 columns">
@@ -798,7 +807,7 @@
             {% endif %}
 
             {% if showContactsTab %}
-            <div class="content {% if activeTab == 'contacts' %}active{% endif %}" id="contacts">
+            <div class="content {% if activeTab == 'contacts' %}active{% endif %}" id="tab-contacts">
                 <section class="content">
                     {% block contacts_island %}
                         {% block contacts %}

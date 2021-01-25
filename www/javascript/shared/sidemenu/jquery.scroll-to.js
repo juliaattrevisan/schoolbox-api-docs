@@ -10,7 +10,14 @@
 
         var config = init(options, $(this));
 
-        setupScrollToTop();
+        /* Decide whether this scrolls upon plugin init,
+         * or whether it needs a human interaction
+         */
+        if (config.scrollOnInit) {
+            executeScroll();
+        } else {
+            setupScrollToTop();
+        }
 
         /**
          * Init
@@ -36,15 +43,17 @@
                  */
                 velocity: 500,
 
+                /* Execute scroll upon init
+                 * By default you need to click an element to activate it
+                 */
+                scrollOnInit: false,
+
+                /* A cancel callback function
+                 */
                 cancel: function () { return false; }
             }
 
-            var derived = {
-            }
-
-            var merged = $.extend(defaults, derived, options);
-
-            return merged;
+            return $.extend(defaults, options);
         }
 
         /**
@@ -53,11 +62,19 @@
         function setupScrollToTop() {
             $(config.element).on('click', config.activator, function(event) {
                 if (config.cancel.apply(this) == false) {
-                    $('html, body').animate({
-                        scrollTop: $(config.scrollTo).offset().top
-                    }, config.velocity);
+                    executeScroll();
                 }
             });
+        }
+
+
+        /**
+         * Actually perform the scroll
+         */
+        function executeScroll() {
+            $('html, body').animate({
+                scrollTop: $(config.scrollTo).offset().top
+            }, config.velocity);
         }
     }
 }(jQuery));
