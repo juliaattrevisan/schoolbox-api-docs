@@ -659,6 +659,9 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
                         WHERE event.deleted_at IS NULL AND folder_id = :folderId";
 
         $folderEvents = $this->database->query($folderEventQuery, ['folderId' => $fid])->fetchAll(\PDO::FETCH_COLUMN);
+        if (empty($folderEvents)) {
+            return;
+        }
         $bindings     = Builder::getArrayBindings($folderEvents);
 
         // Find events which is associated to this folder only
