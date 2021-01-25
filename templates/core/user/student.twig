@@ -310,14 +310,6 @@
                 <ul class='flex-list flex-wrap buttons'>
                     {% block buttons %}
 
-                        {% block buttons_shareLearningMoment %}
-                            {% if shareLearningMomentUrl %}
-                                <li>
-                                    <a href="#" class="icon-share" data-reveal-id="shareLearningMoment">Share Learning</a>
-                                </li>
-                            {% endif %}
-                        {% endblock buttons_shareLearningMoment %}
-
                         {% if eportfolioAuth %}
                             {% block buttons_eportfolio %}
                                 <li>
@@ -453,7 +445,9 @@
     <div class="small-12 island">
         <section>
             <div class="profile-learning-actions">
-                <a href="#" title="Share Learning" class="learning icon-share"><span>Share Learning</span></a>
+                {# {% if shareLearningMomentUrl %} #}
+                <a href="#" title="Share Learning" class="learning icon-share" data-reveal-id="shareLearningMoment"><span>Share Learning</span></a>
+                {# {% endif %} #}
                 <a href="#" title="Set goals" class="goals icon-goal"><span>Set goals</span></a>
                 <a href="#" title="Award achievement" class="achievement icon-achievement"><span>Award achievement</span></a>
             </div>
