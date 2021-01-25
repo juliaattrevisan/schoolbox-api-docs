@@ -372,10 +372,8 @@ class CourseMarkbook
             }
             $courseStudents = $this->courseImportStudents[$courseImplId];
             foreach ($aImpl->getAllParticipants() as $participant) {
-                if (!$participant->isExcluded()) {
-                    $user                           = $participant->getUser();
-                    $courseStudents[$user->getId()] = $user;
-                }
+                $user                           = $participant->getUser();
+                $courseStudents[$user->getId()] = $user;
             }
         }
     }

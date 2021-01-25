@@ -310,7 +310,7 @@ class Controller extends WebController\Base
     {
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
-        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments);
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
 
         // Build a course markbook
         return new CourseMarkbook(
