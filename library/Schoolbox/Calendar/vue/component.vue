@@ -7,7 +7,6 @@
     import momentPlugin       from "@fullcalendar/moment";
     import axios              from "axios";
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
-    import RevealModal        from '@schoolbox/reveal-modal'
     import {ENDPOINTS}        from '@schoolboxCalendarEvent/endpoints';
 
     // TODO let display formats be configurable
@@ -19,7 +18,6 @@
         components: {
             ViewEventModal,
             FullCalendar,
-            RevealModal,
             ExportUrlModal,
         },
         created() {
