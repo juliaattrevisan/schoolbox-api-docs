@@ -22,8 +22,10 @@ export default {
         Storage,
         CommentThread,
         BadgeImage,
-        foundationMixin
     },
+    mixins: [
+        foundationMixin,
+    ],
     data() {
         return {
             data:     [],
@@ -54,10 +56,6 @@ export default {
     mounted() {
         this.$root.$on(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
         this.load();
-    },
-    updated() {
-        // Re-apply Foundation dropdowns
-        // this.$nextTick(() => this.jQuery(this.$el).foundation('dropdown', 'reflow'));
     },
     methods: {
         /**

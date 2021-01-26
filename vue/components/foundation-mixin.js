@@ -2,7 +2,6 @@
  * Restart all of foundation's stuff to avoid its bs
  */
 export default {
-
     /**
      * Get access to jquery
      */
@@ -11,21 +10,21 @@ export default {
     },
 
     /**
-     * Switch off and then reflow everything
+     * Reflow everything in the entire document:
      *  - Re-apply Foundation dropdowns
      *  - Re-apply equalizer
      *
-     * The dropdowns need to be switched off, because applying a dropdown twice
-     * to the same DOM node applies two click events; this causes the dropdown
-     * to open and immediately close on click.
+     * The entire document needs to be reflowed, because:
+     * * `this.$el` may not yet contain the dropdowns
+     * * `this.$el` may be replaced with another DOM node entirely?
+     *
+     * According to Foundation's docs it is appropriate to reflow the entire doc
+     * when re-applying listeners when the DOM changes:
+     * see https://get.foundation/sites/docs-v5/javascript.html#adding-new-content-after-page-load
      */
     updated() {
         this.$nextTick(() => {
-            this.jQuery(this.$el)
-                .foundation('dropdown', 'off')
-                // Equalizer doesn't have an 'off' event for some reason.
-                // Attempting to call it raises an error.
-                // .foundation('equalizer', 'off')
+            this.jQuery(document)
                 .foundation('dropdown', 'reflow')
                 .foundation('equalizer', 'reflow');
         });
