@@ -116,7 +116,7 @@ topMenu:
     - /fixtures
 components:
   hide:
-   - Schoolbox_Learning_Component_Dashboard_UpcomingWorkController
+   - Schoolbox\Learning\Component\Dashboard\UpcomingWorkController
    - Component_Dashboard_RecentSubmissionsController
    - Schoolbox\Learning\Assessment\DueWork\Component\Homepage\Controller
    - Schoolbox\Learning\Assessment\Quiz\Component\Homepage\Controller

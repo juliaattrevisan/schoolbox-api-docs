@@ -124,3 +124,5 @@ components:
    - Schoolbox\Curriculum\Component\CurriculumOverviewController
    - Schoolbox\Fixtures\Component\Homepage\Controller
    - Schoolbox\Fixtures\Component\Dashboard\Controller
+   - Schoolbox\Learning\Moment\StudentToolkit\Component\Dashboard\Controller
+

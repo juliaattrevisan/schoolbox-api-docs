@@ -115,7 +115,7 @@ topMenu:
     - /pastoral
 components:
   hide:
-   - Schoolbox_Learning_Component_Dashboard_UpcomingWorkController
+   - Schoolbox\Learning\Component\Dashboard\UpcomingWorkController
    - Component_Dashboard_RecentSubmissionsController
    - Component_Homepage_ClickviewController
    - Schoolbox\Learning\Assessment\DueWork\Component\Homepage\Controller
@@ -132,3 +132,5 @@ components:
    - Schoolbox\Fixtures\Component\Homepage\Controller
    - Schoolbox\Fixtures\Component\Dashboard\Controller
    - Schoolbox\Learning\Assessment\Task\Component\Homepage\Controller
+   - Schoolbox\Learning\Moment\StudentToolkit\Component\Dashboard\Controller
+
