@@ -59,7 +59,10 @@ class Definition extends AbstractDefinition
      */
     public static function getPages(IConfigLoader $configLoader): array
     {
-        return [Page\Model::PAGE_BADGE_LIST,];
+        return [
+            Page\Model::PAGE_BADGE_LIST,
+            Page\Model::PAGE_BADGE_ALLOW_AS_GOAL,
+        ];
     }
 
     /**

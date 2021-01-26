@@ -244,16 +244,27 @@ class Profile implements IStrategy
             $enrolment = $this->findDate(trim((string)$student['general_details']['date_of_entry']));
             $leaving = $this->findDate(trim((string)$student['general_details']['date_of_leaving']));
 
-            /* Find out if this externalId already has a student profile
-             * If one already exists, load it, update it, then save it
-             * Otherwise make a new one for the given id
+            /* Parents might inadvertently have the same externalId as someone else's
+             * base profile (e.g. parent has same external id as student)
+             *
+             * This is not usually supposed to happen.
+             * some sis implementations let you have broken data in this way
+             *
+             * Try and load a student profile based on external id. If it exists, just reuse
+             * those pieces. If it doesn't exist, first check if there's an existing base
+             * profile before making a whole new one (this is how you end up with fk issues)
              */
             try {
                 $studentProfile = $this->studentProfileMapper->findByExternalId($externalId);
                 $studentBaseProfile = $studentProfile->getBaseProfile();
-            } catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (Exception $e) {
                 $studentProfile = $this->studentProfileMapper->createModel();
-                $studentBaseProfile = $this->baseProfileMapper->createModel();
+
+                try {
+                    $studentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                } catch (Exception $e) {
+                    $studentBaseProfile = $this->baseProfileMapper->createModel();
+                }
 
                 $studentProfile->setBaseProfile($studentBaseProfile);
             }
@@ -572,17 +583,27 @@ class Profile implements IStrategy
                 $relationship = trim((string)$parent['relationship']);
                 $title = '';
 
-                /* $username is the result of that $externalId calculation
-                 * but you can override this in UPS anyway
+                /* Parents might inadvertently have the same externalId as someone else's
+                 * base profile (e.g. parent has same external id as student)
+                 *
+                 * This is not usually supposed to happen.
+                 * some sis implementations let you have broken data in this way
+                 *
+                 * Try and load a parent profile based on external id. If it exists, just reuse
+                 * those pieces. If it doesn't exist, first check if there's an existing base
+                 * profile before making a whole new one (this is how you end up with fk issues)
                  */
-                $username = $externalId;
-
                 try {
                     $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
                     $parentBaseProfile = $parentProfile->getBaseProfile();
                 } catch (Exception $e) {
                     $parentProfile = $this->parentProfileMapper->createModel();
-                    $parentBaseProfile = $this->baseProfileMapper->createModel();
+
+                    try {
+                        $parentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                    } catch (Exception $e) {
+                        $parentBaseProfile = $this->baseProfileMapper->createModel();
+                    }
 
                     $parentProfile->setBaseProfile($parentBaseProfile);
                 }
@@ -610,8 +631,7 @@ class Profile implements IStrategy
                     ->setPhoneHome($phoneHome)
                     ->setPhoneWork($phoneWork)
                     ->setMobile($phoneMobile)
-                    ->setEmail($email)
-                    ->setUsername($username);
+                    ->setEmail($email);
 
                 /* Log it
                  */
@@ -666,7 +686,7 @@ class Profile implements IStrategy
      * who need user accounts but don't teach students
      *
      * @throws DomainException
-     * @throws RuntimeException
+     * @throws RuntimeException|InvalidArgumentException
      */
     private function findStaff()
     {
@@ -689,6 +709,33 @@ class Profile implements IStrategy
         $employeeSetDedupe = [];
 
         foreach ($employees['employees'] as $employee) {
+            $value = trim($employee['end_date']);
+
+            /* getEmployees gives you *everyone* that ever existed as an employee
+             * even employees who are no longer active - so we have to filter them
+             * away based on their end_date field. Anyone who ended in the past
+             * should be skipped
+             *
+             * Empty string assumed to mean they are still active, they haven't ended yet
+             */
+            if ('' !== $value) {
+
+                /* Trim away microseconds
+                 */
+                $endDate = new \Alaress_Date_Format(substr($employee['end_date'], 0, 19), \Alaress_Date_Format::DATABASE_FORMAT);
+
+                /* A date in the past means this guy's inactive now; skip him
+                 *
+                 * It might be possible to set an end date in the future when a person
+                 * is scheduled to end their tenure
+                 */
+                if ($endDate->isPast()) {
+                    continue;
+                }
+            }
+
+            /* Otherwise you're assumed to be current
+             */
             $employeeSetDedupe[$employee['user_code']] = $employee;
         }
 
@@ -772,7 +819,12 @@ class Profile implements IStrategy
                 $staffBaseProfile = $staffProfile->getBaseProfile();
             } catch (Exception $e) {
                 $staffProfile = $this->staffProfileMapper->createModel();
-                $staffBaseProfile = $this->baseProfileMapper->createModel();
+
+                try {
+                    $staffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                } catch (Exception $e) {
+                    $staffBaseProfile = $this->baseProfileMapper->createModel();
+                }
 
                 $staffProfile->setBaseProfile($staffBaseProfile);
             }

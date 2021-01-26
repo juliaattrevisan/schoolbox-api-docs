@@ -106,8 +106,9 @@ class Sync extends Base implements ISync
                 ''               AS staff_house,
                 ''               AS staff_department,
                 ''               AS staff_year_level,
-                ''               AS staff_year_level_description
-
+                ''               AS staff_year_level_description,
+                ''               AS staff_position_code,
+                ''               AS staff_position   
             FROM Staff s
             JOIN People p ON s.peopleDenbighID = p.denbighID
         ";

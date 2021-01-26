@@ -111,7 +111,6 @@ export default {
                     self.emitUpdateToAllUserProfileFeeds();
                 })
                 .catch(() => {
-                    console.log(arguments);
                     self.toastError('Failed to award achievement')
                 })
         }
@@ -141,6 +140,9 @@ export default {
                         <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
                     </template>
                 </p>
+                <p class="meta" v-if="award.isGoal && award.award">
+                    Goal has been achieved <relative-time :datetime="award.award.awardedAt"></relative-time>
+                </p>
 
                 <article v-html="award.badge.body"></article>
 
@@ -157,7 +159,7 @@ export default {
 
                 <div class="component-action">
                     <section>
-                        <a v-if="award._links.goalAward && award.isGoal"
+                        <a v-if="award._links.goalAward && award.isGoal && !award.award"
                            class="button"
                            @click.prevent="awardAchievement">Award Achievement</a>
                     </section>

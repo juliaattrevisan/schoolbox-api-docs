@@ -6,10 +6,6 @@
     import timeGridPlugin             from '@fullcalendar/timegrid'
     import listPlugin                 from '@fullcalendar/list'
     import momentPlugin, {toDuration} from '@fullcalendar/moment'
-    import RevealModal                from '@schoolbox/reveal-modal'
-    import MetaList                   from '@schoolbox/meta/list'
-    import MetaItem                   from '@schoolbox/meta/item'
-    import Toast                      from "@schoolbox/toast";
     import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
     import CreateEventModal           from './createEventModal';
     import ExportModal                from "./exportModal";
@@ -19,7 +15,6 @@
     import qs                         from "qs";
     import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
     import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
-    import {ATTENDANCE_STATUS}        from '@schoolboxCalendarEvent/attendance-status';
 
     // Various URLs that FullCalendar may make use of.
     const URL_STATE_CHANGE = '/calendar/changeState';
@@ -59,15 +54,11 @@
 
     export default {
         components: {
-            Toast,
             FilterModal,
             ExportModal,
             CreateEventModal,
             ViewEventModal,
-            MetaItem,
-            MetaList,
             FullCalendar,
-            RevealModal,
             FlatPickr,
         },
         beforeMount() {
@@ -804,7 +795,6 @@
                 @dateSelected="onQuickSwitch"
         />
 
-        <toast ref="toast"></toast>
     </div>
 </template>
 

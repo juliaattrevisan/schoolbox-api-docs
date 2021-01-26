@@ -63,4 +63,23 @@ trait StackableHelper
 
         return $returnEmails;
     }
+
+
+    /**
+     * Concatenate all the $columnName columns that were in $rows, and pop out a csv string
+     *
+     * @param array $rows
+     * @param string $columnName
+     * @return string
+     */
+    public function columnValuesAsCSV(array $rows, string $columnName): string
+    {
+        $values = [];
+
+        foreach ($rows as $row) {
+            $values[] = trim($row[$columnName]);
+        }
+
+        return implode(', ', array_filter($values));
+    }
 }

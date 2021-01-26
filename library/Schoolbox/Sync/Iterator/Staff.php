@@ -69,19 +69,20 @@ class Staff extends IteratorIterator
 
         /* Email - one for every item in stack
          */
-
         array_map([$staff, "addEmail"], $this->columnValuesAsEmail($preStack, 'default_email'));
         array_map([$staff, "addWorkEmail"], $this->columnValuesAsEmail($preStack, 'work_email'));
         array_map([$staff, "addHomeEmail"], $this->columnValuesAsEmail($preStack, 'home_email'));
 
-        /* Position - one for every item in stack
+        /* Collate every position into a csv string
          */
-        $positions = $this->columnValuesAsArray($preStack, 'staff_position');
-        foreach ($positions as $position) {
-            $staff->getMeta()->getPosition()->add(
-                (new User\Staff\Position())->setDescription($position)
-            );
-        }
+        $positionCodes = $this->columnValuesAsCSV($preStack, 'staff_position_code');
+        $positionDescriptions = $this->columnValuesAsCSV($preStack, 'staff_position');
+
+        /* Position - csv strings for multiple positions
+         */
+        $staff->getMeta()->getPosition()
+            ->setCode($positionCodes)
+            ->setDescription($positionDescriptions);
 
         /* Campus
          */

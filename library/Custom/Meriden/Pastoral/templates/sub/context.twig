@@ -1,13 +1,29 @@
+{% set showSubjectSelector = showSubjectSelector ?? true %}
 <div class="small-12 medium-8 column">
     {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
 </div>
 <div class="small-12 medium-4 column">
-    {% include '@customMeridenPastoral/sub/selector.twig' with {
-        tutorGroupList:   report.tutorGroupList,
-        subjectList:      report.subjectList,
-        student:          report.student,
-        subjectReport:    report.subjectReport,
-        tutorGroupReport: report.tutorGroupReport,
-        roleTypeOverride: report.roleTypeOverride,
-    } %}
+    {% if showSubjectSelector %}
+        {% include '@customMeridenPastoral/sub/selector.twig' with {
+            tutorGroupList:   report.tutorGroupList,
+            subjectList:      report.subjectList,
+            student:          report.student,
+            subjectReport:    report.subjectReport,
+            tutorGroupReport: report.tutorGroupReport,
+            roleTypeOverride: report.roleTypeOverride,
+        } %}
+    {% endif %}
+
+    {# Print-only heading #}
+    <p class="print-only">
+        {% if report.tutorGroupReport.subjectCode %}
+            {{ report.tutorGroupReport.year }} eReport
+        {% elseif report.subjectReport.subjectCode %}
+            {{ report.subjectReport.year }} eReport:
+            <br />
+            {{ report.subjectReport.name }}
+            <br />
+            ({{ report.subjectReport.subjectCode }})
+        {% endif %}
+    </p>
 </div>

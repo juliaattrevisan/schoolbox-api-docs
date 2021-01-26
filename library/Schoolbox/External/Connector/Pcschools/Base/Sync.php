@@ -131,7 +131,9 @@ class Sync extends Base implements ISync
                 T.HOUSE_T        AS staff_house,
                 ''               AS staff_department,
                 ''               AS staff_year_level,
-                ''               AS staff_year_level_description
+                ''               AS staff_year_level_description,
+                ''               AS staff_position_code,
+                ''               AS staff_position   
             FROM TEACHER T
             LEFT JOIN [IDENTITY] AS ID ON T.TEACHER# = ID.MEMBER#
             WHERE (

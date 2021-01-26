@@ -114,7 +114,8 @@ class Controller extends Base
         $this->getAwardBadgeForm(
             $users,
             '@learningBadgeAward/awardAsAchievementForm.twig',
-            'Award Achievements'
+            'Award Achievements',
+            Filter\Page\Model::PAGE_BADGE_LIST
         );
     }
 
@@ -154,7 +155,8 @@ class Controller extends Base
         $this->getAwardBadgeForm(
             $users,
             '@learningBadgeAward/setAsGoalForm.twig',
-            'Set Goals'
+            'Set Goals',
+            Filter\Page\Model::PAGE_BADGE_ALLOW_AS_GOAL
         );
     }
 
@@ -170,7 +172,8 @@ class Controller extends Base
         $this->getAwardBadgeForm(
             new GenericCollection(User::class),
             '@learningBadgeAward/setAsGoalForSelfForm.twig',
-            'Set Goals'
+            'Set Goals',
+            Filter\Page\Model::PAGE_BADGE_ALLOW_AS_GOAL
         );
     }
 
@@ -182,10 +185,10 @@ class Controller extends Base
      * @param GenericCollection|User[] $users
      * @param string                   $template The template to display
      * @param string                   $title    The title of this page
+     * @param string                   $page
      */
-    private function getAwardBadgeForm(GenericCollection $users, string $template, string $title): void
+    private function getAwardBadgeForm(GenericCollection $users, string $template, string $title, string $page): void
     {
-        $page        = Filter\Page\Model::PAGE_BADGE_LIST;
         $filterPanel = $this->filterFactoryFactory->buildPanel(
             $this->getUser(),
             $page,

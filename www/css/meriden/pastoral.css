@@ -106,6 +106,15 @@ body.login input[type=checkbox]:not(.plain):checked + label:after {
   .e-report a {
     text-decoration: none;
   }
+
+  /** Assessment print styling **/
+  .e-report #assessments {
+    page-break-inside: avoid;
+  }
+  .e-report #assessments table td.distribution {
+      padding-top: 0;
+      padding-bottom: 0;
+  }
 }
 /** Style the crest **/
 .meriden-crest {

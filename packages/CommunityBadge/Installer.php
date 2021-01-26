@@ -36,6 +36,7 @@ class Installer implements IPackageInstall
             $badge->setBody('<p>' . $row['Description'] . '</p>');
             $badge->setIcon('/images/badges' . $row['Image']);
             $badge->setCategory($badgeCatMapper->findOneByColumn('name', $row['Category']));
+            $badge->setAllowAsGoal((bool)$row['Goal']);
 
             $curriculumCodes = explode(',', $row['Curriculum']);
             $nodeCollection  = new GenericCollection(Node\Model::class);

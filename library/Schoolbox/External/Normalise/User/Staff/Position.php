@@ -13,10 +13,23 @@ class Position {
 
     /**
      * Job position description
+     * This is usually a nice human-readable format of a person's position
+     * e.g. "Human Resources"
      *
      * @var string
      */
-    private $description = '';
+    private string $description = '';
+
+
+    /**
+     * Job position code
+     * This is some abbreviated format of a person's position
+     * e.g. "HR", which is the short format of "Human Resources"
+     *
+     * @var string
+     */
+    private string $code = '';
+
 
     /**
      * Position start date
@@ -49,6 +62,26 @@ class Position {
 
     /* Getters/Setters
      */
+
+    /**
+     * @return string
+     */
+    public function getCode(): string
+    {
+        return $this->code;
+    }
+
+
+    /**
+     * @param string $code
+     * @return $this
+     */
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
+        return $this;
+    }
+
 
     /**
      * Set description
@@ -116,8 +149,15 @@ class Position {
         return $this->startDate;
     }
 
+
     /**
+     * This magic method shouldn't exist when meta.position token is removed
+     *
+     * It bandaided over a wonky implementation of multiple position descriptions
+     * and shouldn't really be here
+     *
      * @return string
+     *@deprecated
      */
     public function __toString()
     {

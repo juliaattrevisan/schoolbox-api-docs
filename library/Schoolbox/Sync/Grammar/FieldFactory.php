@@ -53,9 +53,9 @@ class FieldFactory
                     'year.level'                => 'Year Level',
                     'house.code'                => 'House Code',
                     'meta.department'           => 'Department',
-                    'meta.position'             => 'Position(s)',
+                    'meta.position.code'        => 'Position Code(s)',
                     'meta.position.description' => 'Position Description(s)',
-                    'meta.positionName'         => 'Position Names',
+                    'meta.position'             => 'Position Title(s) (deprecated)',
                     'meta.category.code'        => 'Category Code',
                     'meta.category.type'        => 'Category Type',
                 ];

@@ -36,9 +36,14 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-        $this->addGetRoute($router, 'currentReport', $basePath, '/{id}');
-        $this->addGetRoute($router, 'index', $basePath, '/{id}/{year}');
-        $this->addGetRoute($router, 'subject', $basePath, '/{id}/{year}/{subjectCode}');
+        $this->addGetRoute($router, 'currentReport', $basePath, '/{id}')
+             ->addTokens(['id' => '\\d+']);
+        $this->addGetRoute($router, 'index', $basePath, '/{id}/{year}')
+             ->addTokens(['id' => '\\d+', 'year' => '\\d+']);
+        $this->addGetRoute($router, 'subject', $basePath, '/{id}/{year}/{subjectCode}')
+             ->addTokens(['id' => '\\d+', 'year' => '\\d+']);
+        $this->addGetRoute($router, 'printableReport', $basePath, '/{id}/print/{year}')
+             ->addTokens(['id' => '\\d+', 'year' => '\\d+']);
     }
 
     /**
@@ -53,7 +58,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(?:index|subject)';
+        $ruleRegexp = '(?:index|subject|printableReport)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
             ->addRoutePermission(
@@ -76,7 +81,7 @@ class Module extends BaseModule
 
         $this->addRoutePreload(
             $matcher,
-            '(?:index|subject|currentReport)',
+            '(?:index|subject|currentReport|printableReport)',
             function ($params) {
                 $student = $this->getUserMapper()->findWithSubjects($params['id']);
                 $student->setSubjectCollection(

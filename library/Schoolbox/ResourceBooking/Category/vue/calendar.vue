@@ -3,10 +3,6 @@
     import FullCalendar               from '@fullcalendar/vue'
     import interactionPlugin          from '@fullcalendar/interaction'
     import momentPlugin, {toDuration} from '@fullcalendar/moment'
-    import RevealModal                from '@schoolbox/reveal-modal'
-    import MetaList                   from '@schoolbox/meta/list'
-    import MetaItem                   from '@schoolbox/meta/item'
-    import Toast                      from "@schoolbox/toast";
     import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
     import CreateBookingModal         from '@schoolbox/fullcalendar/resourceBooking/createBookingModal';
     import ExportModal                from '@schoolbox/fullcalendar/resourceBooking/exportBookingModal';
@@ -29,15 +25,11 @@
 
     export default {
         components: {
-            Toast,
             FilterModal,
             CreateBookingModal,
             ExportModal,
             ViewEventModal,
-            MetaItem,
-            MetaList,
             FullCalendar,
-            RevealModal,
             FlatPickr,
         },
         beforeMount() {
