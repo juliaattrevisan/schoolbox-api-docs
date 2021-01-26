@@ -363,7 +363,7 @@ export default {
                             </a>
                         </template>
 
-                        to see it appear in the activity feed.
+                        to see it appear in your activity feed.
                     </p>
                 </template>
 
