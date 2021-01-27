@@ -591,7 +591,7 @@
                 //to display an existing file within the drop zone view, as the file has already been loaded
                 //https://gitlab.com/meno/dropzone/-/wikis/FAQ#how-to-show-files-already-stored-on-server
                 this.dropzone.displayExistingFile(data, getExistingFileUrl(), onExistingFileDisplayed);
-
+                
                 elems.push($(data.previewElement));
 
             } else {
