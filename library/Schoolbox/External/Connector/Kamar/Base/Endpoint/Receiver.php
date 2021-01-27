@@ -76,6 +76,20 @@ XML;
         } else {
             $this->process($data);
         }
+
+        /* $data is what the kamar instance sent us
+         *
+         * if $data is empty, send a No Data response payload
+         */
+
+        /* If $data contains the sync:check attribute in the SMSDirectoryData node
+         * then it's a check request for when a Kamar instance is enabled (or re-enabeld)
+         * We need to treat it specially
+         */
+
+        /* Otherwise presume it's one of the normal data payloads and save it
+         * to a local xml for later processing
+         */
     }
 
 
