@@ -19,6 +19,15 @@ case "$1" in
             /usr/share/schoolbox/tools/backup-database.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
         fi
 
+        # Temporary fix for moving symlinked conf file as part of 20.2 upgrade
+        if [[ -L /usr/share/schoolbox/www/conf ]]; then
+            temp_file=$(mktemp)
+            mv /usr/share/schoolbox/www/conf/conf.php "$temp_file"
+            rm /usr/share/schoolbox/www/conf
+            mkdir /usr/share/schoolbox/www/conf
+            mv "$temp_file" /usr/share/schoolbox/www/conf/conf.php
+        fi
+
          # We cannot reference a file in the package from a prinst script, so need to inline it here
         echo 'Taking Schoolbox offline...' | tee -a /var/log/schoolbox/upgrade.log;
         maintenanceFileName="/usr/share/schoolbox/.maintenance";
