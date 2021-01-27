@@ -64,6 +64,11 @@
         userIds: user.id
     }
 ) %}
+{##
+ # Is the current user viewing their own profile?
+ # This affects some links and metadata displayed.
+ #}
+{% set isCurrentUser = user.id == USER.id %}
 
 <script type="text/javascript">
     $(function () {
@@ -310,14 +315,6 @@
                 <ul class='flex-list flex-wrap buttons'>
                     {% block buttons %}
 
-                        {% block buttons_shareLearningMoment %}
-                            {% if shareLearningMomentUrl %}
-                                <li>
-                                    <a href="#" class="icon-share" data-reveal-id="shareLearningMoment">Share Learning</a>
-                                </li>
-                            {% endif %}
-                        {% endblock buttons_shareLearningMoment %}
-
                         {% if eportfolioAuth %}
                             {% block buttons_eportfolio %}
                                 <li>
@@ -449,6 +446,36 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="profile-learning-actions">
+                {% if shareLearningMomentUrl %}
+                    <a href="#" title="Share Learning" class="learning icon-share" data-reveal-id="shareLearningMoment"><span>Share Learning</span></a>
+                {% endif %}
+
+                {% set setAsGoalUrl = isCurrentUser
+                    ? routeLookupIfAuthorized('learningBadgeAward.getSetAsGoalForSelfForm')
+                    : routeLookupIfAuthorized(
+                        'learningBadgeAward.getSetAsGoalForm',
+                        {users: [user], userIds: user.id}
+                    )
+                %}
+                {% if setAsGoalUrl %}
+                    <a href="{{ setAsGoalUrl }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Set goals" class="goals icon-goal"><span>Set goals</span></a>
+                {% endif %}
+
+                {% set awardAsAchievementUrl = routeLookupIfAuthorized(
+                    'learningBadgeAward.getAwardAsAchievementForm',
+                    {users: [user], userIds: user.id}
+                ) %}
+                {% if awardAsAchievementUrl %}
+                    <a href="{{ awardAsAchievementUrl }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Award achievement" class="achievement icon-achievement"><span>Award achievement</span></a>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
 
 {# Tabs #}
 <div class="row">
@@ -1074,7 +1101,7 @@
     {% include '@learningMomentEvidence/shareModal.twig' with {
         id:      "shareLearningMoment",
         baseUrl: shareLearningMomentUrl,
-        user:    user.id == USER.id ? null : user,
+        user:    isCurrentUser ? null : user,
     } only %}
 {% endif %}
 
