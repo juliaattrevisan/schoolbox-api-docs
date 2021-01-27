@@ -114,10 +114,8 @@ XML;
      * or re-enabled after being deactivated
      *
      * We need to re-confirm that we're who we say we are
-     *
-     * @param string $data
      */
-    private function processCheck(string $data): void
+    private function processCheck(): void
     {
         $string = <<<XML
 <SMSDirectoryData>
