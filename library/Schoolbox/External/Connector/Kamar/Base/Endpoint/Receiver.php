@@ -73,7 +73,7 @@ class Receiver
          * This is stored in the SUDS School Data Endpoint Key field as a colon-separated tuple:
          * e.g. "schoolbox:schoolboxkamar"
          */
-        $this->expectedAuthorization = 'Basic ' . base64_encode($apiKey);
+        $this->expectedAuthorization = base64_encode($apiKey);
     }
 
 
