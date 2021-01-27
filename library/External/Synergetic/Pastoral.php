@@ -5,6 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Database\Exception;
 use Html2Text\Html2Text;
 use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Mapper as BaseMapper;
@@ -630,6 +631,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         try {
             $params = $this->getQueryParameters($pastoral);
+            $this->connector->beginTransaction();
             if ($this->connector->executeQuery($query, $params)) {
                 // If this is a new record we need to store the ID of the newly created Synergetic record
 
@@ -658,6 +660,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     )->fetchColumn();
 
                     if (!$pastoralCareSeq) {
+                        $this->connector->rollBack();
                         throw new ExternalException('Failed to get pastoralCareSeq for pastoral: ' . $pastoral->getId());
                     }
 
@@ -676,9 +679,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                 $this->updatePastoralCareContacts($pastoral);
 
+                $this->connector->commit();
                 return true;
             }
         } catch (ExternalException $e) {
+            $this->connector->rollBack();
             return false;
         }
 
@@ -838,6 +843,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         ";
 
         try {
+            $this->connector->beginTransaction();
             $this->connector->executeQuery($query, [
                 'externalId' => $pastoral->getExternalId(),
                 'externalId2' => $pastoral->getExternalId(),
@@ -863,6 +869,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     'createdOwnerId' => $comment->getOwner()->getExternalId(),
                 ]
             )->fetchColumn();
+            $this->connector->commit();
 
             $comment->setExternalCode($pastoralCareCommentsSeq);
 
@@ -875,7 +882,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             // Restore the proper propagator
             $this->pastoralCommentMapper->setEventPropagator($propagator);
             return true;
-        } catch (\Alaress\Database\Exception $e) {
+        } catch (Exception $e) {
+            $this->connector->rollBack();
             // most likely that corresponding pastoral record is deleted in Synergetic
             return false;
         }
@@ -1017,54 +1025,59 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             'documentType' => ['value' => $extension],
         ]);
 
-        if (!$query->execute()) {
-            throw new ExternalException('Error uploading pastoral document to Synergetic database.');
-        }
+        try {
+            $this->connector->beginTransaction();
+            if (!$query->execute()) {
+                $this->connector->rollBack();
+                throw new ExternalException('Error uploading pastoral document to Synergetic database.');
+            }
 
-        // gets tDocumentsSeq for the inserted record
-        // lastInsertId() does not work because of DB trigger attached to this table
-        $documentReferencesSeq = $this->connector->executeQuery(
-            "SELECT tDocumentsSeq FROM media.tDocuments WHERE
+            // gets tDocumentsSeq for the inserted record
+            // lastInsertId() does not work because of DB trigger attached to this table
+            $documentReferencesSeq = $this->connector->executeQuery(
+                "SELECT tDocumentsSeq FROM media.tDocuments WHERE
                 Description = :filename AND
                 ClassificationCode = :classificationCode AND
                 DocumentCreatedByID = :createdById AND
                 DocumentCreatedDate = :createdDate AND
                 SourceDate = :sourceDate AND
                 DocumentType = :documentType",
-            [
-                'filename'           => ['value' => $storage->getFilename()],
-                'classificationCode' => ['value' => $classificationCode],
-                'createdById'        => ['value' => $externalId],
-                'createdDate'        => ['value' => $date],
-                'sourceDate'         => ['value' => $sourceDate],
-                'documentType'       => ['value' => $extension],
-            ]
-        )->fetchColumn();
+                [
+                    'filename'           => ['value' => $storage->getFilename()],
+                    'classificationCode' => ['value' => $classificationCode],
+                    'createdById'        => ['value' => $externalId],
+                    'createdDate'        => ['value' => $date],
+                    'sourceDate'         => ['value' => $sourceDate],
+                    'documentType'       => ['value' => $extension],
+                ]
+            )->fetchColumn();
 
-        if (empty($documentReferencesSeq)) {
-            throw new ExternalException('Error linking pastoral document to record in Synergetic database.');
-        }
+            if (empty($documentReferencesSeq)) {
+                $this->connector->rollBack();
+                throw new ExternalException('Error linking pastoral document to record in Synergetic database.');
+            }
 
-        // Add a document reference to the student so it shows up on their normal community record
-        $query = $this->connector->prepareQuery(
-            "
+            // Add a document reference to the student so it shows up on their normal community record
+            $query = $this->connector->prepareQuery(
+                "
                 INSERT INTO {$this->schemaMedia}.DocumentReferences (ID, DocumentReferencesSeq)
                 VALUES (:id, :documentReferencesSeq);
             ",
-            [
-                'id' => $studentExternalId,
-                'documentReferencesSeq' => $documentReferencesSeq,
-            ]
-        );
+                [
+                    'id'                    => $studentExternalId,
+                    'documentReferencesSeq' => $documentReferencesSeq,
+                ]
+            );
 
-        if (!$query->execute()) {
-            throw new ExternalException('Error linking pastoral document to record in Synergetic database.');
-        }
+            if (!$query->execute()) {
+                $this->connector->rollBack();
+                throw new ExternalException('Error linking pastoral document to record in Synergetic database.');
+            }
 
-        // Specifically link it to their pastoral record as well
+            // Specifically link it to their pastoral record as well
 
-        $sql =
-            "
+            $sql =
+                "
             INSERT INTO {$this->schemaMedia}.tDocumentReferences
             (
                 CommunityID,
@@ -1084,16 +1097,24 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             WHERE   tDocumentsSeq = :documentReferencesSeq2
         ";
 
-        $query = $this->connector->prepareQuery($sql, [
-            'pastoralExternalId' => $pastoralExternalId,
-            'documentReferencesSeq' => $documentReferencesSeq,
-            'documentReferencesSeq2' => $documentReferencesSeq,
-        ]);
+            $query = $this->connector->prepareQuery(
+                $sql,
+                [
+                    'pastoralExternalId'     => $pastoralExternalId,
+                    'documentReferencesSeq'  => $documentReferencesSeq,
+                    'documentReferencesSeq2' => $documentReferencesSeq,
+                ]
+            );
 
-        if (!$query->execute()) {
-            throw new ExternalException('Error linking pastoral document to record in Synergetic database.');
+            if (!$query->execute()) {
+                $this->connector->rollBack();
+                throw new ExternalException('Error linking pastoral document to record in Synergetic database.');
+            }
+            $this->connector->commit();
+        } catch (Exception $e) {
+            $this->connector->rollBack();
+            throw new ExternalException('Error linking pastoral document to record in Synergetic database:' . $e->getTraceAsString());
         }
-
         return true;
     }
 
