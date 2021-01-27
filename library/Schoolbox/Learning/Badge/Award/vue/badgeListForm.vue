@@ -41,6 +41,7 @@ export default {
             default: '',
             required: true,
         },
+
         /**
          * The key within each selected badge's `_links` list to which requests
          * to create badges are posted.

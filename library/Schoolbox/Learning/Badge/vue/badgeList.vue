@@ -346,8 +346,14 @@ export default {
                 <template v-else>
                     <i class="icon-badge"></i>
                     <p>
-                        No badges have been created. Start by
-                        <a :href="getBadgeCreateFormRoute" title="Create the first badge">creating the first badge</a>.
+                        <!-- the getBadgeCreateFormRoute could optionally contain a ?returnUrl=... appendage -->
+                        <template v-if="getBadgeCreateFormRoute !== '' && getBadgeCreateFormRoute[0] !== '?'">
+                            No badges have been created.
+                            Start by <a :href="getBadgeCreateFormRoute" title="Create the first badge">creating the first badge</a>.
+                        </template>
+                        <template v-else>
+                            There are no goals for you to choose yet. Please try again soon.
+                        </template>
                     </p>
                 </template>
             </div>
