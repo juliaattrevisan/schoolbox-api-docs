@@ -119,8 +119,12 @@ XML;
             if (self::XML_CHECK === $syncVal) {
 
                 /* If $data contains the sync:check attribute in the SMSDirectoryData node
-                 * then it's a check request for when a Kamar instance is enabled (or re-enabeld)
+                 * then it's a check request for when a Kamar instance is enabled (or re-enabled)
                  * We need to treat it specially
+                 *
+                 * Note: the docs are inconsistent, some places say the check request happens
+                 * upon configuration, other places suggest it happens on every payload request;
+                 * not sure which is right, if any
                  */
                 $this->processCheck();
 
