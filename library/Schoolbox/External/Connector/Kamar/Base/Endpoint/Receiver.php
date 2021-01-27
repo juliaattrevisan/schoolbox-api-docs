@@ -27,10 +27,20 @@ class Receiver
     public const XML_FULL = 'full';
     public const XML_STUDENTTIMETABLES = 'studenttimetables';
 
+
+    /**
+     * Authorization header pieces
+     * These should be sent in the headers of every message Kamar sends to us
+     */
+    private const USERNAME = 'schoolbox';
+    private const PASSWORD = 'kamar';
+
+
     /**
      * Check request string, contained in the @sync attribute of SMSDirectoryData
      */
     private const XML_CHECK = 'check';
+
 
     /**
      * @var string
@@ -45,6 +55,15 @@ class Receiver
 
 
     /**
+     * Basic authorization string
+     * base64encoded username/password combination
+     *
+     * @var string
+     */
+    private string $expectedAuthorization;
+
+
+    /**
      * Receiver constructor.
      *
      * @param string $dir
@@ -53,6 +72,8 @@ class Receiver
     {
         $this->dir = $dir;
         $this->suffix = '_' . date('YmdHis') . uniqid('_', true) . '.xml';
+
+        $this->expectedAuthorization = 'Basic ' . base64_encode(self::USERNAME . ':' . self::PASSWORD);
     }
 
 
@@ -64,6 +85,10 @@ class Receiver
      */
     public function receive(string $data): void
     {
+
+        /* Check Authorization in the payload's headers
+         */
+        $this->checkAuthorization();
 
         /* $data is what the kamar instance sent us
          */
@@ -97,7 +122,7 @@ XML;
                  * then it's a check request for when a Kamar instance is enabled (or re-enabeld)
                  * We need to treat it specially
                  */
-                $this->processCheck($data);
+                $this->processCheck();
 
             } else {
 
@@ -106,6 +131,38 @@ XML;
                  */
                 $this->process($data);
             }
+        }
+    }
+
+
+    /**
+     * Check that the kamar payload contained the required authentication parts
+     * If it doesn't, send out an error xml
+     */
+    private function checkAuthorization(): void
+    {
+        $headers = getallheaders();
+
+        /* Authorization header might not exist
+         */
+        $authorizationString = $headers['Authorization'] ?? '';
+
+        /* If the authorization string doesn't match our expected value,
+         * then the request is invalid; reject it and end
+         */
+        if ($authorizationString !== $this->expectedAuthorization) {
+            $string = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<SMSDirectoryData>
+        <error>403</error>
+        <result>Authentication Failed</result>
+        <service>Example</service>
+        <version>1.0</version>
+</SMSDirectoryData>
+XML;
+
+            echo (new SimpleXMLElement($string))->asXML();
+            exit();
         }
     }
 
