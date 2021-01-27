@@ -565,7 +565,7 @@
         <div class="profile-tabs tabs-content">
 
             {% if showActivityFeed %}
-            <div class="content {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
+            <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
                 <div id="activity-feed"></div>
             </div>
             {% endif %}
@@ -574,7 +574,8 @@
             <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
                 <div id="goal-feed"></div>
             </div>
-            <div class="content {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
+
+            <div class="content no-pad {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
                 <div id="achievement-feed"></div>
             </div>
             {% endif %}
@@ -629,98 +630,115 @@
             <script type="text/javascript" src="/javascript/components/userProfileFeeds.bundle.js"></script>
 
             {% if showClasses %}
-            <div class="content {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
+            <div class="content no-pad {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
                 <section>
                     {% if showSubjects %}
                     {% for group, subjectGroup in subjects %}
                     {# Keep a running total of all teachers emails in this group #}
                     {% set teacherEmails = [] %}
-                    <div class="row content">
-                        <div class="small-12 columns">
-                        <h2 class="subheader">{{ group }}</h2>
-                        <section class="v-card-list">
-                            {% for subjectKey, subject in subjectGroup %}
-                            <div class="v-card small-12">
-                                <a href="{% if subject.folder.id %}/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}{% else %}#{% endif %}">
-                                    <div class="card-class-image"
-                                         style="border-bottom-width: 10px;
-                                                border-bottom-style: solid;
-                                                {% if subject.folder is defined and subject.folder.colour %}
-                                                background-color:{{ subject.folder.colour }};
-                                                border-bottom-color: {{ subject.folder.colour }};
-                                                {% endif %}
-                                                {% if subject.folder is defined and subject.folder.coverImage %}
-                                                background-image: url('/storage/image.php?hash={{ subject.folder.coverImage.hash }}&size=cardImageLarge');
-                                                background-size: cover;
-                                                background-repeat: no-repeat;
-                                                background-position: center;
-                                                {% endif %}"
-                                    >
-                                        <div class="owner">
-                                        {% for teacher in subject.teachers %}
-                                            <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="Teacher: {{ teacher.formatName }}" alt="Teacher: {{ teacher.formatName }}" />
-                                        {% endfor %}
-                                        </div>
-                                    </div>
-                                </a>
-                                {% set hasTeachersWithEmail = false %}
+                    <div class="actions-small-1 content">
+                        <div class="list-item">
+                            <div>
+                                <h2 class="subheader">{{ group }}</h2>
+                            </div>
+                        </div>
+                        {% if isStaff and config.email_all_staff and config.mail_enable %}
+                            {% for subject in subjectGroup %}
                                 {% for teacher in subject.teachers %}
                                     {% if not teacher.email is empty %}
-                                        {% set hasTeachersWithEmail = true %}
+                                        {% set teacherEmails = teacherEmails|merge([teacher.getFormattedEmailDisplay]) %}
                                     {% endif %}
                                 {% endfor %}
-                                <div class="card-content classes actions-small-{{ hasTeachersWithEmail ? '1' : '0'}} {% block folderListItemClasses %}{% endblock %}">
-                                    <div class="list-item">
-                                        {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
-                                        {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
-                                            <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
+                            {% endfor %}
+                            {% set replyTo = USER.getFormattedEmailDisplay %}
+                            {% if teacherEmails|length > 0 %}
+                            <nav><a href="#" class="icon-overflow" data-dropdown="email-teachers"></a></nav>
+                            <ul class="f-dropdown" data-dropdown-content id="email-teachers">
+                                <li>
+                                    <a id="email-all" class="icon-email" href="#" title="Email all {{ group }} teachers">Email all {{ group }} teachers</a>
+                                </li>
+                            </ul>
+                            <form id="email-all-form" action="/mail/createMail.php" method="post">
+                                <input type="hidden" name="replyto" value="{{ replyTo }}"/>
+                                <input type="hidden" name="cc" value="{{ teacherEmails|join(emailSeparator) }}"/>
+                                {# <input type="submit" value="Email all {{ group }} teachers" /> #}
+                            </form>
+                            {% autoescape 'js' %}
+                                <script type="text/javascript">
+                                    $('#email-all').on('click',function(){
+                                        $('#email-all-form').submit();
+                                    });
+                                </script>
+                            {% endautoescape %}
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="row content">
+                        <div class="small-12 columns">
+                            <section class="v-card-list">
+                                {% for subjectKey, subject in subjectGroup %}
+                                <div class="v-card small-12">
+                                    <a href="{% if subject.folder.id %}/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}{% else %}#{% endif %}">
+                                        <div class="card-class-image"
+                                             style="border-bottom-width: 10px;
+                                                    border-bottom-style: solid;
+                                                    {% if subject.folder is defined and subject.folder.colour %}
+                                                    background-color:{{ subject.folder.colour }};
+                                                    border-bottom-color: {{ subject.folder.colour }};
+                                                    {% endif %}
+                                                    {% if subject.folder is defined and subject.folder.coverImage %}
+                                                    background-image: url('/storage/image.php?hash={{ subject.folder.coverImage.hash }}&size=cardImageLarge');
+                                                    background-size: cover;
+                                                    background-repeat: no-repeat;
+                                                    background-position: center;
+                                                    {% endif %}"
+                                        >
+                                            <div class="owner">
+                                            {% for teacher in subject.teachers %}
+                                                <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="Teacher: {{ teacher.formatName }}" alt="Teacher: {{ teacher.formatName }}" />
+                                            {% endfor %}
+                                            </div>
+                                        </div>
+                                    </a>
+                                    {% set hasTeachersWithEmail = false %}
+                                    {% for teacher in subject.teachers %}
+                                        {% if not teacher.email is empty %}
+                                            {% set hasTeachersWithEmail = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    <div class="card-content classes actions-small-{{ hasTeachersWithEmail ? '1' : '0'}} {% block folderListItemClasses %}{% endblock %}">
+                                        <div class="list-item">
+                                            {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
+                                            {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
+                                                <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
+                                                    <h3>{{ subject.name }}</h3>
+                                                    {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
+                                                </a>
+                                            {% else %}
                                                 <h3>{{ subject.name }}</h3>
                                                 {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
-                                            </a>
-                                        {% else %}
-                                            <h3>{{ subject.name }}</h3>
-                                            {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
+                                            {% endif %}
+                                        </div>
+                                        {% block folderListItemActions %}{% endblock %}
+                                        {% if hasTeachersWithEmail %}
+                                            <nav>
+                                                <a class="icon-more" data-dropdown="class-options-{{ subjectKey }}" title="Actions"></a>
+                                            </nav>
+                                            <ul id="class-options-{{ subjectKey }}" class="f-dropdown" data-dropdown-content>
+                                                {% for teacher in subject.teachers %}
+                                                    {% if not teacher.email is empty %}
+                                                        <li>
+                                                            {% set replyTo = teacher.getFormattedEmailDisplay %}
+                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ teacher.formatName }}</a>
+                                                        </li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
                                         {% endif %}
                                     </div>
-                                    {% block folderListItemActions %}{% endblock %}
-                                    {% if hasTeachersWithEmail %}
-                                        <nav>
-                                            <a class="icon-more" data-dropdown="class-options-{{ subjectKey }}" title="Actions"></a>
-                                        </nav>
-                                        <ul id="class-options-{{ subjectKey }}" class="f-dropdown" data-dropdown-content>
-                                            {% for teacher in subject.teachers %}
-                                                {% if not teacher.email is empty %}
-                                                    {% set email =  '"' ~ teacher.formatName ~ '"' ~ " <" ~ teacher.email ~ ">" %}
-                                                    {% set teacherEmails = teacherEmails|merge([email]) %}
-                                                    <li>
-                                                        {% set replyTo = teacher.getFormattedEmailDisplay %}
-                                                        <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ teacher.formatName }}</a>
-                                                    </li>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </ul>
-                                    {% endif %}
                                 </div>
-                            </div>
-                            {% endfor %}
-                            {% if session.user.role.staff and config.email_all_staff and config.mail_enable %}
-                                {% set teacherEmails = teacherEmails|join(emailSeparator)  %}
-                                {% set replyTo = session.user.getFormattedEmailDisplay %}
-                                <div class="component-action">
-                                    <section>
-                                        <form action="/mail/createMail.php" method="post">
-                                            <div class="row">
-                                                <div class="small-12 columns">
-                                                    <input type="hidden" name="replyto" value="{{ replyTo }}"/>
-                                                    <input type="hidden" name="cc" value="{{ teacherEmails }}"/>
-                                                    <button type="submit" class="button">Email All {{ group }} Teachers</button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </section>
-                                </div>
-                            {% endif %}
-                        </section>
+                                {% endfor %}
+                            </section>
                         </div>
                     </div>
                     {% endfor %}
@@ -730,7 +748,7 @@
             {% endif %}
 
             {% if showGroups and groups is not empty %}
-            <div class="content {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
+            <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
                 <section>
                     <div class="row content">
                         <div class="small-12 columns">
@@ -807,7 +825,8 @@
             {% endif %}
 
             {% if showContactsTab %}
-            <div class="content {% if activeTab == 'contacts' %}active{% endif %}" id="tab-contacts">
+            <div class="content no-pad {% if activeTab == 'contacts' %}active{% endif %}" id="tab-contacts">
+
                 <section class="content">
                     {% block contacts_island %}
                         {% block contacts %}
