@@ -84,30 +84,32 @@ class Attendance_Synergetic_AttendanceMaster
 
         $statement = $this->connector->prepareStoredProcedure('spiwkAttendances');
 
-        $statement->bindInputs([
-            'FileType' => $this->getClassFileType(),
-            'FileYear' => $this->getFileYear(),
-            'FileSemester' => $this->getFileSemester(),
-            'ClassCampus' => $classCampus,
-            'ClassCode' => $this->getClassCode(),
-            'AttendanceDate' => $attendanceDate->getDatabaseDate() . ' 00:00:00.000',
-            'AttendancePeriod' => $this->getAttendancePeriod(),
-            'AttendanceDayNumber' => $attendanceDay,
-            'StaffID' => $staffId,
-            'AttendedFlag' => 1,
-            'TimeTableGroup' => $timetableGroup,
-            'SynWebFlag' => 1,
-        ]);
+        $statement->bindInputs(
+            [
+                'FileType'            => $this->getClassFileType(),
+                'FileYear'            => $this->getFileYear(),
+                'FileSemester'        => $this->getFileSemester(),
+                'ClassCampus'         => $classCampus,
+                'ClassCode'           => $this->getClassCode(),
+                'AttendanceDate'      => $attendanceDate->getDatabaseDate() . ' 00:00:00.000',
+                'AttendancePeriod'    => $this->getAttendancePeriod(),
+                'AttendanceDayNumber' => $attendanceDay,
+                'StaffID'             => $staffId,
+                'AttendedFlag'        => 1,
+                'TimeTableGroup'      => $timetableGroup,
+                'SynWebFlag'          => 1,
+            ]
+        );
 
         // Bind output parameters for procedure
 
         $attendanceMasterSeq = null;
 
-        $outputs = [];
+        $outputs                          = [];
         $outputs['wkAttendanceMasterSeq'] = [
-            'value' => &$attendanceMasterSeq,
-            'type' => PDO::PARAM_INT,
-            'length' => 4
+            'value'  => &$attendanceMasterSeq,
+            'type'   => PDO::PARAM_INT,
+            'length' => 4,
         ];
 
         $statement->bindOutputs($outputs);
@@ -137,13 +139,15 @@ class Attendance_Synergetic_AttendanceMaster
     public function findTimetablePeriod(): ?array
     {
         $timetableDefinition = $this->connector->prepareStoredProcedure('spsTimetableDefinition');
-        $timetableDefinition->bindInputs([
-            'TimetableGroup' => $this->timetableGroup,
-            'FileYear'       => $this->fileYear,
-            'FileSemester'   => $this->fileSemester,
-            'DayNumber'      => $this->attendanceDay,
-            'FileType'       => $this->classFileType,
-        ]);
+        $timetableDefinition->bindInputs(
+            [
+                'TimetableGroup' => $this->timetableGroup,
+                'FileYear'       => $this->fileYear,
+                'FileSemester'   => $this->fileSemester,
+                'DayNumber'      => $this->attendanceDay,
+                'FileType'       => $this->classFileType,
+            ]
+        );
         $timetableDefinition->execute();
         foreach ($timetableDefinition->fetchAll() as $record) {
             if ((int)$this->attendancePeriod === $record['PeriodNumber']) {
@@ -165,29 +169,43 @@ class Attendance_Synergetic_AttendanceMaster
     {
         $statement = $this->connector->prepareStoredProcedure('sptwkAttendances');
 
-        $statement->bindInputs([
-            'wkAttendanceMasterSeq' => $this->getAttendanceMasterSeq(),
-            'HoldFlag' => 0
-        ]);
+        $statement->bindInputs(
+            [
+                'wkAttendanceMasterSeq' => $this->getAttendanceMasterSeq(),
+                'HoldFlag'              => 0,
+            ]
+        );
 
         $attendanceMasterSeq = null;
 
-        $outputs = [];
+        $outputs                        = [];
         $outputs['AttendanceMasterSeq'] = [
-            'value' => &$attendanceMasterSeq,
-            'type' => PDO::PARAM_INT,
-            'length' => 4
+            'value'  => &$attendanceMasterSeq,
+            'type'   => PDO::PARAM_INT,
+            'length' => 4,
         ];
 
         $statement->bindOutputs($outputs);
         $success = $statement->execute();
 
         /* Stored proc does not update the CreatedById so we do that separately */
-        if($success) {
+        if ($success) {
+            // This query must be run with ANSI_WARNINGS=ON.
+            // Check the value of that setting, then switch it back to its
+            // original value.
+            $isAnsiWarningsOn = (bool)$this->connector->executeQuery('SELECT (@@OPTIONS & 8)')->fetchColumn();
+            if (!$isAnsiWarningsOn) {
+                $this->connector->executeQuery('SET ANSI_WARNINGS ON');
+            }
+
             $this->connector->executeQuery(
                 "UPDATE AttendanceMaster SET CreatedById = StaffID, ModifiedById = StaffID WHERE AttendanceMasterSeq = :attendanceMasterSeq",
                 ['attendanceMasterSeq' => $attendanceMasterSeq]
             );
+
+            if (!$isAnsiWarningsOn) {
+                $this->connector->executeQuery('SET ANSI_WARNINGS OFF');
+            }
         }
 
         return $success;
@@ -324,7 +342,7 @@ class Attendance_Synergetic_AttendanceMaster
     }
 
     /**
-     * @param  string $classFileType
+     * @param string $classFileType
      * @return $this
      */
     public function setClassFileType($classFileType)
