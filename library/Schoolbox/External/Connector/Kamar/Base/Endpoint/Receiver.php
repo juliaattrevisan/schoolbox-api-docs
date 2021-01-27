@@ -164,6 +164,7 @@ XML;
 </SMSDirectoryData>
 XML;
 
+            http_response_code(403);
             echo (new SimpleXMLElement($string))->asXML();
             exit();
         }
