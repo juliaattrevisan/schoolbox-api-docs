@@ -183,11 +183,23 @@ class Attendance_Synergetic_AttendanceMaster
         $success = $statement->execute();
 
         /* Stored proc does not update the CreatedById so we do that separately */
-        if($success) {
+        if ($success) {
+            // This query must be run with ANSI_WARNINGS=ON.
+            // Check the value of that setting, then switch it back to its
+            // original value.
+            $isAnsiWarningsOn = (bool)$this->connector->executeQuery('SELECT (@@OPTIONS & 8)')->fetchColumn();
+            if (!$isAnsiWarningsOn) {
+                $this->connector->executeQuery('SET ANSI_WARNINGS ON');
+            }
+
             $this->connector->executeQuery(
                 "UPDATE AttendanceMaster SET CreatedById = StaffID, ModifiedById = StaffID WHERE AttendanceMasterSeq = :attendanceMasterSeq",
                 ['attendanceMasterSeq' => $attendanceMasterSeq]
             );
+
+            if (!$isAnsiWarningsOn) {
+                $this->connector->executeQuery('SET ANSI_WARNINGS OFF');
+            }
         }
 
         return $success;
