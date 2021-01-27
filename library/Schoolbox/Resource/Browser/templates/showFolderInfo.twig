@@ -73,17 +73,58 @@
                                 $uploadButton.removeClass('hide').prop('disabled', false);
                             }
                             if (dropzone.getAcceptedFiles().length === 0) {
-                                debugger;
                                 $uploadButton.addClass('hide').prop('disabled', true);
                             }
                         };
-                    $attachzone
+                    /*$attachzone
                         .on('success.attachzone', controlUploadButton)
                         .on('removedfile.attachzone', controlUploadButton)
-                        .on('error.attachzone', controlUploadButton);
+                        .on('error.attachzone', controlUploadButton);*/
+
+                    var fileCount = 0;
+                    var fileList = [];
+                    $attachzone.on('success.attachzone', function (event, file) {
+                        fileCount++;
+                        fileList.push({
+                            name: 'attachment[]',
+                            value: file.hash + ':' + file.meta.name
+                        })
+                        if (fileCount === $attachzone.data('plugin_resourceAttach').dropzone.files.length) {
+                            var ajaxParams = {
+                                url: document.getElementById('uploadForm').action,
+                                method: document.getElementById('uploadForm').method,
+                                data: fileList,
+                                dataType: 'json'
+                            };
+                            var jstree = $('#tree').jstree(true);
+                            $.ajax(ajaxParams)
+                                .done(function (data) {
+                                    // The response contains all items in the folder.
+                                    // Add any new ones.
+                                    data.forEach(function (item) {
+                                        var existingNode = jstree.get_node(item.id);
+                                        if (!existingNode) {
+                                            jstree.create_node(item.parent, item);
+                                        }
+                                    });
+
+                                    // Then remove all the files I just uploaded
+                                    $attachzone.data('plugin_resourceAttach').dropzone.removeAllFiles();
+
+                                    fileCount = 0;
+                                    fileList = [];
+                                    
+                                })
+                                .fail(function () {
+                                    // I don't know what a fail message could look like?
+                                    //$uploadButton.prop('disabled', false);
+                                });
+                        }
+                        debugger;
+                    })
 
                     // AJAX submission: add any new files to the tree
-                    $('#uploadForm').on('submit', function (event) {
+                    /*$('#uploadForm').on('submit', function (event) {
                         event.preventDefault();
                         var ajaxParams = {
                                 url: this.action,
@@ -92,7 +133,7 @@
                                 dataType: 'json'
                             },
                             jstree = $('#tree').jstree(true);
-
+                        debugger;
                         $uploadButton.prop('disabled', true);
                         $.ajax(ajaxParams)
                             .done(function (data) {
@@ -112,7 +153,7 @@
                                 // I don't know what a fail message could look like?
                                 $uploadButton.prop('disabled', false);
                             });
-                    })
+                    })*/
                 });
             </script>
             <form id="uploadForm" action="{{ routeLookup(namespace ~ '.postFiles', {folderId: folder.id}) }}" method="post">
