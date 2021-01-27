@@ -566,7 +566,7 @@
                 
                 //if the file was attached using 'Upload file(s)' it's been uploaded, 
                 //so we can display the image in the drop zone when we return to the page
-                let getExistingFileUrl = () => {
+                let getExistingFileUrl = function () {
                     if (list[i].file && list[i].file.imageUrl) { //this file prop is set within templates/core/resources/filesystem/upload.html - onQueueComplete()
                         return list[i].file.imageUrl;
                     } else { //otherwise we'll just show the file type image
@@ -575,7 +575,7 @@
                 }
                 
                 //once the files displayed, ensure the drop zone window and progress view are hidden depending on max uploads
-                let onExistingFileDisplayed = () => {
+                let onExistingFileDisplayed = function () {
                     let elementDOM = $(this.element)[0];
                     if (elementDOM.id === 'cover-photo-zone') {
                         elementDOM.querySelector('.az-list').style.display = 'none';
