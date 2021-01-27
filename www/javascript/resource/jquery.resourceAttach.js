@@ -440,6 +440,7 @@
                 });
 
                 // Trigger attachzone success event
+                
                 $(self.element).trigger('success.attachzone', [message]);
             }
         });
@@ -577,7 +578,6 @@
                 //once the files displayed, ensure the drop zone window and progress view are hidden depending on max uploads
                 let onExistingFileDisplayed = function () {
                     let elementDOM = $(self.element)[0];
-                    debugger;
                     if (elementDOM.id === 'cover-photo-zone') {
                         elementDOM.querySelector('.az-list').style.display = 'none';
                     } else {

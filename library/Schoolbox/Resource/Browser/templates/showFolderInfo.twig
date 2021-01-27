@@ -73,6 +73,7 @@
                                 $uploadButton.removeClass('hide').prop('disabled', false);
                             }
                             if (dropzone.getAcceptedFiles().length === 0) {
+                                debugger;
                                 $uploadButton.addClass('hide').prop('disabled', true);
                             }
                         };
