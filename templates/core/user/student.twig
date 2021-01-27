@@ -506,7 +506,7 @@
                      # Don't try to preselect any tabs, because you might not be here for the tabs
                      #}
                     default:
-                        $('[data-tab] a[href=#tab-activity]').trigger('click');
+                        $('[data-tab] a').first().trigger('click');
                         break;
                 }
             });
