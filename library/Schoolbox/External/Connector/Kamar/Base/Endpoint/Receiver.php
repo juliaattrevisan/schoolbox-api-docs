@@ -145,11 +145,10 @@ XML;
      */
     private function checkAuthorization(): void
     {
-        $headers = getallheaders();
 
         /* Authorization header might not exist
          */
-        $authorizationString = $headers['Authorization'] ?? '';
+        $authorizationString = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 
         /* If the authorization string doesn't match our expected value,
          * then the request is invalid; reject it and end
