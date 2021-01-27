@@ -576,11 +576,12 @@
                 
                 //once the files displayed, ensure the drop zone window and progress view are hidden depending on max uploads
                 let onExistingFileDisplayed = function () {
-                    let elementDOM = $(this.element)[0];
+                    let elementDOM = $(self.element)[0];
+                    debugger;
                     if (elementDOM.id === 'cover-photo-zone') {
                         elementDOM.querySelector('.az-list').style.display = 'none';
                     } else {
-                        if (this.dropzone.options.maxFiles === 1) {
+                        if (self.dropzone.options.maxFiles === 1) {
                             elementDOM.classList.add('dz-max-files-reached');
                         }
                     }
