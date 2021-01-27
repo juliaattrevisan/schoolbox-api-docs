@@ -102,7 +102,7 @@ class Receiver
 <SMSDirectoryData>
         <error>401</error>
         <result>No Data</result>
-        <service>Example</service>
+        <service>Schoolbox</service>
         <version>1.0</version>
         <status>Ready</status>
 </SMSDirectoryData>
@@ -160,7 +160,7 @@ XML;
 <SMSDirectoryData>
         <error>403</error>
         <result>Authentication Failed</result>
-        <service>Example</service>
+        <service>Schoolbox</service>
         <version>1.0</version>
 </SMSDirectoryData>
 XML;
@@ -184,7 +184,7 @@ XML;
 <SMSDirectoryData>
     <error>0</error>
     <result>OK</result>
-    <service>Example</service>
+    <service>Schoolbox</service>
     <version>1.0</version>
     <status>Ready</status>
     <infourl>https://www.schoolbox.com.au</infourl>
@@ -291,7 +291,7 @@ XML;
 <SMSDirectoryData>
         <error>0</error>
         <result>OK</result>
-        <service>Example</service>
+        <service>Schoolbox</service>
         <version>1.0</version>
         <status>Ready</status>
         <options>
