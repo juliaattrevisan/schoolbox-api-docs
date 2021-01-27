@@ -27,6 +27,10 @@ class Receiver
     public const XML_FULL = 'full';
     public const XML_STUDENTTIMETABLES = 'studenttimetables';
 
+    /**
+     * Check request string, contained in the @sync attribute of SMSDirectoryData
+     */
+    private const XML_CHECK = 'check';
 
     /**
      * @var string
@@ -61,6 +65,11 @@ class Receiver
     public function receive(string $data): void
     {
         if ('' === $data) {
+
+            /* $data is what the kamar instance sent us
+             *
+             * if $data is empty, send a No Data response payload
+             */
             $string = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <SMSDirectoryData>
@@ -74,22 +83,90 @@ XML;
 
             echo (new SimpleXMLElement($string))->asXML();
         } else {
-            $this->process($data);
+
+            $xml = new SimpleXMLElement($data);
+
+            /* The value of @sync attribute in SMSDirectoryData
+             */
+            $syncVal = (string)$xml->xpath('/SMSDirectoryData/@sync')[0];
+
+            if (self::XML_CHECK === $syncVal) {
+
+                /* If $data contains the sync:check attribute in the SMSDirectoryData node
+                 * then it's a check request for when a Kamar instance is enabled (or re-enabeld)
+                 * We need to treat it specially
+                 */
+                $this->processCheck($data);
+
+            } else {
+
+                /* Otherwise presume it's one of the normal data payloads and save it
+                 * to a local xml for later processing
+                 */
+                $this->process($data);
+            }
         }
+    }
 
-        /* $data is what the kamar instance sent us
-         *
-         * if $data is empty, send a No Data response payload
-         */
 
-        /* If $data contains the sync:check attribute in the SMSDirectoryData node
-         * then it's a check request for when a Kamar instance is enabled (or re-enabeld)
-         * We need to treat it specially
-         */
+    /**
+     * Kamar was enabled for the first time,
+     * or re-enabled after being deactivated
+     *
+     * We need to re-confirm that we're who we say we are
+     *
+     * @param string $data
+     */
+    private function processCheck(string $data): void
+    {
+        $string = <<<XML
+<SMSDirectoryData>
+    <error>0</error>
+    <result>OK</result>
+    <service>Example</service>
+    <version>1.0</version>
+    <status>Ready</status>
+    <infourl>https://www.schoolbox.com.au</infourl>
+    <privacystatement>data privacy statement</privacystatement>
+    <options>
+        <ics>false</ics>
+        <students>
+            <details>true</details>
+            <passwords>false</passwords>
+            <photos>false</photos>
+            <groups>true</groups>
+            <awards>false</awards>
+            <timetables>true</timetables>
+            <attendance>false</attendance>
+            <assessments>false</assessments>
+            <pastoral>false</pastoral>
+            <learningsupport>true</learningsupport>
+            <fields>
+                <required>nsn;firstname;lastname;siblinglink;caregivers;caregivers1;caregivers2;caregivers3;caregivers4;caregiver.name;caregiver.relationship;caregiver.mobile;caregiver.email</required>
+                <optional>uniqueid;genderpreferred;boarder;datebirth;yearlevel;house;startingdate;leavingdate;mobile;tutor;esol;flags;flag.conditions;flag.specialneeds;flag.notes</optional>
+            </fields>
+        </students>
+        <staff>
+            <details>true</details>
+            <passwords>false</passwords>
+            <photos>true</photos>
+            <timetables>true</timetables>
+            <fields>
+                <required>firstname;lastname</required>
+                <optional>classification;email;extension;position;title;groups;groups.departments</optional>
+            </fields>
+        </staff>
+        <common>
+            <subjects>true</subjects>
+            <notices>false</notices>
+            <calendar>false</calendar>
+            <bookings>false</bookings>
+        </common>
+    </options>
+</SMSDirectoryData>
+XML;
 
-        /* Otherwise presume it's one of the normal data payloads and save it
-         * to a local xml for later processing
-         */
+        echo (new SimpleXMLElement($string))->asXML();
     }
 
 
