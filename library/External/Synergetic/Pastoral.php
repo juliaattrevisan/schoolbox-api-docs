@@ -629,11 +629,39 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         }
 
         try {
-            if ($this->connector->executeQuery($query, $this->getQueryParameters($pastoral))) {
+            $params = $this->getQueryParameters($pastoral);
+            if ($this->connector->executeQuery($query, $params)) {
                 // If this is a new record we need to store the ID of the newly created Synergetic record
 
                 if (empty($pastoral->getExternalId())) {
-                    $pastoral->setExternalId($this->connector->lastInsertId());
+                    // gets pastoralCareSeq for the inserted record, and set it to SB pastoral table
+                    // lastInsertId() does not work because of DB trigger attached to this table
+                    $pastoralCareSeq = $this->connector->executeQuery(
+                        "SELECT PastoralCareSeq FROM tPastoralCare
+                         WHERE
+                            ID = :studentExternalId AND
+                            ItemDate = :itemDate AND
+                            TypeCode = :pastoralTypeCode AND
+                            CategoryCode = :pastoralSubTypeCode AND
+                            CreatedDate = :createdDate AND
+                            CreatedById = :createdOwnerId AND
+                            ClassificationCode = :classificationCode",
+                        [
+                            $params['studentExternalId'],
+                            $params['itemDate'],
+                            $params['pastoralTypeCode'],
+                            $params['pastoralSubTypeCode'],
+                            $params['createdDate'],
+                            $params['createdOwnerId'],
+                            $params['classificationCode'],
+                        ]
+                    )->fetchColumn();
+
+                    if (!$pastoralCareSeq) {
+                        throw new ExternalException('Failed to get pastoralCareSeq for pastoral: ' . $pastoral->getId());
+                    }
+
+                    $pastoral->setExternalId($pastoralCareSeq);
 
                     // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
                     // notification every time someone creates a pastoral record
@@ -819,7 +847,24 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 'modifiedDate' => $comment->getCreatedAt()->getDatabase(),
                 'modifiedOwnerId' => $comment->getOwner()->getExternalId(),
             ]);
-            $comment->setExternalCode($this->connector->lastInsertId());
+
+            // gets PastoralCareCommentsSeq for the inserted record and set it to SB pastoral_comment table
+            // lastInsertId() does not work because of DB trigger attached to this table
+            $pastoralCareCommentsSeq = $this->connector->executeQuery(
+                "SELECT PastoralCareCommentsSeq
+                 FROM PastoralCareComments
+                 WHERE
+                    PastoralCareSeq = :externalId AND
+                    CreatedDate = :createdDate AND
+                    CreatedById = :createdOwnerId",
+                [
+                    'externalId'     => $pastoral->getExternalId(),
+                    'createdDate'    => $comment->getCreatedAt()->getDatabase(),
+                    'createdOwnerId' => $comment->getOwner()->getExternalId(),
+                ]
+            )->fetchColumn();
+
+            $comment->setExternalCode($pastoralCareCommentsSeq);
 
             // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
             // notification every time someone creates a pastoral record
@@ -976,7 +1021,29 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             throw new ExternalException('Error uploading pastoral document to Synergetic database.');
         }
 
-        $documentReferencesSeq = $this->connector->lastInsertId();
+        // gets tDocumentsSeq for the inserted record
+        // lastInsertId() does not work because of DB trigger attached to this table
+        $documentReferencesSeq = $this->connector->executeQuery(
+            "SELECT tDocumentsSeq FROM media.tDocuments WHERE
+                Description = :filename AND
+                ClassificationCode = :classificationCode AND
+                DocumentCreatedByID = :createdById AND
+                DocumentCreatedDate = :createdDate AND
+                SourceDate = :sourceDate AND
+                DocumentType = :documentType",
+            [
+                'filename'           => ['value' => $storage->getFilename()],
+                'classificationCode' => ['value' => $classificationCode],
+                'createdById'        => ['value' => $externalId],
+                'createdDate'        => ['value' => $date],
+                'sourceDate'         => ['value' => $sourceDate],
+                'documentType'       => ['value' => $extension],
+            ]
+        )->fetchColumn();
+
+        if (empty($documentReferencesSeq)) {
+            throw new ExternalException('Error linking pastoral document to record in Synergetic database.');
+        }
 
         // Add a document reference to the student so it shows up on their normal community record
         $query = $this->connector->prepareQuery(
