@@ -73,7 +73,7 @@ class Receiver
          * This is stored in the SUDS School Data Endpoint Key field as a colon-separated tuple:
          * e.g. "schoolbox:schoolboxkamar"
          */
-        $this->expectedAuthorization = base64_encode($apiKey);
+        $this->expectedAuthorization = 'Basic ' . base64_encode($apiKey);
     }
 
 
@@ -180,6 +180,7 @@ XML;
     private function processCheck(): void
     {
         $string = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
 <SMSDirectoryData>
     <error>0</error>
     <result>OK</result>
@@ -189,7 +190,6 @@ XML;
     <infourl>https://www.schoolbox.com.au</infourl>
     <privacystatement>For more information about Schoolbox privacy policy please refer to https://schoolbox.com.au/legal</privacystatement>
     <options>
-        <ics>false</ics>
         <students>
             <details>true</details>
             <passwords>false</passwords>
@@ -227,6 +227,7 @@ XML;
 XML;
 
         echo (new SimpleXMLElement($string))->asXML();
+        exit();
     }
 
 
@@ -310,5 +311,6 @@ XML;
 XML;
 
         echo (new SimpleXMLElement($string))->asXML();
+        exit();
     }
 }

@@ -45,7 +45,7 @@ class Alaress_Log_File {
 		print_r($data);
 		$x = ob_get_contents();
 		fputs($filepointer, "\n---------------------------------------------------------------\n\n", 8192);
-		fputs($filepointer, date('Y-m-d H:i:s') . '    ' . $this->getPrefiX() . ': ' . $x . "\n\n", 16003840);
+		fputs($filepointer, date('Y-m-d H:i:s') . '    ' . $this->getPrefix() . ': ' . $x . "\n\n", 16003840);
 		ob_end_clean();
 		fclose($filepointer);
 	}
