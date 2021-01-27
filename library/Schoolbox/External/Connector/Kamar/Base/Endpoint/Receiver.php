@@ -60,7 +60,7 @@ class Receiver
      *
      * @var string
      */
-    private string $expectedAuthorization;
+    private $expectedAuthorization;
 
 
     /**
