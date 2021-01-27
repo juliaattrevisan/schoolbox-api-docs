@@ -31,9 +31,10 @@ class Receiver
     /**
      * Authorization header pieces
      * These should be sent in the headers of every message Kamar sends to us
+     * Passwords need to be at least 6 chars long sigh
      */
     private const USERNAME = 'schoolbox';
-    private const PASSWORD = 'kamar';
+    private const PASSWORD = 'schoolboxkamar';
 
 
     /**
