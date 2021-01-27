@@ -10,9 +10,9 @@ INSERT INTO component_definition (
     msg_namespace_slug_suffix,
     config_copy
 ) VALUES (
-             'Geoshapshot',
+             'GeoSnapShot',
              'Schoolbox\\Geosnapshot\\Component\\Dashboard\\Controller',
-             'Displays a Geosnapshot event gallery on your dashboard, ensure you have configured your Geosnapshot school code before using this component.',
+             'Displays a GeoSnapShot event gallery on your dashboard, ensure you have configured your GeoSnapShot school code before using this component.',
              'dashboard',
              null,
              'true',
@@ -26,8 +26,8 @@ INSERT INTO config(name, value, title, description, field_id, options, type_id, 
 VALUES (
            'geosnapshot_school_code',
            '',
-           'Geosnapshot Organisation Code',
-           'Input your Geosnapshot organisation code to allow integrations with Geosnapshot to be linked with your school',
+           'GeoSnapShot Organisation Code',
+           'Input your GeoSnapShot organisation code to allow integrations with GeoSnapShot to be linked with your school',
            (SELECT id FROM lu_config_field WHERE field = 'input'),
            '',
            (SELECT id FROM lu_config_type WHERE `type` = '3rd Party Services'),
