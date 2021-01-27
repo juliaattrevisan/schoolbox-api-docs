@@ -20,7 +20,6 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Registry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\Mapper\Exception;
 use SimpleXMLElement;

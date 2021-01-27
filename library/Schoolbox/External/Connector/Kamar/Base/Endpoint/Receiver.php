@@ -64,11 +64,12 @@ class Receiver
      */
     public function receive(string $data): void
     {
+
+        /* $data is what the kamar instance sent us
+         */
         if ('' === $data) {
 
-            /* $data is what the kamar instance sent us
-             *
-             * if $data is empty, send a No Data response payload
+            /* if $data is empty, send a No Data response payload
              */
             $string = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
