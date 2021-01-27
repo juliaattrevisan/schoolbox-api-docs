@@ -188,7 +188,7 @@ XML;
     <version>1.0</version>
     <status>Ready</status>
     <infourl>https://www.schoolbox.com.au</infourl>
-    <privacystatement>data privacy statement</privacystatement>
+    <privacystatement>For more information about Schoolbox privacy policy please refer to https://schoolbox.com.au/legal</privacystatement>
     <options>
         <ics>false</ics>
         <students>
