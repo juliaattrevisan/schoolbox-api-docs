@@ -41,9 +41,6 @@ config:
   #Learning Moments
   evidence_parent_create: {hide: false}
 
-  #Badges
-  allow_as_goal: {hide: false}
-
   #LMS
   grade_comments_enable: {hide: false}
   custom_assessment_participation: {hide: false}
