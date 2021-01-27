@@ -398,8 +398,6 @@
                 }"
                 @dateSelected="onQuickSwitch"
         />
-
-        <toast ref="toast"></toast>
     </div>
 </template>
 
