@@ -26,6 +26,11 @@ $setup->import();
 
 $cacheDir = $setup->getCacheDir();
 
+/* Authentication
+ * A username/password tuple, colon separated
+ */
+$apiKey = Loader::getInstance()->get('schooldata_import_endpoint_key');
+
 /* Testing independently of a Kamar push
  *
  * You can test Receiver's processing by loading from a local xml
@@ -34,6 +39,6 @@ $cacheDir = $setup->getCacheDir();
  * Or you can do it via the cli:
  * clear;curl --data-binary "@/vagrant/tools/synchronise/temp.xml" -k https://vagrant.dev.schoolbox.cloud/api/kamar.php
  */
-(new Receiver($cacheDir))->receive((string)$data);
+(new Receiver($cacheDir, $apiKey))->receive((string)$data);
 
 exit();

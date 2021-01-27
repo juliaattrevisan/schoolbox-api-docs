@@ -29,15 +29,6 @@ class Receiver
 
 
     /**
-     * Authorization header pieces
-     * These should be sent in the headers of every message Kamar sends to us
-     * Passwords need to be at least 6 chars long sigh
-     */
-    private const USERNAME = 'schoolbox';
-    private const PASSWORD = 'schoolboxkamar';
-
-
-    /**
      * Check request string, contained in the @sync attribute of SMSDirectoryData
      */
     private const XML_CHECK = 'check';
@@ -68,13 +59,21 @@ class Receiver
      * Receiver constructor.
      *
      * @param string $dir
+     * @param string $apiKey
      */
-    public function __construct(string $dir)
+    public function __construct(string $dir, string $apiKey)
     {
         $this->dir = $dir;
         $this->suffix = '_' . date('YmdHis') . uniqid('_', true) . '.xml';
 
-        $this->expectedAuthorization = 'Basic ' . base64_encode(self::USERNAME . ':' . self::PASSWORD);
+        /* Authorization header pieces
+         * These should be sent in the headers of every message Kamar sends to us
+         * Passwords need to be at least 6 chars long sigh
+         *
+         * This is stored in the SUDS School Data Endpoint Key field as a colon-separated tuple:
+         * e.g. "schoolbox:schoolboxkamar"
+         */
+        $this->expectedAuthorization = 'Basic ' . base64_encode($apiKey);
     }
 
 
