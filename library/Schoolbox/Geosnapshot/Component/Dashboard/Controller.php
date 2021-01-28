@@ -27,7 +27,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute(): bool
     {
-        return $this->getConfig('geosnapshot_school_code') !== '';
+        return true;
     }
 
 
