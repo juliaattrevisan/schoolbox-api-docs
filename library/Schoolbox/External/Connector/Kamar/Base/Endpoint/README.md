@@ -35,9 +35,9 @@ Import it via `Timetable Structure`. This sets up the Cycles for you.
 Visit https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport and set the `Data Source` to `Kamar`. Set up the `School Data Endpoint Host` and `School Data Endpoint Key` accordingly:
 
 * Endpoint Host: `/vagrant/data/cache/stream/kamar`
-* Endpoint Key: `test`
+* Endpoint Key: `schoolbox:schoolboxkamar`
 
-The Key isn't used yet, so you can just dump any text string in there for now.
+The Endpoint Key is a colon-separated username/password tuple. Kamar instance sends it and is supposed to match something we're expecting; if it doesn't match, we can reject data.
 
 ## 3. Importing
 

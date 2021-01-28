@@ -8,10 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 
-use InvalidArgumentException;
 use Iterator;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile\Registry;
 use SimpleXMLElement;
 
