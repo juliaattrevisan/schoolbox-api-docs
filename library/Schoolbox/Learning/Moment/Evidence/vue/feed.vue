@@ -246,7 +246,7 @@ export default {
                   </template>
                   <template v-if="config.routes.getSetAsGoalForSelfForm">
                     <a :href="config.routes.getSetAsGoalForSelfForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
-                       title="Set goals" class="goals icon-goal"><span>Set Goals</span></a>
+                       title="Set goals" class="goals icon-goal"><span>Set My Goals</span></a>
                   </template>
                   <template v-if="config.routes.getAwardAsAchievementForm">
                     <a :href="config.routes.getAwardAsAchievementForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
