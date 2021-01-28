@@ -314,8 +314,6 @@ class Controller extends BaseController
             Page\Model::PAGE_UPCOMING_ASSESSMENTS => "Upcoming Due Work", // intentionally not localised.
             Page\Model::PAGE_ASSESSMENT_CALENDAR  => "{$assessmentLocalised} Calendar",
             Page\Model::PAGE_BADGE_LIST           => "Badge List",
-            Page\Model::PAGE_BADGE_ALLOW_AS_GOAL  => "Badge Goal List",
-
         ];
     }
 }
