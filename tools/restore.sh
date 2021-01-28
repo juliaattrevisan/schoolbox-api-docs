@@ -36,6 +36,7 @@ readonly PRESERVED_CONFIG=(
 );
 # Associative array of config to preserve during restoration. Maps config_name to config_value.
 declare -A sql_config=();
+declare alaress_password;
 
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};
@@ -101,6 +102,11 @@ readsqlconfig() {
     fi
     sql_config[$config_name]="$config_value"
   done
+  sql_command="SELECT password FROM user WHERE username = 'alaress' AND deleted_at IS NULL"
+  if ! alaress_password=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command" 2>/dev/null); then
+    echo "Unable to fetch alaress password'" >&2
+    exit 1
+  fi
 }
 
 setsqlconfig() {
@@ -111,6 +117,11 @@ setsqlconfig() {
       echo "Unable to set value for config '$config_name' to '${sql_config[$config_name]}'" >&2
     fi
   done
+  sql_command="UPDATE user SET password = '$alaress_password' WHERE username = 'alaress' AND deleted_at IS NULL"
+  if ! mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command"; then
+    echo "Unable to set alaress_password'" >&2
+  fi
+
 }
 
 truncateTables() {
