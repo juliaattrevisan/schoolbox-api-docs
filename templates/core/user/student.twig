@@ -52,7 +52,6 @@
 %}
 {% set showSubjects = showDetails and subjects is not empty %}
 {% set showGroups = showDetails and groups is not empty %}
-{% set showClasses = showClasses and showDetails %}
 {% set showTitle = user.hasPositionTitle() %}
 
 {% set showActivityFeed = (config.learning_moments_enabled or config.badges_enabled) and (isStaff or isSelf or isParentOfStudent) %}
@@ -538,7 +537,7 @@
             {
                 label: 'Classes',
                 anchor: 'tab-classes',
-                visible: showClasses
+                visible: showClasses and showSubjects
             },
             {
                 label: 'Groups',
@@ -656,10 +655,9 @@
             {% endautoescape %}
             <script type="text/javascript" src="/javascript/components/userProfileFeeds.bundle.js"></script>
 
-            {% if showClasses %}
+            {% if showClasses and showSubjects %}
             <div class="content no-pad {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
                 <section>
-                    {% if showSubjects %}
                     {% for group, subjectGroup in subjects %}
                     {# Keep a running total of all teachers emails in this group #}
                     {% set teacherEmails = [] %}
@@ -765,7 +763,6 @@
                         {% endfor %}
                     </section>
                     {% endfor %}
-                    {% endif %}
                 </section>
             </div>
             {% endif %}

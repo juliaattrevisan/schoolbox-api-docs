@@ -494,6 +494,12 @@ function renderStudent(
     // Get the data from Verso API.
     $travelLogs = $travelLogRenderer->render($page->getTwig(), $user->getExternalId(), true);
 
+    /* For a student's classes tiles to be visible, they must pass the sis
+     * checks determined by $showDetails and their timetable must be visible
+     * via the Hide Timetable checkbox in their Modify User screen
+     */
+    $showClasses = $showDetails && !$student->getHideTimetable();
+
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
@@ -505,7 +511,7 @@ function renderStudent(
                 'showPastoral'       => $showPastoral,
                 'eportfolioAuth'     => $authenticator->canView(),
                 'hideContacts'       => $hideContacts,
-                'showClasses'        => $student->getHideTimetable() ? 0 : 1,
+                'showClasses'        => $showClasses,
                 'now'                => Alaress_Date_Format::now(),
                 'boarderType'        => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
                 'contacts'           => $contacts,
