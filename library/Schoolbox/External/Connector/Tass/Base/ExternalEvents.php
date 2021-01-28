@@ -149,8 +149,9 @@ class ExternalEvents extends Base implements IExternalEvents
             $end,
             null,
             $user->getExternalId(),
-            $paramSuffix++
+            $paramSuffix
         );
+        $paramSuffix++;
 
         /* Get role-specific set of events
          */
@@ -163,7 +164,7 @@ class ExternalEvents extends Base implements IExternalEvents
                     $end,
                     self::STUDENT_PRODUCT_CODE,
                     null,
-                    $paramSuffix++
+                    $paramSuffix
                 )
             );
         } elseif ($user->getRole()->isStaff()) {
@@ -175,7 +176,7 @@ class ExternalEvents extends Base implements IExternalEvents
                     $end,
                     self::STAFF_PRODUCT_CODE,
                     null,
-                    $paramSuffix++
+                    $paramSuffix
                 )
             );
         } elseif ($user->getRole()->isParent()) {
@@ -187,10 +188,11 @@ class ExternalEvents extends Base implements IExternalEvents
                     $end,
                     self::PARENT_PRODUCT_CODE,
                     null,
-                    $paramSuffix++
+                    $paramSuffix
                 )
             );
         }
+        $paramSuffix++;
 
         $allEvents[] = $this->buildQueryForProductCode(self::PUBLIC_PRODUCT_CODE, $paramSuffix);
         $params      = array_merge(
