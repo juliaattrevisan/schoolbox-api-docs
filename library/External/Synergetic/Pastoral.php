@@ -647,7 +647,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             CategoryCode = :pastoralSubTypeCode AND
                             CreatedDate = :createdDate AND
                             CreatedById = :createdOwnerId AND
-                            ClassificationCode = :classificationCode",
+                            ClassificationCode = :classificationCode
+                        ORDER BY PastoralCareSeq DESC",
                         [
                             $params['studentExternalId'],
                             $params['itemDate'],
@@ -862,7 +863,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                  WHERE
                     PastoralCareSeq = :externalId AND
                     CreatedDate = :createdDate AND
-                    CreatedById = :createdOwnerId",
+                    CreatedById = :createdOwnerId
+                ORDER BY PastoralCareCommentsSeq DESC",
                 [
                     'externalId'     => $pastoral->getExternalId(),
                     'createdDate'    => $comment->getCreatedAt()->getDatabase(),
@@ -1041,7 +1043,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 DocumentCreatedByID = :createdById AND
                 DocumentCreatedDate = :createdDate AND
                 SourceDate = :sourceDate AND
-                DocumentType = :documentType",
+                DocumentType = :documentType
+                ORDER BY tDocumentsSeq DESC",
                 [
                     'filename'           => ['value' => $storage->getFilename()],
                     'classificationCode' => ['value' => $classificationCode],
