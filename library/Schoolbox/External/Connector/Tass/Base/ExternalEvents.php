@@ -136,7 +136,7 @@ class ExternalEvents extends Base implements IExternalEvents
     public function getExternalEvents(User $user, $startDate, $endDate)
     {
         $start = new Alaress_Date_Format($startDate, Alaress_Date_Format::TIMESTAMP);
-        $end = new Alaress_Date_Format($endDate, Alaress_Date_Format::TIMESTAMP);
+        $end   = new Alaress_Date_Format($endDate, Alaress_Date_Format::TIMESTAMP);
 
         /* Get personal events for $user - it doesn't matter which role this user is
          */
@@ -227,8 +227,8 @@ class ExternalEvents extends Base implements IExternalEvents
         int $paramSuffix
     ): array {
         $params = [
-            "startTime{$paramSuffix}"  => $start->getDatabase(),
-            "endTime{$paramSuffix}"    => $end->getDatabase(),
+            "startTime{$paramSuffix}" => $start->getDatabase(),
+            "endTime{$paramSuffix}"   => $end->getDatabase(),
         ];
         if (isset($productCode)) {
             $params["productCode{$paramSuffix}"] = $productCode;
