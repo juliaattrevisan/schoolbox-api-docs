@@ -644,8 +644,9 @@ ul.az-error-list {
     filter: none;
     height: 100%;
     width: 100%;
-    display: table;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .dz-preview,
@@ -801,7 +802,7 @@ ul.az-error-list {
   z-index: 500;
 }
 
-.dz-default.dz-message span {
+.dz-default.dz-message {
   color: $attachzone-resting-color;
   font-weight: $body-font-weight;
   width: 100%;
