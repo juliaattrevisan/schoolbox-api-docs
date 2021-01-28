@@ -414,7 +414,9 @@ ul.tileList {
             @media #{$large-up}    { right: 2rem; }
 
             .dzone:before {
-                top: 0;
+                padding: 0;
+                top: 6px;
+                left: 6px;
             }
         }
     }
