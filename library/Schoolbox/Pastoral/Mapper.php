@@ -145,6 +145,7 @@ class Mapper extends BaseMapper
         return "
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('student', 's')},
+                        {$this->getJoinColumnString('student.year', 'sy')},
                         {$this->getJoinColumnString('severity', 'sv')},
                         {$this->getJoinColumnString('owner', 'o')},
                         {$this->getJoinColumnString('type', 't')},
@@ -161,6 +162,7 @@ class Mapper extends BaseMapper
         return "
             FROM        {$this->getTable()}
             INNER JOIN   {$this->getJoinSql('student', '', 's')}
+            LEFT  JOIN   {$this->getJoinSql('student.year', 's', 'sy')}
             LEFT  JOIN   {$this->getJoinSql('severity', '', 'sv', true)}
             INNER JOIN   {$this->getJoinSql('owner', '', 'o', true)}
             LEFT JOIN    {$this->getJoinSql('modifiedBy', '', 'mb', true)}
@@ -238,6 +240,10 @@ class Mapper extends BaseMapper
         $model->setOwner($ownerMapper->hydrate($row, 'o'));
         $model->setModifiedBy($modifiedByMapper->hydrate($row, 'mb'));
         $model->setStudent($studentMapper->hydrate($row, 's')->loadParents()->loadTeachers());
+        $studentYear = $this->hydrateJoin($row, 'student.year', 'sy');
+        if ($studentYear) {
+            $model->getStudent()->setYear($studentYear);
+        }
         $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_id', $model->getId()));
 
         if ($this->getConfigLoader()->get('pastoral_severity')) {
@@ -839,7 +845,7 @@ class Mapper extends BaseMapper
                     $orderParts[] = "`pastoral`.points";
                     break;
                 case 'year':
-                    $orderParts[] = "`s`.year_id";
+                    $orderParts[] = "`sy`.sequence asc";
                     break;
                 case 'author':
                     $orderParts[] = "`o`.lastname, `o`.firstname";
