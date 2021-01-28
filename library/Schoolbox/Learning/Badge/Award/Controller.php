@@ -114,8 +114,7 @@ class Controller extends Base
         $this->getAwardBadgeForm(
             $users,
             '@learningBadgeAward/awardAsAchievementForm.twig',
-            'Award Achievements',
-            Filter\Page\Model::PAGE_BADGE_LIST
+            'Award Achievements'
         );
     }
 
@@ -155,8 +154,7 @@ class Controller extends Base
         $this->getAwardBadgeForm(
             $users,
             '@learningBadgeAward/setAsGoalForm.twig',
-            'Set Goals',
-            Filter\Page\Model::PAGE_BADGE_ALLOW_AS_GOAL
+            'Set Goals'
         );
     }
 
@@ -172,8 +170,7 @@ class Controller extends Base
         $this->getAwardBadgeForm(
             new GenericCollection(User::class),
             '@learningBadgeAward/setAsGoalForSelfForm.twig',
-            'Set Goals',
-            Filter\Page\Model::PAGE_BADGE_ALLOW_AS_GOAL
+            'Set Goals'
         );
     }
 
@@ -185,16 +182,16 @@ class Controller extends Base
      * @param GenericCollection|User[] $users
      * @param string                   $template The template to display
      * @param string                   $title    The title of this page
-     * @param string                   $page
      */
-    private function getAwardBadgeForm(GenericCollection $users, string $template, string $title, string $page): void
+    private function getAwardBadgeForm(GenericCollection $users, string $template, string $title): void
     {
         $filterPanel = $this->filterFactoryFactory->buildPanel(
             $this->getUser(),
-            $page,
+            Filter\Page\Model::PAGE_BADGE_LIST,
             null,
             $this->getUser(),
-            []
+            [],
+            $this->request->query->getArrayCopy(),
         );
 
         // Segment users into users which are and are not this user

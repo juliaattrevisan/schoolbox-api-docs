@@ -31,7 +31,6 @@ class Model
     public const PAGE_UPCOMING_ASSESSMENTS = 'dueWorkCal';
     public const PAGE_ASSESSMENT_CALENDAR = 'assessmentCal';
     public const PAGE_BADGE_LIST          = 'badgeList';
-    public const PAGE_BADGE_ALLOW_AS_GOAL   = 'badgeListSetAsGoal';
 
 
     /**
@@ -111,11 +110,6 @@ class Model
                 Role::STAFF,
             ],
             self::PAGE_BADGE_LIST => [
-                Role::STAFF,
-                Role::PARENT,
-                Role::STUDENT,
-            ],
-            self::PAGE_BADGE_ALLOW_AS_GOAL => [
                 Role::STAFF,
                 Role::PARENT,
                 Role::STUDENT,

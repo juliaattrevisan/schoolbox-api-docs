@@ -63,7 +63,6 @@ class Definition extends Filter\AbstractDefinition
     public static function getPages(IConfigLoader $configLoader): array
     {
         return [
-            Filter\Page\Model::PAGE_BADGE_ALLOW_AS_GOAL,
         ];
     }
 
@@ -80,6 +79,15 @@ class Definition extends Filter\AbstractDefinition
             return 'Not allowed';
         }
         throw new InvalidArgumentException("Unknown AllowAsGoal key: $key");
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public static function isMandatory(string $page): bool
+    {
+        return true;
     }
 
 
@@ -114,6 +122,6 @@ class Definition extends Filter\AbstractDefinition
      */
     protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
     {
-        return in_array($key, [self::KEY_ALLOWED], true);
+        return true;
     }
 }

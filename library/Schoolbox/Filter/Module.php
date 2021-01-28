@@ -50,7 +50,6 @@ class Module extends AlaressModule
                 case Page\Model::PAGE_UPCOMING_ASSESSMENTS:
                 case Page\Model::PAGE_ASSESSMENT_CALENDAR:
                 case Page\Model::PAGE_BADGE_LIST:
-                case Page\Model::PAGE_BADGE_ALLOW_AS_GOAL:
                     return ['factoryFactory' => $this->getInjector()->get('filters.factoryFactory')];
                 // Other entity types can have their factory factories registered here
             }

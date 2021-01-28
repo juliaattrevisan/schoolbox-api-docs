@@ -112,7 +112,8 @@ class Controller extends Base
      */
     public function getBadgeJsonList(): void
     {
-        $page = $this->request->query->get('sag') ? Filter\Page\Model::PAGE_BADGE_ALLOW_AS_GOAL : Filter\Page\Model::PAGE_BADGE_LIST;
+        $page = Filter\Page\Model::PAGE_BADGE_LIST;
+        $allowAsGoalOnly = $this->request->query->get('sag') ? true : false;
 
         // Boilerplate for getting a set of badges which match filter
         $qsFilters      = $this->request->query->get('filters', []);
@@ -120,6 +121,14 @@ class Controller extends Base
         $user           = $this->getUser();
         $userSelections = $codec->convertRequestToSelections($user, $page, $qsFilters);
         $filters        = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $user, $page);
+        if ($allowAsGoalOnly) {
+            $filters = \array_merge($filters, [
+                Filter\Filters\Badge\AllowAsGoal\Definition::class => [
+                    Filter\Filters\Badge\AllowAsGoal\Definition::KEY_ALLOWED => 1,
+                ],
+            ]);
+        }
+
         $idFinder       = Filter\Filters\Badge\IdFinder::getInstance($this->filterMapper, $this->mapper);
         $badgeIds       = $idFinder->findIdsByFilters($filters);
 

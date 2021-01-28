@@ -46,7 +46,6 @@ class Mapper extends \Schoolbox\Mapper
                 Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS,
                 Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR,
                 Filter\Page\Model::PAGE_BADGE_LIST,
-                Filter\Page\Model::PAGE_BADGE_ALLOW_AS_GOAL,
             ]
         );
         $this->uses('key', self::TYPE_STRING);
