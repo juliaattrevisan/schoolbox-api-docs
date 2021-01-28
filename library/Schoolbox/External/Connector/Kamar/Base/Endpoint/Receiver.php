@@ -202,7 +202,7 @@ XML;
             <pastoral>false</pastoral>
             <learningsupport>true</learningsupport>
             <fields>
-                <required>nsn;firstname;lastname;siblinglink;caregivers;caregivers1;caregivers2;caregivers3;caregivers4;caregiver.name;caregiver.relationship;caregiver.mobile;caregiver.email</required>
+                <required>nsn;firstname;lastname;username;siblinglink;caregivers;caregivers1;caregivers2;caregivers3;caregivers4;caregiver.name;caregiver.relationship;caregiver.mobile;caregiver.email</required>
                 <optional>uniqueid;genderpreferred;boarder;datebirth;yearlevel;house;startingdate;leavingdate;mobile;tutor;esol;flags;flag.conditions;flag.specialneeds;flag.notes</optional>
             </fields>
         </students>
@@ -212,7 +212,7 @@ XML;
             <photos>true</photos>
             <timetables>true</timetables>
             <fields>
-                <required>firstname;lastname</required>
+                <required>firstname;lastname;username</required>
                 <optional>classification;email;extension;position;title;groups;groups.departments</optional>
             </fields>
         </staff>
