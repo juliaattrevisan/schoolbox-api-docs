@@ -50,7 +50,7 @@
         <div id="{{ reportContentId }}">
             <badge-list-form get-badges-route="{{ routeLookup('learningBadge.getBadgeJsonList') ~ (allowAsGoalOnly ? '?sag=1' : '') }}"
                              get-badge-create-form-route="{{ routeLookupIfAuthorized('learningBadge.getCreateForm')
-                             ? routeLookupIfAuthorized('learningBadge.getCreateForm')~RETURN_URL.name~'='~RETURN_URL.current : null }}"
+                             ? routeLookupIfAuthorized('learningBadge.getCreateForm')~'?'~RETURN_URL.name~'='~RETURN_URL.current : null }}"
                              :users="{{ users | json_encode }}"
                              :award-to-self-only="Boolean('{{ awardToSelfOnly }}')"
                              post-award-route-lookup="{{ postAwardRouteLookup }}"

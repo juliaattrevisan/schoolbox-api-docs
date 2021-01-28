@@ -39,7 +39,7 @@
         <div id="{{ reportContentId }}">
             <badge-list get-badges-route="{{ routeLookup('learningBadge.getBadgeJsonList') }}"
                         get-badge-create-form-route="{{ routeLookupIfAuthorized('learningBadge.getCreateForm')
-                        ? routeLookupIfAuthorized('learningBadge.getCreateForm')~RETURN_URL.name~'='~RETURN_URL.current : null }}">
+                        ? routeLookupIfAuthorized('learningBadge.getCreateForm')~'?'~RETURN_URL.name~'='~RETURN_URL.current : null }}">
             </badge-list>
         </div>
         <script src="/javascript/components/badgeList.bundle.js"></script>

@@ -294,10 +294,7 @@ export default {
          * @return {Boolean}
          */
         isSelectedFiltersEmpty() {
-            let nonEmptyFilters = Object.entries(this.selectedFilters).filter(function ([k1, v1]) {
-                if ($('#filter_panel').find('[data-component='+k1+']').hasClass('hide')) {
-                  return false;
-                }
+            let nonEmptyFilters = Object.values(this.selectedFilters).filter(function (v1) {
                 if (v1 instanceof Object) {
                     // Each value in this object will be either a string 0 or 1:
                     // 1 if it is selected, 0 if it is not
