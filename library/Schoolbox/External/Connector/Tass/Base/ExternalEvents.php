@@ -43,7 +43,9 @@ class ExternalEvents extends Base implements IExternalEvents
      * Build a query to get events for a given $productCode
      * If $productCode is null, obtain personal events instead
      *
-     * @param null|string $productCode
+     * @param null|string $productCode If set, build a query for this product
+     *                                 code; otherwise, build a query for the
+     *                                 user's personal events
      * @param int         $paramSuffix A numeric suffix added to query params,
      *                                 required for disambiguating parameters
      * @return string
@@ -210,13 +212,15 @@ class ExternalEvents extends Base implements IExternalEvents
     }
 
     /**
-     * Builds the parameters for the product code queries.
+     * Builds the parameters for the query built by `buildQueryForProductCode`.
      *
-     * @param Alaress_Date_Format $start
-     * @param Alaress_Date_Format $end
-     * @param string|null         $productCode
-     * @param string|null         $externalId
-     * @param int                 $paramSuffix
+     * @param Alaress_Date_Format $start       Fetch all events after this date
+     * @param Alaress_Date_Format $end         Fetch all events before this date
+     * @param string|null         $productCode The product code, if set
+     * @param string|null         $externalId  The user's external ID, if set
+     * @param int                 $paramSuffix A numeric suffix added to query
+     *                                         params, required for
+     *                                         disambiguating parameters
      * @return array
      */
     private function buildQueryForProductCodeParams(
