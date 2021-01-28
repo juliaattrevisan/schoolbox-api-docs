@@ -50,8 +50,8 @@
     or showContactsAlert
     or showEmergencyContacts
 %}
-{% set showSubjects = showDetails %}
-{% set showGroups = showDetails %}
+{% set showSubjects = showDetails and subjects is not empty %}
+{% set showGroups = showDetails and groups is not empty %}
 {% set showClasses = showClasses and showDetails %}
 {% set showTitle = user.hasPositionTitle() %}
 
@@ -770,7 +770,7 @@
             </div>
             {% endif %}
 
-            {% if showGroups and groups is not empty %}
+            {% if showGroups %}
             <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
                 <section>
                     <h2 class="subheader content">Groups</h2>
