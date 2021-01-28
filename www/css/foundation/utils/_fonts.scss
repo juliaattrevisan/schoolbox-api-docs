@@ -346,6 +346,11 @@
     font-family: $font-family-icon;
 }
 
+.icon-geosnapshot:before {
+    content: "\e91e";
+    font-family: $font-family-icon;
+}
+
 .icon-goal:before {
     content: "\e919";
     font-family: $font-family-icon;
