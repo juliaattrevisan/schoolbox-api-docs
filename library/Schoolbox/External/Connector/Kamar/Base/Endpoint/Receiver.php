@@ -99,11 +99,11 @@ class Receiver
             $string = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <SMSDirectoryData>
-        <error>401</error>
-        <result>No Data</result>
-        <service>Schoolbox</service>
-        <version>1.0</version>
-        <status>Ready</status>
+    <error>401</error>
+    <result>No Data</result>
+    <service>Schoolbox</service>
+    <version>1.0</version>
+    <status>Ready</status>
 </SMSDirectoryData>
 XML;
 
@@ -157,10 +157,10 @@ XML;
             $string = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <SMSDirectoryData>
-        <error>403</error>
-        <result>Authentication Failed</result>
-        <service>Schoolbox</service>
-        <version>1.0</version>
+    <error>403</error>
+    <result>Authentication Failed</result>
+    <service>Schoolbox</service>
+    <version>1.0</version>
 </SMSDirectoryData>
 XML;
 
@@ -289,24 +289,24 @@ XML;
         $string = <<<XML
 <?xml version="1.0" encoding="UTF-8"?>
 <SMSDirectoryData>
-        <error>0</error>
-        <result>OK</result>
-        <service>Schoolbox</service>
-        <version>1.0</version>
-        <status>Ready</status>
-        <options>
-            <ics>false</ics>
-            <students>
-                <details>true</details>
-                <timetables>true</timetables>
-                <learningsupport>true</learningsupport>
-            </students>
-            <staff>
-                <details>true</details>
-                <photos>true</photos>
-                <timetables>true</timetables>
-            </staff>
-        </options>
+    <error>0</error>
+    <result>OK</result>
+    <service>Schoolbox</service>
+    <version>1.0</version>
+    <status>Ready</status>
+    <options>
+        <ics>false</ics>
+        <students>
+            <details>true</details>
+            <timetables>true</timetables>
+            <learningsupport>true</learningsupport>
+        </students>
+        <staff>
+            <details>true</details>
+            <photos>true</photos>
+            <timetables>true</timetables>
+        </staff>
+    </options>
 </SMSDirectoryData>
 XML;
 
