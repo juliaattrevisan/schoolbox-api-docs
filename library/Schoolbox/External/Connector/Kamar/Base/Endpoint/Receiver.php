@@ -202,8 +202,8 @@ XML;
             <pastoral>false</pastoral>
             <learningsupport>true</learningsupport>
             <fields>
-                <required>nsn;firstname;lastname;username;siblinglink;caregivers;caregivers1;caregivers2;caregivers3;caregivers4;caregiver.name;caregiver.relationship;caregiver.mobile;caregiver.email</required>
-                <optional>uniqueid;genderpreferred;boarder;datebirth;yearlevel;house;startingdate;leavingdate;mobile;tutor;esol;flags;flag.conditions;flag.specialneeds;flag.notes</optional>
+                <required>nsn;firstname;lastname;username;siblinglink</required>
+                <optional>uniqueid;emergency;emergency1;emergency2;emergency.name;emergency.relationship;emergency.mobile;genderpreferred;boarder;datebirth;yearlevel;house;startingdate;leavingdate;mobile;tutor;esol;flags;flag.conditions;flag.specialneeds;flag.notes;caregivers;caregivers1;caregivers2;caregivers3;caregivers4;caregiver.name;caregiver.relationship;caregiver.mobile;caregiver.email</optional>
             </fields>
         </students>
         <staff>
