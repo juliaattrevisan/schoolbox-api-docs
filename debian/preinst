@@ -20,7 +20,7 @@ case "$1" in
         fi
 
         # Temporary fix for moving symlinked conf file as part of 20.2 upgrade
-        if [[ -L /usr/share/schoolbox/www/conf ]]; then
+        if [ -L /usr/share/schoolbox/www/conf ]; then
             temp_file=$(mktemp)
             mv /usr/share/schoolbox/www/conf/conf.php "$temp_file"
             rm /usr/share/schoolbox/www/conf
