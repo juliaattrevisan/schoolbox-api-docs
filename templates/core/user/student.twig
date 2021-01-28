@@ -445,36 +445,6 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="small-12 island">
-        <section>
-            <div class="profile-learning-actions">
-                {% if shareLearningMomentUrl %}
-                    <a href="#" title="Share Learning" class="learning icon-share" data-reveal-id="shareLearningMoment"><span>Share Learning</span></a>
-                {% endif %}
-
-                {% set setAsGoalUrl = isCurrentUser
-                    ? routeLookupIfAuthorized('learningBadgeAward.getSetAsGoalForSelfForm')
-                    : routeLookupIfAuthorized(
-                        'learningBadgeAward.getSetAsGoalForm',
-                        {users: [user], userIds: user.id}
-                    )
-                %}
-                {% if setAsGoalUrl %}
-                    <a href="{{ setAsGoalUrl }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Set goals" class="goals icon-goal"><span>Set goals</span></a>
-                {% endif %}
-
-                {% set awardAsAchievementUrl = routeLookupIfAuthorized(
-                    'learningBadgeAward.getAwardAsAchievementForm',
-                    {users: [user], userIds: user.id}
-                ) %}
-                {% if awardAsAchievementUrl %}
-                    <a href="{{ awardAsAchievementUrl }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Award achievement" class="achievement icon-achievement"><span>Award achievement</span></a>
-                {% endif %}
-            </div>
-        </section>
-    </div>
-</div>
 
 {# Tabs #}
 <div class="row">
