@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TASS Scheduler Events related queries
  *
