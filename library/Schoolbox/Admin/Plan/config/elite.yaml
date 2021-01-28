@@ -38,6 +38,9 @@ config:
   boarder_dinner_end: {hide: false}
   boarder_leave_creation_threshold: {hide: false}
 
+  #Learning Moments
+  evidence_parent_create: {hide: false}
+
   #LMS
   grade_comments_enable: {hide: false}
   custom_assessment_participation: {hide: false}
@@ -81,7 +84,7 @@ config:
   messaging_enabled: { hide: false }
   push_notifications_enabled: { edit: true }
   ups_groups_enabled: { value: true, hide: true }
-  eportfolio_enabled: {edit: true}
+  eportfolio_enabled: { edit: true}
   staff_directory_enabled: {edit: true}
   report_staff_access : { hide : false }
   parent_directory_enabled: {edit: true}

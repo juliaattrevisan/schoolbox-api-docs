@@ -38,6 +38,9 @@ config:
   boarder_dinner_end: {hide: true}
   boarder_leave_creation_threshold: {hide: true}
 
+  #Learning Moments
+  evidence_parent_create: {hide: true}
+
   #LMS
   grade_comments_enable: {value: false, hide: true}
   custom_assessment_participation: {value: false, hide: true}
@@ -81,7 +84,7 @@ config:
   messaging_enabled: { hide: false }
   push_notifications_enabled: { edit: true }
   ups_groups_enabled: { value: true, hide: true }
-  eportfolio_enabled: {value: false, hide: true}
+  eportfolio_enabled: { value: false, edit: false}
   staff_directory_enabled: {value: false, edit: false}
   report_staff_access: {hide: true }
   parent_directory_enabled: {value: false, edit: false}
@@ -115,7 +118,7 @@ topMenu:
     - /pastoral
 components:
   hide:
-   - Schoolbox_Learning_Component_Dashboard_UpcomingWorkController
+   - Schoolbox\Learning\Component\Dashboard\UpcomingWorkController
    - Component_Dashboard_RecentSubmissionsController
    - Component_Homepage_ClickviewController
    - Schoolbox\Learning\Assessment\DueWork\Component\Homepage\Controller
@@ -132,3 +135,5 @@ components:
    - Schoolbox\Fixtures\Component\Homepage\Controller
    - Schoolbox\Fixtures\Component\Dashboard\Controller
    - Schoolbox\Learning\Assessment\Task\Component\Homepage\Controller
+   - Schoolbox\Learning\Moment\StudentToolkit\Component\Dashboard\Controller
+

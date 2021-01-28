@@ -16,7 +16,7 @@ config:
   webdav_enable: {edit: true}
 
   #Pastoral
-  external_pastoral: {value: false, edit: false}
+  external_pastoral: {value: false, hide: true}
   pastoral_external_delete: {hide: true}
   external_pastoral_upload: {hide: true}
   pastoral_upload_timeout: {hide: true}
@@ -37,6 +37,9 @@ config:
   boarder_dinner_start: {hide: true}
   boarder_dinner_end: {hide: true}
   boarder_leave_creation_threshold: {hide: true}
+
+  #Learning Moments
+  evidence_parent_create: {hide: false}
 
   #LMS
   grade_comments_enable: {value: false, hide: true}
@@ -81,7 +84,7 @@ config:
   messaging_enabled: { hide: false }
   push_notifications_enabled: { edit: true }
   ups_groups_enabled: { value: true, hide: true }
-  eportfolio_enabled: {hide: false}
+  eportfolio_enabled: { edit: true}
   staff_directory_enabled: {edit: true}
   report_staff_access : { hide : false }
   parent_directory_enabled: {edit: true}
@@ -116,7 +119,7 @@ topMenu:
     - /fixtures
 components:
   hide:
-   - Schoolbox_Learning_Component_Dashboard_UpcomingWorkController
+   - Schoolbox\Learning\Component\Dashboard\UpcomingWorkController
    - Component_Dashboard_RecentSubmissionsController
    - Schoolbox\Learning\Assessment\DueWork\Component\Homepage\Controller
    - Schoolbox\Learning\Assessment\Quiz\Component\Homepage\Controller

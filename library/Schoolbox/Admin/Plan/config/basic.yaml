@@ -3,7 +3,7 @@ config:
   site_plan: {value: Basic}
 
   #Modules
-  boarder_leave_enabled: {value: false, hide: true}
+  boarder_leave_enabled: {value: false, edit: false}
   teams_enabled: {value: false, edit: false}
   curriculum_tagging_enabled: {value: false, edit: false}
   eotc_enabled: {value: false, edit: false}
@@ -37,6 +37,9 @@ config:
   boarder_dinner_start: {hide: true}
   boarder_dinner_end: {hide: true}
   boarder_leave_creation_threshold: {hide: true}
+
+  #Learning Moments
+  evidence_parent_create: {hide: true}
 
   #LMS
   grade_comments_enable: {value: false, hide: true}
@@ -81,7 +84,7 @@ config:
   messaging_enabled: { hide: false }
   push_notifications_enabled: { value: false, edit: false }
   ups_groups_enabled: { value: false, hide: true }
-  eportfolio_enabled: {value: false, edit: false}
+  eportfolio_enabled: { value: false, edit: false}
   staff_directory_enabled: {value: false, edit: false}
   report_staff_access : { hide : true }
   parent_directory_enabled: {value: false, edit: false}
@@ -124,3 +127,5 @@ components:
    - Schoolbox\Curriculum\Component\CurriculumOverviewController
    - Schoolbox\Fixtures\Component\Homepage\Controller
    - Schoolbox\Fixtures\Component\Dashboard\Controller
+   - Schoolbox\Learning\Moment\StudentToolkit\Component\Dashboard\Controller
+
