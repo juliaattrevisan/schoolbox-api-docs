@@ -449,6 +449,9 @@ class Definition implements IStrategy
             ]
              */
             /** @var TimetablePeriod $period */
+            usort($periods, static function ($a, $b) {
+                return ($a['PRD_START'] > $b['PRD_START']);
+            });
             foreach ($periods as $j => $period) {
                 $periodName = $period['PRD_DESC'];
                 $sequence = $j;
