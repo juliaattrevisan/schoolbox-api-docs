@@ -222,10 +222,6 @@ button.submit {
     width: 100%;
     max-width: 45rem;
     margin: 0 auto;
-
-    @media #{$small-only} {
-      flex-wrap: wrap;
-    }
   }
 
   a {
@@ -239,25 +235,12 @@ button.submit {
       font-size: 2rem;
       float: none;
       padding: 0;
-
-      @media #{$small-only} {
-        font-size: 1rem;
-        padding: 10px;
-      }
     }
 
     span {
       display: block;
-
-      @media #{$small-only} {
-        display: inline-block;
-      }
     }
 
-    @media #{$small-only} {
-      border-bottom: 1px solid #ededed;
-      flex: 1 0 100%;
-    }
   }
 
   .learning {

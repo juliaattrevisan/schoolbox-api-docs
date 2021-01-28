@@ -233,7 +233,27 @@ export default {
     <div>
         <div class="feed" v-for="evidenceGroup in groupedEvidence">
             <div class="feed-column left"></div>
+
             <section class="activity-feed">
+              <div class="profile-learning-actions">
+                <div>
+                  <template v-if="config.routes.getCreateEvidenceForm">
+                  <a href="#" title="Share Learning" class="learning icon-share" data-reveal-id="shareLearningMoment"><span>Share Learning</span></a>
+                  </template>
+                  <template v-if="config.routes.getSetAsGoalForm">
+                    <a :href="config.routes.getSetAsGoalForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
+                       title="Set goals" class="goals icon-goal"><span>Set Goals</span></a>
+                  </template>
+                  <template v-if="config.routes.getSetAsGoalForSelfForm">
+                    <a :href="config.routes.getSetAsGoalForSelfForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
+                       title="Set goals" class="goals icon-goal"><span>Set Goals</span></a>
+                  </template>
+                  <template v-if="config.routes.getAwardAsAchievementForm">
+                    <a :href="config.routes.getAwardAsAchievementForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
+                       title="Award achievement" class="achievement icon-achievement"><span>Award Achievement</span></a>
+                  </template>
+                </div>
+              </div>
                 <h2 class="subheader no-margin">
                     <time :datetime="evidenceGroup.date | dateFormat('YYYY-MM-DD')"
                           :title="evidenceGroup.date | dateFormat(dateDisplayFormats.momentJsDateLong)"
