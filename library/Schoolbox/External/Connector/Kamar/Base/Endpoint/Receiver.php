@@ -291,22 +291,6 @@ XML;
 <SMSDirectoryData>
     <error>0</error>
     <result>OK</result>
-    <service>Schoolbox</service>
-    <version>1.0</version>
-    <status>Ready</status>
-    <options>
-        <ics>false</ics>
-        <students>
-            <details>true</details>
-            <timetables>true</timetables>
-            <learningsupport>true</learningsupport>
-        </students>
-        <staff>
-            <details>true</details>
-            <photos>true</photos>
-            <timetables>true</timetables>
-        </staff>
-    </options>
 </SMSDirectoryData>
 XML;
 
