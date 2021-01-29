@@ -966,7 +966,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         /* If there wasn't a meaningful $studentExternalId, exit early
          * There's nothing we can do
          */
-        if ('' === $studentExternalId) {
+        if ('' === (string)$studentExternalId) {
             throw new \InvalidArgumentException(sprintf(
                 "Student external id not provided for upload external id %s",
                 $upload->getExternalId()
