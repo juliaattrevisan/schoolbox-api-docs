@@ -193,7 +193,7 @@ class DisasterRecovery extends CliTool\App
     /**
      * Deletes stale backups from S3
      *
-     * @param Filesystem $fileSystemAwsS3
+     * @param Filesystem $fileSystemAwsS3Backups
      * @param string     $dailyBackupDir
      * @throws InvalidArgumentException
      * @throws Flysystem\RootViolationException
@@ -220,7 +220,7 @@ class DisasterRecovery extends CliTool\App
     /**
      * Get the daily backup dir from S3
      *
-     * @param Filesystem $fileSystemAwsS3
+     * @param Filesystem $fileSystemAwsS3Backups
      * @return string[]
      */
     private function getBackupsInS3(Filesystem $fileSystemAwsS3Backups): array
