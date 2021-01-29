@@ -211,12 +211,29 @@ function renderStudent(
     $codeMatcher   = (new SubjectCodeMatchFactory())->build($config->get('external_type'));
     $subjectList   = $synUserHandler->getSubjectList($student);
     foreach ($subjectList as $subject) {
+
+        /* Decide whether the currently logged in user can see a link
+         * to this subject's folder; link availability is dependent
+         * on the folder existing and the current user having >= READ
+         * permission on that folder
+         *
+         * Mindfully deconflict any array keys that might have come out of
+         * the external connector's array of data
+         */
+        $subject['linkedToFolder'] = false;
+
         $group = $splitSubjects && $subject['classType'] ? $subject['classType'] : 'Classes';
         // Load a bunch of category and teacher info too
         $folder = $folderMapper->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
         if ($folder) {
             $subject['folder'] = $folder;
             $subject['perms']  = $groupHandler->getPermission($folder->getId());
+
+            /* At this point we know the folder exists
+             * if the user has >= READ access, then they can view the link to the folder
+             * With more elbow grease this becomes unit testable
+             */
+            $subject['linkedToFolder'] = $subject['perms'] >= UserAccess::ACCESS_READ;
 
             // If config flag enabled, only fetch teacher(s) for folder's codes which map to an enrolled subject
             $taughtFolderCodes = $folder->getCodeString();
@@ -272,6 +289,15 @@ function renderStudent(
     foreach ($groups as &$group) {
         $group['perms']  = $groupHandler->getPermission($group['id']);
         $group['folder'] = $groupFolders[$group['id']] ?? null;
+
+        /* Decide whether the currently logged in user can see a link
+         * to this group's folder; link availability is dependent
+         * the current user having >= READ permission on that folder
+         *
+         * Mindfully deconflict any array keys that might have come out of
+         * the external connector's array of data
+         */
+        $group['linkedToFolder'] = $group['perms'] >= UserAccess::ACCESS_READ;
 
         // Apply a color if there is none
         if ($colorCount > 0 && !$group['folder']->getColour()) {
