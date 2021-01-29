@@ -77,6 +77,18 @@ interface IConnector extends IQuoter
     public function execute($sql);
 
     /**
+     * Executes a query directly via a PDO connection, instead of preparing it
+     * and then executing.
+     *
+     * This seems to be required for `SET` queries: they don't update the
+     * session configuration if prepared and then run.
+     *
+     * @param string $sql
+     * @return bool
+     */
+    public function executeDirectly(string $sql): bool;
+
+    /**
      * Prepare database query and return a statement
      *
      * @param string $query

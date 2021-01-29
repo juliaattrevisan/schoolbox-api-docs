@@ -279,6 +279,14 @@ class Base implements Serializable, IConnector
     /**
      * @inheritdoc
      */
+    public function executeDirectly(string $sql): bool
+    {
+        return $this->broker->getPdo()->exec($sql) !== false;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function prepareFunctionCall($function, $inputs = null, &$outputs = null, &$return = null)
     {
         /** @var IStoredProcedure $statement */
