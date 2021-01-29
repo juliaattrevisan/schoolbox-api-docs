@@ -946,11 +946,33 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         return false;
     }
 
+
     /**
      * @inheritdoc
+     * @param UploadQueue $upload
+     * @return bool
+     * @throws ExternalException
+     * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @throws PDOException
      */
     public function uploadPastoralDocument(UploadQueue $upload): bool
     {
+        // Save the file into to the database
+        $externalId = $upload->getExternalId();
+        $studentExternalId = $upload->getStudentExternalId();
+
+        /* If there wasn't a meaningful $studentExternalId, exit early
+         * There's nothing we can do
+         */
+        if ('' === (string)$studentExternalId) {
+            throw new \InvalidArgumentException(sprintf(
+                "Student external id not provided for upload external id %s",
+                $upload->getExternalId()
+            ));
+        }
+
         // Temporarily increase the memory limit and timeout so we can get the file across to Synergetic
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
@@ -974,9 +996,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             }
         }
 
-        // Save the file into to the database
-        $externalId = $upload->getExternalId();
-        $studentExternalId = $upload->getStudentExternalId();
         $date = date("Y-m-d H:i:s");
         $sourceDate = $storage->getCreatedAt()->getDatabase();
         $extension = strtoupper($storage->getExtension());

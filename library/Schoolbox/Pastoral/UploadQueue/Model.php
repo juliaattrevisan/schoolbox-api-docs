@@ -28,7 +28,7 @@ class Model implements ISoftDeletable
     /** @var int SIS Pastoral record ID */
     protected $externalId;
 
-    /** @var int SIS Student ID */
+    /** @var string|null SIS Student ID */
     protected $studentExternalId;
 
     /** @var IStorage $storage */
@@ -104,19 +104,19 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return string|null
      */
-    public function getStudentExternalId()
+    public function getStudentExternalId(): ?string
     {
         return $this->studentExternalId;
     }
 
     /**
-     * @param int $studentExternalId
+     * @param string|null $studentExternalId
      *
      * @return self
      */
-    public function setStudentExternalId($studentExternalId)
+    public function setStudentExternalId(?string $studentExternalId): self
     {
         $this->studentExternalId = $studentExternalId;
 

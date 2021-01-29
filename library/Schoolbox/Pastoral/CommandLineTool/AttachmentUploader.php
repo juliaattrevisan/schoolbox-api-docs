@@ -147,6 +147,9 @@ HELP;
         try {
             $this->externalPastoral->uploadPastoralDocument($pendingUpload);
             $pendingUpload->setStatus(Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_COMPLETED);
+        } catch (\InvalidArgumentException $e) {
+            $this->getLogger()->warning("File could not be processed: {$e->getMessage()}", ['exception' => $e]);
+            $pendingUpload->setStatus(Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_FAILED);
         } catch (Exception $e) {
             $this->getLogger()->error($e, ['exception' => $e]);
             $pendingUpload->setStatus(Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_FAILED);
@@ -161,5 +164,3 @@ HELP;
         return true;
     }
 }
-
-;
