@@ -1,5 +1,7 @@
 <template>
+
     <div>
+
         <section>
             
             <dl class="tabs" :id="config.topicContainerId" v-if="allArticles.length || articlesLoading">
@@ -11,9 +13,112 @@
                 </dd>
             </dl>
             
+            <div class="tabs-content no-margin">
 
-        </section>
+                <ul class="information-list">
+
+                    <li class="actions-small-1" v-if="articlesLoading" v-for="n in 3">
+                        <div class="list-item">
+                            <div class="small-12 card skeleton">
+                                <div class="img"></div>
+                                <h3></h3>
+                                <p class="meta"></p>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="actions-small-1" v-for="article in currentArticles">
+                        <div class="list-item">
+                            <div class="small-12 card">
+
+                                <a :href="article._links.self.href" v-if="article.featureImage">
+                                    <img :src="article.featureImage._links.image.href + '&size=square64'">
+                                </a>
+
+                                <h3><a v-if="article.title" :href="article._links.self.href">{{ article.title }}</a>
+                                    <a v-else :href="article._links.self.href">(untitled)</a>
+                                </h3>
+
+                                <p class="meta">
+                                    <b>{{article.status }}</b>
+                                    <time :title="article.statusDate.long">{{ article.statusDate.relativeTime }}</time>
+                                </p>
+                            </div>
+                        </div>
+
+                        <article>
+                            <div v-html="article.blurb"></div>
+                            <div class="article-read-more">
+                                <a v-if="article.readmore.available" :href="article._links.self.href" v-html="article.readmore.string"></a>
+                            </div>
+                        </article>
+                        <nav>
+                            <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" title="Modify this locale.news "></a>
+                        </nav>
+                    </li>
+                </ul>
+
+                <div class="tabs-content no-margin">
+
+                    <ul class="information-list">
+
+                        <li class="actions-small-1" v-if="articlesLoading" v-for="n in 3">
+                            <div class="list-item">
+                                <div class="small-12 card skeleton">
+                                    <div class="img"></div>
+                                    <h3></h3>
+                                    <p class="meta"></p>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="actions-small-1" v-for="article in currentArticles">
+                            <div class="list-item">
+                                <div class="small-12 card">
+
+                                    <a :href="article._links.self.href" v-if="article.featureImage">
+                                        <img :src="article.featureImage._links.image.href + '&size=square64'">
+                                    </a>
+
+                                    <h3><a v-if="article.title" :href="article._links.self.href">{{ article.title }}</a>
+                                        <a v-else :href="article._links.self.href">(untitled)</a>
+                                    </h3>
+
+                                    <p class="meta">
+                                        <b>{{ article.status }}</b>
+                                        <time :title="article.statusDate.long">{{ article.statusDate.relativeTime }}</time>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <article>
+                                <div v-html="article.blurb"></div>
+                                <div class="article-read-more">
+                                    <a v-if="article.readmore.available" :href="article._links.self.href" v-html="article.readmore.string"></a>
+                                </div>
+                            </article>
+                            <nav>
+                                <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" title="Modify this locale.news"></a>
+                            </nav>
+                        </li>
+
+                    </ul>
+
+                    <!-- <div class="empty-state no-margin" v-if="!filteredArticles.length && !articlesLoading">
+                    <i class="icon-news"></i>
+                    <p>You haven't authored any {{ locale.news.plural }}.</p>
+                    {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+                    {% if createRoute %}<p><a href="{{ createRoute }}">Create {{ locale.news }}</a>.</p>{% endif %}
+                    </div> -->
+
+                </div><!-- <div class="tabs-content no-margin"> -->
+
+            </div><!-- <div class="tabs-content no-margin"> -->
+
+        </section><!-- <div class="tabs-content no-margin"> -->
+
     </div>
+
 </template>
 
 <script>
@@ -54,12 +159,16 @@
 
             // The current set of articles showing for the page
             currentArticles: function() {
+                
                 if (!this.filteredArticles.length) {
                     return [];
                 }
 
+                debugger;
+
                 var offset = (this.page-1) * this.limit;
                 var total = offset + this.limit;
+                
 
                 return this.filteredArticles.slice(offset, total);
             }
@@ -76,10 +185,9 @@
                     return response.data[key];
                 });
 
-                vue.articlesLoading = false;
                 vue.allArticles = articles;
                 vue.filteredArticles = articles;
-
+                
                 vue.statuses = {
                     'All': 0,
                     'Drafted': 0,
@@ -107,6 +215,8 @@
                 // setTimeout(function(){
                 //     $(document).foundation();
                 // }, 1);
+
+                vue.articlesLoading = false;
 
             }).catch(function (error) {
                 console.log(error);
