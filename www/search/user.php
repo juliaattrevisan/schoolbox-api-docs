@@ -211,7 +211,6 @@ function renderStudent(
     $codeMatcher   = (new SubjectCodeMatchFactory())->build($config->get('external_type'));
     $subjectList   = $synUserHandler->getSubjectList($student);
     foreach ($subjectList as $subject) {
-
         /* Decide whether the currently logged in user can see a link
          * to this subject's folder; link availability is dependent
          * on the folder existing and the current user having >= READ
@@ -423,7 +422,8 @@ function renderStudent(
             }
 
             // Only show the parent contacts to the parent themselves, hide divorced parents from each other
-            if ($sessionUser->getRole()->isStaff() || ($sessionUser->getRole()->isParent() && (
+            if (
+                $sessionUser->getRole()->isStaff() || ($sessionUser->getRole()->isParent() && (
                         $contact['StudentContactID'] == $sessionUser->getExternalId() ||
                         $contact['StudentContactSpouseID'] == $sessionUser->getExternalId())
                 )
@@ -452,23 +452,26 @@ function renderStudent(
 
     $showPastoral = $config->get('pastoral_enabled');
 
-    if ($sessionUser->getRole()->isParent() && !$config->get('pastoral_parent_access'))
+    if ($sessionUser->getRole()->isParent() && !$config->get('pastoral_parent_access')) {
         $showPastoral = false;
+    }
 
     $protectStudentContacts = $config->get('protect_student_contacts');
 
     $hideContacts = $student->getHideContacts() ? 1 : 0;
 
     switch ($protectStudentContacts) {
-        case Access::VISIBILITY_EVERYONE : // Everyone
+        case Access::VISIBILITY_EVERYONE: // Everyone
             break;
         case Access::VISIBILITY_STAFF: // Staff Only
-            if (!$sessionUser->getRole()->isStaff())
+            if (!$sessionUser->getRole()->isStaff()) {
                 $hideContacts = true;
+            }
             break;
         case Access::VISIBILITY_STAFF_PARENT: // Staff & Parents Only
-            if (!$sessionUser->getRole()->isStaff() && !$sessionUser->getRole()->isParent())
+            if (!$sessionUser->getRole()->isStaff() && !$sessionUser->getRole()->isParent()) {
                 $hideContacts = true;
+            }
             break;
     }
 
