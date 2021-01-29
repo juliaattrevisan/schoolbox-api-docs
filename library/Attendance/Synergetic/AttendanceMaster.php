@@ -192,11 +192,11 @@ class Attendance_Synergetic_AttendanceMaster
         // original value.
         $isAnsiWarningsOn = (bool)$this->connector->executeQuery('SELECT (@@OPTIONS & 8)')->fetchColumn();
         if (!$isAnsiWarningsOn) {
-            $this->connector->executeQuery('SET ANSI_WARNINGS ON');
+            $this->connector->executeDirectly('SET ANSI_WARNINGS ON');
         }
         $success = $statement->execute();
         if (!$isAnsiWarningsOn) {
-            $this->connector->executeQuery('SET ANSI_WARNINGS OFF');
+            $this->connector->executeDirectly('SET ANSI_WARNINGS OFF');
         }
 
         /* Stored proc does not update the CreatedById so we do that separately */
