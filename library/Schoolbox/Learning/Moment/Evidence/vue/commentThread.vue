@@ -43,7 +43,7 @@ export default {
             isCKEditorLoading: false,
             isCKEditorLoaded: false,
             isCKEditorReady: false,
-            ckeditorConfig: { 
+            ckeditorConfig: {
                 embed_provider: '//iframe.ly/api/oembed?url={url}&callback={callback}&api_key=94aa8fc28ac1089a2dfb28',
                 removePlugins: 'image,uploadimage,link,schoolboxanchor,elementspath,wordcount',
                 removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
@@ -147,8 +147,8 @@ export default {
 
             //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
             this.isCKEditorLoading = true;
-            
-            //file is referenced from /javascript/components/ckeditor4-vue.bundle.js according to the publicPath and filename props within output in webpack.config.js 
+
+            //file is referenced from /javascript/components/ckeditor4-vue.bundle.js according to the publicPath and filename props within output in webpack.config.js
             //see https://webpack.js.org/guides/code-splitting/ and https://webpack.js.org/guides/public-path/ (code-splitting) for further details
             import(/* webpackChunkName: "ckeditor4-vue" */ 'ckeditor4-vue')
                 .then(({ default: CKEditor }) => {
@@ -301,7 +301,7 @@ export default {
                                 <div class="card small-12 compact">
                                     <a :href="comment.author._links.profile.href" title="View Profile">
                                         <img :src="comment.author._links.avatar.href" alt="View Profile" />
-                                        <p>{{ comment.author.firstname }} {{ comment.author.lastname }}</p>
+                                        <p>{{ comment.author.fullName }}</p>
                                         <time class="pipe meta"
                                               :datetime="comment.createdAt.json | dateFormat"
                                               :title="comment.createdAt.json | dateFormat(dateDisplayFormats.momentJsDatetime)"
