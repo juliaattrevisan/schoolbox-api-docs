@@ -88,6 +88,7 @@ interface External_PastoralInterface extends External\IConnector
      * @param Pastoral\UploadQueue\Model $upload
      * @return bool
      * @throws \Schoolbox\External\Exception
+     * @throws \InvalidArgumentException   when student external id is invalid
      */
     public function uploadPastoralDocument(Pastoral\UploadQueue\Model $upload): bool;
 
