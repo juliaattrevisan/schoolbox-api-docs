@@ -9,8 +9,17 @@
 
 {% block newsContent %}
     
+    <div class="{{ pageNum }}"></div>
+
     <div id="authored-container">
-        <authored></authored>
+        <authored
+            :page-num="{{ pageNum }}"
+            tab-selected="{{ status }}"
+            route="{{ routeLookup('commsNews.getAuthoredArticles') }}"
+            :limit="{{ config.search_type_limit }}"
+            :topic-container-id="{{ topicContainerId is defined ? topicContainerId : 0 }}"
+        >
+        </authored>
     </div>
     
     <!--
