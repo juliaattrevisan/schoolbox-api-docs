@@ -290,6 +290,15 @@ function renderStudent(
         $group['perms']  = $groupHandler->getPermission($group['id']);
         $group['folder'] = $groupFolders[$group['id']] ?? null;
 
+        /* Decide whether the currently logged in user can see a link
+         * to this group's folder; link availability is dependent
+         * the current user having >= READ permission on that folder
+         *
+         * Mindfully deconflict any words that might have come out of
+         * the external connector's array of data
+         */
+        $group['linkedToFolder'] = $group['perms'] >= UserAccess::ACCESS_READ;
+
         // Apply a color if there is none
         if ($colorCount > 0 && !$group['folder']->getColour()) {
             $group['folder']->setColour(
