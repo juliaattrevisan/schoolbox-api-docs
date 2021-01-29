@@ -199,16 +199,16 @@ class DisasterRecovery extends CliTool\App
      * @throws Flysystem\RootViolationException
      * @throws UnexpectedValueException
      */
-    private function deleteStaleBackups(Filesystem $fileSystemAwsS3, string $dailyBackupDir): void
+    private function deleteStaleBackups(Filesystem $fileSystemAwsS3Backups, string $dailyBackupDir): void
     {
-        $backupsFromS3 = $this->getBackupsInS3($fileSystemAwsS3);
+        $backupsFromS3 = $this->getBackupsInS3($fileSystemAwsS3Backups);
 
         foreach ((new BackupRetention())->getDatesToDelete($backupsFromS3) as $backupToDelete) {
             if ($backupToDelete === $dailyBackupDir) {
                 // Safety check, this should never happen
                 throw new UnexpectedValueException("Attempted to delete current backup '$backupToDelete'");
             }
-            if ($fileSystemAwsS3->deleteDir(self::PREFIX_BACKUPS . $backupToDelete)) {
+            if ($fileSystemAwsS3Backups->deleteDir('/' . $backupToDelete)) {
                 $this->getLogger()->info("Successfully deleted backup '$backupToDelete'");
             } else {
                 $this->getLogger()->error("Unable to delete backup '$backupToDelete'");
@@ -223,10 +223,10 @@ class DisasterRecovery extends CliTool\App
      * @param Filesystem $fileSystemAwsS3
      * @return string[]
      */
-    private function getBackupsInS3(Filesystem $fileSystemAwsS3): array
+    private function getBackupsInS3(Filesystem $fileSystemAwsS3Backups): array
     {
         $backups = [];
-        foreach ($fileSystemAwsS3->listContents(self::PREFIX_BACKUPS) as $content) {
+        foreach ($fileSystemAwsS3Backups->listContents('/') as $content) {
             if ($content['type'] === 'dir') {
                 $backups[] = $content['basename'];
             }
