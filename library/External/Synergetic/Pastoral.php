@@ -775,6 +775,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     private function isExternalCodeValid(Pastoral $pastoral)
     {
+        if (!$this->isExternalIdValid($pastoral->getStudent()->getExternalId())) {
+            return false;
+        }
 
         if ($pastoral->getType()
             && !empty($pastoral->getType()->getExternalCode())
