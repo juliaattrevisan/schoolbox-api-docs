@@ -671,7 +671,10 @@
                     <section class="v-card-list">
                         {% for subjectKey, subject in subjectGroup %}
                         <div class="v-card small-12 medium-4 xlarge-3">
-                            <a href="{% if subject.folder.id %}/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}{% else %}#{% endif %}">
+
+                            {% if subject.linkedToFolder %}
+                            <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
+                            {% endif %}
                                 <div class="card-class-image"
                                      style="border-bottom-width: 10px;
                                             border-bottom-style: solid;
@@ -692,7 +695,10 @@
                                     {% endfor %}
                                     </div>
                                 </div>
+                            {% if subject.linkedToFolder %}
                             </a>
+                            {% endif %}
+
                             {% set hasTeachersWithEmail = false %}
                             {% for teacher in subject.teachers %}
                                 {% if not teacher.email is empty %}
@@ -702,7 +708,8 @@
                             <div class="card-content classes actions-small-{{ hasTeachersWithEmail ? '1' : '0'}} {% block folderListItemClasses %}{% endblock %}">
                                 <div class="list-item">
                                     {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
-                                    {% if subject.folder.id and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
+
+                                    {% if subject.linkedToFolder %}
                                         <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
                                             <h3>{{ subject.name }}</h3>
                                             {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
