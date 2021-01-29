@@ -164,5 +164,3 @@ HELP;
         return true;
     }
 }
-
-;
