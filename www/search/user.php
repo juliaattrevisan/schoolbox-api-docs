@@ -217,7 +217,7 @@ function renderStudent(
          * on the folder existing and the current user having >= READ
          * permission on that folder
          *
-         * Mindfully deconflict any words that might have come out of
+         * Mindfully deconflict any array keys that might have come out of
          * the external connector's array of data
          */
         $subject['linkedToFolder'] = false;
@@ -294,7 +294,7 @@ function renderStudent(
          * to this group's folder; link availability is dependent
          * the current user having >= READ permission on that folder
          *
-         * Mindfully deconflict any words that might have come out of
+         * Mindfully deconflict any array keys that might have come out of
          * the external connector's array of data
          */
         $group['linkedToFolder'] = $group['perms'] >= UserAccess::ACCESS_READ;
