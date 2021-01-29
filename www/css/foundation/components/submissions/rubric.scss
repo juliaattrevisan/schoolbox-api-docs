@@ -84,9 +84,7 @@ table.rb {
     // Self Reflection
     .rb-self-reflection-choice {
         border-radius: 50%;
-        position: absolute;
-        bottom: 3px;
-        right: 3px;
+        float: right;
         &.blind-mode { //can't show the students image, so just show a circle in place
             width: 2rem;
             height: 2rem;

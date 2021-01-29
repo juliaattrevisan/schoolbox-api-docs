@@ -76,6 +76,12 @@
                         <td data-header="{{ level.name }}" {% if isMarkDisplayed %}class="rb-selected"{% endif %}>
                             <div>
                                 <span class="rb-description">
+                                    {# Self-Assessment #}
+                                    {% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}
+                                        <img class="rb-self-reflection-choice"
+                                             src="/portrait.php?id={{ learner.id }}&amp;size=square32"
+                                             title="{% if selfAssessmentFeedback.isSelfGrading %}({{ selfAssessmentIndicatorMark.value }}) {{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
+                                    {% endif %}
                                     {{- descriptor.description|nl2br -}}
                                 </span>
                                 {% if descriptor.hasValue and config.rubric_show_points and rubricGrid.showDescriptorValue and showDescriptorValue %}
@@ -92,13 +98,6 @@
                                         {% endif %}
                                     </span>
                                 {% endif %}
-
-                            {# Self-Assessment #}
-                            {% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}
-                                <img class="rb-self-reflection-choice"
-                                     src="/portrait.php?id={{ learner.id }}&amp;size=square32"
-                                     title="{% if selfAssessmentFeedback.isSelfGrading %}({{ selfAssessmentIndicatorMark.value }}) {{ locale.selfAssessment.proper }}{% else %}{{ locale.selfReflection.proper }}{% endif %} choice" />
-                            {% endif %}
                             </div>
                         </td>
 
