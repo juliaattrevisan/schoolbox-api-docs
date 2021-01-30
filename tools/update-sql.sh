@@ -72,7 +72,7 @@ if [ "$backupdir" == "" ]; then
     exit 1;
 fi
 
-backupfile="$backupdir/$sqlver-`date +%Y-%m-%d_%H-%M-%S`.sql"
+backupfile="$backupdir/$sqlver-$(date +%Y-%m-%d_%H-%M-%S).sql.gz"
 
 echo "Current SQL Version: "$sqlver;
 echo "New SQL Version: "$newver;
@@ -155,7 +155,7 @@ fi
 # Need to check for min size because gzip of empty file produces non-empty file.
 existingbackup=$(find $backupdir -mindepth 1 -maxdepth 1 -name "$sqlver-$(date +%Y-%m-%d_%H-)*.sql.gz" | head -n 1);
 if [[ -f $existingbackup ]] && [[ $(wc -c "$existingbackup" | awk '{ print $1 }') -gt 10000 ]]; then
-    echo "Backup already completed";
+    echo "Backup already completed at '$existingbackup'";
     backupfile=$existingbackup;
 else
     echo "Backing up database before changes";
@@ -164,6 +164,7 @@ else
       echo "Unable to backup database '$sqldb'"
       exit 1
     fi
+    echo "Database backed up to '$backupfile'";
 fi
 
 echo "Updating database to new version";
