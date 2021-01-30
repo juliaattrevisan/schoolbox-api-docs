@@ -3,8 +3,8 @@
 # Fetches the path of the directory from the an instance's database
 # If not data dir args are provided, then all dirs are updated
 # Usage:
-#   set-data-dir-perms.sh --owner www:data                  --dir twig_cache_dir --dir purifier_cache_dir
-#   set-data-dir-perms.sh --owner www:data --group www:data --skip storage_dir
+#   set-config-data-dirs-perms.sh --owner www-data                  --dir twig_cache_dir --dir purifier_cache_dir
+#   set-config-data-dirs-perms.sh --owner www-data --group www-data --skip storage_dir
 #
 # @copyright   Copyright 2020, Schoolbox Pty Ltd
 # @link        https://schoolbox.com.au/
