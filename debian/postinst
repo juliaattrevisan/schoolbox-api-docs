@@ -27,33 +27,15 @@ case "$1" in
         # In theory, package files should be root-owned, but this assists Support/Devs using FTP to manipulate files.
         # https://www.debian.org/doc/debian-policy/ch-files.html#permissions-and-owners
         chown -R alaress:alaress /usr/share/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-        /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
 
-        # Clear cache directories
-#        if [ -f /etc/schoolbox/conf.php ]; then
-            /usr/share/schoolbox/tools/clean-cache-dir.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-#        fi
+        # Upgrade all (0:N) instances on this host
+        /usr/local/bin/schoolboxcloud-upgrade 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
 
-#        # Fix ownership and permissions of existing configuration.
-#        if [ -f /etc/schoolbox/conf.php ]; then
-#            chown root:www-data /etc/schoolbox/conf.php;
-#            chmod 0644 /etc/schoolbox/conf.php;
-            /usr/share/schoolbox/tools/update-sql.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-#        fi
-
-        # Run scripts that apply instance-specific values.
-        # (These should only be run on install, not on upgrade. For that reason, these scripts must be idempotent.)
-        php /usr/share/schoolbox/tools/token/generateKeyPair.php --quiet 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-
+        # Rebuild daemons using latest instance data from IR
         /usr/local/bin/schoolbox-rebuild-daemons --fetch -v 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
 
         # Bring site back up
         /usr/share/schoolbox/tools/maintenance/site_up.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-
-        # Fix ownership and permissions of existing configuration.
-#        if [ -f /etc/schoolbox/conf.php ]; then
-          /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/cache 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-#        fi
 
         echo "$(date +%Y-%m-%d\ %X) - Upgrade completed successfully" >> /var/log/schoolbox/upgrade.log;
     ;;

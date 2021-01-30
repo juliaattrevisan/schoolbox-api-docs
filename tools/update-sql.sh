@@ -67,12 +67,12 @@ else
 fi
 backupdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='$backup_dir_name' \G;" | grep 'value' | cut -d' ' -f2`;
 backupdir=`readlink -f $backupdir/../`
-if [ "$backupdir" == "" ];
-then
-    backupdir="/tmp";
+if [ "$backupdir" == "" ]; then
+    echo "Unable to detect backup dir"
+    exit 1;
 fi
 
-backupfile="$backupdir/$sqlver-`date +%Y-%m-%d_%H-%M-%S`.sql"
+backupfile="$backupdir/$sqlver-$(date +%Y-%m-%d_%H-%M-%S).sql.gz"
 
 echo "Current SQL Version: "$sqlver;
 echo "New SQL Version: "$newver;
@@ -151,16 +151,20 @@ if [ $syscheck_exit_code -ne 0 ]; then
     exit $syscheck_exit_code;
 fi
 
-# Only run DB backup if not completed in the last hour
-existingbackup=$(find $backupdir -mindepth 1 -maxdepth 1 -name "$sqlver-$(date +%Y-%m-%d_%H-)*.sql" | head -n 1);
-if [[ (-f $existingbackup) && (! -z $existingbackup) ]];
-then
-    echo "Backup already completed";
+# Skip backup if backup exists for same version and within last hour.
+# Need to check for min size because gzip of empty file produces non-empty file.
+existingbackup=$(find $backupdir -mindepth 1 -maxdepth 1 -name "$sqlver-$(date +%Y-%m-%d_%H-)*.sql.gz" | head -n 1);
+if [[ -f $existingbackup ]] && [[ $(wc -c "$existingbackup" | awk '{ print $1 }') -gt 10000 ]]; then
+    echo "Backup already completed at '$existingbackup'";
     backupfile=$existingbackup;
 else
     echo "Backing up database before changes";
     mkdir -p $backupdir;
-    mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
+    if ! mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb | gzip > $backupfile; then
+      echo "Unable to backup database '$sqldb'"
+      exit 1
+    fi
+    echo "Database backed up to '$backupfile'";
 fi
 
 echo "Updating database to new version";
