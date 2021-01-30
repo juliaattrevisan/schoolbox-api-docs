@@ -1,5 +1,0 @@
-# Overrides for Vagrant running of schoolbox-scheduled
-env SBHOME=/vagrant/tools/mq
-env SBLOGS=/vagrant/data
-env SBVERBOSITY=' -vvv --pid --mem --truemem'
-start on mounted MOUNTPOINT=/vagrant

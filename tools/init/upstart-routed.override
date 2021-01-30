@@ -1,5 +1,0 @@
-# Overrides for Vagrant running of schoolbox-routed
-env SBHOME=/vagrant/tools/notif/route
-env SBLOGS=/vagrant/data
-env SBVERBOSITY=' -vvv --pid --mem --truemem'
-start on mounted MOUNTPOINT=/vagrant
