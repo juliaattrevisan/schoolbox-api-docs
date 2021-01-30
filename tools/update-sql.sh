@@ -151,16 +151,16 @@ if [ $syscheck_exit_code -ne 0 ]; then
     exit $syscheck_exit_code;
 fi
 
-# Only run DB backup if not completed in the last hour
-existingbackup=$(find $backupdir -mindepth 1 -maxdepth 1 -name "$sqlver-$(date +%Y-%m-%d_%H-)*.sql" | head -n 1);
-if [[ (-f $existingbackup) && (! -z $existingbackup) ]];
-then
+# Skip backup if backup exists for same version and within last hour.
+# Need to check for min size because gzip of empty file produces non-empty file.
+existingbackup=$(find $backupdir -mindepth 1 -maxdepth 1 -name "$sqlver-$(date +%Y-%m-%d_%H-)*.sql.gz" | head -n 1);
+if [[ -f $existingbackup ]] && [[ $(wc -c "$existingbackup" | awk '{ print $1 }') -gt 10000 ]]; then
     echo "Backup already completed";
     backupfile=$existingbackup;
 else
     echo "Backing up database before changes";
     mkdir -p $backupdir;
-    mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
+    mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb | gzip > $backupfile 2>&1;
 fi
 
 echo "Updating database to new version";
