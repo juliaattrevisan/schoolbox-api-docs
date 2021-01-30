@@ -160,7 +160,10 @@ if [[ -f $existingbackup ]] && [[ $(wc -c "$existingbackup" | awk '{ print $1 }'
 else
     echo "Backing up database before changes";
     mkdir -p $backupdir;
-    mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb | gzip > $backupfile 2>&1;
+    if ! mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb | gzip > $backupfile; then
+      echo "Unable to backup database '$sqldb'"
+      exit 1
+    fi
 fi
 
 echo "Updating database to new version";
