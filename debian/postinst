@@ -45,7 +45,7 @@ case "$1" in
         # (These should only be run on install, not on upgrade. For that reason, these scripts must be idempotent.)
         php /usr/share/schoolbox/tools/token/generateKeyPair.php --quiet 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
 
-        /usr/local/bin/schoolbox-rebuild-daemons --fetch
+        /usr/local/bin/schoolbox-rebuild-daemons --fetch -v 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
 
         # Bring site back up
         /usr/share/schoolbox/tools/maintenance/site_up.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
