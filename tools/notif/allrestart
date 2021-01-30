@@ -8,23 +8,19 @@ conf_file="$site_root"/www/conf/conf.php
 # Stop all schoolbox notif daemons
 "$dir_path"/allstop
 
-# On-Premise use old single-instance style
-# Vagrant + Cloud uses new multi-instance style
-if [[ $site_root == '/vagrant' ]] || [[ -d /etc/schoolbox/cloud ]] || [[ -d /etc/schoolboxdev/cloud ]]; then
-    # Multi-instance
-    instance_list=$(schoolbox-conf --conf="$conf_file" --option=instancelist | jq -r '.[]' | sort);
-    for daemon in socketd digestd routed scheduled; do
-        for instance_id in $instance_list; do
-            echo "starting schoolbox-cloud-$daemon@$instance_id"
-            service "schoolbox-cloud-$daemon@$instance_id" start;
-        done
+# All environments are now Multi-instance arch.
+instance_list=$(schoolbox-conf --conf="$conf_file" --option=instancelist | jq -r '.[]' | sort);
+for daemon in socketd digestd routed scheduled; do
+    for instance_id in $instance_list; do
+        echo "starting schoolbox-cloud-$daemon@$instance_id"
+        service "schoolbox-cloud-$daemon@$instance_id" start;
     done
-else
-    # Single-instance (live/dev)
-    for service in $(systemctl -a | grep -E "schoolbox.*(socketd|digestd|routed|scheduled).*service" | awk '{print $1}'); do
-        echo "starting $service"
-        systemctl start "$service"
-    done
-fi
+done
 
-
+# Start schoolbox-belld only if already enabled
+for instance_id in $instance_list; do
+    if [ "$(systemctl is-enabled schoolbox-cloud-belld@"$instance_id" 2>/dev/null)" = "enabled" ]; then
+        echo "starting schoolbox-cloud-belld@$instance_id"
+        service schoolbox-cloud-belld@"$instance_id" start;
+    fi
+done

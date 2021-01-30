@@ -1,5 +1,0 @@
-# Overrides for Vagrant running of schoolbox-digestd
-env SBHOME=/vagrant/tools/digest
-env SBLOGS=/vagrant/data
-env SBVERBOSITY=' -vvv --pid --mem --truemem'
-start on mounted MOUNTPOINT=/vagrant

@@ -54,6 +54,7 @@ fi
 # Does vagrant.yaml file indicate we wish this host to use a custom IR endpoint?
 # We would do this if we wished to test an integration between Schoolbox, Puppet + IR
 instance_registry_url_override=$1
+instance_registry_api_token=$2
 instance_registry_conf_file="/etc/schoolbox/instance-registry.json"
 if [[ -n $instance_registry_url_override ]]; then
   echo "Setting instance_registry_url_override to '$instance_registry_url_override' in $instance_registry_conf_file";
@@ -61,7 +62,11 @@ else
   echo "Using default instance registry URL";
 fi
 mkdir -p /etc/schoolbox
-echo "{\"instance_registry_url_override\": \"${instance_registry_url_override}\"}" > $instance_registry_conf_file
+echo -e \
+"{\n" \
+"  \"instance_registry_url_override\": \"${instance_registry_url_override}\",\n" \
+"  \"instance_registry_api_token\": \"${instance_registry_api_token}\"\n" \
+"}" > $instance_registry_conf_file
 
 # This is needed by the puppet Instance Registry API integration
 if ! /opt/puppetlabs/puppet/bin/gem list | grep -q lookup_http; then

@@ -23,6 +23,9 @@ case "$1" in
         date >> /var/log/schoolbox/upgrade.log;
         echo "Schoolbox Upgrade" >> /var/log/schoolbox/upgrade.log;
 
+        # Modify newly-deployed package files to be owned by 'alaress' user.
+        # In theory, package files should be root-owned, but this assists Support/Devs using FTP to manipulate files.
+        # https://www.debian.org/doc/debian-policy/ch-files.html#permissions-and-owners
         chown -R alaress:alaress /usr/share/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
         /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
 
@@ -42,37 +45,7 @@ case "$1" in
         # (These should only be run on install, not on upgrade. For that reason, these scripts must be idempotent.)
         php /usr/share/schoolbox/tools/token/generateKeyPair.php --quiet 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
 
-        # Manage services (upstart|systemd)
-        if [ "$(readlink /proc/1/exe)" = "/lib/systemd/systemd" ]; then
-            cp -f /usr/share/schoolbox/tools/init/schoolbox-*.service /lib/systemd/system;
-            systemctl daemon-reload;
-            # Enable services
-            # schoolbox-belld is not enabled by default
-            systemctl enable schoolbox-scheduled.service;
-            systemctl enable schoolbox-routed.service;
-            systemctl enable schoolbox-socketd.service;
-            systemctl enable schoolbox-digestd.service;
-            # Restart all daemons post upgrade
-            systemctl restart schoolbox-scheduled.service | tee -a /var/log/schoolbox/upgrade.log;
-            systemctl restart schoolbox-routed.service | tee -a /var/log/schoolbox/upgrade.log;
-            systemctl restart schoolbox-socketd.service | tee -a /var/log/schoolbox/upgrade.log;
-            systemctl restart schoolbox-digestd.service | tee -a /var/log/schoolbox/upgrade.log;
-            # Restart schoolbox-belld only if already enabled
-            if [ "$(systemctl is-enabled schoolbox-belld.service 2>/dev/null)" = "enabled" ]; then
-                systemctl restart schoolbox-belld.service | tee -a /var/log/schoolbox/upgrade.log;
-            fi
-        else
-            cp -f /usr/share/schoolbox/tools/init/schoolbox-*.conf /etc/init/;
-            cp -f /usr/share/schoolbox/tools/init/schoolbox-*.override /etc/init/;
-            # Restart all daemons post upgrade
-            service schoolbox-scheduled restart 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-            service schoolbox-socketd restart 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-            service schoolbox-digestd restart 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-            service schoolbox-routed restart 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-            if [ -f /etc/init/schoolbox-belld.conf ]; then
-                service schoolbox-belld restart 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-            fi
-        fi
+        /usr/local/bin/schoolbox-rebuild-daemons --fetch -v 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
 
         # Bring site back up
         /usr/share/schoolbox/tools/maintenance/site_up.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
