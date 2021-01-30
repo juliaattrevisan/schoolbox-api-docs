@@ -19,6 +19,7 @@ case "$1" in
 
         # Temporary fix for moving symlinked conf file as part of 20.2 upgrade
         if [ -L /usr/share/schoolbox/www/conf ]; then
+            echo "Converting conf link to dir..." | tee -a /var/log/schoolbox/upgrade.log;
             temp_file=$(mktemp)
             mv /usr/share/schoolbox/www/conf/conf.php "$temp_file"
             rm /usr/share/schoolbox/www/conf
@@ -26,46 +27,36 @@ case "$1" in
             mv "$temp_file" /usr/share/schoolbox/www/conf/conf.php
         fi
 
-         # We cannot reference a file in the package from a prinst script, so need to inline it here
-        echo 'Taking Schoolbox offline...' | tee -a /var/log/schoolbox/upgrade.log;
-        maintenanceFileName="/usr/share/schoolbox/.maintenance";
-        # Does maintenance file already exist
-        echo "Checking for maintenance file '$maintenanceFileName'..." | tee -a /var/log/schoolbox/upgrade.log;
-        if [ ! -d /usr/share/schoolbox ]; then
-            echo "Schoolbox folder does not yet exist, maintenance file cannot be created." | tee -a /var/log/schoolbox/upgrade.log;
-        elif [ -f ${maintenanceFileName} ]; then
-            echo "Maintenance file already present." | tee -a /var/log/schoolbox/upgrade.log;
-        else
-            echo "Maintenance file not present, creating..." | tee -a /var/log/schoolbox/upgrade.log;
-            touch ${maintenanceFileName};
-            if [ $? != 0 ]; then
-                echo "Unable to create maintenance file, exiting" | tee -a /var/log/schoolbox/upgrade.log;
-                exit 1;
+        # Is nginx local? TODO Add cloud support.
+        if service nginx status >/dev/null 2>&1; then
+            # We cannot reference a file in the package from a prinst script, so need to inline it here
+            echo 'Taking Schoolbox offline...' | tee -a /var/log/schoolbox/upgrade.log;
+            maintenanceFileName="/usr/share/schoolbox/.maintenance";
+            # Does maintenance file already exist
+            echo "Checking for maintenance file '$maintenanceFileName'..." | tee -a /var/log/schoolbox/upgrade.log;
+            if [ ! -d /usr/share/schoolbox ]; then
+                echo "Schoolbox folder does not yet exist, maintenance file cannot be created." | tee -a /var/log/schoolbox/upgrade.log;
+            elif [ -f ${maintenanceFileName} ]; then
+                echo "Maintenance file already present." | tee -a /var/log/schoolbox/upgrade.log;
+            else
+                echo "Maintenance file not present, creating..." | tee -a /var/log/schoolbox/upgrade.log;
+                if ! touch ${maintenanceFileName}; then
+                    echo "Unable to create maintenance file, exiting" | tee -a /var/log/schoolbox/upgrade.log;
+                    exit 1;
+                fi;
+                echo "Maintenance file created at '$maintenanceFileName'" | tee -a /var/log/schoolbox/upgrade.log;
             fi;
-            echo "Maintenance file created at '$maintenanceFileName'" | tee -a /var/log/schoolbox/upgrade.log;
-        fi;
-        # Production servers use 'open_file_cache', need to reload to detect file change
-        nginx -s reload | tee -a /var/log/schoolbox/upgrade.log;
-
-        # Stop all daemons for consistency (upstart|systemd)
-        if [ "$(readlink /proc/1/exe)" = "/lib/systemd/systemd" ]; then
-            systemctl stop schoolbox-scheduled.service | tee -a /var/log/schoolbox/upgrade.log;
-            systemctl stop schoolbox-routed.service | tee -a /var/log/schoolbox/upgrade.log;
-            systemctl stop schoolbox-socketd.service | tee -a /var/log/schoolbox/upgrade.log;
-            systemctl stop schoolbox-digestd.service | tee -a /var/log/schoolbox/upgrade.log;
-            # Restart schoolbox-belld only if already enabled
-            if [ "$(systemctl is-enabled schoolbox-belld.service 2>/dev/null)" = "enabled" ]; then
-                systemctl stop schoolbox-belld.service | tee -a /var/log/schoolbox/upgrade.log;
-            fi
-        else
-            service schoolbox-scheduled stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
-            service schoolbox-socketd stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
-            service schoolbox-digestd stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
-            service schoolbox-routed stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
-            if [ -f /etc/init/schoolbox-belld.conf ]; then
-                service schoolbox-belld stop 2>&1 >> /var/log/schoolbox/upgrade.log || true;
-            fi
+            # Production servers use 'open_file_cache', need to reload to detect file change
+            nginx -s reload | tee -a /var/log/schoolbox/upgrade.log;
         fi
+
+        # Stop all schoolbox daemons (supports both old+new single/multi instance style)
+        for daemon in socketd digestd routed scheduled belld; do
+            for service in $(systemctl | grep -E "schoolbox*.*$daemon.*service" | awk '{print $1}'); do
+                echo "stopping $service" | tee -a /var/log/schoolbox/upgrade.log
+                systemctl stop "$service"
+            done
+        done
     ;;
 
     abort-upgrade)

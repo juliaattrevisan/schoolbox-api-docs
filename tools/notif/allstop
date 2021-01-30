@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Stop all schoolbox notif daemons (supports both old+new single/multi instance style)
-for daemon in socketd digestd routed scheduled; do
+for daemon in socketd digestd routed scheduled belld; do
     for service in $(systemctl | grep -E "schoolbox.*$daemon.*service" | awk '{print $1}'); do
         echo "stopping $service"
         systemctl stop "$service"
