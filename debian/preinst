@@ -10,8 +10,6 @@ set -e
 
 case "$1" in
     install)
-        # Ensure the alaress user exists
-        useradd -m alaress 2> /dev/null || true;
     ;;
     upgrade)
         # If a schoolbox DB backup script has been previously shipped, use it
@@ -49,8 +47,6 @@ case "$1" in
         # Production servers use 'open_file_cache', need to reload to detect file change
         nginx -s reload | tee -a /var/log/schoolbox/upgrade.log;
 
-        # Ensure the alaress user exists
-        useradd -m alaress 2> /dev/null || true;
         # Stop all daemons for consistency (upstart|systemd)
         if [ "$(readlink /proc/1/exe)" = "/lib/systemd/systemd" ]; then
             systemctl stop schoolbox-scheduled.service | tee -a /var/log/schoolbox/upgrade.log;
