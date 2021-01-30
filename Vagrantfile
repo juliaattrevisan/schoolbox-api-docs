@@ -24,6 +24,7 @@ bridged_network_interface = default["bridged_network_interface"]
 puppet_dir = default["puppet_dir"]
 puppet_debug = default["puppet_debug"]
 instance_registry_url_override = default["instance_registry_url_override"]
+instance_registry_api_key = default["instance_registry_api_key"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -77,6 +78,9 @@ if File.file?('vagrant.yaml')
   if !conf["instance_registry_url_override"].nil?
     instance_registry_url_override = conf["instance_registry_url_override"]
   end
+  if !conf["instance_registry_api_key"].nil?
+    instance_registry_api_key = conf["instance_registry_api_key"]
+  end
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -106,7 +110,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "shell" do |s|
     s.path = "tools/vagrant-provision-pre-puppet.sh"
-    s.args = "#{instance_registry_url_override}"
+    s.args = "'#{instance_registry_url_override}' '#{instance_registry_api_key}'"
   end
 
   # Puppet Apply Provisioner (without a puppet master)

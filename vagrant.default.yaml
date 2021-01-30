@@ -20,3 +20,6 @@ puppet_debug: false
 # By default is empty, so will fall back to real IR URL.
 # Set this to your dev IR when developing integrations between IR, Puppet + Schoolbox
 instance_registry_url_override: ""
+# By default this is empty. When developing integrations with the IR you can add host + instance records. The host
+# records API_KEY must match this value.
+instance_registry_api_key: ""
