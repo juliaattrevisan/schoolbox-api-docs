@@ -1,29 +1,18 @@
 <template>
     <div>
         <section>
-            <dl v-if="isArticlesLoading" class="tabs" :id="topicContainerId">
-                <dd class="skeleton" v-for="(n, index) in 3" :key="index">
-                    <a></a>
-                </dd>
-            </dl>
-            <dl v-else class="tabs" :id="topicContainerId">
+            <dl v-if="isArticlesLoaded" class="tabs" :id="topicContainerId">
                 <dd v-for="(statusCount, status) in statuses" :class="{active: tabSelected === status}" :key="status">
                     <a v-if="statusCount" @click="onTabChange(status)">{{ status }}</a>
                 </dd>
             </dl>
+            <dl v-else class="tabs" :id="topicContainerId">
+                <dd class="skeleton" v-for="(n, index) in 3" :key="index">
+                    <a></a>
+                </dd>
+            </dl>
             <div class="tabs-content no-margin">
-                <ul v-if="isArticlesLoading" class="information-list">
-                    <li class="actions-small-1" v-for="(n, index) in 3" :key="index">
-                        <div class="list-item">
-                            <div class="small-12 card skeleton">
-                                <div class="img"></div>
-                                <h3></h3>
-                                <p class="meta"></p>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-                <ul v-else class="information-list">
+                <ul v-if="isArticlesLoaded" class="information-list">
                     <li class="actions-small-1" v-for="article in currentArticles" :key="article.id">
                         <div class="list-item">
                             <div class="small-12 card">
@@ -46,20 +35,30 @@
                             </div>
                         </article>
                         <nav>
-                            <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" title="Modify this locale.news "></a>
+                            <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" :title="'Modify this ' + localeNews"></a>
                         </nav>
                     </li>
                 </ul>
-                <!-- <div class="empty-state no-margin" v-if="!filteredArticles.length && !isArticlesLoading">
+                <ul v-else class="information-list">
+                    <li class="actions-small-1" v-for="(n, index) in 3" :key="index">
+                        <div class="list-item">
+                            <div class="small-12 card skeleton">
+                                <div class="img"></div>
+                                <h3></h3>
+                                <p class="meta"></p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div v-if="isArticlesLoaded && filteredArticles.length === 0" class="empty-state no-margin">
                     <i class="icon-news"></i>
-                    <p>You haven't authored any {{ locale.news.plural }}.</p>
-                    {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-                    {% if createRoute %}<p><a href="{{ createRoute }}">Create {{ locale.news }}</a>.</p>{% endif %}
-                </div> -->
+                    <p>You haven't authored any {{ localeNewsPlural }}.</p>
+                    <p v-if="canCreateNews"><a :href="createNewsRoute">Create {{ localeNews }}</a>.</p>
+                </div>
             </div><!-- <div class="tabs-content no-margin"> -->
         </section>
         <paginate
-            v-model="pageNum"
+            v-model="activePageNumber"
             :page-count="pageCount"
             :container-class="'pagination'"
             :prev-text="'‹'"
@@ -83,47 +82,29 @@
             'paginate': VuejsPaginate
         },
         props: {
-            
-            // The active page on the pagination
-            pageNum: Number,
-            
-            // The selected tab, just used for active styling
-            tabSelected: String,
-            
-            //route to retrieve my news
-            route: String,
-
-            //limit per page
-            limit: Number,
-
-            topicContainerId: Number
-
+            activePageNumber: Number, // The active page on the pagination
+            tabSelected: String, // The selected tab, just used for active styling
+            newsRoute: String,
+            limitPerPage: Number,
+            topicContainerId: Number,
+            localeNews: String,
+            localeNewsPlural: String,
+            canCreateNews: Boolean,
+            createNewsRoute: String,
         },
         data: function() {
             return {
-
-                // Whether the articles are still being loaded or not
-                // Used to show the placeholder loader
-                isArticlesLoading: true,
-
-                // A unique list of statuses returned from the user's articles
-                // Used to display tab options
-                statuses: {},
-
-                // *All* the author's articles
+                isArticlesLoaded: false,
+                statuses: {}, // A unique list of statuses returned from the user's articles, Used to display tab options
                 allArticles: [],
-
-                // A container for a filtered list of authored articles
-                // Will be populated as all articles on load
-                filteredArticles: [],
-                
+                filteredArticles: []  // A container for a filtered list of authored articles, Will be populated as all articles on load
             }
         },
         computed: {
             
             // The total pages to show for pagination buttons
             pageCount: function () {
-                return Math.ceil(this.filteredArticles.length / this.limit);
+                return Math.ceil(this.filteredArticles.length / this.limitPerPage);
             },
 
             // The current set of articles showing for the page
@@ -133,15 +114,16 @@
                     return [];
                 }
 
-                var offset = (this.pageNum-1) * this.limit;
-                var total = offset + this.limit;
+                let offset = (this.activePageNumber-1) * this.limitPerPage;
+                let total = offset + this.limitPerPage;
                 
                 return this.filteredArticles.slice(offset, total);
+
             }
         },
         mounted: function () {
 
-            fetch(this.route)
+            fetch(this.newsRoute)
             .then((response) => response.json())
             .then((response) => {
 
@@ -167,8 +149,8 @@
                 if (this.tabSelected !== 'All') {
                     this.onTabChange(this.tabSelected, true, true);
                 }
-                if (this.pageNum > 1) {
-                    this.onPaginate(this.pageNum, true);
+                if (this.activePageNumber > 1) {
+                    this.onPaginate(this.activePageNumber, true);
                 }
 
                 // Reinit foundation for the kebab dropdowns, for some reason this has to happen just very slightly delayed :|
@@ -176,7 +158,7 @@
                     $(document).foundation();
                 }, 1);
                 
-                this.isArticlesLoading = false;
+                this.isArticlesLoaded = true;
 
             }).catch((error) => {
                 console.log(error);
@@ -201,7 +183,7 @@
                         this.onTabChange(event.state.tab, true, true);
                     }
                 }
-            };
+            }
 
         },
         methods: {
@@ -236,7 +218,7 @@
                 this.tabSelected = tab;
 
                 if (!persistPage) {
-                    this.pageNum = 1;
+                    this.activePageNumber = 1;
                 }
 
                 if (tab === 'All') {
@@ -253,7 +235,7 @@
 
                 // Update the window history
                 if (!holdState) {
-                    window.history.pushState({ tab: tab, page: this.pageNum }, '', '?status=' + tab);
+                    window.history.pushState({ tab: tab, page: this.activePageNumber }, '', '?status=' + tab);
                 
                 }
             }

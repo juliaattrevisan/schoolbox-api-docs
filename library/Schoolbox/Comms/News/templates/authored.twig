@@ -10,14 +10,24 @@
 {% block newsContent %}
     
     <div class="{{ pageNum }}"></div>
-
+    
     <div id="authored-container">
         <authored
-            :page-num="{{ pageNum }}"
+            :active-page-number="{{ pageNum }}"
             tab-selected="{{ status }}"
-            route="{{ routeLookup('commsNews.getAuthoredArticles') }}"
-            :limit="{{ config.search_type_limit }}"
+            news-route="{{ routeLookup('commsNews.getAuthoredArticles') }}"
+            :limit-per-page="{{ config.search_type_limit }}"
             :topic-container-id="{{ topicContainerId is defined ? topicContainerId : 0 }}"
+            locale-news="{{ locale.news }}"
+            locale-news-plural="{{ locale.news.plural }}"
+            {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
+            {% if createRoute %}
+            :can-create-news="true"
+            create-news-route="{{ createRoute }}"
+            {% else %}
+            :can-create-news="false"
+            create-news-route=""
+            {% endif %}
         >
         </authored>
     </div>
@@ -122,7 +132,7 @@
             
             limit: {{ config.search_type_limit }},
 
-            topicContainerId: {{ topicContainerId is defined ? topicContainerId : 0 }}
+            topicContainerId: {{ topicContainerId is defined ? topicContainerId : 0 }},
 
         }
         
