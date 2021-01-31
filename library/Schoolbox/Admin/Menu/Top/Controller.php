@@ -193,6 +193,7 @@ class Controller extends Base
             $item = $this->getMenuTopMapper()->findById($post['id']);
         } else {
             $item = new MenuTop();
+            $item->setPlanHide(false);
 
             $itemOrder = $this->getMenuTopMapper()->findAll([
                 'limit' => 1,
