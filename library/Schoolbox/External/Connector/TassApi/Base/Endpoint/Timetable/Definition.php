@@ -247,7 +247,7 @@ class Definition implements IStrategy
                 'student_code' => $externalId
             ]);
 
-            $this->preloadTimetable((string)$externalId, $person, $data,'student_timetable');
+            $this->preloadTimetable((string)$externalId, $person, $data, 'student_timetable');
         }
 
         /* Staff
@@ -270,7 +270,7 @@ class Definition implements IStrategy
                 'semester' => $semester
             ]);
 
-            $this->preloadTimetable((string)$externalId, $person, $data,'teacher_timetable');
+            $this->preloadTimetable((string)$externalId, $person, $data, 'teacher_timetable');
         }
     }
 
@@ -448,6 +448,12 @@ class Definition implements IStrategy
                 ]
             ]
              */
+
+            /* Sort periods by start time to set sequence properly
+             */
+            usort($periods, static function ($a, $b) {
+                return (strtotime($a['PRD_START']) > strtotime($b['PRD_START']));
+            });
             /** @var TimetablePeriod $period */
             foreach ($periods as $j => $period) {
                 $periodName = $period['PRD_DESC'];
