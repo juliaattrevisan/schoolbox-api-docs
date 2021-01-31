@@ -85,6 +85,14 @@ readconf() {
 	tempsqlhost=$(schoolbox-conf --conf="$tempconffile" --option=SQL_host);
 	tempsqldb=$(schoolbox-conf --conf="$tempconffile" --option=SQL_db);
 }
+declare temp_ini_file;
+read_ini() {
+  # Collect Credentials from $temp_ini_file
+  tempsqluser=$(schoolbox-readini.php --ini="$temp_ini_file" --option=SQL_user);
+  tempsqlpasswd=$(schoolbox-readini.php --ini="$temp_ini_file" --option=SQL_passwd);
+  tempsqlhost=$(schoolbox-readini.php --ini="$temp_ini_file" --option=SQL_host);
+  tempsqldb=$(schoolbox-readini.php --ini="$temp_ini_file" --option=SQL_db);
+}
 
 readsqlver() {
 	# Retrive the Schoolbox version from MySQL using provided credentials
@@ -293,33 +301,39 @@ do
 	ssh -o ConnectTimeout=3 -o ConnectionAttempts=1 $host exit >/dev/null 2>&1;
 	if [ $? -eq 0 ];
 	then
-		for x in $searchlist;
-		do
-			scp $host:$x /tmp >/dev/null 2>&1;
-			if [ $? -eq 0 ];
-			then
-				tempconffile="/tmp/conf.php"
-				readconf;
-        sql_ver=$(ssh "$host" "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='site_version'\"" 2>/dev/null);
-        if [[  "$(echo -e "20.1.alpha1\n${sql_ver}" | sort -V | head -n 1)" != "20.1.alpha1"  ]]; then
-          backup_dir='file_dir';
-        else
-          backup_dir='backup_dir';
-        fi
-        tempfiledir=`ssh $host "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='${backup_dir}'\"" 2>/dev/null`
-				if [ ! -z $tempfiledir ];
-				then
-					tempdatadirlist=`ssh $host "ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null"`;
-					for i in $tempdatadirlist;
-					do
-						echo -e ".\c";
-						checki=`ssh $host "readlink -f $i"`;
-						echo "[R],[D],$host,$x,$checki" >> $sbrl;
-						echo "[R],[A],$host,$x,$checki" >> $sbrl;
-					done
-				fi
-			fi
-		done;
+    # remote may be at current or older arch
+    remote_found=0
+    # First try current conf arch.
+    if scp $host:/etc/schoolbox/instances.ini /tmp >/dev/null 2>&1; then
+      remote_found=1
+      temp_ini_file="/tmp/instances.ini"
+      read_ini
+    # fallback to old conf arch.
+    elif scp $host:/etc/schoolbox/conf.php /tmp >/dev/null 2>&1; then
+      remote_found=1
+      tempconffile="/tmp/conf.php"
+      readconf;
+    fi
+
+    if [[ $remote_found == '1' ]]; then
+      sql_ver=$(ssh "$host" "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='site_version'\"" 2>/dev/null);
+      if [[  "$(echo -e "20.1.alpha1\n${sql_ver}" | sort -V | head -n 1)" != "20.1.alpha1"  ]]; then
+        backup_dir='file_dir';
+      else
+        backup_dir='backup_dir';
+      fi
+
+      tempfiledir=`ssh $host "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='${backup_dir}'\"" 2>/dev/null`
+      if [ ! -z $tempfiledir ]; then
+        tempdatadirlist=`ssh $host "ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null"`;
+        for i in $tempdatadirlist; do
+          echo -e ".\c";
+          checki=`ssh $host "readlink -f $i"`;
+          echo "[R],[D],$host,$x,$checki" >> $sbrl;
+          echo "[R],[A],$host,$x,$checki" >> $sbrl;
+        done
+      fi
+    fi
 	fi
 done
 
