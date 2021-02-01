@@ -22,7 +22,10 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute(): bool
     {
-        return true;
+        /* Only students have access to the Student Toolkit
+         * All other roletypes have no utilisation of it
+         */
+        return $this->getUser()->getRole()->isStudent();
     }
 
 
