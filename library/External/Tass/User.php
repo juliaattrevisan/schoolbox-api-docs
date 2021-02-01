@@ -172,7 +172,7 @@ class External_Tass_User implements External_UserInterface
                 studnswbos.bos_id,
                 studqcaa.learner_id,
                 studscsa.scsa_number,
-                studvsn.vsn,
+                CONVERT(varchar(20), studvsn.vsn),
                 ''
             ) AS StudentStudiesCode,
             '' AS AlertMessage,
