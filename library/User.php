@@ -348,7 +348,7 @@ class User extends DeprecatedModel
         if ($keyword != "") {
             if (is_numeric($keyword)) {
                 $param = $this->db->quote($keyword);
-                $query .= "( synergy_id = $param OR year = $param ) ";
+                $query .= "( synergy_id = $param OR lyl.name = $param ) ";
             } else {
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
                     $firstName = $this->db->escapeForLike($name[1]);
@@ -384,7 +384,7 @@ class User extends DeprecatedModel
         if (($searchFilter = $this->getSearchFilter($_SESSION['user']))) {
             $query .= ' AND '.$searchFilter;
         }
-        $query .= "ORDER BY group_id, year, lastname, firstname";
+        $query .= "ORDER BY group_id, lyl.sequence, lastname, firstname";
         if (is_numeric($limit)) {
             $query .= " LIMIT $limit";
         }
