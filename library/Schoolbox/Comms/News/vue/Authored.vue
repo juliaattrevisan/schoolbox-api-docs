@@ -58,6 +58,7 @@
             </div><!-- <div class="tabs-content no-margin"> -->
         </section>
         <paginate
+            v-if="currentArticles.length && pageCount > 1"
             v-model="activePageNumber"
             :page-count="pageCount"
             :container-class="'pagination'"
@@ -67,7 +68,6 @@
             :next-link-class="'arrow'"
             :disabled-class="'unavailable'"
             :click-handler="onPaginate"
-            v-if="currentArticles.length && pageCount > 1"
         >
         </paginate>
     </div>
@@ -125,69 +125,87 @@
             this.activePageNumber = this.pageNumber; 
             this.activeTabSelected = this.tabSelected;
 
-            fetch(this.newsRoute)
-            .then((response) => response.json())
-            .then((response) => {
-
-                this.allArticles = response;
-                this.filteredArticles = response;
-
-                this.statuses = {
-                    'All': 0,
-                    'Drafted': 0,
-                    'Awaiting Moderation': 0,
-                    'Rejected': 0,
-                    'Awaiting Publication': 0,
-                    'Published': 0,
-                    'Archived': 0
-                };
-
-                response.forEach((article) => {
-                    this.statuses['All']++;
-                    this.statuses[article.status]++;
-                });
-
-                // In the case that this page has loaded with a page and/or tab in the URL params - update the page to reflect those params
-                if (this.activeTabSelected !== 'All') {
-                    this.onTabChange(this.activeTabSelected, true, true);
-                }
-                if (this.activePageNumber > 1) {
-                    this.onPaginate(this.activePageNumber, true);
-                }
-
-                // Reinit foundation for the kebab dropdowns, for some reason this has to happen just very slightly delayed :|
-                setTimeout(function(){
-                    $(document).foundation();
-                }, 1);
-                
-                this.isArticlesLoaded = true;
-
-            }).catch((error) => {
-                console.log(error);
-            });
-
-            // Listen for window state change
-            window.onpopstate = (event) => {
-                if (!event.state) {
-                    // Return to defaults
-                    this.activePageNumber = 1;
-                    this.onPaginate(this.activePageNumber, true);
-                    this.activeTabSelected = 'All';
-                    this.onTabChange(this.activeTabSelected, true, true);
-                } else {
-                    if (event.state.page) {
-                        this.activePageNumber = event.state.page;
-                        this.onPaginate(event.state.page, true);
-                    }
-                    if (event.state.tab) {
-                        this.activeTabSelected = event.state.tab;
-                        this.onTabChange(event.state.tab, true, true);
-                    }
-                }
-            }
+            this.getNews();
+            this.initWindowStateChangeListener();
 
         },
         methods: {
+
+            /**
+             * Load up all the news linked to the current user
+             *
+             */
+            getNews: function () {
+
+                fetch(this.newsRoute)
+                .then((response) => response.json())
+                .then((response) => {
+
+                    this.allArticles = response;
+                    this.filteredArticles = response;
+
+                    this.statuses = {
+                        'All': 0,
+                        'Drafted': 0,
+                        'Awaiting Moderation': 0,
+                        'Rejected': 0,
+                        'Awaiting Publication': 0,
+                        'Published': 0,
+                        'Archived': 0
+                    };
+
+                    response.forEach((article) => {
+                        this.statuses['All']++;
+                        this.statuses[article.status]++;
+                    });
+
+                    // In the case that this page has loaded with a page and/or tab in the URL params - update the page to reflect those params
+                    if (this.activeTabSelected !== 'All') {
+                        this.onTabChange(this.activeTabSelected, true, true);
+                    }
+                    if (this.activePageNumber > 1) {
+                        this.onPaginate(this.activePageNumber, true);
+                    }
+
+                    // Reinit foundation for the kebab dropdowns, for some reason this has to happen just very slightly delayed :|
+                    setTimeout(function(){
+                        $(document).foundation();
+                    }, 1);
+                    
+                    this.isArticlesLoaded = true;
+
+                }).catch((error) => {
+                    console.log(error);
+                });
+
+            },
+
+            /**
+             *  Listen for window state change, to manage changes to pagination or tabs
+             *
+             */
+            initWindowStateChangeListener: function () {
+
+                window.onpopstate = (event) => {
+                    if (!event.state) {
+                        // Return to defaults
+                        this.activePageNumber = 1;
+                        this.onPaginate(this.activePageNumber, true);
+                        this.activeTabSelected = 'All';
+                        this.onTabChange(this.activeTabSelected, true, true);
+                    } else {
+                        if (event.state.page) {
+                            this.activePageNumber = event.state.page;
+                            this.onPaginate(event.state.page, true);
+                        }
+                        if (event.state.tab) {
+                            this.activeTabSelected = event.state.tab;
+                            this.onTabChange(event.state.tab, true, true);
+                        }
+                    }
+                }
+
+            },
 
             /**
              * On change of page
