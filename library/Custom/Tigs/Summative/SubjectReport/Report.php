@@ -594,13 +594,10 @@ class Report
         // * HSC-Y11-S2   (work-type = NESA)
         $yearLevel = $attributes->getCurriculumYearLevel();
         $semester  = $attributes->getCurriculumSemester();
-        if (!(11 === $yearLevel && $semester === 2 && $attributes->isHsc())) {
-            return null;
-        }
 
         // Which work types should we fetch?
         $configNames = [Config::_TIGS_WORK_TYPE_NESA_SCORE => 'Set MYP FAL Work Type'];
-        $configNames[Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS] = 'Set NESA Grade Work Type';
+        $configNames[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK] = 'Set NESA Grade Work Type';
 
         $workTypeIds = [];
         foreach ($configNames as $configName => $errorMsgLink) {
@@ -646,6 +643,7 @@ class Report
                 $roleTypeOverride
             );
             $context = $nesa->toContext($reportSemester);
+
             if ($context !== null) {
                 $reports['data'][$reportSemester] = $context;
             }
