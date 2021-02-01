@@ -213,9 +213,7 @@ button.submit {
   }
 }
 
-.island .profile-learning-actions {
-  margin-bottom: 2px;
-
+.profile-learning-actions {
   > div {
     display: flex;
     justify-content: center;
@@ -228,6 +226,7 @@ button.submit {
     color: $anchor-font-color;
     padding: .75rem 1rem;
     text-align: center;
+    flex-basis: 0;
     flex-grow: 1;
     line-height: 1.4;
 
@@ -241,6 +240,9 @@ button.submit {
       display: block;
     }
 
+    @media #{$small-only} {
+      flex-basis: auto;
+    }
   }
 
   .learning {
