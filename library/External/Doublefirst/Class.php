@@ -24,7 +24,7 @@ class External_Doublefirst_Class implements External_ClassInterface
     /**
      * External_Doublefirst_Class constructor.
      */
-    function __construct()
+    public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
         $this->externalUser = new External_User('Doublefirst');
@@ -57,10 +57,22 @@ class External_Doublefirst_Class implements External_ClassInterface
                     null AS StudentTutorDescription,
                     pbi.PupilID as synergy_id
                 FROM PupilSubjects ps JOIN V_PupilBasicInformation pbi ON pbi.PupilID = ps.PupilID
-                LEFT JOIN YearGroupSubjectDivision ygsd ON ygsd.DivisionID = ps.DivisionID AND ygsd.SubjectID = ps.SubjectID AND ygsd.YearGroup = ps.YearGroup AND ygsd.AcademicYear = ps.SchoolYear
-                JOIN TimetableClassRoom tcr ON tcr.YearGroup = ps.yeargroup AND tcr.SubjectID = ps.SubjectID AND tcr.DivisionID = ps.DivisionID AND tcr.AcademicYear = ps.SchoolYear
+                LEFT JOIN YearGroupSubjectDivision ygsd
+                    ON ygsd.DivisionID = ps.DivisionID
+                        AND ygsd.SubjectID = ps.SubjectID
+                        AND ygsd.YearGroup = ps.YearGroup
+                        AND ygsd.AcademicYear = ps.SchoolYear
+                JOIN TimetableClassRoom tcr
+                    ON tcr.YearGroup = ps.yeargroup
+                        AND tcr.SubjectID = ps.SubjectID
+                        AND tcr.DivisionID = ps.DivisionID
+                        AND tcr.AcademicYear = ps.SchoolYear
                 JOIN TimetableMatrix tm ON tm.MatrixID = tcr.MatrixID
-                JOIN TimetableMaster ttm ON ttm.TimetableName = tm.TimetableName AND ttm.AcademicYear = tcr.AcademicYear AND ttm.IsWorking = 1 AND ttm.YearGroup = ps.YearGroup
+                JOIN TimetableMaster ttm
+                    ON ttm.TimetableName = tm.TimetableName
+                        AND ttm.AcademicYear = tcr.AcademicYear
+                        AND ttm.IsWorking = 1
+                        AND ttm.YearGroup = ps.YearGroup
                 WHERE ps.SchoolYear = {$year} AND ygsd.SubjectDivisionName = '{$code}'
             ";
 
@@ -77,7 +89,7 @@ class External_Doublefirst_Class implements External_ClassInterface
     /**
      * Gets the class code part of a query.
      *
-     * @param  string $subCode
+     * @param string $subCode
      * @return string
      */
     protected function getClassCodeQuery($subCode)
@@ -88,7 +100,7 @@ class External_Doublefirst_Class implements External_ClassInterface
             $code = "'" . $this->database->quote($code) . "'";
         }
 
-        return "ygsd.SubjectDivisionName IN (" . implode($subCodeArray, ',') . ")";
+        return "ygsd.SubjectDivisionName IN (" . implode(',', $subCodeArray) . ")";
     }
 
     /**
@@ -109,10 +121,19 @@ class External_Doublefirst_Class implements External_ClassInterface
             "
             SELECT DISTINCT tcs.StaffID
             FROM PupilSubjects ps
-            JOIN TimetableClassStaff tcs ON tcs.SchoolID = ps.SchoolID AND tcs.YearGroup = ps.YearGroup AND tcs.DivisionID = ps.DivisionID AND tcs.AcademicYear = ps.SchoolYear AND tcs.BatchID = ps.BatchID
+            JOIN TimetableClassStaff tcs
+                ON tcs.SchoolID = ps.SchoolID
+                       AND tcs.YearGroup = ps.YearGroup
+                       AND tcs.DivisionID = ps.DivisionID
+                       AND tcs.AcademicYear = ps.SchoolYear
+                       AND tcs.BatchID = ps.BatchID
             JOIN StaffPersonalDetails spd ON spd.StaffID = tcs.StaffID
 
-            LEFT JOIN YearGroupSubjectDivision ygsd ON ygsd.DivisionID = tcs.DivisionID AND ygsd.SubjectID = tcs.SubjectID AND ygsd.YearGroup = tcs.YearGroup AND ygsd.AcademicYear = tcs.AcademicYear
+            LEFT JOIN YearGroupSubjectDivision ygsd
+                ON ygsd.DivisionID = tcs.DivisionID
+                       AND ygsd.SubjectID = tcs.SubjectID
+                       AND ygsd.YearGroup = tcs.YearGroup
+                       AND ygsd.AcademicYear = tcs.AcademicYear
             WHERE ps.SchoolYear = {$year} and $classQuery
         ";
 
@@ -122,7 +143,7 @@ class External_Doublefirst_Class implements External_ClassInterface
             return [];
         }
 
-        $teachers = array();
+        $teachers = [];
 
         foreach ($rows as $row) {
             $teachers[] = $row['StaffID'];
