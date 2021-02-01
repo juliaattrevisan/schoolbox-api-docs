@@ -191,7 +191,7 @@ class External_Tass_User implements External_UserInterface
         LEFT JOIN studqcaa ON s.stud_code = studqcaa.stud_code
         LEFT JOIN studscsa ON s.stud_code = studscsa.stud_code
         LEFT JOIN studvsn ON s.stud_code = studvsn.stud_code
-        WHERE stud_code = '{$this->database->quote($externalUserId)}'
+        WHERE s.stud_code = '{$this->database->quote($externalUserId)}'
         ";
         $student = $this->database->trimRow($this->database->getRow($query));
         if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
