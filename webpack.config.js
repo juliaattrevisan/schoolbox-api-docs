@@ -1,11 +1,8 @@
 const path              = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
     entry: {
-
-        chromeFoundation: './www/css/foundation/chrome-foundation.scss',
 
         // Libraries
         clipboard: "./www/javascript/shared/clipboard/clipboard.main.js",
@@ -28,6 +25,8 @@ module.exports = {
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.main.js',
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.main.js',
         authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
+
+        chromeFoundation: './www/css/foundation/chrome-foundation.scss'
     },
     output: {
         path: path.resolve(__dirname, "www/javascript/components"),
@@ -76,27 +75,49 @@ module.exports = {
                 test: /\.css$/,
                 use: ['vue-style-loader', 'css-loader'],
             },
+            // {
+            //     test: /\.scss$/,
+            //     use: [
+            //         'vue-style-loader',
+            //         'css-loader',
+            //         'sass-loader'
+            //     ],
+            // },
             {
-                test: /\.scss$/,
-                use: [
-                    'vue-style-loader',
-                    'css-loader',
-                    'sass-loader'
-                ],
-            },
-            {
-                test: /\.s[ac]ss$/i,
-                use: [
-                    {
-                        loader: MiniCssExtractPlugin.loader,
-                        options: {
-                            publicPath: path.resolve(__dirname, 'www/css')
-                        },
-                    },
-                    "css-loader",
-                    "sass-loader",
-                ]
-            },
+				test: /\.scss$/,
+				oneOf: [
+					{
+						//this allows us to only perform the below on vue files, other scss files follow the following
+						resourceQuery: /^\?vue/,
+						use: [
+							'vue-style-loader',
+							'css-loader',
+							'sass-loader'
+						]
+					},
+					{
+						use: [
+							{
+								loader: "file-loader",
+								options: {
+									name: "[name].css",
+									outputPath: "../../css/core/"
+								}
+							},
+							{ loader: "extract-loader" },
+							{ loader: "css-loader?url=false" },
+							{ loader: "sass-loader",
+								options: {
+									sassOptions: {
+										indentWidth: 4,
+										includePaths: ["../../css/foundation/"],
+									},
+								},
+							}
+						]
+					}
+				]
+			}
         ]
     },
     resolve: {
@@ -111,12 +132,6 @@ module.exports = {
         extensions: ['*', '.js', '.vue', '.json']
     },
     plugins: [
-        new VueLoaderPlugin(),
-        new MiniCssExtractPlugin({
-            // Options similar to the same options in webpackOptions.output
-            // both options are optional
-            filename: "../../css/[name].css",
-            chunkFilename: "[id].css",
-        })
+        new VueLoaderPlugin()
     ]
 };
