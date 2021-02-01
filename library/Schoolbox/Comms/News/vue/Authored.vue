@@ -14,6 +14,7 @@
             <div class="tabs-content no-margin">
                 <ul v-if="isArticlesLoaded" class="information-list">
                     <li class="actions-small-1" v-for="article in currentArticles" :key="article.id">
+                        
                         <div class="list-item">
                             <div class="small-12 card">
                                 <a :href="article._links.self.href" v-if="article.featureImage">
@@ -94,7 +95,7 @@
         },
         data: function() {
             return {
-                isArticlesLoaded: false,
+                isArticlesLoaded: false, //show skeleton display otherwise
                 activePageNumber: 1,
                 activeTabSelected: '',
                 statuses: {}, // A unique list of statuses returned from the user's articles, Used to display tab options
@@ -110,17 +111,13 @@
             },
 
             // The current set of articles showing for the page
-            currentArticles: function() {
-                
+            currentArticles: function () {
                 if (this.filteredArticles.length === 0) {
                     return [];
                 }
-
                 let offset = (this.activePageNumber-1) * this.limitPerPage;
                 let total = offset + this.limitPerPage;
-                
                 return this.filteredArticles.slice(offset, total);
-
             }
 
         },
@@ -128,8 +125,6 @@
             
             this.activePageNumber = this.pageNumber; 
             this.activeTabSelected = this.tabSelected;
-
-
 
             fetch(this.newsRoute)
             .then((response) => response.json())
@@ -194,6 +189,7 @@
 
         },
         methods: {
+
             /**
              * On change of page
              *
@@ -221,13 +217,10 @@
              * @param {boolean} holdState - Whether to change the window's history or not
              */
             onTabChange: function (tab, persistPage, holdState) {
-
                 this.activeTabSelected = tab;
-
                 if (!persistPage) {
                     this.activePageNumber = 1;
                 }
-
                 if (tab === 'All') {
                     // Reset back to original set
                     this.filteredArticles = this.allArticles;
@@ -236,17 +229,15 @@
                     var filteredArticles = this.allArticles.filter(function (article) {
                         return article.status === tab;
                     });
-
                     this.filteredArticles = filteredArticles;
                 }
-
                 // Update the window history
                 if (!holdState) {
                     window.history.pushState({ tab: tab, activePageNumber: this.activePageNumber }, '', '?status=' + tab);
-                
                 }
             }
-        },
+
+        }
 
     }
 </script>
