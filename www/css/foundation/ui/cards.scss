@@ -420,28 +420,31 @@
     position: relative;
     padding-top: 50%;
 
-    .owner {
+    .related {
       position: absolute;
       bottom: 0;
-      padding: 4px 8px;
+      display: flex;
+      margin: 0 0 6px 6px;
 
-      img,
-      .plus-more {
-        width: 3rem;
-        border: 1px solid $white;
-        box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
+      &.groups {
+        bottom: -.5rem;
       }
 
+      img, .plus-more {
+        width: 3rem;
+        border: 1px solid $white;
+        box-shadow: 0 2px 3px 0 rgba(0,0,0,0.1);
+      }
+      img {
+        margin-right: 6px;
+      }
       .plus-more {
+        background-color: rgba(198,198,198,0.9);
+        color: $white;
         display: inline-flex;
         justify-content: center;
         align-items: center;
         height: 3rem;
-        background-color: rgba(198, 198, 198, 0.9);
-        color: $white;
-      }
-      img {
-        margin-right: 6px;
       }
     }
   }
