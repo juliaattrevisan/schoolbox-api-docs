@@ -174,7 +174,6 @@
 
             // Listen for window state change
             window.onpopstate = (event) => {
-                debugger;
                 if (!event.state) {
                     // Return to defaults
                     this.activePageNumber = 1;

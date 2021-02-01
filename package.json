@@ -31,7 +31,7 @@
     "vue": "^2.6.12",
     "vue-select": "^3.11.2",
     "vue-style-loader": "^4.1.2",
-    "vuejs-paginate": "^2.1.0"
+    "vuejs-paginate": "2.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
