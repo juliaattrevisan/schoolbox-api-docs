@@ -420,6 +420,19 @@ class StudentAttributes
         $this->curriculumSemesterFinish = $this->deriveCurriculumSemesterFinishDate($config, $reportDate, $this->yearLevel, $this->term);
         $this->curriculumYearStart      = $this->deriveCurriculumYearStartDate($config, $reportDate, $this->yearLevel, $this->term);
         $this->curriculumYearFinish     = $this->deriveCurriculumYearFinishDate($config, $reportDate, $this->yearLevel, $this->term);
+
+        /* Inspect contents of these derived vars
+         *
+         * Try to figure out why these semester years are wild and crazy,
+         * and also how the tigs admin system works
+         */
+//        new \Alaress_Probe(
+//            "Year Level<br>" . $this->yearLevel,
+//            "Curriculum semester start:<br>" . $this->curriculumSemesterStart->getDatabase(),
+//            "Curriculum semester finish:<br>" . $this->curriculumSemesterFinish->getDatabase(),
+//            "Curriculum year start:<br>" . $this->curriculumYearStart->getDatabase(),
+//            "Curriculum year finish:<br>" . $this->curriculumYearFinish->getDatabase()
+//        );
     }
 
 
