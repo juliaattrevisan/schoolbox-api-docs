@@ -629,10 +629,11 @@ class Report
         // Find relevant assessments and participation and insert into units
         $reports = [];
         foreach ($semesters as $reportSemester) {
-
-            $workTypeId = $reportSemester === 2
-                ? $workTypeIds[Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS]
-                : $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE];
+            if ($reportSemester === 2) {
+                $workTypeId = $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK];
+            } else {
+                $workTypeId = $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE];
+            }
 
             $nesa    = new NesaScoreGraph(
                 $cohortUnitImpls,
