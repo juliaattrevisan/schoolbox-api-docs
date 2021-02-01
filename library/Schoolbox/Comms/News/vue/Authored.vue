@@ -14,7 +14,6 @@
             <div class="tabs-content no-margin">
                 <ul v-if="isArticlesLoaded" class="information-list">
                     <li class="actions-small-1" v-for="article in currentArticles" :key="article.id">
-                        
                         <div class="list-item">
                             <div class="small-12 card">
                                 <a :href="article._links.self.href" v-if="article.featureImage">
