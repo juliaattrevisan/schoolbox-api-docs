@@ -9,11 +9,9 @@
 
 {% block newsContent %}
     
-    <div class="{{ pageNum }}"></div>
-    
     <div id="authored-container">
         <authored
-            :active-page-number="{{ pageNum }}"
+            :page-number="{{ pageNum }}"
             tab-selected="{{ status }}"
             news-route="{{ routeLookup('commsNews.getAuthoredArticles') }}"
             :limit-per-page="{{ config.search_type_limit }}"
@@ -32,111 +30,8 @@
         </authored>
     </div>
     
-    <!--
-    <div id="authored-container">
-        <section>
-            {# tabs #}
-            <dl class="tabs" id="{{ topicContainerId is defined ? topicContainerId : 0 }}" v-if="allArticles.length || articlesLoading">
-                <dd v-for="(statusCount, status) in statuses" :class="{active: tabSelected === status}" v-if="statusCount">
-                    <a @click="onTabChange(status)">${ status }</a>
-                </dd>
-                <dd class="skeleton" v-if="articlesLoading" v-for="n in 3">
-                    <a></a>
-                </dd>
-            </dl>
-            
-            <div class="tabs-content no-margin">
-                <ul class="information-list">
-
-                    <li class="actions-small-1" v-if="articlesLoading" v-for="n in 3">
-                        <div class="list-item">
-                            <div class="small-12 card skeleton">
-                                <div class="img"></div>
-                                <h3></h3>
-                                <p class="meta"></p>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="actions-small-1" v-for="article in currentArticles">
-                        <div class="list-item">
-                            <div class="small-12 card">
-
-                                <a :href="article._links.self.href" v-if="article.featureImage">
-                                    <img :src="article.featureImage._links.image.href + '&size=square64'">
-                                </a>
-
-                                <h3><a v-if="article.title" :href="article._links.self.href">${ article.title }</a>
-                                    <a v-else :href="article._links.self.href">(untitled)</a>
-                                </h3>
-
-                                <p class="meta">
-                                    <b>${ article.status }</b>
-                                    <time :title="article.statusDate.long">${ article.statusDate.relativeTime }</time>
-                                </p>
-                            </div>
-                        </div>
-
-                        <article>
-                            <div v-html="article.blurb"></div>
-                            <div class="article-read-more">
-                                <a v-if="article.readmore.available" :href="article._links.self.href" v-html="article.readmore.string"></a>
-                            </div>
-                        </article>
-                        <nav>
-                            <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" title="Modify this {{ locale.news }}"></a>
-                        </nav>
-                    </li>
-                </ul>
-
-                <div class="empty-state no-margin" v-if="!filteredArticles.length && !articlesLoading">
-                    <i class="icon-news"></i>
-                    <p>You haven't authored any {{ locale.news.plural }}.</p>
-                    {% set createRoute = routeLookupIfAuthorized('commsNews.getCreate') %}
-                    {% if createRoute %}<p><a href="{{ createRoute }}">Create {{ locale.news }}</a>.</p>{% endif %}
-                </div>
-
-            </div>
-           
-        </section>
-        <paginate
-                v-model="page"
-                :page-count="pageCount"
-                :container-class="'pagination'"
-                :prev-text="'‹'"
-                :next-text="'›'"
-                :prev-link-class="'arrow'"
-                :next-link-class="'arrow'"
-                :disabled-class="'unavailable'"
-                :click-handler="onPaginate"
-                v-if="currentArticles.length && pageCount > 1"
-        >
-        </paginate>
-        
-    </div>
-     -->
 {% endblock %}
 
-
 {% block newsScripts %}
-    <script src="/javascript/components/schoolbox-vue.min.js"></script>
-    <script>
-
-        window.authoredConfig = {
-            // The active page on the pagination
-            page: {{ pageNum }},
-            // The selected tab, just used for active styling
-            tabSelected: '{{ status }}',
-            //route to retrieve my news
-            route: '{{ routeLookup('commsNews.getAuthoredArticles') }}',
-            
-            limit: {{ config.search_type_limit }},
-
-            topicContainerId: {{ topicContainerId is defined ? topicContainerId : 0 }},
-
-        }
-        
-        
-    </script>
     <script type="text/javascript" src="/javascript/components/authored.bundle.js?v={{ config.site_version }}"></script>
 {% endblock %}

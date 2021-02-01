@@ -82,10 +82,10 @@ module.exports = {
                     'sass-loader'
                 ]
         },
-            {
-                enforce: "pre",
-                test: /\.js$/,
-                loader: "source-map-loader"
+        {
+            test: /\.js$/,
+            enforce: "pre",
+            use: ["source-map-loader"],
         }
         ]
     },

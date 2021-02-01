@@ -2,7 +2,7 @@
     <div>
         <section>
             <dl v-if="isArticlesLoaded" class="tabs" :id="topicContainerId">
-                <dd v-for="(statusCount, status) in statuses" :class="{active: tabSelected === status}" :key="status">
+                <dd v-for="(statusCount, status) in statuses" :class="{active: activeTabSelected === status}" :key="status">
                     <a v-if="statusCount" @click="onTabChange(status)">{{ status }}</a>
                 </dd>
             </dl>
@@ -75,15 +75,15 @@
 
 <script>
     
-    // import VuejsPaginate from 'vuejs-paginate';
+    import VuejsPaginate from 'vuejs-paginate';
     
     export default {
         components: {
             'paginate': VuejsPaginate
         },
         props: {
-            activePageNumber: Number, // The active page on the pagination
-            tabSelected: String, // The selected tab, just used for active styling
+            pageNumber: Number, // The start page on the pagination
+            tabSelected: String, // The start selected tab, just used for active styling
             newsRoute: String,
             limitPerPage: Number,
             topicContainerId: Number,
@@ -95,9 +95,11 @@
         data: function() {
             return {
                 isArticlesLoaded: false,
+                activePageNumber: 1,
+                activeTabSelected: '',
                 statuses: {}, // A unique list of statuses returned from the user's articles, Used to display tab options
                 allArticles: [],
-                filteredArticles: []  // A container for a filtered list of authored articles, Will be populated as all articles on load
+                filteredArticles: [],  // A container for a filtered list of authored articles, Will be populated as all articles on load
             }
         },
         computed: {
@@ -120,8 +122,14 @@
                 return this.filteredArticles.slice(offset, total);
 
             }
+
         },
         mounted: function () {
+            
+            this.activePageNumber = this.pageNumber; 
+            this.activeTabSelected = this.tabSelected;
+
+
 
             fetch(this.newsRoute)
             .then((response) => response.json())
@@ -146,8 +154,8 @@
                 });
 
                 // In the case that this page has loaded with a page and/or tab in the URL params - update the page to reflect those params
-                if (this.tabSelected !== 'All') {
-                    this.onTabChange(this.tabSelected, true, true);
+                if (this.activeTabSelected !== 'All') {
+                    this.onTabChange(this.activeTabSelected, true, true);
                 }
                 if (this.activePageNumber > 1) {
                     this.onPaginate(this.activePageNumber, true);
@@ -166,20 +174,20 @@
 
             // Listen for window state change
             window.onpopstate = (event) => {
+                debugger;
                 if (!event.state) {
                     // Return to defaults
-                    this.page = 1;
-                    this.onPaginate(this.page, true);
-                    this.tabSelected = 'All';
-                    this.onTabChange(this.tabSelected, true, true);
+                    this.activePageNumber = 1;
+                    this.onPaginate(this.activePageNumber, true);
+                    this.activeTabSelected = 'All';
+                    this.onTabChange(this.activeTabSelected, true, true);
                 } else {
                     if (event.state.page) {
-                        this.page = event.state.page;
+                        this.activePageNumber = event.state.page;
                         this.onPaginate(event.state.page, true);
                     }
-
                     if (event.state.tab) {
-                        this.tabSelected = event.state.tab;
+                        this.activeTabSelected = event.state.tab;
                         this.onTabChange(event.state.tab, true, true);
                     }
                 }
@@ -197,12 +205,12 @@
                 // Update the window history
                 if (!holdState) {
                     var params;
-                    if (this.tabSelected === 'All') {
+                    if (this.activeTabSelected === 'All') {
                         params = '?p=' + page;
                     } else {
-                        params = '?p=' + page + '&status=' + this.tabSelected;
+                        params = '?p=' + page + '&status=' + this.activeTabSelected;
                     }
-                    window.history.pushState({page: page, tab: this.tabSelected}, '', params);
+                    window.history.pushState({ page: page, tab: this.activeTabSelected }, '', params);
                 }
             },
 
@@ -215,7 +223,7 @@
              */
             onTabChange: function (tab, persistPage, holdState) {
 
-                this.tabSelected = tab;
+                this.activeTabSelected = tab;
 
                 if (!persistPage) {
                     this.activePageNumber = 1;
@@ -235,7 +243,7 @@
 
                 // Update the window history
                 if (!holdState) {
-                    window.history.pushState({ tab: tab, page: this.activePageNumber }, '', '?status=' + tab);
+                    window.history.pushState({ tab: tab, activePageNumber: this.activePageNumber }, '', '?status=' + tab);
                 
                 }
             }
