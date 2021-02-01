@@ -594,15 +594,14 @@ class Report
         // * HSC-Y11-S2   (work-type = NESA)
         $yearLevel = $attributes->getCurriculumYearLevel();
         $semester  = $attributes->getCurriculumSemester();
-        if (!($attributes->isMyp() || (11 === $yearLevel && $semester === 2 && $attributes->isHsc()))) {
+        if (!(11 === $yearLevel && $semester === 2 && $attributes->isHsc())) {
             return null;
         }
 
         // Which work types should we fetch?
         $configNames = [Config::_TIGS_WORK_TYPE_NESA_SCORE => 'Set MYP FAL Work Type'];
-        if ($semester === 2 && $attributes->isMyp()) {
-            $configNames[Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS] = 'Set NESA Grade Work Type';
-        }
+        $configNames[Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS] = 'Set NESA Grade Work Type';
+
         $workTypeIds = [];
         foreach ($configNames as $configName => $errorMsgLink) {
             try {
@@ -631,7 +630,7 @@ class Report
         $reports = [];
         foreach ($semesters as $reportSemester) {
 
-            $workTypeId = $reportSemester === 2 && $attributes->isMyp()
+            $workTypeId = $reportSemester === 2
                 ? $workTypeIds[Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS]
                 : $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE];
 
