@@ -7,25 +7,22 @@
   // card "extends" column
   float: left;
   position: relative;
-  padding: 0.5rem 1rem 0 1rem;
+  padding: .5rem 1rem 0 1rem;
 
-  img,
-  .img,
+  img, .img,
   [class^="icon-"],
   [class*=" icon-"] {
     float: left;
-    margin: -0.5rem 1rem 0 -1rem;
+    margin: -.5rem 1rem 0 -1rem;
   }
-  img,
-  .img {
+  img, .img {
     width: (4 * rem-calc($base-font-size));
   }
 
   @media #{$small-only} {
-    padding: 0.25rem 1rem 0 1rem;
+    padding: .25rem 1rem 0 1rem;
 
-    img,
-    .img {
+    img, .img {
       width: (3 * rem-calc($base-font-size));
     }
 
@@ -33,7 +30,7 @@
     .img,
     [class^="icon-"],
     [class*=" icon-"] {
-      margin: -0.25rem 1rem 0 -1rem;
+      margin: -.25rem 1rem 0 -1rem;
     }
   }
   .card-content {
@@ -108,7 +105,7 @@
     padding: nth($label-padding, 1) 1rem;
 
     @media #{$small-only} {
-      padding: 0.275rem 1rem;
+      padding: .275rem 1rem;
     }
 
     /* Status Label special definition - this uses
@@ -376,7 +373,7 @@
 
   // if a <p> is the last child of a card, add a little spacing on the bottom
   > p:last-child {
-    margin-bottom: 0.5rem;
+    margin-bottom: .5rem;
 
     @media #{$small-only} {
       margin-bottom: 0;
@@ -433,7 +430,7 @@
       img, .plus-more {
         width: 3rem;
         border: 1px solid $white;
-        box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 3px 0 rgba(0,0,0,0.1);
       }
       img {
         margin-right: 6px;
@@ -481,8 +478,7 @@
     h3 {
       padding-right: 0;
     }
-    h3,
-    .meta {
+    h3, .meta {
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
@@ -505,7 +501,7 @@
   .card-actions {
     display: flex;
     margin-top: auto;
-    padding-top: 0.75rem;
+    padding-top: .75rem;
 
     a {
       align-self: center;
@@ -526,8 +522,7 @@
         padding-right: 0;
         float: none;
       }
-      &[disabled],
-      &.disabled {
+      &[disabled], &.disabled {
         opacity: 0.33;
       }
       &.selected {
@@ -535,7 +530,7 @@
         background-color: $content-ui-foreground;
       }
       &:hover {
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: rgba(0,0,0,0.1);
         text-decoration: none;
       }
     }
@@ -551,7 +546,7 @@
     .card-feature-avatar a {
       min-height: 6rem;
     }
-    .card-feature-avatar img {
+    .card-feature-avatar img{
       width: 4rem;
     }
   }
