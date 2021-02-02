@@ -237,6 +237,7 @@ class NesaScoreGraphMiddleYears extends BaseComponent
     {
         $markData    = self::BASE_MARKS;
         $studentMark = null;
+        $humanReadableMark = null;
         $comment = [];
 
         $this->validateAssessments($assessmentData);
@@ -283,7 +284,7 @@ class NesaScoreGraphMiddleYears extends BaseComponent
                                         $indicatorMark = $markedGrid->retrieveIndicatorMark($indicatorUsage);
 
                                         if ($indicatorMark) {
-                                            $studentMark = $indicatorMark->getDescriptor()->getDescription();
+                                            $humanReadableMark = $indicatorMark->getDescriptor()->getDescription();
                                         }
                                     }
                                 }
@@ -293,6 +294,8 @@ class NesaScoreGraphMiddleYears extends BaseComponent
                         // Only care about student's mark in current folder. This caters for case where student does not yet have mark in this class, but
                         // has participation record in a different class in this cohort.
                         if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
+                            $studentMark = $humanReadableMark;
+
                             $comment['comment']   = $feedback->getComment();
                             $comment['commentBy'] = $feedback->getReviewer();
                         }
@@ -300,11 +303,11 @@ class NesaScoreGraphMiddleYears extends BaseComponent
                         // It's quite possible for students to be given marks outside valid range, eg HR = 'Absent', Norm = 0.
                         // Since we cannot predict all possible marks, and whether these should be ignored or considered an error,
                         // we will simply ignore all invalid data.
-                        if (!$this->isValidLetterGrade($studentMark)) {
+                        if (!$this->isValidLetterGrade($humanReadableMark)) {
                             continue;
                         }
 
-                        $markData[$studentMark]++;
+                        $markData[$humanReadableMark]++;
                     } elseif ($this->reportSemester === 1) {
                         $humanReadableMark = $feedback->getHumanReadableMark();
 
