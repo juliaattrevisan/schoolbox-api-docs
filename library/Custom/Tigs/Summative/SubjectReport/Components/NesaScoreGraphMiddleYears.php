@@ -165,17 +165,6 @@ class NesaScoreGraphMiddleYears extends BaseComponent
                     );
                 }
 
-                if ($assessment->getMarkType()->getSlug() !== MarkType::SLUG_LETTER) {
-                    throw new UnexpectedValueException(
-                        sprintf(
-                            "A NESA Grade due work must have Mark Type of 'Letter Grade'. Assessment '%s' in folder '%s' has a mark type of  '%s'",
-                            $assessment->getTitle(),
-                            $folder->getTitle(),
-                            $assessment->getMarkType()->getName()
-                        )
-                    );
-                }
-
                 $assessables[$folderId]['assessments'][$assessment->getId()] = $assessment;
             }
         }
