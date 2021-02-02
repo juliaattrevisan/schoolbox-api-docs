@@ -179,9 +179,9 @@ Data:
 
                 <div class="small-12 columns">
                     {# Were we given AAS data for this unit? #}
-                    {% if aasData.data is defined and aasData.data[unitSpecId] is defined %}
-                        {% include '@tigsSubjectReport/components/academicAchievementSummary.twig' with aasData.data[unitSpecId]|merge(extraComponentData) only %}
-                    {% endif %}
+{#                    {% if aasData.data is defined and aasData.data[unitSpecId] is defined %}#}
+{#                        {% include '@tigsSubjectReport/components/academicAchievementSummary.twig' with aasData.data[unitSpecId]|merge(extraComponentData) only %}#}
+{#                    {% endif %}#}
 
                     {# Were we given AAM data for this unit? #}
                     {% if aamData.data is defined and aamData.data[unitSpecId] is defined %}
