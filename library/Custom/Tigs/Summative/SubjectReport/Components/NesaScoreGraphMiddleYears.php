@@ -302,14 +302,7 @@ class NesaScoreGraphMiddleYears extends BaseComponent
                         // It's quite possible for students to be given marks outside valid range, eg HR = 'Absent', Norm = 0.
                         // Since we cannot predict all possible marks, and whether these should be ignored or considered an error,
                         // we will simply ignore all invalid data.
-
-                        /* Note: I think these keys are meant to he kept in sync, as per nesaScoreGraph.twig
-                         * {% set studentMarks = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1} %}
-                         *
-                         * But why isn't this preg match derived from the array_keys of self::BASE_MARKS??
-                         * That's three points of contact that you have to know to keep synchronised??
-                         */
-                        if (!\preg_match('#^[ABCDE]$#', $studentMark, $matches)) {
+                        if (!$this->isValidLetterGrade($studentMark)) {
                             continue;
                         }
 
@@ -329,14 +322,7 @@ class NesaScoreGraphMiddleYears extends BaseComponent
                         // It's quite possible for students to be given marks outside valid range, eg HR = 'Absent', Norm = 0.
                         // Since we cannot predict all possible marks, and whether these should be ignored or considered an error,
                         // we will simply ignore all invalid data.
-
-                        /* Note: I think these keys are meant to he kept in sync, as per nesaScoreGraph.twig
-                         * {% set studentMarks = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1} %}
-                         *
-                         * But why isn't this preg match derived from the array_keys of self::BASE_MARKS??
-                         * That's three points of contact that you have to know to keep synchronised??
-                         */
-                        if (!\preg_match('#^[ABCDE]$#', $humanReadableMark, $matches)) {
+                        if (!$this->isValidLetterGrade($humanReadableMark)) {
                             continue;
                         }
 
@@ -347,6 +333,27 @@ class NesaScoreGraphMiddleYears extends BaseComponent
         }
 
         return [$markData, $studentMark, $showComponent, $comment];
+    }
+
+
+    /**
+     * Decide if $value is one of the allowed letter grade values [A,B,C,D,E]
+     *
+     * @param string|null $value
+     * @return bool
+     */
+    private function isValidLetterGrade(?string $value): bool
+    {
+
+        /* Note: I think these keys are meant to he kept in sync, as per nesaScoreGraph.twig
+         * {% set studentMarks = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1} %}
+         *
+         * But why isn't this preg match derived from the array_keys of self::BASE_MARKS??
+         * That's three points of contact that you have to know to keep synchronised??
+         */
+        $validLetters = implode('', array_keys(self::BASE_MARKS));
+
+        return (bool)\preg_match('#^[' . $validLetters . ']$#', $value);
     }
 
 
