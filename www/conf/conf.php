@@ -48,9 +48,9 @@ if (PHP_SAPI === 'cli') {
     }
 } else {
     // Web request
+    $hostname = ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? '') ?: $_SERVER['HTTP_HOST'];
+    $hostname = explode(':', $hostname)[0];
     foreach ($instances as $instanceIdKey => $instance) {
-        $hostname = ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? '') ?: $_SERVER['HTTP_HOST'];
-        $hostname = explode(':', $hostname)[0];
         if (in_array($hostname, $instance['hostnames'], true)) {
             $instanceId = $instanceIdKey;
             $dbHost     = $instance['db_host'] ?? null;
