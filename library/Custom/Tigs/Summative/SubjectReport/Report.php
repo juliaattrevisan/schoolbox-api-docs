@@ -688,6 +688,7 @@ class Report
                     $this->viewer,
                     $workTypeId,
                     $folder,
+                    $this->rubricMapper,
                     $roleTypeOverride
                 );
             } else {

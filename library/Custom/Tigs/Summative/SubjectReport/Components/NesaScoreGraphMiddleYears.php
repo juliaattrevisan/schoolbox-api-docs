@@ -9,7 +9,6 @@ namespace Custom\Tigs\Summative\SubjectReport\Components;
 
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -61,6 +60,14 @@ class NesaScoreGraphMiddleYears extends BaseComponent
 
 
     /**
+     * NESA Grade is derived from a rubric
+     *
+     * @var \Schoolbox\Assessment\Rubric\DataModel\DataSource
+     */
+    private \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper;
+
+
+    /**
      * Constructor
      *
      * @param GenericCollection $unitImpls
@@ -81,6 +88,7 @@ class NesaScoreGraphMiddleYears extends BaseComponent
         User $viewer,
         int $workTypeId,
         Folder\Model $folder,
+        \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper,
         ?string $roleTypeOverride
     ) {
         parent::__construct($attributes, $viewer, $roleTypeOverride);
@@ -90,6 +98,7 @@ class NesaScoreGraphMiddleYears extends BaseComponent
         $this->visibility = $visibility;
         $this->workTypeId = $workTypeId;
         $this->folder     = $folder;
+        $this->rubricMapper = $rubricMapper;
     }
 
 
@@ -97,7 +106,7 @@ class NesaScoreGraphMiddleYears extends BaseComponent
      * Generates and returns a data structure, suitable for passing to twig.
      *
      * @param int $semester
-     * @return array
+     * @return array|null
      */
     public function toContext(int $semester): ?array
     {
@@ -231,18 +240,40 @@ class NesaScoreGraphMiddleYears extends BaseComponent
                         continue;
                     }
 
-                    $humanReadableMark = $feedback->getHumanReadableMark();
+                    $markedGrid = $this->rubricMapper->retrieveMarkedGrid($feedback);
+
+                    /* Look specifically for the capability: "NESA"
+                     * Look specifically for the indicator: "Grade"
+                     *
+                     * Then find the descriptor that was chosen, which can be located in $indicatorMark['descriptor']
+                     * That descriptor's text contains the actual letter grade itself
+                     * Madness
+                     */
+                    $studentMark = '';
+
+                    foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
+                        $capabilityName = $capabilityMark->getCapabilityUsage()->getCapability()->getName();
+
+                        if ('NESA' === $capabilityName) {
+                            foreach ($capabilityMark->getCapabilityUsage()->getIndicatorUsages() as $indicatorUsage) {
+                                $indicatorName = $indicatorUsage->getIndicator()->getName();
+
+                                if ('Grade' === $indicatorName) {
+                                    $indicatorMark = $markedGrid->retrieveIndicatorMark($indicatorUsage);
+
+                                    if ($indicatorMark) {
+                                        $studentMark = $indicatorMark->getDescriptor()->getDescription();
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     // Only care about student's mark in current folder. This caters for case where student does not yet have mark in this class, but
                     // has participation record in a different class in this cohort.
                     if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
-                        $studentMark = $humanReadableMark;
-
-//                        // MYP students' comments will come from this assessment
-//                        if ($this->getAttributes()->isMyp()) {
-                            $comment['comment']   = $feedback->getComment();
-                            $comment['commentBy'] = $feedback->getReviewer();
-//                        }
+                        $comment['comment']   = $feedback->getComment();
+                        $comment['commentBy'] = $feedback->getReviewer();
                     }
 
                     // It's quite possible for students to be given marks outside valid range, eg HR = 'Absent', Norm = 0.
@@ -255,11 +286,11 @@ class NesaScoreGraphMiddleYears extends BaseComponent
                      * But why isn't this preg match derived from the array_keys of self::BASE_MARKS??
                      * That's three points of contact that you have to know to keep synchronised??
                      */
-                    if (!\preg_match('#^[ABCDE]$#', $humanReadableMark, $matches)) {
+                    if (!\preg_match('#^[ABCDE]$#', $studentMark, $matches)) {
                         continue;
                     }
 
-                    $markData[$humanReadableMark]++;
+                    $markData[$studentMark]++;
                 }
             }
         }
