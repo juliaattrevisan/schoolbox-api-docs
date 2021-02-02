@@ -168,8 +168,6 @@ Data:
                     {% set commentData = hscTaskMarks.data[unitSpecId] %}
                 {% endif %}
 
-                {% set commentData = {comment: 'test', commentBy: 'a teacher'} %}
-
                 {% if commentData.comment is defined and commentData.comment%}
                     <div class="small-12 island comments">
                         <h2 class="subheader">Comments by {{ commentData.commentBy.fullname }}</h2>
