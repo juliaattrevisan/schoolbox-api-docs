@@ -1066,9 +1066,9 @@
       "integrity": "sha512-Ek+wJL+PcLpBddrOoIFLGnqsp1LG5Jm6lWeqA37sKvTwx/02IgZsHzx+lrhzR6l1JTFmtAfuANQeYdYYjVor1Q=="
     },
     "@fullcalendar/resource-common": {
-      "version": "4.3.0",
-      "resolved": "https://registry.npmjs.org/@fullcalendar/resource-common/-/resource-common-4.3.0.tgz",
-      "integrity": "sha512-RLMDpE2USxTwm53j/cs9lB26a0lbS2BAun5mdOfMOYL1sGsC8JMZ2wAiKU+igwTJj16OKllbfeF0cxGPSUYgxQ=="
+      "version": "4.3.1",
+      "resolved": "https://registry.npmjs.org/@fullcalendar/resource-common/-/resource-common-4.3.1.tgz",
+      "integrity": "sha512-c0u9jE1vUsXZJZZptdJ+OmGjBmkJYXr3OKbwqpc7ip49jiz5VSNZEdGR5fJ910GgbMrDTpYYMzbyifZE4XEzMw=="
     },
     "@fullcalendar/resource-daygrid": {
       "version": "4.3.0",
