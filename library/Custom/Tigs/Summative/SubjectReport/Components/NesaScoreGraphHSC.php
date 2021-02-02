@@ -23,7 +23,7 @@ use UnexpectedValueException;
 /**
  * Builds a suitable data structure for rendering the NESA Grade Graph component.
  */
-class NesaScoreGraph extends BaseComponent
+class NesaScoreGraphHSC extends BaseComponent
 {
 
     // Sort left-to-right for highcharts performance. @see https://www.highcharts.com/errors/15/

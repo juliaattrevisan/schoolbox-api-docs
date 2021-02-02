@@ -21,7 +21,8 @@ use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementSummary;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentMatrix;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
-use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraph;
+use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraphHSC;
+use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraphMiddleYears;
 use DomainException;
 use External_ClassInterface;
 use InvalidArgumentException;
@@ -652,29 +653,58 @@ class Report
 
         // Find relevant assessments and participation and insert into units
         $reports = [];
+
         foreach ($semesters as $reportSemester) {
+
+            /* Second semester get the NESA grade from a special assessment, a different one
+             * than for semester 1
+             */
             if ($reportSemester === 2) {
                 $workTypeId = $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK];
             } else {
                 $workTypeId = $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE];
             }
 
-            $nesa    = new NesaScoreGraph(
-                $cohortUnitImpls,
-                $student,
-                $attributes,
-                $this->visibility,
-                $this->viewer,
-                $workTypeId,
-                $folder,
-                $roleTypeOverride
-            );
+            /* NESA Graphs render in special ways depending on whether the student
+             * is an HSC or Middle Years student
+             */
+            if ($attributes->isHsc()) {
+                $nesa = new NesaScoreGraphHSC(
+                    $cohortUnitImpls,
+                    $student,
+                    $attributes,
+                    $this->visibility,
+                    $this->viewer,
+                    $workTypeId,
+                    $folder,
+                    $roleTypeOverride
+                );
+            } elseif ($attributes->isMiddleYear()) {
+                $nesa = new NesaScoreGraphMiddleYears(
+                    $cohortUnitImpls,
+                    $student,
+                    $attributes,
+                    $this->visibility,
+                    $this->viewer,
+                    $workTypeId,
+                    $folder,
+                    $roleTypeOverride
+                );
+            } else {
+
+                /* Can't tell if this student is HSC or Middle Years
+                 * Return empty
+                 */
+                return [];
+            }
+
             $context = $nesa->toContext($reportSemester);
 
             if ($context !== null) {
                 $reports['data'][$reportSemester] = $context;
             }
         }
+
         return $reports;
     }
 
