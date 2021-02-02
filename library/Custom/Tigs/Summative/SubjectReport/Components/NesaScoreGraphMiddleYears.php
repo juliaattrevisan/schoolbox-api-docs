@@ -272,8 +272,6 @@ class NesaScoreGraphMiddleYears extends BaseComponent
                          * That descriptor's text contains the actual letter grade itself
                          * Madness
                          */
-                        $studentMark = '';
-
                         foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
                             $capabilityName = $capabilityMark->getCapabilityUsage()->getCapability()->getName();
 
@@ -332,6 +330,10 @@ class NesaScoreGraphMiddleYears extends BaseComponent
             }
         }
 
+        /* $markData is everyone's feedback's marks
+         * $studentMark is what this student got, so you see cohort-level data
+         * $comment is what this student got
+         */
         return [$markData, $studentMark, $showComponent, $comment];
     }
 
@@ -344,6 +346,12 @@ class NesaScoreGraphMiddleYears extends BaseComponent
      */
     private function isValidLetterGrade(?string $value): bool
     {
+
+        /* Nulls have no meaning and equivalently return falseness
+         */
+        if (null === $value) {
+            return false;
+        }
 
         /* Note: I think these keys are meant to he kept in sync, as per nesaScoreGraph.twig
          * {% set studentMarks = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1} %}
