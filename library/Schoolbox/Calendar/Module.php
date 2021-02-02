@@ -92,6 +92,8 @@ class Module extends BaseModule
     {
         $this->addRoutePermission($authorizer, 'getOwnCalendar', new IsLoggedIn());
         $this->addRoutePermission($authorizer, 'redirect', new IsLoggedIn());
+        $this->addRoutePermission($authorizer, 'changeState', new IsLoggedIn());
+
 
         $this->addRoutePermission(
             $authorizer,
