@@ -69,6 +69,15 @@ class NesaScoreGraphMiddleYears extends BaseComponent
 
 
     /**
+     * Semester 1 data for the NESA Graph comes directly from authoritative feedback
+     * Semester 2 data for the NESA Graph comes from a specific descriptor in a rubric grid
+     *
+     * @var int
+     */
+    private int $reportSemester;
+
+
+    /**
      * NESA Grade is derived from a rubric
      *
      * @var \Schoolbox\Assessment\Rubric\DataModel\DataSource
@@ -79,14 +88,16 @@ class NesaScoreGraphMiddleYears extends BaseComponent
     /**
      * Constructor
      *
-     * @param GenericCollection $unitImpls
-     * @param User              $student
-     * @param StudentAttributes $attributes
-     * @param Visibility        $visibility
-     * @param User              $viewer
-     * @param int               $workTypeId
-     * @param Folder\Model      $folder
-     * @param string|null       $roleTypeOverride
+     * @param GenericCollection                                 $unitImpls
+     * @param User                                              $student
+     * @param StudentAttributes                                 $attributes
+     * @param Visibility                                        $visibility
+     * @param User                                              $viewer
+     * @param int                                               $workTypeId
+     * @param Folder\Model                                      $folder
+     * @param int                                               $reportSemester
+     * @param \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper
+     * @param string|null                                       $roleTypeOverride
      * @throws \InvalidArgumentException
      */
     public function __construct(
@@ -97,6 +108,7 @@ class NesaScoreGraphMiddleYears extends BaseComponent
         User $viewer,
         int $workTypeId,
         Folder\Model $folder,
+        int $reportSemester,
         \Schoolbox\Assessment\Rubric\DataModel\DataSource $rubricMapper,
         ?string $roleTypeOverride
     ) {
@@ -107,6 +119,7 @@ class NesaScoreGraphMiddleYears extends BaseComponent
         $this->visibility = $visibility;
         $this->workTypeId = $workTypeId;
         $this->folder     = $folder;
+        $this->reportSemester = $reportSemester;
         $this->rubricMapper = $rubricMapper;
     }
 
@@ -249,57 +262,86 @@ class NesaScoreGraphMiddleYears extends BaseComponent
                         continue;
                     }
 
-                    $markedGrid = $this->rubricMapper->retrieveMarkedGrid($feedback);
+                    if ($this->reportSemester === 2) {
+                        $markedGrid = $this->rubricMapper->retrieveMarkedGrid($feedback);
 
-                    /* Look specifically for the capability: "NESA"
-                     * Look specifically for the indicator: "Grade"
-                     *
-                     * Then find the descriptor that was chosen, which can be located in $indicatorMark['descriptor']
-                     * That descriptor's text contains the actual letter grade itself
-                     * Madness
-                     */
-                    $studentMark = '';
+                        /* Look specifically for the capability: "NESA"
+                         * Look specifically for the indicator: "Grade"
+                         *
+                         * Then find the descriptor that was chosen, which can be located in $indicatorMark['descriptor']
+                         * That descriptor's text contains the actual letter grade itself
+                         * Madness
+                         */
+                        $studentMark = '';
 
-                    foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
-                        $capabilityName = $capabilityMark->getCapabilityUsage()->getCapability()->getName();
+                        foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
+                            $capabilityName = $capabilityMark->getCapabilityUsage()->getCapability()->getName();
 
-                        if (self::NESA_RUBRIC_CAPABILITY === $capabilityName) {
-                            foreach ($capabilityMark->getCapabilityUsage()->getIndicatorUsages() as $indicatorUsage) {
-                                $indicatorName = $indicatorUsage->getIndicator()->getName();
+                            if (self::NESA_RUBRIC_CAPABILITY === $capabilityName) {
+                                foreach ($capabilityMark->getCapabilityUsage()->getIndicatorUsages() as $indicatorUsage) {
+                                    $indicatorName = $indicatorUsage->getIndicator()->getName();
 
-                                if (self::NESA_RUBRIC_INDICATOR === $indicatorName) {
-                                    $indicatorMark = $markedGrid->retrieveIndicatorMark($indicatorUsage);
+                                    if (self::NESA_RUBRIC_INDICATOR === $indicatorName) {
+                                        $indicatorMark = $markedGrid->retrieveIndicatorMark($indicatorUsage);
 
-                                    if ($indicatorMark) {
-                                        $studentMark = $indicatorMark->getDescriptor()->getDescription();
+                                        if ($indicatorMark) {
+                                            $studentMark = $indicatorMark->getDescriptor()->getDescription();
+                                        }
                                     }
                                 }
                             }
                         }
+
+                        // Only care about student's mark in current folder. This caters for case where student does not yet have mark in this class, but
+                        // has participation record in a different class in this cohort.
+                        if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
+                            $comment['comment']   = $feedback->getComment();
+                            $comment['commentBy'] = $feedback->getReviewer();
+                        }
+
+                        // It's quite possible for students to be given marks outside valid range, eg HR = 'Absent', Norm = 0.
+                        // Since we cannot predict all possible marks, and whether these should be ignored or considered an error,
+                        // we will simply ignore all invalid data.
+
+                        /* Note: I think these keys are meant to he kept in sync, as per nesaScoreGraph.twig
+                         * {% set studentMarks = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1} %}
+                         *
+                         * But why isn't this preg match derived from the array_keys of self::BASE_MARKS??
+                         * That's three points of contact that you have to know to keep synchronised??
+                         */
+                        if (!\preg_match('#^[ABCDE]$#', $studentMark, $matches)) {
+                            continue;
+                        }
+
+                        $markData[$studentMark]++;
+                    } elseif ($this->reportSemester === 1) {
+                        $humanReadableMark = $feedback->getHumanReadableMark();
+
+                        // Only care about student's mark in current folder. This caters for case where student does not yet have mark in this class, but
+                        // has participation record in a different class in this cohort.
+                        if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
+                            $studentMark = $humanReadableMark;
+
+                            $comment['comment']   = $feedback->getComment();
+                            $comment['commentBy'] = $feedback->getReviewer();
+                        }
+
+                        // It's quite possible for students to be given marks outside valid range, eg HR = 'Absent', Norm = 0.
+                        // Since we cannot predict all possible marks, and whether these should be ignored or considered an error,
+                        // we will simply ignore all invalid data.
+
+                        /* Note: I think these keys are meant to he kept in sync, as per nesaScoreGraph.twig
+                         * {% set studentMarks = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1} %}
+                         *
+                         * But why isn't this preg match derived from the array_keys of self::BASE_MARKS??
+                         * That's three points of contact that you have to know to keep synchronised??
+                         */
+                        if (!\preg_match('#^[ABCDE]$#', $humanReadableMark, $matches)) {
+                            continue;
+                        }
+
+                        $markData[$humanReadableMark]++;
                     }
-
-                    // Only care about student's mark in current folder. This caters for case where student does not yet have mark in this class, but
-                    // has participation record in a different class in this cohort.
-                    if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
-                        $comment['comment']   = $feedback->getComment();
-                        $comment['commentBy'] = $feedback->getReviewer();
-                    }
-
-                    // It's quite possible for students to be given marks outside valid range, eg HR = 'Absent', Norm = 0.
-                    // Since we cannot predict all possible marks, and whether these should be ignored or considered an error,
-                    // we will simply ignore all invalid data.
-
-                    /* Note: I think these keys are meant to he kept in sync, as per nesaScoreGraph.twig
-                     * {% set studentMarks = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1} %}
-                     *
-                     * But why isn't this preg match derived from the array_keys of self::BASE_MARKS??
-                     * That's three points of contact that you have to know to keep synchronised??
-                     */
-                    if (!\preg_match('#^[ABCDE]$#', $studentMark, $matches)) {
-                        continue;
-                    }
-
-                    $markData[$studentMark]++;
                 }
             }
         }
