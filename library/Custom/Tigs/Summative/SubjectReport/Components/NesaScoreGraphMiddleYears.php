@@ -34,6 +34,15 @@ use UnexpectedValueException;
 class NesaScoreGraphMiddleYears extends BaseComponent
 {
 
+    /**
+     * This (capability, indicator) tuple corresponds to a descriptor which contains
+     * the letter grade value attributable to a student's feedback. The feedback itself
+     * could be in a different Marking Scheme like percentage. Anyway, this descriptor
+     * text letter grade value is the thing that turns up in the NESA Grade graph.
+     */
+    private const NESA_RUBRIC_CAPABILITY = 'NESA';
+    private const NESA_RUBRIC_INDICATOR = 'Grade';
+
     // Sort left-to-right for highcharts performance. @see https://www.highcharts.com/errors/15/
     private const BASE_MARKS = [
         'A' => 0,
@@ -254,11 +263,11 @@ class NesaScoreGraphMiddleYears extends BaseComponent
                     foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
                         $capabilityName = $capabilityMark->getCapabilityUsage()->getCapability()->getName();
 
-                        if ('NESA' === $capabilityName) {
+                        if (self::NESA_RUBRIC_CAPABILITY === $capabilityName) {
                             foreach ($capabilityMark->getCapabilityUsage()->getIndicatorUsages() as $indicatorUsage) {
                                 $indicatorName = $indicatorUsage->getIndicator()->getName();
 
-                                if ('Grade' === $indicatorName) {
+                                if (self::NESA_RUBRIC_INDICATOR === $indicatorName) {
                                     $indicatorMark = $markedGrid->retrieveIndicatorMark($indicatorUsage);
 
                                     if ($indicatorMark) {
