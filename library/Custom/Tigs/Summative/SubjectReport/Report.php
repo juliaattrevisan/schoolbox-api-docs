@@ -428,11 +428,34 @@ class Report
             return [];
         }
 
-        $configName = Config::_TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK;
+        /* The Academic Achievement Matrix searches for assessments that have a
+         * particular work type. These work types differ depending on whether you're
+         * in the Middle Years Program or whether you're in HSC, producing a different
+         * list accordingly.
+         *
+         * The assessments and their units' links depends on this being configured
+         * and searched in this particular way. Misconfiguration results in units not
+         * having their titles linked.
+         */
+        $identifier = null;
 
+        if ($attributes->isMiddleYear()) {
+            $identifier = Config::_TIGS_WORK_TYPE_7_10_ASSESSMENT_TASK;
+        } elseif ($attributes->isHsc()) {
+            $identifier = Config::_TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK;
+        }
+
+        /* Error early when you can't detect which work type you're supposed to use
+         */
+        if (null === $identifier) {
+            return ['error' => 'Cannot identify whether this student is in Middle Years program or HSC. Academic Achievement Summary not available.'];
+        }
+
+        /* Otherwise check that the work type existed somewhere in the config
+         */
         try {
             $workTypeId = $this->checkWorkType(
-                $configName,
+                $identifier,
                 'Cannot render Approaches to Learning components. Work type not set.',
                 'Set Approaches to Learning Work Type'
             );
@@ -440,6 +463,9 @@ class Report
             return ['error' => $e->getMessage()];
         }
 
+        /* Produce the Academic Achievement Matrix which is the rubric grid that correspond
+         * their assessments which used a particular work type
+         */
         $aam = new AcademicAchievementMatrix(
             $attributes,
             $unitSpecs,
@@ -454,6 +480,8 @@ class Report
             $roleTypeOverride
         );
 
+        /* Generically build an array of data via AbstractMatrix
+         */
         return $aam->toContext();
     }
 
