@@ -75,13 +75,6 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
         }
     }
 
-    //fix quote escapes
-    if (get_magic_quotes_gpc())
-    {
-        $message = stripslashes($message);
-        $subject = stripslashes($subject);
-    }
-
     //create email header
     $mail->setSubject($subject);
 
