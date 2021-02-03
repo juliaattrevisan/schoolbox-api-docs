@@ -221,7 +221,7 @@ class Definition implements IStrategy
 
 
     /**
-     * For each $ttid, find the most recent VALUE >= today's date
+     * For each $ttid, find the most recent VALUE <= today's date
      * When you find it, remember its VALUE and DAY_CODE for later
      *
      * @param array $cycles
@@ -256,23 +256,23 @@ class Definition implements IStrategy
 
             /* Otherwise continue processing its contents
              *
-             * Index the $timetableCalendar data by (ttid, value) where VALUE >= today's date
+             * Index the $timetableCalendar data by (ttid, value) where VALUE <= today's date
              * ensuring we only remember meaningful records, discarding ones that aren't applicable
              */
             foreach ($timetableCalendar['tt_calendar'] as $current) {
-                if ($current['VALUE'] >= $currentDate) {
+                if ($current['VALUE'] <= $currentDate) {
                     $stack[$ttid][$current['VALUE']][] = $current;
                 }
             }
 
-            /* Sort them so in reverse chronological order, then pop the topmost value
-             * That's the date (and record) closest to today, but not in the past
+            /* Sort them so in chronological order, then pop the last value
+             * That's the date (and record) closest to today, but not in the future
              */
             uksort($stack[$ttid], static function ($a, $b) {
-                return $a < $b;
+                return $a > $b;
             });
 
-            $record = array_shift($stack[$ttid])[0];
+            $record = array_pop($stack[$ttid])[0];
 
             /* Mine it for all its worth
              */
