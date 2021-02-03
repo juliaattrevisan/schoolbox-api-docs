@@ -492,8 +492,8 @@ class External_Tass_User implements External_UserInterface
         $splitParentLength = Config::get('external_tass_parent_id_length') + 1;
         if (strlen($id) == $splitParentLength) {
             // This is a split family parent, deal with them differently
-            $parentCode = substr($id, 0, $splitParentLength-1);
-            $parentNum = $id[$splitParentLength-1];
+            $parentCode = substr($id, 0, $splitParentLength - 1);
+            $parentNum  = intval($id[$splitParentLength - 1]);
 
             $query = "
                 SELECT DISTINCT

@@ -76,7 +76,7 @@ class Freedom implements IQueryHelper
         ";
 
         $params = [
-            'externalId'     => $externalUserId,
+            'externalId'     => intval($externalUserId),
             'relationStatus' => self::RELATION_CHILD,
             'contactLevel'   => self::CONTACT_LEVEL_FULL
         ];
