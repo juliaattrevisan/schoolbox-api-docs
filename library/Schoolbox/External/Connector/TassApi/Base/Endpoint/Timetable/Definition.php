@@ -158,9 +158,9 @@ class Definition implements IStrategy
             $cycleName = $cycle['name'];
             $cycleLength = $cycle['cycleLength'];
             $dayLength = $cycle['dayLength'];
-            $cycleStart = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_START);
+            $cycleStart = $cycleConfiguration[$ttid]['cycleStart'];
             $cycleEnd = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
-            $dayStart = 1;
+            $dayStart = $cycleConfiguration[$ttid]['dayStart'];
 
             /* Reuse existing cycle with the same identifier, if it exists, and update it
              */
@@ -229,10 +229,14 @@ class Definition implements IStrategy
      * @throws DomainException
      * @throws RuntimeException
      */
-    private function preloadCycleConfiguration(array $cycles)
+    private function preloadCycleConfiguration(array $cycles): array
     {
         $currentDate = date('Y-m-d');
         $payload = [];
+
+        /* Intermediary step
+         */
+        $stack = [];
 
         foreach ($cycles as $ttid => $cycle) {
             $timetableCalendar = $this->api->retrieveDocument('getTimetableCalendar', [
@@ -241,7 +245,7 @@ class Definition implements IStrategy
 
             /* If tass hasn't got any data for $ttid, exit early
              */
-            if (!$timetableCalendar['tt_calendar']) {
+            if (!$timetableCalendar['tt_calendar'] || !\count($timetableCalendar['tt_calendar'])) {
                 $this->log->warning(sprintf(
                     'Skipping: no getTimetableCalendar data for ttid %s when preloading cycle configuration',
                     $ttid
@@ -251,19 +255,40 @@ class Definition implements IStrategy
             }
 
             /* Otherwise continue processing its contents
+             *
+             * Index the $timetableCalendar data by (ttid, value) where VALUE >= today's date
+             * ensuring we only remember meaningful records, discarding ones that aren't applicable
              */
+            foreach ($timetableCalendar['tt_calendar'] as $current) {
+                if ($current['VALUE'] >= $currentDate) {
+                    $stack[$ttid][$current['VALUE']][] = $current;
+                }
+            }
 
-                /* Index the $timetableCalendar data by (ttid, value) where VALUE >= today's date
-                 * ensuring we only remember meaningful records, discarding ones that aren't applicable
+            /* Sort them so in reverse chronological order, then pop the topmost value
+             * That's the date (and record) closest to today, but not in the past
+             */
+            uksort($stack[$ttid], static function ($a, $b) {
+                return $a < $b;
+            });
+
+            $record = array_shift($stack[$ttid])[0];
+
+            /* Mine it for all its worth
+             */
+            $payload[$ttid] = [
+
+                /* Cycle start date
                  */
+                'cycleStart' => $record['VALUE'],
 
-                /* Sort them so in reverse chronological order, then pop the topmost value
-                 * That's the date (and record) closest to today, but not in the past
+                /* Starting Day number
                  */
-
+                'dayStart' => $record['DAY_CODE']
+            ];
         }
 
-        /* Return (ttid, start, end, day) tuples for later
+        /* Return (ttid, startDate, dayNumber) tuples for later
          */
         return $payload;
     }
