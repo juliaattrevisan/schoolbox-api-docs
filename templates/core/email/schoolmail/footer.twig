@@ -1,9 +1,5 @@
-{% import 'macro/spacer.twig' as fn %}
-
-<tr>{{ fn.spacer(config.fqdn, 16, 4, 3) }}</tr>
 <tr>
-    {{ fn.spacer(config.fqdn, 0, 8) }}
-    <td width="608" valign="top">
+    <td width="670" valign="top">
 
         {% if hideUnsubscribe is defined and hideUnsubscribe %}
             {# noop #}
@@ -29,6 +25,4 @@
             {% endif %}
         </p>
     </td>
-    {{ fn.spacer(config.fqdn, 0, 8) }}
 </tr>
-<tr>{{ fn.spacer(config.fqdn, 16, 4, 3) }}</tr>
