@@ -180,10 +180,12 @@ class Definition implements IStrategy
                 ->setStartDay($dayStart);
 
             $this->log->info(sprintf(
-                'Creating timetable cycle %s (%s) with day length %s',
+                'Creating timetable cycle %s (%s) with day length %s, starting on %s with day number %s',
                 $timetableCycle->getId(),
                 $timetableCycle->getTitle(),
-                $timetableCycle->getDayLength()
+                $timetableCycle->getDayLength(),
+                $cycleStart,
+                $dayStart
             ));
 
             if ($this->perform) {
