@@ -413,7 +413,7 @@
                             {% endblock  buttons_email_all_staff  %}
 
                             {% block buttons_email_parents %}
-                                {% if isStaff and config.email_all_parents and session.user.email %}
+                                {% if isStaff and config.email_all_parents and session.user.email and not hideContacts %}
                                     <li>
                                         <a class="icon-email" id="email-all-parents" title="Emails the parents that have email addresses and can be contacted">Email Parents</a>
                                         <form action="/mail/createMail.php" method="post" class="no-margin" id="email-contacts-form">
