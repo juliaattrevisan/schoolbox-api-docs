@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
@@ -46,7 +48,6 @@ class External_Tass_V53_User extends External_Tass_User
          * from there as well
          */
         if (Config::get('external_tass_commrules')) {
-
             $typeCodeBindings = $this->helper->getTypeCodeBindings();
 
             $typeWhere = '';
@@ -228,7 +229,8 @@ class External_Tass_V53_User extends External_Tass_User
         // Each of the parents may get two entries with different address (paraddress). Keep the first entry only.
         foreach ($iterator as $row) {
             $row = $this->database->trimRow($row);
-            if ($row['addressNumber'] === '1'
+            if (
+                $row['addressNumber'] === '1'
                 && $previousParentCode === $row['parentCode']
                 && $previousPersonNum === $row['personNumber']
             ) {

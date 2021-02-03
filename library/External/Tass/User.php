@@ -1,10 +1,12 @@
 <?php
+
 /**
  * This file provides access to TASS user info
  *
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Schoolbox\External\Normalise\TupleStack;
@@ -92,7 +94,6 @@ class External_Tass_User implements External_UserInterface
          * from there as well
          */
         if (Config::get('external_tass_commrules')) {
-
             $query .= "
                 UNION
                 SELECT DISTINCT pa.par_code, pa.e_mail, pa.add_num
@@ -141,7 +142,7 @@ class External_Tass_User implements External_UserInterface
             s.preferred_name AS StudentGiven1,
             s.surname AS StudentSurname,
             s.sex AS StudentGender,
-            CONVERT(nvarchar(30), s.dob, ".self::FORMAT_ISO8601." )  AS StudentBirthDate,
+            CONVERT(nvarchar(30), s.dob, " . self::FORMAT_ISO8601 . " )  AS StudentBirthDate,
             '' AS StudentTutorName,
             '' AS StudentHeadOfHouse,
             '' AS HeadOfHouseID,
@@ -219,8 +220,7 @@ class External_Tass_User implements External_UserInterface
 
         $ids = implode(',', array_map(function ($val) {
                 return sprintf("'%s'", $this->database->quote($val));
-            }, $externalUserId)
-        );
+        }, $externalUserId));
 
         foreach ($externalUserId as $externalId) {
             $charIndexQuery[] = "(CHARINDEX(','+ '{$this->database->quote($externalId)}' +',', ','+RTRIM(sf.stud_codes)+',') > 0)";
@@ -429,7 +429,7 @@ class External_Tass_User implements External_UserInterface
                     AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
                     ORDER BY studsub.sub_code ASC, studsub.class ASC
             ";
-        } else if ($user->getRole()->isStaff()) {
+        } elseif ($user->getRole()->isStaff()) {
             $sql = "SELECT class, tchsub.cmpy_code, semester, tchsub.sub_code, year_num, ISNULL(tchsub.year_grp,subtab.year_grp) as year_grp, sub_desc, sub_type
                     FROM tchsub
                     JOIN subtab ON subtab.sub_code=tchsub.sub_code AND subtab.cmpy_code=tchsub.cmpy_code
@@ -631,16 +631,16 @@ class External_Tass_User implements External_UserInterface
 
         $wherePositionText = '';
 
-        if (is_array($staffCategory) && $staffCategory[0] != '')
-        {
+        if (is_array($staffCategory) && $staffCategory[0] != '') {
             $wherePositionText = 'AND (';
             $db = $this->database;
 
             $count = 0;
 
             foreach ($staffCategory as $category) {
-                if ($count > 0)
+                if ($count > 0) {
                     $wherePositionText .= " AND ";
+                }
 
                 $wherePositionText .= " dbo.tel_vw_telemf.position_text NOT LIKE '" . $db->quote($category) . "'";
                 $count++;
@@ -655,8 +655,7 @@ class External_Tass_User implements External_UserInterface
 
         $wherePositionTitle = '';
 
-        if (is_array($staffCategory) && $staffCategory[0] != '')
-        {
+        if (is_array($staffCategory) && $staffCategory[0] != '') {
             $wherePositionTitle = " AND (";
 
             $db = $this->database;
@@ -664,8 +663,9 @@ class External_Tass_User implements External_UserInterface
             $count = 0;
 
             foreach ($staffCategory as $category) {
-                if ($count > 0)
+                if ($count > 0) {
                     $wherePositionTitle .= " AND ";
+                }
 
                 $wherePositionTitle .= " dbo.tel_vw_telemf.position_title NOT LIKE '" . $db->quote($category) . "'";
                 $count++;
@@ -680,16 +680,16 @@ class External_Tass_User implements External_UserInterface
 
         $whereAward = '';
 
-        if (is_array($staffAward) && $staffAward[0] != '')
-        {
+        if (is_array($staffAward) && $staffAward[0] != '') {
             $whereAward = " AND (";
             $db = $this->database;
 
             $count = 0;
 
             foreach ($staffAward as $award) {
-                if ($count > 0)
+                if ($count > 0) {
                     $whereAward .= " AND ";
+                }
 
                 $whereAward .= " dbo.tel_vw_telemf.awd_code NOT LIKE '" . $db->quote($award) . "'";
                 $count++;
@@ -702,19 +702,17 @@ class External_Tass_User implements External_UserInterface
 
         $awardMappings = explode(',', Config::get('tass_staff_dir_award_mappings'));
 
-        if (is_array($awardMappings) && $awardMappings[0] != '' && count($awardMappings) % 2 == 0)
-        {
+        if (is_array($awardMappings) && $awardMappings[0] != '' && count($awardMappings) % 2 == 0) {
             $caseAwardMappings = 'CASE (dbo.tel_vw_telemf.awd_code) ';
             $db = $this->database;
 
             $countAwardMappers = count($awardMappings);
-            for ($i = 0; $i < $countAwardMappers; $i += 2)
-                $caseAwardMappings .= " WHEN '" . $db->quote($awardMappings[$i]) . "' THEN '" . $db->quote($awardMappings[$i+1]) . "'";
+            for ($i = 0; $i < $countAwardMappers; $i += 2) {
+                $caseAwardMappings .= " WHEN '" . $db->quote($awardMappings[$i]) . "' THEN '" . $db->quote($awardMappings[$i + 1]) . "'";
+            }
 
             $caseAwardMappings .= " ELSE '' END AS StaffCategoryType";
-        }
-        else {
-
+        } else {
             // No mappings specified, just display the code
 
             $caseAwardMappings = "dbo.tel_vw_telemf.awd_code AS StaffCategoryType";

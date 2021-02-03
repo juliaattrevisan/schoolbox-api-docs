@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -260,7 +261,6 @@ class Freedom implements IQueryHelper
 
         // emergency contacts need to be squashed into a single row
         foreach ($rows as $i => $ec) {
-
             if ('' === $ec["{$pfx}Name"]) {
                 // skip the first record because it's already populated
                 // and doesn't get a number in the fieldname
@@ -280,5 +280,4 @@ class Freedom implements IQueryHelper
 
         return $row;
     }
-
 }
