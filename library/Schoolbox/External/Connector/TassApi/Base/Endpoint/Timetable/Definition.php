@@ -239,7 +239,7 @@ class Definition implements IStrategy
         $stack = [];
 
         foreach ($cycles as $ttid => $cycle) {
-            $timetableCalendar = $this->api->retrieveDocument('getTimetableCalendar', [
+            $timetableCalendar = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getTimetableCalendar', [
                 'tt_id' => $ttid
             ]);
 
