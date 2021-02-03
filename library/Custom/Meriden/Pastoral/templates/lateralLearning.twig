@@ -1,0 +1,17 @@
+<script type="text/javascript">
+    (function($){
+        $(function(){
+            // Jump menu for changing semester
+            $('#context-selector-semester, #context-selector-enrolled-subjects').on('change', function() {
+                window.location.href = this.value;
+            });
+        })
+    })(jQuery);
+</script>
+
+<div id="lateral-learning-report" class="e-report">
+    {% include '@customMeridenPastoral/contents/lateralLearning.twig' with {
+        report:              report,
+        showSubjectSelector: true,
+    } only %}
+</div>

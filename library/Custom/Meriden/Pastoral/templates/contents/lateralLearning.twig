@@ -1,0 +1,43 @@
+{##
+ # Contents of the eReport lateral learning report page.
+ #
+ # Parameters:
+ # * report.student:       the student whose report this is
+ # * report.subjectList:   the list of the student's subjects
+ # * report.subjectReport: the subject report for this student
+ # * showSubjectSelector:  is the subject selector shown?
+#}
+{% extends '@customMeridenPastoral/contents/base.twig' %}
+
+{% block contents %}
+    {% include '@customMeridenPastoral/sub/courseDescription.twig' with {description: report.subjectReport.description} only %}
+
+    {# Lateral Learning - a rubric rendered somehow #}
+    <div class="row" id="lateral-learning-skills">
+        <div class="small-12 column">
+            <dl class="small-gap">
+                <dt>Lateral Learning Skills</dt>
+            </dl>
+        </div>
+        <div class="small-12 column">
+            {% set capabilityMark = report.subjectReport.retrieveLateralLearningCapabilityMark %}
+            {% set indicatorMarks = (capabilityMark is defined) ? capabilityMark.indicatorMarks : [] %}
+            {% if indicatorMarks is not empty %}
+                <table class="width-auto bordered-table">
+                    {% for indicatorMark in indicatorMarks %}
+                        <tr>
+                            <td>{{ indicatorMark.indicatorUsage.indicator.name }}</td>
+                            <td>{{ indicatorMark.descriptor.description }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p>No lateral learning marks have been given for this student yet.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock contents %}
+
+{% block footer %}
+    {% include '@customMeridenPastoral/sub/classTeachers.twig' with {teachers: report.subjectReport.teachers} only %}
+{% endblock footer %}

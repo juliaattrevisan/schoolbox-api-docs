@@ -147,7 +147,9 @@ class Controller extends Base
             $subjectReport = $reportData['report']['subjectReport'];
             $this->getResponse()->content->set(
                 [
-                    'template' => '@customMeridenPastoral/subject.twig',
+                    'template' => $subjectReport->isLateralLearning()
+                        ? '@customMeridenPastoral/lateralLearning.twig'
+                        : '@customMeridenPastoral/subject.twig',
                     'data'     => $reportData,
                     'title'    => $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName(),
                 ]

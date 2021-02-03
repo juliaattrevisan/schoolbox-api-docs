@@ -221,6 +221,11 @@ class Factory
             $subject->setNamedGrade('courseGrade', $courseGrade);
         }
 
+        // Add the rubric rowset, if there is an actual folder
+        if ($subject->getFolder() && $subject->getFolder()->getId()) {
+            $subject->setRubricRowSet($this->rubricMapper->retrieveRowSet($subject->getFolder(), false));
+        }
+
         return $subject;
     }
 
@@ -433,6 +438,9 @@ class Factory
                     && $assessment->getUseRubric()
                 ) {
                     $rubric = $this->rubricMapper->retrieveMarkedGrid($feedback);
+                    // Install the marked grid into the feedback, so that it is
+                    // accessible by the lateral learning methods.
+                    $feedback->setRubricMarkedGrid($rubric);
                 }
                 if ($feedback) {
                     $allGrades['a' . $assessment->getId()] = [
