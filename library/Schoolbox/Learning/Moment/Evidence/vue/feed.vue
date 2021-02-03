@@ -231,11 +231,10 @@ export default {
 
 <template>
     <div>
-        <div class="feed" v-for="evidenceGroup in groupedEvidence">
+        <div class="feed" v-for="(evidenceGroup, index) in groupedEvidence" :key="index">
             <div class="feed-column left"></div>
-
             <section class="activity-feed">
-              <div class="profile-learning-actions">
+              <div v-if="index === 0" class="profile-learning-actions">
                 <div>
                   <template v-if="config.routes.getCreateEvidenceForm">
                   <a href="#" title="Share Learning" class="learning icon-share" data-reveal-id="shareLearningMoment"><span>Share Learning</span></a>
@@ -260,7 +259,7 @@ export default {
                     >{{ renderCreatedAt(evidenceGroup.date) }}</time>
                 </h2>
                 <ul class="information-list">
-                    <li v-for="evidence in evidenceGroup.evidence" class="feed-item">
+                    <li v-for="(evidence, index) in evidenceGroup.evidence" class="feed-item" :key="index">
                         <template v-if="evidence.discriminator === 'evidence'">
                             <!-- This evidence isn't necessarily editable -->
                             <div :class="{'actions-small-1': hasMenu(evidence.object), 'actions-small-0': !hasMenu(evidence.object)}">
@@ -302,12 +301,12 @@ export default {
                                   <p class="meta" v-if="evidence.object.curriculumNodes.length > 0 || evidence.object.tags.length > 0">
                                       Tags:
                                       <template v-for="(curriculumNode, index) in evidence.object.curriculumNodes">
-                                          <template v-if="index !== 0">, </template><span
-                                            :title="curriculumNode.name">{{ curriculumNode.code }}</span>
+                                          <template v-if="index !== 0">, </template>
+                                          <span :title="curriculumNode.name" :key="index">{{ curriculumNode.code }}</span>
                                       </template>
                                       <template v-if="evidence.object.curriculumNodes.length > 0 && evidence.object.tags.length > 0">, </template>
                                       <template v-for="(tag, index) in evidence.object.tags">
-                                          <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
+                                          <template v-if="index !== 0">, </template><span :key="index">{{ tag.name }}</span>
                                       </template>
                                   </p>
                                 </div>
@@ -345,7 +344,7 @@ export default {
         </div>
         <div class="skeleton-feed" v-if="showSkeletonLoader">
             <ul class="information-list">
-                <li class="row" v-for="n in 3">
+                <li class="row" v-for="n in 3" :key="n">
                     <div class="small-12 card skeleton">
                         <div class="img"></div>
                         <h3></h3>
