@@ -35,7 +35,7 @@ class Definition implements IStrategy
      */
     private const CYCLE_START = '2000-01-01 00:00:00';
     private const CYCLE_END = '2999-01-01 00:00:00';
-
+    private const CYCLE_DEFAULT_DAY_NUMBER = 1;
 
     /**
      * @var LoggerInterface
@@ -146,6 +146,10 @@ class Definition implements IStrategy
          */
         $cycles = $this->cycleRegistry->recallAll();
 
+        /* For each cycle we found, identify its start date, day number
+         */
+        $cycleConfiguration = $this->preloadCycleConfiguration($cycles);
+
         /* $ext is a key to identify this cycle and associate it with an luCampus record
          * Also happens to be synonymous with $cycle['id'], only because I said so earlier
          */
@@ -154,9 +158,9 @@ class Definition implements IStrategy
             $cycleName = $cycle['name'];
             $cycleLength = $cycle['cycleLength'];
             $dayLength = $cycle['dayLength'];
-            $cycleStart = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_START);
+            $cycleStart = $cycleConfiguration[$ttid]['cycleStart'] ?? \Alaress_Date_Format::newDatabaseDate(self::CYCLE_START);
             $cycleEnd = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
-            $dayStart = 1;
+            $dayStart = $cycleConfiguration[$ttid]['dayStart'] ?? self::CYCLE_DEFAULT_DAY_NUMBER;
 
             /* Reuse existing cycle with the same identifier, if it exists, and update it
              */
@@ -176,10 +180,12 @@ class Definition implements IStrategy
                 ->setStartDay($dayStart);
 
             $this->log->info(sprintf(
-                'Creating timetable cycle %s (%s) with day length %s',
+                'Creating timetable cycle %s (%s) with day length %s, starting on %s with day number %s',
                 $timetableCycle->getId(),
                 $timetableCycle->getTitle(),
-                $timetableCycle->getDayLength()
+                $timetableCycle->getDayLength(),
+                $cycleStart,
+                $dayStart
             ));
 
             if ($this->perform) {
@@ -213,6 +219,80 @@ class Definition implements IStrategy
                 }
             }
         }
+    }
+
+
+    /**
+     * For each $ttid, find the most recent VALUE <= today's date
+     * When you find it, remember its VALUE and DAY_CODE for later
+     *
+     * @param array $cycles
+     * @return array
+     * @throws DomainException
+     * @throws RuntimeException
+     */
+    private function preloadCycleConfiguration(array $cycles): array
+    {
+        $currentDate = date('Y-m-d');
+        $payload = [];
+
+        /* Intermediary step
+         */
+        $stack = [];
+
+        foreach ($cycles as $ttid => $cycle) {
+            $timetableCalendar = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getTimetableCalendar', [
+                'tt_id' => $ttid
+            ]);
+
+            /* If tass hasn't got any data for $ttid, exit early
+             */
+            if (!$timetableCalendar['tt_calendar'] || !\count($timetableCalendar['tt_calendar'])) {
+                $this->log->warning(sprintf(
+                    'Skipping: no getTimetableCalendar data for ttid %s when preloading cycle configuration',
+                    $ttid
+                ));
+
+                continue;
+            }
+
+            /* Otherwise continue processing its contents
+             *
+             * Index the $timetableCalendar data by (ttid, value) where VALUE <= today's date
+             * ensuring we only remember meaningful records, discarding ones that aren't applicable
+             */
+            foreach ($timetableCalendar['tt_calendar'] as $current) {
+                if ($current['VALUE'] <= $currentDate) {
+                    $stack[$ttid][$current['VALUE']][] = $current;
+                }
+            }
+
+            /* Sort them so in chronological order, then pop the last value
+             * That's the date (and record) closest to today, but not in the future
+             */
+            uksort($stack[$ttid], static function ($a, $b) {
+                return $a > $b;
+            });
+
+            $record = array_pop($stack[$ttid])[0];
+
+            /* Mine it for all its worth
+             */
+            $payload[$ttid] = [
+
+                /* Cycle start date
+                 */
+                'cycleStart' => $record['VALUE'],
+
+                /* Starting Day number
+                 */
+                'dayStart' => $record['DAY_CODE']
+            ];
+        }
+
+        /* Return (ttid, startDate, dayNumber) tuples for later
+         */
+        return $payload;
     }
 
 
