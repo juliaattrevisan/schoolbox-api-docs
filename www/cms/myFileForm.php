@@ -143,11 +143,24 @@ if (isset($_POST['description'])) {
                             // set this component's image to this one
                             foreach ($component->getConfig() as $config) {
                                 if ($config->getKey() == 'eportfolioImage') {
-                                    $configInstance = new Component_Config();
-                                    $configInstance->setId(null);
-                                    $configInstance->setConfigDefinitionId($config->getId());
-                                    $configInstance->setInstanceId($component->getId());
+
+                                    /* Try to find an existing record and reuse it, if possible
+                                     */
+                                    try {
+                                        $configInstance = Component_ConfigMapper::getInstance()->findOneByColumnList([
+                                            'component_config_definition_id' => $config->getId(),
+                                            'component_instance_id' => $component->getId()
+                                        ]);
+                                    } catch (\Schoolbox\Mapper\Exception $e) {
+                                        $configInstance = new Component_Config();
+                                        $configInstance->setId(null);
+                                        $configInstance->setConfigDefinitionId($config->getId());
+                                        $configInstance->setInstanceId($component->getId());
+
+                                    }
+
                                     $configInstance->setValue($file->getId());
+
                                     Component_ConfigMapper::getInstance()->save($configInstance);
                                     break;
                                 }
