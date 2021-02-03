@@ -146,6 +146,10 @@ class Definition implements IStrategy
          */
         $cycles = $this->cycleRegistry->recallAll();
 
+        /* For each cycle we found, identify its start date, end date, day number
+         */
+        $cycleConfiguration = $this->preloadCycleConfiguration($cycles);
+
         /* $ext is a key to identify this cycle and associate it with an luCampus record
          * Also happens to be synonymous with $cycle['id'], only because I said so earlier
          */
@@ -213,6 +217,55 @@ class Definition implements IStrategy
                 }
             }
         }
+    }
+
+
+    /**
+     * For each $ttid, find the most recent VALUE >= today's date
+     * When you find it, remember its VALUE and DAY_CODE for later
+     *
+     * @param array $cycles
+     * @return array
+     * @throws DomainException
+     * @throws RuntimeException
+     */
+    private function preloadCycleConfiguration(array $cycles)
+    {
+        $currentDate = date('Y-m-d');
+        $payload = [];
+
+        foreach ($cycles as $ttid => $cycle) {
+            $timetableCalendar = $this->api->retrieveDocument('getTimetableCalendar', [
+                'tt_id' => $ttid
+            ]);
+
+            /* If tass hasn't got any data for $ttid, exit early
+             */
+            if (!$timetableCalendar['tt_calendar']) {
+                $this->log->warning(sprintf(
+                    'Skipping: no getTimetableCalendar data for ttid %s when preloading cycle configuration',
+                    $ttid
+                ));
+
+                continue;
+            }
+
+            /* Otherwise continue processing its contents
+             */
+
+                /* Index the $timetableCalendar data by (ttid, value) where VALUE >= today's date
+                 * ensuring we only remember meaningful records, discarding ones that aren't applicable
+                 */
+
+                /* Sort them so in reverse chronological order, then pop the topmost value
+                 * That's the date (and record) closest to today, but not in the past
+                 */
+
+        }
+
+        /* Return (ttid, start, end, day) tuples for later
+         */
+        return $payload;
     }
 
 
