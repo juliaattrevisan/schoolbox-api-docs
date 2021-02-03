@@ -388,7 +388,6 @@ class Classes implements IStrategy
                 $timetableClassPeriod->getId()
             ));
         } catch (Exception $e) {
-            /** @var ClassPeriod $timetableClassPeriod */
             $timetableClassPeriod = $this->classPeriodMapper->createModel()
                 ->setClass($timetableClass)
                 ->setPeriod($period)
