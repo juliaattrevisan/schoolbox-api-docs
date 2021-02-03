@@ -310,11 +310,15 @@ class External_Isams_User implements External_UserInterface
           SELECT DISTINCT   V_Class.ClassCode AS code
           FROM              V_Class
           WHERE             V_Class.StudentID = :external_user_id OR
-                            V_Class.Tutor1ID = :external_user_id OR
-                            V_Class.Tutor2ID = :external_user_id
+                            V_Class.Tutor1ID  = :external_user_id1 OR
+                            V_Class.Tutor2ID  = :external_user_id2
         ';
 
-        $iterator = $this->getConnector()->getQueryIterator($sql, ['external_user_id' => $externalUserId]);
+        $iterator = $this->getConnector()->getQueryIterator($sql, [
+            'external_user_id'  => $externalUserId,
+            'external_user_id1' => $externalUserId,
+            'external_user_id2' => $externalUserId,
+        ]);
         $subjectList = [];
 
         foreach ($iterator as $currentRow) {
