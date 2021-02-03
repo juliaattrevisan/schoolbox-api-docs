@@ -231,11 +231,10 @@ export default {
 
 <template>
     <div>
-        <div class="feed" v-for="evidenceGroup in groupedEvidence">
+        <div class="feed" v-for="(evidenceGroup, index) in groupedEvidence" :key="index">
             <div class="feed-column left"></div>
-
             <section class="activity-feed">
-              <div class="profile-learning-actions">
+              <div v-if="index === 0" class="profile-learning-actions">
                 <div>
                   <template v-if="config.routes.getCreateEvidenceForm">
                   <a href="#" title="Share Learning" class="learning icon-share" data-reveal-id="shareLearningMoment"><span>Share Learning</span></a>
