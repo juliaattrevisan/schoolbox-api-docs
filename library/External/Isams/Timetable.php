@@ -190,7 +190,7 @@ class External_Isams_Timetable implements External_TimetableInterface
      */
     public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
-        $time = date("U");
+        $time = date("H:i:s");
 
         $queryPeriod = '
            SELECT     StartTime as TimeFrom,
@@ -279,18 +279,20 @@ class External_Isams_Timetable implements External_TimetableInterface
                     CampusCode = :campus_code AND
                     (
                         V_Class.Tutor1ID = :external_user_id OR
-                        V_Class.Tutor2ID = :external_user_id OR
-                        V_Class.StudentID = :external_user_id
+                        V_Class.Tutor2ID = :external_user_id1 OR
+                        V_Class.StudentID = :external_user_id2
                     )
         ';
 
         $iterator = $this->getConnector()->getQueryIterator($queryTimetable, [
             'day_id'            => $dayId,
             'campus_code'       => $campus->getExtTimetableCode(),
-            'external_user_id'  => $externalUserId
+            'external_user_id'  => $externalUserId,
+            'external_user_id1' => $externalUserId,
+            'external_user_id2' => $externalUserId,
         ]);
 
-        foreach($iterator as $desc) {
+        foreach ($iterator as $desc) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber'] && !isset($timetable[$x]['class'][$desc['ClassCode']])) {
                     $timetable[$x]['class'][$desc['ClassCode']] = array(
@@ -352,8 +354,8 @@ class External_Isams_Timetable implements External_TimetableInterface
             LEFT JOIN   V_Staff ON V_Staff.StaffID = V_Class.Tutor1ID
             WHERE       (
                             V_Class.Tutor1ID = :external_user_id OR
-                            V_Class.Tutor2ID = :external_user_id OR
-                            V_Class.StudentID = :external_user_id
+                            V_Class.Tutor2ID = :external_user_id1 OR
+                            V_Class.StudentID = :external_user_id2
                         )
                         AND CampusCode = :campus_code
             ORDER BY V_Days.intOrder, V_Periods.intOrder
@@ -361,6 +363,8 @@ class External_Isams_Timetable implements External_TimetableInterface
 
         $iterator = $this->getConnector()->getQueryIterator($queryTimetable, [
             'external_user_id'  => $externalUserId,
+            'external_user_id1' => $externalUserId,
+            'external_user_id2' => $externalUserId,
             'campus_code'       => $campus->getExtTimetableCode()
         ]);
 
