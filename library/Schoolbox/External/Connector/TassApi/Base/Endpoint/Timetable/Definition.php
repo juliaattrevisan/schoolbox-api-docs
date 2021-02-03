@@ -35,7 +35,7 @@ class Definition implements IStrategy
      */
     private const CYCLE_START = '2000-01-01 00:00:00';
     private const CYCLE_END = '2999-01-01 00:00:00';
-
+    private const CYCLE_DEFAULT_DAY_NUMBER = 1;
 
     /**
      * @var LoggerInterface
@@ -158,9 +158,9 @@ class Definition implements IStrategy
             $cycleName = $cycle['name'];
             $cycleLength = $cycle['cycleLength'];
             $dayLength = $cycle['dayLength'];
-            $cycleStart = $cycleConfiguration[$ttid]['cycleStart'];
+            $cycleStart = $cycleConfiguration[$ttid]['cycleStart'] ?? \Alaress_Date_Format::newDatabaseDate(self::CYCLE_START);
             $cycleEnd = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
-            $dayStart = $cycleConfiguration[$ttid]['dayStart'];
+            $dayStart = $cycleConfiguration[$ttid]['dayStart'] ?? self::CYCLE_DEFAULT_DAY_NUMBER;
 
             /* Reuse existing cycle with the same identifier, if it exists, and update it
              */
