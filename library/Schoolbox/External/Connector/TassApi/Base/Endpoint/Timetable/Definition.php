@@ -146,7 +146,7 @@ class Definition implements IStrategy
          */
         $cycles = $this->cycleRegistry->recallAll();
 
-        /* For each cycle we found, identify its start date, end date, day number
+        /* For each cycle we found, identify its start date, day number
          */
         $cycleConfiguration = $this->preloadCycleConfiguration($cycles);
 
