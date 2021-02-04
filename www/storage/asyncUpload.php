@@ -1,7 +1,7 @@
 <?php
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Resource\Storage\Translator\ModelToArray as ModelToArray;
+use Schoolbox\Resource\Storage\Translator\ModelToArray;
 
 /**
  * Asynchronous upload of a brownhole file.
@@ -113,7 +113,7 @@ function attemptStorage($fileData)
             'type' => $storage->getMimetype()->getMime(),
             'size' => $storage->getSize(),
             'name' => $fileData['name'],
-            'modelToArray' => $modelToArray($storage)
+            'file' => $modelToArray($storage)
         ]
     ];
 }
