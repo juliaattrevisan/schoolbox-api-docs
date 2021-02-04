@@ -88,10 +88,42 @@ readconf() {
 declare temp_ini_file;
 read_ini() {
   # Collect Credentials from $temp_ini_file
-  tempsqluser=$(schoolbox-readini.php --ini="$temp_ini_file" --option=SQL_user);
-  tempsqlpasswd=$(schoolbox-readini.php --ini="$temp_ini_file" --option=SQL_passwd);
-  tempsqlhost=$(schoolbox-readini.php --ini="$temp_ini_file" --option=SQL_host);
-  tempsqldb=$(schoolbox-readini.php --ini="$temp_ini_file" --option=SQL_db);
+  instance_list=$(schoolbox-read-instances --ini "$temp_ini_file" --option instance-list)
+  if [[ $(echo "$instance_list" | wc -l) -gt 1 ]]; then
+    # Multiple instances in instances.ini file. Prompt user to select an instance.
+    valid_selection=0
+    while [[ $valid_selection == 0 ]]; do
+      line_idx=0
+      for instance_id in $instance_list; do
+        ((line_idx++))
+        echo -n "$line_idx: $instance_id ("
+        hostnames=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option hostnames)
+        hostname_idx=0
+        for hostname in $hostnames; do
+          ((hostname_idx++))
+          if [[ $hostname_idx -gt 1 ]]; then
+            echo -n ","
+          fi
+          echo -n "$hostname"
+        done
+        echo ")"
+      done
+      read -r -p "Option (1-$line_idx): " instance_id_idx
+      if [[ $instance_id_idx -lt 1 ]] || [[ $instance_id_idx -gt $line_idx ]]; then
+        echo "Invalid selection, enter a value from (1-$line_idx)" >&2
+      else
+        valid_selection=1
+        instance_id=$(echo "$instance_list" | head -n "$instance_id_idx" | tail -n 1)
+      fi
+    done
+  else
+    # Only 1 instance in instances.ini file
+    instance_id=$instance_list
+  fi
+  tempsqluser=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option SQL_user);
+  tempsqlpasswd=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option SQL_passwd);
+  tempsqlhost=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option SQL_host);
+  tempsqldb=$(INSTANCE_ID="$instance_id" schoolbox-read-instances --ini "$temp_ini_file" --option SQL_db);
 }
 
 readsqlver() {
