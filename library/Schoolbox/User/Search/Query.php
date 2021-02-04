@@ -218,6 +218,10 @@ class Query
             $params['parentType'] = Role::PARENT;
         }
 
+        // guest should not appear at all
+        $whereParts[]        = "g.group_type != :guestType";
+        $params['guestType'] = Role::GUEST;
+
         return [' WHERE ' . implode(' AND ', $whereParts), $params];
     }
 }
