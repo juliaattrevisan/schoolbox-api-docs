@@ -1,8 +1,13 @@
 <?php
 
+/**
+ * @copyright   Copyright 2021, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
-
+use Schoolbox\Role;
 
 class User extends DeprecatedModel
 {
@@ -181,20 +186,24 @@ class User extends DeprecatedModel
      * @param  \Schoolbox\User $user
      * @return string
      */
-    protected function getSearchFilter($user)
+    protected function getSearchFilter(\Schoolbox\User $user): string
     {
-        $searchFilter = '';
-        if ($user->getRole()->isGuest() ||
+        $excludeRoles = [Role::GUEST];
+
+        if (
+            $user->getRole()->isGuest() ||
             (!$user->getRole()->isStaff() && Config::get('parent_search_enable') != 1)
         ) {
-            $searchFilter =  " `groups`.`group_type` != 'parent' AND ";
+            $excludeRoles[] = Role::PARENT;
         }
-        if ($user->getRole()->isGuest() ||
+        if (
+            $user->getRole()->isGuest() ||
             (!$user->getRole()->isStaff() && Config::get('student_search_enable') != 1)
         ) {
-            $searchFilter .= " `groups`.`group_type` != 'student' AND ";
+            $excludeRoles[] = Role::STUDENT;
         }
-        return $searchFilter."1=1 ";
+
+        return " `groups`.`group_type` NOT IN ('" . implode("','", $excludeRoles) . "')";
     }
 
     /**
