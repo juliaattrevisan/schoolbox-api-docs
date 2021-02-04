@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Csv
  *
@@ -9,16 +10,16 @@
 
 namespace Calendar\Import;
 
-use \Schoolbox\Calendar\Event;
-use \Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventType;
-use \Schoolbox\Calendar\Relation\Category;
-use \Schoolbox\Calendar\Relation\CategoryMapper;
-use \Schoolbox\Calendar\Relation\Role;
-use \Schoolbox\Calendar\Relation\RoleMapper;
-use \Schoolbox\CampusMapper;
-use \Alaress_Date_Format;
-use \Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Calendar\Relation\Category;
+use Schoolbox\Calendar\Relation\CategoryMapper;
+use Schoolbox\Calendar\Relation\Role;
+use Schoolbox\Calendar\Relation\RoleMapper;
+use Schoolbox\CampusMapper;
+use Alaress_Date_Format;
+use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 
 class Csv extends Base
@@ -69,29 +70,19 @@ class Csv extends Base
                 },
                 $thisRow
             );
-            try {
-                list(
-                    $start_date,
-                    $start_time,
-                    $finish_date,
-                    $finish_time,
-                    $all_day,
-                    $name,
-                    $detail,
-                    $location,
-                    $event_type,
-                    $publish_date,
-                    $attendance
-                    ) = $thisRow;
-            } catch (\ErrorException $e) {
-                $output[] = array(
-                    'name'   => \Scrub::text($thisRow[5]),
-                    'status' => 'Not Added',
-                    'error'  => 'Not enough columns in CSV',
-                );
-
-                continue;
-            }
+            [
+                $start_date,
+                $start_time,
+                $finish_date,
+                $finish_time,
+                $all_day,
+                $name,
+                $detail,
+                $location,
+                $event_type,
+                $publish_date,
+                $attendance,
+            ] = $thisRow;
 
             /* Event name is mandatory
              */
@@ -123,12 +114,16 @@ class Csv extends Base
              * If access is 2, then the sid corresponds to group id's
              */
             try {
-                $start = new Alaress_Date_Format($start_date, 'd/m/Y');
+                $start = new Alaress_Date_Format();
+                $start->setFromFormat($start_date, 'd/m/Y', null, false);
                 //
                 // Finish empty? Use start date as the finish.
-                $finish = (strlen(trim($finish_date))) ?
-                    new Alaress_Date_Format($finish_date, 'd/m/Y') :
-                    clone $start;
+                if (!empty(strlen(trim($finish_date)))) {
+                    $finish = new Alaress_Date_Format();
+                    $finish->setFromFormat($finish_date, 'd/m/Y', null, false);
+                } else {
+                    $finish = clone $start;
+                }
             } catch (\InvalidArgumentException $e) {
                 $output[] = array(
                     'name'   => \Scrub::text($name),
@@ -178,11 +173,11 @@ class Csv extends Base
             /* Default value for all-day events
              */
             if (preg_match('#(00:00:00)|(23:59:59)#', $start_time)) {
-                $startDatetime = new \Alaress_Date_Format("{$start_date} {$start_time}", 'd/m/Y H:i:s');
+                $startDatetimeString = "{$start_date} {$start_time}";
             } /* Prescribed 24-hour format from csv, append :00 seconds
              */
             elseif (preg_match('#^((0?\d)|(1\d)|(2[0-3])):([0-5]\d)$#', $start_time)) {
-                $startDatetime = new \Alaress_Date_Format("{$start_date} {$start_time}:00", 'd/m/Y H:i:s');
+                $startDatetimeString = "{$start_date} {$start_time}:00";
             } else {
                 $output[] = array(
                     'name'   => \Scrub::text($name),
@@ -193,14 +188,26 @@ class Csv extends Base
                 continue;
             }
 
+            try {
+                $startDatetime = new Alaress_Date_Format();
+                $startDatetime->setFromFormat($startDatetimeString, 'd/m/Y H:i:s', null, false);
+            } catch (\InvalidArgumentException $e) {
+                $output[] = [
+                    'name'   => \Scrub::text($name),
+                    'status' => 'Not Added',
+                    'error'  => 'Invalid start date time supplied',
+                ];
+                continue;
+            }
+
             /* Default value for all-day events
              */
             if (preg_match('#(00:00:00)|(23:59:59)#', $finish_time)) {
-                $finishDatetime = new \Alaress_Date_Format("{$finish_date} {$finish_time}", 'd/m/Y H:i:s');
+                $finishDatetimeString = "{$finish_date} {$finish_time}";
             } /* Prescribed 24-hour format from csv, append :00 seconds
              */
             elseif (preg_match('#^((0?\d)|(1\d)|(2[0-3])):([0-5]\d)$#', $finish_time)) {
-                $finishDatetime = new \Alaress_Date_Format("{$finish_date} {$finish_time}:00", 'd/m/Y H:i:s');
+                $finishDatetimeString = "{$finish_date} {$finish_time}:00";
             } else {
                 $output[] = array(
                     'name'   => \Scrub::text($name),
@@ -208,6 +215,18 @@ class Csv extends Base
                     'error'  => 'Invalid finish date and/or times (use 24-hour h:m format)',
                 );
 
+                continue;
+            }
+
+            try {
+                $finishDatetime = new Alaress_Date_Format();
+                $finishDatetime->setFromFormat($finishDatetimeString, 'd/m/Y H:i:s', null, false);
+            } catch (\InvalidArgumentException $e) {
+                $output[] = [
+                    'name'   => \Scrub::text($name),
+                    'status' => 'Not Added',
+                    'error'  => 'Invalid finish date time supplied',
+                ];
                 continue;
             }
 
@@ -244,8 +263,18 @@ class Csv extends Base
             /* If a publish date is specified, use it; otherwise leave as empty
              */
             if (strlen(trim($publish_date))) {
-                $pdate = new Alaress_Date_Format($publish_date, 'd/m/Y');
-                $event->setPublishDateTime($pdate);
+                try {
+                    $publishDate = new Alaress_Date_Format();
+                    $publishDate->setFromFormat($publish_date, 'd/m/Y', null, false);
+                } catch (\InvalidArgumentException $e) {
+                    $output[] = [
+                        'name'   => \Scrub::text($name),
+                        'status' => 'Not Added',
+                        'error'  => 'Invalid publish date supplied',
+                    ];
+                    continue;
+                }
+                $event->setPublishDateTime($publishDate);
             }
 
             /* Save it

@@ -377,7 +377,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * @param DateTimeInterface|Alaress_Date_Format|string $dateTime
      * @param string|array $inputDateFormat If array: try all of these formats, use first that doesn't fail
-     * @param DateTimeZone $timezone The timezone of the date, or null to use default
+     * @param DateTimeZone|null $timezone    The timezone of the date, or null to use default
+     * @param bool         $tryTrailing Set to false to stop trying with trailing data
      *
      * @return void
      * @throws InvalidArgumentException if no $inputDateFormat was set and $dateTime
@@ -387,7 +388,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function setFromFormat(
         $dateTime,
         $inputDateFormat,
-        DateTimeZone $timezone = null
+        DateTimeZone $timezone = null,
+        bool $tryTrailing = true
     ) {
         if (is_array($inputDateFormat)) {
             if (empty($inputDateFormat)) {
@@ -437,6 +439,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                 try {
                     $laravelDate = Carbon::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
                 } catch (InvalidArgumentException $e) {
+                    if (!$tryTrailing) {
+                        throw $e;
+                    }
                     // I don't have a datetime, try again with trailing data allowed
                     // This can also throw an InvalidArgumentException - allow that to fall on carpet
                     $laravelDate = Carbon::createFromFormat($inputDateFormat . '+', $dateTime, $newTimezone);
