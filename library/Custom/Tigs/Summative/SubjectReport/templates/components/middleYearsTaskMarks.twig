@@ -9,29 +9,33 @@
 #}
 
 <style>
+    .middle-years-task-marks-wrap {
+        margin-bottom: 1rem;
+    }
+
     table.middle-years-task-marks th {
         width: 150px;
     }
 </style>
 
 <div class="middle-years-task-marks-wrap">
-<p class="meta middle-years-task-marks-heading">Task Marks (%)</p>
-{% if error|default(null) %}
-    {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
-{% else %}
-    <div class="scrollable">
-        <table class="middle-years-task-marks">
-            <tbody>
-                <tr>
-                    <th>Student Mark %</th>
-                    <td>{{ studentMark|default('-') }}</td>
-                </tr>
-                <tr>
-                    <th>Cohort Average %</th>
-                    <td>{{ cohortAverage }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-{% endif %}
+    <h3 class="subheader middle-years-task-marks-heading">Task Marks (%)</h3>
+    {% if error|default(null) %}
+        {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
+    {% else %}
+        <div class="scrollable">
+            <table class="middle-years-task-marks">
+                <tbody>
+                    <tr>
+                        <th>Student Mark %</th>
+                        <td>{{ studentMark|default('-') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Cohort Average %</th>
+                        <td>{{ cohortAverage }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 </div>
