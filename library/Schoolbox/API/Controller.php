@@ -10,7 +10,6 @@ namespace Schoolbox\API;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output;
 use Authenticator;
-use Crell\ApiProblem\ApiProblem;
 use Firebase\JWT;
 use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
 use Okta\JwtVerifier\Discovery\Oidc;
@@ -194,8 +193,8 @@ class Controller extends Base
      */
     private function authenticate(array $postData): ?User
     {
-        $title  = null;
-        $status = null;
+        $response = null;
+        $status   = null;
         try {
             if (isset($postData['username'], $postData['password'])) {
                 return $this->authenticateViaPostData($postData['username'], $postData['password']);
@@ -204,43 +203,36 @@ class Controller extends Base
                 return $this->authenticateViaJwt($postData['jwt']);
             }
 
-            $title  = 'Either the "username" and "password" or the "jwt" POST fields must be set';
-            $status = 400;
+            $response = [
+                'required' => 'Either the "username" and "password" or the "jwt" POST fields must be set'
+            ];
+            $status   = 400;
         } catch (JWT\BeforeValidException $e) {
-            $title  = 'JWT is not yet valid';
-            $status = 401;
+            $response = 'JWT is not yet valid';
+            $status   = 401;
         } catch (JWT\SignatureInvalidException $e) {
-            $title  = 'JWT signature is invalid';
-            $status = 401;
+            $response = 'JWT signature is invalid';
+            $status   = 401;
         } catch (JWT\ExpiredException $e) {
-            $title  = 'JWT expired';
-            $status = 401;
+            $response = 'JWT expired';
+            $status   = 401;
         } catch (SchoolboxAccessDeniedException $e) {
-            $title  = 'Invalid username or password';
-            $status = 401;
+            $response = 'Invalid username or password';
+            $status   = 401;
         } catch (SchoolboxAccountDisabledException $e) {
-            $title  = 'Account disabled';
-            $status = 400;
+            $response = 'Account disabled';
+            $status   = 400;
         } catch (SchoolboxNotFoundException $e) {
-            $title  = 'User not found';
-            $status = 400;
+            $response = 'User not found';
+            $status   = 400;
         } catch (SchoolboxPasswordExpiredException $e) {
-            $title  = 'Password has expired';
-            $status = 400;
-        }
-
-        // There's a problem: do something with it
-        $problem = new ApiProblem();
-        if (isset($title)) {
-            $problem = $problem->setTitle($title);
-        }
-        if (isset($status)) {
-            $problem = $problem->setStatus($status);
+            $response = 'Password has expired';
+            $status   = 400;
         }
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->response->status->setCode($status);
-        $this->response->content->set($this->buildJsonOutput($problem));
+        $this->response->content->set($this->buildJsonOutput($response));
         return null;
     }
 
