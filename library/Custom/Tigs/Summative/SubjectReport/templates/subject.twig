@@ -160,6 +160,11 @@ Data:
                     {% endif %}
                 </div>
 
+                {# Middle Years Task Marks #}
+                {% if middleYearsTaskMarks.data is defined and middleYearsTaskMarks.data[unitSpecId] is defined %}
+                    {% include '@tigsSubjectReport/components/middleYearsTaskMarks.twig' with middleYearsTaskMarks.data[unitSpecId]|merge(extraComponentData) only %}
+                {% endif %}
+
                 {# Comments come from different assessments, depending on student type #}
 
                 {% if attributes.isHsc %}

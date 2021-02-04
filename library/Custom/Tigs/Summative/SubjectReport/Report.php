@@ -21,6 +21,7 @@ use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementSummary;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentMatrix;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
+use Custom\Tigs\Summative\SubjectReport\Components\MiddleYearsAssessmentTasks;
 use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraphHSC;
 use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraphMiddleYears;
 use DomainException;
@@ -53,6 +54,7 @@ use PDO;
 use Schoolbox\Resource\Textbox;
 use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
+use function sprintf;
 
 class Report
 {
@@ -205,6 +207,7 @@ class Report
             $hscTaskMarks  = $this->buildHscTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $hscTaskMatrix = $this->buildHscTaskMatrixData($folder, $attributes,$unitSpecs, $courseSpec, $user, $roleTypeOverride);
             $hscRankData   = $this->buildHscAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
+            $middleYearsTaskMarks = $this->buildMiddleYearsTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
 
             // Filter out unit specs without any data
             $unitSpecsWithData = new Collection();
@@ -273,6 +276,7 @@ class Report
             'hscTaskMarks'              => $hscTaskMarks,
             'hscTaskMatrix'             => $hscTaskMatrix,
             'hscRankData'               => $hscRankData,
+            'middleYearsTaskMarks'      => $middleYearsTaskMarks,
         ];
     }
 
@@ -818,6 +822,65 @@ class Report
         return $hscTaskMarks->toContext();
     }
 
+    /**
+     * This is a little table of information for each Middle Years student
+     * Their task marks table appears next to the comment area, if it exists,
+     * for each assessment
+     *
+     * @param Folder\Model      $folder
+     * @param StudentAttributes $attributes
+     * @param CourseSpec\Model  $courseSpec
+     * @param User              $student
+     * @param string|null       $roleTypeOverride
+     * @return array|null
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws UnexpectedValueException
+     * @throws RouteNotFound
+     * @throws DomainException
+     * @throws LogicException
+     * @throws DefinitionException
+     * @throws UnderflowException
+     * @throws Database\Exception
+     */
+    private function buildMiddleYearsTaskMarksData(
+        Folder\Model $folder,
+        StudentAttributes $attributes,
+        CourseSpec\Model $courseSpec,
+        User $student,
+        ?string $roleTypeOverride
+    ): ?array {
+
+        /* Only relevant to Middle Year students
+         */
+        if (!$attributes->isMiddleYear()) {
+            return null;
+        }
+
+        try {
+            $workTypeId = $this->checkWorkType(
+                Config::_TIGS_WORK_TYPE_7_10_ASSESSMENT_TASK,
+                "Cannot render 'Middle Years Task Marks' components. Work type not set.",
+                "Set '7-10 Assessment Task' Work Type"
+            );
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
+        }
+
+        $this->loadAssessmentsAndParticipation($courseSpec, [$workTypeId], $attributes, 1, $attributes->getCurriculumSemester());
+
+        $middleYearsTaskMarks = new MiddleYearsAssessmentTasks(
+            $courseSpec,
+            $student,
+            $attributes,
+            $this->visibility,
+            $this->viewer,
+            $workTypeId,
+            $folder,
+            $roleTypeOverride
+        );
+        return ['data' => $middleYearsTaskMarks->toContext()];
+    }
 
     /**
      * @param Folder\Model      $folder
