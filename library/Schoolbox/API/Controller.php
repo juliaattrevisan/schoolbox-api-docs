@@ -10,6 +10,7 @@ namespace Schoolbox\API;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output;
 use Authenticator;
+use Crell\ApiProblem\ApiProblem;
 use Firebase\JWT;
 use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
 use Okta\JwtVerifier\Discovery\Oidc;
@@ -193,6 +194,8 @@ class Controller extends Base
      */
     private function authenticate(array $postData): ?User
     {
+        $title  = null;
+        $status = null;
         try {
             if (isset($postData['username'], $postData['password'])) {
                 return $this->authenticateViaPostData($postData['username'], $postData['password']);
@@ -200,42 +203,44 @@ class Controller extends Base
             if (isset($postData['jwt'])) {
                 return $this->authenticateViaJwt($postData['jwt']);
             }
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(400);
-            $this->response->content->set(
-                $this->buildJsonOutput([
-                    'required' => 'Either the "username" and "password" or the "jwt" POST fields must be set',
-                ])
-            );
+
+            $title  = 'Either the "username" and "password" or the "jwt" POST fields must be set';
+            $status = 400;
         } catch (JWT\BeforeValidException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(401);
-            $this->response->content->set($this->buildJsonOutput('JWT is not yet valid'));
+            $title  = 'JWT is not yet valid';
+            $status = 401;
         } catch (JWT\SignatureInvalidException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(401);
-            $this->response->content->set($this->buildJsonOutput('JWT signature is invalid'));
+            $title  = 'JWT signature is invalid';
+            $status = 401;
         } catch (JWT\ExpiredException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(401);
-            $this->response->content->set($this->buildJsonOutput('JWT expired'));
+            $title  = 'JWT expired';
+            $status = 401;
         } catch (SchoolboxAccessDeniedException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(401);
-            $this->response->content->set($this->buildJsonOutput('Invalid username or password'));
+            $title  = 'Invalid username or password';
+            $status = 401;
         } catch (SchoolboxAccountDisabledException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(400);
-            $this->response->content->set($this->buildJsonOutput('Account disabled'));
+            $title  = 'Account disabled';
+            $status = 400;
         } catch (SchoolboxNotFoundException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(400);
-            $this->response->content->set($this->buildJsonOutput('User not found'));
+            $title  = 'User not found';
+            $status = 400;
         } catch (SchoolboxPasswordExpiredException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(400);
-            $this->response->content->set($this->buildJsonOutput('Password has expired'));
+            $title  = 'Password has expired';
+            $status = 400;
         }
+
+        // There's a problem: do something with it
+        $problem = new ApiProblem();
+        if (isset($title)) {
+            $problem = $problem->setTitle($title);
+        }
+        if (isset($status)) {
+            $problem = $problem->setStatus($status);
+        }
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->response->status->setCode($status);
+        $this->response->content->set($this->buildJsonOutput($problem));
         return null;
     }
 
