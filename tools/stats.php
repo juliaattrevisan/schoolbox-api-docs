@@ -139,6 +139,15 @@ $app = new class extends CliTool\App {
             'links'             => 'SELECT count(*) FROM link WHERE deleted_at IS NULL',
             'folders'           => 'SELECT count(*) FROM folder WHERE deleted_at IS NULL',
 
+            //Learning Moments / Evidence
+            'evidence'          => 'SELECT count(*) FROM evidence WHERE deleted_at IS NULL',
+            'evidence_comments' => 'SELECT count(*) FROM evidence JOIN discussion_thread_comment dtc on evidence.discussion_thread_id = dtc.discussion_thread_id',
+
+            //Badges
+            'badges'            => 'SELECT count(*) FROM badge WHERE deleted_at IS NULL',
+            'badge_goals'       => 'SELECT count(*) FROM badge_user WHERE status = "goal" AND deleted_at IS NULL',
+            'badge_achieved'       => 'SELECT count(*) FROM badge_user WHERE status = "achievement" AND deleted_at IS NULL',
+
         ];
 
         $result['instance_id'] = INSTANCE_ID;
