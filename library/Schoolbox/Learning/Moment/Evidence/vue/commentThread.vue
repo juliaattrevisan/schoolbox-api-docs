@@ -295,7 +295,7 @@ export default {
                     :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
                 </div>
                 <template v-if="hasComments">
-                    <ul class="information-list social-stream">
+                    <ul class="information-list">
                         <li class="actions-small-1" v-for="(comment, index) in comments" :key="index">
                             <div class="list-item">
                                 <div class="card small-12 compact">
