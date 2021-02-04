@@ -568,11 +568,11 @@
 
             {% if showAchievementsTab %}
             <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
-                <div id="goal-feed"></div>
+                <div id="goal-feed" class="goals-achievements"></div>
             </div>
 
             <div class="content no-pad {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
-                <div id="achievement-feed"></div>
+                <div id="achievement-feed" class="goals-achievements"></div>
             </div>
             {% endif %}
 
@@ -668,9 +668,9 @@
                             {% endif %}
                         {% endif %}
                     </div>
-                    <section class="v-card-list">
+                    <section class="v-card-list classes-groups content">
                         {% for subjectKey, subject in subjectGroup %}
-                        <div class="v-card small-12 medium-4 xlarge-3">
+                        <div class="v-card">
 
                             {% if subject.linkedToFolder %}
                             <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
@@ -765,9 +765,9 @@
             <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
                 <section>
                     <h2 class="subheader content">Groups</h2>
-                    <section class="v-card-list">
+                    <section class="v-card-list classes-groups content">
                         {% for groupKey, group in groups %}
-                            <div class="v-card small-12 medium-4 xlarge-3">
+                            <div class="v-card">
                                 {% if group.linkedToFolder %}
                                 <a href="/homepage/{{ group.id }}">
                                 {% endif %}
