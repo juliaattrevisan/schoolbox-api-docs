@@ -45,6 +45,18 @@ Data:
     .has-gradient {
         color: white;
     }
+
+    /* The Task Marks tables all have a similar and consistent appearance
+     * They appear at the bottom of the Subject Report for a specific folder
+     * and contain Student Mark, Cohort Average, etc.
+     */
+    .tigs-crp .task-marks-wrap {
+        margin-bottom: 1rem;
+    }
+
+    .tigs-crp .task-marks-wrap th {
+        width: 150px;
+    }
 </style>
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <div class="tigs-crp subject-report {{ macro.cssClasses(attributes) }}">
