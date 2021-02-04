@@ -100,20 +100,19 @@ class CycleConfiguration
              * ensuring we only remember meaningful records, discarding ones that aren't applicable
              */
             foreach ($timetableCalendar['tt_calendar'] as $current) {
-                if (($current['VALUE'] <= $currentDate) && '' !== trim((string)$current['DAY_CODE'])) {
+                if ($current['VALUE'] <= $currentDate) {
                     $stack[$ttid][$current['VALUE']][] = $current;
                 }
             }
 
-            /* Sort them so in chronological order, then pop the first value
-             * That's the oldest date (and record) for a given tt_id and informs
-             * the initial conditions of a cycle
+            /* Sort them so in chronological order, then pop the last value
+             * That's the date (and record) closest to today, but not in the future
              */
             uksort($stack[$ttid], static function ($a, $b) {
                 return $a > $b;
             });
 
-            $record = array_shift($stack[$ttid])[0];
+            $record = array_pop($stack[$ttid])[0];
 
             /* Mine it for all its worth
              */
