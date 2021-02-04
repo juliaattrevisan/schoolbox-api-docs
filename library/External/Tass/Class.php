@@ -23,7 +23,7 @@ class External_Tass_Class implements External_ClassInterface {
     private $externalUser;
 
     function __construct () {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = MSSQL::getInstance();
         $this->externalUser = new External_User('tass');
     }
 
@@ -82,7 +82,7 @@ class External_Tass_Class implements External_ClassInterface {
                 AND ( $classQuery )
             ORDER BY lastname, firstname";
 
-        return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
+        return $this->database->trimAll($this->database->getAll($query));
     }
 
 
@@ -96,25 +96,15 @@ class External_Tass_Class implements External_ClassInterface {
             return [];
         }
 
-        $classQuery = '';
-        if(stristr($classCode, ',')) {
-            $subCodeArray = explode(',',$classCode);
-            foreach($subCodeArray as $code) {
-                list($year, $code, $class) = self::parseClassCode($code);
-                $yearQuery = $year !== '' ?  "(year_grp = '$year' OR year_grp IS NULL) AND" : '';
-
-
-                $classQuery .= " ( $yearQuery sub_code = '$code' AND class = '$class' ) OR ";
-            }
-            $classQuery .= '1=0';
+        $classQueries   = [];
+        $subCodeArray = explode(',', $classCode);
+        foreach ($subCodeArray as $code) {
+            [$year, $code, $class] = self::parseClassCode($code);
+            // tchsub.year_grp is smallint
+            $yearQuery  = is_numeric($year) ? "(year_grp = '$year' OR year_grp IS NULL) AND" : '';
+            $classQueries[] = " ( $yearQuery sub_code = '$code' AND class = '$class' ) ";
         }
-        else {
-            list($year, $code, $class) = self::parseClassCode($classCode);
-            $yearQuery = $year !== '' ?  "(year_grp = '$year' OR year_grp IS NULL) AND" : '';
-
-            $classQuery = " $yearQuery sub_code = '$code' AND class = '$class' ";
-        }
-
+        $classQuery = implode(' OR ', $classQueries);
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
@@ -122,21 +112,13 @@ class External_Tass_Class implements External_ClassInterface {
                     WHERE semester = '{$fileSemester}' AND year_num = '{$fileYear}'
                     AND ( $classQuery )";
 
-        $statement = $this->getDatabase()->query($query);
+        $statement = $this->database->query($query);
         $teachers = [];
         while ($synrow = $statement->fetch()) {
             $teachers[] = $synrow['tch_code'];
         }
 
         return array_unique($teachers);
-    }
-
-    private function setDatabase ($database) {
-        $this->database = $database;
-    }
-
-    private function getDatabase () {
-        return $this->database;
     }
 
     /**
