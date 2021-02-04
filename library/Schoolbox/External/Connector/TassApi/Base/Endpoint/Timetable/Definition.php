@@ -256,6 +256,12 @@ class Definition implements IStrategy
                 continue;
             }
 
+            /* Precautionary init, in case $timetableCalendar had records but none
+             * of those records were in the past and had DAY_CODE values in them
+             * $stack[$ttid] would be nonexistent and uksort() would detonate on you
+             */
+            $stack[$ttid] = [];
+
             /* Otherwise continue processing its contents
              *
              * Index the $timetableCalendar data by (ttid, value) where VALUE <= today's date
