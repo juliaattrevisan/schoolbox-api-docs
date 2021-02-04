@@ -10,7 +10,7 @@ namespace Schoolbox\API;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output;
 use Authenticator;
-use Firebase\JWT\ExpiredException;
+use Firebase\JWT;
 use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
 use Okta\JwtVerifier\Discovery\Oidc;
 use Okta\JwtVerifier\JwtVerifierBuilder;
@@ -207,7 +207,15 @@ class Controller extends Base
                     'required' => 'Either the "username" and "password" or the "jwt" POST fields must be set',
                 ])
             );
-        } catch (ExpiredException $e) {
+        } catch (JWT\BeforeValidException $e) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $this->response->status->setCode(401);
+            $this->response->content->set($this->buildJsonOutput('JWT is not yet valid'));
+        } catch (JWT\SignatureInvalidException $e) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $this->response->status->setCode(401);
+            $this->response->content->set($this->buildJsonOutput('JWT signature is invalid'));
+        } catch (JWT\ExpiredException $e) {
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(401);
             $this->response->content->set($this->buildJsonOutput('JWT expired'));
