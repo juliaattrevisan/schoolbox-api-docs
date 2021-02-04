@@ -1067,8 +1067,8 @@ class Report
      * @param GenericCollection $unitImpls
      * @param int[]             $workTypeIds
      * @param StudentAttributes $attributes
-     * @param int|null          $semesterFrom
-     * @param int|null          $semesterTo
+     * @param int               $semesterFrom
+     * @param int               $semesterTo
      * @return array
      * @throws InvalidColumnException
      * @throws \Alaress\Database\Exception

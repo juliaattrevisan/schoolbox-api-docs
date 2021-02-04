@@ -121,12 +121,13 @@ class Controller extends Web\Controller\Base
      */
     public function getReport(User $user, Folder\Model $folder, ?string $reportDate): void
     {
-        $attributes       = new StudentAttributes(
+        $attributes = new StudentAttributes(
             $this->getConfigLoader(),
             $user,
             $this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'],
             $reportDate
         );
+
         $roleTypeOverride = $this->request->query->get('role-type');
 
         $report = new Report(
