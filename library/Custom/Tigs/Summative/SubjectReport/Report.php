@@ -54,7 +54,6 @@ use PDO;
 use Schoolbox\Resource\Textbox;
 use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
-use function sprintf;
 
 class Report
 {
@@ -353,7 +352,6 @@ class Report
      *
      * @param GenericCollection|CourseImpl\Model[] $courseImplsWithUnits
      * @return GenericCollection|CourseSpec\Model[]
-     * @throws UnexpectedValueException
      */
     private function getImportedCourseSpecs(GenericCollection $courseImplsWithUnits): GenericCollection
     {
@@ -371,7 +369,6 @@ class Report
      *
      * @param GenericCollection|CourseImpl\Model[] $courseImports
      * @return GenericCollection|UnitSpec\Model[]
-     * @throws UnexpectedValueException
      */
     private function getUnitSpecs(GenericCollection $courseImports): GenericCollection
     {
@@ -395,7 +392,6 @@ class Report
      *
      * @param CourseSpec\Model $courseSpec
      * @return GenericCollection|UnitImpl\Model[]
-     * @throws UnexpectedValueException
      */
     private function findCohortUnitImpls(CourseSpec\Model $courseSpec): GenericCollection
     {

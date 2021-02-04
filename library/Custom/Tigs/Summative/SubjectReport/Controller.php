@@ -9,7 +9,6 @@ namespace Custom\Tigs\Summative\SubjectReport;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web;
-use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use External_ClassInterface;
@@ -107,7 +106,6 @@ class Controller extends Web\Controller\Base
      * @param User         $user
      * @param Folder\Model $folder
      * @param string|null  $reportDate
-     * @throws ServiceNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
      * @throws InvalidArgumentException
