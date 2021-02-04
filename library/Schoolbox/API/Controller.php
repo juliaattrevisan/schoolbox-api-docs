@@ -264,6 +264,7 @@ class Controller extends Base
                 ->setAdaptor(new FirebasePhpJwt())
                 ->setDiscovery(new Oidc())
                 ->setAudience([$config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID)])
+                ->setLeeway(sprintf('PT%dS', $config->get('session_length')))
                 ->build()
         );
         $user        = $tokenParser->findUserFromToken($jwt);
