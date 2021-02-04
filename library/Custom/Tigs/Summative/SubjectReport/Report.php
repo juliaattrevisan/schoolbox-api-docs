@@ -190,7 +190,7 @@ class Report
                 $error .= \sprintf(' <a href="%s">Manage Course imports</a>', $route);
             }
             $errors[]  = $error;
-            $unitSpecsWithData = $aamData = $aasData = $hscTaskMarks = $hscTaskMatrix = [];
+            $unitSpecsWithData = $aamData = $aasData = $hscTaskMarks = $hscTaskMatrix = $middleYearsTaskMarks = [];
             $nesaGraphData = $courseSpec = $hscRankData = $courseDescription = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
@@ -216,7 +216,9 @@ class Report
                 $hasData =
                     isset($aasData['data'][$unitSpecId]) ||
                     isset($aamData['data'][$unitSpecId]) ||
-                    isset($hscTaskMarks['data'][$unitSpecId]);
+                    isset($hscTaskMarks['data'][$unitSpecId]) ||
+                    isset($middleYearsTaskMarks['data'][$unitSpecId]);
+
                 if (!$hasData) {
                     continue;
                 }
