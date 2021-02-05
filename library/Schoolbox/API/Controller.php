@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -10,6 +11,7 @@ namespace Schoolbox\API;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Output;
 use Authenticator;
+use Firebase\JWT;
 use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
 use Okta\JwtVerifier\Discovery\Oidc;
 use Okta\JwtVerifier\JwtVerifierBuilder;
@@ -29,6 +31,12 @@ use Zend\Uri\Uri;
 
 class Controller extends Base
 {
+    /**
+     * Default session length, in seconds: used as the default leeway for the
+     * JWT verifier.
+     */
+    private const SESSION_LENGTH_DEFAULT = 1800;
+
     /**
      * @var Authenticator
      */
@@ -102,7 +110,6 @@ class Controller extends Base
         // Authenticate, and if so register app
         $sessionUser = $this->authenticate($this->request->post->getArrayCopy());
         if ($sessionUser) {
-
             // token may be absent or blank, in which case we don't store anything in the registry
             $token = $this->request->post->get('token');
             if (!empty($token)) {
@@ -111,7 +118,6 @@ class Controller extends Base
                 try {
                     $registry = $this->registryMapper->findById($sessionUser->getId(), $token, $provider);
                     $registry->setTouchedAt($now);
-
                 } catch (MapperException $e) {
                     try {
                         /** @var Registry $registry */
@@ -137,7 +143,6 @@ class Controller extends Base
                             $this->registryMapper->deleteByColumn('app_token', $token);
                             $this->registryMapper->save($registry);
                         });
-
                     } catch (MapperException $e) {
                         /** @noinspection PhpUnhandledExceptionInspection */
                         $this->response->status->setCode(400);
@@ -192,6 +197,8 @@ class Controller extends Base
      */
     private function authenticate(array $postData): ?User
     {
+        $response = null;
+        $status   = null;
         try {
             if (isset($postData['username'], $postData['password'])) {
                 return $this->authenticateViaPostData($postData['username'], $postData['password']);
@@ -199,30 +206,37 @@ class Controller extends Base
             if (isset($postData['jwt'])) {
                 return $this->authenticateViaJwt($postData['jwt']);
             }
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(400);
-            $this->response->content->set(
-                $this->buildJsonOutput([
-                    'required' => 'Either the "username" and "password" or the "jwt" POST fields must be set',
-                ])
-            );
+
+            $response = [
+                'required' => 'Either the "username" and "password" or the "jwt" POST fields must be set'
+            ];
+            $status   = 400;
+        } catch (JWT\BeforeValidException $e) {
+            $response = 'JWT is not yet valid';
+            $status   = 401;
+        } catch (JWT\SignatureInvalidException $e) {
+            $response = 'JWT signature is invalid';
+            $status   = 401;
+        } catch (JWT\ExpiredException $e) {
+            $response = 'JWT expired';
+            $status   = 401;
         } catch (SchoolboxAccessDeniedException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(401);
-            $this->response->content->set($this->buildJsonOutput('Invalid username or password'));
+            $response = 'Invalid username or password';
+            $status   = 401;
         } catch (SchoolboxAccountDisabledException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(400);
-            $this->response->content->set($this->buildJsonOutput('Account disabled'));
+            $response = 'Account disabled';
+            $status   = 400;
         } catch (SchoolboxNotFoundException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(400);
-            $this->response->content->set($this->buildJsonOutput('User not found'));
+            $response = 'User not found';
+            $status   = 400;
         } catch (SchoolboxPasswordExpiredException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $this->response->status->setCode(400);
-            $this->response->content->set($this->buildJsonOutput('Password has expired'));
+            $response = 'Password has expired';
+            $status   = 400;
         }
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->response->status->setCode($status);
+        $this->response->content->set($this->buildJsonOutput($response));
         return null;
     }
 
@@ -257,6 +271,10 @@ class Controller extends Base
         $config = $this->getConfigLoader();
 
         // TODO DI this once it starts being used in multiple places
+        $sessionLength = (int)$config->get('session_length');
+        if ($sessionLength <= 0) {
+            $sessionLength = self::SESSION_LENGTH_DEFAULT;
+        }
         $tokenParser = new TokenParser(
             $this->userMapper,
             (new JwtVerifierBuilder())
@@ -264,6 +282,7 @@ class Controller extends Base
                 ->setAdaptor(new FirebasePhpJwt())
                 ->setDiscovery(new Oidc())
                 ->setAudience([$config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID)])
+                ->setLeeway(sprintf('PT%dS', $sessionLength))
                 ->build()
         );
         $user        = $tokenParser->findUserFromToken($jwt);
