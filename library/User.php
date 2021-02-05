@@ -188,24 +188,43 @@ class User extends DeprecatedModel
      */
     protected function getSearchFilter(\Schoolbox\User $user): string
     {
+        /* Superusers can still find Guests via search as part of an administrative
+         * shortcut so you can still administer them and maintain them wherever you
+         * are in schoolbox
+         */
+        if ($user->isSuperuser()) {
+            return '';
+        }
+        /* Hide Guest users from everyone's search results by default
+         */
         $excludeRoles = [Role::GUEST];
 
-        if (
-            $user->getRole()->isGuest() ||
-            (!$user->getRole()->isStaff() && Config::get('parent_search_enable') != 1)
-        ) {
+        /* Staff members shouldn't have guest users in search results
+         * but are otherwise unrestricted
+         *
+         * Anyone other than staff (ie. parents and students) are subjected
+         * config options that restrict the search results
+         *
+         *  Guests have special filters that prevent them from getting search
+         * results for parents and students
+         */
+        if ($user->getRole()->isGuest()) {
             $excludeRoles[] = Role::PARENT;
-        }
-        if (
-            $user->getRole()->isGuest() ||
-            (!$user->getRole()->isStaff() && Config::get('student_search_enable') != 1)
-        ) {
             $excludeRoles[] = Role::STUDENT;
+        } elseif (!$user->getRole()->isStaff()) {
+            /* Include parent users in search results if the config is enabled
+             */
+            if (Config::get('parent_search_enable') != 1) {
+                $excludeRoles[] = Role::PARENT;
+            }
+            /* Include students users in search results if the config is enabled
+             */
+            if (Config::get('student_search_enable') != 1) {
+                $excludeRoles[] = Role::STUDENT;
+            }
         }
-
         return " `groups`.`group_type` NOT IN ('" . implode("','", $excludeRoles) . "')";
     }
-
     /**
      * Search the user table for particular user(s)
      *
