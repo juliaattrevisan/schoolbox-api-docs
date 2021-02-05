@@ -107,9 +107,8 @@ class Controller extends Base
     public function postGroupsDelete()
     {
         $groupId = $this->getRequest()->post['id'];
-
-        $this->pastoralGroupMapper->deleteByColumn('id', $groupId);
-        $this->pastoralAccessMapper->deleteByColumn('group_id', $groupId);
+        $group = $this->pastoralGroupMapper->findById($groupId);
+        $this->pastoralGroupMapper->delete($group);
 
         $this->getResponse()->redirect->afterPost(
             $this->router->generate('pastoralManagement.getGroups')
