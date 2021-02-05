@@ -1,4 +1,8 @@
 .discussion, .threaded {
+  .information-list article {
+    padding-top: 0;
+    padding-left: 3.5rem;
+  }
   .reply,
   .child {
     background-color: $snow;
@@ -17,6 +21,10 @@
 
     .card img{
       width: 2rem;
+    }
+
+    article {
+      padding-left: 3rem;
     }
 
     .reply {
@@ -44,11 +52,6 @@
   .checklist {
     display: flex;
     flex-flow: row-reverse;
-  }
-
-  .information-list article {
-    padding-top: 0;
-    padding-left: 3.5rem;
   }
 }
 
