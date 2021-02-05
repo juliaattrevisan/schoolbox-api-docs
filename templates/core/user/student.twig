@@ -568,11 +568,11 @@
 
             {% if showAchievementsTab %}
             <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
-                <div id="goal-feed"></div>
+                <div id="goal-feed" class="goals-achievements"></div>
             </div>
 
             <div class="content no-pad {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
-                <div id="achievement-feed"></div>
+                <div id="achievement-feed" class="goals-achievements"></div>
             </div>
             {% endif %}
 
@@ -668,9 +668,9 @@
                             {% endif %}
                         {% endif %}
                     </div>
-                    <section class="v-card-list">
+                    <section class="v-card-list classes-groups content">
                         {% for subjectKey, subject in subjectGroup %}
-                        <div class="v-card small-12 medium-4 xlarge-3">
+                        <div class="v-card">
 
                             {% if subject.linkedToFolder %}
                             <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
@@ -689,10 +689,27 @@
                                             background-position: center;
                                             {% endif %}"
                                 >
-                                    <div class="owner">
-                                    {% for teacher in subject.teachers %}
-                                        <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="Teacher: {{ teacher.formatName }}" alt="Teacher: {{ teacher.formatName }}" />
-                                    {% endfor %}
+                                    <div class="related">
+                                        {# A card can't fit more than 5 subject teachers comfortably, so four are displayed,
+                                            with the remaining counted, and displayed in tool tip #}
+                                        {% set maxTeachersToShowCount = 4 %}
+                                        {% set teachersHead = subject.teachers[:maxTeachersToShowCount] %}
+                                        {% for teacher in teachersHead %}
+                                            <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="Teacher: {{ teacher.formatName }}" alt="Teacher: {{ teacher.formatName }}" />
+                                        {% endfor %}
+                                        {% set teachersTail = subject.teachers[maxTeachersToShowCount:] %}
+                                        {% if teachersTail|length %}
+                                            {% set subjectTeacherNames = '' %}
+                                            {% for teacher in teachersTail %}
+                                                {% if loop.index == teachersTail|length %}
+                                                    {% set subjectTeacherNames = subjectTeacherNames ~ teacher.formatName %}
+                                                {% else %}
+                                                    {% set subjectTeacherNames = subjectTeacherNames ~ teacher.formatName ~ ',<br/>' %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% set remainingSubjectTeachersCount = subject.teachers|length - maxTeachersToShowCount  %}
+                                            <div class="plus-more" data-tooltip class="hint has-tip tip-top" title="{{ subjectTeacherNames }}">+{{ remainingSubjectTeachersCount }}</div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             {% if subject.linkedToFolder %}
@@ -748,9 +765,9 @@
             <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
                 <section>
                     <h2 class="subheader content">Groups</h2>
-                    <section class="v-card-list">
+                    <section class="v-card-list classes-groups content">
                         {% for groupKey, group in groups %}
-                            <div class="v-card small-12 medium-4 xlarge-3">
+                            <div class="v-card">
                                 {% if group.linkedToFolder %}
                                 <a href="/homepage/{{ group.id }}">
                                 {% endif %}
@@ -769,10 +786,27 @@
                                                 {% endif %}"
                                     >
                                         {% if group.owners is defined %}
-                                            <div class="owner">
-                                            {% for owner in group.owners %}
-                                                <img src="/portrait.php?userId={{ owner.externalId }}&amp;size=square64" title="{{ owner.formatName }}" alt="{{ owner.formatName }}" />
+                                            <div class="related groups">
+                                            {# A card can't fit more than 5 group owners comfortably, so four are displayed,
+                                                with the remaining counted, and displayed in tool tip #}
+                                            {% set maxOwnersToShowCount = 4 %}
+                                            {% set ownersHead = group.owners[:maxOwnersToShowCount] %}
+                                            {% for owner in ownersHead %}
+                                                <img src="/portrait.php?userId={{ owner.externalId|e('url') }}&amp;size=square64" title="{{ owner.formatName }}" alt="{{ owner.formatName }}" />
                                             {% endfor %}
+                                            {% set ownersTail = group.owners[maxOwnersToShowCount:] %}
+                                            {% if ownersTail|length %}
+                                                {% set groupOwnersNames = '' %}
+                                                {% for owner in ownersTail %}
+                                                    {% if loop.index == ownersTail|length %}
+                                                        {% set groupOwnersNames = groupOwnersNames ~ owner.formatName %}
+                                                    {% else %}
+                                                        {% set groupOwnersNames = groupOwnersNames ~ owner.formatName ~ ',<br/>' %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% set remainingGroupOwnersCount = group.owners|length - maxOwnersToShowCount  %}
+                                                <div class="plus-more" data-tooltip class="hint has-tip tip-top" title="{{ groupOwnersNames }}">+{{ remainingGroupOwnersCount }}</div>
+                                            {% endif %}
                                             </div>
                                         {% endif %}
                                     </div>

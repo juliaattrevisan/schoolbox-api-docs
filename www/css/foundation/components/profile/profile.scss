@@ -13,13 +13,12 @@
   /* Achievements feed via the Achievements tab on student profile
    * Also, the Goals feed via the Goals tab on student profile
    */
-  #achievements, #goals {
+  .goals-achievements {
     .awards > div {
       border-bottom: 2px solid #EDEDED;
     }
   }
-  #classes,
-  #groups {
+  .classes-groups {
     .v-card {
       flex: 1 0 300px;
       border: 1px solid #EDEDED;
@@ -29,6 +28,9 @@
 
       @media #{$medium-down} {
         max-width: none;
+      }
+      @media #{$small-only} {
+        margin-right: 0;
       }
     }
   }
