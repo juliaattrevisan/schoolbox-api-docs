@@ -78,16 +78,17 @@
                 {% endif %}
 
                 {% if blogComments[blog.getId] | length > 0 %}
-                    <a id="commentCount-{{ blog.getId }}" data-interaction="showcomments" class="button icon-chat" data-numcomments="{{ blogComments[blog.getId] | length }}">Show Comments ({{ blogComments[blog.getId] | length }})</a>
+                    <a id="commentCount-{{ blog.getId }}" data-interaction="showcomments" class="article-read-more" data-numcomments="{{ blogComments[blog.getId] | length }}">
+                        Show Comments ({{ blogComments[blog.getId] | length }})
+                        <span> | </span>
+                    </a>
                 {% endif %}
 
-                <a data-toggle="commentform-{{ blog.getId }}" class='button icon-add' >Add Comment</a>
+                <a data-toggle="commentform-{{ blog.getId }}" class='article-read-more'>Add Comment</a>
             </article>
 
             <ul class="information-list reply" id="blogComment_{{ blog.getId }}">
-
                 {% for comment in blogComments[blog.getId] %}
-
                     <li class="actions-small-1" data-thread>
                         <div class="list-item">
                             <div class="card small-12">
@@ -97,19 +98,16 @@
                         </div>
 
                         {% if isRouteAuthorized('eportfolioBlog.postCommentDelete', {comment: comment, page: page }) %}
-                            <nav>
-                                <a data-interaction="deletecomment" class="icon-delete" data-blog-id="{{ blog.getId }}" data-comment-id="{{ comment.getId }}"></a>
-                            </nav>
+                        <nav>
+                            <a data-interaction="deletecomment" class="icon-delete" data-blog-id="{{ blog.getId }}" data-comment-id="{{ comment.getId }}"></a>
+                        </nav>
                         {% endif %}
 
                         <article>
                             <p>{{ comment.getBody | nl2br }}</p>
                         </article>
                     </li>
-
                 {% endfor %}
-
-
             </ul>
         </li>
         {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog, page: page}) %}
@@ -117,8 +115,8 @@
                 <div class="editPanel socialstream-new-post">
                     <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post" data-blog-comment-form>
                         <input type="hidden" name="pageId" value="{{ page.getPageId }}">
-                        <textarea name="commentBody" rows="2" cols="100" placeholder="Add your comment"></textarea>
-                        <input type="submit" name="comment" value="Add Comment"/>
+                        <textarea name="commentBody" rows="2" cols="100" placeholder="Add a Comment"></textarea>
+                        <input type="submit" name="comment" value="Post Comment"/>
                     </form>
                 </div>
             </li>

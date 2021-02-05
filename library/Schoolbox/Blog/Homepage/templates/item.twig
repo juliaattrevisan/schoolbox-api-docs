@@ -106,10 +106,10 @@
         <form id="commentForm" method="post" action="{{ routeLookup('blog.postCommentInsert', { id: record.getId }) }}" class="no-pad">
             <section class="content">
                 <label>
-                    <textarea name="commentBody" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                    <textarea name="commentBody" class="no-margin" rows="2" cols="100" placeholder="Add a Comment"></textarea>
                 </label>
             </section>
-            <input type="submit" name="comment" value="Add comment"/>
+            <input type="submit" name="comment" value="Post Comment"/>
         </form>
         {% endif %}
     </div>
