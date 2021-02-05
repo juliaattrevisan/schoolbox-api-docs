@@ -803,9 +803,9 @@
                                     </div>
                                     {% if hasOwnersWithEmail %}
                                         <nav>
-                                            <a class="icon-more" data-dropdown="group-options-{{ group.name|replace({' ': '-'}) }}" title="Actions"></a>
+                                            <a class="icon-more" data-dropdown="group-options-{{ groupKey }}" title="Actions"></a>
                                         </nav>
-                                        <ul id="group-options-{{ group.name|replace({' ': '-'}) }}" class="f-dropdown" data-dropdown-content>
+                                        <ul id="group-options-{{ groupKey }}" class="f-dropdown" data-dropdown-content>
                                             {% for owner in group.owners %}
                                                 {% if not owner.email is empty %}
                                                 <li>
