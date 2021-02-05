@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -109,7 +110,6 @@ class Controller extends Base
         // Authenticate, and if so register app
         $sessionUser = $this->authenticate($this->request->post->getArrayCopy());
         if ($sessionUser) {
-
             // token may be absent or blank, in which case we don't store anything in the registry
             $token = $this->request->post->get('token');
             if (!empty($token)) {
@@ -118,7 +118,6 @@ class Controller extends Base
                 try {
                     $registry = $this->registryMapper->findById($sessionUser->getId(), $token, $provider);
                     $registry->setTouchedAt($now);
-
                 } catch (MapperException $e) {
                     try {
                         /** @var Registry $registry */
@@ -144,7 +143,6 @@ class Controller extends Base
                             $this->registryMapper->deleteByColumn('app_token', $token);
                             $this->registryMapper->save($registry);
                         });
-
                     } catch (MapperException $e) {
                         /** @noinspection PhpUnhandledExceptionInspection */
                         $this->response->status->setCode(400);
