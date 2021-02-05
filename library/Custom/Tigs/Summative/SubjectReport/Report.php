@@ -650,7 +650,6 @@ class Report
         // * MYP S1       (work-type = NESA)
         // * MYP S2       (work-type = FAL)
         // * HSC-Y11-S2   (work-type = NESA)
-        $yearLevel = $attributes->getCurriculumYearLevel();
         $semester  = $attributes->getCurriculumSemester();
 
         // Which work types should we fetch?
@@ -658,6 +657,7 @@ class Report
         $configNames[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK] = 'Set NESA Grade Work Type';
 
         $workTypeIds = [];
+
         foreach ($configNames as $configName => $errorMsgLink) {
             try {
                 $workTypeIds[$configName] = $this->checkWorkType($configName, 'Cannot render NESA Grade graph. Work type not set.', $errorMsgLink);
@@ -666,78 +666,89 @@ class Report
             }
         }
 
-        // Which semesters' data should we fetch?
-        $semesterFrom = $attributes->isHsc() ? 2 : 1;
-        $semesterTo   = $semester;
-
-        // Load assessments and participations
+        /* Find all the unit implementations that were given birth by $courseSpec
+         * This gives us all the guys in the cohort whom we must compare against
+         */
         $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
-        $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, $semesterFrom, $semesterTo);
-
-        $semesters = [];
-        foreach ([1, 2] as $candidate) {
-            if ($candidate === $semesterFrom || $candidate === $semesterTo) {
-                $semesters[] = $candidate;
-            }
-        }
 
         // Find relevant assessments and participation and insert into units
         $reports = [];
 
-        foreach ($semesters as $reportSemester) {
-            $nesa = null;
+        /* Second semester get the NESA grade from a special assessment, a different one
+         * than for semester 1
+         *
+         * Truth table time
+         * Note that Prod (PRD) and Staging (STG) can have different ids
+         *
+         * HSC Students, Year 11, Semester 1: worktype is not relevant (no NESA data for this)
+         * HSC Students, Year 11, Semester 2: worktype is "NESA Report Grade" (STG 20)
+         *
+         * HSC Students, Year 12, Semester 1: worktype is not relevant (no NESA data for this)
+         * HSC Students, Year 12, Semester 2: worktype is not relevant (no NESA data for this)
+         *
+         * Middle Years Students, Semester 1: worktype is "NESA Report Grade" (STG 20)
+         * Middle Years Students, Semester 2: worktype is "NESA Report Grade & Report Mark" (STG 22)
+         *
+         * NESA Graphs render in special ways depending on whether the student
+         * is an HSC or Middle Years student
+         */
+        if ($attributes->isHsc()) {
+            if ($semester === 2) {
+                if ($attributes->getYearLevel() === 11) {
+                    $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 2, 2);
 
-            /* Second semester get the NESA grade from a special assessment, a different one
-             * than for semester 1
-             *
-             * Truth table time
-             * Note that Prod (PRD) and Staging (STG) can have different ids
-             *
-             * HSC Students, Year 11, Semester 1: worktype is not relevant (no NESA data for this)
-             * HSC Students, Year 11, Semester 2: worktype is "NESA Report Grade" (STG 20)
-             *
-             * HSC Students, Year 12, Semester 1: worktype is not relevant (no NESA data for this)
-             * HSC Students, Year 12, Semester 2: worktype is not relevant (no NESA data for this)
-             *
-             * Middle Years Students, Semester 1: worktype is "NESA Report Grade" (STG 20)
-             * Middle Years Students, Semester 2: worktype is "NESA Report Grade & Report Mark" (STG 22)
-             *
-             * NESA Graphs render in special ways depending on whether the student
-             * is an HSC or Middle Years student
-             */
-            if ($attributes->isHsc()) {
-                if ($reportSemester === 2) {
-                    if ($attributes->getYearLevel() === 11) {
-                        $nesa = new NesaScoreGraphHSC(
-                            $cohortUnitImpls,
-                            $student,
-                            $attributes,
-                            $this->visibility,
-                            $this->viewer,
-                            $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE],
-                            $folder,
-                            $roleTypeOverride
-                        );
-                    }
-                } else {
-
-                    // noop - no NESA graph for HSC students except Year 11 Semester 2 guys
-                }
-            } elseif ($attributes->isMiddleYear()) {
-                if ($reportSemester === 2) {
-                    $nesa = new NesaScoreGraphMiddleYears(
+                    $nesa = new NesaScoreGraphHSC(
                         $cohortUnitImpls,
                         $student,
                         $attributes,
                         $this->visibility,
                         $this->viewer,
-                        $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK],
+                        $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE],
                         $folder,
-                        $reportSemester,
-                        $this->rubricMapper,
                         $roleTypeOverride
                     );
-                } else {
+
+                    $context = $nesa->toContext($semester);
+
+                    if ($context !== null) {
+                        $reports['data'][$semester] = $context;
+                    }
+                }
+            } else {
+
+                // noop - no NESA graph for HSC students except Year 11 Semester 2 guys
+                return [];
+            }
+        } elseif ($attributes->isMiddleYear()) {
+            if ($semester === 2) {
+                $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 2, 2);
+
+                $nesa = new NesaScoreGraphMiddleYears(
+                    $cohortUnitImpls,
+                    $student,
+                    $attributes,
+                    $this->visibility,
+                    $this->viewer,
+                    $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK],
+                    $folder,
+                    $semester,
+                    $this->rubricMapper,
+                    $roleTypeOverride
+                );
+
+                $context = $nesa->toContext($semester);
+
+                if ($context !== null) {
+                    $reports['data'][$semester] = $context;
+                }
+            } else {
+                $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 1, 2);
+
+                /* Middle Years NESA data spans both semester 1 and 2.
+                 * They both appear next to each other, so you need to collect data
+                 * for at least semester 1 and if you're in semester 2, that as well
+                 */
+                foreach ([1, $semester] as $reportSemester) {
                     $nesa = new NesaScoreGraphMiddleYears(
                         $cohortUnitImpls,
                         $student,
@@ -750,24 +761,20 @@ class Report
                         $this->rubricMapper,
                         $roleTypeOverride
                     );
+
+                    $context = $nesa->toContext($reportSemester);
+
+                    if ($context !== null) {
+                        $reports['data'][$reportSemester] = $context;
+                    }
                 }
-            } else {
-
-                /* Can't tell if this student is HSC or Middle Years
-                 * Return empty
-                 */
-                return [];
             }
+        } else {
 
-            /* Only try to scavenge data from $nesa if it was defined
+            /* Can't tell if this student is HSC or Middle Years
+             * Return empty
              */
-            if (null !== $nesa) {
-                $context = $nesa->toContext($reportSemester);
-
-                if ($context !== null) {
-                    $reports['data'][$reportSemester] = $context;
-                }
-            }
+            return [];
         }
 
         return $reports;
