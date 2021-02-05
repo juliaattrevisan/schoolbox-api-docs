@@ -28,6 +28,10 @@
                 }
             });
         $('#cms-zone').on('success.attachzone', function(event, file) {
+            if ($("#fileForm").find('input[data-az-attachment]').val() === "") {
+                const attachment = file.data[0].hash + ":" + file.data[0].title;
+                $("#fileForm").find('input[data-az-attachment]').val(attachment);
+            }
             $('#attachedFile-error').remove();
         });
     });
