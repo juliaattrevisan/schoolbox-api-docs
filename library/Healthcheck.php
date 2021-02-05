@@ -461,7 +461,14 @@ class Healthcheck
             'eventcalendar',
             'eventcatdefs',
             'eventtype',
-            'tchcampus'
+            'tchcampus',
+
+            /* Studies Code equivalents across the nation
+             */
+            'studnswbos',
+            'studqcaa',
+            'studscsa',
+            'studvsn'
         ];
 
         $tables = array_merge($tables, $this->customUPSTest());
