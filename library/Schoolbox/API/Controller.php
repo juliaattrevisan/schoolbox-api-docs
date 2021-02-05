@@ -31,6 +31,12 @@ use Zend\Uri\Uri;
 class Controller extends Base
 {
     /**
+     * Default session length, in seconds: used as the default leeway for the
+     * JWT verifier.
+     */
+    private const SESSION_LENGTH_DEFAULT = 1800;
+
+    /**
      * @var Authenticator
      */
     private $auth;
@@ -267,6 +273,10 @@ class Controller extends Base
         $config = $this->getConfigLoader();
 
         // TODO DI this once it starts being used in multiple places
+        $sessionLength = (int)$config->get('session_length');
+        if ($sessionLength <= 0) {
+            $sessionLength = self::SESSION_LENGTH_DEFAULT;
+        }
         $tokenParser = new TokenParser(
             $this->userMapper,
             (new JwtVerifierBuilder())
@@ -274,7 +284,7 @@ class Controller extends Base
                 ->setAdaptor(new FirebasePhpJwt())
                 ->setDiscovery(new Oidc())
                 ->setAudience([$config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID)])
-                ->setLeeway(sprintf('PT%dS', $config->get('session_length')))
+                ->setLeeway(sprintf('PT%dS', $sessionLength))
                 ->build()
         );
         $user        = $tokenParser->findUserFromToken($jwt);
