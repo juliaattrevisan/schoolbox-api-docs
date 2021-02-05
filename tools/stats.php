@@ -91,6 +91,8 @@ $app = new class extends CliTool\App {
             'tiles'             => 'SELECT count(*) FROM tile WHERE deleted_at IS NULL',
             'textbox'           => 'SELECT count(*) FROM textBox WHERE deleted IS NULL',
             'wiki'              => 'SELECT count(*) FROM wiki WHERE deleted = "false"',
+            'chat'              => 'SELECT count(*) FROM chat',
+            'blog'              => 'SELECT count(*) FROM blog WHERE deleted_at IS NULL',
             'etherpad'          => 'SELECT count(*) FROM etherpad_pad WHERE deleted_at IS NULL',
             'groups'            => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE f.deleted_at is null',
             'views_total'       => 'SELECT SUM(hitcount) FROM homepage_log',
@@ -104,6 +106,7 @@ $app = new class extends CliTool\App {
             'news_posts_comments_allowed'   => 'SELECT count(*) FROM comms_news_article WHERE deleted_at is null AND comments_allowed = 1',
             'news_comments' => 'SELECT count(*) FROM comms_news_article JOIN discussion_thread ON discussion_thread_id = discussion_thread.id AND comms_news_article.deleted_at is null JOIN discussion_thread_comment ON discussion_thread.id = discussion_thread_comment.discussion_thread_id WHERE discussion_thread_comment.deleted_at IS NULL',
             'news_saveforlater' => 'SELECT count(*) FROM comms_news_saveforlater WHERE deleted_at IS NULL',
+            'news_files'        => 'SELECT count(*) FROM comms_news_article_file WHERE deleted_at IS NULL',
 
             //ePortfolio
             'eportfolio_pages'  => 'SELECT count(*) FROM `eportfolio_page` WHERE deleted_at IS NULL',
@@ -138,6 +141,15 @@ $app = new class extends CliTool\App {
             'files'             => 'SELECT COUNT(*) FROM file WHERE deleted_at IS NULL',
             'links'             => 'SELECT count(*) FROM link WHERE deleted_at IS NULL',
             'folders'           => 'SELECT count(*) FROM folder WHERE deleted_at IS NULL',
+
+            //Learning Moments / Evidence
+            'evidence'          => 'SELECT count(*) FROM evidence WHERE deleted_at IS NULL',
+            'evidence_comments' => 'SELECT count(*) FROM evidence JOIN discussion_thread_comment dtc on evidence.discussion_thread_id = dtc.discussion_thread_id',
+
+            //Badges
+            'badges'            => 'SELECT count(*) FROM badge WHERE deleted_at IS NULL',
+            'badge_goals'       => 'SELECT count(*) FROM badge_user WHERE status = "goal" AND deleted_at IS NULL',
+            'badge_achieved'       => 'SELECT count(*) FROM badge_user WHERE status = "achievement" AND deleted_at IS NULL',
 
         ];
 
