@@ -628,6 +628,8 @@
             {% if showClasses and showSubjects %}
             <div class="content no-pad {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
                 <section>
+                    {# to ensure each email drop down toggle is unique #}
+                    {% set dropdownOptionsID = 0  %}
                     {% for group, subjectGroup in subjects %}
                     {# Keep a running total of all teachers emails in this group #}
                     {% set teacherEmails = [] %}
@@ -722,9 +724,9 @@
                                 {% block folderListItemActions %}{% endblock %}
                                 {% if hasTeachersWithEmail %}
                                     <nav>
-                                        <a class="icon-more" data-dropdown="class-options-{{ subjectKey }}" title="Actions"></a>
+                                        <a class="icon-more" data-dropdown="class-options-{{ dropdownOptionsID }}" title="Actions"></a>
                                     </nav>
-                                    <ul id="class-options-{{ subjectKey }}" class="f-dropdown" data-dropdown-content>
+                                    <ul id="class-options-{{ dropdownOptionsID }}" class="f-dropdown" data-dropdown-content>
                                         {% for teacher in subject.teachers %}
                                             {% if not teacher.email is empty %}
                                                 <li>
@@ -737,6 +739,7 @@
                                 {% endif %}
                             </div>
                         </div>
+                        {% set dropdownOptionsID = dropdownOptionsID + 1  %}
                         {% endfor %}
                     </section>
                     {% endfor %}
@@ -800,9 +803,9 @@
                                     </div>
                                     {% if hasOwnersWithEmail %}
                                         <nav>
-                                            <a class="icon-more" data-dropdown="group-options-{{ groupKey }}" title="Actions"></a>
+                                            <a class="icon-more" data-dropdown="group-options-{{ group.name|replace({' ': '-'}) }}" title="Actions"></a>
                                         </nav>
-                                        <ul id="group-options-{{ groupKey }}" class="f-dropdown" data-dropdown-content>
+                                        <ul id="group-options-{{ group.name|replace({' ': '-'}) }}" class="f-dropdown" data-dropdown-content>
                                             {% for owner in group.owners %}
                                                 {% if not owner.email is empty %}
                                                 <li>
