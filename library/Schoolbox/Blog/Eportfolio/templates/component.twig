@@ -86,29 +86,29 @@
 
                 <a data-toggle="commentform-{{ blog.getId }}" class='article-read-more'>Add Comment</a>
             </article>
-
-            <ul class="information-list reply" id="blogComment_{{ blog.getId }}">
-                {% for comment in blogComments[blog.getId] %}
-                    <li class="actions-small-1" data-thread>
-                        <div class="list-item">
-                            <div class="card small-12">
-                                {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
-                                <p class="meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</p>
+            <div class="discussion">
+                <ul class="information-list" id="blogComment_{{ blog.getId }}">
+                    {% for comment in blogComments[blog.getId] %}
+                        <li class="actions-small-1" data-thread>
+                            <div class="list-item">
+                                <div class="card compact small-12">
+                                    {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
+                                </div>
                             </div>
-                        </div>
 
-                        {% if isRouteAuthorized('eportfolioBlog.postCommentDelete', {comment: comment, page: page }) %}
-                        <nav>
-                            <a data-interaction="deletecomment" class="icon-delete" data-blog-id="{{ blog.getId }}" data-comment-id="{{ comment.getId }}"></a>
-                        </nav>
-                        {% endif %}
+                            {% if isRouteAuthorized('eportfolioBlog.postCommentDelete', {comment: comment, page: page }) %}
+                            <nav>
+                                <a data-interaction="deletecomment" class="icon-delete" data-blog-id="{{ blog.getId }}" data-comment-id="{{ comment.getId }}"></a>
+                            </nav>
+                            {% endif %}
 
-                        <article>
-                            <p>{{ comment.getBody | nl2br }}</p>
-                        </article>
-                    </li>
-                {% endfor %}
-            </ul>
+                            <article>
+                                <p>{{ comment.getBody | nl2br }}</p>
+                            </article>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </li>
         {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog, page: page}) %}
             <li class="row hide" id="commentform-{{ blog.getId }}">

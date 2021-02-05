@@ -3,13 +3,13 @@
         <img src="/portrait.php?userId={{ user.getExternalId }}&size=square64" alt="View Profile" />
         <p>
             {{ user.formatName() }}
-            <span class="meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</span>
+            <span class="pipe meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</span>
         </p>
     </a>
 {% else %}
     <img src="/portrait.php?userId={{ user.getExternalId }}&size=square64" alt="View Profile" />
     <p>
         {{ user.formatName() }}
-        <span class="meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</span>
+        <span class="pipe meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</span>
     </p>
 {% endif %}
