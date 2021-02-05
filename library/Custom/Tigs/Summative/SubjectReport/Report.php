@@ -693,8 +693,12 @@ class Report
              * Truth table time
              * Note that Prod (PRD) and Staging (STG) can have different ids
              *
-             * HSC Students, Semester 1: worktype is not relevant
-             * HSC Students, Semester 2: worktype is "NESA Report Grade" (STG 20)
+             * HSC Students, Year 11, Semester 1: worktype is not relevant (no NESA data for this)
+             * HSC Students, Year 11, Semester 2: worktype is "NESA Report Grade" (STG 20)
+             *
+             * HSC Students, Year 12, Semester 1: worktype is not relevant (no NESA data for this)
+             * HSC Students, Year 12, Semester 2: worktype is not relevant (no NESA data for this)
+             *
              * Middle Years Students, Semester 1: worktype is "NESA Report Grade" (STG 20)
              * Middle Years Students, Semester 2: worktype is "NESA Report Grade & Report Mark" (STG 22)
              *
@@ -703,19 +707,21 @@ class Report
              */
             if ($attributes->isHsc()) {
                 if ($reportSemester === 2) {
-                    $nesa = new NesaScoreGraphHSC(
-                        $cohortUnitImpls,
-                        $student,
-                        $attributes,
-                        $this->visibility,
-                        $this->viewer,
-                        $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE],
-                        $folder,
-                        $roleTypeOverride
-                    );
+                    if ($attributes->getYearLevel() === 11) {
+                        $nesa = new NesaScoreGraphHSC(
+                            $cohortUnitImpls,
+                            $student,
+                            $attributes,
+                            $this->visibility,
+                            $this->viewer,
+                            $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE],
+                            $folder,
+                            $roleTypeOverride
+                        );
+                    }
                 } else {
 
-                    // noop - no NESA graph for HSC Semester 2 dudes
+                    // noop - no NESA graph for HSC students except Year 11 Semester 2 guys
                 }
             } elseif ($attributes->isMiddleYear()) {
                 if ($reportSemester === 2) {
