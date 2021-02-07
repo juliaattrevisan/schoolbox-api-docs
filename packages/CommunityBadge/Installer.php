@@ -41,6 +41,9 @@ class Installer implements IPackageInstall
             $curriculumCodes = explode(',', $row['Curriculum']);
             $nodeCollection  = new GenericCollection(Node\Model::class);
             foreach ($curriculumCodes as $code) {
+                if ($code === '') {
+                    continue;
+                }
                 try {
                     $nodeCollection->add($nodeMapper->findOneByColumn('code', $code));
                 } catch (\Schoolbox\Mapper\Exception $e) {
