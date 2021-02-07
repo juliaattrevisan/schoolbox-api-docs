@@ -697,7 +697,7 @@
                                         {% set maxTeachersToShowCount = 4 %}
                                         {% set teachersHead = subject.teachers[:maxTeachersToShowCount] %}
                                         {% for teacher in teachersHead %}
-                                            <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="Teacher: {{ teacher.formatName }}" alt="Teacher: {{ teacher.formatName }}" />
+                                            <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="{{ teacher.formatName }}" />
                                         {% endfor %}
                                         {% set teachersTail = subject.teachers[maxTeachersToShowCount:] %}
                                         {% if teachersTail|length %}
@@ -706,7 +706,7 @@
                                                 {% if loop.index == teachersTail|length %}
                                                     {% set subjectTeacherNames = subjectTeacherNames ~ teacher.formatName %}
                                                 {% else %}
-                                                    {% set subjectTeacherNames = subjectTeacherNames ~ teacher.formatName ~ ',<br/>' %}
+                                                    {% set subjectTeacherNames = subjectTeacherNames ~ teacher.formatName ~ '<br/>' %}
                                                 {% endif %}
                                             {% endfor %}
                                             {% set remainingSubjectTeachersCount = subject.teachers|length - maxTeachersToShowCount  %}
@@ -795,7 +795,7 @@
                                             {% set maxOwnersToShowCount = 4 %}
                                             {% set ownersHead = group.owners[:maxOwnersToShowCount] %}
                                             {% for owner in ownersHead %}
-                                                <img src="/portrait.php?userId={{ owner.externalId|e('url') }}&amp;size=square64" title="{{ owner.formatName }}" alt="{{ owner.formatName }}" />
+                                                <img src="/portrait.php?userId={{ owner.externalId|e('url') }}&amp;size=square64" title="{{ owner.formatName }}" />
                                             {% endfor %}
                                             {% set ownersTail = group.owners[maxOwnersToShowCount:] %}
                                             {% if ownersTail|length %}
@@ -804,7 +804,7 @@
                                                     {% if loop.index == ownersTail|length %}
                                                         {% set groupOwnersNames = groupOwnersNames ~ owner.formatName %}
                                                     {% else %}
-                                                        {% set groupOwnersNames = groupOwnersNames ~ owner.formatName ~ ',<br/>' %}
+                                                        {% set groupOwnersNames = groupOwnersNames ~ owner.formatName ~ '<br/>' %}
                                                     {% endif %}
                                                 {% endfor %}
                                                 {% set remainingGroupOwnersCount = group.owners|length - maxOwnersToShowCount  %}
