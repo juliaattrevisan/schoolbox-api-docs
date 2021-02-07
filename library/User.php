@@ -182,6 +182,7 @@ class User extends DeprecatedModel
      * * Guests
      * * Staff, if config.parent_search_enable is off
      * * Students if config.student_search_enable is off
+     * TODO: Combine this with library/Schoolbox/User/Search/Query->getQueryFilter()
      *
      * @param  \Schoolbox\User $user
      * @return string
@@ -225,6 +226,7 @@ class User extends DeprecatedModel
         }
         return " `groups`.`group_type` NOT IN ('" . implode("','", $excludeRoles) . "')";
     }
+
     /**
      * Search the user table for particular user(s)
      *

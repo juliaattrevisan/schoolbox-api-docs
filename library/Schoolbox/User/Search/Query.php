@@ -163,7 +163,7 @@ class Query
      */
     private function getQueryFilter(string $keyword, User $viewer): array
     {
-        $searchString = '%'.$this->db->escapeForLike($keyword).'%';
+        $searchString = '%' . $this->db->escapeForLike($keyword) . '%';
 
         $whereParts = [
             '(
@@ -194,6 +194,8 @@ class Query
             $whereParts[] = 'u.enabled = 1';
         }
 
+        // TODO: Combine this with library/User->getSearchFilter()
+        // Superuser may always view all users including guests
         // Staff may always view parents and students
         // Guests may never view parents and students
         // Parents and students may only view parents or students if the config
@@ -218,9 +220,11 @@ class Query
             $params['parentType'] = Role::PARENT;
         }
 
-        // guest should not appear at all
-        $whereParts[]        = "g.group_type != :guestType";
-        $params['guestType'] = Role::GUEST;
+        // guest should appear only for superusers
+        if (!$viewer->isSuperuser()) {
+            $whereParts[]        = "g.group_type != :guestType";
+            $params['guestType'] = Role::GUEST;
+        }
 
         return [' WHERE ' . implode(' AND ', $whereParts), $params];
     }
