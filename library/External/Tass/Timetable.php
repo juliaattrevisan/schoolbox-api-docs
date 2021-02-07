@@ -183,10 +183,12 @@ class External_Tass_Timetable implements External_TimetableInterface
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
 
         $params = [
-            'fileSemester' => $this->externalUser->getCurrentSemester($externalUserId),
-            'fileYear'     => $this->externalUser->getCurrentYear($externalUserId),
-            'externalId'   => $externalUserId,
-            'dayNumber'    => $dayNumber,
+            'fileSemester'  => $this->externalUser->getCurrentSemester($externalUserId),
+            'fileYear'      => $this->externalUser->getCurrentYear($externalUserId),
+            'externalId'    => $externalUserId,
+            'dayNumber'     => $dayNumber,
+            'cmpyCode'      => $this->getCampusCode($campus),
+            'timetableCode' => $this->getTimetableCode($campus),
         ];
 
         if ($this->groupHandler->isStudent($userId)) {
@@ -197,6 +199,8 @@ class External_Tass_Timetable implements External_TimetableInterface
                                 AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS null) AND studsub.yr_study=ttmast.year_num
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE yr_study = :fileYear AND studsub.semester = :fileSemester
+                                AND ttmast.cmpy_code = :cmpyCode
+                                AND ttmast.tt_id = :timetableCode
                                 AND studsub.stud_code = :externalId
                                 AND day_code = :dayNumber
                                 AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
@@ -208,11 +212,11 @@ class External_Tass_Timetable implements External_TimetableInterface
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE year_num = :fileYear AND semester = :fileSemester
                             AND ttmast.cmpy_code = :cmpyCode
+                            AND ttmast.tt_id = :timetableCode
                             AND tch_code = :externalId
                             AND day_code = :dayNumber
                          ORDER BY prd_code';
 
-            $params['cmpyCode'] = $this->getCampusCode($campus);
         }
 
         $statement = $this->getConnector()->executeQuery($query, $params);
@@ -279,6 +283,8 @@ class External_Tass_Timetable implements External_TimetableInterface
             'fileSemester' => $this->externalUser->getCurrentSemester($externalUserId),
             'fileYear'     => $this->externalUser->getCurrentYear($externalUserId),
             'externalId'   => $externalUserId,
+            'cmpyCode'      => $this->getCampusCode($campus),
+            'timetableCode' => $this->getTimetableCode($campus),
         ];
 
         if ($this->groupHandler->isStudent($userId)) {
@@ -289,6 +295,8 @@ class External_Tass_Timetable implements External_TimetableInterface
                                     AND studsub.class=ttmast.class AND (student.year_grp=ttmast.year_grp OR ttmast.year_grp IS NULL) AND studsub.yr_study=ttmast.year_num
                             JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                             WHERE yr_study = :fileYear AND studsub.semester = :fileSemester
+                                    AND ttmast.cmpy_code = :cmpyCode
+                                    AND ttmast.tt_id = :timetableCode
                                     AND studsub.stud_code = :externalId
                                     AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
                                     AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
@@ -300,10 +308,9 @@ class External_Tass_Timetable implements External_TimetableInterface
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE year_num = :fileYear AND semester = :fileSemester
                             AND ttmast.cmpy_code = :cmpyCode
+                            AND ttmast.tt_id = :timetableCode
                             AND tch_code = :externalId
                          ORDER BY prd_code, day_code';
-            $params['cmpyCode'] = $this->getCampusCode($campus);
-
         }
 
         $dayCount  = $timetabledef['dayCount'];
