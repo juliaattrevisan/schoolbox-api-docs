@@ -592,7 +592,17 @@
                 //https://gitlab.com/meno/dropzone/-/wikis/FAQ#how-to-show-files-already-stored-on-server
                 this.dropzone.displayExistingFile(data, getExistingFileUrl(), onExistingFileDisplayed);
                 
-                elems.push($(data.previewElement));
+                //as this.on('success') is not called when using the modal window upload, 
+                //need to also add the attachment vars in so the files are added on form submit
+                let inputValue = data.hash + ':' + data.name;
+                $(data.previewElement)
+                        .find('input[data-az-attachment]')
+                        .val(inputValue);
+                self.attach(data);
+
+                elems.push($(data.previewElement));     
+
+                $(this.element).trigger('success.attachzone', [data]);
 
             } else {
                 
