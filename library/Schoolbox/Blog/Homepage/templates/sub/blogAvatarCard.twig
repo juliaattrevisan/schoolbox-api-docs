@@ -1,6 +1,6 @@
 <a href="{{ routeLookup('blog.getItem', { id: blog.getId }) }}">
     <img src="/portrait.php?userId={{ blog.getOwner.getExternalId }}&size=square64" />
-    <p>{{ blog.getHeading }}</p>
+    <h3>{{ blog.getHeading }}</h3>
 </a>
 <p class="meta">
     Posted by
