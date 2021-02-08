@@ -373,11 +373,32 @@ class Classes implements IStrategy
          * - class_id comes from $timetableClass->getId()
          */
 
-        /** @var ClassPeriod $timetableClassPeriod */
-        $timetableClassPeriod = $this->classPeriodMapper->createModel()
-            ->setClass($timetableClass)
-            ->setPeriod($period)
-            ->setRoom($class['room']['name']);
+        /* See if one exists already; if so, reuse it
+        */
+        try {
+            $timetableClassPeriod = $this->classPeriodMapper->findOneByColumnList([
+                'class_id' => $timetableClass->getId(),
+                'period_id' => $period->getId()
+            ]);
+
+            $this->log->info(sprintf(
+                'Reusing previously saved class period %s using period_id %s, with id %s',
+                $timetableClass->getName(),
+                $period->getId(),
+                $timetableClassPeriod->getId()
+            ));
+        } catch (Exception $e) {
+            $timetableClassPeriod = $this->classPeriodMapper->createModel()
+                ->setClass($timetableClass)
+                ->setPeriod($period)
+                ->setRoom($class['room']['name']);
+
+            $this->log->info(sprintf(
+                'Creating new class period %s %s',
+                $timetableClass->getName(),
+                $period->getId()
+            ));
+        }
 
         /* Throw warning, but assign them anyway
          */
