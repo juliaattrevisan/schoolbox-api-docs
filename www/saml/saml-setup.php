@@ -77,7 +77,7 @@ if( $privateKeyResource !== false ) {
 }
 
 $settingsInfo['sp'] = [
-        'entityId' => $spBaseUrl,
+        'entityId' => Config::get('saml_sp_entityid') ?: $spBaseUrl,
         'assertionConsumerService' => [
             'url' => $spBaseUrl.'/saml/consume.php',
             'binding' => Constants::BINDING_HTTP_POST,
