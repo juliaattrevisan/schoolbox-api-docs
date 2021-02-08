@@ -23,7 +23,7 @@ use UnexpectedValueException;
 /**
  * Builds a suitable data structure for rendering the NESA Grade Graph component.
  */
-class NesaScoreGraph extends BaseComponent
+class NesaScoreGraphHSC extends BaseComponent
 {
 
     // Sort left-to-right for highcharts performance. @see https://www.highcharts.com/errors/15/
@@ -240,16 +240,23 @@ class NesaScoreGraph extends BaseComponent
                     if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
                         $studentMark = $humanReadableMark;
 
-                        // MYP students' comments will come from this assessment
-                        if ($this->getAttributes()->isMyp()) {
+//                        // MYP students' comments will come from this assessment
+//                        if ($this->getAttributes()->isMyp()) {
                             $comment['comment']   = $feedback->getComment();
                             $comment['commentBy'] = $feedback->getReviewer();
-                        }
+//                        }
                     }
 
                     // It's quite possible for students to be given marks outside valid range, eg HR = 'Absent', Norm = 0.
                     // Since we cannot predict all possible marks, and whether these should be ignored or considered an error,
                     // we will simply ignore all invalid data.
+
+                    /* Note: I think these keys are meant to he kept in sync, as per nesaScoreGraph.twig
+                     * {% set studentMarks = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1} %}
+                     *
+                     * But why isn't this preg match derived from the array_keys of self::BASE_MARKS??
+                     * That's three points of contact that you have to know to keep synchronised??
+                     */
                     if (!\preg_match('#^[ABCDE]$#', $humanReadableMark, $matches)) {
                         continue;
                     }

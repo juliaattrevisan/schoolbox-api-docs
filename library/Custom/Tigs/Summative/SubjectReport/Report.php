@@ -18,12 +18,11 @@ use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementMatrix;
 use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementSummary;
-use Custom\Tigs\Summative\SubjectReport\Components\FinalAchievementLevels;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentMatrix;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
-use Custom\Tigs\Summative\SubjectReport\Components\InternationalBaccalaureateGraph;
-use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraph;
+use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraphHSC;
+use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraphMiddleYears;
 use DomainException;
 use External_ClassInterface;
 use InvalidArgumentException;
@@ -190,7 +189,7 @@ class Report
             }
             $errors[]  = $error;
             $unitSpecsWithData = $aamData = $aasData = $hscTaskMarks = $hscTaskMatrix = [];
-            $falData   = $ibGraphData = $nesaGraphData = $courseSpec = $hscRankData = $courseDescription = null;
+            $nesaGraphData = $courseSpec = $hscRankData = $courseDescription = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
             $unitSpecs = $this->getUnitSpecs($courseImplsWithUnits);
@@ -200,9 +199,7 @@ class Report
 
             // Build component data
             $courseDescription = $this->buildCourseDescription($courseSpec);
-            $ibGraphData   = $this->buildInternationalBaccalaureateGraphData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $nesaGraphData = $this->buildNesaScoreGraphData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
-            $falData       = $this->buildFinalAchievementLevelsData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
             $aamData       = $this->buildAcademicAchievementMatrixData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
             $aasData       = $this->buildAcademicAchievementSummaryData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
             $hscTaskMarks  = $this->buildHscTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
@@ -270,10 +267,8 @@ class Report
             'errors'                    => $errors,
             'unitSpecs'                 => $unitSpecsWithData,
             'courseDescription'         => $courseDescription,
-            'falData'                   => $falData,
             'aamData'                   => $aamData,
             'aasData'                   => $aasData,
-            'ibGraphData'               => $ibGraphData,
             'nesaGraphData'             => $nesaGraphData,
             'hscTaskMarks'              => $hscTaskMarks,
             'hscTaskMatrix'             => $hscTaskMatrix,
@@ -483,21 +478,45 @@ class Report
         User $student,
         ?string $roleTypeOverride
     ): array {
-        // Only relevant for MYP students
-        if (!$attributes->isMyp()) {
-            return [];
+
+        /* The Academic Achievement Summary searches for assessments that have a
+         * particular work type. These work types differ depending on whether you're
+         * in the Middle Years Program or whether you're in HSC, producing a different
+         * list accordingly.
+         *
+         * The assessments and their units' links depends on this being configured
+         * and searched in this particular way. Misconfiguration results in units not
+         * having their titles linked.
+         */
+        $identifier = null;
+
+        if ($attributes->isMiddleYear()) {
+            $identifier = Config::_TIGS_WORK_TYPE_7_10_ASSESSMENT_TASK;
+        } elseif ($attributes->isHsc()) {
+            $identifier = Config::_TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK;
         }
 
+        /* Error early when you can't detect which work type you're supposed to use
+         */
+        if (null === $identifier) {
+            return ['error' => 'Cannot identify whether this student is in Middle Years program or HSC. Academic Achievement Summary not available.'];
+        }
+
+        /* Otherwise check that the work type existed somewhere in the config
+         */
         try {
             $workTypeId = $this->checkWorkType(
-                Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_SUMMARY,
+                $identifier,
                 'Cannot render Academic Achievement Summary components. Work type not set.',
-                'Set Academic Achievement Summary Work Type'
+                'Set 7-10 Assessment Task Work Type for Middle School, or HSC Assessment Task for other people'
             );
         } catch (UnexpectedValueException $e) {
             return ['error' => $e->getMessage()];
         }
 
+        /* Produce the Academic Achievement Summary which is the list of Units that contain
+         * their assessments which used a particular work type
+         */
         $aas = new AcademicAchievementSummary(
             $attributes,
             $unitSpecs,
@@ -511,61 +530,10 @@ class Report
             $this->router,
             $roleTypeOverride
         );
+
+        /* Generically build an array of data via AbstractMatrix
+         */
         return $aas->toContext();
-    }
-
-
-    /**
-     * Build data for the MYP-FAL component.
-     *
-     * @param Folder\Model                       $folder
-     * @param StudentAttributes                  $attributes
-     * @param GenericCollection|UnitSpec\Model[] $unitSpecs
-     * @param User                               $student
-     * @param string|null                        $roleTypeOverride
-     * @return array|null
-     * @throws InvalidArgumentException
-     * @throws UnexpectedValueException
-     * @throws RouteNotFound
-     * @throws MapperException
-     */
-    private function buildFinalAchievementLevelsData(
-        Folder\Model $folder,
-        StudentAttributes $attributes,
-        GenericCollection $unitSpecs,
-        User $student,
-        ?string $roleTypeOverride
-    ): ?array {
-        // Only relevant for MYP students in Curriculum Semester 2
-        if (!$attributes->isMyp() || $attributes->getCurriculumSemester() !== 2) {
-            return null;
-        }
-
-        try {
-            $workTypeId = $this->checkWorkType(
-                Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS,
-                'Cannot render Final Achievement Levels component. Work type not set.',
-                'Set MYP Final Achievement Levels Work Type'
-            );
-        } catch (UnexpectedValueException $e) {
-            return ['error' => $e->getMessage()];
-        }
-
-        $fal = new FinalAchievementLevels(
-            $attributes,
-            $unitSpecs,
-            $student,
-            $folder,
-            $this->visibility,
-            $this->viewer,
-            $workTypeId,
-            $this->rubricMapper,
-            $this->authorizer,
-            $this->router,
-            $roleTypeOverride
-        );
-
-        return $fal->toContext();
     }
 
 
@@ -595,116 +563,6 @@ class Report
         $textbox = $textBoxes->first();
 
         return $textbox->getBody();
-    }
-
-
-    /**
-     * Returns IB Grade Graph report data for Sem1 and optionally Sem2.
-     *
-     * Returns null if not relevant to student.
-     *
-     * Return structure:
-     * @internal string     return['error']                       Optional. Info about why this component could not be built
-     * @internal array      return['data']
-     * @internal null|array return['data'][idx]                   Where idx is [1,2] and represents data for a semester. Null if don't show component
-     * @internal string     return['data'][idx]['header']
-     * @internal string     return['data'][idx]['data']           Mark data
-     * @internal string     return['data'][idx]['studentMark']    Student's mark
-     * @internal string     return['data'][idx]['studentComment'] Student's comment
-     * @internal string     return['data'][idx]['useComment']     Whether we should just render the student comment instead of the graph
-     * @internal int        return['data'][idx]['semester']       The semester the data belongs to
-     *
-     * @param Folder\Model      $folder
-     * @param StudentAttributes $attributes
-     * @param CourseSpec\Model  $courseSpec
-     * @param User              $student
-     * @param string|null       $roleTypeOverride
-     * @return null|array
-     * @throws InvalidArgumentException
-     * @throws InvalidColumnException
-     * @throws UnexpectedValueException
-     * @throws RouteNotFound
-     * @throws DomainException
-     * @throws LogicException
-     * @throws DefinitionException
-     * @throws UnderflowException
-     * @throws Database\Exception
-     */
-    private function buildInternationalBaccalaureateGraphData(
-        Folder\Model $folder,
-        StudentAttributes $attributes,
-        CourseSpec\Model $courseSpec,
-        User $student,
-        ?string $roleTypeOverride
-    ): ?array {
-        // Only relevant for:
-        // * MYP-S2
-        // * DP-Y11-S2, DP-Y12-S1 + DP-Y12-S2
-        $yearLevel = $attributes->getCurriculumYearLevel();
-        $semester  = $attributes->getCurriculumSemester();
-        if (2 === $semester && $attributes->isMyp()) {
-            $configName   = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
-            $errorMsg     = 'Cannot render MYP Report components. Work type not set.';
-            $errorMsgLink = 'Set MYP Final Achievement Levels Work Type';
-            // Only ever interested in Sem2 for MYP FAL
-            $semesterFrom = 2;
-            $semesterTo   = 2;
-        } elseif ((12 === $yearLevel || 2 === $semester) && $attributes->isDp()) {
-            $configName   = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
-            $errorMsg     = 'Cannot render DP Report components. Work type not set.';
-            $errorMsgLink = 'Set DP Report Work Type';
-            if(11 === $yearLevel){
-                // Only interested in Sem2 for Yr 11 DP
-                $semesterFrom = 2;
-                $semesterTo   = 2;
-            } else {
-                // Always show Sem1, show Sem2 if report is for Sem2
-                $semesterFrom = 1;
-                $semesterTo   = $semester;
-            }
-        } else {
-            // Component is not relevant for this report.
-            return null;
-        }
-
-        try {
-            $workTypeId = $this->checkWorkType($configName, $errorMsg, $errorMsgLink);
-        } catch (UnexpectedValueException $e) {
-            return $this->showErrorsToViewer($roleTypeOverride) ? ['error' => $e->getMessage()] : null;
-        }
-
-        $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
-        $this->loadAssessmentsAndParticipation($courseSpec, [$workTypeId], $attributes, $semesterFrom, $semesterTo);
-
-        $semesters = [];
-        foreach([2,1] as $candidate){
-            if($candidate === $semesterFrom || $candidate === $semesterTo){
-                $semesters[] = $candidate;
-            }
-        }
-
-        $reports = [];
-        foreach($semesters as $semester){
-            $ib = new InternationalBaccalaureateGraph(
-                $cohortUnitImpls,
-                $student,
-                $attributes,
-                $this->visibility,
-                $this->viewer,
-                $workTypeId,
-                $this->rubricMapper,
-                $this->authorizer,
-                $this->router,
-                $folder,
-                $roleTypeOverride
-            );
-            $context = $ib->toContext($semester);
-            if ($context) {
-                $reports['data'][$semester] = $context;
-            }
-        }
-
-        return $reports;
     }
 
 
@@ -764,15 +622,11 @@ class Report
         // * HSC-Y11-S2   (work-type = NESA)
         $yearLevel = $attributes->getCurriculumYearLevel();
         $semester  = $attributes->getCurriculumSemester();
-        if (!($attributes->isMyp() || (11 === $yearLevel && $semester === 2 && $attributes->isHsc()))) {
-            return null;
-        }
 
         // Which work types should we fetch?
         $configNames = [Config::_TIGS_WORK_TYPE_NESA_SCORE => 'Set MYP FAL Work Type'];
-        if ($semester === 2 && $attributes->isMyp()) {
-            $configNames[Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS] = 'Set NESA Grade Work Type';
-        }
+        $configNames[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK] = 'Set NESA Grade Work Type';
+
         $workTypeIds = [];
         foreach ($configNames as $configName => $errorMsgLink) {
             try {
@@ -791,7 +645,7 @@ class Report
         $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, $semesterFrom, $semesterTo);
 
         $semesters = [];
-        foreach ([2, 1] as $candidate) {
+        foreach ([1, 2] as $candidate) {
             if ($candidate === $semesterFrom || $candidate === $semesterTo) {
                 $semesters[] = $candidate;
             }
@@ -799,27 +653,60 @@ class Report
 
         // Find relevant assessments and participation and insert into units
         $reports = [];
+
         foreach ($semesters as $reportSemester) {
 
-            $workTypeId = $reportSemester === 2 && $attributes->isMyp()
-                ? $workTypeIds[Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS]
-                : $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE];
+            /* Second semester get the NESA grade from a special assessment, a different one
+             * than for semester 1
+             */
+            if ($reportSemester === 2) {
+                $workTypeId = $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK];
+            } else {
+                $workTypeId = $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE];
+            }
 
-            $nesa    = new NesaScoreGraph(
-                $cohortUnitImpls,
-                $student,
-                $attributes,
-                $this->visibility,
-                $this->viewer,
-                $workTypeId,
-                $folder,
-                $roleTypeOverride
-            );
+            /* NESA Graphs render in special ways depending on whether the student
+             * is an HSC or Middle Years student
+             */
+            if ($attributes->isHsc()) {
+                $nesa = new NesaScoreGraphHSC(
+                    $cohortUnitImpls,
+                    $student,
+                    $attributes,
+                    $this->visibility,
+                    $this->viewer,
+                    $workTypeId,
+                    $folder,
+                    $roleTypeOverride
+                );
+            } elseif ($attributes->isMiddleYear()) {
+                $nesa = new NesaScoreGraphMiddleYears(
+                    $cohortUnitImpls,
+                    $student,
+                    $attributes,
+                    $this->visibility,
+                    $this->viewer,
+                    $workTypeId,
+                    $folder,
+                    $reportSemester,
+                    $this->rubricMapper,
+                    $roleTypeOverride
+                );
+            } else {
+
+                /* Can't tell if this student is HSC or Middle Years
+                 * Return empty
+                 */
+                return [];
+            }
+
             $context = $nesa->toContext($reportSemester);
+
             if ($context !== null) {
                 $reports['data'][$reportSemester] = $context;
             }
         }
+
         return $reports;
     }
 
