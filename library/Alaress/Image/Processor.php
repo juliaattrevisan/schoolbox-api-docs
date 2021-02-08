@@ -204,17 +204,17 @@ class Processor
         // Check host's image magick limits (these are controlled by Puppet)
         $resourceLimitMap = $this->parseImageMagickResourceLimits();
 
-        foreach ($resourceLimitMap as $name => $value){
-            switch($name){
+        foreach ($resourceLimitMap as $name => $value) {
+            switch ($name) {
                 case 'width':
                     $widthLimit = Alaress_Byte_Format::stringToBytes(rtrim($value, 'P'), false);
-                    if($width > $widthLimit){
+                    if ($width > $widthLimit) {
                         throw new OverflowException("File width ($width) > limit ($widthLimit) - aborting");
                     }
                     break;
                 case 'height':
                     $heightLimit = Alaress_Byte_Format::stringToBytes(rtrim($value, 'P'), false);
-                    if($height > $heightLimit){
+                    if ($height > $heightLimit) {
                         throw new OverflowException("File height ($height) > limit ($heightLimit) - aborting");
                     }
                     break;
@@ -263,7 +263,6 @@ class Processor
             if ($isResourcePolicyTag) {
                 $resourceLimitMap[$name] = $value;
             }
-
         }
         return $resourceLimitMap;
     }
