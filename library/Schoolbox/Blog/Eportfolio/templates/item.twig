@@ -76,7 +76,7 @@
 
         <h2 class="subheader">Comments</h2>
         {% if comments | length > 0 %}
-        <section>
+        <section class="discussion">
             <ul class="information-list">
 
                 {% for comment in comments %}
@@ -84,9 +84,8 @@
                     <li class="actions-small-1">
 
                         <div class="list-item">
-                            <div class="card small-12">
+                            <div class="card compact small-12">
                                 {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
-                                <p class="meta">{{ comment.getCreatedAt.getRelativeTime }}</p>
                             </div>
                         </div>
 

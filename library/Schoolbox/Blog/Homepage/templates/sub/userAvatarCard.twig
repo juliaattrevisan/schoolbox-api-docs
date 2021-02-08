@@ -3,13 +3,17 @@
         <img src="/portrait.php?userId={{ user.getExternalId }}&size=square64" alt="View Profile" />
         <p>
             {{ user.formatName() }}
+            {% if comment is defined %}
             <span class="pipe meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</span>
+            {% endif %}
         </p>
     </a>
 {% else %}
     <img src="/portrait.php?userId={{ user.getExternalId }}&size=square64" alt="View Profile" />
     <p>
         {{ user.formatName() }}
+        {% if comment is defined %}
         <span class="pipe meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</span>
+        {% endif %}
     </p>
 {% endif %}
