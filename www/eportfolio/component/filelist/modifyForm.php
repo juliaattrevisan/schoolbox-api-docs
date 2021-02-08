@@ -19,6 +19,15 @@ $action = $_GET['action'];
 $ownerId = $_GET['userId'];
 $pageId = $_GET['pageId'];
 
+/* All three vars need to exist before you can continue:
+ * $_SESSION['user'], $ownerId, $pageId
+ */
+foreach ([$_SESSION['user'], $ownerId, $pageId] as $val) {
+    if (null === $val) {
+        $page->pageNotFound();
+    }
+}
+
 $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
 
 if ($authenticator->canModify()) {
