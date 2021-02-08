@@ -91,6 +91,7 @@ class Processor
 
         // Is this a SVG? just stream it if so, don't even attempt to transform
         if ($fileFormat === 'svg') {
+            // Assume the stream to the base SVG exists
             return new StreamableFile(
                 true,
                 (string)$this->file->getMimetype(),
@@ -106,11 +107,27 @@ class Processor
         $transformPath  = $storageManager::getTransformPath($this->file->getHash(), $this->cacheKey);
 
         // Fastest check (particularly when using S3)
-        // We can assume if the transform exists in the database that it also exists on disk and can be immediately streamed.
         $transformMapper = Storage\Transform\Mapper::getInstance();
         $transformModel  = $transformMapper->findByHashAndCacheKey($this->file->getHash(), $this->cacheKey);
         if ($transformModel) {
-            return new StreamableFile(true, (string)$this->file->getMimetype(), $transformModel->getSize(), $fileSystem->readStream($transformPath));
+            // We cannot assume if the transform exists in the database that it
+            // also exists on disk and can be immediately streamed:
+            // check the file exists before attempting to stream it.
+            $stream = $fileSystem->readStream($transformPath);
+            if (!is_resource($stream)) {
+                // if config.otfs_verify_previous_file is on, then `readStream`
+                // won't raise an exception if the file doesn't exist:
+                // it will simply return false.
+                // Raise the exception that would've been raised if that config
+                // was off.
+                throw new Flysystem\FileNotFoundException($transformPath);
+            }
+            return new StreamableFile(
+                true,
+                (string)$this->file->getMimetype(),
+                $transformModel->getSize(),
+                $stream
+            );
         }
 
         // Transform exists on (local|s3) disk, but not yet in database.
@@ -118,7 +135,13 @@ class Processor
         if ($fileSystem->has($transformPath)) {
             $transformSize = $fileSystem->getSize($transformPath);
             $transformMapper->createRecord($this->file->getHash(), $this->cacheKey, $transformSize);
-            return new StreamableFile(true, (string)$this->file->getMimetype(), $transformSize, $fileSystem->readStream($transformPath));
+            // Assume the stream exists, because the filesystem has this file
+            return new StreamableFile(
+                true,
+                (string)$this->file->getMimetype(),
+                $transformSize,
+                $fileSystem->readStream($transformPath)
+            );
         }
 
         $image = $this->loadImageFromFile($maxAttempts);
@@ -149,7 +172,13 @@ class Processor
             $transformSize
         );
 
-        return new StreamableFile(false, (string)$this->file->getMimetype(), $transformSize, $fileSystem->readStream($transformPath));
+        // Assume `createRecord` created the stream
+        return new StreamableFile(
+            false,
+            (string)$this->file->getMimetype(),
+            $transformSize,
+            $fileSystem->readStream($transformPath)
+        );
     }
 
 
