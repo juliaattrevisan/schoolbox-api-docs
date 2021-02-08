@@ -182,31 +182,19 @@ class User extends DeprecatedModel
      * * Guests
      * * Staff, if config.parent_search_enable is off
      * * Students if config.student_search_enable is off
-     * TODO: Combine this with library/Schoolbox/User/Search/Query->getQueryFilter()
      *
      * @param  \Schoolbox\User $user
      * @return string
      */
     protected function getSearchFilter(\Schoolbox\User $user): string
     {
-        /* Superusers can still find Guests via search as part of an administrative
-         * shortcut so you can still administer them and maintain them wherever you
-         * are in schoolbox
-         */
-        if ($user->isSuperuser()) {
-            return '';
-        }
-        /* Hide Guest users from everyone's search results by default
-         */
-        $excludeRoles = [Role::GUEST];
-
-        /* Staff members shouldn't have guest users in search results
-         * but are otherwise unrestricted
+        $excludeRoles = [];
+        /* Staff members shouldn't have all users in search results
          *
          * Anyone other than staff (ie. parents and students) are subjected
          * config options that restrict the search results
          *
-         *  Guests have special filters that prevent them from getting search
+         * Guests have special filters that prevent them from getting search
          * results for parents and students
          */
         if ($user->getRole()->isGuest()) {
@@ -224,6 +212,11 @@ class User extends DeprecatedModel
                 $excludeRoles[] = Role::STUDENT;
             }
         }
+
+        if (empty($excludeRoles)) {
+            return '';
+        }
+
         return " `groups`.`group_type` NOT IN ('" . implode("','", $excludeRoles) . "')";
     }
 
