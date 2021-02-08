@@ -31,7 +31,6 @@ module.exports = {
         publicPath: "/javascript/components/",
         filename: "[name].bundle.js"
     },
-    devtool: "source-map",
     module: {
         rules: [
             {
@@ -62,18 +61,18 @@ module.exports = {
                         ]
                     }
                 }
-        },
+            },
             {
                 test: /\.vue$/,
                 loader: 'vue-loader',
                 options: {
                     appendTsSuffixTo: [/\.vue$/]
                 }
-        },
+            },
             {
                 test: /\.css$/,
                 use: ['vue-style-loader', 'css-loader']
-        },
+            },
             {
                 test: /\.scss$/,
                 use: [
@@ -81,12 +80,7 @@ module.exports = {
                     'css-loader',
                     'sass-loader'
                 ]
-        }
-        // {
-        //     test: /\.js$/,
-        //     enforce: "pre",
-        //     use: ["source-map-loader"],
-        // }
+            }
         ]
     },
     resolve: {
@@ -95,7 +89,8 @@ module.exports = {
             '@schoolbox': path.resolve(__dirname, "vue/components"),
             '@schoolboxCalendarEvent': path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue"),
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
-            '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue')
+            '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue'),
+            '@shared': path.resolve(__dirname, 'www/javascript/shared'),
         },
         extensions: ['*', '.js', '.vue', '.json']
     },

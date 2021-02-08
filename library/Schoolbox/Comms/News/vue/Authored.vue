@@ -2,8 +2,8 @@
     <div>
         <section>
             <dl v-if="isArticlesLoaded" class="tabs" :id="topicContainerId">
-                <dd v-for="(statusCount, status) in statuses" :class="{active: activeTabSelected === status}" :key="status">
-                    <a v-if="statusCount" @click="onTabChange(status)">{{ status }}</a>
+                <dd v-for="(stausCount, status) in activeStatuses" :class="{active: activeTabSelected === status}" :key="status">
+                    <a @click="onTabChange(status)">{{ status }}</a>
                 </dd>
             </dl>
             <dl v-else class="tabs" :id="topicContainerId">
@@ -31,7 +31,7 @@
                         <article>
                             <div v-html="article.blurb"></div>
                             <div class="article-read-more">
-                                <a v-if="article.readmore.available" :href="article._links.self.href" v-html="article.readmore.string"></a>
+                                <a v-if="article.readmore.available" :href="article._links.self.href">{{ article.readmore.string }}</a>
                             </div>
                         </article>
                         <nav>
@@ -76,6 +76,7 @@
 <script>
     
     import VuejsPaginate from 'vuejs-paginate';
+    import { fetchAsJson } from '@shared/fetch/fetch';
     
     export default {
         components: {
@@ -97,13 +98,31 @@
                 isArticlesLoaded: false, //show skeleton display otherwise
                 activePageNumber: 1,
                 activeTabSelected: '',
-                statuses: {}, // A unique list of statuses returned from the user's articles, Used to display tab options
+                statuses: {
+                    'All': 0,
+                    'Drafted': 0,
+                    'Awaiting Moderation': 0,
+                    'Rejected': 0,
+                    'Awaiting Publication': 0,
+                    'Published': 0,
+                    'Archived': 0
+                }, 
                 allArticles: [],
                 filteredArticles: [],  // A container for a filtered list of authored articles, Will be populated as all articles on load
             }
         },
         computed: {
             
+            //when only those with posts need to be displayed
+            activeStatuses: function () {
+                return Object.keys(this.statuses).reduce((accumulator, currentValue) => {
+                    if (this.statuses[currentValue] > 0) {
+                        accumulator[currentValue] = this.statuses[currentValue]
+                    }
+                    return accumulator;
+                }, {});
+            },
+
             // The total pages to show for pagination buttons
             pageCount: function () {
                 return Math.ceil(this.filteredArticles.length / this.limitPerPage);
@@ -137,28 +156,18 @@
              */
             getNews: function () {
 
-                fetch(this.newsRoute)
-                .then((response) => response.json())
+                fetchAsJson(this.newsRoute)
                 .then((response) => {
 
                     this.allArticles = response;
                     this.filteredArticles = response;
 
-                    this.statuses = {
-                        'All': 0,
-                        'Drafted': 0,
-                        'Awaiting Moderation': 0,
-                        'Rejected': 0,
-                        'Awaiting Publication': 0,
-                        'Published': 0,
-                        'Archived': 0
-                    };
-
+                    //populate stauses for tab selections 
                     response.forEach((article) => {
                         this.statuses['All']++;
                         this.statuses[article.status]++;
                     });
-
+                
                     // In the case that this page has loaded with a page and/or tab in the URL params - update the page to reflect those params
                     if (this.activeTabSelected !== 'All') {
                         this.onTabChange(this.activeTabSelected, true, true);
