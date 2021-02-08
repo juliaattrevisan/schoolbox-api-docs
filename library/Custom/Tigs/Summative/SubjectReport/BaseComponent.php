@@ -136,6 +136,31 @@ class BaseComponent
 
         $dueDate = $assessable->getDueAt();
 
+// Unleash this beast when your NESA Graphs aren't displaying but you expected
+// them to display. Sometimes it's because their assessments aren't being found
+// in the appropriate semesters, due to this derivation business logic going on
+// elsewhere in Report.php
+//
+//        if (!($dueDate->gte($startDate) && $dueDate->lte($finishDate))) {
+//            new \Alaress_Probe(sprintf(
+//                "%s is not due in semester %s; checking the semesters array instead of attributes",
+//                $assessable->getTitle(),
+//                $semester
+//            ));
+//
+//            new \Alaress_Probe(sprintf(
+//                "Semester 1: starts %s, ends %s",
+//                $semesters[1]->getStart()->getDatabase(),
+//                $semesters[1]->getFinish()->getDatabase(),
+//            ));
+//
+//            new \Alaress_Probe(sprintf(
+//                "Semester 2: starts %s, ends %s",
+//                $semesters[2]->getStart()->getDatabase(),
+//                $semesters[2]->getFinish()->getDatabase(),
+//            ));
+//        }
+
         return $dueDate->gte($startDate) && $dueDate->lte($finishDate);
     }
 

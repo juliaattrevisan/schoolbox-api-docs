@@ -428,11 +428,34 @@ class Report
             return [];
         }
 
-        $configName = Config::_TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK;
+        /* The Academic Achievement Matrix searches for assessments that have a
+         * particular work type. These work types differ depending on whether you're
+         * in the Middle Years Program or whether you're in HSC, producing a different
+         * list accordingly.
+         *
+         * The assessments and their units' links depends on this being configured
+         * and searched in this particular way. Misconfiguration results in units not
+         * having their titles linked.
+         */
+        $identifier = null;
 
+        if ($attributes->isMiddleYear()) {
+            $identifier = Config::_TIGS_WORK_TYPE_7_10_ASSESSMENT_TASK;
+        } elseif ($attributes->isHsc()) {
+            $identifier = Config::_TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK;
+        }
+
+        /* Error early when you can't detect which work type you're supposed to use
+         */
+        if (null === $identifier) {
+            return ['error' => 'Cannot identify whether this student is in Middle Years program or HSC. Academic Achievement Summary not available.'];
+        }
+
+        /* Otherwise check that the work type existed somewhere in the config
+         */
         try {
             $workTypeId = $this->checkWorkType(
-                $configName,
+                $identifier,
                 'Cannot render Approaches to Learning components. Work type not set.',
                 'Set Approaches to Learning Work Type'
             );
@@ -440,6 +463,9 @@ class Report
             return ['error' => $e->getMessage()];
         }
 
+        /* Produce the Academic Achievement Matrix which is the rubric grid that correspond
+         * their assessments which used a particular work type
+         */
         $aam = new AcademicAchievementMatrix(
             $attributes,
             $unitSpecs,
@@ -454,6 +480,8 @@ class Report
             $roleTypeOverride
         );
 
+        /* Generically build an array of data via AbstractMatrix
+         */
         return $aam->toContext();
     }
 
@@ -655,43 +683,66 @@ class Report
         $reports = [];
 
         foreach ($semesters as $reportSemester) {
+            $nesa = null;
 
             /* Second semester get the NESA grade from a special assessment, a different one
              * than for semester 1
-             */
-            if ($reportSemester === 2) {
-                $workTypeId = $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK];
-            } else {
-                $workTypeId = $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE];
-            }
-
-            /* NESA Graphs render in special ways depending on whether the student
+             *
+             * Truth table time
+             * Note that Prod (PRD) and Staging (STG) can have different ids
+             *
+             * HSC Students, Semester 1: worktype is not relevant
+             * HSC Students, Semester 2: worktype is "NESA Report Grade" (STG 20)
+             * Middle Years Students, Semester 1: worktype is "NESA Report Grade" (STG 20)
+             * Middle Years Students, Semester 2: worktype is "NESA Report Grade & Report Mark" (STG 22)
+             *
+             * NESA Graphs render in special ways depending on whether the student
              * is an HSC or Middle Years student
              */
             if ($attributes->isHsc()) {
-                $nesa = new NesaScoreGraphHSC(
-                    $cohortUnitImpls,
-                    $student,
-                    $attributes,
-                    $this->visibility,
-                    $this->viewer,
-                    $workTypeId,
-                    $folder,
-                    $roleTypeOverride
-                );
+                if ($reportSemester === 2) {
+                    $nesa = new NesaScoreGraphHSC(
+                        $cohortUnitImpls,
+                        $student,
+                        $attributes,
+                        $this->visibility,
+                        $this->viewer,
+                        $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE],
+                        $folder,
+                        $roleTypeOverride
+                    );
+                } else {
+
+                    // noop - no NESA graph for HSC Semester 2 dudes
+                }
             } elseif ($attributes->isMiddleYear()) {
-                $nesa = new NesaScoreGraphMiddleYears(
-                    $cohortUnitImpls,
-                    $student,
-                    $attributes,
-                    $this->visibility,
-                    $this->viewer,
-                    $workTypeId,
-                    $folder,
-                    $reportSemester,
-                    $this->rubricMapper,
-                    $roleTypeOverride
-                );
+                if ($reportSemester === 2) {
+                    $nesa = new NesaScoreGraphMiddleYears(
+                        $cohortUnitImpls,
+                        $student,
+                        $attributes,
+                        $this->visibility,
+                        $this->viewer,
+                        $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK],
+                        $folder,
+                        $reportSemester,
+                        $this->rubricMapper,
+                        $roleTypeOverride
+                    );
+                } else {
+                    $nesa = new NesaScoreGraphMiddleYears(
+                        $cohortUnitImpls,
+                        $student,
+                        $attributes,
+                        $this->visibility,
+                        $this->viewer,
+                        $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE],
+                        $folder,
+                        $reportSemester,
+                        $this->rubricMapper,
+                        $roleTypeOverride
+                    );
+                }
             } else {
 
                 /* Can't tell if this student is HSC or Middle Years
@@ -700,10 +751,14 @@ class Report
                 return [];
             }
 
-            $context = $nesa->toContext($reportSemester);
+            /* Only try to scavenge data from $nesa if it was defined
+             */
+            if (null !== $nesa) {
+                $context = $nesa->toContext($reportSemester);
 
-            if ($context !== null) {
-                $reports['data'][$reportSemester] = $context;
+                if ($context !== null) {
+                    $reports['data'][$reportSemester] = $context;
+                }
             }
         }
 

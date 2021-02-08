@@ -1,7 +1,7 @@
 {#
 Renders an Approaches to Learning component.
 
-This is a table derived from a rubric. It does not render the capability column.
+This is a table derived from a rubric.
 
 Data:
     error:               string           - Optional. If present, the reason why we can't render the component
@@ -12,39 +12,22 @@ Data:
 #}
 
 <div class="atl-wrap">
-<p class="meta atl-heading">Approaches to Learning</p>
+<h4 class="subheader atl-heading">Approaches to Learning</h4>
 {% if error|default(null) %}
     {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
     <p>Typical indicators of a student's performance at each level are outlined below.</p>
 
-    <div class="scrollable">
-        <table class="atl">
-            <thead>
-            <tr>
-                <td></td>
-                {% for level in grid.levels %}
-                    <td>{{ level.name }}</td>
-                {% endfor %}
-            </tr>
-            </thead>
-            <tbody>
-            {% for capabilityUsage in grid.capabilityUsages %}
-                {% for indicatorUsage in capabilityUsage.indicatorUsages %}
-                    <tr>
-                        <th>{{ indicatorUsage.indicator.name | nl2br }}</th>
-
-                        {% set indicatorMark = markedGrid is defined ? markedGrid.retrieveIndicatorMark(indicatorUsage) : null %}
-                        {% set indicatorMarkDescriptor = indicatorMark ? indicatorMark.descriptor : null %}
-
-                        {% for descriptor in indicatorUsage.descriptors %}
-                            <td{% if indicatorMarkDescriptor and indicatorMarkDescriptor.id == descriptor.id %} class="rb-selected"{% endif %}>{{ descriptor.description | nl2br }}</td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            {% endfor %}
-            </tbody>
-        </table>
+    <div class="atl">
+        {% include '@rubric/grid.twig' with {
+            rubricGrid: grid,
+            rubricMarkedGrid: markedGrid,
+            markVisibility: true,
+            useMarkRange: useMarkRange,
+            showDescriptorValue: showDescriptorValue,
+            showGroupTotal: showGroupTotal,
+            showRubricTotal: showRubricTotal
+        } only %}
     </div>
 {% endif %}
 </div>
