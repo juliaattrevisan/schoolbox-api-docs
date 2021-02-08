@@ -35,7 +35,7 @@ $breadcrumb-active-bg-color: $content-ui-selected;
 // DONE scale-color (in this case lightness:40%) is possible but cumbersome
 $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 40%);
 
-@import "../../../../javascript/components/foundation/scss/foundation/components/breadcrumbs";
+@import "../../original-foundation/components/breadcrumbs";
 
 /* Breadcrumbs
 *  These sit at the top of the page
@@ -45,12 +45,13 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
   list-style: none;
   overflow: hidden;
   li {
-    a { // Note these styles will default to a disabled crumb, then add the link styles based on a[href]
+    a {
+      // Note these styles will default to a disabled crumb, then add the link styles based on a[href]
       background-color: $breadcrumb-bg-color;
       color: $breadcrumb-noclick-color;
       cursor: text;
       line-height: $base-font-size;
-      padding: .5rem .5rem .5rem 1rem;
+      padding: 0.5rem 0.5rem 0.5rem 1rem;
       position: relative;
       display: block;
       float: left;
@@ -75,11 +76,11 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
 
       &:before {
         margin-left: 1px;
-        border-left: rem-calc($base-font-size * .4) solid $breadcrumb-active-bg-color;
+        border-left: rem-calc($base-font-size * 0.4) solid $breadcrumb-active-bg-color;
       }
 
       &:after {
-        border-left: rem-calc($base-font-size * .4) solid $breadcrumb-bg-color;
+        border-left: rem-calc($base-font-size * 0.4) solid $breadcrumb-bg-color;
       }
 
       // Styles when it actually contains a link
@@ -89,7 +90,7 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
         cursor: pointer;
 
         &:after {
-          border-left: rem-calc($base-font-size * .4) solid $breadcrumb-bg-color;
+          border-left: rem-calc($base-font-size * 0.4) solid $breadcrumb-bg-color;
         }
 
         &:hover {
@@ -132,7 +133,7 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
     li {
       display: none;
 
-      &:nth-last-child(-n+2) {
+      &:nth-last-child(-n + 2) {
         display: list-item;
       }
     }

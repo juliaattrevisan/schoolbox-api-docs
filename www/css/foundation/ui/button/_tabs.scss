@@ -13,7 +13,7 @@ $tabs-content-padding: 0;
 // Schoolbox vars
 $tab-padding: 0.65rem 1rem; // Can't use the foundation one because it doesn't support x and y
 
-@import "../../../../javascript/components/foundation/scss/foundation/components/tabs";
+@import "../../original-foundation/components/tabs";
 
 // Schoolbox specific vars
 $border-bottom-width: 2px;

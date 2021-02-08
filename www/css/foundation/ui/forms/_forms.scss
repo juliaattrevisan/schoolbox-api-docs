@@ -122,7 +122,7 @@ $switch-negative-color: tint($secondary-color, 74%);
 // $switch-label-outline: 1px dotted $jumbo;
 
 @import "../../css-only/components/forms";
-@import "../../../../javascript/components/foundation/scss/foundation/components/switches";
+@import "../../original-foundation/components/switches";
 
 //
 // Custom overrides
@@ -749,13 +749,6 @@ ul.filters {
   #applied_filters,
   .filter-component {
     display: none;
-  }
-}
-
-input[type="radio"]:not(.plain) + label {
-  &:before,
-  &:after {
-    @include border-radius(1rem);
   }
 }
 

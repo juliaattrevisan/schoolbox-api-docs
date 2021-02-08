@@ -1,6 +1,12 @@
 ;(function ($, window, document, undefined) {
   'use strict';
 
+  function isTouchDevice() {
+    return (('ontouchstart' in window) ||
+      (navigator.maxTouchPoints > 0) ||
+      (navigator.msMaxTouchPoints > 0));
+  }
+
   Foundation.libs.tooltip = {
     name : 'tooltip',
 

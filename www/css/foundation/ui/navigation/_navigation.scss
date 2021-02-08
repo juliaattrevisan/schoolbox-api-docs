@@ -60,8 +60,7 @@ $off-canvas-label-border-top: 0px; //1px solid scale-color($off-canvas-label-bg,
 $off-canvas-label-border-bottom: none;
 $off-canvas-label-margin: 0;
 
-$off-canvas-link-padding: rem-calc(($base-font-size/2))
-  rem-calc($base-font-size);
+$off-canvas-link-padding: rem-calc(($base-font-size/2)) rem-calc($base-font-size);
 $off-canvas-link-color: false;
 $off-canvas-link-border-bottom: 0px; //1px solid scale-color($off-canvas-bg, $lightness: -25%);
 
@@ -82,7 +81,7 @@ $off-canvas-overlay-background-hover: transparent;
 // Transition Variables
 $menu-slide: transform 100ms ease;
 
-@import "../../../../javascript/components/foundation/scss/foundation/components/magellan";
+@import "../../original-foundation/components/magellan";
 @import "../../css-only/components/offcanvas";
 
 // Highlight color: is white if tab background is dark, contrasting if light
@@ -681,8 +680,7 @@ $allow-sidebar-stash: $large-up;
 @media #{$small-only} {
   .tab-bar {
     // On small - top menu items drop to a new row- adjust height suit
-    height: $tabbar-height + $tabbar-menu-icon-height +
-      $tabbar-menu-icon-padding;
+    height: $tabbar-height + $tabbar-menu-icon-height + $tabbar-menu-icon-padding;
   }
 }
 
