@@ -57,6 +57,8 @@ class Renderer extends Handler
             $this->getPage()->setBlock('user', 'tot', 'tot_block');
             $this->getPage()->setBlock('modify', 'modify_enabled', 'modify_enabled_block');
             $this->getPage()->setBlock('modify', 'modify_disabled', 'modify_disabled_block');
+            $this->getPage()->setBlock('user', 'user_name_link', 'user_name_link_block');
+            $this->getPage()->setBlock('user', 'user_name_no_link', 'user_name_no_link_block');
             $this->getPage()->setBlock('user', 'position_title', 'position_title_block');
             $this->getPage()->setBlock('user', 'normal_title', 'normal_title_block');
             $this->getPage()->setBlock('user', 'boarder_leave', 'boarder_leave_block');
@@ -171,6 +173,14 @@ class Renderer extends Handler
                 } else {
                     $this->getPage()->parse('position_title_block', 'position_title');
                     $this->getPage()->setVar('normal_title_block', '');
+                }
+
+                if ($groupHandler->isGuest($user['id'])) {
+                    $this->getPage()->parse('user_name_no_link_block', 'user_name_no_link');
+                    $this->getPage()->setVar('user_name_link_block', '');
+                } else {
+                    $this->getPage()->parse('user_name_link_block', 'user_name_link');
+                    $this->getPage()->setVar('user_name_no_link_block', '');
                 }
 
                 // Show student timetables to staff and parents of child

@@ -1,8 +1,13 @@
 <?php
 
+/**
+ * @copyright   Copyright 2021, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
-
+use Schoolbox\Role;
 
 class User extends DeprecatedModel
 {
@@ -181,20 +186,38 @@ class User extends DeprecatedModel
      * @param  \Schoolbox\User $user
      * @return string
      */
-    protected function getSearchFilter($user)
+    protected function getSearchFilter(\Schoolbox\User $user): string
     {
-        $searchFilter = '';
-        if ($user->getRole()->isGuest() ||
-            (!$user->getRole()->isStaff() && Config::get('parent_search_enable') != 1)
-        ) {
-            $searchFilter =  " `groups`.`group_type` != 'parent' AND ";
+        $excludeRoles = [];
+        /* Staff members shouldn't have all users in search results
+         *
+         * Anyone other than staff (ie. parents and students) are subjected
+         * config options that restrict the search results
+         *
+         * Guests have special filters that prevent them from getting search
+         * results for parents and students
+         */
+        if ($user->getRole()->isGuest()) {
+            $excludeRoles[] = Role::PARENT;
+            $excludeRoles[] = Role::STUDENT;
+        } elseif (!$user->getRole()->isStaff()) {
+            /* Include parent users in search results if the config is enabled
+             */
+            if (Config::get('parent_search_enable') != 1) {
+                $excludeRoles[] = Role::PARENT;
+            }
+            /* Include students users in search results if the config is enabled
+             */
+            if (Config::get('student_search_enable') != 1) {
+                $excludeRoles[] = Role::STUDENT;
+            }
         }
-        if ($user->getRole()->isGuest() ||
-            (!$user->getRole()->isStaff() && Config::get('student_search_enable') != 1)
-        ) {
-            $searchFilter .= " `groups`.`group_type` != 'student' AND ";
+
+        if (empty($excludeRoles)) {
+            return '';
         }
-        return $searchFilter."1=1 ";
+
+        return " `groups`.`group_type` NOT IN ('" . implode("','", $excludeRoles) . "')";
     }
 
     /**
