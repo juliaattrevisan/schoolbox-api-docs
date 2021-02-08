@@ -139,14 +139,14 @@ class Specification implements ISpecification
                     'currentstatus' => 'current',
                 ]
             ],
-//            [
-//                'api' => DSNCodec::MODULE_LMS_INTEGRATION,
-//                'method' => 'getTimetableCalendar',
-//                'version' => 3,
-//                'args' => [
-//                    'tt_id' => '1',
-//                ]
-//            ],
+            [
+                'api' => DSNCodec::MODULE_LMS_INTEGRATION,
+                'method' => 'getTimetableCalendar',
+                'version' => 3,
+                'args' => [
+                    'tt_id' => '1',
+                ]
+            ],
 //            [
 //                'api' => DSNCodec::MODULE_LMS_INTEGRATION,
 //                'method' => 'getTimetables',
