@@ -73,8 +73,8 @@
 
         <div class="small-12 large-9 island" id="blog-posts">
             <h2 class="subheader">{{ blogs[0].getCreatedAt | date('F Y') }} Blog Posts</h2>
-            <section>
-                <ul class="information-list social-stream">
+            <section class="discussion">
+                <ul class="information-list">
 
                     {% for blog in blogs %}
 
@@ -101,14 +101,13 @@
 
                         </article>
 
-                        <ul class="information-list reply">
+                        <ul class="information-list">
 
                             {% for comment in blogComments[blog.getId] %}
 
                             <li>
-                                <div class="card small-12">
+                                <div class="card compact small-12">
                                     {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
-                                    <p class="meta">Commented {{ comment.createdAt.getLong }}</p>
                                 </div>
                                 <article>
                                     <p>
