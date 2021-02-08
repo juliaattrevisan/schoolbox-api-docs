@@ -688,13 +688,16 @@ class External_Synergetic_User implements External_UserInterface
             return $this->isExternalIdValid($externalUserId);
         });
 
-        $predicate = Builder::getArrayBindings($validExternalIds, 'studentIds');
-
         if (!$validExternalIds) {
             return [];
         }
 
-        $contactTypes = $this->getStudentContactTypeBindings();
+        if ($this->config->get('external_synergetic_student_contact_types') === '') {
+            // No relationships were found, use the default values we had before introducing this feature
+            $studentContactTypes = ['SC1', 'SC2', 'SC3'];
+        } else {
+            $studentContactTypes = array_map('trim', explode(',', $this->config->get('external_synergetic_student_contact_types')));
+        }
 
         $query =
         "
@@ -727,17 +730,10 @@ class External_Synergetic_User implements External_UserInterface
                                 Semester.FileSemester = a.FileSemester AND
                                 Semester.FileYear = a.FileYear AND
                                 Semester.SystemCurrentFlag = 1
-            WHERE           StudentID IN ({$predicate['placeholders']}) AND
-                            StudentContactType IN ({$contactTypes['placeholders']})
+            WHERE           StudentID IN ('" . implode("','", $validExternalIds) . "')
         ";
 
-        $statement = $this->getConnector()->executeQuery(
-            $query,
-            array_merge(
-                $contactTypes['bindings'],
-                $predicate['bindings']
-            )
-        );
+        $statement = $this->getConnector()->executeQuery($query);
 
         $contacts = $this->clearInvalidValues($statement->fetchAll());
         $contactIdList = [];
@@ -757,6 +753,9 @@ class External_Synergetic_User implements External_UserInterface
          * and Person B appears twice
          */
         foreach ($contacts as $contactTuple) {
+            if (!in_array($contactTuple['StudentContactType'], $studentContactTypes)) {
+                continue;
+            }
 
             /* Find the main contact's fields
              */
