@@ -335,18 +335,17 @@ class User extends AbstractImporter
                 ),
                 ['user' => $user]
             );
+            return;
         }
         if ($this->performUpdate) {
             try {
                 if (!$this->userMapper->delete($user)) {
                     $this->log->error('Could not delete user!');
-                }
-                else {
+                } else {
                     $this->log->info(sprintf('Deleted user "%s" (%d)', $user->formatName(), $user->getId()));
-
                 }
             } catch (\Exception $e) {
-                $this->log->error('Could not delete user: '.$e->getMessage() );
+                $this->log->error('Could not delete user: ' . $e->getMessage());
             }
         } else {
             $this->log->info(sprintf('Pretending to delete user "%s" (%d)', $user->formatName(), $user->getId()));

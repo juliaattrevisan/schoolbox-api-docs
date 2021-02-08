@@ -173,6 +173,10 @@ class UserMapper extends Mapper
         $this->registerCallback(
             self::CALLBACK_POSTSOFTDELETE,
             function (User $user) {
+                // If user id is null, do not attempt to delete pastoral access
+                if (!$user->getId()) {
+                    return;
+                }
                 Pastoral\Access\Mapper::getInstance()->deleteByColumn('user_id', $user->getId());
             }
         );
