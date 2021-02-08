@@ -21,6 +21,7 @@ use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementSummary;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentMatrix;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
+use Custom\Tigs\Summative\SubjectReport\Components\MiddleYearsAssessmentTasks;
 use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraphHSC;
 use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraphMiddleYears;
 use DomainException;
@@ -188,7 +189,7 @@ class Report
                 $error .= \sprintf(' <a href="%s">Manage Course imports</a>', $route);
             }
             $errors[]  = $error;
-            $unitSpecsWithData = $aamData = $aasData = $hscTaskMarks = $hscTaskMatrix = [];
+            $unitSpecsWithData = $aamData = $aasData = $hscTaskMarks = $hscTaskMatrix = $middleYearsTaskMarks = [];
             $nesaGraphData = $courseSpec = $hscRankData = $courseDescription = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
@@ -205,6 +206,7 @@ class Report
             $hscTaskMarks  = $this->buildHscTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $hscTaskMatrix = $this->buildHscTaskMatrixData($folder, $attributes,$unitSpecs, $courseSpec, $user, $roleTypeOverride);
             $hscRankData   = $this->buildHscAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
+            $middleYearsTaskMarks = $this->buildMiddleYearsTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
 
             // Filter out unit specs without any data
             $unitSpecsWithData = new Collection();
@@ -213,7 +215,9 @@ class Report
                 $hasData =
                     isset($aasData['data'][$unitSpecId]) ||
                     isset($aamData['data'][$unitSpecId]) ||
-                    isset($hscTaskMarks['data'][$unitSpecId]);
+                    isset($hscTaskMarks['data'][$unitSpecId]) ||
+                    isset($middleYearsTaskMarks['data'][$unitSpecId]);
+
                 if (!$hasData) {
                     continue;
                 }
@@ -273,6 +277,7 @@ class Report
             'hscTaskMarks'              => $hscTaskMarks,
             'hscTaskMatrix'             => $hscTaskMatrix,
             'hscRankData'               => $hscRankData,
+            'middleYearsTaskMarks'      => $middleYearsTaskMarks,
         ];
     }
 
@@ -347,7 +352,6 @@ class Report
      *
      * @param GenericCollection|CourseImpl\Model[] $courseImplsWithUnits
      * @return GenericCollection|CourseSpec\Model[]
-     * @throws UnexpectedValueException
      */
     private function getImportedCourseSpecs(GenericCollection $courseImplsWithUnits): GenericCollection
     {
@@ -365,7 +369,6 @@ class Report
      *
      * @param GenericCollection|CourseImpl\Model[] $courseImports
      * @return GenericCollection|UnitSpec\Model[]
-     * @throws UnexpectedValueException
      */
     private function getUnitSpecs(GenericCollection $courseImports): GenericCollection
     {
@@ -389,7 +392,6 @@ class Report
      *
      * @param CourseSpec\Model $courseSpec
      * @return GenericCollection|UnitImpl\Model[]
-     * @throws UnexpectedValueException
      */
     private function findCohortUnitImpls(CourseSpec\Model $courseSpec): GenericCollection
     {
@@ -648,7 +650,6 @@ class Report
         // * MYP S1       (work-type = NESA)
         // * MYP S2       (work-type = FAL)
         // * HSC-Y11-S2   (work-type = NESA)
-        $yearLevel = $attributes->getCurriculumYearLevel();
         $semester  = $attributes->getCurriculumSemester();
 
         // Which work types should we fetch?
@@ -656,6 +657,7 @@ class Report
         $configNames[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK] = 'Set NESA Grade Work Type';
 
         $workTypeIds = [];
+
         foreach ($configNames as $configName => $errorMsgLink) {
             try {
                 $workTypeIds[$configName] = $this->checkWorkType($configName, 'Cannot render NESA Grade graph. Work type not set.', $errorMsgLink);
@@ -664,43 +666,37 @@ class Report
             }
         }
 
-        // Which semesters' data should we fetch?
-        $semesterFrom = $attributes->isHsc() ? 2 : 1;
-        $semesterTo   = $semester;
-
-        // Load assessments and participations
+        /* Find all the unit implementations that were given birth by $courseSpec
+         * This gives us all the guys in the cohort whom we must compare against
+         */
         $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
-        $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, $semesterFrom, $semesterTo);
-
-        $semesters = [];
-        foreach ([1, 2] as $candidate) {
-            if ($candidate === $semesterFrom || $candidate === $semesterTo) {
-                $semesters[] = $candidate;
-            }
-        }
 
         // Find relevant assessments and participation and insert into units
         $reports = [];
 
-        foreach ($semesters as $reportSemester) {
-            $nesa = null;
+        /* Second semester get the NESA grade from a special assessment, a different one
+         * than for semester 1
+         *
+         * Truth table time
+         * Note that Prod (PRD) and Staging (STG) can have different ids
+         *
+         * HSC Students, Year 11, Semester 1: worktype is not relevant (no NESA data for this)
+         * HSC Students, Year 11, Semester 2: worktype is "NESA Report Grade" (STG 20)
+         *
+         * HSC Students, Year 12, Semester 1: worktype is not relevant (no NESA data for this)
+         * HSC Students, Year 12, Semester 2: worktype is not relevant (no NESA data for this)
+         *
+         * Middle Years Students, Semester 1: worktype is "NESA Report Grade" (STG 20)
+         * Middle Years Students, Semester 2: worktype is "NESA Report Grade & Report Mark" (STG 22)
+         *
+         * NESA Graphs render in special ways depending on whether the student
+         * is an HSC or Middle Years student
+         */
+        if ($attributes->isHsc()) {
+            if ($semester === 2) {
+                if ($attributes->getYearLevel() === 11) {
+                    $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 2, 2);
 
-            /* Second semester get the NESA grade from a special assessment, a different one
-             * than for semester 1
-             *
-             * Truth table time
-             * Note that Prod (PRD) and Staging (STG) can have different ids
-             *
-             * HSC Students, Semester 1: worktype is not relevant
-             * HSC Students, Semester 2: worktype is "NESA Report Grade" (STG 20)
-             * Middle Years Students, Semester 1: worktype is "NESA Report Grade" (STG 20)
-             * Middle Years Students, Semester 2: worktype is "NESA Report Grade & Report Mark" (STG 22)
-             *
-             * NESA Graphs render in special ways depending on whether the student
-             * is an HSC or Middle Years student
-             */
-            if ($attributes->isHsc()) {
-                if ($reportSemester === 2) {
                     $nesa = new NesaScoreGraphHSC(
                         $cohortUnitImpls,
                         $student,
@@ -711,25 +707,48 @@ class Report
                         $folder,
                         $roleTypeOverride
                     );
-                } else {
 
-                    // noop - no NESA graph for HSC Semester 2 dudes
+                    $context = $nesa->toContext($semester);
+
+                    if ($context !== null) {
+                        $reports['data'][$semester] = $context;
+                    }
                 }
-            } elseif ($attributes->isMiddleYear()) {
-                if ($reportSemester === 2) {
-                    $nesa = new NesaScoreGraphMiddleYears(
-                        $cohortUnitImpls,
-                        $student,
-                        $attributes,
-                        $this->visibility,
-                        $this->viewer,
-                        $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK],
-                        $folder,
-                        $reportSemester,
-                        $this->rubricMapper,
-                        $roleTypeOverride
-                    );
-                } else {
+            } else {
+
+                // noop - no NESA graph for HSC students except Year 11 Semester 2 guys
+                return [];
+            }
+        } elseif ($attributes->isMiddleYear()) {
+            if ($semester === 2) {
+                $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 2, 2);
+
+                $nesa = new NesaScoreGraphMiddleYears(
+                    $cohortUnitImpls,
+                    $student,
+                    $attributes,
+                    $this->visibility,
+                    $this->viewer,
+                    $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK],
+                    $folder,
+                    $semester,
+                    $this->rubricMapper,
+                    $roleTypeOverride
+                );
+
+                $context = $nesa->toContext($semester);
+
+                if ($context !== null) {
+                    $reports['data'][$semester] = $context;
+                }
+            } else {
+                $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 1, 2);
+
+                /* Middle Years NESA data spans both semester 1 and 2.
+                 * They both appear next to each other, so you need to collect data
+                 * for at least semester 1 and if you're in semester 2, that as well
+                 */
+                foreach ([1, $semester] as $reportSemester) {
                     $nesa = new NesaScoreGraphMiddleYears(
                         $cohortUnitImpls,
                         $student,
@@ -742,24 +761,20 @@ class Report
                         $this->rubricMapper,
                         $roleTypeOverride
                     );
+
+                    $context = $nesa->toContext($reportSemester);
+
+                    if ($context !== null) {
+                        $reports['data'][$reportSemester] = $context;
+                    }
                 }
-            } else {
-
-                /* Can't tell if this student is HSC or Middle Years
-                 * Return empty
-                 */
-                return [];
             }
+        } else {
 
-            /* Only try to scavenge data from $nesa if it was defined
+            /* Can't tell if this student is HSC or Middle Years
+             * Return empty
              */
-            if (null !== $nesa) {
-                $context = $nesa->toContext($reportSemester);
-
-                if ($context !== null) {
-                    $reports['data'][$reportSemester] = $context;
-                }
-            }
+            return [];
         }
 
         return $reports;
@@ -818,6 +833,65 @@ class Report
         return $hscTaskMarks->toContext();
     }
 
+    /**
+     * This is a little table of information for each Middle Years student
+     * Their task marks table appears next to the comment area, if it exists,
+     * for each assessment
+     *
+     * @param Folder\Model      $folder
+     * @param StudentAttributes $attributes
+     * @param CourseSpec\Model  $courseSpec
+     * @param User              $student
+     * @param string|null       $roleTypeOverride
+     * @return array|null
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws UnexpectedValueException
+     * @throws RouteNotFound
+     * @throws DomainException
+     * @throws LogicException
+     * @throws DefinitionException
+     * @throws UnderflowException
+     * @throws Database\Exception
+     */
+    private function buildMiddleYearsTaskMarksData(
+        Folder\Model $folder,
+        StudentAttributes $attributes,
+        CourseSpec\Model $courseSpec,
+        User $student,
+        ?string $roleTypeOverride
+    ): ?array {
+
+        /* Only relevant to Middle Year students
+         */
+        if (!$attributes->isMiddleYear()) {
+            return null;
+        }
+
+        try {
+            $workTypeId = $this->checkWorkType(
+                Config::_TIGS_WORK_TYPE_7_10_ASSESSMENT_TASK,
+                "Cannot render 'Middle Years Task Marks' components. Work type not set.",
+                "Set '7-10 Assessment Task' Work Type"
+            );
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
+        }
+
+        $this->loadAssessmentsAndParticipation($courseSpec, [$workTypeId], $attributes, 1, $attributes->getCurriculumSemester());
+
+        $middleYearsTaskMarks = new MiddleYearsAssessmentTasks(
+            $courseSpec,
+            $student,
+            $attributes,
+            $this->visibility,
+            $this->viewer,
+            $workTypeId,
+            $folder,
+            $roleTypeOverride
+        );
+        return ['data' => $middleYearsTaskMarks->toContext()];
+    }
 
     /**
      * @param Folder\Model      $folder
@@ -1002,8 +1076,8 @@ class Report
      * @param GenericCollection $unitImpls
      * @param int[]             $workTypeIds
      * @param StudentAttributes $attributes
-     * @param int|null          $semesterFrom
-     * @param int|null          $semesterTo
+     * @param int               $semesterFrom
+     * @param int               $semesterTo
      * @return array
      * @throws InvalidColumnException
      * @throws \Alaress\Database\Exception

@@ -30,20 +30,35 @@ Data:
     dataAttributeError: dataAttributeError
 } %}
 <style>
-    .linked-unit-heading {
+    .tigs-crp .linked-unit-heading {
         color: inherit;
     }
 
-    .grade-graph {
-        margin-bottom: 30px;
+    /* These manifest in the NESA graph twig fragments
+     */
+    .tigs-crp .grade-graph {
+        margin-bottom: 2rem;
     }
 
-    .grade-heading {
+    .tigs-crp .grade-heading {
         text-align: center;
         margin-bottom: 0;
     }
-    .has-gradient {
+
+    .tigs-crp .grade-heading.has-gradient {
         color: white;
+    }
+
+    /* The Task Marks tables all have a similar and consistent appearance
+     * They appear at the bottom of the Subject Report for a specific folder
+     * and contain Student Mark, Cohort Average, etc.
+     */
+    .tigs-crp .task-marks-wrap {
+        margin-bottom: 1rem;
+    }
+
+    .tigs-crp .task-marks-wrap th {
+        width: 150px;
     }
 </style>
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
@@ -160,22 +175,42 @@ Data:
                     {% endif %}
                 </div>
 
-                {# Comments come from different assessments, depending on student type #}
+                {# All the Task Marks table sit in the left column
+                 # any existing commentary in the right column
+                 #}
+                <div class="small-12 column">
+                    <div class="row">
+                        <div class="small-12 medium-4 columns">
+                            {# Middle Years Task Marks #}
+                            {% if middleYearsTaskMarks.data is defined and middleYearsTaskMarks.data[unitSpecId] is defined %}
+                                {% include '@tigsSubjectReport/components/middleYearsTaskMarks.twig' with middleYearsTaskMarks.data[unitSpecId]|merge(extraComponentData) only %}
+                            {% endif %}
 
-                {% if attributes.isHsc %}
-                    {% set commentData = hscTaskMarks.data[unitSpecId] %}
-                {% else %}
-                    {% set commentData = aamData.data[unitSpecId] %}
-                {% endif %}
+                            {# Were we given HSC Task Marks data for this unit? #}
+                            {% if hscTaskMarks.data is defined and hscTaskMarks.data[unitSpecId] is defined %}
+                                {% include '@tigsSubjectReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId]|merge(extraComponentData) only %}
+                            {% endif %}
+                        </div>
+                        <div class="small-12 medium-8 columns">
+                            {# Comments come from different assessments, depending on student type #}
 
-                {% if commentData.comment is defined and commentData.comment %}
-                    <div class="small-12 island comments">
-                        <h4 class="subheader">Comments by {{ commentData.commentBy.fullname }}</h4>
-                        <section class="content">
-                            <p>{{ commentData.comment | nl2br }}</p>
-                        </section>
+                            {% if attributes.isHsc %}
+                                {% set commentData = hscTaskMarks.data[unitSpecId] %}
+                            {% else %}
+                                {% set commentData = aamData.data[unitSpecId] %}
+                            {% endif %}
+
+                            {% if commentData.comment is defined and commentData.comment %}
+                                <div class="small-12 island comments">
+                                    <h4 class="subheader">Comments by {{ commentData.commentBy.fullname }}</h4>
+                                    <section class="content">
+                                        <p>{{ commentData.comment | nl2br }}</p>
+                                    </section>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
-                {% endif %}
+                </div>
 
                 <div class="small-12 columns">
                     {# Were we given AAS data for this unit? #}
@@ -191,11 +226,6 @@ Data:
                     {# Were we given HSC Task Marks data for this unit? This mark shares the same twig as AAM #}
                     {% if hscTaskMatrix.data is defined and hscTaskMatrix.data[unitSpecId] is defined %}
                         {% include '@tigsSubjectReport/components/academicAchievementMatrix.twig' with hscTaskMatrix.data[unitSpecId]|merge(extraComponentData) only %}
-                    {% endif %}
-
-                    {# Were we given HSC Task Marks data for this unit? #}
-                    {% if hscTaskMarks.data is defined and hscTaskMarks.data[unitSpecId] is defined %}
-                        {% include '@tigsSubjectReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId]|merge(extraComponentData) only %}
                     {% endif %}
                 </div>
             </div>

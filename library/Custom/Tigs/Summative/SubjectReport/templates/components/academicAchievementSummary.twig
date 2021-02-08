@@ -14,20 +14,20 @@ Data:
 #}
 
 <div class="aas-wrap">
-<p class="meta aas-heading">Academic Achievement Summary</p>
-{% if error|default(null) %}
-    {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
-{% else %}
-    <div class="aas">
-        {% include '@rubric/grid.twig' with {
-            rubricGrid: grid,
-            rubricMarkedGrid: markedGrid,
-            markVisibility: true,
-            useMarkRange: useMarkRange,
-            showDescriptorValue: showDescriptorValue,
-            showGroupTotal: showGroupTotal,
-            showRubricTotal: showRubricTotal
-        } only %}
-    </div>
-{% endif %}
+    <h3 class="subheader">Academic Achievement Summary</h3>
+    {% if error|default(null) %}
+        {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
+    {% else %}
+        <div class="aas">
+            {% include '@rubric/grid.twig' with {
+                rubricGrid: grid,
+                rubricMarkedGrid: markedGrid,
+                markVisibility: true,
+                useMarkRange: useMarkRange,
+                showDescriptorValue: showDescriptorValue,
+                showGroupTotal: showGroupTotal,
+                showRubricTotal: showRubricTotal
+            } only %}
+        </div>
+    {% endif %}
 </div>

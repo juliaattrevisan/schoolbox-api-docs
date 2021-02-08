@@ -10,31 +10,31 @@ Data:
     dataAttributeError   string           - A string to apply as a data attribute to error alerts
 #}
 <div class="hsc-rank-wrap">
-<h2 class="subheader hsc-rank-heading">HSC Assessment Rank</h2>
-{% if error|default(null) %}
-    {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
-{% else %}
-    <div class="scrollable">
-        <table class="hsc-rank">
-            <tbody>
-            {% if assessmentMark is defined %}
+    <h2 class="subheader">HSC Assessment Rank</h2>
+    {% if error|default(null) %}
+        {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
+    {% else %}
+        <div class="scrollable">
+            <table class="hsc-rank">
+                <tbody>
+                {% if assessmentMark is defined %}
+                    <tr>
+                        <th>Assessment Mark</th>
+                        <td>{{ assessmentMark|default('-') }}</td>
+                    </tr>
+                {% endif %}
+                {% if assessmentAverage is defined %}
+                    <tr>
+                        <th>Assessment Average</th>
+                        <td>{{ assessmentAverage|default('-') }}</td>
+                    </tr>
+                {% endif %}
                 <tr>
-                    <th>Assessment Mark</th>
-                    <td>{{ assessmentMark|default('-') }}</td>
+                    <th>Assessment Rank</th>
+                    <td>{{ assessmentRank|default('-') }}</td>
                 </tr>
-            {% endif %}
-            {% if assessmentAverage is defined %}
-                <tr>
-                    <th>Assessment Average</th>
-                    <td>{{ assessmentAverage|default('-') }}</td>
-                </tr>
-            {% endif %}
-            <tr>
-                <th>Assessment Rank</th>
-                <td>{{ assessmentRank|default('-') }}</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-{% endif %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 </div>

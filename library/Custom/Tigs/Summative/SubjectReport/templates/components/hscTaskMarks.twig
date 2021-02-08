@@ -1,45 +1,36 @@
 {#
-Renders an Academic Achievement Summary component.
-
-This is a table derived from a rubric. It does not render the capability column.
-
-Data:
-    error:               string           - Optional. If present, the reason why we can't render the component
-    studentMark          string|null      - eg '15 %'
-    cohortRank           string|null      - eg '3 / 8'
-    cohortAverage        string|null      - eg '25 %'
-    showErrors           bool             - Should we render errors?
-    dataAttributeError   string           - A string to apply as a data attribute to error alerts
+# Renders a HSC Task Marks component.
+#
+# @param string $error               Optional. If present, the reason why we can't render the component
+# @param string|null $studentMark    eg '15 %'
+# @param string|null $cohortRank     eg '3 / 8'
+# @param string|null $cohortAverage  eg '25 %'
+# @param bool $showErrors            Should we render errors?
+# @param string $dataAttributeError  A string to apply as a data attribute to error alerts
 #}
 
-<style>
-    table.hsc-task-marks th {
-        width: 150px;
-    }
-</style>
-
-<div class="hsc-task-marks-wrap">
-<p class="meta hsc-task-marks-heading">HSC Task Marks (%)</p>
-{% if error|default(null) %}
-    {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
-{% else %}
-    <div class="scrollable">
-        <table class="hsc-task-marks">
-            <tbody>
-                <tr>
-                    <th>Student Mark %</th>
-                    <td>{{ studentMark|default('-') }}</td>
-                </tr>
-                <tr>
-                    <th>Cohort Rank</th>
-                    <td>{{ cohortRank|default('-') }}</td>
-                </tr>
-                <tr>
-                    <th>Cohort Average %</th>
-                    <td>{{ cohortAverage }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-{% endif %}
+<div class="task-marks-wrap">
+    <h3 class="subheader">HSC Task Marks (%)</h3>
+    {% if error|default(null) %}
+        {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
+    {% else %}
+        <div class="scrollable">
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Student Mark %</th>
+                        <td>{{ studentMark|default('-') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Cohort Rank</th>
+                        <td>{{ cohortRank|default('-') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Cohort Average %</th>
+                        <td>{{ cohortAverage }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 </div>

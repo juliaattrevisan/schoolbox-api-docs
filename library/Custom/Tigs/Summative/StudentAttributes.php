@@ -315,6 +315,14 @@ class StudentAttributes
             $semesters[2]['start']  = $this->getCurriculumSemesterStart();
             $semesters[2]['finish'] = $this->getCurriculumSemesterFinish();
         }
+
+        /* Unleash this beast when you can't figure out what semester we're currently in
+         */
+//        new \Alaress_Probe('Semester 1 starts ' . (new Semester(1, $semesters[1]['start'], $semesters[1]['finish']))->getStart()->getDatabase());
+//        new \Alaress_Probe('Semester 1 finishes ' . (new Semester(1, $semesters[1]['start'], $semesters[1]['finish']))->getFinish()->getDatabase());
+//        new \Alaress_Probe('Semester 2 starts ' . (new Semester(2, $semesters[2]['start'], $semesters[2]['finish']))->getStart()->getDatabase());
+//        new \Alaress_Probe('Semester 2 finishes ' . (new Semester(2, $semesters[2]['start'], $semesters[2]['finish']))->getFinish()->getDatabase());
+
         return [
             1 => new Semester(1, $semesters[1]['start'], $semesters[1]['finish']),
             2 => new Semester(2, $semesters[2]['start'], $semesters[2]['finish']),
