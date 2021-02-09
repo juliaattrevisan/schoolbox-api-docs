@@ -129,7 +129,9 @@ class DisasterRecovery extends CliTool\App
     {
         $config = ConfigMapper::getInstance()->findOneByColumn(ConfigMapper::COL_NAME, self::CONFIG_DR_SYNC_STATUS);
         $config->setValue($message);
-        ConfigMapper::getInstance()->save($config);
+        if (!$this->perform()) {
+            ConfigMapper::getInstance()->save($config);
+        }
     }
 
 
