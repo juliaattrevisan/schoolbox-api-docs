@@ -76,7 +76,7 @@ class DisasterRecovery extends CliTool\App
      */
     public function run(): void
     {
-        $this->logSync("Started at" . (Alaress_Date_Format::now())->getDatabase());
+        $this->logSync("Started at " . (Alaress_Date_Format::now())->getDatabase());
         try {
             $this->execute();
             if (count($this->notFatalErrors)) {
