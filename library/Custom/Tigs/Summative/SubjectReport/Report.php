@@ -720,53 +720,43 @@ class Report
                 return [];
             }
         } elseif ($attributes->isMiddleYear()) {
-            if ($semester === 2) {
-                $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 2, 2);
+            $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 1, 2);
 
+            /* Middle Years NESA data spans both semester 1 and 2.
+             * They both appear next to each other, so you need to collect data
+             * for at least semester 1 and if you're in semester 2, that as well
+             */
+            foreach ([1, $semester] as $reportSemester) {
+
+                /* Semester 1 NESA data comes from a different worktype than the
+                 * Semester 2 NESA data...have to treat them specially
+                 */
+                if ($reportSemester === 1) {
+                    $workType = $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE];
+                } else {
+                    $workType = $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK];
+                }
+
+                /* This class does an internal check on $reportSemester and changes behaviour accordingly
+                 * The NESA grade and its data for semester 1 are obtained differently than semester 2
+                 */
                 $nesa = new NesaScoreGraphMiddleYears(
                     $cohortUnitImpls,
                     $student,
                     $attributes,
                     $this->visibility,
                     $this->viewer,
-                    $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK],
+                    $workType,
                     $folder,
-                    $semester,
+                    $reportSemester,
                     $this->rubricMapper,
                     $roleTypeOverride
                 );
 
-                $context = $nesa->toContext($semester);
+                $context = $nesa->toContext($reportSemester);
 
                 if ($context !== null) {
-                    $reports['data'][$semester] = $context;
-                }
-            } else {
-                $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 1, 2);
-
-                /* Middle Years NESA data spans both semester 1 and 2.
-                 * They both appear next to each other, so you need to collect data
-                 * for at least semester 1 and if you're in semester 2, that as well
-                 */
-                foreach ([1, $semester] as $reportSemester) {
-                    $nesa = new NesaScoreGraphMiddleYears(
-                        $cohortUnitImpls,
-                        $student,
-                        $attributes,
-                        $this->visibility,
-                        $this->viewer,
-                        $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE],
-                        $folder,
-                        $reportSemester,
-                        $this->rubricMapper,
-                        $roleTypeOverride
-                    );
-
-                    $context = $nesa->toContext($reportSemester);
-
-                    if ($context !== null) {
-                        $reports['data'][$reportSemester] = $context;
-                    }
+                    $reports['data'][$reportSemester] = $context;
                 }
             }
         } else {
