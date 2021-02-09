@@ -3,7 +3,7 @@
  * @link        https://schoolbox.com.au/
  */
 ;(function ($, Dropzone, window, document, undefined) {
-
+    
     var pluginName = 'resourceAttach',
         singletonModal = null,
         modalCache = {},
@@ -49,14 +49,15 @@
 
             // callbacks
             onSelect: noop,
-            onDetach: noop
+            onDetach: noop,
+
     };
 
 
     function ResourceAttach(element, options)
     {
         var self, opt, azone, dzone, prompt = '';
-
+        
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
         this.tpl = this.options.tplOverride || $(this.element).find('[data-template]').detach();
@@ -80,8 +81,14 @@
             var li = $(this).closest(opt.attachmentTag);
             self.detach(li);
             e.preventDefault();
-
-            opt.onDetach();
+            
+            //will not be a function if the file has been prevented from uploading
+            //for example if the file limit is 1, and the user dragged 2 files in, 
+            //the 2nd would error when its remove is selected
+            if (typeof opt.onDetach === 'function') {
+                opt.onDetach();
+            }
+            
         });
 
         if (opt.dictDefaultMessage) {
@@ -130,6 +137,7 @@
                 self.dropzone = this;
 
                 this.on('addedfile', function (file) {
+                    
                     self.renderFile({
                         previewElement: file.previewElement,
                         type: file.type
@@ -138,6 +146,7 @@
                 });
 
                 this.on('success', function (file, response) {
+                    
                     var data, inputValue;
 
                     try {
@@ -157,9 +166,9 @@
                         .find('input[data-az-attachment]')
                         .val(inputValue);
                     self.attach(data);
-
-
+                    
                     azone.trigger('success.attachzone', [data]);
+                    
                 });
 
                 this.on('error', function (file, errMsg, xhr) {
@@ -193,6 +202,7 @@
             },
 
             accept: function (file, done) {
+                
                 // no hash yet: treat as normal dz upload
                 if (file.hash === undefined) {
                     done();
@@ -209,6 +219,7 @@
 
                 this._updateMaxFilesReachedClass();
                 azone.trigger('accept.attachzone', [file]);
+                
             }
         });
 
@@ -260,15 +271,6 @@
             });
         }
 
-        // $(this.element).on('click', opt.trigger, function (e) {
-        //     e.preventDefault();
-        //
-        //     if (opt.useModal) {
-        //         self.open();
-        //     } else {
-        //         azone.trigger('click');
-        //     }
-        // });
     }
 
 
@@ -324,13 +326,12 @@
 
 
     ResourceAttach.prototype.getCacheKey = function () {
-
         return this.options.source + '?' + this.getQueryString();
     };
 
 
     ResourceAttach.prototype.cacheModal = function (callback) {
-
+        
         var key = this.getCacheKey(),
             self = this;
 
@@ -439,6 +440,7 @@
                 });
 
                 // Trigger attachzone success event
+                
                 $(self.element).trigger('success.attachzone', [message]);
             }
         });
@@ -548,10 +550,11 @@
 
 
     ResourceAttach.prototype.attach = function (list) {
+        
         var i, data, elems = [], self = this;
 
         this.close();
-
+        
         for (i = 0; i < list.length; ++i) {
             data = {
                 name: list[i].title,
@@ -559,11 +562,50 @@
                 size: list[i].filesize,
                 hash: list[i].hash
             };
-
+            
             if (this.dropzone) {
-                this.dropzone.addFile(data);
-                elems.push($(data.previewElement));
+                
+                //if the file was attached using 'Upload file(s)' it's been uploaded, 
+                //so we can display the image in the drop zone when we return to the page
+                let getExistingFileUrl = function () {
+                    if (list[i].file && list[i].file.imageUrl) { //this file prop is set within templates/core/resources/filesystem/upload.html - onQueueComplete()
+                        return list[i].file.imageUrl;
+                    } else { //otherwise we'll just show the file type image
+                        return '/ajax/mime/' + data.type;
+                    }
+                }
+                
+                //once the files displayed, ensure the drop zone window and progress view are hidden depending on max uploads
+                let onExistingFileDisplayed = function () {
+                    let elementDOM = $(self.element)[0];
+                    if (elementDOM.id === 'cover-photo-zone') {
+                        elementDOM.querySelector('.az-list').style.display = 'none';
+                    } else {
+                        if (self.dropzone.options.maxFiles === 1) {
+                            elementDOM.classList.add('dz-max-files-reached');
+                        }
+                    }
+                    elementDOM.querySelector('.progress').style.display = 'none';
+                }
+
+                //to display an existing file within the drop zone view, as the file has already been loaded
+                //https://gitlab.com/meno/dropzone/-/wikis/FAQ#how-to-show-files-already-stored-on-server
+                this.dropzone.displayExistingFile(data, getExistingFileUrl(), onExistingFileDisplayed);
+                
+                //as this.on('success') is not called when using the modal window upload, 
+                //need to also add the attachment vars in so the files are added on form submit
+                let inputValue = data.hash + ':' + data.name;
+                $(data.previewElement)
+                        .find('input[data-az-attachment]')
+                        .val(inputValue);
+                self.attach(data);
+
+                elems.push($(data.previewElement));     
+
+                $(this.element).trigger('success.attachzone', [data]);
+
             } else {
+                
                 data.previewElement = $(this.tpl.html());
 
                 this.renderFile(data);
@@ -583,6 +625,7 @@
                 this.fallbackFiles.push(data);
 
                 this.fallbackMaxFilesReached();
+
             }
 
             // now the file has been added...if it's buggy, take it out again
@@ -592,6 +635,7 @@
         }
 
         return elems;
+
     };
 
 
@@ -616,6 +660,7 @@
 
 
     ResourceAttach.prototype.renderFile = function (file) {
+        
         var elem;
 
         if (!file.previewElement) {
@@ -637,6 +682,7 @@
             }
             elem.find('input[data-az-attachment]').val(hash);
         }
+        
         if (file.type) {
             elem.find('img[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
         }
@@ -644,6 +690,7 @@
 
 
     ResourceAttach.prototype.fallbackMaxFilesReached = function () {
+        
         // if we accept multi, there's no limit to check
         if (this.options.multi) {
             return;

@@ -64,59 +64,98 @@
         {% if access > 1 and folder.id %}
             <script type="text/javascript">
                 $(function () {
-                    // Show/hide the upload button based on whether any files are in the list
-                    var $attachzone = $('#cms-zone'),
-                        $uploadButton = $('#uploadButton'),
-                        controlUploadButton = function () {
-                            var dropzone = $attachzone.data('plugin_resourceAttach').dropzone;
-                            if (dropzone.getQueuedFiles().length === 0 && dropzone.getUploadingFiles().length === 0) {
-                                $uploadButton.removeClass('hide').prop('disabled', false);
-                            }
-                            if (dropzone.getAcceptedFiles().length === 0) {
-                                $uploadButton.addClass('hide').prop('disabled', true);
-                            }
-                        };
-                    $attachzone
-                        .on('success.attachzone', controlUploadButton)
-                        .on('removedfile.attachzone', controlUploadButton)
-                        .on('error.attachzone', controlUploadButton);
 
-                    // AJAX submission: add any new files to the tree
-                    $('#uploadForm').on('submit', function (event) {
-                        event.preventDefault();
-                        var ajaxParams = {
-                                url: this.action,
-                                method: this.method,
-                                data: $(this).serializeArray(),
-                                dataType: 'json'
-                            },
-                            jstree = $('#tree').jstree(true);
+                    const $attachzone = $('#cms-zone');
+                    const $toast = $('#resource-browser-toast');
+                    const uploadForm = document.getElementById('uploadForm');
+                    let fileCount = 0;
+                    let fileList = [];
 
-                        $uploadButton.prop('disabled', true);
-                        $.ajax(ajaxParams)
+                    //can be called either on upload from modal window (as a group of files) or straight drag and drop (as per file)
+                    $attachzone.on('success.attachzone', function (event, fileData) {
+                        if (fileData.data && fileData.data.length > 0) { //coming from modal window upload
+                            addFilesFromModalWindowUpload(fileData.data);
+                            updateFileTree();
+                        } else if (fileData.meta) { //just straight drag and drop
+                            addFileFromDragAndDrop(fileData);
+                            fileCount++;
+                            if (fileCount === $attachzone.data('plugin_resourceAttach').dropzone.files.length) {
+                                updateFileTree();
+                            }
+                        }
+                    });
+
+                    //files have been uploaded from the modal window 
+                    function addFilesFromModalWindowUpload (files) {
+                        files.forEach(function (file) {
+                            addFile(file.hash, file.title);
+                        });  
+                    }
+
+                    //files been uploaded from straight drag and drop
+                    function addFileFromDragAndDrop (file) {
+                        addFile(file.hash, file.meta.name);
+                    }
+
+                    //for displaying in the file tree
+                    function addFile (hash, name) {
+                        fileList.push({
+                            name: 'attachment[]',
+                            value: hash + ':' + name
+                        });
+                    }
+
+                    //when a file(s) been uploaded through the Drop Zone, update the file tree to reflect the change
+                    function updateFileTree () {
+                        $toast.toastActivate( { text: 'Updating resources...' } );
+                        $.ajax(getAjaxParams())
                             .done(function (data) {
-                                // The response contains all items in the folder.
-                                // Add any new ones.
-                                data.forEach(function (item) {
-                                    var existingNode = jstree.get_node(item.id);
-                                    if (!existingNode) {
-                                        jstree.create_node(item.parent, item);
-                                    }
-                                });
-
-                                // Then remove all the files I just uploaded
-                                $attachzone.data('plugin_resourceAttach').dropzone.removeAllFiles();
+                                addNewFilesToTree(data);
+                                clearDropZone();
+                                $toast.toastTimeout( { text: 'File(s) added to resources', css: 'success' } );
                             })
                             .fail(function () {
-                                // I don't know what a fail message could look like?
-                                $uploadButton.prop('disabled', false);
+                                $toast.toastTimeout( { text: 'Unable to update resources', css: 'error' } );
                             });
-                    })
+                    }
+
+                    //to update the file tree
+                    function getAjaxParams () {
+                       return {
+                            url: uploadForm.action,
+                            method: uploadForm.method,
+                            data: fileList,
+                            dataType: 'json'
+                        };
+                    }
+
+                    // The response contains all items in the folder.
+                    // Add any new ones.
+                    function addNewFilesToTree (data) {
+                        var jstree = $('#tree').jstree(true);
+                        data.forEach(function (item) {
+                            var existingNode = jstree.get_node(item.id);
+                            if (!existingNode) {
+                                jstree.create_node(item.parent, item);
+                            }
+                        });
+                    }
+
+                    // Then remove all the files just uploaded
+                    function clearDropZone (data) {
+                        $attachzone.data('plugin_resourceAttach').dropzone.removeAllFiles();
+                        var azList = uploadForm.querySelector('.az-list');
+                        while(azList.firstChild) {
+                            azList.removeChild(azList.firstChild);     
+                        }
+                        fileCount = 0;
+                        fileList = [];
+                    }
+
                 });
             </script>
             <form id="uploadForm" action="{{ routeLookup(namespace ~ '.postFiles', {folderId: folder.id}) }}" method="post">
                 {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
-                <input type="submit" value="Upload" class="hide" id="uploadButton" />
             </form>
         {% endif %}
         {% set actionBarList %}
