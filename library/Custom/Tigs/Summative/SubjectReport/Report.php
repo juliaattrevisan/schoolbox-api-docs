@@ -883,6 +883,7 @@ class Report
             $folder,
             $roleTypeOverride
         );
+
         return ['data' => $middleYearsTaskMarks->toContext()];
     }
 

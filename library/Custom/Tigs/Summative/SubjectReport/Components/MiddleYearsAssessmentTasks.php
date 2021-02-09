@@ -198,6 +198,7 @@ class MiddleYearsAssessmentTasks extends BaseComponent
 
         return [
             'studentMark'   => $feedback ? $feedback->getHumanReadableMark() : null,
+            'publishAt'     => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
             'cohortAverage' => null === $cohortAverage ? null : "$cohortAverage %",
             'comment'       => $feedback ? $feedback->getComment() : null,
             'commentBy'     => $feedback ? $feedback->getReviewer() : null,
