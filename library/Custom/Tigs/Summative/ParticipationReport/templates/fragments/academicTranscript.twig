@@ -17,9 +17,6 @@ Data:
     data[folderId]['aasData']['data'][unitSpecId]                array
     data[folderId]['aasData']['data'][unitSpecId]['comment']     string
     data[folderId]['aasData']['data'][unitSpecId]['capabilityMarks'] string[]|null[]
-    data[folderId]['ibGraphData'][idx]['showComponent']          bool
-    data[folderId]['ibGraphData'][idx]['header']                 string
-    data[folderId]['ibGraphData'][idx]['studentMark']            int
     data[folderId]['nesaGraphData'][idx]['showComponent']        string
     data[folderId]['nesaGraphData'][idx]['studentMark']          string
     data[folderId]['unitspecs']                                  array   Sorted by most recent first
@@ -143,17 +140,6 @@ Data:
                                         {% endfor %}
                                     {% endif %}
                                 </div>
-
-                                {% set ibGraphData = folderData.ibGraphData.data | default(null) %}
-                                {% if ibGraphData %}
-                                    {% set ibGraphDatum = ibGraphData | first %}
-                                    <div class="result-group{% if ibGraphDatum.error|default(false) %} error{% endif %}">
-                                        <div class="result-item myp-grade">
-                                            <span class="result-heading">{{ ibGraphDatum.header ?? '' }}</span><br>
-                                            <span class="result-value">{{ ibGraphDatum.studentMark|default('-') }}</span>
-                                        </div>
-                                    </div>
-                                {% endif %}
 
                                 {# If we have explicit HscRank data, use that, otherwise fall back to most recent HscTaskMark assessment #}
                                 {% if folderData.hscRankData %}
