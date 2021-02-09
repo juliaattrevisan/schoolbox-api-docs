@@ -113,20 +113,11 @@ class Processor
             // We cannot assume if the transform exists in the database that it
             // also exists on disk and can be immediately streamed:
             // check the file exists before attempting to stream it.
-            $stream = $fileSystem->readStream($transformPath);
-            if (!is_resource($stream)) {
-                // if config.otfs_verify_previous_file is on, then `readStream`
-                // won't raise an exception if the file doesn't exist:
-                // it will simply return false.
-                // Raise the exception that would've been raised if that config
-                // was off.
-                throw new Flysystem\FileNotFoundException($transformPath);
-            }
             return new StreamableFile(
                 true,
                 (string)$this->file->getMimetype(),
                 $transformModel->getSize(),
-                $stream
+                self::readStream($fileSystem, $transformPath)
             );
         }
 
@@ -135,12 +126,11 @@ class Processor
         if ($fileSystem->has($transformPath)) {
             $transformSize = $fileSystem->getSize($transformPath);
             $transformMapper->createRecord($this->file->getHash(), $this->cacheKey, $transformSize);
-            // Assume the stream exists, because the filesystem has this file
             return new StreamableFile(
                 true,
                 (string)$this->file->getMimetype(),
                 $transformSize,
-                $fileSystem->readStream($transformPath)
+                self::readStream($fileSystem, $transformPath)
             );
         }
 
@@ -172,12 +162,11 @@ class Processor
             $transformSize
         );
 
-        // Assume `createRecord` created the stream
         return new StreamableFile(
             false,
             (string)$this->file->getMimetype(),
             $transformSize,
-            $fileSystem->readStream($transformPath)
+            self::readStream($fileSystem, $transformPath)
         );
     }
 
@@ -293,5 +282,30 @@ class Processor
             default:
                 throw new DomainException("Unknown image type '$mime'");
         }
+    }
+
+    /**
+     * Fetch a file stream for `$path` out of `$fileSystem`, bypassing
+     * Flysystem's `disable_asserts` configuration setting.
+     *
+     * If `config.otfs_verify_previous_file` is on, Flysystem `disable_asserts`
+     * will be on, and `readStream` won't raise an exception if the file
+     * doesn't exist: it will simply return false.
+     *
+     * This method will re-raise the exception that would've been raised if that
+     * config was off.
+     *
+     * @param Flysystem\FilesystemInterface $fileSystem
+     * @param string                        $path
+     * @return resource
+     * @throws Flysystem\FileNotFoundException if the stream was not found
+     */
+    private static function readStream(Flysystem\FilesystemInterface $fileSystem, string $path)
+    {
+        $stream = $fileSystem->readStream($path);
+        if (!is_resource($stream)) {
+            throw new Flysystem\FileNotFoundException($path);
+        }
+        return $stream;
     }
 }
