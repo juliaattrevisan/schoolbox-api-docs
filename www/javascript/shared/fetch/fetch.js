@@ -1,6 +1,12 @@
 
 let fetchAsJson = (url) => {
-    return fetch(url)
+    const myRequest = new Request(url, {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow'
+    });
+    return fetch(myRequest)
     .then(response => {
         if (response.ok) {
             return response;

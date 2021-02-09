@@ -30,8 +30,8 @@
                         </div>
                         <article>
                             <div v-html="article.blurb"></div>
-                            <div class="article-read-more">
-                                <a v-if="article.readmore.available" :href="article._links.self.href">{{ article.readmore.string }}</a>
+                            <div v-if="article.readmore.available" class="article-read-more">
+                                <a :href="article._links.self.href">{{ article.readmore.string }}</a>
                             </div>
                         </article>
                         <nav>
