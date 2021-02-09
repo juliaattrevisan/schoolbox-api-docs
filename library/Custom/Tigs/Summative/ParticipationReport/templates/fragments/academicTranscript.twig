@@ -130,56 +130,111 @@ Data:
                                 </div>
 
                                 {# If we have explicit HscRank data, use that, otherwise fall back to most recent HscTaskMark assessment #}
-                                {% if folderData.hscRankData %}
-                                    <div class="result-group hsc-rank">
-                                        {% if folderData.hscRankData.assessmentMark is defined %}
-                                            <div class="result-item hsc-rank-mark">
-                                                <span class="result-heading">Mark</span><br>
-                                                <span class="result-value">{{ folderData.hscRankData.assessmentMark|default('-') }}</span>
-                                            </div>
-                                        {% endif %}
-                                        {% if folderData.hscRankData.assessmentAverage is defined %}
-                                            <div class="result-item hsc-rank-average">
-                                                <span class="result-heading">Average</span><br>
-                                                <span class="result-value">{{ folderData.hscRankData.assessmentAverage|default('-') }}</span>
-                                            </div>
-                                        {% endif %}
-                                        {% if folderData.hscRankData.assessmentRank is defined %}
-                                        <div class="result-item hsc-rank-rank">
-                                            <span class="result-heading">Rank</span><br>
-                                            <span class="result-value">{{ folderData.hscRankData.assessmentRank|default('-') }}</span>
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                {% else %}
-                                    <div class="result-group hsc-rank">
-                                    {% set hasTaskFound = false %}
-                                    {% for unitSpecData in folderData.unitSpecs if not hasTaskFound %}
-                                        {% if folderData.hscTaskMarks.data[unitSpecData.id] ?? false %}
-                                            {% set hasTaskFound = true %}
-                                            {% set hasInterminGrades = true %}
-                                            {% set hscTaskMarkData = folderData.hscTaskMarks.data[unitSpecData.id] %}
-                                            {% if hscTaskMarkData.studentMark is defined %}
+                                {% if attributes.isHsc %}
+                                    {% if folderData.hscRankData %}
+                                        <div class="result-group hsc-rank">
+                                            {% if folderData.hscRankData.assessmentMark is defined %}
                                                 <div class="result-item hsc-rank-mark">
-                                                    <span class="result-heading">Mark*</span><br>
-                                                    <span class="result-value">{{ hscTaskMarkData.studentMark|default('-') }}</span>
+                                                    <span class="result-heading">Mark</span><br>
+                                                    <span class="result-value">{{ folderData.hscRankData.assessmentMark|default('-') }}</span>
                                                 </div>
                                             {% endif %}
-                                            {% if hscTaskMarkData.cohortAverage is defined %}
+                                            {% if folderData.hscRankData.assessmentAverage is defined %}
                                                 <div class="result-item hsc-rank-average">
-                                                    <span class="result-heading">Average*</span><br>
-                                                    <span class="result-value">{{ hscTaskMarkData.cohortAverage|default('-') }}</span>
+                                                    <span class="result-heading">Average</span><br>
+                                                    <span class="result-value">{{ folderData.hscRankData.assessmentAverage|default('-') }}</span>
                                                 </div>
                                             {% endif %}
-                                            {% if hscTaskMarkData.cohortRank is defined %}
-                                                <div class="result-item hsc-rank-rank">
-                                                    <span class="result-heading">Rank*</span><br>
-                                                    <span class="result-value">{{ hscTaskMarkData.cohortRank|default('-') }}</span>
+                                            {% if folderData.hscRankData.assessmentRank is defined %}
+                                            <div class="result-item hsc-rank-rank">
+                                                <span class="result-heading">Rank</span><br>
+                                                <span class="result-value">{{ folderData.hscRankData.assessmentRank|default('-') }}</span>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <div class="result-group hsc-rank">
+                                        {% set hasTaskFound = false %}
+                                        {% for unitSpecData in folderData.unitSpecs if not hasTaskFound %}
+                                            {% if folderData.hscTaskMarks.data[unitSpecData.id] ?? false %}
+                                                {% set hasTaskFound = true %}
+                                                {% set hasInterminGrades = true %}
+                                                {% set hscTaskMarkData = folderData.hscTaskMarks.data[unitSpecData.id] %}
+                                                {% if hscTaskMarkData.studentMark is defined %}
+                                                    <div class="result-item hsc-rank-mark">
+                                                        <span class="result-heading">Mark*</span><br>
+                                                        <span class="result-value">{{ hscTaskMarkData.studentMark|default('-') }}</span>
+                                                    </div>
+                                                {% endif %}
+                                                {% if hscTaskMarkData.cohortAverage is defined %}
+                                                    <div class="result-item hsc-rank-average">
+                                                        <span class="result-heading">Average*</span><br>
+                                                        <span class="result-value">{{ hscTaskMarkData.cohortAverage|default('-') }}</span>
+                                                    </div>
+                                                {% endif %}
+                                                {% if hscTaskMarkData.cohortRank is defined %}
+                                                    <div class="result-item hsc-rank-rank">
+                                                        <span class="result-heading">Rank*</span><br>
+                                                        <span class="result-value">{{ hscTaskMarkData.cohortRank|default('-') }}</span>
+                                                    </div>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                {% elseif attributes.isMiddleYear %}
+                                    {% if folderData.middleYearsRankData %}
+                                        <div class="result-group middle-years-rank">
+                                            {% if folderData.middleYearsRankData.assessmentMark is defined %}
+                                                <div class="result-item middle-years-rank-mark">
+                                                    <span class="result-heading">Mark</span><br>
+                                                    <span class="result-value">{{ folderData.middleYearsRankData.assessmentMark|default('-') }}</span>
                                                 </div>
                                             {% endif %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    </div>
+                                            {% if folderData.middleYearsRankData.assessmentAverage is defined %}
+                                                <div class="result-item middle-years-rank-average">
+                                                    <span class="result-heading">Average</span><br>
+                                                    <span class="result-value">{{ folderData.middleYearsRankData.assessmentAverage|default('-') }}</span>
+                                                </div>
+                                            {% endif %}
+                                            {% if folderData.middleYearsRankData.assessmentRank is defined %}
+                                                <div class="result-item middle-years-rank-rank">
+                                                    <span class="result-heading">Rank</span><br>
+                                                    <span class="result-value">{{ folderData.middleYearsRankData.assessmentRank|default('-') }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <div class="result-group middle-years-rank">
+                                            {% set hasTaskFound = false %}
+                                            {% for unitSpecData in folderData.unitSpecs if not hasTaskFound %}
+                                                {% if folderData.middleYearsTaskMarks.data[unitSpecData.id] ?? false %}
+                                                    {% set hasTaskFound = true %}
+                                                    {% set hasInterminGrades = true %}
+                                                    {% set middleYearsTaskMarks = folderData.middleYearsTaskMarks.data[unitSpecData.id] %}
+
+                                                     {% if middleYearsTaskMarks.studentMark is defined %}
+                                                        <div class="result-item middle-years-rank-mark">
+                                                            <span class="result-heading">Mark*</span><br>
+                                                            <span class="result-value">{{ middleYearsTaskMarks.studentMark|default('-') }}</span>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if middleYearsTaskMarks.cohortAverage is defined %}
+                                                        <div class="result-item middle-years-rank-average">
+                                                            <span class="result-heading">Average*</span><br>
+                                                            <span class="result-value">{{ middleYearsTaskMarks.cohortAverage|default('-') }}</span>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if middleYearsTaskMarks.cohortRank is defined %}
+                                                        <div class="result-item middle-years-rank-rank">
+                                                            <span class="result-heading">Rank*</span><br>
+                                                            <span class="result-value">{{ middleYearsTaskMarks.cohortRank|default('-') }}</span>
+                                                        </div>
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 {% endif %}
 
                                 {% set nesaGraphData = folderData.nesaGraphData.data | default(null) %}

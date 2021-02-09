@@ -21,6 +21,7 @@ use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementSummary;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentMatrix;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
+use Custom\Tigs\Summative\SubjectReport\Components\MiddleYearsAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\MiddleYearsAssessmentTasks;
 use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraphHSC;
 use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraphMiddleYears;
@@ -190,7 +191,7 @@ class Report
             }
             $errors[]  = $error;
             $unitSpecsWithData = $aamData = $aasData = $hscTaskMarks = $hscTaskMatrix = $middleYearsTaskMarks = [];
-            $nesaGraphData = $courseSpec = $hscRankData = $courseDescription = null;
+            $nesaGraphData = $courseSpec = $hscRankData = $middleYearsRankData = $courseDescription = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
             $unitSpecs = $this->getUnitSpecs($courseImplsWithUnits);
@@ -207,6 +208,7 @@ class Report
             $hscTaskMatrix = $this->buildHscTaskMatrixData($folder, $attributes,$unitSpecs, $courseSpec, $user, $roleTypeOverride);
             $hscRankData   = $this->buildHscAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $middleYearsTaskMarks = $this->buildMiddleYearsTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
+            $middleYearsRankData = $this->buildMiddleYearsAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
 
             // Filter out unit specs without any data
             $unitSpecsWithData = new Collection();
@@ -278,6 +280,7 @@ class Report
             'hscTaskMatrix'             => $hscTaskMatrix,
             'hscRankData'               => $hscRankData,
             'middleYearsTaskMarks'      => $middleYearsTaskMarks,
+            'middleYearsRankData'       => $middleYearsRankData
         ];
     }
 
@@ -937,6 +940,93 @@ class Report
         return ['data' => $hscTaskMarks->toContext()];
     }
 
+
+    /**
+     * Build data for the 'Middle Years Assessment Rank' component
+     *
+     * @param Folder\Model      $folder
+     * @param StudentAttributes $attributes
+     * @param CourseSpec\Model  $courseSpec
+     * @param User              $student
+     * @param string|null       $roleTypeOverride
+     * @return array|null
+     * @throws InvalidArgumentException
+     * @throws InvalidColumnException
+     * @throws UnexpectedValueException
+     * @throws RouteNotFound
+     * @throws DomainException
+     * @throws LogicException
+     * @throws DefinitionException
+     * @throws UnderflowException
+     * @throws Database\Exception
+     */
+    private function buildMiddleYearsAssessmentRankData(
+        Folder\Model $folder,
+        StudentAttributes $attributes,
+        CourseSpec\Model $courseSpec,
+        User $student,
+        ?string $roleTypeOverride
+    ): ?array {
+
+        /* Only for Middle Years students
+         */
+        if (!$attributes->isMiddleYear()) {
+            return null;
+        }
+
+        /* We are currently in this semester
+         */
+        $currentSemester = $attributes->getCurriculumSemester();
+
+        /* This services worktypes found in both semesters.
+         * The Summative Grade for semester 1 uses the worktype "NESA Report Grade"
+         * The Summative Grade for semester 2 uses the worktype "NESA Report Grade And Report Mark"
+         *
+         * These names would typically be derived from the WorkType instance itself but I don't
+         * have one of these here conveniently atm. I'd have to modify two places to inject it
+         * into every instance of Report currently in use which seems a bit extreme for debugging
+         */
+        if ($currentSemester === 1) {
+            $workTypeName = 'NESA Report Grade';
+            $identifier = Config::_TIGS_WORK_TYPE_NESA_SCORE;
+        } elseif ($currentSemester === 2) {
+            $workTypeName = 'NESA Report Grade and Report Mark';
+            $identifier = Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK;
+        } else {
+            return ['error' => 'Unknown semester detected in Middle Years Assessment Rank data'];
+        }
+
+        try {
+            $workTypeId = $this->checkWorkType(
+                $identifier,
+                "Cannot render 'Middle Years Assessment Rank' component. Work type not set.",
+                "Set '{$workTypeName}' Work Type"
+            );
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
+        }
+
+        /* Only get assessments for the current semester
+         */
+        $assessables = $this->loadAssessmentsAndParticipation($courseSpec, [$workTypeId], $attributes, $currentSemester, $currentSemester);
+
+        $middleYearsRank = new MiddleYearsAssessmentRank(
+            $assessables,
+            $student,
+            $attributes,
+            $this->visibility,
+            $this->viewer,
+            $folder,
+            $workTypeName,
+            $roleTypeOverride
+        );
+
+        try {
+            return $middleYearsRank->toContext();
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
 
     /**
      * Build data for the 'HSC Assessment Rank' component

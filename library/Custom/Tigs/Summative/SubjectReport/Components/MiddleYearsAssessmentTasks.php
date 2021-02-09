@@ -219,10 +219,13 @@ class MiddleYearsAssessmentTasks extends BaseComponent
         if (!$this->isFeedbackVisibleToUser($assessable)) {
             return null;
         }
+
         $participant = $assessable->getParticipantIfExtant($this->student);
+
         if (!$participant) {
             return null;
         }
+
         return $participant->getAuthoritativeFeedback(true);
     }
 
