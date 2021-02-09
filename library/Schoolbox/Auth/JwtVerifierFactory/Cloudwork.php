@@ -42,6 +42,8 @@ class Cloudwork implements IFactory
      */
     public function build(string $issuer, string $clientId, int $leeway): ?JwtVerifier
     {
+        // TODO figure if the verifier builder's client ID now needs to be set
+        // TODO figure if the audience needs to be in an array
         return (new JwtVerifierBuilder())
             ->setIssuer($issuer)
             ->setAdaptor($this->adaptor)

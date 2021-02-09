@@ -13,13 +13,11 @@ use Alaress\Web\Output;
 use Authenticator;
 use Firebase\JWT;
 use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
-use Okta\JwtVerifier\Discovery\Oidc;
-use Okta\JwtVerifier\JwtVerifier;
-use Okta\JwtVerifier\JwtVerifierBuilder;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredException;
+use Schoolbox\Auth\JwtVerifierFactory;
 use Schoolbox\Auth\TokenParser;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -277,34 +275,20 @@ class Controller extends Base
             $sessionLength = self::SESSION_LENGTH_DEFAULT;
         }
 
-        // Cloudwork variant:
-        // TODO figure if the verifier builder's client ID now needs to be set
-        // TODO figure if the audience needs to be in an array
-        $tokenParser = new TokenParser(
-            $this->userMapper,
-            (new JwtVerifierBuilder())
-                ->setIssuer($config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER))
-                ->setAdaptor(new FirebasePhpJwt())
-                ->setDiscovery(new Oidc())
-                ->setAudience([$config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID)])
-                ->setLeeway(sprintf('PT%dS', $sessionLength))
-                ->build()
+        $adaptor            = new FirebasePhpJwt();
+        $jwtVerifierFactory = new JwtVerifierFactory\Composite(
+            new JwtVerifierFactory\Azure($adaptor),
+            new JwtVerifierFactory\Cloudwork($adaptor),
         );
 
-//        // Azure variant:
-//        // * Audience isn't in an array
-//        // * Client ID is not in the JWT, so it can't be verified, so skip it
-//        $tokenParser = new TokenParser(
-//            $this->userMapper,
-//            new JwtVerifier(
-//                $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER),
-//                new Oidc(),
-//                new FirebasePhpJwt(),
-//                null,
-//                sprintf('PT%dS', $sessionLength),
-//                ['audience' => $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID),],
-//            )
-//        );
+        $tokenParser = new TokenParser(
+            $this->userMapper,
+            $jwtVerifierFactory->build(
+                $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER),
+                $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID),
+                $sessionLength,
+            )
+        );
 
         $user        = $tokenParser->findUserFromToken($jwt);
         $this->auth->createSession($user->getUsername(), true);
