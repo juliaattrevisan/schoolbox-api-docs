@@ -51,7 +51,7 @@ class Assess_Answer_Radio extends Assess_Answer_Multi
          * the marks, otherwise penalise them. The teacher can review and
          * adjust the mark accordingly
          */
-        if (is_array($response) && $numCorrect == count($response)) {
+        if ($numCorrect === 1) {
             if ($i) {
                 $marksPerAnswer = $currentResponse['marks'] / $i;
                 $total = $marksPerAnswer * $numCorrect;
