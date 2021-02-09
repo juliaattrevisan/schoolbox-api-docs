@@ -152,7 +152,7 @@
             forceFallback: this.options.forceFallback,
             maxFilesize: this.options.maxFilesize,
             paramName: this.options.paramName,
-
+            timeout: 300000,
             dictDefaultMessage: this.options.dictDefaultMessage,
             dictFallbackMessage: this.options.dictFallbackMessage,
             previewTemplate: this.options.previewTemplate ? $(this.options.previewTemplate).detach().html() : this.createTemplate(this.options.tplWrap),

@@ -116,6 +116,7 @@
             previewsContainer: $(this.element).find(opt.previewsContainerSelector)[0],
             previewTemplate: this.tpl.html(),
             capture: opt.capture,
+            timeout: 300000,
 
             fallback: function () {
                 var mk = opt.fallbackButtonMarkup || '<a href="#" data-attach-fallback class="button icon-attach">' + opt.dictDefaultMessage + '</a>',
