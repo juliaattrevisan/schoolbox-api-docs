@@ -14,6 +14,7 @@ use Authenticator;
 use Firebase\JWT;
 use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
 use Okta\JwtVerifier\Discovery\Oidc;
+use Okta\JwtVerifier\JwtVerifier;
 use Okta\JwtVerifier\JwtVerifierBuilder;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
@@ -275,6 +276,10 @@ class Controller extends Base
         if ($sessionLength <= 0) {
             $sessionLength = self::SESSION_LENGTH_DEFAULT;
         }
+
+        // Cloudwork variant:
+        // TODO figure if the verifier builder's client ID now needs to be set
+        // TODO figure if the audience needs to be in an array
         $tokenParser = new TokenParser(
             $this->userMapper,
             (new JwtVerifierBuilder())
@@ -285,6 +290,22 @@ class Controller extends Base
                 ->setLeeway(sprintf('PT%dS', $sessionLength))
                 ->build()
         );
+
+//        // Azure variant:
+//        // * Audience isn't in an array
+//        // * Client ID is not in the JWT, so it can't be verified, so skip it
+//        $tokenParser = new TokenParser(
+//            $this->userMapper,
+//            new JwtVerifier(
+//                $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER),
+//                new Oidc(),
+//                new FirebasePhpJwt(),
+//                null,
+//                sprintf('PT%dS', $sessionLength),
+//                ['audience' => $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID),],
+//            )
+//        );
+
         $user        = $tokenParser->findUserFromToken($jwt);
         $this->auth->createSession($user->getUsername(), true);
         return $user;
