@@ -208,7 +208,7 @@ class DisasterRecovery extends CliTool\App
                 // Safety check, this should never happen
                 throw new UnexpectedValueException("Attempted to delete current backup '$backupToDelete'");
             }
-            if ($fileSystemAwsS3Backups->deleteDir('/' . $backupToDelete)) {
+            if (!$this->perform() || $fileSystemAwsS3Backups->deleteDir('/' . $backupToDelete)) {
                 $this->getLogger()->info("Successfully deleted backup '$backupToDelete'");
             } else {
                 $this->getLogger()->error("Unable to delete backup '$backupToDelete'");
