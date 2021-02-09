@@ -3,11 +3,11 @@
 <div class="row">
     <div class="column small-12">
         <div class="row" data-mage-submitrow>
-            <div class="small-12 medium-8 column">
-                <p class="alert alert-box icon-alert" data-mage-error></p>
+            <div class="small-12 column">
+                <div class="alert alert-box icon-alert" data-mage-error>When that config is set to a value it should appear in the metadata available here</div>
             </div>
-            <div class="small-12 medium-4 column">
-                <input type="submit"
+            <div class="small-12 column">
+                <input type="submit" class="end"
                         {% if inputName %}name="{{ inputName }}"{% endif %}
                         {% if mageNext %}data-mage-next="{{ mageNext }}"{% endif %}
                         data-mage-working="{{ mageWorking ?: 'Working...' }}"

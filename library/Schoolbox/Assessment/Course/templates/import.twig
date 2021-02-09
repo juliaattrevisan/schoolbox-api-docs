@@ -274,10 +274,10 @@ Usages:
                     {% if 1 == initialStage %}
                         <div class="small-12 column">
                             <div class="row" data-mage-submitrow>
-                                <div class="small-12 medium-8 column">
-                                    <p class="alert alert-box icon-alert" data-mage-error></p>
+                                <div class="small-12 column">
+                                    <div class="alert alert-box icon-alert" data-mage-error></div>
                                 </div>
-                                <div class="small-12 medium-4 column">
+                                <div class="small-12 column">
                                     <input
                                         type="submit"
                                         name="part-1"
@@ -313,10 +313,10 @@ Usages:
                         </div>
                         <div class="small-12 column">
                             <div class="row" data-mage-submitrow>
-                                <div class="small-12 medium-8 column">
-                                    <p class="alert alert-box icon-alert" data-mage-error></p>
+                                <div class="small-12 column">
+                                    <div class="alert alert-box icon-alert" data-mage-error></div>
                                 </div>
-                                <div class="small-12 medium-4 column">
+                                <div class="small-12 column">
                                     <input
                                         type="submit"
                                         name="part-2"
@@ -337,10 +337,10 @@ Usages:
                         <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
                         <div class="small-12 column">
                             <div class="row" data-mage-submitrow>
-                                <div class="small-12 medium-8 column">
-                                    <p class="alert alert-box icon-alert" data-mage-error></p>
+                                <div class="small-12 column">
+                                    <div class="alert alert-box icon-alert" data-mage-error></div>
                                 </div>
-                                <div class="small-12 medium-4 column">
+                                <div class="small-12 column">
                                     {% set urlSuffix = (encodedReturnUrl | length)
                                         ? ('?' ~ returnUrlName ~ '=' ~ encodedReturnUrl)
                                         : ''
