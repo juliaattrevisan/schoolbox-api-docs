@@ -29,7 +29,7 @@ class Assess_Answer_Radio extends Assess_Answer_Multi
          * i: the actual number of correct responses for the question
          * numCorrect: the number of correct responses submitted
          */
-        $i = 0;
+        $numAnswered = 0;
         $numCorrect = 0;
         $total = 0;
 
@@ -42,7 +42,7 @@ class Assess_Answer_Radio extends Assess_Answer_Multi
                         $numCorrect++;
                     }
 
-                    $i++;
+                    $numAnswered++;
                 }
             }
         }
@@ -51,11 +51,9 @@ class Assess_Answer_Radio extends Assess_Answer_Multi
          * the marks, otherwise penalise them. The teacher can review and
          * adjust the mark accordingly
          */
-        if ($numCorrect === 1) {
-            if ($i) {
-                $marksPerAnswer = $currentResponse['marks'] / $i;
-                $total = $marksPerAnswer * $numCorrect;
-            }
+        if ($numAnswered > 0 && $numCorrect === 1) {
+            $marksPerAnswer = $currentResponse['marks'] / $numAnswered;
+            $total          = $marksPerAnswer * $numCorrect;
         }
 
         /* Total marks for this question
