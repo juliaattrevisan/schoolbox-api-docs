@@ -13,13 +13,14 @@
             </dl>
             <div class="tabs-content no-margin">
                 <ul v-if="isArticlesLoaded" class="information-list">
-                    <li class="actions-small-1" v-for="article in currentArticles" :key="article.id">
+                    <li v-for="article in currentArticles" :key="article.id" class="actions-small-1">
                         <div class="list-item">
                             <div class="small-12 card">
-                                <a :href="article._links.self.href" v-if="article.featureImage">
+                                <a v-if="article.featureImage" :href="article._links.self.href">
                                     <img :src="article.featureImage._links.image.href + '&size=square64'">
                                 </a>
-                                <h3><a v-if="article.title" :href="article._links.self.href">{{ article.title }}</a>
+                                <h3>
+                                    <a v-if="article.title" :href="article._links.self.href">{{ article.title }}</a>
                                     <a v-else :href="article._links.self.href">(untitled)</a>
                                 </h3>
                                 <p class="meta">
@@ -40,7 +41,7 @@
                     </li>
                 </ul>
                 <ul v-else class="information-list">
-                    <li class="actions-small-1" v-for="(n, index) in 3" :key="index">
+                    <li v-for="(n, index) in 3" :key="index" class="actions-small-1">
                         <div class="list-item">
                             <div class="small-12 card skeleton">
                                 <div class="img"></div>
