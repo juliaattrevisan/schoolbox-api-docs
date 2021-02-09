@@ -77,7 +77,7 @@ Data:
         We need to assign the subjectList markup to a variable and defer its render, so that we
         can detect if any interim grades are present, and print a legend above the markup if they are.
      #}
-    {% set hasInterminGrades = false %}
+    {% set hasInterimGrades = false %}
     {% set subjectListHtml %}
         <ul class="subject-list">
             {% for subject in subjects %}
@@ -117,7 +117,7 @@ Data:
                                         {% if folderData.aasData|length %}
                                             {% if folderData.aasData.data[unitSpecData.id].capabilityMarks %}
                                                 {% set aasFound = true %}
-                                                {% set hasInterminGrades = true %}
+                                                {% set hasInterimGrades = true %}
                                                 {% for label, value in folderData.aasData.data[unitSpecData.id].capabilityMarks %}
                                                     <div class="result-item">
                                                         <span class="result-heading">{{ label | last }}{% if loop.last %} *{% endif %}</span><br>
@@ -158,7 +158,7 @@ Data:
                                         {% for unitSpecData in folderData.unitSpecs if not hasTaskFound %}
                                             {% if folderData.hscTaskMarks.data[unitSpecData.id] ?? false %}
                                                 {% set hasTaskFound = true %}
-                                                {% set hasInterminGrades = true %}
+                                                {% set hasInterimGrades = true %}
                                                 {% set hscTaskMarkData = folderData.hscTaskMarks.data[unitSpecData.id] %}
                                                 {% if hscTaskMarkData.studentMark is defined %}
                                                     <div class="result-item hsc-rank-mark">
@@ -226,11 +226,13 @@ Data:
                                                      #}
                                                     {% if middleYearsTaskMarks.publishAt > mostRecentData.publishAt or middleYearsTaskMarks is null%}
                                                         {% set mostRecentData = middleYearsTaskMarks %}
+
+                                                        {# Used to pop up a little notice to the user about transient mark data
+                                                         #}
+                                                        {% set hasInterimGrades = true %}
                                                     {% endif %}
                                                 {% endif %}
                                             {% endfor %}
-
-                                            {% set hasInterminGrades = true %}
 
                                             {# Render the grey bricks as you intended, when each is available
                                              #}
@@ -327,7 +329,7 @@ Data:
     {% endset %}
 
     {# We can now print the optional legend, and then the subject list markup #}
-    {% if hasInterminGrades %}<span class="meta legend">* - marks from most recent task only</span>{% endif %}
+    {% if hasInterimGrades %}<span class="meta legend">* - marks from most recent task only</span>{% endif %}
     {{ subjectListHtml }}
 </div>
 
