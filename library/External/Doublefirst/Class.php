@@ -26,7 +26,7 @@ class External_Doublefirst_Class implements External_ClassInterface
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database     = MSSQL::getInstance();
         $this->externalUser = new External_User('Doublefirst');
     }
 
@@ -42,10 +42,9 @@ class External_Doublefirst_Class implements External_ClassInterface
 
         $year = date("Y");
 
-        $arrayCodes = explode(",", $classCode);
+        $classQuery = $this->getClassCodeQuery($classCode);
 
-        foreach ($arrayCodes as $code) {
-            $query = "
+        $query = "
                 SELECT DISTINCT
                     pbi.Surname as lastname,
                     pbi.ForeName as firstname,
@@ -73,14 +72,13 @@ class External_Doublefirst_Class implements External_ClassInterface
                         AND ttm.AcademicYear = tcr.AcademicYear
                         AND ttm.IsWorking = 1
                         AND ttm.YearGroup = ps.YearGroup
-                WHERE ps.SchoolYear = {$year} AND ygsd.SubjectDivisionName = '{$code}'
+                WHERE ps.SchoolYear = {$year} AND {$classQuery}
             ";
 
-            $rows = $this->getDatabase()->getAll($query);
+        $rows = $this->database->getAll($query);
 
-            if ($rows) {
-                return $rows;
-            }
+        if ($rows) {
+            return $rows;
         }
 
         return [];
@@ -92,7 +90,7 @@ class External_Doublefirst_Class implements External_ClassInterface
      * @param string $subCode
      * @return string
      */
-    protected function getClassCodeQuery($subCode)
+    protected function getClassCodeQuery(string $subCode): string
     {
         $subCodeArray = array_filter(explode(",", $subCode));
 
@@ -137,7 +135,7 @@ class External_Doublefirst_Class implements External_ClassInterface
             WHERE ps.SchoolYear = {$year} and $classQuery
         ";
 
-        $rows = $this->getDatabase()->getAll($query);
+        $rows = $this->database->getAll($query);
 
         if (!$rows) {
             return [];
@@ -150,22 +148,6 @@ class External_Doublefirst_Class implements External_ClassInterface
         }
 
         return $teachers;
-    }
-
-    /**
-     * @param MSSQL $database
-     */
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * @return MSSQL
-     */
-    private function getDatabase()
-    {
-        return $this->database;
     }
 
     /**
