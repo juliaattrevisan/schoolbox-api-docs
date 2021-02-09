@@ -706,16 +706,6 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/Report.php
 
 		-
-			message: "#^PHPDoc tag @param for parameter \\$semesterFrom with type int\\|null is not subtype of native type int\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/Report.php
-
-		-
-			message: "#^PHPDoc tag @param for parameter \\$semesterTo with type int\\|null is not subtype of native type int\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/Report.php
-
-		-
 			message: "#^Constructor of class DeprecatedDatabase has an unused parameter \\$db\\.$#"
 			count: 1
 			path: library/DeprecatedDatabase.php
