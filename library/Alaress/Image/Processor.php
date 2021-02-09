@@ -91,6 +91,7 @@ class Processor
 
         // Is this a SVG? just stream it if so, don't even attempt to transform
         if ($fileFormat === 'svg') {
+            // Assume the stream to the base SVG exists
             return new StreamableFile(
                 true,
                 (string)$this->file->getMimetype(),
@@ -106,11 +107,18 @@ class Processor
         $transformPath  = $storageManager::getTransformPath($this->file->getHash(), $this->cacheKey);
 
         // Fastest check (particularly when using S3)
-        // We can assume if the transform exists in the database that it also exists on disk and can be immediately streamed.
         $transformMapper = Storage\Transform\Mapper::getInstance();
         $transformModel  = $transformMapper->findByHashAndCacheKey($this->file->getHash(), $this->cacheKey);
         if ($transformModel) {
-            return new StreamableFile(true, (string)$this->file->getMimetype(), $transformModel->getSize(), $fileSystem->readStream($transformPath));
+            // We cannot assume if the transform exists in the database that it
+            // also exists on disk and can be immediately streamed:
+            // check the file exists before attempting to stream it.
+            return new StreamableFile(
+                true,
+                (string)$this->file->getMimetype(),
+                $transformModel->getSize(),
+                self::readStream($fileSystem, $transformPath)
+            );
         }
 
         // Transform exists on (local|s3) disk, but not yet in database.
@@ -118,7 +126,12 @@ class Processor
         if ($fileSystem->has($transformPath)) {
             $transformSize = $fileSystem->getSize($transformPath);
             $transformMapper->createRecord($this->file->getHash(), $this->cacheKey, $transformSize);
-            return new StreamableFile(true, (string)$this->file->getMimetype(), $transformSize, $fileSystem->readStream($transformPath));
+            return new StreamableFile(
+                true,
+                (string)$this->file->getMimetype(),
+                $transformSize,
+                self::readStream($fileSystem, $transformPath)
+            );
         }
 
         $image = $this->loadImageFromFile($maxAttempts);
@@ -149,7 +162,12 @@ class Processor
             $transformSize
         );
 
-        return new StreamableFile(false, (string)$this->file->getMimetype(), $transformSize, $fileSystem->readStream($transformPath));
+        return new StreamableFile(
+            false,
+            (string)$this->file->getMimetype(),
+            $transformSize,
+            self::readStream($fileSystem, $transformPath)
+        );
     }
 
 
@@ -175,17 +193,17 @@ class Processor
         // Check host's image magick limits (these are controlled by Puppet)
         $resourceLimitMap = $this->parseImageMagickResourceLimits();
 
-        foreach ($resourceLimitMap as $name => $value){
-            switch($name){
+        foreach ($resourceLimitMap as $name => $value) {
+            switch ($name) {
                 case 'width':
                     $widthLimit = Alaress_Byte_Format::stringToBytes(rtrim($value, 'P'), false);
-                    if($width > $widthLimit){
+                    if ($width > $widthLimit) {
                         throw new OverflowException("File width ($width) > limit ($widthLimit) - aborting");
                     }
                     break;
                 case 'height':
                     $heightLimit = Alaress_Byte_Format::stringToBytes(rtrim($value, 'P'), false);
-                    if($height > $heightLimit){
+                    if ($height > $heightLimit) {
                         throw new OverflowException("File height ($height) > limit ($heightLimit) - aborting");
                     }
                     break;
@@ -234,7 +252,6 @@ class Processor
             if ($isResourcePolicyTag) {
                 $resourceLimitMap[$name] = $value;
             }
-
         }
         return $resourceLimitMap;
     }
@@ -265,5 +282,30 @@ class Processor
             default:
                 throw new DomainException("Unknown image type '$mime'");
         }
+    }
+
+    /**
+     * Fetch a file stream for `$path` out of `$fileSystem`, bypassing
+     * Flysystem's `disable_asserts` configuration setting.
+     *
+     * If `config.otfs_verify_previous_file` is on, Flysystem `disable_asserts`
+     * will be on, and `readStream` won't raise an exception if the file
+     * doesn't exist: it will simply return false.
+     *
+     * This method will re-raise the exception that would've been raised if that
+     * config was off.
+     *
+     * @param Flysystem\FilesystemInterface $fileSystem
+     * @param string                        $path
+     * @return resource
+     * @throws Flysystem\FileNotFoundException if the stream was not found
+     */
+    private static function readStream(Flysystem\FilesystemInterface $fileSystem, string $path)
+    {
+        $stream = $fileSystem->readStream($path);
+        if (!is_resource($stream)) {
+            throw new Flysystem\FileNotFoundException($path);
+        }
+        return $stream;
     }
 }
