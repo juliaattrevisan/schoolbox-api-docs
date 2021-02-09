@@ -76,7 +76,7 @@ class DisasterRecovery extends CliTool\App
      */
     public function run(): void
     {
-        $this->logSync("Started at" . (Alaress_Date_Format::now())->getDatabase());
+        $this->logSync("Started at " . (Alaress_Date_Format::now())->getDatabase());
         try {
             $this->execute();
             if (count($this->notFatalErrors)) {
@@ -129,7 +129,9 @@ class DisasterRecovery extends CliTool\App
     {
         $config = ConfigMapper::getInstance()->findOneByColumn(ConfigMapper::COL_NAME, self::CONFIG_DR_SYNC_STATUS);
         $config->setValue($message);
-        ConfigMapper::getInstance()->save($config);
+        if (!$this->perform()) {
+            ConfigMapper::getInstance()->save($config);
+        }
     }
 
 
@@ -193,22 +195,22 @@ class DisasterRecovery extends CliTool\App
     /**
      * Deletes stale backups from S3
      *
-     * @param Filesystem $fileSystemAwsS3
+     * @param Filesystem $fileSystemAwsS3Backups
      * @param string     $dailyBackupDir
      * @throws InvalidArgumentException
      * @throws Flysystem\RootViolationException
      * @throws UnexpectedValueException
      */
-    private function deleteStaleBackups(Filesystem $fileSystemAwsS3, string $dailyBackupDir): void
+    private function deleteStaleBackups(Filesystem $fileSystemAwsS3Backups, string $dailyBackupDir): void
     {
-        $backupsFromS3 = $this->getBackupsInS3($fileSystemAwsS3);
+        $backupsFromS3 = $this->getBackupsInS3($fileSystemAwsS3Backups);
 
         foreach ((new BackupRetention())->getDatesToDelete($backupsFromS3) as $backupToDelete) {
             if ($backupToDelete === $dailyBackupDir) {
                 // Safety check, this should never happen
                 throw new UnexpectedValueException("Attempted to delete current backup '$backupToDelete'");
             }
-            if ($fileSystemAwsS3->deleteDir(self::PREFIX_BACKUPS . $backupToDelete)) {
+            if (!$this->perform() || $fileSystemAwsS3Backups->deleteDir('/' . $backupToDelete)) {
                 $this->getLogger()->info("Successfully deleted backup '$backupToDelete'");
             } else {
                 $this->getLogger()->error("Unable to delete backup '$backupToDelete'");
@@ -220,13 +222,13 @@ class DisasterRecovery extends CliTool\App
     /**
      * Get the daily backup dir from S3
      *
-     * @param Filesystem $fileSystemAwsS3
+     * @param Filesystem $fileSystemAwsS3Backups
      * @return string[]
      */
-    private function getBackupsInS3(Filesystem $fileSystemAwsS3): array
+    private function getBackupsInS3(Filesystem $fileSystemAwsS3Backups): array
     {
         $backups = [];
-        foreach ($fileSystemAwsS3->listContents(self::PREFIX_BACKUPS) as $content) {
+        foreach ($fileSystemAwsS3Backups->listContents('/') as $content) {
             if ($content['type'] === 'dir') {
                 $backups[] = $content['basename'];
             }
