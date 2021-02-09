@@ -10,8 +10,6 @@ Data:
     data[folderId]                                               array
     data[folderId].folder                                        Folder\Model
     data[folderId].teachers                                      User[]
-    data[folderId]['falData']                                    array
-    data[folderId]['falData']['data']                            float[]    eg, ['Criterion A' => 6.0, ...]
     data[folderId]['aasData']                                    array
     data[folderId]['aasData']['data']                            array
     data[folderId]['aasData']['data'][unitSpecId]                array
@@ -111,34 +109,24 @@ Data:
                         <div class="column small-12 medium-6 results">
                             {% if not subject.isPreviousClass %}
                                 <div class="result-group fal">
-                                    {# If we have explicit FinalAchievementLevel data, use that, otherwise fall back to most recent AAS assessment #}
-                                    {% if folderData.falData.data ?? false %}
-                                        {# Explicit FAL data found, use that #}
-                                        {% for label, value in folderData.falData.data %}
-                                            <div class="result-item">
-                                                <span class="result-heading">{{ label | last }}</span><br>
-                                                <span class="result-value">{{ value|default('-') }}</span>
-                                            </div>
-                                        {% endfor %}
-                                    {% else %}
-                                        {# No explicit FAL data found, fall back to latest AAS assessment #}
-                                        {% set aasFound = false %}
-                                        {# These units are ordered from latest to oldest #}
-                                        {% for unitSpecData in folderData.unitSpecs if not aasFound %}
-                                            {% if folderData.aasData|length %}
-                                                {% if folderData.aasData.data[unitSpecData.id].capabilityMarks %}
-                                                    {% set aasFound = true %}
-                                                    {% set hasInterminGrades = true %}
-                                                    {% for label, value in folderData.aasData.data[unitSpecData.id].capabilityMarks %}
-                                                        <div class="result-item">
-                                                            <span class="result-heading">{{ label | last }}{% if loop.last %} *{% endif %}</span><br>
-                                                            <span class="result-value">{{ value|default('-') }}</span>
-                                                        </div>
-                                                    {% endfor %}
-                                                {% endif %}
+
+                                    {# No explicit FAL data found, fall back to latest AAS assessment #}
+                                    {% set aasFound = false %}
+                                    {# These units are ordered from latest to oldest #}
+                                    {% for unitSpecData in folderData.unitSpecs if not aasFound %}
+                                        {% if folderData.aasData|length %}
+                                            {% if folderData.aasData.data[unitSpecData.id].capabilityMarks %}
+                                                {% set aasFound = true %}
+                                                {% set hasInterminGrades = true %}
+                                                {% for label, value in folderData.aasData.data[unitSpecData.id].capabilityMarks %}
+                                                    <div class="result-item">
+                                                        <span class="result-heading">{{ label | last }}{% if loop.last %} *{% endif %}</span><br>
+                                                        <span class="result-value">{{ value|default('-') }}</span>
+                                                    </div>
+                                                {% endfor %}
                                             {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
 
                                 {# If we have explicit HscRank data, use that, otherwise fall back to most recent HscTaskMark assessment #}
