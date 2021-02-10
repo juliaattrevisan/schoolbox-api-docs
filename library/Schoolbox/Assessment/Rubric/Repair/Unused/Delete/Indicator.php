@@ -12,14 +12,14 @@ namespace Schoolbox\Assessment\Rubric\Repair\Unused\Delete;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress_Date_Format;
-use Aura\Di;
-use Psr\Log\LoggerInterface as Logger;
-use React\EventLoop\LoopInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Throwable;
 
 class Indicator extends CliTool\App
 {
+    private const OPT_LONG_FOLDER_IDS = 'folders:';
+
     private const INDENT = '  ';
 
     private const FIND_RUBRIC_CAPABILITY_QUERY = "
@@ -73,94 +73,57 @@ class Indicator extends CliTool\App
 
     /**
      * Query for finding rubric capabilities in a folder.
-     *
-     * @var IQuery
      */
-    private $findRubricCapabilityQuery;
+    private IQuery $findRubricCapabilityQuery;
 
     /**
      * Query for finding rubric indicators in a capability.
-     *
-     * @var IQuery
      */
-    private $findRubricIndicatorQuery;
+    private IQuery $findRubricIndicatorQuery;
 
     /**
      * Query for finding rubric indicators in a capability.
-     *
-     * @var IQuery
      */
-    private $findUsedRubricIndicatorQuery;
+    private IQuery $findUsedRubricIndicatorQuery;
 
     /**
      * Query for finding all unused indicators in a given folder
-     *
-     * @var IQuery
      */
-    private $findUnusedIndicatorsQuery;
+    private IQuery $findUnusedIndicatorsQuery;
 
     /**
      * Query for deleting a rubric indicator from a unit folder.
-     *
-     * @var IQuery
      */
-    private $deleteRubricIndicatorQuery;
+    private IQuery $deleteRubricIndicatorQuery;
 
     /**
      * Query for deleting a rubric capability from a folder.
-     **
-     * @var IQuery
      */
-    private $deleteRubricCapabilityQuery;
-
-//    /**
-//     * @var Logger
-//     */
-//    private $log;
-//
-//
-//    /**
-//     * @var IConnector
-//     */
-//    private $db;
-
+    private IQuery $deleteRubricCapabilityQuery;
 
     /**
-     * @var Alaress_Date_Format
+     * The time at the start of the script run: stored so that any indicators
+     * deleted are marked as deleted at a consistent time.
      */
-    private $now;
-
-
-//    /**
-//     * Is this actually performing an update?
-//     *
-//     * @var bool
-//     */
-//    private $perform = false;
+    private Alaress_Date_Format $now;
 
     /**
-     * Array of 1 or more folder IDs to operate on
-     * @var array[int]
+     * Array of one or more folder IDs to operate on.
+     *
+     * @var int[]
      */
-    private $folderIds;
+    private array $folderIds;
 
-
-//    /**
-//     * The fully-qualified domain name for this instance.
-//     *
-//     * @var string
-//     */
-//    private $fqdn;
-//
-//
-//    /**
-//     * Significant events: read these, if nothing else.
-//     *
-//     * Indexed by assessment ID.
-//     *
-//     * @var array|string[][]
-//     */
-//    private $significantEvents = [];
+    /**
+     * @inheritdoc
+     */
+    public function getLongOpts(): array
+    {
+        return array_merge(
+            parent::getLongOpts(),
+            [self::OPT_LONG_FOLDER_IDS,]
+        );
+    }
 
 
     /**
@@ -174,21 +137,19 @@ class Indicator extends CliTool\App
      */
     public function run(): void
     {
-        // Install logger and DB
-        $di        = $this->getDi();
+        $di = $this->getDi();
+
         /** @var IConnector $db */
         $db        = $di->get('databaseInternal');
         $this->now = Alaress_Date_Format::now();
-//        $this->perform   = isset($opts['p']) || isset($opts['perform']);
-        $this->folderIds = isset($opts['folders']) ? explode(",", $opts['folders']) : null;
-//        $config          = $di->get('config');
-//        $this->fqdn      = trim($config->get('site_hostname') . "." . $config->get('site_domain'), ';.');
 
-        if ($this->folderIds === null) {
+        // Set up folders
+        $folderIds = $this->getOpt(self::OPT_LONG_FOLDER_IDS);
+        if (!isset($folderIds)) {
             $this->getLogger()->error('Exiting - at least 1 folder ID must be supplied. Run again with --folders <id1,id2>');
             return;
         }
-
+        $this->folderIds = explode(",", $folderIds);
 
         // log perform / dry run
         if ($this->perform()) {
@@ -223,7 +184,6 @@ class Indicator extends CliTool\App
         $this->deleteRubricCapabilityQuery
             = $db->prepareQuery(self::DELETE_RUBRIC_CAPABILITY_QUERY);
 
-
         // Wrap entire loop in a transaction
         $db->beginTransaction();
         try {
@@ -235,7 +195,7 @@ class Indicator extends CliTool\App
                 $this->getLogger()->notice('Repair dry run complete: rolling back changes');
                 $db->rollBack();
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->getLogger()->error('Error occurred during repair: rolling back changes');
             $db->rollBack();
             throw $e;
@@ -290,6 +250,7 @@ class Indicator extends CliTool\App
 
     /**
      * Find unused indicators and delete them
+     *
      * @param array $indicators
      */
     private function deleteUnusedIndicators(array $indicators): void
@@ -316,6 +277,7 @@ class Indicator extends CliTool\App
 
     /**
      * Finds capabilities without indicators and delete them
+     *
      * @param array $capabilities
      */
     private function deleteEmptyCapabilities(array $capabilities): void
@@ -344,6 +306,11 @@ class Indicator extends CliTool\App
         }
     }
 
+    /**
+     * If any capabilities in `$capabilities` are unused, remove them.
+     *
+     * @param array $capabilities
+     */
     private function deleteCapabilitiesWithNoUsedIndicators(array $capabilities): void
     {
         foreach ($capabilities as $capabilityId => $capabilityName) {
