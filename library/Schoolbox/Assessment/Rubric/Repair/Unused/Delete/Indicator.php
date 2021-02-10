@@ -236,6 +236,9 @@ class Indicator extends CliTool\App
                     // Clean up
                     $this->getLogger()->debug(self::indent(1) . 'cleaning up any empty capabilities left behind...');
                     $this->deleteEmptyCapabilities($folderCapabilities);
+
+                    // Should not need to clean up capabilities with unused indicators:
+                    // all these would have been cleaned up in the last step
 //                    $this->getLogger()->debug(self::indent(1) . 'cleaning up any capabilities with no indicators in use...');
 //                    $this->deleteCapabilitiesWithNoUsedIndicators($folderCapabilities);
                 }
@@ -308,6 +311,9 @@ class Indicator extends CliTool\App
      * Find capabilities with no indicators that are in use, and delete them.
      *
      * @param array $capabilities
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection retaining this method for
+     *                                                now: may be needed later
      */
     private function deleteCapabilitiesWithNoUsedIndicators(array $capabilities): void
     {
