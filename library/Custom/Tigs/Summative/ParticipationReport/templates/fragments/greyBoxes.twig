@@ -22,35 +22,46 @@
  #                                       the student's NESA grade, if applicable and any error messages
  #}
 
+{% if attributes.isMiddleYear and nesaSemester == 1%}
+    {% if attributes.curriculumSemester == 1 %}
 
-
-
-    {# Special case for Middle Years Semester 1
-     # They won't show any Formative grey boxes if there's a NESA Grade for semester 1
-     #}
-
-    {# Special case for Middle Years Semester 2
-     # If they have a NESA Grade for semester 1, hide it, but show the Formative grey boxes
-     #}
-
-    {# Otherwise just do the usual thing like everyone else
-     # putting the Formative values into the grey boxes, show a NESA grade if available, etc
-     #}
-
-
-
-{% if attributes.curriculumSemester == 1 and attributes.isMiddleYear and nesaSemester == 1 %}
-
-    <div class="result-group {% if nesa.error|default(false) %} error{% endif %}">
-        <div class="result-item nesa-grade">
-            <span class="result-heading">NESA Grade</span><br />
-            <span class="result-value">{{ nesa.grade|default('-') }}</span>
+        {# Special case for Middle Years and it's currently Semester 1
+         # They won't show any Formative grey boxes if there's a NESA Grade for semester 1
+         #}
+        <div class="result-group {% if nesa.error|default(false) %} error{% endif %}">
+            <div class="result-item nesa-grade">
+                <span class="result-heading">NESA Grade</span><br />
+                <span class="result-value">{{ nesa.grade|default('-') }}</span>
+            </div>
         </div>
-    </div>
-{% elseif  %}
+    {% elseif attributes.curriculumSemester == 2 %}
 
+        {# Special case for Middle Years and it's currently Semester 2
+         # If they had a NESA Grade for semester 1, hide it, but show the Formative grey boxes instead
+         #}
+        <div class="result-group hsc-rank">
+            {% if rankData.studentMark is defined %}
+                <div class="result-item hsc-rank-mark">
+                    <span class="result-heading">Mark{% if hasInterimGrades %}*{% endif %}</span><br />
+                    <span class="result-value">{{ rankData.studentMark|default('-') }}</span>
+                </div>
+            {% endif %}
+            {% if rankData.cohortAverage is defined %}
+                <div class="result-item hsc-rank-average">
+                    <span class="result-heading">Average{% if hasInterimGrades %}*{% endif %}</span><br />
+                    <span class="result-value">{{ rankData.cohortAverage|default('-') }}</span>
+                </div>
+            {% endif %}
+            {% if rankData.cohortRank is defined %}
+                <div class="result-item hsc-rank-rank">
+                    <span class="result-heading">Rank{% if hasInterimGrades %}*{% endif %}</span><br />
+                    <span class="result-value">{{ rankData.cohortRank|default('-') }}</span>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
 
-
+{% else %}
 
     {# Just do the usual thing like everyone else
      # putting the Formative values into the grey boxes, show a NESA grade if available, etc
