@@ -142,7 +142,7 @@ Data:
                                         {% set commentData = folderData.nesaGraphData.data.2.comment %}
                                     {% elseif folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment|length %}
                                         {% set nesaGrade = folderData.nesaGraphData.data.1.studentMark %}
-                                        {% set nesaError = folderData.nesaGraphData.data.2.error %}
+                                        {% set nesaError = folderData.nesaGraphData.data.1.error %}
                                         {% set commentData = folderData.nesaGraphData.data.1.comment %}
                                     {% else %}
 
