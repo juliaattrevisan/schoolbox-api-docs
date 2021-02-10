@@ -282,8 +282,7 @@ class Indicator extends CliTool\App
             // Are there any extant indicators in this capability?
             // If so, do not delete this capability.
             $this->findRubricIndicatorQuery->execute(['capabilityId' => $capabilityId]);
-            $indicators = $this->findRubricIndicatorQuery->fetchColumnArray('name', 'id');
-            if (!empty($indicators)) {
+            if ($this->findRubricIndicatorQuery->rowCount() > 0) {
                 continue;
             }
 
@@ -316,8 +315,7 @@ class Indicator extends CliTool\App
             // Are any indicators in this capability in use?
             // If so, do not delete this capability.
             $this->findUsedRubricIndicatorQuery->execute(['capabilityId' => $capabilityId]);
-            $usedIndicators = $this->findUsedRubricIndicatorQuery->fetchColumnArray('name', 'id');
-            if (!empty($usedIndicators)) {
+            if ($this->findUsedRubricIndicatorQuery->rowCount() > 0) {
                 continue;
             }
 
