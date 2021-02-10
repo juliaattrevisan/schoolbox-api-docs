@@ -44,6 +44,7 @@ use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMap
 use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
 use Schoolbox\Blog;
 use Schoolbox\Collection;
+use Schoolbox\Comms\News;
 use Schoolbox\Curriculum;
 use Schoolbox\Discussion;
 use Schoolbox\GenericCollection;
@@ -298,6 +299,7 @@ class RecursiveUndeleter
             Forum\PostMapper::class => 'threadID',
         ],
         Forum\PostMapper::class                         => [],
+        News\Mapper::class                              => [],
     ];
 
 
