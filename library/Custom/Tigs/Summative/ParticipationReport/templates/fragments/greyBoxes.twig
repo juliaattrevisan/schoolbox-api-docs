@@ -1,0 +1,30 @@
+{##
+ # Grey Boxes
+ #
+ # As the title suggests, this renders the little grey box things on each subject
+ # in the Academic Transcript. Typically contains the student's mark, average, rank
+ # and NESA grade depending on availability.
+ #
+ # @param bool  hasInterimGrades  Decide whether to render an asterisk in the heading
+ # @param array rankData          A (studentMark, cohortAverage, cohortRank) tuple
+ #}
+<div class="result-group hsc-rank">
+    {% if rankData.studentMark is defined %}
+        <div class="result-item hsc-rank-mark">
+            <span class="result-heading">Mark{% if hasInterimGrades %}*{% endif %}</span><br>
+            <span class="result-value">{{ rankData.studentMark|default('-') }}</span>
+        </div>
+    {% endif %}
+    {% if rankData.cohortAverage is defined %}
+        <div class="result-item hsc-rank-average">
+            <span class="result-heading">Average{% if hasInterimGrades %}*{% endif %}</span><br>
+            <span class="result-value">{{ rankData.cohortAverage|default('-') }}</span>
+        </div>
+    {% endif %}
+    {% if rankData.cohortRank is defined %}
+        <div class="result-item hsc-rank-rank">
+            <span class="result-heading">Rank{% if hasInterimGrades %}*{% endif %}</span><br>
+            <span class="result-value">{{ rankData.cohortRank|default('-') }}</span>
+        </div>
+    {% endif %}
+</div>
