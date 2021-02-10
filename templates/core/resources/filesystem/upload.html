@@ -100,6 +100,9 @@ $(function () {
                         // noop
                     }
 
+                    //to pass through into #jquery.resourceAttach.js to notify of file failure
+                    file.errorMessage = msg;
+
                     if (msg.hash) {
                         file.hash = msg.hash;
                         $(file.previewElement).find('span[data-dz-errormessage]').html(msg.hash.split(':')[1]);
@@ -185,8 +188,7 @@ $(function () {
         
         let successFiles = this.getFilesWithStatus(Dropzone.SUCCESS),
             errorFiles   = this.getFilesWithStatus(Dropzone.ERROR),
-            data         = [],
-            i;
+            data         = [];
 
         // Does the button say we're uploading? return
         if (!abUploadSubmitBtn.data('uploading')) {
@@ -201,27 +203,33 @@ $(function () {
         // Cancel button is no longer disabled, even if there's error files
         abUploadCancelBtn.removeAttr('disabled');
 
-        // Finally post the message
-        if (successFiles.length) {
-            for (i = 0; i < successFiles.length; ++i) {
-                if (successFiles[i].hash) {
-                    data.push({
-                        file: successFiles[i],
-                        title: successFiles[i].name,
-                        mimeType: successFiles[i].type,
-                        filesize: successFiles[i].size,
-                        hash: successFiles[i].hash,
-                        status: successFiles[i].status,
-                    });
-                }
+        successFiles.forEach(function (successFile) {
+            if (successFile.hash) {
+                data.push({
+                    status: successFile.status,
+                    file: successFile,
+                    title: successFile.name,
+                    mimeType: successFile.type,
+                    filesize: successFile.size,
+                    hash: successFile.hash
+                });
             }
+        });
 
-            /* Send a list of file data to message receiver in modal.js
-             */
-            setTimeout(function () {
-                window.top.postMessage(JSON.stringify({ data: data }), location.origin);
-            }, 1000);
-        }
+        errorFiles.forEach(function (errorFile) {
+            data.push({
+                status: errorFile.status,
+                name: errorFile.name,
+                errorMessage: errorFile.errorMessage
+            });
+        });
+
+        /* Send a list of file data to message receiver in modal.js
+            */
+        setTimeout(function () {
+            window.top.postMessage(JSON.stringify({ data: data }), location.origin);
+        }, 1000);
+
     }
 });
 </script>
