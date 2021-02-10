@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Repair\Unused\Delete;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Statement\Query\IQuery;
+use Alaress\Database\Statement\IStatement;
 use Alaress_Date_Format;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -74,32 +74,32 @@ class Indicator extends CliTool\App
     /**
      * Query for finding rubric capabilities in a folder.
      */
-    private IQuery $findRubricCapabilityQuery;
+    private IStatement $findRubricCapabilityQuery;
 
     /**
      * Query for finding rubric indicators in a capability.
      */
-    private IQuery $findRubricIndicatorQuery;
+    private IStatement $findRubricIndicatorQuery;
 
     /**
      * Query for finding rubric indicators in a capability.
      */
-    private IQuery $findUsedRubricIndicatorQuery;
+    private IStatement $findUsedRubricIndicatorQuery;
 
     /**
      * Query for finding all unused indicators in a given folder
      */
-    private IQuery $findUnusedIndicatorsQuery;
+    private IStatement $findUnusedIndicatorsQuery;
 
     /**
      * Query for deleting a rubric indicator from a unit folder.
      */
-    private IQuery $deleteRubricIndicatorQuery;
+    private IStatement $deleteRubricIndicatorQuery;
 
     /**
      * Query for deleting a rubric capability from a folder.
      */
-    private IQuery $deleteRubricCapabilityQuery;
+    private IStatement $deleteRubricCapabilityQuery;
 
     /**
      * The time at the start of the script run: stored so that any indicators
