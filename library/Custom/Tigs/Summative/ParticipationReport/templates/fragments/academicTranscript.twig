@@ -135,7 +135,7 @@ Data:
                                      #
                                      # An empty array means there isn't any NESA data and you should fall
                                      # back to finding the most recent feedbacks' comment instead
-                                    #}
+                                     #}
                                     {% if folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.data.2.comment|length %}
                                         {% set nesaGrade = folderData.nesaGraphData.data.2.studentMark %}
                                         {% set nesaError = folderData.nesaGraphData.data.2.error %}
@@ -169,6 +169,12 @@ Data:
 
 
                                 {# If we have explicit HscRank data, use that, otherwise fall back to most recent HscTaskMark assessment #}
+
+                                {# This is actually a bit funny, because hscRankData and middleYearsRankData return an array
+                                 # Usually that array contains mark/average/rank data but in the case of an error, it'll be
+                                 # represented as an array element; $hasInterimGrades don't understand that here, so an empty
+                                 # (but error-ful) case will be represented without asterisks
+                                 #}
                                 {% if attributes.isHsc %}
                                     {% if folderData.hscRankData %}
                                         {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
