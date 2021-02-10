@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Deletes unused indicators for a specific folder
  *
