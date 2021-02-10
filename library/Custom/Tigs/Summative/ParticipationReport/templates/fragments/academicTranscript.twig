@@ -179,6 +179,7 @@ Data:
                                 {% if attributes.isHsc %}
                                     {% if folderData.hscRankData %}
                                         {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
+                                            attributes: attributes,
                                             interimGrades: hasInterimGrades,
                                             rankData: {
                                                 'studentMark': folderData.hscRankData.assessmentMark,
@@ -199,6 +200,7 @@ Data:
                                                 {% set hscTaskMarkData = folderData.hscTaskMarks.data[unitSpecData.id] %}
 
                                                 {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
+                                                    attributes: attributes,
                                                     interimGrades: hasInterimGrades,
                                                     rankData: hscTaskMarkData,
                                                     nesa: {
@@ -214,42 +216,19 @@ Data:
                                     {# Summative Grade
                                      #}
                                     {% if folderData.middleYearsRankData %}
-
-                                        {# Special case for Middle Years Semester 1
-                                         # They won't show any Formative grey boxes if there's a NESA grade available
-                                         #}
-                                        {% if attributes.curriculumSemester == 1 %}
-                                            {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
-                                                interimGrades: hasInterimGrades,
-                                                rankData: {
-                                                    'studentMark': null,
-                                                    'cohortAverage': null,
-                                                    'cohortRank': null
-                                                },
-                                                nesa: {
-                                                    'grade': nesaGrade,
-                                                    'error': nesaError
-                                                }
-                                            } %}
-                                        {% else %}
-
-                                            {# Semester 2 just does the usual thing like everyone else
-                                             # putting the Formative values into the grey boxes etc.
-                                             #}
-                                            {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
-                                                interimGrades: hasInterimGrades,
-                                                rankData: {
-                                                    'studentMark': folderData.middleYearsRankData.assessmentMark,
-                                                    'cohortAverage': folderData.middleYearsRankData.assessmentAverage,
-                                                    'cohortRank': folderData.middleYearsRankData.assessmentRank
-                                                },
-                                                nesa: {
-                                                    'grade': nesaGrade,
-                                                    'error': nesaError
-                                                }
-                                            } %}
-                                        {% endif %}
-
+                                        {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
+                                            attributes: attributes,
+                                            interimGrades: hasInterimGrades,
+                                            rankData: {
+                                                'studentMark': folderData.middleYearsRankData.assessmentMark,
+                                                'cohortAverage': folderData.middleYearsRankData.assessmentAverage,
+                                                'cohortRank': folderData.middleYearsRankData.assessmentRank
+                                            },
+                                            nesa: {
+                                                'grade': nesaGrade,
+                                                'error': nesaError
+                                            }
+                                        } %}
                                     {% else %}
 
                                         {# Formative Grade
@@ -283,6 +262,7 @@ Data:
                                         {% endfor %}
 
                                         {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
+                                            attributes: attributes,
                                             interimGrades: hasInterimGrades,
                                             rankData: mostRecentData,
                                             nesa: {
