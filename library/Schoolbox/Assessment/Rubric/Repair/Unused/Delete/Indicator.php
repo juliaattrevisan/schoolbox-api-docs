@@ -32,6 +32,7 @@ class Indicator extends CliTool\App
         WHERE  parent_type = 'category'
         AND    parent_id   = :folderId
         AND    deleted_at IS NULL
+        ORDER BY id
     ";
 
 
@@ -40,6 +41,7 @@ class Indicator extends CliTool\App
         FROM   rubric_indicator
         WHERE  rubric_capability_id = :capabilityId
         AND    deleted_at IS NULL
+        ORDER BY id
     ";
 
     /**
@@ -60,13 +62,16 @@ class Indicator extends CliTool\App
      * Query for finding unused rubric indicators: these ones will be deleted.
      */
     private const FIND_UNUSED_INDICATORS_QUERY = "
-        SELECT    ri.id, ri.name
+        SELECT ri.id,
+               ri.name AS indicatorName,
+               rc.name AS capabilityName
         FROM      rubric_indicator ri
         LEFT JOIN rubric_indicator_usage riu ON ri.id=riu.rubric_indicator_id
         LEFT JOIN rubric_capability rc ON ri.rubric_capability_id = rc.id
         WHERE riu.rubric_indicator_id IS NULL
         AND rc.parent_id = :folderId
-        AND ri.deleted_at IS null;
+        AND ri.deleted_at IS NULL
+        ORDER BY rc.id, ri.id
     ";
 
     /**
@@ -221,27 +226,26 @@ class Indicator extends CliTool\App
             } else {
                 // This folder contains capabilities: great! Let's delete any unused indicators.
                 $this->getLogger()->debug(self::indent(1) . 'finding unused indicators...');
-                $this->findUnusedIndicatorsQuery->execute(['folderId' => $folder->getFolder()->getId()]);
-                $folderIndicators = $this->findUnusedIndicatorsQuery->fetchColumnArray('name', 'id');
-
-                if (count($folderIndicators) === 0) {
+                $this->findUnusedIndicatorsQuery->execute(['folderId' => $folder->getId()]);
+                if ($this->findUnusedIndicatorsQuery->rowCount() === 0) {
                     $this->getLogger()->debug(self::indent(1) . 'no unused indicators to delete, skipping');
-                } else {
-                    $this->deleteUnusedIndicators($folderIndicators);
-
-                    // Find all the capabilities in this folder
-                    $this->findRubricCapabilityQuery->execute(['folderId' => $folder->getId()]);
-                    $folderCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
-
-                    // Clean up
-                    $this->getLogger()->debug(self::indent(1) . 'cleaning up any empty capabilities left behind...');
-                    $this->deleteEmptyCapabilities($folderCapabilities);
-
-                    // Should not need to clean up capabilities with unused indicators:
-                    // all these would have been cleaned up in the last step
-//                    $this->getLogger()->debug(self::indent(1) . 'cleaning up any capabilities with no indicators in use...');
-//                    $this->deleteCapabilitiesWithNoUsedIndicators($folderCapabilities);
+                    continue;
                 }
+
+                $this->deleteUnusedIndicators($this->findUnusedIndicatorsQuery->fetchRowArray('id'));
+
+                // Find all the capabilities in this folder
+                $this->findRubricCapabilityQuery->execute(['folderId' => $folder->getId()]);
+                $folderCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
+
+                // Clean up
+                $this->getLogger()->debug(self::indent(1) . 'cleaning up any empty capabilities left behind...');
+                $this->deleteEmptyCapabilities($folderCapabilities);
+
+                // Should not need to clean up capabilities with unused indicators:
+                // all these would have been cleaned up in the last step
+//                $this->getLogger()->debug(self::indent(1) . 'cleaning up any capabilities with no indicators in use...');
+//                $this->deleteCapabilitiesWithNoUsedIndicators($folderCapabilities);
             }
         }
     }
@@ -254,12 +258,13 @@ class Indicator extends CliTool\App
      */
     private function deleteUnusedIndicators(array $indicators): void
     {
-        foreach ($indicators as $indicatorId => $indicatorName) {
+        foreach ($indicators as $indicatorId => $indicator) {
             $this->getLogger()->info(
                 sprintf(
-                    self::indent(2) . 'deleting unused indicator #%d (%s)',
+                    self::indent(2) . 'deleting unused indicator #%d (%s / %s)',
                     $indicatorId,
-                    self::formatNameForOutput(trim($indicatorName)),
+                    self::formatNameForOutput($indicator['capabilityName']),
+                    self::formatNameForOutput($indicator['indicatorName']),
                 )
             );
 
@@ -294,7 +299,7 @@ class Indicator extends CliTool\App
                 sprintf(
                     self::indent(2) . 'deleting empty capability #%d (%s)',
                     $capabilityId,
-                    self::formatNameForOutput(trim($capabilityName)),
+                    self::formatNameForOutput($capabilityName),
                 )
             );
             $this->deleteRubricCapabilityQuery
@@ -330,7 +335,7 @@ class Indicator extends CliTool\App
                 sprintf(
                     self::indent(2) . 'deleting unused capability #%d (%s)',
                     $capabilityId,
-                    self::formatNameForOutput(trim($capabilityName)),
+                    self::formatNameForOutput($capabilityName),
                 )
             );
             $this->deleteRubricCapabilityQuery
@@ -362,7 +367,7 @@ class Indicator extends CliTool\App
      */
     private static function formatNameForOutput(string $name): string
     {
-        $name = preg_replace('/\\s+/', ' ', $name);
+        $name = trim(preg_replace('/\\s+/', ' ', $name));
         return mb_strlen($name) > self::MAX_CHARS_IN_OUTPUT_NAME
             ? mb_substr($name, 0, self::MAX_CHARS_IN_OUTPUT_NAME) . '...'
             : $name;
