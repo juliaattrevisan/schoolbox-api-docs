@@ -381,7 +381,7 @@ Usage:
                                             <div data-mage-error style="display:none;" class="alert alert-box icon-alert"></div>
                                         </div>
                                         <div class="small-12 column">
-                                            <input name="spawn-unit" type="submit" class="end" value="Create {{ locale.unit.proper }}"
+                                            <input name="spawn-unit" type="submit" value="Create {{ locale.unit.proper }}"
                                                    data-mage-next="spawn-unit" data-mage-working="Working..."
                                                    formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"/>
                                         </div>
@@ -397,7 +397,7 @@ Usage:
                 <div class="row" data-mage="unit-info">
                     {# Don't delete the inline style, it's needed -#}
                     <div class="small-12 column" {% if not courseSpec %}data-mage-collapsed style="display: none;"{% endif %}>
-                        <input type="submit" value="Save Course" data-mage-working="Saving..." data-mage-next="main-course"/>
+                        <input type="submit" class="end" value="Save Course" data-mage-working="Saving..." data-mage-next="main-course"/>
                     </div>
                 </div>
             {% endif %}
