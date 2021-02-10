@@ -116,6 +116,13 @@ Data:
                                  # data comes from the Formative Data structs hscRankData and middleYearsRankData.
                                  #}
                                 {% set nesaGrade = null %}
+
+                                {# This is the semester where we found the most recent NESA grade
+                                 #}
+                                {% set nesaSemester = 1 %}
+
+                                {# A random error message, idk why we really did this, but ok
+                                 #}
                                 {% set nesaError = null %}
 
                                 {# Search for comments. If they were in a previous class - it's now rolled over etc. - then
@@ -139,10 +146,12 @@ Data:
                                      #}
                                     {% if folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.data.2.comment|length %}
                                         {% set nesaGrade = folderData.nesaGraphData.data.2.studentMark %}
+                                        {% set nesaSemester = 1 %}
                                         {% set nesaError = folderData.nesaGraphData.data.2.error %}
                                         {% set commentData = folderData.nesaGraphData.data.2.comment %}
                                     {% elseif folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment|length %}
                                         {% set nesaGrade = folderData.nesaGraphData.data.1.studentMark %}
+                                        {% set nesaSemester = 1 %}
                                         {% set nesaError = folderData.nesaGraphData.data.1.error %}
                                         {% set commentData = folderData.nesaGraphData.data.1.comment %}
                                     {% else %}
@@ -188,6 +197,7 @@ Data:
                                             },
                                             nesa: {
                                                 'grade': nesaGrade,
+                                                'semester': nesaSemester,
                                                 'error': nesaError
                                             }
                                         } %}
@@ -205,6 +215,7 @@ Data:
                                                     rankData: hscTaskMarkData,
                                                     nesa: {
                                                         'grade': nesaGrade,
+                                                        'semester': nesaSemester,
                                                         'error': nesaError
                                                     }
                                                 } %}
@@ -226,6 +237,7 @@ Data:
                                             },
                                             nesa: {
                                                 'grade': nesaGrade,
+                                                'semester': nesaSemester,
                                                 'error': nesaError
                                             }
                                         } %}
@@ -267,6 +279,7 @@ Data:
                                             rankData: mostRecentData,
                                             nesa: {
                                                 'grade': nesaGrade,
+                                                'semester': nesaSemester,
                                                 'error': nesaError
                                             }
                                         } %}
