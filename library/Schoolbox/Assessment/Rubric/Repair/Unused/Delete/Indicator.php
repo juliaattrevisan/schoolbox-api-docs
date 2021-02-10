@@ -42,19 +42,27 @@ class Indicator extends CliTool\App
         AND    deleted_at IS NULL
     ";
 
+    /**
+     * Query for finding used rubric indicators.
+     *
+     * TODO figure out why this even exists: why do we want to delete rubric
+     *      capabilities that are in use?
+     */
     private const FIND_USED_RUBRIC_INDICATOR_QUERY = "
-        SELECT ri.id, ri.name
-        FROM   rubric_indicator ri
+        SELECT    ri.id, ri.name
+        FROM      rubric_indicator ri
         LEFT JOIN rubric_indicator_usage riu on ri.id=riu.rubric_indicator_id
         WHERE  rubric_capability_id = :capabilityId
         AND    riu.rubric_indicator_id IS NOT NULL
         AND    deleted_at IS NULL
     ";
 
-
+    /**
+     * Query for finding unused rubric indicators: these ones will be deleted.
+     */
     private const FIND_UNUSED_INDICATORS_QUERY = "
-        SELECT ri.id, ri.name
-        FROM rubric_indicator ri
+        SELECT    ri.id, ri.name
+        FROM      rubric_indicator ri
         LEFT JOIN rubric_indicator_usage riu ON ri.id=riu.rubric_indicator_id
         LEFT JOIN rubric_capability rc ON ri.rubric_capability_id = rc.id
         WHERE riu.rubric_indicator_id IS NULL
@@ -62,12 +70,18 @@ class Indicator extends CliTool\App
         AND ri.deleted_at IS null;
     ";
 
+    /**
+     * Query for deleting indicators
+     */
     private const DELETE_RUBRIC_INDICATOR_QUERY = '
         UPDATE rubric_indicator
         SET    deleted_at = :now
         WHERE  id         = :indicatorId
     ';
 
+    /**
+     * Query for deleting capabilities
+     */
     private const DELETE_RUBRIC_CAPABILITY_QUERY = '
         UPDATE rubric_capability
         SET    deleted_at = :now
@@ -223,8 +237,8 @@ class Indicator extends CliTool\App
                     // Clean up
                     $this->getLogger()->debug(self::indent(1) . 'cleaning up any empty capabilities left behind...');
                     $this->deleteEmptyCapabilities($folderCapabilities);
-                    $this->getLogger()->debug(self::indent(1) . 'cleaning up any capabilities with no indicators in use...');
-                    $this->deleteCapabilitiesWithNoUsedIndicators($folderCapabilities);
+//                    $this->getLogger()->debug(self::indent(1) . 'cleaning up any capabilities with no indicators in use...');
+//                    $this->deleteCapabilitiesWithNoUsedIndicators($folderCapabilities);
                 }
             }
         }
