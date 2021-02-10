@@ -40,7 +40,7 @@
                 {# blurb already has a <p> tag #}
                 {{ msg.meta.blurb | purifyAbsoluteUri('https://'~config.fqdn) }}
             {% else %}
-                <p>{{ msg.meta.body | cutSentence(300, true) }}</p>
+                <p>{{ msg.meta.body | cutSentence(220, true) }}</p>
             {% endif %}
         </td>
     </tr>
