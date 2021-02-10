@@ -108,27 +108,6 @@ Data:
                         </div>
                         <div class="column small-12 medium-6 results">
                             {% if not subject.isPreviousClass %}
-                                <div class="result-group fal">
-
-                                    {# No explicit FAL data found, fall back to latest AAS assessment #}
-                                    {% set aasFound = false %}
-                                    {# These units are ordered from latest to oldest #}
-                                    {% for unitSpecData in folderData.unitSpecs if not aasFound %}
-                                        {% if folderData.aasData|length %}
-                                            {% if folderData.aasData.data[unitSpecData.id].capabilityMarks %}
-                                                {% set aasFound = true %}
-                                                {% set hasInterimGrades = true %}
-                                                {% for label, value in folderData.aasData.data[unitSpecData.id].capabilityMarks %}
-                                                    <div class="result-item">
-                                                        <span class="result-heading">{{ label | last }}{% if loop.last %} *{% endif %}</span><br>
-                                                        <span class="result-value">{{ value|default('-') }}</span>
-                                                    </div>
-                                                {% endfor %}
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-
 
                                 {# Summative Data (NESA Grade for HSC and Middle Years students)
                                  #
