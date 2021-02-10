@@ -41,6 +41,14 @@ class Indicator extends CliTool\App
     ";
 
     /**
+     * Query for finding if the requested folder is a course spec.
+     *
+     * Indicators will not be removed from course specs: it's too risky, because
+     * this course's indicators could be used in unit spec assessments.
+     */
+    private const FIND_COURSE_SPEC_QUERY = "SELECT * FROM course_specification WHERE folder_id = :folderId";
+
+    /**
      * Query for finding rubric capabilities within a folder.
      */
     private const FIND_RUBRIC_CAPABILITY_QUERY = "
@@ -115,6 +123,11 @@ class Indicator extends CliTool\App
      * Query for finding a folder's name.
      */
     private IStatement $findFolderNameQuery;
+
+    /**
+     * Query for finding if a folder is a course spec.
+     */
+    private IStatement $findCourseSpecQuery;
 
     /**
      * Query for finding rubric capabilities in a folder.
@@ -202,6 +215,7 @@ class Indicator extends CliTool\App
 
         // prepare queries
         $this->findFolderNameQuery          = $db->prepareQuery(self::FIND_FOLDER_NAME_QUERY);
+        $this->findCourseSpecQuery          = $db->prepareQuery(self::FIND_COURSE_SPEC_QUERY);
         $this->findRubricCapabilityQuery    = $db->prepareQuery(self::FIND_RUBRIC_CAPABILITY_QUERY);
         $this->findRubricIndicatorQuery     = $db->prepareQuery(self::FIND_RUBRIC_INDICATOR_QUERY);
         $this->findUsedRubricIndicatorQuery = $db->prepareQuery(self::FIND_USED_RUBRIC_INDICATOR_QUERY);
@@ -238,6 +252,13 @@ class Indicator extends CliTool\App
             if ($this->findFolderNameQuery->rowCount() === 0) {
                 // No folder found:
                 $this->getLogger()->notice(sprintf('Folder #%d does not exist: skipping', $folderId));
+                continue;
+            }
+
+            $this->findCourseSpecQuery->execute(['folderId' => $folderId]);
+            if ($this->findCourseSpecQuery->rowCount() > 0) {
+                // This is a course spec:
+                $this->getLogger()->notice(sprintf('Folder #%d is a course specification: skipping', $folderId));
                 continue;
             }
 
