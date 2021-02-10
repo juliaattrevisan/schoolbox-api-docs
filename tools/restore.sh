@@ -518,7 +518,7 @@ then
 		fi
 		echo -e "\nPerforming Data Transfer";
 		echo -e "\nCopying data from $sourcedata to $thisdatadir";
-		rsync -rltHv $sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip* --exclude=*.lock;
+		rsync -rltHv $sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip* --exclude=*.lock --exclude=backups;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
 		$instdir/tools/set-data-dir-perms.sh $thisdatadir $wwwuser;
 	fi
@@ -548,7 +548,7 @@ then
 		fi
 		echo -e "\nPerforming Data Transfer";
 		echo -e "\nCopying data from ssh $sourcep1 : $sourcedata to $thisdatadir";
-		rsync -rltHzv -e ssh $sourcep1:$sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip*;
+		rsync -rltHzv -e ssh $sourcep1:$sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip* --exclude=backups;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
 		$instdir/tools/set-data-dir-perms.sh $thisdatadir $wwwuser;
 	fi
