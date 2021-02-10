@@ -12,7 +12,6 @@ namespace Schoolbox\Assessment\Rubric\Repair\Unused\Delete;
 use Alaress\Database\Statement\IStatement;
 use Alaress_Date_Format;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Throwable;
 
 class Indicator extends CliTool\App
@@ -26,6 +25,24 @@ class Indicator extends CliTool\App
      */
     private const MAX_CHARS_IN_OUTPUT_NAME = 40;
 
+    /**
+     * Query for finding a folder's name and class codes.
+     */
+    private const FIND_FOLDER_NAME_QUERY = "
+        SELECT f.name,
+               GROUP_CONCAT(fc.code ORDER BY fc.code SEPARATOR ', ') AS codes
+        FROM      folder f
+        LEFT JOIN folder_code fc ON f.id = fc.folder_id
+        WHERE f.id = :folderId
+        AND   f.deleted_at  IS NULL
+        AND   fc.deleted_at IS NULL
+        GROUP BY fc.code
+        ORDER BY fc.code
+    ";
+
+    /**
+     * Query for finding rubric capabilities within a folder.
+     */
     private const FIND_RUBRIC_CAPABILITY_QUERY = "
         SELECT id, name
         FROM   rubric_capability
@@ -35,7 +52,9 @@ class Indicator extends CliTool\App
         ORDER BY id
     ";
 
-
+    /**
+     * Query for finding rubric indicators within a capability.
+     */
     private const FIND_RUBRIC_INDICATOR_QUERY = "
         SELECT id, name
         FROM   rubric_indicator
@@ -92,6 +111,10 @@ class Indicator extends CliTool\App
         WHERE  id         = :capabilityId
     ';
 
+    /**
+     * Query for finding a folder's name.
+     */
+    private IStatement $findFolderNameQuery;
 
     /**
      * Query for finding rubric capabilities in a folder.
@@ -178,6 +201,7 @@ class Indicator extends CliTool\App
         }
 
         // prepare queries
+        $this->findFolderNameQuery          = $db->prepareQuery(self::FIND_FOLDER_NAME_QUERY);
         $this->findRubricCapabilityQuery    = $db->prepareQuery(self::FIND_RUBRIC_CAPABILITY_QUERY);
         $this->findRubricIndicatorQuery     = $db->prepareQuery(self::FIND_RUBRIC_INDICATOR_QUERY);
         $this->findUsedRubricIndicatorQuery = $db->prepareQuery(self::FIND_USED_RUBRIC_INDICATOR_QUERY);
@@ -210,23 +234,33 @@ class Indicator extends CliTool\App
     private function repair(): void
     {
         foreach ($this->folderIds as $folderId) {
-            $folder = FolderMapper::getInstance()->findById($folderId);
+            $this->findFolderNameQuery->execute(['folderId' => $folderId]);
+            if ($this->findFolderNameQuery->rowCount() === 0) {
+                // No folder found:
+                $this->getLogger()->notice(sprintf('Folder #%d does not exist: skipping', $folderId));
+                continue;
+            }
+
+            $folder = $this->findFolderNameQuery->fetch();
             $this->getLogger()->info(
                 sprintf(
                     'Deleting unused indicators in folder #%d (%s)',
-                    $folder->getId(),
-                    $folder->getTitle()
+                    $folderId,
+                    $folder['name'] . (isset($folder['codes'])
+                        ? ' (' . $folder['codes'] . ')'
+                        : ''
+                    )
                 )
             );
 
             // Don't go further if there's no capabilities in folder
-            $this->findRubricCapabilityQuery->execute(['folderId' => $folder->getId()]);
+            $this->findRubricCapabilityQuery->execute(['folderId' => $folderId]);
             if ($this->findRubricCapabilityQuery->rowCount() === 0) {
                 $this->getLogger()->debug(self::indent(1) . 'folder contains no capabilities: no action required');
             } else {
                 // This folder contains capabilities: great! Let's delete any unused indicators.
                 $this->getLogger()->debug(self::indent(1) . 'finding unused indicators...');
-                $this->findUnusedIndicatorsQuery->execute(['folderId' => $folder->getId()]);
+                $this->findUnusedIndicatorsQuery->execute(['folderId' => $folderId]);
                 if ($this->findUnusedIndicatorsQuery->rowCount() === 0) {
                     $this->getLogger()->debug(self::indent(1) . 'no unused indicators to delete, skipping');
                     continue;
@@ -235,7 +269,7 @@ class Indicator extends CliTool\App
                 $this->deleteUnusedIndicators($this->findUnusedIndicatorsQuery->fetchRowArray('id'));
 
                 // Find all the capabilities in this folder
-                $this->findRubricCapabilityQuery->execute(['folderId' => $folder->getId()]);
+                $this->findRubricCapabilityQuery->execute(['folderId' => $folderId]);
                 $folderCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
 
                 // Clean up
