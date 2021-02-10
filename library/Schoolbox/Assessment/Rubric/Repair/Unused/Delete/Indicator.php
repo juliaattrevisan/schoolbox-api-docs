@@ -259,7 +259,7 @@ class Indicator extends CliTool\App
                 sprintf(
                     self::indent(2) . 'deleting unused indicator #%d (%s)',
                     $indicatorId,
-                    self::truncateNameForOutput(trim($indicatorName)),
+                    self::formatNameForOutput(trim($indicatorName)),
                 )
             );
 
@@ -294,7 +294,7 @@ class Indicator extends CliTool\App
                 sprintf(
                     self::indent(2) . 'deleting empty capability #%d (%s)',
                     $capabilityId,
-                    self::truncateNameForOutput(trim($capabilityName)),
+                    self::formatNameForOutput(trim($capabilityName)),
                 )
             );
             $this->deleteRubricCapabilityQuery
@@ -330,7 +330,7 @@ class Indicator extends CliTool\App
                 sprintf(
                     self::indent(2) . 'deleting unused capability #%d (%s)',
                     $capabilityId,
-                    self::truncateNameForOutput(trim($capabilityName)),
+                    self::formatNameForOutput(trim($capabilityName)),
                 )
             );
             $this->deleteRubricCapabilityQuery
@@ -355,13 +355,14 @@ class Indicator extends CliTool\App
     }
 
     /**
-     * Truncate `$name` for output in a log message.
+     * Truncate and normalize space in `$name` for output in a log message.
      *
      * @param string $name
      * @return string
      */
-    private static function truncateNameForOutput(string $name): string
+    private static function formatNameForOutput(string $name): string
     {
+        $name = preg_replace('/\\s+/', ' ', $name);
         return mb_strlen($name) > self::MAX_CHARS_IN_OUTPUT_NAME
             ? mb_substr($name, 0, self::MAX_CHARS_IN_OUTPUT_NAME) . '...'
             : $name;
