@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Repair\Unused\Delete;
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Statement\IStatement;
 use Alaress_Date_Format;
 use Schoolbox\Application\CliTool;
@@ -21,6 +20,11 @@ class Indicator extends CliTool\App
     private const OPT_LONG_FOLDER_IDS = 'folders:';
 
     private const INDENT = '  ';
+
+    /**
+     * How many characters max of a capability or indicator name are in the log?
+     */
+    private const MAX_CHARS_IN_OUTPUT_NAME = 40;
 
     private const FIND_RUBRIC_CAPABILITY_QUERY = "
         SELECT id, name
@@ -235,11 +239,14 @@ class Indicator extends CliTool\App
     private function deleteUnusedIndicators(array $indicators): void
     {
         foreach ($indicators as $indicatorId => $indicatorName) {
+            $outputName = trim($indicatorName);
             $this->getLogger()->info(
                 sprintf(
-                    self::indent(2) . 'indicator "%s" (%d) is unused: deleting',
-                    trim($indicatorName),
-                    $indicatorId
+                    self::indent(2) . 'deleting unused indicator #%d (%s)',
+                    $indicatorId,
+                    (mb_strlen($outputName) > self::MAX_CHARS_IN_OUTPUT_NAME
+                        ? mb_substr($outputName, 0, self::MAX_CHARS_IN_OUTPUT_NAME) . '...'
+                        : $outputName),
                 )
             );
 
@@ -267,11 +274,15 @@ class Indicator extends CliTool\App
             if (!empty($indicators)) {
                 continue;
             }
+            $outputName = trim($capabilityName);
             $this->getLogger()->info(
                 sprintf(
-                    self::indent(2) . 'capability "%s" (%d) does not have any indicators: deleting',
-                    trim($capabilityName),
-                    $capabilityId
+                    self::indent(2) . 'deleting empty capability #%d (%s)',
+                    $capabilityId,
+                    (mb_strlen($outputName) > self::MAX_CHARS_IN_OUTPUT_NAME
+                        ? mb_substr($outputName, 0, self::MAX_CHARS_IN_OUTPUT_NAME) . '...'
+                        : $outputName
+                    ),
                 )
             );
             // no indicators for this capability
@@ -298,11 +309,15 @@ class Indicator extends CliTool\App
             if (!empty($usedIndicators)) {
                 continue;
             }
+            $outputName = trim($capabilityName);
             $this->getLogger()->info(
                 sprintf(
-                    self::indent(2) . 'capability "%s" (%d) does not have any indicators in use: deleting',
-                    trim($capabilityName),
-                    $capabilityId
+                    self::indent(2) . 'deleting unused capability #%d (%s)',
+                    $capabilityId,
+                    (mb_strlen($outputName) > self::MAX_CHARS_IN_OUTPUT_NAME
+                        ? mb_substr($outputName, 0, self::MAX_CHARS_IN_OUTPUT_NAME) . '...'
+                        : $outputName
+                    ),
                 )
             );
             // no indicators in use for this capability
