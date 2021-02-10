@@ -26,7 +26,10 @@ module.exports = {
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.main.js',
         authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
 
-        chromeFoundation: './www/css/foundation/chrome-foundation.scss'
+        //Sass
+        chromeFoundation: './www/css/foundation/chrome-foundation.scss',
+        editor: './www/css/foundation/editor.scss'
+
     },
     output: {
         path: path.resolve(__dirname, "www/javascript/components"),
@@ -75,14 +78,6 @@ module.exports = {
                 test: /\.css$/,
                 use: ['vue-style-loader', 'css-loader'],
             },
-            // {
-            //     test: /\.scss$/,
-            //     use: [
-            //         'vue-style-loader',
-            //         'css-loader',
-            //         'sass-loader'
-            //     ],
-            // },
             {
 				test: /\.scss$/,
 				oneOf: [
