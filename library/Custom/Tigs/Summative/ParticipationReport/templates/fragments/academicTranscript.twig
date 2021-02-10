@@ -158,10 +158,12 @@ Data:
                                      # back to finding the most recent feedbacks' comment instead
                                     #}
                                     {% if folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.data.2.comment|length %}
-                                        {% set nesaGrade = folderData.nesaGraphData.data.2.studentMark|default('-') %}
+                                        {% set nesaGrade = folderData.nesaGraphData.data.2.studentMark %}
+                                        {% set nesaError = folderData.nesaGraphData.data.2.error %}
                                         {% set commentData = folderData.nesaGraphData.data.2.comment %}
                                     {% elseif folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment|length %}
-                                        {% set nesaGrade = folderData.nesaGraphData.data.1.studentMark|default('-') %}
+                                        {% set nesaGrade = folderData.nesaGraphData.data.1.studentMark %}
+                                        {% set nesaError = folderData.nesaGraphData.data.2.error %}
                                         {% set commentData = folderData.nesaGraphData.data.1.comment %}
                                     {% else %}
 
@@ -197,7 +199,10 @@ Data:
                                                 'cohortAverage': folderData.hscRankData.assessmentAverage,
                                                 'cohortRank': folderData.hscRankData.assessmentRank
                                             },
-                                            nesaGrade: nesaGrade
+                                            nesa: {
+                                                'grade': nesaGrade,
+                                                'error': nesaError
+                                            }
                                         } %}
                                     {% else %}
                                         {% set hasTaskFound = false %}
@@ -210,7 +215,10 @@ Data:
                                                 {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
                                                     interimGrades: hasInterimGrades,
                                                     rankData: hscTaskMarkData,
-                                                    nesaGrade: nesaGrade
+                                                    nesa: {
+                                                        'grade': nesaGrade,
+                                                        'error': nesaError
+                                                    }
                                                 } %}
                                             {% endif %}
                                         {% endfor %}
@@ -227,7 +235,10 @@ Data:
                                                 'cohortAverage': folderData.middleYearsRankData.assessmentAverage,
                                                 'cohortRank': folderData.middleYearsRankData.assessmentRank
                                             },
-                                            nesaGrade: nesaGrade
+                                            nesa: {
+                                                'grade': nesaGrade,
+                                                'error': nesaError
+                                            }
                                         } %}
                                     {% else %}
 
@@ -264,7 +275,10 @@ Data:
                                         {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
                                             interimGrades: hasInterimGrades,
                                             rankData: middleYearsTaskMarks,
-                                            nesaGrade: nesaGrade
+                                            nesa: {
+                                                'grade': nesaGrade,
+                                                'error': nesaError
+                                            }
                                         } %}
                                     {% endif %}
                                 {% endif %}
