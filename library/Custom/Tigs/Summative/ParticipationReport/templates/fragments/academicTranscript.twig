@@ -129,6 +129,64 @@ Data:
                                     {% endfor %}
                                 </div>
 
+
+                                {# Summative Data (NESA Grade for HSC and Middle Years students)
+                                 #
+                                 # These are calculated from a separate data struct - nesaGraphData - but they are
+                                 # presented in the greyboxes and supply comment data if it exists. Otherwise the comment
+                                 # data comes from the Formative Data structs hscRankData and middleYearsRankData.
+                                 #}
+                                {% set nesaGrade = null %}
+
+                                {# Search for comments. If they were in a previous class - it's now rolled over etc. - then
+                                 # just say that and carry onwards. There's nothing we can show
+                                 #
+                                 # If there is a NESA worktype feedback, then show its comment first
+                                 #
+                                 # Otherwise fall back to showing the most recent comment from the student's feedbacks
+                                 #}
+                                {% if subject.isPreviousClass %}
+                                    {% set commentData = { comment: 'Student is no longer enrolled in this class.' } %}
+                                {% else %}
+                                    {% set commentData = { comment: null } %}
+
+                                    {# buildNesaScoreData returns an empty array or an array with data
+                                     # If there's data in it, try loading semester 2 comment first,
+                                     # otherwise try to load semester 1 comment instead.
+                                     #
+                                     # An empty array means there isn't any NESA data and you should fall
+                                     # back to finding the most recent feedbacks' comment instead
+                                    #}
+                                    {% if folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.data.2.comment|length %}
+                                        {% set nesaGrade = folderData.nesaGraphData.data.2.studentMark|default('-') %}
+                                        {% set commentData = folderData.nesaGraphData.data.2.comment %}
+                                    {% elseif folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment|length %}
+                                        {% set nesaGrade = folderData.nesaGraphData.data.1.studentMark|default('-') %}
+                                        {% set commentData = folderData.nesaGraphData.data.1.comment %}
+                                    {% else %}
+
+                                        {# Render the first comment only #}
+                                        {% set commentFound = false %}
+
+                                        {% for unitSpecData in folderData.unitSpecs if not commentFound %}
+                                            {% if attributes.isHsc %}
+                                                {% set commentData = folderData.hscTaskMarks.data[unitSpecData.id] %}
+                                            {% else %}
+                                                {% set commentData = folderData.middleYearsTaskMarks.data[unitSpecData.id] %}
+                                            {% endif %}
+
+                                            {# Bust out of the for() once we find meaningful data
+                                             # This suffers from the same assumptive flaw that unitSpecIds are in order of creation
+                                             #}
+                                            {% if commentData.comment is not null %}
+                                                {% set commentFound = true %}
+                                            {% endif %}
+
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endif %}
+
+
                                 {# If we have explicit HscRank data, use that, otherwise fall back to most recent HscTaskMark assessment #}
                                 {% if attributes.isHsc %}
                                     {% if folderData.hscRankData %}
@@ -138,7 +196,8 @@ Data:
                                                 'studentMark': folderData.hscRankData.assessmentMark,
                                                 'cohortAverage': folderData.hscRankData.assessmentAverage,
                                                 'cohortRank': folderData.hscRankData.assessmentRank
-                                            }
+                                            },
+                                            nesaGrade: nesaGrade
                                         } %}
                                     {% else %}
                                         {% set hasTaskFound = false %}
@@ -150,7 +209,8 @@ Data:
 
                                                 {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
                                                     interimGrades: hasInterimGrades,
-                                                    rankData: hscTaskMarkData
+                                                    rankData: hscTaskMarkData,
+                                                    nesaGrade: nesaGrade
                                                 } %}
                                             {% endif %}
                                         {% endfor %}
@@ -166,7 +226,8 @@ Data:
                                                 'studentMark': folderData.middleYearsRankData.assessmentMark,
                                                 'cohortAverage': folderData.middleYearsRankData.assessmentAverage,
                                                 'cohortRank': folderData.middleYearsRankData.assessmentRank
-                                            }
+                                            },
+                                            nesaGrade: nesaGrade
                                         } %}
                                     {% else %}
 
@@ -202,72 +263,17 @@ Data:
 
                                         {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
                                             interimGrades: hasInterimGrades,
-                                            rankData: middleYearsTaskMarks
+                                            rankData: middleYearsTaskMarks,
+                                            nesaGrade: nesaGrade
                                         } %}
                                     {% endif %}
                                 {% endif %}
-
-                                {% set nesaGraphData = folderData.nesaGraphData.data | default(null) %}
-
-                                {% if nesaGraphData %}
-                                    {% set nesaGraphDatum = folderData.nesaGraphData.data | first %}
-                                    {% if nesaGraphDatum  %}
-                                        <div class="result-group{% if nesaGraphDatum.error|default(false) %} error{% endif %}">
-                                            <div class="result-item nesa-grade">
-                                                <span class="result-heading">NESA Grade</span><br>
-                                                <span class="result-value">{{ nesaGraphDatum.studentMark|default('-') }}</span>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                {% endif %}
-
                             {% endif %}
                         </div>
 
-                        {# Search for comments. If they were in a previous class - it's now rolled over etc. - then
-                         # just say that and carry onwards. There's nothing we can show
-                         #
-                         # If there is a NESA worktype feedback, then show its comment first
-                         #
-                         # Otherwise fall back to showing the most recent comment from the student's feedbacks
+                        {# This will come from either the most recent NESA data available
+                         # or the most recent formative assessment's feedback
                          #}
-                        {% if subject.isPreviousClass %}
-                            {% set commentData = { comment: 'Student is no longer enrolled in this class.' } %}
-                        {% else %}
-                            {% set commentData = { comment: null } %}
-
-                            {# buildNesaScoreData returns an empty array or an array with data
-                             # If there's data in it, try loading semester 2 comment first,
-                             # otherwise try to load semester 1 comment instead.
-                             #
-                             # An empty array means there isn't any NESA data and you should fall
-                             # back to finding the most recent feedbacks' comment instead
-                             #}
-                            {% if folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.data.2.comment|length %}
-                                {% set commentData = folderData.nesaGraphData.data.2.comment %}
-                            {% elseif folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment|length %}
-                                {% set commentData = folderData.nesaGraphData.data.1.comment %}
-                            {% else %}
-
-                                {# Render the first comment only #}
-                                {% set commentFound = false %}
-
-                                {% for unitSpec in folderData.unitSpecs if not commentFound %}
-                                    {% if attributes.isHsc %}
-                                        {% set commentData = folderData.hscTaskMarks.data[unitSpecId] %}
-                                    {% else %}
-                                        {% set commentData = folderData.aamData.data[unitSpecId] %}
-                                    {% endif %}
-
-                                    {# bust out of the for() once we find meaningful data
-                                     #}
-                                    {% if commentData.comment is not null %}
-                                        {% set commentFound = true %}
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                        {% endif %}
-
                         <div class="column small-12 teacher-comment content">
                             {{ commentData.comment | nl2br }}
                         </div>
