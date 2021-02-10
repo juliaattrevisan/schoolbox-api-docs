@@ -137,10 +137,7 @@ class Indicator extends CliTool\App
      */
     public function run(): void
     {
-        $di = $this->getDi();
-
-        /** @var IConnector $db */
-        $db        = $di->get('databaseInternal');
+        $db        = $this->getDatabaseInternal();
         $this->now = Alaress_Date_Format::now();
 
         // Set up folders
@@ -158,31 +155,13 @@ class Indicator extends CliTool\App
             $this->getLogger()->warning('Running in dry-run mode: use -p to write changes to database');
         }
 
-        // log verbosity
-        $verbosity = count($opts['verbose'] ?? []);
-        if ($verbosity <= 0) {
-            $this->getLogger()->warning('Running in non-verbose mode: Use -v, -vv or -vvv for varying levels of verbosity');
-        } elseif ($verbosity === 1) {
-            $this->getLogger()->warning('Running in verbose mode (-v)');
-        } elseif ($verbosity === 2) {
-            $this->getLogger()->warning('Running in very verbose mode (-vv)');
-        } elseif ($verbosity >= 3) {
-            $this->getLogger()->warning('Running in very very verbose mode (-vvv)');
-        }
-
-        $this->findRubricCapabilityQuery
-            = $db->prepareQuery(self::FIND_RUBRIC_CAPABILITY_QUERY);
-        $this->findRubricIndicatorQuery
-            = $db->prepareQuery(self::FIND_RUBRIC_INDICATOR_QUERY);
-        $this->findUsedRubricIndicatorQuery
-            = $db->prepareQuery(self::FIND_USED_RUBRIC_INDICATOR_QUERY);
-        $this->findUnusedIndicatorsQuery
-            = $db->prepareQuery(self::FIND_UNUSED_INDICATORS_QUERY);
-
-        $this->deleteRubricIndicatorQuery
-            = $db->prepareQuery(self::DELETE_RUBRIC_INDICATOR_QUERY);
-        $this->deleteRubricCapabilityQuery
-            = $db->prepareQuery(self::DELETE_RUBRIC_CAPABILITY_QUERY);
+        // prepare queries
+        $this->findRubricCapabilityQuery    = $db->prepareQuery(self::FIND_RUBRIC_CAPABILITY_QUERY);
+        $this->findRubricIndicatorQuery     = $db->prepareQuery(self::FIND_RUBRIC_INDICATOR_QUERY);
+        $this->findUsedRubricIndicatorQuery = $db->prepareQuery(self::FIND_USED_RUBRIC_INDICATOR_QUERY);
+        $this->findUnusedIndicatorsQuery    = $db->prepareQuery(self::FIND_UNUSED_INDICATORS_QUERY);
+        $this->deleteRubricIndicatorQuery   = $db->prepareQuery(self::DELETE_RUBRIC_INDICATOR_QUERY);
+        $this->deleteRubricCapabilityQuery  = $db->prepareQuery(self::DELETE_RUBRIC_CAPABILITY_QUERY);
 
         // Wrap entire loop in a transaction
         $db->beginTransaction();
