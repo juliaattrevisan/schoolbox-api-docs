@@ -17,14 +17,14 @@
             <table class="inner-wrap">
                 <tr{# header #} height="100">
                     <td class="header">
-                        <table align="center" width="670">
+                        <table align="center" width="670" class="fullwidth">
                             {% include 'schoolmail/header.twig' %}
                         </table>
                     </td>
                 </tr>
                 <tr{# content #}>
                     <td class="content">
-                        <table align="center" width="670">
+                        <table align="center" width="670" class="fullwidth">
                             <tr>
                                 <td>
                                 {% block content %}
@@ -36,8 +36,8 @@
                     </td>
                 </tr>
                 <tr{# footer #}>
-                    <td class="footer" width="670">
-                        <table align="center" width="670">
+                    <td class="footer" width="670" class="fullwidth">
+                        <table align="center" width="670" class="fullwidth">
                             {% include 'schoolmail/footer.twig' %}
                         </table>
                     </td>
