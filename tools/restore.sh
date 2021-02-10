@@ -467,25 +467,17 @@ sourcep3=`echo $restore | cut -d',' -f5`;
 if [ "$sourcetype" == '[A]' ] && [ "$sourceloc" == '[R]' ]; then
   local_mount=$(findmnt -n -o SOURCE --target "$thisdatadir");
   local_mount_total=$(df -B1 | grep "$local_mount" | awk -F " " '{print $2}');
-  local_mount_dir=$(mount | grep "$local_mount" | awk -F " " '{print $3}');
-  local_non_sb_used=$(du -sh "$local_mount_dir" --exclude "$thisdatadir" -B1 | cut -f 1);
-  localAvailableStorage=$((local_mount_total - local_non_sb_used));
   remote_mount=$(ssh "$host" findmnt -n -o SOURCE --target "$sourcep3");
   remote_mount_used=$(ssh "$host" df -B1 | grep "$remote_mount" | awk -F " " '{print $3}');
-  remote_data_dir=${tempfiledir%/*};
-  remote_mount_dir=$(ssh "$host" mount | grep "$remote_mount" | awk -F " " '{print $3}');
-  remote_not_sb_used=$(ssh "$host" du -sh "$remote_mount_dir" --exclude "$remote_data_dir" -B1 2>/dev/null | cut -f 1);
-  remote_cache_used=$(ssh "$host" du -sh "$remote_data_dir/cache/zip" -B1 | cut -f 1);
-  remoteUsedStorage=$((remote_mount_used - remote_not_sb_used - remote_cache_used));
 
-  if [ "$localAvailableStorage" == "" ] || [ "$remoteUsedStorage" == "" ]; then
+  if [ "$local_mount" == "" ] || [ "$remote_mount_used" == "" ]; then
     errmsg="Please check the datapool disk on both hosts, one or both are either full or not available";
     error;
-  elif [ $localAvailableStorage -le $remoteUsedStorage ]; then
-    errmsg="You are trying to restore more data ($remoteUsedStorage bytes) than disk that is available ($localAvailableStorage bytes)";
+  elif [[ "$local_mount" -le "$remote_mount_used" ]]; then
+    errmsg="You are trying to restore more data ($remote_mount_used bytes) than disk that is available ($local_mount bytes)";
     error;
   fi
-  echo "Full sync space check passed: available - $localAvailableStorage bytes / needed - $remoteUsedStorage bytes";
+  echo "Full sync space check passed: available - $local_mount bytes / needed - $remote_mount_used bytes";
 fi
 
 # Sync the datafiles, with progress if possible
