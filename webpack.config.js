@@ -1,5 +1,6 @@
 const path              = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
+const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries'); //https://www.npmjs.com/package/webpack-fix-style-only-entries
 
 module.exports = {
     entry: {
@@ -100,8 +101,15 @@ module.exports = {
 								}
 							},
 							{ loader: "extract-loader" },
-							{ loader: "css-loader?url=false" },
-							{ loader: "sass-loader",
+                            {
+                                loader: "css-loader",
+                                options: {
+                                    url: false,
+                                    modules: false
+                                }
+                            },
+                            {
+                                loader: "sass-loader",
 								options: {
 									sassOptions: {
 										indentWidth: 4,
@@ -127,6 +135,7 @@ module.exports = {
         extensions: ['*', '.js', '.vue', '.json']
     },
     plugins: [
-        new VueLoaderPlugin()
+        new VueLoaderPlugin(),
+        new FixStyleOnlyEntriesPlugin()
     ]
 };
