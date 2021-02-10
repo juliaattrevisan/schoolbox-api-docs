@@ -196,6 +196,19 @@ class MiddleYearsAssessmentTasks extends BaseComponent
         $cohortMarks    = $this->deriveCohortMarks($cohortAssessments);
         $cohortAverage  = $this->deriveCohortAverage($cohortMarks);
 
+        /* Handy diagnosis
+         */
+//        new \Alaress_Probe([
+//            'unitSpecId'    => $unitSpec->getId(),
+//            'unitSpecTitle' => $unitSpec->getTitle(),
+//            'studentMark'   => $feedback ? $feedback->getHumanReadableMark() : null,
+//            'publishAt'     => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
+//            'cohortAverage' => null === $cohortAverage ? null : "$cohortAverage %",
+//            'comment'       => $feedback ? $feedback->getComment() : null,
+//            'commentBy'     => $feedback ? $feedback->getReviewer()->getFullName() : null,
+//            'dueDate'       => $classAssessment->getDueAt()->getDatabase(),
+//        ]);
+
         return [
             'studentMark'   => $feedback ? $feedback->getHumanReadableMark() : null,
             'publishAt'     => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,

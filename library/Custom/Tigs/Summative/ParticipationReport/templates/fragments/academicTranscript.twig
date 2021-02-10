@@ -231,7 +231,7 @@ Data:
                                         {# Formative Grade
                                          # Look at this student's feedbacks, find the most recent one, greyBox that
                                          #}
-                                        {% set middleYearsTaskMarks = null %}
+                                        {% set mostRecentData = null %}
 
                                         {# folderData.unitSpecs might not be in the intended order
                                          # Unit 2 might appear before Unit 1 if their unitSpecs are
@@ -241,14 +241,14 @@ Data:
                                          # Anyway traverse until you find the most recent publishAt
                                          # then use that data
                                          #}
-                                        {% for unitSpecData in folderData.unitSpecs if not hasTaskFound %}
+                                        {% for unitSpecData in folderData.unitSpecs %}
                                             {% if folderData.middleYearsTaskMarks.data[unitSpecData.id] ?? false %}
                                                 {% set middleYearsTaskMarks = folderData.middleYearsTaskMarks.data[unitSpecData.id] %}
 
                                                 {# Remember the data which the most recent publishAt
                                                  # Keep looking until there aren't any records more recent
                                                  #}
-                                                {% if middleYearsTaskMarks.publishAt > mostRecentData.publishAt or middleYearsTaskMarks is null%}
+                                                {% if middleYearsTaskMarks.publishAt > mostRecentData.publishAt or mostRecentData is null %}
                                                     {% set mostRecentData = middleYearsTaskMarks %}
 
                                                     {# Used to pop up a little notice to the user about transient mark data
@@ -260,7 +260,7 @@ Data:
 
                                         {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
                                             interimGrades: hasInterimGrades,
-                                            rankData: middleYearsTaskMarks,
+                                            rankData: mostRecentData,
                                             nesa: {
                                                 'grade': nesaGrade,
                                                 'error': nesaError
