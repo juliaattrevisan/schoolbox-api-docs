@@ -45,8 +45,7 @@ class Indicator extends CliTool\App
     /**
      * Query for finding used rubric indicators.
      *
-     * TODO figure out why this even exists: why do we want to delete rubric
-     *      capabilities that are in use?
+     * Capabilities with no indicators that are in use will be deleted.
      */
     private const FIND_USED_RUBRIC_INDICATOR_QUERY = "
         SELECT    ri.id, ri.name
@@ -220,7 +219,7 @@ class Indicator extends CliTool\App
             if ($this->findRubricCapabilityQuery->rowCount() === 0) {
                 $this->getLogger()->debug(self::indent(1) . 'folder contains no capabilities: no action required');
             } else {
-                // This folder contains capabilites: great! Let's delete any unused indicators.
+                // This folder contains capabilities: great! Let's delete any unused indicators.
                 $this->getLogger()->debug(self::indent(1) . 'finding unused indicators...');
                 $this->findUnusedIndicatorsQuery->execute(['folderId' => $folder->getFolder()->getId()]);
                 $folderIndicators = $this->findUnusedIndicatorsQuery->fetchColumnArray('name', 'id');
@@ -231,7 +230,7 @@ class Indicator extends CliTool\App
                     $this->deleteUnusedIndicators($folderIndicators);
 
                     // Find all the capabilities in this folder
-                    $this->findRubricCapabilityQuery->execute(['folderId' => $folder->getFolder()->getId()]);
+                    $this->findRubricCapabilityQuery->execute(['folderId' => $folder->getId()]);
                     $folderCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
 
                     // Clean up
@@ -280,11 +279,15 @@ class Indicator extends CliTool\App
     private function deleteEmptyCapabilities(array $capabilities): void
     {
         foreach ($capabilities as $capabilityId => $capabilityName) {
+            // Are there any extant indicators in this capability?
+            // If so, do not delete this capability.
             $this->findRubricIndicatorQuery->execute(['capabilityId' => $capabilityId]);
             $indicators = $this->findRubricIndicatorQuery->fetchColumnArray('name', 'id');
             if (!empty($indicators)) {
                 continue;
             }
+
+            // Delete empty capability
             $this->getLogger()->info(
                 sprintf(
                     self::indent(2) . 'deleting empty capability #%d (%s)',
@@ -292,7 +295,6 @@ class Indicator extends CliTool\App
                     self::truncateNameForOutput(trim($capabilityName)),
                 )
             );
-            // no indicators for this capability
             $this->deleteRubricCapabilityQuery
                 ->execute(
                     [
@@ -304,18 +306,22 @@ class Indicator extends CliTool\App
     }
 
     /**
-     * If any capabilities in `$capabilities` are unused, remove them.
+     * Find capabilities with no indicators that are in use, and delete them.
      *
      * @param array $capabilities
      */
     private function deleteCapabilitiesWithNoUsedIndicators(array $capabilities): void
     {
         foreach ($capabilities as $capabilityId => $capabilityName) {
+            // Are any indicators in this capability in use?
+            // If so, do not delete this capability.
             $this->findUsedRubricIndicatorQuery->execute(['capabilityId' => $capabilityId]);
             $usedIndicators = $this->findUsedRubricIndicatorQuery->fetchColumnArray('name', 'id');
             if (!empty($usedIndicators)) {
                 continue;
             }
+
+            // Delete unused capability
             $this->getLogger()->info(
                 sprintf(
                     self::indent(2) . 'deleting unused capability #%d (%s)',
@@ -323,7 +329,6 @@ class Indicator extends CliTool\App
                     self::truncateNameForOutput(trim($capabilityName)),
                 )
             );
-            // no indicators in use for this capability
             $this->deleteRubricCapabilityQuery
                 ->execute(
                     [
