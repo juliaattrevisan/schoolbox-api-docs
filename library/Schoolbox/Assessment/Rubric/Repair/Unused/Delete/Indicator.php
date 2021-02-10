@@ -239,14 +239,11 @@ class Indicator extends CliTool\App
     private function deleteUnusedIndicators(array $indicators): void
     {
         foreach ($indicators as $indicatorId => $indicatorName) {
-            $outputName = trim($indicatorName);
             $this->getLogger()->info(
                 sprintf(
                     self::indent(2) . 'deleting unused indicator #%d (%s)',
                     $indicatorId,
-                    (mb_strlen($outputName) > self::MAX_CHARS_IN_OUTPUT_NAME
-                        ? mb_substr($outputName, 0, self::MAX_CHARS_IN_OUTPUT_NAME) . '...'
-                        : $outputName),
+                    self::truncateNameForOutput(trim($indicatorName)),
                 )
             );
 
@@ -274,15 +271,11 @@ class Indicator extends CliTool\App
             if (!empty($indicators)) {
                 continue;
             }
-            $outputName = trim($capabilityName);
             $this->getLogger()->info(
                 sprintf(
                     self::indent(2) . 'deleting empty capability #%d (%s)',
                     $capabilityId,
-                    (mb_strlen($outputName) > self::MAX_CHARS_IN_OUTPUT_NAME
-                        ? mb_substr($outputName, 0, self::MAX_CHARS_IN_OUTPUT_NAME) . '...'
-                        : $outputName
-                    ),
+                    self::truncateNameForOutput(trim($capabilityName)),
                 )
             );
             // no indicators for this capability
@@ -309,15 +302,11 @@ class Indicator extends CliTool\App
             if (!empty($usedIndicators)) {
                 continue;
             }
-            $outputName = trim($capabilityName);
             $this->getLogger()->info(
                 sprintf(
                     self::indent(2) . 'deleting unused capability #%d (%s)',
                     $capabilityId,
-                    (mb_strlen($outputName) > self::MAX_CHARS_IN_OUTPUT_NAME
-                        ? mb_substr($outputName, 0, self::MAX_CHARS_IN_OUTPUT_NAME) . '...'
-                        : $outputName
-                    ),
+                    self::truncateNameForOutput(trim($capabilityName)),
                 )
             );
             // no indicators in use for this capability
@@ -331,7 +320,6 @@ class Indicator extends CliTool\App
         }
     }
 
-
     /**
      * Helper method for indenting log output for legibility.
      *
@@ -341,5 +329,18 @@ class Indicator extends CliTool\App
     private static function indent(int $depth): string
     {
         return str_repeat(self::INDENT, $depth);
+    }
+
+    /**
+     * Truncate `$name` for output in a log message.
+     *
+     * @param string $name
+     * @return string
+     */
+    private static function truncateNameForOutput(string $name): string
+    {
+        return mb_strlen($name) > self::MAX_CHARS_IN_OUTPUT_NAME
+            ? mb_substr($name, 0, self::MAX_CHARS_IN_OUTPUT_NAME) . '...'
+            : $name;
     }
 }
