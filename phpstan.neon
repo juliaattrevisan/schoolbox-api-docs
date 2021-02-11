@@ -1,7 +1,7 @@
 parameters:
     bootstrapFiles:
         - %rootDir%/../../../conf/core/require.php
-    level: 2
+    level: 4
     paths:
         - conf
         - dav
