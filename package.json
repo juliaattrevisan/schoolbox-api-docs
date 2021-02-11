@@ -16,33 +16,33 @@
     "@fullcalendar/timegrid": "^4.3.0",
     "@fullcalendar/vue": "^4.3.1",
     "@microsoft/immersive-reader-sdk": "^1.1.0",
-    "@types/classnames": "^2.2.9",
+    "@types/classnames": "^2.2.11",
     "axios": "0.21.1",
-    "ckeditor4-vue": "^1.1.0",
+    "ckeditor4-vue": "^1.3.0",
     "clipboard": "^2.0.6",
-    "core-js": "^3.4.5",
+    "core-js": "^3.8.3",
     "filesize": "^6.1.0",
     "flatpickr": "^4.6.3",
-    "locutus": "^2.0.11",
+    "locutus": "^2.0.14",
     "lodash": "4.17.19",
-    "moment": "^2.24.0",
-    "qs": "^6.9.1",
+    "moment": "^2.29.1",
+    "qs": "^6.9.6",
     "ucid": "^1.0.0",
-    "vue": "2.6.10",
-    "vue-select": "^3.10.5",
+    "vue": "^2.6.12",
+    "vue-select": "^3.11.2",
     "vue-style-loader": "^4.1.2",
     "vuejs-paginate": "2.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.7.4",
-    "@babel/plugin-proposal-optional-chaining": "^7.7.4",
-    "@babel/plugin-transform-object-assign": "^7.7.4",
-    "@babel/plugin-transform-shorthand-properties": "^7.7.4",
-    "@babel/preset-env": "^7.7.4",
-    "babel-loader": "^8.0.6",
-    "bower": "^1.8.4",
-    "css-loader": "^3.2.0",
-    "grunt": "^1.0.4",
+    "@babel/core": "^7.12.10",
+    "@babel/plugin-proposal-optional-chaining": "^7.12.7",
+    "@babel/plugin-transform-object-assign": "^7.12.1",
+    "@babel/plugin-transform-shorthand-properties": "^7.12.1",
+    "@babel/preset-env": "^7.12.11",
+    "babel-loader": "^8.2.2",
+    "bower": "^1.8.12",
+    "css-loader": "^3.6.0",
+    "grunt": "^1.3.0",
     "grunt-bower-task": "^0.5.0",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-concat": "^1.0.1",
@@ -50,15 +50,15 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-sass": "^3.1.0",
     "jit-grunt": "^0.10.0",
-    "sass": "^1.26.7",
+    "sass": "^1.32.5",
     "sass-loader": "^7.3.1",
     "source-map-loader": "^0.2.4",
-    "vue-loader": "^15.7.2",
-    "vue-template-compiler": "^2.6.10",
-    "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.10"
+    "vue-loader": "^15.9.6",
+    "vue-template-compiler": "^2.6.12",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^3.3.12"
   },
-  "license": "Commercial",
+  "license": "UNLICENSED",
   "repository": {
     "type": "git",
     "url": "git://github.com/alaress/schoolbox.git"
@@ -68,26 +68,5 @@
     "watch": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development --watch",
     "watch-poll": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development --watch --watch-poll=1000",
     "publish": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=production"
-  },
-  "babel": {
-    "presets": [
-      [
-        "@babel/preset-env",
-        {
-          "targets": {
-            "browsers": [
-              "defaults"
-            ]
-          },
-          "useBuiltIns": "usage",
-          "corejs": 3
-        }
-      ]
-    ],
-    "plugins": [
-      "@babel/plugin-proposal-optional-chaining",
-      "@babel/plugin-transform-object-assign",
-      "@babel/plugin-transform-shorthand-properties"
-    ]
   }
 }
