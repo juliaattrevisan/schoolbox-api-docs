@@ -236,7 +236,7 @@ class Profile implements IStrategy
             $studiesCode = $this->findStudiesCode($student);
             $title = '';
             $tutorGroup = trim((string)$student['school_details']['pc_tutor_group']);
-            $username = trim((string)$student['general_details']['student_code']);
+            $username = trim((string)$student['general_details']['portal_user_code']);
             $yearLevel = trim((string)$student['school_details']['year_group']);
 
             /* Dates
