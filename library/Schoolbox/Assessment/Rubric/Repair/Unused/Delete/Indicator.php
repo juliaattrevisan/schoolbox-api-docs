@@ -299,7 +299,9 @@ class Indicator extends CliTool\App
 
             // Clean up empty capabilities
             $this->getLogger()->info(self::indent(1) . 'cleaning up any empty capabilities left behind...');
-            $this->deleteEmptyCapabilities($capabilities);
+            foreach ($capabilities as $capability) {
+                $this->deleteCapabilityIfEmpty($capability);
+            }
 
             // Should not need to clean up capabilities with unused indicators:
             // all these would have been cleaned up in the last step
@@ -309,45 +311,12 @@ class Indicator extends CliTool\App
     }
 
     /**
-     * Finds capabilities without indicators and delete them
-     *
-     * @param array $capabilities
-     */
-    private function deleteEmptyCapabilities(array $capabilities): void
-    {
-        foreach ($capabilities as $capability) {
-            // Are there any extant indicators in this capability?
-            // If so, do not delete this capability.
-            $this->findRubricIndicatorQuery->execute(['capabilityId' => $capability['id']]);
-            if ($this->findRubricIndicatorQuery->rowCount() > 0) {
-                continue;
-            }
-
-            // Delete empty capability
-            $this->getLogger()->info(
-                sprintf(
-                    self::indent(2) . 'deleting empty capability #%d (%s)',
-                    $capability['id'],
-                    self::formatNameForOutput($capability['name']),
-                )
-            );
-            $this->deleteRubricCapabilityQuery->execute(
-                [
-                    'now'          => $this->now,
-                    'capabilityId' => $capability['id'],
-                ]
-            );
-        }
-    }
-
-    /**
      * Delete the given indicator, if it is empty.
      *
      * @param array $indicator  The indicator to delete: contains the "id" and
      *                          "name" fields
      * @param array $capability The capability the indicator is in: contains the
-     *                          "id" and
-     *                          "name" fields
+     *                          "id" and "name" fields
      */
     private function deleteIndicatorIfEmpty(array $indicator, array $capability): void
     {
@@ -382,6 +351,34 @@ class Indicator extends CliTool\App
                 [
                     'now'         => $this->now,
                     'indicatorId' => $indicator['id'],
+                ]
+            );
+        }
+    }
+
+    /**
+     * Delete the given capability, if it is empty.
+     *
+     * @param array $capability The capability the indicator is in: contains the
+     *                          "id" and "name" fields
+     */
+    private function deleteCapabilityIfEmpty(array $capability): void
+    {
+        // Are there any extant indicators in this capability?
+        // If so, do not delete this capability.
+        $this->findRubricIndicatorQuery->execute(['capabilityId' => $capability['id']]);
+        if ($this->findRubricIndicatorQuery->rowCount() === 0) {
+            $this->getLogger()->info(
+                sprintf(
+                    self::indent(2) . 'deleting empty capability #%d (%s)',
+                    $capability['id'],
+                    self::formatNameForOutput($capability['name']),
+                )
+            );
+            $this->deleteRubricCapabilityQuery->execute(
+                [
+                    'now'          => $this->now,
+                    'capabilityId' => $capability['id'],
                 ]
             );
         }
