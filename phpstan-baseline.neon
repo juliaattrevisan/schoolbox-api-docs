@@ -16,11 +16,6 @@ parameters:
 			path: library/Alaress/Async/Notification/Cloud/Google/Response.php
 
 		-
-			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
-			count: 1
-			path: library/Alaress/Async/Notification/NotificationBundle.php
-
-		-
 			message: "#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#"
 			count: 1
 			path: library/Alaress/Async/Test/Subscription.php
@@ -129,11 +124,6 @@ parameters:
 			message: "#^Call to an undefined method Alaress\\\\Json\\\\Serializable\\:\\:getPrimitive\\(\\)\\.$#"
 			count: 2
 			path: library/Alaress/Json/Decorator/Test/PropertyDecoratorTest.php
-
-		-
-			message: "#^Variable \\$context in isset\\(\\) is never defined\\.$#"
-			count: 1
-			path: library/Alaress/Lumberjack/CliFormatter.php
 
 		-
 			message: "#^Constructor of class Alaress\\\\Mail\\\\AbstractMailer has an unused parameter \\$host\\.$#"
@@ -566,11 +556,6 @@ parameters:
 			path: library/Custom/Diocesan/AchievementReport/Module.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Custom/Diocesan/AchievementReport/Module.php
-
-		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\UserMapper\\.$#"
 			count: 1
 			path: library/Custom/Help/CourseParticipation/Controller.php
@@ -613,16 +598,6 @@ parameters:
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
-			path: library/Custom/Help/Hero/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Custom/Help/Nesa/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
 			path: library/Custom/Meriden/Pastoral/Module.php
 
 		-
@@ -639,11 +614,6 @@ parameters:
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForToday\\(\\)\\.$#"
 			count: 1
 			path: library/Custom/Mggs/Personalised/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Custom/Stk/NCEA/Module.php
 
 		-
 			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
@@ -694,11 +664,6 @@ parameters:
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Resource\\\\Folder\\\\Mapper\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/SubjectReport/Module.php
-
-		-
-			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/Report.php
 
 		-
 			message: "#^PHPDoc tag @return with type array\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>\\|\\(iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\GenericCollection\\) is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
@@ -1268,36 +1233,6 @@ parameters:
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
-			path: library/Schoolbox/Admin/Import/Pastoral/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/Photos/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/Profile/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/Timetable/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/TimetableEnrolment/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Import/TimetableStructure/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
 			path: library/Schoolbox/Admin/Import/UserAccount/Module.php
 
 		-
@@ -1306,44 +1241,10 @@ parameters:
 			path: library/Schoolbox/Admin/Lists/Controller.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Lists/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Oauth/Module.php
-
-		-
-			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
-			count: 2
-			path: library/Schoolbox/Admin/Oauth/Module.php
-
-		-
-			message: "#^Method Aura\\\\Di\\\\ContainerInterface\\:\\:set\\(\\) invoked with 3 parameters, 2 required\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Profile/Button/Module.php
-
-		-
 			message: "#^Access to protected property Aura\\\\Router\\\\Route\\:\\:\\$method\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/RouteSummary/Controller.php
 
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/SHAPS/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Service/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Settings/Module.php
 
 		-
 			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
@@ -1365,10 +1266,6 @@ parameters:
 			count: 1
 			path: library/Schoolbox/Application/CliTool/Kernel.php
 
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Application/Feedback/Module.php
 
 		-
 			message: "#^Variable \\$authenticated might not be defined\\.$#"
@@ -1535,10 +1432,6 @@ parameters:
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/Markbook/Controller.php
 
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Markbook/Module.php
 
 		-
 			message: "#^Multiple PHPDoc @var tags above single variable assignment are not supported\\.$#"
@@ -1555,20 +1448,6 @@ parameters:
 			count: 2
 			path: library/Schoolbox/Blog/Homepage/Post/Mapper.php
 
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event/Attendance/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Module.php
 
 		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
@@ -1691,11 +1570,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Audience/Segment/Translator.php
 
 		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/AudienceBrowser/Module.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Comms\\\\News\\\\Mapper\\:\\:findCheaplyById\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Comms/News/Controller.php
@@ -1709,16 +1583,6 @@ parameters:
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForArticles\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Discussion/Thread/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Feed/Module.php
-
-		-
-			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Moderation/Module.php
 
 		-
 			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
