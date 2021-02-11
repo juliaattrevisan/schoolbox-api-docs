@@ -86,6 +86,25 @@ class Indicator extends CliTool\App
     ";
 
     /**
+     * Query for finding the number of usages of an indicator.
+     */
+    private const FIND_INDICATOR_USAGE_COUNT_QUERY = "
+        SELECT
+            COUNT(a.id) AS usages,
+            vr.capability_id,
+            vr.capability_name,
+            vr.indicator_id,
+            vr.indicator_name
+        FROM       v_assessment_relation var
+        INNER JOIN v_rubric              vr ON var.assessment_id = vr.assessment_id
+        INNER JOIN assessment            a  ON var.assessment_id = a.id
+        WHERE vr.indicator_id = :indicatorId
+        AND   a.deleted_at IS NULL
+        GROUP BY vr.capability_id, vr.capability_name, vr.indicator_id, vr.indicator_name
+        ORDER BY vr.capability_id, vr.indicator_id
+    ";
+
+    /**
      * Query for finding unused rubric indicators: these ones will be deleted.
      */
     private const FIND_UNUSED_INDICATORS_QUERY = "
@@ -148,6 +167,11 @@ class Indicator extends CliTool\App
      * Query for finding all unused indicators in a given folder
      */
     private IStatement $findUnusedIndicatorsQuery;
+
+    /**
+     * Query for finding the number of usages of an indicator.
+     */
+    private IStatement $findIndicatorUsageCountQuery;
 
     /**
      * Query for deleting a rubric indicator from a unit folder.
@@ -220,6 +244,7 @@ class Indicator extends CliTool\App
         $this->findRubricIndicatorQuery     = $db->prepareQuery(self::FIND_RUBRIC_INDICATOR_QUERY);
         $this->findUsedRubricIndicatorQuery = $db->prepareQuery(self::FIND_USED_RUBRIC_INDICATOR_QUERY);
         $this->findUnusedIndicatorsQuery    = $db->prepareQuery(self::FIND_UNUSED_INDICATORS_QUERY);
+        $this->findIndicatorUsageCountQuery = $db->prepareQuery(self::FIND_INDICATOR_USAGE_COUNT_QUERY);
         $this->deleteRubricIndicatorQuery   = $db->prepareQuery(self::DELETE_RUBRIC_INDICATOR_QUERY);
         $this->deleteRubricCapabilityQuery  = $db->prepareQuery(self::DELETE_RUBRIC_CAPABILITY_QUERY);
 
@@ -278,30 +303,73 @@ class Indicator extends CliTool\App
             $this->findRubricCapabilityQuery->execute(['folderId' => $folderId]);
             if ($this->findRubricCapabilityQuery->rowCount() === 0) {
                 $this->getLogger()->debug(self::indent(1) . 'folder contains no capabilities: no action required');
-            } else {
-                // This folder contains capabilities: great! Let's delete any unused indicators.
-                $this->getLogger()->debug(self::indent(1) . 'finding unused indicators...');
-                $this->findUnusedIndicatorsQuery->execute(['folderId' => $folderId]);
-                if ($this->findUnusedIndicatorsQuery->rowCount() === 0) {
-                    $this->getLogger()->debug(self::indent(1) . 'no unused indicators to delete, skipping');
-                    continue;
-                }
-
-                $this->deleteUnusedIndicators($this->findUnusedIndicatorsQuery->fetchRowArray('id'));
-
-                // Find all the capabilities in this folder
-                $this->findRubricCapabilityQuery->execute(['folderId' => $folderId]);
-                $folderCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
-
-                // Clean up
-                $this->getLogger()->debug(self::indent(1) . 'cleaning up any empty capabilities left behind...');
-                $this->deleteEmptyCapabilities($folderCapabilities);
-
-                // Should not need to clean up capabilities with unused indicators:
-                // all these would have been cleaned up in the last step
-//                $this->getLogger()->debug(self::indent(1) . 'cleaning up any capabilities with no indicators in use...');
-//                $this->deleteCapabilitiesWithNoUsedIndicators($folderCapabilities);
+                continue;
             }
+
+            // This folder contains capabilities: great!
+            // Let's find indicators, and then determine if they are used or not.
+            $this->getLogger()->info(self::indent(1) . 'finding unused indicators...');
+
+            foreach ($this->findRubricCapabilityQuery->fetchAll() as $capability) {
+                $this->findRubricIndicatorQuery->execute(['capabilityId' => $capability['id']]);
+                foreach ($this->findRubricIndicatorQuery->fetchAll() as $indicator) {
+                    // How many usages of this indicator are there?
+                    $this->findIndicatorUsageCountQuery->execute(['indicatorId' => $indicator['id']]);
+                    $indicatorUsageCount = (int)$this->findIndicatorUsageCountQuery->fetchColumn();
+
+                    $this->getLogger()->debug(
+                        self::indent(2)
+                        . sprintf(
+                            'indicator #%d (%s / %s) has %d usage(s)',
+                            $indicator['id'],
+                            self::formatNameForOutput($capability['name']),
+                            self::formatNameForOutput($indicator['name']),
+                            $indicatorUsageCount,
+                        )
+                    );
+
+                    if ($indicatorUsageCount === 0) {
+                        $this->getLogger()->info(
+                            self::indent(2)
+                            . sprintf(
+                                'deleting unused indicator #%d (%s / %s)',
+                                $indicator['id'],
+                                self::formatNameForOutput($capability['name']),
+                                self::formatNameForOutput($indicator['name']),
+                            )
+                        );
+
+                        $this->deleteRubricIndicatorQuery
+                            ->execute(
+                                [
+                                    'now'         => $this->now,
+                                    'indicatorId' => $indicator['id'],
+                                ]
+                            );
+                    }
+                }
+            }
+
+//            $this->findUnusedIndicatorsQuery->execute(['folderId' => $folderId]);
+//            if ($this->findUnusedIndicatorsQuery->rowCount() === 0) {
+//                $this->getLogger()->debug(self::indent(1) . 'no unused indicators to delete, skipping');
+//                continue;
+//            }
+//
+//            $this->deleteUnusedIndicators($this->findUnusedIndicatorsQuery->fetchRowArray('id'));
+
+            // Find all the capabilities in this folder
+            $this->findRubricCapabilityQuery->execute(['folderId' => $folderId]);
+            $folderCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
+
+            // Clean up
+            $this->getLogger()->info(self::indent(1) . 'cleaning up any empty capabilities left behind...');
+            $this->deleteEmptyCapabilities($folderCapabilities);
+
+            // Should not need to clean up capabilities with unused indicators:
+            // all these would have been cleaned up in the last step
+//            $this->getLogger()->debug(self::indent(1) . 'cleaning up any capabilities with no indicators in use...');
+//            $this->deleteCapabilitiesWithNoUsedIndicators($folderCapabilities);
         }
     }
 
