@@ -45,7 +45,7 @@ module.exports = {
                                     targets: {
                                         browsers: [
                                             "defaults",
-                                            "IE 11"
+                                            "not IE <= 11"
                                         ],
                                     },
                                     useBuiltIns: 'usage',
