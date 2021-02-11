@@ -1,79 +1,3 @@
-<template>
-    <div>
-        <section>
-            <dl v-if="isArticlesLoaded" class="tabs" :id="topicContainerId">
-                <dd v-for="(stausCount, status) in activeStatuses" :class="{active: activeTabSelected === status}" :key="status">
-                    <a @click="onTabChange(status)">{{ status }}</a>
-                </dd>
-            </dl>
-            <dl v-else class="tabs" :id="topicContainerId">
-                <dd class="skeleton" v-for="(n, index) in 3" :key="index">
-                    <a></a>
-                </dd>
-            </dl>
-            <div class="tabs-content no-margin">
-                <ul v-if="isArticlesLoaded" class="information-list">
-                    <li v-for="article in currentArticles" :key="article.id" class="actions-small-1">
-                        <div class="list-item">
-                            <div class="small-12 card">
-                                <a v-if="article.featureImage" :href="article._links.self.href">
-                                    <img :src="article.featureImage._links.image.href + '&size=square64'">
-                                </a>
-                                <h3>
-                                    <a v-if="article.title" :href="article._links.self.href">{{ article.title }}</a>
-                                    <a v-else :href="article._links.self.href">(untitled)</a>
-                                </h3>
-                                <p class="meta">
-                                    <b>{{article.status }}</b>
-                                    <time :title="article.statusDate.long">{{ article.statusDate.relativeTime }}</time>
-                                </p>
-                            </div>
-                        </div>
-                        <article>
-                            <div v-html="article.blurb"></div>
-                            <div v-if="article.readmore.available" class="article-read-more">
-                                <a :href="article._links.self.href">{{ article.readmore.string }}</a>
-                            </div>
-                        </article>
-                        <nav>
-                            <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" :title="'Modify this ' + localeNews"></a>
-                        </nav>
-                    </li>
-                </ul>
-                <ul v-else class="information-list">
-                    <li v-for="(n, index) in 3" :key="index" class="actions-small-1">
-                        <div class="list-item">
-                            <div class="small-12 card skeleton">
-                                <div class="img"></div>
-                                <h3></h3>
-                                <p class="meta"></p>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-                <div v-if="isArticlesLoaded && filteredArticles.length === 0" class="empty-state no-margin">
-                    <i class="icon-news"></i>
-                    <p>You haven't authored any {{ localeNewsPlural }}.</p>
-                    <p v-if="canCreateNews"><a :href="createNewsRoute">Create {{ localeNews }}</a>.</p>
-                </div>
-            </div><!-- <div class="tabs-content no-margin"> -->
-        </section>
-        <paginate
-            v-if="currentArticles.length && pageCount > 1"
-            v-model="activePageNumber"
-            :page-count="pageCount"
-            :container-class="'pagination'"
-            :prev-text="'‹'"
-            :next-text="'›'"
-            :prev-link-class="'arrow'"
-            :next-link-class="'arrow'"
-            :disabled-class="'unavailable'"
-            :click-handler="onPaginate"
-        >
-        </paginate>
-    </div>
-</template>
-
 <script>
     
     import VuejsPaginate from 'vuejs-paginate';
@@ -157,7 +81,7 @@
              */
             getNews: function () {
 
-                fetchAsJson(this.newsRoute)
+                fetchAsJson(this.newsRoute + '/ha')
                 .then((response) => {
 
                     this.allArticles = response;
@@ -185,7 +109,7 @@
                     this.isArticlesLoaded = true;
 
                 }).catch((error) => {
-                    console.log(error);
+                    console.error(error);
                 });
 
             },
@@ -268,3 +192,79 @@
 
     }
 </script>
+
+<template>
+    <div>
+        <section>
+            <dl v-if="isArticlesLoaded" class="tabs" :id="topicContainerId">
+                <dd v-for="(stausCount, status) in activeStatuses" :class="{active: activeTabSelected === status}" :key="status">
+                    <a @click="onTabChange(status)">{{ status }}</a>
+                </dd>
+            </dl>
+            <dl v-else class="tabs" :id="topicContainerId">
+                <dd class="skeleton" v-for="(n, index) in 3" :key="index">
+                    <a></a>
+                </dd>
+            </dl>
+            <div class="tabs-content no-margin">
+                <ul v-if="isArticlesLoaded" class="information-list">
+                    <li v-for="article in currentArticles" :key="article.id" class="actions-small-1">
+                        <div class="list-item">
+                            <div class="small-12 card">
+                                <a v-if="article.featureImage" :href="article._links.self.href">
+                                    <img :src="article.featureImage._links.image.href + '&size=square64'">
+                                </a>
+                                <h3>
+                                    <a v-if="article.title" :href="article._links.self.href">{{ article.title }}</a>
+                                    <a v-else :href="article._links.self.href">(untitled)</a>
+                                </h3>
+                                <p class="meta">
+                                    <b>{{article.status }}</b>
+                                    <time :title="article.statusDate.long">{{ article.statusDate.relativeTime }}</time>
+                                </p>
+                            </div>
+                        </div>
+                        <article>
+                            <div v-html="article.blurb"></div>
+                            <div v-if="article.readmore.available" class="article-read-more">
+                                <a :href="article._links.self.href">{{ article.readmore.string }}</a>
+                            </div>
+                        </article>
+                        <nav>
+                            <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" :title="'Modify this ' + localeNews"></a>
+                        </nav>
+                    </li>
+                </ul>
+                <ul v-else class="information-list">
+                    <li v-for="(n, index) in 3" :key="index" class="actions-small-1">
+                        <div class="list-item">
+                            <div class="small-12 card skeleton">
+                                <div class="img"></div>
+                                <h3></h3>
+                                <p class="meta"></p>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div v-if="isArticlesLoaded && filteredArticles.length === 0" class="empty-state no-margin">
+                    <i class="icon-news"></i>
+                    <p>You haven't authored any {{ localeNewsPlural }}.</p>
+                    <p v-if="canCreateNews"><a :href="createNewsRoute">Create {{ localeNews }}</a>.</p>
+                </div>
+            </div><!-- <div class="tabs-content no-margin"> -->
+        </section>
+        <paginate
+            v-if="currentArticles.length && pageCount > 1"
+            v-model="activePageNumber"
+            :page-count="pageCount"
+            :container-class="'pagination'"
+            :prev-text="'‹'"
+            :next-text="'›'"
+            :prev-link-class="'arrow'"
+            :next-link-class="'arrow'"
+            :disabled-class="'unavailable'"
+            :click-handler="onPaginate"
+        >
+        </paginate>
+    </div>
+</template>
