@@ -72,20 +72,6 @@ class Indicator extends CliTool\App
     ";
 
     /**
-     * Query for finding used rubric indicators.
-     *
-     * Capabilities with no indicators that are in use will be deleted.
-     */
-    private const FIND_USED_RUBRIC_INDICATOR_QUERY = "
-        SELECT    ri.id, ri.name
-        FROM      rubric_indicator ri
-        LEFT JOIN rubric_indicator_usage riu on ri.id=riu.rubric_indicator_id
-        WHERE  rubric_capability_id = :capabilityId
-        AND    riu.rubric_indicator_id IS NOT NULL
-        AND    deleted_at IS NULL
-    ";
-
-    /**
      * Query for finding the number of usages of an indicator.
      */
     private const FIND_INDICATOR_USAGE_COUNT_QUERY = "
@@ -141,11 +127,6 @@ class Indicator extends CliTool\App
      * Query for finding rubric indicators in a capability.
      */
     private IStatement $findRubricIndicatorQuery;
-
-    /**
-     * Query for finding rubric indicators in a capability.
-     */
-    private IStatement $findUsedRubricIndicatorQuery;
 
     /**
      * Query for finding the number of usages of an indicator.
@@ -221,7 +202,6 @@ class Indicator extends CliTool\App
         $this->findCourseSpecQuery          = $db->prepareQuery(self::FIND_COURSE_SPEC_QUERY);
         $this->findRubricCapabilityQuery    = $db->prepareQuery(self::FIND_RUBRIC_CAPABILITY_QUERY);
         $this->findRubricIndicatorQuery     = $db->prepareQuery(self::FIND_RUBRIC_INDICATOR_QUERY);
-        $this->findUsedRubricIndicatorQuery = $db->prepareQuery(self::FIND_USED_RUBRIC_INDICATOR_QUERY);
         $this->findIndicatorUsageCountQuery = $db->prepareQuery(self::FIND_INDICATOR_USAGE_COUNT_QUERY);
         $this->deleteRubricIndicatorQuery   = $db->prepareQuery(self::DELETE_RUBRIC_INDICATOR_QUERY);
         $this->deleteRubricCapabilityQuery  = $db->prepareQuery(self::DELETE_RUBRIC_CAPABILITY_QUERY);
@@ -381,42 +361,6 @@ class Indicator extends CliTool\App
                     'capabilityId' => $capability['id'],
                 ]
             );
-        }
-    }
-
-    /**
-     * Find capabilities with no indicators that are in use, and delete them.
-     *
-     * @param array $capabilities
-     *
-     * @noinspection PhpUnusedPrivateMethodInspection retaining this method for
-     *                                                now: may be needed later
-     */
-    private function deleteCapabilitiesWithNoUsedIndicators(array $capabilities): void
-    {
-        foreach ($capabilities as $capabilityId => $capabilityName) {
-            // Are any indicators in this capability in use?
-            // If so, do not delete this capability.
-            $this->findUsedRubricIndicatorQuery->execute(['capabilityId' => $capabilityId]);
-            if ($this->findUsedRubricIndicatorQuery->rowCount() > 0) {
-                continue;
-            }
-
-            // Delete unused capability
-            $this->getLogger()->info(
-                sprintf(
-                    self::indent(2) . 'deleting unused capability #%d (%s)',
-                    $capabilityId,
-                    self::formatNameForOutput($capabilityName),
-                )
-            );
-            $this->deleteRubricCapabilityQuery
-                ->execute(
-                    [
-                        'now'          => $this->now,
-                        'capabilityId' => $capabilityId,
-                    ]
-                );
         }
     }
 
