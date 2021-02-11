@@ -127,6 +127,27 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * @inheritDoc
+     */
+    public function cloneForCopy()
+    {
+        /** @var static $clone */
+        $clone = parent::cloneForCopy();
+
+        // copy attachments
+        $newFiles = new Collection();
+        foreach ($this->getAttachedFiles() as $file) {
+            $newFiles->add(
+                (new File())
+                    ->setStorage($file->getStorage())
+                    ->setBasename($file->getBasename())
+            );
+        }
+        $clone->setAttachedFiles($newFiles);
+        return $clone;
+    }
+
+    /**
      * @param GradeGroup|null $gradeGroup
      * @return static
      */
