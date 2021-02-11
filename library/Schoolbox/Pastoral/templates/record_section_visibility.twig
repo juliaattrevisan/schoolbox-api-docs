@@ -37,7 +37,7 @@
             {# Confidential Access #}
             {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
 
-            {% for access in record.access if access.access == 2 %}
+            {% for access in record.access|filter(access=>access.access == 2) %}
                 {% if access.group is not empty %}
 
                     {# Pastoral Group Access #}
@@ -132,7 +132,7 @@
             {# General Content Access #}
             {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
 
-            {% for access in record.access if access.access == 1 %}
+            {% for access in record.access|filter(access=>access.access == 1) %}
                 {% if access.group is not empty %}
 
                     {# Pastoral Group Access #}
@@ -221,7 +221,7 @@
             {# Denied Access #}
             {# ---------------------------------------------------------------------------------------------------------------------------------------------------------- #}
 
-            {% for access in record.access if access.access == 0 %}
+            {% for access in record.access|filter(access=>access.access == 0) %}
                 {% if access.group is not empty %}
 
                     {# Pastoral Group Access #}

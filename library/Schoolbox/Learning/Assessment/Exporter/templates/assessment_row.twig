@@ -84,7 +84,7 @@
             <span class="size-32 icon-home"></span>
             <h3><a href="/homepage/{{ unitImpl.course.folder.id }}">{{ unitImpl.course.folder.title }}</a></h3>
             <p class="meta">
-                {% spaceless %}
+                {% apply spaceless %}
                     <time title="{{ unitImpl.openDate.short }}"
                           datetime="{{ unitImpl.openDate.databaseDate }}"
                     >{{ unitImpl.openDate.relativeTime }}</time>
@@ -92,7 +92,7 @@
                     <time title="{{ unitImpl.dueDate.short }}"
                           datetime="{{ unitImpl.dueDate.databaseDate }}"
                     >{{ unitImpl.dueDate.relativeTime }}</time>
-                {% endspaceless %}
+                {% endapply %}
             </p>
             <p class="meta">
                 {% if isImported %}

@@ -1,18 +1,18 @@
 {% macro text(pageCurrent, recordCount, resultsPerPage) %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% if resultsPerPage is empty %}
             {% set resultsPerPage = config.pastoral_page_size %}
         {% endif %}
         {% if recordCount > resultsPerPage %}
             Showing Records {{ ((pageCurrent - 1) * resultsPerPage) + 1 }} - {{ min(recordCount, ((pageCurrent - 1) * resultsPerPage) + resultsPerPage) }} Of {{ recordCount }}
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}
 
 {# TODO: Front-end developer needs to make this thing properly pretty #}
 
 {% macro buttons(pageCurrent, recordCount, resultsPerPage, pagesToDisplay, typeSelected) %}
-    {% spaceless %}
+    {% apply spaceless %}
 
         <style>
             .pagination li {
@@ -115,5 +115,5 @@
                 </div>
             </div>
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {%- endmacro %}

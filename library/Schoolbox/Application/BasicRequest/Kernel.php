@@ -28,7 +28,6 @@ use SitePage;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
 use Twig\Extension\DebugExtension;
-use Twig_Extensions_Extension_Text;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
@@ -259,7 +258,6 @@ class Kernel extends WebKernelAbstract
                     $twig = new Environment($loader, $options);
 
                     $twig->addExtension(new DebugExtension());
-                    $twig->addExtension(new Twig_Extensions_Extension_Text());
                     $twig->addExtension(new AdminNavigationRenderer());
 
                     // HTML Purifier filter - known to output safe HTML

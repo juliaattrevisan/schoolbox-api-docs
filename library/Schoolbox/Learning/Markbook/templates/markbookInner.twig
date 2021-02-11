@@ -135,7 +135,7 @@
                 {% endfor %}
             </tr>
             {# Need all students that ever participated in any assessments #}
-            {% spaceless %}
+            {% apply spaceless %}
             {% for student in markbook.students %}
             <tr data-student="{{ student.id }}">
                 <td class="profile-cell">
@@ -225,7 +225,7 @@
                 {% endfor %}
             </tr>
             {% endfor %}
-            {% endspaceless %}
+            {% endapply %}
         </tbody>
         </table>
     {% else %}

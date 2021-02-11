@@ -3,7 +3,7 @@
  #
  #}
 {% macro unitCompletion(unit) %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% if unit.isBeforeOpenDate %}
             This {{ locale.unit }} will open {{ unit.getRelativeOpenDate.getRelativeTime }}
         {% elseif unit.isOpen %}
@@ -11,11 +11,11 @@
         {% else %}
             This {{ locale.unit }} closed {{ unit.getRelativeDueDate.getRelativeTime }}
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}
 
 {% macro unitUrgency(unit) %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% if unit.isBeforeOpenDate %}
             gradient
         {% elseif unit.isOpen %}
@@ -23,5 +23,5 @@
         {% else %}
             gradient-0
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}

@@ -1,12 +1,17 @@
 <?php
+
 /**
   * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Admin\Navigation;
 
 use Schoolbox\Config\Loader;
+use Twig\Environment;
+use Twig\Extension;
+use Twig\TwigFunction;
 
 /**
  * Class Renderer
@@ -15,15 +20,15 @@ use Schoolbox\Config\Loader;
  *
  * @package Schoolbox\Admin\Navigation
  */
-class Renderer extends \Twig_Extension
+class Renderer extends Extension\AbstractExtension
 {
     /**
-     * @return array|\Twig_Function[]
+     * @return array|TwigFunction[]
      */
     public function getFunctions(): array
     {
         return array(
-            new \Twig_SimpleFunction('renderAdminNavigation', [$this, 'renderAdminNavigation'], [
+            new TwigFunction('renderAdminNavigation', [$this, 'renderAdminNavigation'], [
                 'is_safe' => ['html'],
                 'needs_environment' => true
             ]),
@@ -31,14 +36,11 @@ class Renderer extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $twig
+     * @param Environment $twig
      * @param string            $pageCurrent
      * @return string
-     * @throws \Twig_Error_Loader
-     * @throws \Twig_Error_Runtime
-     * @throws \Twig_Error_Syntax
      */
-    public function renderAdminNavigation(\Twig_Environment $twig, $pageCurrent): string
+    public function renderAdminNavigation(Environment $twig, $pageCurrent): string
     {
         // Grab navigation items from old admin class
         // TODO SA-8354: inject this

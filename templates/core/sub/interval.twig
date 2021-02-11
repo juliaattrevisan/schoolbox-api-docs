@@ -6,7 +6,7 @@
 {%- endmacro -%}
 
 {# This is really ugly, but it does work - consider making outputs neater. #}
-{% spaceless %}
+{% apply spaceless %}
     {%- if interval.dayTotal -%}
         {{ intervalMacro.intervalPart(interval.dayTotal, 'day', 'days') }}
         {%- if interval.hourRemainder -%}
@@ -37,4 +37,4 @@
     {%- elseif interval.secondRemainder -%}
         {{ intervalMacro.intervalPart(interval.secondRemainder, 'second', 'seconds') }}
     {%- endif -%}
-{% endspaceless %}
+{% endapply %}

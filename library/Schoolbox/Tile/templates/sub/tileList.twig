@@ -31,7 +31,7 @@
 <script type="text/javascript" src="/javascript/shared/tiles/jquery.tile-resize.js"></script>
 
 {# spaceless because spaces between inline-block elements split the element. WTF #}
-{% spaceless %}
+{% apply spaceless %}
 {% if (tileList|length > 0) or editable %}
 <ul id="tileList-{{ layout.id }}" class="tileList" data-tile-list>
     {% for tile in tileList %}
@@ -50,4 +50,4 @@
     {% endif %}
 </ul>
 {% endif %}
-{% endspaceless %}
+{% endapply %}

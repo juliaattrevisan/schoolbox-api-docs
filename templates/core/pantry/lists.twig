@@ -56,9 +56,9 @@
                                 <div class="grip"></div>
                                 <div class="list-item">{{ content }}</div>
                                 <nav>
-                                    {% for icon in item %}{% spaceless %}
+                                    {% for icon in item %}{% apply spaceless %}
                                     <a title="I do nothing" class="icon-{{ icon }}"></a>
-                                    {% endspaceless %}{% endfor %}
+                                    {% endapply %}{% endfor %}
                                 </nav>
                             </div>
                         </li>
@@ -88,9 +88,9 @@
                             <div class="actions-small-{{ c }}">
                                 <div class="list-item">{{ content }}</div>
                                 <nav>
-                                    {% for icon in item %}{% spaceless %}
+                                    {% for icon in item %}{% apply spaceless %}
                                         <a class="icon-{{ icon }}"></a>
-                                    {% endspaceless %}{% endfor %}
+                                    {% endapply %}{% endfor %}
                                 </nav>
                             </div>
                         </li>

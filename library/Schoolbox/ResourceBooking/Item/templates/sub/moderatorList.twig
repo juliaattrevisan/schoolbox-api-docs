@@ -1,5 +1,5 @@
 {% for moderator in moderatorList %}
-    {% spaceless %}
+    {% apply spaceless %}
     {% include 'sub/userLink.twig' with {user: moderator} %}{% if not loop.last %},{% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endfor %}

@@ -6,7 +6,9 @@
  */
 namespace Alaress\Web\Template;
 
-abstract class DebugTwig extends \Twig_Template
+use Twig\Template;
+
+abstract class DebugTwig extends Template
 {
     // To cause twig to not render a debug wrapper around templates, set this key to FALSE in the template's context data
     public const DEBUG_WRAP = 'DEBUG_WRAP';

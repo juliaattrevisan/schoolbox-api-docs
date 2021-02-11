@@ -37,11 +37,11 @@
             {% if search.category|length == categoryList|length %}
                 All
             {% else %}
-                {% spaceless %}
+                {% apply spaceless %}
                     {% for categoryId in search.category %}
                         {{ categoryList[categoryId].getName() }}{% if not loop.last %}, {% endif %}
                     {% endfor %}
-                {% endspaceless %}
+                {% endapply %}
             {% endif %}
         </h2>
     </div>

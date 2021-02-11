@@ -63,10 +63,10 @@
     </ul>
     <div class="row">
         <div class="small-12 columns">
-            <div class="alert-box">{% spaceless %}
+            <div class="alert-box">{% apply spaceless %}
                 Use the {{ text }} comment box below to submit a {{ locale.selfAssessment.singularForm }} before you submit this
                 work to your teacher for feedback.
-                {% endspaceless %}</div>
+                {% endapply %}</div>
         </div>
     </div>
 {% endblock %}
@@ -128,14 +128,14 @@
 
 {# Action Bar #}
 {% block actionButtons %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% set buttons %}
             <span class="button disabled" data-draft="drafted" title="Saved as draft" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
             {% if not readonly %}
                 <a class="button" data-draft="publish"></a>
             {% endif %}
         {% endset %}
-    {% endspaceless %}
+    {% endapply %}
 
     {% include '@learningAssessment/fragments/actionBar.twig' with {
         actionStyle:  '',

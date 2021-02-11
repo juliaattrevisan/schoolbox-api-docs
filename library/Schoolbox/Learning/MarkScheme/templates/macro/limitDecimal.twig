@@ -1,9 +1,9 @@
 {% macro limit(number, decimal_places) %}
-{% spaceless %}
+{% apply spaceless %}
     {% if number // 1 != number %}
         {{ number | number_format(decimal_places) }}
         {% else %}
         {{ number | number_format(0) }}
     {% endif %}
-{% endspaceless %}
+{% endapply %}
 {% endmacro limit %}

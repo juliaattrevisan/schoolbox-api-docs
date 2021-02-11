@@ -10,15 +10,8 @@
 {% endmacro %}
 
 {% macro crumbsArray(crumbsArray) %}
-    {# preprocess crumbsArray to strip blanks, in lieu of an array_filter |filter #}
-    {% set crumbs = [] %}
-
-    {% for i in crumbsArray if i[0] %}
-        {% set crumbs = crumbs|merge([ i ]) %}
-    {% endfor %}
-
     <ul class="breadcrumb">
-        {% for crumb in crumbs %}
+        {% for crumb in crumbsArray|filter(i=>i[0]) %}
             <li{% if loop.last %} class="active"{% endif %}>
                 <a{% if crumb[1] ?? false %} href="{{ crumb[1] }}"{% endif %}>{{ crumb[0] }}</a>
             </li>
@@ -33,15 +26,8 @@
 {% endmacro %}
 
 {% macro basicArray(crumbsArray) %}
-    {# preprocess crumbsArray to strip blanks, in lieu of an array_filter |filter #}
-    {% set crumbs = [] %}
-
-    {% for i in crumbsArray if i[0] %}
-        {% set crumbs = crumbs|merge([ i ]) %}
-    {% endfor %}
-
     <ul class="breadcrumb-basic meta no-margin">
-        {% for crumb in crumbs %}
+        {% for crumb in crumbsArray|filter(i=>i[0]) %}
             <li{% if loop.last %} class="active"{% endif %}>
                 <a{% if crumb[1] ?? false %} href="{{ crumb[1] }}"{% endif %}>{{ crumb[0] }}</a>
             </li>

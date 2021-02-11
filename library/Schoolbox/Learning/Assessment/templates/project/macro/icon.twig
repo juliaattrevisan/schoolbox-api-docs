@@ -1,5 +1,5 @@
 {% macro renderClass(assessment) %}
-{% spaceless %}
+{% apply spaceless %}
     {% if assessment is project %}
         icon-project
     {% elseif assessment is task %}
@@ -9,5 +9,5 @@
     {% elseif assessment is dueWork %}
         icon-due-work
     {% endif %}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}

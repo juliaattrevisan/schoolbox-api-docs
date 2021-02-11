@@ -115,13 +115,13 @@
     <div class="row">
         <div class="small-12 island">
             <legend class="subheader">
-                {% spaceless %}
+                {% apply spaceless %}
                     {% if selfAssessmentFeedback.isSelfGrading %}
                         {{ locale.selfAssessment.proper }}
                     {% else %}
                         {{ locale.selfReflection.proper }}
                     {% endif %}
-                {% endspaceless %}
+                {% endapply %}
             </legend>
             <div class="flex-grade">
                 <ul class="information-list threaded sibling">
