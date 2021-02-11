@@ -34,6 +34,7 @@ rm -rf /usr/share/schoolbox
 ln -sf /vagrant /usr/share/schoolbox
 
 rm -rf /var/lib/schoolbox /vagrant/data
+mkdir /vagrant/data
 mkdir /mnt/data
 ln -sf /vagrant/data /var/lib/schoolbox
 
