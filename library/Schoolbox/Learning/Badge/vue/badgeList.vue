@@ -458,8 +458,8 @@ export default {
         <reveal-modal ref="deleteModal">
             <template v-if="currentBadge">
                 <h2>Delete <strong>&lsquo;{{ currentBadge.name }}&lsquo;</strong></h2>
-                <p>WARNING! Any users who have been awarded this badge will have it removed from their collection.
-                    Are you sure you wish to delete the badge {{ currentBadge.name }}?</p>
+                <div class="alert-box alert icon-alert">WARNING! Any users who have been awarded this badge will have it removed from their collection.</div>
+                <p>Are you sure you wish to delete the badge '{{ currentBadge.name }}'?</p>
                 <ul class="flex-list buttons">
                     <li><a @click.prevent="closeDeleteModal()" class="button">Cancel</a></li>
                     <li><a @click.prevent="deleteBadge()" class="button submit">Delete</a></li>
