@@ -1429,61 +1429,6 @@ $selector-width: 2.25rem;
   }
 }
 
-// Threaded / Social Stream
-.social-stream,
-.threaded {
-  .reply,
-  .child {
-    background-color: $snow;
-    border-top: 0;
-    border-left: 6px solid $base;
-    padding-left: 1rem;
-
-    @media #{$small-only} {
-      padding-left: 0.5rem;
-    }
-
-    blockquote {
-      margin-left: 1rem;
-      margin-bottom: 0;
-    }
-
-    .card {
-      margin-left: 1rem;
-      img {
-        width: 2rem;
-      }
-    }
-
-    .reply {
-      background-color: transparent;
-      margin-left: 1rem;
-
-      li:first-child {
-        border-top: 0;
-      }
-
-      li {
-        border-top: 1px solid $base;
-      }
-      .card {
-        margin-top: 1rem;
-      }
-    }
-  }
-
-  .reply ~ .reply,
-  .child ~ .child {
-    border-top: 1px solid $body-bg;
-  }
-}
-
-.socialstream-preview {
-  background-color: $snow;
-  font-size: $paragraph-font-size;
-  padding: 1rem;
-}
-
 // Reveal
 .reveal-modal {
   min-height: auto;
