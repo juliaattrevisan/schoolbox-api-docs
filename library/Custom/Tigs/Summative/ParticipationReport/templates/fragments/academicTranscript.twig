@@ -133,46 +133,58 @@ Data:
                                  # Otherwise fall back to showing the most recent comment from the student's feedbacks
                                  #}
                                 {% if subject.isPreviousClass %}
-                                    {% set commentData = { comment: 'Student is no longer enrolled in this class.' } %}
+                                    {% set comment = 'Student is no longer enrolled in this class.' %}
                                 {% else %}
-                                    {% set commentData = { comment: null } %}
+                                    {% set comment = null %}
 
-                                    {# buildNesaScoreData returns an empty array or an array with data
-                                     # If there's data in it, try loading semester 2 comment first,
-                                     # otherwise try to load semester 1 comment instead.
+                                    {# If we're in semester 2, try loading semester 2 NESA data. If there's something here
+                                     # then use that data to inform the NESA Grade and subject comment
                                      #
-                                     # An empty array means there isn't any NESA data and you should fall
-                                     # back to finding the most recent feedbacks' comment instead
+                                     # Otherwise look for formative data in the task marks data struct and use that
+                                     # to inform the grey boxes' values and subject comment
+                                     #
+                                     # If we're in semester 1, try loading semester 1 NESA data. If there's something here
+                                     # then use that data to inform the NESA Grade and subject comment
+                                     #
+                                     # Otherwise look for formative data in the task marks data struct and use that
+                                     # to inform the grey boxes' values and subject comment
                                      #}
-                                    {% if folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.data.2.comment|length %}
+                                    {% if attributes.curriculumSemester == 2 and folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.data.2.comment|length %}
                                         {% set nesaGrade = folderData.nesaGraphData.data.2.studentMark %}
                                         {% set nesaSemester = 2 %}
                                         {% set nesaError = folderData.nesaGraphData.data.2.error %}
-                                        {% set commentData = folderData.nesaGraphData.data.2.comment %}
-                                    {% elseif folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment|length %}
+                                        {% set comment = folderData.nesaGraphData.data.2.comment.comment %}
+                                    {% elseif attributes.curriculumSemester == 1 and folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment|length %}
                                         {% set nesaGrade = folderData.nesaGraphData.data.1.studentMark %}
                                         {% set nesaSemester = 1 %}
                                         {% set nesaError = folderData.nesaGraphData.data.1.error %}
-                                        {% set commentData = folderData.nesaGraphData.data.1.comment %}
+                                        {% set comment = folderData.nesaGraphData.data.1.comment.comment %}
                                     {% else %}
 
-                                        {# Render the first comment only #}
-                                        {% set commentFound = false %}
+                                        {# Gotta mine the Formative feedbacks in either HSC Task Marks or Middle Years Task Marks structs
+                                         # Find the most recent feedback and show its comment
+                                         #}
+                                        {% set mostRecentData = null %}
 
-                                        {% for unitSpecData in folderData.unitSpecs if not commentFound %}
-                                            {% if attributes.isHsc %}
-                                                {% set commentData = folderData.hscTaskMarks.data[unitSpecData.id] %}
-                                            {% else %}
-                                                {% set commentData = folderData.middleYearsTaskMarks.data[unitSpecData.id] %}
+                                        {% if attributes.isHsc %}
+                                            {% set taskData = folderData.hscTaskMarks %}
+                                        {% else %}
+                                            {% set taskData = folderData.middleYearsTaskMarks %}
+                                        {% endif %}
+
+                                        {% for unitSpecData in folderData.unitSpecs %}
+                                            {% if taskData.data[unitSpecData.id] ?? false %}
+                                                {% set taskMarks = taskData.data[unitSpecData.id] %}
+
+                                                {# Remember the data which the most recent publishAt
+                                                 # Keep looking until there aren't any records more recent
+                                                 #}
+                                                {% if taskMarks.publishAt > mostRecentData.publishAt or mostRecentData is null %}
+                                                    {% set mostRecentData = taskMarks %}
+
+                                                    {% set comment = mostRecentData.comment %}
+                                                {% endif %}
                                             {% endif %}
-
-                                            {# Bust out of the for() once we find meaningful data
-                                             # This suffers from the same assumptive flaw that unitSpecIds are in order of creation
-                                             #}
-                                            {% if commentData.comment is not null %}
-                                                {% set commentFound = true %}
-                                            {% endif %}
-
                                         {% endfor %}
                                     {% endif %}
                                 {% endif %}
@@ -292,7 +304,7 @@ Data:
                          # or the most recent formative assessment's feedback
                          #}
                         <div class="column small-12 teacher-comment content">
-                            {{ commentData.comment | nl2br }}
+                            {{ comment | nl2br }}
                         </div>
                     </a>
                 </li>
