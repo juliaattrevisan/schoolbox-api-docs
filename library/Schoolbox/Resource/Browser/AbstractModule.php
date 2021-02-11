@@ -15,10 +15,8 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Config;
-use Schoolbox\Resource;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
-use Twig_Loader_Filesystem;
 
 abstract class AbstractModule extends BaseModule
 {
@@ -51,7 +49,7 @@ abstract class AbstractModule extends BaseModule
 
     /**
      * @param IChainLoader $templateLoader
-     * @throws \Twig_Error_Loader
+     * @throws \Twig\Error\LoaderError
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {

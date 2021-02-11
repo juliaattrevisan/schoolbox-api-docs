@@ -22,7 +22,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\User\Password\MailService;
 use Schoolbox\User\Password\Reset;
 use Schoolbox\UserMapper;
-use Twig_Error_Loader;
+use Twig\Error\LoaderError;
 use Alaress\Twig\Loader\IChainLoader;
 
 
@@ -107,7 +107,7 @@ class Module extends Alaress\Module\Module
 
     /**
      * @param IChainLoader $templateLoader
-     * @throws Twig_Error_Loader
+     * @throws LoaderError
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {

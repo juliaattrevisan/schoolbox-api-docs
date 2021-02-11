@@ -53,16 +53,14 @@ class External_Isams_Timetable implements External_TimetableInterface
         $definitionArray = [];
 
         foreach ($periods as $period) {
-            if (!isset($found_periods[$period["PeriodNumber"]])) {
-                $definition = [];
-                $definition["desc"] = $period["Description"];
-                $definition["start"] = $period["StartTime"];
-                $definition["end"] = $period["EndTime"];
-                $definition["number"] = $period["PeriodNumber"];
-                $definition["sequence"] = $period["PeriodNumberSeq"];
+            $definition = [];
+            $definition["desc"] = $period["Description"];
+            $definition["start"] = $period["StartTime"];
+            $definition["end"] = $period["EndTime"];
+            $definition["number"] = $period["PeriodNumber"];
+            $definition["sequence"] = $period["PeriodNumberSeq"];
 
-                $definitionArray[] = $definition;
-            }
+            $definitionArray[] = $definition;
         }
 
         $queryPeriodCount = '

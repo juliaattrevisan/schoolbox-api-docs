@@ -4,7 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\Fixtures\Landing;
 
 use Alaress\Authorizer\Authorizer;
@@ -12,7 +12,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Twig_Error_Loader;
+use Twig\Error\LoaderError;
 use Alaress\Twig\Loader\IChainLoader;
 use \Schoolbox\Permission\Access\UserAccess;
 
@@ -74,7 +74,7 @@ class Module extends BaseModule
 
     /**
      * @param IChainLoader $templateLoader
-     * @throws Twig_Error_Loader
+     * @throws LoaderError
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {

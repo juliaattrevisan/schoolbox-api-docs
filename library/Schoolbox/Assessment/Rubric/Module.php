@@ -20,7 +20,8 @@ use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
-use Twig_Error_Loader;
+use Twig\Error\Loader;
+use Twig\Error\LoaderError;
 
 class Module extends BaseModule
 {
@@ -57,7 +58,7 @@ class Module extends BaseModule
 
     /**
      * @param IChainLoader $templateLoader
-     * @throws Twig_Error_Loader
+     * @throws LoaderError
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {

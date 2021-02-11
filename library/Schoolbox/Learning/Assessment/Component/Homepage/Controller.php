@@ -23,6 +23,9 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use SitePage;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 abstract class Controller extends Component_Homepage_ControllerAbstract
 {
@@ -132,9 +135,9 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
      * @param String $templateHandle
      * @return boolean
      * @throws \RuntimeException
-     * @throws \Twig_Error_Loader
-     * @throws \Twig_Error_Runtime
-     * @throws \Twig_Error_Syntax
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function renderTemplate($templateHandle)
     {

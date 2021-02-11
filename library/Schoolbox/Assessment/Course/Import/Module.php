@@ -29,7 +29,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Twig_Error_Loader;
+use Twig\Error\LoaderError;
 
 class Module extends \Alaress\Module\Module
 {
@@ -73,7 +73,7 @@ class Module extends \Alaress\Module\Module
 
     /**
      * @param IChainLoader $templateLoader
-     * @throws Twig_Error_Loader
+     * @throws LoaderError
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {

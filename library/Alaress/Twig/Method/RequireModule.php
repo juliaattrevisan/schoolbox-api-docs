@@ -14,7 +14,7 @@ namespace Alaress\Twig\Method;
 
 use Alaress\Module\Module as BaseModule;
 use Aura\Di;
-use Twig_Error_Runtime;
+use Twig\Error\RuntimeError;
 
 class RequireModule
 {
@@ -38,7 +38,7 @@ class RequireModule
      * Loads the module.
      *
      * @param  string $moduleName
-     * @throws Twig_Error_Runtime if the module doesn't exist or isn't an instance of
+     * @throws RuntimeError if the module doesn't exist or isn't an instance of
      *                            `\Alaress\Module\Module`.
      */
     public function __invoke($moduleName)
@@ -46,10 +46,10 @@ class RequireModule
         try {
             $module = $this->di->get('module:'.$moduleName);
         } catch (Di\Exception\ServiceNotFound $e) {
-            throw new Twig_Error_Runtime(sprintf('Module "%s" does not exist', $moduleName));
+            throw new RuntimeError(sprintf('Module "%s" does not exist', $moduleName));
         }
         if (!$module instanceof BaseModule) {
-            throw new Twig_Error_Runtime(
+            throw new RuntimeError(
                 sprintf(
                     'Module "%s" is not an instance of "%s"',
                     $moduleName,

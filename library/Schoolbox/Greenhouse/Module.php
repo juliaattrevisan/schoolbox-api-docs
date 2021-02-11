@@ -12,7 +12,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Twig_Error_Loader;
+use Twig\Error\LoaderError;
 
 class Module extends BaseModule
 {
@@ -60,7 +60,7 @@ class Module extends BaseModule
 
     /**
      * @param IChainLoader $templateLoader
-     * @throws Twig_Error_Loader
+     * @throws LoaderError
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {

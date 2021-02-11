@@ -17,7 +17,7 @@ use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Twig_Error_Loader;
+use Twig\Error\LoaderError;
 
 /**
  * Module for the rubric criteria management form.
@@ -54,7 +54,7 @@ class Module extends BaseModule
 
     /**
      * @param IChainLoader $templateLoader
-     * @throws Twig_Error_Loader
+     * @throws LoaderError
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {

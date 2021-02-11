@@ -16,9 +16,9 @@ use Schoolbox\Collection;
 use Schoolbox\Fixtures\Component\ComponentDelegate;
 use Schoolbox\User;
 use SitePage;
-use Twig_Error_Loader;
-use Twig_Error_Runtime;
-use Twig_Error_Syntax;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use UnexpectedValueException;
 
 /**
@@ -104,9 +104,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
      * @param String $templateHandle
      * @return bool
      * @throws RuntimeException
-     * @throws Twig_Error_Loader
-     * @throws Twig_Error_Runtime
-     * @throws Twig_Error_Syntax
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function renderTemplate($templateHandle)
     {

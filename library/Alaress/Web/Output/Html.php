@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Output handling class that renders a Twig template without any theme.
  *
@@ -23,7 +24,7 @@ class Html extends Base
     protected $template = null;
 
     /**
-     * @var \Twig_Environment
+     * @var \Twig\Environment
      */
     protected $templateEngine;
 
@@ -33,7 +34,8 @@ class Html extends Base
      * This method assumes the output is an array with "template" and "data"
      * keys.
      */
-    protected function outputResponseBody() {
+    protected function outputResponseBody()
+    {
 
         echo $this->getAsString();
     }
@@ -52,18 +54,20 @@ class Html extends Base
     }
 
     /**
-     * @param  \Twig_Environment $templateEngine
+     * @param  \Twig\Environment $templateEngine
      * @return $this
      */
-    public function setTemplateEngine($templateEngine) {
+    public function setTemplateEngine($templateEngine)
+    {
         $this->templateEngine = $templateEngine;
         return $this;
     }
 
     /**
-     * @return \Twig_Environment
+     * @return \Twig\Environment
      */
-    public function getTemplateEngine() {
+    public function getTemplateEngine()
+    {
         return $this->templateEngine;
     }
 

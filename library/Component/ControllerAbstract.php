@@ -612,9 +612,9 @@ abstract class Component_ControllerAbstract
      * @param bool   $contentRaw     This is a flag that lets you dump the twig raw rather than using standard header block
      * @param bool   $renderInIsland Set to false if you need to render directly into ocean
      * @return bool Was the template renderable?
-     * @throws Twig_Error_Loader  When the template cannot be found
-     * @throws Twig_Error_Syntax  When an error occurred during compilation
-     * @throws Twig_Error_Runtime When an error occurred during rendering
+     * @throws Twig\Error\LoaderError  When the template cannot be found
+     * @throws Twig\Error\SyntaxError  When an error occurred during compilation
+     * @throws Twig\Error\RuntimeError When an error occurred during rendering
      * @throws RuntimeException   When Twig renderer not found in this Sitepage object's dependency injector.
      */
     protected function renderTwigTemplate(

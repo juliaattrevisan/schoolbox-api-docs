@@ -17,7 +17,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Swift_RfcComplianceException;
 use Swift_SwiftException;
-use Twig_Error_Runtime;
+use Twig\Error\RuntimeError;
 use UnderflowException;
 
 
@@ -123,7 +123,7 @@ class Mailer
         } catch (Swift_SwiftException $e) {
             $this->log->warning(get_class($e) . ': ' . $e->getMessage(), ['exception'=>$e]);
 
-        } catch (Twig_Error_Runtime $e) {
+        } catch (RuntimeError $e) {
             $this->log->error(get_class($e) . ': ' . $e->getMessage(), ['exception'=>$e]);
 
             if (strpos($e->getMessage(), 'Invalid multibyte sequence in argument') !== false) {
