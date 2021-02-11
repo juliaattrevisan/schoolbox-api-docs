@@ -55,18 +55,14 @@ class PDOStatement extends BasePDOStatement
     public function execute($input_params = null)
     {
         if (is_array($input_params) && count($input_params) > 0) {
-
             // Use the supplied parameters rather than the ones previously bound
 
             $parameters = $input_params;
-
         } else {
-
             // No parameters were passed, extract named parameters from the SQL statement and use the values
             // that should have been previously bound using the Db2/PDOStatement functions.
 
             $parameters = preg_match_all('#:([A-Za-z0-9-_]+)#', $this->sql, $matches) ? $matches[1] : null;
-
         }
 
         // Replace the named parameters in the SQL string with anonymous '?' placeholder
@@ -89,7 +85,6 @@ class PDOStatement extends BasePDOStatement
 
         if (is_array($parameters)) {
             foreach ($parameters as $parameterName) {
-
                 // We need to slot the values of the parameters into a numerically 0-indexed array that matches the
                 // order of the parameters used in the query
 
@@ -149,6 +144,8 @@ class PDOStatement extends BasePDOStatement
             'type' => $parameterType,
             'value' => &$variable
         ];
+
+        return true;
     }
 
     /**
@@ -160,6 +157,7 @@ class PDOStatement extends BasePDOStatement
             'type' => DB2_PARAM_IN,
             'value' => $value
         ];
+        return true;
     }
 
     /**
@@ -260,7 +258,10 @@ class PDOStatement extends BasePDOStatement
      */
     public function nextRowset()
     {
-        db2_next_result($this->statement);
+        if (false !== db2_next_result($this->statement)) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -268,7 +269,7 @@ class PDOStatement extends BasePDOStatement
      */
     public function closeCursor()
     {
-        db2_free_stmt($this->statement);
+        return db2_free_stmt($this->statement);
     }
 
     // These methods haven't been implemented because we don't use them (and I'm too lazy to write them)
