@@ -181,11 +181,11 @@ class Profile implements IStrategy
 
         $this->importStudents();
 
-//        /* Import staff profile data
-//         */
-//        $this->log->info('Processing staff.');
-//
-//        $this->importStaff();
+        /* Import staff profile data
+         */
+        $this->log->info('Processing staff.');
+
+        $this->importStaff();
     }
 
 
@@ -194,24 +194,24 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
-//        /* Build some lookups to save on traversal and api banging
-//         */
-//        $families = (new Lookup\Family(
-//            $this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT],
-//            $this->spousePrefix,
-//            $this->addnumFather,
-//            $this->addnumMother,
-//            (new Phone($this->api[DSNCodec::MODULE_STUDENT_DETAILS]))->generate()
-//        ))->generate();
-//
-//        /* Also alert any broken tass api payloads that we detected in lookups
-//         */
-//        foreach ($families['unknown'] as $unknown) {
-//            $this->log->critical(sprintf(
-//                'Cannot identify father/mother records for family record %s',
-//                $unknown
-//            ));
-//        }
+        /* Build some lookups to save on traversal and api banging
+         */
+        $families = (new Lookup\Family(
+            $this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT],
+            $this->spousePrefix,
+            $this->addnumFather,
+            $this->addnumMother,
+            (new Phone($this->api[DSNCodec::MODULE_STUDENT_DETAILS]))->generate()
+        ))->generate();
+
+        /* Also alert any broken tass api payloads that we detected in lookups
+         */
+        foreach ($families['unknown'] as $unknown) {
+            $this->log->critical(sprintf(
+                'Cannot identify father/mother records for family record %s',
+                $unknown
+            ));
+        }
 
         /* Process each current student, and their parents too
          */
@@ -243,10 +243,6 @@ class Profile implements IStrategy
              */
             $enrolment = $this->findDate(trim((string)$student['general_details']['date_of_entry']));
             $leaving = $this->findDate(trim((string)$student['general_details']['date_of_leaving']));
-
-if ($externalId !== '100043') {
-    continue;
-}
 
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
@@ -386,24 +382,24 @@ if ($externalId !== '100043') {
 
             /* Time for importing parents
              */
-//            $this->importParentsOfStudent($studentBaseProfile, $families);
+            $this->importParentsOfStudent($studentBaseProfile, $families);
         }
 
-//        /* Show some basic diagnostics
-//         */
-//        $this->log->info(sprintf(
-//            'Nuclear families: %s. Split families: %s',
-//            $families['count']['nuclear'],
-//            $families['count']['split']
-//        ));
-//
-//        if ($families['count']['unknown']) {
-//            $this->log->warning(sprintf(
-//                'Unidentifiable data: %s (%s)',
-//                $families['count']['unknown'],
-//                implode(', ', $families['unknown'])
-//            ));
-//        }
+        /* Show some basic diagnostics
+         */
+        $this->log->info(sprintf(
+            'Nuclear families: %s. Split families: %s',
+            $families['count']['nuclear'],
+            $families['count']['split']
+        ));
+
+        if ($families['count']['unknown']) {
+            $this->log->warning(sprintf(
+                'Unidentifiable data: %s (%s)',
+                $families['count']['unknown'],
+                implode(', ', $families['unknown'])
+            ));
+        }
     }
 
 
