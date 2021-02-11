@@ -218,40 +218,37 @@ class Definition implements IStrategy
                      *
                      * Look ahead to see if it exists; if it does, augment the title - but schools
                      * should have unique period names per day instead.
-                     *
-                     * ...but this stopped happening suddenly? Did someone change data somewhere?
-                     * Anyway I'll keep this here for now, just in case
                      */
-//                    try {
-//                        $existing = $this->timetablePeriodMapper->findOneByColumnList([
-//                            'title' => $period->getTitle(),
-//                            'day' => $period->getDay(),
-//                            'cycle_id' => $timetableCycle->getId()
-//                        ]);
-//
-//                        /* Remember the count, augment the name
-//                         */
-//                        if (!isset($existingTuples[$period->getDay()][$period->getTitle()])) {
-//                            $existingTuples[$period->getDay()][$period->getTitle()] = 0;
-//                        }
-//
-//                        $existingTuples[$period->getDay()][$period->getTitle()]++;
-//
-//                        $newTitle = "{$period->getTitle()} ({$existingTuples[$period->getDay()][$period->getTitle()]})";
-//
-//                        $this->log->critical(sprintf(
-//                            'Augmented %s since it occurs multiple times in day %s and cycle %s',
-//                            $period->getTitle(),
-//                            $period->getDay(),
-//                            $period->getCycle()->getId()
-//                        ));
-//
-//                        $period->setTitle($newTitle);
-//
-//                    } catch (\Schoolbox\Mapper\Exception $e) {
-//
-//                        // noop; doesn't already exist, just create it as normal
-//                    }
+                    try {
+                        $existing = $this->timetablePeriodMapper->findOneByColumnList([
+                            'title' => $period->getTitle(),
+                            'day' => $period->getDay(),
+                            'cycle_id' => $timetableCycle->getId()
+                        ]);
+
+                        /* Remember the count, augment the name
+                         */
+                        if (!isset($existingTuples[$period->getDay()][$period->getTitle()])) {
+                            $existingTuples[$period->getDay()][$period->getTitle()] = 0;
+                        }
+
+                        $existingTuples[$period->getDay()][$period->getTitle()]++;
+
+                        $newTitle = "{$period->getTitle()} ({$existingTuples[$period->getDay()][$period->getTitle()]})";
+
+                        $this->log->critical(sprintf(
+                            'Augmented %s since it occurs multiple times in day %s and cycle %s',
+                            $period->getTitle(),
+                            $period->getDay(),
+                            $period->getCycle()->getId()
+                        ));
+
+                        $period->setTitle($newTitle);
+
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+
+                        // noop; doesn't already exist, just create it as normal
+                    }
 
                     $this->log->info(sprintf(
                         'Creating period %s (%s-%s) in timetable cycle %s (%s)',
