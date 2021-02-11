@@ -6,7 +6,7 @@ $side-nav-link-color-hover: $body-font-color;
 $side-nav-list-margin: 0;
 $side-nav-divider-style: dotted;
 
-@import '../../../../javascript/components/foundation/scss/foundation/components/side-nav';
+@import "../../original-foundation/components/side-nav";
 
 // Schoolbox specific vars
 $border-bottom-width: 2px;

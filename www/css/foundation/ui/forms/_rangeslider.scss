@@ -33,15 +33,15 @@ $range-slider-handle-bg-color: $content-ui-foreground;
 $range-slider-handle-bg-hover-color: $content-ui-foreground;
 // $range-slider-handle-cursor: pointer;
 
-@import "../../../../javascript/components/foundation/scss/foundation/components/range-slider";
+@import "../../original-foundation/components/range-slider";
 
-.range-slider{
-	@include box-shadow(inset, -2px, 2px, 0px, rgba(0,0,0,0.10));
+.range-slider {
+  @include box-shadow(inset, -2px, 2px, 0px, rgba(0, 0, 0, 0.1));
 
-	.range-slider-handle{
-		top: -0.65rem;
-		height: 2.25rem;
-		width: 2.25rem;
-		@include border-radius(1.25rem);
-	}
+  .range-slider-handle {
+    top: -0.65rem;
+    height: 2.25rem;
+    width: 2.25rem;
+    @include border-radius(1.25rem);
+  }
 }

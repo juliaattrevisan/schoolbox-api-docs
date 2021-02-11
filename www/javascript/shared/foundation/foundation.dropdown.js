@@ -1,6 +1,12 @@
 ;(function ($, window, document, undefined) {
   'use strict';
 
+  function isTouchDevice() {
+      return (('ontouchstart' in window) ||
+      (navigator.maxTouchPoints > 0) ||
+      (navigator.msMaxTouchPoints > 0));
+  }
+
   Foundation.libs.dropdown = {
     name : 'dropdown',
 
@@ -32,7 +38,7 @@
         .off('.dropdown')
         .on('click.fndtn.dropdown', '[' + this.attr_name() + ']', function (e) {
           var settings = S(this).data(self.attr_name(true) + '-init') || self.settings;
-          if (!settings.is_hover || Modernizr.touch) {
+          if (!settings.is_hover || isTouchDevice()) {
             e.preventDefault();
             if (S(this).parent('[data-reveal-id]').length) {
               e.stopPropagation();

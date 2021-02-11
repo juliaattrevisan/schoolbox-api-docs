@@ -12,7 +12,7 @@ $rem-base: $base-font-size;
 
 // Allows the use of rem-calc() or lower-bound() in your settings
 // @import "foundation/functions";
-@import "../../javascript/components/foundation/scss/foundation/functions";
+@import "original-foundation/functions";
 
 // The default font-size is set to 100% of the browser style sheet (usually 16px)
 // for compatibility with browser-based text zoom or user-set defaults.
@@ -34,7 +34,8 @@ $include-html-global-classes: $include-html-classes;
 //
 
 // We use these to define default font stacks
-$font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue",
+  Helvetica, Arial, sans-serif;
 $font-family-serif: Georgia, Cambria, "Droid Serif", "Times New Roman", Times, serif;
 $font-family-monospace: Consolas, "Liberation Mono", "Droid Mono", Courier, monospace;
 $font-family-icon: "schoolbox";
@@ -68,8 +69,8 @@ $global-rounded: 1000px;
 
 // We use these to control inset shadow shiny edges and depressions.
 $shiny-edge-size: 0 1px 0;
-$shiny-edge-color: rgba($white, .5);
-$shiny-edge-active-color: rgba($black, .2);
+$shiny-edge-color: rgba($white, 0.5);
+$shiny-edge-active-color: rgba($black, 0.2);
 
 // Skeleton screen loaders
 $skeleton-background: $vapor;
@@ -77,19 +78,19 @@ $skeleton-background: $vapor;
 $column-gutter: rem-calc(32);
 
 // Media Query Ranges
-$small-breakpoint:  40em     !default;
+$small-breakpoint: 40em !default;
 $medium-breakpoint: 59.375em !default;
 $mediumwide-breakpoint: 64em !default; // used to let the chrome change to "large" before content
-$large-breakpoint:  90em     !default;
-$xlarge-breakpoint: 120em    !default;
+$large-breakpoint: 90em !default;
+$xlarge-breakpoint: 120em !default;
 
 // Here we define the lower and upper bounds for each media size
-$small-range:      (0, $small-breakpoint) !default; /* 0, 640px */
-$medium-range:     ($small-breakpoint  + 0.0625em, $medium-breakpoint)     !default; /*  641px,  950px */
+$small-range: (0, $small-breakpoint) !default; /* 0, 640px */
+$medium-range: ($small-breakpoint + 0.0625em, $medium-breakpoint) !default; /*  641px,  950px */
 $mediumwide-range: ($medium-breakpoint + 0.0625em, $mediumwide-breakpoint) !default; /*  951px, 1024px */
-$large-range:      ($mediumwide-breakpoint + 0.0625em, $large-breakpoint)  !default; /*  951px, 1440px */
-$xlarge-range:     ($large-breakpoint  + 0.0625em, $xlarge-breakpoint)     !default; /* 1441px, 1920px */
-$xxlarge-range:    ($xlarge-breakpoint + 0.0625em, 99999999em)             !default; /* 1921px, ...    */
+$large-range: ($mediumwide-breakpoint + 0.0625em, $large-breakpoint) !default; /*  951px, 1440px */
+$xlarge-range: ($large-breakpoint + 0.0625em, $xlarge-breakpoint) !default; /* 1441px, 1920px */
+$xxlarge-range: ($xlarge-breakpoint + 0.0625em, 99999999em) !default; /* 1921px, ...    */
 
 $screen: "only print, screen";
 

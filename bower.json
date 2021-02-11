@@ -22,8 +22,6 @@
     "doT": "1.0.1",
     "jquery.tablesorter": "2.14.5",
     "jstree": "3.2.1",
-    "foundation": "5.5.3",
-    "modernizr": "2.8.3",
     "datatables": "1.10.15",
     "datatables.net-fixedcolumns": "3.2.2",
     "highcharts-release": "6.1.1",
