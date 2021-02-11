@@ -52,7 +52,7 @@ class Profile implements IStrategy
 
 
     /**
-     * An arbitrary string used to prefix Employees' employee_code. This field is usually numeric
+     * An arbitrary string used to prefix Employees' user_code. This field is usually numeric
      * and can directly conflict with student external ids, so you end up with employees' profiles
      * overwriting student profiles. To prevent them matching up like that, we chuck a letter in
      */
