@@ -52,6 +52,7 @@ class SparqlClient extends Client
             }
         }
 
+        /** @var Http\Client $client */
         $client = Http::getDefaultHttpClient();
         $client->resetParameters();
 

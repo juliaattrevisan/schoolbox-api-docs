@@ -83,7 +83,7 @@
         "phpoffice/phpexcel": "dev-master",
         "zendframework/zend-uri": "~2.7.1",
         "onelogin/php-saml": "~3.5.1",
-        "karriere/json-decoder": "^2.1.1",
+        "karriere/json-decoder": "~4.0.3",
         "crell/api-problem": "^3.0",
         "knplabs/knp-snappy": "^1.1",
         "ext-redis": "*",
