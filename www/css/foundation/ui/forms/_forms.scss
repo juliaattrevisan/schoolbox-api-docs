@@ -752,6 +752,13 @@ ul.filters {
   }
 }
 
+input[type="radio"]:not(.plain) + label {
+  &:before,
+  &:after {
+    @include border-radius(1rem);
+  }
+}
+
 // Disabled
 input[type="checkbox"]:not(.plain):disabled,
 input[type="radio"]:not(.plain):disabled {
