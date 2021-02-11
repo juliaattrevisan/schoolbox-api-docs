@@ -116,6 +116,7 @@
             previewsContainer: $(this.element).find(opt.previewsContainerSelector)[0],
             previewTemplate: this.tpl.html(),
             capture: opt.capture,
+            timeout: 300000,
 
             fallback: function () {
                 var mk = opt.fallbackButtonMarkup || '<a href="#" data-attach-fallback class="button icon-attach">' + opt.dictDefaultMessage + '</a>',
@@ -556,82 +557,95 @@
         this.close();
         
         for (i = 0; i < list.length; ++i) {
-            data = {
-                name: list[i].title,
-                type: list[i].mimeType,
-                size: list[i].filesize,
-                hash: list[i].hash
-            };
             
-            if (this.dropzone) {
+            if (list[i].status === 'success') { //only display those files that were succesfully uploaded from the modal window
+
+                data = {
+                    name: list[i].title,
+                    type: list[i].mimeType,
+                    size: list[i].filesize,
+                    hash: list[i].hash
+                };
                 
-                //if the file was attached using 'Upload file(s)' it's been uploaded, 
-                //so we can display the image in the drop zone when we return to the page
-                let getExistingFileUrl = function () {
-                    if (list[i].file && list[i].file.imageUrl) { //this file prop is set within templates/core/resources/filesystem/upload.html - onQueueComplete()
-                        return list[i].file.imageUrl;
-                    } else { //otherwise we'll just show the file type image
-                        return '/ajax/mime/' + data.type;
-                    }
-                }
-                
-                //once the files displayed, ensure the drop zone window and progress view are hidden depending on max uploads
-                let onExistingFileDisplayed = function () {
-                    let elementDOM = $(self.element)[0];
-                    if (elementDOM.id === 'cover-photo-zone') {
-                        elementDOM.querySelector('.az-list').style.display = 'none';
-                    } else {
-                        if (self.dropzone.options.maxFiles === 1) {
-                            elementDOM.classList.add('dz-max-files-reached');
+                if (this.dropzone) {
+                    
+                    //if the file was attached using 'Upload file(s)' it's been uploaded, 
+                    //so we can display the image in the drop zone when we return to the page
+                    let getExistingFileUrl = function () {
+                        if (list[i].file && list[i].file.imageUrl) { //this file prop is set within templates/core/resources/filesystem/upload.html - onQueueComplete()
+                            return list[i].file.imageUrl;
+                        } else { //otherwise we'll just show the file type image
+                            return '/ajax/mime/' + data.type;
                         }
                     }
-                    elementDOM.querySelector('.progress').style.display = 'none';
-                }
+                    
+                    //once the files displayed, ensure the drop zone window and progress view are hidden depending on max uploads
+                    let onExistingFileDisplayed = function () {
+                        let elementDOM = $(self.element)[0];
+                        if (elementDOM.id === 'cover-photo-zone') {
+                            elementDOM.querySelector('.az-list').style.display = 'none';
+                        } else {
+                            if (self.dropzone.options.maxFiles === 1) {
+                                elementDOM.classList.add('dz-max-files-reached');
+                            }
+                        }
+                        elementDOM.querySelector('.progress').style.display = 'none';
+                    }
 
-                //to display an existing file within the drop zone view, as the file has already been loaded
-                //https://gitlab.com/meno/dropzone/-/wikis/FAQ#how-to-show-files-already-stored-on-server
-                this.dropzone.displayExistingFile(data, getExistingFileUrl(), onExistingFileDisplayed);
-                
-                //as this.on('success') is not called when using the modal window upload, 
-                //need to also add the attachment vars in so the files are added on form submit
-                let inputValue = data.hash + ':' + data.name;
-                $(data.previewElement)
+                    //to display an existing file within the drop zone view, as the file has already been loaded
+                    //https://gitlab.com/meno/dropzone/-/wikis/FAQ#how-to-show-files-already-stored-on-server
+                    this.dropzone.displayExistingFile(data, getExistingFileUrl(), onExistingFileDisplayed);
+                    
+                    //as this.on('success') is not called when using the modal window upload, 
+                    //need to also add the attachment vars in so the files are added on form submit
+                    let inputValue = data.hash + ':' + data.name;
+                    $(data.previewElement)
                         .find('input[data-az-attachment]')
                         .val(inputValue);
-                self.attach(data);
+                    self.attach(data);
 
-                elems.push($(data.previewElement));     
+                    elems.push($(data.previewElement));
 
-                $(this.element).trigger('success.attachzone', [data]);
+                    $(this.element).trigger('success.attachzone', [data]);
 
-            } else {
-                
-                data.previewElement = $(this.tpl.html());
+                } else {
+                    
+                    data.previewElement = $(this.tpl.html());
 
-                this.renderFile(data);
+                    this.renderFile(data);
 
-                $(this.element)
-                    .find(this.options.previewsContainerSelector)
-                    .append(data.previewElement);
+                    $(this.element)
+                        .find(this.options.previewsContainerSelector)
+                        .append(data.previewElement);
 
-                data.previewElement.find('[data-dz-remove]').on('click', function () {
-                    var ff = self.fallbackFiles;
-                    ff.splice(ff.indexOf(data), 1);
-                    self.detach(this);
-                });
+                    data.previewElement.find('[data-dz-remove]').on('click', function () {
+                        var ff = self.fallbackFiles;
+                        ff.splice(ff.indexOf(data), 1);
+                        self.detach(this);
+                    });
 
-                elems.push(data.previewElement);
+                    elems.push(data.previewElement);
 
-                this.fallbackFiles.push(data);
+                    this.fallbackFiles.push(data);
 
-                this.fallbackMaxFilesReached();
+                    this.fallbackMaxFilesReached();
+
+                }
+
+                // now the file has been added...if it's buggy, take it out again
+                if (data.hash.split(':')[0] == 'exception') {
+                    this.rejectFile(data, data);
+                }
+
+            } else { //otherwise dummy up the error display that occurs when using straight drag n drop without the modal
+
+                let fileName = list[i].name;
+                let errorMessage = list[i].errorMessage;
+                let failedFileItem = document.createRange().createContextualFragment('<li class="actions-small-1 dz-error"><div class="list-item"><div class="card small-12"><p class="filename" data-dz-name="" title="' + errorMessage + '">' + fileName + ' failed: ' + errorMessage + '</p></div></div><nav><a href="#" data-dz-remove="" title="Remove" class="icon-close"></a></nav></li>');
+                this.element.querySelector('.az-error-list').appendChild(failedFileItem);
 
             }
 
-            // now the file has been added...if it's buggy, take it out again
-            if (data.hash.split(':')[0] == 'exception') {
-                this.rejectFile(data, data);
-            }
         }
 
         return elems;
