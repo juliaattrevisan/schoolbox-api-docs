@@ -162,6 +162,12 @@ class Definition implements IStrategy
             $cycleEnd = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
             $dayStart = $cycleConfiguration[$ttid]['dayStart'] ?? self::CYCLE_DEFAULT_DAY_NUMBER;
 
+            /* Unique constraint on sis_timetable_period
+             * (title, day, cycle_id) tuples must be unique
+             * Remember a counter for each dupe we encounter
+             */
+            $existingTuples = [];
+
             /* Reuse existing cycle with the same identifier, if it exists, and update it
              */
             try {
@@ -203,6 +209,49 @@ class Definition implements IStrategy
                 foreach ($periods as $period) {
                     $period->setDay($day);
                     $period->setCycle($timetableCycle);
+
+                    /* We have a unique constraint on (title, day, cycle) in sis_timetable_period
+                     * Sometimes schools have multiple instances of the same name on a given day
+                     *
+                     * e.g. two Tutor periods without any distinction in their name occur in the
+                     * same day in a given cycle (one is a morning session, another in the aftenoon)
+                     *
+                     * Look ahead to see if it exists; if it does, augment the title - but schools
+                     * should have unique period names per day instead.
+                     *
+                     * ...but this stopped happening suddenly? Did someone change data somewhere?
+                     * Anyway I'll keep this here for now, just in case
+                     */
+//                    try {
+//                        $existing = $this->timetablePeriodMapper->findOneByColumnList([
+//                            'title' => $period->getTitle(),
+//                            'day' => $period->getDay(),
+//                            'cycle_id' => $timetableCycle->getId()
+//                        ]);
+//
+//                        /* Remember the count, augment the name
+//                         */
+//                        if (!isset($existingTuples[$period->getDay()][$period->getTitle()])) {
+//                            $existingTuples[$period->getDay()][$period->getTitle()] = 0;
+//                        }
+//
+//                        $existingTuples[$period->getDay()][$period->getTitle()]++;
+//
+//                        $newTitle = "{$period->getTitle()} ({$existingTuples[$period->getDay()][$period->getTitle()]})";
+//
+//                        $this->log->critical(sprintf(
+//                            'Augmented %s since it occurs multiple times in day %s and cycle %s',
+//                            $period->getTitle(),
+//                            $period->getDay(),
+//                            $period->getCycle()->getId()
+//                        ));
+//
+//                        $period->setTitle($newTitle);
+//
+//                    } catch (\Schoolbox\Mapper\Exception $e) {
+//
+//                        // noop; doesn't already exist, just create it as normal
+//                    }
 
                     $this->log->info(sprintf(
                         'Creating period %s (%s-%s) in timetable cycle %s (%s)',
@@ -436,29 +485,6 @@ class Definition implements IStrategy
             $maxPeriods = $timetable['PERIODMAX'];
         }
 
-        /* To find info about Period Times, you need to inspect each Cycle's STRDAYS element
-         * Each day has its own set of Period Names but we don't support that, so just
-         * get the longest day's Period setup and apply that scheme universally
-         */
-        $longestDay = $this->cycleRegistry->recall($ttid)['periods'] ?? [];
-
-        foreach ($timetable['STRDAYS'] as $day => $periods) {
-            if (\count($periods['PERIODS']) >= \count($longestDay)) {
-
-                /* + Assumption: Period naming
-                 * Rename periods, because their names can vary between students
-                 * and timetables; so give them something predictable
-                 */
-                $longestDay = [];
-
-                foreach ($periods['PERIODS'] as $i => $period) {
-                    $period['PRD_DESC'] = 'Period ' . $i;
-
-                    $longestDay[] = $period;
-                }
-            }
-        }
-
         /* Remember the cycle's info consisting of the last known maxDays and maxPeriods info
          * as we investigate every data ever
          */
@@ -470,7 +496,7 @@ class Definition implements IStrategy
 
             /* Period scheme that we assume can apply universally
              */
-            'periods' => $longestDay,
+            'periods' => $timetable['STRDAYS'],
 
             /* There doesn't appear to be any info about cycles starting/ending at a particular
              * datetime, so just presume the hardcoded defaults for now
@@ -515,7 +541,6 @@ class Definition implements IStrategy
         /* Explore all the Period data
          */
         $days = range(1, $cycle['cycleLength']);
-        $periods = array_values($cycle['periods']);
 
         foreach ($days as $i => $dayIndex) {
 
@@ -535,12 +560,8 @@ class Definition implements IStrategy
             ]
              */
 
-            /* Sort periods by start time to set sequence properly
-             */
-            usort($periods, static function ($a, $b) {
-                return (strtotime($a['PRD_START']) > strtotime($b['PRD_START']));
-            });
-            /** @var TimetablePeriod $period */
+            $periods = $cycle['periods'][$dayIndex]['PERIODS'];
+
             foreach ($periods as $j => $period) {
                 $periodName = $period['PRD_DESC'];
                 $sequence = $j;
