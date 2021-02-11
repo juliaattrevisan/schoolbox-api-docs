@@ -44,12 +44,13 @@ class Lookup
      */
     private function initStudentLookup(): array
     {
-        $userStatement = $this->timetablePeriodMapper->getDatabase()->query('
+//        new \Alaress_Probe("test uid");
+        $userStatement = $this->timetablePeriodMapper->getDatabase()->query("
             SELECT external_id, firstname, lastname
             FROM sis_user_profile sup
             INNER JOIN sis_user_profile_student sups ON sup.id = sups.sis_user_profile_id
-            WHERE external_id IS NOT NULL
-        ');
+            WHERE external_id = '100043'
+        ");
 
         $students = [];
 
