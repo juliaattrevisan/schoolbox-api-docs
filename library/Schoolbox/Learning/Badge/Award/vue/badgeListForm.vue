@@ -307,13 +307,13 @@ export default {
         ></badge-list>
 
         <ul class="flex-list buttons">
+            <li><a :href="returnUrl" class="button">Cancel</a></li>
             <li>
-                <button class="submit full-width"
+                <button class="submit"
                         @click.prevent="$refs.awardModal.open"
                         :disabled="selectedBadges.length === 0"
                 >{{ confirmButtonText }}</button>
             </li>
-            <li><a :href="returnUrl" class="button">Cancel</a></li>
         </ul>
 
         <reveal-modal ref="awardModal" size="large">
@@ -346,8 +346,8 @@ export default {
             </template>
 
             <ul class="flex-list buttons">
-                <li><button ref="awardModalSubmit" @click.prevent="onSubmit" class="submit">Confirm</button></li>
                 <li><a @click.prevent="$refs.awardModal.close" class="button">Cancel</a></li>
+                <li><button ref="awardModalSubmit" @click.prevent="onSubmit" class="submit">Confirm</button></li>
             </ul>
         </reveal-modal>
     </div>
