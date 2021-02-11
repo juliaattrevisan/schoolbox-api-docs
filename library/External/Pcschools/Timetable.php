@@ -374,7 +374,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         foreach ($weekDays as $weekDay) {
             try {
                 // 2020-08-10 00:00:00.000
-                $adf = new Alaress_Date_Format($weekDay['DATE'], Alaress_Date_Format::DATABASE_FORMAT . '.v');
+                $adf = new Alaress_Date_Format($weekDay['DATE'], Alaress_Date_Format::DATABASE_FORMAT_MLS);
             } catch (Exception $e) {
                 continue;
             }

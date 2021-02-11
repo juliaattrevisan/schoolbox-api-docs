@@ -50,7 +50,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     protected $warnings = array();
 
     const DATABASE_FORMAT = 'Y-m-d H:i:s';
-    const DATABASE_FORMAT_MS = 'Y-m-d H:i:s.u';
+    const DATABASE_FORMAT_MS = 'Y-m-d H:i:s.u';  // microseconds
+    const DATABASE_FORMAT_MLS = 'Y-m-d H:i:s.v'; // milliseconds
     const FORMAT_DATETIME_UTC = 'Y-m-d\TH:i:s.u\Z';  // eg '2015-09-22T23:22:12.798Z'
     const DATABASE_DATE_FORMAT = 'Y-m-d';
     const DATABASE_TIME_FORMAT = 'H:i:s';
@@ -434,7 +435,23 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                     );
                 }
             } else {
-                $laravelDate = Carbon::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
+                try {
+                    $laravelDate = Carbon::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
+                } catch (InvalidArgumentException $e) {
+                    // We allow truncating time by passing Y-m-d as a date format
+                    if ($inputDateFormat === self::DATABASE_DATE_FORMAT && Carbon::hasFormat($dateTime, self::DATABASE_FORMAT)) {
+                        $laravelDate = Carbon::createFromFormat(self::DATABASE_FORMAT, $dateTime, $newTimezone);
+                    }
+                    if (!$laravelDate) {
+                        throw $e;
+                    }
+                }
+
+                $errors = Carbon::getLastErrors();
+                if ($errors['warning_count']) {
+                    $this->warnings = $errors['warnings'];
+                }
+
                 // Did I specify a timezone? If not, set it to the default
                 if (!preg_match('/[eOPT]/', $inputDateFormat)) {
                     $laravelDate->setTimezone($newTimezone);
