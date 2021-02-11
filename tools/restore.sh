@@ -473,15 +473,16 @@ if [ "$sourcetype" == '[A]' ] && [ "$sourceloc" == '[R]' ]; then
   remote_mount=$(ssh "$host" findmnt -n -o SOURCE --target "$sourcep3");
   remote_mount_used=$(ssh "$host" df -B1 | grep "$remote_mount" | awk -F " " '{print $3}');
   remote_data_dir=${tempfiledir%/*};
+  remote_real_data_dir=$(ssh "$host" realpath "$remote_data_dir");
   remote_mount_dir=$(ssh "$host" mount | grep "$remote_mount" | awk -F " " '{print $3}');
-  remote_not_sb_used=$(ssh "$host" du -sh "$remote_mount_dir" --exclude "$remote_data_dir" -B1 2>/dev/null | cut -f 1);
+  remote_not_sb_used=$(ssh "$host" du -sh "$remote_mount_dir" --exclude "$remote_real_data_dir" -B1 2>/dev/null | cut -f 1);
   remote_cache_used=$(ssh "$host" du -sh "$remote_data_dir/cache/zip" -B1 | cut -f 1);
   remoteUsedStorage=$((remote_mount_used - remote_not_sb_used - remote_cache_used));
 
   if [[ "$localAvailableStorage" == "" ]] || [[ "$remoteUsedStorage" == "" ]]; then
     errmsg="Please check the datapool disk on both hosts, one or both are either full or not available";
     error;
-  elif [[ $(echo "$localAvailableStorage*1.05" | bc) -le $remoteUsedStorage ]]; then
+  elif [[ $localAvailableStorage -le $remoteUsedStorage ]]; then
     errmsg="You are trying to restore more data ($remoteUsedStorage bytes) than disk that is available ($localAvailableStorage bytes)";
     error;
   fi
