@@ -2,7 +2,8 @@
 
 {% block image %}
     {% set msg = row.messages | first %}
-    <img src="{{ msg.icon }}" width="64" height="64" />
+    {# <img src="{{ msg.icon }}" width="64" height="64" /> #}
+    <img src="/storage/image.php?hash=691a0e7b86d7fc181e0f841e5ef3e129825defb1&amp;size=constrain200" />
 {% endblock %}
 
 {% block pretty %}
@@ -37,11 +38,12 @@
     <tr>
         <td>
             {% if msg.meta.blurb | length %}
-                {# blurb already has a <p> tag #}
-                {{ msg.meta.blurb | purifyAbsoluteUri('https://'~config.fqdn) }}
+            {# blurb already has a <p> tag #}
+            {{ msg.meta.blurb | purifyAbsoluteUri('https://'~config.fqdn) }}
             {% else %}
-                <p>{{ msg.meta.body | cutSentence(220, true) }}</p>
+            <p>{{ msg.meta.body | cutSentence(200, true) }}</p>
             {% endif %}
+            <a href="{{ msg.href }}" class="more" title="Read more">Read more</a>
         </td>
     </tr>
     {% endif %}
