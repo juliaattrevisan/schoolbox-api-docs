@@ -288,58 +288,23 @@ class Indicator extends CliTool\App
             // Let's find indicators, and then determine if they are used or not.
             $this->getLogger()->info(self::indent(1) . 'finding unused indicators...');
 
-            foreach ($this->findRubricCapabilityQuery->fetchAll() as $capability) {
+            // Iterate each indicator, delete ones which are empty
+            $capabilities = $this->findRubricCapabilityQuery->fetchAll();
+            foreach ($capabilities as $capability) {
                 $this->findRubricIndicatorQuery->execute(['capabilityId' => $capability['id']]);
                 foreach ($this->findRubricIndicatorQuery->fetchAll() as $indicator) {
-                    // How many usages of this indicator are there?
-                    $this->findIndicatorUsageCountQuery->execute(['indicatorId' => $indicator['id']]);
-                    $indicatorUsageCount = (int)$this->findIndicatorUsageCountQuery->fetchColumn();
-
-                    $this->getLogger()->debug(
-                        self::indent(2)
-                        . sprintf(
-                            'indicator #%d (%s / %s) has %d usage(s)',
-                            $indicator['id'],
-                            self::formatNameForOutput($capability['name']),
-                            self::formatNameForOutput($indicator['name']),
-                            $indicatorUsageCount,
-                        )
-                    );
-
-                    if ($indicatorUsageCount === 0) {
-                        $this->getLogger()->info(
-                            self::indent(2)
-                            . sprintf(
-                                'deleting unused indicator #%d (%s / %s)',
-                                $indicator['id'],
-                                self::formatNameForOutput($capability['name']),
-                                self::formatNameForOutput($indicator['name']),
-                            )
-                        );
-
-                        $this->deleteRubricIndicatorQuery
-                            ->execute(
-                                [
-                                    'now'         => $this->now,
-                                    'indicatorId' => $indicator['id'],
-                                ]
-                            );
-                    }
+                    $this->deleteIndicatorIfEmpty($indicator, $capability);
                 }
             }
 
-            // Find all the capabilities in this folder
-            $this->findRubricCapabilityQuery->execute(['folderId' => $folderId]);
-            $folderCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
-
             // Clean up empty capabilities
             $this->getLogger()->info(self::indent(1) . 'cleaning up any empty capabilities left behind...');
-            $this->deleteEmptyCapabilities($folderCapabilities);
+            $this->deleteEmptyCapabilities($capabilities);
 
             // Should not need to clean up capabilities with unused indicators:
             // all these would have been cleaned up in the last step
 //            $this->getLogger()->debug(self::indent(1) . 'cleaning up any capabilities with no indicators in use...');
-//            $this->deleteCapabilitiesWithNoUsedIndicators($folderCapabilities);
+//            $this->deleteCapabilitiesWithNoUsedIndicators($capabilities);
         }
     }
 
@@ -350,10 +315,10 @@ class Indicator extends CliTool\App
      */
     private function deleteEmptyCapabilities(array $capabilities): void
     {
-        foreach ($capabilities as $capabilityId => $capabilityName) {
+        foreach ($capabilities as $capability) {
             // Are there any extant indicators in this capability?
             // If so, do not delete this capability.
-            $this->findRubricIndicatorQuery->execute(['capabilityId' => $capabilityId]);
+            $this->findRubricIndicatorQuery->execute(['capabilityId' => $capability['id']]);
             if ($this->findRubricIndicatorQuery->rowCount() > 0) {
                 continue;
             }
@@ -362,17 +327,63 @@ class Indicator extends CliTool\App
             $this->getLogger()->info(
                 sprintf(
                     self::indent(2) . 'deleting empty capability #%d (%s)',
-                    $capabilityId,
-                    self::formatNameForOutput($capabilityName),
+                    $capability['id'],
+                    self::formatNameForOutput($capability['name']),
                 )
             );
-            $this->deleteRubricCapabilityQuery
-                ->execute(
-                    [
-                        'now'          => $this->now,
-                        'capabilityId' => $capabilityId,
-                    ]
-                );
+            $this->deleteRubricCapabilityQuery->execute(
+                [
+                    'now'          => $this->now,
+                    'capabilityId' => $capability['id'],
+                ]
+            );
+        }
+    }
+
+    /**
+     * Delete the given indicator, if it is empty.
+     *
+     * @param array $indicator  The indicator to delete: contains the "id" and
+     *                          "name" fields
+     * @param array $capability The capability the indicator is in: contains the
+     *                          "id" and
+     *                          "name" fields
+     */
+    private function deleteIndicatorIfEmpty(array $indicator, array $capability): void
+    {
+        // How many usages of this indicator are there?
+        $this->findIndicatorUsageCountQuery->execute(['indicatorId' => $indicator['id']]);
+        $indicatorUsageCount = (int)$this->findIndicatorUsageCountQuery->fetchColumn();
+
+        $this->getLogger()->debug(
+            self::indent(2)
+            . sprintf(
+                'indicator #%d (%s / %s) has %d usage(s)',
+                $indicator['id'],
+                self::formatNameForOutput($capability['name']),
+                self::formatNameForOutput($indicator['name']),
+                $indicatorUsageCount,
+            )
+        );
+
+        // If it's empty, delete it
+        if ($indicatorUsageCount === 0) {
+            $this->getLogger()->info(
+                self::indent(2)
+                . sprintf(
+                    'deleting unused indicator #%d (%s / %s)',
+                    $indicator['id'],
+                    self::formatNameForOutput($capability['name']),
+                    self::formatNameForOutput($indicator['name']),
+                )
+            );
+
+            $this->deleteRubricIndicatorQuery->execute(
+                [
+                    'now'         => $this->now,
+                    'indicatorId' => $indicator['id'],
+                ]
+            );
         }
     }
 
