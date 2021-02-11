@@ -836,8 +836,8 @@
                 <h2>Please confirm</h2>
                 <p>Are you sure you wish to delete this event?</p>
                 <ul class="flex-list buttons">
-                    <li><a href="#" class="button" @click.prevent="$refs.eventDeleteModal.close">No</a></li>
-                    <li><a href="#" class="button submit" @click.prevent="confirmEventDeleteSelf">Yes</a></li>
+                    <li><a href="#" class="button" @click.prevent="$refs.eventDeleteModal.close">Cancel</a></li>
+                    <li><a href="#" class="button submit" @click.prevent="confirmEventDeleteSelf">Delete</a></li>
                 </ul>
             </template>
         </reveal-modal>
@@ -866,8 +866,8 @@
                     </template>
                 </p>
                 <ul class="flex-list buttons">
-                    <li><a href="#" class="button" @click.prevent="$refs.bookingDeleteModal.close">No</a></li>
-                    <li><a href="#" class="button submit" @click.prevent="confirmBookingDeleteSelf">Yes</a></li>
+                    <li><a href="#" class="button" @click.prevent="$refs.bookingDeleteModal.close">Cancel</a></li>
+                    <li><a href="#" class="button submit" @click.prevent="confirmBookingDeleteSelf">Delete</a></li>
                 </ul>
             </template>
         </reveal-modal>
