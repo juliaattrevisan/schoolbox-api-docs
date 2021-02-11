@@ -23,7 +23,6 @@ module.exports = {
         userProfileFeeds: './library/Schoolbox/Learning/vue/user-profile/feeds.main.js',
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.main.js',
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.main.js',
-
         authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
     },
     output: {
