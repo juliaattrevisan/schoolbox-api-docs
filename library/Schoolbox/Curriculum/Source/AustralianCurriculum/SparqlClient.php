@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -8,14 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Curriculum\Source\AustralianCurriculum;
 
-use EasyRdf_Exception;
-use EasyRdf_Format;
-use EasyRdf_Graph;
-use EasyRdf_Http;
-use EasyRdf_Namespace;
-use EasyRdf_Sparql_Client;
-use EasyRdf_Sparql_Result;
-use EasyRdf_Utils;
+use EasyRdf\Exception;
+use EasyRdf\Format;
+use EasyRdf\Graph;
+use EasyRdf\Http;
+use EasyRdf\RdfNamespace;
+use EasyRdf\Sparql\Client;
+use EasyRdf\Sparql\Result;
+use EasyRdf\Utils;
 
 /**
  * Extension of SPARQL client to work with ACARA's API.
@@ -23,7 +24,7 @@ use EasyRdf_Utils;
  * The only actual difference is that ACARA only accepts its query parameter in
  * `$_GET['q']`: SPARQL supposedly takes its query in `$_GET['query']`.
  */
-class SparqlClient extends EasyRdf_Sparql_Client
+class SparqlClient extends Client
 {
     /**
      * The URI for ACARA's API.
@@ -32,24 +33,30 @@ class SparqlClient extends EasyRdf_Sparql_Client
 
 
     /**
-     * @inheritdoc
+     *
+     * @param $type
+     * @param $query
+     * @return Graph|Http\Response|Result
+     * @throws Exception
      */
     protected function request($type, $query)
     {
         // Check for undefined prefixes
         $prefixes = '';
-        foreach (EasyRdf_Namespace::namespaces() as $prefix => $uri) {
-            if (strpos($query, "$prefix:") !== false and
-                strpos($query, "PREFIX $prefix:") === false) {
+        foreach (RdfNamespace::namespaces() as $prefix => $uri) {
+            if (
+                strpos($query, "$prefix:") !== false &&
+                strpos($query, "PREFIX $prefix:") === false
+            ) {
                 $prefixes .= "PREFIX $prefix: <$uri>\n";
             }
         }
 
-        $client = EasyRdf_Http::getDefaultHttpClient();
+        $client = Http::getDefaultHttpClient();
         $client->resetParameters();
 
         // Tell the server which response formats we can parse
-        $accept = EasyRdf_Format::getHttpAcceptHeader(
+        $accept = Format::getHttpAcceptHeader(
             [
                 'application/sparql-results+json' => 1.0,
                 'application/sparql-results+xml'  => 0.8,
@@ -58,12 +65,12 @@ class SparqlClient extends EasyRdf_Sparql_Client
         $client->setHeaders('Accept', $accept);
 
         $queryUri = $this->getQueryUri();
-        if ($type == 'update') {
+        if ($type === 'update') {
             $client->setMethod('POST');
             $client->setUri($this->getUpdateUri());
             $client->setRawData($prefixes . $query);
             $client->setHeaders('Content-Type', 'application/sparql-update');
-        } elseif ($type == 'query') {
+        } elseif ($type === 'query') {
             // Use GET if the query is less than 2kB
             // 2046 = 2kB minus 1 for '?' and 1 for NULL-terminated string on server
 
@@ -88,20 +95,20 @@ class SparqlClient extends EasyRdf_Sparql_Client
         }
 
         $response = $client->request();
-        if ($response->getStatus() == 204) {
+        if ($response->getStatus() === 204) {
             // No content
             return $response;
         } elseif ($response->isSuccessful()) {
-            list($type, $params) = EasyRdf_Utils::parseMimeType(
+            [$type, $params] = Utils::parseMimeType(
                 $response->getHeader('Content-Type')
             );
             if (strpos($type, 'application/sparql-results') === 0) {
-                return new EasyRdf_Sparql_Result($response->getBody(), $type);
+                return new Result($response->getBody(), $type);
             } else {
-                return new EasyRdf_Graph($queryUri, $response->getBody(), $type);
+                return new Graph($queryUri, $response->getBody(), $type);
             }
         } else {
-            throw new EasyRdf_Exception(
+            throw new Exception(
                 "HTTP request for SPARQL query failed: " . $response->getBody()
             );
         }
