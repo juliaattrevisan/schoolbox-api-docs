@@ -377,19 +377,17 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * @param DateTimeInterface|Alaress_Date_Format|string $dateTime
      * @param string|array $inputDateFormat If array: try all of these formats, use first that doesn't fail
-     * @param DateTimeZone|null $timezone    The timezone of the date, or null to use default
-     * @param bool         $tryTrailing Set to false to stop trying with trailing data
+     * @param DateTimeZone|null $timezone The timezone of the date, or null to use default
      *
      * @return void
      * @throws InvalidArgumentException if no $inputDateFormat was set and $dateTime
      *                                  is a string, or if $dateTime is a string and
      *                                  it can't be parsed in $inputDateFormat
      */
-    public function setFromFormat(
+    private function setFromFormat(
         $dateTime,
         $inputDateFormat,
-        DateTimeZone $timezone = null,
-        bool $tryTrailing = true
+        ?DateTimeZone $timezone = null
     ) {
         if (is_array($inputDateFormat)) {
             if (empty($inputDateFormat)) {
@@ -436,32 +434,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                     );
                 }
             } else {
-                try {
-                    $laravelDate = Carbon::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
-                } catch (InvalidArgumentException $e) {
-                    if (!$tryTrailing) {
-                        throw $e;
-                    }
-                    // I don't have a datetime, try again with trailing data allowed
-                    // This can also throw an InvalidArgumentException - allow that to fall on carpet
-                    $laravelDate = Carbon::createFromFormat($inputDateFormat . '+', $dateTime, $newTimezone);
-                }
-
-                $errors = Carbon::getLastErrors();
-                if ($errors['warning_count']) {
-                    // I have a datetime, but it's not what I expected. Warn the user.
-                    // This date will also fail isValid()
-                    $this->warnings = $errors['warnings'];
-                    trigger_error(
-                        sprintf(
-                            'LaravelDate creation raised %d warnings: (%s)',
-                            $errors['warning_count'],
-                            implode(', ', $errors['warnings'])
-                        ),
-                        E_USER_WARNING
-                    );
-                }
-
+                $laravelDate = Carbon::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
                 // Did I specify a timezone? If not, set it to the default
                 if (!preg_match('/[eOPT]/', $inputDateFormat)) {
                     $laravelDate->setTimezone($newTimezone);

@@ -114,13 +114,11 @@ class Csv extends Base
              * If access is 2, then the sid corresponds to group id's
              */
             try {
-                $start = new Alaress_Date_Format();
-                $start->setFromFormat($start_date, 'd/m/Y', null, false);
+                $start = new Alaress_Date_Format($start_date, 'd/m/Y');
                 //
                 // Finish empty? Use start date as the finish.
                 if (!empty(strlen(trim($finish_date)))) {
-                    $finish = new Alaress_Date_Format();
-                    $finish->setFromFormat($finish_date, 'd/m/Y', null, false);
+                    $finish = new Alaress_Date_Format($finish_date, 'd/m/Y');
                 } else {
                     $finish = clone $start;
                 }
@@ -189,8 +187,7 @@ class Csv extends Base
             }
 
             try {
-                $startDatetime = new Alaress_Date_Format();
-                $startDatetime->setFromFormat($startDatetimeString, 'd/m/Y H:i:s', null, false);
+                $startDatetime = new Alaress_Date_Format($startDatetimeString, 'd/m/Y H:i:s');
             } catch (\InvalidArgumentException $e) {
                 $output[] = [
                     'name'   => \Scrub::text($name),
@@ -219,8 +216,7 @@ class Csv extends Base
             }
 
             try {
-                $finishDatetime = new Alaress_Date_Format();
-                $finishDatetime->setFromFormat($finishDatetimeString, 'd/m/Y H:i:s', null, false);
+                $finishDatetime = new Alaress_Date_Format($finishDatetimeString, 'd/m/Y H:i:s');
             } catch (\InvalidArgumentException $e) {
                 $output[] = [
                     'name'   => \Scrub::text($name),
@@ -264,8 +260,7 @@ class Csv extends Base
              */
             if (strlen(trim($publish_date))) {
                 try {
-                    $publishDate = new Alaress_Date_Format();
-                    $publishDate->setFromFormat($publish_date, 'd/m/Y', null, false);
+                    $publishDate = new Alaress_Date_Format($publish_date, 'd/m/Y');
                 } catch (\InvalidArgumentException $e) {
                     $output[] = [
                         'name'   => \Scrub::text($name),
