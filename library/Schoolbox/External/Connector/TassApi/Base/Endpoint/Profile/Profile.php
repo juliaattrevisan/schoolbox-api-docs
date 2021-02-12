@@ -52,6 +52,14 @@ class Profile implements IStrategy
 
 
     /**
+     * An arbitrary string used to prefix Employees' user_code. This field is usually numeric
+     * and can directly conflict with student external ids, so you end up with employees' profiles
+     * overwriting student profiles. To prevent them matching up like that, we chuck a letter in
+     */
+    private const EMPLOYEE_PREFIX = 'E';
+
+
+    /**
      * @var LoggerInterface
      */
     private $log;
@@ -763,14 +771,14 @@ class Profile implements IStrategy
             /* Apparently there's both title and salutation for some bizarre reason
              */
             $employeeSetReformatted[] = [
-                'teacher_code' => $employee['user_code'],
+                'teacher_code' => self::EMPLOYEE_PREFIX . $employee['user_code'],
                 'salutation' => array_values(array_filter([$employee['title'], $employee['salutation']]))[0],
                 'given_names' => $employee['first_name'],
                 'surname' => $employee['surname'],
                 'school_email_address' => $employee['school_email'],
                 'email_address' => $employee['e_mail'],
                 'department' => $employee['departments'],
-                'portal_user_code' => $employee['user_code'],
+                'portal_user_code' => $employee['username'],
                 'active_flag' => null,
             ];
         }
