@@ -166,16 +166,21 @@ class MiddleYearsAssessmentRank extends BaseComponent
             return null;
         }
 
-        $normalisedMark = $feedback ? $feedback->getNormalisedMark() : null;
-        $cohortMarks    = $this->deriveCohortMarks($this->cohortAssessments);
-        $cohortRank     = $this->deriveCohortRank($normalisedMark, $cohortMarks);
-        $countCohort    = \count($cohortMarks);
-        $cohortAverage  = $this->deriveCohortAverage($cohortMarks);
+        /* Generate some stats about this student's performance among their peers
+         */
+        $statistics = (new CohortStatistics(
+            $this->getViewer(),
+            $this->getRoleTypeOverride(),
+            $this->cohortAssessments,
+            $feedback
+        ))->generate();
 
+        /* I'll never know why these are different array keys
+         */
         $data = [
-            'assessmentRank'    => null === $cohortRank ? null : "$cohortRank / $countCohort",
-            'assessmentMark'    => $feedback ? $feedback->getHumanReadableMark() : null,
-            'assessmentAverage' => null === $cohortAverage ? null : "$cohortAverage %",
+            'assessmentRank'    => $statistics['cohortRank'],
+            'assessmentMark'    => $statistics['studentMark'],
+            'assessmentAverage' => $statistics['cohortAverage']
         ];
 
         return $data;
@@ -225,72 +230,5 @@ class MiddleYearsAssessmentRank extends BaseComponent
             }
         }
         return null;
-    }
-
-
-    /**
-     * Returns all normalised marks for the cohort. Respects assessment's grade visibility
-     *
-     * @param GenericCollection|IAssessable[] $cohortAssessments
-     * @return float[]
-     */
-    private function deriveCohortMarks(GenericCollection $cohortAssessments): array
-    {
-        $cohortMarks = [];
-        foreach ($cohortAssessments as $assessable) {
-            if (!$this->isFeedbackVisibleToUser($assessable)) {
-                continue;
-            }
-            foreach ($assessable->getAllParticipants() as $participant) {
-                $authFeedback = $participant->getAuthoritativeFeedback(true);
-                if (!$authFeedback) {
-                    continue;
-                }
-                $normalisedMark = $authFeedback->getNormalisedMark();
-                if (null === $normalisedMark) {
-                    continue;
-                }
-                $cohortMarks[] = $normalisedMark;
-            }
-        }
-        return $cohortMarks;
-    }
-
-
-    /**
-     * Returns the student's rank against the cohort
-     *
-     * @param float|null $studentMark
-     * @param float[]    $cohortMarks
-     * @return int|null
-     */
-    private function deriveCohortRank(?float $studentMark, array $cohortMarks): ?int
-    {
-        if (null === $studentMark) {
-            return null;
-        }
-        \rsort($cohortMarks);
-
-        $index = \array_search($studentMark, $cohortMarks, true);
-        if (false === $index) {
-            return null;
-        }
-        return $index + 1;
-    }
-
-
-    /**
-     * Returns the average cohort mark, rounded to the specified precision
-     *
-     * @param float[] $cohortMarks
-     * @param int     $precision
-     * @return float|null
-     */
-    private function deriveCohortAverage(array $cohortMarks, int $precision = 2): ?float
-    {
-        if (!\count($cohortMarks)) {
-            return null;
-        }
-        return \round(\array_sum($cohortMarks) / \count($cohortMarks), $precision);
     }
 }

@@ -192,27 +192,34 @@ class MiddleYearsAssessmentTasks extends BaseComponent
             throw new UnexpectedValueException($msg);
         }
 
-        $feedback       = $this->findStudentFeedback($classAssessment);
-        $cohortMarks    = $this->deriveCohortMarks($cohortAssessments);
-        $cohortAverage  = $this->deriveCohortAverage($cohortMarks);
+        $feedback = $this->findStudentFeedback($classAssessment);
+
+        /* Generate some stats about this student's performance among their peers
+         */
+        $statistics = (new CohortStatistics(
+            $this->getViewer(),
+            $this->getRoleTypeOverride(),
+            $cohortAssessments,
+            $feedback
+        ))->generate();
 
         /* Handy diagnosis
          */
 //        new \Alaress_Probe([
+//            'studentMark'   => $statistics['studentMark'],
+//            'cohortAverage' => $statistics['cohortAverage'],
+//            'publishAt'     => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
+//            'comment'       => $feedback ? $feedback->getComment() : null,
+//            'commentBy'     => $feedback ? $feedback->getReviewer() : null,
+//            'dueDate'       => $classAssessment->getDueAt(),
 //            'unitSpecId'    => $unitSpec->getId(),
 //            'unitSpecTitle' => $unitSpec->getTitle(),
-//            'studentMark'   => $feedback ? $feedback->getHumanReadableMark() : null,
-//            'publishAt'     => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
-//            'cohortAverage' => null === $cohortAverage ? null : "$cohortAverage %",
-//            'comment'       => $feedback ? $feedback->getComment() : null,
-//            'commentBy'     => $feedback ? $feedback->getReviewer()->getFullName() : null,
-//            'dueDate'       => $classAssessment->getDueAt()->getDatabase(),
 //        ]);
 
         return [
-            'studentMark'   => $feedback ? $feedback->getHumanReadableMark() : null,
+            'studentMark'   => $statistics['studentMark'],
+            'cohortAverage' => $statistics['cohortAverage'],
             'publishAt'     => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
-            'cohortAverage' => null === $cohortAverage ? null : "$cohortAverage %",
             'comment'       => $feedback ? $feedback->getComment() : null,
             'commentBy'     => $feedback ? $feedback->getReviewer() : null,
             'dueDate'       => $classAssessment->getDueAt(),

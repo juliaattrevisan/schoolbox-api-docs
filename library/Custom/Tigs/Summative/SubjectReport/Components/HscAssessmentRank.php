@@ -145,23 +145,32 @@ class HscAssessmentRank extends BaseComponent
             return null;
         }
 
-        $feedback       = $this->findStudentFeedback($cohortAssessmentsPerClass[$this->folder->getId()]);
-        $normalisedMark = $feedback ? $feedback->getNormalisedMark() : null;
-        $cohortMarks    = $this->deriveCohortMarks($this->cohortAssessments);
-        $cohortRank     = $this->deriveCohortRank($normalisedMark, $cohortMarks);
-        $countCohort    = \count($cohortMarks);
-        $cohortAverage  = $this->deriveCohortAverage($cohortMarks);
+        $feedback = $this->findStudentFeedback($cohortAssessmentsPerClass[$this->folder->getId()]);
 
+        /* Generate some stats about this student's performance among their peers
+         */
+        $statistics = (new CohortStatistics(
+            $this->getViewer(),
+            $this->getRoleTypeOverride(),
+            $this->cohortAssessments,
+            $feedback
+        ))->generate();
+
+        /* I'll never know why these are different array keys
+         */
         // Both Yr11 + 12 see this datum
-        $data = ['assessmentRank' => null === $cohortRank ? null : "$cohortRank / $countCohort"];
+        $data = [
+            'assessmentRank' => $statistics['cohortRank'],
+        ];
 
         // But only Yr11 see these datums
         if (11 === $this->getAttributes()->getCurriculumYearLevel()) {
-            $data = \array_merge($data, [
-                'assessmentMark'    => $feedback ? $feedback->getHumanReadableMark() : null,
-                'assessmentAverage' => null === $cohortAverage ? null : "$cohortAverage %",
+            $data = array_merge([
+                'assessmentMark' => $statistics['studentMark'],
+                'assessmentAverage' => $statistics['cohortAverage']
             ]);
         }
+
         return $data;
     }
 

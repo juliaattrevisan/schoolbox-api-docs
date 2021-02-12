@@ -226,4 +226,13 @@ class BaseComponent
     {
         return $this->attributes;
     }
+
+
+    /**
+     * @return string|null
+     */
+    protected function getRoleTypeOverride(): ?string
+    {
+        return $this->roleTypeOverride;
+    }
 }

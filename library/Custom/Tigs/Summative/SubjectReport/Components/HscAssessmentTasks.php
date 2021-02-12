@@ -192,17 +192,21 @@ class HscAssessmentTasks extends BaseComponent
             throw new UnexpectedValueException($msg);
         }
 
-        $feedback       = $this->findStudentFeedback($classAssessment);
-        $normalisedMark = $feedback ? $feedback->getNormalisedMark() : null;
-        $cohortMarks    = $this->deriveCohortMarks($cohortAssessments);
-        $cohortRank     = $this->deriveCohortRank($normalisedMark, $cohortMarks);
-        $countCohort    = count($cohortMarks);
-        $cohortAverage  = $this->deriveCohortAverage($cohortMarks);
+        $feedback = $this->findStudentFeedback($classAssessment);
+
+        /* Generate some stats about this student's performance among their peers
+         */
+        $statistics = (new CohortStatistics(
+            $this->getViewer(),
+            $this->getRoleTypeOverride(),
+            $cohortAssessments,
+            $feedback
+        ))->generate();
 
         return [
-            'studentMark'   => $feedback ? $feedback->getHumanReadableMark() : null,
-            'cohortRank'    => null === $cohortRank ? null : "$cohortRank / $countCohort",
-            'cohortAverage' => null === $cohortAverage ? null : "$cohortAverage %",
+            'studentMark'   => $statistics['studentMark'],
+            'cohortRank'    => $statistics['cohortRank'],
+            'cohortAverage' => $statistics['cohortAverage'],
             'comment'       => $feedback ? $feedback->getComment() : null,
             'commentBy'     => $feedback ? $feedback->getReviewer() : null,
             'dueDate'       => $classAssessment->getDueAt(),
