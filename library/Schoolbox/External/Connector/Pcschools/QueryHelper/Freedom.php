@@ -224,8 +224,8 @@ class Freedom implements IQueryHelper
             LEFT JOIN ALUMREL AS A ON A.CHILD# = S.STUDENT#
             LEFT JOIN [IDENTITY] EC
               ON A.PARENT# = EC.MEMBER#
-              AND A.EMERGENCY_PREF = :contactLevel
-              AND A.STUDENT_PREF = :contactLevel
+              AND A.EMERGENCY_PREF = :contactLevel1
+              AND A.STUDENT_PREF = :contactLevel2
               AND A.RELATION_STAT = :relationStatus
               AND (A.PARENT# <> A.FAMILY_HASH)
               AND EC.DECEASED = ' '
@@ -235,8 +235,9 @@ class Freedom implements IQueryHelper
 
         $params = [
             'relationStatus' => self::RELATION_CHILD,
-            'contactLevel'   => self::CONTACT_LEVEL_FULL,
-            'studentId' => $studentExternalId
+            'contactLevel1'  => self::CONTACT_LEVEL_FULL,
+            'contactLevel2'  => self::CONTACT_LEVEL_FULL,
+            'studentId'      => $studentExternalId,
         ];
 
         return [ $sql, $params ];
