@@ -555,20 +555,27 @@
         var i, data, elems = [], self = this;
 
         this.close();
-        
+           
         for (i = 0; i < list.length; ++i) {
             
-            if (list[i].status === 'success') { //only display those files that were succesfully uploaded from the modal window
-
-                data = {
-                    name: list[i].title,
-                    type: list[i].mimeType,
-                    size: list[i].filesize,
-                    hash: list[i].hash
-                };
-                
-                if (this.dropzone) {
+            data = {
+                name: list[i].title,
+                type: list[i].mimeType,
+                size: list[i].filesize,
+                hash: list[i].hash
+            };
+             
+            if (this.dropzone) { //from the Upload files modal option
                     
+                if (list[i].status === 'error') { //otherwise dummy up the error display that occurs when using straight drag n drop without the modal 
+                    
+                    let fileName = list[i].name;
+                    let errorMessage = list[i].errorMessage;
+                    let failedFileItem = document.createRange().createContextualFragment('<li class="actions-small-1 dz-error"><div class="list-item"><div class="card small-12"><p class="filename" data-dz-name="" title="' + errorMessage + '">' + fileName + ' failed: ' + errorMessage + '</p></div></div><nav><a href="#" data-dz-remove="" title="Remove" class="icon-close"></a></nav></li>');
+                    this.element.querySelector('.az-error-list').appendChild(failedFileItem);
+                
+                } else { //only display those files that were succesfully uploaded from the modal window
+
                     //if the file was attached using 'Upload file(s)' it's been uploaded, 
                     //so we can display the image in the drop zone when we return to the page
                     let getExistingFileUrl = function () {
@@ -608,41 +615,39 @@
 
                     $(this.element).trigger('success.attachzone', [data]);
 
-                } else {
-                    
-                    data.previewElement = $(this.tpl.html());
+                    // now the file has been added...if it's buggy, take it out again
+                    if (data.hash.split(':')[0] == 'exception') {
+                        this.rejectFile(data, data);
+                    }
 
-                    this.renderFile(data);
+                }        
 
-                    $(this.element)
-                        .find(this.options.previewsContainerSelector)
-                        .append(data.previewElement);
+            } else { //all others excluding Upload files option
+                
+                data.previewElement = $(this.tpl.html());
 
-                    data.previewElement.find('[data-dz-remove]').on('click', function () {
-                        var ff = self.fallbackFiles;
-                        ff.splice(ff.indexOf(data), 1);
-                        self.detach(this);
-                    });
+                this.renderFile(data);
 
-                    elems.push(data.previewElement);
+                $(this.element)
+                    .find(this.options.previewsContainerSelector)
+                    .append(data.previewElement);
 
-                    this.fallbackFiles.push(data);
+                data.previewElement.find('[data-dz-remove]').on('click', function () {
+                    var ff = self.fallbackFiles;
+                    ff.splice(ff.indexOf(data), 1);
+                    self.detach(this);
+                });
 
-                    this.fallbackMaxFilesReached();
+                elems.push(data.previewElement);
 
-                }
+                this.fallbackFiles.push(data);
+
+                this.fallbackMaxFilesReached();
 
                 // now the file has been added...if it's buggy, take it out again
                 if (data.hash.split(':')[0] == 'exception') {
                     this.rejectFile(data, data);
                 }
-
-            } else { //otherwise dummy up the error display that occurs when using straight drag n drop without the modal
-
-                let fileName = list[i].name;
-                let errorMessage = list[i].errorMessage;
-                let failedFileItem = document.createRange().createContextualFragment('<li class="actions-small-1 dz-error"><div class="list-item"><div class="card small-12"><p class="filename" data-dz-name="" title="' + errorMessage + '">' + fileName + ' failed: ' + errorMessage + '</p></div></div><nav><a href="#" data-dz-remove="" title="Remove" class="icon-close"></a></nav></li>');
-                this.element.querySelector('.az-error-list').appendChild(failedFileItem);
 
             }
 
