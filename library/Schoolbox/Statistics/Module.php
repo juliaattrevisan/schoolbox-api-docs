@@ -87,13 +87,11 @@ class Module extends BaseModule
                  * Convert the Y-m date formats in the URL to date objects
                  */
                 if (array_key_exists('startDate', $params) && $params['startDate'] !== '') {
-                    $startDate = new Alaress_Date_Format();
-                    $startDate->setFromFormat($params['startDate'], 'Y-m');
+                    $startDate = new Alaress_Date_Format($params['startDate'], 'Y-m');
                     $params['startDate'] = $startDate->startOfMonth();
                 }
                 if (array_key_exists('endDate', $params)  && $params['endDate'] !== '') {
-                    $endDate = new Alaress_Date_Format();
-                    $endDate->setFromFormat($params['endDate'], 'Y-m');
+                    $endDate = new Alaress_Date_Format($params['endDate'], 'Y-m');
                     $params['endDate'] = $endDate->endOfMonth();
                 }
 

@@ -148,17 +148,13 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
 
     // Determine the time period we want to sync
 
-    $startTime = new Alaress_Date_Format;
-    $endTime   = new Alaress_Date_Format;
 
     if ($start && $end) {
-
         // Start and end range passed on commandline, use supplied dates
 
         try {
-
-            $startTime->setFromFormat($start, Alaress_Date_Format::DATABASE_DATE_FORMAT);
-            $endTime->setFromFormat($end, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $startTime = new Alaress_Date_Format($start, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $endTime   = new Alaress_Date_Format($end, Alaress_Date_Format::DATABASE_DATE_FORMAT);
 
             // Hardcode the time to start/end of the day
 
@@ -170,7 +166,6 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
             }
 
         } catch (InvalidArgumentException $e) {
-
             // Creation of date/time objects failed, format must be wrong
 
             $log->error("ERROR: Invalid date supplied, please check date format matches (" . Alaress_Date_Format::DATABASE_DATE_FORMAT . ").");
@@ -178,16 +173,16 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
         }
 
     } elseif (date('n') > 6) {
-
         // If we have gone past June- assume a fake "Semester 2" and use the last six months of the year
-
+        $startTime = new Alaress_Date_Format();
+        $endTime   = new Alaress_Date_Format();
         $startTime->setDate(date('Y'), 7, 1)->setTime(0, 0, 0);
         $endTime->setDate(date('Y'), 12, 30)->setTime(23, 59, 59);
 
     } else {
-
         // Otherwise use a fake "Semester 1" and use the first six months of the year
-
+        $startTime = new Alaress_Date_Format();
+        $endTime   = new Alaress_Date_Format();
         $startTime->setDate(date('Y'), 1, 1)->setTime(0, 0, 0);
         $endTime->setDate(date('Y'), 6, 30)->setTime(23, 59, 59);
     }

@@ -57,8 +57,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
             $poll = $pollHandler->getByID($this->getConfig('poll'));
 
-            $created = new Alaress_Date_Format;
-            $created->setFromFormat($poll['created'], Alaress_Date_Format::DATABASE_FORMAT);
+            $created = new Alaress_Date_Format($poll['created'], Alaress_Date_Format::DATABASE_FORMAT);
 
             try {
                 $author = \Schoolbox\UserMapper::getInstance()->findById($poll['created_by']);

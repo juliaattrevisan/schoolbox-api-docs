@@ -50,7 +50,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     protected $warnings = array();
 
     const DATABASE_FORMAT = 'Y-m-d H:i:s';
-    const DATABASE_FORMAT_MS = 'Y-m-d H:i:s.u';
+    const DATABASE_FORMAT_MS = 'Y-m-d H:i:s.u';  // microseconds
+    const DATABASE_FORMAT_MLS = 'Y-m-d H:i:s.v'; // milliseconds
     const FORMAT_DATETIME_UTC = 'Y-m-d\TH:i:s.u\Z';  // eg '2015-09-22T23:22:12.798Z'
     const DATABASE_DATE_FORMAT = 'Y-m-d';
     const DATABASE_TIME_FORMAT = 'H:i:s';
@@ -377,17 +378,17 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * @param DateTimeInterface|Alaress_Date_Format|string $dateTime
      * @param string|array $inputDateFormat If array: try all of these formats, use first that doesn't fail
-     * @param DateTimeZone $timezone The timezone of the date, or null to use default
+     * @param DateTimeZone|null $timezone The timezone of the date, or null to use default
      *
      * @return void
      * @throws InvalidArgumentException if no $inputDateFormat was set and $dateTime
      *                                  is a string, or if $dateTime is a string and
      *                                  it can't be parsed in $inputDateFormat
      */
-    public function setFromFormat(
+    private function setFromFormat(
         $dateTime,
         $inputDateFormat,
-        DateTimeZone $timezone = null
+        ?DateTimeZone $timezone = null
     ) {
         if (is_array($inputDateFormat)) {
             if (empty($inputDateFormat)) {
@@ -437,24 +438,18 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                 try {
                     $laravelDate = Carbon::createFromFormat($inputDateFormat, $dateTime, $newTimezone);
                 } catch (InvalidArgumentException $e) {
-                    // I don't have a datetime, try again with trailing data allowed
-                    // This can also throw an InvalidArgumentException - allow that to fall on carpet
-                    $laravelDate = Carbon::createFromFormat($inputDateFormat . '+', $dateTime, $newTimezone);
+                    // We allow truncating time by passing Y-m-d as a date format
+                    if ($inputDateFormat === self::DATABASE_DATE_FORMAT && Carbon::hasFormat($dateTime, self::DATABASE_FORMAT)) {
+                        $laravelDate = Carbon::createFromFormat(self::DATABASE_FORMAT, $dateTime, $newTimezone);
+                    }
+                    if (!$laravelDate) {
+                        throw $e;
+                    }
                 }
 
                 $errors = Carbon::getLastErrors();
                 if ($errors['warning_count']) {
-                    // I have a datetime, but it's not what I expected. Warn the user.
-                    // This date will also fail isValid()
                     $this->warnings = $errors['warnings'];
-                    trigger_error(
-                        sprintf(
-                            'LaravelDate creation raised %d warnings: (%s)',
-                            $errors['warning_count'],
-                            implode(', ', $errors['warnings'])
-                        ),
-                        E_USER_WARNING
-                    );
                 }
 
                 // Did I specify a timezone? If not, set it to the default

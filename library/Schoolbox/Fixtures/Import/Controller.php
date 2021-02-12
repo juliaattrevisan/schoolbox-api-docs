@@ -571,8 +571,7 @@ class Controller extends Base
         }
 
         try {
-            $dateObject = new \Alaress_Date_Format();
-            $dateObject->setFromFormat("{$date} {$time}", ['d/m/y H:i:s', 'd/m/Y H:i:s']);
+            $dateObject = new \Alaress_Date_Format("{$date} {$time}", ['d/m/y H:i:s', 'd/m/Y H:i:s']);
         } catch (\Exception $e) {
             throw new \Exception("Invalid date format, please ensure all dates are entered in DD/MM/YY format.");
         }

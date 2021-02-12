@@ -70,9 +70,8 @@ class Module extends BaseModule
                 }
                 if (array_key_exists('selectedDate', $params) && $params['selectedDate'] !== ''
                     && !in_array($params['selectedDate'], ['week', 'month', 'full', 'week-list', 'month-list'])) {
-                    $selectedDate = new \Alaress_Date_Format();
                     try {
-                        $selectedDate->setFromFormat($params['selectedDate'], \Alaress_Date_Format::URL_FORMAT);
+                        $selectedDate = new \Alaress_Date_Format($params['selectedDate'], \Alaress_Date_Format::URL_FORMAT);
                         $params['selectedDate'] = $selectedDate->getDatabaseDate();
                     } catch (\Exception $e) {
                         $params['selectedDate'] = null;
