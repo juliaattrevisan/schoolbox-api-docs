@@ -198,7 +198,7 @@ Data:
                                  # (but error-ful) case will be represented without asterisks
                                  #}
                                 {% if attributes.isHsc %}
-                                    {% if folderData.hscRankData %}
+                                    {% if folderData.hscRankData and folderData.hscRankData.studentMark %}
                                         {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
                                             attributes: attributes,
                                             interimGrades: hasInterimGrades,
@@ -210,31 +210,53 @@ Data:
                                             }
                                         } %}
                                     {% else %}
-                                        {% set hasTaskFound = false %}
-                                        {% for unitSpecData in folderData.unitSpecs if not hasTaskFound %}
-                                            {% if folderData.hscTaskMarks.data[unitSpecData.id] ?? false %}
-                                                {% set hasTaskFound = true %}
-                                                {% set hasInterimGrades = true %}
-                                                {% set hscTaskMarkData = folderData.hscTaskMarks.data[unitSpecData.id] %}
 
-                                                {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
-                                                    attributes: attributes,
-                                                    interimGrades: hasInterimGrades,
-                                                    rankData: hscTaskMarkData,
-                                                    nesa: {
-                                                        'grade': nesaGrade,
-                                                        'semester': nesaSemester,
-                                                        'error': nesaError
-                                                    }
-                                                } %}
+                                        {# Formative Grade
+                                         # Look at this student's feedbacks, find the most recent one, greyBox that
+                                         #}
+                                        {% set mostRecentData = null %}
+
+                                        {# folderData.unitSpecs might not be in the intended order
+                                         # Unit 2 might appear before Unit 1 if their unitSpecs are
+                                         # in the wrong order somehow. It can be manufactured though
+                                         # I don't know the steps to do it, exactly
+                                         #
+                                         # Anyway traverse until you find the most recent publishAt
+                                         # then use that data
+                                         #}
+                                        {% for unitSpecData in folderData.unitSpecs %}
+                                            {% if folderData.hscTaskMarks.data[unitSpecData.id] ?? false %}
+                                                {% set taskMarks = folderData.hscTaskMarks.data[unitSpecData.id] %}
+
+                                                {# Remember the data which the most recent publishAt
+                                                 # Keep looking until there aren't any records more recent
+                                                 #}
+                                                {% if taskMarks.publishAt > mostRecentData.publishAt or mostRecentData is null %}
+                                                    {% set mostRecentData = taskMarks %}
+
+                                                    {# Used to pop up a little notice to the user about transient mark data
+                                                     #}
+                                                    {% set hasInterimGrades = true %}
+                                                {% endif %}
                                             {% endif %}
                                         {% endfor %}
+
+                                        {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
+                                            attributes: attributes,
+                                            interimGrades: hasInterimGrades,
+                                            rankData: mostRecentData,
+                                            nesa: {
+                                                'grade': nesaGrade,
+                                                'semester': nesaSemester,
+                                                'error': nesaError
+                                            }
+                                        } %}
                                     {% endif %}
                                 {% elseif attributes.isMiddleYear %}
 
                                     {# Summative Grade
                                      #}
-                                    {% if folderData.middleYearsRankData %}
+                                    {% if folderData.middleYearsRankData and folderData.middleYearsRankData.studentMark %}
                                         {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
                                             attributes: attributes,
                                             interimGrades: hasInterimGrades,
