@@ -220,6 +220,7 @@ class HscAssessmentTasks extends BaseComponent
             'studentMark'   => $statistics['studentMark'],
             'cohortRank'    => $statistics['cohortRank'],
             'cohortAverage' => $statistics['cohortAverage'],
+            'publishAt'     => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
             'comment'       => $feedback ? $feedback->getComment() : null,
             'commentBy'     => $feedback ? $feedback->getReviewer() : null,
             'dueDate'       => $classAssessment->getDueAt(),
