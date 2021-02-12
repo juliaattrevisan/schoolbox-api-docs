@@ -308,6 +308,17 @@ class NesaScoreGraphMiddleYears extends BaseComponent
                         }
 
                         $markData[$humanReadableMark]++;
+
+                        /* Reset var. When a student's rubric hasn't got a descriptor selection, $humanReadableMark
+                         * is still set to whatever was last put in there and will inadvertently get recycled to the
+                         * wrong person. So we clear it after use to prevent cross contamination in edge cases like that
+                         *
+                         * The foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) never fires when you don't
+                         * have a descriptor selected (no capabilities/indicators in use) and you immediately end up in
+                         * $studentMark = $humanReadableMark; which isn't necessarily what you want since you're
+                         * iterating a set of guys
+                         */
+                        $humanReadableMark = null;
                     } elseif ($this->reportSemester === 1) {
                         $humanReadableMark = $feedback->getHumanReadableMark();
 
