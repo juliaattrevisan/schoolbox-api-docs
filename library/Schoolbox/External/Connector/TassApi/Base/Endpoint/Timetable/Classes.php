@@ -206,7 +206,7 @@ class Classes implements IStrategy
                     $class = [
                         'period' => [
                             'day' => (string)$dayIndex,
-                            'name' => 'Period ' .  $periodIndex,
+                            'name' => $period['PRD_DESC'],
                             'sequence' => $periodIndex,
                             'start' => $start,
                             'end' => $finish
