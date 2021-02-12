@@ -113,6 +113,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     s.args = "'#{instance_registry_url_override}' '#{instance_registry_api_key}'"
   end
 
+  # Mount the puppet directory and execute the puppet hook.
+  # This enables us to invoke current environment code for non-current SB versions.
+  # This script runs inside vagrant and can access the shared mount at '/tmp/puppet'
+  config.vm.synced_folder "#{puppet_dir}/vagrant", "/tmp/puppet"
+  config.vm.provision "shell", inline: "/tmp/puppet/hooks/provision-pre-puppet"
+
   # Puppet Apply Provisioner (without a puppet master)
   # See https://www.vagrantup.com/docs/provisioning/puppet_apply.html
   config.vm.synced_folder "#{puppet_dir}/environments/staging/hieradata/node", "/etc/puppetlabs/code/hieradata/node"
