@@ -38,7 +38,7 @@ class CohortStatistics
 
 
     /**
-     * @var string
+     * @var string|null
      */
     private $roleTypeOverride;
 
@@ -59,13 +59,13 @@ class CohortStatistics
      * CohortStatistics constructor.
      *
      * @param \Schoolbox\User   $viewer
-     * @param string            $roleTypeOverride
+     * @param string|null       $roleTypeOverride
      * @param GenericCollection $cohortAssessments
      * @param IFeedback|null    $feedback
      */
     public function __construct(
         \Schoolbox\User $viewer,
-        string $roleTypeOverride,
+        ?string $roleTypeOverride,
         GenericCollection $cohortAssessments,
         ?IFeedback $feedback
     ) {
