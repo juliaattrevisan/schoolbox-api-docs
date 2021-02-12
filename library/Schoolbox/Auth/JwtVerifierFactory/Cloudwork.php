@@ -12,13 +12,20 @@ namespace Schoolbox\Auth\JwtVerifierFactory;
 use Okta\JwtVerifier\Adaptors\Adaptor;
 use Okta\JwtVerifier\Discovery\Oidc;
 use Okta\JwtVerifier\JwtVerifier;
-use Okta\JwtVerifier\JwtVerifierBuilder;
 
 /**
  * Factory for the Cloudwork variant of the JWT verifier.
  *
  * For now this is the default variant, so it will always create a verifier:
  * in practice the issuer will be "https://{$tenantId}.cloudworkengine.net/".
+ *
+ * Peculiarities:
+ * * The JWT uses OpenID Connect for key discovery
+ * * The JWT is not guaranteed to contain a "cid" claim, so don't try to
+ *   validate that
+ * * The JWT's "aud" (audience) claim is an array containing only the client ID
+ *   for some reason, instead of just the client ID. Maybe the JWT is able to be
+ *   targeted to multiple audiences?
  */
 class Cloudwork implements IFactory
 {
@@ -42,14 +49,13 @@ class Cloudwork implements IFactory
      */
     public function build(string $issuer, string $clientId, int $leeway): ?JwtVerifier
     {
-        // TODO figure if the verifier builder's client ID now needs to be set
-        // TODO figure if the audience needs to be in an array
-        return (new JwtVerifierBuilder())
-            ->setIssuer($issuer)
-            ->setAdaptor($this->adaptor)
-            ->setDiscovery(new Oidc())
-            ->setAudience([$clientId])
-            ->setLeeway(sprintf('PT%dS', $leeway))
-            ->build();
+        return new JwtVerifier(
+            $issuer,
+            new Oidc(),
+            $this->adaptor,
+            null,
+            $leeway,
+            ['audience' => [$clientId],],
+        );
     }
 }

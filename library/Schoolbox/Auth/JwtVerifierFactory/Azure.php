@@ -18,6 +18,12 @@ use Okta\JwtVerifier\JwtVerifier;
  *
  * In order to use this variant, the issuer must match
  * "https://login.microsoftonline.com/{$tenantId}/v2.0/".
+ *
+ * Peculiarities:
+ * * The issuer will be "https://login.microsoftonline.com/{$tenantId}/v2.0/"
+ * * The JWT uses OpenID Connect for key discovery
+ * * The JWT is not guaranteed to contain a "cid" claim, so don't try to
+ *   validate that
  */
 class Azure implements IFactory
 {
