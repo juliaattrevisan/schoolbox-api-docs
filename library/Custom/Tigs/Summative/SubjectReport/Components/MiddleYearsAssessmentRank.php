@@ -175,15 +175,7 @@ class MiddleYearsAssessmentRank extends BaseComponent
             $feedback
         ))->generate();
 
-        /* I'll never know why these are different array keys
-         */
-        $data = [
-            'assessmentRank'    => $statistics['cohortRank'],
-            'assessmentMark'    => $statistics['studentMark'],
-            'assessmentAverage' => $statistics['cohortAverage']
-        ];
-
-        return $data;
+        return $statistics;
     }
 
 

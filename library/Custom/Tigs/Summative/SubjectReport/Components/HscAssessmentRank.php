@@ -160,14 +160,14 @@ class HscAssessmentRank extends BaseComponent
          */
         // Both Yr11 + 12 see this datum
         $data = [
-            'assessmentRank' => $statistics['cohortRank'],
+            'cohortRank' => $statistics['cohortRank'],
         ];
 
         // But only Yr11 see these datums
         if (11 === $this->getAttributes()->getCurriculumYearLevel()) {
             $data = array_merge([
-                'assessmentMark' => $statistics['studentMark'],
-                'assessmentAverage' => $statistics['cohortAverage']
+                'studentMark' => $statistics['studentMark'],
+                'cohortAverage' => $statistics['cohortAverage']
             ]);
         }
 

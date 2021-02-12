@@ -202,11 +202,7 @@ Data:
                                         {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
                                             attributes: attributes,
                                             interimGrades: hasInterimGrades,
-                                            rankData: {
-                                                'studentMark': folderData.hscRankData.assessmentMark,
-                                                'cohortAverage': folderData.hscRankData.assessmentAverage,
-                                                'cohortRank': folderData.hscRankData.assessmentRank
-                                            },
+                                            rankData: folderData.hscRankData,
                                             nesa: {
                                                 'grade': nesaGrade,
                                                 'semester': nesaSemester,
@@ -242,11 +238,7 @@ Data:
                                         {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
                                             attributes: attributes,
                                             interimGrades: hasInterimGrades,
-                                            rankData: {
-                                                'studentMark': folderData.middleYearsRankData.assessmentMark,
-                                                'cohortAverage': folderData.middleYearsRankData.assessmentAverage,
-                                                'cohortRank': folderData.middleYearsRankData.assessmentRank
-                                            },
+                                            rankData: folderData.middleYearsRankData,
                                             nesa: {
                                                 'grade': nesaGrade,
                                                 'semester': nesaSemester,

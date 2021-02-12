@@ -2,12 +2,12 @@
 Renders the 'HSC Assessment Rank' component.
 
 Data:
-    error:               string           - Optional. If present, the reason why we can't render the component
-    assessmentMark:      string|null      - Optional. eg '65 %'
-    assessmentAverage:   string|null      - Optional. eg '76.33 %'    The average mark given to students across the cohort
-    assessmentRank:      string|null      -           eg '7 / 9'      Where the student ranked compared to the cohort
-    showErrors           bool             - Should we render errors?
-    dataAttributeError   string           - A string to apply as a data attribute to error alerts
+    error:             string           - Optional. If present, the reason why we can't render the component
+    studentMark:       string|null      - Optional. eg '65 %'
+    cohortAverage:     string|null      - Optional. eg '76.33 %'    The average mark given to students across the cohort
+    cohortRank:        string|null      -           eg '7 / 9'      Where the student ranked compared to the cohort
+    showErrors         bool             - Should we render errors?
+    dataAttributeError string           - A string to apply as a data attribute to error alerts
 #}
 <div class="hsc-rank-wrap">
     <h2 class="subheader">HSC Assessment Rank</h2>
@@ -17,21 +17,21 @@ Data:
         <div class="scrollable">
             <table class="hsc-rank">
                 <tbody>
-                {% if assessmentMark is defined %}
+                {% if studentMark is defined %}
                     <tr>
                         <th>Assessment Mark</th>
-                        <td>{{ assessmentMark|default('-') }}</td>
+                        <td>{{ studentMark|default('-') }}</td>
                     </tr>
                 {% endif %}
-                {% if assessmentAverage is defined %}
+                {% if cohortAverage is defined %}
                     <tr>
                         <th>Assessment Average</th>
-                        <td>{{ assessmentAverage|default('-') }}</td>
+                        <td>{{ cohortAverage|default('-') }}</td>
                     </tr>
                 {% endif %}
                 <tr>
                     <th>Assessment Rank</th>
-                    <td>{{ assessmentRank|default('-') }}</td>
+                    <td>{{ cohortRank|default('-') }}</td>
                 </tr>
                 </tbody>
             </table>
