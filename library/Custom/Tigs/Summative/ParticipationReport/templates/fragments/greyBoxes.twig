@@ -52,7 +52,10 @@
                     <span class="result-value">{{ rankData.cohortAverage|default('-') }}</span>
                 </div>
             {% endif %}
-            {% if rankData.cohortRank is defined %}
+
+            {# Rank only relevant to HSC students
+             #}
+            {% if rankData.cohortRank is defined and attributes.isHsc %}
                 <div class="result-item hsc-rank-rank">
                     <span class="result-heading">Rank{% if hasInterimGrades %}*{% endif %}</span><br />
                     <span class="result-value">{{ rankData.cohortRank|default('-') }}</span>
@@ -79,7 +82,10 @@
                 <span class="result-value">{{ rankData.cohortAverage|default('-') }}</span>
             </div>
         {% endif %}
-        {% if rankData.cohortRank is defined %}
+
+        {# Rank only relevant to HSC students
+         #}
+        {% if rankData.cohortRank is defined and attributes.isHsc %}
             <div class="result-item hsc-rank-rank">
                 <span class="result-heading">Rank{% if hasInterimGrades %}*{% endif %}</span><br />
                 <span class="result-value">{{ rankData.cohortRank|default('-') }}</span>
