@@ -210,8 +210,8 @@ class MiddleYearsAssessmentTasks extends BaseComponent
 //            'cohortAverage' => $statistics['cohortAverage'],
 //            'publishAt'     => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
 //            'comment'       => $feedback ? $feedback->getComment() : null,
-//            'commentBy'     => $feedback ? $feedback->getReviewer() : null,
-//            'dueDate'       => $classAssessment->getDueAt(),
+//            'commentBy'     => $feedback ? $feedback->getReviewer()->getFullName() : null,
+//            'dueDate'       => $classAssessment->getDueAt()->getDatabase(),
 //            'unitSpecId'    => $unitSpec->getId(),
 //            'unitSpecTitle' => $unitSpec->getTitle(),
 //        ]);
