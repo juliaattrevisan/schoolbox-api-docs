@@ -13,12 +13,11 @@ use Alaress\Web\Output;
 use Authenticator;
 use Firebase\JWT;
 use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
-use Okta\JwtVerifier\Discovery\Oidc;
-use Okta\JwtVerifier\JwtVerifierBuilder;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Schoolbox\Application\Exception\PasswordExpired as SchoolboxPasswordExpiredException;
+use Schoolbox\Auth\JwtVerifierFactory;
 use Schoolbox\Auth\TokenParser;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -275,16 +274,22 @@ class Controller extends Base
         if ($sessionLength <= 0) {
             $sessionLength = self::SESSION_LENGTH_DEFAULT;
         }
+
+        $adaptor            = new FirebasePhpJwt();
+        $jwtVerifierFactory = new JwtVerifierFactory\Composite(
+            new JwtVerifierFactory\Azure($adaptor),
+            new JwtVerifierFactory\Cloudwork($adaptor),
+        );
+
         $tokenParser = new TokenParser(
             $this->userMapper,
-            (new JwtVerifierBuilder())
-                ->setIssuer($config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER))
-                ->setAdaptor(new FirebasePhpJwt())
-                ->setDiscovery(new Oidc())
-                ->setAudience([$config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID)])
-                ->setLeeway(sprintf('PT%dS', $sessionLength))
-                ->build()
+            $jwtVerifierFactory->build(
+                $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER),
+                $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID),
+                $sessionLength,
+            )
         );
+
         $user        = $tokenParser->findUserFromToken($jwt);
         $this->auth->createSession($user->getUsername(), true);
         return $user;
