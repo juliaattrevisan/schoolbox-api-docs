@@ -778,7 +778,7 @@ class Profile implements IStrategy
                 'school_email_address' => $employee['school_email'],
                 'email_address' => $employee['e_mail'],
                 'department' => $employee['departments'],
-                'portal_user_code' => $employee['user_code'],
+                'portal_user_code' => $employee['username'],
                 'active_flag' => null,
             ];
         }
