@@ -181,9 +181,14 @@ function upgrade_instances(){
       sql_host=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_host);
       sql_schema=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_db);
 
-      saml_check=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -BNe "SELECT value FROM config WHERE name='saml_public_cert'" 2>/dev/null | sed "s/\\\\n/\n/g" | openssl x509 -noout >/dev/null 2>&1);
-      if [ "$saml_check" != "0" ]; then
-          INSTANCE_ID="$i" "$site_root"/tools/saml/createKeys.php >> "$instance_log_file" 2>&1
+      if ! saml_public_cert=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -BNe "SELECT value FROM config WHERE name='saml_public_cert'"); then
+        error "Unable to fetch 'saml_public_cert' from database" >> "$instance_log_file" 2>&1
+      else
+        saml_check=$(echo "$saml_public_cert" | sed "s/\\\\n/\n/g" | openssl x509 -noout >/dev/null 2>&1);
+        debug "saml_check: '$saml_check'" >> "$instance_log_file" 2>&1
+        if [ "$saml_check" != "0" ]; then
+            INSTANCE_ID="$i" "$site_root"/tools/saml/createKeys.php >> "$instance_log_file" 2>&1
+        fi
       fi
     fi
     log "upgrade complete for instance $i";
