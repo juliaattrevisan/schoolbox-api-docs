@@ -200,9 +200,16 @@ function remove_maintenance_page(){
   "$site_root"/tools/maintenance/site_up.sh
 }
 
-function restart_daemons(){
+
+function rebuild_and_restart_daemons(){
   if [[ $is_primary_host == '1' ]]; then
-    log "---restarting daemon on primary host---";
+    log "---rebuilding + restarting daemon on primary host---";
+    # TODO, if we want to run this script in vagrant, and for better performance when invoked from puppet, need to add support for the --socketd-ports flag
+    if [[ $verbose == 1 ]]; then
+      /usr/local/bin/schoolbox-rebuild-daemons --fetch -v
+    else
+      /usr/local/bin/schoolbox-rebuild-daemons --fetch
+    fi
     ${package}cloud-restart-daemons;
   else
     log "---skipping daemon restart on secondary host---";
@@ -245,7 +252,7 @@ function main() {
   parse_global_vars "$@"
   upgrade_instances
   remove_maintenance_page
-  restart_daemons
+  rebuild_and_restart_daemons
   rebuild_cron_jobs
   reload_binding_cache
   log "Upgrade complete"

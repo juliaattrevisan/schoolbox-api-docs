@@ -19,9 +19,7 @@ maintenanceFileName="$DIR/../../.maintenance";
 echo "Checking for maintenance file '$maintenanceFileName'..."
 if [[ -f ${maintenanceFileName} ]]; then
   echo "Maintenance file present, removing";
-  rm ${maintenanceFileName};
-  if [[ $? != 0 ]]; then
-    echo $?;
+  if ! rm "${maintenanceFileName}"; then
     echo "Unable to remove maintenance file, exiting";
     exit 1;
   fi;
