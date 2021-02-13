@@ -21,7 +21,7 @@ package=${instdir##*/};
 
 curdir=`pwd`;
 
-echo "Starting SQL update process";
+echo "Starting SQL update process for instance: '$INSTANCE_ID'";
 
 versionlist=$(find "$instdir"/updates -mindepth 1 -maxdepth 1 -type d -printf %f\\n | sort -V)
 
@@ -159,8 +159,13 @@ if [[ -f $existingbackup ]] && [[ $(wc -c "$existingbackup" | awk '{ print $1 }'
 else
     echo "Backing up database before changes";
     mkdir -p $backupdir;
-    if ! mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb | gzip > $backupfile; then
+    if ! mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb | gzip > $backupfile; then
       echo "Unable to backup database '$sqldb'"
+      exit 1
+    fi
+    # For some reason the above test is not failing when the dump fails. Need to check we actually got data.
+    if [[ $(wc -c "$backupfile" | awk '{ print $1 }') -lt 1000 ]]; then
+      echo "Unable to backup database '$sqldb'. Dump file seems too small."
       exit 1
     fi
     echo "Database backed up to '$backupfile'";
