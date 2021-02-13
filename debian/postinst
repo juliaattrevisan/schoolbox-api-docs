@@ -34,6 +34,7 @@ case "$1" in
         # - execute various post-package-upgrade actions
         # We need to do this in puppet, not here, because there is a 1hr limit to upgrade a `package` resource
         # whereas we can set a custom timeout for `exec` resources
+        echo "$(date) Debian package post install hook complete" >> /var/log/schoolbox/upgrade.log;
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
