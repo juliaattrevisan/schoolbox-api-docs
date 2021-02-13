@@ -176,10 +176,10 @@ function upgrade_instances(){
 
     if [[ $is_primary_host == '1' ]]; then
       echo "$(date) - checking saml certificate" >> "$instance_log_file";
-      sql_user=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_user);
-      sql_pass=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_passwd);
-      sql_host=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_host);
-      sql_schema=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_db);
+      sql_user=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_user);
+      sql_pass=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_passwd);
+      sql_host=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_host);
+      sql_schema=$(INSTANCE_ID="$i" schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_db);
 
       saml_check=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -BNe "SELECT value FROM config WHERE name='saml_public_cert'" 2>/dev/null | sed "s/\\\\n/\n/g" | openssl x509 -noout >/dev/null 2>&1);
       if [ "$saml_check" != "0" ]; then
