@@ -4,7 +4,7 @@ INSERT INTO `config`
 (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`,`sequence`)
 VALUES (
            'saml_sp_entityid',
-           (SELECT value FROM `config` as c WHERE name like 'saml_sso_url'),
+           '',
            'Schoolbox Entity ID',
            'The unique identifier for Schoolbox to use as its EntityID. If this is not set, we will use the URL for your instance.',
            (SELECT id FROM `lu_config_field` WHERE `field` = 'input'),
