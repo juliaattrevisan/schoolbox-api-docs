@@ -242,9 +242,10 @@ class Threads
          */
         $page->setFile('socialstream_thread', '/component/homepage/socialstream/thread.html');
         $page->setBlock('socialstream_thread', 'socialstream_post', 'socialstream_post_block');
-        $page->setBlock('socialstream_post', 'socialstream_comment', 'socialstream_comment_block');
+        $page->setBlock('socialstream_post', 'socialstream_comment_list', 'socialstream_comment_list_block');
         $page->setBlock('socialstream_post', 'owner_exists', 'owner_exists_block');
         $page->setBlock('socialstream_post', 'owner_deleted', 'owner_deleted_block');
+        $page->setBlock('socialstream_comment_list', 'socialstream_comment', 'socialstream_comment_block');
         $page->setBlock('socialstream_comment', 'socialstream_reply', 'socialstream_reply_block');
 
         /* Thumbnail stuff
@@ -261,6 +262,7 @@ class Threads
         $page->setBlock('socialstream_post', 'socialstream_post_has_add', 'socialstream_post_has_add_block');
         $page->setBlock('socialstream_post', 'socialstream_post_has_delete', 'socialstream_post_has_delete_block');
 
+        // Comments
         $page->setBlock('socialstream_comment', 'socialstream_comment_has_attachment', 'socialstream_comment_has_attachment_block');
         $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_icon', 'socialstream_comment_has_icon_block');
         $page->setBlock('socialstream_comment_has_attachment', 'socialstream_comment_has_thumbnail', 'socialstream_comment_has_thumbnail_block');
@@ -293,6 +295,7 @@ class Threads
             array(
                 'socialstream_post_block'                      => '',
                 'socialstream_comment_block'                   => '',
+                'socialstream_comment_list_block'              => '',
                 'socialstream_reply_block'                     => '',
                 'socialstream_post_has_attachment_block'       => '',
                 'socialstream_post_has_icon_block'             => '',
@@ -578,6 +581,9 @@ class Threads
                         'socialstream_reply_block'                     => '',
                     )
                 );
+            }
+            if (count($currentPost->getChildren())) {
+                $page->parse('socialstream_comment_list_block', 'socialstream_comment_list');
             }
 
             /* Clear children after parsing out the parent
