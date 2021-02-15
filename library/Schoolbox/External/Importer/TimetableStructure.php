@@ -78,6 +78,8 @@ class TimetableStructure extends AbstractImporter
     protected function parse()
     {
         $result = [];
+        $existingPeriods = [];
+
         foreach ($this->reader as $i => $row) {
             $this->log->info("Parsing row {$i}...");
 
@@ -162,6 +164,23 @@ class TimetableStructure extends AbstractImporter
             // Sort the periods by start then end later, then use that to apply a sequence
             $day   = $row['Period Day'];
             $title = $row['Period Title'];
+
+            /* Remember a (day, title) tuple because our schema doesn't let you have dupe period names
+             * in a given day of the cycle. Warn the user, ignore the row, and continue onwards
+             */
+            if (isset($existingPeriods[$cycleIdentifier][$day][$title])) {
+                $this->log->warning(sprintf(
+                    'Period "%s" for day %d has already been parsed and will be skipped.',
+                    $title,
+                    $day
+                ));
+
+                continue;
+            }
+
+            /* Next time we encounter this period, we'll warn the user then we'll skip it
+             */
+            $existingPeriods[$cycleIdentifier][$day][$title] = $title;
 
             $period = new TimetablePeriod();
             $this->log->info(sprintf('Parsing period "%s" for day %d', $title, $day));
