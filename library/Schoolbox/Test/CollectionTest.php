@@ -70,6 +70,91 @@ class CollectionTest extends TestCase
     }
 
 
+    /**
+     * @dataProvider provider_sortNaturally
+     * @param mixed $input
+     * @param int   $expected
+     */
+    public function testSortNaturally($input, $expected)
+    {
+        $outcome = $input->sortNaturally('firstname');
+
+        $this->assertEquals($expected, $outcome);
+    }
+
+    /**
+     * Data provider for testSortNaturally
+     *
+     * @return array
+     */
+    public function provider_sortNaturally(): array
+    {
+        return [
+            'Firstnames 1' => [
+                (new Collection())
+                    ->add((new \Schoolbox\User())->setFirstname('robert'))
+                    ->add((new \Schoolbox\User())->setFirstname('JOSEPH'))
+                    ->add((new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
+                    ->add((new \Schoolbox\User())->setFirstname('a STABLE GENIUS')),
+
+                (new Collection())
+                    ->add((new \Schoolbox\User())->setFirstname('a STABLE GENIUS'))
+                    ->add((new \Schoolbox\User())->setFirstname('JOSEPH'))
+                    ->add((new \Schoolbox\User())->setFirstname('robert'))
+                    ->add((new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
+            ],
+            'Firstnames 2' => [
+                (new Collection())
+                    ->add((new \Schoolbox\User())->setFirstname('  Alfred'))
+                    ->add((new \Schoolbox\User())->setFirstname(' is'))
+                    ->add((new \Schoolbox\User())->setFirstname('   The Butler'))
+                    ->add((new \Schoolbox\User())->setFirstname('  of Wayne Mansion')),
+
+                (new Collection())
+                    ->add((new \Schoolbox\User())->setFirstname('  Alfred'))
+                    ->add((new \Schoolbox\User())->setFirstname(' is'))
+                    ->add((new \Schoolbox\User())->setFirstname('  of Wayne Mansion'))
+                    ->add((new \Schoolbox\User())->setFirstname('   The Butler'))
+            ]
+        ];
+    }
+
+
+    /**
+     * @dataProvider provider_sortNaturallyInvalid
+     * @param mixed $input
+     */
+    public function testSortNaturallyInvalid($input)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $input->sortNaturally('firstname');
+    }
+
+
+    /**
+     * Data provider for testSortNaturally
+     *
+     * @return array
+     */
+    public function provider_sortNaturallyInvalid(): array
+    {
+        return [
+            'Invalid 1' => [
+                (new Collection())->add('robert')
+            ],
+            'Invalid 2' => [
+                (new Collection())->add([])
+            ],
+            'Invalid 3' => [
+                (new Collection())
+                    ->add(new \Schoolbox\User())
+                    ->add('haha')
+                    ->add(new \StdClass())
+            ]
+        ];
+    }
+
+
     // ============= Data Providers =============
 
     public function provider_Collection()
