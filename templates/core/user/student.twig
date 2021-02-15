@@ -630,6 +630,12 @@
                 <section>
 
                     {% for group, subjectGroup in subjects %}
+
+                        {# Suffix all iterated identifiers
+                         # Tot menus and so on start exhiting interrelated behaviour when they share the same id
+                         # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
+                         # taking advantage of a twig construct
+                         #}
                         {% set dropdownOptionsID = loop.index %}
 
                         {# Keep a running total of all teachers emails in this group #}
@@ -653,10 +659,10 @@
                                 <nav><a href="#" class="icon-overflow" data-dropdown="email-teachers-{{ dropdownOptionsID }}"></a></nav>
                                 <ul class="f-dropdown" data-dropdown-content id="email-teachers-{{ dropdownOptionsID }}">
                                     <li>
-                                        <a id="email-all" class="icon-email" href="#" title="Email all {{ group }} teachers">Email all {{ group }} teachers</a>
+                                        <a id="email-all-{{ dropdownOptionsID }}" class="icon-email" href="#" title="Email all {{ group }} teachers">Email all {{ group }} teachers</a>
                                     </li>
                                 </ul>
-                                <form id="email-all-form" action="/mail/createMail.php" method="post">
+                                <form id="email-all-form-{{ dropdownOptionsID }}" action="/mail/createMail.php" method="post">
                                     <input type="hidden" name="replyto" value="{{ replyTo }}"/>
                                     <input type="hidden" name="cc" value="{{ teacherEmails|join(emailSeparator) }}"/>
                                     {# <input type="submit" value="Email all {{ group }} teachers" /> #}
