@@ -19,6 +19,14 @@ use JsonSerializable;
 
 class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
 {
+
+    /**
+     * Consts corresponding to ordering
+     */
+    private const ORDER_ASCENDING = 'asc';
+    private const ORDER_DESCENDING = 'desc';
+
+
     /** @var array */
     protected $stack = array();
 
@@ -396,14 +404,19 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      * It only works on homogenous collections containing models
      *
      * @param string $field
+     * @param string $order
      * @return $this
      */
-    public function sortNaturally(string $field): Collection
+    public function sortNaturally(string $field, string $order = self::ORDER_ASCENDING): Collection
     {
         $getter = $this->getGetMethodName($field);
 
-        return $this->sortByCallback(static function($a, $b) use ($getter) {
-            return strnatcasecmp($a->$getter(), $b->$getter());
+        return $this->sortByCallback(static function($a, $b) use ($getter, $order) {
+            if (self::ORDER_ASCENDING === strtolower($order)) {
+                return strnatcasecmp($a->$getter(), $b->$getter()) >= 1;
+            }
+
+            return strnatcasecmp($a->$getter(), $b->$getter()) < 1;
         });
     }
 
