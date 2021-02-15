@@ -148,12 +148,13 @@ class Interactions
                                            ->setType(Mapper::TYPE_OPEN);
         }
 
-        /* It's a valid referrer and $user hasn't Opened this period
-         * so add an Open record and increment the cumulative total
-         */
-        $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $date, $roleType, $roleId, $referrer);
-
         try {
+
+            /* It's a valid referrer and $user hasn't Opened this period
+             * so add an Open record and increment the cumulative total
+             */
+            $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $date, $roleType, $roleId, $referrer);
+
             return $this->statisticsMapper->save($open->setOccursAt($date));
         } catch (PDOException $e) {
             /* noop
