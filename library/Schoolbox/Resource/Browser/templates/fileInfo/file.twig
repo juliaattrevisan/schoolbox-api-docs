@@ -14,8 +14,12 @@
     <dt class="small-12 medium-4">Filesize</dt>
     <dd class="small-12 medium-8">{{ file.size | bytes }}</dd>
 
+    {% set fileHasCreatedAt = file.createdAt is defined and file.createdAt is not null %}
+    {% set fileHasModifiedAt = file.modifiedAt is defined and file.modifiedAt is not null %}
+    {% if fileHasCreatedAt %}
     <dt class="small-12 medium-4">Created</dt>
     <dd class="small-12 medium-8">{{ file.createdAt.short }}</dd>
+    {% endif %}
 
     {% if namespace == 'resourceBrowser' %}
 
@@ -24,7 +28,9 @@
          # ModifiedAt actually exists in the absence of ModifiedBy if you upload this file somewhere,
          # which isn't something I expected to find
          #}
-        {% if file.createdAt.unixTimestamp != file.modifiedAt.unixTimestamp %}
+        {% if fileHasModifiedAt
+            and (not fileHasCreatedAt or file.createdAt.unixTimestamp != file.modifiedAt.unixTimestamp)
+        %}
             <dt class="small-12 medium-4">Last modified</dt>
             <dd class="small-12 medium-8">{{ file.modifiedAt.short }}
                 {% if file.modifiedBy %}
