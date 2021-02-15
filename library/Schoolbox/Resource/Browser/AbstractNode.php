@@ -170,7 +170,7 @@ abstract class AbstractNode implements NodeInterface
 
 
     /**
-     * Get all the subcategories for a particular category
+     * Get all the subfolders for a particular folder
      *
      * @return array
      */
@@ -178,7 +178,7 @@ abstract class AbstractNode implements NodeInterface
     {
         $output = array();
 
-        $allFolders = $this->getFolderLocator()->findByParentId($this->getNodeId());
+        $allFolders = $this->getFolderLocator()->findByParentId($this->getNodeId())->sortNaturally('name');
 
         foreach ($allFolders as $currentFolder) {
             if ($this->hasPermission($currentFolder->getId(), UserAccess::ACCESS_READ)) {

@@ -390,6 +390,24 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
         return $parts;
     }
 
+
+    /**
+     * Sort naturally by $field
+     * It only works on homogenous collections containing models
+     *
+     * @param string $field
+     * @return $this
+     */
+    public function sortNaturally(string $field): Collection
+    {
+        $getter = $this->getGetMethodName($field);
+
+        return $this->sortByCallback(static function($a, $b) use ($getter) {
+            return strnatcasecmp($a->$getter(), $b->$getter());
+        });
+    }
+
+
     /**
      * Sorts the collection by a field and a direction. If the field values are
      * IComparable objects, then the object's compare method is used, otherwise
