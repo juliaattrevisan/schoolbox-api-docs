@@ -44,7 +44,9 @@ module.exports = {
                                 {
                                     targets: {
                                         browsers: [
-                                            "defaults",
+                                            ">0.5%",
+                                            "not dead",
+                                            "not op_mini all",
                                             "not IE <= 11"
                                         ],
                                     },
