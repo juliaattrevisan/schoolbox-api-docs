@@ -138,7 +138,7 @@
                 self.dropzone = this;
 
                 this.on('addedfile', function (file) {
-                    
+
                     self.renderFile({
                         previewElement: file.previewElement,
                         type: file.type
@@ -614,6 +614,9 @@
                     elems.push($(data.previewElement));
 
                     $(this.element).trigger('success.attachzone', [data]);
+
+                    list[i].accepted = true; //ensure any dropzone.getAcceptedFiles() checks are valid
+                    this.dropzone.files.push(list[i]);
 
                     // now the file has been added...if it's buggy, take it out again
                     if (data.hash.split(':')[0] == 'exception') {
