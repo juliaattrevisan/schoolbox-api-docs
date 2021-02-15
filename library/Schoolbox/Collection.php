@@ -402,7 +402,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     /**
      * Sort naturally by $field
      *
-     * It only works on homogenous collections containing models, or arrays
+     * It only works on homogenous collections containing models
      * If it contains mixed data types it'll throw InvalidArgumentException
      * though you could make it interpret mixed types with some more work on the idea
      *
