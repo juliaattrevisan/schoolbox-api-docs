@@ -85,7 +85,9 @@ class Factory
         'task' => [
             'browse'    => Filesystem\BrowseController::class,
             'teams'     => Filesystem\TeamsController::class,
-            'webdav'    => Filesystem\WebdavController::class,
+            // I really don't think that Tasks (which are links) should allow WebDAV:
+            // permissions between staff and students could be wildly different
+//            'webdav'    => Filesystem\WebdavController::class,
             'google'    => Filesystem\GoogleController::class,
             'office'    => Filesystem\Office365Controller::class,
         ],
