@@ -32,15 +32,23 @@ class UrlDetection {
 		'#^/send\.php\?#',
 	);
 
-	/**
-	 * Homepage used by the resource browser. First capturing match contains the
-	 * homepage ID or code. (Assume only IDs for now)
-	 *
-	 * @var array
-	 */
-	private $homepagePatterns = array(
-		'#^/homepage/(\d+)#',
-	);
+    /**
+     * Homepage used by the resource browser. First capturing match contains the
+     * homepage ID or code. (Assume only IDs for now)
+     *
+     * @var array
+     */
+    private $homepagePatterns = array(
+        '#^/homepage/(\d+)#',
+    );
+
+    /**
+     * Homepage used by the WebDAV browser: first capturing match contains the
+     * ID of the file in WebDAV.
+     *
+     * @var array
+     */
+    private $webdavPatterns = ['#^/cms/sendNetworkFile.php\\?#'];
 
 	/**
 	 * The url to analyse
@@ -128,7 +136,8 @@ class UrlDetection {
 		$allPatterns = array_merge(
 			$this->getStoragePatterns(),
 			$this->getResourcePatterns(),
-			$this->getHomepagePatterns()
+			$this->getHomepagePatterns(),
+            $this->webdavPatterns,
 		);
 		return $this->matchAgainstPatterns($allPatterns);
 	}
@@ -159,6 +168,16 @@ class UrlDetection {
 	public function isHomepageUrl() {
 		return $this->matchAgainstPatterns($this->getHomepagePatterns());
 	}
+
+    /**
+     * Bypass caching for local urls
+     *
+     * @return bool
+     */
+    public function isWebdavUrl(): bool
+    {
+        return $this->matchAgainstPatterns($this->webdavPatterns);
+    }
 
 	/* Getters/Setters
 	 */

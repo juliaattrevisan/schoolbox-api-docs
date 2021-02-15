@@ -131,6 +131,10 @@ class Creational extends AbstractFactory
                  */
                 $this->spawnMetadataFromUpload($uploadedFile);
                 $this->spawnThumbnailFromUpload($uploadedFile);
+            } elseif ($this->urlDetection->isWebdavUrl()) {
+                // I guess just construct a standard URL post
+                $this->product = new \SocialStream_Post_Url();
+                $this->populate($data);
             }
         } elseif (($this->type === 'upload') && ($_FILES['file']['size'] > 0)) {
 
