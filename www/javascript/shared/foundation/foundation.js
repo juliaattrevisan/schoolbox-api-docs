@@ -40,16 +40,6 @@
     'foundation-mq-xxlarge',
     'foundation-data-attribute-namespace']);
 
-  // Enable FastClick if present
-
-  $(function () {
-    if (typeof FastClick !== 'undefined') {
-      // Don't attach to body if undefined
-      if (typeof document.body !== 'undefined') {
-        FastClick.attach(document.body);
-      }
-    }
-  });
 
   // private Fast Selector wrapper,
   // returns jQuery object. Only use where

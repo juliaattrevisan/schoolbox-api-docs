@@ -22,7 +22,7 @@ $data = {
 }
 
 #}
-<div class="attachzone s{{ attachzone.size }} needsclick" id="{{ attachzone.id }}-zone">
+<div class="attachzone s{{ attachzone.size }}" id="{{ attachzone.id }}-zone">
     <label>{{ attachzone.label }}</label>
     <ul data-dz-previews class="az-list">
         {% for attachment in attachzone.attachments ?? [] %}
@@ -45,8 +45,8 @@ $data = {
         {% endfor %}
     </ul>
     {% if not attachzone.readonly %}
-    <div class="dzone needsclick{% if attachzone.mode == 'button' %} button" title="{{ attachzone.prompt | capitalize }}{% endif %}" id="{{ attachzone.camelId }}Zone">
-        <ul data-template class="hide needsclick">
+    <div class="dzone {% if attachzone.mode == 'button' %} button" title="{{ attachzone.prompt | capitalize }}{% endif %}" id="{{ attachzone.camelId }}Zone">
+        <ul data-template class="hide">
             <li class="actions-small-1">
                 <div class="list-item">
                     <div class="card small-12">
