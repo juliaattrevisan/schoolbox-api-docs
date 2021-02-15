@@ -376,6 +376,11 @@
                 /* When you select a My File
                  */
                 url = config.url.storage + hash;
+            } else if (filesystem === 'webdav') {
+
+                /* When you select a WebDAV file
+                 */
+                url = config.url.webdav + val;
             } else if (type === 'meetingUrl') {
 
                 /* When you select a Microsoft Teams meeting url
@@ -486,6 +491,10 @@
                 /* Prefix for link to Storage hash
                  */
                 storage: '/storage/fetch.php?hash=',
+
+                /* Prefix for link to WebDAV
+                 */
+                webdav: '/cms/sendNetworkFile.php?id=',
 
                 /* Prefix for linking to Files
                  */
