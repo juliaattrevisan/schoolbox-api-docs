@@ -132,7 +132,7 @@
             },
 
             init: function () {
-
+                dzone.append($('<span/>').html(prompt));
                 // *goes crosseyed*
                 self.dropzone = this;
 
