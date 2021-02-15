@@ -439,6 +439,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                             sis_timetable_cycle.finish >= DATE(NOW()) AND
                             sis_class_period.room IN ({$predicate["placeholders"]}) AND
                             luCampus.deleted_at IS NULL
+                GROUP BY    RoomCode, TimetableGroup, DayNumber, PeriodNumber, PeriodStart, PeriodEnd, ClassCode 
                 ORDER BY    sis_timetable_period.day ASC,
                             sis_timetable_period.sequence ASC
             ",
