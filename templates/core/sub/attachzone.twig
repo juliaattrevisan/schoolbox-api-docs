@@ -45,7 +45,7 @@ $data = {
         {% endfor %}
     </ul>
     {% if not attachzone.readonly %}
-    <div class="dzone {% if attachzone.mode == 'button' %} button" title="{{ attachzone.prompt | capitalize }}{% endif %}" id="{{ attachzone.camelId }}Zone">
+    <div class="dzone {% if attachzone.mode == 'button' %}button" title="{{ attachzone.prompt | capitalize }}{% endif %}" id="{{ attachzone.camelId }}Zone">
         <ul data-template class="hide">
             <li class="actions-small-1">
                 <div class="list-item">
