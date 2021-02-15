@@ -9,11 +9,9 @@
 
 namespace Schoolbox\Resource\File\Search;
 
-use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\File\Model;
 use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
 use Schoolbox\Resource\Search\MapperResult\Base;

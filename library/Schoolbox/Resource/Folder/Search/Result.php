@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Resource\Folder\Search;
 
-use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Mapper;
