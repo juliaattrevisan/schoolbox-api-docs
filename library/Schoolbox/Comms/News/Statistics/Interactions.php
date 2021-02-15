@@ -148,21 +148,30 @@ class Interactions
                                            ->setType(Mapper::TYPE_OPEN);
         }
 
-        /* It's a valid referrer and $user hasn't Opened this period
-         * so add an Open record and increment the cumulative total
+        /* A race condition occurs when multiple opens are made by the same user
+         * to the same article; in this case catch the fatal error caused by FK
+         * constraints and just carry on View logged, instead of trying to record
+         * both views SA-11038 SA-11134
          */
-        $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $date, $roleType, $roleId, $referrer);
+        try {
 
+            /* It's a valid referrer and $user hasn't Opened this period
+             * so add an Open record and increment the cumulative total
+             */
+            $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $date, $roleType, $roleId, $referrer);
+        } catch (PDOException $e) {
+
+            // noop
+        }
+
+        /* If the incrementOpen() failed due to contention, still try to record this individual open
+         * Its failure should still allow this to try anyway
+         */
         try {
             return $this->statisticsMapper->save($open->setOccursAt($date));
         } catch (PDOException $e) {
-            /* noop
-             *
-             * A race condition occurs when multiple opens are made by the same user
-             * to the same article; in this case catch the fatal error caused by FK
-             * constraints and just carry on View logged, instead of trying to record
-             * both views SA-11038
-             */
+
+            // nopo
         }
 
         return false;
