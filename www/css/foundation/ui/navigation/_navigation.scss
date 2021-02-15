@@ -146,14 +146,14 @@ $allow-sidebar-stash: $large-up;
 // Main navigation tab bar at top
 .hybrid-bar {
   .logo {
-    width: $tabbar-icon-width;
+    display: flex;
+    max-width: $tabbar-icon-width;
     height: $tabbar-height;
     float: left;
 
     img {
-      display: block;
-      height: 100%;
-      max-width: none;
+      align-self: center;
+      max-width: $tabbar-icon-width;
     }
   }
 
