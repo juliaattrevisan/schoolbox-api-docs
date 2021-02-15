@@ -669,8 +669,8 @@
                                 </form>
                                 {% autoescape 'js' %}
                                     <script type="text/javascript">
-                                        $('#email-all').on('click',function(){
-                                            $('#email-all-form').submit();
+                                        $('#email-all-{{ dropdownOptionsID }}').on('click',function(){
+                                            $('#email-all-form-{{ dropdownOptionsID }}').submit();
                                         });
                                     </script>
                                 {% endautoescape %}
