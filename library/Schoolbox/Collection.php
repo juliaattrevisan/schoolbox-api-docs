@@ -401,15 +401,29 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
 
     /**
      * Sort naturally by $field
-     * It only works on homogenous collections containing models
+     *
+     * It only works on homogenous collections containing models, or arrays
+     * If it contains mixed data types it'll throw InvalidArgumentException
+     * though you could make it interpret mixed types with some more work on the idea
      *
      * @param string $field
      * @param string $order
      * @return $this
+     * @throws InvalidArgumentException
      */
     public function sortNaturally(string $field, string $order = self::ORDER_ASCENDING): Collection
     {
         $getter = $this->getGetMethodName($field);
+
+        /* Everything in the collection needs to be an object, for now
+         * You could expand it to comprehend a hybrid model/array collection
+         * but then you get 2x2x2 = 8 possible outcomes which is a lot
+         */
+        foreach ($this->getAll() as $current) {
+            if (!\is_object($current)) {
+                throw new \InvalidArgumentException('sortNaturally operates on objects only.');
+            }
+        }
 
         return $this->sortByCallback(static function($a, $b) use ($getter, $order) {
             if (self::ORDER_ASCENDING === strtolower($order)) {
