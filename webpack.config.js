@@ -44,10 +44,10 @@ module.exports = {
                                 {
                                     targets: {
                                         browsers: [
-                                            ">0.5%",
+                                            ">0.25%",
                                             "not dead",
                                             "not op_mini all",
-                                            "not IE <= 11"
+                                            "not ie 11"
                                         ],
                                     },
                                     useBuiltIns: 'usage',
