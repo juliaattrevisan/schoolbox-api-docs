@@ -161,9 +161,8 @@ class Finder
                     f.name AS folderName,
                     a.title AS assessmentTitle
                 FROM v_assessment_participation vap
-                INNER JOIN assessment a              ON vap.assessment_id = a.id
-                INNER JOIN v_assessment_relation var ON vap.assessment_id = var.assessment_id
-                INNER JOIN folder f                  ON vap.folder_id     = f.id
+                INNER JOIN assessment a ON vap.assessment_id = a.id
+                INNER JOIN folder     f ON vap.folder_id     = f.id
                 WHERE vap.student_id = :studentId
                 AND   a.deleted_at IS NULL
                 AND   vap.folder_id IN {$folderPlaceholders}
