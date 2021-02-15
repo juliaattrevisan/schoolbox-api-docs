@@ -88,7 +88,20 @@ class Factory
             'webdav'    => Filesystem\WebdavController::class,
             'google'    => Filesystem\GoogleController::class,
             'office'    => Filesystem\Office365Controller::class,
-        ]
+        ],
+
+        /* Social Stream: a link which may be to a file,
+         * everything except WebDAV is allowed
+         */
+        'socialstream' => [
+            'upload'    => Filesystem\UploadController::class,
+            'usermedia' => Filesystem\UsermediaController::class,
+            'browse'    => Filesystem\BrowseController::class,
+            'teams'     => Filesystem\TeamsController::class,
+            'myfile'    => Filesystem\MyfileController::class,
+            'google'    => Filesystem\GoogleController::class,
+            'office'    => Filesystem\Office365Controller::class,
+        ],
     ];
 
 
