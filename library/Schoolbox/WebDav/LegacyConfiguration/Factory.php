@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -113,7 +114,6 @@ class Factory
                         '/H-DRIVE/USERS/STAFF/TEACHERS/YEAR02-12/' . $session['username'] . '/',
                     );
                 }
-
             } elseif ($user->getRole()->isStudent()) {
                 $paths = array(
                     '/H-DRIVE/USERS/STUDENTS/YEAR%20' . str_pad($session['year'], 2, '0', STR_PAD_LEFT) . '/' . $session['username'] . '/',
@@ -166,7 +166,6 @@ class Factory
                     '/EXCHANGE/',
                     '/morrishall/',
                 );
-
             } elseif ($user->getRole()->isStudent()) {
                 $settings['baseUri'] = 'http://mggs-fs02/';
                 $paths = array(
@@ -231,7 +230,6 @@ class Factory
                 foreach ($fileShares as $share) {
                     $paths[] = $settings['baseUri'] . '/' . $share . '/';
                 }
-
             } elseif ($user->getRole()->isStudent()) {
                 if ($session['year'] >= '6') {
                     $paths = array(
@@ -352,7 +350,6 @@ class Factory
                 );
             }
         } elseif ($siteLocation === 'ngsl') {
-
             if ($user->getRole()->isStaff()) {
                 $settings = array(
                     'baseUri' => 'http://facultycloud.ngs.nsw.edu.au/',

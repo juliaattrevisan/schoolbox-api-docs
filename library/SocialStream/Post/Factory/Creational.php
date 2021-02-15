@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream\Post\Factory;
 
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -95,7 +97,6 @@ class Creational extends AbstractFactory
                 $this->populate($data);
             }
         } elseif ($this->urlDetection->isLocalUrl()) {
-
             /* Treat local urls differently as they should bypass the caching
              * stuff entirely - this applies to the Resource browser mainly,
              * but also when people input a local url manually
@@ -137,7 +138,6 @@ class Creational extends AbstractFactory
                 $this->populate($data);
             }
         } elseif (($this->type === 'upload') && ($_FILES['file']['size'] > 0)) {
-
             /* If upload option was chosen, extract metadata and thumbnail information
              * directly from already-known information (no curling needed)
              */
@@ -147,11 +147,9 @@ class Creational extends AbstractFactory
                 $resource = Mapper::getInstance()->accept($fileArray['name'], $fileArray['tmp_name'], $_SESSION['id']);
                 $this->parseStorageMetadata($resource, $data);
             } catch (\Schoolbox\Mapper\Exception $e) {
-
                 // noop - don't do anything else if you can attach the file for some reason?
             }
         } else {
-
             /* Try to process as a url instead
              */
             if ('' !== $this->getUrl()) {
@@ -237,7 +235,7 @@ class Creational extends AbstractFactory
                     $this->product = new \SocialStream_Post_Image();
                     return;
                 }
-            } catch (\Schoolbox\File\Exception|\UnexpectedValueException $e) {
+            } catch (\Schoolbox\File\Exception | \UnexpectedValueException $e) {
                 // noop when something went wrong with the file
             }
         }
@@ -311,7 +309,8 @@ class Creational extends AbstractFactory
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    private function constructFromHomepage(string $url): Model {
+    private function constructFromHomepage(string $url): Model
+    {
         $this->product = new \SocialStream_Post_Url();
 
         $homepageId = $this->urlDetection->getHomepageIdFromUrl();
@@ -326,7 +325,8 @@ class Creational extends AbstractFactory
      *
      * @return \SocialStream_Post_String
      */
-    private function constructDefault() {
+    private function constructDefault()
+    {
         return new \SocialStream_Post_String();
     }
 
@@ -448,7 +448,6 @@ class Creational extends AbstractFactory
 
             $this->product->setUrl($url);
         } elseif ($uploadedFile->getMimetype()->isImage()) {
-
             /* Set up image thumbnails
              */
             $url = "/storage/image.php?size=maxsize&hash={$uploadedFile->getHash()}";
@@ -461,12 +460,11 @@ class Creational extends AbstractFactory
             $cache = new \SocialStream\Cache\Original();
             $cache->initPost($this->product);
         } else {
-
             /* Set up storage stream location and its icon thumbnails
              */
             $url = "/storage/fetch.php?hash={$uploadedFile->getHash()}";
             $this->product->setUrl($url);
-            $this->product->setThumbnail('icon:'.$uploadedFile->getMimetype()->getIconFile());
+            $this->product->setThumbnail('icon:' . $uploadedFile->getMimetype()->getIconFile());
         }
     }
 
@@ -522,7 +520,7 @@ class Creational extends AbstractFactory
              */
             $url = "/send.php?id={$file->getId()}";
             $this->product->setUrl($url);
-            $this->product->setThumbnail('icon:'.$file->getMimetype()->getIconFile());
+            $this->product->setThumbnail('icon:' . $file->getMimetype()->getIconFile());
         }
     }
 
