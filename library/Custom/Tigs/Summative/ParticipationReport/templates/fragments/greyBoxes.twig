@@ -22,7 +22,23 @@
  #                                       the student's NESA grade, if applicable and any error messages
  #}
 
-{% if attributes.isMiddleYear and nesaSemester == 1%}
+{# Show the assessment that had their Mark value, but only show it when
+ # you're providing Formative information
+#}
+{% if hasInterimGrades %}
+    <div class="result-group">
+        <div class="result-item hsc-rank-assessment-title">
+            <span class="result-heading">Formative Assessment</span><br />
+            <span class="result-value">{{ rankData.assessmentTitle|default('-') }}</span>
+        </div>
+    </div>
+{% endif %}
+
+{# Special conditions for middle year, semester 1 NESA data
+ # If you're in semester 2, don't show semester 1's NESA data by mistake
+ #}
+{% if attributes.isMiddleYear and nesaSemester == 1 %}
+
     {% if attributes.curriculumSemester == 1 %}
 
         {# Special case for Middle Years and it's currently Semester 1

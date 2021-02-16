@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\IFeedback;
  * find out some basic statistics data for that given student so you can see how
  * they fared vs their peers
  *
+ * - the assessment which has their mark in it
  * - the mark they received
  * - the average cohort mark
  * - the student's rank among the cohort
@@ -91,11 +92,13 @@ class CohortStatistics
         /* Figure out the three pieces you need and represent them as simple string values
          * stored in a tuple:
          *
+         * The assessment name containing the Student Mark
          * Student Mark
          * Cohort Average
          * Cohort Rank
          */
         return [
+            'assessmentTitle' => null === $this->feedback ? null : $this->feedback->getAssessable()->getTitle(),
             'studentMark' => null === $this->feedback ? null : $this->feedback->getHumanReadableMark(),
             'cohortAverage' => null === $cohortAverage ? null : "{$cohortAverage} %",
             'cohortRank' => null === $cohortRank ? null : "{$cohortRank} / {$cohortCount}",
