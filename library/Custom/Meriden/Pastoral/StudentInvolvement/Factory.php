@@ -483,17 +483,7 @@ class Factory
      *
      * @return array {
      *  assessment:  IAssessable
-     *  rubric:      array {
-     *    groups: {
-     *      criteria: {
-     *        name: string
-     *          descriptors: {
-     *            selected: bool
-     *            text:     string
-     *        }
-     *      }
-     *    }
-     *  }
+     *  rubric:      MarkedGrid|null
      *  pretty_mark: string
      *  mark:        float
      *  comment:     string
