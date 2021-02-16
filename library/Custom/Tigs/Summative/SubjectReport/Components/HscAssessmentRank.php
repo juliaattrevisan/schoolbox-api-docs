@@ -156,22 +156,7 @@ class HscAssessmentRank extends BaseComponent
             $feedback
         ))->generate();
 
-        /* I'll never know why these are different array keys
-         */
-        // Both Yr11 + 12 see this datum
-        $data = [
-            'cohortRank' => $statistics['cohortRank'],
-        ];
-
-        // But only Yr11 see these datums
-        if (11 === $this->getAttributes()->getCurriculumYearLevel()) {
-            $data = array_merge($data, [
-                'studentMark' => $statistics['studentMark'],
-                'cohortAverage' => $statistics['cohortAverage']
-            ]);
-        }
-
-        return $data;
+        return $statistics;
     }
 
 
