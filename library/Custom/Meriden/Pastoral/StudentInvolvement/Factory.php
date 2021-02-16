@@ -242,7 +242,7 @@ class Factory
      * @param string          $subjectCode
      * @param array|Subject[] $subjectList      `$student`'s subjects in `$year`
      * @param string|null     $roleTypeOverride
-     * @return Subject
+     * @return LateralLearning
      */
     public function buildLateralLearning(
         int $year,
@@ -250,7 +250,7 @@ class Factory
         string $subjectCode,
         array $subjectList,
         ?string $roleTypeOverride
-    ): Subject {
+    ): LateralLearning {
         // Need a course description
         $lateralLearning = new LateralLearning();
         $externalData    = $this->gateway->getSubject($year, $subjectCode);
@@ -266,13 +266,12 @@ class Factory
         // Put together all the stuff for the lateral learning report
         $publishedOnly = !$this->doesDraftFeedbackContribute($year);
 
-        /** @var IndicatorMark[] $mostRecentIndicatorMarks */
-        $mostRecentIndicatorMarks = [];
-        $indicatorMarksByName     = [];
+//        /** @var IndicatorMark[] $mostRecentIndicatorMarks */
+//        $mostRecentIndicatorMarks = [];
+//        $indicatorMarksByName     = [];
 
 
-        // Iterate over the grades for every subject the student is in,
-        // to build the list of lateral learning marks
+        $allGrades = [];
         foreach ($subjectList as $subject) {
             $folderWithGrades = $this->getFolderWithGrades(
                 $subject->getSubjectCode(),
@@ -280,66 +279,80 @@ class Factory
                 $publishedOnly,
                 $roleTypeOverride
             );
-
-            foreach ($folderWithGrades['grades'] as $grade) {
-                /** @var MarkedGrid|null $rubric */
-                $rubric = $grade['rubric'];
-                if ($rubric) {
-                    foreach ($rubric->getCapabilityMarks() as $capabilityMark) {
-                        // Does this assessment have a rubric, and does that
-                        // rubric have the lateral learning capability?
-                        // If so: store the indicator mark and feedback it's
-                        // part of
-                        if (
-                            preg_match(
-                                Subject::LATERAL_LEARNING_CAPABILITY_REGEX,
-                                $capabilityMark->getCapabilityUsage()->getCapability()->getName()
-                            )
-                        ) {
-                            $feedback = $rubric->getFeedback();
-                            foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
-                                $indicatorMarksByName[$indicatorMark->getIndicatorUsage()->getIndicator()->getName()][] = [
-                                    'feedback' => $feedback,
-                                    'mark'     => $indicatorMark,
-                                ];
-                            }
-                        }
-                    }
-                }
-            }
+            $allGrades[] = $folderWithGrades['grades'];
         }
+//        $allGrades = array_merge(...$allGrades);
+        $lateralLearning->injectIndicatorMarks(array_merge(...$allGrades));
 
-
-        // Find the most recent mark for each indicator
-        foreach ($indicatorMarksByName as $name => $indicatorMarks) {
-            $mostRecentTimestamp = null;
-            foreach ($indicatorMarks as $indicatorMark) {
-                $timestamp = $indicatorMark['feedback']->getPublishedAt()->getUnixTimeStamp();
-                if (!isset($mostRecentTimestamp) || $mostRecentTimestamp < $timestamp) {
-                    $mostRecentTimestamp             = $timestamp;
-                    $mostRecentIndicatorMarks[$name] = $indicatorMark['mark'];
-                }
-            }
-        }
-
-
-        // Sort the list by natcase for output
-        uksort($mostRecentIndicatorMarks, 'strnatcasecmp');
-        foreach ($mostRecentIndicatorMarks as $indicatorMark) {
-            new \Alaress_Probe(
-                $indicatorMark->getIndicatorUsage()->getIndicator()->getName(),
-                $indicatorMark->getDescriptor()->getDescription(),
-            );
-        }
-
-
-        // Just so the interface is fulfilled: return the report for the LL subject
-        foreach ($subjectList as $subject) {
-            if ($subject->isLateralLearning()) {
-                return $this->buildSubject($year, $student, $subject->getSubjectCode(), $roleTypeOverride);
-            }
-        }
-        throw new \RangeException("Student was not in a lateral learning class in $year");
+//        // Iterate over the grades for every subject the student is in,
+//        // to build the list of lateral learning marks
+//        foreach ($subjectList as $subject) {
+//            $folderWithGrades = $this->getFolderWithGrades(
+//                $subject->getSubjectCode(),
+//                $student,
+//                $publishedOnly,
+//                $roleTypeOverride
+//            );
+//
+//            foreach ($folderWithGrades['grades'] as $grade) {
+//                /** @var MarkedGrid|null $rubric */
+//                $rubric = $grade['rubric'];
+//                if ($rubric) {
+//                    foreach ($rubric->getCapabilityMarks() as $capabilityMark) {
+//                        // Does this assessment have a rubric, and does that
+//                        // rubric have the lateral learning capability?
+//                        // If so: store the indicator mark and feedback it's
+//                        // part of
+//                        if (
+//                            preg_match(
+//                                Subject::LATERAL_LEARNING_CAPABILITY_REGEX,
+//                                $capabilityMark->getCapabilityUsage()->getCapability()->getName()
+//                            )
+//                        ) {
+//                            $feedback = $rubric->getFeedback();
+//                            foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+//                                $indicatorMarksByName[$indicatorMark->getIndicatorUsage()->getIndicator()->getName()][] = [
+//                                    'feedback' => $feedback,
+//                                    'mark'     => $indicatorMark,
+//                                ];
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//
+//        // Find the most recent mark for each indicator
+//        foreach ($indicatorMarksByName as $name => $indicatorMarks) {
+//            $mostRecentTimestamp = null;
+//            foreach ($indicatorMarks as $indicatorMark) {
+//                $timestamp = $indicatorMark['feedback']->getPublishedAt()->getUnixTimeStamp();
+//                if (!isset($mostRecentTimestamp) || $mostRecentTimestamp < $timestamp) {
+//                    $mostRecentTimestamp             = $timestamp;
+//                    $mostRecentIndicatorMarks[$name] = $indicatorMark['mark'];
+//                }
+//            }
+//        }
+//
+//
+//        // Sort the list by natcase for output
+//        uksort($mostRecentIndicatorMarks, 'strnatcasecmp');
+//        foreach ($mostRecentIndicatorMarks as $indicatorMark) {
+//            new \Alaress_Probe(
+//                $indicatorMark->getIndicatorUsage()->getIndicator()->getName(),
+//                $indicatorMark->getDescriptor()->getDescription(),
+//            );
+//        }
+//
+//
+//        // Just so the interface is fulfilled: return the report for the LL subject
+//        foreach ($subjectList as $subject) {
+//            if ($subject->isLateralLearning()) {
+//                return $this->buildSubject($year, $student, $subject->getSubjectCode(), $roleTypeOverride);
+//            }
+//        }
+//        throw new \RangeException("Student was not in a lateral learning class in $year");
     }
 
     /**

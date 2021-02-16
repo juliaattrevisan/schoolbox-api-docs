@@ -219,6 +219,7 @@ class Controller extends Base
             }
 
             if ($subject->isLateralLearning()) {
+                // Exchange the subject report for a lateral learning report
                 $subject = $this->studentInvolvementFactory->buildLateralLearning(
                     $year,
                     $student,
@@ -227,6 +228,7 @@ class Controller extends Base
                     $roleTypeOverride
                 );
             } else {
+                // Augment the subject report with proper data
                 $subject = $this->getStudentInvolvementFactory()->buildSubject(
                     $year,
                     $student,

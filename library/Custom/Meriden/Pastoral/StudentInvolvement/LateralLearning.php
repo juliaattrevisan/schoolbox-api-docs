@@ -9,38 +9,34 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
-use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
+use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model;
-use Schoolbox\Learning\Assessment\IFeedback;
-use Schoolbox\User;
 
 class LateralLearning extends Involvement
 {
     /**
-     * Regular expression for lateral learning class pages: used to identify if
-     * this subject should display as a lateral learning report.
-     */
-    private const LATERAL_LEARNING_CLASS_NAME_REGEX = '/Lateral\\s+Learning/i';
-
-    /**
      * Regular expression for lateral learning capabilities: used to identify if
      * this subject should display as a lateral learning report.
      */
-    public const LATERAL_LEARNING_CAPABILITY_REGEX = '/Lateral\\s+Learning\\s+Skills/i';
+    private const LATERAL_LEARNING_CAPABILITY_REGEX = '/Lateral\\s+Learning\\s+Skills/i';
 
     /**
      * External data (class name and description)
-     *
-     * @var array
      */
-    protected $externalData;
+    protected array $externalData;
+
+    /**
+     * The most recent mark given for each indicator.
+     *
+     * @var array|IndicatorMark[]
+     */
+    private array $indicatorMarks = [];
 
     /**
      * @return array
      */
-    public function getExternalData()
+    public function getExternalData(): array
     {
         return $this->externalData;
     }
@@ -50,71 +46,70 @@ class LateralLearning extends Involvement
      *
      * @return $this
      */
-    public function setExternalData($externalData)
+    public function setExternalData(array $externalData): self
     {
         $this->externalData = $externalData;
         return $this;
     }
 
-
     /**
-     * Retrieves the most recently given feedback for a lateral learning
-     * assessment.
+     * Collate the indicator marks from all grades given to the student, and
+     * injects them into `$this->indicatorMarks`.
      *
-     * @return Model|null
+     * @param array $allGrades All grades given to this student across all
+     *                         subjects in this eReport.
+     *
+     * @return $this
      */
-    public function retrieveLateralLearningFeedback(): ?Model
+    public function injectIndicatorMarks(array $allGrades): self
     {
-        $mostRecentFeedback = null;
-        foreach ($this->iterateLateralLearningFeedback() as $feedback) {
-            if (!$mostRecentFeedback || $mostRecentFeedback->getPublishedAt()->lt($feedback->getPublishedAt())) {
-                $mostRecentFeedback = $feedback;
-            }
-        }
-        return $mostRecentFeedback;
-    }
-
-    /**
-     * Retrieves the lateral learning capability mark for the most recent
-     * lateral learning feedback.
-     *
-     * The capability mark will contain the indicator marks which are displayed
-     * on the lateral learning report.
-     *
-     * @return CapabilityMark|null
-     */
-    public function retrieveLateralLearningCapabilityMark(): ?CapabilityMark
-    {
-        $feedback = $this->retrieveLateralLearningFeedback();
-        if ($feedback && $feedback->getRubricMarkedGrid()) {
-            foreach ($feedback->getRubricMarkedGrid()->getCapabilityMarks() as $capabilityMark) {
-                if ($this->isCapabilityLateralLearning($capabilityMark->getCapabilityUsage()->getCapability())) {
-                    return $capabilityMark;
+        $indicatorMarksByName = [];
+        foreach ($allGrades as $grade) {
+            /** @var MarkedGrid|null $rubric */
+            $rubric = $grade['rubric'];
+            if ($rubric) {
+                foreach ($rubric->getCapabilityMarks() as $capabilityMark) {
+                    // Does this assessment have a rubric, and does that rubric
+                    // have the lateral learning capability?
+                    // If so: store the indicator mark and feedback it's part of
+                    if ($this->isCapabilityLateralLearning($capabilityMark->getCapabilityUsage()->getCapability())) {
+                        $feedback = $rubric->getFeedback();
+                        foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                            $indicatorMarksByName[$indicatorMark->getIndicatorUsage()->getIndicator()->getName()][] = [
+                                'feedback' => $feedback,
+                                'mark'     => $indicatorMark,
+                            ];
+                        }
+                    }
                 }
             }
         }
-        return null;
-    }
 
-    /**
-     * Iterator for feedback from lateral learning assessments.
-     *
-     * @return iterable|IFeedback[]
-     */
-    private function iterateLateralLearningFeedback(): iterable
-    {
-        foreach ($this->getGrades() as $grade) {
-            $rubric = $grade['rubric'] ?? null;
-            if (!$rubric instanceof MarkedGrid) {
-                continue;
-            }
-            foreach ($rubric->iterateCapabilityUsages() as $capabilityUsage) {
-                if ($this->isCapabilityLateralLearning($capabilityUsage->getCapability())) {
-                    yield $rubric->getFeedback();
-                    break;
+        // Find the most recent mark for each indicator
+        foreach ($indicatorMarksByName as $name => $indicatorMarks) {
+            $mostRecentTimestamp = null;
+            foreach ($indicatorMarks as $indicatorMark) {
+                $timestamp = $indicatorMark['feedback']->getPublishedAt()->getUnixTimeStamp();
+                if (!isset($mostRecentTimestamp) || $mostRecentTimestamp < $timestamp) {
+                    $mostRecentTimestamp             = $timestamp;
+                    $mostRecentIndicatorMarks[$name] = $indicatorMark['mark'];
                 }
             }
         }
+
+        // Sort the list by natcase for output
+        uksort($mostRecentIndicatorMarks, 'strnatcasecmp');
+        $this->indicatorMarks = $mostRecentIndicatorMarks;
+
+        return $this;
+    }
+
+    /**
+     * @return array|IndicatorMark[]
+     */
+    public function getIndicatorMarks(): array
+    {
+        return $this->indicatorMarks;
     }
 
     /**
