@@ -144,11 +144,17 @@ Data:
                                     {# If we're in semester 2, try loading semester 2 NESA data. If there's something here
                                      # then use that data to inform the NESA Grade and subject comment
                                      #
+                                     # Otherwise look for summative data in the rankData struct
+                                     #
                                      # Otherwise look for formative data in the task marks data struct and use that
                                      # to inform the grey boxes' values and subject comment
                                      #
+                                     # ----
+                                     #
                                      # If we're in semester 1, try loading semester 1 NESA data. If there's something here
                                      # then use that data to inform the NESA Grade and subject comment
+                                     #
+                                     # Otherwise look for summative data in the rankData struct
                                      #
                                      # Otherwise look for formative data in the task marks data struct and use that
                                      # to inform the grey boxes' values and subject comment
@@ -165,31 +171,69 @@ Data:
                                         {% set comment = folderData.nesaGraphData.data.1.comment.comment %}
                                     {% else %}
 
-                                        {# Gotta mine the Formative feedbacks in either HSC Task Marks or Middle Years Task Marks structs
+                                        {# Gotta mine the Summative feedbacks or Formative feedbacks in either
+                                         # HSC Task Marks or Middle Years Task Marks structs
                                          # Find the most recent feedback and show its comment
+                                         #
+                                         # Summative feedbacks take precedence over Formative
                                          #}
                                         {% set mostRecentData = null %}
 
                                         {% if attributes.isHsc %}
-                                            {% set taskData = folderData.hscTaskMarks %}
-                                        {% else %}
-                                            {% set taskData = folderData.middleYearsTaskMarks %}
-                                        {% endif %}
+                                            {% if folderData.hscRankData and folderData.hscRankData.studentMark %}
 
-                                        {% for unitSpecData in folderData.unitSpecs %}
-                                            {% if taskData.data[unitSpecData.id] ?? false %}
-                                                {% set taskMarks = taskData.data[unitSpecData.id] %}
-
-                                                {# Remember the data which the most recent publishAt
-                                                 # Keep looking until there aren't any records more recent
+                                                {# Summative comment exists straight out of the gate
+                                                 # There's only one data struct
                                                  #}
-                                                {% if taskMarks.publishAt > mostRecentData.publishAt or mostRecentData is null %}
-                                                    {% set mostRecentData = taskMarks %}
+                                                {% set comment = folderData.hscRankData.comment %}
+                                            {% else %}
 
-                                                    {% set comment = mostRecentData.comment %}
-                                                {% endif %}
+                                                {# Traverse the Formative set, find the most recent feedback
+                                                 # Yank out its comment
+                                                 #}
+                                                {% set taskData = folderData.hscTaskMarks %}
+
+                                                {% for unitSpecData in folderData.unitSpecs %}
+                                                    {% if taskData.data[unitSpecData.id] ?? false %}
+                                                        {% set taskMarks = taskData.data[unitSpecData.id] %}
+
+                                                        {# Remember the data which the most recent publishAt
+                                                         # Keep looking until there aren't any records more recent
+                                                         #}
+                                                        {% if taskMarks.publishAt > mostRecentData.publishAt or mostRecentData is null %}
+                                                            {% set comment = taskMarks.comment %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
                                             {% endif %}
-                                        {% endfor %}
+                                        {% else %}
+                                            {% if folderData.middleYearsRankData and folderData.middleYearsRankData.studentMark %}
+
+                                                {# Summative comment exists straight out of the gate
+                                                 # There's only one data struct
+                                                 #}
+                                                {% set comment = folderData.middleYearsRankData.comment %}
+                                            {% else %}
+
+                                                {# Traverse the Formative set, find the most recent feedback
+                                                 # Yank out its comment
+                                                 #}
+                                                {% set taskData = folderData.middleYearsTaskMarks %}
+
+                                                {% for unitSpecData in folderData.unitSpecs %}
+                                                    {% if taskData.data[unitSpecData.id] ?? false %}
+                                                        {% set taskMarks = taskData.data[unitSpecData.id] %}
+
+                                                        {# Remember the data which the most recent publishAt
+                                                         # Keep looking until there aren't any records more recent
+                                                         #}
+                                                        {% if taskMarks.publishAt > mostRecentData.publishAt or mostRecentData is null %}
+                                                            {% set comment = taskMarks.comment %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endif %}
                                     {% endif %}
                                 {% endif %}
 

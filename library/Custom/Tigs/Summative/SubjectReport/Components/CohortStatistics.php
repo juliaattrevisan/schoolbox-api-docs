@@ -21,6 +21,7 @@ use Schoolbox\Learning\Assessment\IFeedback;
  *
  * - the assessment which has their mark in it
  * - the mark they received
+ * - the accompanying comment
  * - the average cohort mark
  * - the student's rank among the cohort
  *
@@ -94,12 +95,14 @@ class CohortStatistics
          *
          * The assessment name containing the Student Mark
          * Student Mark
+         * Comment
          * Cohort Average
          * Cohort Rank
          */
         return [
             'assessmentTitle' => null === $this->feedback ? null : $this->feedback->getAssessable()->getTitle(),
             'studentMark' => null === $this->feedback ? null : $this->feedback->getHumanReadableMark(),
+            'comment' => null === $this->feedback ? null : $this->feedback->getComment(),
             'cohortAverage' => null === $cohortAverage ? null : "{$cohortAverage} %",
             'cohortRank' => null === $cohortRank ? null : "{$cohortRank} / {$cohortCount}",
         ];
