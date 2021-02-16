@@ -190,7 +190,7 @@ class Factory
     ): Subject\Base {
         $externalData = $this->gateway->getSubject($year, $subjectCode);
 
-        // external data not guaranteed to contain a description
+        // external data not guaranteed to contain a description, so load folder
         $folderWithGrades = $this->getFolderWithGrades(
             $subjectCode,
             $student,
