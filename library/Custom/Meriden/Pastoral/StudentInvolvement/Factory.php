@@ -12,11 +12,12 @@ namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
 use Alaress\Statistics\Statistics;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
+use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Permission\Access\UserAccess;
@@ -246,8 +247,15 @@ class Factory
     {
         // Put together all the stuff for the lateral learning report
         $publishedOnly = !$this->doesDraftFeedbackContribute($year);
+
+        /** @var IndicatorMark[] $mostRecentIndicatorMarks */
+        $mostRecentIndicatorMarks = [];
+        $indicatorMarksByName     = [];
+
+
+        // Iterate over the grades for every subject the student is in,
+        // to build the list of lateral learning marks
         foreach ($subjectList as $subject) {
-            // Fetch all assessments for subject
             $folderWithGrades = $this->getFolderWithGrades(
                 $subject->getSubjectCode(),
                 $student,
@@ -255,14 +263,57 @@ class Factory
                 $roleTypeOverride
             );
 
-            /** @var Folder $folder */
-            $folder = $folderWithGrades['folder'];
             foreach ($folderWithGrades['grades'] as $grade) {
-                /** @var IAssessable $assessment */
-                $assessment = $grade['assessment'];
-                new \Alaress_Probe($folder->getTitle(), $assessment->getTitle());
+                /** @var MarkedGrid|null $rubric */
+                $rubric = $grade['rubric'];
+                if ($rubric) {
+                    foreach ($rubric->getCapabilityMarks() as $capabilityMark) {
+                        // Does this assessment have a rubric, and does that
+                        // rubric have the lateral learning capability?
+                        // If so: store the indicator mark and feedback it's
+                        // part of
+                        if (
+                            preg_match(
+                                Subject::LATERAL_LEARNING_CAPABILITY_REGEX,
+                                $capabilityMark->getCapabilityUsage()->getCapability()->getName()
+                            )
+                        ) {
+                            $feedback = $rubric->getFeedback();
+                            foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                                $indicatorMarksByName[$indicatorMark->getIndicatorUsage()->getIndicator()->getName()][] = [
+                                    'feedback' => $feedback,
+                                    'mark'     => $indicatorMark,
+                                ];
+                            }
+                        }
+                    }
+                }
             }
         }
+
+
+        // Find the most recent mark for each indicator
+        foreach ($indicatorMarksByName as $name => $indicatorMarks) {
+            $mostRecentTimestamp = null;
+            foreach ($indicatorMarks as $indicatorMark) {
+                $timestamp = $indicatorMark['feedback']->getPublishedAt()->getUnixTimeStamp();
+                if (!isset($mostRecentTimestamp) || $mostRecentTimestamp < $timestamp) {
+                    $mostRecentTimestamp             = $timestamp;
+                    $mostRecentIndicatorMarks[$name] = $indicatorMark['mark'];
+                }
+            }
+        }
+
+
+        // Sort the list by natcase for output
+        uksort($mostRecentIndicatorMarks, 'strnatcasecmp');
+        foreach ($mostRecentIndicatorMarks as $indicatorMark) {
+            new \Alaress_Probe(
+                $indicatorMark->getIndicatorUsage()->getIndicator()->getName(),
+                $indicatorMark->getDescriptor()->getDescription(),
+            );
+        }
+
 
         // Just so the interface is fulfilled: return the report for the LL subject
         foreach ($subjectList as $subject) {

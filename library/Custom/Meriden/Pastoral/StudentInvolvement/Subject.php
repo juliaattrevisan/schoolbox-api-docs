@@ -28,7 +28,7 @@ class Subject extends Involvement
      * Regular expression for lateral learning capabilities: used to identify if
      * this subject should display as a lateral learning report.
      */
-    private const LATERAL_LEARNING_CAPABILITY_REGEX = '/Lateral\\s+Learning\\s+Skills/i';
+    public const LATERAL_LEARNING_CAPABILITY_REGEX = '/Lateral\\s+Learning\\s+Skills/i';
 
     /**
      * External data (class name and description)
