@@ -636,7 +636,7 @@
                          # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
                          # taking advantage of a twig construct
                          #}
-                        {% set dropdownOptionsID = loop.index %}
+                        {% set groupIdentifier = loop.index %}
 
                         {# Keep a running total of all teachers emails in this group #}
                         {% set teacherEmails = [] %}
@@ -656,21 +656,21 @@
                                 {% endfor %}
                                 {% set replyTo = USER.getFormattedEmailDisplay %}
                                 {% if teacherEmails|length > 0 %}
-                                <nav><a href="#" class="icon-overflow" data-dropdown="email-teachers-{{ dropdownOptionsID }}"></a></nav>
-                                <ul class="f-dropdown" data-dropdown-content id="email-teachers-{{ dropdownOptionsID }}">
+                                <nav><a href="#" class="icon-overflow" data-dropdown="email-teachers-{{ groupIdentifier }}"></a></nav>
+                                <ul class="f-dropdown" data-dropdown-content id="email-teachers-{{ groupIdentifier }}">
                                     <li>
-                                        <a id="email-all-{{ dropdownOptionsID }}" class="icon-email" href="#" title="Email all {{ group }} teachers">Email all {{ group }} teachers</a>
+                                        <a id="email-all-{{ groupIdentifier }}" class="icon-email" href="#" title="Email all {{ group }} teachers">Email all {{ group }} teachers</a>
                                     </li>
                                 </ul>
-                                <form id="email-all-form-{{ dropdownOptionsID }}" action="/mail/createMail.php" method="post">
+                                <form id="email-all-form-{{ groupIdentifier }}" action="/mail/createMail.php" method="post">
                                     <input type="hidden" name="replyto" value="{{ replyTo }}"/>
                                     <input type="hidden" name="cc" value="{{ teacherEmails|join(emailSeparator) }}"/>
                                     {# <input type="submit" value="Email all {{ group }} teachers" /> #}
                                 </form>
                                 {% autoescape 'js' %}
                                     <script type="text/javascript">
-                                        $('#email-all-{{ dropdownOptionsID }}').on('click',function(){
-                                            $('#email-all-form-{{ dropdownOptionsID }}').submit();
+                                        $('#email-all-{{ groupIdentifier }}').on('click',function(){
+                                            $('#email-all-form-{{ groupIdentifier }}').submit();
                                         });
                                     </script>
                                 {% endautoescape %}
@@ -679,92 +679,102 @@
                         </div>
                         <section class="v-card-list classes-groups content">
                             {% for subjectKey, subject in subjectGroup %}
-                            <div class="v-card">
 
-                                {% if subject.linkedToFolder %}
-                                <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
-                                {% endif %}
-                                    <div class="card-class-image"
-                                         style="border-bottom-width: 10px;
-                                                border-bottom-style: solid;
-                                                {% if subject.folder is defined and subject.folder.colour %}
-                                                background-color:{{ subject.folder.colour }};
-                                                border-bottom-color: {{ subject.folder.colour }};
-                                                {% endif %}
-                                                {% if subject.folder is defined and subject.folder.coverImage %}
-                                                background-image: url('/storage/image.php?hash={{ subject.folder.coverImage.hash }}&size=cardImageLarge');
-                                                background-size: cover;
-                                                background-repeat: no-repeat;
-                                                background-position: center;
-                                                {% endif %}"
-                                    >
-                                        <div class="related">
-                                            {# A card can't fit more than 5 subject teachers comfortably, so four are displayed,
-                                                with the remaining counted, and displayed in tool tip #}
-                                            {% set maxTeachersToShowCount = 4 %}
-                                            {% set teachersHead = subject.teachers[:maxTeachersToShowCount] %}
-                                            {% for teacher in teachersHead %}
-                                                <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="{{ teacher.formatName }}" />
-                                            {% endfor %}
-                                            {% set teachersTail = subject.teachers[maxTeachersToShowCount:] %}
-                                            {% if teachersTail|length %}
-                                                {% set subjectTeacherNames = '' %}
-                                                {% for teacher in teachersTail %}
-                                                    {% if loop.index == teachersTail|length %}
-                                                        {% set subjectTeacherNames = subjectTeacherNames ~ teacher.formatName %}
-                                                    {% else %}
-                                                        {% set subjectTeacherNames = subjectTeacherNames ~ teacher.formatName ~ '<br/>' %}
-                                                    {% endif %}
-                                                {% endfor %}
-                                                {% set remainingSubjectTeachersCount = subject.teachers|length - maxTeachersToShowCount  %}
-                                                <div class="plus-more" data-tooltip class="hint has-tip tip-top" title="{{ subjectTeacherNames }}">+{{ remainingSubjectTeachersCount }}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                {% if subject.linkedToFolder %}
-                                </a>
-                                {% endif %}
+                                {# Suffix all iterated identifiers
+                                 # Tot menus and so on start exhibiting interrelated behaviour when they share the same id
+                                 # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
+                                 # taking advantage of a twig construct
+                                 #
+                                 # You have multiple subjects per subject group so you need further uniquification
+                                 #}
+                                {% set subjectIdentifier = loop.index %}
 
-                                {% set hasTeachersWithEmail = false %}
-                                {% for teacher in subject.teachers %}
-                                    {% if not teacher.email is empty %}
-                                        {% set hasTeachersWithEmail = true %}
+                                <div class="v-card">
+
+                                    {% if subject.linkedToFolder %}
+                                     <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
                                     {% endif %}
-                                {% endfor %}
-                                <div class="card-content classes actions-small-{{ hasTeachersWithEmail ? '1' : '0'}} {% block folderListItemClasses %}{% endblock %}">
-                                    <div class="list-item">
-                                        {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
+                                        <div class="card-class-image"
+                                             style="border-bottom-width: 10px;
+                                                    border-bottom-style: solid;
+                                                    {% if subject.folder is defined and subject.folder.colour %}
+                                                    background-color:{{ subject.folder.colour }};
+                                                    border-bottom-color: {{ subject.folder.colour }};
+                                                    {% endif %}
+                                                    {% if subject.folder is defined and subject.folder.coverImage %}
+                                                    background-image: url('/storage/image.php?hash={{ subject.folder.coverImage.hash }}&size=cardImageLarge');
+                                                    background-size: cover;
+                                                    background-repeat: no-repeat;
+                                                    background-position: center;
+                                                    {% endif %}"
+                                        >
+                                            <div class="related">
+                                                {# A card can't fit more than 5 subject teachers comfortably, so four are displayed,
+                                                    with the remaining counted, and displayed in tool tip #}
+                                                {% set maxTeachersToShowCount = 4 %}
+                                                {% set teachersHead = subject.teachers[:maxTeachersToShowCount] %}
+                                                {% for teacher in teachersHead %}
+                                                    <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="{{ teacher.formatName }}" />
+                                                {% endfor %}
+                                                {% set teachersTail = subject.teachers[maxTeachersToShowCount:] %}
+                                                {% if teachersTail|length %}
+                                                    {% set subjectTeacherNames = '' %}
+                                                    {% for teacher in teachersTail %}
+                                                        {% if loop.index == teachersTail|length %}
+                                                            {% set subjectTeacherNames = subjectTeacherNames ~ teacher.formatName %}
+                                                        {% else %}
+                                                            {% set subjectTeacherNames = subjectTeacherNames ~ teacher.formatName ~ '<br/>' %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    {% set remainingSubjectTeachersCount = subject.teachers|length - maxTeachersToShowCount  %}
+                                                    <div class="plus-more" data-tooltip class="hint has-tip tip-top" title="{{ subjectTeacherNames }}">+{{ remainingSubjectTeachersCount }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% if subject.linkedToFolder %}
+                                    </a>
+                                    {% endif %}
 
-                                        {% if subject.linkedToFolder %}
-                                            <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
+                                    {% set hasTeachersWithEmail = false %}
+                                    {% for teacher in subject.teachers %}
+                                        {% if not teacher.email is empty %}
+                                            {% set hasTeachersWithEmail = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    <div class="card-content classes actions-small-{{ hasTeachersWithEmail ? '1' : '0'}} {% block folderListItemClasses %}{% endblock %}">
+                                        <div class="list-item">
+                                            {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
+
+                                            {% if subject.linkedToFolder %}
+                                                <a href="/homepage/code/{{ subject.folder.matchedCode|e('url')|e('url')|e('url') }}">
+                                                    <h3>{{ subject.name }}</h3>
+                                                    {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
+                                                </a>
+                                            {% else %}
                                                 <h3>{{ subject.name }}</h3>
                                                 {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
-                                            </a>
-                                        {% else %}
-                                            <h3>{{ subject.name }}</h3>
-                                            {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
+                                            {% endif %}
+                                        </div>
+                                        {% block folderListItemActions %}{% endblock %}
+                                        {% if hasTeachersWithEmail %}
+                                            <nav>
+                                                <a class="icon-more" data-dropdown="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}" title="Actions"></a>
+                                            </nav>
+                                            <ul id="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}" class="f-dropdown" data-dropdown-content>
+                                                {% for teacher in subject.teachers %}
+                                                    {% if not teacher.email is empty %}
+                                                        <li>
+                                                            {% set replyTo = teacher.getFormattedEmailDisplay %}
+                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ teacher.formatName }}</a>
+                                                        </li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
                                         {% endif %}
                                     </div>
-                                    {% block folderListItemActions %}{% endblock %}
-                                    {% if hasTeachersWithEmail %}
-                                        <nav>
-                                            <a class="icon-more" data-dropdown="class-options-{{ dropdownOptionsID }}" title="Actions"></a>
-                                        </nav>
-                                        <ul id="class-options-{{ dropdownOptionsID }}" class="f-dropdown" data-dropdown-content>
-                                            {% for teacher in subject.teachers %}
-                                                {% if not teacher.email is empty %}
-                                                    <li>
-                                                        {% set replyTo = teacher.getFormattedEmailDisplay %}
-                                                        <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ teacher.formatName }}</a>
-                                                    </li>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </ul>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </section>
+                                 </div>
+                            {% endfor %}
+                        </section>
                     {% endfor %}
                 </section>
             </div>
