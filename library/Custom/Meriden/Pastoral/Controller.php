@@ -144,15 +144,28 @@ class Controller extends Base
     {
         try {
             $reportData = $this->buildReportData($year, $student, $subjectCode);
-            /** @var StudentInvolvement\Subject $subjectReport */
+
+            // Is this the lateral learning or the subject variant?
+            /** @var StudentInvolvement\Subject|null $subjectReport */
             $subjectReport = $reportData['report']['subjectReport'];
-            $this->getResponse()->content->set(
+            /** @var StudentInvolvement\LateralLearning|null $lateralLearningReport */
+            $lateralLearningReport = $reportData['report']['lateralLearningReport'];
+
+            if ($subjectReport) {
+                $title    = $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName();
+                $template = '@customMeridenPastoral/subject.twig';
+            } elseif ($lateralLearningReport) {
+                $title    = $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName();
+                $template = '@customMeridenPastoral/lateralLearning.twig';
+            } else {
+                $this->response->status->setCode(404);
+                return;
+            }
+            $this->response->content->set(
                 [
-                    'template' => $subjectReport->isLateralLearning()
-                        ? '@customMeridenPastoral/lateralLearning.twig'
-                        : '@customMeridenPastoral/subject.twig',
+                    'template' => $template,
                     'data'     => $reportData,
-                    'title'    => $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName(),
+                    'title'    => $title,
                 ]
             );
         } catch (RangeException $e) {
