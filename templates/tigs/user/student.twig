@@ -29,9 +29,22 @@
 
 {% block folderListItemActions %}
     {% set routeSubjectReport = routeLookupIfAuthorized('tigsSubjectReport.getReport', { userId: user.id, user: user, folderId: subject.folder.id, folder: subject.folder }) %}
-    {% if routeSubjectReport %}
-        <nav>
-            <a class="icon-report" href="{{ routeSubjectReport }}" title="Subject Report"></a>
-        </nav>
-    {% endif %}
+    <nav>
+        <a class="icon-more" data-dropdown="class-options-{{ dropdownOptionsID }}" title="Actions"></a>
+    </nav>
+    <ul id="class-options-{{ dropdownOptionsID }}" class="f-dropdown" data-dropdown-content>
+        {% if routeSubjectReport %}
+            <li><a class="icon-report" href="{{ routeSubjectReport }}" title="Subject Report">Subject Report</a></li>
+        {% endif %}
+        {% if hasTeachersWithEmail %}
+        {% for teacher in subject.teachers %}
+            {% if not teacher.email is empty %}
+                <li>
+                    {% set replyTo = teacher.getFormattedEmailDisplay %}
+                    <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ teacher.formatName }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        {% endif %}
+    </ul>
 {% endblock %}
