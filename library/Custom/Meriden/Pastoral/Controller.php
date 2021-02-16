@@ -232,22 +232,30 @@ class Controller extends Base
             }
 
             // Augment the reports with proper data
-            if ($subject instanceof Subject\LateralLearning) {
-                $subject = $this->studentInvolvementFactory->buildLateralLearning(
-                    $year,
-                    $student,
-                    $subjectCode,
-                    $subjectList,
-                    $roleTypeOverride
-                );
-            } else {
-                $subject = $this->getStudentInvolvementFactory()->buildSubject(
-                    $year,
-                    $student,
-                    $subjectCode,
-                    $roleTypeOverride
-                );
-            }
+            $subject = $this->getStudentInvolvementFactory()->buildSubject(
+                $year,
+                $student,
+                $subjectCode,
+                $subjectList,
+                $roleTypeOverride
+            );
+//            if ($subject instanceof Subject\LateralLearning) {
+//                $subject = $this->studentInvolvementFactory->buildLateralLearning(
+//                    $year,
+//                    $student,
+//                    $subjectCode,
+//                    $subjectList,
+//                    $roleTypeOverride
+//                );
+//            } else {
+//                $subject = $this->getStudentInvolvementFactory()->buildSubject(
+//                    $year,
+//                    $student,
+//                    $subjectCode,
+//                    $subjectList,
+//                    $roleTypeOverride
+//                );
+//            }
         }
         return [
             'report' => [
