@@ -68,12 +68,12 @@
                 </div>
             {% endif %}
 
-            {# Rank only relevant to HSC students
-             #}
-            {% if rankData.cohortRank is defined and attributes.isHsc %}
-                <div class="result-item hsc-rank-rank">
-                    <span class="result-heading">Rank{% if hasInterimGrades %}*{% endif %}</span><br />
-                    <span class="result-value">{{ rankData.cohortRank|default('-') }}</span>
+            {% if nesa.grade %}
+                <div class="result-group {% if nesa.error|default(false) %} error{% endif %}">
+                    <div class="result-item nesa-grade">
+                        <span class="result-heading">NESA Grade</span><br />
+                        <span class="result-value">{{ nesa.grade|default('-') }}</span>
+                    </div>
                 </div>
             {% endif %}
         </div>

@@ -166,19 +166,26 @@ Data:
                                     {# If we're in semester 2, try loading semester 2 NESA data. If there's something here
                                      # then use that data to inform the NESA Grade and subject comment
                                      #
-                                     # Otherwise look for summative data in the rankData struct
+                                     # Else if we're in semester 2, but there's no semester 2 NESA data,
+                                     # Look at semester 1 and see if there's semester 1 NES data there
+                                     # They want to display the previous NESA grade here
                                      #
-                                     # Otherwise look for formative data in the task marks data struct and use that
+                                     # Else look for summative data in the rankData struct. If there's nothing
+                                     # here, go dig around in the formative data struct.
+                                     #
+                                     # Else look for formative data in the task marks data struct and use that
                                      # to inform the grey boxes' values and subject comment
                                      #
                                      # ----
                                      #
+                                     #
                                      # If we're in semester 1, try loading semester 1 NESA data. If there's something here
                                      # then use that data to inform the NESA Grade and subject comment
                                      #
-                                     # Otherwise look for summative data in the rankData struct
+                                     # Else look for summative data in the rankData struct. If there's nothing
+                                     # here, go dig around in the formative data struct.
                                      #
-                                     # Otherwise look for formative data in the task marks data struct and use that
+                                     # Else look for formative data in the task marks data struct and use that
                                      # to inform the grey boxes' values and subject comment
                                      #}
                                     {% if attributes.curriculumSemester == 2 and folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.data.2.comment|length %}
@@ -186,6 +193,11 @@ Data:
                                         {% set nesaSemester = 2 %}
                                         {% set nesaError = folderData.nesaGraphData.data.2.error %}
                                         {% set comment = folderData.nesaGraphData.data.2.comment.comment %}
+                                    {% elseif attributes.curriculumSemester == 2 and folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment|length %}
+                                        {% set nesaGrade = folderData.nesaGraphData.data.1.studentMark %}
+                                        {% set nesaSemester = 1 %}
+                                        {% set nesaError = folderData.nesaGraphData.data.1.error %}
+                                        {% set comment = folderData.nesaGraphData.data.1.comment.comment %}
                                     {% elseif attributes.curriculumSemester == 1 and folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment|length %}
                                         {% set nesaGrade = folderData.nesaGraphData.data.1.studentMark %}
                                         {% set nesaSemester = 1 %}
