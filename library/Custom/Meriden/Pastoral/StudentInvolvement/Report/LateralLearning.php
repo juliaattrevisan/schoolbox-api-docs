@@ -5,7 +5,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement;
+namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
 
 use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
@@ -14,7 +14,7 @@ use Schoolbox\Assessment\Rubric\RowSet;
 /**
  * Representation of report data for a lateral learning subject.
  */
-class LateralLearning extends Involvement
+class LateralLearning extends Base
 {
     /**
      * Regular expression for lateral learning capabilities: used to identify if

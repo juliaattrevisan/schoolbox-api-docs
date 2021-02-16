@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace Custom\Meriden\Pastoral\CommandLineTool;
 
 use Aura\Router\Router;
-use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
-use Custom\Meriden\Pastoral\StudentInvolvement\Subject;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Factory;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject;
 use Schoolbox\User;
 use Zend\Uri\UriInterface;
 
