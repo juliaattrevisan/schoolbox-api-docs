@@ -15,7 +15,6 @@ use ArrayAccess;
 use InvalidArgumentException;
 use ArrayIterator;
 use ICollection;
-use JsonSerializable;
 
 class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
 {
