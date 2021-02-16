@@ -12,8 +12,7 @@ namespace Custom\Meriden\Pastoral;
 
 use Alaress\Web\Controller\Base;
 use Custom\Meriden\Pastoral\StudentInvolvement\Report\Factory;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\LateralLearning;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\Standard;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject;
 use Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup;
 use RangeException;
 use Schoolbox\Role;
@@ -107,7 +106,7 @@ class Controller extends Base
 
         $subjectReportDataList = [];
         foreach ($baseReportData['report']['subjectList'] as $subject) {
-            /** @var Standard $subject */
+            /** @var Subject\Standard $subject */
             try {
                 $subjectReportDataList[$subject->getSubjectCode()] = $this->buildReportData(
                     $year,
@@ -146,9 +145,9 @@ class Controller extends Base
             $reportData = $this->buildReportData($year, $student, $subjectCode);
 
             // Is this the lateral learning or the subject variant?
-            /** @var Standard|null $subjectReport */
+            /** @var Subject\Standard|null $subjectReport */
             $subjectReport = $reportData['report']['subjectReport'];
-            /** @var LateralLearning|null $lateralLearningReport */
+            /** @var Subject\LateralLearning|null $lateralLearningReport */
             $lateralLearningReport = $reportData['report']['lateralLearningReport'];
 
             if ($subjectReport) {
@@ -193,7 +192,6 @@ class Controller extends Base
         $tutorGroupList   = $this->retrieveTutorGroupList($student);
         $subject          = null;
         $subjectList      = $this->getStudentInvolvementFactory()->buildSubjectList($year, $student);
-        $lateralLearning  = null;
         $roleTypeOverride = null;
         $roleTypes        = Role::getRoleTypes();
 
@@ -233,11 +231,9 @@ class Controller extends Base
                 throw new RangeException("Student was not in subject $subjectCode in $year");
             }
 
-            // TODO maybe subject shouldn't be in lateral learning?
-            if ($subject instanceof LateralLearning) {
-                // Exchange the subject report for a lateral learning report
-                $subject         = null;
-                $lateralLearning = $this->studentInvolvementFactory->buildLateralLearning(
+            // Augment the reports with proper data
+            if ($subject instanceof Subject\LateralLearning) {
+                $subject = $this->studentInvolvementFactory->buildLateralLearning(
                     $year,
                     $student,
                     $subjectCode,
@@ -245,7 +241,6 @@ class Controller extends Base
                     $roleTypeOverride
                 );
             } else {
-                // Augment the subject report with proper data
                 $subject = $this->getStudentInvolvementFactory()->buildSubject(
                     $year,
                     $student,
@@ -256,14 +251,13 @@ class Controller extends Base
         }
         return [
             'report' => [
-                'year'                  => $year,
-                'student'               => $student,
-                'tutorGroupReport'      => $tutorGroup,
-                'subjectReport'         => $subject,
-                'lateralLearningReport' => $lateralLearning,
-                'tutorGroupList'        => $tutorGroupList,
-                'subjectList'           => $subjectList,
-                'roleTypeOverride'      => $roleTypeOverride,
+                'year'             => $year,
+                'student'          => $student,
+                'tutorGroupReport' => $tutorGroup,
+                'subjectReport'    => $subject,
+                'tutorGroupList'   => $tutorGroupList,
+                'subjectList'      => $subjectList,
+                'roleTypeOverride' => $roleTypeOverride,
             ],
             'graphWidth' => $this->request->query->getInt('graph-width'),
         ];
