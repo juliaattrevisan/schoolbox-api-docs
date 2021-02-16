@@ -223,6 +223,7 @@ Data:
                                                          # Keep looking until there aren't any records more recent
                                                          #}
                                                         {% if taskMarks.publishAt > mostRecentData.publishAt or mostRecentData is null %}
+                                                            {% set mostRecentData = taskMarks %}
                                                             {% set comment = taskMarks.comment %}
                                                         {% endif %}
                                                     {% endif %}
@@ -250,6 +251,7 @@ Data:
                                                          # Keep looking until there aren't any records more recent
                                                          #}
                                                         {% if taskMarks.publishAt > mostRecentData.publishAt or mostRecentData is null %}
+                                                            {% set mostRecentData = taskMarks %}
                                                             {% set comment = taskMarks.comment %}
                                                         {% endif %}
                                                     {% endif %}
