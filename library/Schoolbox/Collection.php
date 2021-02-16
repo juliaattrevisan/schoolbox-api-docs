@@ -15,10 +15,17 @@ use ArrayAccess;
 use InvalidArgumentException;
 use ArrayIterator;
 use ICollection;
-use JsonSerializable;
 
 class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
 {
+
+    /**
+     * Consts corresponding to ordering
+     */
+    public const ORDER_ASCENDING = 'asc';
+    public const ORDER_DESCENDING = 'desc';
+
+
     /** @var array */
     protected $stack = array();
 
@@ -389,6 +396,43 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
         }
         return $parts;
     }
+
+
+    /**
+     * Sort naturally by $field
+     *
+     * It only works on homogenous collections containing models
+     * If it contains mixed data types it'll throw InvalidArgumentException
+     * though you could make it interpret mixed types with some more work on the idea
+     *
+     * @param string $field
+     * @param string $order
+     * @return $this
+     * @throws InvalidArgumentException
+     */
+    public function sortNaturally(string $field, string $order = self::ORDER_ASCENDING): Collection
+    {
+        $getter = $this->getGetMethodName($field);
+
+        /* Everything in the collection needs to be an object, for now
+         * You could expand it to comprehend a hybrid model/array collection
+         * but then you get 2x2x2 = 8 possible outcomes which is a lot
+         */
+        foreach ($this->getAll() as $current) {
+            if (!\is_object($current)) {
+                throw new \InvalidArgumentException('sortNaturally operates on objects only.');
+            }
+        }
+
+        return $this->sortByCallback(static function($a, $b) use ($getter, $order) {
+            if (self::ORDER_ASCENDING === strtolower($order)) {
+                return strnatcasecmp($a->$getter(), $b->$getter()) >= 1;
+            }
+
+            return strnatcasecmp($a->$getter(), $b->$getter()) < 1;
+        });
+    }
+
 
     /**
      * Sorts the collection by a field and a direction. If the field values are
