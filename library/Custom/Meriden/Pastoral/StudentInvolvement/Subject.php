@@ -19,6 +19,12 @@ use Schoolbox\User;
 class Subject extends Involvement
 {
     /**
+     * Regular expression for lateral learning class pages: used to identify if
+     * this subject should display as a lateral learning report.
+     */
+    private const LATERAL_LEARNING_CLASS_NAME_REGEX = '/Lateral\\s+Learning/i';
+
+    /**
      * Regular expression for lateral learning capabilities: used to identify if
      * this subject should display as a lateral learning report.
      */
@@ -100,21 +106,22 @@ class Subject extends Involvement
     /**
      * Is this subject a Lateral Learning report?
      *
-     * If the subject has a rubric rowset, and that rowset contains a capability
-     * that is lateral learning, then this shows the lateral learning report.
+     * If the subject's class page is named "Lateral Learning", then it's a
+     * lateral learning report.
      *
      * @return bool
      */
     public function isLateralLearning(): bool
     {
-        if ($this->rubricRowSet) {
-            foreach ($this->rubricRowSet->getCapabilities() as $capability) {
-                if ($this->isCapabilityLateralLearning($capability)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return (bool)preg_match(self::LATERAL_LEARNING_CLASS_NAME_REGEX, $this->folder->getName());
+//        if ($this->rubricRowSet) {
+//            foreach ($this->rubricRowSet->getCapabilities() as $capability) {
+//                if ($this->isCapabilityLateralLearning($capability)) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
     }
 
     /**
