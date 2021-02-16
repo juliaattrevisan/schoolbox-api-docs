@@ -239,12 +239,30 @@ class Factory
      *
      * @param int             $year
      * @param User            $student
+     * @param string          $subjectCode
      * @param array|Subject[] $subjectList      `$student`'s subjects in `$year`
      * @param string|null     $roleTypeOverride
      * @return Subject
      */
-    public function buildLateralLearning(int $year, User $student, array $subjectList, ?string $roleTypeOverride): Subject
-    {
+    public function buildLateralLearning(
+        int $year,
+        User $student,
+        string $subjectCode,
+        array $subjectList,
+        ?string $roleTypeOverride
+    ): Subject {
+        // Need a course description
+        $lateralLearning = new LateralLearning();
+        $externalData    = $this->gateway->getSubject($year, $subjectCode);
+        $lateralLearning
+            ->setName($externalData['sub_desc'])
+            ->setDescription($externalData['outline_text'])
+//            ->setTeachers($externalData['teachers'])
+            ->setStudent($student)
+            ->setYear($year)
+            ->setSubjectCode($subjectCode);
+
+
         // Put together all the stuff for the lateral learning report
         $publishedOnly = !$this->doesDraftFeedbackContribute($year);
 
