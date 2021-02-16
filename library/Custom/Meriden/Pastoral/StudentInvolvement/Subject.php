@@ -9,11 +9,7 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
-use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
-use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model;
-use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\User;
 
 class Subject extends Involvement
@@ -23,12 +19,6 @@ class Subject extends Involvement
      * this subject should display as a lateral learning report.
      */
     private const LATERAL_LEARNING_CLASS_NAME_REGEX = '/Lateral\\s+Learning/i';
-
-    /**
-     * Regular expression for lateral learning capabilities: used to identify if
-     * this subject should display as a lateral learning report.
-     */
-    public const LATERAL_LEARNING_CAPABILITY_REGEX = '/Lateral\\s+Learning\\s+Skills/i';
 
     /**
      * External data (class name and description)

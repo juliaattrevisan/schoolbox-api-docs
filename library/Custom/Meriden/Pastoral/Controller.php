@@ -12,6 +12,7 @@ namespace Custom\Meriden\Pastoral;
 
 use Alaress\Web\Controller\Base;
 use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
+use Custom\Meriden\Pastoral\StudentInvolvement\LateralLearning;
 use Custom\Meriden\Pastoral\StudentInvolvement\Subject;
 use Custom\Meriden\Pastoral\StudentInvolvement\TutorGroup;
 use RangeException;
@@ -219,7 +220,8 @@ class Controller extends Base
                 throw new RangeException("Student was not in subject $subjectCode in $year");
             }
 
-            if ($subject->isLateralLearning()) {
+            // TODO maybe subject shouldn't be in lateral learning?
+            if ($subject instanceof LateralLearning) {
                 // Exchange the subject report for a lateral learning report
                 $subject         = null;
                 $lateralLearning = $this->studentInvolvementFactory->buildLateralLearning(
