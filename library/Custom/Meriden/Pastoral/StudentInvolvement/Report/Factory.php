@@ -188,10 +188,14 @@ class Factory
         array $subjectList,
         ?string $roleTypeOverride
     ): Subject\Base {
-        if (self::isSubjectLateralLearning($subjectCode)) {
-            return $this->buildLateralLearning($year, $student, $subjectCode, $subjectList, $roleTypeOverride);
+        $externalData = $this->gateway->getSubject($year, $subjectCode);
+
+        // external data not guaranteed to contain a description
+
+        if (self::isSubjectLateralLearning($externalData['sub_desc'])) {
+            return $this->buildLateralLearning($externalData, $year, $student, $subjectCode, $subjectList, $roleTypeOverride);
         }
-        return $this->buildStandard($year, $student, $subjectCode, $roleTypeOverride);
+        return $this->buildStandard($externalData, $year, $student, $subjectCode, $roleTypeOverride);
     }
 
     /**
@@ -200,20 +204,21 @@ class Factory
      *
      * This is used as a data store for the eReport's standard subject page.
      *
+     * @param array       $externalData
      * @param int         $year
      * @param User        $student
      * @param string      $subjectCode
      * @param string|null $roleTypeOverride
      * @return Standard
      */
-    public function buildStandard(
+    private function buildStandard(
+        array $externalData,
         int $year,
         User $student,
         string $subjectCode,
         ?string $roleTypeOverride
     ): Standard {
         $subject      = new Standard();
-        $externalData = $this->gateway->getSubject($year, $subjectCode);
         $externalData = $this->augmentSubjectWithTeacher($externalData);
         $subject
             ->setName($externalData['sub_desc'])
@@ -269,6 +274,7 @@ class Factory
      *
      * This is used as a data store for the lateral learning eReport.
      *
+     * @param array          $externalData
      * @param int            $year
      * @param User           $student
      * @param string         $subjectCode
@@ -277,6 +283,7 @@ class Factory
      * @return LateralLearning
      */
     private function buildLateralLearning(
+        array $externalData,
         int $year,
         User $student,
         string $subjectCode,
@@ -285,7 +292,6 @@ class Factory
     ): LateralLearning {
         // Need a course description
         $lateralLearning = new LateralLearning();
-        $externalData    = $this->gateway->getSubject($year, $subjectCode);
         $lateralLearning
             ->setName($externalData['sub_desc'])
             ->setDescription($externalData['outline_text'])
