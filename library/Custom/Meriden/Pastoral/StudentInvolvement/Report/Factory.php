@@ -9,9 +9,8 @@ namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
 
 use Alaress\Statistics\Statistics;
 use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\LateralLearning;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\LateralLearning;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\Standard;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -179,11 +178,11 @@ class Factory
      * @param string      $subjectCode
      * @param string|null $roleTypeOverride
      *
-     * @return Subject
+     * @return Standard
      */
     public function buildSubject($year, User $student, $subjectCode, ?string $roleTypeOverride)
     {
-        $subject      = new Subject();
+        $subject      = new Standard();
         $externalData = $this->gateway->getSubject($year, $subjectCode);
         $externalData = $this->augmentSubjectWithTeacher($externalData);
         $subject
@@ -245,11 +244,11 @@ class Factory
      *
      * This is used as a data store for the lateral learning eReport.
      *
-     * @param int             $year
-     * @param User            $student
-     * @param string          $subjectCode
-     * @param array|Subject[] $subjectList      `$student`'s subjects in `$year`
-     * @param string|null     $roleTypeOverride
+     * @param int              $year
+     * @param User             $student
+     * @param string           $subjectCode
+     * @param array|Standard[] $subjectList `$student`'s subjects in `$year`
+     * @param string|null      $roleTypeOverride
      * @return LateralLearning
      */
     public function buildLateralLearning(
@@ -333,7 +332,7 @@ class Factory
      * @param int  $year
      * @param User $student
      *
-     * @return array|Subject[]
+     * @return array|Subject\Base[]
      */
     public function buildSubjectList($year, User $student)
     {
@@ -353,7 +352,7 @@ class Factory
                     ->setYear($row['yr_study'])
                     ->setSubjectCode($row['code']);
             } else {
-                $subject = new Subject();
+                $subject = new Standard();
                 $subject
                     ->setName($row['sub_desc'])
                     ->setStudent($student)
