@@ -179,6 +179,7 @@ class Controller extends Base
         $tutorGroupList   = $this->retrieveTutorGroupList($student);
         $subject          = null;
         $subjectList      = $this->getStudentInvolvementFactory()->buildSubjectList($year, $student);
+        $lateralLearning  = null;
         $roleTypeOverride = null;
         $roleTypes        = Role::getRoleTypes();
 
@@ -220,7 +221,8 @@ class Controller extends Base
 
             if ($subject->isLateralLearning()) {
                 // Exchange the subject report for a lateral learning report
-                $subject = $this->studentInvolvementFactory->buildLateralLearning(
+                $subject         = null;
+                $lateralLearning = $this->studentInvolvementFactory->buildLateralLearning(
                     $year,
                     $student,
                     $subjectCode,
@@ -239,13 +241,14 @@ class Controller extends Base
         }
         return [
             'report' => [
-                'year'             => $year,
-                'student'          => $student,
-                'tutorGroupReport' => $tutorGroup,
-                'subjectReport'    => $subject,
-                'tutorGroupList'   => $tutorGroupList,
-                'subjectList'      => $subjectList,
-                'roleTypeOverride' => $roleTypeOverride,
+                'year'                  => $year,
+                'student'               => $student,
+                'tutorGroupReport'      => $tutorGroup,
+                'subjectReport'         => $subject,
+                'lateralLearningReport' => $lateralLearning,
+                'tutorGroupList'        => $tutorGroupList,
+                'subjectList'           => $subjectList,
+                'roleTypeOverride'      => $roleTypeOverride,
             ],
             'graphWidth' => $this->request->query->getInt('graph-width'),
         ];
