@@ -173,15 +173,45 @@ class Factory
      *
      * This is used as a data store for the subject eReport.
      *
+     * @param int            $year
+     * @param User           $student
+     * @param string         $subjectCode
+     * @param Subject\Base[] $subjectList     `$student`'s subjects in `$year`
+     * @param string|null    $roleTypeOverride
+     *
+     * @return Subject\Base
+     */
+    public function buildSubject(
+        int $year,
+        User $student,
+        string $subjectCode,
+        array $subjectList,
+        ?string $roleTypeOverride
+    ): Subject\Base {
+        if (self::isSubjectLateralLearning($subjectCode)) {
+            return $this->buildLateralLearning($year, $student, $subjectCode, $subjectList, $roleTypeOverride);
+        }
+        return $this->buildStandard($year, $student, $subjectCode, $roleTypeOverride);
+    }
+
+    /**
+     * Builds a report object for the subject report for a given year, student
+     * and subject code.
+     *
+     * This is used as a data store for the eReport's standard subject page.
+     *
      * @param int         $year
      * @param User        $student
      * @param string      $subjectCode
      * @param string|null $roleTypeOverride
-     *
      * @return Standard
      */
-    public function buildSubject($year, User $student, $subjectCode, ?string $roleTypeOverride)
-    {
+    public function buildStandard(
+        int $year,
+        User $student,
+        string $subjectCode,
+        ?string $roleTypeOverride
+    ): Standard {
         $subject      = new Standard();
         $externalData = $this->gateway->getSubject($year, $subjectCode);
         $externalData = $this->augmentSubjectWithTeacher($externalData);
@@ -230,28 +260,23 @@ class Factory
             $subject->setNamedGrade('courseGrade', $courseGrade);
         }
 
-//        // Add the rubric rowset, if there is an actual folder
-//        if ($subject->getFolder() && $subject->getFolder()->getId()) {
-//            $subject->setRubricRowSet($this->rubricMapper->retrieveRowSet($subject->getFolder(), false));
-//        }
-
         return $subject;
     }
 
     /**
-     * Builds a Subject object for the lateral learning report for a given year
+     * Builds a report object for the lateral learning report for a given year
      * and student.
      *
      * This is used as a data store for the lateral learning eReport.
      *
-     * @param int              $year
-     * @param User             $student
-     * @param string           $subjectCode
-     * @param array|Standard[] $subjectList `$student`'s subjects in `$year`
-     * @param string|null      $roleTypeOverride
+     * @param int            $year
+     * @param User           $student
+     * @param string         $subjectCode
+     * @param Subject\Base[] $subjectList `$student`'s subjects in `$year`
+     * @param string|null    $roleTypeOverride
      * @return LateralLearning
      */
-    public function buildLateralLearning(
+    private function buildLateralLearning(
         int $year,
         User $student,
         string $subjectCode,
