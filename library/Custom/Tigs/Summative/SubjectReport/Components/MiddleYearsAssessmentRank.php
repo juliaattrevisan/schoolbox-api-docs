@@ -16,7 +16,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnexpectedValueException;
