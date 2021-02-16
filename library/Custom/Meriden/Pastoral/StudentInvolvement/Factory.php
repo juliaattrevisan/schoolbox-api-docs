@@ -16,6 +16,7 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Permission\Access\UserAccess;
@@ -227,6 +228,49 @@ class Factory
         }
 
         return $subject;
+    }
+
+    /**
+     * Builds a Subject object for the lateral learning report for a given year
+     * and student.
+     *
+     * This is used as a data store for the lateral learning eReport.
+     *
+     * @param int             $year
+     * @param User            $student
+     * @param array|Subject[] $subjectList      `$student`'s subjects in `$year`
+     * @param string|null     $roleTypeOverride
+     * @return Subject
+     */
+    public function buildLateralLearning(int $year, User $student, array $subjectList, ?string $roleTypeOverride): Subject
+    {
+        // Put together all the stuff for the lateral learning report
+        $publishedOnly = !$this->doesDraftFeedbackContribute($year);
+        foreach ($subjectList as $subject) {
+            // Fetch all assessments for subject
+            $folderWithGrades = $this->getFolderWithGrades(
+                $subject->getSubjectCode(),
+                $student,
+                $publishedOnly,
+                $roleTypeOverride
+            );
+
+            /** @var Folder $folder */
+            $folder = $folderWithGrades['folder'];
+            foreach ($folderWithGrades['grades'] as $grade) {
+                /** @var IAssessable $assessment */
+                $assessment = $grade['assessment'];
+                new \Alaress_Probe($folder->getTitle(), $assessment->getTitle());
+            }
+        }
+
+        // Just so the interface is fulfilled: return the report for the LL subject
+        foreach ($subjectList as $subject) {
+            if ($subject->isLateralLearning()) {
+                return $this->buildSubject($year, $student, $subject->getSubjectCode(), $roleTypeOverride);
+            }
+        }
+        throw new \RangeException("Student was not in a lateral learning class in $year");
     }
 
     /**
