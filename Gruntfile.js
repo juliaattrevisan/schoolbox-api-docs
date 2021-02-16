@@ -2,9 +2,6 @@ const sass  = require('sass');
 const jsSrc = {
     main: [
 
-        // Fastclick
-        'www/javascript/components/fastclick/lib/fastclick.js',
-
         // jQuery
         'www/javascript/components/jquery/dist/jquery.js',
 
