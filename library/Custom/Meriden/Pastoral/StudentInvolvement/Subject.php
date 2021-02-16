@@ -113,7 +113,8 @@ class Subject extends Involvement
      */
     public function isLateralLearning(): bool
     {
-        return (bool)preg_match(self::LATERAL_LEARNING_CLASS_NAME_REGEX, $this->folder->getName());
+        return (bool)preg_match(self::LATERAL_LEARNING_CLASS_NAME_REGEX, $this->getName());
+//        return (bool)preg_match(self::LATERAL_LEARNING_CLASS_NAME_REGEX, $this->folder->getName());
 //        if ($this->rubricRowSet) {
 //            foreach ($this->rubricRowSet->getCapabilities() as $capability) {
 //                if ($this->isCapabilityLateralLearning($capability)) {
