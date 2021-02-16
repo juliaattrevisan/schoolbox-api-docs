@@ -9,17 +9,10 @@
 
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
-use Schoolbox\Assessment\Rubric\RowSet;
 use Schoolbox\User;
 
 class Subject extends Involvement
 {
-    /**
-     * Regular expression for lateral learning class pages: used to identify if
-     * this subject should display as a lateral learning report.
-     */
-    private const LATERAL_LEARNING_CLASS_NAME_REGEX = '/Lateral\\s+Learning/i';
-
     /**
      * External data (class name and description)
      *
@@ -33,11 +26,6 @@ class Subject extends Involvement
      * @var array|User[]
      */
     protected $teachers;
-
-    /**
-     * This subject's rubric rowset, if it has one.
-     */
-    private ?RowSet\RowSet $rubricRowSet;
 
     /**
      * @return array
@@ -75,34 +63,5 @@ class Subject extends Involvement
     {
         $this->teachers = $teachers;
         return $this;
-    }
-
-    /**
-     * @return RowSet\RowSet|null
-     */
-    public function getRubricRowSet(): ?RowSet\RowSet
-    {
-        return $this->rubricRowSet;
-    }
-
-    /**
-     * @param RowSet\RowSet|null $rubricRowSet
-     */
-    public function setRubricRowSet(?RowSet\RowSet $rubricRowSet): void
-    {
-        $this->rubricRowSet = $rubricRowSet;
-    }
-
-    /**
-     * Is this subject a Lateral Learning report?
-     *
-     * If the subject's class page is named "Lateral Learning", then it's a
-     * lateral learning report.
-     *
-     * @return bool
-     */
-    public function isLateralLearning(): bool
-    {
-        return (bool)preg_match(self::LATERAL_LEARNING_CLASS_NAME_REGEX, $this->getName());
     }
 }
