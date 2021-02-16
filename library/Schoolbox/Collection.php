@@ -23,8 +23,8 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     /**
      * Consts corresponding to ordering
      */
-    private const ORDER_ASCENDING = 'asc';
-    private const ORDER_DESCENDING = 'desc';
+    public const ORDER_ASCENDING = 'asc';
+    public const ORDER_DESCENDING = 'desc';
 
 
     /** @var array */
