@@ -201,9 +201,24 @@ class Factory
         $folder = $folderWithGrades['folder'];
 
         if (self::isSubjectLateralLearning($folder->getName())) {
-            return $this->buildLateralLearning($externalData, $year, $student, $subjectCode, $subjectList, $roleTypeOverride);
+            return $this->buildLateralLearning(
+                $externalData,
+                $folder,
+                $year,
+                $student,
+                $subjectCode,
+                $subjectList,
+                $roleTypeOverride,
+            );
         }
-        return $this->buildStandard($externalData, $year, $student, $subjectCode, $roleTypeOverride);
+        return $this->buildStandard(
+            $externalData,
+            $folder,
+            $folderWithGrades['grades'],
+            $year,
+            $student,
+            $subjectCode,
+        );
     }
 
     /**
@@ -212,19 +227,21 @@ class Factory
      *
      * This is used as a data store for the eReport's standard subject page.
      *
-     * @param array       $externalData
-     * @param int         $year
-     * @param User        $student
-     * @param string      $subjectCode
-     * @param string|null $roleTypeOverride
+     * @param array   $externalData
+     * @param Folder  $folder
+     * @param array   $grades
+     * @param int     $year
+     * @param User    $student
+     * @param string  $subjectCode
      * @return Standard
      */
     private function buildStandard(
         array $externalData,
+        Folder $folder,
+        array $grades,
         int $year,
         User $student,
-        string $subjectCode,
-        ?string $roleTypeOverride
+        string $subjectCode
     ): Standard {
         $subject      = new Standard();
         $externalData = $this->augmentSubjectWithTeacher($externalData);
@@ -237,12 +254,11 @@ class Factory
             ->setSubjectCode($subjectCode);
 
         // Add grades for the class page
-        $publishedOnly    = !$this->doesDraftFeedbackContribute($year);
-        $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student, $publishedOnly, $roleTypeOverride);
+        $publishedOnly = !$this->doesDraftFeedbackContribute($year);
         $subject
-            ->setFolder($folderWithGrades['folder'])
-            ->setCohortFolders($this->getCohortFolders($folderWithGrades['folder'], $subjectCode))
-            ->setGrades($folderWithGrades['grades'])
+            ->setFolder($folder)
+            ->setCohortFolders($this->getCohortFolders($folder, $subjectCode))
+            ->setGrades($grades)
             ->moveToNamedGrade('courseGrade', 'Course Grade')
             ->moveToNamedGrade('endeavourGrades', 'Endeavour Grades')
             ->moveToNamedGrade('endeavourGrade1', 'Endeavour Grade Term 1')
@@ -283,6 +299,7 @@ class Factory
      * This is used as a data store for the lateral learning eReport.
      *
      * @param array          $externalData
+     * @param Folder         $folder
      * @param int            $year
      * @param User           $student
      * @param string         $subjectCode
@@ -292,6 +309,7 @@ class Factory
      */
     private function buildLateralLearning(
         array $externalData,
+        Folder $folder,
         int $year,
         User $student,
         string $subjectCode,
@@ -305,7 +323,8 @@ class Factory
             ->setDescription($externalData['outline_text'])
             ->setStudent($student)
             ->setYear($year)
-            ->setSubjectCode($subjectCode);
+            ->setSubjectCode($subjectCode)
+            ->setFolder($folder);
 
 
         // Put together all the stuff for the lateral learning report
