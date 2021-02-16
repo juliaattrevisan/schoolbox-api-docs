@@ -34,11 +34,10 @@
 {% endif %}
 
 {# Special conditions for middle year, semester 1 NESA data
- # If you're in semester 2, don't show semester 1's NESA data by mistake
  #}
-{% if attributes.isMiddleYear and nesaSemester == 1 %}
+{% if attributes.isMiddleYear %}
 
-    {% if attributes.curriculumSemester == 1 %}
+    {% if attributes.curriculumSemester == 1 and nesaSemester == 1 %}
 
         {# Special case for Middle Years and it's currently Semester 1
          # They won't show any Formative grey boxes if there's a NESA Grade for semester 1
@@ -68,7 +67,12 @@
                 </div>
             {% endif %}
 
-            {% if nesa.grade %}
+            {# Only show the previous semester's NESA grade when:
+             # - you're in semester 2
+             # - a semester 1 nesa grade exists
+             # - hasInterimGrades is false because you haven't started sem 2 formative evaluations
+             #}
+            {% if nesa.grade and not hasInterimGrades %}
                 <div class="result-group {% if nesa.error|default(false) %} error{% endif %}">
                     <div class="result-item nesa-grade">
                         <span class="result-heading">NESA Grade</span><br />
