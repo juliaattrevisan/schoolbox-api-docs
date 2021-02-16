@@ -32,6 +32,12 @@ class Factory
     private const WORK_TYPE_ASSESSMENT_TASK = 1;
 
     /**
+     * Regular expression for lateral learning class pages: used to identify if
+     * a subject page should instead display as a lateral learning report.
+     */
+    private const LATERAL_LEARNING_SUBJECT_NAME_REGEX = '/Lateral\\s+Learning/i';
+
+    /**
      * @var Gateway
      */
     private $gateway;
@@ -283,12 +289,12 @@ class Factory
         $lateralLearning->injectIndicatorMarks(array_merge(...$allGrades));
 
 
-        foreach ($lateralLearning->getIndicatorMarks() as $indicatorMark) {
-            new \Alaress_Probe(
-                $indicatorMark->getIndicatorUsage()->getIndicator()->getName(),
-                $indicatorMark->getDescriptor()->getDescription(),
-            );
-        }
+//        foreach ($lateralLearning->getIndicatorMarks() as $indicatorMark) {
+//            new \Alaress_Probe(
+//                $indicatorMark->getIndicatorUsage()->getIndicator()->getName(),
+//                $indicatorMark->getDescriptor()->getDescription(),
+//            );
+//        }
 
         return $lateralLearning;
     }
@@ -332,15 +338,31 @@ class Factory
             [$this, 'augmentSubjectWithTeacher'],
             $this->gateway->getAllSubjectsForYear($year, $student)
         );
+
+        $lateralLearning = null;
         foreach ($result as $row) {
-            $subject = new Subject();
-            $subject
-                ->setName($row['sub_desc'])
-                ->setStudent($student)
-                ->setYear($row['yr_study'])
-                ->setSubjectCode($row['code'])
-                ->setTeachers($row['teachers']);
-            $subjects[$row['code']] = $subject;
+            if (self::isSubjectLateralLearning($row['sub_desc'])) {
+                $lateralLearning = new LateralLearning();
+                $lateralLearning
+                    ->setName($row['sub_desc'])
+                    ->setStudent($student)
+                    ->setYear($row['yr_study'])
+                    ->setSubjectCode($row['code']);
+            } else {
+                $subject = new Subject();
+                $subject
+                    ->setName($row['sub_desc'])
+                    ->setStudent($student)
+                    ->setYear($row['yr_study'])
+                    ->setSubjectCode($row['code'])
+                    ->setTeachers($row['teachers']);
+                $subjects[$row['code']] = $subject;
+            }
+        }
+
+        $subjects = array_values($subjects);
+        if ($lateralLearning) {
+            array_unshift($subjects, $lateralLearning);
         }
         return $subjects;
     }
@@ -727,5 +749,16 @@ class Factory
     private function doesDraftFeedbackContribute($reportYear): bool
     {
         return $reportYear < 2018;
+    }
+
+    /**
+     * Does this subject name refer to what should be a lateral learning report?
+     *
+     * @param string $subjectName
+     * @return bool
+     */
+    private static function isSubjectLateralLearning(string $subjectName): bool
+    {
+        return (bool)preg_match(self::LATERAL_LEARNING_SUBJECT_NAME_REGEX, $$subjectName);
     }
 }
