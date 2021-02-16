@@ -50,6 +50,7 @@ These are its args, which is given for you
         </a>
     {% elseif file.mimetype.isAudio %}
         <audio id="schoolbox_video_preview"
+               data-audiocomponent
                controls
                preload="none"
                width="100%">
@@ -102,7 +103,7 @@ These are its args, which is given for you
 <script type="text/javascript">
     $(function() {
         $('[data-plugin="preview"]','#content').preview();
-        $('[data-videocomponent]').mediaelementplayer();
+        $('[data-audiocomponent], [data-videocomponent]').mediaelementplayer();
     });
 </script>
 {% endif %}
