@@ -191,8 +191,16 @@ class Factory
         $externalData = $this->gateway->getSubject($year, $subjectCode);
 
         // external data not guaranteed to contain a description
+        $folderWithGrades = $this->getFolderWithGrades(
+            $subjectCode,
+            $student,
+            !$this->doesDraftFeedbackContribute($year),
+            $roleTypeOverride
+        );
+        /** @var Folder $folder */
+        $folder = $folderWithGrades['folder'];
 
-        if (self::isSubjectLateralLearning($externalData['sub_desc'])) {
+        if (self::isSubjectLateralLearning($folder->getName())) {
             return $this->buildLateralLearning($externalData, $year, $student, $subjectCode, $subjectList, $roleTypeOverride);
         }
         return $this->buildStandard($externalData, $year, $student, $subjectCode, $roleTypeOverride);
