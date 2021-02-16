@@ -73,6 +73,12 @@ Data:
 
 <h2 class="subheader">Academic Transcript</h2>
 <div>
+
+    {# Decide whether we need to show this little legend depending on the massive
+     # massive processing about to take place...which should have been elsewhere
+     #}
+    {% set displayLegend = false %}
+
     {#
         We need to assign the subjectList markup to a variable and defer its render, so that we
         can detect if any interim grades are present, and print a legend above the markup if they are.
@@ -285,6 +291,7 @@ Data:
                                                     {# Used to pop up a little notice to the user about transient mark data
                                                      #}
                                                     {% set hasInterimGrades = true %}
+                                                    {% set displayLegend = true %}
                                                 {% endif %}
                                             {% endif %}
                                         {% endfor %}
@@ -343,6 +350,7 @@ Data:
                                                     {# Used to pop up a little notice to the user about transient mark data
                                                      #}
                                                     {% set hasInterimGrades = true %}
+                                                    {% set displayLegend = true %}
                                                 {% endif %}
                                             {% endif %}
                                         {% endfor %}
@@ -375,7 +383,7 @@ Data:
     {% endset %}
 
     {# We can now print the optional legend, and then the subject list markup #}
-    {% if hasInterimGrades %}<span class="meta legend">* - marks from most recent task only</span>{% endif %}
+    {% if displayLegend %}<span class="meta legend">* - marks from most recent task only</span>{% endif %}
     {{ subjectListHtml }}
 </div>
 
