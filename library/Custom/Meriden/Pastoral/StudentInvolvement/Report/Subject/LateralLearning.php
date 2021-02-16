@@ -5,7 +5,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
+namespace Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject;
 
 use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
@@ -23,35 +23,11 @@ class LateralLearning extends Base
     private const LATERAL_LEARNING_CAPABILITY_REGEX = '/Lateral\\s+Learning\\s+Skills/i';
 
     /**
-     * External data (class name and description)
-     */
-    protected array $externalData;
-
-    /**
      * The most recent mark given for each indicator.
      *
      * @var array|IndicatorMark[]
      */
     private array $indicatorMarks = [];
-
-    /**
-     * @return array
-     */
-    public function getExternalData(): array
-    {
-        return $this->externalData;
-    }
-
-    /**
-     * @param array $externalData
-     *
-     * @return $this
-     */
-    public function setExternalData(array $externalData): self
-    {
-        $this->externalData = $externalData;
-        return $this;
-    }
 
     /**
      * Collate the indicator marks from all grades given to the student, and

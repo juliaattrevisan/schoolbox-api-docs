@@ -12,8 +12,8 @@ namespace Custom\Meriden\Pastoral;
 
 use Alaress\Web\Controller\Base;
 use Custom\Meriden\Pastoral\StudentInvolvement\Report\Factory;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\LateralLearning;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\LateralLearning;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\Standard;
 use Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup;
 use RangeException;
 use Schoolbox\Role;
@@ -107,7 +107,7 @@ class Controller extends Base
 
         $subjectReportDataList = [];
         foreach ($baseReportData['report']['subjectList'] as $subject) {
-            /** @var Subject $subject */
+            /** @var Standard $subject */
             try {
                 $subjectReportDataList[$subject->getSubjectCode()] = $this->buildReportData(
                     $year,
@@ -146,7 +146,7 @@ class Controller extends Base
             $reportData = $this->buildReportData($year, $student, $subjectCode);
 
             // Is this the lateral learning or the subject variant?
-            /** @var Subject|null $subjectReport */
+            /** @var Standard|null $subjectReport */
             $subjectReport = $reportData['report']['subjectReport'];
             /** @var LateralLearning|null $lateralLearningReport */
             $lateralLearningReport = $reportData['report']['lateralLearningReport'];

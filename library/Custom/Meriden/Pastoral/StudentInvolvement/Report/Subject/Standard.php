@@ -1,50 +1,25 @@
 <?php
+
 /**
  * @copyright Copyright 2021, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
+namespace Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject;
 
 use Schoolbox\User;
 
 /**
  * Representation of report data for a standard subject.
  */
-class Subject extends Base
+class Standard extends Base
 {
-    /**
-     * External data (class name and description)
-     *
-     * @var array
-     */
-    protected $externalData;
-
     /**
      * The teachers for this subject
      *
      * @var array|User[]
      */
     protected $teachers;
-
-    /**
-     * @return array
-     */
-    public function getExternalData()
-    {
-        return $this->externalData;
-    }
-
-    /**
-     * @param  array $externalData
-     *
-     * @return $this
-     */
-    public function setExternalData($externalData)
-    {
-        $this->externalData = $externalData;
-        return $this;
-    }
 
     /**
      * @return array|\Schoolbox\User[]
