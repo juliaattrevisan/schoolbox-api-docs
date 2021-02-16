@@ -98,7 +98,7 @@ class CohortStatistics
         return [
             'studentMark' => null === $this->feedback ? null : $this->feedback->getHumanReadableMark(),
             'cohortAverage' => null === $cohortAverage ? null : "{$cohortAverage} %",
-            'cohortRank' => null === $cohortRank ? null :  "{$cohortRank} / {$cohortCount}",
+            'cohortRank' => null === $cohortRank ? null : "{$cohortRank} / {$cohortCount}",
         ];
     }
 
@@ -167,7 +167,7 @@ class CohortStatistics
             return null;
         }
 
-        /* you can never be rank 00
+        /* you can never be rank 0
          */
         return $index + 1;
     }
