@@ -51,7 +51,10 @@
     {% elseif attributes.curriculumSemester == 2 %}
 
         {# Special case for Middle Years and it's currently Semester 2
-         # If they had a NESA Grade for semester 1, hide it, but show the Formative grey boxes instead
+         #
+         # If they had a NESA Grade for semester 1, show it, until you start evaluating Semester 2
+         # Formative feedbacks. At that point you're looking at interim grades for Formative
+         # feedbacks in semester 2 and at this particular point, hide the NESA Semester 1.
          #}
         <div class="result-group hsc-rank">
             {% if rankData.studentMark is defined %}
