@@ -1,8 +1,6 @@
 <?php
 
 /**
- * The lateral learning eReport page.
- *
  * @copyright Copyright 2021, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -13,11 +11,14 @@ use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
 
+/**
+ * Representation of report data for a lateral learning subject.
+ */
 class LateralLearning extends Involvement
 {
     /**
      * Regular expression for lateral learning capabilities: used to identify if
-     * this subject should display as a lateral learning report.
+     * an assessment's rubric should be on this report.
      */
     private const LATERAL_LEARNING_CAPABILITY_REGEX = '/Lateral\\s+Learning\\s+Skills/i';
 
