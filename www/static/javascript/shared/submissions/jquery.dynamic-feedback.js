@@ -156,6 +156,26 @@
             });
         }
 
+        /**
+         * To notify the user they haven't added any comments
+         */
+        const emptyDialog = $('#empty-dialog');
+        emptyDialog.on('click', '[data-interaction="close"]', function (event) {
+            event.preventDefault();
+            emptyDialog.foundation('reveal', 'close');
+        });
+
+        /**
+         * To prevent an empty submission
+         */
+        function isCommentsEmpty(commentBoxId) {
+            const commentBox = document.querySelector('#' + commentBoxId);
+            if (commentBox.value === "") {
+                return true;
+            } else {
+                return false;
+            }
+        }
 
 
         /**
@@ -172,7 +192,12 @@
                     $btnPublish  = $actionBar.find('[data-draft=publish]'),
                     participantId = $participant.data('participant'),
                     commentBoxId = "comment-" + participantId;
-
+                
+                if (isCommentsEmpty(commentBoxId)) {
+                    emptyDialog.foundation('reveal', 'open');
+                    return;
+                }
+                
                 // We can safely clear this timeout now that we're publishing
                 window.clearTimeout(commentBoxTimeouts[commentBoxId]);
 
