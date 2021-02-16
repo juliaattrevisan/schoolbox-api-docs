@@ -219,9 +219,20 @@ class Controller extends Base
             }
 
             if ($subject->isLateralLearning()) {
-                $subject = $this->studentInvolvementFactory->buildLateralLearning($year, $student, $subjectList, $roleTypeOverride);
+                $subject = $this->studentInvolvementFactory->buildLateralLearning(
+                    $year,
+                    $student,
+                    $subjectCode,
+                    $subjectList,
+                    $roleTypeOverride
+                );
             } else {
-                $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode, $roleTypeOverride);
+                $subject = $this->getStudentInvolvementFactory()->buildSubject(
+                    $year,
+                    $student,
+                    $subjectCode,
+                    $roleTypeOverride
+                );
             }
         }
         return [
