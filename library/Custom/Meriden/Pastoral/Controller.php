@@ -217,7 +217,12 @@ class Controller extends Base
             if (!$exists) {
                 throw new RangeException("Student was not in subject $subjectCode in $year");
             }
-            $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode, $roleTypeOverride);
+
+            if ($subject->isLateralLearning()) {
+                $subject = $this->studentInvolvementFactory->buildLateralLearning($year, $student, $subjectList, $roleTypeOverride);
+            } else {
+                $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode, $roleTypeOverride);
+            }
         }
         return [
             'report' => [
