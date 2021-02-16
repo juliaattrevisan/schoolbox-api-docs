@@ -783,6 +783,6 @@ class Factory
      */
     private static function isSubjectLateralLearning(string $subjectName): bool
     {
-        return (bool)preg_match(self::LATERAL_LEARNING_SUBJECT_NAME_REGEX, $$subjectName);
+        return (bool)preg_match(self::LATERAL_LEARNING_SUBJECT_NAME_REGEX, $subjectName);
     }
 }
