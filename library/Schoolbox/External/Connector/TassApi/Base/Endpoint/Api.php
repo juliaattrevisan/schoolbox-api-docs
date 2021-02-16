@@ -11,7 +11,6 @@ use DomainException;
 use GuzzleHttp\Client;
 use InvalidArgumentException;
 use RuntimeException;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Explorer\BrokenPayload;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Explorer\BrokenPayloadCodec;
 
 

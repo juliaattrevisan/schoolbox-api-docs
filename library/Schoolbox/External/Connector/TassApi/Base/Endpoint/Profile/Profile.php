@@ -224,7 +224,7 @@ class Profile implements IStrategy
         /* Process each current student, and their parents too
          */
         $students = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
-            'currentstatus' => 'current'
+            'currentstatus' => ' '
         ]);
 
         foreach ($students['students'] as $student) {
