@@ -11,6 +11,9 @@ use DomainException;
 use GuzzleHttp\Client;
 use InvalidArgumentException;
 use RuntimeException;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Explorer\BrokenPayload;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Explorer\BrokenPayloadCodec;
+
 
 /**
  * Class Api
@@ -41,6 +44,15 @@ class Api implements IApi
      * @var string
      */
     private $host;
+
+
+    /**
+     * The module selected
+     * It's one of LMS Integration, Student Details, Identity Management
+     *
+     * @var string
+     */
+    private $module;
 
 
     /**
@@ -85,6 +97,10 @@ class Api implements IApi
     public function __construct(string $host, string $dsn, string $module)
     {
         $this->host = $host;
+
+        /* Remember the module that was selected since we need that for diagnosis
+         */
+        $this->module = $module;
 
         /* Set up guzzle client
          */
@@ -142,9 +158,11 @@ class Api implements IApi
      *
      * @param string $method
      * @param array  $params
-     * @return array
-     * @throws RuntimeException
+     * @return array|null
      * @throws DomainException
+     * @throws RuntimeException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
      */
     public function retrieveDocument(string $method, array $params): ?array
     {
@@ -175,7 +193,34 @@ class Api implements IApi
         /* Mine out an error message if you try to access a thing that doesn't exist
          */
         if ($response) {
-            throw new RuntimeException("Bad endpoint {$method}: {$response->getStatusCode()} {$response->getReasonPhrase()}");
+
+            /* Some schools intermittently report a Bad Endpoint in a non-repeating fashion
+             * Sometimes a guy will succeed, sometimes he won't; there's no particular pattern
+             * just by looking at the log itself. In this circumstance, base64 the payload we
+             * tried to use, then pop it into the explorer to see what happened and to replay
+             * the access attempt
+             */
+            throw new RuntimeException(sprintf(
+                'Bad endpoint %s: %s %s. Payload: %s',
+                $method,
+                $response->getStatusCode(),
+                $response->getReasonPhrase(),
+                (new BrokenPayloadCodec())->encode([
+
+                    /* Enables a retry from a shantytown ui
+                     */
+                    'module' => $this->module,
+
+                    /* These were requested by suds
+                     */
+                    'method' => $method,
+                    'params' => $params,
+
+                    /* This was generated and sent to tass
+                     */
+                    'queryArgs' => $queryArgs
+                ])
+            ));
         }
 
         /* Couldn't decode json, or tass server refused something, or something else died
