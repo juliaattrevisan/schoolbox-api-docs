@@ -289,7 +289,6 @@ class Factory
         $lateralLearning
             ->setName($externalData['sub_desc'])
             ->setDescription($externalData['outline_text'])
-//            ->setTeachers($externalData['teachers'])
             ->setStudent($student)
             ->setYear($year)
             ->setSubjectCode($subjectCode);
@@ -297,13 +296,7 @@ class Factory
 
         // Put together all the stuff for the lateral learning report
         $publishedOnly = !$this->doesDraftFeedbackContribute($year);
-
-//        /** @var IndicatorMark[] $mostRecentIndicatorMarks */
-//        $mostRecentIndicatorMarks = [];
-//        $indicatorMarksByName     = [];
-
-
-        $allGrades = [];
+        $allGrades     = [];
         foreach ($subjectList as $subject) {
             $folderWithGrades = $this->getFolderWithGrades(
                 $subject->getSubjectCode(),
@@ -313,18 +306,7 @@ class Factory
             );
             $allGrades[] = $folderWithGrades['grades'];
         }
-//        $allGrades = array_merge(...$allGrades);
-        $lateralLearning->injectIndicatorMarks(array_merge(...$allGrades));
-
-
-//        foreach ($lateralLearning->getIndicatorMarks() as $indicatorMark) {
-//            new \Alaress_Probe(
-//                $indicatorMark->getIndicatorUsage()->getIndicator()->getName(),
-//                $indicatorMark->getDescriptor()->getDescription(),
-//            );
-//        }
-
-        return $lateralLearning;
+        return $lateralLearning->injectIndicatorMarks(array_merge(...$allGrades));
     }
 
     /**
