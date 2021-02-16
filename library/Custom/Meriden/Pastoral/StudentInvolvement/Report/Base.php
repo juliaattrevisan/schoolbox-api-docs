@@ -5,7 +5,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement;
+namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
 
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
@@ -14,7 +14,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 /**
  * Base representation of an eReport page.
  */
-class Involvement
+class Base
 {
     /**
      * The year that this tutor group is in

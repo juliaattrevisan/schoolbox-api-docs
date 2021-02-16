@@ -4,14 +4,14 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement;
+namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
 
 use Schoolbox\User;
 
 /**
  * Representation of report data for a standard subject.
  */
-class Subject extends Involvement
+class Subject extends Base
 {
     /**
      * External data (class name and description)

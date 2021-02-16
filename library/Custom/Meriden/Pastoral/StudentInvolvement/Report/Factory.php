@@ -1,16 +1,17 @@
 <?php
 
 /**
- * Factory for creating tutor group factory objects
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement;
+namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
 
 use Alaress\Statistics\Statistics;
+use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\LateralLearning;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -26,6 +27,9 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * Factory for building various eReport data sets.
+ */
 class Factory
 {
     // This is pretty fragile. Must match value configured in Admin WorkType lists
