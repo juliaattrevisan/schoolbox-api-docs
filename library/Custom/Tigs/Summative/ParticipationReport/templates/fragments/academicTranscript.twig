@@ -77,13 +77,17 @@ Data:
         We need to assign the subjectList markup to a variable and defer its render, so that we
         can detect if any interim grades are present, and print a legend above the markup if they are.
      #}
-    {% set hasInterimGrades = false %}
     {% set subjectListHtml %}
         <ul class="subject-list">
             {% for subject in subjects %}
                 {% set folderId = subject.folderId %}
                 {% set folderData = data[folderId] %}
                 {% set firstTeacher = folderData.teachers | first %}
+
+                {# Reinit flag for each subject
+                 # Each subject can be in either Formative or Summative evaluation scenarios
+                 #}
+                {% set hasInterimGrades = false %}
 
                 <li class="subject-list-item">
                     <a href="{{ routeLookup('tigsSubjectReport.getReport', {userId: student.id, folderId: subject.folderId, reportDate: reportDate}) }}" class="link-row">
