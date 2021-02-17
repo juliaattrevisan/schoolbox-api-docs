@@ -32,7 +32,7 @@ class Controller extends Base
      */
     public function __construct(Factory $studentInvolvementFactory)
     {
-        $this->setStudentInvolvementFactory($studentInvolvementFactory);
+        $this->studentInvolvementFactory = $studentInvolvementFactory;
     }
 
     /**
@@ -178,7 +178,7 @@ class Controller extends Base
         $tutorGroup       = null;
         $tutorGroupList   = $this->retrieveTutorGroupList($student);
         $subject          = null;
-        $subjectList      = $this->getStudentInvolvementFactory()->buildSubjectList($year, $student);
+        $subjectList      = $this->studentInvolvementFactory->buildSubjectList($year, $student);
         $roleTypeOverride = null;
         $roleTypes        = Role::getRoleTypes();
         $template         = null;
@@ -205,7 +205,7 @@ class Controller extends Base
             if (!$exists) {
                 throw new RangeException("Student has no tutor group in $year");
             }
-            $tutorGroup = $this->getStudentInvolvementFactory()->buildTutorGroup($year, $student, $roleTypeOverride);
+            $tutorGroup = $this->studentInvolvementFactory->buildTutorGroup($year, $student, $roleTypeOverride);
             $template   = '@customMeridenPastoral/index.twig';
         } else {
             // Does this subject exist for this student?
@@ -221,7 +221,7 @@ class Controller extends Base
             }
 
             // Augment the reports with proper data
-            $subject = $this->getStudentInvolvementFactory()->buildSubject(
+            $subject = $this->studentInvolvementFactory->buildSubject(
                 $year,
                 $student,
                 $subjectCode,
@@ -248,25 +248,6 @@ class Controller extends Base
     }
 
     /**
-     * @return Factory
-     */
-    public function getStudentInvolvementFactory()
-    {
-        return $this->studentInvolvementFactory;
-    }
-
-    /**
-     * @param  Factory $studentInvolvementFactory
-     *
-     * @return $this
-     */
-    public function setStudentInvolvementFactory($studentInvolvementFactory)
-    {
-        $this->studentInvolvementFactory = $studentInvolvementFactory;
-        return $this;
-    }
-
-    /**
      * Builds a list of tutor groups for this student, excluding invalid years.
      *
      * @param User $student
@@ -275,7 +256,7 @@ class Controller extends Base
     private function retrieveTutorGroupList(User $student): array
     {
         return array_filter(
-            $this->getStudentInvolvementFactory()->buildTutorGroupList($student),
+            $this->studentInvolvementFactory->buildTutorGroupList($student),
             function (TutorGroup $tutorGroup) use ($student) {
                 try {
                     $this->assertValidYearForReport($tutorGroup->getYear(), $student, null);
