@@ -64,6 +64,16 @@ abstract class Base extends BaseReport
     protected $subjects;
 
     /**
+     * By default, tutor group reports have subject reports.
+     *
+     * @return true
+     */
+    public function hasSubjectReports(): bool
+    {
+        return true;
+    }
+
+    /**
      * @return array
      */
     public function getTutors()

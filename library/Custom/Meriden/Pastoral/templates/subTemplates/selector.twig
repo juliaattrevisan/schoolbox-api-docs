@@ -25,23 +25,25 @@
                href="{{ routeLookup('customMeridenPastoral.index', {year: currentYear+1, id: student.id}) }}{{ roleTypeQueryString }}"></a>
         </nav>
 
-        <div class="subject">
-            <select id="context-selector-enrolled-subjects">
-                {# Subject report? show a "Back to eReport" option #}
-                {% if tutorGroupReport.subjectCode %}
-                    <option disabled="disabled" selected="selected">Select a subject</option>
-                {% elseif subjectReport.subjectCode %}
-                    <option value="{{ routeLookup('customMeridenPastoral.index', {year: subjectReport.year, id: student.id}) }}{{ roleTypeQueryString }}"
-                            label="« {{ subjectReport.year }} eReport"
-                    >« {{ subjectReport.year }} eReport</option>
-                {% endif %}
-                {% for currentSubject in subjectList %}
-                    <option value="{{ routeLookup('customMeridenPastoral.subject', {year: currentSubject.year, id: student.id, subjectCode: currentSubject.subjectCode}) }}{{ roleTypeQueryString }}"
-                            label="{{ currentSubject.name }} ({{ currentSubject.subjectCode }})"
-                            {% if currentSubject.subjectCode == subjectReport.subjectCode %}selected{% endif %}
-                    >{{ currentSubject.name }} ({{ currentSubject.subjectCode }})</option>
-                {% endfor %}
-            </select>
-        </div>
+        {% if tutorGroupReport.hasSubjectReports %}
+            <div class="subject">
+                <select id="context-selector-enrolled-subjects">
+                    {# Subject report? show a "Back to eReport" option #}
+                    {% if tutorGroupReport.subjectCode %}
+                        <option disabled="disabled" selected="selected">Select a subject</option>
+                    {% elseif subjectReport.subjectCode %}
+                        <option value="{{ routeLookup('customMeridenPastoral.index', {year: subjectReport.year, id: student.id}) }}{{ roleTypeQueryString }}"
+                                label="« {{ subjectReport.year }} eReport"
+                        >« {{ subjectReport.year }} eReport</option>
+                    {% endif %}
+                    {% for currentSubject in subjectList %}
+                        <option value="{{ routeLookup('customMeridenPastoral.subject', {year: currentSubject.year, id: student.id, subjectCode: currentSubject.subjectCode}) }}{{ roleTypeQueryString }}"
+                                label="{{ currentSubject.name }} ({{ currentSubject.subjectCode }})"
+                                {% if currentSubject.subjectCode == subjectReport.subjectCode %}selected{% endif %}
+                        >{{ currentSubject.name }} ({{ currentSubject.subjectCode }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% endif %}
     </div>
 </div>

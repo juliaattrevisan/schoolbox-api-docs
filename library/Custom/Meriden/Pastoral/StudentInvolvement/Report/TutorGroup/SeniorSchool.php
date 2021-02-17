@@ -8,7 +8,6 @@
 namespace Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup;
 
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
@@ -31,6 +30,16 @@ class SeniorSchool extends Base
      * A list of endeavor grades, collated for this report.
      */
     private array $endeavorGrades = [];
+
+    /**
+     * Senior tutor group reports don't have subject reports.
+     *
+     * @return false
+     */
+    public function hasSubjectReports(): bool
+    {
+        return false;
+    }
 
     /**
      * Collate the endeavor grades out of `$allGrades`, and inject them into
