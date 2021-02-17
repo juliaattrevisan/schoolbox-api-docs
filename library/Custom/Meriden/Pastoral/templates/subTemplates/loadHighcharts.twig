@@ -1,0 +1,12 @@
+
+{# https://github.com/wkhtmltopdf/wkhtmltopdf/issues/2587#issuecomment-144520720 #}
+<script type="text/javascript">
+    Function.prototype.bind = Function.prototype.bind || function (thisp) {
+        var fn = this;
+        return function () {
+            return fn.apply(thisp, arguments);
+        };
+    };
+</script>
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
