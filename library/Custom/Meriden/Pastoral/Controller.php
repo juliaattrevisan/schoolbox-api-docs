@@ -173,7 +173,7 @@ class Controller extends Base
      */
     protected function buildReportData($year, User $student, $subjectCode = null)
     {
-        $this->assertValidYearForReport($year, $student);
+        $this->assertValidYearForReport($year, $student, $subjectCode);
 
         $tutorGroup       = null;
         $tutorGroupList   = $this->retrieveTutorGroupList($student);
@@ -278,7 +278,7 @@ class Controller extends Base
             $this->getStudentInvolvementFactory()->buildTutorGroupList($student),
             function (TutorGroup $tutorGroup) use ($student) {
                 try {
-                    $this->assertValidYearForReport($tutorGroup->getYear(), $student);
+                    $this->assertValidYearForReport($tutorGroup->getYear(), $student, null);
                     return true;
                 } catch (RangeException $e) {
                     return false;
@@ -306,14 +306,19 @@ class Controller extends Base
     /**
      * Asserts that this year is valid for the eReport.
      *
+     * All pages:
      * * Reports are only for students who started year 7 in 2015+ for now
      * * Reports are only for years the student is/was in year 7-12
      *
-     * @param int  $year
-     * @param User $student
+     * Subject pages:
+     * * Also only valid for years 7-9
+     *
+     * @param int         $year
+     * @param User        $student
+     * @param string|null $subjectCode
      * @throws RangeException if it's not valid
      */
-    private function assertValidYearForReport($year, User $student): void
+    private function assertValidYearForReport(int $year, User $student, ?string $subjectCode): void
     {
         $thisYear  = (int)date('Y');
         $startYear = $thisYear + 7 - (int)$student->getYear()->getName();
@@ -324,6 +329,9 @@ class Controller extends Base
         $reportYearLevel = ((int)$student->getYear()->getName()) - ($thisYear - $year);
         if ($reportYearLevel > 12) {
             throw new RangeException("Reports are only for years 7-12");
+        }
+        if (isset($subjectCode) && $reportYearLevel > 9) {
+            throw new RangeException("Report subject pages are only for years 7-9");
         }
     }
 }
