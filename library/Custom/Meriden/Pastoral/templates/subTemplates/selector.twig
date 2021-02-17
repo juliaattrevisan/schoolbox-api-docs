@@ -1,5 +1,6 @@
 {# Selector - like the grades selector, but displays only years #}
 {% set currentYear = (tutorGroupReport.year ?: subjectReport.year) %}
+{% set hasSubjectReports = subjectReport is not null or tutorGroupReport.hasSubjectReports %}
 
 {# Role type query string: included in selector menu #}
 {% set roleTypeQueryString = (roleTypeOverride ? "?role-type=#{roleTypeOverride}" : '') %}
@@ -25,7 +26,7 @@
                href="{{ routeLookup('customMeridenPastoral.index', {year: currentYear+1, id: student.id}) }}{{ roleTypeQueryString }}"></a>
         </nav>
 
-        {% if tutorGroupReport.hasSubjectReports %}
+        {% if hasSubjectReports %}
             <div class="subject">
                 <select id="context-selector-enrolled-subjects">
                     {# Subject report? show a "Back to eReport" option #}
