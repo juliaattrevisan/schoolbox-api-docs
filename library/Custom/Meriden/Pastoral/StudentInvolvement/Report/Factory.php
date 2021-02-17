@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -27,6 +28,8 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+
+use function count;
 
 /**
  * Factory for building various eReport data sets.
@@ -641,7 +644,7 @@ class Factory
                 if ($liveCategory->getParent()->getId() == $parentId) {
                     $cohortList[] = $liveCategory;
                 }
-            } catch (\Exception $e) {
+            } catch (MapperException $e) {
                 // noop
             }
             foreach ($this->folderMapper->findAllByArchivedCode($otherCode) as $archivedCategory) {
@@ -782,7 +785,7 @@ class Factory
                 },
                 $distribution['continuous']['marks']
             );
-            $count = \count($marks);
+            $count = count($marks);
             $mean  = array_sum($marks) / $count;
             $sd    = sqrt(
                 array_sum(
