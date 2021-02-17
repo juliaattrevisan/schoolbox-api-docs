@@ -63,6 +63,7 @@ class LateralLearning extends Base
         }
 
         // Find the most recent mark for each indicator
+        $mostRecentIndicatorMarks = [];
         foreach ($indicatorMarksByName as $name => $indicatorMarks) {
             $mostRecentTimestamp = null;
             foreach ($indicatorMarks as $indicatorMark) {
