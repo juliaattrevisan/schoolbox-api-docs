@@ -11,6 +11,7 @@ use Alaress\Statistics\Statistics;
 use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
 use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\LateralLearning;
 use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\Standard;
+use RangeException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -342,6 +343,43 @@ class Factory
             $allGrades[] = $folderWithGrades['grades'];
         }
         return $lateralLearning->injectIndicatorMarks(array_merge(...$allGrades));
+    }
+
+    /**
+     * Which year level was `$student` in during calendar year `$year`?
+     *
+     * Reports are only valid for
+     * * students who started year 7 in 2015+
+     * * for years in which the student was in years 7-12
+     *
+     * In addition, subject pages are only valid for students in years 7-9.
+     *
+     * @param int         $year        The calendar year for which the report is
+     *                                 being built
+     * @param User        $student     The student for whom it's being built
+     * @param string|null $subjectCode If provided, the subject code for which
+     *                                 it is being built
+     * @return int
+     * @throws RangeException if `$student` is not in a recognised year for this
+     *                        report.
+     */
+    public static function determineYearLevel(int $year, User $student, ?string $subjectCode): int
+    {
+        $thisYear  = (int)date('Y');
+        $startYear = $thisYear + 7 - (int)$student->getYear()->getName();
+        if ($startYear < 2015) {
+            throw new RangeException("Reports are only for students who started year 7 in 2015 or later");
+        }
+
+        // Determine the year level of the report
+        $reportYearLevel = ((int)$student->getYear()->getName()) - ($thisYear - $year);
+        if ($reportYearLevel < 7 || $reportYearLevel > 12) {
+            throw new RangeException("Reports are only for years 7-12");
+        }
+        if (isset($subjectCode) && $reportYearLevel > 9) {
+            throw new RangeException("Report subject pages are only for years 7-9");
+        }
+        return $reportYearLevel;
     }
 
     /**

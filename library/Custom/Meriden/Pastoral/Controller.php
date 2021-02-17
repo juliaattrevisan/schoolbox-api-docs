@@ -287,13 +287,6 @@ class Controller extends Base
     /**
      * Asserts that this year is valid for the eReport.
      *
-     * All pages:
-     * * Reports are only for students who started year 7 in 2015+ for now
-     * * Reports are only for years the student is/was in year 7-12
-     *
-     * Subject pages:
-     * * Also only valid for years 7-9
-     *
      * @param int         $year
      * @param User        $student
      * @param string|null $subjectCode
@@ -301,18 +294,6 @@ class Controller extends Base
      */
     private function assertValidYearForReport(int $year, User $student, ?string $subjectCode): void
     {
-        $thisYear  = (int)date('Y');
-        $startYear = $thisYear + 7 - (int)$student->getYear()->getName();
-        if ($startYear < 2015) {
-            throw new RangeException("Reports are only for students who started year 7 in 2015 or later");
-        }
-
-        $reportYearLevel = ((int)$student->getYear()->getName()) - ($thisYear - $year);
-        if ($reportYearLevel > 12) {
-            throw new RangeException("Reports are only for years 7-12");
-        }
-        if (isset($subjectCode) && $reportYearLevel > 9) {
-            throw new RangeException("Report subject pages are only for years 7-9");
-        }
+        Factory::determineYearLevel($year, $student, $subjectCode);
     }
 }
