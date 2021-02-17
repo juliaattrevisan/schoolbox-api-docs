@@ -115,13 +115,14 @@ class Factory
      *
      * This is used as a data store for the year level eReport.
      *
-     * @param int         $year
-     * @param User        $student
-     * @param string|null $roleTypeOverride
+     * @param int            $year
+     * @param User           $student
+     * @param Subject\Base[] $subjectList      `$student`'s subjects in `$year`
+     * @param string|null    $roleTypeOverride
      *
      * @return TutorGroup\Base
      */
-    public function buildTutorGroup($year, User $student, ?string $roleTypeOverride)
+    public function buildTutorGroup($year, User $student, array $subjectList, ?string $roleTypeOverride)
     {
         $tutorGroup = self::buildTutorGroupReport($year, $student);
         $tutorGroup
@@ -167,6 +168,14 @@ class Factory
                 )
             );
         }
+
+        // Senior report only: collate endeavor grades
+        if ($tutorGroup instanceof TutorGroup\SeniorSchool) {
+            $tutorGroup->injectEndeavorGrades(
+                $this->collateAllGrades($subjectList, $student, $publishedOnly, $roleTypeOverride)
+            );
+        }
+
         return $tutorGroup;
     }
 
@@ -331,17 +340,9 @@ class Factory
 
         // Put together all the stuff for the lateral learning report
         $publishedOnly = !$this->doesDraftFeedbackContribute($year);
-        $allGrades     = [];
-        foreach ($subjectList as $subject) {
-            $folderWithGrades = $this->getFolderWithGrades(
-                $subject->getSubjectCode(),
-                $student,
-                $publishedOnly,
-                $roleTypeOverride
-            );
-            $allGrades[] = $folderWithGrades['grades'];
-        }
-        return $lateralLearning->injectIndicatorMarks(array_merge(...$allGrades));
+        return $lateralLearning->injectIndicatorMarks(
+            $this->collateAllGrades($subjectList, $student, $publishedOnly, $roleTypeOverride)
+        );
     }
 
     /**
@@ -447,6 +448,7 @@ class Factory
             }
         }
 
+        // Ensure lateral learning is at the head of the list, if it's there
         $subjects = array_values($subjects);
         if ($lateralLearning) {
             array_unshift($subjects, $lateralLearning);
@@ -866,5 +868,33 @@ class Factory
             $tutorGroup = new TutorGroup\SeniorSchool();
         }
         return $tutorGroup;
+    }
+
+    /**
+     * Collates all grades given for `$subjectList` to `$student`.
+     *
+     * @param array       $subjectList
+     * @param User        $student
+     * @param bool        $publishedOnly
+     * @param string|null $roleTypeOverride
+     * @return array
+     */
+    private function collateAllGrades(
+        array $subjectList,
+        User $student,
+        bool $publishedOnly,
+        ?string $roleTypeOverride
+    ): array {
+        $allGrades = [];
+        foreach ($subjectList as $subject) {
+            $folderWithGrades = $this->getFolderWithGrades(
+                $subject->getSubjectCode(),
+                $student,
+                $publishedOnly,
+                $roleTypeOverride
+            );
+            $allGrades[] = $folderWithGrades['grades'];
+        }
+        return array_merge(...$allGrades);
     }
 }

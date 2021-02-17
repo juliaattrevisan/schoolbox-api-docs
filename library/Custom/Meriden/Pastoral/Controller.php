@@ -205,7 +205,12 @@ class Controller extends Base
             if (!$exists) {
                 throw new RangeException("Student has no tutor group in $year");
             }
-            $tutorGroup = $this->studentInvolvementFactory->buildTutorGroup($year, $student, $roleTypeOverride);
+            $tutorGroup = $this->studentInvolvementFactory->buildTutorGroup(
+                $year,
+                $student,
+                $subjectList,
+                $roleTypeOverride
+            );
             $template   = $tutorGroup instanceof TutorGroup\SeniorSchool
                 ? '@customMeridenPastoral/index/seniorSchool.twig'
                 : '@customMeridenPastoral/index/middleSchool.twig';

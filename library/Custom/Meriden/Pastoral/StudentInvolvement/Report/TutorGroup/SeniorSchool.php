@@ -15,4 +15,28 @@ namespace Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup;
  */
 class SeniorSchool extends Base
 {
+    /**
+     * A list of endeavor grades, collated for this report.
+     */
+    private array $endeavorGrades;
+
+    /**
+     * Collate the endeavor grades out of `$allGrades`, and inject them into
+     * `$this->endeavorGrades`.
+     *
+     * @param array $allGrades
+     * @return $this
+     */
+    public function injectEndeavorGrades(array $allGrades): self
+    {
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEndeavorGrades(): array
+    {
+        return $this->endeavorGrades;
+    }
 }
