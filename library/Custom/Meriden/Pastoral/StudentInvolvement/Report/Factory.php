@@ -121,6 +121,8 @@ class Factory
      */
     public function buildTutorGroup($year, User $student, ?string $roleTypeOverride)
     {
+        // The variant that is built depends on the student's year level at the
+        // year of the report.
         $tutorGroup = new TutorGroup();
         $tutorGroup
             ->setName($year . ' eReport')
@@ -424,7 +426,7 @@ class Factory
      *  grades: array
      * }
      */
-    protected function getFolderWithGrades($subjectCode, User $student, bool $publishedOnly, ?string $roleTypeOverride)
+    private function getFolderWithGrades($subjectCode, User $student, bool $publishedOnly, ?string $roleTypeOverride)
     {
         // Find by category code, and figure out if they're involved.
         $folder = $this->folderMapper->findForCampusAndClass('', $subjectCode);
@@ -476,7 +478,7 @@ class Factory
      *  grades: array (if the student is involved)
      * }
      */
-    protected function getStudentInvolvement(
+    private function getStudentInvolvement(
         Folder $folder,
         User $student,
         bool $publishedOnly,
@@ -523,7 +525,7 @@ class Factory
      *  comment:     string
      * }
      */
-    protected function getGrades(Folder $folder, User $student, bool $publishedOnly, ?string $roleTypeOverride)
+    private function getGrades(Folder $folder, User $student, bool $publishedOnly, ?string $roleTypeOverride)
     {
         $allGrades = [];
 
@@ -584,7 +586,7 @@ class Factory
      *
      * @return Folder[]
      */
-    protected function getCohortFolders(Folder $category, $subjectCode)
+    private function getCohortFolders(Folder $category, $subjectCode)
     {
         // Find the equivalent assessments for each cohort class
         // (class with the same second part of the class code)
@@ -621,7 +623,7 @@ class Factory
      *  teachers: User[]
      * }
      */
-    protected function augmentSubjectWithTeacher(array $subject)
+    private function augmentSubjectWithTeacher(array $subject)
     {
         // Get every teacher by their tch_code
         if (!empty($subject['tch_code'])) {
@@ -648,7 +650,7 @@ class Factory
      *   }
      * }
      */
-    public function buildDistribution($grade, $cohortFolders, bool $publishedOnly)
+    private function buildDistribution($grade, $cohortFolders, bool $publishedOnly)
     {
         // Only interested in distribution of due works that are assessment tasks
         $baseAssessment = $grade['assessment'];
