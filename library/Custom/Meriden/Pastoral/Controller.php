@@ -171,7 +171,7 @@ class Controller extends Base
      *
      * @throws RangeException if student isn't in year or subject
      */
-    protected function buildReportData($year, User $student, $subjectCode = null)
+    private function buildReportData($year, User $student, $subjectCode = null)
     {
         $this->assertValidYearForReport($year, $student, $subjectCode);
 
@@ -206,7 +206,9 @@ class Controller extends Base
                 throw new RangeException("Student has no tutor group in $year");
             }
             $tutorGroup = $this->studentInvolvementFactory->buildTutorGroup($year, $student, $roleTypeOverride);
-            $template   = '@customMeridenPastoral/index.twig';
+            $template   = $tutorGroup instanceof TutorGroup\SeniorSchool
+                ? '@customMeridenPastoral/index/seniorSchool.twig'
+                : '@customMeridenPastoral/index/middleSchool.twig';
         } else {
             // Does this subject exist for this student?
             $exists = false;
@@ -229,8 +231,8 @@ class Controller extends Base
                 $roleTypeOverride
             );
             $template = $subject instanceof Subject\LateralLearning
-                ? '@customMeridenPastoral/lateralLearning.twig'
-                : '@customMeridenPastoral/subject.twig';
+                ? '@customMeridenPastoral/subject/lateralLearning.twig'
+                : '@customMeridenPastoral/subject/standard.twig';
         }
         return [
             'report' => [
