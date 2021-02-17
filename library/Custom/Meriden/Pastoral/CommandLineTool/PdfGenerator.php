@@ -38,7 +38,7 @@ class PdfGenerator extends App
 
     // Year levels to generate the report for
     private const OPT_LONG_YEAR_LEVEL = 'year-level:';
-    private const DEFAULT_YEAR_LEVELS = [7, 8, 9,];
+    private const DEFAULT_YEAR_LEVELS = [7, 8, 9, 10, 11, 12];
 
     // Calendar year to generate a report for
     private const OPT_LONG_REPORT_YEAR = 'report-year:';
@@ -98,7 +98,7 @@ $baseOptionHelp
         Just generate reports for students in this year level for the report's
         year, e.g. '--year-level=7'.
         Defaults to generating reports for all year levels which may have an
-        eReport (i.e. 7, 8 and 9).
+        eReport (i.e. 7-12).
 
     $yellow--report-year=REPORT_YEAR$white
         Generate the reports for the given year.
@@ -246,17 +246,24 @@ EXAMPLES:
         // Build the source bundles, each will have a PDF generated for it
         $result = new GenericCollection(SourceBundle::class);
         foreach ($students as $student) {
+            $urls = $urlGenerator->generate($baseUrl, $reportYear, $student, $roleType, $graphWidth);
+            $sprintfParams = [
+                $student->getLastname(),
+                $student->getFirstname(),
+                $student->getId(),
+                $student->getExternalId(),
+            ];
+            if (empty($urls)) {
+                $this->getLogger()->warning(
+                    sprintf('No report exists for %s, %s (ID: %d, TASS ID: %s)', ...$sprintfParams)
+                );
+                continue;
+            }
             $result->add(
                 new SourceBundle(
                     sprintf('%s-%d.pdf', $student->getExternalId(), $reportYear),
                     $urlGenerator->generate($baseUrl, $reportYear, $student, $roleType, $graphWidth),
-                    sprintf(
-                        'Generating report for %s, %s (ID: %d, TASS ID: %s)',
-                        $student->getLastname(),
-                        $student->getFirstname(),
-                        $student->getId(),
-                        $student->getExternalId()
-                    )
+                    sprintf('Generating report for %s, %s (ID: %d, TASS ID: %s)', ...$sprintfParams)
                 )
             );
         }
