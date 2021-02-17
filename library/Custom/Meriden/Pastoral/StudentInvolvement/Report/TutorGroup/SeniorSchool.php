@@ -9,6 +9,7 @@ namespace Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup;
 
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * Representation of report data for a senior school student's tutor group.
@@ -35,12 +36,21 @@ class SeniorSchool extends Base
      * Collate the endeavor grades out of `$allGrades`, and inject them into
      * `$this->endeavorGrades`.
      *
-     * @param array $allGrades
-     * @param bool  $publishedOnly
+     * @param array|Folder[] $allFolders
+     * @param array          $allGrades
+     * @param bool           $publishedOnly
      * @return $this
      */
-    public function injectEndeavorGrades(array $allGrades, bool $publishedOnly): self
+    public function injectEndeavorGrades(array $allFolders, array $allGrades, bool $publishedOnly): self
     {
+        // Collate all folders this student is in, presuming they have an endeavor grade
+        foreach ($allFolders as $folder) {
+            $this->endeavorGrades[$folder->getId()] ??= [
+                'folder'      => $folder,
+                'assessments' => [],
+            ];
+        }
+
         foreach ($allGrades as $grade) {
             // Which one is Endeavor Grades?
             /** @var IAssessable $assessment */
@@ -50,14 +60,10 @@ class SeniorSchool extends Base
             foreach (self::ENDEAVOR_GRADES_ASSESSMENT_TITLES as $key => $title) {
                 if (strcasecmp($title, $assessmentTitle) === 0) {
                     $participant = $assessment->getParticipantIfExtant($this->student);
-                    $this->endeavorGrades[$folder->getId()] ??= [
-                        'folder'      => $folder,
-                        'assessments' => [],
-                    ];
-                    if ($participant) {
-                        $this->endeavorGrades[$folder->getId()]['assessments'][$key]
-                            = $participant->getAuthoritativeFeedback($publishedOnly);
-                    }
+                    $this->endeavorGrades[$folder->getId()]['assessments'][$key] = $participant
+                        ? $participant->getAuthoritativeFeedback($publishedOnly)
+                        : null
+                    ;
                 }
             }
         }

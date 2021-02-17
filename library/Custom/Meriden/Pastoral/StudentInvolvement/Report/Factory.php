@@ -171,10 +171,20 @@ class Factory
 
         // Senior report only: collate endeavor grades
         if ($tutorGroup instanceof TutorGroup\SeniorSchool) {
-            $tutorGroup->injectEndeavorGrades(
-                $this->collateAllGrades($subjectList, $student, $publishedOnly, $roleTypeOverride),
-                $publishedOnly
-            );
+            $allFolders = [];
+            $allGrades  = [];
+            foreach ($subjectList as $subject) {
+                $folderWithGrades = $this->getFolderWithGrades(
+                    $subject->getSubjectCode(),
+                    $student,
+                    $publishedOnly,
+                    $roleTypeOverride
+                );
+                $allFolders[] = $folderWithGrades['folder'];
+                $allGrades[]  = $folderWithGrades['grades'];
+            }
+
+            $tutorGroup->injectEndeavorGrades($allFolders, array_merge(...$allGrades), $publishedOnly);
         }
 
         return $tutorGroup;
