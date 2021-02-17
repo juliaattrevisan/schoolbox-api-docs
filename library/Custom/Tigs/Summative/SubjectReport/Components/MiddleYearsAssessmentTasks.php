@@ -121,9 +121,11 @@ class MiddleYearsAssessmentTasks extends BaseComponent
             }
         }
 
-        // Filter anything not due within this report's window
-        // If report is for Sem1, only get data from Sem1, otherwise no limit
-        $semester = $this->getAttributes()->getCurriculumSemester() === 1 ? 1 : null;
+        /* For middle years students, only get assessments that are due in the current semester
+         * We don't need formative data from semester 1 when we are in semester 2
+         */
+        $semester = $this->getAttributes()->getCurriculumSemester();
+
         foreach ($cohortAssessments as $assessable) {
             if (!$this->isDueWithinReportWindow($assessable, $semester)) {
                 $cohortAssessments->offsetUnset($assessable->getId());
@@ -205,17 +207,17 @@ class MiddleYearsAssessmentTasks extends BaseComponent
 
         /* Handy diagnosis
          */
-//        new \Alaress_Probe([
-//            'assessmentTitle' => $statistics['assessmentTitle'],
-//            'studentMark'     => $statistics['studentMark'],
-//            'cohortAverage'   => $statistics['cohortAverage'],
-//            'publishAt'       => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
-//            'comment'         => $feedback ? $feedback->getComment() : null,
-//            'commentBy'       => $feedback ? $feedback->getReviewer()->getFullName() : null,
-//            'dueDate'         => $classAssessment->getDueAt()->getDatabase(),
-//            'unitSpecId'      => $unitSpec->getId(),
-//            'unitSpecTitle'   => $unitSpec->getTitle(),
-//        ]);
+        new \Alaress_Probe([
+            'assessmentTitle' => $statistics['assessmentTitle'],
+            'studentMark'     => $statistics['studentMark'],
+            'cohortAverage'   => $statistics['cohortAverage'],
+            'publishAt'       => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
+            'comment'         => $feedback ? $feedback->getComment() : null,
+            'commentBy'       => $feedback ? $feedback->getReviewer()->getFullName() : null,
+            'dueDate'         => $classAssessment->getDueAt()->getDatabase(),
+            'unitSpecId'      => $unitSpec->getId(),
+            'unitSpecTitle'   => $unitSpec->getTitle(),
+        ]);
 
         return [
             'assessmentTitle' => $statistics['assessmentTitle'],
