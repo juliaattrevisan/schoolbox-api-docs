@@ -90,7 +90,7 @@
     {# Special case for HSC Year 12 students
      # HSC 12 students only have a rank, they don't have Student Mark or Cohort Average in semester 2
      #}
-    {% if attributes.isHsc and attributes.curriculumSemester == 2 and not hasInterimGrades %}
+    {% if attributes.isHsc and attributes.getYearLevel == 12 and attributes.curriculumSemester == 2 and not hasInterimGrades %}
         <div class="result-group hsc-rank">
             {% if rankData.cohortRank is defined %}
                 <div class="result-item hsc-rank-rank">
