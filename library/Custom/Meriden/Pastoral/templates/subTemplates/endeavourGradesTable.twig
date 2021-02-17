@@ -1,0 +1,33 @@
+<div class="row" id="endeavour-grades">
+    <div class="small-12 column">
+        <dl class="small-gap">
+            <dt>Endeavour {{ locale.grades.properPlural }}</dt>
+            <dd class="explanation hide-for-print"><a href="/homepage/3461">[{{ locale.grades.proper }} Description]</a></dd>
+        </dl>
+    </div>
+
+    <div class="small-12 column">
+        <table class="width-auto bordered-table">
+            <thead>
+            <tr>
+                <th>&nbsp;</th>
+                <th>Term 1</th>
+                <th>Term 2</th>
+                <th>Term 3</th>
+                <th>Term 4</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for endeavorGrade in endeavorGrades %}
+                <tr>
+                    <th>{{ endeavorGrade.folder.title }}</th>
+                    <td>{{ endeavorGrade.assessments.endeavourGrade1.humanReadableMark | default('N/A') }}</td>
+                    <td>{{ endeavorGrade.assessments.endeavourGrade2.humanReadableMark | default('N/A') }}</td>
+                    <td>{{ endeavorGrade.assessments.endeavourGrade3.humanReadableMark | default('N/A') }}</td>
+                    <td>{{ endeavorGrade.assessments.endeavourGrade4.humanReadableMark | default('N/A') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
