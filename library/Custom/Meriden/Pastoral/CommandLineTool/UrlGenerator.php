@@ -75,7 +75,7 @@ class UrlGenerator
         $hasSubjectReports = false;
         $tutorGroupList    = $this->factory->buildTutorGroupList($student);
         foreach ($tutorGroupList as $tutorGroup) {
-            if ($tutorGroup->getYear() === $year) {
+            if ((int)$tutorGroup->getYear() === $year) {
                 $hasSubjectReports = $tutorGroup->hasSubjectReports();
 
                 // Find the page for this year
