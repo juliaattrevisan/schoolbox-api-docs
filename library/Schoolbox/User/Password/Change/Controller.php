@@ -82,7 +82,9 @@ class Controller extends Base
         $validChangeRequest = new ValidChangeRequest($this->passwordService);
 
         if ($validChangeRequest->isSatisfiedBy($currentPassword, $userPassword, $newPassword, $confirmPassword)) {
-            $user->setPassword($this->passwordService->hash($this->getRequest()->post['new_password']));
+            $user->setPassword($this->passwordService->hash($newPassword));
+            // this is required for syncing external password
+            $user->setRetrievablePassword($newPassword);
 
             try {
                 $this->userMapper->save($user);
