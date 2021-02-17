@@ -307,7 +307,7 @@ class Controller extends Base
      * Asserts that this year is valid for the eReport.
      *
      * * Reports are only for students who started year 7 in 2015+ for now
-     * * Reports are only for years the student is/was in year 7, 8 or 9
+     * * Reports are only for years the student is/was in year 7-12
      *
      * @param int  $year
      * @param User $student
@@ -318,12 +318,12 @@ class Controller extends Base
         $thisYear  = (int)date('Y');
         $startYear = $thisYear + 7 - (int)$student->getYear()->getName();
         if ($startYear < 2015) {
-            throw new RangeException("Reports are only for students who started year 7 in 2015 or later for now");
+            throw new RangeException("Reports are only for students who started year 7 in 2015 or later");
         }
 
         $reportYearLevel = ((int)$student->getYear()->getName()) - ($thisYear - $year);
-        if ($reportYearLevel >= 10) {
-            throw new RangeException("Reports are only for years 7, 8 and 9 for now");
+        if ($reportYearLevel > 12) {
+            throw new RangeException("Reports are only for years 7-12");
         }
     }
 }
