@@ -14,7 +14,7 @@
 
             <p>Processing failed for the following reason: {{ data.reason }}</p>
 
-            {% if data.resolution %}<p>{{ data.resolution }}</p>{% endif %}
+            {% if data.resolution is defined %}<p>{{ data.resolution }}</p>{% endif %}
 
             {% if data.date and not data.date.isNull %}
                 <p><br>Issue occurred at {{ data.date.long }}, further information has been logged.</p>
