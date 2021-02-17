@@ -38,7 +38,6 @@
 {% if attributes.isMiddleYear %}
 
     {% if attributes.curriculumSemester == 1 and nesaSemester == 1 %}
-
         {# Special case for Middle Years and it's currently Semester 1
          # They won't show any Formative grey boxes if there's a NESA Grade for semester 1
          #}
@@ -48,14 +47,7 @@
                 <span class="result-value">{{ nesa.grade|default('-') }}</span>
             </div>
         </div>
-    {% elseif attributes.curriculumSemester == 2 %}
-
-        {# Special case for Middle Years and it's currently Semester 2
-         #
-         # If they had a NESA Grade for semester 1, show it, until you start evaluating Semester 2
-         # Formative feedbacks. At that point you're looking at interim grades for Formative
-         # feedbacks in semester 2 and at this particular point, hide the NESA Semester 1.
-         #}
+    {% else %}
         <div class="result-group hsc-rank">
             {% if rankData.studentMark is defined %}
                 <div class="result-item hsc-rank-mark">
@@ -70,10 +62,18 @@
                 </div>
             {% endif %}
 
-            {# Only show the previous semester's NESA grade when:
+            {# Special case for Middle Years and it's currently Semester 2
+             #
+             # If they had a NESA Grade for semester 1, show it, until you start evaluating Semester 2
+             # Formative feedbacks. At that point you're looking at interim grades for Formative
+             # feedbacks in semester 2 and at this particular point, hide the NESA Semester 1.
+             #
+             # Only show the previous semester's NESA grade when:
              # - you're in semester 2
              # - a semester 1 nesa grade exists
-             # - hasInterimGrades is false because you haven't started sem 2 formative evaluations
+             #
+             # In this circumstance, nesa.grade will have been previously populated elsewhere with
+             # that data set. Otherwise it'll be the semester 2 grade. It's messed up, I know.
              #}
             {% if nesa.grade %}
                 <div class="result-group {% if nesa.error|default(false) %} error{% endif %}">
@@ -85,7 +85,6 @@
             {% endif %}
         </div>
     {% endif %}
-
 {% else %}
 
     {# Special case for HSC Year 12 students
