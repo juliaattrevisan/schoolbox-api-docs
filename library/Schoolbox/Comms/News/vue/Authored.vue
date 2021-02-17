@@ -81,7 +81,7 @@
              */
             getNews: function () {
 
-                fetchAsJson(this.newsRoute + '/ha')
+                fetchAsJson(this.newsRoute)
                 .then((response) => {
 
                     this.allArticles = response;

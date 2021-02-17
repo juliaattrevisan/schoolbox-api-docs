@@ -1,25 +1,35 @@
 
-let fetchAsJson = (url) => {
-    const myRequest = new Request(url, {
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        redirect: 'follow'
-    });
-    return fetch(myRequest)
-    .then(response => {
-        if (response.ok) {
-            return response;
-        } else {
-            throw new Error('Network response was not ok');
-        }
-    })
-    .then(response => {
-        return response.json();
-    })
-    .catch(error => {
-        throw new Error('There has been a problem with your fetch operation:', error);
-    });
-}
+/**
+ * Return the data from a requested url as json
+ *
+ * @param url:String
+ * @return data:Object
+ */
+export async function fetchAsJson (url) {
+    
+    try {
 
-export { fetchAsJson }
+        const myRequest = new Request(url, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            redirect: 'follow'
+        });
+
+		let response = await fetch(myRequest);
+
+		if (!response.ok) {
+			throw new Error('Network response was not ok');
+        }
+        
+		let data = await response.json();
+        
+        return data;
+
+    } catch (error) {
+        
+        throw new Error('There has been a problem with your fetch operation:', error);
+        
+	}
+
+}
