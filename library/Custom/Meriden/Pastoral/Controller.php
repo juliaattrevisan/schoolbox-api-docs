@@ -47,12 +47,12 @@ class Controller extends Base
 
         if (empty($reportYears)) {
             // 404
-            $this->getResponse()->status->setCode(404);
+            $this->response->status->setCode(404);
         } else {
             // Redirect to current year, or last year in report
             $lastReportYear = max($reportYears);
-            $this->getResponse()->redirect->found(
-                $this->getRouter()->generate(
+            $this->response->redirect->found(
+                $this->router->generate(
                     'customMeridenPastoral.index',
                     array(
                         'id'   => $student->getId(),
@@ -73,7 +73,7 @@ class Controller extends Base
     {
         try {
             $report = $this->buildReportData($year, $student);
-            $this->getResponse()->content->set(
+            $this->response->content->set(
                 [
                     'template' => $report['template'],
                     'data'     => $report,
@@ -81,7 +81,7 @@ class Controller extends Base
                 ]
             );
         } catch (RangeException $e) {
-            $this->getResponse()->status->setCode(404);
+            $this->response->status->setCode(404);
         }
     }
 
@@ -155,7 +155,7 @@ class Controller extends Base
                 ]
             );
         } catch (RangeException $e) {
-            $this->getResponse()->status->setCode(404);
+            $this->response->status->setCode(404);
         }
     }
 
