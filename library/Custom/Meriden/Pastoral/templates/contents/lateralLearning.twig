@@ -4,7 +4,7 @@
  # Parameters:
  # * report.student:       the student whose report this is
  # * report.subjectList:   the list of the student's subjects
- # * report.subjectReport: the subject report for this student
+ # * report.subjectReport: the lateral learning report for this student
  # * showSubjectSelector:  is the subject selector shown?
 #}
 {% extends '@customMeridenPastoral/contents/base.twig' %}
@@ -20,8 +20,7 @@
             </dl>
         </div>
         <div class="small-12 column">
-            {% set capabilityMark = report.subjectReport.retrieveLateralLearningCapabilityMark %}
-            {% set indicatorMarks = (capabilityMark is defined) ? capabilityMark.indicatorMarks : [] %}
+            {% set indicatorMarks = report.subjectReport.indicatorMarks ?? [] %}
             {% if indicatorMarks is not empty %}
                 <table class="width-auto bordered-table">
                     {% for indicatorMark in indicatorMarks %}
