@@ -9,10 +9,6 @@ namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
 
 use Alaress\Statistics\Statistics;
 use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\LateralLearning;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\Standard;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup\MiddleSchool;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup\SeniorSchool;
 use RangeException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\AssessmentType;
@@ -239,7 +235,7 @@ class Factory
      * @param int     $year
      * @param User    $student
      * @param string  $subjectCode
-     * @return Standard
+     * @return Subject\Standard
      */
     private function buildStandard(
         array $externalData,
@@ -248,8 +244,8 @@ class Factory
         int $year,
         User $student,
         string $subjectCode
-    ): Standard {
-        $subject      = new Standard();
+    ): Subject\Standard {
+        $subject      = new Subject\Standard();
         $externalData = $this->augmentSubjectWithTeacher($externalData);
         $subject
             ->setName($externalData['sub_desc'])
@@ -311,7 +307,7 @@ class Factory
      * @param string         $subjectCode
      * @param Subject\Base[] $subjectList `$student`'s subjects in `$year`
      * @param string|null    $roleTypeOverride
-     * @return LateralLearning
+     * @return Subject\LateralLearning
      */
     private function buildLateralLearning(
         array $externalData,
@@ -321,9 +317,9 @@ class Factory
         string $subjectCode,
         array $subjectList,
         ?string $roleTypeOverride
-    ): LateralLearning {
+    ): Subject\LateralLearning {
         // Need a course description
-        $lateralLearning = new LateralLearning();
+        $lateralLearning = new Subject\LateralLearning();
         $lateralLearning
             ->setName($externalData['sub_desc'])
             ->setDescription($externalData['outline_text'])
@@ -433,14 +429,14 @@ class Factory
         $lateralLearning = null;
         foreach ($result as $row) {
             if (self::isSubjectLateralLearning($row['sub_desc'])) {
-                $lateralLearning = new LateralLearning();
+                $lateralLearning = new Subject\LateralLearning();
                 $lateralLearning
                     ->setName($row['sub_desc'])
                     ->setStudent($student)
                     ->setYear($row['yr_study'])
                     ->setSubjectCode($row['code']);
             } else {
-                $subject = new Standard();
+                $subject = new Subject\Standard();
                 $subject
                     ->setName($row['sub_desc'])
                     ->setStudent($student)
@@ -865,9 +861,9 @@ class Factory
     {
         $yearLevel = self::determineYearLevel($level, $student, null);
         if ($yearLevel <= 9) {
-            $tutorGroup = new MiddleSchool();
+            $tutorGroup = new TutorGroup\MiddleSchool();
         } else {
-            $tutorGroup = new SeniorSchool();
+            $tutorGroup = new TutorGroup\SeniorSchool();
         }
         return $tutorGroup;
     }
