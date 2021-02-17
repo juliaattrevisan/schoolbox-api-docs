@@ -207,17 +207,17 @@ class MiddleYearsAssessmentTasks extends BaseComponent
 
         /* Handy diagnosis
          */
-        new \Alaress_Probe([
-            'assessmentTitle' => $statistics['assessmentTitle'],
-            'studentMark'     => $statistics['studentMark'],
-            'cohortAverage'   => $statistics['cohortAverage'],
-            'publishAt'       => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
-            'comment'         => $feedback ? $feedback->getComment() : null,
-            'commentBy'       => $feedback ? $feedback->getReviewer()->getFullName() : null,
-            'dueDate'         => $classAssessment->getDueAt()->getDatabase(),
-            'unitSpecId'      => $unitSpec->getId(),
-            'unitSpecTitle'   => $unitSpec->getTitle(),
-        ]);
+//        new \Alaress_Probe([
+//            'assessmentTitle' => $statistics['assessmentTitle'],
+//            'studentMark'     => $statistics['studentMark'],
+//            'cohortAverage'   => $statistics['cohortAverage'],
+//            'publishAt'       => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
+//            'comment'         => $feedback ? $feedback->getComment() : null,
+//            'commentBy'       => $feedback ? $feedback->getReviewer()->getFullName() : null,
+//            'dueDate'         => $classAssessment->getDueAt()->getDatabase(),
+//            'unitSpecId'      => $unitSpec->getId(),
+//            'unitSpecTitle'   => $unitSpec->getTitle(),
+//        ]);
 
         return [
             'assessmentTitle' => $statistics['assessmentTitle'],

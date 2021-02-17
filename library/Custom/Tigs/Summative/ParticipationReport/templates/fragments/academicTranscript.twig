@@ -163,6 +163,25 @@ Data:
                                 {% else %}
                                     {% set comment = null %}
 
+                                    {# Find out if you have any formative feedbacks in the current semester for this subject
+                                     # if you're a middle years student - beacuse we show the student's NESA Semester 1 grade
+                                     # in semester 2 unless they have semester 2 formative feedbacks
+                                     #
+                                     # This works, but only if folderData.middleYearsTaskMarks only contains assessments in the
+                                     # current semester. Once you start mixing up other semesters, you'll get misbehaviours
+                                     #}
+                                    {% set hasFormativeFeedback = false %}
+
+                                    {% for unitSpecData in folderData.unitSpecs %}
+                                        {% set taskData = folderData.middleYearsTaskMarks %}
+
+                                        {% if taskData.data[unitSpecData.id] ?? false %}
+                                            {% if taskData.data[unitSpecData.id].studentMark|length %}
+                                                {% set hasFormativeFeedback = true %}
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+
                                     {# If we're in semester 2, try loading semester 2 NESA data. If there's something here
                                      # then use that data to inform the NESA Grade and subject comment
                                      #
@@ -189,7 +208,16 @@ Data:
                                         {% set nesaSemester = 2 %}
                                         {% set nesaError = folderData.nesaGraphData.data.2.error %}
                                         {% set comment = folderData.nesaGraphData.data.2.comment.comment %}
-                                    {% elseif attributes.curriculumSemester == 2 and folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment.comment|length %}
+                                    {% elseif attributes.isMiddleYear and attributes.curriculumSemester == 2 and folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment.comment|length and not hasFormativeFeedback %}
+
+                                        {# Extremely specific use case where all the following are true:
+                                         # - you're a Middle Years student,
+                                         # - you're in semester 2,
+                                         # - you don't have any formative feedbacks in semester 2
+                                         # - you have a NESA Grade that was given to you in semester 1
+                                         #
+                                         # If that's the case, show the NESA Semester 1 grade + comment
+                                         #}
                                         {% set nesaGrade = folderData.nesaGraphData.data.1.studentMark %}
                                         {% set nesaSemester = 1 %}
                                         {% set nesaError = folderData.nesaGraphData.data.1.error %}

@@ -75,7 +75,7 @@
              # - a semester 1 nesa grade exists
              # - hasInterimGrades is false because you haven't started sem 2 formative evaluations
              #}
-            {% if nesa.grade and not hasInterimGrades %}
+            {% if nesa.grade %}
                 <div class="result-group {% if nesa.error|default(false) %} error{% endif %}">
                     <div class="result-item nesa-grade">
                         <span class="result-heading">NESA Grade</span><br />
