@@ -12,6 +12,7 @@ use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
 use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\LateralLearning;
 use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\Standard;
 use Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup\MiddleSchool;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup\SeniorSchool;
 use RangeException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\AssessmentType;
@@ -122,13 +123,11 @@ class Factory
      * @param User        $student
      * @param string|null $roleTypeOverride
      *
-     * @return MiddleSchool
+     * @return TutorGroup\Base
      */
     public function buildTutorGroup($year, User $student, ?string $roleTypeOverride)
     {
-        // The variant that is built depends on the student's year level at the
-        // year of the report.
-        $tutorGroup = new MiddleSchool();
+        $tutorGroup = self::buildTutorGroupReport($year, $student);
         $tutorGroup
             ->setName($year . ' eReport')
             ->setStudent($student)
@@ -400,7 +399,11 @@ class Factory
         $tutorGroups = [];
         foreach ($this->gateway->getAllYearLevelGroups($student) as $level) {
             // Which variant gets built?
-            $tutorGroup = new MiddleSchool();
+            try {
+                $tutorGroup = self::buildTutorGroupReport((int)$level['yr_study'], $student);
+            } catch (RangeException $e) {
+                continue;
+            }
             $tutorGroup
                 ->setName($level['yr_study'] . ' eReport')
                 ->setStudent($student)
@@ -848,5 +851,24 @@ class Factory
     private static function isSubjectLateralLearning(string $subjectName): bool
     {
         return (bool)preg_match(self::LATERAL_LEARNING_SUBJECT_NAME_REGEX, $subjectName);
+    }
+
+    /**
+     * Base builder for a tutor group report: constructs only the base object.
+     *
+     * @param int  $level
+     * @param User $student
+     * @return TutorGroup\Base
+     * @throws RangeException if the year level is invalid
+     */
+    private static function buildTutorGroupReport(int $level, User $student)
+    {
+        $yearLevel = self::determineYearLevel($level, $student, null);
+        if ($yearLevel <= 9) {
+            $tutorGroup = new MiddleSchool();
+        } else {
+            $tutorGroup = new SeniorSchool();
+        }
+        return $tutorGroup;
     }
 }
