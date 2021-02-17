@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -124,15 +125,12 @@ class Finder
             $query                  = $this->database->getQueryIterator(
                 "
                     SELECT
-                        vap.assessment_id,
-                        vap.due_date,
-                        vap.excluded_at
-                    FROM v_assessment_participation vap
-                    INNER JOIN assessment a              ON vap.assessment_id = a.id
-                    INNER JOIN v_assessment_relation var ON vap.assessment_id = var.assessment_id
-                    INNER JOIN folder f                  ON vap.folder_id     = f.id
-                    WHERE vap.student_id = :studentId
-                    AND   vap.assessment_id IN {$assessmentPlaceholders}
+                        assessment_id,
+                        due_date,
+                        excluded_at
+                    FROM v_assessment_participation
+                    WHERE student_id = :studentId
+                    AND   assessment_id IN {$assessmentPlaceholders}
                 ",
                 $assessmentParams + [
                     'studentId' => $studentId,
@@ -164,9 +162,8 @@ class Finder
                     f.name AS folderName,
                     a.title AS assessmentTitle
                 FROM v_assessment_participation vap
-                INNER JOIN assessment a              ON vap.assessment_id = a.id
-                INNER JOIN v_assessment_relation var ON vap.assessment_id = var.assessment_id
-                INNER JOIN folder f                  ON vap.folder_id     = f.id
+                INNER JOIN assessment a ON vap.assessment_id = a.id
+                INNER JOIN folder     f ON vap.folder_id     = f.id
                 WHERE vap.student_id = :studentId
                 AND   a.deleted_at IS NULL
                 AND   vap.folder_id IN {$folderPlaceholders}
