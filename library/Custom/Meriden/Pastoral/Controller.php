@@ -251,13 +251,13 @@ class Controller extends Base
      * Builds a list of tutor groups for this student, excluding invalid years.
      *
      * @param User $student
-     * @return array|TutorGroup[]
+     * @return array|TutorGroup\Base[]
      */
     private function retrieveTutorGroupList(User $student): array
     {
         return array_filter(
             $this->studentInvolvementFactory->buildTutorGroupList($student),
-            function (TutorGroup $tutorGroup) use ($student) {
+            function (TutorGroup\Base $tutorGroup) use ($student) {
                 try {
                     $this->assertValidYearForReport($tutorGroup->getYear(), $student, null);
                     return true;
@@ -277,7 +277,7 @@ class Controller extends Base
     private function retrieveValidYearsForReport(User $student): array
     {
         return array_map(
-            function (TutorGroup $tutorGroup) {
+            function (TutorGroup\Base $tutorGroup) {
                 return $tutorGroup->getYear();
             },
             $this->retrieveTutorGroupList($student)

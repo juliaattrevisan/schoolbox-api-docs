@@ -11,6 +11,7 @@ use Alaress\Statistics\Statistics;
 use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
 use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\LateralLearning;
 use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\Standard;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup\MiddleSchool;
 use RangeException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\AssessmentType;
@@ -118,13 +119,13 @@ class Factory
      * @param User        $student
      * @param string|null $roleTypeOverride
      *
-     * @return TutorGroup
+     * @return MiddleSchool
      */
     public function buildTutorGroup($year, User $student, ?string $roleTypeOverride)
     {
         // The variant that is built depends on the student's year level at the
         // year of the report.
-        $tutorGroup = new TutorGroup();
+        $tutorGroup = new MiddleSchool();
         $tutorGroup
             ->setName($year . ' eReport')
             ->setStudent($student)
@@ -389,13 +390,14 @@ class Factory
      *
      * @param User $student
      *
-     * @return array|TutorGroup[]
+     * @return array|TutorGroup\Base[]
      */
     public function buildTutorGroupList(User $student)
     {
         $tutorGroups = [];
         foreach ($this->gateway->getAllYearLevelGroups($student) as $level) {
-            $tutorGroup = new TutorGroup();
+            // Which variant gets built?
+            $tutorGroup = new MiddleSchool();
             $tutorGroup
                 ->setName($level['yr_study'] . ' eReport')
                 ->setStudent($student)

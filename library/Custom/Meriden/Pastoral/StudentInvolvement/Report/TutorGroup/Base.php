@@ -5,15 +5,18 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
+declare(strict_types=1);
 
+namespace Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup;
+
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Base as BaseReport;
 use Schoolbox\User;
 
 /**
- * Representation of report data for a student's tutor group, independent of any
- * subjects that the student is in.
+ * Base representation of report data for a student's tutor group, independent
+ * of any subjects that the student is in.
  */
-class TutorGroup extends Base
+abstract class Base extends BaseReport
 {
     /**
      * The year level coordinator(s) for this group
