@@ -95,7 +95,8 @@ try {
     $imageProcessor = new Image\Processor($resource, $key, $transform);
     $imageProcessor->load()->stream();
 } catch (Exception $e) {
-    $placeHolderFile = __DIR__ . $logoSizes[$logo][$size][2];
+    // moved to /www-static/
+    $placeHolderFile = str_replace('/www/', '/www-static/', __DIR__) . $logoSizes[$logo][$size][2];
 
     if (is_readable($placeHolderFile)) {
         header('Content-type: image/png');
