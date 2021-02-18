@@ -6,7 +6,9 @@
  */
 namespace Schoolbox\Sync\Provisioner;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User as SchoolboxUser;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -177,6 +179,84 @@ class User extends SchoolboxUser
         // And add to the list to remove, if this actually does anything anymore!
         $this->campusRemoveList = $campusCollectionRemove;
     }
+
+
+    /**
+     * Using the mutation timeline, derive UserAccess instances
+     * deciding whether to retain Full Access settings and/or create
+     * new instances
+     *
+     * @param \Schoolbox\Resource\Folder\Mapper $fm
+     * @param LoggerInterface                   $logger
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Schoolbox\Mapper\Exception\NotFound
+     */
+    public function generateUserAccess(\Schoolbox\Resource\Folder\Mapper $fm, LoggerInterface $logger): void
+    {
+        /* Modify accessList only when ups_groups_enabled is actually enabled
+         * Otherwise leave it unchanged from whatever it was
+         */
+        if (!$this->getConfigLoader()->get('ups_groups_enabled')) {
+            return;
+        }
+
+        /* Decide the net effect, in accordance to how the mutation timeline evolved
+         */
+        $finalGroups = [];
+
+        foreach ($this->getUserAccessMutations() as $mutation) {
+            foreach($mutation['instance'] as $folderId) {
+                $folder = $fm->findCheaplyById($folderId);
+
+                if ($mutation['status'] === 'add') {
+                    $logger->debug(sprintf(
+                        "Groups: %s %s (%s) with accesslevel %s\n",
+                        $mutation['status'],
+                        $folder->getId(),
+                        $folder->getName(),
+                        $mutation['level']
+                    ));
+
+                    $finalGroups[$folderId] = $mutation['level'];
+                } elseif ($mutation['status'] === 'remove') {
+
+                    $logger->debug(sprintf(
+                        "Groups: %s %s (%s)\n",
+                        $mutation['status'],
+                        $folder->getId(),
+                        $folder->getName()
+                    ));
+
+                    unset($finalGroups[$folderId]);
+                }
+            }
+        }
+
+        /* For every item listed in the mutation timeline, process a UserAccess
+         * These are now the userAccesses the person should have
+         */
+        foreach ($finalGroups as $serviceIdentifier => $accessLevel) {
+            $userAccess = UserAccessMapper::getInstance()->createModel()
+                ->setUser($this)
+                ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setServiceIdentifier($serviceIdentifier)
+                ->setAccessLevel($accessLevel);
+
+            /* Shank it in to this user instance
+             */
+            $this->accessList->add($userAccess);
+
+            $logger->debug(sprintf(
+                "Final Groups: %s %s \n",
+                $serviceIdentifier,
+                $accessLevel
+            ));
+        }
+    }
+
 //
 //    /**
 //     * Set $identifiers to access level $level in $accessList collection

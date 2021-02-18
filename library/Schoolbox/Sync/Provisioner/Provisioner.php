@@ -302,50 +302,12 @@ class Provisioner
                         ));
                     }
 
-                    /* Find out what got assigned, in order.
-                     */
-                    $finalGroups = [];
+                    $internalUser->generateUserAccess($fm, $this->logger);
 
-                    /* Process the final list of userAccess instances
-                     */
-                    foreach ($internalUser->getUserAccessMutations() as $mutation) {
-                        foreach($mutation['instance'] as $folderId) {
-                            $folder = $fm->findCheaplyById($folderId);
-
-                            if ($mutation['status'] === 'add') {
-                                $this->logger->debug(sprintf(
-                                    "Groups: %s %s (%s) with accesslevel %s\n",
-                                    $mutation['status'],
-                                    $folder->getId(),
-                                    $folder->getName(),
-                                    $mutation['level']
-                                ));
-
-                                $finalGroups[$folderId] = $mutation['level'];
-                            } elseif ($mutation['status'] === 'remove') {
-
-                                $this->logger->debug(sprintf(
-                                    "Groups: %s %s (%s)\n",
-                                    $mutation['status'],
-                                    $folder->getId(),
-                                    $folder->getName()
-                                ));
-
-                                unset($finalGroups[$folderId]);
-                            }
-                        }
-                    }
-
-                    $this->logger->warning('originallist');
-                    print_r($existingGroups);
-
-                    $this->logger->warning('$finalGroups');
-                    print_r($finalGroups);
-
-                    $diff['accessList'] = [
-                        'old' => $existingGroups,
-                        'new' => $finalGroups
-                    ];
+//                    $diff['accessList'] = [
+//                        'old' => $existingGroups,
+//                        'new' => $finalGroups
+//                    ];
 
                     $originalName = ($action == 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})"
                         : $originalUser->formatName() . " ({$internalUser->getExternalID()})";
