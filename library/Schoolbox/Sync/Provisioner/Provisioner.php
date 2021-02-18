@@ -302,12 +302,17 @@ class Provisioner
                         ));
                     }
 
-                    $internalUser->generateUserAccess($fm, $this->logger);
+                    $finalGroups = $internalUser->generateUserAccess($fm, $this->logger);
 
-//                    $diff['accessList'] = [
-//                        'old' => $existingGroups,
-//                        'new' => $finalGroups
-//                    ];
+                    /* generateUserAccess() returns null when the config option is off
+                     * No changes take place in that situation; no diff to calculate
+                     */
+                    if (null !== $finalGroups) {
+                        $diff['accessList'] = [
+                            'old' => $existingGroups,
+                            'new' => $finalGroups
+                        ];
+                    }
 
                     $originalName = ($action == 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})"
                         : $originalUser->formatName() . " ({$internalUser->getExternalID()})";

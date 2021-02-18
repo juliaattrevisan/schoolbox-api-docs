@@ -188,19 +188,20 @@ class User extends SchoolboxUser
      *
      * @param \Schoolbox\Resource\Folder\Mapper $fm
      * @param LoggerInterface                   $logger
+     * @return array|null
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    public function generateUserAccess(\Schoolbox\Resource\Folder\Mapper $fm, LoggerInterface $logger): void
+    public function generateUserAccess(\Schoolbox\Resource\Folder\Mapper $fm, LoggerInterface $logger): ?array
     {
         /* Modify accessList only when ups_groups_enabled is actually enabled
          * Otherwise leave it unchanged from whatever it was
          */
         if (!$this->getConfigLoader()->get('ups_groups_enabled')) {
-            return;
+            return null;
         }
 
         /* Decide the net effect, in accordance to how the mutation timeline evolved
@@ -255,6 +256,10 @@ class User extends SchoolboxUser
                 $accessLevel
             ));
         }
+
+        /* This is the list of groups to which this person has access
+         */
+        return $finalGroups;
     }
 
 //

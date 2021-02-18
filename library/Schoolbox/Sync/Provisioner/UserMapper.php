@@ -67,39 +67,39 @@ class UserMapper extends SchoolboxMapper
             // make sure any mutes go through correctly
             $userAccessMapper->setEventPropagator($this->getEventPropagator());
 
-            /* If you combined 'Groups (Read/Write)' and 'Groups (Remove)' in the
-             * same rule, you'll always be added to the groups specified by the
-             * value of 'Groups (Read/Write)'. It will overpower the Remove.
-             * It is recommended that Remove operations be set up before Read/Write
-             *
-             * This is so you can remove people from multiple groups, then reassign
-             * people to new groups, in the same rule.
-             *
-             * There isn't a way to tell whether the 'Groups (Remove)' came before
-             * or after the 'Groups (Read/Write)' in the same rule.
-             */
-
-            /* Get a list of all the UserAccess instances for this User
-             */
-            $allUserAccess = $userAccessMapper->findAllGroupsForUser($user);
-
-            /* Search $allUserAccess for anything that should be deleted
-             * If found, delete it from the db if it was already there
-             * These are spawned from a previous Rule.
-             */
-            foreach ($user->getUserAccessRemove() as $current) {
-                $found = $allUserAccess->getBy('serviceIdentifier', $current);
-
-                /* Do not blow away Owners, only Read/Write accessors
-                 */
-                if ($found instanceof UserAccess && ($found->getAccessLevel() < UserAccess::ACCESS_FULL)) {
-                    $userAccessMapper->deleteByColumnList([
-                        'uid'     => $user->getId(),
-                        'sid'     => $found->getServiceIdentifier(),
-                        'service' => UserAccess::SERVICE_HOMEPAGE,
-                    ]);
-                }
-            }
+//            /* If you combined 'Groups (Read/Write)' and 'Groups (Remove)' in the
+//             * same rule, you'll always be added to the groups specified by the
+//             * value of 'Groups (Read/Write)'. It will overpower the Remove.
+//             * It is recommended that Remove operations be set up before Read/Write
+//             *
+//             * This is so you can remove people from multiple groups, then reassign
+//             * people to new groups, in the same rule.
+//             *
+//             * There isn't a way to tell whether the 'Groups (Remove)' came before
+//             * or after the 'Groups (Read/Write)' in the same rule.
+//             */
+//
+//            /* Get a list of all the UserAccess instances for this User
+//             */
+//            $allUserAccess = $userAccessMapper->findAllGroupsForUser($user);
+//
+//            /* Search $allUserAccess for anything that should be deleted
+//             * If found, delete it from the db if it was already there
+//             * These are spawned from a previous Rule.
+//             */
+//            foreach ($user->getUserAccessRemove() as $current) {
+//                $found = $allUserAccess->getBy('serviceIdentifier', $current);
+//
+//                /* Do not blow away Owners, only Read/Write accessors
+//                 */
+//                if ($found instanceof UserAccess && ($found->getAccessLevel() < UserAccess::ACCESS_FULL)) {
+//                    $userAccessMapper->deleteByColumnList([
+//                        'uid'     => $user->getId(),
+//                        'sid'     => $found->getServiceIdentifier(),
+//                        'service' => UserAccess::SERVICE_HOMEPAGE,
+//                    ]);
+//                }
+//            }
 
             /* Reinstate all elements in $accessList
              */
