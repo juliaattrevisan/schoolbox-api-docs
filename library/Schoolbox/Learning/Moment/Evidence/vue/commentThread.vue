@@ -72,7 +72,7 @@ export default {
          */
         getAddCommentButtonText () {
             if (this.isCKEditorLoading) return 'Loading';
-            else return 'Add a Comment'
+            else return 'Add a comment'
         },
 
         dateDisplayFormats: () => window.dateDisplayFormats,
@@ -292,7 +292,7 @@ export default {
                     <ckeditor tag-name="textarea" v-model="pendingComment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
                     <a class="button submit"
                     @click="postComment"
-                    :disabled="pendingComment.trim() === '' || saveInProgress">Post Comment</a>
+                    :disabled="pendingComment.trim() === '' || saveInProgress">Post comment</a>
                 </div>
                 <template v-if="hasComments">
                     <ul class="information-list">
