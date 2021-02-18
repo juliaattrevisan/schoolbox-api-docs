@@ -281,14 +281,35 @@ class Provisioner
                     // get a diff of the original user and what we've ended up with
                     $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
 
-                    // get a diff of the access list as well
-                    $newAccessList = $this->formatAccessLevels($internalUser, $originalUser);
-                    if ($newAccessList !== $oldAccessList) {
-                        $diff['accessList'] = [
-                            'old' => $oldAccessList,
-                            'new' => $newAccessList,
-                        ];
+
+                    /* Find out what got assigned, in order.
+                     */
+                    $fm = \Schoolbox\Resource\Folder\Mapper::getInstance();
+
+                    echo "Testing mutations\n";
+
+                    foreach ($internalUser->getUserAccessMutations() as $mutation) {
+                        foreach($mutation['instance'] as $instance) {
+                            $folder = $fm->findCheaplyById($instance);
+
+                            print_r(sprintf(
+                                "%s %s (%s)\n",
+                                $mutation['status'],
+                                $folder->getId(),
+                                $folder->getName()
+                            ));
+                        }
                     }
+
+
+//                    // get a diff of the access list as well
+//                    $newAccessList = $this->formatAccessLevels($internalUser, $originalUser);
+//                    if ($newAccessList !== $oldAccessList) {
+//                        $diff['accessList'] = [
+//                            'old' => $oldAccessList,
+//                            'new' => $newAccessList,
+//                        ];
+//                    }
 
                     $originalName = ($action == 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})"
                         : $originalUser->formatName() . " ({$internalUser->getExternalID()})";
