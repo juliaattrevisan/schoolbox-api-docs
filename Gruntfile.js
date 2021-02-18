@@ -1,4 +1,3 @@
-const sass  = require('sass');
 const jsSrc = {
     main: [
 
@@ -227,7 +226,6 @@ module.exports = function (grunt) {
     require('jit-grunt')(grunt, {bower: 'grunt-bower-task'});
 
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-sass');
     grunt.loadNpmTasks('grunt-contrib-concat');
 
     // Dev tasks
