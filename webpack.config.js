@@ -6,8 +6,8 @@ module.exports = {
     entry: {
 
         // Libraries
-        clipboard: "./www/javascript/shared/clipboard/clipboard.main.js",
-        strtotime: "./www/javascript/shared/alaress-datetime-picker/strtotime.main.js",
+        clipboard: "./www-static/javascript/shared/clipboard/clipboard.main.js",
+        strtotime: "./www-static/javascript/shared/alaress-datetime-picker/strtotime.main.js",
 
         // Vue components
         hybridbar: path.resolve(__dirname, 'resources/js/hybrid-bar/index.js'),
@@ -47,7 +47,7 @@ module.exports = {
 
     },
     output: {
-        path: path.resolve(__dirname, "www/javascript/components"),
+        path: path.resolve(__dirname, "www-static/javascript/components"),
         publicPath: "/javascript/components/",
         filename: "[name].bundle.js"
     },
