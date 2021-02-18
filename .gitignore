@@ -17,8 +17,8 @@ chrome-foundation*.css
 #chrome-foundation*.scss
 chrome-foundation*.css.map
 chrome-foundation-ie9*.css
-editor.css
-editor.css.map
+#editor.css
+#editor.css.map
 legacy.css
 variables.css
 mixins.css
@@ -30,7 +30,7 @@ print.css
 screen.css
 vendor/
 # Bower install directory
-www/javascript/components/
+www-static/javascript/components/
 node_modules/
 test/behavior/screenshots/*.png
 test/behavior/screenshots/*.html
