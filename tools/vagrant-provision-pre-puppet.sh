@@ -28,6 +28,16 @@ if [ ! -f /vagrant/.env ]; then
 fi
 
 
+# Is mysql installed ? (it won't if packer image build)
+if type mysql 2>/dev/null >&2 && test -f /root/.my.cnf; then
+  echo "[SB][$(date +%Y-%m-%d\ %X)] Removing current Schoolbox MySQL database";
+  mysql --defaults-extra-file=/root/.my.cnf -e "DROP DATABASE IF EXISTS schoolbox";
+
+  echo "[SB][$(date +%Y-%m-%d\ %X)] Removing current Schoolbox MySQL user";
+  mysql --defaults-extra-file=/root/.my.cnf -e "DROP USER IF EXISTS 'schoolboxvagrant'@'localhost'";
+fi
+
+
 # We want to be able to reference schoolbox code at the standard location,
 # but have the disks on the shared mount se we can directly manipulate from the host
 rm -rf /usr/share/schoolbox
