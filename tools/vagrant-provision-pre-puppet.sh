@@ -34,8 +34,8 @@ rm -rf /usr/share/schoolbox
 ln -sf /vagrant /usr/share/schoolbox
 
 rm -rf /var/lib/schoolbox /vagrant/data
-mkdir /vagrant/data
-mkdir /mnt/data
+mkdir -p /vagrant/data
+mkdir -p /mnt/data
 ln -sf /vagrant/data /var/lib/schoolbox
 
 # Does vagrant.yaml file indicate we wish this host to use a custom IR endpoint?
