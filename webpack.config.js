@@ -44,8 +44,10 @@ module.exports = {
                                 {
                                     targets: {
                                         browsers: [
-                                            "defaults",
-                                            "not IE <= 11"
+                                            ">0.25%",
+                                            "not dead",
+                                            "not op_mini all",
+                                            "not ie 11"
                                         ],
                                     },
                                     useBuiltIns: 'usage',
@@ -55,8 +57,6 @@ module.exports = {
                         ],
                         plugins: [
                             "@babel/plugin-proposal-optional-chaining",
-                            "@babel/plugin-transform-object-assign",
-                            "@babel/plugin-transform-shorthand-properties"
                         ]
                     }
                 }
