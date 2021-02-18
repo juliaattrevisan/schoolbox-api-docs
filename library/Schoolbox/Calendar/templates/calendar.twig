@@ -42,6 +42,7 @@
         eventLimit:         Boolean('{{ config.calendar_collapse_events }}'),
         firstDay:           Number('{{ config.calendar_start_day }}'),
         defaultView:        anchorView || '{{ calendarView }}',
+        momentJsDateShort:  '{{ config.date_short | momentJsFormat }}',
         dateDisplayFormats: dateDisplayFormats,
         translations:       {
             eotc: {
