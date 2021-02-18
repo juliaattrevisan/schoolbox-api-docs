@@ -81,9 +81,8 @@ module.exports = {
             },
             {
 				test: /\.scss$/,
-				oneOf: [
+				oneOf: [ //this allows us to only perform the below on vue files, then other scss files follow the following
 					{
-						//this allows us to only perform the below on vue files, other scss files follow the following
 						resourceQuery: /^\?vue/,
 						use: [
 							'vue-style-loader',

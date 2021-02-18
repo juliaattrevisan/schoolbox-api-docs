@@ -165,18 +165,6 @@ module.exports = function (grunt) {
             },
             install: {}
         },
-        sass: {
-            options: {
-                implementation: sass,
-                outputStyle: 'compressed'
-            },
-            dist: {
-                files: {
-                    'www/css/core/chrome-foundation.css': 'www/css/foundation/chrome-foundation.scss',
-                    'www/css/core/editor.css': 'www/css/foundation/editor.scss'
-                }
-            }
-        },
         concat: {
             // Concat JS files (used for development)
             options: {
@@ -232,13 +220,6 @@ module.exports = function (grunt) {
                 options: {
                     interrupt: true
                 }
-            },
-            css: {
-                files: ['www/css/**/*.scss', '!www/css/foundation/utils/*.scss'],
-                tasks: 'sass',
-                options: {
-                    interrupt: true
-                }
             }
         }
     });
@@ -251,10 +232,10 @@ module.exports = function (grunt) {
 
     // Dev tasks
     grunt.registerTask('js', 'concat');
-    grunt.registerTask('dev', ['bower', 'concat', 'sass']);
+    grunt.registerTask('dev', ['bower', 'concat']);
 
     // Build tasks
     grunt.registerTask('build.js', 'uglify');
-    grunt.registerTask('build',    ['bower', 'build.js', 'sass']);
+    grunt.registerTask('build',    ['bower', 'build.js']);
     grunt.registerTask('default',  'build');
 };
