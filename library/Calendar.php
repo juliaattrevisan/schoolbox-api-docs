@@ -4,6 +4,8 @@ use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 use Schoolbox\Calendar\Event as EventModel;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\User;
 
 class Calendar extends DeprecatedModel
 {
@@ -442,14 +444,14 @@ class Calendar extends DeprecatedModel
     /**
      * Get all events occurring across the specified date span.
      *
-     * @param \Schoolbox\User $user
-     * @param \Schoolbox\User $viewer
-     * @param int             $startTimestamp If not null, filter out events that end on
+     * @param User  $user
+     * @param User  $viewer
+     * @param int   $startTimestamp If not null, filter out events that end on
      *                                        or before this time
      *                                        (end times are exclusive in calendars)
-     * @param int             $endTimestamp   If not null, filter out events that start
+     * @param int   $endTimestamp   If not null, filter out events that start
      *                                        after this time
-     * @param array           $filter A filter to put on the list of results.
+     * @param array $filter A filter to put on the list of results.
      *                                * campus: if set, event set is restricted to
      *                                events in this campus.
      *                                * group: if set, event set is restricted to
@@ -459,33 +461,25 @@ class Calendar extends DeprecatedModel
      *                                * id: if set, only this event ID will be retrieved.
      *                                If empty, all events for user are retrieved.
      *                                * type: if set, only events of this type will be retrieved.
+     * @param bool $userCampusOnly
      * @return Collection
      */
-    public function getDayEvents(\Schoolbox\User $user, \Schoolbox\User $viewer, $startTimestamp, $endTimestamp, $filter = array())
+    public function getDayEvents(User $user, User $viewer, $startTimestamp, $endTimestamp, $filter = [], bool $userCampusOnly = true)
     {
-        $firstCampus = false;
-
-        $campusList = array();
-
-        if ($user->getCampusCollection()->count()) {
-            foreach ($user->getCampusCollection() as $currentCampus) {
-                if (!$firstCampus) {
-                    $firstCampus = $currentCampus;
-                }
-
-                $campusList[] = $currentCampus->getId();
-            }
-
-
-        }
+        $campusList = $userCampusOnly ? $user->getCampusCollection()->getPropertyValues('id') : [];
 
         //Fake in some campusii here from calendar permissions, so user can see events relevant
-        $accessMapper = \Schoolbox\Permission\Access\UserAccessMapper::getInstance();
+        $accessMapper = UserAccessMapper::getInstance();
 
-        $calendarPerms = $accessMapper->findByColumnList(['uid' => $user->getId(), 'service' => \Schoolbox\Permission\Access\UserAccess::SERVICE_CALENDAR])->getPropertyValues('ServiceIdentifier');
-        $campusList = array_merge($campusList, $calendarPerms);
+        $calendarPerms = $accessMapper->findByColumnList(
+            [
+                'uid' => $user->getId(),
+                'service' => UserAccess::SERVICE_CALENDAR,
+            ]
+        )->getPropertyValues('ServiceIdentifier');
+        $campusList    = array_merge($campusList, $calendarPerms);
 
-        if(count($campusList) > 0){
+        if (count($campusList) > 0) {
             $campusQuery = "event_campus.campus_id IN(" . implode(',', $campusList) . ")";
         } else {
             $campusQuery = '1 = 1';
@@ -530,7 +524,7 @@ class Calendar extends DeprecatedModel
          * an admin.
          */
         if ($user->getCampusCollection()->count()) {
-            if ($this->groupHandler->getPermission($firstCampus->getId(), $user->getId()) > UserAccess::ACCESS_WRITE) {
+            if ($this->groupHandler->getPermission($user->getCampusCollection()->first()->getId(), $user->getId()) > UserAccess::ACCESS_WRITE) {
                 $groupChunk = "";
             } else {
                 $groupChunk = "AND event_role.role_id = {$user->getRole()->getId()}";

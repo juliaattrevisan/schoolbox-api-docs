@@ -12,15 +12,16 @@ use Schoolbox\User;
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
-class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventType_Event_Schoolbox_Default {
+class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventType_Event_Schoolbox_Default
+{
 
     /**
      * The campus to get events for. If null, returns events for all campuses.
      *
      * @var null|int
      */
-    private $campus_id;
+    private ?int $campusId;
+    private bool $userCampusOnly;
 
 
     /**
@@ -28,29 +29,33 @@ class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventTy
      * @param User     $user
      * @param User     $viewer
      * @param null|int $campusId
+     * @param bool     $userCampusOnly
      */
-    public function __construct(int $connectorId, User $user, User $viewer, int $campusId = null)
+    public function __construct(int $connectorId, User $user, User $viewer, ?int $campusId = null, bool $userCampusOnly = true)
     {
         parent::__construct($connectorId, $user, $viewer);
-        $this->campus_id = $campusId;
+        $this->campusId       = $campusId;
+        $this->userCampusOnly = $userCampusOnly;
     }
 
 
     /**
-	 * Overridden to get events only for this campus.
-	 *
-	 * @param int $startTimestamp
-	 * @param int $endTimestamp
-	 *
-	 * @return \Calendar\Event\Collection
-	 */
-	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
-		return $this->getCalendarHandler()->getDayEvents(
-			$this->getUser(),
+     * Overridden to get events only for this campus.
+     *
+     * @param int $startTimestamp
+     * @param int $endTimestamp
+     *
+     * @return \Calendar\Event\Collection
+     */
+    protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp)
+    {
+        return $this->getCalendarHandler()->getDayEvents(
+            $this->getUser(),
             $this->getViewer(),
-			$startTimestamp,
-			$endTimestamp,
-            ['campus' => $this->campus_id]
+            $startTimestamp,
+            $endTimestamp,
+            ['campus' => $this->campusId],
+            $this->userCampusOnly
         );
-	}
+    }
 }
