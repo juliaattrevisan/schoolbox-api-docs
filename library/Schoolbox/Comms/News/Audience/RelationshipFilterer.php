@@ -259,16 +259,6 @@ class RelationshipFilterer
             return $this->userMapper->createCollection();
         }
 
-        $folderIds = $taughtFolders->getPropertyValues('id');
-
-        $groupMemberIds = $this->userAccessMapper->findScalarByPredicates(
-            'uid',
-            $this->userAccessMapper->getPredicateBuilder()
-                                   ->equals('service', UserAccess::SERVICE_HOMEPAGE)
-                                   ->in('sid', $folderIds)
-                                   ->equals('type', UserAccess::ACCESS_READ)
-        );
-
         // Get all the codes from all the folders
         $folderCodes = [];
         foreach ($taughtFolders as $taughtFolder) {
@@ -279,31 +269,18 @@ class RelationshipFilterer
 
         // Find students for these folders codes
         $classStudentExternalIds = [];
-        if(\count($folderCodes) > 0) {
+        if (\count($folderCodes) > 0) {
             foreach ($this->externalClass->getStudents(\implode(',', $folderCodes)) as $classStudent) {
                 $classStudentExternalIds[$classStudent['synergy_id']] = $classStudent['synergy_id'];
             }
         }
 
-        if (!\count($groupMemberIds) && !\count($classStudentExternalIds)) {
+        if (!\count($classStudentExternalIds)) {
             return $this->userMapper->createCollection();
         }
 
-        $innerPredicate = $this->userMapper->getPredicateBuilder();
-
-        if (\count($groupMemberIds)) {
-            $innerPredicate->in('id', $groupMemberIds);
-            $innerPredicate->any(
-                $this->userMapper->getPredicateBuilder()->in('id', $groupMemberIds)
-            );
-        }
-
-        if (\count($classStudentExternalIds)) {
-            $innerPredicate->in('synergy_id', $classStudentExternalIds);
-        }
-
         $outerPb = $this->userMapper->getPredicateBuilder()
-                                    ->any($innerPredicate)
+                                    ->in('synergy_id', $classStudentExternalIds)
                                     ->equals('g.group_type', Role::STUDENT);
 
         return $this->userMapper->findByPredicates($outerPb);
