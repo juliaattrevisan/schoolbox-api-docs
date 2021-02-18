@@ -6,7 +6,7 @@
   .reply,
   .child {
     background-color: $snow;
-    border-top: 1px solid $base;
+    border-top: 1px solid $body-bg;
     border-left: 6px solid $base;
     padding-left: 1rem;
 
@@ -47,6 +47,9 @@
   }
   .socialstream-attachment .meta {
     padding-left: 2.5rem;
+  }
+  .reply .socialstream-attachment .meta {
+    padding-left: 0;
   }
   // "Allow Comments" checkbox
   .checklist {
