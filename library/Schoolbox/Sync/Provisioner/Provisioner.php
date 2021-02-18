@@ -282,14 +282,32 @@ class Provisioner
                     $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
 
 
-                    /* Find out what got assigned, in order.
+                    /* See what we started with
                      */
                     $fm = \Schoolbox\Resource\Folder\Mapper::getInstance();
 
+                    $existingGroups = [];
+
+                    foreach ($originalUser->getAccessList() as $userAccess) {
+                        $folderId = $userAccess->getServiceIdentifier();
+                        $folder = $fm->findCheaplyById($folderId);
+
+                        $existingGroups[$folderId] = $userAccess->getAccessLevel();
+
+                        $this->logger->debug(sprintf(
+                            "Existing Group: %s (%s) with accesslevel %s\n",
+                            $folder->getId(),
+                            $folder->getName(),
+                            $userAccess->getAccessLevel()
+                        ));
+                    }
+
+                    /* Find out what got assigned, in order.
+                     */
+                    $finalGroups = [];
+
                     /* Process the final list of userAccess instances
                      */
-                    $finalList = [];
-
                     foreach ($internalUser->getUserAccessMutations() as $mutation) {
                         foreach($mutation['instance'] as $folderId) {
                             $folder = $fm->findCheaplyById($folderId);
@@ -303,7 +321,7 @@ class Provisioner
                                     $mutation['level']
                                 ));
 
-                                $finalList[$folderId] = $mutation['level'];
+                                $finalGroups[$folderId] = $mutation['level'];
                             } elseif ($mutation['status'] === 'remove') {
 
                                 $this->logger->debug(sprintf(
@@ -313,23 +331,21 @@ class Provisioner
                                     $folder->getName()
                                 ));
 
-                                unset($finalList[$folderId]);
+                                unset($finalGroups[$folderId]);
                             }
                         }
                     }
 
-                    $this->logger->debug('$finalList');
-                    print_r($finalList);
+                    $this->logger->warning('originallist');
+                    print_r($existingGroups);
 
+                    $this->logger->warning('$finalGroups');
+                    print_r($finalGroups);
 
-//                    // get a diff of the access list as well
-//                    $newAccessList = $this->formatAccessLevels($internalUser, $originalUser);
-//                    if ($newAccessList !== $oldAccessList) {
-//                        $diff['accessList'] = [
-//                            'old' => $oldAccessList,
-//                            'new' => $newAccessList,
-//                        ];
-//                    }
+                    $diff['accessList'] = [
+                        'old' => $existingGroups,
+                        'new' => $finalGroups
+                    ];
 
                     $originalName = ($action == 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})"
                         : $originalUser->formatName() . " ({$internalUser->getExternalID()})";
