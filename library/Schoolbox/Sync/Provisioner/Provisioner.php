@@ -236,7 +236,7 @@ class Provisioner
 
                     // Keep a copy of the original user, for comparison
                     $originalUser  = clone $internalUser;
-                    $oldAccessList = $this->formatAccessLevels($originalUser);
+//                    $oldAccessList = $this->formatAccessLevels($originalUser);
 
 
                     /* Deliberately empty $accessList so that Role-based
@@ -286,20 +286,40 @@ class Provisioner
                      */
                     $fm = \Schoolbox\Resource\Folder\Mapper::getInstance();
 
-                    echo "Testing mutations\n";
+                    /* Process the final list of userAccess instances
+                     */
+                    $finalList = [];
 
                     foreach ($internalUser->getUserAccessMutations() as $mutation) {
-                        foreach($mutation['instance'] as $instance) {
-                            $folder = $fm->findCheaplyById($instance);
+                        foreach($mutation['instance'] as $folderId) {
+                            $folder = $fm->findCheaplyById($folderId);
 
-                            print_r(sprintf(
-                                "%s %s (%s)\n",
-                                $mutation['status'],
-                                $folder->getId(),
-                                $folder->getName()
-                            ));
+                            if ($mutation['status'] === 'add') {
+                                $this->logger->debug(sprintf(
+                                    "Groups: %s %s (%s) with accesslevel %s\n",
+                                    $mutation['status'],
+                                    $folder->getId(),
+                                    $folder->getName(),
+                                    $mutation['level']
+                                ));
+
+                                $finalList[$folderId] = $mutation['level'];
+                            } elseif ($mutation['status'] === 'remove') {
+
+                                $this->logger->debug(sprintf(
+                                    "Groups: %s %s (%s)\n",
+                                    $mutation['status'],
+                                    $folder->getId(),
+                                    $folder->getName()
+                                ));
+
+                                unset($finalList[$folderId]);
+                            }
                         }
                     }
+
+                    $this->logger->debug('$finalList');
+                    print_r($finalList);
 
 
 //                    // get a diff of the access list as well
@@ -466,71 +486,71 @@ class Provisioner
         return true;
     }
 
-
-    /**
-     * Format access levels in a user-readable manner
-     *
-     * @param User      $user
-     * @param User|null $previous
-     * @return array
-     */
-    private function formatAccessLevels(User $user, ?User $previous = null): array
-    {
-        // Final access levels:
-        // Original - removed + added
-        $result = [];
-        if ($previous) {
-            foreach ($previous->getAccessList() as $access) {
-                if ($access->getService() === UserAccess::SERVICE_HOMEPAGE) {
-                    $result[$access->getServiceIdentifier()] = $access->getAccessLevel();
-                }
-            }
-        }
-
-
-        // Remove any groups in the remove list
-        foreach ($user->getUserAccessRemove() as $accessRemove) {
-            $existingAccess = $result[$accessRemove] ?? UserAccess::ACCESS_DENY;
-            if ($existingAccess < UserAccess::ACCESS_FULL) {
-                unset($result[$accessRemove]);
-            }
-        }
-
-
-        // Then add any groups in the add list
-        foreach ($user->getAccessList() as $access) {
-            if ($access->getService() === UserAccess::SERVICE_HOMEPAGE
-                && $access->getAccessLevel() < UserAccess::ACCESS_FULL
-            ) {
-                $result[$access->getServiceIdentifier()] = $access->getAccessLevel();
-            }
-        }
-
-
-        // Format it in a readable format
-        ksort($result);
-        $formattedResult = [];
-        foreach ($result as $groupId => $accessLevel) {
-            $accessLevelString = null;
-            switch ($accessLevel) {
-                case UserAccess::ACCESS_WRITE:
-                    $accessLevelString = 'write';
-                    break;
-
-                case UserAccess::ACCESS_READ:
-                    $accessLevelString = 'read';
-                    break;
-
-                case UserAccess::ACCESS_FULL:
-                case UserAccess::ACCESS_DENY:
-                default:
-                    // Don't render
-                    break;
-            }
-            if (isset($accessLevelString)) {
-                $formattedResult[] = sprintf('%d: %s', $groupId, $accessLevelString);
-            }
-        }
-        return $formattedResult;
-    }
+//
+//    /**
+//     * Format access levels in a user-readable manner
+//     *
+//     * @param User      $user
+//     * @param User|null $previous
+//     * @return array
+//     */
+//    private function formatAccessLevels(User $user, ?User $previous = null): array
+//    {
+//        // Final access levels:
+//        // Original - removed + added
+//        $result = [];
+//        if ($previous) {
+//            foreach ($previous->getAccessList() as $access) {
+//                if ($access->getService() === UserAccess::SERVICE_HOMEPAGE) {
+//                    $result[$access->getServiceIdentifier()] = $access->getAccessLevel();
+//                }
+//            }
+//        }
+//
+//
+//        // Remove any groups in the remove list
+//        foreach ($user->getUserAccessRemove() as $accessRemove) {
+//            $existingAccess = $result[$accessRemove] ?? UserAccess::ACCESS_DENY;
+//            if ($existingAccess < UserAccess::ACCESS_FULL) {
+//                unset($result[$accessRemove]);
+//            }
+//        }
+//
+//
+//        // Then add any groups in the add list
+//        foreach ($user->getAccessList() as $access) {
+//            if ($access->getService() === UserAccess::SERVICE_HOMEPAGE
+//                && $access->getAccessLevel() < UserAccess::ACCESS_FULL
+//            ) {
+//                $result[$access->getServiceIdentifier()] = $access->getAccessLevel();
+//            }
+//        }
+//
+//
+//        // Format it in a readable format
+//        ksort($result);
+//        $formattedResult = [];
+//        foreach ($result as $groupId => $accessLevel) {
+//            $accessLevelString = null;
+//            switch ($accessLevel) {
+//                case UserAccess::ACCESS_WRITE:
+//                    $accessLevelString = 'write';
+//                    break;
+//
+//                case UserAccess::ACCESS_READ:
+//                    $accessLevelString = 'read';
+//                    break;
+//
+//                case UserAccess::ACCESS_FULL:
+//                case UserAccess::ACCESS_DENY:
+//                default:
+//                    // Don't render
+//                    break;
+//            }
+//            if (isset($accessLevelString)) {
+//                $formattedResult[] = sprintf('%d: %s', $groupId, $accessLevelString);
+//            }
+//        }
+//        return $formattedResult;
+//    }
 }
