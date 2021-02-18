@@ -106,7 +106,7 @@
                     displayDatetime: FORMAT_DISPLAY_DATETIME,
                     displayWeekDay: FORMAT_DISPLAY_WEEK_DAY,
                 };
-            },
+            }
         },
         methods: {
             /**
@@ -652,6 +652,7 @@
                     value.selectedDate,
                 );
             },
+
         },
         mounted() {
             this.registerListCustomInputFields();
@@ -662,6 +663,7 @@
                 quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
 
             document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
+            
         }
     }
 
@@ -728,7 +730,7 @@
                 list: {
                     buttonText: 'List',
                     duration: { days: this.duration },
-
+                    listDayFormat: this.config.momentJsDateShort
                 }
             }"
             :event-time-format="helper.eventTimeFormat"
