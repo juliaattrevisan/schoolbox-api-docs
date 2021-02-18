@@ -224,10 +224,10 @@ function rebuild_and_restart_daemons(){
 function rebuild_cron_jobs(){
   if [[ $is_primary_host == '1' ]]; then
     log "---rebuilding cron jobs on primary host---";
-    schoolboxcloud-rebuild-cronjobs --site-root "$site_root"
   else
-    log "---skipping cron job rebuild on secondary host---";
+    log "---removing cron jobs on secondary host---";
   fi
+  schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host"
 }
 
 function reload_binding_cache(){
