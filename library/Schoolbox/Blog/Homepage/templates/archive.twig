@@ -123,8 +123,8 @@
                         {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
                         <div class="editPanel socialstream-new-post">
                             <form method="post" action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}" data-blog-comment-form>
-                                <textarea name="commentBody" rows="2" cols="100" placeholder="Add a Comment"></textarea>
-                                <input type="submit" name="comment" value="Post Comment"/>
+                                <textarea name="commentBody" rows="2" cols="100" placeholder="Add a comment"></textarea>
+                                <input type="submit" name="comment" value="Post comment"/>
                             </form>
                         </div>
                         {% endif %}
