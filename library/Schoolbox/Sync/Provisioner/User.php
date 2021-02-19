@@ -186,14 +186,14 @@ class User extends SchoolboxUser
      *
      * @param \Schoolbox\Resource\Folder\Mapper $fm
      * @param LoggerInterface                   $logger
-     * @return array|null
+     * @return array
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    public function generateExistingUserAccess(\Schoolbox\Resource\Folder\Mapper $fm, LoggerInterface $logger): ?array
+    public function generateExistingUserAccess(\Schoolbox\Resource\Folder\Mapper $fm, LoggerInterface $logger): array
     {
         /* Find out what you started with
          */
@@ -224,14 +224,14 @@ class User extends SchoolboxUser
      *
      * @param \Schoolbox\Resource\Folder\Mapper $fm
      * @param LoggerInterface                   $logger
-     * @return array|null
+     * @return array
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    public function generateFinalUserAccess(\Schoolbox\Resource\Folder\Mapper $fm, LoggerInterface $logger): ?array
+    public function generateFinalUserAccess(\Schoolbox\Resource\Folder\Mapper $fm, LoggerInterface $logger): array
     {
 
         /* Decide the net effect, in accordance to how the mutation timeline evolved
