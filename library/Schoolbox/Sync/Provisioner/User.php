@@ -266,10 +266,37 @@ class User extends SchoolboxUser
             }
         }
 
+        /* Find the existing UserAccess instances and see if any have a ACCESS_FULL access level
+         * We want to keep that instance unchanged, because people are going to lose their Group Admin
+         * access and abilities, essentially locking them out of their own Groups en masse
+         */
+        $keep = [];
+
+        foreach ($this->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE) as $current) {
+            if (UserAccess::ACCESS_FULL === $current->getAccessLevel()) {
+                $keep[$current->getServiceIdentifier()] = true;
+            }
+        }
+
         /* For every item listed in the mutation timeline, process a UserAccess
          * These are now the userAccesses the person should have
          */
         foreach ($finalGroups as $serviceIdentifier => $accessLevel) {
+
+            /* If this person had ACCESS_FULL before, they still have it now
+             * Don't mutate them
+             */
+            if (isset($keep[$serviceIdentifier])) {
+                $logger->debug(sprintf(
+                    "Retained full access to %s\n",
+                    $serviceIdentifier
+                ));
+
+                continue;
+            }
+
+            /* Otherwise change their stuff
+             */
             $userAccess = UserAccessMapper::getInstance()->createModel()
                 ->setUser($this)
                 ->setService(UserAccess::SERVICE_HOMEPAGE)
