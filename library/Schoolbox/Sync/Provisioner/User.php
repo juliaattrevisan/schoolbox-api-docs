@@ -248,7 +248,7 @@ class User extends SchoolboxUser
 
         /* Decide the net effect, in accordance to how the mutation timeline evolved
          */
-        $finalGroups = [];
+        $mutationGroups = [];
 
         foreach ($this->getUserAccessMutations() as $mutation) {
             foreach($mutation['instance'] as $folderId) {
@@ -274,7 +274,7 @@ class User extends SchoolboxUser
                         $mutation['level']
                     ));
 
-                    $finalGroups[$folderId] = $mutation['level'];
+                    $mutationGroups[$folderId] = $mutation['level'];
                 } elseif ($mutation['status'] === 'remove') {
                     $logger->debug(sprintf(
                         "Groups: %s %s (%s)\n",
@@ -283,7 +283,7 @@ class User extends SchoolboxUser
                         $folderName,
                     ));
 
-                    unset($finalGroups[$folderId]);
+                    unset($mutationGroups[$folderId]);
                 }
             }
         }
@@ -300,7 +300,9 @@ class User extends SchoolboxUser
         /* For every item listed in the mutation timeline, process a UserAccess
          * These are now the userAccesses the person should have
          */
-        foreach ($finalGroups as $serviceIdentifier => $accessLevel) {
+        $finalGroups = [];
+
+        foreach ($mutationGroups as $serviceIdentifier => $accessLevel) {
 
             /* If this person had ACCESS_FULL before, they still have it now
              * Don't mutate them
@@ -310,6 +312,10 @@ class User extends SchoolboxUser
                     "Retained full access to %s\n",
                     $serviceIdentifier
                 ));
+
+                /* Remember it for the log ui
+                 */
+                $finalGroups[$serviceIdentifier] = $keep[$serviceIdentifier]->getAccessLevel();
 
                 continue;
             }
@@ -331,6 +337,10 @@ class User extends SchoolboxUser
                 $serviceIdentifier,
                 $accessLevel
             ));
+
+            /* Remember it for the log ui
+             */
+            $finalGroups[$serviceIdentifier] = $accessLevel;
         }
 
         /* This is the list of groups to which this person has access
