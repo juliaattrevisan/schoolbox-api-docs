@@ -315,10 +315,20 @@ class Provisioner
                         $diffGroups = (new UserAccessXOR())->generate($existingGroups, $finalGroups);
 
                         if (\count($diffGroups)) {
+                            $this->logger->debug(sprintf(
+                                'Groups for %s underwent a meaningful mutation',
+                                $internalUser->getFullName()
+                            ));
+
                             $diff['accessList'] = [
                                 'old' => $existingGroups,
                                 'new' => $finalGroups
                             ];
+                        } else {
+                            $this->logger->debug(sprintf(
+                                'Groups for %s remained unchanged',
+                                $internalUser->getFullName()
+                            ));
                         }
                     }
 
