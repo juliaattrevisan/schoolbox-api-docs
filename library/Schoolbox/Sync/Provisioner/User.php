@@ -201,16 +201,28 @@ class User extends SchoolboxUser
 
         foreach ($this->getAccessList() as $userAccess) {
             $folderId = $userAccess->getServiceIdentifier();
-            $folder = $fm->findCheaplyById($folderId);
 
             $existingGroups[$folderId] = $userAccess->getAccessLevel();
 
-            $logger->debug(sprintf(
-                "Existing Group: %s (%s) with accesslevel %s\n",
-                $folder->getId(),
-                $folder->getName(),
-                $userAccess->getAccessLevel()
-            ));
+            /* Maybe this folder doesn't actually exist at runtime
+             */
+            try {
+                $folder = $fm->findCheaplyById($folderId);
+
+                $logger->debug(sprintf(
+                    "Existing Group: %s (%s) with accesslevel %s\n",
+                    $folder->getId(),
+                    $folder->getName(),
+                    $userAccess->getAccessLevel()
+                ));
+            } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
+                $logger->debug(sprintf(
+                    "Existing Group: %s (%s) with accesslevel %s\n",
+                    $folderId,
+                    'unknown folder',
+                    $userAccess->getAccessLevel()
+                ));
+            }
         }
 
         return $existingGroups;
@@ -240,25 +252,35 @@ class User extends SchoolboxUser
 
         foreach ($this->getUserAccessMutations() as $mutation) {
             foreach($mutation['instance'] as $folderId) {
-                $folder = $fm->findCheaplyById($folderId);
 
+                /* Maybe this folder doesn't actually exist at runtime
+                 */
+                try {
+                    $folder = $fm->findCheaplyById($folderId);
+
+                    $folderName = $folder->getName();
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $folderName = 'unknown folder';
+                }
+
+                /* Record the mutations
+                 */
                 if ($mutation['status'] === 'add') {
                     $logger->debug(sprintf(
                         "Groups: %s %s (%s) with accesslevel %s\n",
                         $mutation['status'],
-                        $folder->getId(),
-                        $folder->getName(),
+                        $folderId,
+                        $folderName,
                         $mutation['level']
                     ));
 
                     $finalGroups[$folderId] = $mutation['level'];
                 } elseif ($mutation['status'] === 'remove') {
-
                     $logger->debug(sprintf(
                         "Groups: %s %s (%s)\n",
                         $mutation['status'],
-                        $folder->getId(),
-                        $folder->getName()
+                        $folderId,
+                        $folderName,
                     ));
 
                     unset($finalGroups[$folderId]);

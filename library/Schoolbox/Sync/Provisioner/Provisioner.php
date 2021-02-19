@@ -328,13 +328,21 @@ class Provisioner
                             $oldLog = [];
 
                             foreach ($existingGroups as $folderId => $accessLevel) {
-                                $folder = $folderMapper->findCheaplyById($folderId);
+
+                                /* Maybe this folder doesn't actually exist at runtime
+                                  */
+                                try {
+                                    $folder = $folderMapper->findCheaplyById($folderId);
+                                    $folderName = $folder->getName();
+                                } catch (\Schoolbox\Mapper\Exception $e) {
+                                    $folderName = 'unknown folder';
+                                }
 
                                 $oldLog[] = sprintf(
                                     '%s access to %s (/homepage/%s)',
                                     UserAccess::ACCESS_MAP[$accessLevel],
-                                    $folder->getName(),
-                                    $folder->getId()
+                                    $folderName,
+                                    $folderId
                                 );
                             }
 
@@ -345,13 +353,21 @@ class Provisioner
                             $newLog = [];
 
                             foreach ($finalGroups as $folderId => $accessLevel) {
-                                $folder = $folderMapper->findCheaplyById($folderId);
+
+                                /* Maybe this folder doesn't actually exist at runtime
+                                 */
+                                try {
+                                    $folder = $folderMapper->findCheaplyById($folderId);
+                                    $folderName = $folder->getName();
+                                } catch (\Schoolbox\Mapper\Exception $e) {
+                                    $folderName = 'unknown folder';
+                                }
 
                                 $newLog[] = sprintf(
                                     '%s access to %s (/homepage/%s)',
                                     UserAccess::ACCESS_MAP[$accessLevel],
-                                    $folder->getName(),
-                                    $folder->getId()
+                                    $folderName,
+                                    $folderId
                                 );
                             }
 
