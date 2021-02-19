@@ -299,6 +299,8 @@ abstract class Mapper implements IMapper, Serializable
 
         // only functional in development
 
+        // This line raises an error on CI, where INSTANCE_ID is constant
+        /* @phpstan-ignore-next-line */
         self::$perfmon = (INSTANCE_ID === 'vagrantx' && self::isWithinWebRequest())
             ? new DevMonitor(DebugBar::getInstance())
             : new LiveMonitor()
