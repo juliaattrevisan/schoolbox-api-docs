@@ -109,6 +109,7 @@ use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
@@ -423,13 +424,15 @@ abstract class Kernel
         );
 
         // Session
+        // TODO Session things shouldn't be on the top-level abstract (it's also a duplicate copy/paste of the BasicRequest version)
+        //      Should be implemented once-only on the WebKernel Abstract
         $di->set(
             'session',
             $di->lazy(
                 function () use ($di) {
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
-
+                    session_save_path(sprintf('%s?prefix=%s', $this->get('config')->get('redis_url'), PipeManager::REDIS_SESSION_PREFIX));
                     /** @var Predis\ClientInterface $redis */
                     $redis = $di->get('redis');
                     $factory = new Factory(

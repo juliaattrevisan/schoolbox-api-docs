@@ -40,7 +40,7 @@ use Schoolbox\Realtime\Subscription\ISubscriptionManager;
 class PipeManager implements MessageComponentInterface, TaskResponseHandlerInterface, Async\EventListener
 {
 
-    const REDIS_SESSION_PREFIX = 'PHPREDIS_SESSION:';
+    public const REDIS_SESSION_PREFIX = 'PHPREDIS_SESSION:' . INSTANCE_ID . ':';
     const PHP_SESSION_PREFIX   = 'PHPSESSID';
     const INACTIVE_TIMEOUT     = 300; // 5 minutes
 

@@ -25,6 +25,7 @@ use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Realtime\Pipe\PipeManager;
 use SitePage;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
@@ -151,6 +152,7 @@ class Kernel extends WebKernelAbstract
                 function () use ($di) {
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
+                    session_save_path(sprintf('%s?prefix=%s', $config->get('redis_url'), PipeManager::REDIS_SESSION_PREFIX));
                     /** @var Predis\ClientInterface $redis */
                     $redis = $di->get('redis');
 
