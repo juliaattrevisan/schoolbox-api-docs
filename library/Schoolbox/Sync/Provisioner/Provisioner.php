@@ -259,7 +259,7 @@ class Provisioner
                         if ($current->getAccessLevel() === UserAccess::ACCESS_FULL) {
                             $preserved->add($current);
 
-                            $this->logger->debug("{$internalUser->getFullname()} is staying at access level {$current->getAccessLevel()} for {$current->getServiceIdentifier()}", $commonContext);
+                            $this->logger->debug("{$internalUser->getFullname()} is staying at accesslevel {$current->getAccessLevel()} for {$current->getServiceIdentifier()}", $commonContext);
                         }
                     }
 
