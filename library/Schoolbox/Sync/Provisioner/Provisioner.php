@@ -245,15 +245,12 @@ class Provisioner
 
                     // Keep a copy of the original user, for comparison
                     $originalUser  = clone $internalUser;
-//                    $oldAccessList = $this->formatAccessLevels($originalUser);
-
 
                     /* Deliberately empty $accessList so that Role-based
                      * permissions don't get saved in addition to the Group
                      * permissions that we can set
                      */
                     $preserved = $this->userAccessMapper->createCollection();
-
 
                     /* Don't blow away any UserAccess::ACCESS_FULL settings
                      */
@@ -337,6 +334,9 @@ class Provisioner
                                 );
                             }
 
+                            /* Do you actually need to see what they had,
+                             * or is the new set of UserAccess enough?
+                             */
                             $diff['accessList'] = [
                                 'old' => [],
                                 'new' => $log
@@ -504,72 +504,4 @@ class Provisioner
         }
         return true;
     }
-
-//
-//    /**
-//     * Format access levels in a user-readable manner
-//     *
-//     * @param User      $user
-//     * @param User|null $previous
-//     * @return array
-//     */
-//    private function formatAccessLevels(User $user, ?User $previous = null): array
-//    {
-//        // Final access levels:
-//        // Original - removed + added
-//        $result = [];
-//        if ($previous) {
-//            foreach ($previous->getAccessList() as $access) {
-//                if ($access->getService() === UserAccess::SERVICE_HOMEPAGE) {
-//                    $result[$access->getServiceIdentifier()] = $access->getAccessLevel();
-//                }
-//            }
-//        }
-//
-//
-//        // Remove any groups in the remove list
-//        foreach ($user->getUserAccessRemove() as $accessRemove) {
-//            $existingAccess = $result[$accessRemove] ?? UserAccess::ACCESS_DENY;
-//            if ($existingAccess < UserAccess::ACCESS_FULL) {
-//                unset($result[$accessRemove]);
-//            }
-//        }
-//
-//
-//        // Then add any groups in the add list
-//        foreach ($user->getAccessList() as $access) {
-//            if ($access->getService() === UserAccess::SERVICE_HOMEPAGE
-//                && $access->getAccessLevel() < UserAccess::ACCESS_FULL
-//            ) {
-//                $result[$access->getServiceIdentifier()] = $access->getAccessLevel();
-//            }
-//        }
-//
-//
-//        // Format it in a readable format
-//        ksort($result);
-//        $formattedResult = [];
-//        foreach ($result as $groupId => $accessLevel) {
-//            $accessLevelString = null;
-//            switch ($accessLevel) {
-//                case UserAccess::ACCESS_WRITE:
-//                    $accessLevelString = 'write';
-//                    break;
-//
-//                case UserAccess::ACCESS_READ:
-//                    $accessLevelString = 'read';
-//                    break;
-//
-//                case UserAccess::ACCESS_FULL:
-//                case UserAccess::ACCESS_DENY:
-//                default:
-//                    // Don't render
-//                    break;
-//            }
-//            if (isset($accessLevelString)) {
-//                $formattedResult[] = sprintf('%d: %s', $groupId, $accessLevelString);
-//            }
-//        }
-//        return $formattedResult;
-//    }
 }
