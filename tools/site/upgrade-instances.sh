@@ -49,6 +49,13 @@ function help(){
   echo "  -h,--help          Optional. Print this help message and exit"
 }
 
+# Check script is running with sufficient permissions
+function check_run_as_root(){
+  if [[ $EUID -ne 0 ]]; then
+     error "This script must be run as root"
+     exit 1
+  fi
+}
 
 # Parse CLI args
 function parse_args() {
@@ -258,6 +265,7 @@ function reload_binding_cache(){
 # Main script logic
 function main() {
   export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games;
+  check_run_as_root
   parse_args "$@"
   parse_global_vars "$@"
   upgrade_instances
