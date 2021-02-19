@@ -290,24 +290,32 @@ class Provisioner
                     // get a diff of the original user and what we've ended up with
                     $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
 
-                    /* Figure out what is going on in the userAccess mutations
-                     *
-                     * UPS Rulesets can have N adds/removes in any order so you need to compute
-                     * the mutations in order to find out where you ended up. These evaluations
-                     * also create log->debug entries so you can see what happened
-                     */
-                    $existingGroups = $originalUser->generateExistingUserAccess($folderMapper, $this->logger);
-                    $finalGroups = $internalUser->generateFinalUserAccess($folderMapper, $this->logger);
 
-                    /* generateUserAccess() returns null when the config option is off
-                     * No changes take place in that situation; no diff to calculate
+                    /* Modify accessList only when ups_groups_enabled is actually enabled
+                     * Otherwise leave it unchanged from whatever it was
                      */
-                    if (null !== $finalGroups) {
-                        $diff['accessList'] = [
-                            'old' => $existingGroups,
-                            'new' => $finalGroups
-                        ];
+                    if ($config->get('ups_groups_enabled')) {
+
+                        /* Figure out what is going on in the userAccess mutations
+                         *
+                         * UPS Rulesets can have N adds/removes in any order so you need to compute
+                         * the mutations in order to find out where you ended up. These evaluations
+                         * also create log->debug entries so you can see what happened
+                         */
+                        $existingGroups = $originalUser->generateExistingUserAccess($folderMapper, $this->logger);
+                        $finalGroups = $internalUser->generateFinalUserAccess($folderMapper, $this->logger);
+
+                        /* generateUserAccess() returns null when the config option is off
+                         * No changes take place in that situation; no diff to calculate
+                         */
+                        if (null !== $finalGroups) {
+                            $diff['accessList'] = [
+                                'old' => $existingGroups,
+                                'new' => $finalGroups
+                            ];
+                        }
                     }
+
 
                     $originalName = ($action == 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})"
                         : $originalUser->formatName() . " ({$internalUser->getExternalID()})";

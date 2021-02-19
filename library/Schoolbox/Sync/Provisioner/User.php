@@ -195,14 +195,8 @@ class User extends SchoolboxUser
      */
     public function generateExistingUserAccess(\Schoolbox\Resource\Folder\Mapper $fm, LoggerInterface $logger): ?array
     {
-
-        /* Modify accessList only when ups_groups_enabled is actually enabled
-         * Otherwise leave it unchanged from whatever it was
+        /* Find out what you started with
          */
-        if (!$this->getConfigLoader()->get('ups_groups_enabled')) {
-            return null;
-        }
-
         $existingGroups = [];
 
         foreach ($this->getAccessList() as $userAccess) {
@@ -239,12 +233,6 @@ class User extends SchoolboxUser
      */
     public function generateFinalUserAccess(\Schoolbox\Resource\Folder\Mapper $fm, LoggerInterface $logger): ?array
     {
-        /* Modify accessList only when ups_groups_enabled is actually enabled
-         * Otherwise leave it unchanged from whatever it was
-         */
-        if (!$this->getConfigLoader()->get('ups_groups_enabled')) {
-            return null;
-        }
 
         /* Decide the net effect, in accordance to how the mutation timeline evolved
          */
