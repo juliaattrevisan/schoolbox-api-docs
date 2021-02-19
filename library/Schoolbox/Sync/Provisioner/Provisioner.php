@@ -308,6 +308,10 @@ class Provisioner
                          *
                          * Otherwise show them the old list and the new list and let them see
                          * how they're different
+                         *
+                         * Note: In the past the XOR serialisation was done on log messages which
+                         * sounds like a kind of weird way to do it but I guess it's not as insane
+                         * as it might first appear
                          */
                         $diffGroups = (new UserAccessXOR())->generate($existingGroups, $finalGroups);
 
@@ -317,6 +321,10 @@ class Provisioner
                                 $internalUser->getFullName()
                             ));
 
+                            /* Translate the existing group tuples into something nice for humans
+                             * to read - there's a lot of overhead doing these folder lookups
+                             * which can definitely be optimised further if we want to keep it
+                             */
                             $oldLog = [];
 
                             foreach ($existingGroups as $folderId => $accessLevel) {
