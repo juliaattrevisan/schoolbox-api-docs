@@ -317,16 +317,29 @@ class Provisioner
                                 $internalUser->getFullName()
                             ));
 
+                            $oldLog = [];
+
+                            foreach ($existingGroups as $folderId => $accessLevel) {
+                                $folder = $folderMapper->findCheaplyById($folderId);
+
+                                $oldLog[] = sprintf(
+                                    '%s access to %s (/homepage/%s)',
+                                    UserAccess::ACCESS_MAP[$accessLevel],
+                                    $folder->getName(),
+                                    $folder->getId()
+                                );
+                            }
+
                             /* Translate the final group tuples into something nice for humans
                              * to read - there's a lot of overhead doing these folder lookups
                              * which can definitely be optimised further if we want to keep it
                              */
-                            $log = [];
+                            $newLog = [];
 
                             foreach ($finalGroups as $folderId => $accessLevel) {
                                 $folder = $folderMapper->findCheaplyById($folderId);
 
-                                $log[] = sprintf(
+                                $newLog[] = sprintf(
                                     '%s access to %s (/homepage/%s)',
                                     UserAccess::ACCESS_MAP[$accessLevel],
                                     $folder->getName(),
@@ -338,8 +351,8 @@ class Provisioner
                              * or is the new set of UserAccess enough?
                              */
                             $diff['accessList'] = [
-                                'old' => [],
-                                'new' => $log
+                                'old' => $oldLog,
+                                'new' => $newLog
                             ];
                         } else {
                             $this->logger->debug(sprintf(
