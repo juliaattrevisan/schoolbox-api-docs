@@ -3,7 +3,7 @@
     @see NodeInterface::TYPE_* constants for set of valid types
 #}
 {%- macro icon(nodeType) -%}
-    {%- spaceless -%}
+    {%- apply spaceless -%}
         {% if 'course' == nodeType %}
             icon-course-builder
         {% elseif 'unit' == nodeType %}
@@ -22,7 +22,7 @@
         {# 'root', 'folder' #}
             icon-folder
         {% endif %}
-    {%- endspaceless -%}
+    {%- endapply -%}
 {%- endmacro -%}
 
 

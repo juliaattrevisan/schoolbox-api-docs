@@ -60,7 +60,7 @@
      # The green dot/grey square/oj diamond
      #}
     {% set pStatusClass %}
-        {%- spaceless %}
+        {%- apply spaceless %}
             {% if participant.responseRequired %}
                 {{ statusIncomplete }}
             {% elseif participant.reviewComplete %}
@@ -68,7 +68,7 @@
             {% else %}
                 {{ statusPending }}
             {% endif %}
-        {% endspaceless -%}
+        {% endapply -%}
     {% endset %}
 
     {# Progress icon tool tip
@@ -76,7 +76,7 @@
      # This is the tooltip that appears when you hover over the green dot/grey square/oj diamond
      #}
     {% set pTooltip %}
-        {%- spaceless %}
+        {%- apply spaceless %}
             {% if latestResponse and not latestResponse.isSubmitted %}
                 Review will be required when this attempt is finished
             {% elseif participant.responseRequired %}
@@ -86,14 +86,14 @@
             {% else %}
                 Review required
             {% endif %}
-        {% endspaceless -%}
+        {% endapply -%}
     {% endset %}
 
     {# The description to output under the user's name
      # This is the text that appears next to the green dot/grey square/oj diamond
      #}
     {% set pStatusText %}
-        {%- spaceless %}
+        {%- apply spaceless %}
             {% if not latestResponse %}
                 Not attempted
             {% elseif latestResponse.submittedAt.isNull %}
@@ -111,7 +111,7 @@
                     late
                 {% endif %}
             {% endif %}
-        {% endspaceless -%}
+        {% endapply -%}
     {% endset %}
 
     <li data-status="{{ pStatusClass }}" data-participant-external-id="{{ participant.user.externalId }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
@@ -221,10 +221,10 @@
         </div>
         <div class="component-action">
             <section>
-                {%- spaceless -%}
+                {%- apply spaceless -%}
                     <a class="button">Cancel</a>
                     <a class="button" data-submit>Mark All as Reviewed</a>
-                {%- endspaceless -%}
+                {%- endapply -%}
             </section>
         </div>
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
@@ -245,10 +245,10 @@
         <p data-mass-available><em>Note: all unreviewed attempts will be deleted for any students selected.</em></p>
         <div class="component-action">
             <section>
-                {%- spaceless -%}
+                {%- apply spaceless -%}
                     <a class="button">Cancel</a>
                     <a class="button" data-submit>Delete All</a>
-                {%- endspaceless -%}
+                {%- endapply -%}
             </section>
         </div>
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>

@@ -87,7 +87,7 @@
      # The green dot/grey square/oj diamond
      #}
     {% set pStatusClass %}
-        {%- spaceless %}
+        {%- apply spaceless %}
             {% if participant.responseRequired %}
                 {{ statusIncomplete }}
             {% elseif participant.resubmissionRequired %}
@@ -97,7 +97,7 @@
             {% else %}
                 {{ statusReviewed }}
             {% endif %}
-        {% endspaceless -%}
+        {% endapply -%}
     {% endset %}
 
     {% set inputNo = 1 %}
@@ -120,7 +120,7 @@
                         <a class="icon-more" title="" data-dropdown="feedback-options-{{ participant.user.id }}"></a>
                     </nav>
                     <ul id="feedback-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
-                        {%- spaceless %}
+                        {%- apply spaceless %}
                             {% if pActionResponses %}
                                 <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.firstName }}" data-inline-grader>View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
                             {% endif %}
@@ -130,7 +130,7 @@
                             {% if pActionSobo %}
                                 <li><a class="icon-due-work" href="{{ pActionSobo }}" title="Submit on behalf of {{ participant.user.firstName }}">Submit on behalf of {{ participant.user.firstName }}</a></li>
                             {% endif %}
-                        {% endspaceless -%}
+                        {% endapply -%}
                     </ul>
                 {% endif %}
             </div>
@@ -245,7 +245,7 @@
         {% set dataAttrs   = isPublishedFeedback ? 'data-published' : '' %}
 
         {% set buttons %}
-            {%- spaceless %}
+            {%- apply spaceless %}
                 {% if pAckReceipt %}
                     {% set soboTitle = 'Acknowledge receipt of student submission' %}
                     <a class="button" data-sobo title="{{ soboTitle }}" href="{{ pAckReceipt }}">Mark as Submitted</a>
@@ -260,7 +260,7 @@
                             {% if isDraftFeedback %}data-draft-id="{{ latestFeedback.id }}"{% endif %}
                     >Publish</a>
                 {% endif %}
-            {% endspaceless -%}
+            {% endapply -%}
         {% endset %}
 
     {% include '@learningAssessment/fragments/actionBar.twig' with {
@@ -295,10 +295,10 @@
             </section>
             <div class="component-action">
                 <section>
-                    {%- spaceless -%}
+                    {%- apply spaceless -%}
                         <a class="button">Cancel</a>
                         <a class="button" data-submit>Publish All</a>
-                    {%- endspaceless -%}
+                    {%- endapply -%}
                 </section>
             </div>
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
@@ -317,10 +317,10 @@
             </section>
             <div class="component-action">
                 <section>
-                    {%- spaceless -%}
+                    {%- apply spaceless -%}
                         <a class="button">Cancel</a>
                         <a class="button" data-submit>All Received</a>
-                    {%- endspaceless -%}
+                    {%- endapply -%}
                 </section>
             </div>
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
