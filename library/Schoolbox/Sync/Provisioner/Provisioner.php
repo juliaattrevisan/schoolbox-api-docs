@@ -320,9 +320,26 @@ class Provisioner
                                 $internalUser->getFullName()
                             ));
 
+                            /* Translate the final group tuples into something nice for humans
+                             * to read - there's a lot of overhead doing these folder lookups
+                             * which can definitely be optimised further if we want to keep it
+                             */
+                            $log = [];
+
+                            foreach ($finalGroups as $folderId => $accessLevel) {
+                                $folder = $folderMapper->findCheaplyById($folderId);
+
+                                $log[] = sprintf(
+                                    '%s access to %s (/homepage/%s)',
+                                    UserAccess::ACCESS_MAP[$accessLevel],
+                                    $folder->getName(),
+                                    $folder->getId()
+                                );
+                            }
+
                             $diff['accessList'] = [
-                                'old' => $existingGroups,
-                                'new' => $finalGroups
+                                'old' => [],
+                                'new' => $log
                             ];
                         } else {
                             $this->logger->debug(sprintf(
