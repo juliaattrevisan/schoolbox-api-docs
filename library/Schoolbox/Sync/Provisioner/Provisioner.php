@@ -305,10 +305,16 @@ class Provisioner
                         $existingGroups = $originalUser->generateExistingUserAccess($folderMapper, $this->logger);
                         $finalGroups = $internalUser->generateFinalUserAccess($folderMapper, $this->logger);
 
-                        /* generateUserAccess() returns null when the config option is off
-                         * No changes take place in that situation; no diff to calculate
+                        /* Compute the actual difference - if the set of (folderId, accessLevel)
+                         * tuples are the same, then there's no difference and we don't need to
+                         * tell anyone about changes
+                         *
+                         * Otherwise show them the old list and the new list and let them see
+                         * how they're different
                          */
-                        if (null !== $finalGroups) {
+                        $diffGroups = (new UserAccessXOR())->generate($existingGroups, $finalGroups);
+
+                        if (\count($diffGroups)) {
                             $diff['accessList'] = [
                                 'old' => $existingGroups,
                                 'new' => $finalGroups
