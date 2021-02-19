@@ -84,7 +84,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         // This is a config var that determines how many days in the past you can mark attendance for.
         // Later, we need to fetch these days expensively, because otherwise they come without attendance data.
         $attendanceWindow = strtotime("{$this->configLoader->get('external_attendance_days')} day", 0); // convert days to seconds
-        if ($this->getUser()->getRole()->isStaff()) {
+        if ($this->getUser()->getRole()->isStaff() && $this->configLoader->get('external_attendance')) {
             $externalAttendanceLink = new External_AttendanceLink();
             $externalAttendanceLink->init($this->configLoader, $this->getUser()->getRole()->isStaff());
         }
