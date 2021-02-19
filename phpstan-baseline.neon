@@ -71,11 +71,6 @@ parameters:
 			path: library/Alaress/Async/Notification/Cloud/Google/Response.php
 
 		-
-			message: "#^Property Alaress\\\\Async\\\\Notification\\\\Instance\\\\InstanceBundle\\:\\:\\$splStore \\(iterable\\<Alaress\\\\Async\\\\Notification\\\\Instance\\\\Instance\\>&SplObjectStorage\\) does not accept SplObjectStorage\\<object, mixed\\>\\.$#"
-			count: 1
-			path: library/Alaress/Async/Notification/Instance/InstanceBundle.php
-
-		-
 			message: "#^Property Alaress\\\\Async\\\\Queue\\\\RedisQueue\\:\\:\\$redis \\(Predis\\\\Client\\) does not accept Predis\\\\ClientInterface\\.$#"
 			count: 1
 			path: library/Alaress/Async/Queue/RedisQueue.php
@@ -591,16 +586,6 @@ parameters:
 			path: library/Alaress/Rules/Condition/In.php
 
 		-
-			message: "#^Property Alaress\\\\Rules\\\\Rule\\:\\:\\$conditions \\(iterable\\<Alaress\\\\Rules\\\\Condition\\>&SplObjectStorage\\) does not accept SplObjectStorage\\<object, mixed\\>\\.$#"
-			count: 1
-			path: library/Alaress/Rules/Rule.php
-
-		-
-			message: "#^Property Alaress\\\\Rules\\\\Ruleset\\:\\:\\$rules \\(iterable\\<Alaress\\\\Rules\\\\Rule\\>&SplObjectStorage\\) does not accept SplObjectStorage\\<object, mixed\\>\\.$#"
-			count: 1
-			path: library/Alaress/Rules/Ruleset.php
-
-		-
 			message: "#^Call to function is_array\\(\\) with string will always evaluate to false\\.$#"
 			count: 1
 			path: library/Alaress/Rules/Token/Tokenizer.php
@@ -649,11 +634,6 @@ parameters:
 			message: "#^Call to method getStatus\\(\\) on an unknown class Alaress\\\\Scheduler\\\\StompScheduler\\.$#"
 			count: 1
 			path: library/Alaress/Scheduler/Interactive/Interactor.php
-
-		-
-			message: "#^Property Alaress\\\\Scheduler\\\\Stomp\\\\ResolutionManager\\:\\:\\$resolvers \\(iterable\\<Alaress\\\\Async\\\\Broker\\\\IResolver\\>&SplObjectStorage\\) does not accept SplObjectStorage\\<object, mixed\\>\\.$#"
-			count: 1
-			path: library/Alaress/Scheduler/Stomp/ResolutionManager.php
 
 		-
 			message: "#^Right side of && is always true\\.$#"
@@ -764,11 +744,6 @@ parameters:
 			message: "#^Property Alaress\\\\WorkerCrew\\\\Worker\\\\AbstractProcess\\:\\:\\$timeout \\(React\\\\EventLoop\\\\TimerInterface\\) does not accept null\\.$#"
 			count: 1
 			path: library/Alaress/WorkerCrew/Worker/AbstractProcess.php
-
-		-
-			message: "#^Property Alaress\\\\WorkerCrew\\\\Worker\\\\IO\\\\WrappedReadableResourceStream\\:\\:\\$listenerStore \\(iterable\\<Alaress\\\\Async\\\\Listener\\\\Stream\\\\StreamListener\\>&SplObjectStorage\\) does not accept SplObjectStorage\\<object, mixed\\>\\.$#"
-			count: 1
-			path: library/Alaress/WorkerCrew/Worker/IO/WrappedReadableResourceStream.php
 
 		-
 			message: "#^Call to function unset\\(\\) contains undefined variable \\$e\\.$#"
@@ -1579,11 +1554,6 @@ parameters:
 			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\ParticipationReport\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/ParticipationReport/Module.php
-
-		-
-			message: "#^Variable \\$data in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/Components/AbstractMatrix.php
 
 		-
 			message: "#^If condition is always true\\.$#"
@@ -2936,11 +2906,6 @@ parameters:
 			path: library/External/TimetableDatePeriod.php
 
 		-
-			message: "#^Variable \\$return in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/External/UserInterface.php
-
-		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 5
 			path: library/Feed.php
@@ -3057,11 +3022,6 @@ parameters:
 
 		-
 			message: "#^Variable \\$request in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Leave/Controller.php
-
-		-
-			message: "#^Variable \\$return in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Leave/Controller.php
 
@@ -3541,11 +3501,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Controller.php
 
 		-
-			message: "#^Variable \\$data in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Controller.php
-
-		-
 			message: "#^Call to function is_null\\(\\) with Alaress_Date_Format will always evaluate to false\\.$#"
 			count: 2
 			path: library/Schoolbox/Assessment/Course/Import/AssessmentPair.php
@@ -3567,16 +3522,6 @@ parameters:
 
 		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^Variable \\$post in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/Controller.php
-
-		-
-			message: "#^Variable \\$query in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Import/Controller.php
 
@@ -3902,11 +3847,6 @@ parameters:
 
 		-
 			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
-
-		-
-			message: "#^Variable \\$indicators in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/DataModel/DataSource.php
 
@@ -4944,16 +4884,6 @@ parameters:
 			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Curriculum/Node/Model.php
-
-		-
-			message: "#^Argument of an invalid type false supplied for foreach, only iterables are supported\\.$#"
-			count: 3
-			path: library/Schoolbox/Curriculum/Source/AustralianCurriculum/Browser.php
-
-		-
-			message: "#^If condition is always false\\.$#"
-			count: 2
-			path: library/Schoolbox/Curriculum/Source/AustralianCurriculum/Browser.php
 
 		-
 			message: "#^PHPDoc tag @param has invalid value \\(\\$query\\)\\: Unexpected token \"\\$query\", expected type at offset 45$#"
@@ -6261,11 +6191,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Match/Controller.php
 
 		-
-			message: "#^Variable \\$return in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Match/Controller.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between iterable\\<Schoolbox\\\\Fixtures\\\\ItineraryItem\\\\Model\\>&Schoolbox\\\\Collection and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Match/Mapper.php
@@ -6446,17 +6371,7 @@ parameters:
 			path: library/Schoolbox/Learning/Analytics/BoxPlot/Summary.php
 
 		-
-			message: "#^PHPDoc tag @var does not specify variable name\\.$#"
-			count: 3
-			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Analytics\\\\CohortAnalysis\\:\\:getParticipatingStudents\\(\\) should return iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
-
-		-
-			message: "#^Variable \\$results in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
 
@@ -7361,24 +7276,9 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/FeedbackStrategy/NoFavour.php
 
 		-
-			message: "#^PHPDoc tag @var does not specify variable name\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/IAssessable.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$gradeGroup with type Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\GradeLevel\\\\Group\\\\Model\\|null is not subtype of native type Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\GradeLevel\\\\Group\\\\Model\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/IAssessable.php
-
-		-
-			message: "#^PHPDoc tag @var does not specify variable name\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/IFeedback.php
-
-		-
-			message: "#^PHPDoc tag @var does not specify variable name\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/IResponse.php
 
 		-
 			message: "#^Variable \\$sortedAssessments in PHPDoc tag @var does not exist\\.$#"
@@ -7721,11 +7621,6 @@ parameters:
 			path: library/Schoolbox/Learning/Badge/Translator/ModelToArray.php
 
 		-
-			message: "#^PHPDoc tag @var does not specify variable name\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Classes/ClassList.php
-
-		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Component\\\\Dashboard\\\\ClassController\\:\\:\\$timeTableColourMapper \\(Timetable_ColourMapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Component/Dashboard/ClassController.php
@@ -7772,11 +7667,6 @@ parameters:
 
 		-
 			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Grades/Controller.php
-
-		-
-			message: "#^Variable \\$graph in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Grades/Controller.php
 
@@ -7927,11 +7817,6 @@ parameters:
 
 		-
 			message: "#^Method Schoolbox\\\\Learning\\\\MarkScheme\\\\Test\\\\FactoryTest\\:\\:provider_dueWork_markTypeValid\\(\\) should return array\\<array\\<Schoolbox\\\\Learning\\\\Assessment\\\\DueWork\\\\Model\\>\\> but returns array\\<int, array\\<int, class\\-string\\|Schoolbox\\\\Learning\\\\Assessment\\\\DueWork\\\\Model\\>\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/Test/FactoryTest.php
-
-		-
-			message: "#^Variable \\$projects in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/MarkScheme/Test/FactoryTest.php
 
@@ -8154,11 +8039,6 @@ parameters:
 			message: "#^Left side of \\|\\| is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/LearningAnalytics/Controller.php
-
-		-
-			message: "#^PHPDoc tag @var does not specify variable name\\.$#"
-			count: 1
-			path: library/Schoolbox/LearningAnalytics/Module.php
 
 		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
@@ -9859,11 +9739,6 @@ parameters:
 			message: "#^Part \\$data \\(array\\) of encapsed string cannot be cast to string\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Routing/DispatchResponder.php
-
-		-
-			message: "#^Property Schoolbox\\\\Realtime\\\\Routing\\\\Filter\\\\FilterBundle\\:\\:\\$filters \\(iterable\\<Schoolbox\\\\Realtime\\\\Routing\\\\Filter\\\\FilterInterface\\>&SplObjectStorage\\) does not accept SplObjectStorage\\<object, mixed\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Routing/Filter/FilterBundle.php
 
 		-
 			message: "#^If condition is always true\\.$#"
