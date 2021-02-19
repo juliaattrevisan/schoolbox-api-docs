@@ -11,12 +11,8 @@ namespace Schoolbox\Curriculum\Source\AustralianCurriculum;
 
 use EasyRdf\Exception;
 use EasyRdf\Format;
-use EasyRdf\Graph;
 use EasyRdf\Http;
-use EasyRdf\RdfNamespace;
 use EasyRdf\Sparql\Client;
-use EasyRdf\Sparql\Result;
-use EasyRdf\Utils;
 
 /**
  * Extension of SPARQL client to work with ACARA's API.
@@ -33,85 +29,82 @@ class SparqlClient extends Client
 
 
     /**
+     * Copied out of the parent class: the only change is the aforementioned
+     * query parameter.
      *
-     * @param $type
-     * @param $query
-     * @return Graph|Http\Response|Result
-     * @throws Exception
+     * @inheritdoc
      */
-    protected function request($type, $query)
+    protected function executeQuery($processed_query, $type)
     {
-        // Check for undefined prefixes
-        $prefixes = '';
-        foreach (RdfNamespace::namespaces() as $prefix => $uri) {
-            if (
-                strpos($query, "$prefix:") !== false &&
-                strpos($query, "PREFIX $prefix:") === false
-            ) {
-                $prefixes .= "PREFIX $prefix: <$uri>\n";
-            }
-        }
-
-        /** @var Http\Client $client */
         $client = Http::getDefaultHttpClient();
         $client->resetParameters();
 
         // Tell the server which response formats we can parse
-        $accept = Format::getHttpAcceptHeader(
-            [
-                'application/sparql-results+json' => 1.0,
-                'application/sparql-results+xml'  => 0.8,
-            ]
-        );
-        $client->setHeaders('Accept', $accept);
+        $sparql_results_types = [
+            'application/sparql-results+json' => 1.0,
+            'application/sparql-results+xml'  => 0.8,
+        ];
 
-        $queryUri = $this->getQueryUri();
-        if ($type === 'update') {
+        if ($type == 'update') {
+            // accept anything, as "response body of a […] update request is implementation defined"
+            // @see http://www.w3.org/TR/sparql11-protocol/#update-success
+            $accept = Format::getHttpAcceptHeader($sparql_results_types);
+            $this->setHeaders($client, 'Accept', $accept);
+
             $client->setMethod('POST');
             $client->setUri($this->getUpdateUri());
-            $client->setRawData($prefixes . $query);
-            $client->setHeaders('Content-Type', 'application/sparql-update');
-        } elseif ($type === 'query') {
-            // Use GET if the query is less than 2kB
-            // 2046 = 2kB minus 1 for '?' and 1 for NULL-terminated string on server
+            $client->setRawData($processed_query);
+            $this->setHeaders($client, 'Content-Type', 'application/sparql-update');
+        } elseif ($type == 'query') {
+            $re = '(?:(?:\s*BASE\s*<.*?>\s*)|(?:\s*PREFIX\s+.+:\s*<.*?>\s*))*' .
+                '(CONSTRUCT|SELECT|ASK|DESCRIBE)[\W]';
 
+            $result  = null;
+            $matched = mb_eregi($re, $processed_query, $result);
+
+            if (false === $matched or count($result) !== 2) {
+                // non-standard query. is this something non-standard?
+                $query_verb = null;
+            } else {
+                $query_verb = strtoupper($result[1]);
+            }
+
+            if ($query_verb === 'SELECT' or $query_verb === 'ASK') {
+                // only "results"
+                $accept = Format::formatAcceptHeader($sparql_results_types);
+            } elseif ($query_verb === 'CONSTRUCT' or $query_verb === 'DESCRIBE') {
+                // only "graph"
+                $accept = Format::getHttpAcceptHeader();
+            } else {
+                // both
+                $accept = Format::getHttpAcceptHeader($sparql_results_types);
+            }
+
+            $this->setHeaders($client, 'Accept', $accept);
 
             // This is the only functional change in this subclass.
             // Usually the query string key is "query": here, it must be "q".
-            $encodedQuery = 'q=' . urlencode($prefixes . $query);
+            $encodedQuery = 'q=' . urlencode($processed_query);
 
-
-            if (\strlen($encodedQuery) + \strlen($queryUri) <= 2046) {
-                $delimiter = (parse_url($queryUri, PHP_URL_QUERY) ?? '') === '' ? '?' : '&';
+            // Use GET if the query is less than 2kB
+            // 2046 = 2kB minus 1 for '?' and 1 for NULL-terminated string on server
+            if (strlen($encodedQuery) + strlen($this->getQueryUri()) <= 2046) {
+                $queryPart = parse_url($this->getQueryUri(), PHP_URL_QUERY) ?? '';
+                $delimiter = strlen($queryPart) > 0 ? '&' : '?';
 
                 $client->setMethod('GET');
-                $client->setUri($queryUri . $delimiter . $encodedQuery);
+                $client->setUri($this->getQueryUri() . $delimiter . $encodedQuery);
             } else {
                 // Fall back to POST instead (which is un-cacheable)
                 $client->setMethod('POST');
-                $client->setUri($queryUri);
+                $client->setUri($this->getQueryUri());
                 $client->setRawData($encodedQuery);
-                $client->setHeaders('Content-Type', 'application/x-www-form-urlencoded');
-            }
-        }
-
-        $response = $client->request();
-        if ($response->getStatus() === 204) {
-            // No content
-            return $response;
-        } elseif ($response->isSuccessful()) {
-            [$type, $params] = Utils::parseMimeType(
-                $response->getHeader('Content-Type')
-            );
-            if (strpos($type, 'application/sparql-results') === 0) {
-                return new Result($response->getBody(), $type);
-            } else {
-                return new Graph($queryUri, $response->getBody(), $type);
+                $this->setHeaders($client, 'Content-Type', 'application/x-www-form-urlencoded');
             }
         } else {
-            throw new Exception(
-                "HTTP request for SPARQL query failed: " . $response->getBody()
-            );
+            throw new Exception('unexpected request-type: ' . $type);
         }
+
+        return $client->request();
     }
 }
