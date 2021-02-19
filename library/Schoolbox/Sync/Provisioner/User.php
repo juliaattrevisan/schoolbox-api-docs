@@ -270,13 +270,10 @@ class User extends SchoolboxUser
          * We want to keep that instance unchanged, because people are going to lose their Group Admin
          * access and abilities, essentially locking them out of their own Groups en masse
          */
-        $keep = [];
-
-        foreach ($this->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE) as $current) {
-            if (UserAccess::ACCESS_FULL === $current->getAccessLevel()) {
-                $keep[$current->getServiceIdentifier()] = true;
-            }
-        }
+        $keep = $this->getAccessList()
+            ->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
+            ->filterBy('accessLevel', UserAccess::ACCESS_FULL)
+            ->indexBy('serviceIdentifier');
 
         /* For every item listed in the mutation timeline, process a UserAccess
          * These are now the userAccesses the person should have
