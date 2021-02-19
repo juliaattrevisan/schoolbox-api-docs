@@ -184,16 +184,13 @@ class User extends SchoolboxUser
     /**
      * Find the current set of userAccess instances
      *
-     * @param \Schoolbox\Resource\Folder\Mapper $fm
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      * @param LoggerInterface                   $logger
      * @return array
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    public function generateExistingUserAccess(\Schoolbox\Resource\Folder\Mapper $fm, LoggerInterface $logger): array
+    public function generateExistingUserAccess(\Schoolbox\Resource\Folder\Mapper $folderMapper, LoggerInterface $logger): array
     {
         /* Find out what you started with
          */
@@ -207,7 +204,7 @@ class User extends SchoolboxUser
             /* Maybe this folder doesn't actually exist at runtime
              */
             try {
-                $folder = $fm->findCheaplyById($folderId);
+                $folder = $folderMapper->findCheaplyById($folderId);
 
                 $logger->debug(sprintf(
                     "Existing Group: %s (%s) with accesslevel %s\n",
@@ -215,7 +212,7 @@ class User extends SchoolboxUser
                     $folder->getName(),
                     $userAccess->getAccessLevel()
                 ));
-            } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
+            } catch (\Schoolbox\Mapper\Exception $e) {
                 $logger->debug(sprintf(
                     "Existing Group: %s (%s) with accesslevel %s\n",
                     $folderId,
@@ -234,16 +231,14 @@ class User extends SchoolboxUser
      * deciding whether to retain Full Access settings and/or create
      * new instances
      *
-     * @param \Schoolbox\Resource\Folder\Mapper $fm
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      * @param LoggerInterface                   $logger
      * @return array
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    public function generateFinalUserAccess(\Schoolbox\Resource\Folder\Mapper $fm, LoggerInterface $logger): array
+    public function generateFinalUserAccess(\Schoolbox\Resource\Folder\Mapper $folderMapper, LoggerInterface $logger): array
     {
 
         /* Decide the net effect, in accordance to how the mutation timeline evolved
@@ -256,7 +251,7 @@ class User extends SchoolboxUser
                 /* Maybe this folder doesn't actually exist at runtime
                  */
                 try {
-                    $folder = $fm->findCheaplyById($folderId);
+                    $folder = $folderMapper->findCheaplyById($folderId);
 
                     $folderName = $folder->getName();
                 } catch (\Schoolbox\Mapper\Exception $e) {
