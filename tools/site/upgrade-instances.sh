@@ -200,6 +200,11 @@ function upgrade_instances(){
   log "All child upgrade instance processes appear to have completed";
 }
 
+function restart_php_fpm(){
+  log "Restarting php7.4-fpm ..."
+  service php7.4-fpm restart         # Allow web requests again, ensure upgraded code is used
+}
+
 function remove_maintenance_page(){
   # TODO, this will have no effect on cloud
   "$site_root"/tools/maintenance/site_up.sh
@@ -256,6 +261,7 @@ function main() {
   parse_args "$@"
   parse_global_vars "$@"
   upgrade_instances
+  restart_php_fpm
   remove_maintenance_page
   rebuild_and_restart_daemons
   rebuild_cron_jobs
