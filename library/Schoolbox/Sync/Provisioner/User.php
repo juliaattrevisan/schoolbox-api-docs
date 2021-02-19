@@ -205,21 +205,17 @@ class User extends SchoolboxUser
              */
             try {
                 $folder = $folderMapper->findCheaplyById($folderId);
-
-                $logger->debug(sprintf(
-                    "Existing Group: %s (%s) with accesslevel %s\n",
-                    $folder->getId(),
-                    $folder->getName(),
-                    $userAccess->getAccessLevel()
-                ));
+                $folderName = $folder->getName();
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $logger->debug(sprintf(
-                    "Existing Group: %s (%s) with accesslevel %s\n",
-                    $folderId,
-                    'unknown folder',
-                    $userAccess->getAccessLevel()
-                ));
+                $folderName = 'unknown folder';
             }
+
+            $logger->debug(sprintf(
+                "Existing Group: %s (%s) with accesslevel %s\n",
+                $folderId,
+                $folderName,
+                $userAccess->getAccessLevel()
+            ));
         }
 
         return $existingGroups;
