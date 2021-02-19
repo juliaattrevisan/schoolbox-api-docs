@@ -148,7 +148,7 @@
                                        name="types[]"
                                        value="{{ type.id }}"
                                        type="checkbox"
-                                       {% for typeSelected in report.types | filter(typeSelected => typeSelected.id == type.id ) %}checked{% endfor %}
+                                       {% for typeSelected in (report.types ?? []) | filter(typeSelected => typeSelected.id == type.id ) %}checked{% endfor %}
                                        data-check-type
                                 >
 
@@ -178,7 +178,7 @@
                                                    name="subtypes[]"
                                                    value="{{ subtype.id }}"
                                                    type="checkbox"
-                                                   {% for subtypeSelected in report.subtypes | filter(subtypeSelected => subtypeSelected.id == subtype.id ) %}checked{% endfor %}
+                                                   {% for subtypeSelected in (report.subtypes ?? []) | filter(subtypeSelected => subtypeSelected.id == subtype.id ) %}checked{% endfor %}
                                                    data-check-subtype
                                             >
                                             <label for="subtype-{{ subtype.id }}">
@@ -245,7 +245,7 @@
                                            name="years[]"
                                            value="{{ year.id }}"
                                            type="checkbox"
-                                           {% for yearSelected in report.years |filter(yearSelected => yearSelected == year.id ) %}checked{% endfor %}
+                                           {% for yearSelected in (report.years ?? []) |filter(yearSelected => yearSelected == year.id ) %}checked{% endfor %}
                                            data-check-year
                                     >
                                     <label for="year-{{ year.id }}">{{ year.name }}</label>
@@ -277,7 +277,7 @@
                                            name="houses[]"
                                            value="{{ house.id }}"
                                            type="checkbox"
-                                           {% for houseSelected in report.houses | filter(houseSelected => houseSelected == house) %}checked{% endfor %}
+                                           {% for houseSelected in (report.houses ?? []) | filter(houseSelected => houseSelected == house) %}checked{% endfor %}
                                            data-check-house
                                     >
                                     <label for="house-{{ house.id }}">{{ house.house }}</label>
@@ -422,7 +422,7 @@
                                     <input type="hidden" name="group[{{ group.id }}]" value="0"/>
                                     <input type="checkbox"
                                            name="group[{{ group.id }}]"
-                                           {% for reportGroup in report.groups | filter(reportGroup=>reportGroup.id == group.id) %}checked{% endfor %}
+                                           {% for reportGroup in (report.groups ?? []) | filter(reportGroup=>reportGroup.id == group.id) %}checked{% endfor %}
                                            id="group[{{ group.id }}]"
                                            value="1"
                                     />

@@ -4,7 +4,7 @@
         studentAttributes   StudentAttributes
 #}
 {% macro cssClasses(studentAttributes) %}
-    {%- spaceless %}
+    {%- apply spaceless %}
         {% set classes = [
             'schoolbox-year-level-' ~ studentAttributes.yearLevel,
             'curriculum-year-level-' ~ studentAttributes.curriculumYearLevel,
