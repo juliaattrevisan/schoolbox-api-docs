@@ -365,7 +365,10 @@
             }).alaressValidate({
                 onfocusout: false,
                 submitHandler: function() {
+                    
                     var theForm = $(config.element);
+
+                    theForm.find('input[type="submit"]').prop('disabled', true); //prevent multiple submissions
 
                     /* Collate possible answers and their correctness status
                      */
