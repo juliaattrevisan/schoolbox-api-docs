@@ -147,7 +147,7 @@ $allow-sidebar-stash: $large-up;
 .hybrid-bar {
   .logo {
     display: flex;
-    max-width: $tabbar-icon-width;
+    width: $tabbar-icon-width;
     height: $tabbar-height;
     float: left;
 
