@@ -12,6 +12,7 @@ use InvalidArgumentException;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Campus;
+use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise;
 use Schoolbox\GenericCollection;
@@ -163,6 +164,14 @@ class Provisioner
             set_time_limit(1800);
         }
 
+        /* Various dependencies
+         * FolderMapper for identifying a group's folder name
+         * Config for options that change the following algorithm
+         * and also because it's somehow inside User models
+         */
+        $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
+        $config = new Loader();
+
         foreach ($this->runOrder as $roleType) {
             if (isset($forRoleType) && $roleType != $forRoleType) {
                 // Don't run the provisioner for this role
@@ -281,28 +290,14 @@ class Provisioner
                     // get a diff of the original user and what we've ended up with
                     $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
 
-
-                    /* See what we started with
+                    /* Figure out what is going on in the userAccess mutations
+                     *
+                     * UPS Rulesets can have N adds/removes in any order so you need to compute
+                     * the mutations in order to find out where you ended up. These evaluations
+                     * also create log->debug entries so you can see what happened
                      */
-                    $fm = \Schoolbox\Resource\Folder\Mapper::getInstance();
-
-                    $existingGroups = [];
-
-                    foreach ($originalUser->getAccessList() as $userAccess) {
-                        $folderId = $userAccess->getServiceIdentifier();
-                        $folder = $fm->findCheaplyById($folderId);
-
-                        $existingGroups[$folderId] = $userAccess->getAccessLevel();
-
-                        $this->logger->debug(sprintf(
-                            "Existing Group: %s (%s) with accesslevel %s\n",
-                            $folder->getId(),
-                            $folder->getName(),
-                            $userAccess->getAccessLevel()
-                        ));
-                    }
-
-                    $finalGroups = $internalUser->generateUserAccess($fm, $this->logger);
+                    $existingGroups = $originalUser->generateExistingUserAccess($folderMapper, $this->logger);
+                    $finalGroups = $internalUser->generateFinalUserAccess($folderMapper, $this->logger);
 
                     /* generateUserAccess() returns null when the config option is off
                      * No changes take place in that situation; no diff to calculate

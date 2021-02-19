@@ -182,6 +182,48 @@ class User extends SchoolboxUser
 
 
     /**
+     * Find the current set of userAccess instances
+     *
+     * @param \Schoolbox\Resource\Folder\Mapper $fm
+     * @param LoggerInterface                   $logger
+     * @return array|null
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Schoolbox\Mapper\Exception\NotFound
+     */
+    public function generateExistingUserAccess(\Schoolbox\Resource\Folder\Mapper $fm, LoggerInterface $logger): ?array
+    {
+
+        /* Modify accessList only when ups_groups_enabled is actually enabled
+         * Otherwise leave it unchanged from whatever it was
+         */
+        if (!$this->getConfigLoader()->get('ups_groups_enabled')) {
+            return null;
+        }
+
+        $existingGroups = [];
+
+        foreach ($this->getAccessList() as $userAccess) {
+            $folderId = $userAccess->getServiceIdentifier();
+            $folder = $fm->findCheaplyById($folderId);
+
+            $existingGroups[$folderId] = $userAccess->getAccessLevel();
+
+            $logger->debug(sprintf(
+                "Existing Group: %s (%s) with accesslevel %s\n",
+                $folder->getId(),
+                $folder->getName(),
+                $userAccess->getAccessLevel()
+            ));
+        }
+
+        return $existingGroups;
+    }
+
+
+    /**
      * Using the mutation timeline, derive UserAccess instances
      * deciding whether to retain Full Access settings and/or create
      * new instances
@@ -195,7 +237,7 @@ class User extends SchoolboxUser
      * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \Schoolbox\Mapper\Exception\NotFound
      */
-    public function generateUserAccess(\Schoolbox\Resource\Folder\Mapper $fm, LoggerInterface $logger): ?array
+    public function generateFinalUserAccess(\Schoolbox\Resource\Folder\Mapper $fm, LoggerInterface $logger): ?array
     {
         /* Modify accessList only when ups_groups_enabled is actually enabled
          * Otherwise leave it unchanged from whatever it was
