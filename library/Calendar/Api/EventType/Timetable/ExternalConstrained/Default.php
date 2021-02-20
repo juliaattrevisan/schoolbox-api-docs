@@ -94,8 +94,11 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         /** @var Event[] $addedEvents */
         $addedEvents = array();
         while ($currentTimestamp < $endTimestamp) {
+            // elapsedTime: negative - past, positive - future
             $elapsedTime = $currentTimestamp - $startOfDay;
-            $showAttendance = $externalAttendanceLink && $elapsedTime >= (-$attendanceWindow) && $elapsedTime < $expensiveWindow;
+            // 60 * 60 * 24 = 86400
+            $showAttendance = $externalAttendanceLink && ($elapsedTime < 86400) && ($elapsedTime >= (-$attendanceWindow));
+            $showExpensive  = $elapsedTime >= 0 && $elapsedTime < $expensiveWindow;
 
             foreach ($this->getUser()->getCampusCollection() as $campus) {
                 $campusId  = $campus->getId();
@@ -106,7 +109,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                     continue;
                 }
 
-                if ($showAttendance) {
+                if ($showAttendance || $showExpensive) {
                     // if the day we're looking at is
                     // - no more than $attendanceWindow in the past, and
                     // - no more than $expensiveWindow in the future,
@@ -312,7 +315,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                 $period['category'] = null;
                 unset($period['class']);
 
-                // Load staff into period defintion
+                // Load staff into period definition
                 $staffId = $period['staffID'];
                 try {
                     if (!empty($staffId)) {
