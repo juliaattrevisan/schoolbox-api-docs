@@ -4886,16 +4886,6 @@ parameters:
 			path: library/Schoolbox/Curriculum/Node/Model.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$query\\)\\: Unexpected token \"\\$query\", expected type at offset 45$#"
-			count: 1
-			path: library/Schoolbox/Curriculum/Source/AustralianCurriculum/SparqlClient.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$type\\)\\: Unexpected token \"\\$type\", expected type at offset 25$#"
-			count: 1
-			path: library/Schoolbox/Curriculum/Source/AustralianCurriculum/SparqlClient.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Curriculum/Source/Model.php

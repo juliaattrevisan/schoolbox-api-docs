@@ -32,10 +32,16 @@ class SparqlClient extends Client
      * Copied out of the parent class: the only change is the aforementioned
      * query parameter.
      *
-     * @inheritdoc
+     * @param string $processed_query
+     * @param string $type            Should be either "query" or "update"
+     *
+     * @return Http\Response
+     * @throws Exception
      */
     protected function executeQuery($processed_query, $type)
     {
+        // This will always be EasyRDF's HTTP client, not the Zend client
+        /** @var Http\Client $client */
         $client = Http::getDefaultHttpClient();
         $client->resetParameters();
 
