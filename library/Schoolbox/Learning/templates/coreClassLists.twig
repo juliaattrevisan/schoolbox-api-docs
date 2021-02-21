@@ -17,17 +17,17 @@ Data:
         <h1>${ subject }</h1>
         <section class="content">
             <ul class="flex-list flex-wrap buttons">
+                {% if learningMomentsEnabled %}
+                    <li><a @click.prevent="openShareLearningMomentDialog"
+                           :class="{disabled: selectedStudentIds.length === 0, 'icon-share': true}">Share Learning Moment</a></li>
+                {% endif %}
                 {% if badgesEnabled %}
-                    <li><a :href="buildAwardAchievementUrl()" :class="{disabled: selectedStudentIds.length === 0, 'icon-achievement': true}">Award Achievements</a></li>
                     <li><a :href="buildSetGoalUrl()" :class="{disabled: selectedStudentIds.length === 0, 'icon-goal': true}">Set Goals</a></li>
+                    <li><a :href="buildAwardAchievementUrl()" :class="{disabled: selectedStudentIds.length === 0, 'icon-achievement': true}">Award Achievements</a></li>
                 {% endif %}
                 {% if pastoralEnabled %}
                     <li><a @click.prevent="addPastoralRecord"
                            :class="{disabled: selectedStudentIds.length === 0, 'icon-user': true}">Add {{ locale.pastoralCare.proper }} Record</a></li>
-                {% endif %}
-                {% if learningMomentsEnabled %}
-                    <li><a @click.prevent="openShareLearningMomentDialog"
-                           :class="{disabled: selectedStudentIds.length === 0, 'icon-share': true}">Share Learning Moment</a></li>
                 {% endif %}
                 {% if mailEnabled %}
                     <li><a @click.prevent="openMailDialog"
