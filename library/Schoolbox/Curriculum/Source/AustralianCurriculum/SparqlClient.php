@@ -65,10 +65,10 @@ class SparqlClient extends Client
             $re = '(?:(?:\s*BASE\s*<.*?>\s*)|(?:\s*PREFIX\s+.+:\s*<.*?>\s*))*' .
                 '(CONSTRUCT|SELECT|ASK|DESCRIBE)[\W]';
 
-            $result  = null;
-            $matched = mb_eregi($re, $processed_query, $result);
+            $result = null;
+            mb_eregi($re, $processed_query, $result);
 
-            if (false === $matched or count($result) !== 2) {
+            if (count($result) !== 2) {
                 // non-standard query. is this something non-standard?
                 $query_verb = null;
             } else {
