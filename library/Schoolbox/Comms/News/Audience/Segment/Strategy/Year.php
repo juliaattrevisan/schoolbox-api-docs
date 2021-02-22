@@ -66,7 +66,7 @@ class Year extends SimpleStrategy
               '{$entityType}' AS entity_type,
               null as entity_meta
             FROM lu_year_level
-            WHERE lu_year_level.deleted_AT IS NULL
+            WHERE lu_year_level.deleted_at IS NULL
             AND lu_year_level.name IS NOT NULL
             {$keywordFilter}
             ORDER BY lu_year_level.sequence
