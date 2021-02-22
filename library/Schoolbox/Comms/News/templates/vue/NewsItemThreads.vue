@@ -49,20 +49,20 @@ export default {
             isCKEditorReady: false,
             ckeditorConfig: {
                 embed_provider: '//iframe.ly/api/oembed?url={url}&callback={callback}&api_key=94aa8fc28ac1089a2dfb28',
-                removePlugins: 'image,uploadimage,link,schoolboxanchor,elementspath,wordcount',
+                removePlugins: 'uploadimage,link,schoolboxanchor',
                 removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
                 toolbarGroups: [
                     {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
                     {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
                     {name: 'links', groups: ['links']},
-                    {name: 'insert', groups: ['insert']}
+                    {name: 'insert', groups: ['insert']},
+                    {name: 'schoolbox', groups: ['schoolboxlink']}
                 ],
                 contentsCss: [
                     '/css/core/skin.css.php',
                     '/css/core/editor.css',
                 ],
                 height: '4rem',
-                resize_enabled: false,
                 startupFocus: true
             }
 
@@ -271,13 +271,12 @@ export default {
             Object.keys(this.comments).forEach((key) => {
                 let content = $('<div>' + this.comments[key].content + '</div>');
                 let replaced = false;
-                $(content).each(function (index, element) {
+                $(content).each((index, element) => {
                     replaced = $.fn.schoolboxResource_ReplaceAll($(element));
                     // Before we render the elements into the front-end, let's try to update the Vue comments model
                     // first so that we can easily initialise mediaelementplayer().
                     // And only update those models who's data has been updated.
                     // Basically those elements that has a videos/audios.
-                    debugger;
                     if (replaced) {
                         this.comments[key].content = $(element).html();
                     }
