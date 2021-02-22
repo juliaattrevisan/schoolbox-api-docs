@@ -114,8 +114,6 @@ export default {
                 return;
             }
 
-            this.showSkeletonLoader = true;
-
             // TODO don't construct this endpoint manually
             axios.get('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments/', {
                 params: {
@@ -125,7 +123,6 @@ export default {
                 
                 const responseData = response.data;
 
-                // this.comments = responseData.data.map(data => data);
                 responseData.data.forEach((data) => {
                     this.comments.push(data);
                 });
@@ -280,6 +277,7 @@ export default {
                     // first so that we can easily initialise mediaelementplayer().
                     // And only update those models who's data has been updated.
                     // Basically those elements that has a videos/audios.
+                    debugger;
                     if (replaced) {
                         this.comments[key].content = $(element).html();
                     }
