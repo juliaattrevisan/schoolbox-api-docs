@@ -90,7 +90,7 @@
             event.preventDefault();
 
             var id = $('[data-resourcebookingsuggest]').val().pop();
-            var url = $('[data-bookitemform]').attr('action') + id + '?startDate={EVENT_START_DATE}&startTime={EVENT_START_TIME}&endDate={EVENT_END_DATE}&endTime={EVENT_END_TIME}&name={EVENT_NAME_ENCODED}&callbackUrl=/modules/eotc/manage/resources/bookingForm/{EVENT_ID}';
+            var url = $('[data-bookitemform]').attr('action') + id + '?startDate={EVENT_START_DATE}&startTime={EVENT_START_TIME}&endDate={EVENT_END_DATE}&endTime={EVENT_END_TIME}&name={EVENT_NAME_ENCODED}&returnUrl={RETURN_URL}';
 
             window.location.href = url;
 
