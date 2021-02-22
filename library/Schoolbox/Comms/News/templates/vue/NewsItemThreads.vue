@@ -5,6 +5,7 @@ import moment from 'moment';
 import axios from 'axios';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
+import { fetchAsJson } from '@shared/fetch/fetch';
 
 export default {
 
@@ -26,18 +27,15 @@ export default {
     data: function() {
         return {
             comments: [],
-            showCommentsCount: false,
             totalCommentsCount: 0,
-            cursorNext: '',
             isThreadCheckboxVisible: undefined,
             isThreadCheckboxEnabled: undefined,
             isThreadEnabled: undefined,
-            errorLoadingCommentsText: 'Unable to load comments',
             showSkeletonLoader: true,
             showLoadMoreButton: false,
             commentIndexToDelete: undefined,
             confirmDeleteButton: true,
-            comment: '',
+            newComment: '',
             isProcessActive: false,
             showCommentsSection: false,
             initialLoad: true,
@@ -80,19 +78,7 @@ export default {
         getAddCommentButtonText () {
             if (this.isCKEditorLoading) return 'Loading';
             else return 'Add a Comment'
-        },
-
-        /**
-         * How many total comments (beyond the amount currently in the list)
-         * are there in this thread?
-         *
-         * @returns {Number}
-         */
-        commentTotalCount () {
-            // let count = Number(this.commentThread?.children?.metadata?.count);
-            // return isNaN(count) ? 0 : count;
-            return 0;
-        },
+        }
 
     },
 
@@ -123,7 +109,6 @@ export default {
             if (!this.threadId) {
                 this.isProcessActive = false;
                 this.showSkeletonLoader = false;
-                this.showCommentsCount = true;
                 this.showCommentsSection = this.isThreadCheckboxVisible;
                 return;
             }
@@ -131,23 +116,16 @@ export default {
             this.showSkeletonLoader = true;
 
             // TODO don't construct this endpoint manually
-            axios.get('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments/', {
-                params: {
-                    cursor: this.cursorNext
-                }
-            }).then((response) => {
-
+            axios.get('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments/')
+            .then((response) => {
+                
                 const responseData = response.data;
-
-                this.totalCommentsCount = responseData.metadata.count;
-                this.cursorNext = responseData.metadata.cursor.next;
 
                 this.comments = responseData.data.map(data => data);
 
-                // Hide skeleton loader once the request is done
-                this.showSkeletonLoader = false;
-                // Make comments count visible when the request is done
-                this.showCommentsCount = true;
+                this.totalCommentsCount = responseData.metadata.count;
+
+                this.showSkeletonLoader = false; // Hide skeleton loader once the request is done
 
                 /**
                  * TODO: Maybe the API should return a metadata that will let the front-end know if there's still
@@ -158,16 +136,15 @@ export default {
                 this.showLoadMoreButton = this.comments.length < responseData.metadata.count;
 
                 /**
-                 * If the user have the rights to modify the thread, despite that there's comments, comments section
-                 * must be rendered
+                 * If the user has the rights to modify the thread, despite that there's comments, 
+                 * comments section must be rendered
                  */
                 this.showCommentsSection = (this.isThreadCheckboxVisible || this.totalCommentsCount > 0 || this.isThreadEnabled);
                 
             }).catch((error) => {
                 this.showSkeletonLoader = false;
-                this.showCommentsCount = true;
-                this.$refs.toast.activate(this.errorLoadingCommentsText);
-                this.$refs.toast.timeout(this.errorLoadingCommentsText, false);
+                this.$refs.toast.activate('Unable to load comments');
+                this.$refs.toast.timeout('Unable to load comments', false);
             }).finally(() => {
                 /**
                  * Since schoolbox.min.js is being executed first before VueJS content gets rendered,
@@ -320,19 +297,17 @@ export default {
 
             // TODO don't construct this endpoint manually
             axios.post('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments', {
-                content: this.comment
+                content: this.newComment
             }).then((response) => {
 
                 let responseData = response.data;
-                // Add the latest comment into the top of array
+               
                 this.comments.unshift(response.data)
-
-                // On successful comment posting, add one into the total comments count in the UI without hitting the backend
                 this.totalCommentsCount++;
 
                 this.$refs.toast.timeout('Comment has been added', true);
                 
-                this.comment = '';
+                this.newComment = '';
 
                 this.isProcessActive = false;
 
@@ -374,8 +349,6 @@ export default {
             axios.delete('/discussion/comms/' + this.articleId + '/comments/' + commentIdToDelete, {}, { headers: this.postHeaders }).then(() => {
                 
                 this.comments.splice(this.commentIndexToDelete, 1);
-
-                // On successful delete, reduce the total comments count in the UI without hitting the backend
                 this.totalCommentsCount--;
 
                 this.$refs.toast.timeout('Comment deleted', true);
@@ -420,7 +393,7 @@ export default {
             <div class="discussion-threads">
                 <div class="row">
                     <div class="small-6 columns">
-                        <h2>Comments <span v-if="showCommentsCount">({{ totalCommentsCount }})</span></h2>
+                        <h2>Comments <span v-if="!showSkeletonLoader">({{ totalCommentsCount }})</span></h2>
                     </div>
                     <div v-if="isThreadCheckboxVisible" class="checklist small-6 columns">
                         <input id="allow-comments" name="allowComments" type="checkbox" @click="changeThreadStatus" v-model="isThreadCheckboxEnabled" />
@@ -432,10 +405,10 @@ export default {
                         <button class="btn-show-ckeditor" v-show="!isCKEditorReady" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
                         <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
                         <div v-if="isCKEditorLoaded" :style="[isCKEditorReady ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
-                            <ckeditor tag-name="textarea" v-model="comment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="isProcessActive"></ckeditor>
+                            <ckeditor tag-name="textarea" v-model="newComment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="isProcessActive"></ckeditor>
                             <a class="button submit"
                             @click="postComment"
-                            :disabled="comment.trim() === '' || isProcessActive">Post Comment</a>
+                            :disabled="newComment.trim() === '' || isProcessActive">Post Comment</a>
                         </div>
                     </div>
                     <div v-else>
@@ -474,7 +447,7 @@ export default {
                             </div>
                         </div>
                         <nav>
-                            <a v-if="comment._links.delete.auth" @click="showDeleteModal(index)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
+                            <a v-if="comment._links.delete.auth" @click.prevent="showDeleteModal(index)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
                         </nav>
                         <article v-html="comment.content"></article>
                     </li>
