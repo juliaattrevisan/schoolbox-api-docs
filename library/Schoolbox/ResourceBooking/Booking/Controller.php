@@ -245,21 +245,21 @@ class Controller extends Base
             $code = 400;
         }
 
+        /* Append the booking's id to the url, for the calling module to
+         * process in whatever way it needs. This allows a decoupling between
+         * Resource Booking any any modules that use it.
+         *
+         * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId}
+         * (name/startdate/enddate/details)
+         */
+        $callbackUrl = null;
+
+        if (strlen($this->getRequest()->post['callbackUrl'])) {
+            $callbackUrl = $this->getRequest()->post['callbackUrl'];
+        }
+
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->status->setCode($code);
-
-            /* Append the booking's id to the url, for the calling module to
-             * process in whatever way it needs. This allows a decoupling between
-             * Resource Booking any any modules that use it.
-             *
-             * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId}
-             * (name/startdate/enddate/details)
-             */
-            $callbackUrl = '';
-
-            if (strlen($this->getRequest()->post['callbackUrl'])) {
-                $callbackUrl = $this->getRequest()->post['callbackUrl'];
-            }
 
             $this->getResponse()->content->set(
                 [
@@ -267,14 +267,14 @@ class Controller extends Base
                     'data'   => [
                         'item'        => $bookingList,
                         'errors'      => $errors,
-                        'callbackUrl' => $callbackUrl,
+                        'callbackUrl' => (string)$callbackUrl,
                     ],
                 ]
             );
         } else {
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
-            $this->getResponse()->redirect->afterPost($this->getSession()->getHistory());
+            $this->getResponse()->redirect->afterPost($callbackUrl ?? $this->getSession()->getHistory());
         }
     }
 
