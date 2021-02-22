@@ -27,51 +27,61 @@
                 </div>
             </div>
         </div>
-
-        <div class="row" id="grade-distribution">
-            <div class="small-12 column">
-                <dl class="small-gap">
-                    <dt>{{ locale.grades.proper }} Distribution</dt>
-                </dl>
-            </div>
-            <div class="small-12 column">
-                <table class="width-auto bordered-table">
-                    <thead>
-                    <tr>
-                        {% for gradeLevel,_ in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
-                            <th>{{ gradeLevel }}</th>
-                        {% endfor %}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        {% for _,results in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
-                            <td>{{ results|length }}</td>
-                        {% endfor %}
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
     {% endif %}
 
-    {# Endeavor Grades - complicated enough to be its own template #}
-    {% include '@customMeridenPastoral/sub/endeavourGrades.twig' %}
+    {# Grade distribution, endeavour grades, approaches to learning #}
+    <div class="row">
+        <div class="small-12 medium-6 column">
+            {# Grade distribution: show collated grades for all students #}
+            {% if report.subjectReport.namedGrades.courseGrade %}
+                <div class="row" id="grade-distribution">
+                    <div class="small-12 column">
+                        <dl class="small-gap">
+                            <dt>{{ locale.grades.proper }} Distribution</dt>
+                        </dl>
+                    </div>
+                    <div class="small-12 column">
+                        <table class="width-auto bordered-table">
+                            <thead>
+                            <tr>
+                                {% for gradeLevel,_ in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
+                                    <th>{{ gradeLevel }}</th>
+                                {% endfor %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                {% for _,results in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
+                                    <td>{{ results|length }}</td>
+                                {% endfor %}
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
 
-    {# Approaches to learning - another rubric #}
-    {% if report.subjectReport.namedGrades.learningApproaches %}
-        <div class="row" id="learning-approaches">
-            <div class="small-12 column">
-                <dl class="small-gap">
-                    <dt>Approaches to Learning</dt>
-                    <dd class="explanation hide-for-print"><a href="/homepage/3462">[{{ locale.grades.proper }} Description]</a></dd>
-                </dl>
-            </div>
-            <div class="small-12 column">
-                {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.learningApproaches} %}
-            </div>
+            {# Endeavor Grades - complicated enough to be its own template #}
+            {% include '@customMeridenPastoral/sub/endeavourGrades.twig' %}
         </div>
-    {% endif %}
+
+        <div class="small-12 medium-6 column">
+            {# Approaches to learning - another rubric #}
+            {% if report.subjectReport.namedGrades.learningApproaches %}
+                <div class="row" id="learning-approaches">
+                    <div class="small-12 column">
+                        <dl class="small-gap">
+                            <dt>Approaches to Learning</dt>
+                            <dd class="explanation hide-for-print"><a href="/homepage/3462">[{{ locale.grades.proper }} Description]</a></dd>
+                        </dl>
+                    </div>
+                    <div class="small-12 column">
+                        {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.learningApproaches} %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 
     {# Assessments #}
     {% if report.subjectReport.grades %}
