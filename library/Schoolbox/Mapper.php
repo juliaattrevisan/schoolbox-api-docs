@@ -299,7 +299,9 @@ abstract class Mapper implements IMapper, Serializable
 
         // only functional in development
 
-        // This line raises an error on CI, where INSTANCE_ID is constant
+        // This line raises an error on CI, where INSTANCE_ID is always "ci":
+        // it doesn't raise an error on Vagrant where INSTANCE_ID comes from
+        // an external config, so ignore the "no error to ignore" message here.
         /* @phpstan-ignore-next-line */
         self::$perfmon = (INSTANCE_ID === 'vagrantx' && self::isWithinWebRequest())
             ? new DevMonitor(DebugBar::getInstance())
