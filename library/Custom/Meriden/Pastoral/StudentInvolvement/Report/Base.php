@@ -1,19 +1,20 @@
 <?php
+
 /**
- * Representation of a subject within Meriden.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement;
+namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
 
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder\Model as Folder;
 
-class Involvement
+/**
+ * Base representation of an eReport page.
+ */
+class Base
 {
     /**
      * The year that this tutor group is in

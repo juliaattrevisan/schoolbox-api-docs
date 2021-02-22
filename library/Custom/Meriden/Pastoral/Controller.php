@@ -11,9 +11,9 @@
 namespace Custom\Meriden\Pastoral;
 
 use Alaress\Web\Controller\Base;
-use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
-use Custom\Meriden\Pastoral\StudentInvolvement\Subject;
-use Custom\Meriden\Pastoral\StudentInvolvement\TutorGroup;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Factory;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup;
 use RangeException;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -72,12 +72,13 @@ class Controller extends Base
     public function index($year, User $student)
     {
         try {
+            $report = $this->buildReportData($year, $student);
             $this->getResponse()->content->set(
-                array(
-                    'template' => '@customMeridenPastoral/index.twig',
-                    'data'     => $this->buildReportData($year, $student),
+                [
+                    'template' => $report['template'],
+                    'data'     => $report,
                     'title'    => 'School Report - ' . $year . ' - ' . $student->formatName()
-                )
+                ]
             );
         } catch (RangeException $e) {
             $this->getResponse()->status->setCode(404);
@@ -106,7 +107,7 @@ class Controller extends Base
 
         $subjectReportDataList = [];
         foreach ($baseReportData['report']['subjectList'] as $subject) {
-            /** @var Subject $subject */
+            /** @var Subject\Standard $subject */
             try {
                 $subjectReportDataList[$subject->getSubjectCode()] = $this->buildReportData(
                     $year,
@@ -143,13 +144,12 @@ class Controller extends Base
     {
         try {
             $reportData = $this->buildReportData($year, $student, $subjectCode);
-            /** @var StudentInvolvement\Subject $subjectReport */
+
+            /** @var Subject\Base $subjectReport */
             $subjectReport = $reportData['report']['subjectReport'];
-            $this->getResponse()->content->set(
+            $this->response->content->set(
                 [
-                    'template' => $subjectReport->isLateralLearning()
-                        ? '@customMeridenPastoral/lateralLearning.twig'
-                        : '@customMeridenPastoral/subject.twig',
+                    'template' => $reportData['template'],
                     'data'     => $reportData,
                     'title'    => $subjectReport->getName() . ' - ' . $year . ' - ' . $student->formatName(),
                 ]
@@ -181,6 +181,7 @@ class Controller extends Base
         $subjectList      = $this->getStudentInvolvementFactory()->buildSubjectList($year, $student);
         $roleTypeOverride = null;
         $roleTypes        = Role::getRoleTypes();
+        $template         = null;
 
         // Only staff may override role type?
         if ($this->getUser()->getRole()->isStaff()) {
@@ -205,6 +206,7 @@ class Controller extends Base
                 throw new RangeException("Student has no tutor group in $year");
             }
             $tutorGroup = $this->getStudentInvolvementFactory()->buildTutorGroup($year, $student, $roleTypeOverride);
+            $template   = '@customMeridenPastoral/index.twig';
         } else {
             // Does this subject exist for this student?
             $exists = false;
@@ -217,7 +219,18 @@ class Controller extends Base
             if (!$exists) {
                 throw new RangeException("Student was not in subject $subjectCode in $year");
             }
-            $subject = $this->getStudentInvolvementFactory()->buildSubject($year, $student, $subjectCode, $roleTypeOverride);
+
+            // Augment the reports with proper data
+            $subject = $this->getStudentInvolvementFactory()->buildSubject(
+                $year,
+                $student,
+                $subjectCode,
+                $subjectList,
+                $roleTypeOverride
+            );
+            $template = $subject instanceof Subject\LateralLearning
+                ? '@customMeridenPastoral/lateralLearning.twig'
+                : '@customMeridenPastoral/subject.twig';
         }
         return [
             'report' => [
@@ -229,6 +242,7 @@ class Controller extends Base
                 'subjectList'      => $subjectList,
                 'roleTypeOverride' => $roleTypeOverride,
             ],
+            'template'   => $template,
             'graphWidth' => $this->request->query->getInt('graph-width'),
         ];
     }

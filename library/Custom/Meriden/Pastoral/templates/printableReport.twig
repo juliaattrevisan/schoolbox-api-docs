@@ -8,14 +8,14 @@
 </script>
 
 <div id="printable-report" class="e-report">
-    {% include '@customMeridenPastoral/contents/index.twig'
+    {% include baseReport.template
         with baseReport | merge({showSubjectSelector: false})
         only
     %}
     <div class="row" style="break-after: page"></div>
 
     {% for subjectReport in subjectReports %}
-        {% include '@customMeridenPastoral/contents/subject.twig'
+        {% include subjectReport.template
             with subjectReport | merge({showSubjectSelector: false})
             only
         %}

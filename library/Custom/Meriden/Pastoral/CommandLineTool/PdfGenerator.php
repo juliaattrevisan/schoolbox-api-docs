@@ -13,7 +13,7 @@ use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Database\Connector\IConnector;
 use Aura\Router\Router;
-use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Factory;
 use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
 use InvalidArgumentException;
 use Schoolbox\Application\CliTool\PdfGenerator\App;

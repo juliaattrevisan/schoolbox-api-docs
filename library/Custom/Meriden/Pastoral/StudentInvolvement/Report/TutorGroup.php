@@ -1,17 +1,19 @@
 <?php
+
 /**
- * Representation of a student's involvement within a tutor group.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement;
+namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
 
 use Schoolbox\User;
 
-class TutorGroup extends Involvement
+/**
+ * Representation of report data for a student's tutor group, independent of any
+ * subjects that the student is in.
+ */
+class TutorGroup extends Base
 {
     /**
      * The year level coordinator(s) for this group

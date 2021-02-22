@@ -21,7 +21,6 @@ use House;
 use HouseMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\External\SubjectMapper;
-use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
@@ -125,21 +124,21 @@ class Module extends BaseModule
         // Inject the custom Meriden pastoral database connection too
         // a MSSQL connection should be a service?
         $injector->params[Controller::class]['studentInvolvementFactory']
-            = $injector->lazyNew(StudentInvolvement\Factory::class);
+            = $injector->lazyNew(StudentInvolvement\Report\Factory::class);
 
-        $injector->params[StudentInvolvement\Factory::class]['gateway']
+        $injector->params[StudentInvolvement\Report\Factory::class]['gateway']
             = $injector->lazyNew(StudentInvolvement\Gateway::class);
-        $injector->params[StudentInvolvement\Factory::class]['folderMapper']
+        $injector->params[StudentInvolvement\Report\Factory::class]['folderMapper']
             = $this->getMapperFactory()->getLazy(Folder\Mapper::class);
-        $injector->params[StudentInvolvement\Factory::class]['userMapper']
+        $injector->params[StudentInvolvement\Report\Factory::class]['userMapper']
             = $this->getMapperFactory()->getLazy(UserMapper::class);
-        $injector->params[StudentInvolvement\Factory::class]['assessmentDataSource']
+        $injector->params[StudentInvolvement\Report\Factory::class]['assessmentDataSource']
             = $injector->lazyGet('assessmentDataSource');
-        $injector->params[StudentInvolvement\Factory::class]['rubricMapper']
+        $injector->params[StudentInvolvement\Report\Factory::class]['rubricMapper']
             = $this->getMapperFactory()->getLazy(RubricDataSource::class);
-        $injector->params[StudentInvolvement\Factory::class]['currentUser']
+        $injector->params[StudentInvolvement\Report\Factory::class]['currentUser']
             = $injector->lazyGet('user');
-        $injector->params[StudentInvolvement\Factory::class]['userAccessMapper']
+        $injector->params[StudentInvolvement\Report\Factory::class]['userAccessMapper']
             = $this->getMapperFactory()->getLazy(UserAccessMapper::class);
 
         $injector->params[StudentInvolvement\Gateway::class]['database']

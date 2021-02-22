@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace Custom\Meriden\Pastoral\CommandLineTool;
 
 use Aura\Router\Router;
-use Custom\Meriden\Pastoral\StudentInvolvement\Factory;
-use Custom\Meriden\Pastoral\StudentInvolvement\Subject;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Factory;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\Standard;
 use Schoolbox\User;
 use Zend\Uri\UriInterface;
 
@@ -89,7 +89,7 @@ class UrlGenerator
         $subjectList = $this->factory->buildSubjectList($year, $student);
         usort(
             $subjectList,
-            static function (Subject $a, Subject $b) {
+            static function (Standard $a, Standard $b) {
                 return strnatcasecmp($a->getName(), $b->getName());
             }
         );

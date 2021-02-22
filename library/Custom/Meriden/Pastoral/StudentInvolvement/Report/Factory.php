@@ -1,16 +1,16 @@
 <?php
 
 /**
- * Factory for creating tutor group factory objects
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement;
+namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
 
 use Alaress\Statistics\Statistics;
+use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\LateralLearning;
+use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\Standard;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -26,10 +26,19 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
+/**
+ * Factory for building various eReport data sets.
+ */
 class Factory
 {
     // This is pretty fragile. Must match value configured in Admin WorkType lists
     private const WORK_TYPE_ASSESSMENT_TASK = 1;
+
+    /**
+     * Regular expression for lateral learning class pages: used to identify if
+     * a subject page should instead display as a lateral learning report.
+     */
+    private const LATERAL_LEARNING_SUBJECT_NAME_REGEX = '/Lateral\\s+Learning/i';
 
     /**
      * @var Gateway
@@ -164,17 +173,77 @@ class Factory
      *
      * This is used as a data store for the subject eReport.
      *
-     * @param int         $year
-     * @param User        $student
-     * @param string      $subjectCode
-     * @param string|null $roleTypeOverride
+     * @param int            $year
+     * @param User           $student
+     * @param string         $subjectCode
+     * @param Subject\Base[] $subjectList     `$student`'s subjects in `$year`
+     * @param string|null    $roleTypeOverride
      *
-     * @return Subject
+     * @return Subject\Base
      */
-    public function buildSubject($year, User $student, $subjectCode, ?string $roleTypeOverride)
-    {
-        $subject      = new Subject();
+    public function buildSubject(
+        int $year,
+        User $student,
+        string $subjectCode,
+        array $subjectList,
+        ?string $roleTypeOverride
+    ): Subject\Base {
         $externalData = $this->gateway->getSubject($year, $subjectCode);
+
+        // external data not guaranteed to contain a description, so load folder
+        $folderWithGrades = $this->getFolderWithGrades(
+            $subjectCode,
+            $student,
+            !$this->doesDraftFeedbackContribute($year),
+            $roleTypeOverride
+        );
+        /** @var Folder $folder */
+        $folder = $folderWithGrades['folder'];
+
+        if (self::isSubjectLateralLearning($folder->getName())) {
+            return $this->buildLateralLearning(
+                $externalData,
+                $folder,
+                $year,
+                $student,
+                $subjectCode,
+                $subjectList,
+                $roleTypeOverride,
+            );
+        }
+        return $this->buildStandard(
+            $externalData,
+            $folder,
+            $folderWithGrades['grades'],
+            $year,
+            $student,
+            $subjectCode,
+        );
+    }
+
+    /**
+     * Builds a report object for the subject report for a given year, student
+     * and subject code.
+     *
+     * This is used as a data store for the eReport's standard subject page.
+     *
+     * @param array   $externalData
+     * @param Folder  $folder
+     * @param array   $grades
+     * @param int     $year
+     * @param User    $student
+     * @param string  $subjectCode
+     * @return Standard
+     */
+    private function buildStandard(
+        array $externalData,
+        Folder $folder,
+        array $grades,
+        int $year,
+        User $student,
+        string $subjectCode
+    ): Standard {
+        $subject      = new Standard();
         $externalData = $this->augmentSubjectWithTeacher($externalData);
         $subject
             ->setName($externalData['sub_desc'])
@@ -185,12 +254,11 @@ class Factory
             ->setSubjectCode($subjectCode);
 
         // Add grades for the class page
-        $publishedOnly    = !$this->doesDraftFeedbackContribute($year);
-        $folderWithGrades = $this->getFolderWithGrades($subjectCode, $student, $publishedOnly, $roleTypeOverride);
+        $publishedOnly = !$this->doesDraftFeedbackContribute($year);
         $subject
-            ->setFolder($folderWithGrades['folder'])
-            ->setCohortFolders($this->getCohortFolders($folderWithGrades['folder'], $subjectCode))
-            ->setGrades($folderWithGrades['grades'])
+            ->setFolder($folder)
+            ->setCohortFolders($this->getCohortFolders($folder, $subjectCode))
+            ->setGrades($grades)
             ->moveToNamedGrade('courseGrade', 'Course Grade')
             ->moveToNamedGrade('endeavourGrades', 'Endeavour Grades')
             ->moveToNamedGrade('endeavourGrade1', 'Endeavour Grade Term 1')
@@ -221,12 +289,57 @@ class Factory
             $subject->setNamedGrade('courseGrade', $courseGrade);
         }
 
-        // Add the rubric rowset, if there is an actual folder
-        if ($subject->getFolder() && $subject->getFolder()->getId()) {
-            $subject->setRubricRowSet($this->rubricMapper->retrieveRowSet($subject->getFolder(), false));
-        }
-
         return $subject;
+    }
+
+    /**
+     * Builds a report object for the lateral learning report for a given year
+     * and student.
+     *
+     * This is used as a data store for the lateral learning eReport.
+     *
+     * @param array          $externalData
+     * @param Folder         $folder
+     * @param int            $year
+     * @param User           $student
+     * @param string         $subjectCode
+     * @param Subject\Base[] $subjectList `$student`'s subjects in `$year`
+     * @param string|null    $roleTypeOverride
+     * @return LateralLearning
+     */
+    private function buildLateralLearning(
+        array $externalData,
+        Folder $folder,
+        int $year,
+        User $student,
+        string $subjectCode,
+        array $subjectList,
+        ?string $roleTypeOverride
+    ): LateralLearning {
+        // Need a course description
+        $lateralLearning = new LateralLearning();
+        $lateralLearning
+            ->setName($externalData['sub_desc'])
+            ->setDescription($externalData['outline_text'])
+            ->setStudent($student)
+            ->setYear($year)
+            ->setSubjectCode($subjectCode)
+            ->setFolder($folder);
+
+
+        // Put together all the stuff for the lateral learning report
+        $publishedOnly = !$this->doesDraftFeedbackContribute($year);
+        $allGrades     = [];
+        foreach ($subjectList as $subject) {
+            $folderWithGrades = $this->getFolderWithGrades(
+                $subject->getSubjectCode(),
+                $student,
+                $publishedOnly,
+                $roleTypeOverride
+            );
+            $allGrades[] = $folderWithGrades['grades'];
+        }
+        return $lateralLearning->injectIndicatorMarks(array_merge(...$allGrades));
     }
 
     /**
@@ -259,7 +372,7 @@ class Factory
      * @param int  $year
      * @param User $student
      *
-     * @return array|Subject[]
+     * @return array|Subject\Base[]
      */
     public function buildSubjectList($year, User $student)
     {
@@ -268,15 +381,31 @@ class Factory
             [$this, 'augmentSubjectWithTeacher'],
             $this->gateway->getAllSubjectsForYear($year, $student)
         );
+
+        $lateralLearning = null;
         foreach ($result as $row) {
-            $subject = new Subject();
-            $subject
-                ->setName($row['sub_desc'])
-                ->setStudent($student)
-                ->setYear($row['yr_study'])
-                ->setSubjectCode($row['code'])
-                ->setTeachers($row['teachers']);
-            $subjects[$row['code']] = $subject;
+            if (self::isSubjectLateralLearning($row['sub_desc'])) {
+                $lateralLearning = new LateralLearning();
+                $lateralLearning
+                    ->setName($row['sub_desc'])
+                    ->setStudent($student)
+                    ->setYear($row['yr_study'])
+                    ->setSubjectCode($row['code']);
+            } else {
+                $subject = new Standard();
+                $subject
+                    ->setName($row['sub_desc'])
+                    ->setStudent($student)
+                    ->setYear($row['yr_study'])
+                    ->setSubjectCode($row['code'])
+                    ->setTeachers($row['teachers']);
+                $subjects[$row['code']] = $subject;
+            }
+        }
+
+        $subjects = array_values($subjects);
+        if ($lateralLearning) {
+            array_unshift($subjects, $lateralLearning);
         }
         return $subjects;
     }
@@ -388,17 +517,7 @@ class Factory
      *
      * @return array {
      *  assessment:  IAssessable
-     *  rubric:      array {
-     *    groups: {
-     *      criteria: {
-     *        name: string
-     *          descriptors: {
-     *            selected: bool
-     *            text:     string
-     *        }
-     *      }
-     *    }
-     *  }
+     *  rubric:      MarkedGrid|null
      *  pretty_mark: string
      *  mark:        float
      *  comment:     string
@@ -673,5 +792,16 @@ class Factory
     private function doesDraftFeedbackContribute($reportYear): bool
     {
         return $reportYear < 2018;
+    }
+
+    /**
+     * Does this subject name refer to what should be a lateral learning report?
+     *
+     * @param string $subjectName
+     * @return bool
+     */
+    private static function isSubjectLateralLearning(string $subjectName): bool
+    {
+        return (bool)preg_match(self::LATERAL_LEARNING_SUBJECT_NAME_REGEX, $subjectName);
     }
 }
