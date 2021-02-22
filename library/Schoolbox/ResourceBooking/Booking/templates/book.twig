@@ -138,8 +138,14 @@ $(function() {
              */
             if (data.callbackUrl.length) {
                 if (!data.callbackUrl.includes('#resourceBookingByCategory')) {
-                    var ids = data.item.map(function(v) { return v.id; }).join();
-                    window.location.href = data.callbackUrl + '?ids=' + ids;
+                    if (data.item.length) {
+                        var ids = data.item.map(function (v) {
+                            return v.id;
+                        }).join();
+                        window.location.href = data.callbackUrl + '?ids=' + ids;
+                    } else {
+                        window.location.href = data.callbackUrl;
+                    }
                 } else {
                     window.location.href = data.callbackUrl;
                 }
@@ -357,6 +363,7 @@ $(function() {
         <form id="resource-booking-form" action="{{ saveAction }}" method="post" name="form">
             <input type="hidden" name="id" value="{{ item.id }}"/>
             <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
+            <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
 
             {# Inputs for editing bookings in a series #}
             <input type="hidden" name="efficacy" value="{{ efficacySelf }}" />

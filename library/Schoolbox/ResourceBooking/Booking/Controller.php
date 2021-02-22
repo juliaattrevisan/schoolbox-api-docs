@@ -366,10 +366,17 @@ class Controller extends Base
          * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId}
          * (name/startdate/enddate/details)
          */
-        $callbackUrl = '';
+        $callbackUrl = null;
 
         if (strlen($this->getRequest()->post['callbackUrl'])) {
             $callbackUrl = $this->getRequest()->post['callbackUrl'];
+        }
+
+        /* returnUrl functions similarly to callbackUrl and arguably should be made synonymously
+         * Anyway, if that's set, it's an encoded destination url
+         */
+        if (strlen($this->getRequest()->post['returnUrl'])) {
+            $callbackUrl = \Schoolbox\Learning\Assessment\Redirect::decode($this->getRequest()->post['returnUrl']);
         }
 
         if ($this->getRequest()->isXhr()) {
@@ -388,7 +395,7 @@ class Controller extends Base
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
             // Consider storing redirect URL in form or GET?
-            $this->getResponse()->redirect->afterPost($this->getSession()->getHistory(2));
+            $this->getResponse()->redirect->afterPost($callbackUrl ?? $this->getSession()->getHistory(2));
         }
     }
 
@@ -699,6 +706,7 @@ class Controller extends Base
                     'item'              => $item,
                     'campusList'        => $this->getCampusList(),
                     'callbackUrl'       => $this->getRequest()->query['callbackUrl'],
+                    'returnUrl'         => $this->getRequest()->query['returnUrl'],
                     'cancelCallbackUrl' => $this->session->getHistory(),
                     'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
