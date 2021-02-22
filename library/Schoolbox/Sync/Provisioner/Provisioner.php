@@ -115,6 +115,12 @@ class Provisioner
 
 
     /**
+     * @var Loader
+     */
+    private $config;
+
+
+    /**
      * Constructor
      *
      * @param Ruleset\Factory          $rulesetFactory
@@ -125,6 +131,7 @@ class Provisioner
      * @param Log\Mapper               $logMapper
      * @param UserAccessMapper         $userAccessMapper
      * @param Folder\Mapper            $folderMapper
+     * @param Loader                   $config
      */
     public function __construct(
         Ruleset\Factory $rulesetFactory,
@@ -134,7 +141,8 @@ class Provisioner
         CacheableLoggerInterface $logger,
         Log\Mapper $logMapper,
         UserAccessMapper $userAccessMapper,
-        Folder\Mapper $folderMapper
+        Folder\Mapper $folderMapper,
+        Loader $config
     ) {
         $this->rulesetFactory = $rulesetFactory;
         $this->grammarFactory = $grammarFactory;
@@ -146,6 +154,7 @@ class Provisioner
         $userAccessMapper->setEventPropagator(new MockPropagator());
         $this->userAccessMapper = $userAccessMapper;
         $this->folderMapper = $folderMapper;
+        $this->config = $config;
     }
 
     /**
@@ -174,12 +183,6 @@ class Provisioner
         if (PHP_SAPI != 'cli') {
             set_time_limit(1800);
         }
-
-        /* Various dependencies
-         * Config for options that change the following algorithm
-         * and also because it's somehow inside User models
-         */
-        $config = new Loader();
 
         foreach ($this->runOrder as $roleType) {
             if (isset($forRoleType) && $roleType != $forRoleType) {
@@ -287,7 +290,7 @@ class Provisioner
                     /* Modify accessList only when ups_groups_enabled is actually enabled
                      * Otherwise leave it unchanged from whatever it was
                      */
-                    if ($config->get('ups_groups_enabled')) {
+                    if ($this->config->get('ups_groups_enabled')) {
 
                         /* Figure out what is going on in the userAccess mutations
                          *

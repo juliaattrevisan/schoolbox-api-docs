@@ -1051,6 +1051,7 @@ abstract class Kernel
                     'logMapper'        => $di->lazyNew(SyncLogMapper::class),
                     'userAccessMapper' => $di->lazyNew(UserAccessMapper::class),
                     'folderMapper'     => $di->lazyNew(Folder\Mapper::class),
+                    'config'           => $di->get('config')
                 ]
             )
         );
