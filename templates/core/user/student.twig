@@ -755,7 +755,7 @@
                                                 {% if subjectCode|length %}<p class="meta">{{ subjectCode }}</p>{% endif %}
                                             {% endif %}
                                         </div>
-                                        {% block folderListItemActions %}{% endblock %}
+                                        {% block folderListItemActions %}
                                         {% if hasTeachersWithEmail %}
                                             <nav>
                                                 <a class="icon-more" data-dropdown="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}" title="Actions"></a>
@@ -771,6 +771,7 @@
                                                 {% endfor %}
                                             </ul>
                                         {% endif %}
+                                        {% endblock %}
                                     </div>
                                  </div>
                             {% endfor %}
