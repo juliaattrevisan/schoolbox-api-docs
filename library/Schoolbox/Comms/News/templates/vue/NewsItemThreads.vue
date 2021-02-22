@@ -28,6 +28,7 @@ export default {
         return {
             comments: [],
             totalCommentsCount: 0,
+            cursorNext: '',
             isThreadCheckboxVisible: undefined,
             isThreadCheckboxEnabled: undefined,
             isThreadEnabled: undefined,
@@ -38,7 +39,7 @@ export default {
             newComment: '',
             isProcessActive: false,
             showCommentsSection: false,
-            initialLoad: true,
+            isInitialLoad: true,
             postHeaders: {
                 'X-Requested-With' : 'XMLHttpRequest'
             },
@@ -116,14 +117,21 @@ export default {
             this.showSkeletonLoader = true;
 
             // TODO don't construct this endpoint manually
-            axios.get('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments/')
-            .then((response) => {
+            axios.get('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments/', {
+                params: {
+                    cursor: this.cursorNext
+                }
+            }).then((response) => {
                 
                 const responseData = response.data;
 
-                this.comments = responseData.data.map(data => data);
-
+                // this.comments = responseData.data.map(data => data);
+                responseData.data.forEach((data) => {
+                    this.comments.push(data);
+                });
+                
                 this.totalCommentsCount = responseData.metadata.count;
+                this.cursorNext = responseData.metadata.cursor.next;
 
                 this.showSkeletonLoader = false; // Hide skeleton loader once the request is done
 
@@ -154,14 +162,14 @@ export default {
                  */
                 this.reInitialiseMediaPlayer();
 
-                if (this.initialLoad) {
+                if (this.isInitialLoad) {
                     // Anchored? go to the element once the component has been loaded
                     // We will need to do this for now to make the anchor behaviour more consistent
                     if (window.location.hash === '#discussion') {
                         const offset = $('.banner.content').outerHeight() + $('.article.content').outerHeight() + $('#discussion').offset().top;
                         $("html, body").animate({ scrollTop: offset }, 500);
                     }
-                    this.initialLoad = false;
+                    this.isInitialLoad = false;
                 }
             });
         },
@@ -302,7 +310,7 @@ export default {
 
                 let responseData = response.data;
                
-                this.comments.unshift(response.data)
+                this.comments.unshift(response.data);
                 this.totalCommentsCount++;
 
                 this.$refs.toast.timeout('Comment has been added', true);
