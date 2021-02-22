@@ -32,7 +32,7 @@ class Controller extends Base
      */
     public function __construct(Factory $studentInvolvementFactory)
     {
-        $this->setStudentInvolvementFactory($studentInvolvementFactory);
+        $this->studentInvolvementFactory = $studentInvolvementFactory;
     }
 
     /**
@@ -47,12 +47,12 @@ class Controller extends Base
 
         if (empty($reportYears)) {
             // 404
-            $this->getResponse()->status->setCode(404);
+            $this->response->status->setCode(404);
         } else {
             // Redirect to current year, or last year in report
             $lastReportYear = max($reportYears);
-            $this->getResponse()->redirect->found(
-                $this->getRouter()->generate(
+            $this->response->redirect->found(
+                $this->router->generate(
                     'customMeridenPastoral.index',
                     array(
                         'id'   => $student->getId(),
@@ -73,7 +73,7 @@ class Controller extends Base
     {
         try {
             $report = $this->buildReportData($year, $student);
-            $this->getResponse()->content->set(
+            $this->response->content->set(
                 [
                     'template' => $report['template'],
                     'data'     => $report,
@@ -81,7 +81,7 @@ class Controller extends Base
                 ]
             );
         } catch (RangeException $e) {
-            $this->getResponse()->status->setCode(404);
+            $this->response->status->setCode(404);
         }
     }
 
@@ -155,7 +155,7 @@ class Controller extends Base
                 ]
             );
         } catch (RangeException $e) {
-            $this->getResponse()->status->setCode(404);
+            $this->response->status->setCode(404);
         }
     }
 
@@ -171,14 +171,14 @@ class Controller extends Base
      *
      * @throws RangeException if student isn't in year or subject
      */
-    protected function buildReportData($year, User $student, $subjectCode = null)
+    private function buildReportData($year, User $student, $subjectCode = null)
     {
-        $this->assertValidYearForReport($year, $student);
+        $this->assertValidYearForReport($year, $student, $subjectCode);
 
         $tutorGroup       = null;
         $tutorGroupList   = $this->retrieveTutorGroupList($student);
         $subject          = null;
-        $subjectList      = $this->getStudentInvolvementFactory()->buildSubjectList($year, $student);
+        $subjectList      = $this->studentInvolvementFactory->buildSubjectList($year, $student);
         $roleTypeOverride = null;
         $roleTypes        = Role::getRoleTypes();
         $template         = null;
@@ -205,8 +205,15 @@ class Controller extends Base
             if (!$exists) {
                 throw new RangeException("Student has no tutor group in $year");
             }
-            $tutorGroup = $this->getStudentInvolvementFactory()->buildTutorGroup($year, $student, $roleTypeOverride);
-            $template   = '@customMeridenPastoral/index.twig';
+            $tutorGroup = $this->studentInvolvementFactory->buildTutorGroup(
+                $year,
+                $student,
+                $subjectList,
+                $roleTypeOverride
+            );
+            $template   = $tutorGroup instanceof TutorGroup\SeniorSchool
+                ? '@customMeridenPastoral/index/seniorSchool.twig'
+                : '@customMeridenPastoral/index/middleSchool.twig';
         } else {
             // Does this subject exist for this student?
             $exists = false;
@@ -221,7 +228,7 @@ class Controller extends Base
             }
 
             // Augment the reports with proper data
-            $subject = $this->getStudentInvolvementFactory()->buildSubject(
+            $subject = $this->studentInvolvementFactory->buildSubject(
                 $year,
                 $student,
                 $subjectCode,
@@ -229,8 +236,8 @@ class Controller extends Base
                 $roleTypeOverride
             );
             $template = $subject instanceof Subject\LateralLearning
-                ? '@customMeridenPastoral/lateralLearning.twig'
-                : '@customMeridenPastoral/subject.twig';
+                ? '@customMeridenPastoral/subject/lateralLearning.twig'
+                : '@customMeridenPastoral/subject/standard.twig';
         }
         return [
             'report' => [
@@ -248,37 +255,18 @@ class Controller extends Base
     }
 
     /**
-     * @return Factory
-     */
-    public function getStudentInvolvementFactory()
-    {
-        return $this->studentInvolvementFactory;
-    }
-
-    /**
-     * @param  Factory $studentInvolvementFactory
-     *
-     * @return $this
-     */
-    public function setStudentInvolvementFactory($studentInvolvementFactory)
-    {
-        $this->studentInvolvementFactory = $studentInvolvementFactory;
-        return $this;
-    }
-
-    /**
      * Builds a list of tutor groups for this student, excluding invalid years.
      *
      * @param User $student
-     * @return array|TutorGroup[]
+     * @return array|TutorGroup\Base[]
      */
     private function retrieveTutorGroupList(User $student): array
     {
         return array_filter(
-            $this->getStudentInvolvementFactory()->buildTutorGroupList($student),
-            function (TutorGroup $tutorGroup) use ($student) {
+            $this->studentInvolvementFactory->buildTutorGroupList($student),
+            function (TutorGroup\Base $tutorGroup) use ($student) {
                 try {
-                    $this->assertValidYearForReport($tutorGroup->getYear(), $student);
+                    $this->assertValidYearForReport($tutorGroup->getYear(), $student, null);
                     return true;
                 } catch (RangeException $e) {
                     return false;
@@ -296,7 +284,7 @@ class Controller extends Base
     private function retrieveValidYearsForReport(User $student): array
     {
         return array_map(
-            function (TutorGroup $tutorGroup) {
+            function (TutorGroup\Base $tutorGroup) {
                 return $tutorGroup->getYear();
             },
             $this->retrieveTutorGroupList($student)
@@ -306,24 +294,13 @@ class Controller extends Base
     /**
      * Asserts that this year is valid for the eReport.
      *
-     * * Reports are only for students who started year 7 in 2015+ for now
-     * * Reports are only for years the student is/was in year 7, 8 or 9
-     *
-     * @param int  $year
-     * @param User $student
+     * @param int         $year
+     * @param User        $student
+     * @param string|null $subjectCode
      * @throws RangeException if it's not valid
      */
-    private function assertValidYearForReport($year, User $student): void
+    private function assertValidYearForReport(int $year, User $student, ?string $subjectCode): void
     {
-        $thisYear  = (int)date('Y');
-        $startYear = $thisYear + 7 - (int)$student->getYear()->getName();
-        if ($startYear < 2015) {
-            throw new RangeException("Reports are only for students who started year 7 in 2015 or later for now");
-        }
-
-        $reportYearLevel = ((int)$student->getYear()->getName()) - ($thisYear - $year);
-        if ($reportYearLevel >= 10) {
-            throw new RangeException("Reports are only for years 7, 8 and 9 for now");
-        }
+        Factory::determineYearLevel($year, $student, $subjectCode);
     }
 }

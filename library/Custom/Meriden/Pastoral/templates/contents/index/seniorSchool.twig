@@ -1,0 +1,77 @@
+{##
+ # Contents of the eReport index page (i.e. the tutor group report).
+ #
+ # Parameters:
+ # * report.student:          the student whose report this is
+ # * report.subjectList:      the list of the student's subjects
+ # * report.tutorGroupReport: the tutor group report for this student
+ # * showSubjectSelector:     is the subject selector shown?
+ #}
+{% extends '@customMeridenPastoral/contents/base.twig' %}
+
+{% block contents %}
+    {# House info #}
+    <div class="row" id="house-info">
+        <div class="small-12 medium-4 column">
+            <dl>
+                <dt>House</dt>
+                <dd>{{ report.student.schoolHouse.house }}</dd>
+            </dl>
+        </div>
+        <div class="small-12 medium-4 column">
+            <dl>
+                <dt>Year Coordinator</dt>
+                {% for coordinator in report.tutorGroupReport.coordinators %}
+                    <dd><a href="/search/user/{{ coordinator.id }}">{{ coordinator.formatName }}</a></dd>
+                {% endfor %}
+            </dl>
+        </div>
+        <div class="small-12 medium-4 column end">
+            <dl>
+                <dt>Tutor</dt>
+                {% for tutor in report.tutorGroupReport.tutors %}
+                    <dd>{{ tutor.tch_name }}</dd>
+                {% endfor %}
+            </dl>
+        </div>
+    </div>
+
+    {# Attendance info #}
+    <div class="row" id="attendance-info">
+        <div class="small-12 medium-4 column">
+            <dl>
+                <dt>Days Absent</dt>
+                <dd>{{ report.tutorGroupReport.attendances.absent }}</dd>
+            </dl>
+        </div>
+        <div class="small-12 medium-4 column">
+            <dl>
+                <dt>Days Late</dt>
+                <dd>{{ report.tutorGroupReport.attendances.late }}</dd>
+            </dl>
+        </div>
+        <div class="small-12 medium-4 column">
+            <dl>
+                <dt>Detentions</dt>
+                <dd>{{ report.tutorGroupReport.attendances.detentions }}</dd>
+            </dl>
+        </div>
+        {# Don't show endorsed leave at all if there is none #}
+        {% if report.tutorGroupReport.attendances.endorsedLeave %}
+            <div class="small-12 medium-4 column end">
+                <dl>
+                    <dt>Endorsed Leave</dt>
+                    <dd>{{ report.tutorGroupReport.attendances.endorsedLeave }}</dd>
+                </dl>
+            </div>
+        {% endif %}
+    </div>
+
+    {# Endeavor Grades for all classes: complex enough for its own template #}
+    {% if (report.tutorGroupReport.endeavorGrades ?? []) is not empty %}
+        {%
+            include '@customMeridenPastoral/subTemplates/endeavourGradesTable.twig'
+            with {endeavorGrades: report.tutorGroupReport.endeavorGrades} only
+        %}
+    {% endif %}
+{% endblock contents %}

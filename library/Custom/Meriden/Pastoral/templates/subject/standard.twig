@@ -8,11 +8,14 @@
         })
     })(jQuery);
 </script>
-<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
-<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts-more.js"></script>
+
+{# The printable report has already loaded Highcharts: don't load it again #}
+{% if reloadHighcharts ?? true %}
+    {% include '@customMeridenPastoral/subTemplates/loadHighcharts.twig' %}
+{% endif %}
 
 <div id="subject-report" class="e-report">
-    {% include '@customMeridenPastoral/contents/subject.twig' with {
+    {% include '@customMeridenPastoral/contents/subject/standard.twig' with {
         report:              report,
         showSubjectSelector: true,
         graphWidth:          graphWidth,

@@ -11,7 +11,6 @@ namespace Custom\Meriden\Pastoral\CommandLineTool;
 
 use Aura\Router\Router;
 use Custom\Meriden\Pastoral\StudentInvolvement\Report\Factory;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\Standard;
 use Schoolbox\User;
 use Zend\Uri\UriInterface;
 
@@ -72,42 +71,45 @@ class UrlGenerator
             $query['graph-width'] = $graphWidthOverride;
         }
 
-        // Find the page for the current year
-        $params  = [
-            'student' => $student,
-            'id'      => $student->getId(),
-            'year'    => $year,
-        ];
-        $results = [
-            $baseUrl
-                ->setPath($this->router->generate('customMeridenPastoral.index', $params))
-                ->setQuery($query)
-                ->toString(),
-        ];
+        $results           = [];
+        $hasSubjectReports = false;
+        $tutorGroupList    = $this->factory->buildTutorGroupList($student);
+        foreach ($tutorGroupList as $tutorGroup) {
+            if ((int)$tutorGroup->getYear() === $year) {
+                $hasSubjectReports = $tutorGroup->hasSubjectReports();
 
-        // Find the pages for each subject: sort by alphabetical order
-        $subjectList = $this->factory->buildSubjectList($year, $student);
-        usort(
-            $subjectList,
-            static function (Standard $a, Standard $b) {
-                return strnatcasecmp($a->getName(), $b->getName());
+                // Find the page for this year
+                $params    = [
+                    'student' => $student,
+                    'id'      => $student->getId(),
+                    'year'    => $year,
+                ];
+                $results[] = $baseUrl
+                    ->setPath($this->router->generate('customMeridenPastoral.index', $params))
+                    ->setQuery($query)
+                    ->toString();
+                break;
             }
-        );
-
-        foreach ($subjectList as $subject) {
-            $params    = [
-                'student'     => $student,
-                'id'          => $student->getId(),
-                'year'        => $year,
-                'subject'     => $subject,
-                'subjectCode' => $subject->getSubjectCode(),
-            ];
-            $results[] = $baseUrl
-                ->setPath($this->router->generate('customMeridenPastoral.subject', $params))
-                ->setQuery($query)
-                ->toString();
         }
 
+
+        // Find the subject pages, only if the tutor group report has them
+        if ($hasSubjectReports) {
+            $subjectList = $this->factory->buildSubjectList($year, $student);
+            foreach ($subjectList as $subject) {
+                $params    = [
+                    'student'     => $student,
+                    'id'          => $student->getId(),
+                    'year'        => $year,
+                    'subject'     => $subject,
+                    'subjectCode' => $subject->getSubjectCode(),
+                ];
+                $results[] = $baseUrl
+                    ->setPath($this->router->generate('customMeridenPastoral.subject', $params))
+                    ->setQuery($query)
+                    ->toString();
+            }
+        }
         return $results;
     }
 }

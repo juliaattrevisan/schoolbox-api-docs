@@ -12,7 +12,7 @@ use Custom\Meriden\Pastoral\StudentInvolvement\Report\Base as BaseReport;
 /**
  * Base representation of report data for all subject reports.
  */
-class Base extends BaseReport
+abstract class Base extends BaseReport
 {
     /**
      * External data (class name and description)

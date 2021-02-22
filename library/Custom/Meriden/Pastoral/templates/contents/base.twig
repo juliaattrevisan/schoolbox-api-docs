@@ -11,13 +11,13 @@
     <div class="row">
         <div class="small-12 columns">
             <div class="meriden-crest">
-                {% include '@customMeridenPastoral/sub/crestSvg.twig' %}
+                {% include '@customMeridenPastoral/subTemplates/crestSvg.twig' %}
             </div>
         </div>
     </div>
 
     <div class="row" id="context">
-        {% include '@customMeridenPastoral/sub/context.twig' with {report: report, showSubjectSelector: showSubjectSelector ?? true} %}
+        {% include '@customMeridenPastoral/subTemplates/context.twig' with {report: report, showSubjectSelector: showSubjectSelector ?? true} %}
     </div>
 {% endblock header %}
 

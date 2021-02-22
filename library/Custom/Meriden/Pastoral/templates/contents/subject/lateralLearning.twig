@@ -10,7 +10,7 @@
 {% extends '@customMeridenPastoral/contents/base.twig' %}
 
 {% block contents %}
-    {% include '@customMeridenPastoral/sub/courseDescription.twig' with {description: report.subjectReport.description} only %}
+    {% include '@customMeridenPastoral/subTemplates/courseDescription.twig' with {description: report.subjectReport.description} only %}
 
     {# Lateral Learning - a rubric rendered somehow #}
     <div class="row" id="lateral-learning-skills">
@@ -38,5 +38,5 @@
 {% endblock contents %}
 
 {% block footer %}
-    {% include '@customMeridenPastoral/sub/classTeachers.twig' with {teachers: report.subjectReport.teachers} only %}
+    {% include '@customMeridenPastoral/subTemplates/classTeachers.twig' with {teachers: report.subjectReport.teachers} only %}
 {% endblock footer %}

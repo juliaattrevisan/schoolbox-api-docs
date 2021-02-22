@@ -173,6 +173,11 @@ abstract class App extends BaseApp
             }
         }
 
+        // Nothing generated: exit early
+        if (count($pdfFilenames) === 0) {
+            $this->getLogger()->notice('No PDFs generated: not attempting to create archive');
+            return;
+        }
 
         // Done generating PDFs: zip them up and clean up
         $this->createZipArchive($pdfFilenames, $tempDir);

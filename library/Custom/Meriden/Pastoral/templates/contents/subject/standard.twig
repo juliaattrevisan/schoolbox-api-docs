@@ -10,7 +10,7 @@
 {% extends '@customMeridenPastoral/contents/base.twig' %}
 
 {% block contents %}
-    {% include '@customMeridenPastoral/sub/courseDescription.twig' with {description: report.subjectReport.description} only %}
+    {% include '@customMeridenPastoral/subTemplates/courseDescription.twig' with {description: report.subjectReport.description} only %}
 
     {# course grade - derived from grade for this class #}
     {% if report.subjectReport.namedGrades.courseGrade %}
@@ -62,7 +62,7 @@
             {% endif %}
 
             {# Endeavor Grades - complicated enough to be its own template #}
-            {% include '@customMeridenPastoral/sub/endeavourGrades.twig' %}
+            {% include '@customMeridenPastoral/subTemplates/endeavourGrades.twig' %}
         </div>
 
         <div class="small-12 medium-6 column">
@@ -76,7 +76,7 @@
                         </dl>
                     </div>
                     <div class="small-12 column">
-                        {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.learningApproaches} %}
+                        {% include '@customMeridenPastoral/subTemplates/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.learningApproaches} %}
                     </div>
                 </div>
             {% endif %}
@@ -85,10 +85,10 @@
 
     {# Assessments #}
     {% if report.subjectReport.grades %}
-        {% include '@customMeridenPastoral/sub/assessments.twig' with {work: report.subjectReport.grades, student: report.student, graphWidth: graphWidth} %}
+        {% include '@customMeridenPastoral/subTemplates/assessments.twig' with {work: report.subjectReport.grades, student: report.student, graphWidth: graphWidth} %}
     {% endif %}
 {% endblock contents %}
 
 {% block footer %}
-    {% include '@customMeridenPastoral/sub/classTeachers.twig' with {teachers: report.subjectReport.teachers} only %}
+    {% include '@customMeridenPastoral/subTemplates/classTeachers.twig' with {teachers: report.subjectReport.teachers} only %}
 {% endblock footer %}

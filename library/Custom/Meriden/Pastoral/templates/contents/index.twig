@@ -71,7 +71,7 @@
                 <dd>
                     {% if report.tutorGroupReport.namedGrades.athletics %}
                         {%
-                            include '@customMeridenPastoral/sub/assessmentResult.twig'
+                            include '@customMeridenPastoral/subTemplates/assessmentResult.twig'
                             with {grade: report.tutorGroupReport.namedGrades.athletics}
                         %}
                     {% else %}
@@ -86,7 +86,7 @@
                 <dd>
                     {% if report.tutorGroupReport.namedGrades.swimming %}
                         {%
-                            include '@customMeridenPastoral/sub/assessmentResult.twig'
+                            include '@customMeridenPastoral/subTemplates/assessmentResult.twig'
                             with {grade: report.tutorGroupReport.namedGrades.swimming}
                         %}
                     {% else %}
@@ -101,7 +101,7 @@
                 <dd>
                     {% if report.tutorGroupReport.namedGrades.camp %}
                         {%
-                            include '@customMeridenPastoral/sub/assessmentResult.twig'
+                            include '@customMeridenPastoral/subTemplates/assessmentResult.twig'
                             with {grade: report.tutorGroupReport.namedGrades.camp}
                         %}
                     {% else %}
@@ -117,7 +117,7 @@
                 <dd>
                     {% if report.tutorGroupReport.namedGrades.uniform %}
                         {%
-                            include '@customMeridenPastoral/sub/assessmentResult.twig'
+                            include '@customMeridenPastoral/subTemplates/assessmentResult.twig'
                             with {grade: report.tutorGroupReport.namedGrades.uniform}
                         %}
                     {% else %}
@@ -133,7 +133,7 @@
                 <dd>
                     {% if report.tutorGroupReport.namedGrades.pastoral %}
                         {%
-                            include '@customMeridenPastoral/sub/assessmentResult.twig'
+                            include '@customMeridenPastoral/subTemplates/assessmentResult.twig'
                             with {grade: report.tutorGroupReport.namedGrades.pastoral}
                         %}
                     {% else %}
@@ -159,25 +159,25 @@
     {# Awards info #}
     <div class="row" id="awards-info">
         {% if not report.tutorGroupReport.activities.awards is empty %}
-            {% include '@customMeridenPastoral/sub/activity.twig' with {
+            {% include '@customMeridenPastoral/subTemplates/activity.twig' with {
                 header: 'Awards and Prizes',
                 activityList: report.tutorGroupReport.activities.awards
             } %}
         {% endif %}
         {% if not report.tutorGroupReport.activities.cocurricular is empty %}
-            {% include '@customMeridenPastoral/sub/activity.twig' with {
+            {% include '@customMeridenPastoral/subTemplates/activity.twig' with {
                 header: 'Cocurricular Activities',
                 activityList: report.tutorGroupReport.activities.cocurricular
             } %}
         {% endif %}
         {% if not report.tutorGroupReport.activities.service is empty %}
-            {% include '@customMeridenPastoral/sub/activity.twig' with {
+            {% include '@customMeridenPastoral/subTemplates/activity.twig' with {
                 header: 'Community Service',
                 activityList: report.tutorGroupReport.activities.service
             } %}
         {% endif %}
         {% if not report.tutorGroupReport.activities.positions is empty %}
-            {% include '@customMeridenPastoral/sub/activity.twig' with {
+            {% include '@customMeridenPastoral/subTemplates/activity.twig' with {
                 header: 'Positions of Office',
                 activityList: report.tutorGroupReport.activities.positions
             } %}
@@ -213,7 +213,7 @@
                 {% set reportHalf = (report.subjectList|length / 2)|round(0, 'ceil') %}
                 <div class="small-12 medium-6 column">
                     {% for subject in report.subjectList|slice(0, reportHalf) %}
-                        {% include '@customMeridenPastoral/sub/subject.twig' with {
+                        {% include '@customMeridenPastoral/subTemplates/subject.twig' with {
                             student: report.student,
                             year: report.tutorGroupReport.year,
                             subject: subject,
@@ -224,7 +224,7 @@
                 </div>
                 <div class="small-12 medium-6 column">
                     {% for subject in report.subjectList|slice(reportHalf) %}
-                        {% include '@customMeridenPastoral/sub/subject.twig' with {
+                        {% include '@customMeridenPastoral/subTemplates/subject.twig' with {
                             student: report.student,
                             year: report.tutorGroupReport.year,
                             subject: subject,

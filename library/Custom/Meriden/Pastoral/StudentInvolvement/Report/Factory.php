@@ -9,8 +9,7 @@ namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
 
 use Alaress\Statistics\Statistics;
 use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\LateralLearning;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject\Standard;
+use RangeException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -18,6 +17,7 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -25,6 +25,8 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+
+use function count;
 
 /**
  * Factory for building various eReport data sets.
@@ -113,15 +115,16 @@ class Factory
      *
      * This is used as a data store for the year level eReport.
      *
-     * @param int         $year
-     * @param User        $student
-     * @param string|null $roleTypeOverride
+     * @param int            $year
+     * @param User           $student
+     * @param Subject\Base[] $subjectList      `$student`'s subjects in `$year`
+     * @param string|null    $roleTypeOverride
      *
-     * @return TutorGroup
+     * @return TutorGroup\Base
      */
-    public function buildTutorGroup($year, User $student, ?string $roleTypeOverride)
+    public function buildTutorGroup($year, User $student, array $subjectList, ?string $roleTypeOverride)
     {
-        $tutorGroup = new TutorGroup();
+        $tutorGroup = self::buildTutorGroupReport($year, $student);
         $tutorGroup
             ->setName($year . ' eReport')
             ->setStudent($student)
@@ -165,6 +168,25 @@ class Factory
                 )
             );
         }
+
+        // Senior report only: collate endeavor grades
+        if ($tutorGroup instanceof TutorGroup\SeniorSchool) {
+            $allFolders = [];
+            $allGrades  = [];
+            foreach ($subjectList as $subject) {
+                $folderWithGrades = $this->getFolderWithGrades(
+                    $subject->getSubjectCode(),
+                    $student,
+                    $publishedOnly,
+                    $roleTypeOverride
+                );
+                $allFolders[] = $folderWithGrades['folder'];
+                $allGrades[]  = $folderWithGrades['grades'];
+            }
+
+            $tutorGroup->injectEndeavorGrades($allFolders, array_merge(...$allGrades), $publishedOnly);
+        }
+
         return $tutorGroup;
     }
 
@@ -233,7 +255,7 @@ class Factory
      * @param int     $year
      * @param User    $student
      * @param string  $subjectCode
-     * @return Standard
+     * @return Subject\Standard
      */
     private function buildStandard(
         array $externalData,
@@ -242,8 +264,8 @@ class Factory
         int $year,
         User $student,
         string $subjectCode
-    ): Standard {
-        $subject      = new Standard();
+    ): Subject\Standard {
+        $subject      = new Subject\Standard();
         $externalData = $this->augmentSubjectWithTeacher($externalData);
         $subject
             ->setName($externalData['sub_desc'])
@@ -305,7 +327,7 @@ class Factory
      * @param string         $subjectCode
      * @param Subject\Base[] $subjectList `$student`'s subjects in `$year`
      * @param string|null    $roleTypeOverride
-     * @return LateralLearning
+     * @return Subject\LateralLearning
      */
     private function buildLateralLearning(
         array $externalData,
@@ -315,9 +337,9 @@ class Factory
         string $subjectCode,
         array $subjectList,
         ?string $roleTypeOverride
-    ): LateralLearning {
+    ): Subject\LateralLearning {
         // Need a course description
-        $lateralLearning = new LateralLearning();
+        $lateralLearning = new Subject\LateralLearning();
         $lateralLearning
             ->setName($externalData['sub_desc'])
             ->setDescription($externalData['outline_text'])
@@ -329,17 +351,46 @@ class Factory
 
         // Put together all the stuff for the lateral learning report
         $publishedOnly = !$this->doesDraftFeedbackContribute($year);
-        $allGrades     = [];
-        foreach ($subjectList as $subject) {
-            $folderWithGrades = $this->getFolderWithGrades(
-                $subject->getSubjectCode(),
-                $student,
-                $publishedOnly,
-                $roleTypeOverride
-            );
-            $allGrades[] = $folderWithGrades['grades'];
+        return $lateralLearning->injectIndicatorMarks(
+            $this->collateAllGrades($subjectList, $student, $publishedOnly, $roleTypeOverride)
+        );
+    }
+
+    /**
+     * Which year level was `$student` in during calendar year `$year`?
+     *
+     * Reports are only valid for
+     * * students who started year 7 in 2015+
+     * * for years in which the student was in years 7-12
+     *
+     * In addition, subject pages are only valid for students in years 7-9.
+     *
+     * @param int         $year        The calendar year for which the report is
+     *                                 being built
+     * @param User        $student     The student for whom it's being built
+     * @param string|null $subjectCode If provided, the subject code for which
+     *                                 it is being built
+     * @return int
+     * @throws RangeException if `$student` is not in a recognised year for this
+     *                        report.
+     */
+    public static function determineYearLevel(int $year, User $student, ?string $subjectCode): int
+    {
+        $thisYear  = (int)date('Y');
+        $startYear = $thisYear + 7 - (int)$student->getYear()->getName();
+        if ($startYear < 2015) {
+            throw new RangeException("Reports are only for students who started year 7 in 2015 or later");
         }
-        return $lateralLearning->injectIndicatorMarks(array_merge(...$allGrades));
+
+        // Determine the year level of the report
+        $reportYearLevel = ((int)$student->getYear()->getName()) - ($thisYear - $year);
+        if ($reportYearLevel < 7 || $reportYearLevel > 12) {
+            throw new RangeException("Reports are only for years 7-12");
+        }
+        if (isset($subjectCode) && $reportYearLevel > 9) {
+            throw new RangeException("Report subject pages are only for years 7-9");
+        }
+        return $reportYearLevel;
     }
 
     /**
@@ -349,13 +400,18 @@ class Factory
      *
      * @param User $student
      *
-     * @return array|TutorGroup[]
+     * @return array|TutorGroup\Base[]
      */
     public function buildTutorGroupList(User $student)
     {
         $tutorGroups = [];
         foreach ($this->gateway->getAllYearLevelGroups($student) as $level) {
-            $tutorGroup = new TutorGroup();
+            // Which variant gets built?
+            try {
+                $tutorGroup = self::buildTutorGroupReport((int)$level['yr_study'], $student);
+            } catch (RangeException $e) {
+                continue;
+            }
             $tutorGroup
                 ->setName($level['yr_study'] . ' eReport')
                 ->setStudent($student)
@@ -385,14 +441,14 @@ class Factory
         $lateralLearning = null;
         foreach ($result as $row) {
             if (self::isSubjectLateralLearning($row['sub_desc'])) {
-                $lateralLearning = new LateralLearning();
+                $lateralLearning = new Subject\LateralLearning();
                 $lateralLearning
                     ->setName($row['sub_desc'])
                     ->setStudent($student)
                     ->setYear($row['yr_study'])
                     ->setSubjectCode($row['code']);
             } else {
-                $subject = new Standard();
+                $subject = new Subject\Standard();
                 $subject
                     ->setName($row['sub_desc'])
                     ->setStudent($student)
@@ -403,6 +459,7 @@ class Factory
             }
         }
 
+        // Ensure lateral learning is at the head of the list, if it's there
         $subjects = array_values($subjects);
         if ($lateralLearning) {
             array_unshift($subjects, $lateralLearning);
@@ -424,7 +481,7 @@ class Factory
      *  grades: array
      * }
      */
-    protected function getFolderWithGrades($subjectCode, User $student, bool $publishedOnly, ?string $roleTypeOverride)
+    private function getFolderWithGrades($subjectCode, User $student, bool $publishedOnly, ?string $roleTypeOverride)
     {
         // Find by category code, and figure out if they're involved.
         $folder = $this->folderMapper->findForCampusAndClass('', $subjectCode);
@@ -476,7 +533,7 @@ class Factory
      *  grades: array (if the student is involved)
      * }
      */
-    protected function getStudentInvolvement(
+    private function getStudentInvolvement(
         Folder $folder,
         User $student,
         bool $publishedOnly,
@@ -523,7 +580,7 @@ class Factory
      *  comment:     string
      * }
      */
-    protected function getGrades(Folder $folder, User $student, bool $publishedOnly, ?string $roleTypeOverride)
+    private function getGrades(Folder $folder, User $student, bool $publishedOnly, ?string $roleTypeOverride)
     {
         $allGrades = [];
 
@@ -584,7 +641,7 @@ class Factory
      *
      * @return Folder[]
      */
-    protected function getCohortFolders(Folder $category, $subjectCode)
+    private function getCohortFolders(Folder $category, $subjectCode)
     {
         // Find the equivalent assessments for each cohort class
         // (class with the same second part of the class code)
@@ -599,7 +656,7 @@ class Factory
                 if ($liveCategory->getParent()->getId() == $parentId) {
                     $cohortList[] = $liveCategory;
                 }
-            } catch (\Exception $e) {
+            } catch (MapperException $e) {
                 // noop
             }
             foreach ($this->folderMapper->findAllByArchivedCode($otherCode) as $archivedCategory) {
@@ -621,7 +678,7 @@ class Factory
      *  teachers: User[]
      * }
      */
-    protected function augmentSubjectWithTeacher(array $subject)
+    private function augmentSubjectWithTeacher(array $subject)
     {
         // Get every teacher by their tch_code
         if (!empty($subject['tch_code'])) {
@@ -648,7 +705,7 @@ class Factory
      *   }
      * }
      */
-    public function buildDistribution($grade, $cohortFolders, bool $publishedOnly)
+    private function buildDistribution($grade, $cohortFolders, bool $publishedOnly)
     {
         // Only interested in distribution of due works that are assessment tasks
         $baseAssessment = $grade['assessment'];
@@ -740,7 +797,7 @@ class Factory
                 },
                 $distribution['continuous']['marks']
             );
-            $count = \count($marks);
+            $count = count($marks);
             $mean  = array_sum($marks) / $count;
             $sd    = sqrt(
                 array_sum(
@@ -803,5 +860,52 @@ class Factory
     private static function isSubjectLateralLearning(string $subjectName): bool
     {
         return (bool)preg_match(self::LATERAL_LEARNING_SUBJECT_NAME_REGEX, $subjectName);
+    }
+
+    /**
+     * Base builder for a tutor group report: constructs only the base object.
+     *
+     * @param int  $level
+     * @param User $student
+     * @return TutorGroup\Base
+     * @throws RangeException if the year level is invalid
+     */
+    private static function buildTutorGroupReport(int $level, User $student)
+    {
+        $yearLevel = self::determineYearLevel($level, $student, null);
+        if ($yearLevel <= 9) {
+            $tutorGroup = new TutorGroup\MiddleSchool();
+        } else {
+            $tutorGroup = new TutorGroup\SeniorSchool();
+        }
+        return $tutorGroup;
+    }
+
+    /**
+     * Collates all grades given for `$subjectList` to `$student`.
+     *
+     * @param array       $subjectList
+     * @param User        $student
+     * @param bool        $publishedOnly
+     * @param string|null $roleTypeOverride
+     * @return array
+     */
+    private function collateAllGrades(
+        array $subjectList,
+        User $student,
+        bool $publishedOnly,
+        ?string $roleTypeOverride
+    ): array {
+        $allGrades = [];
+        foreach ($subjectList as $subject) {
+            $folderWithGrades = $this->getFolderWithGrades(
+                $subject->getSubjectCode(),
+                $student,
+                $publishedOnly,
+                $roleTypeOverride
+            );
+            $allGrades[] = $folderWithGrades['grades'];
+        }
+        return array_merge(...$allGrades);
     }
 }
