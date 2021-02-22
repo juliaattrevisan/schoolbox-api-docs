@@ -246,24 +246,11 @@ class Provisioner
                     // Keep a copy of the original user, for comparison
                     $originalUser  = clone $internalUser;
 
-                    /* Deliberately empty $accessList so that Role-based
-                     * permissions don't get saved in addition to the Group
+                    /* Deliberately empty $accessList of everything except SERVICE_HOMEPAGE items
+                     * so that Role-based permissions don't get saved in addition to the Group
                      * permissions that we can set
                      */
-                    $preserved = $this->userAccessMapper->createCollection();
-
-                    /* Don't blow away any UserAccess::ACCESS_FULL settings
-                     */
-                    foreach ($internalUser->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE) as $current) {
-                        /** @var UserAccess $current */
-                        if ($current->getAccessLevel() === UserAccess::ACCESS_FULL) {
-                            $preserved->add($current);
-
-                            $this->logger->debug("{$internalUser->getFullname()} is staying at accesslevel {$current->getAccessLevel()} for {$current->getServiceIdentifier()}", $commonContext);
-                        }
-                    }
-
-                    $internalUser->setAccessList($preserved);
+                    $internalUser->setAccessList($internalUser->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE));
 
                     $commonContext['action'] = $action;
 

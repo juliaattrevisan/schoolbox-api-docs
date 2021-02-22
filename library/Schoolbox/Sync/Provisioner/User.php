@@ -192,6 +192,7 @@ class User extends SchoolboxUser
      */
     public function generateExistingUserAccess(\Schoolbox\Resource\Folder\Mapper $folderMapper, LoggerInterface $logger): array
     {
+
         /* Find out what you started with
          */
         $existingGroups = [];
@@ -236,12 +237,31 @@ class User extends SchoolboxUser
      */
     public function generateFinalUserAccess(\Schoolbox\Resource\Folder\Mapper $folderMapper, LoggerInterface $logger): array
     {
+        $logger->debug('Computing groups mutations');
 
         /* Decide the net effect, in accordance to how the mutation timeline evolved
          */
+        $initialGroups = [];
         $mutationGroups = [];
 
-        foreach ($this->getUserAccessMutations() as $mutation) {
+        /* The ruleset records mutations with [] as initial conditions, but that meant
+         * what you started with would never show up in logs; initial conditions are
+         * the list of userAccess instances you originally had and the mutations act
+         * upon this
+         */
+        foreach ($this->getAccessList() as $userAccess) {
+            $folderId = $userAccess->getServiceIdentifier();
+
+            $initialGroups[$folderId] = [
+                'instance' => [$folderId],
+                'level' => $userAccess->getAccessLevel(),
+                'status' => 'initial'
+            ];
+        }
+
+        /* Mutate initial conditions chronologically
+         */
+        foreach (array_merge($initialGroups, $this->getUserAccessMutations()) as $mutation) {
             foreach($mutation['instance'] as $folderId) {
 
                 /* Maybe this folder doesn't actually exist at runtime
@@ -256,9 +276,19 @@ class User extends SchoolboxUser
 
                 /* Record the mutations
                  */
-                if ($mutation['status'] === 'add') {
+                if ($mutation['status'] === 'initial') {
                     $logger->debug(sprintf(
-                        "Groups: %s %s (%s) with accesslevel %s\n",
+                        "Mutation: %s %s (%s) with accesslevel %s\n",
+                        $mutation['status'],
+                        $folderId,
+                        $folderName,
+                        $mutation['level']
+                    ));
+
+                    $mutationGroups[$folderId] = $mutation['level'];
+                } elseif ($mutation['status'] === 'add') {
+                    $logger->debug(sprintf(
+                        "Mutation: %s %s (%s) with accesslevel %s\n",
                         $mutation['status'],
                         $folderId,
                         $folderName,
@@ -268,7 +298,7 @@ class User extends SchoolboxUser
                     $mutationGroups[$folderId] = $mutation['level'];
                 } elseif ($mutation['status'] === 'remove') {
                     $logger->debug(sprintf(
-                        "Groups: %s %s (%s)\n",
+                        "Mutation: %s %s (%s)\n",
                         $mutation['status'],
                         $folderId,
                         $folderName,
@@ -291,6 +321,8 @@ class User extends SchoolboxUser
         /* For every item listed in the mutation timeline, process a UserAccess
          * These are now the userAccesses the person should have
          */
+        $logger->debug('Computing groups final list');
+
         $finalGroups = [];
 
         foreach ($mutationGroups as $serviceIdentifier => $accessLevel) {
@@ -300,8 +332,9 @@ class User extends SchoolboxUser
              */
             if (isset($keep[$serviceIdentifier])) {
                 $logger->debug(sprintf(
-                    "Retained full access to %s\n",
-                    $serviceIdentifier
+                    "Final Groups: %s %s (retained)\n",
+                    $serviceIdentifier,
+                    $keep[$serviceIdentifier]->getAccessLevel()
                 ));
 
                 /* Remember it for the log ui
