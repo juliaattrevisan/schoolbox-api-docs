@@ -29,26 +29,21 @@ export default {
             showCommentsCount: false,
             totalCommentsCount: 0,
             cursorNext: '',
-            loadMoreIsEnabled: false,
             isThreadCheckboxVisible: undefined,
             isThreadCheckboxEnabled: undefined,
             isThreadEnabled: undefined,
             errorLoadingCommentsText: 'Unable to load comments',
             showSkeletonLoader: true,
             showLoadMoreButton: false,
-            commentIdToDelete: undefined,
             commentIndexToDelete: undefined,
             confirmDeleteButton: true,
-            cancelDeleteButton: true,
             comment: '',
-            postCommentButtonIsEnabled: true,
+            isProcessActive: false,
             showCommentsSection: false,
             initialLoad: true,
             postHeaders: {
                 'X-Requested-With' : 'XMLHttpRequest'
             },
-
-            saveInProgress: false,
             editorUrl: "/javascript/ckeditor/ckeditor.js",
             isCKEditorLoading: false,
             isCKEditorLoaded: false,
@@ -87,6 +82,18 @@ export default {
             else return 'Add a Comment'
         },
 
+        /**
+         * How many total comments (beyond the amount currently in the list)
+         * are there in this thread?
+         *
+         * @returns {Number}
+         */
+        commentTotalCount () {
+            // let count = Number(this.commentThread?.children?.metadata?.count);
+            // return isNaN(count) ? 0 : count;
+            return 0;
+        },
+
     },
 
     mounted: function() {
@@ -114,14 +121,13 @@ export default {
 
             // Short-circuit if no thread ID
             if (!this.threadId) {
+                this.isProcessActive = false;
                 this.showSkeletonLoader = false;
-                this.loadMoreIsEnabled = false;
                 this.showCommentsCount = true;
                 this.showCommentsSection = this.isThreadCheckboxVisible;
                 return;
             }
 
-            this.loadMoreIsEnabled = false;
             this.showSkeletonLoader = true;
 
             // TODO don't construct this endpoint manually
@@ -140,8 +146,6 @@ export default {
 
                 // Hide skeleton loader once the request is done
                 this.showSkeletonLoader = false;
-                // Enable back load more button once the request is done
-                this.loadMoreIsEnabled = true;
                 // Make comments count visible when the request is done
                 this.showCommentsCount = true;
 
@@ -158,11 +162,10 @@ export default {
                  * must be rendered
                  */
                 this.showCommentsSection = (this.isThreadCheckboxVisible || this.totalCommentsCount > 0 || this.isThreadEnabled);
-
+                
             }).catch((error) => {
                 this.showSkeletonLoader = false;
                 this.showCommentsCount = true;
-                this.loadMoreIsEnabled = true;
                 this.$refs.toast.activate(this.errorLoadingCommentsText);
                 this.$refs.toast.timeout(this.errorLoadingCommentsText, false);
             }).finally(() => {
@@ -311,37 +314,35 @@ export default {
          */
         postComment () {
             
-            if (this.comment !== '') {
-                this.$refs.toast.activate('Posting comment...');
+            this.isProcessActive = true;
 
-                this.postCommentButtonIsEnabled = false;
+            this.$refs.toast.activate('Posting comment...');
 
-                // TODO don't construct this endpoint manually
-                axios.post('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments', {
-                    content: this.comment
-                }).then((response) => {
+            // TODO don't construct this endpoint manually
+            axios.post('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments', {
+                content: this.comment
+            }).then((response) => {
 
-                    let responseData = response.data;
-                    // Add the latest comment into the top of array
-                    this.comments.unshift(response.data)
+                let responseData = response.data;
+                // Add the latest comment into the top of array
+                this.comments.unshift(response.data)
 
-                    // On successful comment posting, add one into the total comments count in the UI without hitting the backend
-                    this.totalCommentsCount++;
+                // On successful comment posting, add one into the total comments count in the UI without hitting the backend
+                this.totalCommentsCount++;
 
-                    this.$refs.toast.timeout('Comment has been added', true);
+                this.$refs.toast.timeout('Comment has been added', true);
+                
+                this.comment = '';
 
-                    // Bring post comment components back to their original states and reset CKEditor content on successful request
-                    this.postCommentButtonIsEnabled = true;
-                    this.comment = '';
-                    // CKEDITOR.instances['comment'].setData(this.comment);
+                this.isProcessActive = false;
 
-                }).catch((error) => {
-                    this.postCommentButtonIsEnabled = true;
-                    this.$refs.toast.timeout('Unable to post comment', false);
-                }).finally(() => {
-                    this.reInitialiseMediaPlayer();
-                });
-            }
+            }).catch((error) => {
+                this.$refs.toast.timeout('Unable to post comment', false);
+                this.isProcessActive = false;
+            }).finally(() => {
+                this.reInitialiseMediaPlayer();
+            });
+
         },
 
 
@@ -363,27 +364,19 @@ export default {
          */
         deleteComment () {
             
-            this.commentIdToDelete = this.comments[this.commentIndexToDelete].id;
+            this.isProcessActive = true;
 
-            // If the user has agreed to delete the comment...
-            // Disable 'OK' and 'CANCEL' button from the delete confirmation modal temporarily while the delete request is being processed
-            // 'CANCEL' button will be disabled while the request is being processed so that, the users won't have a wrong understanding that they can still cancel the request
-            this.confirmDeleteButton = false;
-            this.cancelDeleteButton = false;
+            const commentIdToDelete = this.comments[this.commentIndexToDelete].id;
 
             this.$refs.toast.activate('Deleting comment...');
 
             // TODO don't construct this endpoint manually
-            axios.delete('/discussion/comms/' + this.articleId + '/comments/' + this.commentIdToDelete, {}, { headers: this.postHeaders }).then(() => {
+            axios.delete('/discussion/comms/' + this.articleId + '/comments/' + commentIdToDelete, {}, { headers: this.postHeaders }).then(() => {
                 
                 this.comments.splice(this.commentIndexToDelete, 1);
 
                 // On successful delete, reduce the total comments count in the UI without hitting the backend
                 this.totalCommentsCount--;
-
-                // Bring 'OK' and 'CANCEL' button from the delete confirmation modal back to it's original state
-                this.confirmDeleteButton = true;
-                this.cancelDeleteButton = true;
 
                 this.$refs.toast.timeout('Comment deleted', true);
 
@@ -397,10 +390,11 @@ export default {
                 }, 300);
 
                 this.$refs.deleteModal.close();
-            }).catch((error) => {
-                this.confirmDeleteButton = true;
-                this.cancelDeleteButton = true;
 
+                this.isProcessActive = false;
+
+            }).catch((error) => {
+                this.isProcessActive = false;
                 this.$refs.toast.timeout('Unable to delete comment', false);
             });
 
@@ -438,10 +432,10 @@ export default {
                         <button class="btn-show-ckeditor" v-show="!isCKEditorReady" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
                         <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
                         <div v-if="isCKEditorLoaded" :style="[isCKEditorReady ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
-                            <ckeditor tag-name="textarea" v-model="comment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
+                            <ckeditor tag-name="textarea" v-model="comment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="isProcessActive"></ckeditor>
                             <a class="button submit"
                             @click="postComment"
-                            :disabled="! postCommentButtonIsEnabled || comment.trim() === ''">Post Comment</a>
+                            :disabled="comment.trim() === '' || isProcessActive">Post Comment</a>
                         </div>
                     </div>
                     <div v-else>
@@ -481,12 +475,11 @@ export default {
                         </div>
                         <nav>
                             <a v-if="comment._links.delete.auth" @click="showDeleteModal(index)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
-                            <a href="#add-reply" class="icon-reply no-text" title="Add Reply"></a>
                         </nav>
                         <article v-html="comment.content"></article>
                     </li>
                 </ul>
-                <a v-if="showLoadMoreButton" @click="getThread" class="button expand" :disabled="! loadMoreIsEnabled">Show older comments</a>
+                <a v-if="showLoadMoreButton" @click="getThread" class="button expand" :disabled="isProcessActive">Show older comments</a>
             </div>
         </section>
         <toast ref="toast"></toast>
@@ -495,8 +488,8 @@ export default {
                 <h2>Please confirm</h2>
                 <p>Are you sure you want to delete this comment?</p>
                 <ul class="flex-list buttons">
-                    <li><a @click.prevent="deleteComment" class="button submit" :disabled="! confirmDeleteButton">Yes</a></li>
-                    <li><a @click.prevent="$refs.deleteModal.close" class="button" :disabled="! cancelDeleteButton">No</a></li>
+                    <li><a @click.prevent="deleteComment" class="button submit" :disabled="isProcessActive">Yes</a></li>
+                    <li><a @click.prevent="$refs.deleteModal.close" class="button" :disabled="isProcessActive">No</a></li>
                 </ul>
             </template>
         </reveal-modal>
