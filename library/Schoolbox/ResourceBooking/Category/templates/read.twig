@@ -73,6 +73,7 @@
             }
         }],
         resources: {{ resources|json_encode|raw }},
+        returnUrl: '{{ RETURN_URL.name }}={{ RETURN_URL.current }}'
     };
 </script>
 {% autoescape 'js' %}
