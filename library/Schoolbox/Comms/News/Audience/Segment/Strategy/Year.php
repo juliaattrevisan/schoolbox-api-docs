@@ -69,6 +69,7 @@ class Year extends SimpleStrategy
             WHERE lu_year_level.deleted_AT IS NULL
             AND lu_year_level.name IS NOT NULL
             {$keywordFilter}
+            ORDER BY lu_year_level.sequence
         ";
     }
 
