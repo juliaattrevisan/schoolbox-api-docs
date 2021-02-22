@@ -264,23 +264,23 @@ class Leave_RequestMapper extends Schoolbox\Mapper
         $userMapper = $this->getUserMapper();
 
         return "
-			SELECT
-				{$this->getColumnString('lr')},
-				{$this->getJoinColumnString('user', 'u')},
-				{$this->getJoinColumnString('author', 'a')},
-				{$this->getJoinColumnString('authorisationUser', 'au')},
-				{$this->getJoinColumnString('travelType', 'tt')},
-				{$this->getJoinColumnString('host_type', 'ht')},
-				{$userMapper->getJoinColumnString('year', 'lyl')},
-				lyl.name AS year
-			FROM `{$this->table}` lr
-			LEFT JOIN {$this->getJoinSql('user', 'lr', 'u')}
-			LEFT JOIN {$this->getJoinSql('author', 'lr', 'a')}
-			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
-			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
-			LEFT JOIN {$this->getJoinSql('host_type', 'lr', 'ht')}
-			LEFT JOIN {$userMapper->getJoinSql('year', 'u', 'lyl')}
-		";
+            SELECT
+                {$this->getColumnString('lr')},
+                {$this->getJoinColumnString('user', 'u')},
+                {$this->getJoinColumnString('author', 'a')},
+                {$this->getJoinColumnString('authorisationUser', 'au')},
+                {$this->getJoinColumnString('travelType', 'tt')},
+                {$this->getJoinColumnString('host_type', 'ht')},
+                {$userMapper->getJoinColumnString('year', 'lyl')},
+                lyl.name AS year
+            FROM `{$this->table}` lr
+            LEFT JOIN {$this->getJoinSql('user', 'lr', 'u')}
+            LEFT JOIN {$this->getJoinSql('author', 'lr', 'a')}
+            LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
+            LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
+            LEFT JOIN {$this->getJoinSql('host_type', 'lr', 'ht')}
+            LEFT JOIN {$userMapper->getJoinSql('year', 'u', 'lyl')}
+        ";
     }
 
     /**
@@ -292,11 +292,11 @@ class Leave_RequestMapper extends Schoolbox\Mapper
     public function findAllByUserId($userId)
     {
         $statement = $this->database->prepare("
-			{$this->getBaseQuery()}
-			WHERE lr.user_id = :userId
-			AND lr.status != :status
-			ORDER BY lr.start
-		");
+            {$this->getBaseQuery()}
+            WHERE lr.user_id = :userId
+            AND lr.status != :status
+            ORDER BY lr.start
+        ");
 
         $statement->execute(
             [
@@ -340,12 +340,12 @@ class Leave_RequestMapper extends Schoolbox\Mapper
           */
 
         $statement = $this->database->prepare("
-			{$this->getBaseQuery()}
-			WHERE u.residential_house_id = :houseId
-			AND lr.created >= :limit
-			AND lr.status != :deleted
-			ORDER BY substr(lr.start, 1, 10), LENGTH(year), year, u.lastname
-		");
+            {$this->getBaseQuery()}
+            WHERE u.residential_house_id = :houseId
+            AND lr.created >= :limit
+            AND lr.status != :deleted
+            ORDER BY substr(lr.start, 1, 10), LENGTH(year), year, u.lastname
+        ");
 
         $statement->execute(
             [
@@ -381,12 +381,12 @@ class Leave_RequestMapper extends Schoolbox\Mapper
     private function getAllLeaveRequests($houseId)
     {
         $statement = $this->database->prepare("
-			{$this->getBaseQuery()}
-			WHERE u.residential_house_id = :houseId
-			AND lr.status = :status
-			AND lr.created >= :limit
-			ORDER BY substr(lr.start, 1, 10), LENGTH(year), year, u.lastname
-		");
+            {$this->getBaseQuery()}
+            WHERE u.residential_house_id = :houseId
+            AND lr.status = :status
+            AND lr.created >= :limit
+            ORDER BY substr(lr.start, 1, 10), LENGTH(year), year, u.lastname
+        ");
 
         $statement->execute(
             [
@@ -491,26 +491,27 @@ class Leave_RequestMapper extends Schoolbox\Mapper
         // Right Join with filters onto users - I want all users in this
         // res.house, regardless of whether they have a leave request or not.
         $statement = $this->database->prepare("
-			SELECT
-				{$this->getColumnString('lr')},
-				{$this->getUserMapper()->getColumnString('u')},
-				{$this->getUserMapper()->getColumnString('au')},
-				{$this->getJoinColumnString('travelType', 'tt')},
-				{$this->getJoinColumnString('host_type', 'ht')},
-				lyl.name AS year
-			FROM {$this->getTable()} `lr`
-			RIGHT JOIN {$this->getJoinSql('user', 'lr', 'u')}
-				AND CAST(lr.start AS DATE) <= :finish
-				AND lr.finish >= :start
-				AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
-			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
-			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
-			LEFT JOIN {$this->getJoinSql('host_type', 'lr', 'ht')}
-			LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
-			WHERE u.residential_house_id = :houseId
-			AND u.deleted_at IS NULL
-			ORDER BY LENGTH(year), year, u.lastname
-		");
+            SELECT
+                {$this->getColumnString('lr')},
+                {$this->getUserMapper()->getColumnString('u')},
+                {$this->getUserMapper()->getColumnString('au')},
+                {$this->getJoinColumnString('travelType', 'tt')},
+                {$this->getJoinColumnString('host_type', 'ht')},
+                {$this->getUserMapper()->getJoinColumnString('year', 'lyl')},
+                lyl.name AS year
+            FROM {$this->getTable()} `lr`
+            RIGHT JOIN {$this->getJoinSql('user', 'lr', 'u')}
+                AND CAST(lr.start AS DATE) <= :finish
+                AND lr.finish >= :start
+                AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
+            LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
+            LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
+            LEFT JOIN {$this->getJoinSql('host_type', 'lr', 'ht')}
+            LEFT JOIN lu_year_level lyl ON u.year_id = lyl.id
+            WHERE u.residential_house_id = :houseId
+            AND u.deleted_at IS NULL
+            ORDER BY LENGTH(year), year, u.lastname
+        ");
 
         $args = [
             ':houseId'        => $houseId,
@@ -567,26 +568,26 @@ class Leave_RequestMapper extends Schoolbox\Mapper
            */
         $statement = $this->database->prepare(
             "
-			SELECT
-				luResidentialHouse.id AS houseId,
-				luResidentialHouse.name AS name,
-				leave_request.id AS leaveRequestId,
-				SUM(leave_request.id AND ((`start` < :breakfastStart) AND (`finish` > :breakfastEnd))) AS absent_morning,
-				((SELECT COUNT(*) FROM `user` WHERE `user`.residential_house_id = houseId AND `user`.deleted_at IS NULL) - COALESCE(SUM(leave_request.id AND ((`start` < :breakfastStart) AND (`finish` > :breakfastEnd))),0)) AS present_morning,
-				SUM(leave_request.id AND ((`start` < :lunchStart) AND (`finish` > :lunchEnd))) AS absent_day,
-				((SELECT COUNT(*) FROM `user` WHERE `user`.residential_house_id = houseId AND `user`.deleted_at IS NULL) - COALESCE(SUM(leave_request.id AND ((`start` < :lunchStart) AND (`finish` > :lunchEnd))),0)) AS present_day,
-				SUM(leave_request.id AND ((`start` < :dinnerStart) AND (`finish` > :dinnerEnd))) AS absent_night,
-				((SELECT COUNT(*) FROM `user` WHERE `user`.residential_house_id = houseId AND `user`.deleted_at IS NULL) - COALESCE(SUM(leave_request.id AND ((`start` < :dinnerStart) AND (`finish` > :dinnerEnd))),0)) AS present_night
-			FROM luResidentialHouse
-			INNER JOIN `user` ON `user`.residential_house_id = luResidentialHouse.id AND `user`.deleted_at IS NULL
+            SELECT
+                luResidentialHouse.id AS houseId,
+                luResidentialHouse.name AS name,
+                leave_request.id AS leaveRequestId,
+                SUM(leave_request.id AND ((`start` < :breakfastStart) AND (`finish` > :breakfastEnd))) AS absent_morning,
+                ((SELECT COUNT(*) FROM `user` WHERE `user`.residential_house_id = houseId AND `user`.deleted_at IS NULL) - COALESCE(SUM(leave_request.id AND ((`start` < :breakfastStart) AND (`finish` > :breakfastEnd))),0)) AS present_morning,
+                SUM(leave_request.id AND ((`start` < :lunchStart) AND (`finish` > :lunchEnd))) AS absent_day,
+                ((SELECT COUNT(*) FROM `user` WHERE `user`.residential_house_id = houseId AND `user`.deleted_at IS NULL) - COALESCE(SUM(leave_request.id AND ((`start` < :lunchStart) AND (`finish` > :lunchEnd))),0)) AS present_day,
+                SUM(leave_request.id AND ((`start` < :dinnerStart) AND (`finish` > :dinnerEnd))) AS absent_night,
+                ((SELECT COUNT(*) FROM `user` WHERE `user`.residential_house_id = houseId AND `user`.deleted_at IS NULL) - COALESCE(SUM(leave_request.id AND ((`start` < :dinnerStart) AND (`finish` > :dinnerEnd))),0)) AS present_night
+            FROM luResidentialHouse
+            INNER JOIN `user` ON `user`.residential_house_id = luResidentialHouse.id AND `user`.deleted_at IS NULL
             LEFT JOIN leave_request
                 ON leave_request.user_id = `user`.id
                 AND leave_request.authorisation_datetime IS NOT NULL
                 AND leave_request.status NOT IN (:deleted, :rejected)
-			WHERE luResidentialHouse.deleted_at IS NULL
-			GROUP BY residential_house_id
-			ORDER BY luResidentialHouse.name
-		"
+            WHERE luResidentialHouse.deleted_at IS NULL
+            GROUP BY residential_house_id
+            ORDER BY luResidentialHouse.name
+        "
         );
 
         $statement->execute(
@@ -610,9 +611,9 @@ class Leave_RequestMapper extends Schoolbox\Mapper
     public function findById($id)
     {
         $statement = $this->database->prepare("
-			{$this->getBaseQuery()}
-			WHERE lr.id = :id
-		");
+            {$this->getBaseQuery()}
+            WHERE lr.id = :id
+        ");
 
         $statement->execute(
             [
@@ -634,9 +635,9 @@ class Leave_RequestMapper extends Schoolbox\Mapper
     public function findAllByDateRange($start, $finish)
     {
         $statement = $this->database->prepare("
-			{$this->getBaseQuery()}
-			WHERE lr.start < :finish AND lr.finish > :start AND lt.status != :deleted
-		");
+            {$this->getBaseQuery()}
+            WHERE lr.start < :finish AND lr.finish > :start AND lt.status != :deleted
+        ");
 
         $statement->execute(
             [
