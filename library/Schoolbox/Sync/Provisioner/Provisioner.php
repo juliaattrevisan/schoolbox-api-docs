@@ -21,6 +21,7 @@ use Schoolbox\Notif\CacheableLoggerInterface;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Log;
@@ -108,6 +109,12 @@ class Provisioner
 
 
     /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
+
+    /**
      * Constructor
      *
      * @param Ruleset\Factory          $rulesetFactory
@@ -116,6 +123,8 @@ class Provisioner
      * @param UserMapper               $userMapper
      * @param CacheableLoggerInterface $logger
      * @param Log\Mapper               $logMapper
+     * @param UserAccessMapper         $userAccessMapper
+     * @param Folder\Mapper            $folderMapper
      */
     public function __construct(
         Ruleset\Factory $rulesetFactory,
@@ -124,7 +133,8 @@ class Provisioner
         UserMapper $userMapper,
         CacheableLoggerInterface $logger,
         Log\Mapper $logMapper,
-        UserAccessMapper $userAccessMapper
+        UserAccessMapper $userAccessMapper,
+        Folder\Mapper $folderMapper
     ) {
         $this->rulesetFactory = $rulesetFactory;
         $this->grammarFactory = $grammarFactory;
@@ -135,6 +145,7 @@ class Provisioner
         $this->logMapper = $logMapper;
         $userAccessMapper->setEventPropagator(new MockPropagator());
         $this->userAccessMapper = $userAccessMapper;
+        $this->folderMapper = $folderMapper;
     }
 
     /**
@@ -165,11 +176,9 @@ class Provisioner
         }
 
         /* Various dependencies
-         * FolderMapper for identifying a group's folder name
          * Config for options that change the following algorithm
          * and also because it's somehow inside User models
          */
-        $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
         $config = new Loader();
 
         foreach ($this->runOrder as $roleType) {
@@ -244,7 +253,7 @@ class Provisioner
 
 
                     // Keep a copy of the original user, for comparison
-                    $originalUser  = clone $internalUser;
+                    $originalUser = clone $internalUser;
 
                     /* Deliberately empty $accessList of everything except SERVICE_HOMEPAGE items
                      * so that Role-based permissions don't get saved in addition to the Group
@@ -286,8 +295,8 @@ class Provisioner
                          * the mutations in order to find out where you ended up. These evaluations
                          * also create log->debug entries so you can see what happened
                          */
-                        $existingGroups = $originalUser->generateExistingUserAccess($folderMapper, $this->logger);
-                        $finalGroups = $internalUser->generateFinalUserAccess($folderMapper, $this->logger);
+                        $existingGroups = $originalUser->generateExistingUserAccess($this->folderMapper, $this->logger);
+                        $finalGroups = $internalUser->generateFinalUserAccess($this->folderMapper, $this->logger);
 
                         /* Compute the actual difference - if the set of (folderId, accessLevel)
                          * tuples are the same, then there's no difference and we don't need to
@@ -319,7 +328,7 @@ class Provisioner
                                 /* Maybe this folder doesn't actually exist at runtime
                                   */
                                 try {
-                                    $folder = $folderMapper->findCheaplyById($folderId);
+                                    $folder = $this->folderMapper->findCheaplyById($folderId);
                                     $folderName = $folder->getName();
                                 } catch (\Schoolbox\Mapper\Exception $e) {
                                     $folderName = 'unknown folder';
@@ -344,7 +353,7 @@ class Provisioner
                                 /* Maybe this folder doesn't actually exist at runtime
                                  */
                                 try {
-                                    $folder = $folderMapper->findCheaplyById($folderId);
+                                    $folder = $this->folderMapper->findCheaplyById($folderId);
                                     $folderName = $folder->getName();
                                 } catch (\Schoolbox\Mapper\Exception $e) {
                                     $folderName = 'unknown folder';
