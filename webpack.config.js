@@ -23,13 +23,13 @@ module.exports = {
         userProfileFeeds: './library/Schoolbox/Learning/vue/user-profile/feeds.main.js',
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.main.js',
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.main.js',
+        authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
     },
     output: {
         path: path.resolve(__dirname, "www/javascript/components"),
         publicPath: "/javascript/components/",
         filename: "[name].bundle.js"
     },
-    devtool: "source-map",
     module: {
         rules: [
             {
@@ -60,18 +60,18 @@ module.exports = {
                         ]
                     }
                 }
-        },
+            },
             {
                 test: /\.vue$/,
                 loader: 'vue-loader',
                 options: {
                     appendTsSuffixTo: [/\.vue$/]
                 }
-        },
+            },
             {
                 test: /\.css$/,
                 use: ['vue-style-loader', 'css-loader']
-        },
+            },
             {
                 test: /\.scss$/,
                 use: [
@@ -79,12 +79,7 @@ module.exports = {
                     'css-loader',
                     'sass-loader'
                 ]
-        },
-            {
-                enforce: "pre",
-                test: /\.js$/,
-                loader: "source-map-loader"
-        }
+            }
         ]
     },
     resolve: {
@@ -93,7 +88,8 @@ module.exports = {
             '@schoolbox': path.resolve(__dirname, "vue/components"),
             '@schoolboxCalendarEvent': path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue"),
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
-            '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue')
+            '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue'),
+            '@shared': path.resolve(__dirname, 'www/javascript/shared'),
         },
         extensions: ['*', '.js', '.vue', '.json']
     },
