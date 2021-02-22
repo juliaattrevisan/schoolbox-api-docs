@@ -418,11 +418,14 @@
 
         // Get an array of letter grade {value : letter} pairs
         function getLetterGrades($dropdown) {
-            var grades = [];
+            let grades = [];
             $dropdown.find("option[data-letter]").each(function(index, option) {
-                grades.push(
-                    {'value' : $(option).prop("value"), 'letter' : $(option).attr('data-letter')}
-                );
+                let $option = $(option);
+                grades.push({
+                    value:      $option.prop("value"),
+                    lowerBound: $option.attr('data-lower-bound'),
+                    letter:     $option.attr('data-letter'),
+                });
             });
 
             return grades;
