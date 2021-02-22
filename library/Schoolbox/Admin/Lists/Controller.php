@@ -871,6 +871,20 @@ class Controller extends Base
             ]
         ];
 
+        $return['user-title'] = [
+            'title'             => 'User Titles',
+            'mapper'            => \Schoolbox\User\Title\Mapper::class,
+            'delete'            => true,
+            'fields'            => [
+                'title'         => [
+                    'caption'   => 'Name',
+                    'width'     => 12,
+                    'maxLength' => 60,
+                    'mandatory' => true,
+                ],
+            ]
+        ];
+
         return $return;
     }
 
