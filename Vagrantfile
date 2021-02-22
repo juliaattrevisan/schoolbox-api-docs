@@ -34,6 +34,9 @@ if File.file?('vagrant.yaml')
   if !conf["vagrant_box"].nil?
     vagrant_box = conf["vagrant_box"]
   end
+  if !conf["memory"].nil?
+    memory = conf["memory"]
+  end
   if !conf["processors"].nil?
     processors = conf["processors"]
   end
