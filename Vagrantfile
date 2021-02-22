@@ -11,6 +11,7 @@ VAGRANTFILE_API_VERSION = "2"
 default = YAML.load_file('vagrant.default.yaml')
 vagrant_box = default["vagrant_box"]
 memory = default["memory"]
+processors = default["processors"]
 external_db = default["external_db"]
 external_db_host = default["external_db_host"]
 external_db_db = default["external_db_db"]
@@ -35,6 +36,9 @@ if File.file?('vagrant.yaml')
   end
   if !conf["memory"].nil?
     memory = conf["memory"]
+  end
+  if !conf["processors"].nil?
+    processors = conf["processors"]
   end
   if !conf["external_db"].nil?
     external_db = conf["external_db"]
@@ -99,7 +103,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.provider :virtualbox do |vb|
-    vb.customize ["modifyvm", :id, "--memory", memory]
+    vb.customize ["modifyvm", :id, "--memory", memory, "--cpus", processors]
     # Workaround issues in Vitualbox < 5.1.6
     vb.customize ['modifyvm', :id, '--cableconnected1', 'on']
   end
