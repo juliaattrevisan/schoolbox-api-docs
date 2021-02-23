@@ -38,13 +38,13 @@ switch ($_GET['code']) {
 $path = null;
 switch ($code) {
     case 403:
-        $path = '/images/core/permission-denied.png';
+        $path = '/images/placeholders/permission-denied.png';
         break;
 
     case 404:
     case 500:
     default:
-        $path = '/images/core/corrupt-image.png';
+        $path = '/images/placeholders/corrupt-image.png';
         break;
 }
 
@@ -56,7 +56,7 @@ $transform = null;
 $cache_key = null;
 switch ($_GET['transform_type']) {
     case 'portrait':
-        $path          = '/images/core/placeholder.png';
+        $path          = '/images/placeholders/portraitt.png';
         $transforms     = new Image\Transformation\Portrait();
         $transform_key = $_GET['transform'];
         try {
@@ -86,9 +86,14 @@ switch ($_GET['transform_type']) {
         break;
 }
 
-// Try to output the fail image. If even THAT fails, just redirect to the image.
+// Try to transform the fail image in /resources
+// If even THAT fails, just redirect to the static version.
 try {
-    $imageProcessor = new Image\Processor(Cache\LocalFS::getStorageModel(WEB_root, $path), $cache_key, $transform);
+    $imageProcessor = new Image\Processor(
+        Cache\LocalFS::getStorageModel(SITE_root, '/resources' . $path),
+        $cache_key,
+        $transform
+    );
     $imageProcessor->load()->stream();
 } catch (Exception $e) {
     SitePage::localRedir($path);
