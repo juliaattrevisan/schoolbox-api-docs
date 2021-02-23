@@ -235,7 +235,11 @@
                 var groupSummarySelector  = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]',
                     $groupSummary         = $rb.find(groupSummarySelector),
                     $descriptorCheckboxes = $groupRows.find('input'),
-                    scaledGroupMark       = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
+                    scaledGroupMark       = scale(
+                        $groupSummary,
+                        summateDescriptors($descriptorCheckboxes),
+                        getLetterGrades($groupSummary.find("[data-group-mark]"))
+                    );
 
                 $groupSummary.attr('data-scaled-mark', scaledGroupMark);
                 $groupSummary.attr('data-mark', scaledGroupMark);
@@ -385,7 +389,11 @@
                 groupSummarySelector  = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]',
                 $groupSummary         = $rb.find(groupSummarySelector),
                 $descriptorCheckboxes = $groupRows.find('input'),
-                scaledGroupMark       = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
+                scaledGroupMark       = scale(
+                    $groupSummary,
+                    summateDescriptors($descriptorCheckboxes),
+                    getLetterGrades($groupSummary.find("[data-group-mark]"))
+                );
 
             $groupSummary.attr('data-scaled-mark', scaledGroupMark);
             $groupSummary.attr('data-mark', scaledGroupMark);
@@ -393,7 +401,10 @@
 
             switch (markType) {
                 case 'letter':
-                    assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $gradeInput.val(scaledGroupMark));
+                    assignLetterGrade(
+                        getPercentage($groupSummary, $groupSummary.attr('data-mark')),
+                        $gradeInput.val(scaledGroupMark)
+                    );
                     break;
 
                 case 'percent':
@@ -531,15 +542,34 @@
             }
         }
 
-        // Scale an unscaled mark based on a group's max mark
-        function scale($groupSummary, value) {
+        /**
+         * Scale an unscaled mark based on a group's max mark.
+         *
+         * @param {Object} $groupSummary a jQuery object which stores the group
+         *                               max and row max sum as data attributes
+         * @param {Number} value         the value to scale, proportionate to
+         *                               the max value for the group
+         * @param {Array}  grades        if not empty: adjust the value to the
+         *                               raw value of the grade that this value
+         *                               is in
+         */
+        function scale($groupSummary, value, grades) {
             if (value === null) {
                 return null;
             }
 
-            var groupMax = $groupSummary.attr('data-max'),
+            let groupMax       = $groupSummary.attr('data-max'),
                 groupRowMaxSum = $groupSummary.attr('data-row-max-sum'),
                 scaledGroupSum;
+
+            // If there's grades: round up the value to the next highest grade
+            if (grades.length) {
+                let percent     = (value / groupRowMaxSum * 100),
+                    letterGrade = getGradeFromNumeric(percent, grades);
+                if (letterGrade.value !== null) {
+                    value = letterGrade.value / 100 * groupRowMaxSum;
+                }
+            }
 
             if (groupRowMaxSum > 0) {
                 scaledGroupSum = value * (groupMax / groupRowMaxSum);
