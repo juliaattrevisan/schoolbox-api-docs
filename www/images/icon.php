@@ -16,7 +16,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 
-$path = '/images/core/icons/activity-icons-64x64px.png';
+$path = '/resources/images/icons/activity-icons-64x64px.png';
 
 $icon = isset($_GET['icon']) ? $_GET['icon'] : '';
 $size = isset($_GET['size']) ? $_GET['size'] : 32;
@@ -28,7 +28,7 @@ $size = str_replace('square', '', $size);
 try {
     $transform      = (new Image\Transformation\Icon())->retrieve($icon, $size);
     $cache_key      = "$icon-$size";
-    $imageProcessor = new Image\Processor(LocalFS::getStorageModel(WEB_root, $path), $cache_key, $transform);
+    $imageProcessor = new Image\Processor(LocalFS::getStorageModel(SITE_root, $path), $cache_key, $transform);
     $imageProcessor->load()->stream();
 } catch (Exception $e) {
 //  echo $e;
