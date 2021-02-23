@@ -325,7 +325,7 @@ class Builder implements BuilderInterface
 			$check = array('title', 'icon', 'namespace', 'href');
 
 			foreach($check as $prop) {
-				if(!(trim($this->$prop))) {
+				if(!(trim($this->$prop ?? ''))) {
 					throw new InvalidArgumentException(ucfirst($prop)." has not been set");
 				}
 			}
