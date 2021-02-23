@@ -143,7 +143,7 @@ module.exports = {
             '@schoolboxCalendarEvent': path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue"),
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
             '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue'),
-            '@shared': path.resolve(__dirname, 'www/javascript/shared'),
+            '@shared': path.resolve(__dirname, 'www-static/javascript/shared'),
         },
         extensions: ['*', '.js', '.vue', '.json']
     },
