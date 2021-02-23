@@ -74,7 +74,7 @@ class ConflictingExternalIds
 
         /* Process each current student, and their parents too
          */
-        $students = $this->api[Endpoint\DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
+        $students = $this->api[Endpoint\DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getdddStudents', [
             'currentstatus' => 'current'
         ]);
 

@@ -38,6 +38,23 @@ class Api implements IApi
 
 
     /**
+     * Number of seconds to take a nap before retrying a failed endpoint
+     *
+     * Sometimes tass endpoints fail for no obvious reason and trying again seems
+     * to work - instead of doing it manually, try insisting programmatically
+     * waiting NAP_TIMEOUT seconds between each attempt
+     */
+    private const NAP_TIMEOUT = 3;
+
+
+    /**
+     * Number of times to retry after having NAP_TIMEOUT seconds' rest before
+     * finally giving up
+     */
+    private const NUM_RETRY = 3;
+
+
+    /**
      * The host server
      *
      * @var string
@@ -178,48 +195,71 @@ class Api implements IApi
             'v'       => self::VERSION_NUMBER,
         ];
 
-        $response = $this->client->get($this->host, [
-            'query' => $queryArgs
-        ]);
-
-        /* Successful response from server, but it might not send a valid data payload back
-         * so try to decode it. If it can't decode properly, return null
-         */
-        if ((int)$response->getStatusCode() === 200) {
-            return json_decode($response->getBody()->getContents(), true);
-        }
-
         /* Mine out an error message if you try to access a thing that doesn't exist
          */
-        if ($response) {
+        $fails = 0;
 
-            /* Some schools intermittently report a Bad Endpoint in a non-repeating fashion
-             * Sometimes a guy will succeed, sometimes he won't; there's no particular pattern
-             * just by looking at the log itself. In this circumstance, base64 the payload we
-             * tried to use, then pop it into the explorer to see what happened and to replay
-             * the access attempt
+        /* Try multiple times in case tass dies for a random reason
+         */
+        while ($fails < self::NUM_RETRY) {
+            $response = $this->client->get($this->host, [
+                'query' => $queryArgs
+            ]);
+
+            /* Successful response from server, but it might not send a valid data payload back
+             * so try to decode it. If it can't decode properly, return null
              */
-            throw new RuntimeException(sprintf(
-                'Bad endpoint %s: %s %s. Payload: %s',
-                $method,
-                $response->getStatusCode(),
-                $response->getReasonPhrase(),
-                (new BrokenPayloadCodec())->encode([
+            if ((int)$response->getStatusCode() === 200) {
+                return json_decode($response->getBody()->getContents(), true);
+            }
 
-                    /* Enables a retry from a shantytown ui
-                     */
-                    'module' => $this->module,
+            /* We got a response but it's broken
+             * Take a little nap before trying again
+             * (We suspect that it might be timing related, or network traffic)
+             */
+            if ($response) {
+                $fails++;
 
-                    /* These were requested by suds
-                     */
-                    'method' => $method,
-                    'params' => $params,
+                sleep(self::NAP_TIMEOUT);
+            }
 
-                    /* This was generated and sent to tass
-                     */
-                    'queryArgs' => $queryArgs
-                ])
-            ));
+            /* We tried multiple times and failed multiple times
+             * This might as well have died
+             *
+             * Exit by throwing exception like we normally would have done
+             * otherwise we'll get stuck in an infinite loop and pound the api
+             */
+            if ($fails >= self::NUM_RETRY) {
+
+                /* Some schools intermittently report a Bad Endpoint in a non-repeating fashion
+                 * Sometimes a guy will succeed, sometimes he won't; there's no particular pattern
+                 * just by looking at the log itself. In this circumstance, base64 the payload we
+                 * tried to use, then pop it into the explorer to see what happened and to replay
+                 * the access attempt
+                 */
+                throw new RuntimeException(sprintf(
+                    'Bad endpoint %s: %s %s after %s retries. Payload: %s',
+                    $method,
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase(),
+                    self::NUM_RETRY,
+                    (new BrokenPayloadCodec())->encode([
+
+                        /* Enables a retry from a shantytown ui
+                         */
+                        'module' => $this->module,
+
+                        /* These were requested by suds
+                         */
+                        'method' => $method,
+                        'params' => $params,
+
+                        /* This was generated and sent to tass
+                         */
+                        'queryArgs' => $queryArgs
+                    ])
+                ));
+            }
         }
 
         /* Couldn't decode json, or tass server refused something, or something else died
