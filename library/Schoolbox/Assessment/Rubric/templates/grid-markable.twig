@@ -224,17 +224,17 @@
 
         // Update the per-capability and overall marks when descriptor selection is changed
         $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
-            let $changed        = $(this),
-                groupId         = $changed.attr('data-rubric-group'),
-                rubricId        = $changed.attr('data-rubric'),
-                rowSelector     = '[data-group="rb-' + rubricId + '-' + groupId + '"]',
-                $groupRows      = $(rowSelector),
-                rubricTotalMark = null;
+            let $changed             = $(this),
+                groupId              = $changed.attr('data-rubric-group'),
+                rubricId             = $changed.attr('data-rubric'),
+                rowSelector          = '[data-group="rb-' + rubricId + '-' + groupId + '"]',
+                $groupRows           = $(rowSelector),
+                groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]',
+                $groupSummary        = $rb.find(groupSummarySelector),
+                rubricTotalMark      = null;
 
             if ($groupRows.length) {
-                let groupSummarySelector  = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]',
-                    $groupSummary         = $rb.find(groupSummarySelector),
-                    $descriptorCheckboxes = $groupRows.find('input'),
+                let $descriptorCheckboxes = $groupRows.find('input'),
                     letterGrades          = getLetterGrades($groupSummary.find("[data-group-mark]")),
                     scaledGroupMark       = scale(
                         $groupSummary,
@@ -294,8 +294,8 @@
 
                 rubricTotalMark = getTotalMark();
             }
-            var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
-            var rubricSummary = $rb.find(rubricSummarySelector);
+            let rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]',
+                rubricSummary         = $rb.find(rubricSummarySelector);
             rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
             // Only update the overall mark if we haven't customised the cap mark
