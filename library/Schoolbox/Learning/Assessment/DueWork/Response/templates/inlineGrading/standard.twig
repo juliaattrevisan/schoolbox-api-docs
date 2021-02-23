@@ -235,7 +235,11 @@ Usage:
                                                             </a>
                                                             {% endif %}
                                                         </div>
+                                                        {% if selfAssessmentFeedback.comment|length %}
                                                         <article>{{ selfAssessmentFeedback.comment|nl2br }}</article>
+                                                        {% else %}
+                                                        <article><em>Nothing submitted</em></article>
+                                                        {% endif %}
                                                     </li>
                                                 </ul>
                                             </li>
