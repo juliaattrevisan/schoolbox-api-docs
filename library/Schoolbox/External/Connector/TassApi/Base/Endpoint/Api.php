@@ -221,6 +221,11 @@ class Api implements IApi
                 $fails++;
 
                 sleep(self::NAP_TIMEOUT);
+            } else {
+
+                /* Couldn't decode json, or tass server refused something, or something else died
+                 */
+                throw new DomainException('Could not access Tass server, or bad json payload returned.');
             }
 
             /* We tried multiple times and failed multiple times
@@ -262,9 +267,7 @@ class Api implements IApi
             }
         }
 
-        /* Couldn't decode json, or tass server refused something, or something else died
-         */
-        throw new DomainException('Could not access Tass server, or bad json payload returned.');
+        return null;
     }
 
 
