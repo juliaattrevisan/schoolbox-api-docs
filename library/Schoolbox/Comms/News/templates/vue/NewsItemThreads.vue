@@ -5,7 +5,6 @@ import moment from 'moment';
 import axios from 'axios';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
-import { fetchAsJson } from '@shared/fetch/fetch';
 
 export default {
 
@@ -22,6 +21,7 @@ export default {
         isThreadEnabledOnLoad: Boolean,
         isPublished: Boolean,
         createThreadEndpoint: String,
+        siteVersion: String //for cache busting
     },
 
     data: function() {
@@ -32,7 +32,6 @@ export default {
             isThreadCheckboxVisible: undefined,
             isThreadCheckboxEnabled: undefined,
             isThreadEnabled: undefined,
-            showSkeletonLoader: true,
             showLoadMoreButton: false,
             commentIndexToDelete: undefined,
             confirmDeleteButton: true,
@@ -43,29 +42,8 @@ export default {
             postHeaders: {
                 'X-Requested-With' : 'XMLHttpRequest'
             },
-            editorUrl: "/javascript/ckeditor/ckeditor.js",
             isCKEditorLoading: false,
-            isCKEditorLoaded: false,
-            isCKEditorReady: false,
-            ckeditorConfig: {
-                embed_provider: '//iframe.ly/api/oembed?url={url}&callback={callback}&api_key=94aa8fc28ac1089a2dfb28',
-                removePlugins: 'uploadimage,link,schoolboxanchor',
-                removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
-                toolbarGroups: [
-                    {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                    {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                    {name: 'links', groups: ['links']},
-                    {name: 'insert', groups: ['insert']},
-                    {name: 'schoolbox', groups: ['schoolboxlink']}
-                ],
-                contentsCss: [
-                    '/css/core/skin.css.php',
-                    '/css/core/editor.css',
-                ],
-                height: '4rem',
-                startupFocus: true
-            }
-
+            isCKEditorLoaded: false
         }
     },
 
@@ -106,10 +84,11 @@ export default {
          */
         getThread () {
 
+            this.isProcessActive = true;
+
             // Short-circuit if no thread ID
             if (!this.threadId) {
                 this.isProcessActive = false;
-                this.showSkeletonLoader = false;
                 this.showCommentsSection = this.isThreadCheckboxVisible;
                 return;
             }
@@ -130,8 +109,6 @@ export default {
                 this.totalCommentsCount = responseData.metadata.count;
                 this.cursorNext = responseData.metadata.cursor.next;
 
-                this.showSkeletonLoader = false; // Hide skeleton loader once the request is done
-
                 /**
                  * TODO: Maybe the API should return a metadata that will let the front-end know if there's still
                  * a next page to render rather than comparing the value of the length of array and the comment's total count?
@@ -147,7 +124,7 @@ export default {
                 this.showCommentsSection = (this.isThreadCheckboxVisible || this.totalCommentsCount > 0 || this.isThreadEnabled);
                 
             }).catch((error) => {
-                this.showSkeletonLoader = false;
+                this.isInitialLoad = false;
                 this.$refs.toast.activate('Unable to load comments');
                 this.$refs.toast.timeout('Unable to load comments', false);
             }).finally(() => {
@@ -168,6 +145,7 @@ export default {
                     }
                     this.isInitialLoad = false;
                 }
+                this.isProcessActive = false;
             });
         },
 
@@ -221,7 +199,6 @@ export default {
             this.$refs.toast.activate('Saving...');
             changeThreadStatusAction
                 .then(() => {
-                    // this.loadCkEditor();
                     this.$refs.toast.timeout('Saved', true);
                 })
                 .catch((error) => {
@@ -235,30 +212,63 @@ export default {
          *
          */
         loadCKEditor () {
-            
-            //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
-            this.isCKEditorLoading = true;
 
-            //file is referenced from /javascript/components/ckeditor4-vue.bundle.js according to the publicPath and filename props within output in webpack.config.js
-            //see https://webpack.js.org/guides/code-splitting/ and https://webpack.js.org/guides/public-path/ (code-splitting) for further details
-            import(/* webpackChunkName: "ckeditor4-vue" */ 'ckeditor4-vue')
-                .then(({ default: CKEditor }) => {
-                    Vue.component('ckeditor', CKEditor.component); //register the component for use once ready
-                    this.isCKEditorLoaded = true;
-                })
-                .catch(err => {
+            //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
+            this.isCKEditorLoading = true;    
+
+            const loadScripts = async () => {
+                
+                try {
+
+                    await this.injectScript('/javascript/ckeditor/ckeditor.js?v=' + this.siteVersion);
+                    await this.injectScript('/javascript/shared/editor/jquery.editor.js?v=' + this.siteVersion);
+                    
+                    $.fn.alaressEditor({
+                        targetElements: $('#comment'),
+                        startupFocus: true,
+                        height: '8rem',
+                        removePlugins: 'uploadimage,link,schoolboxanchor',
+                        removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+                        toolbarGroups: [
+                            {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                            {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
+                            {name: 'links', groups: ['links']},
+                            {name: 'insert', groups: ['insert']},
+                            {name: 'schoolbox', groups: ['schoolboxlink']}
+                        ],
+                        on: {
+                            change: (event) => {
+                                this.newComment = CKEDITOR.instances['comment'].getData(); // Bind the content of CKEditor into the comment model on change
+                            },
+                            instanceReady: (event) => { //can display the loaded CKEditor now
+                                this.isCKEditorLoading = false;
+                                this.isCKEditorLoaded = true;
+                            }
+                        }
+                    });
+
+                } catch (error) {
                     this.$refs.toast.timeout('Loading comments failed', false, 5000);
-                });
+	            }
+            }
+
+            loadScripts();
 
         },
 
         /**
-         * Once CKEditor is ready, we can display it and hide the prompt button
-         * 
+         * Async inject a <script> tag into the DOM
+         * https://stackoverflow.com/a/39008859
+         *
          */
-        onCKEditorReady (event) {
-            this.isCKEditorReady = true;
-            this.isCKEditorLoading = false;
+        injectScript (src) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.addEventListener('load', resolve);
+                script.addEventListener('error', e => reject(e.error));
+                document.head.appendChild(script);
+            });
         },
 
         /**
@@ -283,11 +293,20 @@ export default {
                 });
             });
 
-            // Need to add this here. Not really sure why this doesn't get executed when setTimeout is not present...
-            setTimeout(function() {
-                $.fn.schoolboxResource_InitialiseMediaElementPlayer('#threads-section');
-            }, 100);
+            this.initMediaElementPlayers();    
+            
+        },
 
+        /**
+         * to ensure media elements are available after Vue has updated the DOM
+         * https://vuejs.org/v2/api/#Vue-nextTick
+         *
+         */
+        initMediaElementPlayers () {
+            Vue.nextTick()
+            .then(() => {
+                $.fn.schoolboxResource_InitialiseMediaElementPlayer('#threads-section');
+            });
         },
 
         /**
@@ -297,30 +316,27 @@ export default {
         postComment () {
             
             this.isProcessActive = true;
-
             this.$refs.toast.activate('Posting comment...');
 
             // TODO don't construct this endpoint manually
             axios.post('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments', {
                 content: this.newComment
             }).then((response) => {
-
-                let responseData = response.data;
                
                 this.comments.unshift(response.data);
                 this.totalCommentsCount++;
 
-                this.$refs.toast.timeout('Comment has been added', true);
-                
                 this.newComment = '';
+                CKEDITOR.instances['comment'].setData(this.newComment); //clear out the CKEditor for another possible post
 
-                this.isProcessActive = false;
+                this.$refs.toast.timeout('Comment has been added', true);
 
             }).catch((error) => {
-                this.$refs.toast.timeout('Unable to post comment', false);
                 this.isProcessActive = false;
+                this.$refs.toast.timeout('Unable to post comment', false);
             }).finally(() => {
                 this.reInitialiseMediaPlayer();
+                this.isProcessActive = false;
             });
 
         },
@@ -345,10 +361,9 @@ export default {
         deleteComment () {
             
             this.isProcessActive = true;
+            this.$refs.toast.activate('Deleting comment...');
 
             const commentIdToDelete = this.comments[this.commentIndexToDelete].id;
-
-            this.$refs.toast.activate('Deleting comment...');
 
             // TODO don't construct this endpoint manually
             axios.delete('/discussion/comms/' + this.articleId + '/comments/' + commentIdToDelete, {}, { headers: this.postHeaders }).then(() => {
@@ -356,24 +371,21 @@ export default {
                 this.comments.splice(this.commentIndexToDelete, 1);
                 this.totalCommentsCount--;
 
-                this.$refs.toast.timeout('Comment deleted', true);
-
                 // Automatically trigger show previous comments to show the next set of records when the list has gone down to 0
                 if (this.comments.length < 1 && this.totalCommentsCount > 0) {
                     this.getThread();
                 }
 
-                setTimeout(function() {
-                    $.fn.schoolboxResource_InitialiseMediaElementPlayer($('#threads-section'));
-                }, 300);
+                this.initMediaElementPlayers();
 
                 this.$refs.deleteModal.close();
-
+                
+                this.$refs.toast.timeout('Comment deleted', true);
                 this.isProcessActive = false;
 
             }).catch((error) => {
-                this.isProcessActive = false;
                 this.$refs.toast.timeout('Unable to delete comment', false);
+                this.isProcessActive = false;
             });
 
         }
@@ -398,78 +410,82 @@ export default {
             <div class="discussion-threads">
                 <div class="row">
                     <div class="small-6 columns">
-                        <h2>Comments <span v-if="!showSkeletonLoader">({{ totalCommentsCount }})</span></h2>
+                        <h2>Comments <span v-if="!isInitialLoad">({{ totalCommentsCount }})</span></h2>
                     </div>
-                    <div v-if="isThreadCheckboxVisible" class="checklist small-6 columns">
+                    <div v-if="!isInitialLoad && isThreadCheckboxVisible" class="checklist small-6 columns">
                         <input id="allow-comments" name="allowComments" type="checkbox" @click="changeThreadStatus" v-model="isThreadCheckboxEnabled" />
                         <label for="allow-comments">Allow comments</label>
                     </div>
                 </div>
-                <div v-if="isThreadEnabled">
-                    <div v-if="isPublished">
-                        <button class="btn-show-ckeditor" v-show="!isCKEditorReady" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
-                        <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
-                        <div v-if="isCKEditorLoaded" :style="[isCKEditorReady ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
-                            <ckeditor tag-name="textarea" v-model="newComment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="isProcessActive"></ckeditor>
-                            <a class="button submit"
-                            @click="postComment"
-                            :disabled="newComment.trim() === '' || isProcessActive">Post Comment</a>
+                <div v-if="!isInitialLoad">
+                    <div v-show="isThreadEnabled">
+                        <div v-if="isPublished">
+                            <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
+                            <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
+                            <div :style="[isCKEditorLoaded ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
+                                <textarea id="comment" name="comment" rows="5"></textarea>
+                                <a class="button submit"
+                                    @click="postComment"
+                                    :disabled="newComment.trim() === '' || isProcessActive">Post Comment</a>
+                            </div>
+                        </div>
+                        <div v-else>
+                            <div data-alert="" class="alert-box">
+                                <span class="icon-locked">Comments will be available once this article is published.</span>
+                            </div>
                         </div>
                     </div>
-                    <div v-else>
+                    <div v-show="!isThreadEnabled">
                         <div data-alert="" class="alert-box">
-                            <span class="icon-locked">Comments will be available once this article is published.</span>
+                            <span class="icon-locked">Comments are currently disabled for this article.</span>
                         </div>
                     </div>
+                </div>
+                <div v-if="isInitialLoad">
+                    <ul class="information-list social-stream">
+                        <li class="actions-small-1" v-for="n in 3" :key="n">
+                            <div class="list-item">
+                                <div class="small-12 card skeleton">
+                                    <div class="img"></div>
+                                    <h3></h3>
+                                    <p class="meta"></p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
                 <div v-else>
-                    <div data-alert="" class="alert-box">
-                        <span class="icon-locked">Comments are currently disabled for this article.</span>
-                    </div>
+                    <ul class="information-list social-stream">
+                        <li class="actions-small-2" v-for="(comment, index) in comments" :key="index">
+                            <div class="list-item">
+                                <div class="card compact small-12">
+                                    <a :href="'/search/user/' + comment.author.id" title="View Profile">
+                                        <img :src="'/portrait.php?id=' + comment.author.id + '&size=square64'">
+                                        <p class="" meta>
+                                            {{ comment.author.fullName }}
+                                            <span class="pipe meta" :title="comment.createdAt | fullString ">Posted {{ comment.createdAt | fromNow }}</span>
+                                        </p>
+                                    </a>
+                                </div>
+                            </div>
+                            <nav>
+                                <a v-if="comment._links.delete.auth" @click.prevent="showDeleteModal(index)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
+                            </nav>
+                            <article v-html="comment.content"></article>
+                        </li>
+                    </ul>
+                    <a v-if="showLoadMoreButton" @click="getThread" class="button expand" :disabled="isProcessActive">Show older comments</a>
                 </div>
-                <ul v-if="showSkeletonLoader" class="information-list social-stream">
-                    <li class="actions-small-1" v-for="n in 3" :key="n">
-                        <div class="list-item">
-                            <div class="small-12 card skeleton">
-                                <div class="img"></div>
-                                <h3></h3>
-                                <p class="meta"></p>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-                <ul v-else class="information-list social-stream">
-                    <li class="actions-small-2" v-for="(comment, index) in comments" :key="index">
-                        <div class="list-item">
-                            <div class="card compact small-12">
-                                <a :href="'/search/user/' + comment.author.id" title="View Profile">
-                                    <img :src="'/portrait.php?id=' + comment.author.id + '&size=square64'">
-                                    <p class="" meta>
-                                        {{ comment.author.fullName }}
-                                        <span class="pipe meta" :title="comment.createdAt | fullString ">Posted {{ comment.createdAt | fromNow }}</span>
-                                    </p>
-                                </a>
-                            </div>
-                        </div>
-                        <nav>
-                            <a v-if="comment._links.delete.auth" @click.prevent="showDeleteModal(index)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
-                        </nav>
-                        <article v-html="comment.content"></article>
-                    </li>
-                </ul>
-                <a v-if="showLoadMoreButton" @click="getThread" class="button expand" :disabled="isProcessActive">Show older comments</a>
             </div>
         </section>
         <toast ref="toast"></toast>
         <reveal-modal ref="deleteModal">
-            <template>
-                <h2>Please confirm</h2>
-                <p>Are you sure you want to delete this comment?</p>
-                <ul class="flex-list buttons">
-                    <li><a @click.prevent="deleteComment" class="button submit" :disabled="isProcessActive">Yes</a></li>
-                    <li><a @click.prevent="$refs.deleteModal.close" class="button" :disabled="isProcessActive">No</a></li>
-                </ul>
-            </template>
+            <h2>Please confirm</h2>
+            <p>Are you sure you want to delete this comment?</p>
+            <ul class="flex-list buttons">
+                <li><a @click.prevent="deleteComment" class="button submit" :disabled="isProcessActive">Yes</a></li>
+                <li><a @click.prevent="$refs.deleteModal.close" class="button" :disabled="isProcessActive">No</a></li>
+            </ul>
         </reveal-modal>
     </div>
 </template>
