@@ -160,16 +160,22 @@
          * To notify the user they haven't added any comments
          */
         const emptyDialog = $('#empty-dialog');
+        let commentBox; //to set focus when closing the No comment modal window
+        emptyDialog.on('click', '[data-interaction="enable"]', function (event) {
+            event.preventDefault();
+            publishFeedback('[data-draft="publish"]');
+        });
         emptyDialog.on('click', '[data-interaction="close"]', function (event) {
             event.preventDefault();
             emptyDialog.foundation('reveal', 'close');
+            commentBox.focus();
         });
 
         /**
-         * To prevent an empty submission
+         * To check for an empty submission
          */
         function isCommentsEmpty(commentBoxId) {
-            const commentBox = document.querySelector('#' + commentBoxId);
+            commentBox = document.querySelector('#' + commentBoxId);
             if (commentBox.value === "") {
                 return true;
             } else {
@@ -177,97 +183,118 @@
             }
         }
 
-
         /**
          * Set up actions to occur when Publishing Feedback
          */
         function setupPublishAction() {
-            $(config.assessmentList).on('mousedown click', '[data-draft="publish"]', function (e) {
-                e.preventDefault();
 
+            $(config.assessmentList).on('mousedown click', '[data-draft="publish"]', function (e) {
+                
+                e.preventDefault();
+                
                 var $participant = findParticipantElement($(this)),
-                    $form        = $participant.find('[data-feedback-form]'),
-                    $actionBar   = $participant.find('[data-action-bar]'),
-                    $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
-                    $btnPublish  = $actionBar.find('[data-draft=publish]'),
                     participantId = $participant.data('participant'),
                     commentBoxId = "comment-" + participantId;
-                
-                if (isCommentsEmpty(commentBoxId)) {
+
+                if (isCommentsEmpty(commentBoxId) && this.hasAttribute('data-has-empty-check')) {
                     emptyDialog.foundation('reveal', 'open');
                     return;
                 }
-                
-                // We can safely clear this timeout now that we're publishing
-                window.clearTimeout(commentBoxTimeouts[commentBoxId]);
 
-                $btnPublish.attr('disabled', 'disabled').text(config.publishingText);
+                publishFeedback(this);
 
-                $(config.formSaveLabel).toastActivate({
-                    text: config.publishingText
-                });
-
-                // Publish submits everything
-                var formData             = $form.serializeArray(),
-                    resubmissionRequired = $form.find('[name="resubmissionRequired"]').prop('checked');
-                formData.push({name: 'publish', value: 1});
-
-                config.onPrePublishCallback(participantId, formData);
-
-                $.ajax($form.attr('action'), {
-                    dataType: 'json',
-                    data:     formData,
-                    type:     'post'
-                }).done(function (response) {
-                    // Have we inserted feedback meta message into action bar ?
-                    if ($actionBar.find('[data-feedback-attach-info]').length) {
-                        $btnPublish.text(config.publishText).addClass('hide');
-                        $btnDrafted.text('');
-                    } else {
-                        $actionBar.slideUp(function () {
-                            $btnPublish.text(config.publishText);
-                            $btnDrafted.text('');
-                        });
-                    }
-
-                    // Update this participant's status:
-                    // need to be able to differentiate between reviewed and resubmit required somehow
-                    var status = resubmissionRequired ? config.statusResubmissionRequired : config.statusReviewed,
-                        title  = resubmissionRequired ? config.resubmissionRequiredText   : config.reviewedText;
-                    $participant.attr('data-status', status);
-
-                    // Update the icon
-                    $participant.find('[data-status]')
-                        .removeClass(config.statusPending)
-                        .removeClass(config.statusIncomplete)
-                        .removeClass(config.statusReviewed)
-                        .removeClass(config.statusResubmissionRequired)
-                        .addClass(status)
-                        .attr('title', title);
-
-                    // Update the text
-                    $participant.find('[data-status-label]').html(title);
-
-                    // Ensure the 'display reviewed' filter is ON
-                    $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
-
-                    // Store that this has been published in a data var, so that component info msg
-                    // can be deleted if needed on new feedback creation
-                    $actionBar.attr('data-published', '');
-
-                    toast.call($participant, config.publishedText, true, false);
-                    config.onPublishCallback(
-                        participantId,
-                        response.success,
-                        response.message,
-                        response.id
-                    );
-
-                }).fail(function (xhr) {
-                    toast.call($participant, xhr.responseText, false, false);
-                    $btnPublish.removeAttr('disabled').text(config.publishText);
-                });
             });
+
+        }
+
+        /**
+         * Publish the feedback
+         * 
+         * @param selectedButton - with either be [data-draft="publish"] through 'this' or target directly when within the confirm empty comment modal
+         * 
+         */
+        function publishFeedback (selectedButton) {
+            
+            var $participant = findParticipantElement($(selectedButton)),
+                $form = $participant.find('[data-feedback-form]'),
+                $actionBar = $participant.find('[data-action-bar]'),
+                $btnDrafted = $actionBar.find('[data-draft=drafted]'),
+                $btnPublish = $actionBar.find('[data-draft=publish]'),
+                participantId = $participant.data('participant'),
+                commentBoxId = "comment-" + participantId;
+            
+            // We can safely clear this timeout now that we're publishing
+            window.clearTimeout(commentBoxTimeouts[commentBoxId]);
+
+            $btnPublish.attr('disabled', 'disabled').text(config.publishingText);
+
+            $(config.formSaveLabel).toastActivate({
+                text: config.publishingText
+            });
+
+            // Publish submits everything
+            var formData             = $form.serializeArray(),
+                resubmissionRequired = $form.find('[name="resubmissionRequired"]').prop('checked');
+            formData.push({name: 'publish', value: 1});
+
+            // debugger;
+
+            config.onPrePublishCallback(participantId, formData);
+
+            $.ajax($form.attr('action'), {
+                dataType: 'json',
+                data:     formData,
+                type:     'post'
+            }).done(function (response) {
+                // Have we inserted feedback meta message into action bar ?
+                if ($actionBar.find('[data-feedback-attach-info]').length) {
+                    $btnPublish.text(config.publishText).addClass('hide');
+                    $btnDrafted.text('');
+                } else {
+                    $actionBar.slideUp(function () {
+                        $btnPublish.text(config.publishText);
+                        $btnDrafted.text('');
+                    });
+                }
+
+                // Update this participant's status:
+                // need to be able to differentiate between reviewed and resubmit required somehow
+                var status = resubmissionRequired ? config.statusResubmissionRequired : config.statusReviewed,
+                    title  = resubmissionRequired ? config.resubmissionRequiredText   : config.reviewedText;
+                $participant.attr('data-status', status);
+
+                // Update the icon
+                $participant.find('[data-status]')
+                    .removeClass(config.statusPending)
+                    .removeClass(config.statusIncomplete)
+                    .removeClass(config.statusReviewed)
+                    .removeClass(config.statusResubmissionRequired)
+                    .addClass(status)
+                    .attr('title', title);
+
+                // Update the text
+                $participant.find('[data-status-label]').html(title);
+
+                // Ensure the 'display reviewed' filter is ON
+                $(config.filters).find('[data-status="reviewed"]').prop('checked', true);
+
+                // Store that this has been published in a data var, so that component info msg
+                // can be deleted if needed on new feedback creation
+                $actionBar.attr('data-published', '');
+
+                toast.call($participant, config.publishedText, true, false);
+                config.onPublishCallback(
+                    participantId,
+                    response.success,
+                    response.message,
+                    response.id
+                );
+
+            }).fail(function (xhr) {
+                toast.call($participant, xhr.responseText, false, false);
+                $btnPublish.removeAttr('disabled').text(config.publishText);
+            });
+
         }
 
         /**

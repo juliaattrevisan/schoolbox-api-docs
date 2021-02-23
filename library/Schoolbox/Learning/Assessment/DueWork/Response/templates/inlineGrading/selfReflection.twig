@@ -112,11 +112,14 @@
         {% set buttons %}
             <span class="button disabled" data-draft="drafted" title="Saved as draft" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
             {% if not readonly %}
-                <a class="button" data-draft="publish"></a>
+                <a class="button" data-draft="publish" data-has-empty-check="true"></a>
                 <div id="empty-dialog" class="reveal-modal" data-reveal role="dialog">
-                    <h2 id="empty-dialog-title">Nothing To Submit</h2>
-                    <p>You haven't added your self-reflection yet.</p>
-                    <a class="button full-width" data-interaction="close">OK</a>
+                    <h2 id="empty-dialog-title">No comment added</h2>
+                    <p>Are you sure you wish to submit your self-reflection without a comment?</p>
+                    <ul class="flex-list buttons">
+                        <li><a class="button submit" data-interaction="enable">Yes</a></li>
+                        <li><a class="button" data-interaction="close">No</a></li>
+                    </ul>
                     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
                 </div>
             {% endif %}
