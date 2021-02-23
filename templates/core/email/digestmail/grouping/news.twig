@@ -2,19 +2,18 @@
 
 {% block image %}
     {% set msg = row.messages | first %}
-    {# <img src="{{ msg.icon }}" width="64" height="64" /> #}
-    <img src="/storage/image.php?hash=691a0e7b86d7fc181e0f841e5ef3e129825defb1&amp;size=constrain200" />
+    {% if msg.meta.thumb %}
+    <img src="{{ msg.meta.thumb }}" />
+    {% endif %}
 {% endblock %}
 
 {% block pretty %}
     {% set msg = row.messages | first %}
     {% if msg.meta.title %}
-        {# use the meta title if possible, it looks nicer #}
-        {# Blurb only? show no link #}
-        {% if msg.meta.body|length %}
-            <a href="{{ msg.href }}" class="title">{{ msg.meta.title }}</a>
-        {% else %}
+        {% if config.read_more | length %}
             <span class="title">{{ msg.meta.title }}</span>
+        {% else %}
+            <a href="{{ msg.href }}" class="title">{{ msg.meta.title }}</a>
         {% endif %}
     {% else %}
         {# raw HTML unable to be sanctioned or rejected - I don't know whether this could be HTML or not. #}
@@ -43,7 +42,9 @@
             {% else %}
             <p>{{ msg.meta.body | cutSentence(200, true) }}</p>
             {% endif %}
-            <a href="{{ msg.href }}" class="more" title="Read more">Read more</a>
+            {% if config.read_more | length %}
+            <a href="{{ msg.href }}" class="more">{{ config.read_more }}</a>
+            {% endif %}
         </td>
     </tr>
     {% endif %}
