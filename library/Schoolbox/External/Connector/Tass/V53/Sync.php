@@ -43,7 +43,7 @@ class Sync extends BaseSync implements ISync
      * @param bool $useCommRules
      * @return array
      */
-    private function getParentQuery(bool $useCommRules): array
+    public function getParentQuery(bool $useCommRules): array
     {
         /* If Tass Comm rules are enabled then locate the guardian relationship
          * from there as well
