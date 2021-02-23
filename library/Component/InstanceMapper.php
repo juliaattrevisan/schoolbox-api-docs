@@ -194,7 +194,8 @@ class Component_InstanceMapper extends BaseMapper
 
         $sql = $this->getSelectString() . "
 			WHERE       {$componentInstanceTable}.`module` = :module AND
-                        {$componentInstanceTable}.`identifier` = :identifier
+                        {$componentInstanceTable}.`identifier` = :identifier AND
+                        `cd`.`enabled` = 1
 			ORDER BY    {$componentInstanceTable}.`identifier` ASC,
 			            {$componentInstanceTable}.`position` ASC,
 			            {$componentInstanceTable}.`sequence` ASC
@@ -242,6 +243,7 @@ class Component_InstanceMapper extends BaseMapper
         $sql = $this->getSelectString() . "
             WHERE       {$componentInstanceTable}.`module` = :module AND
                         {$componentInstanceTable}.`identifier` = :identifier AND
+                        `cd`.`enabled` = 1 AND
                         `cd`.`class` = :class
             ORDER BY    {$componentInstanceTable}.`identifier` ASC,
                         {$componentInstanceTable}.`position` ASC,
