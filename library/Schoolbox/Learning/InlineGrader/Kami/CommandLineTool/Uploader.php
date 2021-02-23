@@ -17,6 +17,7 @@ use Proxy;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\MapperFactory;
+use Sentry\State\HubInterface;
 use Throwable;
 
 /**
@@ -97,12 +98,17 @@ class Uploader extends CliTool\App
             exit(0);
         }
 
+        $sentry = null;
+        if ($this->getDi()->has('sentry')) {
+            $sentry = $this->getDi()->get('sentry');
+        }
         $uploader = new Kami\Uploader(
             $dryRun,
             $connector,
             new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff),
             $kamiMapper,
-            $this->getLogger()
+            $this->getLogger(),
+            $sentry instanceof HubInterface ? $sentry : null,
         );
 
 

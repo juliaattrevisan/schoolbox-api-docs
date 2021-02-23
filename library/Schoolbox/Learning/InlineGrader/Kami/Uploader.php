@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
 use GuzzleHttp\Exception\ConnectException;
+use Sentry\State\HubInterface;
 
 /**
  * Uploads eligible student submission files into Kami and inserts the
@@ -40,28 +41,36 @@ class Uploader
     /** @var LoggerInterface */
     private $log;
 
+    /**
+     * The Sentry instance for reporting errors to, if there is one.
+     */
+    private ?HubInterface $sentry;
+
 
     /**
      * Build the uploader.
      *
-     * @param bool            $dryRun
-     * @param IConnector      $kamiConnector
-     * @param IJitter         $jitter
-     * @param Mapper          $kamiMapper
-     * @param LoggerInterface $log
+     * @param bool              $dryRun
+     * @param IConnector        $kamiConnector
+     * @param IJitter           $jitter
+     * @param Mapper            $kamiMapper
+     * @param LoggerInterface   $log
+     * @param HubInterface|null $sentry
      */
     public function __construct(
         bool $dryRun,
         IConnector $kamiConnector,
         IJitter $jitter,
         Mapper $kamiMapper,
-        LoggerInterface $log
+        LoggerInterface $log,
+        ?HubInterface $sentry
     ) {
         $this->dryRun        = $dryRun;
         $this->kamiConnector = $kamiConnector;
         $this->jitter        = $jitter;
         $this->kamiMapper    = $kamiMapper;
         $this->log           = $log;
+        $this->sentry        = $sentry;
     }
 
 
@@ -177,6 +186,11 @@ class Uploader
                         $kamiModel->getId(),
                         Model::STATUS_FAILED
                     ));
+
+                    // Log the fail in Sentry
+                    if ($this->sentry) {
+                        $this->sentry->captureException($lastException);
+                    }
 
                     if($lastException instanceof ConnectException){
                         $this->log->error('Network is down: aborting!');
