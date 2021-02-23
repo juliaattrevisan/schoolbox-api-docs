@@ -111,12 +111,12 @@ topMenu:
   hide:
     - /fixtures
     - /pastoral
+    - /eportfolio
   show:
     - /learning/pending
     - /learning/due
     - /learning/grades
     - /course/list
-    - /eportfolio
 components:
   hide:
    - Schoolbox\Weather\Component\Dashboard\Controller
