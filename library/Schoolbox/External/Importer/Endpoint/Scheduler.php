@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint;
 
+use Alaress\Database\Connector\IConnector;
 use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -29,6 +30,12 @@ class Scheduler
     public const HOURLY = 'hourly';
     public const TWICE_DAILY = 'twiceDaily';
     public const DAILY = 'daily';
+
+
+    /**
+     * @var IConnector
+     */
+    private $db;
 
 
     /**
@@ -69,14 +76,16 @@ class Scheduler
     /**
      * Scheduler constructor.
      *
+     * @param IConnector      $db
      * @param string          $frequency
      * @param Factory         $factory
      * @param string          $type
      * @param string|null     $file
      * @param LoggerInterface $logger
      */
-    public function __construct(string $frequency, Factory $factory, string $type, ?string $file, LoggerInterface $logger)
+    public function __construct(IConnector $db, string $frequency, Factory $factory, string $type, ?string $file, LoggerInterface $logger)
     {
+        $this->db = $db;
         $this->frequency = $frequency;
         $this->factory = $factory;
         $this->type = $type;
@@ -108,11 +117,29 @@ class Scheduler
             }
 
             try {
+                $this->logger->debug(sprintf(
+                    'Beginning transaction'
+                ));
+
+                $this->db->beginTransaction();
+
                 foreach ($composites as $composite) {
                     $composite->import();
                 }
+
+                $this->logger->debug(sprintf(
+                    'Committing transaction'
+                ));
+
+                $this->db->commit();
             } catch (RuntimeException $e) {
                 $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
+
+                $this->logger->debug(sprintf(
+                    'Rollback transaction'
+                ));
+
+                $this->db->rollBack();
             }
         }
     }
