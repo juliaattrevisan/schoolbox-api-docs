@@ -192,7 +192,7 @@
                     // Compare letter grades by their string value (easier since we're dealing with brackets)
 
                     var grades = getLetterGrades($this);
-                    customMark = getLetterGradeFromNumeric($this.find("[data-group-mark]").val(), grades);
+                    customMark = getGradeFromNumeric($this.find("[data-group-mark]").val(), grades).letter;
                     if (displayedMark !== customMark) {
                         markIsDifferent = true;
                     }
@@ -243,8 +243,12 @@
                 // Update button text with mark calculated from descriptors
                 switch (markType) {
                     case 'letter':
-                        var grades = getLetterGrades($groupSummary.find("[data-group-mark]"));
-                        $groupSummary.find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($groupSummary, $groupSummary.attr('data-mark')), grades));
+                        let grades       = getLetterGrades($groupSummary.find("[data-group-mark]")),
+                            currentGrade = getGradeFromNumeric(getPercentage($groupSummary, $groupSummary.attr('data-mark')), grades);
+
+                        // scaledGroupMark needs to be rounded to the nearest value in grades
+                        $groupSummary.find("[data-group-descriptor-sum]").text(currentGrade.letter);
+
                         break;
 
                     case 'percent':
@@ -317,7 +321,12 @@
             var customMark = $changed.val();
 
             if ($groupSummary.length) {
-                var normalisedMark = getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum'), $groupSummary.attr('data-max'));
+                var normalisedMark = getNormalisedCustomMark(
+                    $groupRows,
+                    customMark,
+                    $groupSummary.attr('data-row-max-sum'),
+                    $groupSummary.attr('data-max')
+                );
                 $groupSummary.attr('data-scaled-mark', normalisedMark);
                 $groupSummary.attr('data-mark', normalisedMark);
                 $groupSummary.find('[data-db-mark]').val(normalisedMark);
@@ -335,7 +344,8 @@
             disableEnableAssignFromDescs();
         });
 
-        // Custom marks reach us as either a scaled numeric mark or a percentage. Turn them into an unscaled raw mark for data-mark
+        // Custom marks reach us as either a scaled numeric mark or a percentage.
+        // Turn them into an unscaled raw mark for data-mark
         function getNormalisedCustomMark($groupRows, customMark, rowMaxSum, capMax) {
             // The custom mark may be empty. This is null, not zero
             if (customMark === '') {
@@ -454,23 +464,26 @@
             });
         }
 
-        // Given a percentage mark, find the letter grade that corresponds to its bracket in the marking scheme
+        // Given a percentage mark, find the grade object that corresponds to
+        // its bracket in the marking scheme.
         // TODO this function seems to not be calculating brackets the same way twig is; who is wrong?
-        function getLetterGradeFromNumeric(numericMark, grades) {
+        function getGradeFromNumeric(numericMark, grades) {
+            let gradesLength = grades.length,
+                numberMark   = Number(numericMark),
+                nullGrade    = {value: null, lowerBound: null, letter: '(no grade)'};
             if (numericMark === null || numericMark === undefined || numericMark === '') {
-                return '(no grade)';
+                return nullGrade;
             }
-            var gradesLength = grades.length,
-                numberMark   = Number(numericMark);
             for (var i = 0; i < gradesLength; i++) {
                 // TODO assumes values are always descending which might not be the case?
                 if (numberMark >= Number(grades[i].lowerBound)) {
-                    return grades[i].letter;
+                    return grades[i];
                 }
             }
 
-            // Did I fall through to here? Use the last grade
-            return gradesLength > 0 ? grades[gradesLength-1].letter : '';
+            // Did I fall through to here? Use the last grade, or nothing at all
+            // that case should never happen
+            return gradesLength > 0 ? grades[gradesLength-1] : nullGrade;
         }
 
         // Turn a specified value into a percentage of the max marks for a group
