@@ -51,11 +51,8 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
 
         // If the user is not allowed to view timetables return an empty collection
         if ($this->getUser()->getHideTimetable()) {
-            $stack = new Collection();
-            return $stack;
+            return new Collection();
         }
-        $externalAttendanceLink = new External_AttendanceLink();
-        $externalAttendanceLink->init($this->configLoader, $this->getUser()->getRole()->isStaff());
 
         $currentTimestamp = $startTimestamp;
 
@@ -80,38 +77,45 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         } catch (\Schoolbox\Mapper\Exception $e) {
             $eventType = 1;
         }
+
+        $externalAttendanceLink = null;
         $expensiveWindow = strtotime("{$days} day", 0); // convert days to seconds
 
         // This is a config var that determines how many days in the past you can mark attendance for.
         // Later, we need to fetch these days expensively, because otherwise they come without attendance data.
         $attendanceWindow = strtotime("{$this->configLoader->get('external_attendance_days')} day", 0); // convert days to seconds
+        if ($this->getUser()->getRole()->isStaff() && $this->configLoader->get('external_attendance')) {
+            $externalAttendanceLink = new External_AttendanceLink();
+            $externalAttendanceLink->init($this->configLoader, $this->getUser()->getRole()->isStaff());
+        }
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
         /** @var Event[] $addedEvents */
         $addedEvents = array();
         while ($currentTimestamp < $endTimestamp) {
+            // elapsedTime: negative - past, positive - future
             $elapsedTime = $currentTimestamp - $startOfDay;
+            // 60 * 60 * 24 = 86400
+            $showAttendance = $externalAttendanceLink && ($elapsedTime < 86400) && ($elapsedTime >= (-$attendanceWindow));
+            $showExpensive  = $elapsedTime >= 0 && $elapsedTime < $expensiveWindow;
 
             foreach ($this->getUser()->getCampusCollection() as $campus) {
                 $campusId  = $campus->getId();
 
                 $date = new Alaress_Date_Format($currentTimestamp, Alaress_Date_Format::TIMESTAMP);
                 $dayNumber = $this->externalTimetable->getDayNumber($campus, $currentTimestamp);
+                if ($dayNumber <= 0) {
+                    continue;
+                }
 
-                if ($elapsedTime >= (-$attendanceWindow) && $elapsedTime < $expensiveWindow) {
+                if ($showAttendance || $showExpensive) {
                     // if the day we're looking at is
                     // - no more than $attendanceWindow in the past, and
                     // - no more than $expensiveWindow in the future,
                     // get the expensive timetable
                     $dayTimetable = $this->buildTimetableExpensively($this->getUser(), $campus, $date);
-
                 } else {
-
-                    if ($dayNumber <= 0) {
-                        continue;
-                    }
-
                     $dayTimetable = $this->buildTimetableCheaply($this->getUser(), $campus, $dayNumber);
                 }
 
@@ -126,7 +130,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                         $key       = sprintf('%d-%d-%s', $startTime, $endTime, $code);
                         if (array_key_exists($key, $addedEvents)) {
                             $addedEvents[$key]->setCampusList(
-                                $addedEvents[$key]->getCampusList().','.$campusId
+                                $addedEvents[$key]->getCampusList() . ',' . $campusId
                             );
                             continue;
                         }
@@ -180,7 +184,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                         // has periods to mark.
                         $event->setHasAttendance(false);
 
-                        if ($externalAttendanceLink->isEnabled($period['code'], $period['AttendanceEnabled'], $event->getStartTime())) {
+                        if ($showAttendance && $externalAttendanceLink->isEnabled($period['code'], $period['AttendanceEnabled'], $event->getStartTime())) {
                             $attendanceLink = $externalAttendanceLink->getAttendanceLink(
                                 $period['code'],
                                 $period['campus'],
@@ -189,7 +193,8 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                                 $period['periodNumber'],
                                 $event->getStartTime(),
                                 $this->getUser()->getCampusCollection(),
-                                $campusId, $this->getUser()->getExternalId(),
+                                $campusId,
+                                $this->getUser()->getExternalId(),
                                 $dayNumber
                             );
                             if (!empty($attendanceLink)) {
@@ -310,7 +315,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                 $period['category'] = null;
                 unset($period['class']);
 
-                // Load staff into period defintion
+                // Load staff into period definition
                 $staffId = $period['staffID'];
                 try {
                     if (!empty($staffId)) {
