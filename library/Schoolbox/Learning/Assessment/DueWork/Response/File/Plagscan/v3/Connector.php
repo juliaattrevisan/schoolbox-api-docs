@@ -140,6 +140,9 @@ class Connector
 
         $filename = $this->makeFileName($submissionFile, $filename);
 
+        // Note that storage files in multipart form data must be sent as string
+        // values (and not resources), because files can't be posted from
+        // non-local resources.
         $postData = [
             [
                 'name'     => 'fileUpload',
