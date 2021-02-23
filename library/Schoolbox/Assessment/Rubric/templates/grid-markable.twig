@@ -224,7 +224,7 @@
 
         // Update the per-capability and overall marks when descriptor selection is changed
         $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
-            var $changed        = $(this),
+            let $changed        = $(this),
                 groupId         = $changed.attr('data-rubric-group'),
                 rubricId        = $changed.attr('data-rubric'),
                 rowSelector     = '[data-group="rb-' + rubricId + '-' + groupId + '"]',
@@ -232,13 +232,14 @@
                 rubricTotalMark = null;
 
             if ($groupRows.length) {
-                var groupSummarySelector  = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]',
+                let groupSummarySelector  = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]',
                     $groupSummary         = $rb.find(groupSummarySelector),
                     $descriptorCheckboxes = $groupRows.find('input'),
+                    letterGrades          = getLetterGrades($groupSummary.find("[data-group-mark]")),
                     scaledGroupMark       = scale(
                         $groupSummary,
                         summateDescriptors($descriptorCheckboxes),
-                        getLetterGrades($groupSummary.find("[data-group-mark]"))
+                        letterGrades
                     );
 
                 $groupSummary.attr('data-scaled-mark', scaledGroupMark);
@@ -247,8 +248,10 @@
                 // Update button text with mark calculated from descriptors
                 switch (markType) {
                     case 'letter':
-                        let grades       = getLetterGrades($groupSummary.find("[data-group-mark]")),
-                            currentGrade = getGradeFromNumeric(getPercentage($groupSummary, $groupSummary.attr('data-mark')), grades);
+                        let currentGrade = getGradeFromNumeric(
+                            getPercentage($groupSummary, $groupSummary.attr('data-mark')),
+                            letterGrades
+                        );
 
                         // scaledGroupMark needs to be rounded to the nearest value in grades
                         $groupSummary.find("[data-group-descriptor-sum]").text(currentGrade.letter);
