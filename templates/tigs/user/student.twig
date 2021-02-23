@@ -29,6 +29,7 @@
 
 {% block folderListItemActions %}
     {% set routeSubjectReport = routeLookupIfAuthorized('tigsSubjectReport.getReport', { userId: user.id, user: user, folderId: subject.folder.id, folder: subject.folder }) %}
+    {% if routeSubjectReport or hasTeachersWithEmail  %}
     <nav>
         <a class="icon-more" data-dropdown="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}" title="Actions"></a>
     </nav>
@@ -47,4 +48,5 @@
         {% endfor %}
         {% endif %}
     </ul>
+    {% endif %}
 {% endblock %}
