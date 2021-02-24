@@ -137,6 +137,9 @@ class Connector implements IConnector
         $this->assertEnabled();
 
         // The 'name' and 'document' fields are required.
+        // Note that storage files in multipart form data must be sent as string
+        // values (and not resources), because files can't be posted from
+        // non-local resources.
         $options  = [
             RequestOptions::MULTIPART => [
                 [
@@ -145,7 +148,7 @@ class Connector implements IConnector
                 ],
                 [
                     'name'     => 'document',
-                    'contents' => $storage->readStream(),
+                    'contents' => $storage->read(),
                     'filename' => $storage->getBasename(),
                 ],
             ],
