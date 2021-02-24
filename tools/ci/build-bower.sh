@@ -46,14 +46,6 @@ then
 	exit 1;
 fi
 
-echo "Building SASS into CSS files";
-tools/pkg-build-sass.sh --sass;
-if [ $? -ne 0 ];
-then
-	echo "An error occurred";
-	exit 1;
-fi
-
 echo "Creating artifact directory";
 mkdir -vp $initialdir/built-artifacts;
 

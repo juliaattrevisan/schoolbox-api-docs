@@ -38,11 +38,3 @@ then
 	echo "An error occurred";
 	exit 1;
 fi
-
-echo "SASS";
-if [ $sass -eq 1 ];
-then
-	tools/pkg-build-sass.sh --sass;
-else
-	tools/pkg-build-sass.sh;
-fi

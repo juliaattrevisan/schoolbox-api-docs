@@ -20,7 +20,7 @@ then
 	exit $check;
 fi
 
-echo "Building JS files (Webpack)";
+echo "Building JS/CSS files (Webpack)";
 npm run publish;
 check=$?;
 if [ $check -ne 0 ];

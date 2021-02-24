@@ -449,14 +449,11 @@ cd /vagrant;
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing grunt-cli if not already installed (a second time)";
 /vagrant/tools/grunt.sh;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Building JS files (Webpack)";
+echo "[SB][`date +%Y-%m-%d\ %X`] Building JS/CSS files (Webpack)";
 npm run build;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building JS files (Grunt)";
 grunt build.js;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Building CSS";
-/vagrant/tools/pkg-build-sass.sh --sass;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 
