@@ -167,18 +167,6 @@ class FinalUserAccess
                 continue;
             }
 
-            /* Otherwise change their stuff
-             */
-            $userAccess = UserAccessMapper::getInstance()->createModel()
-                ->setUser($user)
-                ->setService(UserAccess::SERVICE_HOMEPAGE)
-                ->setServiceIdentifier($serviceIdentifier)
-                ->setAccessLevel($accessLevel);
-
-            /* Shank it in to this user instance
-             */
-            $user->getAccessList()->add($userAccess);
-
             $this->log(sprintf(
                 "Final Groups: %s %s \n",
                 $serviceIdentifier,
