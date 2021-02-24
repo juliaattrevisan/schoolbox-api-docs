@@ -1431,19 +1431,9 @@ parameters:
 			path: library/Custom/Meriden/Pastoral/Module.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Custom/Meriden/Pastoral/StudentInvolvement/Factory.php
-
-		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 1
-			path: library/Custom/Meriden/Pastoral/StudentInvolvement/Factory.php
-
-		-
-			message: "#^Method Custom\\\\Meriden\\\\Pastoral\\\\StudentInvolvement\\\\Subject\\:\\:retrieveLateralLearningFeedback\\(\\) should return Schoolbox\\\\Learning\\\\Assessment\\\\DueWork\\\\Feedback\\\\Model\\|null but returns Schoolbox\\\\Learning\\\\Assessment\\\\IFeedback\\|null\\.$#"
-			count: 1
-			path: library/Custom/Meriden/Pastoral/StudentInvolvement/Subject.php
+			path: library/Custom/Meriden/Pastoral/StudentInvolvement/Report/Factory.php
 
 		-
 			message: "#^Method Custom\\\\Mggs\\\\Calendar\\\\Event\\\\Type\\\\Submission\\\\Renderer\\\\Javascript\\:\\:getStatus\\(\\) should return string but returns null\\.$#"
