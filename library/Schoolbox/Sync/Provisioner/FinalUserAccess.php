@@ -57,6 +57,7 @@ class FinalUserAccess
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function generate(User $user): array
     {
