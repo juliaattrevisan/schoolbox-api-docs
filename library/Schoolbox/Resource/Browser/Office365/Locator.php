@@ -13,6 +13,7 @@ use InvalidArgumentException;
 use OutOfBoundsException;
 use Proxy;
 use RuntimeException;
+use Schoolbox\GenericCollection;
 use Schoolbox\Resource;
 
 /**
@@ -94,7 +95,7 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
      * Return the files contained within the folder with the given ID
      *
      * @param string $nodeId
-     * @return Resource\File\IFile[]
+     * @return GenericCollection|Resource\File\IFile[]
      * @throws AuthenticationTimedOut
      * @throws RuntimeException
      * @throws Unauthorized
@@ -106,7 +107,7 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
         $items = $this->rq("/files/$nodeId/children");
 
         // iterate, filtering to files only and casting to file objects
-        $files = [];
+        $files = new GenericCollection(Resource\File\IFile::class);
 
         foreach ($items['value'] as $item) {
             try {
@@ -124,7 +125,7 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
      * Return the folders contained within the folder with the given ID
      *
      * @param string $nodeId
-     * @return Resource\Folder\IFolder[]
+     * @return GenericCollection|Resource\Folder\IFolder[]
      * @throws AuthenticationTimedOut
      * @throws RuntimeException
      * @throws Unauthorized
@@ -135,7 +136,7 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
         $items = $this->rq("/files/$nodeId/children");
 
         // iterate, filtering to folders only and casting to folder objects
-        $folders = [];
+        $folders = new GenericCollection(Resource\Folder\IFolder::class);
 
         foreach ($items['value'] as $item) {
             try {
