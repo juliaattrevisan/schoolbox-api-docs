@@ -41,13 +41,6 @@ The exception to this is `grunt bower`, which will just run `bower install` (wil
 
 Concatenates all JS files, will not minify or uglify the code.
 
-`grunt sass`
-
-Concatenates all Sass files and compile them to CSS.
-
-> The separate `build.sass` task for compiling Sass with a school's configured skin variables is no longer required,
-> as all skin variables are now included as CSS variables.
-
 `grunt dev`
 
 Full development build. Will run `grunt bower` plus the two tasks above.
@@ -67,4 +60,4 @@ Concatenates and compresses (uglify) all JS files.
 
 `grunt`
 
-Full production build. Runs `grunt bower`, `grunt build.js` & `grunt sass`.
+Full production build. Runs `grunt bower` and `grunt build.js`.

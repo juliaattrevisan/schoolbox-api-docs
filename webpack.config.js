@@ -1,8 +1,10 @@
 const path              = require('path');
-const {VueLoaderPlugin} = require('vue-loader');
+const { VueLoaderPlugin } = require('vue-loader');
+const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries'); //https://www.npmjs.com/package/webpack-fix-style-only-entries
 
 module.exports = {
     entry: {
+
         // Libraries
         clipboard: "./www/javascript/shared/clipboard/clipboard.main.js",
         strtotime: "./www/javascript/shared/alaress-datetime-picker/strtotime.main.js",
@@ -24,6 +26,11 @@ module.exports = {
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.main.js',
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.main.js',
         authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
+
+        //Sass
+        chromeFoundation: './www/css/foundation/chrome-foundation.scss',
+        editor: './www/css/foundation/editor.scss'
+
     },
     output: {
         path: path.resolve(__dirname, "www/javascript/components"),
@@ -59,7 +66,7 @@ module.exports = {
                             "@babel/plugin-proposal-optional-chaining",
                         ]
                     }
-                }
+                },
             },
             {
                 test: /\.vue$/,
@@ -70,16 +77,49 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: ['vue-style-loader', 'css-loader']
+                use: ['vue-style-loader', 'css-loader'],
             },
             {
-                test: /\.scss$/,
-                use: [
-                    'vue-style-loader',
-                    'css-loader',
-                    'sass-loader'
-                ]
-            }
+				test: /\.scss$/,
+				oneOf: [ //this allows us to only perform the below on vue files, then other scss files follow the following
+					{
+						resourceQuery: /^\?vue/,
+						use: [
+							'vue-style-loader',
+							'css-loader',
+							'sass-loader'
+						]
+					},
+					{
+						use: [
+							{
+								loader: "file-loader",
+								options: {
+									name: "[name].css",
+									outputPath: "../../css/core/"
+								}
+							},
+							{ loader: "extract-loader" },
+                            {
+                                loader: "css-loader",
+                                options: {
+                                    url: false,
+                                    modules: false
+                                }
+                            },
+                            {
+                                loader: "sass-loader",
+								options: {
+									sassOptions: {
+										indentWidth: 4,
+										includePaths: ["../../css/foundation/"],
+									},
+								},
+							}
+						]
+					}
+				]
+			}
         ]
     },
     resolve: {
@@ -94,6 +134,7 @@ module.exports = {
         extensions: ['*', '.js', '.vue', '.json']
     },
     plugins: [
-        new VueLoaderPlugin()
+        new VueLoaderPlugin(),
+        new FixStyleOnlyEntriesPlugin()
     ]
 };
