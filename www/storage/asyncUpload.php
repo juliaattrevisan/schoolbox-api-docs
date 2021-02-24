@@ -13,8 +13,9 @@ use Schoolbox\Resource\Storage\Translator\ModelToArray;
  * @link      https://schoolbox.com.au/
  */
 
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+// TODO, this file should be using the Basic Kernel, but is actually using the WebRequest Kernel
+//require_once __DIR__ . '/../../conf/core/require.php';
+//$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 /** @var PrefixGenerator $prefixGenerator */
 $prefixGenerator = $kernel->get('cdnPrefixGenerator');
