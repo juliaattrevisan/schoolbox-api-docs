@@ -142,6 +142,7 @@ class Decorator extends NotificationBundle
         $rosettaStone = $this->rosettaStoneFactory->build(L10nMapper::getInstance());
 
         $headings = [
+            'custom'   => 'Custom Heading',
             'work'     => 'Schoolwork',
             'news'     => $rosettaStone->translate('news', true, true),
             'activity' => 'Activity',
