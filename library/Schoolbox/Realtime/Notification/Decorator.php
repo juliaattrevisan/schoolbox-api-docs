@@ -400,9 +400,10 @@ class Decorator extends NotificationBundle
     {
         // icon cannot be a protected link
         $isPortrait = strpos($notification->getIcon(), '/portrait') === 0;
+        $isStorage  = strpos($notification->getIcon(), '/storage') === 0;
         $isBlank    = $notification->getIcon() == '';
 
-        if ($isPortrait || $isBlank) {
+        if ($isPortrait || $isBlank || $isStorage) {
             // change to be the generic icon for the namespace
             return '/images/icon.php?size=64&icon=' . $notification->getNamespace();
         }

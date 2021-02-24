@@ -172,6 +172,7 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
 
         try {
+            /** @var Award $award */
             $award    = $this->mapper->findById($model->getId());
             $effector = $this->userMapper->findById($effector->getId());
         } catch (MapperException $e) {
@@ -187,7 +188,7 @@ class Notifier extends AbstractModuleNotifier
         $awardHref = sprintf(self::PATTERN_GOAL_SET_HREF, $student->getId());
 
         $bob = new Builder();
-        $bob->setIcon($award->getBadge()->getIcon())
+        $bob->setIcon($this->getIcon($award))
             ->setHref($awardHref)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
@@ -243,6 +244,7 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
 
         try {
+            /** @var Model $award */
             $award    = $this->mapper->findById($model->getId());
             $effector = $this->userMapper->findById($effector->getId());
         } catch (MapperException $e) {
@@ -258,7 +260,7 @@ class Notifier extends AbstractModuleNotifier
         $awardHref = sprintf(self::PATTERN_AWARDED_HREF, $student->getId());
 
         $bob = new Builder();
-        $bob->setIcon($award->getBadge()->getIcon())
+        $bob->setIcon($this->getIcon($award))
             ->setHref($awardHref)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
@@ -386,5 +388,23 @@ class Notifier extends AbstractModuleNotifier
     public function notifyParentGoalset(Award $award, User $user, ?array $diff): Envelope
     {
         return $this->notifyGoalSet(Role::PARENT, $award, $user, $diff);
+    }
+
+    /**
+     * Gets image path suitable for award icon
+     * @param Model $award
+     * @return string
+     */
+    private function getIcon(Award $award): string
+    {
+        $badge = $award->getBadge();
+        if ($badge->getIcon()) {
+            return $badge->getIcon();
+        }
+        if ($badge->getImage() && $badge->getImage()->getMimetype()->isImage()) {
+            return "/storage/image.php?hash={$badge->getImage()->getHash()}";
+        }
+        // should not happen, but just in case
+        return $this->getUserIcon($award->getAwardedBy());
     }
 }
