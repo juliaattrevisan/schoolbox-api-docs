@@ -9,7 +9,7 @@ namespace Schoolbox\Sync\Provisioner;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
 
 
 /**
@@ -22,8 +22,17 @@ use Schoolbox\Permission\Access\UserAccessMapper;
  */
 class FinalUserAccess
 {
+
     /**
-     * @var \Schoolbox\Resource\Folder\Mapper
+     * Representations of the mutations that occurred, in chronological order
+     */
+    private const STATUS_INITIAL = 'initial';
+    private const STATUS_ADD = 'add';
+    private const STATUS_REMOVE = 'remove';
+
+
+    /**
+     * @var Folder\Mapper
      */
     private $folderMapper;
 
@@ -37,10 +46,10 @@ class FinalUserAccess
     /**
      * FinalUserAccess constructor.
      *
-     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
-     * @param LoggerInterface|null              $logger
+     * @param Folder\Mapper        $folderMapper
+     * @param LoggerInterface|null $logger
      */
-    public function __construct(\Schoolbox\Resource\Folder\Mapper $folderMapper, ?LoggerInterface $logger)
+    public function __construct(Folder\Mapper $folderMapper, ?LoggerInterface $logger)
     {
         $this->folderMapper = $folderMapper;
         $this->logger = $logger;
@@ -56,8 +65,6 @@ class FinalUserAccess
      * @return array
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
      */
     public function generate(User $user): array
     {
@@ -99,7 +106,7 @@ class FinalUserAccess
 
                 /* Record the mutations
                  */
-                if ($mutation['status'] === 'initial') {
+                if (self::STATUS_INITIAL === $mutation['status']) {
                     $this->log(sprintf(
                         "Mutation: %s %s (%s) with accesslevel %s\n",
                         $mutation['status'],
@@ -109,7 +116,7 @@ class FinalUserAccess
                     ));
 
                     $mutationGroups[$folderId] = $mutation['level'];
-                } elseif ($mutation['status'] === 'add') {
+                } elseif (self::STATUS_ADD === $mutation['status']) {
                     $this->log(sprintf(
                         "Mutation: %s %s (%s) with accesslevel %s\n",
                         $mutation['status'],
@@ -119,7 +126,7 @@ class FinalUserAccess
                     ));
 
                     $mutationGroups[$folderId] = $mutation['level'];
-                } elseif ($mutation['status'] === 'remove') {
+                } elseif (self::STATUS_REMOVE === $mutation['status']) {
                     $this->log(sprintf(
                         "Mutation: %s %s (%s)\n",
                         $mutation['status'],
