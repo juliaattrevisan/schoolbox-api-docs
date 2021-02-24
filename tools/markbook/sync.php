@@ -316,8 +316,8 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
                         else {
                             $totalSuccess++;
                         }
-//                    } else {
-//                        $markbookExternal->deleteFeedback($assessment, $student);
+                    } else {
+                        $markbookExternal->deleteFeedback($assessment, $student);
                     }
                 }
 

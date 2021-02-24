@@ -354,11 +354,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         if (!$this->isExternalIdValid($student->getExternalId())) {
             return false;
         }
-        /*        if (!$this->isExternalIdValid($marker->getExternalId())) {
-            echo $marker->getUsername();
-            echo $marker->getExternalId();
-                    return false;
-                }*/
+       if (!$this->isExternalIdValid($marker->getExternalId())) {
+            return false;
+       }
 
         return $this->setActivityMark($feedback);
     }
@@ -475,7 +473,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
             'dueDate'              => $assessment->getDueAt()->getDatabase(),
         ]);
-        var_dump($statement);
         return $statement->execute();
     }
 
@@ -860,7 +857,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $owner = $this->retrieveOwnerFromAssessment($activity);
         if (!($owner && $this->isExternalIdValid($owner->getExternalId()))) {
-            //  return false;
+              return false;
         }
 
         $remoteAssessmentList = $this->getSynergeticMarkbookList($activity, $fileYear, $fileSemester);
