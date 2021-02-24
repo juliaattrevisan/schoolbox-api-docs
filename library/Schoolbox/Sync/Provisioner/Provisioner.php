@@ -298,8 +298,8 @@ class Provisioner
                          * the mutations in order to find out where you ended up. These evaluations
                          * also create log->debug entries so you can see what happened
                          */
-                        $existingGroups = $originalUser->generateExistingUserAccess($this->folderMapper, $this->logger);
-                        $finalGroups = $internalUser->generateFinalUserAccess($this->folderMapper, $this->logger);
+                        $existingGroups = (new ExistingUserAccess($this->folderMapper, $this->logger))->generate($originalUser);
+                        $finalGroups = (new FinalUserAccess($this->folderMapper, $this->logger))->generate($internalUser);
 
                         /* Compute the actual difference - if the set of (folderId, accessLevel)
                          * tuples are the same, then there's no difference and we don't need to
