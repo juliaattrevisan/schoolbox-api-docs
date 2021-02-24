@@ -1253,8 +1253,12 @@ class ConnectorTest extends TestCase
 
     private function getMockStorage()
     {
-        $storage = new class() extends Storage\Model
+        $storage = new class () extends Storage\Model
         {
+            public function read()
+            {
+                return 'some random file contents';
+            }
 
             public function readStream()
             {
