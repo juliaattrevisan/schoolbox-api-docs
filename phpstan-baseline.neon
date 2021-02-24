@@ -10031,17 +10031,7 @@ parameters:
 			path: library/Schoolbox/Resource/Browser/Office365/Locator.php
 
 		-
-			message: "#^Return type \\(array\\<Schoolbox\\\\Resource\\\\File\\\\IFile\\>\\) of method Schoolbox\\\\Resource\\\\Browser\\\\Office365\\\\Locator\\:\\:findByFolderId\\(\\) should be compatible with return type \\(iterable\\<Schoolbox\\\\Resource\\\\File\\\\IFile\\>&Schoolbox\\\\Collection\\) of method Schoolbox\\\\Resource\\\\File\\\\ILocator\\:\\:findByFolderId\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/Office365/Locator.php
-
-		-
 			message: "#^Parameter \\#1 \\$nodeId \\(string\\) of method Schoolbox\\\\Resource\\\\Browser\\\\Office365\\\\Locator\\:\\:findByParentId\\(\\) should be compatible with parameter \\$nodeId \\(int\\) of method Schoolbox\\\\Resource\\\\Folder\\\\ILocator\\:\\:findByParentId\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/Office365/Locator.php
-
-		-
-			message: "#^Return type \\(array\\<Schoolbox\\\\Resource\\\\Folder\\\\IFolder\\>\\) of method Schoolbox\\\\Resource\\\\Browser\\\\Office365\\\\Locator\\:\\:findByParentId\\(\\) should be compatible with return type \\(iterable\\<Schoolbox\\\\Resource\\\\Folder\\\\IFolder\\>&Schoolbox\\\\Collection\\) of method Schoolbox\\\\Resource\\\\Folder\\\\ILocator\\:\\:findByParentId\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Resource/Browser/Office365/Locator.php
 
