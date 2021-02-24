@@ -777,24 +777,6 @@ input[type="radio"]:not(.plain):disabled:checked + label {
   opacity: 0.5;
 }
 
-.mage {
-  input[type="submit"] {
-    float: right;
-    max-width: 500px;
-    width: 40%;
-    @media #{$small-only} {
-      max-width: none;
-      width: 100%;
-    }
-  }
-  input.end {
-    max-width: none;
-    width: 100%;
-  }
-}
-
-
-
 select.visibility {
   &.show-icon-only {
     width: 3rem !important;

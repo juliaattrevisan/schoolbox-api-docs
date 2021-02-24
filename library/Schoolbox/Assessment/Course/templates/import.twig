@@ -277,16 +277,14 @@ Usages:
                                 <div class="small-12 column">
                                     <div class="alert alert-box icon-alert" data-mage-error></div>
                                 </div>
-                                <div class="small-12 column">
-                                    <input
-                                        type="submit"
-                                        name="part-1"
-                                        value="Next"
-                                        data-mage-next="part-2"
-                                        data-mage-working="Working..."
-                                        formaction="{{ routeLookup('courseImport.postClasses') }}"
-                                    />
-                                </div>
+                                <input
+                                    type="submit"
+                                    name="part-1"
+                                    value="Next"
+                                    data-mage-next="part-2"
+                                    data-mage-working="Working..."
+                                    formaction="{{ routeLookup('courseImport.postClasses') }}"
+                                />
                             </div>
                         </div>
                     {% endif %}
@@ -316,16 +314,14 @@ Usages:
                                 <div class="small-12 column">
                                     <div class="alert alert-box icon-alert" data-mage-error></div>
                                 </div>
-                                <div class="small-12 column">
-                                    <input
-                                        type="submit"
-                                        name="part-2"
-                                        value="Next"
-                                        data-mage-next="part-3"
-                                        data-mage-working="Working..."
-                                        formaction="{{ routeLookup('courseImport.postUnits') }}"
-                                    />
-                                </div>
+                                <input
+                                    type="submit"
+                                    name="part-2"
+                                    value="Next"
+                                    data-mage-next="part-3"
+                                    data-mage-working="Working..."
+                                    formaction="{{ routeLookup('courseImport.postUnits') }}"
+                                />
                             </div>
                         </div>
                     </div>
@@ -340,20 +336,18 @@ Usages:
                                 <div class="small-12 column">
                                     <div class="alert alert-box icon-alert" data-mage-error></div>
                                 </div>
-                                <div class="small-12 column">
-                                    {% set urlSuffix = (encodedReturnUrl | length)
-                                        ? ('?' ~ returnUrlName ~ '=' ~ encodedReturnUrl)
-                                        : ''
-                                    %}
-                                    <input
-                                        name="part-3"
-                                        type="submit"
-                                        value="{% if 'import' == action %}Import{% else %}Modify{% endif %}"
-                                        data-mage-next="none"
-                                        data-mage-working="Working..."
-                                        formaction="{{ routeLookup('courseImport.postAssessments') }}{{ urlSuffix }}"
-                                    />
-                                </div>
+                                {% set urlSuffix = (encodedReturnUrl | length)
+                                    ? ('?' ~ returnUrlName ~ '=' ~ encodedReturnUrl)
+                                    : ''
+                                %}
+                                <input
+                                    name="part-3"
+                                    type="submit"
+                                    value="{% if 'import' == action %}Import{% else %}Modify{% endif %}"
+                                    data-mage-next="none"
+                                    data-mage-working="Working..."
+                                    formaction="{{ routeLookup('courseImport.postAssessments') }}{{ urlSuffix }}"
+                                />
                             </div>
                         </div>
                     </div>
