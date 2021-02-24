@@ -47,7 +47,7 @@ class ExceptionFilter
     {
         foreach ($event->getExceptions() as $exception) {
             foreach ($this->excludedClasses as $excludedClass) {
-                if (is_a($exception['type'], $excludedClass, true)) {
+                if (is_a($exception->getType(), $excludedClass, true)) {
                     return null;
                 }
             }
