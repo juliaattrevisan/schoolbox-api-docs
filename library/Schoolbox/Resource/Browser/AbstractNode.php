@@ -228,6 +228,7 @@ abstract class AbstractNode implements NodeInterface
 
 
         try {
+            // TODO consider whether files as well should be natural-sorted by title
             $allFiles = $this->fileLocator->findByFolderId($this->getNodeId());
         } catch (\Exception $e) {
             return $output;
