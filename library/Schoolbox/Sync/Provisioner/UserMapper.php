@@ -67,6 +67,15 @@ class UserMapper extends SchoolboxMapper
             // make sure any mutes go through correctly
             $userAccessMapper->setEventPropagator($this->getEventPropagator());
 
+            /* Find the final UserAccess instances that a person should have
+             * Clear their existing ones
+             * Insert these ones
+             */
+            $finalUserAccess = (new FinalUserAccess(\Schoolbox\Resource\Folder\Mapper::getInstance(), null))
+                ->generate($user);
+
+
+
 //            /* If you combined 'Groups (Read/Write)' and 'Groups (Remove)' in the
 //             * same rule, you'll always be added to the groups specified by the
 //             * value of 'Groups (Read/Write)'. It will overpower the Remove.

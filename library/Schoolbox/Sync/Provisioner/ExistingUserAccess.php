@@ -28,7 +28,7 @@ class ExistingUserAccess
 
 
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface|null
      */
     private $logger;
 
@@ -37,9 +37,9 @@ class ExistingUserAccess
      * ExistingUserAccess constructor.
      *
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
-     * @param LoggerInterface                   $logger
+     * @param LoggerInterface|null              $logger
      */
-    public function __construct(\Schoolbox\Resource\Folder\Mapper $folderMapper, LoggerInterface $logger)
+    public function __construct(\Schoolbox\Resource\Folder\Mapper $folderMapper, ?LoggerInterface $logger)
     {
         $this->folderMapper = $folderMapper;
         $this->logger = $logger;
