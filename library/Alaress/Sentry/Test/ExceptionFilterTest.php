@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use LengthException;
 use Sentry\Event;
 use Sentry\ExceptionDataBag;
+use Throwable;
 
 /**
  * Class ExceptionFilterTest
@@ -104,37 +105,10 @@ class ExceptionFilterTest extends TestCase
         yield 'event implements interface of filter' => [$event, $filter, true];
         unset($event, $filter);
 
-//        // An event's exceptions should always be concrete classes and not
-//        // interfaces, but test anyhow.
-//        $event  = $this->buildEvent(IException::class);
-//        $filter = $this->buildFilter(Exception::class);
-//        yield 'event contains interface implemented by filter' => [$event, $filter, false];
-//        unset($event, $filter);
-//
-//
-//        // Compare normalized class names (some provide with a leading \, others not)
-//        $className           = Exception::class;
-//        $normalizedClassName = trim($className, '\\');
-//        $event               = $this->buildEvent($normalizedClassName);
-//        $filter              = $this->buildFilter($className);
-//        yield 'event trimmed class name matches untrimmed filter class name' => [$event, $filter, true];
-//        unset($event, $filter);
-//
-//        $event  = $this->buildEvent($className);
-//        $filter = $this->buildFilter($normalizedClassName);
-//        yield 'event untrimmed class name matches trimmed filter class name' => [$event, $filter, true];
-//        unset($event, $filter);
-//
-//        $event  = $this->buildEvent($normalizedClassName);
-//        $filter = $this->buildFilter($normalizedClassName);
-//        yield 'event trimmed class name matches trimmed filter class name' => [$event, $filter, true];
-//        unset($event, $filter);
-
 
         // Compare things that aren't class names
         $className             = Exception::class;
-        $nonExistentClassName1 = $className.'DoesNotExist1';
-//        $nonExistentClassName2 = $className.'DoesNotExist2';
+        $nonExistentClassName1 = $className . 'DoesNotExist1';
         $event                 = $this->buildEvent(new Exception());
         $filter                = $this->buildFilter($nonExistentClassName1);
         yield 'filter class does not exist' => [$event, $filter, false];
@@ -144,26 +118,11 @@ class ExceptionFilterTest extends TestCase
         $filter = $this->buildFilter($nonExistentClassName1, $className);
         yield 'one filter class does not exist, but another matches' => [$event, $filter, true];
         unset($event, $filter);
-
-//        $event  = $this->buildEvent($nonExistentClassName1);
-//        $filter = $this->buildFilter($className);
-//        yield 'event class does not exist' => [$event, $filter, false];
-//        unset($event, $filter);
-//
-//        $event  = $this->buildEvent($nonExistentClassName2);
-//        $filter = $this->buildFilter($nonExistentClassName1);
-//        yield 'event and filter class do not exist' => [$event, $filter, false];
-//        unset($event, $filter);
-//
-//        $event  = $this->buildEvent($nonExistentClassName1);
-//        $filter = $this->buildFilter($nonExistentClassName1);
-//        yield 'event and filter class are same and do not exist' => [$event, $filter, false];
-//        unset($event, $filter);
     }
 
 
     /**
-     * @covers \Alaress\Sentry\ExceptionFilter::__invoke
+     * @covers       \Alaress\Sentry\ExceptionFilter::__invoke
      * @dataProvider getTestExclusionData
      * @param Event           $event
      * @param ExceptionFilter $filter
@@ -183,16 +142,16 @@ class ExceptionFilterTest extends TestCase
     /**
      * Helper for building data that the filter will check.
      *
-     * @param \Throwable ...$exceptions
+     * @param Throwable ...$exceptions
      * @return Event
      */
-    private function buildEvent(\Throwable... $exceptions): Event
+    private function buildEvent(Throwable ...$exceptions): Event
     {
         $event    = Event::createEvent();
         $dataBags = [];
         if (count($exceptions)) {
-            foreach ($exceptions as $class) {
-                $dataBags[] = new ExceptionDataBag(new $class());
+            foreach ($exceptions as $exception) {
+                $dataBags[] = new ExceptionDataBag($exception);
             }
             $event->setExceptions($dataBags);
         }
@@ -206,7 +165,7 @@ class ExceptionFilterTest extends TestCase
      * @param string ...$exceptionClasses
      * @return ExceptionFilter
      */
-    private function buildFilter(string... $exceptionClasses): ExceptionFilter
+    private function buildFilter(string ...$exceptionClasses): ExceptionFilter
     {
         return new ExceptionFilter(...$exceptionClasses);
     }
