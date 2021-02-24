@@ -1,5 +1,5 @@
-const path              = require('path');
-const { VueLoaderPlugin } = require('vue-loader');
+const path = require('path');
+const {VueLoaderPlugin} = require('vue-loader');
 const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries'); //https://www.npmjs.com/package/webpack-fix-style-only-entries
 
 module.exports = {
@@ -42,8 +42,8 @@ module.exports = {
         usageSpecificFile: './library/Schoolbox/Admin/Usage/vue/specific/file.main.js',
 
         //Sass
-        chromeFoundation: './www/css/foundation/chrome-foundation.scss',
-        editor: './www/css/foundation/editor.scss'
+        chromeFoundation: './www-static/css/foundation/chrome-foundation.scss',
+        editor: './www-static/css/foundation/editor.scss'
 
     },
     output: {
@@ -73,7 +73,7 @@ module.exports = {
                                     },
                                     useBuiltIns: 'usage',
                                     corejs: 3
-                        }
+                                }
                             ]
                         ],
                         plugins: [
@@ -94,26 +94,26 @@ module.exports = {
                 use: ['vue-style-loader', 'css-loader'],
             },
             {
-				test: /\.scss$/,
-				oneOf: [ //this allows us to only perform the below on vue files, then other scss files follow the following
-					{
-						resourceQuery: /^\?vue/,
-						use: [
-							'vue-style-loader',
-							'css-loader',
-							'sass-loader'
-						]
-					},
-					{
-						use: [
-							{
-								loader: "file-loader",
-								options: {
-									name: "[name].css",
-									outputPath: "../../css/core/"
-								}
-							},
-							{ loader: "extract-loader" },
+                test: /\.scss$/,
+                oneOf: [ //this allows us to only perform the below on vue files, then other scss files follow the following
+                    {
+                        resourceQuery: /^\?vue/,
+                        use: [
+                            'vue-style-loader',
+                            'css-loader',
+                            'sass-loader'
+                        ]
+                    },
+                    {
+                        use: [
+                            {
+                                loader: "file-loader",
+                                options: {
+                                    name: "[name].css",
+                                    outputPath: "../../css/core/"
+                                }
+                            },
+                            {loader: "extract-loader"},
                             {
                                 loader: "css-loader",
                                 options: {
@@ -123,17 +123,17 @@ module.exports = {
                             },
                             {
                                 loader: "sass-loader",
-								options: {
-									sassOptions: {
-										indentWidth: 4,
-										includePaths: ["../../css/foundation/"],
-									},
-								},
-							}
-						]
-					}
-				]
-			}
+                                options: {
+                                    sassOptions: {
+                                        indentWidth: 4,
+                                        includePaths: ["../../css/foundation/"],
+                                    },
+                                },
+                            }
+                        ]
+                    }
+                ]
+            }
         ]
     },
     resolve: {
