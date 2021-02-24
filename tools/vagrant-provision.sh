@@ -43,6 +43,7 @@ if [ ! -z $3 ]; then external_db=$3; fi;
 if [ ! -z $4 ]; then external_db_host=$4; fi;
 if [ ! -z $5 ]; then external_db_db=$5; fi;
 if [ ! -z $6 ]; then enable_xdebug=$6; fi;
+if [ ! -z $7 ]; then instance_id_env_var=$7; fi;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
@@ -495,10 +496,9 @@ then
             echo "export PHP_IDE_CONFIG=\"serverName=10.0.2.15\"" >> ${bashrcFile};
         fi
 
-        if ! grep -qE '^export\s+INSTANCE_ID\s*=\s*"vagrantx"' ${bashrcFile}; then
-            # Ensure that we always run tools with vagrant instance
-            echo "export INSTANCE_ID=\"vagrantx\"" >> ${bashrcFile};
-        fi
+        sed -i '/export INSTANCE_ID=/d' ${bashrcFile}
+        # Ensure that we always run tools with vagrant instance
+        echo "export INSTANCE_ID=\"$instance_id_env_var\"" >> ${bashrcFile};
     done
 
     # Need to preserve these ENV vars for vagrant's sudo session

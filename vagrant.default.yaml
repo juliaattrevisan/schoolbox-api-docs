@@ -24,3 +24,5 @@ instance_registry_url_override: ""
 # By default this is empty. When developing integrations with the IR you can add host + instance records. The host
 # records API_KEY must match this value.
 instance_registry_api_key: ""
+# By default the INSTANCE_ID env variable is set as vagrantx
+instance_id_env_var: "vagrantx"
