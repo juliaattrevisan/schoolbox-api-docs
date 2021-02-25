@@ -5686,11 +5686,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Api.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Api.php
-
-		-
 			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\TassApi\\\\Base\\\\Endpoint\\\\Profile\\\\Profile\\:\\:\\$api \\(Schoolbox\\\\External\\\\Connector\\\\TassApi\\\\Base\\\\Endpoint\\\\Api\\) does not accept array\\<Schoolbox\\\\External\\\\Connector\\\\TassApi\\\\Base\\\\Endpoint\\\\Api\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Profile/Profile.php
