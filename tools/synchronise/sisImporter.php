@@ -7,9 +7,9 @@
  */
 declare(strict_types=1);
 
-use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Importer\Endpoint;
+use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -107,10 +107,8 @@ NULLTYPE;
          */
         $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
 
-        /* @var IConnector $db */
-        $db = $this->getDi()->get('databaseInternal');
-
-        (new Endpoint\Scheduler($db, $frequency, $factory, $type, $file, $this->getLogger()))->run(time());
+        $randomMapper = UserMapper::getInstance();
+        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $factory, $type, $file, $this->getLogger()))->run(time());
 
         /* Announce conclusion
          */

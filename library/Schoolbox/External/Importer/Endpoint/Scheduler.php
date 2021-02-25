@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint;
 
-use Alaress\Database\Connector\IConnector;
+use Alaress\IDatabase;
 use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -33,7 +33,7 @@ class Scheduler
 
 
     /**
-     * @var IConnector
+     * @var IDatabase
      */
     private $db;
 
@@ -76,14 +76,14 @@ class Scheduler
     /**
      * Scheduler constructor.
      *
-     * @param IConnector      $db
+     * @param IDatabase       $db
      * @param string          $frequency
      * @param Factory         $factory
      * @param string          $type
      * @param string|null     $file
      * @param LoggerInterface $logger
      */
-    public function __construct(IConnector $db, string $frequency, Factory $factory, string $type, ?string $file, LoggerInterface $logger)
+    public function __construct(IDatabase $db, string $frequency, Factory $factory, string $type, ?string $file, LoggerInterface $logger)
     {
         $this->db = $db;
         $this->frequency = $frequency;
