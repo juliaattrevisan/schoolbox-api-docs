@@ -357,16 +357,18 @@
         defaults for their role type.
     </p>
     <form id="push-selections-modal-form" method="post" action="{{ routeLookup('filters.postPushDefaultSelections', { page: page }) }}">
-        {% for roleType, roles in rolesForFilter if roles is not empty %}
-            <fieldset class="checklist">
-                <legend>{{ roleType | capitalize }}</legend>
-                <section>
-                    {% for role in roles %}
-                        <input id="push-selection-role-{{ role.id }}" name="role[]" value="{{ role.id }}" type="checkbox" />
-                        <label for="push-selection-role-{{ role.id }}">{{ role.name }}</label>
-                    {% endfor %}
-                </section>
-            </fieldset>
+        {% for roleType, roles in rolesForFilter %}
+            {% if roles is not empty %}
+                <fieldset class="checklist">
+                    <legend>{{ roleType | capitalize }}</legend>
+                    <section>
+                        {% for role in roles %}
+                            <input id="push-selection-role-{{ role.id }}" name="role[]" value="{{ role.id }}" type="checkbox" />
+                            <label for="push-selection-role-{{ role.id }}">{{ role.name }}</label>
+                        {% endfor %}
+                    </section>
+                </fieldset>
+            {% endif %}
         {% endfor %}
         <input type="submit" value="Push to Selected Roles" />
     </form>
