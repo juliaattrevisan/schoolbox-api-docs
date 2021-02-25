@@ -74,6 +74,16 @@ class FinalUserAccess
          */
         $initialGroups = [];
         $mutationGroups = [];
+        $finalGroups = [];
+
+        /* Find the existing UserAccess instances and see if any have a ACCESS_FULL access level
+         * We want to keep that instance unchanged, because people are going to lose their Group Admin
+         * access and abilities, essentially locking them out of their own Groups en masse
+         */
+        $keep = $user->getAccessList()
+            ->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
+            ->filterBy('accessLevel', UserAccess::ACCESS_FULL)
+            ->indexBy('serviceIdentifier');
 
         /* The ruleset records mutations with [] as initial conditions, but that meant
          * what you started with would never show up in logs; initial conditions are
@@ -127,62 +137,61 @@ class FinalUserAccess
 
                     $mutationGroups[$folderId] = $mutation['level'];
                 } elseif (self::STATUS_REMOVE === $mutation['status']) {
+
+                    /* Did we retain this because of FULL_ACCESS preservation?
+                     * If so, log the intended mutation anyway, but note that we're
+                     * disregarding the intended mutation
+                     *
+                     * Otherwise remove it, as intended
+                     */
+                    $status = $mutation['status'];
+
+                    if (isset($keep[$folderId])) {
+                        $status = 'retain';
+                    } else {
+                        unset($mutationGroups[$folderId]);
+                    }
+
                     $this->log(sprintf(
                         "Mutation: %s %s (%s)\n",
-                        $mutation['status'],
+                        $status,
                         $folderId,
                         $folderName,
                     ));
-
-                    unset($mutationGroups[$folderId]);
                 }
             }
         }
-
-        /* Find the existing UserAccess instances and see if any have a ACCESS_FULL access level
-         * We want to keep that instance unchanged, because people are going to lose their Group Admin
-         * access and abilities, essentially locking them out of their own Groups en masse
-         */
-        $keep = $user->getAccessList()
-            ->filterBy('service', UserAccess::SERVICE_HOMEPAGE)
-            ->filterBy('accessLevel', UserAccess::ACCESS_FULL)
-            ->indexBy('serviceIdentifier');
 
         /* For every item listed in the mutation timeline, process a UserAccess
          * These are now the userAccesses the person should have
          */
         $this->log('Computing groups final list');
 
-        $finalGroups = [];
-
         foreach ($mutationGroups as $serviceIdentifier => $accessLevel) {
 
             /* If this person had ACCESS_FULL before, they still have it now
              * Don't mutate them
              */
+            $status = '';
+            $actualAccessLevel = $accessLevel;
+
+            /* If we retain it, update the intent
+             */
             if (isset($keep[$serviceIdentifier])) {
-                $this->log(sprintf(
-                    "Final Groups: %s %s (retained)\n",
-                    $serviceIdentifier,
-                    $keep[$serviceIdentifier]->getAccessLevel()
-                ));
-
-                /* Remember it for the log ui
-                 */
-                $finalGroups[$serviceIdentifier] = $keep[$serviceIdentifier]->getAccessLevel();
-
-                continue;
+                $status = '(retain)';
+                $actualAccessLevel = UserAccess::ACCESS_FULL;
             }
 
             $this->log(sprintf(
-                "Final Groups: %s %s \n",
+                "Final Groups: %s %s %s\n",
                 $serviceIdentifier,
-                $accessLevel
+                $actualAccessLevel,
+                $status
             ));
 
             /* Remember it for the log ui
              */
-            $finalGroups[$serviceIdentifier] = $accessLevel;
+            $finalGroups[$serviceIdentifier] = $actualAccessLevel;
         }
 
         /* This is the list of groups to which this person has access
