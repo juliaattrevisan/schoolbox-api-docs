@@ -11,6 +11,14 @@
 <script type="text/javascript">
     $(function(){
         $("#schoolbox_video_preview").mediaelementplayer();
+
+        {# Hide the interactives if the video's not actually playable
+         # Eventually shank this into a css stylesheet somewhere
+         # but how
+         #}
+        {% if error %}
+            $('.mejs__overlay.mejs__layer.mejs__overlay-play, .mejs__overlay-button, .mejs__controls').remove();
+        {% endif %}
     });
 </script>
 <video id="schoolbox_video_preview"
@@ -22,15 +30,3 @@
     <source src="/cms/sendVideo.php?type={{ type }}&id={{ hash }}" type='video/mp4'>
 </video>
 
-{# Hide the interactives if the video's not actually playable
- # Eventually shank this into a css stylesheet somewhere
- #}
-{% if error %}
-    <style type="text/css">
-        .mejs__overlay.mejs__layer.mejs__overlay-play,
-        .mejs__overlay-button,
-        .mejs__controls {
-            display: none;
-        }
-    </style>
-{% endif %}
