@@ -177,7 +177,6 @@ class Api implements IApi
      * @return array|null
      * @throws DomainException
      * @throws RuntimeException
-     * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
      */
     public function retrieveDocument(string $method, array $params): ?array
@@ -202,9 +201,23 @@ class Api implements IApi
         /* Try multiple times in case tass dies for a random reason
          */
         while ($fails < self::NUM_RETRY) {
-            $response = $this->client->get($this->host, [
-                'query' => $queryArgs
-            ]);
+
+            /* Any exception thrown by guzzle might as well be a reason to nap and retry
+             *
+             * I don't think tass plays in the same reality as most other people
+             * and they might broadcast error states in a successful payload one day
+             */
+            try {
+                $response = $this->client->get($this->host, [
+                    'query' => $queryArgs
+                ]);
+            } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+                $fails++;
+
+                sleep(self::NAP_TIMEOUT);
+
+                continue;
+            }
 
             /* Successful response from server, but it might not send a valid data payload back
              * so try to decode it. If it can't decode properly, return null
@@ -267,7 +280,11 @@ class Api implements IApi
             }
         }
 
-        return null;
+        /* Couldn't decode json, or tass server refused something, or something else died
+         * Guzzle repeatedly failed too many times and kept throwing exceptions when $response
+         * was being requested, so I guess you ended up here
+         */
+        throw new DomainException('Could not access Tass server, or bad json payload returned.');
     }
 
 
