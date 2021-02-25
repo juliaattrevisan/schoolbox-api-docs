@@ -66,7 +66,7 @@
 
        /**
         * Decide whether the current page is being displayed on a
-        * device with a small screen. 
+        * device with a small screen.
         *
         * 40em marks Small breakpoint
         * Multiply by 16px base font size, js doesn't support em units
@@ -967,12 +967,12 @@
                 <ul class="meta">
                     <li class="icon-calendar">{{ pronoun }} due date: <span class="date"></span></li>
                     {% if canModify %}
-                    <li class="icon-time-value">{% spaceless %}
+                    <li class="icon-time-value">{% apply spaceless %}
                         You can change this date to be anywhere between
                         <span data-event-modal-field="bounds.open"></span>
                         and
                         <span data-event-modal-field="bounds.due"></span>
-                    {% endspaceless %}</li>
+                    {% endapply %}</li>
                     <li class="icon-info">
                         <em>(you can also change the date by dragging the assessment around the calendar)</em>
                     </li>

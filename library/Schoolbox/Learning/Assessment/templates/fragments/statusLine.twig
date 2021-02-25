@@ -1,7 +1,7 @@
 {% set participant = assessable.getParticipantIfExtant(student) %}
 {% if participant %}
     {% set pStatusText %}
-        {%- spaceless %}
+        {% apply spaceless %}
             {% if participant.responseRequired %}
                 {% set pStatusClass = 'incomplete' %}
                 {% set pTooltip = 'Submission Required' %}
@@ -48,7 +48,7 @@
                     Reviewed
                 {% endif %}
             {% endif %}
-        {% endspaceless -%}
+        {% endapply %}
     {% endset %}
 
     <span data-status

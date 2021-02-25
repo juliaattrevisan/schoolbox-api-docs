@@ -1,5 +1,5 @@
 {# Iterate all child nodes #}
-{% spaceless %}
+{% apply spaceless %}
     {% for childNode in node.children %}
         {% if loop.first %}
             {# This is the first child, open the <ul> tag #}
@@ -23,4 +23,4 @@
         </li>
     {% endfor %}
     </ul>
-{% endspaceless %}
+{% endapply %}

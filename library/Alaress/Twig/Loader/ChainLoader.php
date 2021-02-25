@@ -16,6 +16,7 @@ namespace Alaress\Twig\Loader;
 use Alaress\Module\Loader as ModuleLoader;
 use Twig\Loader\ChainLoader as TwigChainLoader;
 use Twig\Loader\LoaderInterface;
+use Twig\Source;
 
 class ChainLoader implements IChainLoader
 {
@@ -83,7 +84,7 @@ class ChainLoader implements IChainLoader
     /**
      * {@inheritdoc}
      */
-    public function getCacheKey($name)
+    public function getCacheKey($name): string
     {
         $this->moduleLoader->loadModule($name);
         return $this->twigLoader->getCacheKey($name);
@@ -92,7 +93,7 @@ class ChainLoader implements IChainLoader
     /**
      * {@inheritdoc}
      */
-    public function isFresh($name, $time)
+    public function isFresh($name, $time): bool
     {
         $this->moduleLoader->loadModule($name);
         return $this->twigLoader->isFresh($name, $time);
@@ -101,7 +102,7 @@ class ChainLoader implements IChainLoader
     /**
      * {@inheritdoc}
      */
-    public function getSourceContext($name)
+    public function getSourceContext($name): Source
     {
         $this->moduleLoader->loadModule($name);
         return $this->twigLoader->getSourceContext($name);

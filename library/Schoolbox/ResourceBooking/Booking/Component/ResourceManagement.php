@@ -14,7 +14,7 @@ namespace Schoolbox\ResourceBooking\Booking\Component;
 use Component_Dashboard_ControllerAbstract;
 use Calendar_Api_EventType_ResourceBooking_Moderation_Default;
 use Schoolbox\ResourceBooking\Booking;
-use Twig_Environment;
+use Twig\Environment;
 use Calendar_Api_Config_Mapper;
 
 class ResourceManagement extends Component_Dashboard_ControllerAbstract
@@ -26,7 +26,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
     protected $bookingMapper;
 
     /**
-     * @var Twig_Environment
+     * @var Environment
      */
     protected $templateEngine;
 

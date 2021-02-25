@@ -134,7 +134,6 @@ use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
-use Twig_Extensions_Extension_Text;
 
 /**
  * Class Kernel
@@ -987,7 +986,6 @@ abstract class Kernel
                     // According to https://twig.symfony.com/doc/1.x/deprecated.html#globals
                     // globals must be loaded before extensions.
                     $twig->addExtension(new DebugExtension());
-                    $twig->addExtension(new Twig_Extensions_Extension_Text());
                     $twig->addExtension(new AdminNavigationRenderer());
                     $twig->addExtension(new LearningRenderer());
 

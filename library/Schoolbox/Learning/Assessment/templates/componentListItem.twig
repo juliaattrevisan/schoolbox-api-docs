@@ -34,7 +34,7 @@
             }) %}
             {# No route for own participation, what about children ? #}
             {% if not viewRoute %}
-                {% for child in USER.children if not viewRoute %}
+                {% for child in USER.children %}
                     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
                         assessmentId: assessable.id,
                         assessment: assessable,
@@ -59,11 +59,11 @@
     </nav>
     {% if isActionRoutes %}
         <ul data-dropdown-content class="f-dropdown" id="duework-options{{ assessable.id }}">
-            {% spaceless %}
+            {% apply spaceless %}
                 {% if statusRoute %}<li><a class="icon-progress" href="{{ statusRoute }}">View Status</a></li>{% endif %}
                 {% if modifyRoute %}<li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify</a></li>{% endif %}
                 {% if deleteRoute %}<li><a class="icon-delete" href="{{ deleteRoute }}" data-action="delete" data-id="{{ assessable.id }}">Delete</a></li>{% endif %}
-            {% endspaceless %}
+            {% endapply %}
         </ul>
     {% endif %}
 

@@ -12,7 +12,7 @@
 
             {% set countUsers = 0 %}
 
-            {% for userAccess in record.access if userAccess.user %}
+            {% for userAccess in record.access|filter(userAccess=>userAccess.user) %}
 
                 {# Work out which radio should be checked for each row#}
 
@@ -57,7 +57,7 @@
         $(function () {
             window.usersAdded = [];
 
-            {% for access in record.access if access.user %}
+            {% for access in record.access|filter(access=>access.user) %}
                 window.usersAdded[{{ access.user.id }}] = true;
             {% endfor %}
 

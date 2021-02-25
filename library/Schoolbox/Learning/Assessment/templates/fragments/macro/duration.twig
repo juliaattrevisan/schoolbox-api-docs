@@ -4,7 +4,7 @@
  # * seconds: number of seconds of duration
  #}
 {% macro secondsToHoursAndMinutes(seconds) %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% set hours           = seconds // 3600 %}
         {% set minuteRemainder = (seconds // 60) % 60 %}
         {% set secondRemainder = seconds % 60 %}
@@ -17,5 +17,5 @@
         {% if secondRemainder %}
             {{ secondRemainder }} {{ secondRemainder == 1 ? 'second' : 'seconds' }}
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}

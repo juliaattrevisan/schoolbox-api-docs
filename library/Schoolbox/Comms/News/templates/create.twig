@@ -737,7 +737,7 @@
 
     /** @var {AudienceOption[]|Object} audienceOptions */
     var audienceOptions = {};
-    {% for entityType in availableEntityTypes if entityTypesData[entityType] is defined %}
+    {% for entityType in availableEntityTypes | filter(entityType => entityTypesData[entityType] is defined) %}
         {% set data = entityTypesData[entityType] %}
         {# TODO implement other types for comms officers #}
         {% if data %}

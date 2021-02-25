@@ -10,7 +10,7 @@ namespace Schoolbox\Module;
 
 
 use Aura\Di\ContainerInterface;
-use Twig_Error_Loader;
+use Twig\Error\LoaderError;
 use Alaress\Twig\Loader\IChainLoader;
 
 /**
@@ -51,7 +51,7 @@ trait StandardModuleTrait
 
     /**
      * @param IChainLoader $templateLoader
-     * @throws Twig_Error_Loader
+     * @throws LoaderError
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {

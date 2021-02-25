@@ -4,7 +4,7 @@
  # hyperlink it
  #}
 {% macro generateWithResultLink(match) %}
-{% spaceless %}
+{% apply spaceless %}
     {# Home Team #}
     {% if match.homeTeam %}
         {% set homeTeamData %}
@@ -24,7 +24,7 @@
     {% endif %}
 
     {{ homeTeamData }} vs {{ awayTeamData }}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
 
 
@@ -34,7 +34,7 @@
  # hyperlink it
  #}
 {% macro generateWithTeamLink(match) %}
-{% spaceless %}
+{% apply spaceless %}
     {# Home Team #}
     {% if match.homeTeam.url %}
         {% set homeTeamData %}
@@ -54,7 +54,7 @@
     {% endif %}
 
     {{ homeTeamData }} vs {{ awayTeamData }}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
 
 
@@ -65,7 +65,7 @@
  # hyperlink it
  #}
 {% macro generate(match) %}
-{% spaceless %}
+{% apply spaceless %}
 
     {% if match.homeTeam.id %}
         {{ match.homeTeam.name }}
@@ -79,7 +79,7 @@
         {{ match.awaySchool.name }}
     {% endif %}
 
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
 
 {# Use to generate the text for Fixture Component List Item
@@ -87,7 +87,7 @@
  # Links the Team name to results for the given team and match
  #}
 {% macro generateWithStatusLink(match) %}
-{% spaceless %}
+{% apply spaceless %}
     {# Home Team #}
     {% if match.homeTeam.id %}
         {% set homeTeamData %}
@@ -113,7 +113,7 @@
     {% endif %}
 
     {{ homeTeamData }} vs {{ awayTeamData }}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
 
 

@@ -456,12 +456,12 @@
                                 <div class="small-4 card">
                                     {% if serviceMapping[permission.service].identifier == identifiers.campus %}
                                         Campus:
-                                        {% for campus in campuses if campus.id == permission.serviceIdentifier %}
+                                        {% for campus in campuses |filter(campus => campus.id == permission.serviceIdentifier) %}
                                             {{ campus.name }}
                                         {% endfor %}
                                     {% elseif serviceMapping[permission.service].identifier ==  identifiers.residentialHouse %}
                                         House:
-                                        {% for residentialHouse in residentialHouses if residentialHouse.id == permission.serviceIdentifier %}
+                                        {% for residentialHouse in residentialHouses | filter( residentialHouse => residentialHouse.id == permission.serviceIdentifier) %}
                                             {{ residentialHouse.house }}
                                         {% endfor %}
                                     {% endif %}

@@ -9,7 +9,7 @@
 
 namespace Alaress\Twig\Method;
 
-use Twig_Error_Runtime;
+use Twig\Error\RuntimeError;
 
 class InlineImage {
 
@@ -19,12 +19,12 @@ class InlineImage {
      *
      * @param  string $source
      * @return string
-     * @throws Twig_Error_Runtime if the file can't be read or doesn't exist.
+     * @throws RuntimeError if the file can't be read or doesn't exist.
      */
     public static function execute($source) {
         $realpath = WEB_root . '/' . $source;
         if (!(is_file($realpath) && is_readable($realpath))) {
-            throw new Twig_Error_Runtime('Image file "'.$realpath.'" does not exist');
+            throw new RuntimeError('Image file "'.$realpath.'" does not exist');
         }
         return sprintf(
             'data:%s;base64,%s',

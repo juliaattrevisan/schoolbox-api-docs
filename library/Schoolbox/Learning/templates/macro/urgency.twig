@@ -6,7 +6,7 @@
  # run out of time to create responses)
  #}
 {% macro datetime(participant) %}
-    {% spaceless %}
+    {% apply spaceless %}
         {# Only due works have an acceptOnline option; all other assessment types are accept online by default #}
         {% set acceptOnline = participant.plan.assessable.acceptOnline|default(true) %}
 
@@ -23,7 +23,7 @@
                 gradient-{{ max(0, min(10, urgency))|round(0, 'floor') }}
             {% endif %}
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}
 
 
@@ -38,7 +38,7 @@
  # and green respectively)
  #}
 {% macro plagscan(value) %}
-{% spaceless %}
+{% apply spaceless %}
     {% set numericValue = value|replace({'%': ''}) %}
     {% if numericValue > 60 %}
         plagscan-critical
@@ -47,7 +47,7 @@
     {% elseif numericValue > 0 %}
         plagscan-ok
     {% endif %}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
 
 
@@ -55,7 +55,7 @@
  # Decide urgency of normalised marks
  #}
 {% macro marks(normalisedMark) %}
-{% spaceless %}
+{% apply spaceless %}
     {% set index = 'none' %}
     {% if config.grade_gradient_enable %}
         {% if normalisedMark|length %}
@@ -77,5 +77,5 @@
         {% endif %}
     {% endif %}
     gradient-{{ index }}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}

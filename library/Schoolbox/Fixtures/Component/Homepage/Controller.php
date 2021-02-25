@@ -16,9 +16,9 @@ use Schoolbox\User;
 use \Schoolbox\Permission\Access\UserAccess;
 use SitePage;
 use Alaress\Database\Connector\Base;
-use Twig_Error_Loader;
-use Twig_Error_Runtime;
-use Twig_Error_Syntax;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 /**
  * Class Controller
@@ -136,9 +136,9 @@ class Controller extends Component_Homepage_ControllerAbstract
      * @param String $templateHandle
      * @return bool
      * @throws RuntimeException
-     * @throws Twig_Error_Loader
-     * @throws Twig_Error_Runtime
-     * @throws Twig_Error_Syntax
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
      */
     public function renderTemplate($templateHandle)
     {

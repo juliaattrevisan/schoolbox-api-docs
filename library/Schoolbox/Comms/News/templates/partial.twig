@@ -87,7 +87,7 @@
                 {% set textToDisplay = compactMode ? macro.newsBlurb(article, readMore) : article.body %}
 
                 {% if textToDisplay|trim|length %}
-                    {% spaceless %}
+                    {% apply spaceless %}
                         <article>
                             {# Unfortunately, we can't add a filter (purify) in the ternary above. So we need to do this for now. #}
                             {% if compactMode %}
@@ -101,7 +101,7 @@
                             article: article,
                             identifier: 'component-' ~ (componentId ?? '') ~ '-article-' ~ article.id
                         } %}
-                    {% endspaceless %}
+                    {% endapply %}
                 {% endif %}
             </li>
         {% endfor %}

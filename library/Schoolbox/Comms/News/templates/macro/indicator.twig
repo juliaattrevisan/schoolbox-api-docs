@@ -4,19 +4,19 @@
 
 {# @param article: News\Model #}
 {% macro render(article) %}
-    {% spaceless %}
+    {% apply spaceless %}
     {% import _self as self %}
     {% set label    = self.label(article) %}
     {% set cssClass = self.cssClass(article) %}
     {% if label %}
     <span id="status-new" class="label {{ cssClass }}">{{ label }}</span>
     {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}
 
 {# @param article: News\Model #}
 {%- macro label(article) -%}
-    {% spaceless %}
+    {% apply spaceless %}
         {% if article.isDraft %}
             Draft
         {% elseif article.isAwaitingModeration %}
@@ -30,12 +30,12 @@
         {% elseif article.isExpired %}
             Archived
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {%- endmacro -%}
 
 {# @param article: News\Model #}
 {%- macro cssClass(article) -%}
-    {% spaceless %}
+    {% apply spaceless %}
         {% if article.isDraft %}
             unsubmitted
         {% elseif article.isAwaitingModeration %}
@@ -49,12 +49,12 @@
         {% elseif article.isExpired %}
             highlight
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {%- endmacro -%}
 
 {# @param article: News\Model #}
 {%- macro byLine(article) -%}
-    {% spaceless %}
+    {% apply spaceless %}
     {% if article.isDraft or article.isRejected %}
         {% set metaPrefix = 'Created by' %}
         {% set metaDate = {displayDate: {long: article.createdAt.long, short: article.createdAt.short}} %}
@@ -83,6 +83,6 @@
         <li class="icon-clock">Publish date: <span title="{{ metaDate.publicationDate.long }}">{{ metaDate.publicationDate.short }}</span></li>
     {% endif %}
 
-    {% endspaceless %}
+    {% endapply %}
 
 {%- endmacro -%}

@@ -12,7 +12,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
 use InvalidArgumentException;
-use Twig_Error_Loader;
+use Twig\Error\LoaderError;
 use UnexpectedValueException;
 use function array_key_exists;
 use Aura\Di\Container;
@@ -191,7 +191,7 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
-     * @throws Twig_Error_Loader If template directory not found
+     * @throws LoaderError If template directory not found
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {

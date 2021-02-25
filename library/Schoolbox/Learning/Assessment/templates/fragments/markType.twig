@@ -104,13 +104,13 @@
 
                         <tr>
                             <td>
-                                {{ gradeLevel.lowerBound }}{% spaceless %}
+                                {{ gradeLevel.lowerBound }}{% apply spaceless %}
                                 {% if loop.index0 == 0 and gradeLevel.lowerBound != 100 %}
                                     +
                                 {% elseif scheme.gradeLevels[loop.index0 - 1].lowerBound - 0.01 > gradeLevel.lowerBound %}
                                     -{{ scheme.gradeLevels[loop.index0 - 1].lowerBound - 0.01 }}
                                 {% endif %}
-                            {% endspaceless %}</td>
+                            {% endapply %}</td>
                             <td>{{ gradeLevel.caption }}</td>
                         </tr>
                     {% endfor %}

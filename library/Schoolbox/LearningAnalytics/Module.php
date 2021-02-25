@@ -38,6 +38,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Twig\Error\LoaderError;
 
 class Module extends BaseModule
 {
@@ -245,7 +246,7 @@ class Module extends BaseModule
      * Template locations for this module
      *
      * {@inheritdoc}
-     * @throws \Twig_Error_Loader
+     * @throws LoaderError
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {

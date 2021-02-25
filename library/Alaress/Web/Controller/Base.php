@@ -359,8 +359,8 @@ abstract class Base
      */
     protected function getController($name)
     {
-        /** @var self $controller */
         try {
+            /** @var self $controller */
             $controller = $this->getDi()->get("controller:$name");
         } catch (ServiceNotFound $e) {
             // the controller isn't registered... hawkward. Let's remedy that

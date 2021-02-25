@@ -4,7 +4,7 @@
         studentAttributes   StudentAttributes
 #}
 {% macro cssClasses(studentAttributes) %}
-    {%- spaceless %}
+    {%- apply spaceless %}
         {% set classes = [
             'schoolbox-year-level-' ~ studentAttributes.yearLevel,
             'curriculum-year-level-' ~ studentAttributes.curriculumYearLevel,
@@ -20,5 +20,5 @@
             {% set classes = classes|merge(['hsc']) %}
         {% endif %}
         {{ classes|join(' ') }}
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}

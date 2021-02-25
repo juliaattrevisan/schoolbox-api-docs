@@ -160,10 +160,6 @@ class CliFormatter extends NormalizerFormatter {
         $severity = $level;
         $char     = self::$formats[$level][0];
 
-        if ($level <= Monolog\Logger::NOTICE && $level >= Monolog\Logger::INFO && isset($context['char'])) {
-            $char = $context['char'][0];
-        }
-
         $severity = $this->porcelain ? "[@$severity]" : '';
 
         return "[$char]$severity$string";

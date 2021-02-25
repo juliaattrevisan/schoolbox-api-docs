@@ -27,7 +27,7 @@
 
         {# Suppress level headings if none have names #}
         {% set hasLevels = false %}
-        {% for level in rubricGrid.levels if level.name | trim | length %}
+        {% for level in rubricGrid.levels | filter(level => level.name | trim | length )  %}
             {% set hasLevels = true %}
         {% endfor %}
         {% if hasLevels  %}

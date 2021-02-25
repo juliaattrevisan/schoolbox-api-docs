@@ -526,8 +526,8 @@
          #}
         {% set activeTab = null %}
 
-        {% for data in possibleTabs if not activeTab %}
-            {% if data.visible %}
+        {% for data in possibleTabs %}
+            {% if data.visible and not activeTab %}
                 {% set activeTab = data.anchor %}
             {% endif %}
         {%  endfor %}

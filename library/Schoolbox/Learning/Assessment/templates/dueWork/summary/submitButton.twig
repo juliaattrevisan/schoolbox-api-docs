@@ -16,12 +16,12 @@ Data:
                 student: student
             }) %}
             {% if submitRoute %}
-                {% set submitText %}{% spaceless %}
+                {% set submitText %}{% apply spaceless %}
                     Create submission
                     {% if USER.id != student.id %}
                         on behalf of {{ student.fullname }}
                     {% endif %}
-                {% endspaceless %}{% endset %}
+                {% endapply %}{% endset %}
                 <a class="submit button" href="{{ submitRoute }}">{{ submitText }}</a>
             {% endif %}
         {% elseif not acknowlegementBlocked %}

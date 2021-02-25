@@ -66,7 +66,7 @@ abstract class Base extends BaseReport
     /**
      * By default, tutor group reports have subject reports.
      *
-     * @return true
+     * @return bool
      */
     public function hasSubjectReports(): bool
     {

@@ -25,9 +25,9 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Twig_Error_Loader;
-use Twig_Error_Runtime;
-use Twig_Error_Syntax;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use TypeError;
 use UnexpectedValueException;
 
@@ -74,9 +74,9 @@ class Controller extends Component_Homepage_ControllerAbstract
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws LogicException         If cyclic graph detected during translation
      * @throws TypeError              If a PredicateBuilder method is called with wrong data type
-     * @throws Twig_Error_Loader      When the template cannot be found
-     * @throws Twig_Error_Syntax      When an error occurred during compilation
-     * @throws Twig_Error_Runtime     When an error occurred during rendering
+     * @throws LoaderError            When the template cannot be found
+     * @throws SyntaxError            When an error occurred during compilation
+     * @throws RuntimeError           When an error occurred during rendering
      * @throws RuntimeException       When Twig renderer not found in this Sitepage object's dependency injector.
      * @throws UnexpectedValueException If source not set. TODO source should be runtime arg
      */

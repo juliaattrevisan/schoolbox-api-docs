@@ -127,8 +127,8 @@ Data:
                                         {# No explicit FAL data found, fall back to latest AAS assessment #}
                                         {% set aasFound = false %}
                                         {# These units are ordered from latest to oldest #}
-                                        {% for unitSpecData in folderData.unitSpecs if not aasFound %}
-                                            {% if folderData.aasData|length %}
+                                        {% for unitSpecData in folderData.unitSpecs %}
+                                            {% if folderData.aasData|length and not aasFound %}
                                                 {% if folderData.aasData.data[unitSpecData.id].capabilityMarks %}
                                                     {% set aasFound = true %}
                                                     {% set hasInterminGrades = true %}
@@ -245,14 +245,16 @@ Data:
                                     {% endif %}
                                 {% else %}
                                     {# All other comments come from the unitspec #}
-                                    {% for unitSpec in folderData.unitSpecs if not commentFound %}
-                                        {% if attributes.isDp %}
-                                            {% set commentData = folderData.aamData.data[unitSpec.id] %}
-                                        {% elseif attributes.isHsc %}
-                                            {% set commentData = folderData.hscTaskMarks.data[unitSpec.id] %}
-                                        {% endif %}
-                                        {% if commentData.comment is not null %}
-                                            {% set commentFound = true %}
+                                    {% for unitSpec in folderData.unitSpecs %}
+                                        {% if no commentFound %}
+                                            {% if attributes.isDp %}
+                                                {% set commentData = folderData.aamData.data[unitSpec.id] %}
+                                            {% elseif attributes.isHsc %}
+                                                {% set commentData = folderData.hscTaskMarks.data[unitSpec.id] %}
+                                            {% endif %}
+                                            {% if commentData.comment is not null %}
+                                                {% set commentFound = true %}
+                                            {% endif %}
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}

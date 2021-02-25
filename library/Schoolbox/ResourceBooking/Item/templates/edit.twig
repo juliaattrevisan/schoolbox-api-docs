@@ -220,7 +220,7 @@
                             <input type="checkbox" name="role[{{ role.id }}]" id="role[{{ role.id }}]" value="1"
                                    data-select-all-group="role"
                                 {% if item.id %}
-                                    {% for resourceRole in item.roleList if resourceRole.role.id == role.id %}
+                                    {% for resourceRole in item.roleList | filter(resourceRole => resourceRole.role.id == role.id )  %}
                                         {% if resourceRole.allowed %}checked{% endif %}
                                     {% endfor %}
                                 {% else %}

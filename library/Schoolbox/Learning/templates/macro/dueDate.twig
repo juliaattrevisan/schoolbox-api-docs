@@ -8,7 +8,7 @@
  # Display an assessment's due date for the specified user.
  #}
 {% macro dueDate(assessable, user) %}
-{% spaceless %}
+{% apply spaceless %}
     {% import _self as dueDate %}
     {# Is the nominated user a participant ? #}
     {% set participant = assessable.participantIfExtant(user) %}
@@ -17,8 +17,8 @@
     {% else %}
         {# Is the user a parent? Check if any of their children are participants #}
         {% set childParticipant = null %}
-        {% for child in user.children if not childParticipant %}
-            {% if assessable.isParticipant(child) %}
+        {% for child in user.children %}
+            {% if assessable.isParticipant(child) and not childParticipant %}
                 {% set childParticipant = assessable.getParticipantIfExtant(child) %}
             {% endif %}
         {% endfor %}
@@ -31,7 +31,7 @@
             {{ dueDate.forAssessment(assessable) }}
         {% endif %}
     {% endif %}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
 
 
@@ -39,7 +39,7 @@
  # Helper macro to render due date for a participant's plan.
  #}
 {% macro forParticipant(participant) %}
-{% spaceless %}
+{% apply spaceless %}
     {# cache this for performance #}
     {% set participantDueDate = participant.dueDate %}
     {% import '@learning/macro/urgency.twig' as urgency %}
@@ -49,7 +49,7 @@
             (<time datetime="{{ participantDueDate }}">{{ participantDueDate.relativeTime(null, true) }} remaining</time>)
         {% endif %}
     </span>
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
 
 
@@ -57,7 +57,7 @@
  # Helper macro to render an assessment's default (not participant-specific) due date.
  #}
 {% macro forAssessment(assessment) %}
-{% spaceless %}
+{% apply spaceless %}
     {% set dueAt = assessment.dueAt %}
     {% if dueAt is not null and not dueAt.isNull %}
         <span title="{{ dueAt.long }}">Due
@@ -67,5 +67,5 @@
             {% endif %}
         </span>
     {% endif %}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}

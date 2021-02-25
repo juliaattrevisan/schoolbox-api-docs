@@ -22,7 +22,7 @@ class JsonDecoderFactory
      */
     public function build(): JsonDecoder
     {
-        $decoder = new JsonDecoder(true, true);
+        $decoder = new JsonDecoder(true);
         $decoder->register(new CurriculumTransformer());
         $decoder->register(new TeacherTransformer());
         $decoder->register(new UnitTransformer());

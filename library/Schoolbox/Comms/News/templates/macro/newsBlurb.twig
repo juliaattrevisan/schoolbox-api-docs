@@ -1,5 +1,5 @@
 {% macro newsBlurb(article, readMore) %}
-    {% spaceless %}
+    {% apply spaceless %}
         {# If there's a blurb, show that; otherwise use truncated body text as blurb #}
         {% if article.blurb %}
             {% set blurb = article.blurb %}
@@ -25,5 +25,5 @@
             {{ readMoreLink|trim|purify }}
         {% endif %}
 
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A browser for Australian Curriculum classes.
  *
@@ -14,25 +15,21 @@ namespace Schoolbox\Curriculum\Source\AustralianCurriculum;
 use Alaress_Curl_Url;
 use Alaress_Date_Format;
 use DateTime;
-use EasyRdf_Sparql_Client;
+use EasyRdf\Sparql\Client;
 use Alaress\Html\ToText as Html2Text;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Curriculum\Source;
+use UnexpectedValueException;
+
+use function count;
 
 class Browser extends Source\BrowserAbstract
 {
-    /**
-     * @var EasyRdf_Sparql_Client
-     */
-    protected $client;
-
-    /**
-     * @var Html2Text
-     */
-    protected $htmlConverter;
+    protected Client $client;
+    protected Html2Text $htmlConverter;
 
     /**
      * Post-construct hook - creates a SPARQL client for the Australian Curriculum.
@@ -65,19 +62,17 @@ class Browser extends Source\BrowserAbstract
             }';
         $models = array();
         foreach ($this->getClient()->query($sparql) as $row) {
-            if(is_object($row->title)) {
+            if (is_object($row->title)) {
                 $desc = $row->title->getValue();
-            }
-            else if(is_object($row->description)) {
+            } elseif (is_object($row->description)) {
                 $desc = $row->description->getValue();
-            }
-            else {
+            } else {
                 continue;
             }
 
             try {
                 $area = $this->getAreaMapper()->findOneByColumn('reference', $row->doc->getUri(), ["deleted" => false]);
-            } catch(\Schoolbox\Mapper\Exception $e) {
+            } catch (\Schoolbox\Mapper\Exception $e) {
                 $area = new LearningArea\Model();
             }
 
@@ -89,7 +84,6 @@ class Browser extends Source\BrowserAbstract
                 ->setModifiedAt($modified)
                 ->setReference($row->doc->getUri());
             $models[$desc] = $area;
-
         }
         $collection = new Collection(array_values($models));
         return $collection;
@@ -115,7 +109,6 @@ class Browser extends Source\BrowserAbstract
         }';
         $collection = new Collection();
         foreach ($this->getClient()->query($sparql) as $row) {
-
             try {
                 $level = $this->getLevelMapper()->findOneByColumn('reference', $row->level->getUri(), ["deleted" => false]);
             } catch (\Schoolbox\Mapper\Exception $e) {
@@ -132,21 +125,21 @@ class Browser extends Source\BrowserAbstract
                 $label = $row->label->getValue();
             } else {
                 // fetch the label in a separate request.
-                $curl = new Alaress_Curl_Url($row->level->getUri().'.rdf');
+                $curl = new Alaress_Curl_Url($row->level->getUri() . '.rdf');
                 $curl->addOptions([CURLOPT_FOLLOWLOCATION => true]);
                 $curl->exec();
                 if (!count($curl->getErrors())) {
                     $document = simplexml_load_string($curl->getResult());
                     foreach ($document->xpath('//skos:prefLabel') as $labelElement) {
-                        $label = "$labelElement";
+                        $label = (string)$labelElement;
                         break;
                     }
                     foreach ($document->xpath('//dcterms:issued') as $createdElement) {
-                        $created = "$createdElement";
+                        $created = (string)$createdElement;
                         break;
                     }
                     foreach ($document->xpath('//dcterms:modified') as $modifiedElement) {
-                        $modified = "$modifiedElement";
+                        $modified = (string)$modifiedElement;
                         break;
                     }
                 }
@@ -154,7 +147,6 @@ class Browser extends Source\BrowserAbstract
 
             // No label - don't add
             if (isset($label)) {
-
                 $level->setName($label);
                 if ($created) {
                     $level->setCreatedAt(new Alaress_Date_Format(new DateTime($created)));
@@ -178,26 +170,26 @@ class Browser extends Source\BrowserAbstract
 
         $collection = new Collection();
         // Get everything out of the manifest instead of out of RDF queries.
-        $curl = new Alaress_Curl_Url($area->getReference().'-manifest.json');
+        $curl = new Alaress_Curl_Url($area->getReference() . '-manifest.json');
         $curl->addOptions([CURLOPT_FOLLOWLOCATION => true]);
         $curl->exec();
-        if ( !\count($curl->getErrors()) && $manifest = json_decode($curl->getResult()) ) {
+        if (!count($curl->getErrors()) && $manifest = json_decode($curl->getResult())) {
             foreach ($manifest as $part) {
-                if(($nodes = $this->buildOutputTree($part, $level)) != false) {
+                if (($nodes = $this->buildOutputTree($part, $level)) != false) {
                     $collection->add($nodes);
                 }
             }
             return $collection;
         }
 
-        throw new \UnexpectedValueException("No learning areas found");
+        throw new UnexpectedValueException("No learning areas found");
     }
 
     /**
      * Creates this node and its children from the JSON object.
      *
      * @param  object $jsonTree
-     * @return Node\Model
+     * @return bool|Node\Model
      */
     protected function buildOutputTree($jsonTree, $level)
     {
@@ -206,25 +198,23 @@ class Browser extends Source\BrowserAbstract
             // This is the right year level within this learning area.
             // Build an outcome tree out of it.
             $node = $this->buildSingleNode($jsonTree);
-
-        }
-        else if(is_array($jsonTree->dcterms_educationLevel)) {
-            if(count(array_filter($jsonTree->dcterms_educationLevel, function($v) use ($level) {
-                    return $v->uri ==  $level->getReference(); }
-                ))>0 ) {
+        } elseif (is_array($jsonTree->dcterms_educationLevel)) {
+            if (
+                count(array_filter($jsonTree->dcterms_educationLevel, function ($v) use ($level) {
+                    return $v->uri ==  $level->getReference();
+                })) > 0
+            ) {
                 $node = $this->buildSingleNode($jsonTree);
-            }
-            else {
+            } else {
                 return false;
             }
-        }
-        else {
+        } else {
             return false;
         }
 
         if ($jsonTree->children) {
             foreach ($jsonTree->children as $child) {
-                if(($nodes = $this->buildOutputTree($child, $level)) != false) {
+                if (($nodes = $this->buildOutputTree($child, $level)) != false) {
                     $node->addChild($nodes);
                 };
             }
@@ -291,19 +281,19 @@ class Browser extends Source\BrowserAbstract
     }
 
     /**
-     * @param  EasyRdf_Sparql_Client $client
+     * @param  Client $client
      * @return $this
      */
-    public function setClient($client)
+    public function setClient(Client $client)
     {
         $this->client = $client;
         return $this;
     }
 
     /**
-     * @return EasyRdf_Sparql_Client
+     * @return Client
      */
-    public function getClient()
+    public function getClient(): Client
     {
         return $this->client;
     }

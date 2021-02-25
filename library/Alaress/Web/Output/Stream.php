@@ -13,7 +13,7 @@ namespace Alaress\Web\Output;
 class Stream extends Base {
 
     /**
-     * @var \Twig_Environment
+     * @var \Twig\Environment
      */
     protected $templateEngine;
 
@@ -63,7 +63,7 @@ class Stream extends Base {
     }
 
     /**
-     * @param  \Twig_Environment $templateEngine
+     * @param  \Twig\Environment $templateEngine
      * @return $this
      */
     public function setTemplateEngine($templateEngine) {
@@ -72,7 +72,7 @@ class Stream extends Base {
     }
 
     /**
-     * @return \Twig_Environment
+     * @return \Twig\Environment
      */
     public function getTemplateEngine() {
         return $this->templateEngine;

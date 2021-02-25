@@ -6,11 +6,11 @@
  # * default: what to show if the user does not have access
  #}
 {% macro showIfVisible(assessment, string, default) %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% if assessment.isFeedbackVisibleToUser(USER) %}
             {{ string }}
         {% else %}
             {{ default }}
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}

@@ -2,7 +2,7 @@
  # Gets classname for due work/quiz mark indicator
  #}
 {% macro indicator(participant, hasDraft) %}
-{% spaceless %}
+{% apply spaceless %}
     {% if hasDraft %}
         pending
     {% elseif participant.resubmissionRequired %}
@@ -12,14 +12,14 @@
     {% else %}
         none
     {% endif %}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
 
 {##
  # Gets title for due work/quiz mark indicator
  #}
 {% macro notchTitle(participant, hasDraft) %}
-{% spaceless %}
+{% apply spaceless %}
     {% if hasDraft %}
         Unpublished draft
     {% elseif participant.resubmissionRequired %}
@@ -29,18 +29,18 @@
     {% else %}
         No mark
     {% endif %}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}
 
 {##
  # Gets label for due work/quiz mark
  #}
 {% macro label(participant, isPublished) %}
-{% spaceless %}
+{% apply spaceless %}
     {% if participant.hasSubmittedResponse and (not participant.hasPublishedFeedback and isPublished) %}
         Pending
     {% else %}
         {{ participant.humanReadableMark(isPublished) | default('–') }}
     {% endif %}
-{% endspaceless %}
+{% endapply %}
 {% endmacro %}

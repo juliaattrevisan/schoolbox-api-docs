@@ -50,14 +50,14 @@
                                 <li><a href="#" data-participant-change="include" class="hide">Include in assessment</a></li>
                                 <li class="separator">Learning Plans</li>
                                 <li><a href="#" data-participant-change="default" class="hide">Remove customisations</a></li>
-                                {% for plan in assessment.plans if not plan.isDynamic %}
+                                {% for plan in assessment.plans | filter(plan => not plan.isDynamic) %}
                                     <li><a href="#" data-plan-use="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
                                 {% endfor %}
                                 <li><a href="#" id="participant-customise">Create new plan...</a></li>
                             </ul>
                             <ul class="f-dropdown" id="plan-options" data-dropdown-content aria-hidden="true">
                                 <li class="separator">Modify Plans</li>
-                                {% for plan in assessment.plans if not plan.isDynamic %}
+                                {% for plan in assessment.plans | filter(plan => not plan.isDynamic) %}
                                     <li><a href="#" data-plan-modify="{{ plan.id }}" data-plan-name="{{ plan.name }}">{{ plan.name }}</a></li>
                                 {% endfor %}
                             </ul>
@@ -140,7 +140,7 @@
             </div>
             <div id="plan-data">
                 {# load in the existing plans #}
-                {% for plan in assessment.plans if not plan.isDynamic %}
+                {% for plan in assessment.plans | filter(plan => not plan.isDynamic ) %}
                     {# we don't need the dyna-plan rendered here #}
                     <input type="hidden" name="plans[{{ plan.id }}][id]" value="{{ plan.id }}"/>
                     <input type="hidden" name="plans[{{ plan.id }}][name]" value="{{ plan.name }}" data-saved-plan/>

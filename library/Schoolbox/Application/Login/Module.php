@@ -10,7 +10,7 @@ namespace Schoolbox\Application\Login;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
-use Twig_Error_Loader;
+use Twig\Error\LoaderError;
 
 class Module extends BaseModule
 {
@@ -31,7 +31,7 @@ class Module extends BaseModule
 
     /**
      * @param IChainLoader $templateLoader
-     * @throws Twig_Error_Loader
+     * @throws LoaderError
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {

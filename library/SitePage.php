@@ -100,13 +100,13 @@ class SitePage extends Page
      * Gets a Twig renderer out of this sitepage's dependency injector,
      * if there is one.
      *
-     * @return Twig_Environment
+     * @return Twig\Environment
      * @throws RuntimeException if Twig renderer wasn't found in this Sitepage object's dependency injector.
      */
     public function getTwig()
     {
         $twig = $this->getDi()->get('templateEngine');
-        if ($twig instanceof Twig_Environment) {
+        if ($twig instanceof Twig\Environment) {
             return $twig;
         }
         throw new RuntimeException('Twig was not found in dependency injector');

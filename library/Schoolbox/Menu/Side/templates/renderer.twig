@@ -9,7 +9,7 @@
 
 <nav id="nav">
     <ul class="off-canvas-list">
-        {% spaceless %}
+        {% apply spaceless %}
         {% for section in sections %}
 
             {% if section.section == 'menu' and section.visible %}
@@ -104,6 +104,6 @@
             {% endif %}
 
         {% endfor %}
-        {% endspaceless %}
+        {% endapply %}
     </ul>
 </nav>

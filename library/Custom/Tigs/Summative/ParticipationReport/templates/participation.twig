@@ -107,8 +107,8 @@ Data:
              #}
             {% set break = false %}
 
-            {% for i in 2..1 if not break %}
-                {% if deansComments[i] %}
+            {% for i in 2..1 %}
+                {% if deansComments[i] and not break %}
                     <div class="dean-comment semester-{{ i }} small-12 medium-6 island">
                         <h2 class="subheader">Dean's Comment - Semester {{ i }}</h2>
                         <section class="content">

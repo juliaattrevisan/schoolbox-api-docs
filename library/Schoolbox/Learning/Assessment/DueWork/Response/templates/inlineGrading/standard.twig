@@ -214,13 +214,13 @@ Usage:
                             <div class="small-12 columns">
                                 <fieldset>
                                     <legend>
-                                        {% spaceless %}
+                                        {% apply spaceless %}
                                             {% if selfAssessmentFeedback.isSelfGrading %}
                                                 {{ locale.selfAssessment.proper }}
                                             {% else %}
                                                 {{ locale.selfReflection.proper }}
                                             {% endif %}
-                                        {% endspaceless %}
+                                        {% endapply %}
                                     </legend>
                                     <div class="flex-grade">
                                         <ul class="information-list threaded sibling">
@@ -316,7 +316,7 @@ Usage:
                 {% set isPublishedFeedback = feedback and feedback.published %}
 
                 {% block actionButtons %}
-                    {% spaceless %}
+                    {% apply spaceless %}
                         {% set buttons %}
                             <span class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</span>
                             {% if not readonly %}
@@ -327,7 +327,7 @@ Usage:
                                 >Publish and Continue</a>
                             {% endif %}
                         {% endset %}
-                    {% endspaceless %}
+                    {% endapply %}
 
                     {% include '@learningAssessment/fragments/actionBar.twig' with {
                     actionStyle:  '',

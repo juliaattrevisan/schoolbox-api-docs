@@ -70,7 +70,7 @@ class ClassList
      * @param Term\Model          $term
      * @param Alaress_Date_Format $now
      * @return array
-     * @var Term                          return['term']
+     * @var Term\Model                    return['term']
      * @var Collection|Folder\Model[]     return['classList']
      * @var string[]                      return['classTypes'] Indexed by folder.id
      * @var string[][]                    return['courses'] Grouped by folder.id, courseSpec.id
