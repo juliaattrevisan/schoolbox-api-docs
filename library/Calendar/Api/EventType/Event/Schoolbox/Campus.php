@@ -20,8 +20,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventTy
      *
      * @var null|int
      */
-    private ?int $campusId;
-    private bool $userCampusOnly;
+    private $campus_id;
 
 
     /**
@@ -29,13 +28,11 @@ class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventTy
      * @param User     $user
      * @param User     $viewer
      * @param null|int $campusId
-     * @param bool     $userCampusOnly
      */
-    public function __construct(int $connectorId, User $user, User $viewer, ?int $campusId = null, bool $userCampusOnly = true)
+    public function __construct(int $connectorId, User $user, User $viewer, int $campusId = null)
     {
         parent::__construct($connectorId, $user, $viewer);
-        $this->campusId       = $campusId;
-        $this->userCampusOnly = $userCampusOnly;
+        $this->campus_id = $campusId;
     }
 
 
@@ -54,8 +51,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventTy
             $this->getViewer(),
             $startTimestamp,
             $endTimestamp,
-            ['campus' => $this->campusId],
-            $this->userCampusOnly
+            ['campus' => $this->campus_id]
         );
     }
 }

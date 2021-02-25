@@ -463,23 +463,26 @@ class Calendar extends DeprecatedModel
      *                                        * id: if set, only this event ID will be retrieved.
      *                                        If empty, all events for user are retrieved.
      *                                        * type: if set, only events of this type will be retrieved.
-     * @param bool  $userCampusOnly
      * @return Collection
      */
-    public function getDayEvents(User $user, User $viewer, $startTimestamp, $endTimestamp, $filter = [], bool $userCampusOnly = true)
+    public function getDayEvents(User $user, User $viewer, $startTimestamp, $endTimestamp, $filter = [])
     {
-        $campusList = $userCampusOnly ? $user->getCampusCollection()->getPropertyValues('id') : [];
+        // If campus is NOT provided in $filter, we limit events by campuses which the user has access
+        $campusList = [];
+        if (!isset($filter['campus'])) {
+            $campusList = $user->getCampusCollection()->getPropertyValues('id');
 
-        //Fake in some campusii here from calendar permissions, so user can see events relevant
-        $accessMapper = UserAccessMapper::getInstance();
+            //Fake in some campusii here from calendar permissions, so user can see events relevant
+            $accessMapper = UserAccessMapper::getInstance();
 
-        $calendarPerms = $accessMapper->findByColumnList(
-            [
-                'uid'     => $user->getId(),
-                'service' => UserAccess::SERVICE_CALENDAR,
-            ]
-        )->getPropertyValues('ServiceIdentifier');
-        $campusList    = array_merge($campusList, $calendarPerms);
+            $calendarPerms = $accessMapper->findByColumnList(
+                [
+                    'uid'     => $user->getId(),
+                    'service' => UserAccess::SERVICE_CALENDAR,
+                ]
+            )->getPropertyValues('ServiceIdentifier');
+            $campusList    = array_merge($campusList, $calendarPerms);
+        }
 
         if (count($campusList) > 0) {
             $campusQuery = "event_campus.campus_id IN(" . implode(',', $campusList) . ")";
