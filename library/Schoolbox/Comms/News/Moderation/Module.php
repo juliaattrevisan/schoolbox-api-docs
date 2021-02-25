@@ -19,6 +19,8 @@ use Schoolbox\Comms\News\Authorizer\Rule\CanModerateAudience;
 use Schoolbox\Comms\News\Authorizer\Rule\IsModerationEnabled;
 use Schoolbox\Comms\News\Authorizer\Rule\IsArticleAuthor;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Authorizer\Rule\IsNotYetApproved;
+use Schoolbox\Comms\News\Authorizer\Rule\IsPublishedOrExpired;
 use Schoolbox\Error;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -80,13 +82,15 @@ class Module extends BaseModule
 
 
         // loggedIn && (SU || CO || moderator)
-        $canReject = new Rule\LazyCallback(function() {
+        $canReject = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                    new CanModerateAudience($this->getStrategyFactory())
+                    new Rule\All(
+                        new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
+                        new IsPublishedOrExpired()
+                    )
                 )
             );
         });

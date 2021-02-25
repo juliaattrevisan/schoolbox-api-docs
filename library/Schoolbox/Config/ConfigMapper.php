@@ -92,7 +92,6 @@ class ConfigMapper extends Mapper
     public const _READ_MORE                      = 'read_more';
     public const _SAVE_FOR_LATER                 = 'save_for_later';
     public const _STAFF_CAN_POST_NEWS            = 'news_staff_post_enabled';
-    public const _NEWS_EDIT_OTHERS               = 'news_edit_other';
     public const _BOARDER_LEAVE_ENABLED          = 'boarder_leave_enabled';
     public const _AUDIENCE_TO_FOLDER_TEACHERS    = 'audience_to_folder_users_teachers';
 //    public const _EXTERNAL_MS_SQL_SERVER_DRIVER  = 'external_ms_sql_server_driver';
