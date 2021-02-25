@@ -7,13 +7,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint;
 
-use Alaress\Database\Connector\IConnector;
+use Alaress\IDatabase;
 use DomainException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 /**
@@ -34,7 +33,7 @@ class Scheduler
 
 
     /**
-     * @var IConnector
+     * @var IDatabase
      */
     private $db;
 
@@ -77,14 +76,14 @@ class Scheduler
     /**
      * Scheduler constructor.
      *
-     * @param IConnector      $db
+     * @param IDatabase       $db
      * @param string          $frequency
      * @param Factory         $factory
      * @param string          $type
      * @param string|null     $file
      * @param LoggerInterface $logger
      */
-    public function __construct(IConnector $db, string $frequency, Factory $factory, string $type, ?string $file, LoggerInterface $logger)
+    public function __construct(IDatabase $db, string $frequency, Factory $factory, string $type, ?string $file, LoggerInterface $logger)
     {
         $this->db = $db;
         $this->frequency = $frequency;
@@ -117,18 +116,12 @@ class Scheduler
                 exit;
             }
 
-            // For some reason, the mappers don't use `$this->db` as their DB
-            // connection: this means that transactions on that connection are
-            // ignored by mappers.
-            // Just pluck a random mapper and transact over that.
-            // TODO undo this once mappers and `$this->db` share a connection
-            $randomMapper = UserMapper::getInstance();
             try {
                 $this->logger->debug(sprintf(
                     'Beginning transaction'
                 ));
 
-                $randomMapper->getDatabase()->beginTransaction();
+                $this->db->beginTransaction();
 
                 foreach ($composites as $composite) {
                     $composite->import();
@@ -138,7 +131,7 @@ class Scheduler
                     'Committing transaction'
                 ));
 
-                $randomMapper->getDatabase()->commit();
+                $this->db->commit();
             } catch (RuntimeException $e) {
                 $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
 
@@ -146,7 +139,7 @@ class Scheduler
                     'Rollback transaction'
                 ));
 
-                $randomMapper->getDatabase()->rollBack();
+                $this->db->rollBack();
             }
         }
     }
