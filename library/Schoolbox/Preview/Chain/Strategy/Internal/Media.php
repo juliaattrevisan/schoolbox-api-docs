@@ -42,8 +42,6 @@ class Media extends Base {
              * Seems like you can only have unique hashes in this table via business
              * logic, but not by db constraints like UNIQUE keys?
              */
-            $videoQueueItem = null;
-
             try {
                 $videoQueueItem = (QueueMapper::getInstance())
                     ->findOneByColumn('hash', $this->getItem()->getStorage()->getHash());
