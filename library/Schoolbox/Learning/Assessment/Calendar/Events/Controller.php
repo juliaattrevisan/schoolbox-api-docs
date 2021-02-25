@@ -187,8 +187,7 @@ class Controller extends Base
                     $this->calendarConfig->getId(),
                     $user,
                     $user,
-                    $campus->getId(),
-                    false
+                    $campus->getId()
                 )
             );
         }
