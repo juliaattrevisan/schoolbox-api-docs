@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Sync\Provisioner;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Permission\Access\UserAccess;
 
 
 /**
@@ -61,7 +62,9 @@ class ExistingUserAccess
          */
         $existingGroups = [];
 
-        foreach ($user->getAccessList() as $userAccess) {
+        $existingUserAccessList = $user->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE);
+
+        foreach ($existingUserAccessList as $userAccess) {
             $folderId = $userAccess->getServiceIdentifier();
 
             $existingGroups[$folderId] = $userAccess->getAccessLevel();
