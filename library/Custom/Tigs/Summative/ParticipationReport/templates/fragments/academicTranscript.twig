@@ -180,8 +180,8 @@ Data:
                                 {% else %}
                                     <div class="result-group hsc-rank">
                                     {% set hasTaskFound = false %}
-                                    {% for unitSpecData in folderData.unitSpecs if not hasTaskFound %}
-                                        {% if folderData.hscTaskMarks.data[unitSpecData.id] ?? false %}
+                                    {% for unitSpecData in folderData.unitSpecs %}
+                                        {% if not hasTaskFound and (folderData.hscTaskMarks.data[unitSpecData.id] ?? false) %}
                                             {% set hasTaskFound = true %}
                                             {% set hasInterminGrades = true %}
                                             {% set hscTaskMarkData = folderData.hscTaskMarks.data[unitSpecData.id] %}
