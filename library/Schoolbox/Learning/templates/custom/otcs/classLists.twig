@@ -3,8 +3,8 @@
 
             {% block table_header %}
             <tr>
-                <th v-if="mailEnabled">
-                    <input type="checkbox" id="select-all" @click="selectAllStudents" v-model="isAllSelected"/>
+                <th v-if="showCheckboxes">
+                    <input type="checkbox" id="select-all" v-model="allSelected"/>
                     <label for="select-all" class="checkbox-label"></label>
                 </th>
                 <th></th>

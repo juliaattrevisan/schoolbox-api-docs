@@ -1,19 +1,19 @@
 {% extends '@learning/coreClassLists.twig' %}
 
 {% block table_header %}
-<tr>
-    <th v-if="mailEnabled">
-        <input type="checkbox" id="select-all" @click="selectAllStudents" :checked="isAllSelected"/>
-        <label for="select-all" class="checkbox-label"></label>
-    </th>
-    <th></th>
-    <th>Name</th>
-    <th class="show-for-large-up">Year Level</th>
-    <th class="show-for-large-up">Tutor Group</th>
-    <th class="show-for-medium-up">Core Group</th>
-    <th class="show-for-medium-up">Last Visited</th>
-    <th></th>
-</tr>
+    <tr>
+        <th v-if="showCheckboxes">
+            <input type="checkbox" id="select-all" v-model="allSelected"/>
+            <label for="select-all" class="checkbox-label"></label>
+        </th>
+        <th></th>
+        <th>Name</th>
+        <th class="show-for-large-up">Year Level</th>
+        <th class="show-for-large-up">Tutor Group</th>
+        <th class="show-for-medium-up">Core Group</th>
+        <th class="show-for-medium-up">Last Visited</th>
+        <th></th>
+    </tr>
 {% endblock %}
 
 {% block tutor_group %}
