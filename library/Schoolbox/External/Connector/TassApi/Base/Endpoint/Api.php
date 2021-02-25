@@ -11,6 +11,8 @@ use DomainException;
 use GuzzleHttp\Client;
 use InvalidArgumentException;
 use RuntimeException;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Explorer\BrokenPayloadCodec;
+
 
 /**
  * Class Api
@@ -36,11 +38,37 @@ class Api implements IApi
 
 
     /**
+     * Number of seconds to take a nap before retrying a failed endpoint
+     *
+     * Sometimes tass endpoints fail for no obvious reason and trying again seems
+     * to work - instead of doing it manually, try insisting programmatically
+     * waiting NAP_TIMEOUT seconds between each attempt
+     */
+    private const NAP_TIMEOUT = 3;
+
+
+    /**
+     * Number of times to retry after having NAP_TIMEOUT seconds' rest before
+     * finally giving up
+     */
+    private const NUM_RETRY = 3;
+
+
+    /**
      * The host server
      *
      * @var string
      */
     private $host;
+
+
+    /**
+     * The module selected
+     * It's one of LMS Integration, Student Details, Identity Management
+     *
+     * @var string
+     */
+    private $module;
 
 
     /**
@@ -85,6 +113,10 @@ class Api implements IApi
     public function __construct(string $host, string $dsn, string $module)
     {
         $this->host = $host;
+
+        /* Remember the module that was selected since we need that for diagnosis
+         */
+        $this->module = $module;
 
         /* Set up guzzle client
          */
@@ -142,9 +174,10 @@ class Api implements IApi
      *
      * @param string $method
      * @param array  $params
-     * @return array
-     * @throws RuntimeException
+     * @return array|null
      * @throws DomainException
+     * @throws RuntimeException
+     * @throws \JsonException
      */
     public function retrieveDocument(string $method, array $params): ?array
     {
@@ -161,24 +194,95 @@ class Api implements IApi
             'v'       => self::VERSION_NUMBER,
         ];
 
-        $response = $this->client->get($this->host, [
-            'query' => $queryArgs
-        ]);
-
-        /* Successful response from server, but it might not send a valid data payload back
-         * so try to decode it. If it can't decode properly, return null
-         */
-        if ((int)$response->getStatusCode() === 200) {
-            return json_decode($response->getBody()->getContents(), true);
-        }
-
         /* Mine out an error message if you try to access a thing that doesn't exist
          */
-        if ($response) {
-            throw new RuntimeException("Bad endpoint {$method}: {$response->getStatusCode()} {$response->getReasonPhrase()}");
+        $fails = 0;
+
+        /* Try multiple times in case tass dies for a random reason
+         */
+        while ($fails < self::NUM_RETRY) {
+
+            /* Any exception thrown by guzzle might as well be a reason to nap and retry
+             *
+             * I don't think tass plays in the same reality as most other people
+             * and they might broadcast error states in a successful payload one day
+             */
+            try {
+                $response = $this->client->get($this->host, [
+                    'query' => $queryArgs
+                ]);
+            } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+                $fails++;
+
+                sleep(self::NAP_TIMEOUT);
+
+                continue;
+            }
+
+            /* Successful response from server, but it might not send a valid data payload back
+             * so try to decode it. If it can't decode properly, return null
+             */
+            if ((int)$response->getStatusCode() === 200) {
+                return json_decode($response->getBody()->getContents(), true);
+            }
+
+            /* We got a response but it's broken
+             * Take a little nap before trying again
+             * (We suspect that it might be timing related, or network traffic)
+             */
+            if ($response) {
+                $fails++;
+
+                sleep(self::NAP_TIMEOUT);
+            } else {
+
+                /* Couldn't decode json, or tass server refused something, or something else died
+                 */
+                throw new DomainException('Could not access Tass server, or bad json payload returned.');
+            }
+
+            /* We tried multiple times and failed multiple times
+             * This might as well have died
+             *
+             * Exit by throwing exception like we normally would have done
+             * otherwise we'll get stuck in an infinite loop and pound the api
+             */
+            if ($fails >= self::NUM_RETRY) {
+
+                /* Some schools intermittently report a Bad Endpoint in a non-repeating fashion
+                 * Sometimes a guy will succeed, sometimes he won't; there's no particular pattern
+                 * just by looking at the log itself. In this circumstance, base64 the payload we
+                 * tried to use, then pop it into the explorer to see what happened and to replay
+                 * the access attempt
+                 */
+                throw new RuntimeException(sprintf(
+                    'Bad endpoint %s: %s %s after %s retries. Payload: %s',
+                    $method,
+                    $response->getStatusCode(),
+                    $response->getReasonPhrase(),
+                    self::NUM_RETRY,
+                    (new BrokenPayloadCodec())->encode([
+
+                        /* Enables a retry from a shantytown ui
+                         */
+                        'module' => $this->module,
+
+                        /* These were requested by suds
+                         */
+                        'method' => $method,
+                        'params' => $params,
+
+                        /* This was generated and sent to tass
+                         */
+                        'queryArgs' => $queryArgs
+                    ])
+                ));
+            }
         }
 
         /* Couldn't decode json, or tass server refused something, or something else died
+         * Guzzle repeatedly failed too many times and kept throwing exceptions when $response
+         * was being requested, so I guess you ended up here
          */
         throw new DomainException('Could not access Tass server, or bad json payload returned.');
     }

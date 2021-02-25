@@ -186,12 +186,14 @@ class Profile implements IStrategy
          * Import their specific parents' profile data
          */
         $this->log->info('Processing students and their parents.');
+        $this->log->info('Downloading student and parent data (this might take a while)');
 
         $this->importStudents();
 
         /* Import staff profile data
          */
         $this->log->info('Processing staff.');
+        $this->log->info('Downloading staff data (this might take a while)');
 
         $this->importStaff();
     }
@@ -534,11 +536,7 @@ class Profile implements IStrategy
                 $studentCode
             ));
 
-            $this->log->warning(sprintf(
-                "When getting medical conditions info, TASS unexpectedly responded with %s. We used this (endpoint, token) combination: (getMedicalConditions, %s)",
-                $e->getMessage(),
-                $this->api[DSNCodec::MODULE_STUDENT_DETAILS]->getToken()
-            ));
+            $this->log->warning($e->getMessage());
 
             return null;
         }

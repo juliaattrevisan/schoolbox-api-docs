@@ -7,6 +7,7 @@
  */
 declare(strict_types=1);
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Importer\Endpoint;
 
@@ -88,7 +89,10 @@ HELP;
          */
         $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
 
-        (new Endpoint\Scheduler($frequency, $factory, $type, $file, $this->getLogger()))->run(time());
+        /* @var IConnector $db */
+        $db = $this->getDi()->get('databaseInternal');
+
+        (new Endpoint\Scheduler($db, $frequency, $factory, $type, $file, $this->getLogger()))->run(time());
     }
 };
 
