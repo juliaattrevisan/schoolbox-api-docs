@@ -473,15 +473,24 @@ if [ "$sourcetype" == '[A]' ] && [ "$sourceloc" == '[R]' ]; then
   remote_mount=$(ssh "$host" findmnt -n -o SOURCE --target "$sourcep3");
   remote_mount_used=$(ssh "$host" df -B1 | grep "$remote_mount" | awk -F " " '{print $3}');
   remote_data_dir=${tempfiledir%/*};
+  remote_real_data_dir=$(ssh "$host" realpath "$remote_data_dir");
   remote_mount_dir=$(ssh "$host" mount | grep "$remote_mount" | awk -F " " '{print $3}');
-  remote_not_sb_used=$(ssh "$host" du -sh "$remote_mount_dir" --exclude "$remote_data_dir" -B1 2>/dev/null | cut -f 1);
+  remote_not_sb_used=$(ssh "$host" du -sh "$remote_mount_dir" --exclude "$remote_real_data_dir" -B1 2>/dev/null | cut -f 1);
   remote_cache_used=$(ssh "$host" du -sh "$remote_data_dir/cache/zip" -B1 | cut -f 1);
-  remoteUsedStorage=$((remote_mount_used - remote_not_sb_used - remote_cache_used));
+  remoteBackups=$(ssh "$host" du -sb "$remote_real_data_dir"/backups/ | cut -f 1)
+  remoteUsedStorage=$((remote_mount_used - remote_not_sb_used - remote_cache_used - remoteBackups));
 
-  if [ "$localAvailableStorage" == "" ] || [ "$remoteUsedStorage" == "" ]; then
+  # du/df will report different values because du includes FS data structures (inode tables, super-blocks,
+  # partially-filled blocks etc) while df just aggregates file content size. Also du includes deleted files still
+  # referenced by processes. We could try and calculate/estimate the difference, but it's complicated
+  # (see https://ext4.wiki.kernel.org/index.php/Ext4_Disk_Layout and unreliable).
+  # Instead, we'll just apply a rough empirical factor.
+  readonly SAFETY_FACTORY=1.07
+  remoteUsedStorage=$(echo "$remoteUsedStorage * $SAFETY_FACTORY" | bc | cut -f 1 -d '.')
+  if [[ "$localAvailableStorage" == "" ]] || [[ "$remoteUsedStorage" == "" ]]; then
     errmsg="Please check the datapool disk on both hosts, one or both are either full or not available";
     error;
-  elif [ $localAvailableStorage -le $remoteUsedStorage ]; then
+  elif [[ $localAvailableStorage -le $remoteUsedStorage ]]; then
     errmsg="You are trying to restore more data ($remoteUsedStorage bytes) than disk that is available ($localAvailableStorage bytes)";
     error;
   fi
@@ -526,7 +535,7 @@ then
 		fi
 		echo -e "\nPerforming Data Transfer";
 		echo -e "\nCopying data from $sourcedata to $thisdatadir";
-		rsync -rltHv $sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip* --exclude=*.lock;
+		rsync -rltHv $sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip* --exclude=*.lock --exclude=backups;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
 		$instdir/tools/set-data-dir-perms.sh $thisdatadir $wwwuser;
 	fi
@@ -556,7 +565,7 @@ then
 		fi
 		echo -e "\nPerforming Data Transfer";
 		echo -e "\nCopying data from ssh $sourcep1 : $sourcedata to $thisdatadir";
-		rsync -rltHzv -e ssh $sourcep1:$sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip*;
+		rsync -rltHzv -e ssh $sourcep1:$sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip* --exclude=backups;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
 		$instdir/tools/set-data-dir-perms.sh $thisdatadir $wwwuser;
 	fi
