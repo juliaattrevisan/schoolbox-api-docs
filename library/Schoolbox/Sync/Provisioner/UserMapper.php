@@ -77,10 +77,16 @@ class UserMapper extends SchoolboxMapper
              * Find the final UserAccess instances that a person should have
              * Insert these ones
              */
-            $userAccessMapper->deleteByColumnList([
+            $userAccesses = $userAccessMapper->findByColumnList([
                 'uid' => $user->getId(),
                 'service' => UserAccess::SERVICE_HOMEPAGE
             ]);
+
+            foreach ($userAccesses as $userAccess) {
+                if ($userAccess->getAccessLevel() !== UserAccess::ACCESS_FULL) {
+                    $userAccessMapper->delete($userAccess);
+                }
+            }
 
             $finalUserAccess = (new FinalUserAccess(\Schoolbox\Resource\Folder\Mapper::getInstance(), null))
                 ->generate($user);
