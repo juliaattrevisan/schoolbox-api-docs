@@ -48,19 +48,17 @@ class Media extends Base {
                 $videoQueueItem = (QueueMapper::getInstance())
                     ->findOneByColumn('hash', $this->getItem()->getStorage()->getHash());
 
-                $error = false;
+                /* If it was in the queue, check its processing status
+                 * If it's complete, we can show it normally
+                 * Otherwise send the $error flag into the ui
+                 */
+                if ($videoQueueItem && $videoQueueItem->isComplete()) {
+                    $error = false;
+                }
             } catch (\Schoolbox\Mapper\Exception $e) {
 
                 // noop: hash not found
                 // This file was never in the queue, so I guess we don't load it
-            }
-
-            /* If it was in the queue, check its processing status
-             * If it's complete, we can show it normally
-             * Otherwise send the $error flag into the ui
-             */
-            if ($videoQueueItem && !$videoQueueItem->isComplete()) {
-                $error = true;
             }
 
             return [
