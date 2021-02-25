@@ -31,8 +31,6 @@ class UploadController extends AbstractController
         $page->setVar(array(
             'MAX_FILES'      => $this->multi ? '32' : '1',
             'ACCEPTED_FILES' => $mime,
-            'SESSION_NAME'   => session_name(),
-            'SESSION_ID'     => session_id(),
         ));
     }
 

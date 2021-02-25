@@ -20,16 +20,6 @@ use Schoolbox\Resource\Storage\Translator\ModelToArray;
 /** @var PrefixGenerator $prefixGenerator */
 $prefixGenerator = $kernel->get('cdnPrefixGenerator');
 
-// Force session usage due to flash audio recorder.
-// (Uploadify will die, but this is still needed for flash audio upload.)
-$session     = new Session();
-$sessionName = session_name();
-if (isset($_REQUEST[$sessionName]) && $session->validateSessionId($_REQUEST[$sessionName])) {
-    session_id($_REQUEST[$sessionName]);
-}
-
-session_start();
-
 $result = array(
     'success' => false,
     'error'   => 500,
