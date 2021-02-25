@@ -477,7 +477,8 @@ if [ "$sourcetype" == '[A]' ] && [ "$sourceloc" == '[R]' ]; then
   remote_mount_dir=$(ssh "$host" mount | grep "$remote_mount" | awk -F " " '{print $3}');
   remote_not_sb_used=$(ssh "$host" du -sh "$remote_mount_dir" --exclude "$remote_real_data_dir" -B1 2>/dev/null | cut -f 1);
   remote_cache_used=$(ssh "$host" du -sh "$remote_data_dir/cache/zip" -B1 | cut -f 1);
-  remoteUsedStorage=$((remote_mount_used - remote_not_sb_used - remote_cache_used));
+  remoteBackups=$(ssh "$host" du -sb "$remote_real_data_dir"/backups/ | cut -f 1)
+  remoteUsedStorage=$((remote_mount_used - remote_not_sb_used - remote_cache_used - remoteBackups));
 
   if [[ "$localAvailableStorage" == "" ]] || [[ "$remoteUsedStorage" == "" ]]; then
     errmsg="Please check the datapool disk on both hosts, one or both are either full or not available";
