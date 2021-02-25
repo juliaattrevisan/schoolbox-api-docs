@@ -1,3 +1,13 @@
+{##
+ # Video
+ #
+ # A representation of a video when you preview through the Preview subsystem
+ #
+ # @param string $type  either sbfs or storage
+ # @param string $hash  the file hash
+ # @param int error     whether it processed into an error state or completed successfully
+ #}
+
 <script type="text/javascript">
     $(function(){
         $("#schoolbox_video_preview").mediaelementplayer();
@@ -11,3 +21,16 @@
        height="500">
     <source src="/cms/sendVideo.php?type={{ type }}&id={{ hash }}" type='video/mp4'>
 </video>
+
+{# Hide the interactives if the video's not actually playable
+ # Eventually shank this into a css stylesheet somewhere
+ #}
+{% if error %}
+    <style type="text/css">
+        .mejs__overlay.mejs__layer.mejs__overlay-play,
+        .mejs__overlay-button,
+        .mejs__controls {
+            display: none;
+        }
+    </style>
+{% endif %}
