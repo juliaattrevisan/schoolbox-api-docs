@@ -91,7 +91,7 @@ class External_Isams_Class implements External_ClassInterface
             $code = "'" . $this->quote($code) . "'";
         }
 
-        return "V_Class.classcode IN (" . implode($subCodeArray, ',') . ")";
+        return "V_Class.classcode IN (" . implode(',', $subCodeArray) . ")";
     }
 
     /**
