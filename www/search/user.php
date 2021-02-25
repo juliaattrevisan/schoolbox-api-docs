@@ -184,7 +184,7 @@ function renderStudent(
         } else {
             $externalUser['AlertMessages'] = empty(trim($externalUser['AlertMessage'])) ? [] : [$externalUser['AlertMessage']];
         }
-        if (strlen(trim($externalUser["CourtOrderType"])) !== 0) {
+        if (trim($externalUser["CourtOrderType"]) !== '') {
             $externalUser['AlertMessages'][] = "Court Order - " . trim($externalUser["CourtOrderType"]);
         }
     }

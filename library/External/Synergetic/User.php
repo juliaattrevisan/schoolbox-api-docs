@@ -292,6 +292,7 @@ class External_Synergetic_User implements External_UserInterface
                         vStudentsAll.StudentStudiesCode,
                         AlertMessage,
                         vStudentsAll.LegalCourtOrderType AS CourtOrderType,
+                        vStudentsAll.LegalParentsSeparatedFlag AS ParentsSeparatedFlag,
                         vStudentsAll.StudentBoarder,
                         vStudentsAll.StudentsComment as Comment,
                         '' AS StudentEnrolmentDate,
