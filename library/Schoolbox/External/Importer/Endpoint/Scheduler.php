@@ -13,6 +13,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 /**
@@ -116,12 +117,18 @@ class Scheduler
                 exit;
             }
 
+            // For some reason, the mappers don't use `$this->db` as their DB
+            // connection: this means that transactions on that connection are
+            // ignored by mappers.
+            // Just pluck a random mapper and transact over that.
+            // TODO undo this once mappers and `$this->db` share a connection
+            $randomMapper = UserMapper::getInstance();
             try {
                 $this->logger->debug(sprintf(
                     'Beginning transaction'
                 ));
 
-                $this->db->beginTransaction();
+                $randomMapper->getDatabase()->beginTransaction();
 
                 foreach ($composites as $composite) {
                     $composite->import();
@@ -131,7 +138,7 @@ class Scheduler
                     'Committing transaction'
                 ));
 
-                $this->db->commit();
+                $randomMapper->getDatabase()->commit();
             } catch (RuntimeException $e) {
                 $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
 
@@ -139,7 +146,7 @@ class Scheduler
                     'Rollback transaction'
                 ));
 
-                $this->db->rollBack();
+                $randomMapper->getDatabase()->rollBack();
             }
         }
     }
