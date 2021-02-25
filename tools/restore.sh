@@ -480,6 +480,13 @@ if [ "$sourcetype" == '[A]' ] && [ "$sourceloc" == '[R]' ]; then
   remoteBackups=$(ssh "$host" du -sb "$remote_real_data_dir"/backups/ | cut -f 1)
   remoteUsedStorage=$((remote_mount_used - remote_not_sb_used - remote_cache_used - remoteBackups));
 
+  # du/df will report different values because du includes FS data structures (inode tables, super-blocks,
+  # partially-filled blocks etc) while df just aggregates file content size. Also du includes deleted files still
+  # referenced by processes. We could try and calculate/estimate the difference, but it's complicated
+  # (see https://ext4.wiki.kernel.org/index.php/Ext4_Disk_Layout and unreliable).
+  # Instead, we'll just apply a rough empirical factor.
+  readonly SAFETY_FACTORY=1.07
+  remoteUsedStorage=$(echo "$remoteUsedStorage * $SAFETY_FACTORY" | bc | cut -f 1 -d '.')
   if [[ "$localAvailableStorage" == "" ]] || [[ "$remoteUsedStorage" == "" ]]; then
     errmsg="Please check the datapool disk on both hosts, one or both are either full or not available";
     error;
