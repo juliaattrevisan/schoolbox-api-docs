@@ -207,7 +207,7 @@
         // Validate plan form
         $('#participation-plan-form').alaressValidate({
             rules: {
-                'plan-name': 'required',
+                'plan-name': 'requiredNotBlank',
                 'plan-description': 'required',
                 'plan-publish-date': {
                     required: true,
