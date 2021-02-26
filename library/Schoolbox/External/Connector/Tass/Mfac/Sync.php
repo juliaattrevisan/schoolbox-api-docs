@@ -97,7 +97,7 @@ class Sync extends BaseSync implements ISync
                     pd.title                 AS student_contact_title,
                     RTRIM(pd.first_name)     AS student_contact_given_name,
                     RTRIM(pd.preferred_name) AS student_contact_preferred,
-                    RTRIM(pd.surname)        AS student_contact_surname,
+                    RTRIM(p.surname)         AS student_contact_surname,
                     RTRIM(pa.e_mail2)        AS student_contact_home_email,
                     {$defaultEmail[$i]}      AS student_contact_default_email,
                     ''                       AS student_contact_work_email,
