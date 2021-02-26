@@ -3846,11 +3846,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/Indicator/Mapper.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/IndicatorMark/Mapper.php
-
-		-
 			message: "#^Method Schoolbox\\\\Assessment\\\\Rubric\\\\DataModel\\\\Result\\\\Model\\:\\:getLabel\\(\\) should return int but returns string\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/DataModel/Result/Model.php
@@ -10249,11 +10244,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\Resource\\\\Log\\:\\:getObject\\(\\) should return Schoolbox\\\\Resource\\\\File\\\\Model\\|Schoolbox\\\\Resource\\\\Folder\\\\Model\\|Schoolbox\\\\Resource\\\\Link\\|Schoolbox\\\\Resource\\\\Textbox\\\\Model but returns null\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Log.php
-
-		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/LogMapper.php
 
 		-
 			message: "#^Return type \\(array\\<Schoolbox\\\\Resource\\\\Folder\\\\IFolder\\>\\) of method Schoolbox\\\\Resource\\\\My\\\\Folder\\\\Mapper\\:\\:findByParentId\\(\\) should be compatible with return type \\(iterable\\<Schoolbox\\\\Resource\\\\Folder\\\\IFolder\\>&Schoolbox\\\\Collection\\) of method Schoolbox\\\\Resource\\\\Folder\\\\ILocator\\:\\:findByParentId\\(\\)$#"
