@@ -559,8 +559,8 @@
                             <p><strong>Attending?</strong></p>
 
                             <ul class="flex-list buttons rsvp">
-                                <li><a :href="this.ENDPOINTS.rsvpDeclinePath(this.event.id)" @click.prevent="rsvpDecline()" :class="{ declined: this.isDeclined(this.currentAttendanceStatus) }">No</a></li>
                                 <li><a :href="this.ENDPOINTS.rsvpAcceptPath(this.event.id)" @click.prevent="rsvpAccept()" :class="{ accepted: this.isAccepted(this.currentAttendanceStatus) }">Yes</a></li>
+                                <li><a :href="this.ENDPOINTS.rsvpDeclinePath(this.event.id)" @click.prevent="rsvpDecline()" :class="{ declined: this.isDeclined(this.currentAttendanceStatus) }">No</a></li>
                             </ul>
                         </section>
                     </template>
