@@ -346,8 +346,8 @@ export default {
             </template>
 
             <ul class="flex-list buttons">
-                <li><a @click.prevent="$refs.awardModal.close" class="button">Cancel</a></li>
                 <li><button ref="awardModalSubmit" @click.prevent="onSubmit" class="submit">Confirm</button></li>
+                <li><a @click.prevent="$refs.awardModal.close" class="button">Cancel</a></li>
             </ul>
         </reveal-modal>
     </div>
