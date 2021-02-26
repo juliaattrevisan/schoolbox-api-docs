@@ -146,6 +146,7 @@ class Mapper extends BaseMapper
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('student', 's')},
                         {$this->getJoinColumnString('student.year', 'sy')},
+                        {$this->getJoinColumnString('student.schoolHouse', 'sh')},
                         {$this->getJoinColumnString('severity', 'sv')},
                         {$this->getJoinColumnString('owner', 'o')},
                         {$this->getJoinColumnString('type', 't')},
@@ -163,6 +164,7 @@ class Mapper extends BaseMapper
             FROM        {$this->getTable()}
             INNER JOIN   {$this->getJoinSql('student', '', 's')}
             LEFT  JOIN   {$this->getJoinSql('student.year', 's', 'sy')}
+            LEFT  JOIN   {$this->getJoinSql('student.schoolHouse', 's', 'sh')}
             LEFT  JOIN   {$this->getJoinSql('severity', '', 'sv', true)}
             INNER JOIN   {$this->getJoinSql('owner', '', 'o', true)}
             LEFT JOIN    {$this->getJoinSql('modifiedBy', '', 'mb', true)}
@@ -243,6 +245,10 @@ class Mapper extends BaseMapper
         $studentYear = $this->hydrateJoin($row, 'student.year', 'sy');
         if ($studentYear) {
             $model->getStudent()->setYear($studentYear);
+        }
+        $studentHouse = $this->hydrateJoin($row, 'student.schoolHouse', 'sh');
+        if ($studentHouse) {
+            $model->getStudent()->setSchoolHouse($studentHouse);
         }
         $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_id', $model->getId()));
 
