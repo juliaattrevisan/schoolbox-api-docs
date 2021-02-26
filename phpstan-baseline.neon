@@ -9406,11 +9406,6 @@ parameters:
 			path: library/Schoolbox/Pastoral/Management/Controller.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Mapper.php
-
-		-
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/ReportBuilder/Controller.php
