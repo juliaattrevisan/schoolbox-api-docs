@@ -3379,7 +3379,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param string   $alias    The alias that the joined table was given
      * @param callable $callback An optional callback
      *
-     * @return object
+     * @return object|null
      */
     public function hydrateJoin($row, $join, $alias = '', $callback = null)
     {
@@ -3397,7 +3397,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param array    $row
      * @param string   $alias
      * @param callable $callback
-     * @return object
+     * @return object|null
      */
     private function performHydration(Cache $cache, Mapper $mapper, array $row, $alias = '', $callback = null)
     {
