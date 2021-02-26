@@ -50,7 +50,7 @@ class Media extends Base {
                  * If it's complete, we can show it normally
                  * Otherwise send the $error flag into the ui
                  */
-                if ($videoQueueItem && $videoQueueItem->isComplete()) {
+                if ($videoQueueItem->isComplete()) {
                     $error = false;
                 }
             } catch (\Schoolbox\Mapper\Exception $e) {
