@@ -31,7 +31,7 @@ class UserAccessXORTest extends TestCase
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function testSame($array1, $array2, $expected)
+    public function testSame(array $array1, array $array2, int $expected)
     {
 
         $diff = (new UserAccessXOR())->generate($array1, $array2);
