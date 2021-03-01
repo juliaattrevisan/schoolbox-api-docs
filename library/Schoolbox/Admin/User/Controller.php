@@ -15,6 +15,7 @@ use HouseMapper;
 use HouseResidentialMapper;
 use Monolog\Logger;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Role;
 use Scrub;
 use UnexpectedValueException;
 use Schoolbox\API\Token\Jwt;
@@ -371,6 +372,44 @@ class Controller extends Base
         ]);
     }
 
+    /**
+     * Endpoint for returning a list of users that have not been updated recently in the system
+     * @api GET /adminv2/user/stale/list
+     */
+    public function getStaleUsers()
+    {
+        $rolepb = $this->roleMapper->getPredicateBuilder()->notEquals('group_type', Role::GUEST);
+        $roles = $this->roleMapper->findIdsByPredicates($rolepb);
+
+        $lastWeek = new \Alaress_Date_Format(strtotime('-1 week'), \Alaress_Date_Format::TIMESTAMP);
+
+        $pb = $this->userMapper->getPredicateBuilder()
+                               ->notEquals('username', 'alaress')
+                                ->lessThan('updated_at', $lastWeek)
+                               ->in('group_id', $roles);
+
+        $userList = $this->userMapper->findByPredicates($pb, ['order'=>['updated_at'=>'DESC']]);
+
+        foreach($userList as $user) {
+            /**
+             * @var $user User
+             */
+            $jsonPayload[] = [
+                'id'            => $user->getId(),
+                'username'      => $user->getUsername(),
+                'external_id'   => $user->getExternalId(),
+                'firstname'     => $user->getFirstname(),
+                'lastname'      => $user->getLastname(),
+                'role'          => $user->getRole()->getName(),
+                'year'          => $user->getYear() ? $user->getYear()->getName() : '',
+                'updated_at'    => $user->getUpdatedAt()->getJson(),
+            ];
+        }
+
+        $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
+
+
+    }
 
     /**
      * Insert user screen

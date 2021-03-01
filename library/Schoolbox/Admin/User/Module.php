@@ -44,6 +44,8 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'getInsert', $basePath, "/create");
         $this->addGetRoute($router, 'getModify', $basePath, "/{userId}/modify")->setTokens(['userId' => '\d+']);
+        $this->addGetRoute($router, 'getStaleUsers', $basePath, "/stale/list");
+
 
         // CRUD Actions
 
