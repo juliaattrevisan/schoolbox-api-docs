@@ -36,7 +36,7 @@ class PrefixGenerator
      */
     public static function generate(IConfigLoader $config): string
     {
-        if ($config->get(ConfigMapper::NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN)) {
+        if (!$config->get(ConfigMapper::NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN)) {
             return self::DEFAULT_PREFIX;
         }
         return str_replace(
