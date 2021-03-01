@@ -34,6 +34,15 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap implements IAutoma
 
         $actualAnswers = $matches[1];
 
+        // Secondary strength collator differentiates accents, but not cases.
+        // (Collator::ALTERNATE_HANDLING: Collator::SHIFTED causes the collator
+        //  to disregard spaces, punctuation and symbols: this is too extreme,
+        //  spaces are significant but need to be normalized, punctuation and
+        //  symbols are assumed important)
+        $collator = new Collator('root');
+        $collator->setStrength(Collator::SECONDARY);
+        $normalizeSpaceRegex = '/\\s+/';
+
         /* Find out how much each phrase is worth
            * If the number of Fillgap answers is 0 (ie. no blank for students to fill), skip it.
            * TODO: It should be noted that a teacher should be prevented from creating a cloze question that doesn't have any blanks in it...
@@ -45,8 +54,21 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap implements IAutoma
             $marksPerAnswer = $currentResponse['marks'] / $actualAnswerCount;
             foreach ($actualAnswers as $i => $actualAnswer) {
                 $givenAnswer = $response[$i] ?? '';
-                if (strtolower(trim($actualAnswer)) == strtolower(trim($givenAnswer))) {
+
+                // Collate and compare
+                $comparison = $collator->compare(
+                    trim(preg_replace($normalizeSpaceRegex, ' ', $actualAnswer)),
+                    trim(preg_replace($normalizeSpaceRegex, ' ', $givenAnswer)),
+                );
+                if ($comparison === 0) {
                     $totalMarks += $marksPerAnswer;
+                }
+                if ($comparison === false) {
+                    // data is broken, trigger a warning
+                    trigger_error(
+                        'Cannot compare actual and given answer: one or the other is incorrectly encoded',
+                        E_USER_WARNING
+                    );
                 }
             }
         }
