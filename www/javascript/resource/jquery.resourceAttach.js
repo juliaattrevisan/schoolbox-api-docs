@@ -197,13 +197,15 @@
                 //manually ensure the file has been removed, as it seems files 
                 //added via the modal aren't notifying DropZone properly even though 
                 //the 'removedfile' event is still called
-                var dropZone = this;
-                dropZone.files.forEach(function (file, index) {
-                    if (file.hash === _file.hash) {
-                        dropZone.files.splice(index, 1);
-                    }
-                });
-                dropZone._updateMaxFilesReachedClass();
+                if (_file.status !== 'error') {
+                    var dropZone = this;
+                    dropZone.files.forEach(function (file, index) {
+                        if (file.hash === _file.hash) {
+                            dropZone.files.splice(index, 1);
+                        }
+                    });
+                    dropZone._updateMaxFilesReachedClass();
+                }
             },
 
             maxfilesexceeded: function (file) {
