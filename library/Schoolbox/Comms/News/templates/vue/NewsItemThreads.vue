@@ -15,26 +15,24 @@ export default {
 
     props: {
         articleId: Number,
-        threadId: Number,
+        threadIdOnLoad: Number,
         isThreadCheckboxVisibleOnLoad: Boolean,
         isThreadCheckboxEnabledOnLoad: Boolean,
         isThreadEnabledOnLoad: Boolean,
         isPublished: Boolean,
         createThreadEndpoint: String,
-        openThreadEndpoint: String,
-        closeThreadEndpoint: String,
-        threadCommentsEndpoint: String,
         siteVersion: String //for cache busting
     },
 
     data: function() {
         return {
-            comments: [],
-            totalCommentsCount: 0,
-            cursorNext: '',
+            threadId: 0,
             isThreadCheckboxVisible: undefined,
             isThreadCheckboxEnabled: undefined,
             isThreadEnabled: undefined,
+            comments: [],
+            totalCommentsCount: 0,
+            cursorNext: '',
             showLoadMoreButton: false,
             commentIndexToDelete: undefined,
             confirmDeleteButton: true,
@@ -76,6 +74,7 @@ export default {
          *
          */
         initDataFromProps () {
+            this.threadId = this.threadIdOnLoad;
             this.isThreadCheckboxVisible = this.isThreadCheckboxVisibleOnLoad;
             this.isThreadCheckboxEnabled = this.isThreadCheckboxEnabledOnLoad;
             this.isThreadEnabled = this.isThreadEnabledOnLoad; 
@@ -97,7 +96,7 @@ export default {
                 return;
             }
 
-            axios.get(this.threadCommentsEndpoint, {
+            axios.get('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments/', {
                 params: {
                     cursor: this.cursorNext
                 }
@@ -165,11 +164,11 @@ export default {
                 // I already have a thread ID: switch it on/off
                 changeThreadStatusAction = new Promise((resolve, reject) => {
                     
-                    let changeThreadStatusEndpoint;
+                    let changeThreadStatusEndpoint = '/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/';
                     if (this.isThreadEnabled) {
-                        changeThreadStatusEndpoint = this.openThreadEndpoint;
+                        changeThreadStatusEndpoint += 'open';
                     } else {
-                        changeThreadStatusEndpoint = this.closeThreadEndpoint;
+                        changeThreadStatusEndpoint += 'close';
                     }
 
                     axios.put(changeThreadStatusEndpoint, {}, { headers: this.postHeaders }).then(() => {
@@ -319,7 +318,7 @@ export default {
             this.isProcessActive = true;
             this.$refs.toast.activate('Posting comment...');
 
-            axios.post(this.threadCommentsEndpoint, {
+            axios.post('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments', {
                 content: this.newComment
             }).then((response) => {
                

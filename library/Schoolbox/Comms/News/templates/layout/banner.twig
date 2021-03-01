@@ -87,15 +87,12 @@
     <section id="threads-section">
         <news-item-threads 
             :article-id="{{ article.id }}"
-            :thread-id="{{ article.discussionThread ? article.discussionThread.id : 0 }}"
+            :thread-id-on-load="{{ article.discussionThread ? article.discussionThread.id : 0 }}"
             :is-thread-checkbox-visible-on-load="Boolean({{ modifyRoute or isAuthor }})"
             :is-thread-checkbox-enabled-on-load="Boolean({{ article.discussionThread ? article.discussionThread.open : 'false' }})"
             :is-thread-enabled-on-load="Boolean({{ article.discussionThread ? article.discussionThread.open : 'false' }})"
             :is-published="Boolean({{ article.isPublic }})"
             :create-thread-endpoint="'{{ routeLookup('commsDiscussionThreads.createThread', { contextId: article.id } ) }}'"
-            :open-thread-endpoint="'{{ routeLookup('commsDiscussionThreads.openThread', { contextId: article.id, id: article.discussionThread.id } ) }}'"
-            :close-thread-endpoint="'{{ routeLookup('commsDiscussionThreads.closeThread', { contextId: article.id, id: article.discussionThread.id } ) }}'"
-            :thread-comments-endpoint="'{{ routeLookup('commsDiscussionThreads.getCommentsByThread', { contextId: article.id, id: article.discussionThread.id } ) }}'"
             :site-version="'{{ config.site_version }}'"
         />
     </section>
