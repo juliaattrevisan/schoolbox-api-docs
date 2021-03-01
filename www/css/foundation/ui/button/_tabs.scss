@@ -5,8 +5,8 @@
 // Foundation vars
 $tabs-navigation-bg-color: transparent;
 $tabs-navigation-active-bg-color: transparent;
-$tabs-navigation-font-color: $aluminum;
-$tabs-navigation-active-font-color: $body-font-color;
+$tabs-navigation-font-color: $steel;
+$tabs-navigation-active-font-color: $accent-foreground;
 $tabs-navigation-font-size: $base-font-size;
 $tabs-content-padding: 0;
 
@@ -41,7 +41,7 @@ $border-bottom-width: 2px;
       border-bottom: $border-bottom-width solid transparent;
 
       &:hover {
-        color: $body-font-color;
+        color: $tabs-navigation-active-font-color;
         border-bottom: $border-bottom-width solid $content-ui-hover;
       }
     }
@@ -61,6 +61,24 @@ $border-bottom-width: 2px;
         &:hover {
           border-bottom: $border-bottom-width solid transparent;
         }
+      }
+    }
+  }
+  &.vertical {
+    margin: 0;
+    padding: 0;
+    max-width: none;
+    width: auto;
+
+    dd,
+    li.tab-title {
+      a {
+        border-bottom: 0;
+        font-size: .875rem;
+        padding: .4375rem .875rem;
+      }
+      &.active a {
+        border-left: 2px solid $accent-foreground;
       }
     }
   }

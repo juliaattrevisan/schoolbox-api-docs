@@ -23,7 +23,7 @@
 <div id="icon-modal" class="reveal-modal icon-picker file-picker" data-reveal>
     <div class="attachment-browser-container">
         <div class="attachment-browser-filesystems icon-category-list-container">
-            <ul class="side-nav">
+            <ul class="tabs vertical">
                 {% for path, node in registry %}
                 <li class="tab-title" data-icon-path="{{ path }}">
                     <a>{{ node.name }} ({{ node.files|length }})</a>

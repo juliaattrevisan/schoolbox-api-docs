@@ -1,3 +1,4 @@
+
 .attachment-browser-container {
   display: flex;
 
@@ -5,15 +6,12 @@
     flex: 0 0 auto;
 
     ul {
-      background: $ghost;
       box-shadow: inset -1px 0px 0px $silver;
       height: 100%;
     }
 
     li {
       a {
-        color: $aluminum;
-
         @media #{$medium-down} {
           padding: .5rem !important;
           max-width: rem-calc(124);
@@ -30,18 +28,6 @@
 
       &.active > a {
         background: $white;
-        border-right: 1px solid $white;
-        color: $anchor-font-color;
-        font-weight: normal;
-      }
-    }
-
-    .tab-title {
-      // https://stackoverflow.com/questions/2943548/how-to-reset-remove-chromes-input-highlighting-focus-border
-      // probably shouldn't remove this, but it puts an ugly black border around selected element
-      a:focus {
-        outline-style: none;
-        box-shadow: none;
       }
     }
 
