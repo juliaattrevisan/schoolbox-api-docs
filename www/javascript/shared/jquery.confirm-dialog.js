@@ -60,7 +60,7 @@
             confirmLabel: 'Yes',
             confirmEvent: $.confirmDialog.followHref,
             cancelEvent: $.noop,
-            cancelLabel: 'No',
+            cancelLabel: 'Cancel',
             format: 'text'
         };
 

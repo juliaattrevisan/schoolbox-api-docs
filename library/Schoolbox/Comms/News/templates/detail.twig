@@ -44,6 +44,7 @@ Data:
 
                     $element.confirmDialog({
                         text: 'Are you sure you want to delete ' + title + '?',
+                        confirmLabel: 'Delete',
                         confirmEvent: function() {
                             $toast.toastActivate({
                                 text: 'Deleting ' + title
