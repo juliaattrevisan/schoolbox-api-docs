@@ -5,6 +5,7 @@ use Alaress\Web\Output;
 use Aura\Router\Router;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
@@ -298,6 +299,7 @@ class SitePage extends Page
             'USER_ROLE'    => $this->user->getRole()->getName(),
             'SITE_NAME'    => $this->config->get('school_name'),
             'SITE_VERSION' => $this->config->get('site_version'),
+            'CDN_PREFIX'   => PrefixGenerator::generate($this->config),
         ];
         $this->setVar($templateVar);
         $this->localise();
