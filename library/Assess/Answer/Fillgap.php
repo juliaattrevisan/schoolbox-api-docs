@@ -1,7 +1,6 @@
 <?php
 
 use Assess\IAutomarkable;
-use Evaluation\Answer\Comparison;
 
 /**
  * Assess_Answer_Fillgap
@@ -14,8 +13,6 @@ use Evaluation\Answer\Comparison;
  */
 class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap implements IAutomarkable
 {
-    use Comparison;
-
     /**
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.

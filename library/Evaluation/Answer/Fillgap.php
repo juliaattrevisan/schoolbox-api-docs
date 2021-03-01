@@ -1,4 +1,7 @@
 <?php
+
+use Evaluation\Answer\Comparison;
+
 /**
  * Evaluation_Answer_Fillgap
  *
@@ -8,7 +11,9 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
+abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
+{
+    use Comparison;
 
 	/**
 	 * Javascript class to use when creating UI
@@ -359,7 +364,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 
 				/* Indicate matching/non-matching responses to answers
 					 */
-				if (strtolower(trim($actualAnswers[$i])) == strtolower(trim($existingAnswer[$i]))) {
+				if ($this->compareStrings($actualAnswers[$i], $existingAnswer[$i])) {
 					$replace = " <span class='fillgap correct'>$val</span> ";
 				} else {
 					$replace = " <span class='fillgap incorrect'>$val</span> ";
