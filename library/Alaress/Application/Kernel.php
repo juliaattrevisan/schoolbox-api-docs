@@ -44,6 +44,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskCompletionMapper;
 use Schoolbox\Bookmark\Mapper as BookmarkMapper;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
@@ -926,6 +927,7 @@ abstract class Kernel
                     $twig->addGlobal('dateFormats', $dateFormats);
                     $twig->addGlobal('NOW', Alaress_Date_Format::now());
                     $twig->addGlobal('USER', $_SESSION['user']);
+                    $twig->addGlobal('CDN_PREFIX', PrefixGenerator::generate($config));
 
                     // Global access to returnUrl vars
                     $encodedUrl = Redirect::encode($_GET["page"]);
