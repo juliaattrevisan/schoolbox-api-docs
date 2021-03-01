@@ -147,13 +147,13 @@ class UserAccessXORTest extends TestCase
      * $array1 and $array2 contain different set of tuples
      *
      * @dataProvider provider_different
-     * @param $array1
-     * @param $array2
-     * @param $expected
+     * @param array $array1
+     * @param array $array2
+     * @param int $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function testDifferent($array1, $array2, $expected)
+    public function testDifferent(array $array1, array $array2, int $expected)
     {
 
         $diff = (new UserAccessXOR())->generate($array1, $array2);
@@ -259,47 +259,4 @@ class UserAccessXORTest extends TestCase
         ];
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
