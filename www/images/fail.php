@@ -90,7 +90,7 @@ switch ($_GET['transform_type']) {
 // If even THAT fails, just redirect to the static version.
 try {
     $imageProcessor = new Image\Processor(
-        Cache\LocalFS::getStorageModel(SITE_root, '/resources' . $path),
+        Cache\LocalFS::getStorageModel(WEB_root, '/static' . $path),
         $cache_key,
         $transform
     );
