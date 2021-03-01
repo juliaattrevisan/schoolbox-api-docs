@@ -1,12 +1,29 @@
 <div class="row">
     <div class="small-12 columns">
-        <h1>Schoolbox Administration › {{ links[pageCurrent].name ?? 'Home'}}</h1>
-        <ul class="sub-nav">
-            {% for key,value in links %}
-                {% if value.visible %}
-                <li class="{% if key == pageCurrent %}active{% endif %}"><a href="/adminv2/{{ key }}">{{ value.name }}</a></li>
-                {% endif %}
-            {% endfor %}
-        </ul>
+        <h1>Admin › {{ links[pageCurrent].name ?? 'Home'}}</h1>
     </div>
 </div>
+{#<div class="admin-nav">#}
+{#    <ul class="side-nav">#}
+{#        {% for key,value in links %}#}
+{#        {% if value.visible %}#}
+{#        <li class="{% if key == pageCurrent %}active{% endif %}"><a href="/adminv2/{{ key }}">{{ value.name }}</a></li>#}
+{#        {% endif %}#}
+{#        {% endfor %}#}
+{#    </ul>#}
+{#</div>#}
+<nav id="admin-nav">
+    <ul class="side-nav" role="navigation">
+        <li role="menuitem"><a href="#">Home</a></li>
+        <li class="parent-item active" role="menuitem">
+            <a href="#">User Management</a>
+            <ul class="flyout" role="navigation">
+                <li role="menuitem"><a href="#">Users</a></li>
+                <li role="menuitem"><a href="#">Bulk Modify</a></li>
+                <li role="menuitem"><a href="#">User Provisioning System</a></li>
+                <li role="menuitem"><a href="#">Schoolbox Help Provisioning</a></li>
+            </ul>
+        </li>
+        <li><a href="#">School Data Import</a></li>
+    </ul>
+</nav>

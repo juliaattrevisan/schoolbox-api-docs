@@ -1,10 +1,18 @@
-$side-nav-font-weight-active: $font-weight-bold;
 $side-nav-padding: 0;
+$side-nav-list-type: none;
+$side-nav-list-position: inside;
+$side-nav-list-margin: 0;
 $side-nav-link-color: $anchor-font-color;
 $side-nav-link-color-active: $side-nav-link-color;
 $side-nav-link-color-hover: $body-font-color;
-$side-nav-list-margin: 0;
-$side-nav-divider-style: dotted;
+$side-nav-font-size: rem-calc(13);
+$side-nav-font-weight: normal;
+$side-nav-font-weight-active: $font-weight-bold;
+$side-nav-font-family: $body-font-family;
+$side-nav-font-family-active: $side-nav-font-family;
+$side-nav-divider-size: 1px;
+$side-nav-divider-style: solid;
+$side-nav-divider-color: scale-color(#fff, $lightness: 10%);
 
 @import "../../original-foundation/components/side-nav";
 
@@ -12,11 +20,9 @@ $side-nav-divider-style: dotted;
 $border-bottom-width: 2px;
 
 .side-nav {
+  background-color: $white;
   li {
-    margin: 0;
-
     a {
-      display: block;
       padding: 0.5rem 0.75rem;
       border-left: $border-bottom-width solid transparent;
 
@@ -34,8 +40,8 @@ $border-bottom-width: 2px;
     }
 
     ul {
-      list-style: none;
       margin: 0;
+      list-style: none;
 
       li a {
         padding-left: 1.5rem;
@@ -45,7 +51,35 @@ $border-bottom-width: 2px;
           font-size: 10px;
         }
       }
+      &.flyout {
+        position: absolute;
+        background-color: $white;
+        top: 0;
+        left: -250px;
+        min-width: 250px;
+        z-index: -1;
+        transition: left 200ms ease-in;
+      }
     }
+    &:hover > ul.flyout {
+      left: 250px;
+      transition: left 200ms ease-in;
+    }
+    &.parent-item > a:after {
+      font-family: $font-family-icon;
+      content: "\e64b"; // right caret
+      float: right;
+    }
+  }
+}
+
+#admin-nav {
+  overflow: auto;
+  position: relative;
+  z-index: 2;
+
+  .side-nav {
+    width: 250px;
   }
 }
 
