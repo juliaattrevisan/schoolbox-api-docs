@@ -196,6 +196,7 @@
 
                             $(this).confirmDialog({
                                 text: 'Are you sure you want to delete this?',
+                                confirmLabel: 'Delete',
                                 confirmEvent: function (anchor) {
                                     $.get('/cms/fileForm.php?ajax=1&delete=' + anchor.attr('id')).done(function() {
                                         location.reload();
@@ -209,7 +210,7 @@
                 <!-- END source_folder_exists -->
             </section>
             <!-- END has_audio -->
-            
+
         </div>
     </div>
 </div>

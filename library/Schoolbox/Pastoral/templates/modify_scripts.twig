@@ -64,6 +64,7 @@
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this record?',
+                confirmLabel: 'Delete',
                 confirmEvent: function () {
                     $.post('{{ routeLookup('pastoral.postRecordDelete', {'studentId': record.student.id, 'recordId': record.id}) }}')
                         .done(function () {
@@ -94,11 +95,11 @@
         {# Form Validation #}
 
         var form = $('form#pastoralForm');
-        
+
         $.validator.addMethod("duplicateIdSelected", function () {
             return $('#duplicateIds').val() !== '';
         }, $.validator.format("You must select at least one student before you can proceed"));
-        
+
         form.alaressValidate({
             ignore: ':disabled',
             rules: {

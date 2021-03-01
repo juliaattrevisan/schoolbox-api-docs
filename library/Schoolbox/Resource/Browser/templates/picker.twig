@@ -216,6 +216,7 @@
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this?',
+                confirmLabel: 'Delete',
                 confirmEvent: function (anchor) {
                     $.post(anchor.attr('href'), {id: $(event.target).attr('data-folder-id') }).done(function () {
                         jstree.delete_node(deleteNode);

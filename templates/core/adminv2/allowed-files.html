@@ -104,6 +104,7 @@
             event.preventDefault();
             $(this).confirmDialog({
                 text: "Are you sure you want to delete?",
+                confirmLabel: 'Delete',
                 confirmEvent: function(element) {
                     var deleteId = event.target.getAttribute('data-interaction-delete');
                     window.location.href = '/adminv2/allowed-fileForm.php?delete=' + deleteId

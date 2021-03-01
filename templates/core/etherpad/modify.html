@@ -9,6 +9,7 @@
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Collab Doc?',
+                confirmLabel: 'Delete',
                 confirmEvent: function() {
                     form.find('input[name="type"]').val('delete');
                     form.submit();

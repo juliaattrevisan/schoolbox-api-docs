@@ -162,6 +162,7 @@
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this report?',
+                confirmLabel: 'Delete',
                 confirmEvent: function () {
                     var route = '{{ routeLookup('pastoralReportBuilder.postReportDelete', {'reportId': '_reportId'}) }}';
 

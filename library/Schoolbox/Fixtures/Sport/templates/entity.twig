@@ -10,6 +10,7 @@
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Division?',
+                confirmLabel: 'Delete',
                 confirmEvent: function() {
                     $.post(element.attr('data-post-action'), {}, function() {
 
@@ -33,6 +34,7 @@
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Team?',
+                confirmLabel: 'Delete',
                 confirmEvent: function() {
                     $.post(element.attr('href'), {}, function() {
 

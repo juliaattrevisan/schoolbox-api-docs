@@ -58,6 +58,7 @@
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Match?',
+                confirmLabel: 'Delete',
                 confirmEvent: function() {
                     $.post(element.attr('href'), {}, function() {
 

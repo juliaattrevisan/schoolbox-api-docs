@@ -97,6 +97,7 @@
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this menu item?',
+                confirmLabel: 'Delete',
                 confirmEvent: function () {
                     $.post('{{ routeLookup('adminMenuTop.postDelete') }}', {
                         id: id

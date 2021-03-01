@@ -115,6 +115,7 @@
                 onDelete: function (element, container) {
                     $(this).confirmDialog({
                         text: 'Are you sure you want to delete ' + container.find('[data-item-element]').val() + '?',
+                        confirmLabel: 'Delete',
                         confirmEvent: function () {
                             var data = [];
 

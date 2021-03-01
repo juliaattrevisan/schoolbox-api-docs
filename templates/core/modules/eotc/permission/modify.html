@@ -27,6 +27,7 @@
 
 			$(this).confirmDialog({
 				text: 'Are you sure you want to delete this admin?',
+                confirmLabel: 'Delete',
 				confirmEvent: function () {
 					window.location.href = element.attr('href');
 				}

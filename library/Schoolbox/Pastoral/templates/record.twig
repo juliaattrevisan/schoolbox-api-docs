@@ -42,6 +42,7 @@
 
                         $(this).confirmDialog({
                             text: 'Are you sure you want to delete this record?',
+                            confirmLabel: 'Delete',
                             confirmEvent: function () {
                                 $.post('{{ routeLookup('pastoral.postRecordDelete', {studentId: record.student.id, recordId: record.id }) }}'
                                 ).done(function () {
