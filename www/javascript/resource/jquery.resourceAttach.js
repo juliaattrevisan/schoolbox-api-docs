@@ -187,13 +187,23 @@
                 });
             },
 
-            removedfile: function (file) {
+            removedfile: function (_file) {
                 self.detach(
-                    file.previewElement,
+                    _file.previewElement,
                     function () {
-                        azone.trigger('removedfile.attachzone', [file]);
+                        azone.trigger('removedfile.attachzone', [_file]);
                     }
                 );
+                //manually ensure the file has been removed, as it seems files 
+                //added via the modal aren't notifying DropZone properly even though 
+                //the 'removedfile' event is still called
+                var dropZone = this;
+                dropZone.files.forEach(function (file, index) {
+                    if (file.hash === _file.hash) {
+                        dropZone.files.splice(index, 1);
+                    }
+                });
+                dropZone._updateMaxFilesReachedClass();
             },
 
             maxfilesexceeded: function (file) {
@@ -260,7 +270,7 @@
         } else {
             this.fallbackMaxFilesReached();
         }
-
+          
         // cache the content for this reveal modal
         this.cacheModal();
 
@@ -664,13 +674,14 @@
         //noinspection AssignmentToFunctionParameterJS
         elem = $(elem);
         elem.addClass(this.options.detachClass);
-
+        
         if (this.dropzone) {
             this.dropzone._updateMaxFilesReachedClass();
+
         } else {
             this.fallbackMaxFilesReached();
         }
-
+        
         setTimeout(function () {
             elem.remove();
             if ($.isFunction(then)) {
