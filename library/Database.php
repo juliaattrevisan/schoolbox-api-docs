@@ -288,45 +288,6 @@ class Database implements IDatabase, Serializable
     }
 
     /**
-     * Quotes column, table, etc. names so they may be safely used in queries.
-     * For MySQL: ` in an identifier is replaced with ``, and the string is
-     * wrapped with ` characters.
-     *
-     * @param  string $string
-     * @return string
-     */
-    public function quoteIdentifier($string)
-    {
-        return $this->quoter->quoteIdentifier($string);
-    }
-
-    /**
-     * Escapes _ and % characters within $string, so they don't have unintended
-     * effects in LIKE queries.
-     *
-     * This doesn't quote $string for safe use in string-interpolated queries,
-     * it only escapes LIKE chars.
-     *
-     * @param  string $string
-     * @return string
-     */
-    public function escapeForLike($string)
-    {
-        return $this->quoter->escapeForLike($string);
-    }
-
-
-    /**
-     * @inheritdoc
-     * @todo this class should NOT extend IQuoter. Callers should call $db->getQuoter()->quoterMethod()
-     */
-    public function getEscapedOperand(string $defaultTable, string $columnName): string
-    {
-        return $this->quoter->getEscapedOperand($defaultTable, $columnName);
-    }
-
-
-    /**
      * Tries to create a unique parameter name
      *
      * @param string $param_name The base name to attempt to add
