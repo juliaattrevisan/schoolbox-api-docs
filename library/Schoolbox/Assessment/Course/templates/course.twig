@@ -331,11 +331,11 @@ Usage:
 
                     {% if not courseSpec %}
                         <div data-mage-submitrow>
-                            <div class="small-12 medium-8 column">
+                            <div class="small-12 column">
                                 {# Don't delete the inline style, it's needed -#}
-                                <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
+                                <div data-mage-error style="display:none;" class="alert alert-box icon-alert"></div>
                             </div>
-                            <div class="small-12 medium-4 column">
+                            <div class="small-12 column">
                                 <input name="part1" type="submit" class="button" value="Next" data-mage-next="unit-info"
                                        data-mage-working="Working..."
                                        formaction="{{ courseSpec ? routeLookup('course.updateCourse') : routeLookup('course.createCourse') }}"/>
@@ -376,12 +376,12 @@ Usage:
                                         </div>
                                     </div>
                                     <div>
-                                        <div class="small-12 medium-8 column">
+                                        <div class="small-12 column">
                                             {# Don't delete the inline style, it's needed -#}
-                                            <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
+                                            <div data-mage-error style="display:none;" class="alert alert-box icon-alert"></div>
                                         </div>
-                                        <div class="small-12 medium-4 column">
-                                            <input name="spawn-unit" type="submit" class="button" value="Create {{ locale.unit.proper }}"
+                                        <div class="small-12 column">
+                                            <input name="spawn-unit" type="submit" value="Create {{ locale.unit.proper }}"
                                                    data-mage-next="spawn-unit" data-mage-working="Working..."
                                                    formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"/>
                                         </div>

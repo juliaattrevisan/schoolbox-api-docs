@@ -274,19 +274,17 @@ Usages:
                     {% if 1 == initialStage %}
                         <div class="small-12 column">
                             <div class="row" data-mage-submitrow>
-                                <div class="small-12 medium-8 column">
-                                    <p class="alert alert-box icon-alert" data-mage-error></p>
+                                <div class="small-12 column">
+                                    <div class="alert alert-box icon-alert" data-mage-error></div>
                                 </div>
-                                <div class="small-12 medium-4 column">
-                                    <input
-                                        type="submit"
-                                        name="part-1"
-                                        value="Next"
-                                        data-mage-next="part-2"
-                                        data-mage-working="Working..."
-                                        formaction="{{ routeLookup('courseImport.postClasses') }}"
-                                    />
-                                </div>
+                                <input
+                                    type="submit"
+                                    name="part-1"
+                                    value="Next"
+                                    data-mage-next="part-2"
+                                    data-mage-working="Working..."
+                                    formaction="{{ routeLookup('courseImport.postClasses') }}"
+                                />
                             </div>
                         </div>
                     {% endif %}
@@ -313,19 +311,17 @@ Usages:
                         </div>
                         <div class="small-12 column">
                             <div class="row" data-mage-submitrow>
-                                <div class="small-12 medium-8 column">
-                                    <p class="alert alert-box icon-alert" data-mage-error></p>
+                                <div class="small-12 column">
+                                    <div class="alert alert-box icon-alert" data-mage-error></div>
                                 </div>
-                                <div class="small-12 medium-4 column">
-                                    <input
-                                        type="submit"
-                                        name="part-2"
-                                        value="Next"
-                                        data-mage-next="part-3"
-                                        data-mage-working="Working..."
-                                        formaction="{{ routeLookup('courseImport.postUnits') }}"
-                                    />
-                                </div>
+                                <input
+                                    type="submit"
+                                    name="part-2"
+                                    value="Next"
+                                    data-mage-next="part-3"
+                                    data-mage-working="Working..."
+                                    formaction="{{ routeLookup('courseImport.postUnits') }}"
+                                />
                             </div>
                         </div>
                     </div>
@@ -337,23 +333,21 @@ Usages:
                         <!-- Notable absence: no [data-mage-submitrow] since this is the final section -->
                         <div class="small-12 column">
                             <div class="row" data-mage-submitrow>
-                                <div class="small-12 medium-8 column">
-                                    <p class="alert alert-box icon-alert" data-mage-error></p>
+                                <div class="small-12 column">
+                                    <div class="alert alert-box icon-alert" data-mage-error></div>
                                 </div>
-                                <div class="small-12 medium-4 column">
-                                    {% set urlSuffix = (encodedReturnUrl | length)
-                                        ? ('?' ~ returnUrlName ~ '=' ~ encodedReturnUrl)
-                                        : ''
-                                    %}
-                                    <input
-                                        name="part-3"
-                                        type="submit"
-                                        value="{% if 'import' == action %}Import{% else %}Modify{% endif %}"
-                                        data-mage-next="none"
-                                        data-mage-working="Working..."
-                                        formaction="{{ routeLookup('courseImport.postAssessments') }}{{ urlSuffix }}"
-                                    />
-                                </div>
+                                {% set urlSuffix = (encodedReturnUrl | length)
+                                    ? ('?' ~ returnUrlName ~ '=' ~ encodedReturnUrl)
+                                    : ''
+                                %}
+                                <input
+                                    name="part-3"
+                                    type="submit"
+                                    value="{% if 'import' == action %}Import{% else %}Modify{% endif %}"
+                                    data-mage-next="none"
+                                    data-mage-working="Working..."
+                                    formaction="{{ routeLookup('courseImport.postAssessments') }}{{ urlSuffix }}"
+                                />
                             </div>
                         </div>
                     </div>
