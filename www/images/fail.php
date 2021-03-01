@@ -56,7 +56,7 @@ $transform = null;
 $cache_key = null;
 switch ($_GET['transform_type']) {
     case 'portrait':
-        $path          = '/images/placeholders/portraitt.png';
+        $path          = '/images/placeholders/portrait.png';
         $transforms     = new Image\Transformation\Portrait();
         $transform_key = $_GET['transform'];
         try {
