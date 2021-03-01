@@ -364,7 +364,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
 
 				/* Indicate matching/non-matching responses to answers
 					 */
-				if ($this->compareStrings($actualAnswers[$i], $existingAnswer[$i])) {
+				if ($this->compareStrings((string)$actualAnswers[$i], (string)$existingAnswer[$i])) {
 					$replace = " <span class='fillgap correct'>$val</span> ";
 				} else {
 					$replace = " <span class='fillgap incorrect'>$val</span> ";
