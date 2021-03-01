@@ -25,9 +25,9 @@ class UserAccessXORTest extends TestCase
      * $array1 and $array2 contain the same set of tuples
      *
      * @dataProvider provider_same
-     * @param $array1
-     * @param $array2
-     * @param $expected
+     * @param array $array1
+     * @param array $array2
+     * @param int $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
