@@ -21,6 +21,9 @@ export default {
         isThreadEnabledOnLoad: Boolean,
         isPublished: Boolean,
         createThreadEndpoint: String,
+        openThreadEndpoint: String,
+        closeThreadEndpoint: String,
+        threadCommentsEndpoint: String,
         siteVersion: String //for cache busting
     },
 
@@ -83,18 +86,18 @@ export default {
          *
          */
         getThread () {
-
+            
             this.isProcessActive = true;
 
             // Short-circuit if no thread ID
             if (!this.threadId) {
                 this.isProcessActive = false;
+                this.isInitialLoad = false;
                 this.showCommentsSection = this.isThreadCheckboxVisible;
                 return;
             }
 
-            // TODO don't construct this endpoint manually
-            axios.get('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments/', {
+            axios.get(this.threadCommentsEndpoint, {
                 params: {
                     cursor: this.cursorNext
                 }
@@ -121,7 +124,7 @@ export default {
                  * If the user has the rights to modify the thread, despite that there's comments, 
                  * comments section must be rendered
                  */
-                this.showCommentsSection = (this.isThreadCheckboxVisible || this.totalCommentsCount > 0 || this.isThreadEnabled);
+                this.showCommentsSection = (this.isThreadCheckboxVisible || this.totalCommentsCount > 0 || this.isThreadEnabled);                
                 
             }).catch((error) => {
                 this.isInitialLoad = false;
@@ -138,10 +141,9 @@ export default {
 
                 if (this.isInitialLoad) {
                     // Anchored? go to the element once the component has been loaded
-                    // We will need to do this for now to make the anchor behaviour more consistent
                     if (window.location.hash === '#discussion') {
-                        const offset = $('.banner.content').outerHeight() + $('.article.content').outerHeight() + $('#discussion').offset().top;
-                        $("html, body").animate({ scrollTop: offset }, 500);
+                        const discussionElement = document.getElementById('discussion');
+                        discussionElement.scrollIntoView( { behavior: 'smooth' } );
                     }
                     this.isInitialLoad = false;
                 }
@@ -162,13 +164,12 @@ export default {
             if (this.threadId) {
                 // I already have a thread ID: switch it on/off
                 changeThreadStatusAction = new Promise((resolve, reject) => {
-                    // TODO don't construct this endpoint manually
-                    var changeThreadStatusEndpoint = '/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/';
-
+                    
+                    let changeThreadStatusEndpoint;
                     if (this.isThreadEnabled) {
-                        changeThreadStatusEndpoint += 'open';
+                        changeThreadStatusEndpoint = this.openThreadEndpoint;
                     } else {
-                        changeThreadStatusEndpoint += 'close';
+                        changeThreadStatusEndpoint = this.closeThreadEndpoint;
                     }
 
                     axios.put(changeThreadStatusEndpoint, {}, { headers: this.postHeaders }).then(() => {
@@ -318,8 +319,7 @@ export default {
             this.isProcessActive = true;
             this.$refs.toast.activate('Posting comment...');
 
-            // TODO don't construct this endpoint manually
-            axios.post('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments', {
+            axios.post(this.threadCommentsEndpoint, {
                 content: this.newComment
             }).then((response) => {
                
@@ -365,7 +365,7 @@ export default {
 
             const commentIdToDelete = this.comments[this.commentIndexToDelete].id;
 
-            // TODO don't construct this endpoint manually
+            // Need the commentIdToDelete, so needs to be constructed manually?
             axios.delete('/discussion/comms/' + this.articleId + '/comments/' + commentIdToDelete, {}, { headers: this.postHeaders }).then(() => {
                 
                 this.comments.splice(this.commentIndexToDelete, 1);
