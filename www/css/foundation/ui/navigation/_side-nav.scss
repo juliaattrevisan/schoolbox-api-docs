@@ -45,25 +45,24 @@ $border-bottom-width: 2px;
 
       li a {
         padding-left: 1.5rem;
-        font-size: 12px;
 
         .label {
           font-size: 10px;
         }
       }
       &.flyout {
+        @include box-shadow(10px, 10px, 0, rgba(0,0,0,0.1));
+        display: none;
         position: absolute;
         background-color: $white;
-        top: 0;
-        left: -250px;
-        min-width: 250px;
-        z-index: -1;
-        transition: left 200ms ease-in;
+        margin-top: -35px;
+        right: -100%;
+        min-width: 100%;
+        z-index: 1;
       }
     }
     &:hover > ul.flyout {
-      left: 250px;
-      transition: left 200ms ease-in;
+      display: block;
     }
     &.parent-item > a:after {
       font-family: $font-family-icon;
@@ -74,12 +73,9 @@ $border-bottom-width: 2px;
 }
 
 #admin-nav {
-  overflow: auto;
-  position: relative;
-  z-index: 2;
-
   .side-nav {
-    width: 250px;
+    position: relative;
+    width: 100%;
   }
 }
 

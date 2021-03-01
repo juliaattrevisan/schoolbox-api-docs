@@ -1,8 +1,7 @@
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Admin › {{ links[pageCurrent].name ?? 'Home'}}</h1>
-    </div>
+<div class="small-12 columns">
+    <h1>Admin › {{ links[pageCurrent].name ?? 'Home'}}</h1>
 </div>
+
 {#<div class="admin-nav">#}
 {#    <ul class="side-nav">#}
 {#        {% for key,value in links %}#}
@@ -12,7 +11,7 @@
 {#        {% endfor %}#}
 {#    </ul>#}
 {#</div>#}
-<nav id="admin-nav">
+<nav id="admin-nav" class="medium-4 large-3 columns">
     <ul class="side-nav" role="navigation">
         <li role="menuitem"><a href="#">Home</a></li>
         <li class="parent-item active" role="menuitem">
