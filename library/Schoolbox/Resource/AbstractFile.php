@@ -113,6 +113,9 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     /**
      * Act as a proxy for the internal storage object
      *
+     * TODO remove this method entirely, and replace with non-magic methods
+     *      (This magic method's existence has caused an unusual bug SA-11706)
+     *
      * @param string $name
      * @param array  $arguments
      *
