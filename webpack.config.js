@@ -6,8 +6,8 @@ module.exports = {
     entry: {
 
         // Libraries
-        clipboard: "./www-static/javascript/shared/clipboard/clipboard.main.js",
-        strtotime: "./www-static/javascript/shared/alaress-datetime-picker/strtotime.main.js",
+        clipboard: "./www/static/javascript/shared/clipboard/clipboard.main.js",
+        strtotime: "./www/static/javascript/shared/alaress-datetime-picker/strtotime.main.js",
 
         // Vue components
         hybridbar: path.resolve(__dirname, 'resources/js/hybrid-bar/index.js'),
@@ -42,12 +42,12 @@ module.exports = {
         usageSpecificFile: './library/Schoolbox/Admin/Usage/vue/specific/file.main.js',
 
         //Sass
-        chromeFoundation: './www-static/css/foundation/chrome-foundation.scss',
-        editor: './www-static/css/foundation/editor.scss'
+        chromeFoundation: './www/static/css/foundation/chrome-foundation.scss',
+        editor: './www/static/css/foundation/editor.scss'
 
     },
     output: {
-        path: path.resolve(__dirname, "www-static/javascript/components"),
+        path: path.resolve(__dirname, "www/static/javascript/components"),
         publicPath: "/javascript/components/",
         filename: "[name].bundle.js"
     },
@@ -143,7 +143,7 @@ module.exports = {
             '@schoolboxCalendarEvent': path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue"),
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
             '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue'),
-            '@shared': path.resolve(__dirname, 'www-static/javascript/shared'),
+            '@shared': path.resolve(__dirname, 'www/static/javascript/shared'),
         },
         extensions: ['*', '.js', '.vue', '.json']
     },

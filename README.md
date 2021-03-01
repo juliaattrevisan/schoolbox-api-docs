@@ -23,8 +23,8 @@ This file is internal use and is not shipped to clients.
 * test - PHP and other tests (not deployed to clients)
 * tools - Build, update and maintenance tools. Also includes cli scripts for sync.
 * updates - per release update files, primarily sql schema changes
-* www - web root directory for PHP scripts exclusively
-* www-static - web root directory for static assets (JS, CSS, images) only
+* www - web root directory
+* www/static - web root directory for static assets (JS, CSS, images) only
 * vendor - directory for external libraries loaded via Composer
 * vue - directory for storing Vue components that are not directly related to a
   module within `library/`

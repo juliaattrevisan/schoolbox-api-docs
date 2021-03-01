@@ -6,12 +6,12 @@ data/
 www/test.xml
 .vagrant
 Vagrantfile
-www-static/css/core/chrome-foundation.css
-www-static/css/core/editor.css
+www/static/css/core/chrome-foundation.css
+www/static/css/core/editor.css
 *.log
 vendor/
 # Bower install directory
-www-static/javascript/components/
+www/static/javascript/components/
 node_modules/
 test/behavior/screenshots/*.png
 test/behavior/screenshots/*.html
