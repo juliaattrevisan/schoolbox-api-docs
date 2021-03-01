@@ -288,7 +288,7 @@ class External_Liss_Server
             }
 
             if (count($queryItems) > 0) {
-                $fullQuery = 'INSERT INTO sis_class_user (id, class_id, external_id) VALUES ' . implode($queryItems, ',') . ';';
+                $fullQuery = 'INSERT INTO sis_class_user (id, class_id, external_id) VALUES ' . implode(',', $queryItems) . ';';
                 try {
                     // Manual bulk insert into the DB of "$fullquery"
                     $this->externalDb->executeQuery($fullQuery);

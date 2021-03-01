@@ -649,7 +649,7 @@ class LinkRubricMarkToFeedback
 
         if (count($combinedDrafts) > 1) {
             $this->countCombinedDrafts ++;
-            $this->logCombinedDrafts[] = sprintf('Student:box %d:%d created_at %s', $combinedDrafts[0]['student_id'], $combinedDrafts[0]['box_id'], implode($logDates, ', '));
+            $this->logCombinedDrafts[] = sprintf('Student:box %d:%d created_at %s', $combinedDrafts[0]['student_id'], $combinedDrafts[0]['box_id'], implode(', ', $logDates));
         }
 
         return $combinedDrafts;
@@ -809,7 +809,7 @@ class LinkRubricMarkToFeedback
                 sprintf(
                     'Feedback %d: [%s]',
                     $propagatedRubricMark['feedbackId'],
-                    implode($propagatedRubricMark['markIds'], ',')
+                    implode(',', $propagatedRubricMark['markIds'])
                 )
             );
         }
@@ -817,7 +817,7 @@ class LinkRubricMarkToFeedback
         $this->log->notice(sprintf('Total draft feedbacks linked: %d', $this->countLinkedDraftFeedbacks));
         $this->log->notice(sprintf('Total combined draft occurrences: %d', $this->countCombinedDrafts));
         if (count($this->logCombinedDrafts) > 0) {
-            $this->log->notice(sprintf('Combined drafts details: %s', implode($this->logCombinedDrafts, ', ')));
+            $this->log->notice(sprintf('Combined drafts details: %s', implode(', ', $this->logCombinedDrafts)));
         }
     }
 }
