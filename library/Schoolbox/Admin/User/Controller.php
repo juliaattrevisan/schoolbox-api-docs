@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -356,7 +357,7 @@ class Controller extends Base
                 'userGroups' => $this->folderMapper->findForUser($user, false, UserAccess::ACCESS_READ),
                 'userGroupPermissions' => $groupPermissions,
                 'userPermissions' => $userPermissions,
-                'userLog' => $this->userLogMapper->findByColumn('username', $user->getUsername(),[
+                'userLog' => $this->userLogMapper->findByColumn('username', $user->getUsername(), [
                     'order' => ['date' => 'desc'],
                     'limit' => 10
                 ]),
@@ -378,6 +379,8 @@ class Controller extends Base
      */
     public function getStaleUsers()
     {
+        $jsonPayload = [];
+
         $rolepb = $this->roleMapper->getPredicateBuilder()->notEquals('group_type', Role::GUEST);
         $roles = $this->roleMapper->findIdsByPredicates($rolepb);
 
@@ -388,9 +391,9 @@ class Controller extends Base
                                 ->lessThan('updated_at', $lastWeek)
                                ->in('group_id', $roles);
 
-        $userList = $this->userMapper->findByPredicates($pb, ['order'=>['updated_at'=>'DESC']]);
+        $userList = $this->userMapper->findByPredicates($pb, ['order' => ['updated_at' => 'ASC']]);
 
-        foreach($userList as $user) {
+        foreach ($userList as $user) {
             /**
              * @var $user User
              */
@@ -407,8 +410,6 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
-
-
     }
 
     /**
@@ -594,7 +595,6 @@ class Controller extends Base
         $passwordService = new PasswordService();
 
         if (is_numeric($post['userID']) && $post['modusername']) {
-
             // Modify existing user
 
             try {
@@ -611,7 +611,6 @@ class Controller extends Base
                 }
             }
         } else {
-
             if ($post['modusername']) {
                 // Username check - if any other user has this username, abort
                 if ($this->userMapper->countByColumn('username', $post['modusername']) > 0) {
@@ -621,7 +620,6 @@ class Controller extends Base
         }
 
         if (!isset($user)) {
-
             // Creating a new user
             $user = new User();
 
@@ -638,9 +636,7 @@ class Controller extends Base
                 $user->setRetrievablePassword($post['modpassword'])
                      ->setPassword($passwordService->hash($post['modpassword']));
             }
-
         } else {
-
             // Updating an existing user, only password only if the user edited the textbox
 
             if ($post['modpassword'] != 'donotchange') {
@@ -651,17 +647,15 @@ class Controller extends Base
             $user->setEnabled(isset($post['account_enabled']));
         }
 
-        if(!empty($post['house'])) {
+        if (!empty($post['house'])) {
             $house = $this->houseMapper->createModel($post['house']);
-        }
-        else {
+        } else {
             $house = null;
         }
 
-        if(!empty($post['residential_house'])) {
+        if (!empty($post['residential_house'])) {
             $resHouse = $this->houseResidentialMapper->createModel($post['residential_house']);
-        }
-        else {
+        } else {
             $resHouse = null;
         }
 
@@ -673,7 +667,6 @@ class Controller extends Base
             try {
                 $year = $this->yearLevelMapper->findById($post['year_id']);
             } catch (\Schoolbox\Mapper\Exception $e) {
-
                 /* noop - went looking for a deleted or nonexistent year_id
                  * just use null
                  */
@@ -702,7 +695,6 @@ class Controller extends Base
 
 
         if (is_array($post['campus'])) {
-
             $user->setCampusCollection(new GenericCollection(Campus::class));
 
             foreach ($post['campus'] as $campusId) {
@@ -732,13 +724,11 @@ class Controller extends Base
             $user->setPortrait(null);
 
             if (\count($attachments)) {
-
                 // Validate attachment list can actually be built
                 try {
                     /** @var IStorage[] $attachments */
                     $attachments = $factory->build($this->getRequest()->post['attachment'])->getAll();
                 } catch (\InvalidArgumentException $e) {
-
                     /* Bad data; noop
                      */
                 }
@@ -794,7 +784,7 @@ class Controller extends Base
             ->setSeverity(Logger::INFO)
             ->setNamespace('ALERT')
             ->setHref('#')
-            ->setIcon('/images/icon.php?size=64&icon='.NSMapper::NS_MESSAGE)
+            ->setIcon('/images/icon.php?size=64&icon=' . NSMapper::NS_MESSAGE)
             ->addTopic("notify.user.$userId")
             ->putMeta('ttl', 30)
             ->putMeta('title', 'Message from ' . $this->getUser()->getFullName());
