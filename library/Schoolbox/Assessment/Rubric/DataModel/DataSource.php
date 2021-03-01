@@ -1787,7 +1787,7 @@ class DataSource
      */
     private function getFeedbackIds(GenericCollection $dueWorks, User $student, bool $includeComparison): array
     {
-        $pb = new Builder($this->database, '');
+        $pb = new Builder($this->database->getQuoter(), '');
         $pb->in('a.id', $dueWorks->getPropertyValues('id'))
            ->isNull('a.deleted_at')
            ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
