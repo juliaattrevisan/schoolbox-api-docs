@@ -1,4 +1,7 @@
 <?php
+
+use Evaluation\Answer\Comparison;
+
 /**
  * Evaluation_Answer_Exact
  *
@@ -8,7 +11,9 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
+abstract class Evaluation_Answer_Exact extends Evaluation_Answer
+{
+    use Comparison;
 
 	/**
 	 * Javascript class to use when creating UI
@@ -260,7 +265,7 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
 
         $currentAnswer = $this->getByQuestionID($question_id);
 
-        $isCorrect = $this->compareStrings($existing['response'], $currentAnswer['answer']);
+        $isCorrect = $this->compareStrings((string)$existing['response'], (string)$currentAnswer['answer']);
 
         if ($isCorrect) {
             $title = 'Respondent provided a correct answer';
@@ -377,39 +382,4 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
 
 		$page->parse('answerTop_block', 'answerTop', true);
 	}
-
-    /**
-     * Compares to strings for the purposes of marking exact answer
-     *
-     * Returns true when identical
-     *
-     * @param string $str1
-     * @param string $str2
-     * @return bool
-     */
-    protected function compareStrings($str1, $str2) {
-         return strcmp($this->normalizeForComparison($str1),$this->normalizeForComparison($str2)) == 0;
-    }
-
-    /**
-     * Normalizes response and answer for comparison - replaces all spaces,
-     * converts to lower case, and replaces the em dash character with standard hyphen.
-     *
-     * @param string $str
-     * @return string
-     */
-    protected function normalizeForComparison($str)
-    {
-        /* Equivalent characters for automarking purposes
-         * Replace em and en dashes with hyphen
-         */
-        $equivalences = strtr($str, [
-            '×' => 'x',
-            '÷' => '/',
-            '—' => '-',
-            '–' => '-'
-        ]);
-
-        return mb_strtolower(trim(preg_replace('/\\s+/', ' ', $equivalences)), 'UTF-8');
-    }
 }

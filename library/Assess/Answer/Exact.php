@@ -23,7 +23,7 @@ class Assess_Answer_Exact extends Evaluation_Answer_Exact implements IAutomarkab
     public function mark($currentResponse): void
     {
         // Normalize both response and answer for comparison
-        if ($this->compareStrings($currentResponse['response'], $currentResponse['answer'])) {
+        if ($this->compareStrings((string)$currentResponse['response'], (string)$currentResponse['answer'])) {
             $totalMarks = $currentResponse['marks'];
         } else {
             $totalMarks = 0;
