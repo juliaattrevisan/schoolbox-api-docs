@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Evaluation\Answer;
 
+use Collator;
+
 /**
  * Method for comparing string answers to questions.
  *
@@ -25,9 +27,33 @@ trait Comparison
      */
     protected function compareStrings(string $str1, string $str2): bool
     {
-        return strcmp($this->normalizeForComparison($str1), $this->normalizeForComparison($str2)) === 0;
-    }
+        // The locale doesn't really matter for equality testing
+        $collator = new Collator('root');
 
+        // Secondary strength differentiates accents, but not cases.
+        // (Collator::ALTERNATE_HANDLING: Collator::SHIFTED disregards spaces,
+        //  punctuation and symbols: this is too extreme, spaces are significant
+        //  but need to be normalized, punctuation and symbols are assumed
+        //  significant)
+        $collator->setStrength(Collator::SECONDARY);
+
+        // Compare
+        $comparison = $collator->compare(
+            $this->normalizeForComparison($str1),
+            $this->normalizeForComparison($str2),
+        );
+        if ($comparison === 0) {
+            return true;
+        }
+        if ($comparison === false) {
+            // data is broken, trigger a warning
+            trigger_error(
+                'Cannot compare actual and given answer: one or the other is incorrectly encoded',
+                E_USER_WARNING
+            );
+        }
+        return false;
+    }
 
     /**
      * Normalizes response and answer for comparison:
