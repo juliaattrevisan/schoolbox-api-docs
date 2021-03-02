@@ -141,12 +141,11 @@
     });
 
 </script>
-
 <!-- END custom_head-->
 
-{ADMIN_NAV}
-
 <div class="row">
+    {ADMIN_NAV}
+
     <div class="column small-12">
         <div class="actions-small-1">
             <div class="list-item">
@@ -157,9 +156,6 @@
             </nav>
         </div>
     </div>
-</div>
-
-<div class="row">
     <div class="small-12 island">
         <form id="newAllowedFile" method="post" data-action="createNewFileType" action="/adminv2/allowed-fileForm.php" style="display:none;">
             <input type="hidden" readonly="readonly" name="fileTypeId" value=""/>
@@ -220,9 +216,6 @@
             <input type="submit" value="Add" />
         </form>
     </div>
-</div>
-
-<div class="row">
     <div class="island small-12">
         <section>
             <ul class="action-list">
@@ -298,7 +291,7 @@
                                     <div class="max_size column large-3">
                                         <div>
                                             <label for="max_file_size-{FILE_ID}">Max Size</label>
-                                        <input id="max_file_size-{FILE_ID}" type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value="{FILE_MAXSIZE_INPUT}"/>
+                                            <input id="max_file_size-{FILE_ID}" type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value="{FILE_MAXSIZE_INPUT}"/>
                                         </div>
                                     </div>
                                     <div class="inline column large-3">
