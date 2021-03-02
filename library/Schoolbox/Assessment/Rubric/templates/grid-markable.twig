@@ -242,10 +242,12 @@
                         letterGrades
                     );
 
-                // Don't change the scaled mark if the capability now has a null value.
+                // Don't change the scaled mark if the capability now has a null value,
+                // AND a descriptor was selected.
                 // The capability's scaled mark should only be null if all of its
                 // indicator's descriptors are null or not selected.
-                if (scaledGroupMark !== null) {
+                let isAnyDescriptorSelected = $descriptorCheckboxes.filter(':checked') > 0;
+                if (scaledGroupMark !== null || isAnyDescriptorSelected) {
                     $groupSummary.attr('data-scaled-mark', scaledGroupMark);
                     $groupSummary.attr('data-mark', scaledGroupMark);
                 }
