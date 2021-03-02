@@ -9,15 +9,11 @@
             </div>
         {% endif %}
     {% endfor %}
+    {% if externalUser.StudentMedicalAlert ?? false and showMedicalAlert %}
+        <div class="alert-box highlight">{{ externalUser.StudentMedicalAlert | nl2br }}</div>
+    {% endif %}
 {% endblock medicalAlert %}
 
-{% block extraDetails %}
-    {% if externalUser.StudentMedicalAlert ?? false and showMedicalAlert %}
-        <div class="alert-box info">
-           {{ externalUser.StudentMedicalAlert | nl2br }}
-        </div>
-    {% endif %}
-{% endblock extraDetails %}
 
 {% block contacts_alert %}
 {% endblock contacts_alert %}
