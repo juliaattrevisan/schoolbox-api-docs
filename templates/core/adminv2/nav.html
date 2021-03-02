@@ -1,11 +1,71 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>Admin &rsaquo; {CURRENT_ADMIN_LOCATION}</h1>
-
-        <ul class="sub-nav">
-            <!-- BEGIN admin_nav_item -->
-            <li class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></li>
-            <!-- END admin_nav_item -->
-        </ul>
     </div>
 </div>
+
+<ul class="sub-nav">
+    <!-- BEGIN admin_nav_item -->
+    <li class="{ADMNAV_CURRENT}"><a href="/adminv2/{ADMNAV_HREF}">{ADMNAV_LABEL}</a></li>
+    <!-- END admin_nav_item -->
+</ul>
+
+<nav id="admin-nav" class="medium-4 xlarge-3 columns">
+    <h2 class="subheader">Menu</h2>
+    <a href="#" class="dropdown-btn">Go to...</a>
+    <ul class="admin side-nav" role="navigation">
+        <li role="menuitem"><a href="#">Home</a></li>
+        <li class="parent-item" role="menuitem">
+            <a href="#">Calendar</a>
+            <ul class="flyout" role="navigation">
+                <li role="menuitem"><a href="#">Import</a></li>
+                <li role="menuitem"><a href="#">Subscribe</a></li>
+                <li role="menuitem"><a href="#">Cleanup</a></li>
+            </ul>
+        </li>
+        <li><a href="#">Engagement</a></li>
+        <li><a href="#">ePortfolio</a></li>
+        <li><a href="#">Filters</a></li>
+        <li class="parent-item">
+            <a href="#">Homepage Templates</a>
+            <ul class="flyout" role="navigation">
+                <li role="menuitem"><a href="#">Import</a></li>
+                <li role="menuitem"><a href="#">Subscribe</a></li>
+                <li role="menuitem"><a href="#">Cleanup</a></li>
+            </ul>
+        </li>
+        <li><a href="#">Import</a></li>
+        <li><a href="#">LMS</a></li>
+        <li><a href="#">Lists</a></li>
+        <li><a href="#">Modules</a></li>
+        <li><a href="#">News</a></li>
+        <li><a href="#">Notifications</a></li>
+        <li><a href="#">Personalisation</a></li>
+        <li><a href="#">Resources</a></li>
+        <li><a href="#">School Data Import</a></li>
+        <li><a href="#">System Settings</a></li>
+        <li class="parent-item active" role="menuitem">
+            <a href="#">User Management</a>
+            <ul class="flyout" role="navigation">
+                <li role="menuitem"><a href="#">Users</a></li>
+                <li role="menuitem"><a href="#">Bulk Modify</a></li>
+                <li role="menuitem"><a href="#">User Provisioning System</a></li>
+                <li role="menuitem"><a href="#">Schoolbox Help Provisioning</a></li>
+            </ul>
+        </li>
+    </ul>
+</nav>
+
+<script tsype="text/javascript">
+    const mq = window.matchMedia( "(max-width: 640px)" );
+    if (mq.matches) {
+        $(".parent-item a").click(function(e) {
+            e.preventDefault();
+            var $target = $(this).closest('li').find("ul.flyout").slideToggle();
+            $('ul.flyout').not($target).slideUp();
+        });
+    }
+    $('.dropdown-btn').click(function(){
+        $('.admin').toggle();
+    });
+</script>
