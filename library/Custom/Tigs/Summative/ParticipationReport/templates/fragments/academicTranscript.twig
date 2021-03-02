@@ -127,8 +127,8 @@ Data:
                                         {# No explicit FAL data found, fall back to latest AAS assessment #}
                                         {% set aasFound = false %}
                                         {# These units are ordered from latest to oldest #}
-                                        {% for unitSpecData in folderData.unitSpecs %}
-                                            {% if folderData.aasData|length and not aasFound %}
+                                        {% for unitSpecData in folderData.unitSpecs if not aasFound %}
+                                            {% if folderData.aasData|length %}
                                                 {% if folderData.aasData.data[unitSpecData.id].capabilityMarks %}
                                                     {% set aasFound = true %}
                                                     {% set hasInterminGrades = true %}
@@ -180,8 +180,8 @@ Data:
                                 {% else %}
                                     <div class="result-group hsc-rank">
                                     {% set hasTaskFound = false %}
-                                    {% for unitSpecData in folderData.unitSpecs %}
-                                        {% if not hasTaskFound and (folderData.hscTaskMarks.data[unitSpecData.id] ?? false) %}
+                                    {% for unitSpecData in folderData.unitSpecs if not hasTaskFound %}
+                                        {% if folderData.hscTaskMarks.data[unitSpecData.id] ?? false %}
                                             {% set hasTaskFound = true %}
                                             {% set hasInterminGrades = true %}
                                             {% set hscTaskMarkData = folderData.hscTaskMarks.data[unitSpecData.id] %}
@@ -224,46 +224,53 @@ Data:
 
                             {% endif %}
                         </div>
-                        <div class="column small-12 teacher-comment content">
 
-                            {# Special case for previous classes w/ feedbacks #}
-                            {% if subject.isPreviousClass %}
-                                Student is no longer enrolled in this class.
+                        {# Search for comments. If they were in a previous class - it's now rolled over etc. - then
+                         # just say that and carry onwards. There's nothing we can show
+                         #
+                         # If there is a NESA worktype feedback, then show its comment first
+                         #
+                         # Otherwise fall back to showing the most recent comment from the student's feedbacks
+                         #}
+                        {% if subject.isPreviousClass %}
+                            {% set commentData = { comment: 'Student is no longer enrolled in this class.' } %}
+                        {% else %}
+                            {% set commentData = { comment: null } %}
+
+                            {# buildNesaScoreData returns an empty array or an array with data
+                             # If there's data in it, try loading semester 2 comment first,
+                             # otherwise try to load semester 1 comment instead.
+                             #
+                             # An empty array means there isn't any NESA data and you should fall
+                             # back to finding the most recent feedbacks' comment instead
+                             #}
+                            {% if folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.data.2.comment|length %}
+                                {% set commentData = folderData.nesaGraphData.data.2.comment %}
+                            {% elseif folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment|length %}
+                                {% set commentData = folderData.nesaGraphData.data.1.comment %}
                             {% else %}
+
                                 {# Render the first comment only #}
                                 {% set commentFound = false %}
-                                {% set commentData = null %}
 
-                                {% if attributes.isMyp %}
-                                    {##
-                                     # MYP comments: no longer come from the unitspec, so don't iterate it.
-                                     # Used to come from folderData.aasData.data[unitSpec.id]
-                                     #}
-                                    {# nesaGraphData.data.2 ... NESA, nesaGraphData.data.2 ... FAL in semester 2,   #}
-                                    {% if folderData.nesaGraphData %}
-                                        {% set commentData = folderData.nesaGraphData.data.2 is defined ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
+                                {% for unitSpec in folderData.unitSpecs if not commentFound %}
+                                    {% if attributes.isHsc %}
+                                        {% set commentData = folderData.hscTaskMarks.data[unitSpecId] %}
+                                    {% else %}
+                                        {% set commentData = folderData.aamData.data[unitSpecId] %}
                                     {% endif %}
-                                {% else %}
-                                    {# All other comments come from the unitspec #}
-                                    {% for unitSpec in folderData.unitSpecs %}
-                                        {% if no commentFound %}
-                                            {% if attributes.isDp %}
-                                                {% set commentData = folderData.aamData.data[unitSpec.id] %}
-                                            {% elseif attributes.isHsc %}
-                                                {% set commentData = folderData.hscTaskMarks.data[unitSpec.id] %}
-                                            {% endif %}
-                                            {% if commentData.comment is not null %}
-                                                {% set commentFound = true %}
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
 
-                                {% if commentData.comment is defined and commentData.comment|length %}
-                                    {{ commentData.comment | nl2br }}
-                                {% endif %}
+                                    {# bust out of the for() once we find meaningful data
+                                     #}
+                                    {% if commentData.comment is not null %}
+                                        {% set commentFound = true %}
+                                    {% endif %}
+                                {% endfor %}
                             {% endif %}
+                        {% endif %}
 
+                        <div class="column small-12 teacher-comment content">
+                            {{ commentData.comment | nl2br }}
                         </div>
                     </a>
                 </li>
