@@ -5661,11 +5661,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Tass/Bbc/Sync.php
 
 		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Tass\\\\Mfac\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Tass/Mfac/Sync.php
-
-		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Tass\\\\V52\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Tass/V52/Sync.php

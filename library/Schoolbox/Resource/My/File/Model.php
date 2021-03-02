@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -24,7 +24,6 @@ class Model extends AbstractFile
 {
     /** @var Alaress_Date_Format */
     protected $publishedAt;
-
 
     /**
      * @return Alaress_Date_Format

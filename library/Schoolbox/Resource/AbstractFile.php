@@ -7,14 +7,12 @@
 
 namespace Schoolbox\Resource;
 
-use Schoolbox\File\Mimetype;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\Resource\Folder\IFolder;
-use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 
 /**
@@ -22,9 +20,6 @@ use Schoolbox\User;
  * Provides common file-based functionality for files stored in a directory structure (ie. can have an IFolder parent)
  *
  * @package Schoolbox\Resource
- * @method AbstractFile setHash($hash)
- * @method AbstractFile setMimetype(Mimetype $mimetype)
- * @method AbstractFile setSize($size)
  */
 abstract class AbstractFile implements IFile, ISoftDeletable
 {
@@ -108,30 +103,5 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     public function setHidden($hidden)
     {
         return $this;
-    }
-
-    /**
-     * Act as a proxy for the internal storage object
-     *
-     * @param string $name
-     * @param array  $arguments
-     *
-     * @return mixed
-     */
-    function __call($name, $arguments)
-    {
-        if (method_exists($this->storage, $name)) {
-            $value = call_user_func_array([$this->storage, $name], $arguments);
-            if ($value instanceof Storage) {
-                return $this;
-            }
-
-            return $value;
-        }
-        $trace   = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-        $pattern = "Call to undefined method <b>%s::%s()</b> in <b>%s</b> on line <b>%d</b>, triggered";
-        trigger_error(sprintf($pattern, get_called_class(), $name, $trace[1]['file'], $trace[1]['line']), E_USER_ERROR);
-
-        return null;
     }
 }
