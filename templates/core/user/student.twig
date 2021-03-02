@@ -131,7 +131,7 @@
                         {% block medicalAlert %}
                             {% if externalUser.StudentMedicalAlert ?? false and showMedicalAlert %}
                                 <div class="alert-box alert icon-alert">
-                                    Medical Note: {{ externalUser.StudentMedicalAlert }}
+                                    Medical Note: {{ externalUser.StudentMedicalAlert | nl2br }}
                                 </div>
                             {% endif %}
                         {% endblock medicalAlert %}
