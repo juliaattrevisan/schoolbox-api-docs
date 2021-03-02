@@ -710,18 +710,17 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $file->setTitle($data['description']);
         $file->setOwner($owner);
 
-        // Size can't be set on the file directly.
-        // Instead, set it on the storage object within the file.
-        $storage = $file->getStorage();
-        if ($storage instanceof StorageModel) {
-            $storage = $storage->setSize($data['file_size']);
-            try {
-                $storage = $storage->setMimetype($this->mimeMapper->getByFilename($data['name']));
-            } catch (\Schoolbox\File\Exception $e) {
-                $storage = $storage->setMimetype($this->mimeMapper->getUnknownMime());
-            }
-            $file->setStorage($storage);
+        // Don't pretend the WebDAV file has an actual storage hash:
+        // just construct what we can and set it in the file.
+        $storage = (new StorageModel())
+            ->setSize($data['file_size'])
+            ->setBasename($data['name']);
+        try {
+            $storage = $storage->setMimetype($this->mimeMapper->getByFilename($data['name']));
+        } catch (\Schoolbox\File\Exception $e) {
+            $storage = $storage->setMimetype($this->mimeMapper->getUnknownMime());
         }
+        $file->setStorage($storage);
 
         return $file;
     }
