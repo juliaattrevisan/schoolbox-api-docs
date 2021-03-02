@@ -4,6 +4,16 @@
 {# parent DOM: you are directly inside a <td/> right now #}
 {% block content %}
     <table>
+    {% if config.digest_email_intro %}
+        <tr>{{ fn.spacer(config.fqdn, 16, 0, 3) }}</tr>
+        <tr class="island">
+            <td valign="top">
+                <table width="100%">
+                    <tr><td>{{ config.digest_email_intro | purify }}</td></tr>
+                </table>
+            </td>
+        </tr>
+    {% endif %}
     {% for ns, group in groups %}
         <tr>{{ fn.spacer(config.fqdn, 16, 0, 3) }}</tr>
         <tr class="heading">

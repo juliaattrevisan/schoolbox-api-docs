@@ -32,6 +32,8 @@ class CoreContext {
             'feedback_url',
             'feedback_text',
             'read_more',
+            'email_banner_image',
+            'digest_email_intro'
         );
 
         foreach($required as $key) {
