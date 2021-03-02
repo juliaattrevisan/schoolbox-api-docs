@@ -26,21 +26,6 @@ class Model extends AbstractFile
     protected $publishedAt;
 
     /**
-     * Temporary fix to prevent the My Files file browser from dying.
-     *
-     * Twig calls `modifiedAt` on an instance of this class, which should call
-     * this method. However, there's a `__call` on the parent class, and it
-     * attempts to call `modifiedAt` on the internal storage object: that method
-     * doesn't exist.
-     *
-     * @return null
-     */
-    public function getModifiedAt()
-    {
-        return null;
-    }
-
-    /**
      * @return Alaress_Date_Format
      */
     public function getPublishedAt()
