@@ -22,9 +22,6 @@ use Schoolbox\User;
  * Provides common file-based functionality for files stored in a directory structure (ie. can have an IFolder parent)
  *
  * @package Schoolbox\Resource
- * @method AbstractFile setHash($hash)
- * @method AbstractFile setMimetype(Mimetype $mimetype)
- * @method AbstractFile setSize($size)
  */
 abstract class AbstractFile implements IFile, ISoftDeletable
 {
