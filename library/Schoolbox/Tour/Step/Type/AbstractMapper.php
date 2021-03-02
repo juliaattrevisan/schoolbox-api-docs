@@ -11,8 +11,6 @@ namespace Schoolbox\Tour\Step\Type;
 use PDOStatement;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Tour\Step\Mapper as TourStepMapper;
-use Schoolbox\UserMapper;
-use Schoolbox\Tour\Step\Model;
 
 abstract class AbstractMapper extends BaseMapper
 {
@@ -29,16 +27,16 @@ abstract class AbstractMapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->registerCallback(self::CALLBACK_PRESAVE, function (Model $model) {
+        $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
             return $this->preSave($model);
         });
     }
 
     /**
-     * @param Model $model
+     * @param $model
      * @return bool
      */
-    private function preSave(Model $model)
+    private function preSave($model)
     {
         if ($model->getUuid()) {
             // already got an ID; do nothing
@@ -60,10 +58,18 @@ abstract class AbstractMapper extends BaseMapper
     {
         return "
             SELECT      {$this->getColumnString()},
-                        {$this->getJoinColumnString('tourStep', 's')},
-            FROM        {$this->getTable()}
-            INNER JOIN  {$this->getJoinSql('tourStep', '', 's')}
-            LEFT JOIN   {$this->getJoinSql('author', '', 'a', true)}
+                        {$this->getJoinColumnString('tourStep', 's')}
+        ";
+    }
+
+    /**
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM {$this->getTable()}
+            JOIN {$this->getJoinSql('tourStep', null, 's')}
         ";
     }
 
@@ -80,7 +86,7 @@ abstract class AbstractMapper extends BaseMapper
         foreach ($statement as $row) {
             $model = $this->hydrate($row);
 
-            if ($model instanceof Model) {
+            if ($model instanceof $this->model) {
                 $model->setTourStep($tourStepMapper->hydrate($row, 's'));
                 $collection->add($model);
             }
