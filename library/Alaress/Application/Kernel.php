@@ -1050,6 +1050,8 @@ abstract class Kernel
                     'logger'           => $di->lazyGet('ups.logger'),
                     'logMapper'        => $di->lazyNew(SyncLogMapper::class),
                     'userAccessMapper' => $di->lazyNew(UserAccessMapper::class),
+                    'folderMapper'     => $di->lazyNew(Folder\Mapper::class),
+                    'config'           => $di->get('config')
                 ]
             )
         );

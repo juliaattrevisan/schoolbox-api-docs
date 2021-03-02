@@ -142,10 +142,23 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                 foreach ($data as $property => $token) {
                     // Apply tokenization to returned value. The value returned should be a primitive,
                     // which will then by hydrated into the model by the mapper
-                    $value   = $this->tokenizer->parseToken($input, $token, false);
+                    $value = $this->tokenizer->parseToken($input, $token, false);
 
-                    // treat collections special-like
-                    if ($this->isCollection($property)) {
+                    /* Group Modifiers
+                     */
+                    if (in_array($property, ['userAccessRead', 'userAccessWrite', 'userAccessRemove'])) {
+                        if ($value) {
+
+                            // wrap value in an array if not already one
+                            $value = (array)$value;
+
+                            /* Only the setters perform mutations when accessing these three Group Mutator properties
+                             */
+                            $this->applyModelPropertyValue($object, $property, $value);
+                            $context['new data'][$property] = $value;
+                        }
+                    } elseif ($this->isCollection($property)) {
+                        // treat collections special-like
 
                         // first, read the value out of the object
                         $modelProperty = $this->mapper->getModelProperty($object, $property) ?? [];
@@ -169,6 +182,9 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
 
                         // reassign the value to the now (maybe) changed array
                         $value = $modelProperty;
+
+                        $this->applyModelPropertyValue($object, $property, $value);
+                        $context['new data'][$property] = $value;
                     } else {
                         if (is_array($value)) {
                             // not a collection, so we can only accept one value: take the first one
@@ -176,10 +192,10 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                         }
                         // ensure lack of whitespace
                         $value = trim($value);
-                    }
 
-                    $this->applyModelPropertyValue($object, $property, $value);
-                    $context['new data'][$property] = $value;
+                        $this->applyModelPropertyValue($object, $property, $value);
+                        $context['new data'][$property] = $value;
+                    }
                 }
 
                 // TODO log that the rule applied [SB-10514], and provide the new set of values [SB-10515]

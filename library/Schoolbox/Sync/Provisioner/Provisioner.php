@@ -12,6 +12,7 @@ use InvalidArgumentException;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Campus;
+use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise;
 use Schoolbox\GenericCollection;
@@ -20,6 +21,7 @@ use Schoolbox\Notif\CacheableLoggerInterface;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Log;
@@ -107,6 +109,18 @@ class Provisioner
 
 
     /**
+     * @var Folder\Mapper
+     */
+    private $folderMapper;
+
+
+    /**
+     * @var Loader
+     */
+    private $config;
+
+
+    /**
      * Constructor
      *
      * @param Ruleset\Factory          $rulesetFactory
@@ -115,6 +129,9 @@ class Provisioner
      * @param UserMapper               $userMapper
      * @param CacheableLoggerInterface $logger
      * @param Log\Mapper               $logMapper
+     * @param UserAccessMapper         $userAccessMapper
+     * @param Folder\Mapper            $folderMapper
+     * @param Loader                   $config
      */
     public function __construct(
         Ruleset\Factory $rulesetFactory,
@@ -123,7 +140,9 @@ class Provisioner
         UserMapper $userMapper,
         CacheableLoggerInterface $logger,
         Log\Mapper $logMapper,
-        UserAccessMapper $userAccessMapper
+        UserAccessMapper $userAccessMapper,
+        Folder\Mapper $folderMapper,
+        Loader $config
     ) {
         $this->rulesetFactory = $rulesetFactory;
         $this->grammarFactory = $grammarFactory;
@@ -134,6 +153,8 @@ class Provisioner
         $this->logMapper = $logMapper;
         $userAccessMapper->setEventPropagator(new MockPropagator());
         $this->userAccessMapper = $userAccessMapper;
+        $this->folderMapper = $folderMapper;
+        $this->config = $config;
     }
 
     /**
@@ -235,29 +256,13 @@ class Provisioner
 
 
                     // Keep a copy of the original user, for comparison
-                    $originalUser  = clone $internalUser;
-                    $oldAccessList = $this->formatAccessLevels($originalUser);
+                    $originalUser = clone $internalUser;
 
-
-                    /* Deliberately empty $accessList so that Role-based
-                     * permissions don't get saved in addition to the Group
+                    /* Deliberately empty $accessList of everything except SERVICE_HOMEPAGE items
+                     * so that Role-based permissions don't get saved in addition to the Group
                      * permissions that we can set
                      */
-                    $preserved = $this->userAccessMapper->createCollection();
-
-
-                    /* Don't blow away any UserAccess::ACCESS_FULL settings
-                     */
-                    foreach ($internalUser->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE) as $current) {
-                        /** @var UserAccess $current */
-                        if ($current->getAccessLevel() === UserAccess::ACCESS_FULL) {
-                            $preserved->add($current);
-
-                            $this->logger->debug("{$internalUser->getFullname()} is staying at access level {$current->getAccessLevel()} for {$current->getServiceIdentifier()}", $commonContext);
-                        }
-                    }
-
-                    $internalUser->setAccessList($preserved);
+                    $internalUser->setAccessList($internalUser->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE));
 
                     $commonContext['action'] = $action;
 
@@ -281,14 +286,105 @@ class Provisioner
                     // get a diff of the original user and what we've ended up with
                     $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
 
-                    // get a diff of the access list as well
-                    $newAccessList = $this->formatAccessLevels($internalUser, $originalUser);
-                    if ($newAccessList !== $oldAccessList) {
-                        $diff['accessList'] = [
-                            'old' => $oldAccessList,
-                            'new' => $newAccessList,
-                        ];
+
+                    /* Modify accessList only when ups_groups_enabled is actually enabled
+                     * Otherwise leave it unchanged from whatever it was
+                     */
+                    if ($this->config->get('ups_groups_enabled')) {
+
+                        /* Figure out what is going on in the userAccess mutations
+                         *
+                         * UPS Rulesets can have N adds/removes in any order so you need to compute
+                         * the mutations in order to find out where you ended up. These evaluations
+                         * also create log->debug entries so you can see what happened
+                         */
+                        $existingGroups = (new ExistingUserAccess($this->folderMapper, $this->logger))->generate($originalUser);
+                        $finalGroups = (new FinalUserAccess($this->folderMapper, $this->logger))->generate($internalUser);
+
+                        /* Compute the actual difference - if the set of (folderId, accessLevel)
+                         * tuples are the same, then there's no difference and we don't need to
+                         * tell anyone about changes
+                         *
+                         * Otherwise show them the old list and the new list and let them see
+                         * how they're different
+                         *
+                         * Note: In the past the XOR serialisation was done on log messages which
+                         * sounds like a kind of weird way to do it but I guess it's not as insane
+                         * as it might first appear
+                         */
+                        $diffGroups = (new UserAccessXOR())->generate($existingGroups, $finalGroups);
+
+                        if (\count($diffGroups)) {
+                            $this->logger->debug(sprintf(
+                                'Groups for %s underwent a meaningful mutation',
+                                $internalUser->getFullName()
+                            ));
+
+                            /* Translate the existing group tuples into something nice for humans
+                             * to read - there's a lot of overhead doing these folder lookups
+                             * which can definitely be optimised further if we want to keep it
+                             */
+                            $oldLog = [];
+
+                            foreach ($existingGroups as $folderId => $accessLevel) {
+
+                                /* Maybe this folder doesn't actually exist at runtime
+                                  */
+                                try {
+                                    $folder = $this->folderMapper->findCheaplyById($folderId);
+                                    $folderName = $folder->getName();
+                                } catch (\Schoolbox\Mapper\Exception $e) {
+                                    $folderName = 'unknown folder';
+                                }
+
+                                $oldLog[] = sprintf(
+                                    '%s access to %s (/homepage/%s)',
+                                    UserAccess::ACCESS_MAP[$accessLevel],
+                                    $folderName,
+                                    $folderId
+                                );
+                            }
+
+                            /* Translate the final group tuples into something nice for humans
+                             * to read - there's a lot of overhead doing these folder lookups
+                             * which can definitely be optimised further if we want to keep it
+                             */
+                            $newLog = [];
+
+                            foreach ($finalGroups as $folderId => $accessLevel) {
+
+                                /* Maybe this folder doesn't actually exist at runtime
+                                 */
+                                try {
+                                    $folder = $this->folderMapper->findCheaplyById($folderId);
+                                    $folderName = $folder->getName();
+                                } catch (\Schoolbox\Mapper\Exception $e) {
+                                    $folderName = 'unknown folder';
+                                }
+
+                                $newLog[] = sprintf(
+                                    '%s access to %s (/homepage/%s)',
+                                    UserAccess::ACCESS_MAP[$accessLevel],
+                                    $folderName,
+                                    $folderId
+                                );
+                            }
+
+                            /* Do you actually need to see what they had,
+                             * or is the new set of UserAccess enough?
+                             */
+                            $diff['accessList'] = [
+                                'old' => $oldLog,
+                                'new' => $newLog
+                            ];
+                        } else {
+                            $this->logger->debug(sprintf(
+                                'Groups for %s remained unchanged',
+                                $internalUser->getFullName()
+                            ));
+                        }
                     }
+
 
                     $originalName = ($action == 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})"
                         : $originalUser->formatName() . " ({$internalUser->getExternalID()})";
@@ -443,73 +539,5 @@ class Provisioner
             $this->newUsernameCache[$internalUser->getUsername()] = $internalUser->getExternalId();
         }
         return true;
-    }
-
-
-    /**
-     * Format access levels in a user-readable manner
-     *
-     * @param User      $user
-     * @param User|null $previous
-     * @return array
-     */
-    private function formatAccessLevels(User $user, ?User $previous = null): array
-    {
-        // Final access levels:
-        // Original - removed + added
-        $result = [];
-        if ($previous) {
-            foreach ($previous->getAccessList() as $access) {
-                if ($access->getService() === UserAccess::SERVICE_HOMEPAGE) {
-                    $result[$access->getServiceIdentifier()] = $access->getAccessLevel();
-                }
-            }
-        }
-
-
-        // Remove any groups in the remove list
-        foreach ($user->getUserAccessRemove() as $accessRemove) {
-            $existingAccess = $result[$accessRemove] ?? UserAccess::ACCESS_DENY;
-            if ($existingAccess < UserAccess::ACCESS_FULL) {
-                unset($result[$accessRemove]);
-            }
-        }
-
-
-        // Then add any groups in the add list
-        foreach ($user->getAccessList() as $access) {
-            if ($access->getService() === UserAccess::SERVICE_HOMEPAGE
-                && $access->getAccessLevel() < UserAccess::ACCESS_FULL
-            ) {
-                $result[$access->getServiceIdentifier()] = $access->getAccessLevel();
-            }
-        }
-
-
-        // Format it in a readable format
-        ksort($result);
-        $formattedResult = [];
-        foreach ($result as $groupId => $accessLevel) {
-            $accessLevelString = null;
-            switch ($accessLevel) {
-                case UserAccess::ACCESS_WRITE:
-                    $accessLevelString = 'write';
-                    break;
-
-                case UserAccess::ACCESS_READ:
-                    $accessLevelString = 'read';
-                    break;
-
-                case UserAccess::ACCESS_FULL:
-                case UserAccess::ACCESS_DENY:
-                default:
-                    // Don't render
-                    break;
-            }
-            if (isset($accessLevelString)) {
-                $formattedResult[] = sprintf('%d: %s', $groupId, $accessLevelString);
-            }
-        }
-        return $formattedResult;
     }
 }

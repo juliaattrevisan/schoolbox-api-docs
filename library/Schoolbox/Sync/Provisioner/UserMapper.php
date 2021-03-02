@@ -13,8 +13,6 @@ use Schoolbox;
 use Schoolbox\UserMapper as SchoolboxMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Config\Loader as ConfigLoader;
-use Schoolbox\Collection;
 
 /** @method User findByExternalId($id, $roleType = null) */
 class UserMapper extends SchoolboxMapper
@@ -48,12 +46,18 @@ class UserMapper extends SchoolboxMapper
         return $this->getJoinMapper('userAccess')->findAllGroupsForUser($user);
     }
 
+
     /**
      * Save an updated list of UserAccess instances
      *
      * @param User $user
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Schoolbox\Mapper\Exception
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
-    public function postSave($user)
+    public function postSave($user): void
     {
         /* Modify accessList only when ups_groups_enabled is actually enabled
          * Otherwise leave it unchanged from whatever it was
@@ -67,44 +71,34 @@ class UserMapper extends SchoolboxMapper
             // make sure any mutes go through correctly
             $userAccessMapper->setEventPropagator($this->getEventPropagator());
 
-            /* If you combined 'Groups (Read/Write)' and 'Groups (Remove)' in the
-             * same rule, you'll always be added to the groups specified by the
-             * value of 'Groups (Read/Write)'. It will overpower the Remove.
-             * It is recommended that Remove operations be set up before Read/Write
+            /* Update the UserAccess instances
              *
-             * This is so you can remove people from multiple groups, then reassign
-             * people to new groups, in the same rule.
-             *
-             * There isn't a way to tell whether the 'Groups (Remove)' came before
-             * or after the 'Groups (Read/Write)' in the same rule.
+             * Clear their existing ones
+             * Find the final UserAccess instances that a person should have
+             * Insert these ones
              */
+            $userAccesses = $userAccessMapper->findByColumnList([
+                'uid' => $user->getId(),
+                'service' => UserAccess::SERVICE_HOMEPAGE
+            ]);
 
-            /* Get a list of all the UserAccess instances for this User
-             */
-            $allUserAccess = $userAccessMapper->findAllGroupsForUser($user);
-
-            /* Search $allUserAccess for anything that should be deleted
-             * If found, delete it from the db if it was already there
-             * These are spawned from a previous Rule.
-             */
-            foreach ($user->getUserAccessRemove() as $current) {
-                $found = $allUserAccess->getBy('serviceIdentifier', $current);
-
-                /* Do not blow away Owners, only Read/Write accessors
-                 */
-                if ($found instanceof UserAccess && ($found->getAccessLevel() < UserAccess::ACCESS_FULL)) {
-                    $userAccessMapper->deleteByColumnList([
-                        'uid'     => $user->getId(),
-                        'sid'     => $found->getServiceIdentifier(),
-                        'service' => UserAccess::SERVICE_HOMEPAGE,
-                    ]);
+            foreach ($userAccesses as $userAccess) {
+                if ($userAccess->getAccessLevel() !== UserAccess::ACCESS_FULL) {
+                    $userAccessMapper->delete($userAccess);
                 }
             }
 
-            /* Reinstate all elements in $accessList
-             */
-            foreach ($user->getAccessList() as $current) {
-                $userAccessMapper->save($current);
+            $finalUserAccess = (new FinalUserAccess(\Schoolbox\Resource\Folder\Mapper::getInstance(), null))
+                ->generate($user);
+
+            foreach ($finalUserAccess as $folderId => $accessLevel) {
+                $userAccess = $userAccessMapper->createModel()
+                    ->setUser($user)
+                    ->setService(UserAccess::SERVICE_HOMEPAGE)
+                    ->setServiceIdentifier($folderId)
+                    ->setAccessLevel($accessLevel);
+
+                $userAccessMapper->save($userAccess);
             }
         }
     }

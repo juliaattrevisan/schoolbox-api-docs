@@ -6,7 +6,9 @@
  */
 namespace Schoolbox\Sync\Provisioner;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User as SchoolboxUser;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -33,6 +35,16 @@ class User extends SchoolboxUser
      */
     protected $campusRemoveList = [];
 
+
+    /**
+     * A timeline of mutations - additions and removals - of UserAccess instances
+     * as they were specified by the UPS Ruleset.
+     *
+     * @var array
+     */
+    private $userAccessMutations = [];
+
+
     /**
      * Get user access read
      * A list of Groups to which this user has Read access
@@ -51,7 +63,13 @@ class User extends SchoolboxUser
      */
     public function setUserAccessRead($userAccessRead)
     {
-        $this->setAccessLevel($userAccessRead, UserAccess::ACCESS_READ);
+        /* Add it to the list of things to process later
+         */
+        $this->userAccessMutations[] = [
+            'instance' => $userAccessRead,
+            'level' => UserAccess::ACCESS_READ,
+            'status' => 'add'
+        ];
     }
 
     /**
@@ -72,7 +90,13 @@ class User extends SchoolboxUser
      */
     public function setUserAccessWrite($userAccessWrite)
     {
-        $this->setAccessLevel($userAccessWrite, UserAccess::ACCESS_WRITE);
+        /* Add it to the list of things to process later
+         */
+        $this->userAccessMutations[] = [
+            'instance' => $userAccessWrite,
+            'level' => UserAccess::ACCESS_WRITE,
+            'status' => 'add'
+        ];
     }
 
     /**
@@ -92,7 +116,13 @@ class User extends SchoolboxUser
      */
     public function setUserAccessRemove($userAccessRemove)
     {
-        $this->accessRemoveList = $userAccessRemove;
+        /* Add it to the list of things to process later
+         */
+        $this->userAccessMutations[] = [
+            'instance' => $userAccessRemove,
+            'level' => null,
+            'status' => 'remove'
+        ];
     }
 
     /**
@@ -104,6 +134,18 @@ class User extends SchoolboxUser
     {
         return $this->campusRemoveList;
     }
+
+
+    /**
+     * Get a list of UserAccess additions and removals, in the order in which they occurred
+     *
+     * @return array
+     */
+    public function getUserAccessMutations(): array
+    {
+        return $this->userAccessMutations;
+    }
+
 
     /**
      * Remove selected CampusCollection instances.
@@ -136,53 +178,5 @@ class User extends SchoolboxUser
 
         // And add to the list to remove, if this actually does anything anymore!
         $this->campusRemoveList = $campusCollectionRemove;
-    }
-
-    /**
-     * Set $identifiers to access level $level in $accessList collection
-     *
-     * @param array $identifiers
-     * @param int $level
-     */
-    private function setAccessLevel($identifiers, $level)
-    {
-        /* Modify accessList only when ups_groups_enabled is actually enabled
-         * Otherwise leave it unchanged from whatever it was
-         */
-        if ($this->getConfigLoader()->get('ups_groups_enabled')) {
-            $found = [];
-
-            /* Update existing userAccess instance
-             *
-             * In accordance with SB-11230:
-             * - don't change Full Access settings
-             * - downgrade Write to Read
-             */
-            foreach ($this->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE) as $current) {
-                if (in_array($current->getServiceIdentifier(), $identifiers)) {
-                    if ($current->getAccesslevel() < UserAccess::ACCESS_FULL) {
-                        $current->setAccessLevel($level);
-                    }
-
-                    $found[] = $current->getServiceIdentifier();
-                }
-            }
-
-            /* If the userAccess instance didn't exist, create it
-             */
-            $diff = array_diff($identifiers, $found);
-
-            if (count($diff)) {
-                foreach ($diff as $current) {
-                    $userAccess = new UserAccess();
-                    $userAccess->setUser($this);
-                    $userAccess->setService(UserAccess::SERVICE_HOMEPAGE);
-                    $userAccess->setServiceIdentifier($current);
-                    $userAccess->setAccessLevel($level);
-
-                    $this->accessList->add($userAccess);
-                }
-            }
-        }
     }
 }
