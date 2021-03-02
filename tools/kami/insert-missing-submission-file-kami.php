@@ -9,6 +9,7 @@
 
 declare(strict_types=1);
 
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\InlineGrader\Kami\Model as Kami;
 
@@ -19,16 +20,58 @@ $app = new class extends CliTool\App {
     public function getLongOpts(): array
     {
         return [
+            'help',
             'since:',
         ];
     }
 
+    /** @inheritDoc */
+    public function getShortOpts(): array
+    {
+        return [
+            'h',
+        ];
+    }
+
+    /** @inheritDoc */
+    public function printHelp(): void
+    {
+        $help = "
+SYNOPSIS:
+    {$this->getToolFilename()} [OPTION]...
+
+DESCRIPTION
+    Tool for finding missing student_submission_file_kami data for existing student_submission_file.
+
+    -h, --help
+        Print this help and exit
+
+    -p, --perform
+        Update DB
+
+    --since=YYYY-MM-DD
+        Find data since the date provided. 2021-01-01 by default
+";
+        \fwrite(STDOUT, $help);
+    }
+
+
     public function run(): void
     {
+        // Did user request help?
+        if ($this->getOpt('help') || $this->getOpt('h')) {
+            $this->printHelp();
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
         if ($this->getOpt('since')) {
             $date = new Alaress_Date_Format($this->getOpt('since:'), Alaress_Date_Format::DATABASE_DATE_FORMAT);
         } else {
             $date = new Alaress_Date_Format('2021-01-01', Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        }
+
+        if (!$this->perform()) {
+            $this->getLogger()->notice('Executing in dry run mode. Provide --perform to update DB.');
         }
 
         $insertQuery = "INSERT INTO student_submission_file_kami (
@@ -52,9 +95,7 @@ $app = new class extends CliTool\App {
                     AND storage.ext IN ('" . implode("', '", array_keys(Kami::ALLOWED_FILE_TYPES)) . "')";
 
         $query = $this->perform() ? $insertQuery . $selectQuery : $selectQuery;
-        echo $query;
-
-        $db = $this->getDatabaseInternal();
+        $db    = $this->getDatabaseInternal();
 
         $result = $db->executeQuery($query);
         if ($this->perform()) {
