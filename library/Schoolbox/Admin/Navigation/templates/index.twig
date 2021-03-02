@@ -11,9 +11,11 @@
 {#        {% endfor %}#}
 {#    </ul>#}
 {#</div>#}
-<nav id="admin-nav" class="medium-4 xlarge-3 columns">
+
+<nav id="admin-nav" class="medium-4 xlarge-2 columns">
     <h2 class="subheader">Menu</h2>
-    <ul class="side-nav" role="navigation">
+    <a href="#" class="dropdown-btn" onclick="showDropDown(this);return false;">Go to...</a>
+    <ul class="admin side-nav" role="navigation">
         <li role="menuitem"><a href="#">Home</a></li>
         <li class="parent-item" role="menuitem">
             <a href="#">Calendar</a>
@@ -26,7 +28,14 @@
         <li><a href="#">Engagement</a></li>
         <li><a href="#">ePortfolio</a></li>
         <li><a href="#">Filters</a></li>
-        <li><a href="#">Homepage Templates</a></li>
+        <li class="parent-item">
+            <a href="#">Homepage Templates</a>
+            <ul class="flyout" role="navigation">
+                <li role="menuitem"><a href="#">Import</a></li>
+                <li role="menuitem"><a href="#">Subscribe</a></li>
+                <li role="menuitem"><a href="#">Cleanup</a></li>
+            </ul>
+        </li>
         <li><a href="#">Import</a></li>
         <li><a href="#">LMS</a></li>
         <li><a href="#">Lists</a></li>
@@ -48,3 +57,17 @@
         </li>
     </ul>
 </nav>
+
+<script tsype="text/javascript">
+    const mq = window.matchMedia( "(max-width: 640px)" );
+    if (mq.matches) {
+        $(".parent-item a").click(function(e) {
+            e.preventDefault();
+            var $target = $(this).closest('li').find("ul.flyout").slideToggle();
+            $('ul.flyout').not($target).slideUp();
+        });
+    }
+    $('.dropdown-btn').click(function(){
+        $('.admin').toggle();
+    });
+</script>
