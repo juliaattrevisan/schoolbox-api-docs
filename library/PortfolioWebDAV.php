@@ -19,6 +19,7 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Resource\Folder\ILocator as FolderLocatorInterface;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
 use Schoolbox\WebDav\LegacyConfiguration\Factory as LegacyConfigFactory;
 use Schoolbox\WebDav\Mapper as WebDavMapper;
@@ -707,12 +708,19 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $file->setFolder($cat);
         $file->setBasename($data['name']);
         $file->setTitle($data['description']);
-        $file->setSize($data['file_size']);
         $file->setOwner($owner);
-        try {
-            $file->setMimetype($this->mimeMapper->getByFilename($data['name']));
-        } catch (\Schoolbox\File\Exception $e) {
-            $file->setMimetype($this->mimeMapper->getUnknownMime());
+
+        // Size can't be set on the file directly.
+        // Instead, set it on the storage object within the file.
+        $storage = $file->getStorage();
+        if ($storage instanceof StorageModel) {
+            $storage = $storage->setSize($data['file_size']);
+            try {
+                $storage = $storage->setMimetype($this->mimeMapper->getByFilename($data['name']));
+            } catch (\Schoolbox\File\Exception $e) {
+                $storage = $storage->setMimetype($this->mimeMapper->getUnknownMime());
+            }
+            $file->setStorage($storage);
         }
 
         return $file;
