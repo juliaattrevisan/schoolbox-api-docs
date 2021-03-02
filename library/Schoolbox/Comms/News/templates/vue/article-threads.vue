@@ -8,6 +8,8 @@ import RevealModal from '@schoolbox/reveal-modal';
 
 export default {
 
+    name: 'article-threads',
+
     components: {
         Toast,
         RevealModal
@@ -58,6 +60,20 @@ export default {
         getAddCommentButtonText () {
             if (this.isCKEditorLoading) return 'Loading';
             else return 'Add a Comment'
+        },
+
+        /**
+         * Don't allow purely white space comments
+         *
+         * @returns {Boolean}
+         */
+        isCommentJustWhiteSpace () {
+            const htmlStripped = new DOMParser().parseFromString(this.newComment, 'text/html'); //as the comment is from a CKEditor, strip the html entities
+            if (!htmlStripped.body.textContent.replace(/\s/g, '').length) { //ain't nothing but white space
+                return true;
+            } else {
+                return false;
+            }
         }
 
     },
@@ -387,7 +403,7 @@ export default {
                 this.isProcessActive = false;
             });
 
-        }
+        },
 
     },
 
@@ -416,31 +432,31 @@ export default {
                         <label for="allow-comments">Allow comments</label>
                     </div>
                 </div>
-                <div v-if="!isInitialLoad">
-                    <div v-show="isThreadEnabled">
-                        <div v-if="isPublished">
+                <template v-if="!isInitialLoad">
+                    <template v-show="isThreadEnabled">
+                        <template v-if="isPublished">
                             <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
                             <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
                             <div :style="[isCKEditorLoaded ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
                                 <textarea id="comment" name="comment" rows="5"></textarea>
                                 <a class="button submit"
                                     @click="postComment"
-                                    :disabled="newComment.trim() === '' || isProcessActive">Post Comment</a>
+                                    :disabled="isCommentJustWhiteSpace || isProcessActive">Post Comment</a>
                             </div>
-                        </div>
-                        <div v-else>
+                        </template>
+                        <template v-else>
                             <div data-alert="" class="alert-box">
                                 <span class="icon-locked">Comments will be available once this article is published.</span>
                             </div>
-                        </div>
-                    </div>
+                        </template>
+                    </template>
                     <div v-show="!isThreadEnabled">
                         <div data-alert="" class="alert-box">
                             <span class="icon-locked">Comments are currently disabled for this article.</span>
                         </div>
                     </div>
-                </div>
-                <div v-if="isInitialLoad">
+                </template>
+                <template v-if="isInitialLoad">
                     <ul class="information-list social-stream">
                         <li class="actions-small-1" v-for="n in 3" :key="n">
                             <div class="list-item">
@@ -452,15 +468,15 @@ export default {
                             </div>
                         </li>
                     </ul>
-                </div>
-                <div v-else>
+                </template>
+                <template v-else>
                     <ul class="information-list social-stream">
                         <li class="actions-small-2" v-for="(comment, index) in comments" :key="index">
                             <div class="list-item">
                                 <div class="card compact small-12">
                                     <a :href="'/search/user/' + comment.author.id" title="View Profile">
                                         <img :src="'/portrait.php?id=' + comment.author.id + '&size=square64'">
-                                        <p class="" meta>
+                                        <p class="meta">
                                             {{ comment.author.fullName }}
                                             <span class="pipe meta" :title="comment.createdAt | fullString ">Posted {{ comment.createdAt | fromNow }}</span>
                                         </p>
@@ -474,7 +490,7 @@ export default {
                         </li>
                     </ul>
                     <a v-if="showLoadMoreButton" @click="getThread" class="button expand" :disabled="isProcessActive">Show older comments</a>
-                </div>
+                </template>
             </div>
         </section>
         <toast ref="toast"></toast>

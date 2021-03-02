@@ -20,7 +20,7 @@ module.exports = {
         calendarComponent: "./library/Schoolbox/Calendar/vue/component.main.js",
         visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/visitation-list-full.js',
         articleList: './library/Schoolbox/Comms/News/templates/vue/article-list.js',
-        newsItemThreads: './library/Schoolbox/Comms/News/templates/vue/newsItemThreads.js',
+        articleThreads: './library/Schoolbox/Comms/News/templates/vue/init-article-threads.js',
         authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js',
         learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/evidence-detail.js',

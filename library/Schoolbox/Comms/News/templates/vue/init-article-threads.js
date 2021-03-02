@@ -1,9 +1,9 @@
 import Vue from 'vue';
-import NewsItemThreads from './NewsItemThreads'
+import ArticleThreads from './article-threads'
 
 new Vue({
 	el: '#threads-section',
 	components: {
-		NewsItemThreads
+		'article-threads': ArticleThreads
     }
 });

@@ -85,7 +85,7 @@
 
 <div class="small-12 island" id="discussion">
     <section id="threads-section">
-        <news-item-threads 
+        <article-threads 
             :article-id="{{ article.id }}"
             :thread-id-on-load="{{ article.discussionThread ? article.discussionThread.id : 0 }}"
             :is-thread-checkbox-visible-on-load="Boolean({{ modifyRoute or isAuthor }})"
@@ -97,6 +97,6 @@
         />
     </section>
 </div>
-<script src="/javascript/components/newsItemThreads.bundle.js?v={{ config.site_version }}"></script>
+<script src="/javascript/components/articleThreads.bundle.js?v={{ config.site_version }}"></script>
 
 {% endif %}
