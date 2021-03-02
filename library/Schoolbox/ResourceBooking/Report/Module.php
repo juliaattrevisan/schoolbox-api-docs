@@ -6,7 +6,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\ResourceBooking\Report;
 
 use Alaress\Authorizer\Authorizer;
@@ -18,8 +18,6 @@ use Calendar_Api_Composite;
 use External_Timetable;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
-use Twig_Loader_Filesystem;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\ResourceBooking\Item;
 
