@@ -44,7 +44,27 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyNameIsSetIfNotDynamic']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'verifyNoParticipants']);
+    }
+
+
+    /**
+     * Pre-save hook to verify a user-made plan has been given a name.
+     *
+     * @param Model $plan
+     * @return bool
+     * @throws UnexpectedValueException
+     */
+    protected function verifyNameIsSetIfNotDynamic(Model $plan): bool
+    {
+        if (!$plan->isDynamic()) {
+            $name = trim($plan->getName() ?? '');
+            if ($name === '') {
+                throw new UnexpectedValueException('A plan must have a name');
+            }
+        }
+        return true;
     }
 
 
