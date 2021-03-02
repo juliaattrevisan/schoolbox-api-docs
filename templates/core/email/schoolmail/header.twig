@@ -1,5 +1,9 @@
 <tr>
   <td colspan="2" valign="middle">
+      {% if config.email_banner_image %}
+          <img src="https://{{ config.fqdn }}/storage/image.php?hash={{ config.email_banner_image }}" alt="{{ config.title }}" border="0" />
+      {% else %}
       <img src="https://{{ config.fqdn }}/images/logo.php?logo=skin_logo_square&amp;size=normal" alt="{{ config.title }}" border="0" />
+      {% endif %}
   </td>
 </tr>
