@@ -4,7 +4,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\Preview;
 
 use Alaress\Authorizer\Authorizer;
@@ -14,7 +14,6 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
-use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {

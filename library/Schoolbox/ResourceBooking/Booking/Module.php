@@ -16,7 +16,6 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
-use Twig_Loader_Filesystem;
 use Schoolbox\Calendar;
 use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access\UserAccess;

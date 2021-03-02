@@ -16,11 +16,6 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
-use Twig_Loader_Filesystem;
-use Schoolbox\Permission\Access\UserAccess;
-
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Collection;
 
 class Module extends BaseModule
 {
