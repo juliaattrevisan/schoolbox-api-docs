@@ -4,6 +4,7 @@
  *
  * Provides the import file as the first argument to the script
  *
+ * WARNING: Not complete, can only update text in steps
  */
 
 use Schoolbox\Application\CliTool;

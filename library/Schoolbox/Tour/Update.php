@@ -64,14 +64,16 @@ HELP
         foreach ($steps as $step) {
             $step = $step['step'];
             /** @var \Schoolbox\Tour\Step\Model $tourStep */
-            $tourStep = $tourStepMapper->findOneByColumnList(
-                [
-                    'tour_uuid' => $tour->getUuid(),
-                    'type'      => $tourStepMapper::TYPE_MODAL,
-                ]
-            );
 
-            if (!$tourStep) {
+            try {
+                $tourStep = $tourStepMapper->findOneByColumnList(
+                    [
+                        'tour_uuid' => $tour->getUuid(),
+                        'type'      => $tourStepMapper::TYPE_MODAL,
+                    ]
+                );
+            }
+            catch (Exception\NotFound $e) {
                 $this->getLogger()->info('No tour step to update');
                 exit();
             }

@@ -33,7 +33,7 @@ abstract class AbstractMapper extends BaseMapper
     }
 
     /**
-     * @param $model
+     * @param AbstractModel $model
      * @return bool
      */
     private function preSave($model)

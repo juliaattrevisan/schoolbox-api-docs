@@ -190,7 +190,7 @@ interface IMapper
     /**
      * Retreives a model by id
      *
-     * @throws Exception if no instance of model is found
+     * @throws Exception\NotFound if no instance of model is found
      * @throws Exception\Deleted if the model was found but has been deleted
      *
      * @param  mixed $identifierValue
@@ -232,7 +232,7 @@ interface IMapper
      *
      * @return object
      * @throws Exception\Deleted If the model was found but has been deleted
-     * @throws Exception         If no instance of model is found
+     * @throws Exception\NotFound If no instance of model is found
      */
     public function findOneByColumnList($columnList, array $options = array());
 
