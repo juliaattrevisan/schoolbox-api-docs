@@ -52,6 +52,9 @@ case "$1" in
                 systemctl stop "$service"
             done
         done
+
+        echo "Removing cronjobs"
+        /usr/local/bin/schoolboxcloud-rebuild-cronjobs --site-root /usr/share/schoolbox --is-primary-host 0
     ;;
 
     abort-upgrade)
