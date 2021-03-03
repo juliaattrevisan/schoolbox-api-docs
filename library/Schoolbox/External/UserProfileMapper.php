@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -98,7 +99,7 @@ class UserProfileMapper extends Schoolbox\Mapper
     protected function getFromString()
     {
         return "
-            FROM {$this->database->quoteIdentifier($this->getTable())}
+            FROM {$this->database->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
         ";
     }

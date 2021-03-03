@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Schoolbox user role mapper
  *
@@ -98,7 +99,7 @@ class RoleMapper extends Mapper
      */
     public function findByName(string $name, array $options = []): GenericCollection
     {
-        $escaped = $this->getDatabase()->escapeForLike($name);
+        $escaped = $this->getDatabase()->getQuoter()->escapeForLike($name);
         return $this->findByPredicates($this->getPredicateBuilder()->like('name', "%{$escaped}%"), $options);
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -91,7 +92,7 @@ interface IBuilder
      *
      * @param string|ISqlFunc $columnName
      * @param string          $columnValue Used directly in LIKE statement.
-     * @see \Database::escapeForLike for escaping user input.
+     * @see IQuoter::escapeForLike for escaping user input.
      * @return IBuilder
      */
     public function like($columnName, string $columnValue);
@@ -108,7 +109,7 @@ interface IBuilder
      *
      * @param string|ISqlFunc $columnName
      * @param string          $columnValue Used directly in NOT LIKE statement.
-     * @see \Database::escapeForLike for escaping user input.
+     * @see IQuoter::escapeForLike for escaping user input.
      * @return IBuilder
      */
     public function notLike($columnName, string $columnValue);

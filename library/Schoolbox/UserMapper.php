@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox;
 
 use Aura\Di\Exception\ServiceNotFound;
@@ -63,7 +65,9 @@ class UserMapper extends Mapper
     {
         try {
             /*** Do not explode if the integrations is not configured ***/
-            set_error_handler(function () { return true; }, E_USER_WARNING);
+            set_error_handler(function () {
+                return true;
+            }, E_USER_WARNING);
             $externalCommunityPortal = self::getDi()->get('externalCommunityPortal');
             restore_error_handler();
         } catch (ServiceNotFound $e) {
@@ -483,7 +487,8 @@ class UserMapper extends Mapper
      * @throws Mapper\Exception\NotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function findByExternalId($id, $roleType = null) {
+    public function findByExternalId($id, $roleType = null)
+    {
 
         if (\strlen($id) === 0) {
             throw new Schoolbox\Mapper\Exception('An ID must be provided');
@@ -499,7 +504,7 @@ class UserMapper extends Mapper
 
         $user = $this->findByPredicates($pb)->first();
 
-        if (!$user instanceOf User) {
+        if (!$user instanceof User) {
             throw new Schoolbox\Mapper\Exception\NotFound();
         }
 
@@ -581,7 +586,7 @@ class UserMapper extends Mapper
      */
     public function getUnknownUser()
     {
-        $user = new User;
+        $user = new User();
         $user->setLastname('Unknown User');
         return $user;
     }
@@ -603,7 +608,6 @@ class UserMapper extends Mapper
         $foundValidKeyword = false;
 
         if (strlen($search) >= Results::MIN_SEARCH_LENGTH) {
-
             // Only search if there are X or more characters
 
             $keywordArray = explode(' ', $search);
@@ -611,23 +615,20 @@ class UserMapper extends Mapper
             $pb = $this->getPredicateBuilder();
 
             foreach ($keywordArray as $keyword) {
-
                 if (strlen($keyword) >= Results::MIN_SEARCH_LENGTH) {
-
                     // Each keyword must be long enough to search
 
                     $foundValidKeyword = true;
 
-                    $pb->like('firstname', "%{$this->getDatabase()->escapeForLike($keyword)}%")
-                        ->like('lastname', "%{$this->getDatabase()->escapeForLike($keyword)}%");
-
+                    $pb->like('firstname', "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%")
+                        ->like('lastname', "%{$this->getDatabase()->getQuoter()->escapeForLike($keyword)}%");
                 }
             }
 
             // Had to have at least one valid keyword
 
             if ($foundValidKeyword) {
-                $users = $this->findByPredicates($this->getPredicateBuilder()->any( $pb));
+                $users = $this->findByPredicates($this->getPredicateBuilder()->any($pb));
 
                 /** @var User $user */
                 foreach ($users as $user) {
@@ -679,9 +680,9 @@ class UserMapper extends Mapper
         }
 
         if (is_array($order) && !empty($order)) {
-            $order_parts = Array();
+            $order_parts = array();
             foreach ($order as $column => $direction) {
-                $order_parts[] = $this->database->quoteIdentifier($column).(strtoupper($direction) == 'DESC'? ' DESC' : ' ASC');
+                $order_parts[] = $this->database->getQuoter()->quoteIdentifier($column) . (strtoupper($direction) == 'DESC' ? ' DESC' : ' ASC');
             }
             $query .= ' ORDER BY ' . (implode(', ', $order_parts));
         }
@@ -739,22 +740,23 @@ class UserMapper extends Mapper
     public function verifyUniqueUsername(User $user)
     {
         // Load cache on first invocation
-        if(!\is_array($this->usernameCache)){
+        if (!\is_array($this->usernameCache)) {
             $this->usernameCache = [];
             $query = $this->selectScalarByColumnList("{$this->getTable()}.id, {$this->getTable()}.username", []);
             $query->execute();
             /** @noinspection PhpAssignmentInConditionInspection */
-            while($row = $query->fetch(\PDO::FETCH_ASSOC)){
+            while ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
                 $this->usernameCache[\strtolower($row['username'])] = $row['id'];
             }
         }
 
         // Check cache
         $usernameLowerCase = \strtolower($user->getUsername());
-        if(array_key_exists($usernameLowerCase, $this->usernameCache)) {
-            if($this->usernameCache[$usernameLowerCase] != $user->getId()){
+        if (array_key_exists($usernameLowerCase, $this->usernameCache)) {
+            if ($this->usernameCache[$usernameLowerCase] != $user->getId()) {
                 throw new UnexpectedValueException(
-                    sprintf('A user with username "%s" already exists. Existing user id: "%s"',
+                    sprintf(
+                        'A user with username "%s" already exists. Existing user id: "%s"',
                         $user->getUsername(),
                         $this->usernameCache[$usernameLowerCase]
                     )
@@ -772,9 +774,10 @@ class UserMapper extends Mapper
      *
      * @param User $user
      */
-    public function addUsernameToCache(User $user){
+    public function addUsernameToCache(User $user)
+    {
         // Is cache in use?
-        if(\is_array($this->usernameCache)){
+        if (\is_array($this->usernameCache)) {
             $this->usernameCache[strtolower($user->getUsername())] = $user->getId();
         }
     }

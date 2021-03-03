@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Result
  *
@@ -64,7 +65,7 @@ class Result extends Base
 
         $statement = $mapper->getDatabase()->prepare($query);
         $statement->execute([
-            'likeKeyword' => '%'.$mapper->getDatabase()->escapeForLike($sanitiser->getUnquotedKeyword()).'%',
+            'likeKeyword' => '%' . $mapper->getDatabase()->getQuoter()->escapeForLike($sanitiser->getUnquotedKeyword()) . '%',
         ]);
 
         $results = $mapper->createCollection();
@@ -73,7 +74,6 @@ class Result extends Base
         // any folders found after offset+limit get skipped,
         // any before offset get sliced off the start
         foreach ($this->buildSearchResult($statement, $user, 'c.id', 0, self::NO_LIMIT) as $row) {
-
             // Not at offset + limit results yet? Skip
             if (count($results) > ($sanitiser->getOffset() + $sanitiser->getPageLimit())) {
                 break;
@@ -136,7 +136,7 @@ class Result extends Base
 
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute([
-            'likeKeyword' => '%'.$mapper->getDatabase()->escapeForLike($sanitiser->getUnquotedKeyword()).'%',
+            'likeKeyword' => '%' . $mapper->getDatabase()->getQuoter()->escapeForLike($sanitiser->getUnquotedKeyword()) . '%',
         ]);
 
         return $this->buildSearchCount($stmt, $user, 'id');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * During video transcoding, videos are loaded into the queue then processed in the background.
  * This library enables interaction with the queue, to load and process videos
@@ -24,24 +25,25 @@ use Schoolbox\UserMapper;
  *
  * @method Queue createModel($id = null)
  */
-class QueueMapper extends Mapper {
+class QueueMapper extends Mapper
+{
 
     /* Possible video states */
-    const STATUS_PENDING='pending';
-    const STATUS_PROCESSING='processing';
-    const STATUS_COMPLETED='completed';
-	const STATUS_FAILED='failed';
+    const STATUS_PENDING = 'pending';
+    const STATUS_PROCESSING = 'processing';
+    const STATUS_COMPLETED = 'completed';
+    const STATUS_FAILED = 'failed';
 
     /* Possible video types */
     const FILE_TYPE_SBFS = 'sbfs';
     const FILE_TYPE_STORAGE = 'storage';
-	const FILE_TYPE_SUBMISSION = 'submission';
-	const FILE_TYPE_MYFILE = 'myfile';
+    const FILE_TYPE_SUBMISSION = 'submission';
+    const FILE_TYPE_MYFILE = 'myfile';
 
     /**
      * Setup mapper
      */
-    protected function mapping ()
+    protected function mapping()
     {
         $this->hasTable('video_queue');
         $this->hasModel(Queue::class);
@@ -59,7 +61,8 @@ class QueueMapper extends Mapper {
      * Return all pending transcodes
      * @return \Schoolbox\GenericCollection
      */
-    public function getPending() {
+    public function getPending()
+    {
         return $this->findByColumn('status', self::STATUS_PENDING);
     }
 
@@ -68,11 +71,11 @@ class QueueMapper extends Mapper {
      * @param array|null $options
      * @return array|\Schoolbox\GenericCollection
      */
-    public function findByStatus($status, $options = null) {
+    public function findByStatus($status, $options = null)
+    {
         $result = [];
 
         if (is_array($status)) {
-
             foreach ($status as $statusCurrent) {
                 $results = $this->findByColumn('status', $statusCurrent, $options);
 
@@ -112,7 +115,8 @@ class QueueMapper extends Mapper {
      * @param  int $timeout
      * @return int How many videos were marked as timed out?
      */
-    public function markAllProcessingAsTimedOut($timeout) {
+    public function markAllProcessingAsTimedOut($timeout)
+    {
         $statement = $this->database->prepare("
             UPDATE {$this->getTable()}
             SET    status = :new_status, message = :message
@@ -121,8 +125,8 @@ class QueueMapper extends Mapper {
         ");
         $statement->bindValue('old_status', self::STATUS_PROCESSING);
         $statement->bindValue('new_status', self::STATUS_FAILED);
-        $statement->bindValue('message',    sprintf('Timed out - failed to finish processing after %d seconds', $timeout));
-        $statement->bindValue('timeout',    intval($timeout), \PDO::PARAM_INT);
+        $statement->bindValue('message', sprintf('Timed out - failed to finish processing after %d seconds', $timeout));
+        $statement->bindValue('timeout', intval($timeout), \PDO::PARAM_INT);
         $statement->execute();
         return $statement->rowCount();
     }
@@ -132,7 +136,7 @@ class QueueMapper extends Mapper {
      */
     protected function getSelectString()
     {
-        $table = $this->database->quoteIdentifier($this->table);
+        $table = $this->database->getQuoter()->quoteIdentifier($this->table);
 
         $storageMapper = $this->getJoinMapper('storage');
 
@@ -203,5 +207,4 @@ class QueueMapper extends Mapper {
 
         return $hydratedCollection;
     }
-
 }

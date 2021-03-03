@@ -136,7 +136,7 @@ abstract class Mapper implements IMapper, Serializable
     public const SORT_ORDER_DESC = 'desc';
 
     /**
-     * @var IDatabase|IQuoter
+     * @var IDatabase
      */
     protected $database;
 
@@ -618,7 +618,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * @return IDatabase|IQuoter
+     * @return IDatabase
      */
     public function getDatabase()
     {
@@ -1517,7 +1517,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function deleteByColumnList($columnList, array $options = [])
     {
-        return $this->executeDelete($this->getDeleteString(), new Builder($this->getDatabase(), $this->getTable()), $columnList, $options);
+        return $this->executeDelete($this->getDeleteString(), new Builder($this->getDatabase()->getQuoter(), $this->getTable()), $columnList, $options);
     }
 
 
@@ -1670,7 +1670,7 @@ abstract class Mapper implements IMapper, Serializable
         foreach ($pbs as $pb) {
             // Build query
 
-            $query     = "UPDATE `{$this->getTable()}` SET {$this->database->quoteIdentifier($field)} = :value WHERE " . implode(' AND ', $pb->getWhere());
+            $query     = "UPDATE `{$this->getTable()}` SET {$this->database->getQuoter()->quoteIdentifier($field)} = :value WHERE " . implode(' AND ', $pb->getWhere());
             $statement = $this->database->prepare($query);
             $statement->bindValue('value', $value);
             foreach ($pb->getParams() as $key => $id) {
@@ -2042,7 +2042,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function findByColumnList($columnList, $options = array())
     {
-        return $this->executeSelect($this->getSelectString(), $this->getFromString(), new Builder($this->getDatabase(), $this->getTable()), $columnList, $options);
+        return $this->executeSelect($this->getSelectString(), $this->getFromString(), new Builder($this->getDatabase()->getQuoter(), $this->getTable()), $columnList, $options);
     }
 
     /**
@@ -2128,7 +2128,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getPredicateBuilder()
     {
-        return new Builder($this->getDatabase(), $this->getTable());
+        return new Builder($this->getDatabase()->getQuoter(), $this->getTable());
     }
 
     /**
@@ -2203,7 +2203,7 @@ abstract class Mapper implements IMapper, Serializable
             'order'   => $this->getDefaultOrderByParams(),
         );
         $options      = array_merge($defaults, $options);
-        $quoted_table = $this->database->quoteIdentifier($this->table);
+        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
 
         // filter on soft-deletions if this mapper supports them
         if (isset($this->soft_delete_column) && $options['deleted'] == false) {
@@ -2229,7 +2229,7 @@ abstract class Mapper implements IMapper, Serializable
 
         // Build ORDER BY part
         if (isset($options['order']) && \is_array($options['order']) && count($options['order'])) {
-            $query .= self::buildOrderByClause($quoted_table, $options['order'], $this->database);
+            $query .= self::buildOrderByClause($quoted_table, $options['order'], $this->database->getQuoter());
         }
 
         // Build LIMIT and OFFSET part (should bind as parameters instead)
@@ -2325,7 +2325,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function getDeleteString()
     {
-        $quoted_table = $this->database->quoteIdentifier($this->table);
+        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
 
         // only soft-delete if this is a soft-deletable model
         if ($softDelete = $this->getSoftDeleteUpdateSql()) {
@@ -2343,7 +2343,7 @@ abstract class Mapper implements IMapper, Serializable
     protected function getSelectString()
     {
         // in the core mapper this is quite trivial, but implementing classes can override
-        $quoted_table = $this->database->quoteIdentifier($this->table);
+        $quoted_table = $this->database->getQuoter()->quoteIdentifier($this->table);
         return "SELECT {$this->getColumnString()} FROM $quoted_table";
     }
 
@@ -2506,7 +2506,7 @@ abstract class Mapper implements IMapper, Serializable
             $from = "FROM {$this->getTable()}";
         }
 
-        $statement = $this->prepareSelect($select, $from, new Builder($this->getDatabase(), $this->getTable()), $columnList, $options);
+        $statement = $this->prepareSelect($select, $from, new Builder($this->getDatabase()->getQuoter(), $this->getTable()), $columnList, $options);
 
         $statement->execute();
 
@@ -2706,7 +2706,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         $selection = implode(', ', array_map(function ($column) {
             return implode('.', array_map(function ($v) {
-                return $this->database->quoteIdentifier($v);
+                return $this->database->getQuoter()->quoteIdentifier($v);
             }, [ $this->getTable(), $column ]));
         }, $columnList));
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ParticipantMapper
  *
@@ -11,7 +12,7 @@ namespace Schoolbox\Fixtures\Coach\Participant;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
@@ -47,7 +48,7 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('user', 'u')}
-            FROM {$this->database->quoteIdentifier($this->table)}
+            FROM {$this->database->getQuoter()->quoteIdentifier($this->table)}
             LEFT JOIN {$this->getJoinSql('user', '', 'u')}
         ";
     }

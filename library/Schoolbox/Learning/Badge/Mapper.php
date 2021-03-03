@@ -87,7 +87,7 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('createdBy.role', 'cr')},
                 {$this->getJoinColumnString('updatedBy', 'u')},
                 {$this->getJoinColumnString('updatedBy.role', 'ur')}
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('image', '', 'i', true)}
             LEFT JOIN {$this->getJoinSql('image.allowedFileExtension', 'i', 'm', true)}
             INNER JOIN {$this->getJoinSql('category', '', 'bc', true)}
@@ -246,7 +246,7 @@ class Mapper extends \Schoolbox\Mapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('curriculum_badge', 'cn')}
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('curriculum_badge', '', 'cn')}
             WHERE {$pb->getWhereIntersect()}
         ";

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -8,7 +9,6 @@
 namespace Schoolbox\Pastoral;
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
-use Alaress\Database\Quoter\IQuoter;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use House;
@@ -351,8 +351,7 @@ class Mapper extends BaseMapper
             ], [
                     'order' => ['created_at' => 'DESC'],
                     'limit' => $limit,
-                ]
-            );
+                ]);
     }
 
     /**
@@ -441,12 +440,11 @@ class Mapper extends BaseMapper
 
         $words = [];
 
-        /** @var IQuoter $database */
         $database = $this->getDatabase();
 
         foreach (explode(' ', $search) as $word) {
             if (strlen($word) >= Results::MIN_SEARCH_LENGTH) {
-                $words[] = "%{$database->escapeForLike($word)}%";
+                $words[] = "%{$database->getQuoter()->escapeForLike($word)}%";
             }
         }
 
@@ -891,7 +889,7 @@ class Mapper extends BaseMapper
 
         $criteriaParts = [];
         foreach ($this->filters as $filter) {
-            $criteriaParts[] = '(' . $filter .')';
+            $criteriaParts[] = '(' . $filter . ')';
         }
 
         $criteriaSql = ' WHERE pastoral.deleted_at IS NULL ';

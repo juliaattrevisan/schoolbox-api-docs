@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -18,7 +19,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificati
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use \Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Resource\HomepageConfig;
 
 /**
@@ -101,7 +102,7 @@ class Mapper extends AbstractUnitMapper
                 {$this->getJoinColumnString('folder.homepages', 'fh')},
                 {$this->getJoinColumnString('course', 'c')},
                 {$this->getJoinColumnString('course.folder', 'cf')}
-            FROM {$this->database->quoteIdentifier($this->table)}
+            FROM {$this->database->getQuoter()->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('folder', '', 'f', true)}
             LEFT  JOIN {$this->getJoinSql('folder.homepages', 'f', 'fh')}
             INNER JOIN {$this->getJoinSql('course', '', 'c', true)}

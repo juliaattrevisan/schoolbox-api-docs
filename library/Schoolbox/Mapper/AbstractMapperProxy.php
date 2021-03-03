@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -70,7 +71,7 @@ abstract class AbstractMapperProxy
      */
     public function findByColumnList(array $columnList, $options = array())
     {
-        if($this->isColumnTranslationRequired($columnList)){
+        if ($this->isColumnTranslationRequired($columnList)) {
             $columnList = $this->translateColumnList($columnList);
         }
 
@@ -88,7 +89,7 @@ abstract class AbstractMapperProxy
      */
     public function findByPredicates(Builder $pb, $options = array())
     {
-        if($this->isPredicatesTranslationRequired($pb)){
+        if ($this->isPredicatesTranslationRequired($pb)) {
             // TODO. For now, you cannot find by Predicates on columns that require translation.
             // TODO. You can avoid hitting this by translating the columns first using translateColumnList()
             throw new \BadMethodCallException('Not yet implemented.');
@@ -110,7 +111,6 @@ abstract class AbstractMapperProxy
     public function save($model)
     {
         foreach ($this->getMapper()->getModelAsCollection($model) as $domainObject) {
-
             $dataModel = $this->transformDomainObject($domainObject);
             $this->getMapper()->save($dataModel);
 
@@ -132,7 +132,7 @@ abstract class AbstractMapperProxy
      *
      * @return string
      */
-    protected abstract function getModel();
+    abstract protected function getModel();
 
     /**
      * Overridable post-save stub.
@@ -169,7 +169,7 @@ abstract class AbstractMapperProxy
     public function createModel()
     {
         $modelClass = $this->getModel();
-        return new $modelClass;
+        return new $modelClass();
     }
 
     /**
@@ -197,9 +197,8 @@ abstract class AbstractMapperProxy
             ? "/^`{$pb->getTable()}`.`{$this->getExternalColumnName()}`/"
             : "/^`{$this->getExternalColumnName()}`/";
 
-        foreach($pb->getWhere() as $whereClause)
-        {
-            if(preg_match($pattern, $whereClause)){
+        foreach ($pb->getWhere() as $whereClause) {
+            if (preg_match($pattern, $whereClause)) {
                 return true;
             }
         }
@@ -223,17 +222,17 @@ abstract class AbstractMapperProxy
     /**
      * @return string
      */
-    protected abstract function getExternalColumnName();
+    abstract protected function getExternalColumnName();
 
     /**
      * @return string
      */
-    protected abstract function getInternalColumnName();
+    abstract protected function getInternalColumnName();
 
     /**
      * @return string
      */
-    protected abstract function getSelectString();
+    abstract protected function getSelectString();
 
     /**
      * Retrieves a single mapping from an external to an internal ID.
@@ -264,7 +263,7 @@ abstract class AbstractMapperProxy
 
         $query = "
             {$this->getSelectString()}
-            WHERE {$this->getDatabase()->quoteIdentifier($this->getExternalColumnName())} IN {$placeholders}
+            WHERE {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getExternalColumnName())} IN {$placeholders}
         ";
 
         $statement = $this->getDatabase()->query($query, Builder::getArrayParameters($externalValues));
@@ -277,7 +276,7 @@ abstract class AbstractMapperProxy
      * @param Collection $mapperModels
      * @return GenericCollection
      */
-    protected abstract function transformModels(Collection $mapperModels);
+    abstract protected function transformModels(Collection $mapperModels);
 
     /**
      * Converts a single data model object into a domain model.
@@ -296,7 +295,7 @@ abstract class AbstractMapperProxy
      * @param Collection $mapperModels
      * @return GenericCollection
      */
-    protected abstract function transformDomainObjects(Collection $mapperModels);
+    abstract protected function transformDomainObjects(Collection $mapperModels);
 
     /**
      * Converts a single domain model object into a data model.
@@ -314,7 +313,7 @@ abstract class AbstractMapperProxy
      */
     public function getPredicateBuilder()
     {
-        return new Builder($this->database, $this->mapper->getTable());
+        return new Builder($this->database->getQuoter(), $this->mapper->getTable());
     }
 
     /* Getters / Setters

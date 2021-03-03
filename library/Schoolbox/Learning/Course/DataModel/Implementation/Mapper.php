@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -85,7 +86,7 @@ class Mapper extends AbstractCourseMapper
                 {$this->getJoinColumnString('folder.homepages', 'fh')},
                 {$this->getJoinColumnString('specification', 's')},
                 {$this->getJoinColumnString('specification.folder', 'sf')}
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('folder', '', 'f', true)}
             LEFT  JOIN {$this->getJoinSql('folder.homepages', 'f', 'fh')}
             INNER JOIN {$this->getJoinSql('specification', '', 's', true)}
@@ -136,7 +137,7 @@ class Mapper extends AbstractCourseMapper
     {
         $courseImpls = $this->findByColumn('course_specification_id', $courseSpecId, $options);
 
-        if($loadUnits){
+        if ($loadUnits) {
             $courseImpls = $this->loadUnitsForCollection($courseImpls);
         }
         return $courseImpls;

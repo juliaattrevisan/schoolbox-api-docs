@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -130,7 +131,7 @@ class Mapper extends AbstractCourseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('folder', 'f')},
                 {$this->getJoinColumnString('folder.homepages', 'fh')}
-            FROM {$this->database->quoteIdentifier($this->table)}
+            FROM {$this->database->getQuoter()->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('folder', '', 'f', true)}
             LEFT  JOIN {$this->getJoinSql('folder.homepages', 'f', 'fh')}
         ";
@@ -194,7 +195,7 @@ class Mapper extends AbstractCourseMapper
             return $this->findAll($options);
         }
         $pb = $this->getPredicateBuilder();
-        $pb->like('f.name', "%{$this->database->escapeForLike($searchParam)}%");
+        $pb->like('f.name', "%{$this->database->getQuoter()->escapeForLike($searchParam)}%");
         return $this->findByPredicates($pb, $options);
     }
 

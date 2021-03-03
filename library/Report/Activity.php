@@ -48,7 +48,6 @@ class Report_Activity extends Report_Abstract implements Report_IReport
 
         if (!$this->checkPermissions()) {
             error(19);
-
         } else {
             $this->setPage($page);
             $this->setUserHandler(new User());
@@ -147,15 +146,15 @@ class Report_Activity extends Report_Abstract implements Report_IReport
 
         foreach ($resultFilter as $key => $value) {
             if (in_array($key, $this->filterable)) {
-                // custom filter by user
                 if ($key == 'user') {
+                    // custom filter by user
                     $sqlFilter[] = "(username LIKE :user OR firstname LIKE :user OR lastname LIKE :user)";
                     $params['user'] = $value;
                 } else if ($key == 'action') {
                     $sqlFilter[] = "cl.action = :action";
                     $params['action'] = $value;
-                } // custom filter by keyword
-                else if ($key == 'keyword') {
+                } else if ($key == 'keyword') {
+                    // custom filter by keyword
                     $sqlFilter[] =
                         "(
    c.name         LIKE :keyword
@@ -169,7 +168,7 @@ OR mf.description LIKE :keyword
 OR mf.realname    LIKE :keyword
 OR ml.name        LIKE :keyword
 )";
-                    $params['keyword'] = '%' . $this->db->escapeForLike($value) . '%';
+                    $params['keyword'] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
                 } else if ($key == 'after') {
                     if ($date = strtotime($value)) {
                         $date = date('Y-m-d H:i:s', $date);
@@ -182,10 +181,10 @@ OR ml.name        LIKE :keyword
                         $sqlFilter[] = "`time` <= :before";
                         $params['before'] = $date;
                     }
-                } // default filter key
-                else {
-                    $sqlFilter[] = $this->db->quoteIdentifier($key) . " LIKE :$key";
-                    $params[$key] = '%' . $this->db->escapeForLike($value) . '%';
+                } else {
+                    // default filter key
+                    $sqlFilter[] = $this->db->getQuoter()->quoteIdentifier($key) . " LIKE :$key";
+                    $params[$key] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
                 }
             }
         }
@@ -271,7 +270,6 @@ OR ml.name        LIKE :keyword
 
         // render users
         if (!empty($this->dataSet)) {
-
             $page->setVar(
                 array(
                     'COUNTABLE_COUNT' => $this->dataCount,
@@ -282,7 +280,6 @@ OR ml.name        LIKE :keyword
             );
 
             foreach ($this->dataSet as $log) {
-
                 $actionString = '';
                 $locationPrefix = 'in';
                 $moveSuffix = '';
@@ -296,13 +293,13 @@ OR ml.name        LIKE :keyword
                         $locationPrefix = 'to';
                         $moveSuffix = ' to <a href=/homepage/' . $log['cf_id'] . '>' . $log['cf_name'] . '</a>';
                         break;
-                    case 'create' :
+                    case 'create':
                         $actionString .= 'Added ';
                         break;
-                    case 'delete' :
+                    case 'delete':
                         $actionString .= 'Deleted ';
                         break;
-                    case 'access' :
+                    case 'access':
                         $actionString .= 'Accessed ';
                         break;
                 }
@@ -356,7 +353,6 @@ OR ml.name        LIKE :keyword
 
             // set up filtering
             $this->displayFilterBlock();
-
         } else {
             $page->setVar(
                 array(
@@ -414,7 +410,6 @@ OR ml.name        LIKE :keyword
         $page = $this->getPage();
 
         foreach ($this->filterable as $field) {
-
             $output = array(
                 'FILTER_ID'          => $field,
                 'FILTER_NAME'        => $field,

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -7,15 +8,15 @@
 
 namespace Schoolbox\Fixtures\Season;
 
-use \Exception;
+use Exception;
 use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use \Schoolbox\Error\Mapper as ErrorMapper;
-use \Schoolbox\Mapper\Exception as MapperException;
-use \Schoolbox\Fixtures\Season\Model as Season;
-use \Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
-use \Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
-use \Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Fixtures\Season\Model as Season;
+use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
+use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
 use Schoolbox\Collection;
 
 /**
@@ -75,12 +76,11 @@ class Controller extends AbstractController
         /* ajax a list of seasons
          */
         if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
-
             // quote the query string to protect against injection and the like
             $query = $this->getRequest()->query->get('query');
 
             $pb = $this->getMapper()->getPredicateBuilder();
-            $pb->like('name', "%{$this->getMapper()->getDatabase()->escapeForLike($query)}%");
+            $pb->like('name', "%{$this->getMapper()->getDatabase()->getQuoter()->escapeForLike($query)}%");
             $pb->isNull('archived_at');
 
             // get the list with archived excluded, sort by start and end, then transform to be selectize-compatible
@@ -125,11 +125,9 @@ class Controller extends AbstractController
                     ]
                 )
             );
-
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
         }
-
     }
 
     /**
@@ -325,7 +323,6 @@ class Controller extends AbstractController
     protected function outputPostSuccess(Season $season)
     {
         if ($this->getRequest()->isXhr()) {
-
             $divisionCounts = $this->getMapper()->getDivisionCounts([$season->getId()]);
             if (!isset($divisionCounts[$season->getId()])) {
                 $divisionCounts[$season->getId()] = 0;

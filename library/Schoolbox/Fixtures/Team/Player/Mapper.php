@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -10,7 +11,7 @@ namespace Schoolbox\Fixtures\Team\Player;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Role as Role;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;
@@ -55,7 +56,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('user.role', 'ur')},
                 {$this->getJoinColumnString('team', 't')},
                 {$this->getJoinColumnString('team.division', 'td')}
-            FROM {$this->database->quoteIdentifier($this->table)}
+            FROM {$this->database->getQuoter()->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
             INNER JOIN {$this->getJoinSql('user.role', 'u', 'ur')}
             INNER JOIN {$this->getJoinSql('team', '', 't')}

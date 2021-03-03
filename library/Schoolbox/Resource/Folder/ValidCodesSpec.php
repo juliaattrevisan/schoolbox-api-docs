@@ -1,18 +1,21 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Folder;
 
+use Alaress\Database;
 use Alaress\Specification\Leaf;
+
 use function array_unique;
 use function count;
 use function strpos;
 use function substr;
-use Alaress\Database;
 
 /**
  * Efficiently validates that a folder's codes are valid compared to:
@@ -99,7 +102,7 @@ class ValidCodesSpec extends Leaf
 
         foreach ($rawCodes as $code) {
             $innerPb->equals('code', $code);
-            $innerPb->like('code', "%/" . $this->folderCodeMapper->getDatabase()->escapeForLike($code));
+            $innerPb->like('code', "%/" . $this->folderCodeMapper->getDatabase()->getQuoter()->escapeForLike($code));
         }
         foreach ($prefixedCodes as $prefixedCode) {
             $innerPb->equals('code', $prefixedCode);

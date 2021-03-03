@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Award;
@@ -69,7 +71,7 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('award.recipient.role', 'awrr')},
                 {$this->getJoinColumnString('award.awardedBy', 'awa')},
                 {$this->getJoinColumnString('award.awardedBy.role', 'awar')}
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('recipient', '', 'r', true)}
             INNER JOIN {$this->getJoinSql('recipient.role', 'r', 'rr')}
             INNER JOIN {$this->getJoinSql('awardedBy', '', 'a', true)}
@@ -288,7 +290,6 @@ class Mapper extends \Schoolbox\Mapper
         $users = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-
             /* Manufacture a string to present to the user
              */
             $person = "{$row['firstname']} {$row['lastname']} - ";

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This is just enough of a mapper to get the survey component rendering. This is in no way complete, and is only being
  * used to read data out of the table. This should be blown to smithereeens(sp?) when Quiz/Surveys are sucked out of
@@ -127,10 +128,10 @@ class Mapper extends BaseMapper
     {
         $pb = $this->getPredicateBuilder();
         $pb->in('aa.user_id', $userIds);
-        $pb->like('title', '%'.$this->database->escapeForLike($name).'%');
-        $pb->isNull("{$this->getTable()}.deleted_at" );
+        $pb->like('title', '%' . $this->database->getQuoter()->escapeForLike($name) . '%');
+        $pb->isNull("{$this->getTable()}.deleted_at");
 
-        $sql = $this->getSelectString() . " WHERE ".implode(' AND ',$pb->getWhere());
+        $sql = $this->getSelectString() . " WHERE " . implode(' AND ', $pb->getWhere());
 
         $statement = $this->getDatabase()->prepare($sql);
         $statement->execute($pb->getParams());
@@ -163,7 +164,6 @@ class Mapper extends BaseMapper
         // If the logged in user isn't a superuser, restrict search to folders they have access to
 
         if (!$this->getSessionUser()->isSuperuser()) {
-
             // Create a sub-predicate to restrict based on folder perms
 
             $folderPredicate = $this->getPredicateBuilder();
@@ -214,7 +214,7 @@ class Mapper extends BaseMapper
         $pb->isNull('survey.deleted_at');
         $pb->equals('survey.availability', 'survey');
 
-        if(count($userIds) > 0) {
+        if (count($userIds) > 0) {
             $pb->in('attempt.user_id', $userIds);
         }
 
@@ -247,7 +247,7 @@ class Mapper extends BaseMapper
                         response.section_id = section.section_id AND
                         response.question_id = question.question_id
             JOIN        assess_answer answer ON answer.question_id = question.question_id
-            WHERE       ".implode(' AND ', $pb->getWhere())."
+            WHERE       " . implode(' AND ', $pb->getWhere()) . "
             ORDER BY    attempt.user_id,
                         section.sequence,
                         question.sequence

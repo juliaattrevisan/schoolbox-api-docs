@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper
  *
@@ -17,9 +18,6 @@ use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
-use function array_key_exists;
-use function count;
-use function explode;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -42,7 +40,7 @@ use Schoolbox\Resource\AbstractFolderMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
-use \Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermission;
 use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
@@ -63,6 +61,10 @@ use Schoolbox\Resource\Folder\Code as FolderCode;
 use Schoolbox\YearLevel;
 use Alaress\Database\Predicate;
 use Schoolbox\Error;
+
+use function array_key_exists;
+use function count;
+use function explode;
 use function strnatcasecmp;
 
 /**
@@ -113,7 +115,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->joins('image_hash', Storage\Mapper::class, 'hash', null, null, 'coverImage', 'coverImage');
 
         $this->hasJoin(
-            'codes', array(
+            'codes',
+            array(
                 'multiple'  => true,
                 'mapper'    => Code\Mapper::class,
                 'this_key'  => 'id',
@@ -134,7 +137,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         );
 
         $this->hasJoin(
-            'homepages', array(
+            'homepages',
+            array(
                 'multiple'  => false,
                 'mapper'    => HomepageConfigMapper::class,
                 'this_key'  => 'id',
@@ -143,7 +147,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         );
 
         $this->hasJoin(
-            'files', array(
+            'files',
+            array(
                 'multiple'  => true,
                 'mapper'    => File\Mapper::class,
                 'this_key'  => 'id',
@@ -152,7 +157,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         );
 
         $this->hasJoin(
-            'groups', array(
+            'groups',
+            array(
                 'multiple'  => false,
                 'mapper'    => GroupMapper::class,
                 'this_key'  => 'id',
@@ -161,7 +167,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         );
 
         $this->hasJoin(
-            'course_specification', array(
+            'course_specification',
+            array(
                 'multiple'  => false,
                 'mapper'    => CourseSpecification\Mapper::class,
                 'this_key'  => 'id',
@@ -170,7 +177,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         );
 
         $this->hasJoin(
-            'unit_specification', array(
+            'unit_specification',
+            array(
                 'multiple'  => false,
                 'mapper'    => UnitSpecification\Mapper::class,
                 'this_key'  => 'id',
@@ -314,23 +322,20 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // If the folder is a unit, we need to make sure its course specification is right
 
         if ($folder->hasUnitSpecification()) {
-
             // We need to check if parent is a course, but first we need the damn thing hydrated
 
             $parent = $this->findById($folder->getParent()->getId());
 
             if ($parent->hasCourseSpecification()) {
-
                 // It's a course, just use the existing specification
 
                 $courseSpecification = $parent->getCourseSpecification();
-
             } else {
-
                 // It's not a course, we need to make a new one... yippee!
 
                 /** @var CourseSpecification\Model $courseSpecification */
-                $courseSpecification = CourseSpecification\Mapper::getInstance()->createModel();;
+                $courseSpecification = CourseSpecification\Mapper::getInstance()->createModel();
+                ;
                 $courseSpecification->setFolder($parent);
                 CourseSpecification\Mapper::getInstance()->save($courseSpecification);
 
@@ -453,9 +458,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @param Model $category
      */
-    public function logPageView(Model $category) {
+    public function logPageView(Model $category)
+    {
 
-        if(!$category->isRootNode()) {
+        if (!$category->isRootNode()) {
             // new mechanism for storing pageviews
             // the use of NOW() generates a truncation warning (non-fatal and non-critical) since a datetime is being
             // shoved into a date field, but it can be safely ignored: the data inserts correctly
@@ -517,7 +523,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
         /** @var Code\Mapper $codeMapper */
         $codeMapper = $this->getJoinMapper('codes');
-        if(!(new ValidCodesSpec($codeMapper))->isSatisfiedBy($model)){
+        if (!(new ValidCodesSpec($codeMapper))->isSatisfiedBy($model)) {
             throw Error\Mapper::getInstance()->generateException(ErrorMapper::ERROR_CLASS_CODE_EXISTS);
         }
 
@@ -577,7 +583,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     {
         // If we are inheriting permissions delete any previously created group + user perms
         if ($previous && $model->getInherit()) {
-
             // Delete the group
             $this->getJoinMapper('groups')->deleteByColumn('cid', $model->getId());
 
@@ -624,7 +629,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             ? $folderCodeMapper->createCollection()
             : $model->getCodes();
 
-        $comparator = static function(Code\Model $left, Code\Model $right){
+        $comparator = static function (Code\Model $left, Code\Model $right) {
             return strcasecmp($left->getCode(), $right->getCode()) === 0;
         };
 
@@ -652,7 +657,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     {
         // only execute if folder has codes and not inheriting permissions
         if (!$model->getInherit() && $model->getCodes() && $model->getCodes()->count()) {
-
             // remove any mutes that might exist on this subject (classes are not allowed to be muted)
             RerouteOverrideMapper::getInstance()->deleteByColumnList([
                 'delivery'      => RoutePermission::MUTE,
@@ -865,14 +869,14 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $builder = $this->getPredicateBuilder();
 
         // Filter result set further by only returning records that are also in the userGroups table
-        if($userGroupsOnly){
+        if ($userGroupsOnly) {
             $builder->notNull('ug.cid');
         }
 
         $subBuilder = $this->getPredicateBuilder();
         $subBuilder
-            ->like("{$this->getTable()}.name", "%{$this->database->escapeForLike($keyword)}%")
-            ->like('cc.code', "%{$this->database->escapeForLike($keyword)}%");
+            ->like("{$this->getTable()}.name", "%{$this->database->getQuoter()->escapeForLike($keyword)}%")
+            ->like('cc.code', "%{$this->database->getQuoter()->escapeForLike($keyword)}%");
 
         $builder->any($subBuilder);
 
@@ -892,11 +896,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         $folderIds      = $folders->getColumnValues($this->getIdentifierColumn());
         $folderCodes    = $codeMapper->findByColumn('folder_id', $folderIds);
-        $codesPerFolder = $folderCodes->groupByCallback(function(FolderCode\Model $code){
+        $codesPerFolder = $folderCodes->groupByCallback(function (FolderCode\Model $code) {
             return $code->getFolder()->getId();
         });
 
-        foreach($codesPerFolder as $folderId => $codes){
+        foreach ($codesPerFolder as $folderId => $codes) {
             $folders[$folderId]->setCodes($codes);
         }
 
@@ -955,7 +959,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $firstRow               = true;
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-
             // Examine the first row to determine what joins to hydrate
             if ($firstRow) {
                 $hydrateCodes           = array_key_exists('cc.code', $row);
@@ -1111,7 +1114,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         foreach ($classCodes as $classCode) {
             // Always return exact matches
             $codePb->equals('fc.code', $classCode);
-            $codePb->like('fc.code', "%/{$this->database->escapeForLike($classCode)}");
+            $codePb->like('fc.code', "%/{$this->database->getQuoter()->escapeForLike($classCode)}");
         }
 
         $folderPb = $this->getPredicateBuilder()
@@ -1223,7 +1226,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $params["code_{$i}"] = $code;
             if (strlen($campusCode) === 0) {
                 $whereParts[]             = "cc.code LIKE :fullCode_{$i}";
-                $params[":fullCode_{$i}"] = '%/' . $this->database->escapeForLike($code);
+                $params[":fullCode_{$i}"] = '%/' . $this->database->getQuoter()->escapeForLike($code);
             } else {
                 $whereParts[]             = "cc.code = :fullCode_{$i}";
                 $params[":fullCode_{$i}"] = $campusCode . '/' . $code;
@@ -1259,8 +1262,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                             ->groupByCallback(function (Code\Model $code) {
                                 return $code->getFolder()->getId();
                             });
-        foreach($foldersCodes as $folderId => $folderCodes){
-            foreach($folderCodes as $code){
+        foreach ($foldersCodes as $folderId => $folderCodes) {
+            foreach ($folderCodes as $code) {
                 $folders[$folderId]->getCodes()[$code->getCode()] = $code;
             }
         }
@@ -1287,7 +1290,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $statement = $this->database->prepare($query);
         $statement->execute(
             array(
-                'code' => '%[%' . $this->database->escapeForLike($code) . '%]',
+                'code' => '%[%' . $this->database->getQuoter()->escapeForLike($code) . '%]',
             )
         );
         return $this->hydrateList($statement);
@@ -1496,7 +1499,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $folderCodeMapper = $this->getJoinMapper('codes');
 
         $collection = $this->createCollection();
-        while($row = $statement->fetch(PDO::FETCH_ASSOC)){
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $id = $row['c.id'];
 
             // First time we've seen folder?
@@ -1509,7 +1512,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             // Does this folder have a homepage, and we've not attached it yet?
             $homepageId = $row['h.cid'];
-            if(!$folder->getHomepage() && isset($homepageId)){
+            if (!$folder->getHomepage() && isset($homepageId)) {
                 /** @var HomepageConfig $homePage */
                 $homePage = $this->hydrateJoin($row, 'homepages', 'h');
                 $folder->setHomepage($homePage);
@@ -1517,7 +1520,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             // Does folder have a group, and we haven't attached it yet?
             $groupId = $row['g.cid'];
-            if(!$folder->getGroup() && isset($groupId)){
+            if (!$folder->getGroup() && isset($groupId)) {
                 // if list requires homepage and this group does not have it,
                 // it will not have been included anyway.
 //                if ($requireHomepage && (!isset($homepageId) || $homepageId === null)) {
@@ -1610,7 +1613,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // This category is its own parent somehow. That shouldn't happen.
             if (array_key_exists($parent_id, $ancestry)) {
                 throw new \OverflowException(
-                    'Folder "'.$category->getId().'" is its own parent somehow'
+                    'Folder "' . $category->getId() . '" is its own parent somehow'
                 );
             }
             $ancestry[$parent_id] = true;
@@ -1619,8 +1622,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
              */
             if ($cheaply) {
                 $node = $this->findCheaplyById($parent_id);
-            }
-            else {
+            } else {
                 $node = $this->findById($parent_id);
             }
 
@@ -1734,8 +1736,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function findCheaplyById($folderId): Model
     {
         // First, check the local body cache to see if we've already loaded this folder
-        if ($this->isCacheEnabled() && $this->localBodyCache->contains($this->getLocalKeyString($this,$folderId))) {
-            return $this->localBodyCache->get($this->getLocalKeyString($this,$folderId));
+        if ($this->isCacheEnabled() && $this->localBodyCache->contains($this->getLocalKeyString($this, $folderId))) {
+            return $this->localBodyCache->get($this->getLocalKeyString($this, $folderId));
         }
 
         // special case: 0 == root, but not in db
@@ -1812,8 +1814,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         $folderMapper = FolderMapper::getInstance();
 
-        try
-        {
+        try {
             // Find the folder object
 
             $folder = $folderMapper->findById($id);
@@ -1821,13 +1822,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // Make sure user has write permission to the folder
 
             if (Access::getInstance()->getFolderAccess($deletor, $id) >= UserAccess::ACCESS_WRITE) {
-
                 // If the folder has children, then we will only allow superusers to delete it
 
-                if ($folderMapper->countByColumn('parent', $id))
-                {
-                    if (!$deletor->isSuperuser())
-                    {
+                if ($folderMapper->countByColumn('parent', $id)) {
+                    if (!$deletor->isSuperuser()) {
                         throw new SchoolboxException('Access Denied');
                     }
                 }
@@ -1836,9 +1834,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
                 $folderMapper->recursiveDelete($folder);
             }
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             // Permission denied or something wasn't found, do nothing and just return. The folder won't have
             // been deleted.
         }
@@ -1884,7 +1880,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         // Check folder access
 
-        if (Access::getInstance()->getFolderAccess($mover, $source) < UserAccess::ACCESS_WRITE ||
+        if (
+            Access::getInstance()->getFolderAccess($mover, $source) < UserAccess::ACCESS_WRITE ||
             Access::getInstance()->getFolderAccess($mover, $destination) < UserAccess::ACCESS_WRITE ||
             Access::getInstance()->getFolderAccess($mover, $movedFolder->getParent()->getId()) < UserAccess::ACCESS_WRITE
         ) {
@@ -1900,14 +1897,16 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         // Make sure that a course is not being moved direct into a course or unit
-        if ($movedFolder->hasCourseSpecification()
+        if (
+            $movedFolder->hasCourseSpecification()
             && ($parentFolder->hasCourseSpecification() || $parentFolder->hasUnitSpecification())
         ) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_COURSE_FOLDER_INVALID);
         }
 
         // Make sure that a unit is not being moved into another unit, or the root
-        if ($movedFolder->hasUnitSpecification()
+        if (
+            $movedFolder->hasUnitSpecification()
             && ($parentFolder->hasUnitSpecification() || $parentFolder->getId() === 0)
         ) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_COURSE_FOLDER_INVALID);
@@ -2175,7 +2174,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param array $folderIds
      * @return array
      */
-    public function filterIdsForGradePage(array $folderIds) : array
+    public function filterIdsForGradePage(array $folderIds): array
     {
         if (empty($folderIds)) {
             return [];
@@ -2289,7 +2288,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $codeMapper  = $this->getJoinMapper('codes');
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-
             $folderId = $row["f.{$this->getIdentifierColumn()}"];
 
             if (!$folderCache[$folderId] instanceof Model) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -7,25 +8,24 @@
 
 namespace Schoolbox\Fixtures\Team;
 
-use Alaress\Database\Quoter\IQuoter;
 use Alaress\Web\Controller\Exception;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use \Schoolbox\Error\Mapper as ErrorMapper;
-use \Schoolbox\Mapper\Exception as MapperException;
-use \Schoolbox\Fixtures\Coach;
-use \Schoolbox\Fixtures\Sport\Mapper as SportMapper;
-use \Schoolbox\Fixtures\Division\Model as Division;
-use \Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
-use \Schoolbox\Fixtures\Team\Model as Team;
-use \Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\Fixtures\Team\Player\Model as TeamUser;
-use \Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
-use \Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
-use \Schoolbox\Fixtures\Division\Helper\Collector;
-use \Schoolbox\Fixtures\Division\Helper\Translator;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Fixtures\Coach;
+use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
+use Schoolbox\Fixtures\Division\Model as Division;
+use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\Fixtures\Team\Model as Team;
+use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
+use Schoolbox\Fixtures\Team\Player\Model as TeamUser;
+use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
+use Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
+use Schoolbox\Fixtures\Division\Helper\Collector;
+use Schoolbox\Fixtures\Division\Helper\Translator;
 use Schoolbox\UserMapper;
-use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
+use Schoolbox\TagCloud\Mapper as TagCloudMapper;
 use Schoolbox\Application\Exception as ApplicationException;
 
 /**
@@ -150,8 +150,7 @@ class Controller extends AbstractController
         if (empty($context)) {
             try {
                 $context = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
-            }
-            catch (MapperException $e) {
+            } catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
             }
         }
@@ -161,8 +160,7 @@ class Controller extends AbstractController
 
         try {
             $sport = $this->getSportMapper()->findById($context->getSport()->getId());
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
@@ -336,10 +334,9 @@ class Controller extends AbstractController
         $query = $this->getRequest()->query->get('query');
 
         if ($context === null) {
-            /** @var IQuoter $database */
             $database = $this->getMapper()->getDatabase();
             $pb       = $this->getMapper()->getPredicateBuilder();
-            $pb->like('name', "%{$database->escapeForLike($query)}%");
+            $pb->like('name', "%{$database->getQuoter()->escapeForLike($query)}%");
             $allTeams = $this->getMapper()->findByPredicates($pb);
         } else {
             $allTeams = $this->getMapper()->findByName($context->getId(), $query);

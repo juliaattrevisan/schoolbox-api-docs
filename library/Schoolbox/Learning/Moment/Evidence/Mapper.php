@@ -176,7 +176,7 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('evidence_tag', 'et')}
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('evidence_tag', '', 'et')}
             WHERE {$pb->getWhereIntersect()}
         ";
@@ -206,7 +206,7 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('curriculum_evidence', 'cn')}
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('curriculum_evidence', '', 'cn')}
             WHERE {$pb->getWhereIntersect()}
         ";
@@ -261,5 +261,4 @@ class Mapper extends BaseMapper
 
         return $nodes;
     }
-
 }

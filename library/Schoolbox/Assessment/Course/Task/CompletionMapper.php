@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for a student's completion of a task.
  *
@@ -21,7 +22,8 @@ use Schoolbox\Assessment\Participant;
 /**
  * @method Completion createModel($idValue = null)
  */
-class CompletionMapper extends Mapper {
+class CompletionMapper extends Mapper
+{
 
     /**
      * @var Participant\Plan\InteractionIntegrityChecker
@@ -117,7 +119,7 @@ class CompletionMapper extends Mapper {
                 {$this->getJoinColumnString('task', 't')},
                 {$this->getJoinColumnString('marking_user', 'm')},
                 {$this->getJoinColumnString('student', 's')}
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('task', '', 't', true)}
             INNER JOIN {$this->getJoinSql('marking_user', '', 'm', true)}
             INNER JOIN {$this->getJoinSql('student', '', 's', true)}
@@ -217,7 +219,7 @@ class CompletionMapper extends Mapper {
 
         $model = (new Completion())
             ->setTask((new Task())->setId($task_id))
-            ->setStudent((new User)->setId($student_id))
+            ->setStudent((new User())->setId($student_id))
             ->setCompletionDate(new \Alaress_Date_Format(new \DateTime('now')))
             ->setCompletionStatus($status)
         ;
@@ -233,7 +235,8 @@ class CompletionMapper extends Mapper {
      * @return Completion
      * @throws Mapper\Exception if no completion was found.
      */
-    public function findLatestForTaskAndStudent($task_id, $student_id) {
+    public function findLatestForTaskAndStudent($task_id, $student_id)
+    {
         $list = $this->findLatestForList(array($task_id), $student_id);
         if ($list->count() === 0) {
             throw new Mapper\Exception\NotFound();
@@ -250,7 +253,8 @@ class CompletionMapper extends Mapper {
      *
      * @return Collection
      */
-    public function findLatestForList($task_id_list, $student_id = null) {
+    public function findLatestForList($task_id_list, $student_id = null)
+    {
         if (empty($task_id_list)) {
             return $this->createCollection();
         }
@@ -270,7 +274,7 @@ class CompletionMapper extends Mapper {
                 AND `ti`.`completion_date`  = `x`.`completion_date`
         ";
         $where_parts = array(
-            'ti.task_id IN '.$this->getArrayPlaceholders($task_id_list, 'ti')
+            'ti.task_id IN ' . $this->getArrayPlaceholders($task_id_list, 'ti')
         );
         $params = $this->getArrayParameters($task_id_list, 'ti');
         if (!empty($student_id)) {
@@ -292,7 +296,8 @@ class CompletionMapper extends Mapper {
      *
      * @param Completion $object
      */
-    public function preSave(Completion $object) {
+    public function preSave(Completion $object)
+    {
         if (!$object->getId() && $_SESSION['user'] instanceof User) {
             $object->setMarkingUser($_SESSION['user']);
         }

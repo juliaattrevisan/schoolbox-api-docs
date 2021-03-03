@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for online assessment attempts.
  *
@@ -148,7 +149,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('user', 'u')},
 
                 {$this->getJoinColumnString('quiz', 'a')}
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('reviewer', '', 'r', true)}
             INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
             INNER JOIN {$this->getJoinSql('quiz', '', 'a', true)}
@@ -174,7 +175,7 @@ class Mapper extends BaseMapper
             /** @var User $reviewer */
             $reviewer = $this->hydrateJoin($row, 'reviewer', 'r');
             // TODO, second part of test should not be required. see https://github.com/alaress/schoolbox/pull/11281
-            if($reviewer instanceof User && $reviewer->getId()){
+            if ($reviewer instanceof User && $reviewer->getId()) {
                 $attempt->setReviewer($reviewer);
             }
 
@@ -301,7 +302,6 @@ class Mapper extends BaseMapper
         $count = 0;
 
         foreach ($stmt as $row) {
-
             if ($row['user_id']) {
                 // only include the most recent attempt for each user (ie. first seen)
                 if (!empty($extra_params['most_recent']) && $extra_params['most_recent'] == true) {

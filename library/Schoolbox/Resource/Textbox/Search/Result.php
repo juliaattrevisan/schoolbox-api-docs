@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Result
  *
@@ -41,7 +42,7 @@ class Result extends Base
                 `{$mapper->getTable()}` `t`
                 INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
             WHERE
-                t.deleted IS NULL AND 
+                t.deleted IS NULL AND
                 (
                   MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) OR
                   `heading` LIKE ?
@@ -50,7 +51,7 @@ class Result extends Base
             LIMIT 0,{$sanitiser->getResultLimit()}
         ";
 
-        $quotedLike = $mapper->getDatabase()->escapeForLike($sanitiser->getUnquotedKeyword());
+        $quotedLike = $mapper->getDatabase()->getQuoter()->escapeForLike($sanitiser->getUnquotedKeyword());
 
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute(['%' . $quotedLike . '%']);
@@ -89,7 +90,7 @@ class Result extends Base
                 `{$mapper->getTable()}` `t`
                 INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
             WHERE
-                t.deleted IS NULL AND 
+                t.deleted IS NULL AND
                 (
                   MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) OR
                   `heading` LIKE ?
@@ -97,7 +98,7 @@ class Result extends Base
             LIMIT 0,{$sanitiser->getResultLimit()}
         ";
 
-        $quotedLike = $mapper->getDatabase()->escapeForLike($sanitiser->getUnquotedKeyword());
+        $quotedLike = $mapper->getDatabase()->getQuoter()->escapeForLike($sanitiser->getUnquotedKeyword());
 
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute(['%' . $quotedLike . '%']);

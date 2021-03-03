@@ -1,19 +1,20 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Permission\Access;
 
+use Alaress\Database\Predicate;
 use Alaress\Database\Predicate\Builder;
-use Schoolbox\Resource\Folder\NNIAN;
-use function count;
 use External_Class;
-use function implode;
-use function in_array;
+use InvalidArgumentException;
 use PDO;
+use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
@@ -23,10 +24,11 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Alaress\Database\Predicate;
-use PDOException;
 use UnderflowException;
-use InvalidArgumentException;
+
+use function count;
+use function implode;
+use function in_array;
 
 /**
  * Class UserAccessMapper
@@ -52,7 +54,7 @@ class UserAccessMapper extends Mapper
         $this->uses('sid', self::TYPE_INTEGER, null, 'serviceIdentifier');
         $this->uses('type', self::TYPE_INTEGER, null, 'accessLevel');
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE,   [ $this, 'calculateUserSubscription' ]);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'calculateUserSubscription' ]);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this, 'calculateUserSubscription' ]);
     }
 
@@ -201,7 +203,6 @@ class UserAccessMapper extends Mapper
             }
 
             $external->add($ua);
-
         }
 
         $access = $access->merge($external);
@@ -346,7 +347,7 @@ class UserAccessMapper extends Mapper
         $userAccessJoinType = 'INNER';
 
         // Group members (always part of ultimate query)
-        $groupPb = (new Predicate\Builder($this->getDatabase(), 'u'))
+        $groupPb = (new Predicate\Builder($this->getDatabase()->getQuoter(), 'u'))
             ->equals('ua.service', UserAccess::SERVICE_HOMEPAGE)
             ->equals('ua.sid', $folder->getId());
         if ($exactAccess) {
@@ -354,7 +355,7 @@ class UserAccessMapper extends Mapper
         } else {
             $groupPb->greaterThanOrEqualTo('ua.type', $accessType);
         }
-        $outerPb = (new Predicate\Builder($this->getDatabase(), 'u'))->all($groupPb);
+        $outerPb = (new Predicate\Builder($this->getDatabase()->getQuoter(), 'u'))->all($groupPb);
 
         if ($includeSynergy) {
             // Include students if no role filter, or filtering to students, and caller requested exact READ perm, or at least READ perm or below.
@@ -384,7 +385,7 @@ class UserAccessMapper extends Mapper
                     // We'll need to change this to a LEFT join to include class members who lack userAccess records.
                     $userAccessJoinType = 'LEFT';
                     $outerPb->in('u.synergy_id', $externalIds);
-                    $outerPb = (new Predicate\Builder($this->getDatabase(), 'u'))->any($outerPb);
+                    $outerPb = (new Predicate\Builder($this->getDatabase()->getQuoter(), 'u'))->any($outerPb);
                 }
             }
         }
@@ -444,7 +445,7 @@ class UserAccessMapper extends Mapper
         $userMapper = $this->getJoinMapper('user');
         $roleMapper = $userMapper->getJoinMapper('role');
 
-        $pb = new Builder($userMapper->getDatabase(), 'u');
+        $pb = new Builder($userMapper->getDatabase()->getQuoter(), 'u');
         $pb->equals('ua.service', $service);
         $pb->greaterThanOrEqualTo('ua.type', $accessType);
 

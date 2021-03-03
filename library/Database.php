@@ -22,14 +22,14 @@ use DebugBar\DataCollector\PDO as DebugPDO;
  *
  * @deprecated use IConnector objects instead
  */
-class Database implements IDatabase, Serializable, IQuoter
+class Database implements IDatabase, Serializable
 {
     /**
      * An instance of database
      *
      * @var Database
      */
-    static private $instance;
+    private static $instance;
 
     /**
      * Database source name
@@ -85,7 +85,7 @@ class Database implements IDatabase, Serializable, IQuoter
      * @static
      * @return Database
      */
-    static public function getInstance()
+    public static function getInstance()
     {
         if (!self::$instance) {
             self::$instance = new self();
@@ -97,7 +97,7 @@ class Database implements IDatabase, Serializable, IQuoter
     /**
      * Explicitly dis- and re-connect the singleton database connection
      */
-    static public function reinitialise()
+    public static function reinitialise()
     {
         self::$instance->reconnect();
     }
@@ -141,7 +141,10 @@ class Database implements IDatabase, Serializable, IQuoter
         /* Create PDO connection */
         try {
             $this->connection = new PDO(
-                $dsn, $username, $password, array(
+                $dsn,
+                $username,
+                $password,
+                array(
                     PDO::ATTR_PERSISTENT         => empty($options['debug']),
                     PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
                 )
@@ -285,45 +288,6 @@ class Database implements IDatabase, Serializable, IQuoter
     }
 
     /**
-     * Quotes column, table, etc. names so they may be safely used in queries.
-     * For MySQL: ` in an identifier is replaced with ``, and the string is
-     * wrapped with ` characters.
-     *
-     * @param  string $string
-     * @return string
-     */
-    public function quoteIdentifier($string)
-    {
-        return $this->quoter->quoteIdentifier($string);
-    }
-
-    /**
-     * Escapes _ and % characters within $string, so they don't have unintended
-     * effects in LIKE queries.
-     *
-     * This doesn't quote $string for safe use in string-interpolated queries,
-     * it only escapes LIKE chars.
-     *
-     * @param  string $string
-     * @return string
-     */
-    public function escapeForLike($string)
-    {
-        return $this->quoter->escapeForLike($string);
-    }
-
-
-    /**
-     * @inheritdoc
-     * @todo this class should NOT extend IQuoter. Callers should call $db->getQuoter()->quoterMethod()
-     */
-    public function getEscapedOperand(string $defaultTable, string $columnName): string
-    {
-        return $this->quoter->getEscapedOperand($defaultTable, $columnName);
-    }
-
-
-    /**
      * Tries to create a unique parameter name
      *
      * @param string $param_name The base name to attempt to add
@@ -360,7 +324,6 @@ class Database implements IDatabase, Serializable, IQuoter
     {
 
         return $this->connection->lastInsertId($name);
-
     }
 
     /**
@@ -415,7 +378,6 @@ class Database implements IDatabase, Serializable, IQuoter
     public function commit()
     {
         return $this->transactor->commit();
-
     }
 
     /**

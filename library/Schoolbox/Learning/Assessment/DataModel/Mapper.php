@@ -1,10 +1,13 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\DataModel;
+
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Predicate\SqlFunc\Coalesce;
@@ -264,9 +267,9 @@ class Mapper extends BaseMapper
      */
     public function softDeleteQuiz(Model $assessment)
     {
-        if($assessment->getQuiz() instanceof Quiz\Model){
+        if ($assessment->getQuiz() instanceof Quiz\Model) {
             $quizMapper = $this->getJoinMapper('quiz');
-            $quiz = $quizMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
+            $quiz = $quizMapper->findByColumn('assessment_id', $assessment->getId(), ['deleted' => true]);
             $quizMapper->delete($quiz);
         }
     }
@@ -279,9 +282,9 @@ class Mapper extends BaseMapper
      */
     public function softDeleteTask(Model $assessment)
     {
-        if($assessment->getTask() instanceof Task){
+        if ($assessment->getTask() instanceof Task) {
             $taskMapper = $this->getJoinMapper('task');
-            $task = $taskMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
+            $task = $taskMapper->findByColumn('assessment_id', $assessment->getId(), ['deleted' => true]);
             $taskMapper->delete($task);
         }
     }
@@ -294,9 +297,9 @@ class Mapper extends BaseMapper
      */
     public function softDeleteProject(Model $assessment)
     {
-        if($assessment->getProject() instanceof Project\Model){
+        if ($assessment->getProject() instanceof Project\Model) {
             $projectMapper = $this->getJoinMapper('project');
-            $project = $projectMapper->findByColumn('assessment_id',$assessment->getId(), ['deleted' => true]);
+            $project = $projectMapper->findByColumn('assessment_id', $assessment->getId(), ['deleted' => true]);
             $projectMapper->delete($project);
         }
     }
@@ -357,7 +360,7 @@ class Mapper extends BaseMapper
         $where = implode(' AND ', $pb->getWhere());
         $query = "
             SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('task', 'a', 't', true)}
             JOIN  {$this->getJoinSql('task.completion', 't', 'tc')} AND tc.student_id = :userId
                   {$planJoin}
@@ -366,7 +369,7 @@ class Mapper extends BaseMapper
             UNION
 
             SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
             JOIN  {$this->getJoinSql('duework.submission', 'd', 'ds')} AND ds.owner = :userId
                   {$planJoin}
@@ -375,7 +378,7 @@ class Mapper extends BaseMapper
             UNION
 
             SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
             JOIN  {$this->getJoinSql('duework.return', 'd', 'dr')} AND dr.owner = :userId
                   {$planJoin}
@@ -384,7 +387,7 @@ class Mapper extends BaseMapper
             UNION
 
             SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->quoteIdentifier($this->getTable())} a
+            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('quiz', 'a', 'q', true)}
             JOIN  {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
                   {$planJoin}
@@ -430,7 +433,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('project_assessment', 'pa')},
                 {$this->getJoinColumnString('assessment_specification_implementation', 'spec')}
 
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             -- Allow join onto deleted sub-objects
             LEFT JOIN {$this->getJoinSql('task', '', 't', true)}
             LEFT JOIN {$this->getJoinSql('duework', '', 'd', true)}
@@ -823,7 +826,7 @@ class Mapper extends BaseMapper
         $statement = $this->prepareSelect(
             $this->getSelectString(),
             $this->getFromString(),
-            new Builder($this->getDatabase(), $this->getTable()),
+            new Builder($this->getDatabase()->getQuoter(), $this->getTable()),
             ['v_pa.project_id' => $projectIds],
             ['order' => ['sequence' => 'asc']]
         );
@@ -1172,12 +1175,12 @@ class Mapper extends BaseMapper
     protected function setSequence(Model $assessment)
     {
         // Ignore if this Assessment already had a sequence explicitly set
-        if($assessment->getSequence() !== null) {
+        if ($assessment->getSequence() !== null) {
             return;
         }
 
         $contextClass = get_class($assessment->getAssessmentContext());
-        switch($contextClass){
+        switch ($contextClass) {
             case Folder\Model::class:
                 $joinName = 'contextFolder';
                 break;
@@ -1191,14 +1194,14 @@ class Mapper extends BaseMapper
                 $joinName = 'contextUnitSpecification';
                 break;
             default:
-                throw new \InvalidArgumentException('Unknown AssessmentContext: '.$contextClass);
+                throw new \InvalidArgumentException('Unknown AssessmentContext: ' . $contextClass);
         }
         $multiJoin = $this->getMap()->getOffset($joinName)['join_def']['multi'];
         $joinTable = $multiJoin['via_table'];
         $thisKey   = $multiJoin['this_key'];
         $otherKey  = $multiJoin['other_key'];
 
-        $pb = new Builder($this->database, $this->table);
+        $pb = new Builder($this->database->getQuoter(), $this->table);
         $query = "
             SELECT COALESCE(max(`a`.`sequence`), 0) + 1
             FROM `{$this->getTable()}` `a`
@@ -1207,7 +1210,7 @@ class Mapper extends BaseMapper
 
         // Ignore this model's db sequence if it exists.
         // This enables us to clear a model's sequence, and save it again to place it at the end
-        if($assessment->getId()){
+        if ($assessment->getId()) {
             $pb->notEquals("a.id", $assessment->getId());
         }
         $pb->equals("o.{$otherKey}", $assessment->getAssessmentContext()->getId());

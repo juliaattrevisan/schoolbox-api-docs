@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This maintains an audit trail of every record a staff member views, and all the searches that they perform (and the
  * results that these searches returned)
@@ -51,12 +52,12 @@ class Mapper extends BaseMapper
     protected function getSelectString()
     {
         return "
-            
+
             SELECT        {$this->getColumnString()},
                           {$this->getJoinColumnString('user', 'u')},
                           {$this->getJoinColumnString('student', 's')},
                           {$this->getJoinColumnString('pastoral', 'p')}
-            FROM          {$this->database->quoteIdentifier($this->table)}
+            FROM          {$this->database->getQuoter()->quoteIdentifier($this->table)}
             JOIN          {$this->getJoinSql('user', '', 'u', true)}
             LEFT JOIN     {$this->getJoinSql('student', '', 's', true)}
             LEFT JOIN     {$this->getJoinSql('pastoral', '', 'p', true)}
@@ -117,7 +118,7 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare("
             SELECT      {$this->getJoinColumnString('student', 's')},
                         {$userMapper->getJoinColumnString('role', 'r')}
-            FROM        {$this->database->quoteIdentifier($this->table)}
+            FROM        {$this->database->getQuoter()->quoteIdentifier($this->table)}
             INNER JOIN  {$this->getJoinSql('student', '', 's')}
             LEFT  JOIN  {$userMapper->getJoinSql('role', 's', 'r')}
             WHERE       {$this->table}.`user_id` = :userId

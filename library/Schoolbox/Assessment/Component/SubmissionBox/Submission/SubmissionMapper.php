@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -78,7 +79,7 @@ class SubmissionMapper extends BaseMapper
      */
     public function canParticipate(Submission $object, Submission $previous = null): bool
     {
-        if($previous){
+        if ($previous) {
             // If an update, assume the system is still valid
             return true;
         }
@@ -99,7 +100,7 @@ class SubmissionMapper extends BaseMapper
      */
     public function insertParticipation(Submission $object, Submission $previous = null): bool
     {
-        if($previous){
+        if ($previous) {
             // If an update, assume the participation record already exists
             return true;
         }
@@ -121,7 +122,7 @@ class SubmissionMapper extends BaseMapper
                 {$this->getJoinColumnString('box_id', 'b')},
                 {$this->getJoinColumnString('owner', 'o')},
                 {$this->getJoinColumnString('submitted_by', 'sb')}
-            FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('box_id', '', 'b', true)}
             INNER JOIN {$this->getJoinSql('owner', '', 'o', true)}
             INNER JOIN {$this->getJoinSql('submitted_by', '', 'sb', true)}
@@ -164,7 +165,6 @@ class SubmissionMapper extends BaseMapper
 
             $result->setSubmittedBy($this->hydrateJoin($row, 'submitted_by', 'sb'));
             $result->setOwner($this->hydrateJoin($row, 'owner', 'o'));
-
         }
 
         // Fetch and hydrate files
@@ -276,7 +276,6 @@ class SubmissionMapper extends BaseMapper
             'limit'  => $limit,
             'order'  => [ 'submitted' => 'desc' ],
         ]);
-
     }
 
     /**
@@ -288,7 +287,8 @@ class SubmissionMapper extends BaseMapper
      *
      * @return array The submission box ID as the key, the count as the value.
      */
-    public function findCountsForSubmissionBoxes($box_ids, $user_id) {
+    public function findCountsForSubmissionBoxes($box_ids, $user_id)
+    {
         // Retrieve count of submission IDs from a list of IDs for a user
         if (empty($box_ids)) {
             return array();

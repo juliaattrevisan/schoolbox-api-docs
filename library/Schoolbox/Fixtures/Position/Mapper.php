@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -8,11 +9,10 @@
 namespace Schoolbox\Fixtures\Position;
 
 use Schoolbox\Collection;
-use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
 use Schoolbox\Fixtures\Position\Model as Position;
 use Schoolbox\User;
-
 
 /**
  * Class Mapper
@@ -58,7 +58,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
             $query .= ' LIMIT :limit';
         }
         $statement = $this->getDatabase()->prepare($query);
-        $statement->bindValue('search', '%'.$this->getDatabase()->escapeForLike($keyword).'%', \PDO::PARAM_STR);
+        $statement->bindValue('search', '%' . $this->getDatabase()->getQuoter()->escapeForLike($keyword) . '%', \PDO::PARAM_STR);
         if ($offset > 0) {
             $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
             $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);

@@ -62,7 +62,6 @@ class Report_Login extends Report_Abstract implements Report_IReport
 
         if (!$this->checkPermissions()) {
             error(19);
-
         } else {
             $this->setPage($page);
             $this->setUserHandler(new User());
@@ -163,7 +162,6 @@ class Report_Login extends Report_Abstract implements Report_IReport
         $params = array();
         foreach ($resultFilter as $key => $value) {
             if (in_array($key, $this->getFilterFields())) {
-
                 if ($key == 'role') {
                     $key = 'name'; //convert role to group name
                 }
@@ -173,7 +171,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
                     $sqlFilter[] = "user.username LIKE :value
                                         OR user.firstname LIKE :value
                                         OR user.lastname LIKE :value";
-                    $params['value'] = '%' . $this->db->escapeForLike($value) . '%';
+                    $params['value'] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
                 } elseif ($key == 'after') {
                     if ($date = strtotime($value)) {
                         $date = date('Y-m-d H:i:s', $date);
@@ -187,8 +185,8 @@ class Report_Login extends Report_Abstract implements Report_IReport
                         $params['before'] = $date;
                     }
                 } else {
-                    $sqlFilter[] = $this->db->quoteIdentifier($key) . " LIKE :$key";
-                    $params[$key] = '%' . $this->db->escapeForLike($value) . '%';
+                    $sqlFilter[] = $this->db->getQuoter()->quoteIdentifier($key) . " LIKE :$key";
+                    $params[$key] = '%' . $this->db->getQuoter()->escapeForLike($value) . '%';
                 }
             }
         }
@@ -300,9 +298,8 @@ class Report_Login extends Report_Abstract implements Report_IReport
 
             // set up filtering
             $this->displayFilterBlock();
-
-        } // else empty data set
-        else {
+        } else {
+            // else empty data set
             $page->setVar(
                 array(
                     'RESULT'                => 'No results.',
