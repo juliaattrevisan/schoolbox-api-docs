@@ -81,8 +81,17 @@ class Controller extends Base
                 $thisArea = $area;
             }
             if (!$area->getId()) {
-                $area->setOrder($i);
-                $newAreas->add($area);
+                try {
+                    $this->getAreaMapper()->findOneByColumnList(
+                        [
+                            'curriculum_source_id' => $area->getSource()->getId(),
+                            'name'                 => $area->getName(),
+                        ]
+                    );
+                } catch (Mapper\Exception $e) {
+                    $area->setOrder($i);
+                    $newAreas->add($area);
+                }
             }
         }
 
