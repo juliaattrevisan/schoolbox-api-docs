@@ -110,7 +110,8 @@
         "enshrined/svg-sanitize": "~0.14.0",
         "symfony/yaml": "^5.2",
         "maennchen/zipstream-php": "^2.1",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "ext-intl": "^7.4"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",

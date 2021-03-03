@@ -13,7 +13,7 @@ use Assess\IAutomarkable;
  */
 class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap implements IAutomarkable
 {
-	/**
+    /**
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.
      *
@@ -38,11 +38,16 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap implements IAutoma
            * If the number of Fillgap answers is 0 (ie. no blank for students to fill), skip it.
            * TODO: It should be noted that a teacher should be prevented from creating a cloze question that doesn't have any blanks in it...
            */
-        if (count($actualAnswers) != 0) {
-            $marksPerAnswer = $currentResponse['marks'] / count($actualAnswers);
+        $actualAnswerCount = count($actualAnswers);
+        $totalMarks        = null;
+        if ($actualAnswerCount > 0) {
+            $totalMarks     = 0;
+            $marksPerAnswer = $currentResponse['marks'] / $actualAnswerCount;
+            foreach ($actualAnswers as $i => $actualAnswer) {
+                $givenAnswer = $response[$i] ?? '';
 
-            for ($i = 0, $totalMarks = 0; $i < count($actualAnswers); $i++) {
-                if (strtolower(trim($actualAnswers[$i])) == strtolower(trim($response[$i]))) {
+                // Collate and compare
+                if ($this->compareStrings($actualAnswer, $givenAnswer)) {
                     $totalMarks += $marksPerAnswer;
                 }
             }
