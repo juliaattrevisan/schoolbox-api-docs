@@ -12,6 +12,7 @@
  */
 
 use Alaress\Image;
+use Alaress\Image\Exception\ConcurrentTransformationException;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
 use Schoolbox\Config\ConfigMapper;
@@ -79,7 +80,10 @@ try {
     $image = new Image\Processor($storageModel, $_GET['size'], $transform);
 
     $image->load()->stream();
-} catch (\RuntimeException $e) {
+} catch (ConcurrentTransformationException $e) {
+    // This transformation is already being processed.
+    SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], $e->getHttpStatusCode());
+ } catch (\RuntimeException $e) {
     /* When you cannot access the requested image (access denied)
      */
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);

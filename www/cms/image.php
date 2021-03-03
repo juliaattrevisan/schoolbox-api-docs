@@ -8,6 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\Processor;
 use Alaress\Image\Transformation;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
@@ -75,6 +76,8 @@ try {
     $transform      = (new Transformation\MyImage())->retrieve((int)$_GET['width'], (int)$_GET['height']);
     $imageProcessor = new Processor($resource, $cacheKey, $transform);
     $imageProcessor->load()->stream();
+} catch (ConcurrentTransformationException $e) {
+    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], $e->getHttpStatusCode());
 } catch (SchoolboxNotFoundException $e) {
     SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
 } catch (Exception $e) {

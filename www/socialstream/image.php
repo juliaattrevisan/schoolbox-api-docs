@@ -90,6 +90,8 @@ try {
 
     $processor = new Image\Processor($storage, $size, (new Image\Transformation\Storage())->retrieve($size));
     $processor->load()->stream();
+} catch (Image\Exception\ConcurrentTransformationException $e) {
+    \SitePage::redirectToBrokenImageWithTransform('storage', $size, $e->getHttpStatusCode());
 } catch (\Throwable $e) {
     \SitePage::redirectToBrokenImageWithTransform('storage', $size);
 }

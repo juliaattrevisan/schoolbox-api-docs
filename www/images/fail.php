@@ -98,6 +98,8 @@ try {
         $transform
     );
     $imageProcessor->load()->stream();
+} catch (Image\Exception\ConcurrentTransformationException $e) {
+    SitePage::localRedir($path, false, $e->getHttpStatusCode());
 } catch (Exception $e) {
     /** @var PrefixGenerator $prefixGenerator */
     $prefixGenerator = $kernel->get('cdnPrefixGenerator');

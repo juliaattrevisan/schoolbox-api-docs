@@ -48,6 +48,8 @@ $storageModel = $image->getStorage();
 $processor    = new Image\Processor($storageModel, $cacheKey, $transform);
 try {
     $processor->load()->stream();
+} catch (Image\Exception\ConcurrentTransformationException $e) {
+    redirectToBroken($e->getHttpStatusCode());
 } catch (SchoolboxNotFoundException $e) {
     redirectToBroken(404);
 } catch (Exception $e) {

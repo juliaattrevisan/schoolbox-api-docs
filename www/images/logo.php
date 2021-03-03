@@ -9,6 +9,7 @@
  */
 
 use Alaress\Image;
+use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\Transformation;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
@@ -95,6 +96,16 @@ try {
     $transform      = (new Transformation\MyImage())->retrieve($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]);
     $imageProcessor = new Image\Processor($resource, $key, $transform);
     $imageProcessor->load()->stream();
+    exit;
+} catch (ConcurrentTransformationException $e) {
+    $responseCode = $e->getHttpStatusCode();
+    $placeHolderFile = __DIR__ . $logoSizes[$logo][$size][2];
+    if (is_readable($placeHolderFile)) {
+        header('Content-type: image/png');
+        readfile($placeHolderFile);
+        exit;
+    }
+    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], $responseCode);
 } catch (Exception $e) {
     // redirect to the placeholder
     /** @var PrefixGenerator $cdnPrefixGenerator */
