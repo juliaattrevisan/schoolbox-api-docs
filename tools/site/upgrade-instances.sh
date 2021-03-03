@@ -241,7 +241,7 @@ function rebuild_and_restart_daemons(){
       /usr/local/bin/schoolbox-rebuild-daemons --fetch
     fi
     for instance in $instance_list; do
-      "${package}cloud-restart-daemons $instance";
+      ${package}cloud-restart-daemons "$instance";
     done
   else
     log "---skipping daemon restart on secondary host---";
