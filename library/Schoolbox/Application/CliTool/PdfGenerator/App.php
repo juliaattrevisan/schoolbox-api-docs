@@ -13,6 +13,9 @@ use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Aura\Di\Exception\ServiceNotFound;
 use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\RequestOptions;
 use Knp\Snappy\Pdf;
 use Predis\ClientInterface as RedisClient;
 use RuntimeException;
@@ -22,6 +25,10 @@ use Schoolbox\Auth\Remote\RemoteLogin;
 use Schoolbox\GenericCollection;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\User;
+use TheCodingMachine\Gotenberg\DocumentFactory;
+use TheCodingMachine\Gotenberg\GotenbergClientInterface;
+use TheCodingMachine\Gotenberg\MergeRequest;
+use TheCodingMachine\Gotenberg\URLRequest;
 use Zend\Uri\Uri;
 use Zend\Uri\UriInterface;
 use ZipArchive;
@@ -139,8 +146,7 @@ abstract class App extends BaseApp
 
 
         // Build a PDF generator object, put the session hash in it
-        $pdfGenerator = $this->buildPdfGenerator();
-        $pdfGenerator->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
+        $pdfGenerator = new \TheCodingMachine\Gotenberg\Client('localhost:3000');
 
 
         // Generate all PDFs
@@ -159,7 +165,7 @@ abstract class App extends BaseApp
             }
             try {
                 $this->getLogger()->notice($pdfSource->getMessage());
-                $pdfFilenames[]      = $this->generatePdf($pdfSource, $tempDir, $pdfGenerator);
+                $pdfFilenames[]      = $this->generatePdf($pdfSource, $tempDir, $pdfGenerator, $sessionHash);
                 $consecutiveFailures = 0;
             } catch (RuntimeException $e) {
                 // Something went wrong: log it
@@ -469,19 +475,30 @@ BASE;
     /**
      * Generates a PDF for this source.
      *
-     * @param SourceBundle $pdfSource
-     * @param string       $tempDir
-     * @param Pdf          $pdfGenerator
+     * @param SourceBundle             $pdfSource
+     * @param string                   $tempDir
+     * @param GotenbergClientInterface $pdfGenerator
+     * @param string                   $sessionHash
      * @return string
      */
-    private function generatePdf(SourceBundle $pdfSource, string $tempDir, Pdf $pdfGenerator): string
+    private function generatePdf(SourceBundle $pdfSource, string $tempDir, GotenbergClientInterface $pdfGenerator, string $sessionHash): string
     {
         // Create the PDF
         $filename = $tempDir . '/' . $pdfSource->getFilename();
-        $fp       = fopen($filename, 'wb');
-        if (!$fp) {
-            throw new RuntimeException("Unable to create file: '{$filename}'");
-        }
+//        $fp       = fopen($filename, 'wb');
+//        if (!$fp) {
+//            throw new RuntimeException("Unable to create file: '{$filename}'");
+//        }
+
+        // Set up HTTP client
+        // (Maybe create outside of this method?)
+        $httpClient = new Client([
+            RequestOptions::COOKIES => CookieJar::fromArray(
+                [PipeManager::PHP_SESSION_PREFIX => $sessionHash],
+                $this->generateBaseUrl()->toString()
+            ),
+        ]);
+
 
         $maxAttempts       = 10;
         $attempts          = 0;
@@ -494,6 +511,29 @@ BASE;
             }
             try {
                 // Create the file, applying the increased delay if necessary
+
+                // Gotenberg version: do I need to download individually then merge?
+                // I can't even use Gotenberg's URL requests, as I cannot provide a cookie.
+                // I'll have to use a HTTP client to download the file, then generate HTML from it
+                $files = [];
+                foreach ($pdfSource->getUrls() as $i => $url) {
+                    try {
+                        $response = $httpClient->get($url);
+//                        $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
+//                        file_put_contents($tempFile, $response->getBody()->getContents());
+                        $files[] = DocumentFactory::makeFromStream("$i.pdf", $response->getBody());
+                    } catch (GuzzleException $e) {
+                        // Log something
+                    }
+                }
+
+                $request = new MergeRequest($files);
+                $pdfGenerator->store($request, $filename);
+
+
+
+
+
                 $pdfGenerator->setOption('javascript-delay', $jsDelay);
                 $this->getLogger()->debug(
                     "Generating PDF from the following URLs:\n* " . implode("\n* ", $pdfSource->getUrls())
@@ -509,7 +549,7 @@ BASE;
                 $previousException = $e;
             }
         }
-        fclose($fp);
+//        fclose($fp);
         return $filename;
     }
 
