@@ -672,10 +672,11 @@
                 </label>
 
                 <ul class="flex-list buttons">
+                    <li><button @click.prevent="$refs.eventDeleteModal.open">Delete Task</button></li>
                     <li><input ref="eventSubmit"
                                type="submit"
-                               value="Update Task" /></li>
-                    <li><button @click.prevent="$refs.eventDeleteModal.open">Delete Task</button></li>
+                               value="Update Task" />
+                    </li>
                 </ul>
             </form>
         </template>
@@ -826,17 +827,17 @@
                 <h2>This event is part of a series</h2>
                 <p>Would you like to delete only this event, or all in the series?</p>
                 <ul class="flex-list buttons">
+                    <li><a href="#" class="button" @click.prevent="$refs.eventDeleteModal.close">Cancel</a></li>
                     <li><a href="#" class="button" @click.prevent="confirmEventDeleteSelf">Only this event</a></li>
                     <li><a href="#" class="button" @click.prevent="confirmEventDeleteSeries">All events in the series</a></li>
-                    <li><a href="#" class="button" @click.prevent="$refs.eventDeleteModal.close">Cancel</a></li>
                 </ul>
             </template>
             <template v-else>
                 <h2>Please confirm</h2>
                 <p>Are you sure you wish to delete this event?</p>
                 <ul class="flex-list buttons">
-                    <li><a href="#" class="button submit" @click.prevent="confirmEventDeleteSelf">Yes</a></li>
                     <li><a href="#" class="button" @click.prevent="$refs.eventDeleteModal.close">No</a></li>
+                    <li><a href="#" class="button submit" @click.prevent="confirmEventDeleteSelf">Yes</a></li>
                 </ul>
             </template>
         </reveal-modal>
@@ -851,9 +852,9 @@
                     </template>
                 </p>
                 <ul class="flex-list buttons">
+                    <li><a href="#" class="button" @click.prevent="$refs.bookingDeleteModal.close">Cancel</a></li>
                     <li><a href="#" class="button" @click.prevent="confirmBookingDeleteSelf">Only this booking</a></li>
                     <li><a href="#" class="button" @click.prevent="confirmBookingDeleteSeries">All bookings in the series</a></li>
-                    <li><a href="#" class="button" @click.prevent="$refs.bookingDeleteModal.close">Cancel</a></li>
                 </ul>
             </template>
             <template v-else>
@@ -865,8 +866,8 @@
                     </template>
                 </p>
                 <ul class="flex-list buttons">
-                    <li><a href="#" class="button submit" @click.prevent="confirmBookingDeleteSelf">Yes</a></li>
                     <li><a href="#" class="button" @click.prevent="$refs.bookingDeleteModal.close">No</a></li>
+                    <li><a href="#" class="button submit" @click.prevent="confirmBookingDeleteSelf">Yes</a></li>
                 </ul>
             </template>
         </reveal-modal>
@@ -875,9 +876,9 @@
             <h2>This booking is part of a series</h2>
             <p>Would you like to approve only this booking, or all in the series?</p>
             <ul class="flex-list buttons">
+                <li><a href="#" class="button" @click.prevent="$refs.bookingApproveSeriesModal.close">Cancel</a></li>
                 <li><a href="#" class="button" @click.prevent="confirmBookingApproveSelf">Only this event</a></li>
                 <li><a href="#" class="button" @click.prevent="confirmBookingApproveSeries">All events in the series</a></li>
-                <li><a href="#" class="button" @click.prevent="$refs.bookingApproveSeriesModal.close">Cancel</a></li>
             </ul>
         </reveal-modal>
 
@@ -885,9 +886,9 @@
             <h2>This booking is part of a series</h2>
             <p>Would you like to reject only this booking, or all in the series?</p>
             <ul class="flex-list buttons">
+                <li><a href="#" class="button" @click.prevent="$refs.bookingRejectSeriesModal.close">Cancel</a></li>
                 <li><a href="#" class="button" @click.prevent="confirmBookingRejectSelf">Only this event</a></li>
                 <li><a href="#" class="button" @click.prevent="confirmBookingRejectSeries">All events in the series</a></li>
-                <li><a href="#" class="button" @click.prevent="$refs.bookingRejectSeriesModal.close">Cancel</a></li>
             </ul>
         </reveal-modal>
     </reveal-modal>

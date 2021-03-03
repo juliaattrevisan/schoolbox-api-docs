@@ -461,8 +461,8 @@ export default {
                 <p>WARNING! Any users who have been awarded this badge will have it removed from their collection.
                     Are you sure you wish to delete the badge {{ currentBadge.name }}?</p>
                 <ul class="flex-list buttons">
-                    <li><a @click.prevent="deleteBadge()" class="button submit">Yes</a></li>
                     <li><a @click.prevent="closeDeleteModal()" class="button">No</a></li>
+                    <li><a @click.prevent="deleteBadge()" class="button submit">Yes</a></li>
                 </ul>
             </template>
         </reveal-modal>
