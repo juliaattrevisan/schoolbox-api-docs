@@ -265,7 +265,7 @@ class AdditionalSubjects implements IStrategy
             }
 
             $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
-                'code' => $externalId
+                'code' => (string)$externalId
             ]);
 
             /* No additional subjects

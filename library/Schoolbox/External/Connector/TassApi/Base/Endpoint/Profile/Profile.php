@@ -773,7 +773,7 @@ class Profile implements IStrategy
             /* Apparently there's both title and salutation for some bizarre reason
              */
             $employeeSetReformatted[] = [
-                'teacher_code' => $employeeCodec->encode($employee['user_code']),
+                'teacher_code' => $employeeCodec->encode((string)$employee['user_code']),
                 'salutation' => array_values(array_filter([$employee['title'], $employee['salutation']]))[0],
                 'given_names' => $employee['first_name'],
                 'surname' => $employee['surname'],
