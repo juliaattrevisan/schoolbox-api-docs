@@ -10,7 +10,7 @@ namespace External\Tass\Api\Test;
 use External\Tass\Api\Exception\InvalidApiKey;
 use PHPUnit;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\TokenCodec;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Token;
 
 /**
  * @covers \External\Tass\Api\TokenCodec
@@ -30,17 +30,17 @@ class TokenCodecTest extends TestCase
     public function test_invalidApiKey(string $invalidApiKey): void
     {
         $this->expectException(InvalidApiKey::class);
-        new TokenCodec($invalidApiKey);
+        new Token($invalidApiKey);
     }
 
 
     /**
      * @dataProvider provider_reversibility
-     * @param TokenCodec $codec
-     * @param array      $data
+     * @param Token $codec
+     * @param array $data
      * @return void
      */
-    public function test_reversibility(TokenCodec $codec, array $data): void
+    public function test_reversibility(Token $codec, array $data): void
     {
         $unpacked = $codec->unpackToken($codec->generateToken($data));
         $this->assertSame($data, $unpacked);
@@ -79,8 +79,8 @@ class TokenCodecTest extends TestCase
 
     // ===================== Helpers =========================== //
 
-    private function getTokenCodec(): TokenCodec
+    private function getTokenCodec(): Token
     {
-        return new TokenCodec('SSBhbSB0b2tlbg==');
+        return new Token('SSBhbSB0b2tlbg==');
     }
 }

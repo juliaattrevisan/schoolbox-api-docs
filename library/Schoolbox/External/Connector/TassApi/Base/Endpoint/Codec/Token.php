@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 
 use External\Tass\Api\Exception\InvalidApiKey;
 use function base64_decode;
@@ -21,7 +21,7 @@ use function trim;
  *
  * @see https://github.com/TheAlphaSchoolSystemPTYLTD/api-introduction/blob/master/encryptDecrypt.php
  */
-class TokenCodec
+class Token
 {
     /**
      * The cipher method that openssl should use to encrypt/decrypt the token

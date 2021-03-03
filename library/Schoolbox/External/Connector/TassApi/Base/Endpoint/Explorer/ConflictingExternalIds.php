@@ -29,9 +29,9 @@ $dsn = $config->get('schooldata_import_endpoint_key');
 use Schoolbox\External\Connector\TassApi\Base\Endpoint;
 
 $conflictingIds = new Endpoint\Explorer\ConflictingExternalIds([
-Endpoint\DSNCodec::MODULE_LMS_INTEGRATION => new Endpoint\Api($host, $dsn, Endpoint\DSNCodec::MODULE_LMS_INTEGRATION),
-Endpoint\DSNCodec::MODULE_STUDENT_DETAILS => new Endpoint\Api($host, $dsn, Endpoint\DSNCodec::MODULE_STUDENT_DETAILS),
-Endpoint\DSNCodec::MODULE_IDENTITY_MANAGEMENT => new Endpoint\Api($host, $dsn, Endpoint\DSNCodec::MODULE_IDENTITY_MANAGEMENT)
+Endpoint\Codec\DSN::MODULE_LMS_INTEGRATION => new Endpoint\Api($host, $dsn, Endpoint\Codec\DSN::MODULE_LMS_INTEGRATION),
+Endpoint\Codec\DSN::MODULE_STUDENT_DETAILS => new Endpoint\Api($host, $dsn, Endpoint\Codec\DSN::MODULE_STUDENT_DETAILS),
+Endpoint\Codec\DSN::MODULE_IDENTITY_MANAGEMENT => new Endpoint\Api($host, $dsn, Endpoint\Codec\DSN::MODULE_IDENTITY_MANAGEMENT)
 ]);
 
 $conflictingIds->explore();
@@ -74,7 +74,7 @@ class ConflictingExternalIds
 
         /* Process each current student, and their parents too
          */
-        $students = $this->api[Endpoint\DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
+        $students = $this->api[Endpoint\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
             'currentstatus' => 'current'
         ]);
 
@@ -88,7 +88,7 @@ class ConflictingExternalIds
 
         /* Get a list of teaching staff
          */
-        $teachers = $this->api[Endpoint\DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', [
+        $teachers = $this->api[Endpoint\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', [
             'currentstatus' => 'current'
         ]);
 
@@ -103,7 +103,7 @@ class ConflictingExternalIds
 
         /* Get a list of non-teaching staff
          */
-        $employees = $this->api[Endpoint\DSNCodec::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getEmployees', [
+        $employees = $this->api[Endpoint\DSN::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getEmployees', [
             'user_code' => 'all'
         ]);
 

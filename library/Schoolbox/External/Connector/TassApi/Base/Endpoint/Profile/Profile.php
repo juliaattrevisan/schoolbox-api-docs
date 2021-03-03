@@ -15,7 +15,7 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Phone;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -207,11 +207,11 @@ class Profile implements IStrategy
         /* Build some lookups to save on traversal and api banging
          */
         $families = (new Lookup\Family(
-            $this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT],
+            $this->api[Codec\DSN::MODULE_IDENTITY_MANAGEMENT],
             $this->spousePrefix,
             $this->addnumFather,
             $this->addnumMother,
-            (new Phone($this->api[DSNCodec::MODULE_STUDENT_DETAILS]))->generate()
+            (new Phone($this->api[Codec\DSN::MODULE_STUDENT_DETAILS]))->generate()
         ))->generate();
 
         /* Also alert any broken tass api payloads that we detected in lookups
@@ -225,7 +225,7 @@ class Profile implements IStrategy
 
         /* Process each current student, and their parents too
          */
-        $students = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
+        $students = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
             'currentstatus' => 'current'
         ]);
 
@@ -441,7 +441,7 @@ class Profile implements IStrategy
      */
     public function findEmergencyContacts(string $studentCode): array
     {
-        $emergencyContacts = $this->api[DSNCodec::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
+        $emergencyContacts = $this->api[Codec\DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
             'currentstatus' => 'current',
             'commtype' => 'ec',
             'code' => $studentCode
@@ -527,7 +527,7 @@ class Profile implements IStrategy
         /* Specifically handle a 401 Unauthorized which occurred unexpectedly at shalom
          */
         try {
-            $medicalConditions = $this->api[DSNCodec::MODULE_STUDENT_DETAILS]->retrieveDocument('getMedicalConditions', [
+            $medicalConditions = $this->api[Codec\DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getMedicalConditions', [
                 'studcode' => $studentCode,
             ]);
         } catch (\RuntimeException $e) {
@@ -699,13 +699,13 @@ class Profile implements IStrategy
 
         /* Get a list of teaching staff
          */
-        $teachers = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', [
+        $teachers = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', [
             'currentstatus' => 'current'
         ]);
 
         /* Get a list of non-teaching staff
          */
-        $employees = $this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getEmployees', [
+        $employees = $this->api[Codec\DSN::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getEmployees', [
             'user_code' => 'all'
         ]);
 

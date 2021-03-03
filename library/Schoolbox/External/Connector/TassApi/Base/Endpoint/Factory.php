@@ -228,9 +228,9 @@ class Factory
         $this->log->info('Accessing api endpoint');
 
         $modules = [
-            DSNCodec::MODULE_LMS_INTEGRATION,
-            DSNCodec::MODULE_STUDENT_DETAILS,
-            DSNCodec::MODULE_IDENTITY_MANAGEMENT
+            Codec\DSN::MODULE_LMS_INTEGRATION,
+            Codec\DSN::MODULE_STUDENT_DETAILS,
+            Codec\DSN::MODULE_IDENTITY_MANAGEMENT
         ];
 
         $api = [];

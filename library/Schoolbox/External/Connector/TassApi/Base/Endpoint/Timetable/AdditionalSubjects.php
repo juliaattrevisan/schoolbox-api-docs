@@ -12,8 +12,9 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+
 
 /**
  * Class AdditionalSubjects
@@ -144,7 +145,7 @@ class AdditionalSubjects implements IStrategy
         $involvements = $this->lookup->getInvolvements();
 
         foreach ($users as $externalId => $userData) {
-            $data = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
+            $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
                 'code' => $externalId
             ]);
 
@@ -158,7 +159,7 @@ class AdditionalSubjects implements IStrategy
              * the student's timetable import
              */
             foreach ($data[$externalId] as $additionalSubject) {
-                $code = (new CodeCodec())->encode(
+                $code = (new Codec\Code())->encode(
                     (string)$additionalSubject['year_grp'],
                     (string)$additionalSubject['sub_code'],
                     (string)$additionalSubject['class']
@@ -246,7 +247,7 @@ class AdditionalSubjects implements IStrategy
         $endpoint = self::ENDPOINT_TEACHERSUBJECTS;
 
         foreach ($users as $externalId => $userData) {
-            $data = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
+            $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
                 'code' => $externalId
             ]);
 
@@ -260,7 +261,7 @@ class AdditionalSubjects implements IStrategy
              * the student's timetable import
              */
             foreach ($data[$externalId] as $additionalSubject) {
-                $code = (new CodeCodec())->encode(
+                $code = (new Codec\Code())->encode(
                     (string)$additionalSubject['year_grp'],
                     (string)$additionalSubject['sub_code'],
                     (string)$additionalSubject['class']
