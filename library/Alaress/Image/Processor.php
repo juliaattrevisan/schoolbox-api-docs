@@ -8,23 +8,31 @@
 
 namespace Alaress\Image;
 
+use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress_Byte_Format;
+use Alaress_Date_Format;
 use DomainException;
 use Imagine\Exception as ImagineException;
 use Alaress\Image\Transform\RotateOrientation;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\Metadata\ExifMetadataReader;
 use Imagine\Imagick\Imagine;
+use InvalidArgumentException;
 use League\Flysystem;
 use League\Flysystem\FileExistsException;
+use League\Flysystem\FilesystemInterface;
 use OverflowException;
 use PDOException;
 use Schoolbox\Config\Loader;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
 
+/**
+ * Transforms images and persists to database + disk.
+ */
 class Processor
 {
     /**
@@ -72,19 +80,24 @@ class Processor
      * If the transform does not yet exist, it is generated using the supplied transforms
      * and saved to disk and the database.
      *
-     * @param int $maxAttempts
+     * @param int      $maxAttempts
+     * @param null|int $retryAfter If non-null, retry any incomplete transformations older than this value (in seconds)
      * @return StreamableFile
      * @throws DomainException
      * @throws Flysystem\FileNotFoundException
      * @throws Flysystem\FilesystemNotFoundException
      * @throws ImagineException\OutOfBoundsException
      * @throws ImagineException\RuntimeException
+     * @throws InsufficientHydrationException
+     * @throws InvalidArgumentException
      * @throws Mapper\Exception
      * @throws OverflowException if file's too big
      * @throws PDOException
      * @throws UnexpectedValueException
+     * @throws ConcurrentTransformationException
+     * @throws FileExistsException
      */
-    public function load(int $maxAttempts = 1): StreamableFile
+    public function load(int $maxAttempts = 1, ?int $retryAfter = null): StreamableFile
     {
         // ensure file format is actually a string (it may have been a mimetype object)
         $fileFormat = $this->getFormatFromMime((string)$this->file->getMimetype());
@@ -92,50 +105,87 @@ class Processor
         // Is this a SVG? just stream it if so, don't even attempt to transform
         if ($fileFormat === 'svg') {
             // Assume the stream to the base SVG exists
-            return new StreamableFile(
-                true,
-                (string)$this->file->getMimetype(),
-                $this->file->getSize(),
-                $this->file->readStream()
-            );
+            return new StreamableFile(true, $fileFormat, $this->file->getSize(), $this->file->readStream());
         }
 
         // TODO SA-8354 inject dependencies
         $mountManager   = (new FilesystemFactory())->build((new Loader())->get('storage_dir'));
         $fileSystem     = $mountManager->getFilesystem(Storage\Manager::FS_STORAGE);
-        $storageManager = new Storage\Manager($mountManager, new Alaress_Byte_Format());
-        $transformPath  = $storageManager::getTransformPath($this->file->getHash(), $this->cacheKey);
+        $transformPath  = Storage\Manager::getTransformPath($this->file->getHash(), $this->cacheKey);
 
         // Fastest check (particularly when using S3)
         $transformMapper = Storage\Transform\Mapper::getInstance();
         $transformModel  = $transformMapper->findByHashAndCacheKey($this->file->getHash(), $this->cacheKey);
-        if ($transformModel) {
+        if ($transformModel && $transformModel->isStateDone()) {
             // We cannot assume if the transform exists in the database that it
             // also exists on disk and can be immediately streamed:
             // check the file exists before attempting to stream it.
-            return new StreamableFile(
-                true,
-                (string)$this->file->getMimetype(),
-                $transformModel->getSize(),
-                self::readStream($fileSystem, $transformPath)
-            );
+            return new StreamableFile(true, $fileFormat, $transformModel->getSize(), self::readStream($fileSystem, $transformPath));
         }
 
         // Transform exists on (local|s3) disk, but not yet in database.
         // This can occur on systems where we have not yet run the transform seeder tool
         if ($fileSystem->has($transformPath)) {
             $transformSize = $fileSystem->getSize($transformPath);
-            $transformMapper->createRecord($this->file->getHash(), $this->cacheKey, $transformSize);
-            return new StreamableFile(
-                true,
-                (string)$this->file->getMimetype(),
-                $transformSize,
-                self::readStream($fileSystem, $transformPath)
-            );
+            if ($transformModel) {
+                $transformMapper->save($transformModel->setSize($transformSize)->setState(Storage\Transform\Model::STATE_DONE));
+            } else {
+                $transformMapper->createRecord($this->file->getHash(), $this->cacheKey, $transformSize, Storage\Transform\Model::STATE_DONE);
+            }
+            return new StreamableFile(true, $fileFormat, $transformSize, self::readStream($fileSystem, $transformPath));
         }
 
-        $image = $this->loadImageFromFile($maxAttempts);
+        // Transform does not exist on disk. Has the transformation been attempted before?
+        if (!$transformModel) {
+            // Transformation has NOT been attempted before. We will attempt it now.
+            $transformModel = $transformMapper->createRecord($this->file->getHash(), $this->cacheKey, null, Storage\Transform\Model::STATE_PROCESSING);
+        } else {
+            // Transformation HAS been attempted before.
+            // If we are not retrying, or it's possible the prior attempt is still running, just return a placeholder
+            if ($retryAfter === null || $transformModel->getUpdatedAt()->diffInSeconds(Alaress_Date_Format::now()) < $retryAfter) {
+                throw new ConcurrentTransformationException($transformModel);
+            }
+            // Assume the prior execution failed. We will retry it.
+            $transformMapper->save($transformModel->setState(Storage\Transform\Model::STATE_PROCESSING));
+        }
 
+        // Actually attempt the transformation.
+        try {
+            $transformSize = $this->generateTransformation($maxAttempts, $fileFormat, $fileSystem, $transformPath);
+        } catch (FileExistsException | ImagineException\OutOfBoundsException | ImagineException\RuntimeException | OverflowException $e) {
+            $transformModel->setState(Storage\Transform\Model::STATE_FAILED);
+            $transformMapper->save($transformModel);
+            throw $e;
+        }
+
+        $transformModel->setSize($transformSize)->setState(Storage\Transform\Model::STATE_DONE);
+        $transformMapper->save($transformModel);
+
+        return new StreamableFile(
+            false,
+            $fileFormat,
+            $transformModel->getSize(),
+            self::readStream($fileSystem, $transformPath)
+        );
+    }
+
+
+    /**
+     * Transforms the image, writes it to disk, and return the transformed file's size
+     *
+     * @param int                 $maxAttempts How many times should we attempt to read the original file into memory
+     * @param string              $fileFormat
+     * @param FilesystemInterface $fileSystem
+     * @param string              $transformPath
+     * @return int
+     * @throws FileExistsException
+     * @throws ImagineException\OutOfBoundsException
+     * @throws ImagineException\RuntimeException
+     * @throws OverflowException
+     */
+    private function generateTransformation(int $maxAttempts, string $fileFormat, FilesystemInterface $fileSystem, string $transformPath): int
+    {
+        $image = $this->loadImageFromFile($maxAttempts);
         $image = (new RotateOrientation())->manipulate($image);
         $image = $this->transform->manipulate($image);
 
@@ -145,29 +195,8 @@ class Processor
             $options['animated.loops'] = 0;
         }
         $imageContents = $image->get($fileFormat, $options);
-
-        try {
-            // TODO This occurs because we can have multiple processes simultaneously doing the same  transform.
-            // TODO We will add a mutex to fix this.
-            // @see https://schoolbox.atlassian.net/browse/SA-11227
-            $fileSystem->write($transformPath, $imageContents);
-        } catch (FileExistsException $e) {
-            // Just ignore for now.
-        }
-
-        $transformSize = strlen($imageContents);
-        $transformMapper->createRecord(
-            $this->file->getHash(),
-            $this->cacheKey,
-            $transformSize
-        );
-
-        return new StreamableFile(
-            false,
-            (string)$this->file->getMimetype(),
-            $transformSize,
-            self::readStream($fileSystem, $transformPath)
-        );
+        $fileSystem->write($transformPath, $imageContents);
+        return strlen($imageContents);
     }
 
 
