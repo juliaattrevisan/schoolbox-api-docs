@@ -24,7 +24,7 @@ class EmployeeExternalId
      * and can directly conflict with student external ids, so you end up with employees' profiles
      * overwriting student profiles. To prevent them matching up like that, we chuck a letter in
      */
-    private const EMPLOYEE_PREFIX = 'E';
+    public const EMPLOYEE_PREFIX = 'E';
 
 
     /**
