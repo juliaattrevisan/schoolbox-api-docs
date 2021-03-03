@@ -4,7 +4,7 @@
 {# parent DOM: you are directly inside a <td/> right now #}
 {% block content %}
     <table>
-{#    {% if config.digest_email_intro %}#}
+    {% if config.digest_email_intro %}
         <tr>{{ fn.spacer(config.fqdn, 16, 0, 3) }}</tr>
         <tr class="island padding">
             <td valign="top">
@@ -15,7 +15,7 @@
                 </table>
             </td>
         </tr>
-{#    {% endif %}#}
+    {% endif %}
     {% for ns, group in groups %}
         <tr>{{ fn.spacer(config.fqdn, 16, 0, 3) }}</tr>
         <tr class="heading">
