@@ -80,6 +80,8 @@ class EntriesAndResults extends Base
                 'InternalorExternalAssessment' => $current['InternalorExternalAssessment'],
                 'StandardTitle' => $current['StandardTitle'],
                 'Level' => $current['Level'],
+                'Lit' => $current['Lit'],
+                'Num' => $current['Num'],
                 'EnteredCredits' => $current['EnteredCredits'],
                 'Result' => $result,
                 'StrippedResult' => $strippedResult,
@@ -187,13 +189,15 @@ class EntriesAndResults extends Base
                 InternalorExternalAssessment,
                 StandardTitle,
                 Level,
+                Lit,
+                Num,
                 EnteredCredits,
                 Result,
                 StrippedResult,
                 ResultCredits,
                 StudentYear
             FROM
-                dbo.uvSchoolBoxNCEAResults
+                dbo.uvSchoolBoxNCEAResultsV2
             WHERE
                 id = :externalId AND
                 WithdrawnFlag = 0
