@@ -25,7 +25,7 @@ trait Comparison
      * @param string $str2
      * @return bool True when identical, false when not.
      */
-    protected function compareStrings(string $str1, string $str2): bool
+    public function compareStrings(string $str1, string $str2): bool
     {
         // The locale doesn't really matter for equality testing
         $collator = new Collator('root');
@@ -74,6 +74,11 @@ trait Comparison
                 '÷' => '/',
                 '—' => '-',
                 '–' => '-',
+                '’' => "'",
+                '“' => '"',
+                '”' => '"',
+                'ˮ' => '"',
+                'ʺ' => '"',
             ]
         );
 
