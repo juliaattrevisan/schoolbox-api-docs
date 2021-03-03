@@ -57,11 +57,27 @@
                     {% endif %}
                 {% endfor %}
 
+                {# Literacy/Numeracy legend
+                 # Not sure if this is meant to appear just once, or for each table
+                 # I assume each table for now
+                 #}
+                <tr>
+                    <td colspan="8">
+                        <ul>
+                            <li><strong>N</strong> = Numeracy</li>
+                            <li><strong>R</strong> = Literacy (reading)</li>
+                            <li><strong>W</strong> = Literacy (writing)</li>
+                            <li><strong>RW</strong> = Literacy (reading and writing)</li>
+                            <li><strong>&ndash;</strong> = Not applicable</li>
+                        </ul>
+                    </td>
+                </tr>
+
                 {# Summary table for Internally and Externally graded assessments
                  # This is the pink and blue table
                  #}
                 <tr>
-                    <td colspan="6">
+                    <td colspan="8">
                         <table class="no-margin">
                             <thead>
                             <tr>
@@ -106,7 +122,7 @@
                  #}
                 {% if entriesAndResults.comments[year].courses[courseName].terms|length %}
                 <tr>
-                    <td colspan="6">
+                    <td colspan="8">
                         <p class="subheading">Comments</p>
                         {% for term, commentData in entriesAndResults.comments[year].courses[courseName].terms %}
                             {% if commentData.comment|length %}
