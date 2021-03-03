@@ -28,7 +28,6 @@ use Schoolbox\User;
 use TheCodingMachine\Gotenberg\DocumentFactory;
 use TheCodingMachine\Gotenberg\GotenbergClientInterface;
 use TheCodingMachine\Gotenberg\MergeRequest;
-use TheCodingMachine\Gotenberg\URLRequest;
 use Zend\Uri\Uri;
 use Zend\Uri\UriInterface;
 use ZipArchive;
@@ -146,7 +145,7 @@ abstract class App extends BaseApp
 
 
         // Build a PDF generator object, put the session hash in it
-        $pdfGenerator = new \TheCodingMachine\Gotenberg\Client('localhost:3000');
+        $pdfGenerator = new \TheCodingMachine\Gotenberg\Client('http://localhost:3000');
 
 
         // Generate all PDFs
@@ -519,26 +518,17 @@ BASE;
                 foreach ($pdfSource->getUrls() as $i => $url) {
                     try {
                         $response = $httpClient->get($url);
-//                        $tempFile = tempnam(sys_get_temp_dir(), 'pdf');
-//                        file_put_contents($tempFile, $response->getBody()->getContents());
-                        $files[] = DocumentFactory::makeFromStream("$i.pdf", $response->getBody());
+                        $files[]  = DocumentFactory::makeFromStream("$i.pdf", $response->getBody());
                     } catch (GuzzleException $e) {
                         // Log something
+                        $this->getLogger()->warning($e->getMessage());
+                        $this->getLogger()->warning($e->getTraceAsString());
                     }
                 }
 
                 $request = new MergeRequest($files);
                 $pdfGenerator->store($request, $filename);
 
-
-
-
-
-                $pdfGenerator->setOption('javascript-delay', $jsDelay);
-                $this->getLogger()->debug(
-                    "Generating PDF from the following URLs:\n* " . implode("\n* ", $pdfSource->getUrls())
-                );
-                fwrite($fp, $pdfGenerator->getOutput($pdfSource->getUrls()));
                 break;
             } catch (RuntimeException $e) {
                 $this->getLogger()->warning($e->getMessage());
