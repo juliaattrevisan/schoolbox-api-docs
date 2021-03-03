@@ -240,11 +240,8 @@ class NesaScoreGraphHSC extends BaseComponent
                     if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
                         $studentMark = $humanReadableMark;
 
-//                        // MYP students' comments will come from this assessment
-//                        if ($this->getAttributes()->isMyp()) {
-                            $comment['comment']   = $feedback->getComment();
-                            $comment['commentBy'] = $feedback->getReviewer();
-//                        }
+                        $comment['comment']   = $feedback->getComment();
+                        $comment['commentBy'] = $feedback->getReviewer();
                     }
 
                     // It's quite possible for students to be given marks outside valid range, eg HR = 'Absent', Norm = 0.

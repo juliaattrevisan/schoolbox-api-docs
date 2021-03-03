@@ -192,20 +192,40 @@ class HscAssessmentTasks extends BaseComponent
             throw new UnexpectedValueException($msg);
         }
 
-        $feedback       = $this->findStudentFeedback($classAssessment);
-        $normalisedMark = $feedback ? $feedback->getNormalisedMark() : null;
-        $cohortMarks    = $this->deriveCohortMarks($cohortAssessments);
-        $cohortRank     = $this->deriveCohortRank($normalisedMark, $cohortMarks);
-        $countCohort    = count($cohortMarks);
-        $cohortAverage  = $this->deriveCohortAverage($cohortMarks);
+        $feedback = $this->findStudentFeedback($classAssessment);
+
+        /* Generate some stats about this student's performance among their peers
+         */
+        $statistics = (new CohortStatistics(
+            $this->getViewer(),
+            $this->getRoleTypeOverride(),
+            $cohortAssessments,
+            $feedback
+        ))->generate();
+
+        /* Handy diagnosis
+         */
+//        new \Alaress_Probe([
+//            'assessmentTitle' => $statistics['assessmentTitle'],
+//            'studentMark'     => $statistics['studentMark'],
+//            'cohortAverage'   => $statistics['cohortAverage'],
+//            'publishAt'       => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
+//            'comment'         => $feedback ? $feedback->getComment() : null,
+//            'commentBy'       => $feedback ? $feedback->getReviewer()->getFullName() : null,
+//            'dueDate'         => $classAssessment->getDueAt()->getDatabase(),
+//            'unitSpecId'      => $unitSpec->getId(),
+//            'unitSpecTitle'   => $unitSpec->getTitle(),
+//        ]);
 
         return [
-            'studentMark'   => $feedback ? $feedback->getHumanReadableMark() : null,
-            'cohortRank'    => null === $cohortRank ? null : "$cohortRank / $countCohort",
-            'cohortAverage' => null === $cohortAverage ? null : "$cohortAverage %",
-            'comment'       => $feedback ? $feedback->getComment() : null,
-            'commentBy'     => $feedback ? $feedback->getReviewer() : null,
-            'dueDate'       => $classAssessment->getDueAt(),
+            'assessmentTitle' => $statistics['assessmentTitle'],
+            'studentMark'     => $statistics['studentMark'],
+            'cohortRank'      => $statistics['cohortRank'],
+            'cohortAverage'   => $statistics['cohortAverage'],
+            'publishAt'       => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
+            'comment'         => $feedback ? $feedback->getComment() : null,
+            'commentBy'       => $feedback ? $feedback->getReviewer() : null,
+            'dueDate'         => $classAssessment->getDueAt(),
         ];
     }
 
@@ -228,72 +248,5 @@ class HscAssessmentTasks extends BaseComponent
             return null;
         }
         return $participant->getAuthoritativeFeedback(true);
-    }
-
-
-    /**
-     * Returns all normalised marks for the cohort. Respects assessment's grade visibility
-     *
-     * @param GenericCollection|IAssessable[] $cohortAssessments
-     * @return float[]
-     */
-    private function deriveCohortMarks(GenericCollection $cohortAssessments): array
-    {
-        $cohortMarks = [];
-        foreach ($cohortAssessments as $assessable) {
-            if (!$this->isFeedbackVisibleToUser($assessable)) {
-                continue;
-            }
-            foreach ($assessable->getAllParticipants() as $participant) {
-                $authFeedback = $participant->getAuthoritativeFeedback(true);
-                if (!$authFeedback) {
-                    continue;
-                }
-                $normalisedMark = $authFeedback->getNormalisedMark();
-                if (null === $normalisedMark) {
-                    continue;
-                }
-                $cohortMarks[] = $normalisedMark;
-            }
-        }
-        return $cohortMarks;
-    }
-
-
-    /**
-     * Returns the student's rank against the cohort
-     *
-     * @param float|null $studentMark
-     * @param float[]    $cohortMarks
-     * @return int|null
-     */
-    private function deriveCohortRank(?float $studentMark, array $cohortMarks): ?int
-    {
-        if (null === $studentMark) {
-            return null;
-        }
-        \rsort($cohortMarks);
-
-        $index = \array_search($studentMark, $cohortMarks, true);
-        if (false === $index) {
-            return null;
-        }
-        return $index + 1;
-    }
-
-
-    /**
-     * Returns the average cohort mark, rounded to the specified precision
-     *
-     * @param float[] $cohortMarks
-     * @param int     $precision
-     * @return float|null
-     */
-    private function deriveCohortAverage(array $cohortMarks, int $precision = 2): ?float
-    {
-        if (!count($cohortMarks)) {
-            return null;
-        }
-        return \round(\array_sum($cohortMarks) / count($cohortMarks), $precision);
     }
 }

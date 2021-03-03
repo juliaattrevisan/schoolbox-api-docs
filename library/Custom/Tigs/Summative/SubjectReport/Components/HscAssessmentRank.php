@@ -145,24 +145,18 @@ class HscAssessmentRank extends BaseComponent
             return null;
         }
 
-        $feedback       = $this->findStudentFeedback($cohortAssessmentsPerClass[$this->folder->getId()]);
-        $normalisedMark = $feedback ? $feedback->getNormalisedMark() : null;
-        $cohortMarks    = $this->deriveCohortMarks($this->cohortAssessments);
-        $cohortRank     = $this->deriveCohortRank($normalisedMark, $cohortMarks);
-        $countCohort    = \count($cohortMarks);
-        $cohortAverage  = $this->deriveCohortAverage($cohortMarks);
+        $feedback = $this->findStudentFeedback($cohortAssessmentsPerClass[$this->folder->getId()]);
 
-        // Both Yr11 + 12 see this datum
-        $data = ['assessmentRank' => null === $cohortRank ? null : "$cohortRank / $countCohort"];
+        /* Generate some stats about this student's performance among their peers
+         */
+        $statistics = (new CohortStatistics(
+            $this->getViewer(),
+            $this->getRoleTypeOverride(),
+            $this->cohortAssessments,
+            $feedback
+        ))->generate();
 
-        // But only Yr11 see these datums
-        if (11 === $this->getAttributes()->getCurriculumYearLevel()) {
-            $data = \array_merge($data, [
-                'assessmentMark'    => $feedback ? $feedback->getHumanReadableMark() : null,
-                'assessmentAverage' => null === $cohortAverage ? null : "$cohortAverage %",
-            ]);
-        }
-        return $data;
+        return $statistics;
     }
 
 

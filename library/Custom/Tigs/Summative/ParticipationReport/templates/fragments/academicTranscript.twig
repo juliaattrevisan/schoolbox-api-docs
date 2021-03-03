@@ -10,16 +10,11 @@ Data:
     data[folderId]                                               array
     data[folderId].folder                                        Folder\Model
     data[folderId].teachers                                      User[]
-    data[folderId]['falData']                                    array
-    data[folderId]['falData']['data']                            float[]    eg, ['Criterion A' => 6.0, ...]
     data[folderId]['aasData']                                    array
     data[folderId]['aasData']['data']                            array
     data[folderId]['aasData']['data'][unitSpecId]                array
     data[folderId]['aasData']['data'][unitSpecId]['comment']     string
     data[folderId]['aasData']['data'][unitSpecId]['capabilityMarks'] string[]|null[]
-    data[folderId]['ibGraphData'][idx]['showComponent']          bool
-    data[folderId]['ibGraphData'][idx]['header']                 string
-    data[folderId]['ibGraphData'][idx]['studentMark']            int
     data[folderId]['nesaGraphData'][idx]['showComponent']        string
     data[folderId]['nesaGraphData'][idx]['studentMark']          string
     data[folderId]['unitspecs']                                  array   Sorted by most recent first
@@ -29,32 +24,49 @@ Data:
     reportDate                                                   null|string
 #}
 <style>
+
+    /* Greyboxes, in the Academic Transcript
+     * A group consists of several items
+     */
+    .tigs-crp .result-group {
+        display: inline-block;
+    }
+
+    .tigs-crp .result-group .result-item {
+        background-color: #ccc;
+        display: inline-block;
+        padding: 4px 12px;
+        text-align: center;
+        vertical-align: top;
+    }
+
+    /* A Greybox for the Formative Assessment in the Academic Transcript
+     */
+    .tigs-crp .result-group .result-item.hsc-rank-assessment-title {
+        background-color: transparent;
+        font-style: italic
+    }
+
     .legend {
         position: absolute;
         right: 2rem;
         top: 1rem;
     }
+
     .results {
         color: black;
         text-align: right;
     }
-    .result-group {
-        display: inline-block;
-        background-color: #ccc;
-        text-align: center;
-        vertical-align: top;
-    }
+
     .result-group.error{
         background-color: #fa4a47;
         color: white;
     }
-    .result-item {
-        display: inline-block;
-        padding: 4px 12px;
-    }
+
     .result-heading {
         font-weight: bold;
     }
+
     .subject-list > .subject-list-item{
         margin-bottom: 0.5rem;
         background-color: white;
@@ -78,17 +90,27 @@ Data:
 
 <h2 class="subheader">Academic Transcript</h2>
 <div>
+
+    {# Decide whether we need to show this little legend depending on the massive
+     # massive processing about to take place...which should have been elsewhere
+     #}
+    {% set displayLegend = false %}
+
     {#
         We need to assign the subjectList markup to a variable and defer its render, so that we
         can detect if any interim grades are present, and print a legend above the markup if they are.
      #}
-    {% set hasInterminGrades = false %}
     {% set subjectListHtml %}
         <ul class="subject-list">
             {% for subject in subjects %}
                 {% set folderId = subject.folderId %}
                 {% set folderData = data[folderId] %}
                 {% set firstTeacher = folderData.teachers | first %}
+
+                {# Reinit flag for each subject
+                 # Each subject can be in either Formative or Summative evaluation scenarios
+                 #}
+                {% set hasInterimGrades = false %}
 
                 <li class="subject-list-item">
                     <a href="{{ routeLookup('tigsSubjectReport.getReport', {userId: student.id, folderId: subject.folderId, reportDate: reportDate}) }}" class="link-row">
@@ -113,157 +135,302 @@ Data:
                         </div>
                         <div class="column small-12 medium-6 results">
                             {% if not subject.isPreviousClass %}
-                                <div class="result-group fal">
-                                    {# If we have explicit FinalAchievementLevel data, use that, otherwise fall back to most recent AAS assessment #}
-                                    {% if folderData.falData.data ?? false %}
-                                        {# Explicit FAL data found, use that #}
-                                        {% for label, value in folderData.falData.data %}
-                                            <div class="result-item">
-                                                <span class="result-heading">{{ label | last }}</span><br>
-                                                <span class="result-value">{{ value|default('-') }}</span>
-                                            </div>
-                                        {% endfor %}
+
+                                {# Summative Data (NESA Grade for HSC and Middle Years students)
+                                 #
+                                 # These are calculated from a separate data struct - nesaGraphData - but they are
+                                 # presented in the greyboxes and supply comment data if it exists. Otherwise the comment
+                                 # data comes from the Formative Data structs hscRankData and middleYearsRankData.
+                                 #}
+                                {% set nesaGrade = null %}
+
+                                {# This is the semester where we found the most recent NESA grade
+                                 #}
+                                {% set nesaSemester = null %}
+
+                                {# A random error message, idk why we really did this, but ok
+                                 #}
+                                {% set nesaError = null %}
+
+                                {# Search for comments. If they were in a previous class - it's now rolled over etc. - then
+                                 # just say that and carry onwards. There's nothing we can show
+                                 #
+                                 # If there is a NESA worktype feedback, then show its comment first
+                                 #
+                                 # Otherwise fall back to showing the most recent comment from the student's feedbacks
+                                 #}
+                                {% if subject.isPreviousClass %}
+                                    {% set comment = 'Student is no longer enrolled in this class.' %}
+                                {% else %}
+                                    {% set comment = null %}
+
+                                    {# Find out if you have any formative feedbacks in the current semester for this subject
+                                     # if you're a middle years student - beacuse we show the student's NESA Semester 1 grade
+                                     # in semester 2 unless they have semester 2 formative feedbacks
+                                     #
+                                     # This works, but only if folderData.middleYearsTaskMarks only contains assessments in the
+                                     # current semester. Once you start mixing up other semesters, you'll get misbehaviours
+                                     #}
+                                    {% set hasFormativeFeedback = false %}
+
+                                    {% for unitSpecData in folderData.unitSpecs %}
+                                        {% set taskData = folderData.middleYearsTaskMarks %}
+
+                                        {% if taskData.data[unitSpecData.id] ?? false %}
+                                            {% if taskData.data[unitSpecData.id].studentMark|length %}
+                                                {% set hasFormativeFeedback = true %}
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {# If we're in semester 2, try loading semester 2 NESA data. If there's something here
+                                     # then use that data to inform the NESA Grade and subject comment
+                                     #
+                                     # Else if we're in semester 2, but there's no semester 2 NESA data,
+                                     # Look at semester 1 and see if there's semester 1 NESA data there
+                                     # They want to display the previous NESA grade here until the next
+                                     # one is created by their teachers
+                                     #
+                                     # Else we're in semester 1, try loading semester 1 NESA data. If there's something here
+                                     # then use that data to inform the NESA Grade and subject comment
+                                     #
+                                     # ----
+                                     #
+                                     # If there isn't any NESA data to use, you have to dig around in
+                                     # both the Summative data struct and the Formative data struct.
+                                     #
+                                     # If there's nothing in the Summative data struct for your year level
+                                     # (either HSC or middle year) then dig around in the Formative data struct
+                                     #
+                                     # Eventually you dig far enough to find a grade and comment etc.
+                                     #}
+                                    {% if attributes.curriculumSemester == 2 and folderData.nesaGraphData.data.2 is defined and folderData.nesaGraphData.data.2.comment.comment|length %}
+                                        {% set nesaGrade = folderData.nesaGraphData.data.2.studentMark %}
+                                        {% set nesaSemester = 2 %}
+                                        {% set nesaError = folderData.nesaGraphData.data.2.error %}
+                                        {% set comment = folderData.nesaGraphData.data.2.comment.comment %}
+                                    {% elseif attributes.isMiddleYear and attributes.curriculumSemester == 2 and folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment.comment|length and not hasFormativeFeedback %}
+
+                                        {# Extremely specific use case where all the following are true:
+                                         # - you're a Middle Years student,
+                                         # - you're in semester 2,
+                                         # - you don't have any formative feedbacks in semester 2
+                                         # - you have a NESA Grade that was given to you in semester 1
+                                         #
+                                         # If that's the case, show the NESA Semester 1 grade + comment
+                                         #}
+                                        {% set nesaGrade = folderData.nesaGraphData.data.1.studentMark %}
+                                        {% set nesaSemester = 1 %}
+                                        {% set nesaError = folderData.nesaGraphData.data.1.error %}
+                                        {% set comment = folderData.nesaGraphData.data.1.comment.comment %}
+                                    {% elseif attributes.curriculumSemester == 1 and folderData.nesaGraphData.data.1 is defined and folderData.nesaGraphData.data.1.comment.comment|length %}
+                                        {% set nesaGrade = folderData.nesaGraphData.data.1.studentMark %}
+                                        {% set nesaSemester = 1 %}
+                                        {% set nesaError = folderData.nesaGraphData.data.1.error %}
+                                        {% set comment = folderData.nesaGraphData.data.1.comment.comment %}
                                     {% else %}
-                                        {# No explicit FAL data found, fall back to latest AAS assessment #}
-                                        {% set aasFound = false %}
-                                        {# These units are ordered from latest to oldest #}
+
+                                        {# Gotta mine the Summative feedbacks or Formative feedbacks in either
+                                         # HSC Task Marks or Middle Years Task Marks structs
+                                         # Find the most recent feedback and show its comment
+                                         #
+                                         # Summative feedbacks take precedence over Formative
+                                         #}
+                                        {% set mostRecentData = null %}
+
+                                        {% if attributes.isHsc %}
+                                            {% if folderData.hscRankData and folderData.hscRankData.studentMark %}
+
+                                                {# Summative comment exists straight out of the gate
+                                                 # There's only one data struct
+                                                 #}
+                                                {% set comment = folderData.hscRankData.comment %}
+                                            {% else %}
+
+                                                {# Traverse the Formative set, find the most recent feedback
+                                                 # Yank out its comment
+                                                 #}
+                                                {% set taskData = folderData.hscTaskMarks %}
+
+                                                {% for unitSpecData in folderData.unitSpecs %}
+                                                    {% if taskData.data[unitSpecData.id] ?? false %}
+                                                        {% set taskMarks = taskData.data[unitSpecData.id] %}
+
+                                                        {# Remember the data which the most recent publishAt
+                                                         # Keep looking until there aren't any records more recent
+                                                         #}
+                                                        {% if taskMarks.publishAt > mostRecentData.publishAt or mostRecentData is null %}
+                                                            {% set mostRecentData = taskMarks %}
+                                                            {% set comment = taskMarks.comment %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% else %}
+                                            {% if folderData.middleYearsRankData and folderData.middleYearsRankData.studentMark %}
+
+                                                {# Summative comment exists straight out of the gate
+                                                 # There's only one data struct
+                                                 #}
+                                                {% set comment = folderData.middleYearsRankData.comment %}
+                                            {% else %}
+
+                                                {# Traverse the Formative set, find the most recent feedback
+                                                 # Yank out its comment
+                                                 #}
+                                                {% set taskData = folderData.middleYearsTaskMarks %}
+
+                                                {% for unitSpecData in folderData.unitSpecs %}
+                                                    {% if taskData.data[unitSpecData.id] ?? false %}
+                                                        {% set taskMarks = taskData.data[unitSpecData.id] %}
+
+                                                        {# Remember the data which the most recent publishAt
+                                                         # Keep looking until there aren't any records more recent
+                                                         #}
+                                                        {% if taskMarks.publishAt > mostRecentData.publishAt or mostRecentData is null %}
+                                                            {% set mostRecentData = taskMarks %}
+                                                            {% set comment = taskMarks.comment %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+
+
+                                {# If we have explicit HscRank data, use that, otherwise fall back to most recent HscTaskMark assessment #}
+
+                                {# This is actually a bit funny, because hscRankData and middleYearsRankData return an array
+                                 # Usually that array contains mark/average/rank data but in the case of an error, it'll be
+                                 # represented as an array element; $hasInterimGrades don't understand that here, so an empty
+                                 # (but error-ful) case will be represented without asterisks
+                                 #}
+                                {% if attributes.isHsc %}
+                                    {% if folderData.hscRankData and folderData.hscRankData.studentMark %}
+                                        {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
+                                            attributes: attributes,
+                                            interimGrades: hasInterimGrades,
+                                            rankData: folderData.hscRankData,
+                                            nesa: {
+                                                'grade': nesaGrade,
+                                                'semester': nesaSemester,
+                                                'error': nesaError
+                                            }
+                                        } %}
+
+                                    {% else %}
+
+                                        {# Formative Grade
+                                         # Look at this student's feedbacks, find the most recent one, greyBox that
+                                         #}
+                                        {% set mostRecentData = null %}
+
+                                        {# folderData.unitSpecs might not be in the intended order
+                                         # Unit 2 might appear before Unit 1 if their unitSpecs are
+                                         # in the wrong order somehow. It can be manufactured though
+                                         # I don't know the steps to do it, exactly
+                                         #
+                                         # Anyway traverse until you find the most recent publishAt
+                                         # then use that data
+                                         #}
                                         {% for unitSpecData in folderData.unitSpecs %}
-                                            {% if folderData.aasData|length and not aasFound %}
-                                                {% if folderData.aasData.data[unitSpecData.id].capabilityMarks %}
-                                                    {% set aasFound = true %}
-                                                    {% set hasInterminGrades = true %}
-                                                    {% for label, value in folderData.aasData.data[unitSpecData.id].capabilityMarks %}
-                                                        <div class="result-item">
-                                                            <span class="result-heading">{{ label | last }}{% if loop.last %} *{% endif %}</span><br>
-                                                            <span class="result-value">{{ value|default('-') }}</span>
-                                                        </div>
-                                                    {% endfor %}
+                                            {% if folderData.hscTaskMarks.data[unitSpecData.id] ?? false %}
+                                                {% set taskMarks = folderData.hscTaskMarks.data[unitSpecData.id] %}
+
+                                                {# Remember the data which the most recent publishAt
+                                                 # Keep looking until there aren't any records more recent
+                                                 #}
+                                                {% if taskMarks.publishAt > mostRecentData.publishAt or mostRecentData is null %}
+                                                    {% set mostRecentData = taskMarks %}
+
+                                                    {# Used to pop up a little notice to the user about transient mark data
+                                                     #}
+                                                    {% set hasInterimGrades = true %}
+                                                    {% set displayLegend = true %}
                                                 {% endif %}
                                             {% endif %}
                                         {% endfor %}
+
+                                        {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
+                                            attributes: attributes,
+                                            interimGrades: hasInterimGrades,
+                                            rankData: mostRecentData,
+                                            nesa: {
+                                                'grade': nesaGrade,
+                                                'semester': nesaSemester,
+                                                'error': nesaError
+                                            }
+                                        } %}
                                     {% endif %}
-                                </div>
+                                {% elseif attributes.isMiddleYear %}
 
-                                {% set ibGraphData = folderData.ibGraphData.data | default(null) %}
-                                {% if ibGraphData %}
-                                    {% set ibGraphDatum = ibGraphData | first %}
-                                    <div class="result-group{% if ibGraphDatum.error|default(false) %} error{% endif %}">
-                                        <div class="result-item myp-grade">
-                                            <span class="result-heading">{{ ibGraphDatum.header ?? '' }}</span><br>
-                                            <span class="result-value">{{ ibGraphDatum.studentMark|default('-') }}</span>
-                                        </div>
-                                    </div>
-                                {% endif %}
+                                    {# Summative Grade
+                                     #}
+                                    {% if folderData.middleYearsRankData and folderData.middleYearsRankData.studentMark %}
+                                        {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
+                                            attributes: attributes,
+                                            interimGrades: hasInterimGrades,
+                                            rankData: folderData.middleYearsRankData,
+                                            nesa: {
+                                                'grade': nesaGrade,
+                                                'semester': nesaSemester,
+                                                'error': nesaError
+                                            }
+                                        } %}
+                                    {% else %}
 
-                                {# If we have explicit HscRank data, use that, otherwise fall back to most recent HscTaskMark assessment #}
-                                {% if folderData.hscRankData %}
-                                    <div class="result-group hsc-rank">
-                                        {% if folderData.hscRankData.assessmentMark is defined %}
-                                            <div class="result-item hsc-rank-mark">
-                                                <span class="result-heading">Mark</span><br>
-                                                <span class="result-value">{{ folderData.hscRankData.assessmentMark|default('-') }}</span>
-                                            </div>
-                                        {% endif %}
-                                        {% if folderData.hscRankData.assessmentAverage is defined %}
-                                            <div class="result-item hsc-rank-average">
-                                                <span class="result-heading">Average</span><br>
-                                                <span class="result-value">{{ folderData.hscRankData.assessmentAverage|default('-') }}</span>
-                                            </div>
-                                        {% endif %}
-                                        {% if folderData.hscRankData.assessmentRank is defined %}
-                                        <div class="result-item hsc-rank-rank">
-                                            <span class="result-heading">Rank</span><br>
-                                            <span class="result-value">{{ folderData.hscRankData.assessmentRank|default('-') }}</span>
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                {% else %}
-                                    <div class="result-group hsc-rank">
-                                    {% set hasTaskFound = false %}
-                                    {% for unitSpecData in folderData.unitSpecs %}
-                                        {% if not hasTaskFound and (folderData.hscTaskMarks.data[unitSpecData.id] ?? false) %}
-                                            {% set hasTaskFound = true %}
-                                            {% set hasInterminGrades = true %}
-                                            {% set hscTaskMarkData = folderData.hscTaskMarks.data[unitSpecData.id] %}
-                                            {% if hscTaskMarkData.studentMark is defined %}
-                                                <div class="result-item hsc-rank-mark">
-                                                    <span class="result-heading">Mark*</span><br>
-                                                    <span class="result-value">{{ hscTaskMarkData.studentMark|default('-') }}</span>
-                                                </div>
+                                        {# Formative Grade
+                                         # Look at this student's feedbacks, find the most recent one, greyBox that
+                                         #}
+                                        {% set mostRecentData = null %}
+
+                                        {# folderData.unitSpecs might not be in the intended order
+                                         # Unit 2 might appear before Unit 1 if their unitSpecs are
+                                         # in the wrong order somehow. It can be manufactured though
+                                         # I don't know the steps to do it, exactly
+                                         #
+                                         # Anyway traverse until you find the most recent publishAt
+                                         # then use that data
+                                         #}
+                                        {% for unitSpecData in folderData.unitSpecs %}
+                                            {% if folderData.middleYearsTaskMarks.data[unitSpecData.id] ?? false %}
+                                                {% set middleYearsTaskMarks = folderData.middleYearsTaskMarks.data[unitSpecData.id] %}
+
+                                                {# Remember the data which the most recent publishAt
+                                                 # Keep looking until there aren't any records more recent
+                                                 #}
+                                                {% if middleYearsTaskMarks.publishAt > mostRecentData.publishAt or mostRecentData is null %}
+                                                    {% set mostRecentData = middleYearsTaskMarks %}
+
+                                                    {# Used to pop up a little notice to the user about transient mark data
+                                                     #}
+                                                    {% set hasInterimGrades = true %}
+                                                    {% set displayLegend = true %}
+                                                {% endif %}
                                             {% endif %}
-                                            {% if hscTaskMarkData.cohortAverage is defined %}
-                                                <div class="result-item hsc-rank-average">
-                                                    <span class="result-heading">Average*</span><br>
-                                                    <span class="result-value">{{ hscTaskMarkData.cohortAverage|default('-') }}</span>
-                                                </div>
-                                            {% endif %}
-                                            {% if hscTaskMarkData.cohortRank is defined %}
-                                                <div class="result-item hsc-rank-rank">
-                                                    <span class="result-heading">Rank*</span><br>
-                                                    <span class="result-value">{{ hscTaskMarkData.cohortRank|default('-') }}</span>
-                                                </div>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    </div>
-                                {% endif %}
+                                        {% endfor %}
 
-                                {% set nesaGraphData = folderData.nesaGraphData.data | default(null) %}
-
-                                {% if nesaGraphData %}
-                                    {% set nesaGraphDatum = folderData.nesaGraphData.data | first %}
-                                    {% if nesaGraphDatum  %}
-                                        <div class="result-group{% if nesaGraphDatum.error|default(false) %} error{% endif %}">
-                                            <div class="result-item nesa-grade">
-                                                <span class="result-heading">NESA Grade</span><br>
-                                                <span class="result-value">{{ nesaGraphDatum.studentMark|default('-') }}</span>
-                                            </div>
-                                        </div>
+                                        {% include '@tigsParticipationReport/fragments/greyBoxes.twig' with {
+                                            attributes: attributes,
+                                            interimGrades: hasInterimGrades,
+                                            rankData: mostRecentData,
+                                            nesa: {
+                                                'grade': nesaGrade,
+                                                'semester': nesaSemester,
+                                                'error': nesaError
+                                            }
+                                        } %}
                                     {% endif %}
                                 {% endif %}
-
                             {% endif %}
                         </div>
+
+                        {# This will come from either the most recent NESA data available
+                         # or the most recent formative assessment's feedback
+                         #}
                         <div class="column small-12 teacher-comment content">
-
-                            {# Special case for previous classes w/ feedbacks #}
-                            {% if subject.isPreviousClass %}
-                                Student is no longer enrolled in this class.
-                            {% else %}
-                                {# Render the first comment only #}
-                                {% set commentFound = false %}
-                                {% set commentData = null %}
-
-                                {% if attributes.isMyp %}
-                                    {##
-                                     # MYP comments: no longer come from the unitspec, so don't iterate it.
-                                     # Used to come from folderData.aasData.data[unitSpec.id]
-                                     #}
-                                    {# nesaGraphData.data.2 ... NESA, nesaGraphData.data.2 ... FAL in semester 2,   #}
-                                    {% if folderData.nesaGraphData %}
-                                        {% set commentData = folderData.nesaGraphData.data.2 is defined ? folderData.nesaGraphData.data.2.comment : folderData.nesaGraphData.data.1.comment %}
-                                    {% endif %}
-                                {% else %}
-                                    {# All other comments come from the unitspec #}
-                                    {% for unitSpec in folderData.unitSpecs %}
-                                        {% if no commentFound %}
-                                            {% if attributes.isDp %}
-                                                {% set commentData = folderData.aamData.data[unitSpec.id] %}
-                                            {% elseif attributes.isHsc %}
-                                                {% set commentData = folderData.hscTaskMarks.data[unitSpec.id] %}
-                                            {% endif %}
-                                            {% if commentData.comment is not null %}
-                                                {% set commentFound = true %}
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-
-                                {% if commentData.comment is defined and commentData.comment|length %}
-                                    {{ commentData.comment | nl2br }}
-                                {% endif %}
-                            {% endif %}
-
+                            {{ comment | nl2br }}
                         </div>
                     </a>
                 </li>
@@ -272,7 +439,7 @@ Data:
     {% endset %}
 
     {# We can now print the optional legend, and then the subject list markup #}
-    {% if hasInterminGrades %}<span class="meta legend">* - marks from most recent task only</span>{% endif %}
+    {% if displayLegend %}<span class="meta legend">* - marks from most recent task only</span>{% endif %}
     {{ subjectListHtml }}
 </div>
 

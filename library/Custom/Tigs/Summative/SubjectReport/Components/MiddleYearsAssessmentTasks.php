@@ -121,9 +121,11 @@ class MiddleYearsAssessmentTasks extends BaseComponent
             }
         }
 
-        // Filter anything not due within this report's window
-        // If report is for Sem1, only get data from Sem1, otherwise no limit
-        $semester = $this->getAttributes()->getCurriculumSemester() === 1 ? 1 : null;
+        /* For middle years students, only get assessments that are due in the current semester
+         * We don't need formative data from semester 1 when we are in semester 2
+         */
+        $semester = $this->getAttributes()->getCurriculumSemester();
+
         foreach ($cohortAssessments as $assessable) {
             if (!$this->isDueWithinReportWindow($assessable, $semester)) {
                 $cohortAssessments->offsetUnset($assessable->getId());
@@ -192,16 +194,39 @@ class MiddleYearsAssessmentTasks extends BaseComponent
             throw new UnexpectedValueException($msg);
         }
 
-        $feedback       = $this->findStudentFeedback($classAssessment);
-        $cohortMarks    = $this->deriveCohortMarks($cohortAssessments);
-        $cohortAverage  = $this->deriveCohortAverage($cohortMarks);
+        $feedback = $this->findStudentFeedback($classAssessment);
+
+        /* Generate some stats about this student's performance among their peers
+         */
+        $statistics = (new CohortStatistics(
+            $this->getViewer(),
+            $this->getRoleTypeOverride(),
+            $cohortAssessments,
+            $feedback
+        ))->generate();
+
+        /* Handy diagnosis
+         */
+//        new \Alaress_Probe([
+//            'assessmentTitle' => $statistics['assessmentTitle'],
+//            'studentMark'     => $statistics['studentMark'],
+//            'cohortAverage'   => $statistics['cohortAverage'],
+//            'publishAt'       => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
+//            'comment'         => $feedback ? $feedback->getComment() : null,
+//            'commentBy'       => $feedback ? $feedback->getReviewer()->getFullName() : null,
+//            'dueDate'         => $classAssessment->getDueAt()->getDatabase(),
+//            'unitSpecId'      => $unitSpec->getId(),
+//            'unitSpecTitle'   => $unitSpec->getTitle(),
+//        ]);
 
         return [
-            'studentMark'   => $feedback ? $feedback->getHumanReadableMark() : null,
-            'cohortAverage' => null === $cohortAverage ? null : "$cohortAverage %",
-            'comment'       => $feedback ? $feedback->getComment() : null,
-            'commentBy'     => $feedback ? $feedback->getReviewer() : null,
-            'dueDate'       => $classAssessment->getDueAt(),
+            'assessmentTitle' => $statistics['assessmentTitle'],
+            'studentMark'     => $statistics['studentMark'],
+            'cohortAverage'   => $statistics['cohortAverage'],
+            'publishAt'       => $feedback ? $feedback->getPublishedAt()->getDatabase() : null,
+            'comment'         => $feedback ? $feedback->getComment() : null,
+            'commentBy'       => $feedback ? $feedback->getReviewer() : null,
+            'dueDate'         => $classAssessment->getDueAt(),
         ];
     }
 
@@ -219,10 +244,13 @@ class MiddleYearsAssessmentTasks extends BaseComponent
         if (!$this->isFeedbackVisibleToUser($assessable)) {
             return null;
         }
+
         $participant = $assessable->getParticipantIfExtant($this->student);
+
         if (!$participant) {
             return null;
         }
+
         return $participant->getAuthoritativeFeedback(true);
     }
 
