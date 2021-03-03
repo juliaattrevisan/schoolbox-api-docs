@@ -495,7 +495,7 @@ BASE;
         $httpClient = new Client([
             RequestOptions::COOKIES => CookieJar::fromArray(
                 [PipeManager::PHP_SESSION_PREFIX => $sessionHash],
-                $this->generateBaseUrl()->toString()
+                $this->generateBaseUrl()->getHost(),
             ),
         ]);
 
