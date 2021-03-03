@@ -764,12 +764,16 @@ class Profile implements IStrategy
          */
         $employeeSetReformatted = [];
 
+        /* Add a prefix to distinguish them when namespaces collide
+         */
+        $employeeCodec = new Codec\EmployeeExternalId();
+
         foreach ($employeeSetDedupe as $employee) {
 
             /* Apparently there's both title and salutation for some bizarre reason
              */
             $employeeSetReformatted[] = [
-                'teacher_code' => self::EMPLOYEE_PREFIX . $employee['user_code'],
+                'teacher_code' => $employeeCodec->encode($employee['user_code']),
                 'salutation' => array_values(array_filter([$employee['title'], $employee['salutation']]))[0],
                 'given_names' => $employee['first_name'],
                 'surname' => $employee['surname'],
