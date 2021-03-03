@@ -82,7 +82,7 @@ class EmployeeExternalIdTest extends TestCase
 
             'Encoded Employee 3' => [
                 'D99001',
-                'D99001',
+                'ED99001',
             ],
         ];
     }
@@ -121,7 +121,7 @@ class EmployeeExternalIdTest extends TestCase
             ],
 
             'Decoded Employee 3' => [
-                'D99001',
+                'ED99001',
                 'D99001'
             ],
         ];
