@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Transform;
 
+use InvalidArgumentException;
 use PDOException;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
@@ -22,10 +23,12 @@ class Mapper extends \Schoolbox\Mapper
 {
 
     // Table definition
-    public const TABLE_NAME      = 'storage_transform';
-    public const FIELD_HASH      = 'hash';
-    public const FIELD_CACHE_KEY = 'transform';
-    public const FIELD_SIZE      = 'size';
+    public const TABLE_NAME       = 'storage_transform';
+    public const FIELD_HASH       = 'hash';
+    public const FIELD_CACHE_KEY  = 'transform';
+    public const FIELD_SIZE       = 'size';
+    public const FIELD_STATE      = 'state';
+    public const FIELD_UPDATED_AT = 'updated_at';
 
     /**
      * @inheritdoc
@@ -37,6 +40,34 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses(self::FIELD_HASH, self::TYPE_STRING);
         $this->uses(self::FIELD_CACHE_KEY, self::TYPE_STRING, null, 'cacheKey');
         $this->uses(self::FIELD_SIZE, self::TYPE_INTEGER);
+        $this->uses(self::FIELD_STATE, self::TYPE_STRING, self::COLUMN_ENUM, null, Model::STATES);
+        $this->uses(self::FIELD_UPDATED_AT, self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifySizeAndStateCombo']);
+    }
+
+
+    /**
+     * PreSave callback to ensure we don't save a transform where:
+     * * size is NULL && state is DONE, or
+     * * size is !NULL && state is !DONE
+     *
+     * @param Model $model
+     * @return bool
+     * @throws Exception\InsufficientHydrationException
+     * @throws InvalidArgumentException
+     */
+    protected function verifySizeAndStateCombo(Model $model): bool
+    {
+        if (
+            ($model->getSize() === null && $model->isStateDone()) ||
+            ($model->getSize() !== null && !$model->isStateDone())
+        ) {
+            throw new InvalidArgumentException(
+                "Invalid size/state combination. Size: {$model->getSize()}, State: {$model->getState()}"
+            );
+        }
+        return true;
     }
 
     /**
@@ -62,20 +93,25 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Creates a new Transform record in database
      *
-     * @param string $hash
-     * @param string $cacheKey
-     * @param int    $size
+     * @param string   $hash
+     * @param string   $cacheKey
+     * @param null|int $size
+     * @param string   $state
+     * @return Model
      * @throws Exception
+     * @throws InvalidArgumentException
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function createRecord(string $hash, string $cacheKey, int $size): void
+    public function createRecord(string $hash, string $cacheKey, ?int $size, string $state): Model
     {
         $imageTransformation = $this->createModel()
                                     ->setHash($hash)
                                     ->setCacheKey($cacheKey)
-                                    ->setSize($size);
+                                    ->setSize($size)
+                                    ->setState($state);
         $this->save($imageTransformation);
+        return $imageTransformation;
     }
 
     /**
