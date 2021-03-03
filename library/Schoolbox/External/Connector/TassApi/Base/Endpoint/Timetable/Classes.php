@@ -179,8 +179,7 @@ class Classes implements IStrategy
              */
             if ($isEmployee->isSatisfiedBy((string)$externalId)) {
                 $this->log->debug(sprintf(
-                    "Skipping Timetable for %s (user %s) - they are an Employee",
-                    trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
+                    "Skipping Timetable for user %s - they are an Employee",
                     $externalId
                 ));
 
