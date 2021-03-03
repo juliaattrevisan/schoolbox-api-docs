@@ -246,13 +246,20 @@ class AdditionalSubjects implements IStrategy
         $users = $this->lookup->getStaff();
         $endpoint = self::ENDPOINT_TEACHERSUBJECTS;
 
-        /* Decode Employee prefix
+        /* Detect employees - skip getting data for them
          */
-        $codec = new Codec\EmployeeExternalId();
+        $isEmployee = new ValidEmployeeExternalId();
 
         foreach ($users as $externalId => $userData) {
+
+            /* Skip getting subjects for employees
+             */
+            if ($isEmployee->isSatisfiedBy($externalId)) {
+                continue;
+            }
+
             $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
-                'code' => $codec->decode($externalId)
+                'code' => $externalId
             ]);
 
             /* No additional subjects
