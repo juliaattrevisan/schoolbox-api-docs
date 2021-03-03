@@ -177,7 +177,7 @@ class Classes implements IStrategy
 
             /* Skip getting subjects for employees
              */
-            if ($isEmployee->isSatisfiedBy($externalId)) {
+            if ($isEmployee->isSatisfiedBy((string)$externalId)) {
                 $this->log->debug(sprintf(
                     "Skipping Timetable for %s (user %s) - they are an Employee",
                     trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
