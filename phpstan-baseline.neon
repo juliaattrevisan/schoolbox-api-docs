@@ -1391,11 +1391,6 @@ parameters:
 			path: library/Custom/Help/CourseParticipation/Module.php
 
 		-
-			message: "#^PHPDoc tag @param for parameter \\$db with type Alaress\\\\Database\\\\Quoter\\\\IQuoter\\|Alaress\\\\IDatabase is not subtype of native type Alaress\\\\IDatabase\\.$#"
-			count: 1
-			path: library/Custom/Help/Hero/Acquisition.php
-
-		-
 			message: "#^Method Custom\\\\Help\\\\Nesa\\\\Selector\\:\\:generate\\(\\) should return iterable\\<Schoolbox\\\\Assessment\\\\Rubric\\\\DataModel\\\\Descriptor\\\\Model\\>&Schoolbox\\\\GenericCollection but returns array\\<int\\|string, Schoolbox\\\\Assessment\\\\Rubric\\\\DataModel\\\\Descriptor\\\\Model\\>\\.$#"
 			count: 1
 			path: library/Custom/Help/Nesa/Selector.php
@@ -2366,19 +2361,9 @@ parameters:
 			path: library/External/AscTimetables/Translator/Enrolment.php
 
 		-
-			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Enrolment/Map.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
 			count: 1
 			path: library/External/AscTimetables/Translator/Structure.php
-
-		-
-			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Structure/Map.php
 
 		-
 			message: "#^Return type \\(iterable\\<array\\>&Iterator\\) of method External_AscTimetables_Translator_Timetable\\:\\:translateXmlToArray\\(\\) should be compatible with return type \\(array\\<array\\>\\) of method External_AscTimetables_Translator_Base\\:\\:translateXmlToArray\\(\\)$#"
@@ -2389,11 +2374,6 @@ parameters:
 			message: "#^Method External_AscTimetables_Translator_Timetable\\:\\:translateXmlToArray\\(\\) should return iterable\\<array\\>&Iterator but returns array\\<int, array\\<string, mixed\\>\\>\\.$#"
 			count: 1
 			path: library/External/AscTimetables/Translator/Timetable.php
-
-		-
-			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Timetable/Map.php
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"
@@ -2654,31 +2634,6 @@ parameters:
 			message: "#^Method External_Edumate_Timetable\\:\\:getDayNumber\\(\\) should return bool\\|string but returns int\\.$#"
 			count: 2
 			path: library/External/Edumate/Timetable.php
-
-		-
-			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
-			count: 1
-			path: library/External/Isams/Batch/Reader/Iterator/Enrolment/Map.php
-
-		-
-			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
-			count: 1
-			path: library/External/Isams/Batch/Reader/Iterator/Parent/Map.php
-
-		-
-			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
-			count: 1
-			path: library/External/Isams/Batch/Reader/Iterator/Staff/Map.php
-
-		-
-			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
-			count: 1
-			path: library/External/Isams/Batch/Reader/Iterator/Student/Map.php
-
-		-
-			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
-			count: 1
-			path: library/External/Isams/Batch/Reader/Iterator/Timetable/Map.php
 
 		-
 			message: "#^Method External_Isams_Batch_Reader_Timetable\\:\\:getAccountInfo\\(\\) should return Iterator but returns array\\.$#"
@@ -5051,11 +5006,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Doublefirst/Base/User.php
 
 		-
-			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Edumate/Base/ResultIterator.php
-
-		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Edumate\\\\Base\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Edumate/Base/Sync.php
@@ -5419,16 +5369,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schooledge\\\\Base\\\\Sync\\:\\:findAllStaff\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Staff\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Schooledge/Base/Sync.php
-
-		-
-			message: "#^Call to an undefined method Traversable\\:\\:next\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/StudentIterator.php
-
-		-
-			message: "#^Call to an undefined method Traversable\\:\\:current\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/StudentIterator.php
 
 		-
 			message: "#^Call to function is_array\\(\\) with int will always evaluate to false\\.$#"
@@ -8074,11 +8014,6 @@ parameters:
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^Call to an undefined method Alaress\\\\IDatabase\\:\\:quoteIdentifier\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper/AbstractMapperProxy.php
 
 		-
 			message: "#^Expression \"true\" on a separate line does not do anything\\.$#"
