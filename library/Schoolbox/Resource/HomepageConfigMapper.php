@@ -154,7 +154,8 @@ class HomepageConfigMapper extends Mapper
                     // copy the homepage template's tile layout
                     // TODO move this somewhere it actually belongs
                     $value = $c->getValue();
-                    if ($c->getKey() === 'layoutId' && empty($currentInstance->getConfigByKey('src'))) {
+                    $src = $currentInstance->getConfigByKey('src');
+                    if ($c->getKey() === 'layoutId' && empty($src->getValue())) {
                         $layoutMapper = \Schoolbox\Tile\Layout\Mapper::getInstance();
                         $tileMapper   = \Schoolbox\Tile\Mapper::getInstance();
                         try {
