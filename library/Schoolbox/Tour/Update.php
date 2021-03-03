@@ -7,9 +7,10 @@ use Symfony\Component\Yaml\Yaml;
 use Schoolbox\Application\CliTool;
 
 /**
- * Used for importing tours from a YAML file on the CLI
- * See tools/tour/install.php for more information on how it is used
- * There is a sample.yaml file also in tools/tour/sample.yaml for information on the layout of the yaml structure
+ * Created for updating existing tour from a yaml file.
+ * TODO: THIS IS NOT COMPLETED
+ * This is created to fix a typo in the 20.2 tour.
+ * At the moment, this works only for contents of a tour step modal.
  *
  * @package Schoolbox\Tour
  */
@@ -39,6 +40,8 @@ HELP
             $this->getLogger()->error("File \"$file\" does not exist, or is not readable.");
             exit(1);
         }
+
+        $this->getLogger()->warning('Currently, this script supports contents of a tour step modal only.');
 
         $tourSource = Yaml::parseFile($file);
         $tourSource = $tourSource['tour'];
