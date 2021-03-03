@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Application\CliTool;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Exception\UnreachableException;
 use Alaress\Lock\InstanceLockFactory;
 use Aura\Di;
 use Sentry\EventId;
@@ -418,16 +419,20 @@ abstract class App
      *
      * @param Throwable $e
      * @return EventId|null
-     * @throws Di\Exception\ServiceNotFound
      */
     protected function captureException(Throwable $e): ?EventId
     {
         if (!$this->di->has('sentry')) {
             return null;
-
         }
-        /** @var HubInterface $sentry */
-        $sentry = $this->di->get('sentry');
+
+        try {
+            /** @var HubInterface $sentry */
+            $sentry = $this->di->get('sentry');
+        } catch (Di\Exception\ServiceNotFound $e) {
+            // It should not be possible to generate this exception because we checked DI has Sentry a few lines above
+            throw new UnreachableException($e);
+        }
         return $sentry->captureException($e);
     }
 }
