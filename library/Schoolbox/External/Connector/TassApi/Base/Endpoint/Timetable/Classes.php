@@ -169,7 +169,23 @@ class Classes implements IStrategy
             return;
         }
 
+        /* Detect employees - skip getting data for them
+         */
+        $isEmployee = new ValidEmployeeExternalId();
+
         foreach ($timetables as $externalId => $timetable) {
+
+            /* Skip getting subjects for employees
+             */
+            if ($isEmployee->isSatisfiedBy($externalId)) {
+                $this->log->debug(sprintf(
+                    "Skipping Timetable for %s (user %s) - they are an Employee",
+                    trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
+                    $externalId
+                ));
+
+                continue;
+            }
 
             /* External Timetable Code (Cycle Identifier)
              */
