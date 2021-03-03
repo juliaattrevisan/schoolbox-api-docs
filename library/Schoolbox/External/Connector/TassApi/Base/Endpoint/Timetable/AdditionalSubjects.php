@@ -255,6 +255,12 @@ class AdditionalSubjects implements IStrategy
             /* Skip getting subjects for employees
              */
             if ($isEmployee->isSatisfiedBy($externalId)) {
+                $this->log->debug(sprintf(
+                    "Skipping Additional subjects for %s (user %s) - they are an Employee",
+                    trim("{$users[$externalId]['firstname']} {$users[$externalId]['lastname']}"),
+                    $externalId
+                ));
+
                 continue;
             }
 
