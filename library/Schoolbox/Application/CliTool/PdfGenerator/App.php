@@ -25,6 +25,7 @@ use Schoolbox\Auth\Remote\RemoteLogin;
 use Schoolbox\GenericCollection;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\User;
+use TheCodingMachine\Gotenberg\Document;
 use TheCodingMachine\Gotenberg\DocumentFactory;
 use TheCodingMachine\Gotenberg\GotenbergClientInterface;
 use TheCodingMachine\Gotenberg\MergeRequest;
@@ -485,18 +486,6 @@ BASE;
     {
         // Create the PDF
         $filename = $tempDir . '/' . $pdfSource->getFilename();
-//        $fp       = fopen($filename, 'wb');
-//        if (!$fp) {
-//            throw new RuntimeException("Unable to create file: '{$filename}'");
-//        }
-
-//        // Set up HTTP client
-//        // (Maybe create outside of this method?)
-//        $cookies    = CookieJar::fromArray(
-//            [PipeManager::PHP_SESSION_PREFIX => $sessionHash],
-//            $this->generateBaseUrl()->getHost(),
-//        );
-//        $httpClient = new Client([RequestOptions::COOKIES => $cookies,]);
 
 
         $maxAttempts       = 10;
@@ -512,11 +501,14 @@ BASE;
                 // Create the file, applying the increased delay if necessary
 
                 // Gotenberg version: do I need to download individually then merge?
+                /** @var Document $files */
                 $files = [];
                 foreach ($pdfSource->getUrls() as $i => $url) {
                     $request = new URLRequest($url);
                     $request->setWaitDelay($jsDelay / 1000);
                     $request->addRemoteURLHTTPHeader('Cookie', sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $sessionHash));
+
+                    // What if this fails?
                     $pdfGenerator->store($request, $tempDir . "/$i.pdf");
                     $files[] = DocumentFactory::makeFromPath("$i.pdf", $tempDir . "/$i.pdf");
                 }
@@ -525,7 +517,9 @@ BASE;
                 $pdfGenerator->store($request, $filename);
 
                 // Cleanup
-
+                foreach ($files as $file) {
+                    unlink($tempDir . '/' . $file->getFileName());
+                }
                 break;
             } catch (RuntimeException $e) {
                 $this->getLogger()->warning($e->getMessage());
@@ -536,7 +530,6 @@ BASE;
                 $previousException = $e;
             }
         }
-//        fclose($fp);
         return $filename;
     }
 
