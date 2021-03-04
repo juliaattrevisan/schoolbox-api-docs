@@ -87,8 +87,18 @@ class System
             SELECT
                 'News' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT * FROM comms_news_article_file GROUP BY storage_id) f   
-            INNER JOIN storage ON f.storage_id = storage.hash
+            FROM (
+                SELECT DISTINCT subquery.hash 
+                FROM
+                    ((SELECT DISTINCT feature_image_hash AS hash
+                    FROM comms_news_article
+                    WHERE feature_image_hash IS NOT NULL)
+                    UNION
+                    (SELECT DISTINCT storage_id AS hash
+                    FROM comms_news_article_file
+                    WHERE storage_id IS NOT NULL)) subquery
+            ) f   
+            INNER JOIN storage ON f.hash = storage.hash
         ";
     }
 }
