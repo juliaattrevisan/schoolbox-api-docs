@@ -498,9 +498,12 @@ BASE;
                 throw new RuntimeException("Unable to generate PDF after $maxAttempts attempts, skipping", 0, $previousException);
             }
             try {
-                // Create the file, applying the increased delay if necessary
+                $this->getLogger()->debug(
+                    "Generating PDF from the following URLs:\n* " . implode("\n* ", $pdfSource->getUrls())
+                );
 
-                // Gotenberg version: do I need to download individually then merge?
+                // Gotenberg needs to download each URL individually:
+                // merge appears to not work with URLs
                 /** @var Document $files */
                 $files = [];
                 foreach ($pdfSource->getUrls() as $i => $url) {
@@ -508,7 +511,9 @@ BASE;
                     $request->setWaitDelay($jsDelay / 1000);
                     $request->addRemoteURLHTTPHeader('Cookie', sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $sessionHash));
 
-                    // What if this fails?
+                    // Gotenberg doesn't seem to care about the response code.
+                    // Just have to hope that no requests are made with an
+                    // invalid URL.
                     $pdfGenerator->store($request, $tempDir . "/$i.pdf");
                     $files[] = DocumentFactory::makeFromPath("$i.pdf", $tempDir . "/$i.pdf");
                 }
