@@ -51,7 +51,7 @@ class System
         $query = "
             SELECT
                 'CMS Resources' AS label, 
-                SUM(storage.filesize) AS size 
+                COALESCE(SUM(storage.filesize), 0) AS size
             FROM `file` f
             INNER JOIN storage ON f.hash = storage.hash
             
@@ -59,8 +59,16 @@ class System
             
             SELECT
                 'Student Submissions' AS label,
-                SUM(storage.filesize) AS size
+                COALESCE(SUM(storage.filesize), 0) AS size
             FROM student_submission_file f
+            INNER JOIN storage ON f.hash = storage.hash
+            
+            UNION
+            
+            SELECT 
+                'Submission Returns' AS label,
+                COALESCE(SUM(storage.filesize), 0) AS size
+            FROM submission_return_file f
             INNER JOIN storage ON f.hash = storage.hash
         ";
     }
