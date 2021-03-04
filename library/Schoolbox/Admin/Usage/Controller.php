@@ -100,4 +100,18 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
+
+
+    /**
+     * Generate payload for User Usage
+     */
+    public function getFileTypePayload(): void
+    {
+        /** @var IConnector $database */
+        $database = $this->getDi()->get('databaseInternal');
+
+        $payload = (new Graph\FileTypePayload($database))->generate();
+
+        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+    }
 }
