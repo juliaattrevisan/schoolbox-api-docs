@@ -18,10 +18,28 @@ use Zend\Uri\UriInterface;
 /**
  * Test application for the CLI PDF generator.
  *
- * All this does is generate a PDF of the dashboard for the authenticated user.
+ * All this does is generate a PDF of any URLs passed in the command: defaults
+ * to only including the dashboard for the authenticated user.
  */
 class TestApp extends App
 {
+    /**
+     * Option for URLs to include within the generated PDF.
+     */
+    private const OPT_SHORT_URL = 'u:';
+    private const DEFAULT_URLS = ['/'];
+
+    /**
+     * @inheritdoc
+     */
+    public function getShortOpts(): array
+    {
+        return array_merge(parent::getShortOpts(), [self::OPT_SHORT_URL]);
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function printHelp(): void
     {
         $file           = $this->getToolFilename();
@@ -33,18 +51,19 @@ class TestApp extends App
     CLI PDF Generation Test App
 
 SYNOPSIS:
-    $green{$file} {$yellow}[OPTION]... [PATH]...$white
+    $green{$file} {$yellow}[OPTION]...$white
 
 DESCRIPTION
     A test application for generating an archive of PDFs from Schoolbox content.
 
-    Each PATH will be added to the PDF; if no paths are provided, the PDF will
-    contain only the user's dashboard.
-    (PATHs may only be provided as relative to Schoolbox's base URL; any PATH
-    which is not relative will raise an error.)
-
 OPTIONS
 $baseOptionHelp
+
+    $yellow-u=URL$white
+        A URL to include within the PDF. This option may be provided multiple
+        times, but only URLs relative to the Schoolbox instance's base path will
+        be accepted.
+        Defaults to only including the user's dashboard.
 
 EXAMPLES:
  * Write log to terminal, output to archive.zip
@@ -54,7 +73,7 @@ EXAMPLES:
       $file 2>> export.log 1> archive.zip
       $file -l export.log -o archive.zip
  * Output /, /calendar, /resources to archive.zip
-      $file -l export.log -o archive.zip / /calendar /resources
+      $file -l export.log -o archive.zip -u / -u /calendar -u /resources
 ";
         fwrite(STDOUT, $help);
     }
@@ -85,14 +104,23 @@ EXAMPLES:
      */
     protected function generatePdfSources(UriInterface $baseUrl): GenericCollection
     {
+        $urls = $this->getOpt(self::OPT_SHORT_URL);
+        if (!isset($urls)) {
+            $urls = self::DEFAULT_URLS;
+        }
+        if (!is_array($urls)) {
+            $urls = [$urls];
+        }
+
+        $outputUrls = [];
+        foreach ($urls as $url) {
+            $outputUrls[] = $baseUrl->setPath($url)->toString();
+        }
+
         return new GenericCollection(
             SourceBundle::class,
             [
-                new SourceBundle(
-                    'test.pdf',
-                    [$baseUrl->setPath('/')->toString(),],
-                    'Generating test.pdf'
-                ),
+                new SourceBundle('test.pdf', $outputUrls, 'Generating test.pdf'),
             ]
         );
     }
