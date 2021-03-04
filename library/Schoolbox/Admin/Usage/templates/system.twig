@@ -1,6 +1,8 @@
 <script>
     $(function() {
-        $.get('/adminv2/usage2/system', function(responseText) {
+        let route = '{{ routeLookupIfAuthorized('adminUsage.getSystem') }}';
+
+        $.get(route, function(responseText) {
             let categories = Array();
             let values = Array();
 
@@ -10,10 +12,10 @@
             });
 
             {# Convert to human-readable format
-                     # https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
-            #}
+             # https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
+             #}
             function humanFileSize(size) {
-                const i = size === 0 ? 0 : Math.floor( Math.log(size) / Math.log(1024));
+                const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
                 return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
             }
 
