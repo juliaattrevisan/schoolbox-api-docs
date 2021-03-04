@@ -7,7 +7,7 @@
                     {% if user.firstname != externalUser.StudentGiven1 %}({{ user.firstname }}){% endif %}
                     {{ externalUser.StudentGiven1 }} {{ externalUser.StudentSurname }}
                 </p>
-                <p class="meta">Year {{ user.getYear() }}</p>
+                <p class="meta">Year {{ user.year.name }}</p>
                 <p class="meta">NSN {{ externalUser.StudentStudiesCode }}</p>
             </a>
         </div>
