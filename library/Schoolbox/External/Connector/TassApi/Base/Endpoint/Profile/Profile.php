@@ -58,6 +58,11 @@ class Profile implements IStrategy
      */
     private const EMPLOYEE_PREFIX = 'E';
 
+    /**
+     * Used in the profile category field to identify teacher or employee users coming from TASS into the staff table
+     */
+    public const EMPLOYEE = 'employee';
+    public const TEACHER = 'teacher';
 
     /**
      * @var LoggerInterface
@@ -749,6 +754,7 @@ class Profile implements IStrategy
          * The result is: employeeSetDedupe = Teaching Staff XOR Non-Teaching Staff
          */
         foreach ($teachers['teachers'] as $teacher) {
+            $teacher['category'] = self::TEACHER;
             if ('' !== (string)$teacher['employee_code']) {
                 unset($employeeSetDedupe[$teacher['employee_code']]);
 
@@ -779,6 +785,7 @@ class Profile implements IStrategy
                 'surname' => $employee['surname'],
                 'school_email_address' => $employee['school_email'],
                 'email_address' => $employee['e_mail'],
+                'category' => self::EMPLOYEE,
                 'department' => $employee['departments'],
                 'portal_user_code' => $employee['username'],
                 'active_flag' => null,
@@ -804,7 +811,7 @@ class Profile implements IStrategy
             $externalId = trim((string)$staff['teacher_code']);
             $building = '';
             $campusName = '';
-            $category = '';
+            $category = $staff['category'];
             $department = trim((string)$staff['department']);
 
             /* Find the first non-empty email address for staff; it seems that there's a business

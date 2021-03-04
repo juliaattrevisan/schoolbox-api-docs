@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
 
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Profile;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
 
@@ -72,8 +73,10 @@ class Lookup
             SELECT external_id, firstname, lastname
             FROM sis_user_profile sup
             INNER JOIN sis_user_profile_staff sups ON sup.id = sups.sis_user_profile_id
-            WHERE external_id IS NOT NULL
-        ');
+            WHERE external_id IS NOT NULL AND category = :category
+        ',
+        [':category' => Profile::TEACHER]
+        );
 
         $students = [];
 

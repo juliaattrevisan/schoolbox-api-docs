@@ -246,22 +246,7 @@ class AdditionalSubjects implements IStrategy
         $users = $this->lookup->getStaff();
         $endpoint = self::ENDPOINT_TEACHERSUBJECTS;
 
-        /* Detect employees - skip getting data for them
-         */
-        $isEmployee = new ValidEmployeeExternalId();
-
         foreach ($users as $externalId => $userData) {
-
-            /* Skip getting subjects for employees
-             */
-            if ($isEmployee->isSatisfiedBy($externalId)) {
-                $this->log->debug(sprintf(
-                    "Skipping Additional Subjects for user %s - they are an Employee",
-                    $externalId
-                ));
-
-                continue;
-            }
 
             $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
                 'code' => (string)$externalId
