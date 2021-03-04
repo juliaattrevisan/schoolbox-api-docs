@@ -108,6 +108,13 @@ class System
             FROM (SELECT DISTINCT hash FROM pastoral_attachment) f   
             INNER JOIN storage ON f.hash = storage.hash
             
+            UNION
+            
+            SELECT
+                'My Files' AS label,
+                COALESCE(SUM(storage.filesize), 0) AS size
+            FROM (SELECT DISTINCT hash FROM myFile) f   
+            INNER JOIN storage ON f.hash = storage.hash
             
         ";
     }
