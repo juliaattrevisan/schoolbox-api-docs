@@ -45,6 +45,9 @@ class System
     /**
      * Generate the result set for file usage
      * in each of the areas (label, quantity)
+     *
+     * Note that some tables such as task_files can have multiple occurrences
+     * of a file hash (ie. a file gets uploaded multiple times with different names)
      */
     public function generate()
     {
