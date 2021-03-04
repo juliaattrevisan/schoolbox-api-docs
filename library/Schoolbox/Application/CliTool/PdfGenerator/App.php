@@ -21,11 +21,7 @@ use Schoolbox\Auth\Remote\RemoteLogin;
 use Schoolbox\GenericCollection;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\User;
-use TheCodingMachine\Gotenberg\Document;
-use TheCodingMachine\Gotenberg\DocumentFactory;
-use TheCodingMachine\Gotenberg\GotenbergClientInterface;
-use TheCodingMachine\Gotenberg\MergeRequest;
-use TheCodingMachine\Gotenberg\URLRequest;
+use TheCodingMachine\Gotenberg;
 use Zend\Uri\Uri;
 use Zend\Uri\UriInterface;
 use ZipArchive;
@@ -143,7 +139,7 @@ abstract class App extends BaseApp
 
 
         // Build a PDF generator object, put the session hash in it
-        $pdfGenerator = new \TheCodingMachine\Gotenberg\Client('http://localhost:3000');
+        $pdfGenerator = new Gotenberg\Client('http://localhost:3000');
 
 
         // Generate all PDFs
@@ -446,14 +442,18 @@ BASE;
     /**
      * Generates a PDF for this source.
      *
-     * @param SourceBundle             $pdfSource
-     * @param string                   $tempDir
-     * @param GotenbergClientInterface $pdfGenerator
-     * @param string                   $sessionHash
+     * @param SourceBundle                       $pdfSource
+     * @param string                             $tempDir
+     * @param Gotenberg\GotenbergClientInterface $pdfGenerator
+     * @param string                             $sessionHash
      * @return string
      */
-    private function generatePdf(SourceBundle $pdfSource, string $tempDir, GotenbergClientInterface $pdfGenerator, string $sessionHash): string
-    {
+    private function generatePdf(
+        SourceBundle $pdfSource,
+        string $tempDir,
+        Gotenberg\GotenbergClientInterface $pdfGenerator,
+        string $sessionHash
+    ): string {
         $filename          = $tempDir . '/' . $pdfSource->getFilename();
         $maxAttempts       = 10;
         $attempts          = 0;
@@ -472,10 +472,10 @@ BASE;
                 // Gotenberg needs to download each URL individually:
                 // merge appears to not work with URLs.
                 // Just generate a PDF for each URL, then merge them.
-                /** @var Document $files */
+                /** @var Gotenberg\Document[] $files */
                 $files = [];
                 foreach ($pdfSource->getUrls() as $i => $url) {
-                    $request = new URLRequest($url);
+                    $request = new Gotenberg\URLRequest($url);
                     $request->setWaitDelay($jsDelay / 1000);
                     $request->setLandscape((bool)$this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE));
                     $request->addRemoteURLHTTPHeader('Cookie', sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $sessionHash));
@@ -484,11 +484,11 @@ BASE;
                     // Just have to hope that no requests are made with an
                     // invalid URL.
                     $pdfGenerator->store($request, $tempDir . "/$i.pdf");
-                    $files[] = DocumentFactory::makeFromPath("$i.pdf", $tempDir . "/$i.pdf");
+                    $files[] = Gotenberg\DocumentFactory::makeFromPath("$i.pdf", $tempDir . "/$i.pdf");
                 }
 
                 // Merge the intermediary PDFs together, then delete them
-                $request = new MergeRequest($files);
+                $request = new Gotenberg\MergeRequest($files);
                 $pdfGenerator->store($request, $filename);
                 foreach ($files as $file) {
                     unlink($tempDir . '/' . $file->getFileName());
