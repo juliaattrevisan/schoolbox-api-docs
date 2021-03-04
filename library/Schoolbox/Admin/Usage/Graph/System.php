@@ -55,7 +55,7 @@ class System
             SELECT
                 'CMS Resources' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT * FROM file GROUP BY hash) f   
+            FROM (SELECT DISTINCT hash FROM file) f   
             INNER JOIN storage ON f.hash = storage.hash
             
             UNION
@@ -63,7 +63,7 @@ class System
             SELECT
                 'Student Submissions' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT * FROM student_submission_file GROUP BY hash) f   
+            FROM (SELECT DISTINCT hash FROM student_submission_file) f   
             INNER JOIN storage ON f.hash = storage.hash
             
             UNION
@@ -71,7 +71,7 @@ class System
             SELECT
                 'Submission Returns' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT * FROM submission_return_file GROUP BY hash) f   
+            FROM (SELECT DISTINCT hash FROM submission_return_file) f   
             INNER JOIN storage ON f.hash = storage.hash
             
             UNION
@@ -79,8 +79,8 @@ class System
             SELECT
                 'Tasks' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT * FROM task_file GROUP BY storage_id) f   
-            INNER JOIN storage ON f.storage_id = storage.hash
+            FROM (SELECT DISTINCT storage_id AS hash FROM task_file) f   
+            INNER JOIN storage ON f.hash = storage.hash
             
             UNION
             
