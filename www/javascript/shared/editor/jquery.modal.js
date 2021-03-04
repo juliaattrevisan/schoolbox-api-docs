@@ -371,6 +371,11 @@
                 /* When you select a file via Resource Browser
                  */
                 url = config.url.storage + hash;
+            } else if (filesystem === 'office365') {
+
+                /* When you select a file via Office365
+                 */
+                url = config.url.storage + hash;
             } else if (filesystem === 'myfile') {
 
                 /* When you select a My File
