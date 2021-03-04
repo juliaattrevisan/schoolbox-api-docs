@@ -5,7 +5,6 @@ import { VueGoodTable } from 'vue-good-table';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
 import { fetchAsJson } from '@shared/fetch/fetch';
-// import moment from 'moment';
 import { format, parseISO } from 'date-fns';
 
 export default {
@@ -65,15 +64,15 @@ export default {
 					formatFn: this.formatLastUpdated
 				},
 				{
-					label: 'pageIndex',
+					label: 'pageIndex', //to assist in shift-selection
 					field: 'pageIndex',
 					hidden: true
 				}
       		],
             rowsToDelete: [], //keep track of which rows could be deleted
 			isShiftKeySelected: false, //to multi-select fields,
-			checkCount: 0, //to increment on every consecutive row selection, to monitor for shift-select rows
-			uncheckCount: 0, //to increment on every consecutive row de-selection, to monitor for shift-select rows
+			hasShiftKeySelected: false, //to hide a UI note
+			consecutiveRowSelectionCount: 0, //to increment on every consecutive row selection, to monitor for shift-select rows
 			currentPage: 1, //which page within pagination is active
 			currentPerPage: 1 //how many rows per pagination
     	};
@@ -82,6 +81,18 @@ export default {
 	mounted () {
 		this.initShiftKeyDetection();
 		this.loadRows();
+	},
+
+	computed: {
+
+		getUsersToDeleteCount () {
+			if (this.rowsToDelete.length > 1) {
+				return this.rowsToDelete.length + ' Users'
+			} else {
+				return this.rowsToDelete.length + ' User';			
+			}
+		}
+
 	},
 
 	methods: {
@@ -116,12 +127,12 @@ export default {
 				this.hasRowsLoaded = true;
 
 				Vue.nextTick()
-				.then(() => {
+				.then(() => { //to ensure it exists in the DOM
 					this.$refs.vueGoodTable.selectAllByPage = false; //defaults to true, not currently provided as a prop, but works as expected
 				});	
 
 			}).catch((error) => {
-				this.hasLoadError = true;
+				this.hasLoadError = true; //display error note in the DOM
 			});
 
 		},
@@ -131,7 +142,6 @@ export default {
          *
          */
 		formatLastUpdated (value) {
-			// return moment(value).format(this.dateFormat); //need to update 'momentJsFormat' to new date strings
 			return format(parseISO(value), 'dd/LL/yyyy');
 		},
 
@@ -140,8 +150,7 @@ export default {
          *
          */
 		onSortChange () {
-			this.checkCount = 0;
-			this.uncheckCount = 0;
+			this.consecutiveRowSelectionCount = 0;
 		},
 
 		/**
@@ -150,8 +159,7 @@ export default {
          * @param {Object: selectedRows} params
          */
 		onPageChange (params) {
-			this.checkCount = 0;
-			this.uncheckCount = 0;
+			this.consecutiveRowSelectionCount = 0;
             this.currentPage = params.currentPage;
             this.currentPerPage = params.currentPerPage;
 		},
@@ -173,9 +181,9 @@ export default {
 		 * @param {Object} params
          */
 		checkRowSelection (params) {
-			if (params.selected) { //if the rows not in yet, add it in
+			if (params.selected) { //whether the row is selected or not
 				this.addRow(params);
-			} else { //if the row is in, pull it out
+			} else { 
 				this.removeRow(params)
 			}
 		},
@@ -186,11 +194,10 @@ export default {
 		 * @param {Object} params 
          */
 		addRow (params) {
-			if (!this.rowsToDelete.some(rowToDelete => rowToDelete.id === params.row.id)) {
-				this.checkCount++;
-				this.uncheckCount = 0;
-				params.row.pageIndex = params.pageIndex + ((this.currentPage-1) * this.currentPerPage);
+			if (!this.rowsToDelete.some(rowToDelete => rowToDelete.id === params.row.id)) { //not already in
 				this.rowsToDelete.push(params.row);
+				params.row.pageIndex = params.pageIndex + ((this.currentPage-1) * this.currentPerPage);  //to track which rows to select if shift-select
+				this.consecutiveRowSelectionCount++;
 			}
 		},
 
@@ -200,22 +207,25 @@ export default {
 		 * @param {Object} params
          */
 		removeRow (params) {
-			if (this.rowsToDelete.some(rowToDelete => rowToDelete.id === params.row.id)) {
-				this.checkCount = 0;
-				this.uncheckCount++;
+			if (this.rowsToDelete.some(rowToDelete => rowToDelete.id === params.row.id)) { //is in already
+				this.rowsToDelete = this.rowsToDelete.filter(rowToDelete => rowToDelete.id !== params.row.id); //return all but matching id
 				params.row.pageIndex = params.pageIndex + ((this.currentPage-1) * this.currentPerPage);
-				this.rowsToDelete = this.rowsToDelete.filter(rowToDelete => rowToDelete.id !== params.row.id);
+				this.consecutiveRowSelectionCount = 0;
 			}
 		},
 
 		/**
          * allow easier selection of rows with shift-select
+		 * retrieve all rows in between the last two selections 
+		 * and set them as selected when shift is pressed
          *
          */
 		checkForShiftSelectRows () {
             
-			if (this.isShiftKeySelected && this.checkCount >= 2)  {
+			if (this.isShiftKeySelected && this.consecutiveRowSelectionCount >= 2)  {
 				
+				this.hasShiftKeySelected = true;
+
 				const rowsInCurrentOrder = this.$refs.vueGoodTable.filteredRows[0].children; //the current row list, as reflected by current sorting
 
 				const previousCheckedRowIndex = this.rowsToDelete[this.rowsToDelete.length - 2].pageIndex;
@@ -231,7 +241,7 @@ export default {
 				rowsBetweenSelection.forEach( row => {
 					if (!this.rowsToDelete.some(rowToDelete => rowToDelete.id === row.id)) { //if it's not already in, add it in
 						this.$set(row, 'vgtSelected', true);
-						this.rowsToDelete.unshift(row); //to not impact previousCheckedRow on possible further shift-selections
+						this.rowsToDelete.unshift(row); //to not impact previousCheckedRowIndex on possible further shift-selections
 					}
 				} );
 
@@ -239,24 +249,6 @@ export default {
 
 		},
 
-		/**
-         * to keep track of the rows to delete
-         *
-         * @param {Object: selectedRows} params
-         */
-		onSelectedRowsChange (params) {
-            // this.rowsToDelete = params.selectedRows;
-		},
-
-        /**
-         * to keep track of the rows to delete
-         *
-         * @param {Object: selectedRows} params
-         */
-		onSelectedRowsChange (params) {
-            // this.rowsToDelete = params.selectedRows;
-		},
-		
         /**
          * to ensure ALL items, not just those within 
          * the current pagination group are selected
@@ -334,10 +326,10 @@ export default {
 		<vue-good-table
 			v-if="hasRowsLoaded"
 			ref="vueGoodTable"
-			:columns="columns"
-			:rows="rows"
 			styleClass="vgt-table striped bordered"
 			compactMode
+			:columns="columns"
+			:rows="rows"
 			:search-options="{
 				enabled: true,
 				placeholder: 'Search for users...',
@@ -351,7 +343,11 @@ export default {
 			}"
 			:pagination-options="{
 				enabled: true,
-				perPage: 50
+				perPage: 50,
+				perPageDropdown: [50, 100, 200],
+				rowsPerPageLabel: 'Users per page',
+				infoFn: (params) => `${params.firstRecordOnPage} - ${params.lastRecordOnPage} of ${params.totalRecords} Users`,s
+
 			}"
 			:select-options="{ 
 				enabled: true,
@@ -360,7 +356,6 @@ export default {
 			@on-sort-change="onSortChange"
 			@on-page-change="onPageChange"
 			@on-row-click="onRowClick"
-			@on-selected-rows-change="onSelectedRowsChange"
 			@on-select-all="onSelectAllRows"
 		>
 			<div slot="emptystate">
@@ -371,7 +366,7 @@ export default {
         <reveal-modal ref="deleteModal">
             <h2>Please confirm</h2>
 			<div data-alert class="alert-box alert">
-                <p>You are about to delete {{ rowsToDelete.length }} user(s). Deleting users will prevent them from logging into the system and from accessing resources that belong to them.  Attached resources that will be removed include; ePortfolio, My Files, Pastoral Records and My Links.  Resources shared with or by the user like Files, Grades, News, Forum Posts and other collaborative activities will remain available.</p>
+                <h4>You are about to delete <strong>{{ getUsersToDeleteCount }}</strong>. Deleting users will prevent them from logging into the system and from accessing resources that belong to them.  Attached resources that will be removed include; ePortfolio, My Files, Pastoral Records and My Links.  Resources shared with or by the user like Files, Grades, News, Forum Posts and other collaborative activities will remain available.</h4>
             </div>
             <ul class="flex-list buttons">
                 <li><a @click.prevent="onConfirmDeleteUsersSelected" class="button submit">Confirm Deletion</a></li>
@@ -380,9 +375,12 @@ export default {
         </reveal-modal>
 		<transition name="slide">
 			<div v-if="rowsToDelete.length > 0" class="delete-container">
-				<h3>{{ rowsToDelete.length }} selected</h3>
-				<button @click.prevent="onDeleteUsersSelected">Delete Users</button>
-				<button @click.prevent="onClearUsersToSelected">Clear Users To Delete</button>
+				<section class="content">
+					<h3><em>{{ getUsersToDeleteCount }} Selected</em></h3>
+					<span v-if="!hasShiftKeySelected" class="shift-select-note">Use Shift+Select to select multiple Users</span>
+					<button @click.prevent="onClearUsersToSelected" class="button-clear">Clear User Selection</button>
+					<button @click.prevent="onDeleteUsersSelected" class="button submit">Delete Users</button>
+				</section>
 			</div>
 		</transition>
 	</div>
@@ -391,6 +389,10 @@ export default {
 <style lang="scss">
 
 @import 'vue-good-table/dist/vue-good-table';
+
+.vgt-wrap {
+	padding-bottom: 100px; //to allow space for .delete-container at the bottom
+}
 
 .vgt-table input[type=checkbox] {
     position: static; 
@@ -408,17 +410,28 @@ export default {
 
 .delete-container {
 	position: fixed;
-	width: calc(100% - 30px);
-	height: 80px;
+	width: 80%;
+	height: 120px;
 	bottom: 0px;
 	border: 1px solid #dcdfe6;
-	padding: 20px;
+	padding: 10px 20px;
 	background: linear-gradient(#f4f5f8, #f1f3f6);
 	h3, button {
 		display: inline-block;
 	}
 	h3 {
-		margin-right: 20px;
+		margin-right: 5px;
+	}
+	.shift-select-note {
+		padding-right: 20px;
+		font-size: 0.8rem;
+		font-style: italic;
+	}
+	.button-clear {
+		padding: 0px;
+		background: none;
+		vertical-align: baseline;
+		font-size: 0.8rem;
 	}
 }
 
