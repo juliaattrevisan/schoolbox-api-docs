@@ -72,4 +72,18 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
+
+
+    /**
+     * Generate payload for Total Usage
+     */
+    public function getTotal(): void
+    {
+        /** @var IConnector $database */
+        $database = $this->getDi()->get('databaseInternal');
+
+        $payload = (new Graph\TotalPayload($database))->generate();
+
+        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+    }
 }
