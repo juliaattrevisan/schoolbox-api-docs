@@ -1,32 +1,27 @@
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">System Usage</h2>
-
-        {% include ('@adminUsage/system.twig') %}
-    </div>
-
-    <div class="small-12 island">
-        <h2 class="subheader">CMS Usage</h2>
-
-        {% include ('@adminUsage/role.twig') %}
-    </div>
-
-    <div class="small-12 island">
+    <div class="small-12 medium-4 island">
         <h2 class="subheader">Total Usage</h2>
-
         {% include ('@adminUsage/total.twig') %}
     </div>
 
-    <div class="small-12 island">
-        <h2 class="subheader">Type Usage</h2>
+    <div class="small-12 medium-4 island">
+        <h2 class="subheader">System Usage</h2>
+        {% include ('@adminUsage/system.twig') %}
+    </div>
 
+    <div class="small-12 medium-4 island">
+        <h2 class="subheader">Type Usage</h2>
         {% include ('@adminUsage/filetype.twig') %}
     </div>
 
     <div class="small-12 island">
-        <h2 class="subheader">Users</h2>
+        <h2 class="subheader">CMS Usage</h2>
+        {% include ('@adminUsage/role.twig') %}
+    </div>
 
+    <div class="small-12 island">
+        <h2 class="subheader">Users</h2>
         {% include ('@adminUsage/user.twig') %}
     </div>
 </div>
