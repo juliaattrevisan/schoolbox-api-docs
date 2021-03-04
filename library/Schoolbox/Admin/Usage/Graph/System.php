@@ -70,6 +70,14 @@ class System
                 COALESCE(SUM(storage.filesize), 0) AS size
             FROM submission_return_file f
             INNER JOIN storage ON f.hash = storage.hash
+            
+            UNION
+            
+            SELECT 
+                'Tasks' AS label,
+                COALESCE(SUM(storage.filesize), 0) AS size
+            FROM task_file f
+            INNER JOIN storage ON f.storage_id = storage.hash
         ";
     }
 }
