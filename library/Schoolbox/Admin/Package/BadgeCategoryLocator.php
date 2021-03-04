@@ -62,14 +62,13 @@ class BadgeCategoryLocator
      */
     public function locate(string $name, User $creator): Category\Model
     {
-        if (isset($this->existingCategories[$name])) {
-            $category = $this->existingCategories[$name];
-        } else {
+        $category = $this->existingCategories->filterBy('name', $name)->first();
+        if (!isset($category)) {
             $category = $this->mapper->createModel()
                                      ->setName($name)
                                      ->setCreatedBy($creator);
             $this->mapper->save($category);
-            $this->existingCategories[$name] = $category;
+            $this->existingCategories[] = $category;
         }
         return $category;
     }
