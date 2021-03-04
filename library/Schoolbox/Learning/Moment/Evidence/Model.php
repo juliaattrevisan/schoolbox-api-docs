@@ -284,6 +284,6 @@ class Model implements ISoftDeletable, IThreadLocation
      */
     public function getCommentNotifier(): ?string
     {
-        return null;
+        return Discussion\Comment\Notifier::class;
     }
 }
