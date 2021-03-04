@@ -81,6 +81,14 @@ class System
                 COALESCE(SUM(storage.filesize), 0) AS size
             FROM (SELECT * FROM task_file GROUP BY storage_id) f   
             INNER JOIN storage ON f.storage_id = storage.hash
+            
+            UNION
+            
+            SELECT
+                'News' AS label,
+                COALESCE(SUM(storage.filesize), 0) AS size
+            FROM (SELECT * FROM comms_news_article_file GROUP BY storage_id) f   
+            INNER JOIN storage ON f.storage_id = storage.hash
         ";
     }
 }
