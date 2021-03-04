@@ -2,6 +2,7 @@
 
 namespace AusGeneralCapabilitiesBadge;
 
+use Schoolbox\Admin\Package\BadgeCategoryLocator;
 use Schoolbox\Admin\Package\IPackageInstall;
 use Schoolbox\Learning\Badge;
 use Schoolbox\Curriculum\Node;
@@ -25,28 +26,17 @@ class Installer implements IPackageInstall
 
         $csv = new CsvReader(__DIR__ . '/' . self::SOURCE_FILE);
         $csv->setLoadFromFirst(true);
-        $badgeMapper    = Badge\Mapper::getInstance();
-        $badgeCatMapper = Badge\Category\Mapper::getInstance();
-        $nodeMapper     = Node\Mapper::getInstance();
+        $badgeMapper          = Badge\Mapper::getInstance();
+        $badgeCategoryLocator = new BadgeCategoryLocator(Badge\Category\Mapper::getInstance());
+        $nodeMapper           = Node\Mapper::getInstance();
 
-        $badgeCategories = $badgeCatMapper->findAll()->indexBy('name');
 
         foreach ($csv as $row) {
             $badge = $badgeMapper->createModel();
-            $badgeCategoryName = $row['Category'];
-            if (isset($badgeCategories[$badgeCategoryName])) {
-                $badgeCategory = $badgeCategories[$badgeCategoryName];
-            } else {
-                $badgeCategory = $badgeCatMapper->createModel()
-                    ->setName($badgeCategoryName)
-                    ->setCreatedBy($user);
-                $badgeCatMapper->save($badgeCategory);
-                $badgeCategories[$badgeCategoryName] = $badgeCategory;
-            }
             $badge->setName($row['Title']);
             $badge->setBody('<p>' . $row['Description'] . '</p>');
             $badge->setIcon('/images/badges' . $row['Image']);
-            $badge->setCategory($badgeCategory);
+            $badge->setCategory($badgeCategoryLocator->locate($row['Category'], $user));
             $badge->setAllowAsGoal((bool)$row['Goal']);
 
             $curriculumCodes = explode(',', $row['Curriculum']);
