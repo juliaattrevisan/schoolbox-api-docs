@@ -74,8 +74,8 @@ class BadgeCategoryLocator
                                      ->setName($name)
                                      ->setCreatedBy($creator);
             $this->mapper->save($category);
-            $this->existingCategories[$lookupName] = $category;
         }
+        $this->existingCategories[$lookupName] = $category;
         return $category;
     }
 }
