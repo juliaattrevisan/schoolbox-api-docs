@@ -13,10 +13,6 @@ use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Aura\Di\Exception\ServiceNotFound;
 use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\RequestOptions;
-use Knp\Snappy\Pdf;
 use Predis\ClientInterface as RedisClient;
 use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
@@ -266,36 +262,6 @@ BASE;
 
 
     /**
-     * Build a PDF generator with sensible settings.
-     *
-     * @return Pdf
-     */
-    private function buildPdfGenerator(): Pdf
-    {
-        $pdfGenerator = new Pdf('/usr/local/bin/wkhtmltopdf');
-
-        // TODO expose more CLI options
-        $pdfGenerator->setTimeout(120);
-        $pdfGenerator->setOption(
-            'orientation',
-            ($this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE) ? 'Landscape' : 'Portrait')
-        );
-        $pdfGenerator->setOption('disable-external-links', true);
-        $pdfGenerator->setOption('viewport-size', 1024);
-
-        if ($this->getOpt(self::OPT_LONG_PRINT_MEDIA_TYPE)) {
-            $pdfGenerator->setOption('print-media-type', true);
-        }
-
-        $userStyleSheet = $this->getOpt(self::OPT_LONG_USER_STYLE_SHEET);
-        if (isset($userStyleSheet)) {
-            $pdfGenerator->setOption('user-style-sheet', $userStyleSheet);
-        }
-        return $pdfGenerator;
-    }
-
-
-    /**
      * Return a username, either from command line options, or by prompting the
      * user.
      *
@@ -488,10 +454,7 @@ BASE;
      */
     private function generatePdf(SourceBundle $pdfSource, string $tempDir, GotenbergClientInterface $pdfGenerator, string $sessionHash): string
     {
-        // Create the PDF
-        $filename = $tempDir . '/' . $pdfSource->getFilename();
-
-
+        $filename          = $tempDir . '/' . $pdfSource->getFilename();
         $maxAttempts       = 10;
         $attempts          = 0;
         $previousException = null;
@@ -507,7 +470,8 @@ BASE;
                 );
 
                 // Gotenberg needs to download each URL individually:
-                // merge appears to not work with URLs
+                // merge appears to not work with URLs.
+                // Just generate a PDF for each URL, then merge them.
                 /** @var Document $files */
                 $files = [];
                 foreach ($pdfSource->getUrls() as $i => $url) {
@@ -523,10 +487,9 @@ BASE;
                     $files[] = DocumentFactory::makeFromPath("$i.pdf", $tempDir . "/$i.pdf");
                 }
 
+                // Merge the intermediary PDFs together, then delete them
                 $request = new MergeRequest($files);
                 $pdfGenerator->store($request, $filename);
-
-                // Cleanup
                 foreach ($files as $file) {
                     unlink($tempDir . '/' . $file->getFileName());
                 }
