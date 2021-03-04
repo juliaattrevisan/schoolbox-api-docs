@@ -509,6 +509,7 @@ BASE;
                 foreach ($pdfSource->getUrls() as $i => $url) {
                     $request = new URLRequest($url);
                     $request->setWaitDelay($jsDelay / 1000);
+                    $request->setLandscape((bool)$this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE));
                     $request->addRemoteURLHTTPHeader('Cookie', sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $sessionHash));
 
                     // Gotenberg doesn't seem to care about the response code.
