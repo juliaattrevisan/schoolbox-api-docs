@@ -72,72 +72,74 @@
     });
 </script>
 
-<div class="row">
+<div class="admin-container row">
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
 
-    <div class="small-12 medium-8 xlarge-6 island">
-        <div class="row">
-            <div class="list-item">
-                <div class="small-12 island">
-                    <h2 class="subheader">Sections</h2>
+    <div class="admin-content">
+        <div class="small-12 island">
+            <div class="row">
+                <div class="list-item">
+                    <div class="small-12 island">
+                        <h2 class="subheader">Sections</h2>
+                    </div>
                 </div>
+                </nav>
             </div>
-            </nav>
-        </div>
-        <section>
-            <ul class="information-list sortable ui-sortable" data-sortable data-list id="sections">
-                {% for section in sections %}
-                    {% if section.title is empty %}
-                        {% set title = sectionName[section.section] %}
-                    {% else %}
-                        {% set title = section.title %}
-                    {% endif %}
+            <section>
+                <ul class="information-list sortable ui-sortable" data-sortable data-list id="sections">
+                    {% for section in sections %}
+                        {% if section.title is empty %}
+                            {% set title = sectionName[section.section] %}
+                        {% else %}
+                            {% set title = section.title %}
+                        {% endif %}
 
-                    <li>
-                        <div class="actions-small-1">
-                            <div class="grip ui-sortable-handle">&nbsp;</div>
-                            <div class="card" data-menu-section="{{ section.section }}" data-item="{{ section.id }}">
-                                <label data-action="{{ routeLookup('adminMenuSide.postSectionModify', {sectionId: section.section, field: 'title'}) }}">
-                                    <input type="text" name="title" value="{{ title }}" data-item-original-value="{{ title }}"
-                                           placeholder="{{ sectionName[section.section] }}" data-item-element/>
-                                </label>
-                                <span class="toast" data-save-item></span>
+                        <li>
+                            <div class="actions-small-1">
+                                <div class="grip ui-sortable-handle">&nbsp;</div>
+                                <div class="card" data-menu-section="{{ section.section }}" data-item="{{ section.id }}">
+                                    <label data-action="{{ routeLookup('adminMenuSide.postSectionModify', {sectionId: section.section, field: 'title'}) }}">
+                                        <input type="text" name="title" value="{{ title }}" data-item-original-value="{{ title }}"
+                                               placeholder="{{ sectionName[section.section] }}" data-item-element/>
+                                    </label>
+                                    <span class="toast" data-save-item></span>
+                                </div>
+                                <div class="card" data-menu-section="{{ section.section }}" data-item="{{ section.id }}">
+                                    <label data-action="{{ routeLookup('adminMenuSide.postSectionModify', {sectionId: section.section, field:'visible'}) }}">
+                                        <select name="visible" data-item-element data-item-original-value="{{ section.visible }}">
+                                            <option {% if not section.visible %}selected{% endif %} value="0">Hidden</option>
+                                            <option {% if section.visible %}selected{% endif %} value="1">Visible</option>
+                                        </select>
+                                    </label>
+                                    <span class="toast" data-save-item></span>
+                                </div>
                             </div>
-                            <div class="card" data-menu-section="{{ section.section }}" data-item="{{ section.id }}">
-                                <label data-action="{{ routeLookup('adminMenuSide.postSectionModify', {sectionId: section.section, field:'visible'}) }}">
-                                    <select name="visible" data-item-element data-item-original-value="{{ section.visible }}">
-                                        <option {% if not section.visible %}selected{% endif %} value="0">Hidden</option>
-                                        <option {% if section.visible %}selected{% endif %} value="1">Visible</option>
-                                    </select>
-                                </label>
-                                <span class="toast" data-save-item></span>
-                            </div>
-                        </div>
-                    </li>
+                        </li>
 
-                {% endfor %}
-            </ul>
-        </section>
-    </div>
-    <div class="small-12 medium-8 xlarge-4 island right">
-        <div class="row actions-small-3">
-            <div class="list-item">
-                <div class="small-12 island">
-                    <h2 class="subheader">
-                        Menu Items
-                        <span class="hint has-tip tip-top" data-tooltip title="Click on any of the menu items below to edit its details.">?</span>
-                    </h2>
-                </div>
-            </div>
-            <nav>
-                <a href="{{ routeLookup('adminMenuSide.getCreate') }}" class="icon-add" title="Add Menu Item"></a>
-            </nav>
-        </div>
-        <section class="content">
-            <section data-role="sideMenuTree">
-                {{ tree | purify }}
+                    {% endfor %}
+                </ul>
             </section>
-        </section>
+        </div>
+        <div class="small-12 island">
+            <div class="row actions-small-3">
+                <div class="list-item">
+                    <div class="small-12 island">
+                        <h2 class="subheader">
+                            Menu Items
+                            <span class="hint has-tip tip-top" data-tooltip title="Click on any of the menu items below to edit its details.">?</span>
+                        </h2>
+                    </div>
+                </div>
+                <nav>
+                    <a href="{{ routeLookup('adminMenuSide.getCreate') }}" class="icon-add" title="Add Menu Item"></a>
+                </nav>
+            </div>
+            <section class="content">
+                <section data-role="sideMenuTree">
+                    {{ tree | purify }}
+                </section>
+            </section>
+        </div>
     </div>
 </div>

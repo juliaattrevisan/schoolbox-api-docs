@@ -56,13 +56,13 @@ $border-bottom-width: 2px;
         width: 100%;
         z-index: 1;
 
-        @media #{$medium-up} {
+        @media #{$large-up} {
           @include box-shadow(10px, 10px, 0, rgba(0,0,0,0.2));
           position: absolute;
           margin-top: -35px;
           right: -100%;
         }
-        @media #{$small-only} {
+        @media #{$medium-down} {
           background-color: $side-nav-link-bg-hover;
         }
       }
@@ -75,7 +75,7 @@ $border-bottom-width: 2px;
       content: "\e64b"; // right caret
       float: right;
 
-      @media #{$small-only} {
+      @media #{$medium-down} {
         transform: rotate(90deg);
       }
     }
@@ -100,12 +100,12 @@ $border-bottom-width: 2px;
     }
   }
 
-  @media #{$medium-up} {
+  @media #{$large-up} {
     .dropdown-btn {
       display: none;
     }
   }
-  @media #{$small-only} {
+  @media #{$medium-down} {
     .admin {
       border-top: 1px solid $accent-foreground;
       display: none;

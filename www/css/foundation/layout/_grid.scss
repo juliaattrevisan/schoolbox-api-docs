@@ -123,7 +123,7 @@ $align-block-grid-to-grid: true;
     > .list-item > .medium-12 {
       @include mobile-padding();
     }
-    > .small-12,
+    .small-12,
     .medium-12 {
       > [class*="actions-"] {
         margin-right: 0;

@@ -1,62 +1,64 @@
-<div class="row">
+<div class="admin-container row">
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
 
-    {% if menu | length == 0 %}
-    <div class="small-12 medium-8 xlarge-9 island">
-        <div class="empty-state">
-            <i class="icon-month-view"></i>
-            <p>Your top menu is empty.</p>
-            <p><a href="{{ routeLookup('adminMenuTop.getCreate') }}" title="Post some news">Create first top menu item</a></p>
-        </div>
-    </div>
-    {% else %}
-    <div class="small-12 medium-8 xlarge-9 island hide" data-tabs-empty>
-        <div class="empty-state">
-            <i class="icon-month-view"></i>
-            <p>Your top menu is empty.</p>
-            <p><a href="{{ routeLookup('adminMenuTop.getCreate') }}" title="Post some news">Create first top menu item</a></p>
-        </div>
-    </div>
-
-    <div class="small-12 medium-8 xlarge-9 island" data-tab>
-        <div class="row actions-small-1">
-            <div class="list-item">
-                <div class="small-12 island">
-                    <h2 class="subheader">Menu Items</h2>
-                </div>
+    <div class="admin-content">
+        {% if menu | length == 0 %}
+        <div class="small-12 island">
+            <div class="empty-state">
+                <i class="icon-month-view"></i>
+                <p>Your top menu is empty.</p>
+                <p><a href="{{ routeLookup('adminMenuTop.getCreate') }}" title="Post some news">Create first top menu item</a></p>
             </div>
-            <nav>
-                <a href="{{ routeLookup('adminMenuTop.getCreate') }}" class="icon-add" title="Add Menu Item"></a>
-            </nav>
+        </div>
+        {% else %}
+        <div class="small-12 hide" data-tabs-empty>
+            <div class="empty-state">
+                <i class="icon-month-view"></i>
+                <p>Your top menu is empty.</p>
+                <p><a href="{{ routeLookup('adminMenuTop.getCreate') }}" title="Post some news">Create first top menu item</a></p>
+            </div>
         </div>
 
-        <section>
-            <ul class="information-list sortable-card ui-sortable" data-sortable="">
-                {% for item in menu %}
-                    <li data-menu-top="{{ item.id }}">
-                        <div class="actions-small-2">
-                            <div class="grip"></div>
-                            <div class="list-item">
-                                <div class="card small-12">
-                                    <a>
-                                        <div class="icon-{{ item.icon }} size-32"></div>
-                                        <h3>{{ item.text }}</h3>
-                                        <p class="meta">{{ item.title }}</p>
-                                    </a>
+        <div class="small-12 island" data-tab>
+            <div class="row actions-small-1">
+                <div class="list-item">
+                    <div class="small-12 island">
+                        <h2 class="subheader">Menu Items</h2>
+                    </div>
+                </div>
+                <nav>
+                    <a href="{{ routeLookup('adminMenuTop.getCreate') }}" class="icon-add" title="Add Menu Item"></a>
+                </nav>
+            </div>
+
+            <section>
+                <ul class="information-list sortable-card ui-sortable" data-sortable="">
+                    {% for item in menu %}
+                        <li data-menu-top="{{ item.id }}">
+                            <div class="actions-small-2">
+                                <div class="grip"></div>
+                                <div class="list-item">
+                                    <div class="card small-12">
+                                        <a>
+                                            <div class="icon-{{ item.icon }} size-32"></div>
+                                            <h3>{{ item.text }}</h3>
+                                            <p class="meta">{{ item.title }}</p>
+                                        </a>
+                                    </div>
                                 </div>
+                                <nav>
+                                    <a class="icon-modify" title="Edit menu item" href="{{ routeLookup('adminMenuTop.getModify', {id: item.id}) }}"></a>
+                                    <a class="icon-delete" data-delete="{{ item.id }}" title="Delete menu item"></a>
+                                </nav>
                             </div>
-                            <nav>
-                                <a class="icon-modify" title="Edit menu item" href="{{ routeLookup('adminMenuTop.getModify', {id: item.id}) }}"></a>
-                                <a class="icon-delete" data-delete="{{ item.id }}" title="Delete menu item"></a>
-                            </nav>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-        </section>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+        {% endif %}
     </div>
-{% endif %}
 </div>
 
 <!-- BEGIN custom_head -->
