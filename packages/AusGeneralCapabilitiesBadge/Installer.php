@@ -29,13 +29,24 @@ class Installer implements IPackageInstall
         $badgeCatMapper = Badge\Category\Mapper::getInstance();
         $nodeMapper     = Node\Mapper::getInstance();
 
+        $badgeCategories = $badgeCatMapper->findAll()->indexBy('name');
 
         foreach ($csv as $row) {
             $badge = $badgeMapper->createModel();
+            $badgeCategoryName = $row['Category'];
+            if (isset($badgeCategories[$badgeCategoryName])) {
+                $badgeCategory = $badgeCategories[$badgeCategoryName];
+            } else {
+                $badgeCategory = $badgeCatMapper->createModel()
+                    ->setName($badgeCategoryName)
+                    ->setCreatedBy($user);
+                $badgeCatMapper->save($badgeCategory);
+                $badgeCategories[$badgeCategoryName] = $badgeCategory;
+            }
             $badge->setName($row['Title']);
             $badge->setBody('<p>' . $row['Description'] . '</p>');
             $badge->setIcon('/images/badges' . $row['Image']);
-            $badge->setCategory($badgeCatMapper->findOneByColumn('name', $row['Category']));
+            $badge->setCategory($badgeCategory);
             $badge->setAllowAsGoal((bool)$row['Goal']);
 
             $curriculumCodes = explode(',', $row['Curriculum']);
