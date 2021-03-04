@@ -28,6 +28,7 @@ use Schoolbox\User;
 use TheCodingMachine\Gotenberg\DocumentFactory;
 use TheCodingMachine\Gotenberg\GotenbergClientInterface;
 use TheCodingMachine\Gotenberg\MergeRequest;
+use TheCodingMachine\Gotenberg\URLRequest;
 use Zend\Uri\Uri;
 use Zend\Uri\UriInterface;
 use ZipArchive;
@@ -489,14 +490,13 @@ BASE;
 //            throw new RuntimeException("Unable to create file: '{$filename}'");
 //        }
 
-        // Set up HTTP client
-        // (Maybe create outside of this method?)
-        $httpClient = new Client([
-            RequestOptions::COOKIES => CookieJar::fromArray(
-                [PipeManager::PHP_SESSION_PREFIX => $sessionHash],
-                $this->generateBaseUrl()->getHost(),
-            ),
-        ]);
+//        // Set up HTTP client
+//        // (Maybe create outside of this method?)
+//        $cookies    = CookieJar::fromArray(
+//            [PipeManager::PHP_SESSION_PREFIX => $sessionHash],
+//            $this->generateBaseUrl()->getHost(),
+//        );
+//        $httpClient = new Client([RequestOptions::COOKIES => $cookies,]);
 
 
         $maxAttempts       = 10;
@@ -512,22 +512,19 @@ BASE;
                 // Create the file, applying the increased delay if necessary
 
                 // Gotenberg version: do I need to download individually then merge?
-                // I can't even use Gotenberg's URL requests, as I cannot provide a cookie.
-                // I'll have to use a HTTP client to download the file, then generate HTML from it
                 $files = [];
                 foreach ($pdfSource->getUrls() as $i => $url) {
-                    try {
-                        $response = $httpClient->get($url);
-                        $files[]  = DocumentFactory::makeFromStream("$i.pdf", $response->getBody());
-                    } catch (GuzzleException $e) {
-                        // Log something
-                        $this->getLogger()->warning($e->getMessage());
-                        $this->getLogger()->warning($e->getTraceAsString());
-                    }
+                    $request = new URLRequest($url);
+                    $request->setWaitDelay($jsDelay / 1000);
+                    $request->addRemoteURLHTTPHeader('Cookie', sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $sessionHash));
+                    $pdfGenerator->store($request, $tempDir . "/$i.pdf");
+                    $files[] = DocumentFactory::makeFromPath("$i.pdf", $tempDir . "/$i.pdf");
                 }
 
                 $request = new MergeRequest($files);
                 $pdfGenerator->store($request, $filename);
+
+                // Cleanup
 
                 break;
             } catch (RuntimeException $e) {
