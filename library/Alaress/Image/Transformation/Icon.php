@@ -50,6 +50,7 @@ class Icon
         NSMapper::NS_UPS                     => 'import',
         NSMapper::NS_NEWS_DISCUSSION_COMMENT => 'comment',
         NSMapper::NS_EVIDENCE                => 'resource',
+        NSMapper::NS_EVIDENCE_COMMENT        => 'resource',
         NSMapper::NS_BADGE                   => 'list',
     ];
 
