@@ -1,0 +1,77 @@
+<script>
+    $(function() {
+        let route = '{{ routeLookupIfAuthorized('adminUsage.getRole') }}';
+
+        $.get(route, function(responseText) {
+            let categories = Array();
+            let values = Array();
+
+            $.each(responseText, function(index, element) {
+                categories.push(element.label);
+                values.push(parseInt(element.size));
+            });
+
+            $('#roleUsage').highcharts({
+                chart: {
+                    spacingRight: 48,
+                    type: 'column',
+                    zoomType: 'xy'
+                },
+
+                credits: {
+                    enabled: false
+                },
+
+                legend: {
+                    enabled: false
+                },
+
+                plotOptions: {
+                    column: {
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return '<span style="color:' + this.series.color + '">' + this.y + '%</span>'
+                            }
+                        }
+                    }
+                },
+
+                time: {
+                    useUTC: false
+                },
+
+                title: {
+                    text: 'Role Usage'
+                },
+
+                tooltip: {
+                    enabled: false
+                },
+
+                xAxis: {
+                    categories: categories
+                },
+
+                yAxis: {
+                    allowDecimals: false,
+                    min: 0,
+                    title: {
+                        text: 'Percentage'
+                    }
+                },
+
+                series: [
+                    {
+                        color: '#82b5d8',
+                        name: '',
+                        data: values
+                    }
+                ]
+            });
+        });
+    });
+</script>
+<section class="content">
+    <div id="roleUsage"></div>
+</section>

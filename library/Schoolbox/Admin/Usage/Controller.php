@@ -58,4 +58,18 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
+
+
+    /**
+     * Generate payload for Role Usage
+     */
+    public function getRole(): void
+    {
+        /** @var IConnector $database */
+        $database = $this->getDi()->get('databaseInternal');
+
+        $payload = (new Graph\RolePayload($database))->generate();
+
+        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+    }
 }
