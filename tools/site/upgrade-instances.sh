@@ -45,6 +45,7 @@ function help(){
   echo "Args:"
   echo "  --is-primary-host  Required. Is this a primary (1) or non-primary (0) host."
   echo "                               (Primary host has daemons/crons + runs SQL updates)"
+  echo "  --instance-id      Optional. The instance id to run the upgrade against"
   echo "  -v,--verbose       Optional. Log with increased verbosity"
   echo "  -h,--help          Optional. Print this help message and exit"
 }
@@ -81,6 +82,10 @@ function parse_args() {
           shift;
         fi
         ;;
+      --instance-id)
+        instance_list=$2
+        shift; shift;
+        ;;
       *)
         error "Unrecognised option '$1'"
         errors=1
@@ -111,10 +116,18 @@ function parse_global_vars(){
     error "You must specify if this is a primary using the --is-primary-host [0|1] flag"
     exit 1
   fi
-  if ! instance_list=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option instance-list | sort); then
-    error "Unable to parse instance list from ini file: '/etc/$package/instances.ini'"
-    exit 1;
+  if [[ -z $instance_list ]]; then
+    if ! instance_list=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option instance-list | sort); then
+      error "Unable to parse instance list from ini file: '/etc/$package/instances.ini'"
+      exit 1;
+    fi
   fi
+  for i in $instance_list; do
+    if ! INSTANCE_ID=$i schoolbox-read-instances --ini "/etc/$package/instances.ini" --option INSTANCE_ID; then
+      error "instance id $i is invalid!"
+      exit 1;
+    fi
+  done
   debug "site_root: '$site_root'"
   debug "package: '$package'"
   debug "instance_list: $(echo -e "$instance_list" | tr '\n' ' ')"
@@ -227,7 +240,9 @@ function rebuild_and_restart_daemons(){
     else
       /usr/local/bin/schoolbox-rebuild-daemons --fetch
     fi
-    ${package}cloud-restart-daemons;
+    for instance in $instance_list; do
+      ${package}cloud-restart-daemons "$instance";
+    done
   else
     log "---skipping daemon restart on secondary host---";
   fi
