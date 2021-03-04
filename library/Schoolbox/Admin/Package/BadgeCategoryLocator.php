@@ -30,17 +30,26 @@ class BadgeCategoryLocator
     /**
      * Collection of existing categories: not initialised until `locate` is
      * called.
+     *
+     * @var GenericCollection|Category\Model[]
      */
-    private ?GenericCollection $categories;
+    private GenericCollection $existingCategories;
 
     /**
      * Constructor
      *
      * @param Category\Mapper $mapper
      */
-    public function __construct(Category\Mapper $mapper)
+    /**
+     * Constructor
+     *
+     * @param Category\Mapper                    $mapper
+     * @param GenericCollection|Category\Model[] $existingCategories
+     */
+    public function __construct(Category\Mapper $mapper, GenericCollection $existingCategories)
     {
-        $this->mapper = $mapper;
+        $this->mapper             = $mapper;
+        $this->existingCategories = $existingCategories;
     }
 
     /**
@@ -53,18 +62,14 @@ class BadgeCategoryLocator
      */
     public function locate(string $name, User $creator): Category\Model
     {
-        if (!$this->categories) {
-            $this->categories = $this->mapper->findAll()->indexBy('name');
-        }
-
-        if (isset($this->categories[$name])) {
-            $category = $this->categories[$name];
+        if (isset($this->existingCategories[$name])) {
+            $category = $this->existingCategories[$name];
         } else {
             $category = $this->mapper->createModel()
                                      ->setName($name)
                                      ->setCreatedBy($creator);
             $this->mapper->save($category);
-            $this->categories[$name] = $category;
+            $this->existingCategories[$name] = $category;
         }
         return $category;
     }

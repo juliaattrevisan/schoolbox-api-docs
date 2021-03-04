@@ -27,7 +27,8 @@ class Installer implements IPackageInstall
         $csv = new CsvReader(__DIR__ . '/' . self::SOURCE_FILE);
         $csv->setLoadFromFirst(true);
         $badgeMapper          = Badge\Mapper::getInstance();
-        $badgeCategoryLocator = new BadgeCategoryLocator(Badge\Category\Mapper::getInstance());
+        $badgeCategoryMapper  = Badge\Category\Mapper::getInstance();
+        $badgeCategoryLocator = new BadgeCategoryLocator($badgeCategoryMapper, $badgeCategoryMapper->findAll());
         $nodeMapper           = Node\Mapper::getInstance();
 
 
