@@ -346,7 +346,7 @@ export default {
 				perPage: 50,
 				perPageDropdown: [50, 100, 200],
 				rowsPerPageLabel: 'Users per page',
-				infoFn: (params) => `${params.firstRecordOnPage} - ${params.lastRecordOnPage} of ${params.totalRecords} Users`,s
+				infoFn: (params) => `${params.firstRecordOnPage} - ${params.lastRecordOnPage} of ${params.totalRecords} Users`,
 
 			}"
 			:select-options="{ 
