@@ -8,9 +8,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Usage;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
-
 
 /**
  * Class Controller
@@ -38,11 +38,15 @@ class Controller extends Base
 
 
     /**
-     * Provide form
+     * Generate payload for System Usage
      */
     public function getSystem(): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/system.twig', [
-        ])->setTitle('System Usage'));
+        /** @var IConnector $database */
+        $database = $this->getDi()->get('databaseInternal');
+
+        $payload = (new Graph\SystemPayload($database))->generate();
+
+        $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
 }

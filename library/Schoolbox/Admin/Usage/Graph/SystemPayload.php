@@ -5,6 +5,8 @@
  */
 declare(strict_types=1);
 
+namespace Schoolbox\Admin\Usage\Graph;
+
 use Alaress\Database\Connector\IConnector;
 
 
@@ -23,7 +25,7 @@ use Alaress\Database\Connector\IConnector;
  * My Files
  * Tiles
  */
-class System
+class SystemPayload
 {
 
     /**
@@ -42,6 +44,7 @@ class System
         $this->database = $database;
     }
 
+
     /**
      * Generate the result set for file usage
      * in each of the areas (label, quantity)
@@ -49,7 +52,7 @@ class System
      * Note that some tables such as task_files can have multiple occurrences
      * of a file hash (ie. a file gets uploaded multiple times with different names)
      */
-    public function generate()
+    public function generate(): array
     {
         $query = "
             SELECT
@@ -124,5 +127,15 @@ class System
             FROM (SELECT DISTINCT background_image_hash AS hash FROM tile) f   
             INNER JOIN storage ON f.hash = storage.hash  
         ";
+
+        $result = $this->database->executeQuery($query);
+
+        $stack = [];
+
+        while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
+            $stack[] = $row;
+        }
+
+        return $stack;
     }
 }
