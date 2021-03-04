@@ -38,6 +38,15 @@ class Controller extends Base
 
 
     /**
+     * Container for all the graphs and tables
+     */
+    public function getIndex(): void
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/index.twig', []));
+    }
+
+
+    /**
      * Generate payload for System Usage
      */
     public function getSystem(): void

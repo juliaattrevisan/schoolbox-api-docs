@@ -44,6 +44,7 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
+        $this->register('GET', '', 'getIndex', $getPerms);
         $this->register('GET', '/system', 'getSystem', $getPerms);
     }
 
