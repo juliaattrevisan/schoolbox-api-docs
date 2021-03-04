@@ -249,10 +249,14 @@ abstract class App extends BaseApp
 
     $yellow--user-style-sheet=STYLE_FILE$white
         Filename of a style sheet to load with every page.
+        This option is not currently supported: use custom print styles within
+        Schoolbox instead.
 
     $yellow--print-media-type$white
         If set, generate PDFs using the print media type and its styles;
         otherwise, PDFs will be generated using the screen media type.
+        This option is not currently supported: PDFs will always be generated
+        with the print media type.
 
     $yellow--orientation-landscape$white
         If set, generate PDFs in landscape orientation: by default, they will be
