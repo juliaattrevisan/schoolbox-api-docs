@@ -2,12 +2,6 @@
     $(function () {
         var form = $('form#itemForm');
 
-        $('[data-cancel]').click(function () {
-            window.location.href = '{{ routeLookup('adminMenuSide.getIndex') }}';
-            return false;
-        });
-
-
         $('[data-submit]').click(function () {
             form.alaressValidate({
                 ignore: ':disabled',
@@ -136,10 +130,7 @@
     </div>
     <div class="row">
         <div class="small-12 column">
-            <ul class="flex-list buttons">
-                <li><button data-cancel class="button">Cancel</button></li>
-                <li><input data-submit type="submit" value="Save"></li>
-            </ul>
+            <input data-submit type="submit" value="Save">
         </div>
     </div>
 </form>
