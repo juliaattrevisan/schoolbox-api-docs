@@ -33,14 +33,15 @@ class TestApp extends App
     CLI PDF Generation Test App
 
 SYNOPSIS:
-    $green{$file} {$yellow}[OPTION]...$white
+    $green{$file} {$yellow}[OPTION]... [PATH]...$white
 
 DESCRIPTION
-    A proof-of-concept application for generating an archive of PDFs from
-    Schoolbox content.
+    A test application for generating an archive of PDFs from Schoolbox content.
 
-    This application simply generates a PDF of the dashboard for the
-    authenticated user.
+    Each PATH will be added to the PDF; if no paths are provided, the PDF will
+    contain only the user's dashboard.
+    (PATHs may only be provided as relative to Schoolbox's base URL; any PATH
+    which is not relative will raise an error.)
 
 OPTIONS
 $baseOptionHelp
@@ -52,6 +53,8 @@ EXAMPLES:
  * Append log to export.log, output to archive.zip
       $file 2>> export.log 1> archive.zip
       $file -l export.log -o archive.zip
+ * Output /, /calendar, /resources to archive.zip
+      $file -l export.log -o archive.zip / /calendar /resources
 ";
         fwrite(STDOUT, $help);
     }
