@@ -86,14 +86,14 @@ export default {
     methods: {
 
         /**
-         * Setup data that is passed through as Props 
+         * Setup data that is passed through as Props
          *
          */
         initDataFromProps () {
             this.threadId = this.threadIdOnLoad;
             this.isThreadCheckboxVisible = this.isThreadCheckboxVisibleOnLoad;
             this.isThreadCheckboxEnabled = this.isThreadCheckboxEnabledOnLoad;
-            this.isThreadEnabled = this.isThreadEnabledOnLoad; 
+            this.isThreadEnabled = this.isThreadEnabledOnLoad;
         },
 
         /**
@@ -101,7 +101,7 @@ export default {
          *
          */
         getThread () {
-            
+
             this.isProcessActive = true;
 
             // Short-circuit if no thread ID
@@ -117,13 +117,13 @@ export default {
                     cursor: this.cursorNext
                 }
             }).then((response) => {
-                
+
                 const responseData = response.data;
 
                 responseData.data.forEach((data) => {
                     this.comments.push(data);
                 });
-                
+
                 this.totalCommentsCount = responseData.metadata.count;
                 this.cursorNext = responseData.metadata.cursor.next;
 
@@ -136,11 +136,11 @@ export default {
                 this.showLoadMoreButton = this.comments.length < responseData.metadata.count;
 
                 /**
-                 * If the user has the rights to modify the thread, despite that there's comments, 
+                 * If the user has the rights to modify the thread, despite that there's comments,
                  * comments section must be rendered
                  */
-                this.showCommentsSection = (this.isThreadCheckboxVisible || this.totalCommentsCount > 0 || this.isThreadEnabled);                
-                
+                this.showCommentsSection = (this.isThreadCheckboxVisible || this.totalCommentsCount > 0 || this.isThreadEnabled);
+
             }).catch((error) => {
                 this.isInitialLoad = false;
                 this.$refs.toast.activate('Unable to load comments');
@@ -172,14 +172,14 @@ export default {
          * @param {event} to determine the status
          */
         changeThreadStatus (event) {
-            
+
             this.isThreadEnabled = event.target.checked;
 
             let changeThreadStatusAction;
             if (this.threadId) {
                 // I already have a thread ID: switch it on/off
                 changeThreadStatusAction = new Promise((resolve, reject) => {
-                    
+
                     let changeThreadStatusEndpoint = '/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/';
                     if (this.isThreadEnabled) {
                         changeThreadStatusEndpoint += 'open';
@@ -230,15 +230,15 @@ export default {
         loadCKEditor () {
 
             //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
-            this.isCKEditorLoading = true;    
+            this.isCKEditorLoading = true;
 
             const loadScripts = async () => {
-                
+
                 try {
 
                     await this.injectScript('/javascript/ckeditor/ckeditor.js?v=' + this.siteVersion);
                     await this.injectScript('/javascript/shared/editor/jquery.editor.js?v=' + this.siteVersion);
-                    
+
                     $.fn.alaressEditor({
                         targetElements: $('#comment'),
                         startupFocus: true,
@@ -288,7 +288,7 @@ export default {
         },
 
         /**
-         * Comments can contain media elements, 
+         * Comments can contain media elements,
          * so ensure they display properly
          *
          */
@@ -309,8 +309,8 @@ export default {
                 });
             });
 
-            this.initMediaElementPlayers();    
-            
+            this.initMediaElementPlayers();
+
         },
 
         /**
@@ -330,14 +330,14 @@ export default {
          *
          */
         postComment () {
-            
+
             this.isProcessActive = true;
             this.$refs.toast.activate('Posting comment...');
 
             axios.post('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments', {
                 content: this.newComment
             }).then((response) => {
-               
+
                 this.comments.unshift(response.data);
                 this.totalCommentsCount++;
 
@@ -374,7 +374,7 @@ export default {
          * @param {event} to determine the status
          */
         deleteComment () {
-            
+
             this.isProcessActive = true;
             this.$refs.toast.activate('Deleting comment...');
 
@@ -382,7 +382,7 @@ export default {
 
             // Need the commentIdToDelete, so needs to be constructed manually?
             axios.delete('/discussion/comms/' + this.articleId + '/comments/' + commentIdToDelete, {}, { headers: this.postHeaders }).then(() => {
-                
+
                 this.comments.splice(this.commentIndexToDelete, 1);
                 this.totalCommentsCount--;
 
@@ -394,7 +394,7 @@ export default {
                 this.initMediaElementPlayers();
 
                 this.$refs.deleteModal.close();
-                
+
                 this.$refs.toast.timeout('Comment deleted', true);
                 this.isProcessActive = false;
 
@@ -457,7 +457,7 @@ export default {
                     </div>
                 </template>
                 <template v-if="isInitialLoad">
-                    <ul class="information-list social-stream">
+                    <ul class="information-list">
                         <li class="actions-small-1" v-for="n in 3" :key="n">
                             <div class="list-item">
                                 <div class="small-12 card skeleton">
@@ -470,7 +470,7 @@ export default {
                     </ul>
                 </template>
                 <template v-else>
-                    <ul class="information-list social-stream">
+                    <ul class="information-list">
                         <li class="actions-small-2" v-for="(comment, index) in comments" :key="index">
                             <div class="list-item">
                                 <div class="card compact small-12">
