@@ -116,6 +116,13 @@ class System
             FROM (SELECT DISTINCT hash FROM myFile) f   
             INNER JOIN storage ON f.hash = storage.hash
             
+            UNION
+            
+            SELECT
+                'Tiles' AS label,
+                COALESCE(SUM(storage.filesize), 0) AS size
+            FROM (SELECT DISTINCT background_image_hash AS hash FROM tile) f   
+            INNER JOIN storage ON f.hash = storage.hash  
         ";
     }
 }
