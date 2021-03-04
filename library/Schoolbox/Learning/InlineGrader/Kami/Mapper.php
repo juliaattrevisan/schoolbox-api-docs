@@ -46,8 +46,6 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString(): string
     {
-        /** @var IQuoter $db */
-        $db                   = $this->getDatabase();
         $submissionFileMapper = $this->getJoinMapper('file');
 
         return "
@@ -55,7 +53,7 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$submissionFileMapper->getColumnString('f')},
                 {$submissionFileMapper->getJoinColumnString('storage', 's')}
-            FROM {$db->quoteIdentifier($this->getTable())}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('file', '', 'f', true)}
             INNER JOIN {$submissionFileMapper->getJoinSql('storage', 'f', 's', true)}
         ";
