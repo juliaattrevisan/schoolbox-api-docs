@@ -22,7 +22,7 @@ class ValidFiles
      *
      * @var array
      */
-    private $validDocuments = [
+    public static $validDocuments = [
         'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'doc'  => 'application/msword',
         'pdf'  => 'application/pdf',
@@ -47,11 +47,11 @@ class ValidFiles
      * @param string $documentName
      * @return bool
      */
-    public function isPlagscannable($documentName): bool
+    public function isPlagscannable(string $documentName): bool
     {
         $documentExtension = strtolower(pathinfo($documentName, PATHINFO_EXTENSION));
 
-        if (isset($this->validDocuments[$documentExtension])) {
+        if (isset(self::$validDocuments[$documentExtension])) {
             return true;
         }
 
@@ -64,10 +64,10 @@ class ValidFiles
      * @param string $documentName
      * @return string|null
      */
-    public function getMime($documentName)
+    public function getMime(string $documentName)
     {
         $documentExtension = pathinfo($documentName, PATHINFO_EXTENSION);
 
-        return $this->validDocuments[$documentExtension];
+        return self::$validDocuments[$documentExtension];
     }
 }
