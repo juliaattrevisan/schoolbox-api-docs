@@ -1,6 +1,6 @@
 <script>
     $(function() {
-        let route = '{{ routeLookupIfAuthorized('adminUsage.getTotal') }}';
+        let route = '{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}';
 
         $.get(route, function(responseText) {
             let categories = Array();

@@ -49,7 +49,7 @@ class Controller extends Base
     /**
      * Generate payload for System Usage
      */
-    public function getSystem(): void
+    public function getSystemPayload(): void
     {
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
@@ -63,7 +63,7 @@ class Controller extends Base
     /**
      * Generate payload for Role Usage
      */
-    public function getRole(): void
+    public function getRolePayload(): void
     {
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
@@ -77,12 +77,26 @@ class Controller extends Base
     /**
      * Generate payload for Total Usage
      */
-    public function getTotal(): void
+    public function getTotalPayload(): void
     {
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
 
         $payload = (new Graph\TotalPayload($database))->generate();
+
+        $this->getResponse()->content->set($this->buildJsonOutput($payload));
+    }
+
+
+    /**
+     * Generate payload for User Usage
+     */
+    public function getUserPayload(): void
+    {
+        /** @var IConnector $database */
+        $database = $this->getDi()->get('databaseInternal');
+
+        $payload = (new Graph\UserPayload($database))->generate();
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }

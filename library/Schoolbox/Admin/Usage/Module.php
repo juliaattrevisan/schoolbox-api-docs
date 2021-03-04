@@ -45,9 +45,10 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getIndex', $getPerms);
-        $this->register('GET', '/system', 'getSystem', $getPerms);
-        $this->register('GET', '/role', 'getRole', $getPerms);
-        $this->register('GET', '/total', 'getTotal', $getPerms);
+        $this->register('GET', '/system', 'getSystemPayload', $getPerms);
+        $this->register('GET', '/role', 'getRolePayload', $getPerms);
+        $this->register('GET', '/total', 'getTotalPayload', $getPerms);
+        $this->register('GET', '/user', 'getUserPayload', $getPerms);
     }
 
 
