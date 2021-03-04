@@ -18,6 +18,7 @@ use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App as BaseApp;
 use Schoolbox\Auth\Remote\RemoteLogin;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\User;
@@ -62,10 +63,6 @@ abstract class App extends BaseApp
     // should landscape orientation be used? If not default to portrait
     private const OPT_LONG_ORIENTATION_LANDSCAPE = 'orientation-landscape';
 
-    // Which host and port does the Gotenberg API URL run on?
-    private const OPT_LONG_GOTENBERG_API_URL = 'gotenberg-api-url:';
-    private const DEFAULT_GOTENBERG_API_URL = 'http://localhost:3000';
-
     // Exit status for an authentication failure
     private const EXIT_STATUS_AUTHENTICATION_FAILURE = 100;
 
@@ -98,7 +95,6 @@ abstract class App extends BaseApp
             self::OPT_LONG_USER_STYLE_SHEET,
             self::OPT_LONG_PRINT_MEDIA_TYPE,
             self::OPT_LONG_ORIENTATION_LANDSCAPE,
-            self::OPT_LONG_GOTENBERG_API_URL,
         ];
     }
 
@@ -144,9 +140,7 @@ abstract class App extends BaseApp
 
 
         // Build a PDF generator object
-        $pdfGenerator = new Gotenberg\Client(
-            $this->getOpt(self::OPT_LONG_GOTENBERG_API_URL) ?? self::DEFAULT_GOTENBERG_API_URL
-        );
+        $pdfGenerator = new Gotenberg\Client($this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_HOST));
 
 
         // Generate all PDFs
@@ -201,7 +195,6 @@ abstract class App extends BaseApp
     {
         $defaultMaxFails        = self::DEFAULT_MAX_FAILS;
         $defaultJsDelay         = self::DEFAULT_JS_DELAY;
-        $defaultGotenbergApiUrl = self::DEFAULT_GOTENBERG_API_URL;
         $white                  = self::COLOUR_WHITE;
         $yellow                 = self::COLOUR_YELLOW;
 
@@ -261,10 +254,6 @@ abstract class App extends BaseApp
     $yellow--orientation-landscape$white
         If set, generate PDFs in landscape orientation: by default, they will be
         generated in portrait orientation.
-
-    $yellow--gotenberg-api-url$white
-        The URL of the Gotenberg API (used internally to generate PDFs).
-        Defaults to $defaultGotenbergApiUrl.
 BASE;
     }
 
