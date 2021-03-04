@@ -54,6 +54,14 @@ class System
                 SUM(storage.filesize) AS size 
             FROM `file` f
             INNER JOIN storage ON f.hash = storage.hash
+            
+            UNION
+            
+            SELECT
+                'Student Submissions' AS label,
+                SUM(storage.filesize) AS size
+            FROM student_submission_file f
+            INNER JOIN storage ON f.hash = storage.hash
         ";
     }
 }
