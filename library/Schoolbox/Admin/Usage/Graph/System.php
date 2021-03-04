@@ -53,9 +53,9 @@ class System
     {
         $query = "
             SELECT
-                'CMS Resources' AS label, 
+                'CMS Resources' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM `file` f
+            FROM (SELECT * FROM file GROUP BY hash) f   
             INNER JOIN storage ON f.hash = storage.hash
             
             UNION
@@ -63,15 +63,15 @@ class System
             SELECT
                 'Student Submissions' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM student_submission_file f
+            FROM (SELECT * FROM student_submission_file GROUP BY hash) f   
             INNER JOIN storage ON f.hash = storage.hash
             
             UNION
             
-            SELECT 
+            SELECT
                 'Submission Returns' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM submission_return_file f
+            FROM (SELECT * FROM submission_return_file GROUP BY hash) f   
             INNER JOIN storage ON f.hash = storage.hash
             
             UNION
