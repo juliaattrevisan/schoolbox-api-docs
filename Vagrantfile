@@ -26,6 +26,7 @@ puppet_dir = default["puppet_dir"]
 puppet_debug = default["puppet_debug"]
 instance_registry_url_override = default["instance_registry_url_override"]
 instance_registry_api_key = default["instance_registry_api_key"]
+instance_id_env_var = default["instance_id_env_var"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -84,6 +85,9 @@ if File.file?('vagrant.yaml')
   end
   if !conf["instance_registry_api_key"].nil?
     instance_registry_api_key = conf["instance_registry_api_key"]
+  end
+  if !conf["instance_id_env_var"].nil?
+    instance_id_env_var = conf["instance_id_env_var"]
   end
 end
 
@@ -145,7 +149,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "shell" do |s|
     s.path = "#{provision_script}"
-    s.args = "#{data_source} \"#{data_filename}\" #{external_db} #{external_db_host} #{external_db_db} #{enable_xdebug}"
+    s.args = "#{data_source} \"#{data_filename}\" #{external_db} #{external_db_host} #{external_db_db} #{enable_xdebug} #{instance_id_env_var}"
   end
   config.vm.provision "shell", run: "always", path: "tools/vagrant-restart.sh"
 end
