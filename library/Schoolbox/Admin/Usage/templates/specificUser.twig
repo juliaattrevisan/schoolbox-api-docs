@@ -1,21 +1,24 @@
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <div class="row">
-    <h2 class="subheader">Usage for...</h2>
+    <div class="small-12 columns">
+        <h2 class="subheader">Usage for <a href="/search/user{{ user.id }}">{{ user.fullname }}</a></h2>
+    </div>
+
     <div class="small-12 island">
-        {% include ('@adminUsage/specificUser/total.twig') %}
+        {% include '@adminUsage/specificUser/total.twig' with {user: user} %}
     </div>
 
     <div class="small-12 medium-6 island">
-        {% include ('@adminUsage/specificUser/system.twig') %}
+        {% include '@adminUsage/specificUser/system.twig' with {user: user} %}
     </div>
 
     <div class="small-12 medium-6 island">
-        {% include ('@adminUsage/specificUser/filetype.twig') %}
+        {% include '@adminUsage/specificUser/filetype.twig' with {user: user} %}
     </div>
 
     <div class="small-12 island">
         <h2 class="subheader">Users</h2>
-        {% include ('@adminUsage/specificUser/user.twig') %}
+        {% include '@adminUsage/specificUser/user.twig' with {user: user} %}
     </div>
 </div>
 

@@ -52,10 +52,13 @@ class Controller extends Base
     /**
      * Container for all the graphs and tables
      * These are graphs for a user's Specific Usage across the system
+     * @param User $user
      */
-    public function getSpecificUser(): void
+    public function getSpecificUser(User $user): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/specificUser.twig', []));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/specificUser.twig', [
+            'user' => $user
+        ]));
     }
 
 

@@ -14,7 +14,11 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\UserMapper;
 
 
 /**
@@ -44,6 +48,10 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
+        $preloadUser = function (array $params) {
+            return $this->preloadUser($params);
+        };
+
         $this->register('GET', '', 'getIndex', $getPerms);
 
         /* Global Usage payload endpoints
@@ -56,11 +64,33 @@ class Module extends BaseModule
 
         /* Specific Usage payload endpoints
          */
-        $this->register('GET', '/specific/{userId}', 'getSpecificUser', $getPerms);
-        $this->register('GET', '/specific/{userId}/system', 'getSpecificUserSystemPayload', $getPerms);
-        $this->register('GET', '/specific/{userId}/total', 'getSpecificUserTotalPayload', $getPerms);
-        $this->register('GET', '/specific/{userId}/user', 'getSpecificUserUserPayload', $getPerms);
-        $this->register('GET', '/specific/{userId}/type', 'getSpecificUserFileTypePayload', $getPerms);
+        $this->register('GET', '/specific/{userId}', 'getSpecificUser', $getPerms, $preloadUser);
+        $this->register('GET', '/specific/{userId}/system', 'getSpecificUserSystemPayload', $getPerms, $preloadUser);
+        $this->register('GET', '/specific/{userId}/total', 'getSpecificUserTotalPayload', $getPerms, $preloadUser);
+        $this->register('GET', '/specific/{userId}/user', 'getSpecificUserUserPayload', $getPerms, $preloadUser);
+        $this->register('GET', '/specific/{userId}/type', 'getSpecificUserFileTypePayload', $getPerms, $preloadUser);
+    }
+
+
+    /**
+     * Preload a User instance
+     *
+     * @param array $params
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws NotFound
+     */
+    private function preloadUser(array $params): array
+    {
+        try {
+            $user = $this->getUserMapper()->findById($params['userId']);
+        } catch (MapperException $e) {
+            throw new NotFound();
+        }
+
+        return [
+            'user' => $user,
+        ];
     }
 
 
@@ -98,5 +128,15 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
         ];
+    }
+
+
+    /**
+     * @return Mapper|UserMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    protected function getUserMapper()
+    {
+        return $this->getMapperFactory()->get(UserMapper::class);
     }
 }

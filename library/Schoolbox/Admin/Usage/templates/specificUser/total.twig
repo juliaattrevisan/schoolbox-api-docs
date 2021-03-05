@@ -1,79 +1,26 @@
+{##
+ # Total Usage for a Specific User
+ #
+ # @param User user
+ #}
 <script>
     $(function() {
-        let route = '{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}';
+        let route = '{{ routeLookupIfAuthorized('adminUsage.getSpecificUserTotalPayload', {userId: user.id}) }}';
 
         $.get(route, function(responseText) {
-            let categories = Array();
-            let values = Array();
+            {# Convert to human-readable format
+             # https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
+             #}
+            function humanFileSize(size) {
+                const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
+                return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+            }
 
-            $.each(responseText, function(index, element) {
-                categories.push(element.label);
-                values.push(parseInt(element.size));
-            });
-
-            $('#totalUsage').highcharts({
-                chart: {
-                    height: 150,
-                    spacingRight: 48,
-                    type: 'bar',
-                    zoomType: 'xy'
-                },
-
-                credits: {
-                    enabled: false
-                },
-
-                legend: {
-                    enabled: false
-                },
-
-                plotOptions: {
-                    bar: {
-                        dataLabels: {
-                            enabled: true,
-                            formatter: function() {
-                                return '<span style="color: #777777">' + this.y + '%</span>'
-                            }
-                        }
-                    }
-                },
-
-                time: {
-                    useUTC: false
-                },
-
-                title: {
-                    text: 'Total Usage'
-                },
-
-                tooltip: {
-                    enabled: false
-                },
-
-                xAxis: {
-                    categories: ['']
-                },
-
-                yAxis: {
-                    allowDecimals: false,
-                    min: 0,
-                    max: 100,
-                    title: {
-                        text: 'Percentage'
-                    }
-                },
-
-                series: [
-                    {
-                        color: '#82b5d8',
-                        name: '',
-                        data: values
-                    }
-                ]
-            });
+            $('#totalUsage').html(humanFileSize(responseText.size));
         });
     });
 </script>
 <section class="content">
-    <div id="totalUsage"></div>
+    <h2>Total</h2>
+    <p id="totalUsage"></p>
 </section>
