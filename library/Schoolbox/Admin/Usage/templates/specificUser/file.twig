@@ -10,12 +10,14 @@
 
         $.get(route, function(responseText) {
             $.each(responseText, function(index, element) {
-                $('[data-user-usage]').append(
+                $('[data-file-usage]').append(
                     '<tr>' +
-                    '<td><a href="/adminv2/usage2/specific/'+element.userId+'">' + element.firstname + '</a></td>' +
-                    '<td><a href="/adminv2/usage2/specific/'+element.userId+'">' + element.lastname + '</a></td>' +
-                    '<td>' + element.role + '</td>' +
-                    '<td>' + humanFileSize(parseInt(element.size), 1000) + '</td>' +
+                    '<td><a href="' + element._links.send + ' ">' + element.name + '</a></td>' +
+                    '<td>' + humanFileSize(parseInt(element.size), 1024) + '</td>' +
+                    '<td>' + element.location + '</td>' +
+                    '<td><a href="/homepage/' + element.folderId + '">' + element.folder + '</td>' +
+                    '<td>' + element.mimeType + '</td>' +
+                    '<td><a class="icon-delete no-text" href="' + element._links.delete + '" data-action="delete"></a></td>' +
                     '</tr>'
                 );
             });
@@ -25,12 +27,14 @@
 <table>
     <thead>
         <tr>
-            <th>Firstname</th>
-            <th>Lastname</th>
-            <th>Role</th>
-            <th>Usage</th>
+            <th>Filename</th>
+            <th>Size</th>
+            <th>Location</th>
+            <th>Folder</th>
+            <th>Type</th>
+            <th>Delete</th>
         </tr>
     </thead>
-    <tbody data-user-usage>
+    <tbody data-file-usage>
     </tbody>
 </table>
