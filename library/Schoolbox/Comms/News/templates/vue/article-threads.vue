@@ -427,13 +427,13 @@ export default {
                     <div class="small-6 columns">
                         <h2>Comments <span v-if="!isInitialLoad">({{ totalCommentsCount }})</span></h2>
                     </div>
-                    <div v-if="!isInitialLoad && isThreadCheckboxVisible" class="checklist small-6 columns">
+                    <div v-if="isPublished && !isInitialLoad && isThreadCheckboxVisible" class="checklist small-6 columns">
                         <input id="allow-comments" name="allowComments" type="checkbox" @click="changeThreadStatus" v-model="isThreadCheckboxEnabled" />
                         <label for="allow-comments">Allow comments</label>
                     </div>
                 </div>
                 <template v-if="!isInitialLoad">
-                    <template v-show="isThreadEnabled">
+                    <template v-if="isThreadEnabled">
                         <template v-if="isPublished">
                             <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
                             <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
@@ -450,11 +450,11 @@ export default {
                             </div>
                         </template>
                     </template>
-                    <div v-show="!isThreadEnabled">
+                    <template v-if="isPublished && !isThreadEnabled">
                         <div data-alert="" class="alert-box">
                             <span class="icon-locked">Comments are currently disabled for this article.</span>
                         </div>
-                    </div>
+                    </template>
                 </template>
                 <template v-if="isInitialLoad">
                     <ul class="information-list social-stream">
