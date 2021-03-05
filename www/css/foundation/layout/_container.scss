@@ -27,7 +27,7 @@
   flex-wrap: wrap;
 
   #admin-nav {
-    flex: 0 0 220px;
+    flex: 0 0 240px;
     @include responsive-sides(1, padding);
 
     @media #{$medium-down} {
