@@ -138,12 +138,7 @@
 
     <div class="admin-content">
         <div class="small-12 island">
-            <dl class="sub-nav">
-                {% for tableKey, tableCurrent in tables %}
-                    <dd {% if tableKey == table %}class="active"{% endif %}><a href="/adminv2/lists/{{ tableKey }}">{{ tableCurrent.title }}</a></dd>{# TODO routeLookup #}
-                {% endfor %}
-            </dl>
-
+            <h2 class="subheader">Page Name</h2>
             {% if records | length > 0 %}
                 {% set emptyStateClass = 'hide' %}
             {% else %}

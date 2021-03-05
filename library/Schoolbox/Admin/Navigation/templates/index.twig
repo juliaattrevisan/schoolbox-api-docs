@@ -16,7 +16,7 @@
     <h2 class="subheader">Menu</h2>
     <a href="#" class="dropdown-btn">Go to...</a>
     <ul class="admin side-nav" role="navigation">
-        <li role="menuitem"><a href="#">Home</a></li>
+        <li class="active" role="menuitem"><a href="#">Home</a></li>
         <li class="parent-item" role="menuitem">
             <a href="#">Calendar</a>
             <ul class="flyout" role="navigation">
@@ -38,7 +38,34 @@
         </li>
         <li><a href="#">Import</a></li>
         <li><a href="#">LMS</a></li>
-        <li><a href="#">Lists</a></li>
+        <li class="parent-item">
+            <a href="#">Lists</a>
+            <ul class="flyout" role="navigation">
+{#                {% for tableKey, tableCurrent in tables %}#}
+{#                <li {% if tableKey == table %}class="active"{% endif %}><a href="/adminv2/lists/{{ tableKey }}">{{ tableCurrent.title }}</a></li>#}
+{#                {% endfor %}#}
+                <li role="menuitem"><a href="#">Badge Categories</a></li>
+                <li role="menuitem"><a href="#">Campus</a></li>
+                <li role="menuitem"><a href="#">Components</a></li>
+                <li role="menuitem"><a href="#">Drives</a></li>
+                <li role="menuitem"><a href="#">Event Types</a></li>
+                <li role="menuitem"><a href="#">Houses</a></li>
+                <li role="menuitem"><a href="#">Learning Moments</a></li>
+                <li role="menuitem"><a href="#">News Topics</a></li>
+                <li role="menuitem"><a href="#">Pastoral Record Severity</a></li>
+                <li role="menuitem"><a href="#">Pastoral Record Tags</a></li>
+                <li role="menuitem"><a href="#">Pastoral SIS Document Classifications</a></li>
+                <li role="menuitem"><a href="#">Pastoral Sub-Types</a></li>
+                <li role="menuitem"><a href="#">Pastoral Types</a></li>
+                <li role="menuitem"><a href="#">Residential Houses</a></li>
+                <li role="menuitem"><a href="#">Roles</a></li>
+                <li role="menuitem"><a href="#">Submission States</a></li>
+                <li role="menuitem"><a href="#">Timetable Colours</a></li>
+                <li role="menuitem"><a href="#">User Titles</a></li>
+                <li role="menuitem"><a href="#">Work Types</a></li>
+                <li role="menuitem"><a href="#">Year Levels</a></li>
+            </ul>
+        </li>
         <li><a href="#">Modules</a></li>
         <li><a href="#">News</a></li>
         <li><a href="#">Notifications</a></li>
@@ -72,7 +99,7 @@
                 <li><a href="/adminv2/setting/Skin+Config">Skin Config</a></li>
             </ul>
         </li>
-        <li class="parent-item active" role="menuitem">
+        <li class="parent-item" role="menuitem">
             <a href="#">User Management</a>
             <ul class="flyout" role="navigation">
                 <li role="menuitem"><a href="#">Users</a></li>
