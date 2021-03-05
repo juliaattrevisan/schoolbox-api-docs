@@ -75,7 +75,7 @@
         <div class="small-12 large-9 island" id="blog-posts">
             <h2 class="subheader">{{ blogs[0].getCreatedAt | date('F Y') }} Blog Posts</h2>
             <section>
-                <ul class="information-list social-stream">
+                <ul class="information-list">
 
                     {% for blog in blogs %}
 
@@ -90,42 +90,36 @@
                             <a class="icon-modify" title="Modify" href="{{ routeLookup('eportfolioBlog.getModify', {pageId: page.getPageId, id: blog.getId }) }}"></a>
                         </nav>
                         {% endif %}
+
                         <a id="{{ blog.getId() }}"></a>
                         <article>
-
                             {{ blog.getBody | purify }}
 
                             {% if blogImages[blog.getId] | length > 0 %}
                                 {% include '@blog/sub/imageGallery.twig' with {images: blogImages[blog.getId()]} %}
                             {% endif %}
-
                         </article>
 
                         <ul class="information-list reply">
-
                             {% for comment in blogComments[blog.getId] %}
-
                             <li>
-                                <div class="small card small-12">
+                                <div class="card compact small-12">
                                     {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
                                     <p class="meta">Commented {{ comment.createdAt.getLong }}</p>
                                 </div>
                                 <article>
-                                    <p>
-                                        {{ comment.getBody | nl2br }}
-                                    </p>
+                                    <p>{{ comment.getBody | nl2br }}</p>
                                 </article>
                             </li>
-
                             {% endfor %}
-
                         </ul>
+
                         {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog, page: page}) %}
                         <div class="editPanel socialstream-new-post">
                             <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post" data-blog-comment-form>
                                 <input type="hidden" name="pageId" value="{{ page.getPageId }}">
-                                <textarea name="commentBody" rows="2" cols="100" placeholder="Add your comment"></textarea>
-                                <input type="submit" name="comment" value="Add comment"/>
+                                <textarea name="commentBody" rows="2" cols="100" placeholder="Add a comment"></textarea>
+                                <input type="submit" name="comment" value="Post comment"/>
                             </form>
                         </div>
                         {% endif %}

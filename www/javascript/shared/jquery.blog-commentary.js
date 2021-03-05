@@ -72,7 +72,7 @@
                     state = 'Show';
                 }
 
-                button.html(state + ' Comments (' + button.data('numcomments') + ')');
+                button.html(state + ' Comments (' + button.data('numcomments') + ') | ');
 			});
 		}
 	}

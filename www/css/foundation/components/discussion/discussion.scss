@@ -1,23 +1,80 @@
-.discussion {
-  border-top: 1px solid $body-bg;
-  padding-top: 2rem;
+.discussion, .threaded {
+  .information-list article {
+    padding-top: 0;
+    padding-left: 3.5rem;
+  }
+  .reply,
+  .child {
+    background-color: $snow;
+    border-top: 1px solid $body-bg;
+    border-left: 6px solid $base;
+    padding-left: 1rem;
 
-   // Fixed width centered container for discussion threads
-  .discussion-threads {
-    margin: 0 auto;
-    max-width: 45rem;
-    padding: 0 .75rem;
+    @media #{$small-only} {
+      padding-left: 0.5rem;
+    }
+
+    blockquote {
+      margin-left: 1rem;
+      margin-bottom: 0;
+    }
+
+    .card img{
+      width: 2rem;
+    }
+
+    article {
+      padding-left: 3rem;
+    }
+
+    .reply {
+      background-color: transparent;
+      margin-left: 1rem;
+
+      li:first-child{
+        border-top: 0;
+      }
+
+      li {
+        border-top: 1px solid $body-bg;
+      }
+    }
   }
 
+  .reply ~ .reply,
+  .child ~ .child {
+    border-top: 1px solid $body-bg;
+  }
+  .socialstream-attachment .meta {
+    padding-left: 2.5rem;
+  }
+  .reply .socialstream-attachment .meta {
+    padding-left: 0;
+  }
   // "Allow Comments" checkbox
   .checklist {
     display: flex;
     flex-flow: row-reverse;
   }
+}
 
-  // applies to news/learning moment comments
-  .information-list article {
-    padding-top: 0;
-    padding-left: 3.5rem;
+.socialstream-preview {
+  background-color: $snow;
+  font-size: $paragraph-font-size;
+  padding: 1rem;
+}
+
+.chat-messages {
+  .spaced {
+    padding-left: 2.5rem;
+    padding-top: .5rem;
+
+    &:nth-of-type(n+2) {
+      border-top: 1px solid $body-bg;
+      padding-top: .5rem;
+    }
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 }

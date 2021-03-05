@@ -457,7 +457,7 @@ export default {
                     </template>
                 </template>
                 <template v-if="isInitialLoad">
-                    <ul class="information-list social-stream">
+                    <ul class="information-list">
                         <li class="actions-small-1" v-for="n in 3" :key="n">
                             <div class="list-item">
                                 <div class="small-12 card skeleton">
@@ -470,7 +470,7 @@ export default {
                     </ul>
                 </template>
                 <template v-else>
-                    <ul class="information-list social-stream">
+                    <ul class="information-list">
                         <li class="actions-small-2" v-for="(comment, index) in comments" :key="index">
                             <div class="list-item">
                                 <div class="card compact small-12">

@@ -85,7 +85,7 @@
 
 <div class="small-12 island" id="discussion">
     <section id="threads-section">
-        <article-threads 
+        <article-threads
             :article-id="{{ article.id }}"
             :thread-id-on-load="{{ article.discussionThread ? article.discussionThread.id : 0 }}"
             :is-thread-checkbox-visible-on-load="Boolean({{ modifyRoute or isAuthor }})"

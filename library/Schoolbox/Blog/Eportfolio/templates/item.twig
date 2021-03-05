@@ -77,7 +77,7 @@
 
         <h2 class="subheader">Comments</h2>
         {% if comments | length > 0 %}
-        <section>
+        <section class="discussion">
             <ul class="information-list">
 
                 {% for comment in comments %}
@@ -85,9 +85,8 @@
                     <li class="actions-small-1">
 
                         <div class="list-item">
-                            <div class="card small-12">
+                            <div class="card compact small-12">
                                 {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
-                                <p class="meta">{{ comment.getCreatedAt.getRelativeTime }}</p>
                             </div>
                         </div>
 
@@ -111,10 +110,10 @@
             <section class="content">
                 <input type="hidden" name="pageId" value="{{ page.getPageId }}">
                 <label>
-                    <textarea name="commentBody" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                    <textarea name="commentBody" class="no-margin" rows="2" cols="100" placeholder="Add a comment"></textarea>
                 </label>
             </section>
-            <input type="submit" class="no-margin" name="comment" value="Add comment"/>
+            <input type="submit" class="no-margin" name="comment" value="Post comment"/>
         </form>
     {% endif %}
     </div>

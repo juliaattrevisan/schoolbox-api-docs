@@ -241,14 +241,10 @@ $.widget("ui.chat",  {
             }
 
             var $tpl =
-                '<div class="card small-12 wrap-down">' +
-                '<img src="/portrait.php?userId={1}&size=square64" title="{0}" />' +
-                '<h3>{0} <span class="meta">&bull; {2}</span></h3>' +
+                '<div class="card compact small-12 wrap-down">' +
+                '<div><img src="/portrait.php?userId={1}&size=square64" title="{0}" /><p>{0} <span class="pipe meta">{2}</span></p></div>' +
                 '<p class="spaced">{3}</p>' +
-                    //'<p class="chat-username">{2} {0}</p>' +
                 '</div>'
-                //'<div class="chat-message">' +
-                //+ '</div>'
             ;
 
             $message_el.html($tpl.format($message.name, $message.user_ext_id, $message.time, htmlEscapedMessage));

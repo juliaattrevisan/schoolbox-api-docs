@@ -144,27 +144,29 @@
             </div>
             {% endif %}
             <div class="small-12 island">
-                <section>
-                    <ul class="action-list" data-comment-list>
+                <section class="discussion">
+                    <ul class="information-list" data-comment-list>
                         {% for comment in comments %}
                             {% set isCommenter = comment.commenter.id == USER.id  %}
                             <li class="actions-small-2" data-id="{{ comment.id }}">
                                 <div class="list-item">
-                                    <div class="small-10 card">
+                                    <div class="card compact small-10">
                                         {% if comment.commenter.deleted %}
                                             <p>{{ comment.commenter.fullName }}</p>
                                         {% else %}
                                             <a href="/search/user/{{ comment.commenter.id }}" title="View Profile">
                                                 <img src="/portrait.php?id={{ comment.commenter.id }}&size=square64" alt="{{ comment.commenter.fullName }}"/>
-                                                <p>{{ comment.commenter.fullName }}</p>
+                                                <p>
+                                                    {{ comment.commenter.fullName }}
+                                                    <span class="pipe meta">{{ comment.commenter.role.name ?? '' }}</span>
+                                                    <span class="pipe meta"><time title="{{ comment.createdAt.long }}">{{ comment.createdAt.relativeTime }}</time></span>
+                                                </p>
                                             </a>
                                         {% endif %}
-                                        <p class="meta">{{ comment.commenter.role.name ?? '' }}</p>
-                                        <p class="meta"><time title="{{ comment.createdAt.long }}">{{ comment.createdAt.relativeTime }}</time></p>
                                     </div>
                                     <div class="small-2 column content">
-                                    <span class="icon-staff-students {% if comment.studentVisibility %}on{% else %}off{% endif %}"
-                                          title="{% if comment.studentVisibility %}Visible to {% else %}Hidden from {% endif %}student"></span>
+                                        <span class="icon-staff-students {% if comment.studentVisibility %}on{% else %}off{% endif %}"
+                                              title="{% if comment.studentVisibility %}Visible to {% else %}Hidden from {% endif %}student"></span>
                                         <span class="icon-staff {% if comment.parentVisibility %}on{% else %}off{% endif %}"
                                               title="{% if comment.parentVisibility %}Visible to {% else %}Hidden from {% endif %}parents"></span>
                                     </div>

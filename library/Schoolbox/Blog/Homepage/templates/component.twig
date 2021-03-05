@@ -66,7 +66,7 @@
 
 {% else %}
 
-    <ul class="information-list social-stream">
+    <ul class="information-list">
 
         {% for blog in blogs %}
 
@@ -90,43 +90,47 @@
                         {% include '@blog/sub/imageGallery.twig' with {images: blogImages[blog.getId()]} %}
                     {% endif %}
                     {% if blogComments[blog.getId] | length > 0 %}
-                        <a id="commentCount-{{ blog.getId }}" data-interaction="showcomments" class="button icon-chat" data-numcomments="{{ blogComments[blog.getId] | length }}">Show Comments ({{ blogComments[blog.getId] | length }})</a>
+                    <a id="commentCount-{{ blog.getId }}" data-interaction="showcomments" class="article-read-more" data-numcomments="{{ blogComments[blog.getId] | length }}">
+                        Show Comments ({{ blogComments[blog.getId] | length }})
+                        <span> | </span>
+                    </a>
                     {% endif %}
 
                     {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
-                    <a data-toggle="commentform-{{ blog.getId }}" class='button icon-add' >Add Comment</a>
+                    <a data-toggle="commentform-{{ blog.getId }}" class="article-read-more">Add Comment</a>
                     {% endif %}
                 </article>
-                <ul class="information-list reply" id="blogComment_{{ blog.getId }}">
-                    {% for comment in blogComments[blog.getId] %}
-                        <li class="actions-small-1" data-thread>
-                            <div class="list-item">
-                                <div class="card small-12">
-                                    {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
-                                    <p class="meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</p>
+                <div class="discussion">
+                    <ul class="information-list" id="blogComment_{{ blog.getId }}">
+                        {% for comment in blogComments[blog.getId] %}
+                            <li class="actions-small-1" data-thread>
+                                <div class="list-item">
+                                    <div class="card compact small-12">
+                                        {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
+                                    </div>
                                 </div>
-                            </div>
 
-                            {% if isRouteAuthorized('blog.postCommentDelete', { comment: comment, folder: folder }) %}
+                                {% if isRouteAuthorized('blog.postCommentDelete', { comment: comment, folder: folder }) %}
                                 <nav>
                                     <a data-interaction="deletecomment" class="icon-delete" data-blog-id="{{ blog.getId }}" data-comment-id="{{ comment.getId }}"></a>
                                 </nav>
-                            {% endif %}
+                                {% endif %}
 
-                            <article>
-                                <p>{{ comment.getBody | nl2br }}</p>
-                            </article>
-                        </li>
-                    {% endfor %}
-                </ul>
+                                <article>
+                                    <p>{{ comment.getBody | nl2br }}</p>
+                                </article>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </li>
             {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
                 <li class="row hide" id="commentform-{{ blog.getId }}">
                     <div class="editPanel socialstream-new-post">
                         <form action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}" method="post" data-blog-comment-form>
                             <input type="hidden" name="component" value="1">
-                            <textarea name="commentBody" rows="2" cols="100" placeholder="Add your comment"></textarea>
-                            <input type="submit" name="comment" value="Add Comment"/>
+                            <textarea name="commentBody" rows="2" cols="100" placeholder="Add a comment"></textarea>
+                            <input type="submit" name="comment" value="Post comment"/>
                         </form>
                     </div>
                 </li>
