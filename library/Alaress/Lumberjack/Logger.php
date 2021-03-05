@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -64,7 +64,7 @@ class Logger implements LoggerInterface {
      * @param array    $fields
      * @param bool     $porcelain
      */
-    public function __construct($outStream = STDOUT, $errStream = null, $threshold = 200, $fields = array(), $porcelain = false) {
+    public function __construct($outStream = STDOUT, $errStream = null, $threshold = Monologger::INFO, $fields = array(), $porcelain = false) {
 
         $this->out = $outStream;
         $this->err = $errStream;
