@@ -176,13 +176,9 @@
          */
         function isCommentsEmpty(commentBoxId) {
             commentBox = document.querySelector('#' + commentBoxId);
-            if (commentBox.value === "") {
-                return true;
-            } else {
-                return false;
-            }
+            return '' === document.querySelector('#' + commentBoxId).value;
         }
-
+        
         /**
          * Set up actions to occur when Publishing Feedback
          */

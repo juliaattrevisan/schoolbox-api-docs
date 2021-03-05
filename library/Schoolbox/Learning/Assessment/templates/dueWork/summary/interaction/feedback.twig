@@ -143,7 +143,9 @@ feedback: currentFeedback,
                 {{ currentFeedback.comment|linkify|nl2br }}
             </blockquote>
         {% else %}
-        <p style="padding-left: 20px;"><em>Nothing submitted</em></p>
+            <article>
+                <span class="meta">Nothing submitted</span>
+            </article>
         {% endif %}
 
         {% if currentFeedback.allFiles | length %}
