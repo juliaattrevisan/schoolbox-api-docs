@@ -1,6 +1,8 @@
 <script>
+    
+    import { VueGoodTable } from 'vue-good-table';
     import axios from "axios";
-    import {ENDPOINTS} from '@schoolboxCommsNews/Statistics/templates/visitation/endpoints.js';
+    import { ENDPOINTS } from '@schoolboxCommsNews/Statistics/templates/visitation/endpoints.js';
 
     export default {
 
@@ -34,7 +36,7 @@
          * at the top of the file.
          */
         components: {
-            'Paginate': VuejsPaginate
+            VueGoodTable
         },
 
         /**
@@ -57,7 +59,22 @@
 
                 /* The current page number
                  */
-                page: 1
+                page: 1,
+
+                columns: [
+                    {
+                        label: 'Name',
+                        field: 'firstname',
+                    },
+                    {
+                        label: 'Role',
+                        field: 'role',
+                    },
+                    {
+                        label: 'Last Visited',
+                        field: 'occursAt',
+                    },
+                ]
             }
         },
 
@@ -67,8 +84,7 @@
          * kind of like window.onload
          */
         mounted: function () {
-            let self = this;
-
+            
             /* Show skeleton
              */
             this.loading = true;
@@ -82,68 +98,33 @@
             }
 
             axios.request(request)
-                    .then(function (response) {
+                .then( (response) => {
+                    
+                    /* Load into vue component
+                        */
+                    this.rows = response.data;
+                })
+                .catch(error => {
+                    if (error.response) {
+                        this.loading = false;
+                    }
+                })
+                .then(() => {
 
-                        /* Load into vue component
-                         */
-                        self.allUsers = response.data;
-                    })
-                    .catch(error => {
-                        if (error.response) {
-                            self.loading = false;
-                        }
-                    })
-                    .then(function () {
+                    /* Hide skeleton
+                        */
+                    this.loading = false;
+                });
 
-                        /* Hide skeleton
-                         */
-                        self.loading = false;
-                    });
-
-            /* Set up listener for window history state, for pagination refresh
-             * Don't pushState when window.onpopstate executes otherwise the Back
-             * button will only work once.
-             *
-             * https://stackoverflow.com/questions/50647136/forward-button-not-working-after-history-pushstate
-             */
-            window.onpopstate = function (event) {
-                if (!event.state) {
-                    // Return to defaults
-                    self.page = 1;
-                } else if (event.state.page) {
-                    self.page = event.state.page;
-                }
-            }
         },
 
         /**
          * Computed properties.
          * Access the results of a function as if they were a property of an object.
          */
-        computed: {
+        // computed: {
 
-            /**
-             * The total number of pages available for the data set obtained
-             */
-            pageCount: function () {
-                return Math.ceil(this.allUsers.length / this.payload.numPerPage);
-            },
-
-
-            /**
-             * Calculate the paginated subset of all data
-             */
-            users: function() {
-                if (!this.allUsers.length) {
-                    return [];
-                }
-
-                const offset = (this.page-1) * this.payload.numPerPage;
-                const total = offset + this.payload.numPerPage;
-
-                return this.allUsers.slice(offset, total);
-            }
-        },
+        // },
 
         /**
          * Methods.
@@ -152,83 +133,46 @@
          */
         methods: {
 
-            /**
-             * Update the pushState history in the browser to simulate navigation
-             * with async requests
-             *
-             * @param page int - The page to change to
-             */
-            onPaginate: function (page) {
-                const params = '?' + 'p=' + page;
-
-                window.history.pushState({page: page}, '', params);
-            },
+           
         }
+
     }
 </script>
+
 <template>
     <div>
         <div class="row">
             <div class="small-12 island">
-                <template v-if="this.allUsers.length || this.loading">
-                    <template v-if="this.loading">
-                        <table class="skeleton">
-                            <tbody>
-                            <tr v-for="n in 3">
-                                <td></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </template>
-                    <template v-else>
-                        <section>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Role</th>
-                                        <th>Last Visited</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="user in this.users">
-                                        <td>
-                                            <a :href="'/search/user/' + user.id" :title="user.fullname">
-                                                {{ user.fullname }}
-                                            </a>
-                                        </td>
-                                        <td>{{ user.role }}</td>
-                                        <td>
-                                            <template v-if="user.occursAt">
-                                                {{ user.occursAt.nice }} ({{user.occursAt.relative}})
-                                            </template>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </section>
-                    </template>
-                    <template v-if="!this.loading">
-                        <Paginate
-                            v-model="page"
-                            :page-count="pageCount"
-                            :container-class="'pagination'"
-                            :prev-text="'‹'"
-                            :next-text="'›'"
-                            :prev-link-class="'arrow'"
-                            :next-link-class="'arrow'"
-                            :disabled-class="'unavailable'"
-                            :click-handler="onPaginate"
-                        ></Paginate>
-                    </template>
+                <template v-if="this.loading">
+                    <table class="skeleton">
+                        <tbody>
+                        <tr v-for="n in 3" :key="n">
+                            <td></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </template>
-                <template v-else>
-                    <div class="empty-state" v-if="!this.loading">
+                <template v-else-if="!this.loading && rows.length === 0">
+                    <div class="empty-state">
                         <i class="icon-staff"></i>
                         <p>Nobody has visited yet.</p>
                     </div>
+                </template>
+                <template v-else>
+                    <section>
+                        <vue-good-table
+                            :columns="columns"
+                            :rows="rows"/>
+                    </section>
                 </template>
             </div>
         </div>
     </div>
 </template>
+
+<style lang="scss">
+
+@import 'vue-good-table/dist/vue-good-table.scss';
+
+</style>
+
