@@ -11,14 +11,6 @@
                 values.push(parseInt(element.size));
             });
 
-            {# Convert to human-readable format
-             # https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
-             #}
-            function humanFileSize(size) {
-                const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(1000));
-                return (size / Math.pow(1000, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
-            }
-
             $('#systemUsage').highcharts({
                 chart: {
                     spacingRight: 48,
@@ -39,7 +31,7 @@
                         dataLabels: {
                             enabled: true,
                             formatter: function() {
-                                return '<span style="color: #777777">' + humanFileSize(this.y) + '</span>'
+                                return '<span style="color: #777777">' + humanFileSize(this.y, 1000) + '</span>'
                             }
                         }
                     }

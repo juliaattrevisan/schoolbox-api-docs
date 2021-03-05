@@ -1,4 +1,15 @@
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<script>
+
+    {# Convert to human-readable format
+     # https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
+    #}
+    function humanFileSize(size, base) {
+        const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(base));
+        return (size / Math.pow(base, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+    }
+
+</script>
 <div class="row">
     <div class="small-12 columns">
         <h2 class="subheader">Usage for <a href="/search/user{{ user.id }}">{{ user.fullname }}</a></h2>
