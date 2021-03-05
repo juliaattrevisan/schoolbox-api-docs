@@ -37,36 +37,39 @@
 </script>
 <!-- END custom_head -->
 
-{ADMIN_NAV}
+<div class="admin-container row">
 
-<div class="row">
-    <div class="small-12 columns">
-        <h2 class="subheader">Global Usage</h2>
-    </div>
-    <div class="small-12 island">
-        <section>
-            <div class="row">
-                <div class="small-12 large-4 column">
-                    <div data-panel='global'>
-                        <div class="loader"></div>
-                    </div>
-                    <div data-panel='group'>
-                        <div class="loader"></div>
-                    </div>
-                </div>
-                <div class="small-12 large-8 column">
-                    <section>
-                        <div data-panel='type'>
+    {ADMIN_NAV}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader">Global Usage</h2>
+        </div>
+        <div class="small-12 island">
+            <section>
+                <div class="row">
+                    <div class="small-12 large-4 column">
+                        <div data-panel='global'>
                             <div class="loader"></div>
                         </div>
-                    </section>
+                        <div data-panel='group'>
+                            <div class="loader"></div>
+                        </div>
+                    </div>
+                    <div class="small-12 large-8 column">
+                        <section>
+                            <div data-panel='type'>
+                                <div class="loader"></div>
+                            </div>
+                        </section>
+                    </div>
                 </div>
+            </section>
+        </div>
+        <div class="small-12 columns">
+            <div data-panel='user'>
+                <div class="loader"></div>
             </div>
-        </section>
-    </div>
-    <div class="small-12 columns">
-        <div data-panel='user'>
-            <div class="loader"></div>
         </div>
     </div>
 </div>

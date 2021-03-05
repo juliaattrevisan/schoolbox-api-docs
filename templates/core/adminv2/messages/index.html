@@ -16,122 +16,125 @@
     <!-- END digest_time_step -->
 </datalist>
 
-{ADMIN_NAV}
+<div class="admin-container row">
 
-<div class="row">
-    <div class="small-12 medium-4 columns">
-        <div class="row">
-            <div class="small-12 island">
-                <h2 class="subheader">Notification System</h2>
-                <section>
-                    <div class="row content">
-                        <div class="small-12 columns">
-                            <div class="alert-box">
-                                Notification System is
-                                <strong>{MSG_SYS_ENABLED}</strong>
+    {ADMIN_NAV}
+
+    <div class="admin-content">
+        <div class="small-12 large-4 columns">
+            <div class="row">
+                <div class="small-12 island">
+                    <h2 class="subheader">Notification System</h2>
+                    <section>
+                        <div class="row content">
+                            <div class="small-12 columns">
+                                <div class="alert-box">
+                                    Notification System is
+                                    <strong>{MSG_SYS_ENABLED}</strong>
+                                </div>
+                                <!-- BEGIN global_offline -->
+                                <p><em>Enable messaging to set the global notification settings.</em></p>
+                                <!-- END global_offline -->
+                                <p>
+                                    You can {MSG_SYS_TOGGLE} it
+                                    <a href="/adminv2/setting/Modules">via the modules page</a>.
+                                </p>
                             </div>
-                            <!-- BEGIN global_offline -->
-                            <p><em>Enable messaging to set the global notification settings.</em></p>
-                            <!-- END global_offline -->
-                            <p>
-                                You can {MSG_SYS_TOGGLE} it
-                                <a href="/adminv2/setting/Modules">via the modules page</a>.
-                            </p>
                         </div>
-                    </div>
-                    <!-- BEGIN global_online -->
-                    <div class="component-action">
-                        <section>
-                            <a href="/adminv2/messages/configure" class="button">Configure Settings</a>
-                        </section>
-                    </div>
-                    <!-- END global_online -->
-                </section>
+                        <!-- BEGIN global_online -->
+                        <div class="component-action">
+                            <section>
+                                <a href="/adminv2/messages/configure" class="button">Configure Settings</a>
+                            </section>
+                        </div>
+                        <!-- END global_online -->
+                    </section>
+                </div>
+            </div>
+            <div class="row">
+                <div class="small-12 island">
+                    <h2 class="subheader">Email Previews</h2>
+                    <section>
+                        <div class="content">
+                            <p>See how instant and digest emails will be sent to your users.</p>
+                            <p><em>Please remember that different email clients will render emails slightly differently.</em></p>
+                        </div>
+                        <div class="component-action">
+                            <section>
+                                <a href="/adminv2/messages/preview/instant" class="button" data-preview>Preview Instant</a><a href="/adminv2/messages/preview/digest" class="button" data-preview>Preview Digest</a>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <div class="row">
+                <div class="small-12 island">
+                    <h2 class="subheader">Push Notifications</h2>
+                    <section class="content">
+                        <!-- BEGIN push_online -->
+                        <ul>
+                            <li><a href="/adminv2/messages/apps">Configure push provider apps</a></li>
+                            <li><a href="/adminv2/oauth">Configure oAuth providers</a></li>
+                            <li><a href="/adminv2/messages/puush">Review user app registrations</a></li>
+                        </ul>
+                        <!-- END push_online -->
+                        <!-- BEGIN push_offline -->
+                        <p><em>{PUSH_OFFLINE}</em></p>
+                        <!-- END push_offline -->
+                    </section>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="small-12 island">
-                <h2 class="subheader">Email Previews</h2>
+
+        <div class="small-12 large-8 island">
+            <h2 class="subheader">Adjust Digest Schedules</h2>
+
+            <!-- BEGIN digest_online -->
+            <form method="post" action="/adminv2/messages/digestForm.php">
                 <section>
-                    <div class="content">
-                        <p>See how instant and digest emails will be sent to your users.</p>
-                        <p><em>Please remember that different email clients will render emails slightly differently.</em></p>
-                    </div>
-                    <div class="component-action">
-                        <section>
-                            <a href="/adminv2/messages/preview/instant" class="button" data-preview>Preview Instant</a><a href="/adminv2/messages/preview/digest" class="button" data-preview>Preview Digest</a>
-                        </section>
-                    </div>
-                </section>
-            </div>
-        </div>
-        <div class="row">
-            <div class="small-12 island">
-                <h2 class="subheader">Push Notifications</h2>
-                <section class="content">
-                    <!-- BEGIN push_online -->
-                    <ul>
-                        <li><a href="/adminv2/messages/apps">Configure push provider apps</a></li>
-                        <li><a href="/adminv2/oauth">Configure oAuth providers</a></li>
-                        <li><a href="/adminv2/messages/puush">Review user app registrations</a></li>
+                    <p class="content">You can modify which roles receive digest emails at which frequencies:</p>
+
+                    <ul class="information-list no-pad">
+                        <!-- BEGIN role_digest -->
+                        <li class="row content">
+                            <div class="small-12 columns">
+                                <h3>{ROLE_NAME}</h3>
+                            </div>
+                            <div class="small-12 large-8 columns">
+                                <div class="toggle-set">
+                                <!-- BEGIN day_check -->
+                                <div>
+                                    <input id="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" type="checkbox" name="role[{ROLE_ID}][day][]" value="{DAY_VALUE}" {DAY_CHECKED} />
+                                    <label for="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" class="input-toggle" title="{DAY_NAME}">
+                                        {DAY_CHAR}
+                                    </label>
+                                </div>
+                                <!-- END day_check -->
+                                </div>
+                            </div>
+                            <div class="small-12 large-4 columns">
+                                <input name="role[{ROLE_ID}][time]"
+                                       type="time"
+                                       list="digest-time-steps"
+                                       placeholder="{TIME_VALUE}"
+                                       value="{TIME_VALUE}"
+                                />
+                            </div>
+                        </li>
+                        <!-- END role_digest -->
                     </ul>
-                    <!-- END push_online -->
-                    <!-- BEGIN push_offline -->
-                    <p><em>{PUSH_OFFLINE}</em></p>
-                    <!-- END push_offline -->
                 </section>
-            </div>
-        </div>
-    </div>
 
-    <div class="small-12 medium-8 island">
-        <h2 class="subheader">Adjust Digest Schedules</h2>
+                <input type="submit" value="Save"/>
+            </form>
+            <!-- END digest_online -->
 
-        <!-- BEGIN digest_online -->
-        <form method="post" action="/adminv2/messages/digestForm.php">
-            <section>
-                <p class="content">You can modify which roles receive digest emails at which frequencies:</p>
-
-                <ul class="information-list no-pad">
-                    <!-- BEGIN role_digest -->
-                    <li class="row content">
-                        <div class="small-12 columns">
-                            <h3>{ROLE_NAME}</h3>
-                        </div>
-                        <div class="small-12 large-8 columns">
-                            <div class="toggle-set">
-                            <!-- BEGIN day_check -->
-                            <div>
-                                <input id="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" type="checkbox" name="role[{ROLE_ID}][day][]" value="{DAY_VALUE}" {DAY_CHECKED} />
-                                <label for="t{ROLE_ID}{DAY_CHAR}{DAY_VALUE}" class="input-toggle" title="{DAY_NAME}">
-                                    {DAY_CHAR}
-                                </label>
-                            </div>
-                            <!-- END day_check -->
-                            </div>
-                        </div>
-                        <div class="small-12 large-4 columns">
-                            <input name="role[{ROLE_ID}][time]"
-                                   type="time"
-                                   list="digest-time-steps"
-                                   placeholder="{TIME_VALUE}"
-                                   value="{TIME_VALUE}"
-                            />
-                        </div>
-                    </li>
-                    <!-- END role_digest -->
-                </ul>
+            <!-- BEGIN digest_offline -->
+            <section class="content">
+                <p><em>Enable messaging to set digest schedules.</em></p>
             </section>
-
-            <input type="submit" value="Save"/>
-        </form>
-        <!-- END digest_online -->
-
-        <!-- BEGIN digest_offline -->
-        <section class="content">
-            <p><em>Enable messaging to set digest schedules.</em></p>
-        </section>
-        <!-- END digest_offline -->
+            <!-- END digest_offline -->
+        </div>
     </div>
 </div>
 

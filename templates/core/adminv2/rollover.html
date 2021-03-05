@@ -78,41 +78,42 @@
 </script>
 <!-- END custom_head -->
 
-{ADMIN_NAV}
+<div class="admin-container row">
 
-<div class="row">
-    <div class="small-12 island">
-        <div class="alert-box highlight">
-            <p>
-                Rollover will look through all subfolders of the selected folder, and detach them from
-                their class codes. The codes will be appended to the folder title for ease of archiving.
-            </p>
-            <p>
-                This function is irreversible, so only do this if you are <strong>absolutely
-                certain</strong> that you want to.
-            </p>
-        </div>
-    </div>
-</div>
+    {ADMIN_NAV}
 
-<div class="row">
-    <div class="small-12 columns">
-        <h2 class='subheader'>Select folder for rollover</h2>
-    </div>
-
-    <div class="small-12 island">
-        <section class="content">
-            <div class="row">
-                <div class="small-12 large-4 column">
-                    <div data-tree></div>
-                </div>
-                <div class="small-12 large-4 column">
-                    <div data-window="traversal"></div>
-                </div>
-                <div class="small-12 large-4 column">
-                    <div data-window="confirmation"></div>
-                </div>
+    <div class="admin-content">
+        <div class="small-12 island">
+            <div class="alert-box highlight">
+                <p>
+                    Rollover will look through all subfolders of the selected folder, and detach them from
+                    their class codes. The codes will be appended to the folder title for ease of archiving.
+                </p>
+                <p>
+                    This function is irreversible, so only do this if you are <strong>absolutely
+                    certain</strong> that you want to.
+                </p>
             </div>
-        </section>
+        </div>
+
+        <div class="small-12 columns">
+            <h2 class='subheader'>Select folder for rollover</h2>
+        </div>
+
+        <div class="small-12 island">
+            <section class="content">
+                <div class="row">
+                    <div class="small-12 large-4 column">
+                        <div data-tree></div>
+                    </div>
+                    <div class="small-12 large-4 column">
+                        <div data-window="traversal"></div>
+                    </div>
+                    <div class="small-12 large-4 column">
+                        <div data-window="confirmation"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
     </div>
 </div>

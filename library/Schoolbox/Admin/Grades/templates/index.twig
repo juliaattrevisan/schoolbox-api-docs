@@ -1,6 +1,3 @@
-{# Shared navigation menu #}
-{{ renderAdminNavigation(pageCurrent) }}
-
 {% autoescape 'js' %}
     <script type="text/javascript">
         window.adminGradesConfig = {
@@ -13,49 +10,54 @@
     </script>
 {% endautoescape %}
 
-<div class="row">
-    <div class="small-12 medium-6 island">
-        <h2 class="subheader">Guide</h2>
-        <section class="content">
-            <h3>Creating {{ locale.grades.properPlural }}</h3>
-            <p>
-                Use the "Add Level" and "Add Grouping" buttons to add new {{ locale.grades }}
-                levels and groupings.
-            </p>
-            <p>
-                Once levels or groupings have been saved, they cannot be removed;
-                they can be renamed, but ensure that if you do that you rename them to something semantically
-                equivalent, since it will affect all marks already given.
-            </p>
-        </section>
-    </div>
-    <div class="small-12 medium-6 island">
-        <h2 class="subheader">Glossary</h2>
-        <section class="content">
-            <h3>Lower Bound</h3>
-            <p>
-                This value is used for the purpose of displaying a {{ locale.grades }} average for a student or assessment.
-                The caption with the highest lower bound above the average {{ locale.grades }} will be displayed.
-            </p>
+<div class="admin-container row">
 
-            <h3>Normalised {{ locale.grades.proper }}</h3>
-            <p>
-                The value (out of 100) that will be used for {{ locale.grades }} average calculations
-                for an assessment that you give this {{ locale.grades }}.
-            </p>
-            <p>
-                This value should be greater than (not equal to) the lower bound, and less than
-                (not equal to) the next highest lower bound.
-            </p>
-        </section>
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 medium-6 island">
+            <h2 class="subheader">Guide</h2>
+            <section class="content">
+                <h3>Creating {{ locale.grades.properPlural }}</h3>
+                <p>
+                    Use the "Add Level" and "Add Grouping" buttons to add new {{ locale.grades }}
+                    levels and groupings.
+                </p>
+                <p>
+                    Once levels or groupings have been saved, they cannot be removed;
+                    they can be renamed, but ensure that if you do that you rename them to something semantically
+                    equivalent, since it will affect all marks already given.
+                </p>
+            </section>
+        </div>
+        <div class="small-12 medium-6 island">
+            <h2 class="subheader">Glossary</h2>
+            <section class="content">
+                <h3>Lower Bound</h3>
+                <p>
+                    This value is used for the purpose of displaying a {{ locale.grades }} average for a student or assessment.
+                    The caption with the highest lower bound above the average {{ locale.grades }} will be displayed.
+                </p>
+
+                <h3>Normalised {{ locale.grades.proper }}</h3>
+                <p>
+                    The value (out of 100) that will be used for {{ locale.grades }} average calculations
+                    for an assessment that you give this {{ locale.grades }}.
+                </p>
+                <p>
+                    This value should be greater than (not equal to) the lower bound, and less than
+                    (not equal to) the next highest lower bound.
+                </p>
+            </section>
+        </div>
+        <div class="small-12 island">
+            {# Vue component goes here #}
+            <div id="admin-grades"></div>
+            <script type="text/javascript" src="/javascript/components/adminGrades.bundle.js?v={{ config.site_version }}"></script>
+        </div>
     </div>
 </div>
-<div class="row">
-    <div class="small-12 island">
-        {# Vue component goes here #}
-        <div id="admin-grades"></div>
-        <script type="text/javascript" src="/javascript/components/adminGrades.bundle.js?v={{ config.site_version }}"></script>
-    </div>
-</div>
+
 <div id='toaster' class="toast" data-toast></div>
 

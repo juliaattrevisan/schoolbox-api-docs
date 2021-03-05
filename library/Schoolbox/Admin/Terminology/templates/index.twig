@@ -6,10 +6,6 @@
  #
  # @param array terms  (not to be confused with school terms like semesters etc)
  #}
-
-{# Shared navigation menu #}
-{{ renderAdminNavigation(pageCurrent) }}
-
 <script>
     $(function() {
         $('#terminology-form').alaressValidate();
@@ -23,55 +19,57 @@
 </script>
 
 {# show each term #}
-<div class="row">
-    <div class="small-12 column">
-        <h2 class="subheader">Terminology</h2>
-    </div>
-</div>
-<div class="row">
-    <div class="small-12 island">
-        <form id="terminology-form" method="post" action="{{ routeLookup('adminTerminology.postUpdateTerms') }}">
-            <section>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Term</th>
-                            <th>Singular Form</th>
-                            <th>Plural Form</th>
-                            <th>Indefinite Article</th>
-                            <th>Capitalisation<span data-tooltip class="hint has-tip tip-left" data-width="200" title="Determines if the first letter can be capitalised">?</span></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for term in terms %}
-                        <tr>
-                            <td>
-                                {{ term.title }}
-                            </td>
-                            <td>
-                                <input data-input required type="text" class="no-margin" name="singularForm[{{ term.term }}]" value="{{ term.singularForm }}">
-                            </td>
-                            <td>
-                                <input data-input required type="text" class="no-margin" name="pluralForm[{{ term.term }}]" value="{{ term.pluralForm }}">
-                            </td>
-                            <td>
-                                <input required type="text" class="no-margin" name="indefiniteArticle[{{ term.term }}]" value="{{ term.indefiniteArticle }}">
-                            </td>
-                            <td>
-                                <div class="switch no-margin">
-                                    <input id="capitaliseFirst-{{ term.term }}" name="capitaliseFirst[{{ term.term }}]" type="checkbox" {% if term.capitaliseFirst %}checked{% endif %} data-checkbox-group="capitaliseFirst-{{ term.term }}">
-                                    <label for="capitaliseFirst-{{ term.term }}">
-                                        <span>Yes</span>
-                                        <span>No</span>
-                                    </label>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </section>
-            <input type="submit" value="Save">
-        </form>
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+            <h2 class="subheader">Terminology</h2>
+            <form id="terminology-form" method="post" action="{{ routeLookup('adminTerminology.postUpdateTerms') }}">
+                <section>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Term</th>
+                                <th>Singular Form</th>
+                                <th>Plural Form</th>
+                                <th>Indefinite Article</th>
+                                <th>Capitalisation<span data-tooltip class="hint has-tip tip-left" data-width="200" title="Determines if the first letter can be capitalised">?</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for term in terms %}
+                            <tr>
+                                <td>
+                                    {{ term.title }}
+                                </td>
+                                <td>
+                                    <input data-input required type="text" class="no-margin" name="singularForm[{{ term.term }}]" value="{{ term.singularForm }}">
+                                </td>
+                                <td>
+                                    <input data-input required type="text" class="no-margin" name="pluralForm[{{ term.term }}]" value="{{ term.pluralForm }}">
+                                </td>
+                                <td>
+                                    <input required type="text" class="no-margin" name="indefiniteArticle[{{ term.term }}]" value="{{ term.indefiniteArticle }}">
+                                </td>
+                                <td>
+                                    <div class="switch no-margin">
+                                        <input id="capitaliseFirst-{{ term.term }}" name="capitaliseFirst[{{ term.term }}]" type="checkbox" {% if term.capitaliseFirst %}checked{% endif %} data-checkbox-group="capitaliseFirst-{{ term.term }}">
+                                        <label for="capitaliseFirst-{{ term.term }}">
+                                            <span>Yes</span>
+                                            <span>No</span>
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </section>
+                <input type="submit" value="Save">
+            </form>
+        </div>
     </div>
 </div>

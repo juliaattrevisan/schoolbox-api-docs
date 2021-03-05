@@ -128,76 +128,78 @@
 </script>
 <!-- END custom_head -->
 
-{ADMIN_NAV}
+<div class="admin-container row">
 
-<div class="row">
-    <div class="small-12 island">
-        <div class="actions-small-1">
-            <div class="list-item">
-                <h2 class="subheader">Homepage Templates</h2>
-            </div>
-            <nav>
-                <a data-reveal-id="newDialog" class="icon-add" href="#" title="Create"></a>
-            </nav>
-        </div>
+    {ADMIN_NAV}
 
-        <section>
-            <div class="content">
-                <form id="template-action" class="no-margin" action="/adminv2/homepage/homepageForm.php" method="POST">
-                    <div class="actions-small-2">
-                        <div class="list-item">
-                            <input type="hidden" name="action" value="delete" />
-                            <select id="templateSelector" class="no-margin" data-template-select name="template">
-                                <!-- BEGIN template -->
-                                <option value="{template.id}">{template.name}</option>
-                                <!-- END template -->
-                            </select>
-                        </div>
-                        <nav>
-                            <a data-reveal-id="renameDialog" class="icon-modify" href="#" title="Rename"></a>
-                            <a data-button="delete" class="icon-delete" href="#" title="Delete"></a>
-                        </nav>
-                    </div>
-                </form>
-            </div>
-            <div data-definition-palette>
-                <!-- Homepage editor style tabs -->
-                <dl class="tabs" data-tab>
-                    <!-- BEGIN component_tab -->
-                    <dd class="{COMPONENT_CATEGORY_CLASS}">
-                        <a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">
-                            {COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})
-                        </a>
-                    </dd>
-                    <!-- END component_tab -->
-                </dl>
-                <div class="tabs-content">
-                    <!-- BEGIN component_page -->
-                    <ul class="component-palette content grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {COMPONENT_CATEGORY_CLASS} no-pad" id="tabs-sub-{COMPONENT_CATEGORY_ID}">
-                        <!-- BEGIN component -->
-                        <li>
-                            <div class="card small-12 {COMPONENT_MULTIPLE_STATE} no-margin"
-                                 data-count="{COMPONENT_COUNT}"
-                                 data-multi="{COMPONENT_MULTIPLE_STATE}"
-                                 data-component-palette>
-                                <a href="#" rel="{COMPONENT_ID}" title="{COMPONENT_DESCRIPTION}">
-                                    <span class="size-32 icon-masonry icon-masonry-{COMPONENT_CLASS}"></span>
-                                    <p>{COMPONENT_NAME}</p>
-                                    <p class="meta">(<span data-relation="count">{COMPONENT_COUNT}</span>)</p>
-                                </a>
-                            </div>
-                        </li>
-                        <!-- END component -->
-                    </ul>
-                    <!-- END component_page -->
+    <div class="admin-content">
+        <div class="small-12 island">
+            <div class="actions-small-1">
+                <div class="list-item">
+                    <h2 class="subheader">Homepage Templates</h2>
                 </div>
-
+                <nav>
+                    <a data-reveal-id="newDialog" class="icon-add" href="#" title="Create"></a>
+                </nav>
             </div>
-        </section>
+
+            <section>
+                <div class="content">
+                    <form id="template-action" class="no-margin" action="/adminv2/homepage/homepageForm.php" method="POST">
+                        <div class="actions-small-2">
+                            <div class="list-item">
+                                <input type="hidden" name="action" value="delete" />
+                                <select id="templateSelector" class="no-margin" data-template-select name="template">
+                                    <!-- BEGIN template -->
+                                    <option value="{template.id}">{template.name}</option>
+                                    <!-- END template -->
+                                </select>
+                            </div>
+                            <nav>
+                                <a data-reveal-id="renameDialog" class="icon-modify" href="#" title="Rename"></a>
+                                <a data-button="delete" class="icon-delete" href="#" title="Delete"></a>
+                            </nav>
+                        </div>
+                    </form>
+                </div>
+                <div data-definition-palette>
+                    <!-- Homepage editor style tabs -->
+                    <dl class="tabs" data-tab>
+                        <!-- BEGIN component_tab -->
+                        <dd class="{COMPONENT_CATEGORY_CLASS}">
+                            <a href="#tabs-sub-{COMPONENT_CATEGORY_ID}">
+                                {COMPONENT_CATEGORY_NAME} ({COMPONENT_CATEGORY_COUNT})
+                            </a>
+                        </dd>
+                        <!-- END component_tab -->
+                    </dl>
+                    <div class="tabs-content">
+                        <!-- BEGIN component_page -->
+                        <ul class="component-palette content grid small-block-grid-1 medium-block-grid-2 large-block-grid-3 {COMPONENT_CATEGORY_CLASS} no-pad" id="tabs-sub-{COMPONENT_CATEGORY_ID}">
+                            <!-- BEGIN component -->
+                            <li>
+                                <div class="card small-12 {COMPONENT_MULTIPLE_STATE} no-margin"
+                                     data-count="{COMPONENT_COUNT}"
+                                     data-multi="{COMPONENT_MULTIPLE_STATE}"
+                                     data-component-palette>
+                                    <a href="#" rel="{COMPONENT_ID}" title="{COMPONENT_DESCRIPTION}">
+                                        <span class="size-32 icon-masonry icon-masonry-{COMPONENT_CLASS}"></span>
+                                        <p>{COMPONENT_NAME}</p>
+                                        <p class="meta">(<span data-relation="count">{COMPONENT_COUNT}</span>)</p>
+                                    </a>
+                                </div>
+                            </li>
+                            <!-- END component -->
+                        </ul>
+                        <!-- END component_page -->
+                    </div>
+
+                </div>
+            </section>
+        </div>
+        <!-- BEGIN layout --><!-- END layout -->
     </div>
 </div>
-
-<!-- BEGIN layout --><!-- END layout -->
 
 <div id="newDialog" class="reveal-modal" data-reveal aria-labelledby="newDialogLabel" aria-hidden="true" role="dialog">
     <h2 id="newDialogLabel">Add new homepage template</h2>
