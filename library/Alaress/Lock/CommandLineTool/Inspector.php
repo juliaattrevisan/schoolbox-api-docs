@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Alaress\Lock\CommandLineTool;
 
+use Alaress\Image\Processor\Manager;
 use Alaress\Lock\InstanceLockFactory;
 use Predis\ClientInterface;
 use Schoolbox\Application\CliKernelAbstract;
@@ -48,6 +49,7 @@ class Inspector extends CliTool\App
         Uploader::LOCK_NAME           => 'Kami Uploader (./tools/kami/upload.php)',
         AttachmentUploader::LOCK_NAME => 'Pastoral Attachment Uploader (./tools/docman/pastoral-upload.php)',
         Processor::LOCK_NAME          => 'Video Processor (./tools/video/processor.php)',
+        Manager::LOCK_NAME            => 'Image Processor (./tools/image/processor.php)',
     ];
 
 
