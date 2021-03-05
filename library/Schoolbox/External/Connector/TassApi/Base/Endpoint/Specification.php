@@ -58,9 +58,9 @@ class Specification implements ISpecification
     public function check(): array
     {
         $modules = [
-            DSNCodec::MODULE_LMS_INTEGRATION,
-            DSNCodec::MODULE_STUDENT_DETAILS,
-            DSNCodec::MODULE_IDENTITY_MANAGEMENT
+            DSN::MODULE_LMS_INTEGRATION,
+            DSN::MODULE_STUDENT_DETAILS,
+            DSN::MODULE_IDENTITY_MANAGEMENT
         ];
 
         foreach ($modules as $module) {
@@ -90,7 +90,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
             [
-                'api' => DSNCodec::MODULE_LMS_INTEGRATION,
+                'api' => DSN::MODULE_LMS_INTEGRATION,
                 'method' => 'getStudentSubjects',
                 'version' => 3,
                 'args' => [
@@ -98,7 +98,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSNCodec::MODULE_LMS_INTEGRATION,
+                'api' => DSN::MODULE_LMS_INTEGRATION,
                 'method' => 'getStudentTimetable',
                 'version' => 3,
                 'args' => [
@@ -106,7 +106,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSNCodec::MODULE_LMS_INTEGRATION,
+                'api' => DSN::MODULE_LMS_INTEGRATION,
                 'method' => 'getStudents',
                 'version' => 3,
                 'args' => [
@@ -114,7 +114,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSNCodec::MODULE_LMS_INTEGRATION,
+                'api' => DSN::MODULE_LMS_INTEGRATION,
                 'method' => 'getTeacherSubjects',
                 'version' => 3,
                 'args' => [
@@ -122,7 +122,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSNCodec::MODULE_LMS_INTEGRATION,
+                'api' => DSN::MODULE_LMS_INTEGRATION,
                 'method' => 'getTeacherTimetable',
                 'version' => 3,
                 'args' => [
@@ -132,7 +132,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSNCodec::MODULE_LMS_INTEGRATION,
+                'api' => DSN::MODULE_LMS_INTEGRATION,
                 'method' => 'getTeachers',
                 'version' => 3,
                 'args' => [
@@ -140,7 +140,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSNCodec::MODULE_LMS_INTEGRATION,
+                'api' => DSN::MODULE_LMS_INTEGRATION,
                 'method' => 'getTimetableCalendar',
                 'version' => 3,
                 'args' => [
@@ -164,7 +164,7 @@ class Specification implements ISpecification
             [
                 /* Emergency contacts
                  */
-                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+                'api' => DSN::MODULE_STUDENT_DETAILS,
                 'method' => 'getCommunicationRulesDetails',
                 'version' => 3,
                 'args' => [
@@ -175,7 +175,7 @@ class Specification implements ISpecification
             [
                 /* Parents come out in the m_* and f_* nodes
                  */
-                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+                'api' => DSN::MODULE_STUDENT_DETAILS,
                 'method' => 'getCommunicationRulesDetails',
                 'version' => 3,
                 'args' => [
@@ -244,7 +244,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
             [
-                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+                'api' => DSN::MODULE_STUDENT_DETAILS,
                 'method' => 'getMedicalConditions',
                 'version' => 3,
                 'args' => [
@@ -462,7 +462,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
             [
-                'api' => DSNCodec::MODULE_IDENTITY_MANAGEMENT,
+                'api' => DSN::MODULE_IDENTITY_MANAGEMENT,
                 'method' => 'getEmployees',
                 'version' => 3,
                 'args' => [
@@ -470,7 +470,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSNCodec::MODULE_IDENTITY_MANAGEMENT,
+                'api' => DSN::MODULE_IDENTITY_MANAGEMENT,
                 'method' => 'getParents',
                 'version' => 3,
                 'args' => [
@@ -478,7 +478,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSNCodec::MODULE_IDENTITY_MANAGEMENT,
+                'api' => DSN::MODULE_IDENTITY_MANAGEMENT,
                 'method' => 'getStudents',
                 'version' => 3,
                 'args' => [

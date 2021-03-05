@@ -66,14 +66,14 @@ class Watchlist
     public function contactDetails(array $watchlist): void
     {
         $api = [
-            Endpoint\DSNCodec::MODULE_LMS_INTEGRATION => new Endpoint\Api($this->host, $this->dsn, Endpoint\DSNCodec::MODULE_LMS_INTEGRATION),
-            Endpoint\DSNCodec::MODULE_STUDENT_DETAILS => new Endpoint\Api($this->host, $this->dsn, Endpoint\DSNCodec::MODULE_STUDENT_DETAILS),
-            Endpoint\DSNCodec::MODULE_IDENTITY_MANAGEMENT => new Endpoint\Api($this->host, $this->dsn, Endpoint\DSNCodec::MODULE_IDENTITY_MANAGEMENT)
+            Endpoint\DSN::MODULE_LMS_INTEGRATION => new Endpoint\Api($this->host, $this->dsn, Endpoint\DSN::MODULE_LMS_INTEGRATION),
+            Endpoint\DSN::MODULE_STUDENT_DETAILS => new Endpoint\Api($this->host, $this->dsn, Endpoint\DSN::MODULE_STUDENT_DETAILS),
+            Endpoint\DSN::MODULE_IDENTITY_MANAGEMENT => new Endpoint\Api($this->host, $this->dsn, Endpoint\DSN::MODULE_IDENTITY_MANAGEMENT)
         ];
 
         /* Find all the parent records in the watchlist
          */
-        $parents = $api[Endpoint\DSNCodec::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getParents', [
+        $parents = $api[Endpoint\DSN::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getParents', [
             'user_code' => 'all'
         ]);
 
@@ -91,7 +91,7 @@ class Watchlist
 
         /* Find all the comm records for parents int he watchlist
          */
-        $commRules = $api[Endpoint\DSNCodec::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
+        $commRules = $api[Endpoint\DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
             'currentstatus' => 'current',
             'commtype' => 'gen'
         ]);

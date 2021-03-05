@@ -78,7 +78,7 @@ class Api implements IApi
 
 
     /**
-     * @var TokenCodec
+     * @var Codec\Token
      */
     private $tokenCodec;
 
@@ -145,7 +145,7 @@ class Api implements IApi
 
         /* Figure out all the credential parts: module, company code, app code, token
          */
-        $dsnParts = (new DSNCodec())->decode($dsn);
+        $dsnParts = (new Codec\DSN())->decode($dsn);
 
         if (!isset($dsnParts[$module])) {
             throw new DomainException("Tass API DSN: Invalid module name {$module}");
@@ -156,7 +156,7 @@ class Api implements IApi
         /* Set up a token codec which does some security stuff based on the
          * params provided to its generateToken() method
          */
-        $this->tokenCodec = new TokenCodec($this->credentials['token']);
+        $this->tokenCodec = new Codec\Token($this->credentials['token']);
 
         /* Set up a reusable guzzle
          */

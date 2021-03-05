@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 
 use DomainException;
 use function count;
@@ -27,7 +27,7 @@ use function count;
  *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint
  */
-class DSNCodec
+class DSN
 {
 
     /**

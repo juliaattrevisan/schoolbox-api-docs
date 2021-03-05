@@ -11,14 +11,14 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable\CodeCodec;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code as CodeCodec;
 
 /**
  * Class DSNCodecTest
  *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\Test
  */
-class CodeCodecTest extends TestCase
+class CodeTest extends TestCase
 {
 
     /**

@@ -25,9 +25,9 @@ $dsn = $config->get('schooldata_import_endpoint_key');
 use Schoolbox\External\Connector\TassApi\Base\Endpoint;
 
 $api = [
-    Endpoint\DSNCodec::MODULE_LMS_INTEGRATION => new Endpoint\Api($host, $dsn, Endpoint\DSNCodec::MODULE_LMS_INTEGRATION),
-    Endpoint\DSNCodec::MODULE_STUDENT_DETAILS => new Endpoint\Api($host, $dsn, Endpoint\DSNCodec::MODULE_STUDENT_DETAILS),
-    Endpoint\DSNCodec::MODULE_IDENTITY_MANAGEMENT => new Endpoint\Api($host, $dsn, Endpoint\DSNCodec::MODULE_IDENTITY_MANAGEMENT)
+    Endpoint\Codec\DSN::MODULE_LMS_INTEGRATION => new Endpoint\Api($host, $dsn, Endpoint\Codec\DSN::MODULE_LMS_INTEGRATION),
+    Endpoint\Codec\DSN::MODULE_STUDENT_DETAILS => new Endpoint\Api($host, $dsn, Endpoint\Codec\DSN::MODULE_STUDENT_DETAILS),
+    Endpoint\Codec\DSN::MODULE_IDENTITY_MANAGEMENT => new Endpoint\Api($host, $dsn, Endpoint\Codec\DSN::MODULE_IDENTITY_MANAGEMENT)
 ];
 
 (new Endpoint\Explorer\BrokenPayload($api))->explore($_POST);

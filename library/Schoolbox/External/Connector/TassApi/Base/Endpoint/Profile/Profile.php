@@ -15,7 +15,7 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Phone;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -58,6 +58,11 @@ class Profile implements IStrategy
      */
     private const EMPLOYEE_PREFIX = 'E';
 
+    /**
+     * Used in the profile category field to identify teacher or employee users coming from TASS into the staff table
+     */
+    public const EMPLOYEE = 'employee';
+    public const TEACHER = 'teacher';
 
     /**
      * @var LoggerInterface
@@ -207,11 +212,11 @@ class Profile implements IStrategy
         /* Build some lookups to save on traversal and api banging
          */
         $families = (new Lookup\Family(
-            $this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT],
+            $this->api[Codec\DSN::MODULE_IDENTITY_MANAGEMENT],
             $this->spousePrefix,
             $this->addnumFather,
             $this->addnumMother,
-            (new Phone($this->api[DSNCodec::MODULE_STUDENT_DETAILS]))->generate()
+            (new Phone($this->api[Codec\DSN::MODULE_STUDENT_DETAILS]))->generate()
         ))->generate();
 
         /* Also alert any broken tass api payloads that we detected in lookups
@@ -225,7 +230,7 @@ class Profile implements IStrategy
 
         /* Process each current student, and their parents too
          */
-        $students = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
+        $students = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
             'currentstatus' => 'current'
         ]);
 
@@ -441,7 +446,7 @@ class Profile implements IStrategy
      */
     public function findEmergencyContacts(string $studentCode): array
     {
-        $emergencyContacts = $this->api[DSNCodec::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
+        $emergencyContacts = $this->api[Codec\DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
             'currentstatus' => 'current',
             'commtype' => 'ec',
             'code' => $studentCode
@@ -527,7 +532,7 @@ class Profile implements IStrategy
         /* Specifically handle a 401 Unauthorized which occurred unexpectedly at shalom
          */
         try {
-            $medicalConditions = $this->api[DSNCodec::MODULE_STUDENT_DETAILS]->retrieveDocument('getMedicalConditions', [
+            $medicalConditions = $this->api[Codec\DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getMedicalConditions', [
                 'studcode' => $studentCode,
             ]);
         } catch (\RuntimeException $e) {
@@ -699,13 +704,13 @@ class Profile implements IStrategy
 
         /* Get a list of teaching staff
          */
-        $teachers = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', [
+        $teachers = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', [
             'currentstatus' => 'current'
         ]);
 
         /* Get a list of non-teaching staff
          */
-        $employees = $this->api[DSNCodec::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getEmployees', [
+        $employees = $this->api[Codec\DSN::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getEmployees', [
             'user_code' => 'all'
         ]);
 
@@ -748,7 +753,8 @@ class Profile implements IStrategy
         /* Unite the two data sets; teaching records get precedence
          * The result is: employeeSetDedupe = Teaching Staff XOR Non-Teaching Staff
          */
-        foreach ($teachers['teachers'] as $teacher) {
+        foreach ($teachers['teachers'] as &$teacher) {
+            $teacher['category'] = self::TEACHER;
             if ('' !== (string)$teacher['employee_code']) {
                 unset($employeeSetDedupe[$teacher['employee_code']]);
 
@@ -764,17 +770,22 @@ class Profile implements IStrategy
          */
         $employeeSetReformatted = [];
 
+        /* Add a prefix to distinguish them when namespaces collide
+         */
+        $employeeCodec = new Codec\EmployeeExternalId();
+
         foreach ($employeeSetDedupe as $employee) {
 
             /* Apparently there's both title and salutation for some bizarre reason
              */
             $employeeSetReformatted[] = [
-                'teacher_code' => self::EMPLOYEE_PREFIX . $employee['user_code'],
+                'teacher_code' => $employeeCodec->encode((string)$employee['user_code']),
                 'salutation' => array_values(array_filter([$employee['title'], $employee['salutation']]))[0],
                 'given_names' => $employee['first_name'],
                 'surname' => $employee['surname'],
                 'school_email_address' => $employee['school_email'],
                 'email_address' => $employee['e_mail'],
+                'category' => self::EMPLOYEE,
                 'department' => $employee['departments'],
                 'portal_user_code' => $employee['username'],
                 'active_flag' => null,
@@ -800,7 +811,7 @@ class Profile implements IStrategy
             $externalId = trim((string)$staff['teacher_code']);
             $building = '';
             $campusName = '';
-            $category = '';
+            $category = $staff['category'];
             $department = trim((string)$staff['department']);
 
             /* Find the first non-empty email address for staff; it seems that there's a business

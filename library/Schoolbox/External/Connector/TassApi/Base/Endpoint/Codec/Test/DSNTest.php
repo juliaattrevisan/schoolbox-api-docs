@@ -8,18 +8,18 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Test;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Test;
 
 use DomainException;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 
 /**
  * Class DSNCodecTest
  *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\Test
  */
-class DSNCodecTest extends TestCase
+class DSNTest extends TestCase
 {
 
     /**
@@ -87,7 +87,7 @@ class DSNCodecTest extends TestCase
      */
     public function testValidDSNDecode(string $dsn, $expected): void
     {
-        $codec = new DSNCodec();
+        $codec = new DSN();
 
         $this->assertEquals($expected, $codec->decode($dsn));
     }
@@ -119,7 +119,7 @@ class DSNCodecTest extends TestCase
      */
     public function testValidDSNDecodeEncode(string $dsn, $expected): void
     {
-        $codec = new DSNCodec();
+        $codec = new DSN();
         $encoded = $dsn;
 
         $decoded = $codec->decode($encoded);
@@ -232,7 +232,7 @@ class DSNCodecTest extends TestCase
          * per product. To exhaustively list all the invalid formats would require a lot more
          * effort than they're worth.
          */
-        $codec = new DSNCodec();
+        $codec = new DSN();
         $codec->decode($dsn);
     }
 }

@@ -12,7 +12,7 @@ use DomainException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\DSNCodec;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
@@ -287,7 +287,7 @@ class Definition implements IStrategy
         $stack = [];
 
         foreach ($cycles as $ttid => $cycle) {
-            $timetableCalendar = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getTimetableCalendar', [
+            $timetableCalendar = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTimetableCalendar', [
                 'tt_id' => $ttid
             ]);
 
@@ -375,7 +375,7 @@ class Definition implements IStrategy
             /* Hit That Api to find every student's timetable and cache it somewhere
              * We'll need to operate on it all again later anyway
              */
-            $data = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudentTimetable', [
+            $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudentTimetable', [
                 'student_code' => $externalId
             ]);
 
@@ -396,7 +396,7 @@ class Definition implements IStrategy
         /* Inspect every staff's timetable
          */
         foreach ($staff as $externalId => $person) {
-            $data = $this->api[DSNCodec::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeacherTimetable', [
+            $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeacherTimetable', [
                 'teacher_code' => $externalId,
                 'year_num' => $year,
                 'semester' => $semester

@@ -17,6 +17,7 @@ use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\Mapper\Exception;
@@ -215,7 +216,7 @@ class Classes implements IStrategy
 
                             /* This format mirrors the implementation in External/Tass/Timetable.php:239
                              */
-                            'code' => (new CodeCodec())->encode(
+                            'code' => (new Codec\Code())->encode(
                                 '' !== (string)$subject['YEAR_GRP'] ? (string)$subject['YEAR_GRP'] : (string)$subject['SUBTAB_YEAR_GRP'],
                                 (string)$subject['SUB_CODE'],
                                 (string)$subject['CLASS']

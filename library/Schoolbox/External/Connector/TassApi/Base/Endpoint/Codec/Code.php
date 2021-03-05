@@ -5,10 +5,10 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 
 /**
- * Class CodeCodec
+ * Class Code
  *
  * Return a string representation of a (year group, subject code, class) tuple
  * This is a format we adopted for tass more-or-less across the board
@@ -35,7 +35,7 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
  *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable
  */
-class CodeCodec
+class Code
 {
 
     /**
