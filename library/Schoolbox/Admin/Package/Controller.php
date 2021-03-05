@@ -61,8 +61,11 @@ class Controller extends Base
 
         if (!$package->isInstalled()) {
             include(SITE_root . '/packages/' . $package->getLocation() . '/Installer.php');
-            $class = '\\'.$package->getLocation().'\\Installer';
+            $class = '\\' . $package->getLocation() . '\\Installer';
             $installer = new $class();
+            if (!$installer instanceof IPackageInstall) {
+                throw $this->generateException(ErrorMapper::ERROR_PROCESSING, null, "Package class not found");
+            }
 
             $db = $this->packageMapper->getDatabase();
             $db->beginTransaction();
