@@ -8,7 +8,7 @@
         let route = '{{ routeLookupIfAuthorized('adminUsage.getSpecificUserTotalPayload', {userId: user.id}) }}';
 
         $.get(route, function(responseText) {
-            $('#totalUsage').html(humanFileSize(parseInt(responseText.size), 1024));
+            $('#totalUsage').html(humanFileSize(parseInt(responseText.size), 1000));
         });
     });
 </script>
