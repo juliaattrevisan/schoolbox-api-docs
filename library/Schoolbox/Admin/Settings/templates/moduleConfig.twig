@@ -63,27 +63,28 @@
         {% endfor %}
     </datalist>
 {% endif %}
-<div class="row">
-    <div class="small-12 island">
-        <form data-action="saveSettings" id="settings" method="post" action="{{ postRoute }}">
-            <section>
-                <fieldset class="content">
-                        {% for setting in settings %}
-                            {% set data = setting.data %}
-                            {% if not data.hidden %}
-                                <div class="small-12 columns">
-                                <label for="{{ data.name }}" {{ data.required and data.editable ? 'class="required"' }}>{{ data.title }}</label>
-                                <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="{{ data.description|replace({'<': '&lt;'}) }}">?</span>
-                                    {% include '@settings/fieldType/' ~ setting.template with data only %}
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                </fieldset>
-            </section>
-            {% if isEditable %}
-                <input type="submit" value="Save"/>
-            {% endif %}
-        </form>
-    </div>
+
+<div class="small-12 island">
+    <h2 class="subheader">Page Name</h2>
+    <form data-action="saveSettings" id="settings" method="post" action="{{ postRoute }}">
+        <section>
+            <fieldset class="content">
+                    {% for setting in settings %}
+                        {% set data = setting.data %}
+                        {% if not data.hidden %}
+                            <div class="small-12 columns">
+                            <label for="{{ data.name }}" {{ data.required and data.editable ? 'class="required"' }}>{{ data.title }}</label>
+                            <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="{{ data.description|replace({'<': '&lt;'}) }}">?</span>
+                                {% include '@settings/fieldType/' ~ setting.template with data only %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+            </fieldset>
+        </section>
+        {% if isEditable %}
+            <input type="submit" value="Save"/>
+        {% endif %}
+    </form>
 </div>
+
 <div id="resource-browser" class="hide"></div>
