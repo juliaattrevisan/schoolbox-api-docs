@@ -52,6 +52,7 @@ class SystemPayload
      *
      * Note that some tables such as task_files can have multiple occurrences
      * of a file hash (ie. a file gets uploaded multiple times with different names)
+     *
      * @param User $user
      * @return array
      * @throws \Alaress\Database\Exception
@@ -62,7 +63,10 @@ class SystemPayload
             SELECT
                 'CMS Resources' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT hash FROM file) f   
+            FROM (SELECT DISTINCT hash 
+                FROM file
+                WHERE owner = :userId
+            ) f   
             INNER JOIN storage ON f.hash = storage.hash
             
             UNION
@@ -70,7 +74,11 @@ class SystemPayload
             SELECT
                 'Student Submissions' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT hash FROM student_submission_file) f   
+            FROM (SELECT DISTINCT hash 
+                FROM student_submission_file ssf
+                INNER JOIN student_submission ss ON ssf.student_submission_id = ss.id
+                WHERE ss.owner = :userId
+            ) f
             INNER JOIN storage ON f.hash = storage.hash
             
             UNION
@@ -78,7 +86,11 @@ class SystemPayload
             SELECT
                 'Submission Returns' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT hash FROM submission_return_file) f   
+            FROM (SELECT DISTINCT hash 
+                FROM submission_return_file srf
+                INNER JOIN submission_return sr ON srf.submission_return_id = sr.id
+                WHERE sr.owner = :userId
+            ) f   
             INNER JOIN storage ON f.hash = storage.hash
             
             UNION
@@ -86,7 +98,11 @@ class SystemPayload
             SELECT
                 'Tasks' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT storage_id AS hash FROM task_file) f   
+            FROM (SELECT DISTINCT storage_id AS hash 
+                FROM task_file tf
+                INNER JOIN task t ON tf.task_id = t.id
+                WHERE t.user_id = :userId
+            ) f   
             INNER JOIN storage ON f.hash = storage.hash
             
             UNION
@@ -96,15 +112,21 @@ class SystemPayload
                 COALESCE(SUM(storage.filesize), 0) AS size
             FROM (
                 SELECT DISTINCT subquery.hash 
-                FROM
-                    ((SELECT DISTINCT feature_image_hash AS hash
+                FROM (
+                    SELECT DISTINCT feature_image_hash AS hash
                     FROM comms_news_article
-                    WHERE feature_image_hash IS NOT NULL)
+                    WHERE feature_image_hash IS NOT NULL
+                    AND author_id = :userId
+                    
                     UNION
-                    (SELECT DISTINCT storage_id AS hash
-                    FROM comms_news_article_file
-                    WHERE storage_id IS NOT NULL)) subquery
-            ) f   
+                    
+                    SELECT DISTINCT storage_id AS hash
+                    FROM comms_news_article_file cnaf
+                    INNER JOIN comms_news_article cna ON cnaf.article_id = cna.id
+                    WHERE storage_id IS NOT NULL
+                    AND cna.author_id = :userId
+                ) subquery
+            ) f
             INNER JOIN storage ON f.hash = storage.hash
             
             UNION
@@ -112,7 +134,11 @@ class SystemPayload
             SELECT
                 'Pastoral' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT hash FROM pastoral_attachment) f   
+            FROM (SELECT DISTINCT hash 
+                FROM pastoral_attachment pa
+                INNER JOIN pastoral p ON pa.pastoral_id = p.id
+                WHERE p.owner_id = :userId
+            ) f   
             INNER JOIN storage ON f.hash = storage.hash
             
             UNION
@@ -120,19 +146,16 @@ class SystemPayload
             SELECT
                 'My Files' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT hash FROM myFile) f   
+            FROM (SELECT DISTINCT hash 
+                FROM myFile
+                WHERE owner = :userId
+            ) f   
             INNER JOIN storage ON f.hash = storage.hash
-            
-            UNION
-            
-            SELECT
-                'Tiles' AS label,
-                COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT background_image_hash AS hash FROM tile) f   
-            INNER JOIN storage ON f.hash = storage.hash  
         ";
 
-        $result = $this->database->executeQuery($query);
+        $result = $this->database->executeQuery($query, [
+            'userId' => $user->getId()
+        ]);
 
         $stack = [];
 
