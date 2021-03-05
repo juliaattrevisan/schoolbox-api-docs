@@ -1,6 +1,6 @@
 <script>
     $(function() {
-        let route = '{{ routeLookupIfAuthorized('adminUsage.getFileTypePayload') }}';
+        let route = '{{ routeLookupIfAuthorized('adminUsage.getSpecificUserFileTypePayload', {userId: user.id}) }}';
 
         $.get(route, function(responseText) {
             let categories = Array();
