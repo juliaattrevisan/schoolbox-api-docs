@@ -753,7 +753,7 @@ class Profile implements IStrategy
         /* Unite the two data sets; teaching records get precedence
          * The result is: employeeSetDedupe = Teaching Staff XOR Non-Teaching Staff
          */
-        foreach ($teachers['teachers'] as $teacher) {
+        foreach ($teachers['teachers'] as &$teacher) {
             $teacher['category'] = self::TEACHER;
             if ('' !== (string)$teacher['employee_code']) {
                 unset($employeeSetDedupe[$teacher['employee_code']]);
