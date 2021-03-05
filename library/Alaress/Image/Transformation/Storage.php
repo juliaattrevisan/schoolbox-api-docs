@@ -14,20 +14,41 @@ use Alaress\Image\Transform\Rectangle;
 use Alaress\Image\Transform\Square;
 use OutOfBoundsException;
 
+use function in_array;
+
 /**
- * A list of all the transformations used throughout the site
+ * A list of all the 'storage' transformations used throughout the site
  */
-class Storage
+class Storage implements ITransformFactory
 {
     public const TRANSFORM_SQUARE64 = 'square64';
+
+    private const SIZES = [
+        'square32',
+        self::TRANSFORM_SQUARE64,
+        'square128',
+        'square200',
+        'constrain200',
+        'constrain300',
+        'rectangle',
+        'maxsize',
+        'eportfolioImageGalleryLarge',
+        'coverPhoto',
+        'eportfolioCoverPhoto',
+        'eportfolioRecentPhoto',
+        'eportfolioImageGalleryThumbnail',
+        'cardImageLarge',
+        'cacheTest',
+    ];
+
     /**
-     * @param string $key
+     * @param string $size
      * @return ITransform
      * @throws OutOfBoundsException
      */
-    public function retrieve(string $key): ITransform
+    public function retrieve(string $size): ITransform
     {
-        switch ($key) {
+        switch ($size) {
             case 'square32':
                 return new Square(32);
             case self::TRANSFORM_SQUARE64:
@@ -67,5 +88,55 @@ class Storage
                 return new Constrain(247, 204);
         }
         throw new OutOfBoundsException('Could not load transformation list.');
+    }
+
+
+
+    /**
+     * Returns a cache key for a transformation
+     *
+     * @param string $size
+     * @return string
+     */
+    public function getCacheKey(string $size): string
+    {
+        return "storage-$size";
+    }
+
+
+    /**
+     * Returns whether this class generated the specified cache key
+     *
+     * @param string $cacheKey
+     * @return bool
+     */
+    public function recognisesCacheKey(string $cacheKey): bool
+    {
+        if (!preg_match('/storage-([a-z\d]+)/', $cacheKey, $matches)) {
+            return false;
+        }
+        return in_array($matches[1], self::SIZES, true);
+    }
+
+
+    /**
+     * Returns a Transform for the given cache key
+     *
+     * @param string $cacheKey
+     * @return ITransform
+     * @throws OutOfBoundsException
+     */
+    public function retrieveForCacheKey(string $cacheKey): ITransform
+    {
+        preg_match('/storage-([a-z\d]+)/', $cacheKey, $matches);
+        $size = $matches[1];
+        return $this->retrieve($size);
+    }
+
+
+    /** @inheritDoc */
+    public static function getSlug(): string
+    {
+        return 'storage';
     }
 }
