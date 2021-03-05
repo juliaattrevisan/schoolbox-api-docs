@@ -79,7 +79,7 @@ class CycleConfiguration
         $cycles = array_fill_keys($tassTT_IDs, []);
 
         foreach ($cycles as $ttid => $cycle) {
-            $timetableCalendar = $this->api[Endpoint\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTimetableCalendar', [
+            $timetableCalendar = $this->api[Endpoint\Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTimetableCalendar', [
                 'tt_id' => $ttid
             ]);
 

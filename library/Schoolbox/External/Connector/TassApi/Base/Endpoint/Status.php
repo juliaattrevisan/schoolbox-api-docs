@@ -58,7 +58,7 @@ class Status implements IStatus
     public function isReachable(): bool
     {
         try {
-            (new Api($this->host, $this->key, DSN::MODULE_LMS_INTEGRATION))->retrieveDocument('getStudents', [
+            (new Api($this->host, $this->key, Codec\DSN::MODULE_LMS_INTEGRATION))->retrieveDocument('getStudents', [
                 'currentstatus' => 'current'
             ]);
 
