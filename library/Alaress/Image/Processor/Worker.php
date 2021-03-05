@@ -1,0 +1,252 @@
+<?php
+
+/**
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Alaress\Image\Processor;
+
+use Alaress\Image;
+use Alaress\Image\Cache\LocalFS;
+use Alaress\Image\Exception\ConcurrentTransformationException;
+use Alaress\Image\ITransform;
+use LogicException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use Schoolbox\File as SchoolboxFile;
+use Schoolbox\Mapper as SchoolboxMapper;
+use Schoolbox\Resource\Storage;
+use Schoolbox\Application\CliTool;
+use SplFileInfo;
+use Throwable;
+
+/**
+ * The worker process logic used by the background cron job that pre-transforms images
+ *
+ * A new worker is spawned for every distinct transformation.
+ */
+class Worker extends CliTool\App
+{
+    /**
+     * The original file hash
+     *
+     * @var string
+     */
+    private string $hash;
+
+    /**
+     * A string that describes/represents the transformation being applied
+     *
+     * @var string
+     */
+    private string $cacheKey;
+
+    /**
+     * Transform to apply to original image
+     *
+     * @var ITransform
+     */
+    private ITransform $transform;
+
+    /**
+     * After how many seconds should we assume that a transformation still 'processing' has timed out and can
+     * be re-attempted
+     *
+     * @var int
+     */
+    private int $timeOutThreshold;
+
+    /**
+     * How long should image magick be allowed to execute for.
+     *
+     * This must be less than or equal to the Lock/max-execution-time of the PHP process
+     *
+     * @var int
+     */
+    private int $imageMagickTimeout;
+
+    /**
+     * Normally we want to notify Sentry of failures. However if re-trying previous failures, we want to suppress
+     * that behaviour as it is quite normal for failed transforms to not be fixable on subsequent attempts.
+     *
+     * @var bool
+     */
+    private bool $suppressSentryReporting;
+
+    /**
+     * Maximum number of times we will attempt each transformation if it throws a catchable exception
+     *
+     * @var int
+     */
+    private int $attemptsPerTransform;
+
+    /**
+     * @param string     $hash
+     * @param string     $cacheKey
+     * @param ITransform $transform
+     * @param int        $timeOutThreshold
+     * @param int        $imageMagickTimeout
+     * @param bool       $suppressSentryReporting
+     * @param int        $attemptsPerTransform
+     */
+    public function __construct(
+        string $hash,
+        string $cacheKey,
+        ITransform $transform,
+        int $timeOutThreshold,
+        int $imageMagickTimeout,
+        bool $suppressSentryReporting,
+        int $attemptsPerTransform
+    ) {
+        $this->hash                    = $hash;
+        $this->cacheKey                = $cacheKey;
+        $this->transform               = $transform;
+        $this->timeOutThreshold        = $timeOutThreshold;
+        $this->imageMagickTimeout      = $imageMagickTimeout;
+        $this->suppressSentryReporting = $suppressSentryReporting;
+        $this->attemptsPerTransform    = $attemptsPerTransform;
+    }
+
+    /**
+     * @throws LogicException
+     * @throws SchoolboxFile\Exception
+     * @throws SchoolboxMapper\Exception
+     */
+    public function run(): void
+    {
+        $this->getLogger()->debug($this->prefixLog("Processing: Hash: {$this->hash}, CacheKey: '{$this->cacheKey}'"));
+        $hashObject = $this->fetchHashObject();
+        if ($hashObject) {
+            $this->generateTransform($hashObject, $this->cacheKey, $this->transform);
+        }
+        $this->getLogger()->debug($this->prefixLog("Finished"));
+    }
+
+
+    /**
+     * Find the storage object for this hash
+     *
+     * Normally this is a storage file, but in rare cases may represent a static file.
+     *
+     * @return Storage\Model|null
+     * @throws LogicException
+     * @throws SchoolboxFile\Exception
+     * @throws SchoolboxMapper\Exception
+     */
+    private function fetchHashObject(): ?Storage\Model
+    {
+        /** @var Storage\Model $hashObject */
+        $hashObject = Storage\Mapper::getInstance()->findByColumn('hash', $this->hash)->first();
+        if (!$hashObject) {
+            // This is most likely the rare case where we failed to transcode a static image.
+            // We need to locate that image from the hash.
+            $this->getLogger()->warning($this->prefixLog("No storage record found for hash: {$this->hash}, searching static files..."));
+
+            $itr                = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(WEB_root, RecursiveDirectoryIterator::SKIP_DOTS));
+            $excludedExtensions = [
+                '1',
+                'bowerrc',
+                'checksum',
+                'css',
+                'csv',
+                'def',
+                'editorconfig',
+                'eot',
+                'gitattributes',
+                'gitignore',
+                'htm',
+                'html',
+                'js',
+                'jshintrc',
+                'json',
+                'jst',
+                'less',
+                'lock',
+                'map',
+                'md',
+                'npmignore',
+                'otf',
+                'php',
+                'psd',
+                'scss',
+                'spmignore',
+                'ttf',
+                'txt',
+                'woff',
+                'woff2',
+                'xml',
+                'yml',
+            ];
+            $hashGenerator      = new Storage\HashGenerator();
+            foreach ($itr as $item) {
+                /** @var SplFileInfo $item */
+                if (!$item->isFile() || in_array($item->getExtension(), $excludedExtensions, true)) {
+                    continue;
+                }
+                $fp   = fopen($item->getPathname(), 'rb');
+                $hash = $hashGenerator->generateHash($fp);
+                fclose($fp);
+                if ($hash === $this->hash) {
+                    $fileName = str_replace(WEB_root, '', $item->getPathname());
+                    $this->getLogger()->notice($this->prefixLog("Static file found: '$fileName'"));
+                    $hashObject = LocalFS::getStorageModel(WEB_root, $fileName);
+                    break;
+                }
+            }
+        }
+        return $hashObject;
+    }
+
+    /**
+     * Prefix this process's PID to a log message
+     *
+     * @param string $message
+     * @return string
+     */
+    private function prefixLog(string $message): string
+    {
+        return sprintf("[%d] $message", posix_getpid());
+    }
+
+    /**
+     * Apply the specified transform to the storage object and save it using specified cache key
+     *
+     * @param Storage\Model    $hashObject
+     * @param string           $cacheKey
+     * @param Image\ITransform $transform
+     */
+    private function generateTransform(Storage\Model $hashObject, string $cacheKey, Image\ITransform $transform): void
+    {
+        $hash      = $hashObject->getHash();
+        $processor = new Image\Processor($hashObject, $cacheKey, $transform, $this->imageMagickTimeout);
+
+        try {
+            // If transform was previously attempted longer than N seconds ago, assume it failed and retry it.
+            $transformFile = $processor->load($this->attemptsPerTransform, $this->timeOutThreshold);
+            if (!$transformFile->isCacheHit()) {
+                $this->getLogger()->info($this->prefixLog(sprintf("%s: %s", $hash . '-' . $cacheKey, 'success')));
+            } else {
+                $this->getLogger()->warning($this->prefixLog(sprintf("%s: %s", $hash . '-' . $cacheKey, 'already cached')));
+            }
+        } catch (ConcurrentTransformationException $e) {
+            // Another process (probably a php-fpm web request) is already processing this transformation, and has not
+            // yet timed out. We'll just log it and skip it for now.
+            $this->getLogger()->warning($e->getMessage());
+        } catch (Throwable $e) {
+            // Need to handle here rather than bubbling to kernel because we want to render the process id in the log.
+            // Send this exception to Sentry
+            if (!$this->suppressSentryReporting) {
+                $this->captureException($e);
+            }
+            // Print all exceptions in chain
+            while ($e) {
+                $this->getLogger()->error($this->prefixLog(sprintf("%s: %s", $hash . '-' . $cacheKey, $e->getMessage())));
+                $this->getLogger()->error($this->prefixLog(sprintf("%s: %s", $hash . '-' . $cacheKey, $e->getTraceAsString())));
+                $e = $e->getPrevious();
+            }
+        }
+    }
+}

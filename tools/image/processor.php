@@ -2,292 +2,71 @@
 <?php
 
 /**
- * @author      Sam Bailey <sam.bailey@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+declare(ticks=1);
+
 use Alaress\Image;
-use Schoolbox\Application\CliTool;
-use Schoolbox\Resource\Storage;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-// Need to fork before we open any db connection
-// We should be able to just reconnect in the child, but that's not working for some reason.
-const MAX_WORKERS = 4;                      // default maximum number of workers
-const LIMIT       = 300;                    // default maximum amount of images to be processed
-$workerCount = (int)getenv('MAX_WORKERS', true) ?: MAX_WORKERS;
-$limit       = (int)getenv('LIMIT', true) ?: LIMIT;
-if ($workerCount > $limit) {
-    $workerCount = $limit;
-}
-$workerPids = [];
-$workerIdx  = null;
-for ($i = 0; $i < $workerCount; $i++) {
-    $pid = pcntl_fork();
-    if ($pid === -1) {
-        // Unable to fork.
-        echo "[manager] Unable to start image processing workers";
-        exit(1);
-    }
-    if ($pid) {
-        // Parent Process
-        // Add new worker to the worker list and worker count for tracking
-        $workerPids[] = $pid;
-    } else {
-        // Worker Process
-        $workerPids = null;
-        $workerIdx  = $i;
-        break;
-    }
-}
+const DEFAULT_TIME_INTERVAL_MINUTES  = 60;                   // default time period in minutes to look up images for processing
+const DEFAULT_IMAGE_COUNT_LIMIT      = 300;                  // default maximum amount of images to be processed
+const DEFAULT_ATTEMPTS_PER_TRANSFORM = 3;                    // default maximum times to attempt each transformation
 
-/**
- * CLI tool for pre-converting images to the most common formats
- */
-$app = new class ($workerPids, $workerIdx, $limit, $workerCount) extends CliTool\App {
-    private const TIME_INTERVAL = 60;                   // default time period in minutes to look up images for processing
+$timeInterval         = (int)getenv('TIME_INTERVAL', true) ?: DEFAULT_TIME_INTERVAL_MINUTES;
+$workerCount          = (int)getenv('MAX_WORKERS', true) ?: (int)shell_exec('nproc');
+$imageCountLimit      = (int)getenv('LIMIT', true) ?: DEFAULT_IMAGE_COUNT_LIMIT;
+$retryFailed          = (bool)getenv('RETRY_FAILED', true);
+$attemptsPerTransform = (int)getenv('MAX_ATTEMPTS', true) ?: DEFAULT_ATTEMPTS_PER_TRANSFORM;
 
-    // --help: print help
-    private const OPT_LONG_HELP = 'help';
-
-    // List of transformations that we will generate for each image
-    private const CUSTOM_TRANSFORMS = [
-        [100, 100],
-        [2048, 2048],
-    ];
-    private const STORAGE_TRANSFORMS = [
-        'maxsize',
-        'square64',
-        'square128',
-    ];
-
-    /**
-     * This manager's worker's PIDs, null if a worker
-     * @var int[]|null
-     */
-    private $workerPids;
-
-    /**
-     * This worker's 0-based index, null if the manager
-     * @var int|null
-     */
-    private $workerIdx;
-
-    /**
-     * Total hashes to process across all workers
-     * @var int
-     */
-    private $limit;
-
-    /** @var int */
-    private $workerCount;
-
-
-    /**
-     * @param array|null $workerPids
-     * @param int|null   $workerIdx
-     * @param int        $limit
-     * @param int        $workerCount
-     */
-    public function __construct(?array $workerPids, ?int $workerIdx, int $limit, int $workerCount)
-    {
-        $this->workerPids  = $workerPids;
-        $this->workerIdx   = $workerIdx;
-        $this->limit       = $limit;
-        $this->workerCount = $workerCount;
-    }
-
-
-    /** @inheritdoc */
-    public function getLongOpts(): array
-    {
-        return [
-            self::OPT_LONG_HELP,
-        ];
-    }
-
-    /**
-     * Returns whether this process is the manager and not a worker
-     *
-     * @return bool
-     */
-    private function isManager(): bool
-    {
-        return $this->workerIdx === null;
-    }
-
-
-    /** @inheritDoc */
-    public function run(): void
-    {
-        if ($this->getOpt(self::OPT_LONG_HELP)) {
-            $this->printHelp();
-            exit;
-        }
-        $this->isManager()
-            ? $this->runManager($this->workerPids)
-            : $this->runWorkerCode($this->workerIdx, $this->limit);
-    }
-
-
-    /**
-     * Runs the manager.
-     *
-     * @param int[] $workerPids
-     */
-    private function runManager(array $workerPids): void
-    {
-        // Just waits for each child to finish.
-        foreach ($workerPids as $workerPid) {
-            pcntl_waitpid($workerPid, $status);
-        }
-        $this->getLogger()->info('[manager] so long, and thanks for all the fish');
-    }
-
-
-    /**
-     * Runs the worker
-     * @param int $workerIdx
-     * @param int $limit
-     */
-    private function runWorkerCode(int $workerIdx, int $limit): void
-    {
-        $timeInterval = (int)getenv('TIME_INTERVAL', true) ?: self::TIME_INTERVAL;
-
-        $hashList      = $this->getHashList($timeInterval, $limit, $workerIdx);
-        $hashObjects   = Storage\Mapper::getInstance()->findByColumn('hash', $hashList);
-        $filesFound    = $hashObjects->getPropertyValues('hash');
-        $filesNotFound = array_diff($hashList, $filesFound);
-
-        foreach ($filesNotFound as $hash) {
-            $this->getLogger()->error(sprintf("[%s] %s: %s", posix_getpid(), $hash, 'File not found'));
-        }
-
-        foreach ($hashObjects as $hashObject) {
-            $this->processHashObject($hashObject);
-        }
-    }
-
-
-    /**
-     * Worker process function
-     *
-     * @param Storage\Model $hashObject
-     */
-    private function processHashObject(Storage\Model $hashObject): void
-    {
-        $hash = $hashObject->getHash();
-        $this->getLogger()->debug(sprintf("[%d] Processing: %s", posix_getpid(), $hash));
-
-        // Random Width x Height transformations
-        $myImageTransforms = new Image\Transformation\MyImage();
-        foreach (self::CUSTOM_TRANSFORMS as $widthAndHeight) {
-            [$width, $height] = $widthAndHeight;
-            $cacheKey  = "{$width}x{$height}";
-            $transform = $myImageTransforms->retrieve($width, $height);
-            $this->generateTransform($hashObject, $cacheKey, $transform);
-        }
-
-        // Preset transformations
-        $storageTransforms = new Image\Transformation\Storage();
-        foreach (self::STORAGE_TRANSFORMS as $transformName) {
-            $cacheKey  = $transformName;
-            $transform = $storageTransforms->retrieve($transformName);
-            $this->generateTransform($hashObject, $cacheKey, $transform);
-        }
-    }
-
-    /**
-     * Apply the specified transform to the storage object and save it using specified cache key
-     *
-     * @param Storage\Model    $hashObject
-     * @param string           $cacheKey
-     * @param Image\ITransform $transform
-     */
-    private function generateTransform(Storage\Model $hashObject, string $cacheKey, Image\ITransform $transform): void
-    {
-        $hash      = $hashObject->getHash();
-        $processor = new Image\Processor($hashObject, $cacheKey, $transform);
-
-        try {
-            $transformFile = $processor->load(3);
-            if (!$transformFile->isCacheHit()) {
-                $this->getLogger()->info(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $cacheKey, 'success'));
-            } else {
-                $this->getLogger()->debug(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $cacheKey, 'already cached'));
-            }
-        } catch (Exception $e) {
-            // Send this exception to Sentry
-            $this->captureException($e);
-            // Print all exceptions in chain
-            while ($e) {
-                $this->getLogger()->error(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $cacheKey, $e->getMessage()));
-                $this->getLogger()->error(sprintf("[%d] %s: %s", posix_getpid(), $hash . '-' . $cacheKey, $e->getTraceAsString()));
-                $e = $e->getPrevious();
-            }
-        }
-    }
-
-    /**
-     * Returns a list of hashes to process, exits if none found
-     *
-     * @param int $timeInterval
-     * @param int $limit
-     * @param int $workerIdx
-     * @return string[]
-     */
-    private function getHashList(int $timeInterval, int $limit, int $workerIdx): array
-    {
-        // Retrieve list of images uploaded within the 15 minutes up to a max of 300
-        $query = "
-            SELECT `hash` FROM `storage` s
-            JOIN allowedFileExtension afe ON s.ext = afe.extension
-            JOIN allowedFileTypes aft
-                ON afe.fileTypeID = aft.fileTypeID
-                AND aft.mime LIKE 'image%'
-                AND aft.mime NOT LIKE 'image%svg%'
-                AND aft.mime NOT LIKE 'image%webp%'
-            WHERE s.uploaded_on >= (NOW() - INTERVAL {$timeInterval} MINUTE)
-            ORDER BY s.uploaded_on
-            LIMIT 0, {$limit}";
-
-        $hashList = $this->getDatabaseInternal()->executeQuery($query)->fetchAll(PDO::FETCH_COLUMN);
-        $hashList = array_filter($hashList, function (string $hash) use ($workerIdx): bool {
-            // Select a subset of results to be processed by this worker
-            return (int)substr(base_convert($hash, 16, 10), 0, 6) % $this->workerCount === $workerIdx;
-        });
-        if (!count($hashList)) {
-            $this->getLogger()->info(sprintf('[%s] No images found for processing', posix_getpid()));
-            exit(0);
-        }
-        return $hashList;
-    }
-
-
-    /**
-     * Prints help message to STDOUT
-     */
-    private function printHelp(): void
-    {
-        // Only the manager prints help
-        if (!$this->isManager()) {
-            return;
-        }
-        echo <<<HELP
+$opt = getopt('hv', ['help', 'verbose']);
+if (array_key_exists('h', $opt) || array_key_exists('help', $opt)) {
+    echo <<<HELP
 
 Convert image files into their commonly-accessed transforms. This preconversion trades time for storage
 so that first-time-accesses don't require an on-demand transform which can sometimes slow the system
 down when everyone demands image transforms simultaneously.
 
-Usage: processor.php
+Usage: tools/image/processor.php
 
+Options:
+    -h,--help           Print this help message and exit
+    -v,--verbose        Log with additional verbosity. Can be repeated up to 3 times.
+
+Environment variables:
+    TIME_INTERVAL=N     Produce standard transforms for storages files uploaded in last N minutes. Default: 60
+    MAX_WORKERS=N       Maximum number of concurrent workers. Defaults to CPU count
+    LIMIT=N             Maximum number of storage files to transform
+    RETRY_FAILED=0|1    If true, just retry previously failed transforms. Eg if hash file has now been restored.
+    MAX_ATTEMPTS=N      Maximum number of times to attempt a transformation if it throws a catchable exception
 
 HELP;
+    exit;
+}
+proc_nice(10); // Always run with lower priority
+$verboseFlagCount = 0;
+foreach (['v', 'verbose'] as $verboseFlag) {
+    if (array_key_exists($verboseFlag, $opt)) {
+        $verboseFlagCount += count((array)$opt[$verboseFlag]);
     }
-};
-
-$logLevel = (int)getenv('LOG_LEVEL', true) ?: Monolog\Logger::INFO;
-$kernel   = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => $logLevel]);
-$kernel->runApp();
+}
+$verboseFlagCount = min($verboseFlagCount, 3);
+$limits           = [
+    0 => Monolog\Logger::ERROR,    // nil verbosity: exceptional behaviour only
+    1 => Monolog\Logger::NOTICE,   // min verbosity: significant events
+    2 => Monolog\Logger::INFO,     // mod verbosity: most things
+    3 => Monolog\Logger::DEBUG,    // max verbosity: EV-ER-Y-THING...
+];
+$parent = new Image\Processor\Manager(
+    $timeInterval,
+    $imageCountLimit,
+    $workerCount,
+    new Alaress\Lumberjack\Logger(STDOUT, STDERR, $limits[$verboseFlagCount]),
+    $retryFailed,
+    $attemptsPerTransform
+);
+$parent->run();
