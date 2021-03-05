@@ -134,6 +134,7 @@ class Controller extends Base
 
     /**
      * Generate payload for System Usage
+     *
      * @param User $user
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
@@ -150,6 +151,7 @@ class Controller extends Base
 
     /**
      * Generate payload for Total Usage
+     *
      * @param User $user
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
@@ -165,17 +167,18 @@ class Controller extends Base
 
 
     /**
-     * Generate payload for User Usage
+     * Generate payload for File Usage
+     *
      * @param User $user
      * @throws \Alaress\Database\Exception
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getSpecificUserUserPayload(User $user): void
+    public function getSpecificUserFilePayload(User $user): void
     {
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
 
-        $payload = (new Graph\SpecificUser\UserPayload($database))->generate($user);
+        $payload = (new Graph\SpecificUser\FilePayload($database))->generate($user);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }

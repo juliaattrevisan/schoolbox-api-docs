@@ -67,7 +67,7 @@ class Module extends BaseModule
         $this->register('GET', '/specific/{userId}', 'getSpecificUser', $getPerms, $preloadUser);
         $this->register('GET', '/specific/{userId}/system', 'getSpecificUserSystemPayload', $getPerms, $preloadUser);
         $this->register('GET', '/specific/{userId}/total', 'getSpecificUserTotalPayload', $getPerms, $preloadUser);
-        $this->register('GET', '/specific/{userId}/user', 'getSpecificUserUserPayload', $getPerms, $preloadUser);
+        $this->register('GET', '/specific/{userId}/file', 'getSpecificUserFilePayload', $getPerms, $preloadUser);
         $this->register('GET', '/specific/{userId}/type', 'getSpecificUserFileTypePayload', $getPerms, $preloadUser);
     }
 
