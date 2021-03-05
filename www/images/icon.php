@@ -27,8 +27,9 @@ $size = str_replace('square', '', $size);
 
 // Try to output the fail image. If even THAT fails, just redirect to the image.
 try {
-    $transform      = (new Image\Transformation\Icon())->retrieve($icon, $size);
-    $cache_key      = "$icon-$size";
+    $iconTransform  = new Image\Transformation\Icon();
+    $transform      = $iconTransform->retrieve($icon, $size);
+    $cache_key      = $iconTransform->getCacheKey($icon, $size);
     $imageProcessor = new Image\Processor(LocalFS::getStorageModel(WEB_root, $path), $cache_key, $transform);
     $imageProcessor->load()->stream();
 } catch (ConcurrentTransformationException $e) {

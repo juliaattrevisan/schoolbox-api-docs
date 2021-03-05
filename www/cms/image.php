@@ -30,7 +30,7 @@ session_start();
 
 /* Choose a caching method to use
  */
-$cacheKey = $_GET['width'] . 'x' . $_GET['height'];
+
 
 try {
     $file = Schoolbox\Resource\File\Mapper::getInstance()->findById($_GET['id']);
@@ -47,6 +47,8 @@ try {
 
 /* Process and stream image
  */
+$myImage  = new Transformation\MyImage();
+$cacheKey = $myImage->getCacheKey((int)$_GET['width'], (int)$_GET['height']);
 try {
     /** @var Schoolbox\Resource\File\Model $file */
     /** @var Schoolbox\Resource\Storage\Model $resource */
@@ -73,7 +75,7 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $transform      = (new Transformation\MyImage())->retrieve((int)$_GET['width'], (int)$_GET['height']);
+    $transform      = $myImage->retrieve((int)$_GET['width'], (int)$_GET['height']);
     $imageProcessor = new Processor($resource, $cacheKey, $transform);
     $imageProcessor->load()->stream();
 } catch (ConcurrentTransformationException $e) {

@@ -33,11 +33,13 @@ try {
 }
 
 if (isset($_GET['key'])) {
-    $cacheKey   = $_GET['key'];
-    $transform = (new Image\Transformation\Storage())->retrieve($cacheKey);
+    $transforms = new Image\Transformation\Storage();
+    $cacheKey   = $transforms->getCacheKey($_GET['key']);
+    $transform  = $transforms->retrieve($_GET['key']);
 } elseif (isset($_GET['width']) && isset($_GET['height'])) {
-    $cacheKey   = $_GET['width'] . 'x' . $_GET['height'];
-    $transform = (new Image\Transformation\MyImage())->retrieve((int)$_GET['width'], (int)$_GET['height']);
+    $transforms = new Image\Transformation\MyImage();
+    $cacheKey   = $transforms->getCacheKey((int)$_GET['width'], (int)$_GET['height']);
+    $transform  = $transforms->retrieve((int)$_GET['width'], (int)$_GET['height']);
 } else {
     redirectToBroken(400);
     exit;

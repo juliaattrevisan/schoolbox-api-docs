@@ -76,8 +76,10 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $transform = (new Image\Transformation\Portrait())->retrieve($_GET['size']);
-    $image = new Image\Processor($storageModel, $_GET['size'], $transform);
+    $portrait  = new Image\Transformation\Portrait();
+    $transform = $portrait->retrieve($_GET['size']);
+    $cacheKey  = $portrait->getCacheKey($_GET['size']);
+    $image     = new Image\Processor($storageModel, $cacheKey, $transform);
 
     $image->load()->stream();
 } catch (ConcurrentTransformationException $e) {

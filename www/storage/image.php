@@ -46,7 +46,8 @@ try {
             }
         }
 
-        $imageProcessor = new Image\Processor($resource, $size, (new Transformation\Storage())->retrieve($size));
+        $transforms     = new Transformation\Storage();
+        $imageProcessor = new Image\Processor($resource, $transforms->getCacheKey($size), $transforms->retrieve($size));
         $imageProcessor->load()->stream();
         exit;
     }

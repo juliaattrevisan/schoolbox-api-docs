@@ -59,11 +59,11 @@ if (!(array_key_exists($logo, $logoSizes) && array_key_exists($size, $logoSizes[
     SitePage::redirectToBrokenImageOfSize(80, 80, 404);
 }
 
-
+$myImage = new Transformation\MyImage();
+$key     = $myImage->getCacheKey($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]);
 try {
     /* Choose a caching method to use
      */
-    $key            = $logoSizes[$logo][$size][0] . 'x' . $logoSizes[$logo][$size][1];
     $hash           = Config::get($logo);
     if (!$hash) {
         // Quick hack to prevent avoidable db query (shouldn't be throwing exceptions for this)
@@ -93,7 +93,7 @@ try {
 
     /* Process and stream image
      */
-    $transform      = (new Transformation\MyImage())->retrieve($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]);
+    $transform      = $myImage->retrieve($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]);
     $imageProcessor = new Image\Processor($resource, $key, $transform);
     $imageProcessor->load()->stream();
     exit;
