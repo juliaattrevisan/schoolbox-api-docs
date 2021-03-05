@@ -131,6 +131,7 @@
                     event.preventDefault();
                     deleteButton.confirmDialog({
                         text: 'Are you sure you want to delete this event?',
+                        confirmLabel: 'Delete',
                         confirmEvent: $.confirmDialog.followHref
                     });
                 })

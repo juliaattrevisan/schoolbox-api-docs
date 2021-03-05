@@ -35,6 +35,7 @@
                     var $element = $(this);
                     $element.confirmDialog({
                         text: 'Are you sure you want to delete this Quiz?',
+                        confirmLabel: 'Delete',
                         confirmEvent: function () {
                             $.post($element.attr('href'), {returnUrl: '{RETURN_URL}'}, function (data) {
                                 if('string' == typeof data.returnUrl){

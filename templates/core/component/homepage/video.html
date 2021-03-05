@@ -21,6 +21,7 @@
 
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this?',
+                    confirmLabel: 'Delete',
                     confirmEvent: function (anchor) {
                         $.get('/cms/fileForm.php?ajax=1&delete=' + anchor.attr('id')).done(function() {
                             location.reload();

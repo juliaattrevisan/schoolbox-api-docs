@@ -225,6 +225,7 @@
         var self = this;
         self.deleteButton.confirmDialog({
             text: 'Are you sure you want to delete this content permanently?',
+            confirmLabel: 'Delete',
             confirmEvent: function () {
                 var previousState = self.currentState;
                 self.switchState(self.states.deleting);

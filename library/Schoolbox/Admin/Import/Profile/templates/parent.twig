@@ -21,7 +21,7 @@
                         <ul class="flex-list buttons">
                             <li>
                                 {% if numProfiles %}
-                                    <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="icon-download button">Export Parent Data</a>
+                                    <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="icon-export button">Export Parent Data</a>
                                 {% else %}
                                     <a href="/adminv2/import/profile/parent.csv" class="icon-download button">Download Parent Template</a>
                                 {% endif %}

@@ -24,6 +24,7 @@
             event.preventDefault();
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete the selected users?',
+                confirmLabel: 'Delete',
                 confirmEvent: function() {
                     updateForm.append('<input name="deleteUsers" type="hidden" value="1" />');
                     updateForm.submit();

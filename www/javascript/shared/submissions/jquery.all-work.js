@@ -244,6 +244,7 @@
 
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this comment?',
+                    confirmLabel: 'Delete',
                     confirmEvent: function() {
                         $.ajax({
                             type: 'POST',

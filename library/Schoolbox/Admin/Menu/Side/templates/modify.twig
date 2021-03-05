@@ -2,12 +2,6 @@
     $(function () {
         var form = $('form#itemForm');
 
-        $('[data-cancel]').click(function () {
-            window.location.href = '{{ routeLookup('adminMenuSide.getIndex') }}';
-            return false;
-        });
-
-
         $('[data-submit]').click(function () {
             form.alaressValidate({
                 ignore: ':disabled',
@@ -27,6 +21,7 @@
             var id = $(this).data('delete');
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this menu item?',
+                confirmLabel: 'Delete',
                 confirmEvent: function () {
                     $.post('{{ routeLookup('adminMenuSide.postDelete') }}', {
                         id: id
@@ -135,10 +130,7 @@
     </div>
     <div class="row">
         <div class="small-12 column">
-            <ul class="flex-list buttons">
-                <li><input data-submit type="submit" value="Save"></li>
-                <li><button data-cancel class="button icon-cancel">Cancel Changes</button></li>
-            </ul>
+            <input data-submit type="submit" value="Save">
         </div>
     </div>
 </form>

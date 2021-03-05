@@ -1,3 +1,6 @@
+$alert-button-bg-color: $alert-color;
+$alert-button-bg-hover: scale-color($alert-color, $lightness: $button-function-factor);
+$alert-button-border-color: $alert-button-bg-hover;
 $dropdown-button-pip-color: $content-ui-foreground;
 $dropdown-button-padding-med: 2.5rem;
 $dropdown-button-pip-opposite-med: 1rem;
@@ -36,8 +39,9 @@ a[disabled], a.disabled {
     }
 
 	&.alert{
+        color: $white;
 		&:hover {
-			color: $white !important;
+			color: $white;
 		}
 	}
 

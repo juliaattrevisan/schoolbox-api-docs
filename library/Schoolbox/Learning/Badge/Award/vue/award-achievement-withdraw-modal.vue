@@ -151,8 +151,8 @@ export default {
 
             <p>Are you sure you want to withdraw this achievement from {{ award.recipient.fullName }}?</p>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="withdraw()" class="button submit">Yes</a></li>
-                <li><a @click.prevent="close()" class="button">No</a></li>
+                <li><a @click.prevent="withdraw()" class="button submit">Withdraw</a></li>
+                <li><a @click.prevent="close()" class="button">Cancel</a></li>
             </ul>
         </template>
     </reveal-modal>

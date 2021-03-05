@@ -92,6 +92,7 @@
             var groupId = $(this).attr('data-delete');
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this group? Their access will be permanently removed from any associated {{ locale.pastoral }} records.',
+                confirmLabel: 'Delete',
                 confirmEvent: function () {
                     $.post('{{ routeLookup('pastoralManagement.postGroupsDelete') }}', {
                         id: groupId

@@ -23,6 +23,7 @@
             submitHandler: function(form) {
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete the selected attempts?',
+                    confirmLabel: 'Delete',
                     confirmEvent: function() {
                         form.submit();
                     }

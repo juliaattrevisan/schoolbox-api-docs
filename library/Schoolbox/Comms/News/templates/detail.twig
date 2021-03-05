@@ -44,6 +44,7 @@ Data:
 
                     $element.confirmDialog({
                         text: 'Are you sure you want to delete ' + title + '?',
+                        confirmLabel: 'Delete',
                         confirmEvent: function() {
                             $toast.toastActivate({
                                 text: 'Deleting ' + title
@@ -225,7 +226,7 @@ Data:
         <ul class="flex-list buttons" id="actionButtons">
             {# Reject this news article #}
             {% if article.canBeRejected and rejectRoute and not article.isApproved %}
-                <li><a class="icon-undo" href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
+                <li><a href="{{ rejectRoute }}" id="reject-article" title="{{ rejectVerb }} this article" data-reject="{{ article.title }}">{{ rejectVerb }}</a></li>
             {% endif %}
 
             {% if isPublishable and (approveRoute or submitRoute) %}
