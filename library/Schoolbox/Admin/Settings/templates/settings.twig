@@ -7,30 +7,32 @@
     isSkinConfig:             bool        - Are we rendering the skin config settings?
     configContext:            array       - Data required to render a config settings form
 #}
-{{ renderAdminNavigation(pageCurrent) }}
 
-<div class="row">
-<div class="small-12 columns">
-    <dl class="sub-nav">
-        {% for tab in settingsTabs %}
-            <dd class="{% if tab.isActive %}active{% endif %}"><a href="{{ tab.route }}">{{ tab.label }}</a></dd>
-        {% endfor %}
-    </dl>
-</div>
-</div>
+<div class="admin-container row">
 
-{% if isLocalisation %}
-    {% include '@settings/fragments/localisation.twig' %}
-{% elseif isSkinConfig %}
-<div class="row">
-    <div class="small-12">
-        <div class="alert-box warning">
-            Any changes made to the skin configuration may not be visible immediately to you or other users, as they
-            are cached for efficiency.
-            To see your changes immediately, press Ctrl-F5 in the browser.
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <dl class="sub-nav">
+                {% for tab in settingsTabs %}
+                    <dd class="{% if tab.isActive %}active{% endif %}"><a href="{{ tab.route }}">{{ tab.label }}</a></dd>
+                {% endfor %}
+            </dl>
         </div>
+        {% if isLocalisation %}
+        {% include '@settings/fragments/localisation.twig' %}
+        {% elseif isSkinConfig %}
+        <div class="row">
+            <div class="small-12">
+                <div class="alert-box warning">
+                    Any changes made to the skin configuration may not be visible immediately to you or other users, as they
+                    are cached for efficiency.
+                    To see your changes immediately, press Ctrl-F5 in the browser.
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% include '@settings/moduleConfig.twig' with configContext only %}
     </div>
 </div>
-{% endif %}
-
-{% include '@settings/moduleConfig.twig' with configContext only %}
