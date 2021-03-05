@@ -11,7 +11,7 @@ use Alaress\Database\Connector\IConnector;
 
 
 /**
- * Class FileTYpePayload
+ * Class FileTypePayload
  *
  * Storage usage, grouped by mime type
  *

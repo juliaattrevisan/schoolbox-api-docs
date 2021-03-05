@@ -12,7 +12,7 @@ use Schoolbox\User;
 
 
 /**
- * Class FileTYpePayload
+ * Class FileTypePayload
  *
  * Storage usage, grouped by mime type
  *
