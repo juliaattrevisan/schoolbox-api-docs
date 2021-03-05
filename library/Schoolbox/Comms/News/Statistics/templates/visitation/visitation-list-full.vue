@@ -1,7 +1,7 @@
 <script>
     
     import { VueGoodTable } from 'vue-good-table';
-    import axios from "axios";
+    import axios from 'axios';
     import { ENDPOINTS } from '@schoolboxCommsNews/Statistics/templates/visitation/endpoints.js';
 
     export default {
@@ -62,6 +62,11 @@
                 page: 1,
 
                 columns: [
+                    {
+                        label: 'Id',
+                        field: 'id',
+                        hidden: true
+                    },
                     {
                         label: 'Name',
                         field: 'firstname',
@@ -162,7 +167,15 @@
                     <section>
                         <vue-good-table
                             :columns="columns"
-                            :rows="rows"/>
+                            :rows="rows"
+                            :pagination-options="{
+                                enabled: true,
+                                perPage: 50,
+                                perPageDropdown: [50, 100, 200],
+                                rowsPerPageLabel: 'Users per page',
+                                infoFn: (params) => `${params.firstRecordOnPage} - ${params.lastRecordOnPage} of ${params.totalRecords} Users`,
+                            }"
+                        />
                     </section>
                 </template>
             </div>
@@ -172,7 +185,13 @@
 
 <style lang="scss">
 
-@import 'vue-good-table/dist/vue-good-table.scss';
+@import 'vue-good-table/dist/vue-good-table';
+
+.vgt-wrap__footer .footer__row-count__select {
+	width: 100px;
+	margin: 0;
+	padding: 0px 10px;
+}
 
 </style>
 
