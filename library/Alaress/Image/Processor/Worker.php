@@ -237,7 +237,8 @@ class Worker extends CliTool\App
             $this->getLogger()->warning($e->getMessage());
         } catch (Throwable $e) {
             // Need to handle here rather than bubbling to kernel because we want to render the process id in the log.
-            // Send this exception to Sentry
+            // Don't send exception to Sentry if we are retrying failed transforms, as it's quite normal for these to
+            // continue to fail
             if (!$this->suppressSentryReporting) {
                 $this->captureException($e);
             }
