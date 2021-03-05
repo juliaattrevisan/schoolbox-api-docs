@@ -182,7 +182,8 @@ class Processor
         // In both cases the process is killed and does not return to the catch block, so both cases leave the transform with a 'processing' state.
         // If ImageMagick cannot write to temp dir, it will die without throwing an exception, so will not be caught.
         // If we're in a web request, we're constrained by a memory limit. This is often exceeded when ImageMagick finishes and returns the contents which
-        // are then base64 encoded.
+        // are then base64 encoded. This will not throw an exception. We could catch it in a custom shutdown handler, but it's fine to leave in the
+        // 'processing' state so this is not required
         try {
             $transformSize = $this->generateTransformation($maxAttempts, $fileFormat, $fileSystem, $transformPath);
         } catch (FileNotFoundException | FileExistsException | ImagineException\OutOfBoundsException | ImagineException\RuntimeException | OverflowException $e) {
