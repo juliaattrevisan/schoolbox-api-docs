@@ -144,7 +144,12 @@ class Collector
         [$id, $replacementBasename] = $this->parseKey($key);
         $storage = clone $this->handlers[$type]->fetch($id);
         if (isset($replacementBasename)) {
-            $storage->setBasename($replacementBasename);
+            $storage->setFilename(mb_pathinfo($replacementBasename, PATHINFO_FILENAME));
+            $replacementExtension = mb_pathinfo($replacementBasename, PATHINFO_EXTENSION);
+            // override extension only when necessary
+            if (!$storage->getExtension() && !empty($replacementExtension)) {
+                $storage->setExtension($replacementExtension);
+            }
         }
         return $storage;
     }
