@@ -16,7 +16,14 @@ export default {
     props: {
         payload: {
             type: Object,
-            required: true
+            required: true,
+            default: () => {
+                return { 
+                    article: {
+                        id: 0
+                    }
+                }
+            }
         }
     },
 
@@ -24,19 +31,10 @@ export default {
 
         return {
 
-            /* True, when data is currently loading; used to show skeleton
+            /* True, when data is currently isLoading; used to show skeleton
                 */
-            loading: true,
-
-            /* The full list of users who visited this article, obtained asynchronously
-                * This stack gets paginated elsewhere
-                */
-            allUsers: [],
-
-            /* The current page number
-                */
-            page: 1,
-
+            isLoading: true,
+               
             /* The table headings to dsiplay and thus row data to show
                 */
             columns: [
@@ -53,7 +51,11 @@ export default {
                     field: 'occursAt.absolute',
 					formatFn: this.formatLastVisited
                 },
-            ]
+            ],
+
+            /* Will hold the row data once it's loaded
+                */
+            rows: []
 
         }
 
@@ -80,16 +82,16 @@ export default {
                     
                     /* Hide skeleton
                         */
-                    this.loading = false;
+                    this.isLoading = false;
 
                 }).catch((error) => {
-                    this.loading = false; //display error note in the DOM
+                    this.isLoading = false; //display error note in the DOM
                 }); 
 
         },
 
         /**
-         * display the date in the Numerical Date Format within settings
+         * format the ISO date for better readability
          *
          */
         formatLastVisited (value) {
@@ -108,7 +110,7 @@ export default {
     <div>
         <div class="row">
             <div class="small-12 island">
-                <template v-if="this.loading">
+                <template v-if="this.isLoading">
                     <table class="skeleton">
                         <tbody>
                         <tr v-for="n in 3" :key="n">
@@ -117,7 +119,7 @@ export default {
                         </tbody>
                     </table>
                 </template>
-                <template v-else-if="!this.loading && rows.length === 0">
+                <template v-else-if="!this.isLoading && rows.length === 0">
                     <div class="empty-state">
                         <i class="icon-staff"></i>
                         <p>Nobody has visited yet.</p>
