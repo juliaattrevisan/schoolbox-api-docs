@@ -233,9 +233,9 @@
                 resubmissionRequired = $form.find('[name="resubmissionRequired"]').prop('checked');
             formData.push({name: 'publish', value: 1});
 
-            // debugger;
-
             config.onPrePublishCallback(participantId, formData);
+
+            debugger;
 
             $.ajax($form.attr('action'), {
                 dataType: 'json',
