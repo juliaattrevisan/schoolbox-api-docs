@@ -9,6 +9,22 @@
         return (size / Math.pow(base, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
     }
 
+    $(function() {
+    $('[data-file-usage]').on('click', '[data-action=delete]', function(event) {
+            event.preventDefault();
+
+            let element = $(this);
+
+            $(this).confirmDialog({
+                text: 'Are you sure you wish to delete this file?',
+                confirmEvent: function() {
+                    $.get(element.attr('href')).done(function() {
+                        window.location.reload();
+                    });
+                }
+            });
+        });
+    });
 </script>
 <div class="row">
     <div class="small-12 columns">
