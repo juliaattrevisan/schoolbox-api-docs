@@ -1,0 +1,79 @@
+<script>
+    $(function() {
+        let route = '{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}';
+
+        $.get(route, function(responseText) {
+            let categories = Array();
+            let values = Array();
+
+            $.each(responseText, function(index, element) {
+                categories.push(element.label);
+                values.push(parseInt(element.size));
+            });
+
+            $('#totalUsage').highcharts({
+                chart: {
+                    height: 150,
+                    spacingRight: 48,
+                    type: 'bar',
+                    zoomType: 'xy'
+                },
+
+                credits: {
+                    enabled: false
+                },
+
+                legend: {
+                    enabled: false
+                },
+
+                plotOptions: {
+                    bar: {
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return '<span style="color: #777777">' + this.y + '%</span>'
+                            }
+                        }
+                    }
+                },
+
+                time: {
+                    useUTC: false
+                },
+
+                title: {
+                    text: 'Total Usage'
+                },
+
+                tooltip: {
+                    enabled: false
+                },
+
+                xAxis: {
+                    categories: ['']
+                },
+
+                yAxis: {
+                    allowDecimals: false,
+                    min: 0,
+                    max: 100,
+                    title: {
+                        text: 'Percentage'
+                    }
+                },
+
+                series: [
+                    {
+                        color: '#82b5d8',
+                        name: '',
+                        data: values
+                    }
+                ]
+            });
+        });
+    });
+</script>
+<section class="content">
+    <div id="totalUsage"></div>
+</section>

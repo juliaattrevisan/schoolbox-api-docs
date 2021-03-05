@@ -45,11 +45,22 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getIndex', $getPerms);
+
+        /* Global Usage payload endpoints
+         */
         $this->register('GET', '/system', 'getSystemPayload', $getPerms);
         $this->register('GET', '/role', 'getRolePayload', $getPerms);
         $this->register('GET', '/total', 'getTotalPayload', $getPerms);
         $this->register('GET', '/user', 'getUserPayload', $getPerms);
         $this->register('GET', '/type', 'getFileTypePayload', $getPerms);
+
+        /* Specific Usage payload endpoints
+         */
+        $this->register('GET', '/specific/{userId}', 'getSpecificUser', $getPerms);
+        $this->register('GET', '/specific/{userId}/system', 'getSpecificUserSystemPayload', $getPerms);
+        $this->register('GET', '/specific/{userId}/total', 'getSpecificUserTotalPayload', $getPerms);
+        $this->register('GET', '/specific/{userId}/user', 'getSpecificUserUserPayload', $getPerms);
+        $this->register('GET', '/specific/{userId}/type', 'getSpecificUserFileTypePayload', $getPerms);
     }
 
 

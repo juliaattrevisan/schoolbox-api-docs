@@ -1,0 +1,21 @@
+<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+<div class="row">
+    <h2 class="subheader">Usage for...</h2>
+    <div class="small-12 island">
+        {% include ('@adminUsage/specificUser/total.twig') %}
+    </div>
+
+    <div class="small-12 medium-6 island">
+        {% include ('@adminUsage/specificUser/system.twig') %}
+    </div>
+
+    <div class="small-12 medium-6 island">
+        {% include ('@adminUsage/specificUser/filetype.twig') %}
+    </div>
+
+    <div class="small-12 island">
+        <h2 class="subheader">Users</h2>
+        {% include ('@adminUsage/specificUser/user.twig') %}
+    </div>
+</div>
+
