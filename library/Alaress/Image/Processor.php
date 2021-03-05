@@ -12,6 +12,7 @@ use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress_Byte_Format;
 use Alaress_Date_Format;
 use DomainException;
+use Imagick;
 use Imagine\Exception as ImagineException;
 use Alaress\Image\Transform\RotateOrientation;
 use Imagine\Image\ImageInterface;
@@ -20,6 +21,7 @@ use Imagine\Imagick\Imagine;
 use InvalidArgumentException;
 use League\Flysystem;
 use League\Flysystem\FileExistsException;
+use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
 use OverflowException;
 use PDOException;
@@ -59,6 +61,17 @@ class Processor
     /** @var ITransform */
     private $transform;
 
+    /**
+     * Number of seconds to allow image magick to process the transform.
+     *
+     * * For web requests, this value must be less than the php-fpm request timeout to prevent temp files
+     *   being left on disk.
+     * * For CLI requests, it should be less than the Lock + max execution times.
+     *
+     * @var int
+     */
+    private int $imageMagickTimeout;
+
 
     /**
      * Constructor
@@ -66,12 +79,14 @@ class Processor
      * @param Storage\Model $file
      * @param string        $cacheKey
      * @param ITransform    $transform
+     * @param int           $imageMagickTimeout
      */
-    public function __construct(Storage\Model $file, string $cacheKey, ITransform $transform)
+    public function __construct(Storage\Model $file, string $cacheKey, ITransform $transform, int $imageMagickTimeout = 45)
     {
-        $this->file      = $file;
-        $this->cacheKey  = $cacheKey;
-        $this->transform = $transform;
+        $this->file               = $file;
+        $this->cacheKey           = $cacheKey;
+        $this->transform          = $transform;
+        $this->imageMagickTimeout = $imageMagickTimeout;
     }
 
     /**
@@ -120,7 +135,19 @@ class Processor
             // We cannot assume if the transform exists in the database that it
             // also exists on disk and can be immediately streamed:
             // check the file exists before attempting to stream it.
-            return new StreamableFile(true, $fileFormat, $transformModel->getSize(), self::readStream($fileSystem, $transformPath));
+            try {
+                return new StreamableFile(true, $fileFormat, $transformModel->getSize(), self::readStream($fileSystem, $transformPath));
+            } catch (Flysystem\FileNotFoundException $e) {
+                // Check if hash exists on disk. If it does, reset back to 'processing', if not, set to 'failed'
+                $state = $fileSystem->has($this->file->getPath())
+                    ? Storage\Transform\Model::STATE_PROCESSING
+                    : Storage\Transform\Model::STATE_FAILED;
+                $transformMapper->save($transformModel->setSize(null)->setState($state));
+                if ($state === Storage\Transform\Model::STATE_PROCESSING) {
+                    throw new ConcurrentTransformationException($transformModel);
+                }
+                throw $e;
+            }
         }
 
         // Transform exists on (local|s3) disk, but not yet in database.
@@ -150,9 +177,15 @@ class Processor
         }
 
         // Actually attempt the transformation.
+        // If php-fpm times out, it WILL leave temp files on disk
+        // If ImageMagick times out, it will NOT temp files on disk
+        // In both cases the process is killed and does not return to the catch block, so both cases leave the transform with a 'processing' state.
+        // If ImageMagick cannot write to temp dir, it will die without throwing an exception, so will not be caught.
+        // If we're in a web request, we're constrained by a memory limit. This is often exceeded when ImageMagick finishes and returns the contents which
+        // are then base64 encoded.
         try {
             $transformSize = $this->generateTransformation($maxAttempts, $fileFormat, $fileSystem, $transformPath);
-        } catch (FileExistsException | ImagineException\OutOfBoundsException | ImagineException\RuntimeException | OverflowException $e) {
+        } catch (FileNotFoundException | FileExistsException | ImagineException\OutOfBoundsException | ImagineException\RuntimeException | OverflowException $e) {
             $transformModel->setState(Storage\Transform\Model::STATE_FAILED);
             $transformMapper->save($transformModel);
             throw $e;
@@ -182,6 +215,7 @@ class Processor
      * @throws ImagineException\OutOfBoundsException
      * @throws ImagineException\RuntimeException
      * @throws OverflowException
+     * @throws FileNotFoundException If original storage file not found on disk
      */
     private function generateTransformation(int $maxAttempts, string $fileFormat, FilesystemInterface $fileSystem, string $transformPath): int
     {
@@ -209,6 +243,8 @@ class Processor
      * @return ImageInterface
      * @throws OverflowException If file contents are too big
      * @throws ImagineException\RuntimeException If cannot read file into an image
+     * @throws FileNotFoundException If original storage file not found on disk
+     * @noinspection PhpDocRedundantThrowsInspection
      */
     private function loadImageFromFile(int $maxAttempts): ImageInterface
     {
@@ -239,6 +275,7 @@ class Processor
             }
         }
 
+        Imagick::setResourceLimit(Imagick::RESOURCETYPE_TIME, $this->imageMagickTimeout);
         $imagine  = (new Imagine())->setMetadataReader(new ExifMetadataReader());
         $image    = null;
         $attempts = 0;
