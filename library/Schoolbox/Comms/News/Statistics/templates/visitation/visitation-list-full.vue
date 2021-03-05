@@ -1,147 +1,107 @@
 <script>
     
-    import { VueGoodTable } from 'vue-good-table';
-    import axios from 'axios';
-    import { ENDPOINTS } from '@schoolboxCommsNews/Statistics/templates/visitation/endpoints.js';
+import { VueGoodTable } from 'vue-good-table';
+import { fetchAsJson } from '@shared/fetch/fetch';
+import { ENDPOINTS } from '@schoolboxCommsNews/Statistics/templates/visitation/endpoints.js';
+import { format, parseISO, formatDistance } from 'date-fns';
 
-    export default {
+export default {
 
+    name: "visitation-list-full",
+
+    components: {
+        VueGoodTable
+    },   
+
+    props: {
+        payload: {
+            type: Object,
+            required: true
+        }
+    },
+
+    data () {
+
+        return {
+
+            /* True, when data is currently loading; used to show skeleton
+                */
+            loading: true,
+
+            /* The full list of users who visited this article, obtained asynchronously
+                * This stack gets paginated elsewhere
+                */
+            allUsers: [],
+
+            /* The current page number
+                */
+            page: 1,
+
+            /* The table headings to dsiplay and thus row data to show
+                */
+            columns: [
+                {
+                    label: 'Name',
+                    field: 'fullname'
+                },
+                {
+                    label: 'Role',
+                    field: 'role'
+                },
+                {
+                    label: 'Last Visited',
+                    field: 'occursAt.absolute',
+					formatFn: this.formatLastVisited
+                },
+            ]
+
+        }
+
+    },
+
+    mounted () {
+        this.loadRows();
+    },
+
+    methods: {
+        
         /**
-         * Name.
-         * The name of the component that we have here. This name will be used in the container
-         * to spawn this component.
+         * Fetch payload asynchronously
+         *
          */
-        name: "visitation-list-full",
+        loadRows () {
 
-        /**
-         * Mixins.
-         * Basically traits for vue; allows you to share javascript between components in the same
-         * manner as a php trait. They must already be imported at the top of the file and will
-         * be superpositioned on top of this javascript here, inside export default {}
-         */
-        mixins: [],
-
-        /**
-         * Props.
-         * Immutable props that were passed to this component, usually via twig, in our setup.
-         * These are the hypen-separated vars which are magically computed into camelcase elsewhere.
-         */
-        props: [
-            'payload',
-        ],
-
-        /**
-         * Components.
-         * Any other vue components you also want to use here; they must already be imported
-         * at the top of the file.
-         */
-        components: {
-            VueGoodTable
-        },
-
-        /**
-         * Data.
-         * Mutable properties that can be accessed from within this component via "this" keyword
-         * Note that v-if and v-for must never be on the same node together, as this overrides
-         * the meaning of "this" in a way you don't expect.
-         */
-        data() {
-            return {
-
-                /* True, when data is currently loading; used to show skeleton
-                 */
-                loading: true,
-
-                /* The full list of users who visited this article, obtained asynchronously
-                 * This stack gets paginated elsewhere
-                 */
-                allUsers: [],
-
-                /* The current page number
-                 */
-                page: 1,
-
-                columns: [
-                    {
-                        label: 'Id',
-                        field: 'id',
-                        hidden: true
-                    },
-                    {
-                        label: 'Name',
-                        field: 'firstname',
-                    },
-                    {
-                        label: 'Role',
-                        field: 'role',
-                    },
-                    {
-                        label: 'Last Visited',
-                        field: 'occursAt',
-                    },
-                ]
-            }
-        },
-
-        /**
-         * Mounted.
-         * Basically, when vue has done all its inits and is ready to go
-         * kind of like window.onload
-         */
-        mounted: function () {
-            
-            /* Show skeleton
-             */
-            this.loading = true;
-
-            /* Fetch payload asynchronously
-             */
-            let request = {
-                url: ENDPOINTS.payloadFullPath(this.payload.article.id),
-                method: 'get',
-                responseType: 'json'
-            }
-
-            axios.request(request)
-                .then( (response) => {
+            fetchAsJson(ENDPOINTS.payloadFullPath(this.payload.article.id))
+                .then((response) => {
                     
                     /* Load into vue component
                         */
-                    this.rows = response.data;
-                })
-                .catch(error => {
-                    if (error.response) {
-                        this.loading = false;
-                    }
-                })
-                .then(() => {
-
+                    this.rows = response;
+                    
                     /* Hide skeleton
                         */
                     this.loading = false;
-                });
+
+                }).catch((error) => {
+                    this.loading = false; //display error note in the DOM
+                }); 
 
         },
 
         /**
-         * Computed properties.
-         * Access the results of a function as if they were a property of an object.
+         * display the date in the Numerical Date Format within settings
+         *
          */
-        // computed: {
-
-        // },
-
-        /**
-         * Methods.
-         * Arbitrary javascript functions which operate on the args provided, just like any
-         * other ordinary javascript that you might have written before.
-         */
-        methods: {
-
-           
-        }
-
+        formatLastVisited (value) {
+            const nice = format(parseISO(value), 'dd/LL/yyyy');
+            const relative = formatDistance(parseISO(value), new Date(), { addSuffix: true });
+            return nice + ' (' + relative + ')';
+        },
+        
     }
+
+}
+
 </script>
 
 <template>
@@ -166,8 +126,19 @@
                 <template v-else>
                     <section>
                         <vue-good-table
+                            styleClass="vgt-table striped bordered"
                             :columns="columns"
                             :rows="rows"
+                            :search-options="{
+                                enabled: true,
+                                placeholder: 'Search for users...',
+                            }"
+                            :sort-options="{
+                                initialSortBy: { 
+                                    field: 'occursAt.absolute',
+                                    type: 'desc'
+                                }
+                            }"
                             :pagination-options="{
                                 enabled: true,
                                 perPage: 50,
