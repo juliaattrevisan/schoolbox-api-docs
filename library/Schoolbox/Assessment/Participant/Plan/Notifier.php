@@ -1338,7 +1338,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         $bob    = new Builder();
         $folder = $assessment->getBaseContext()->getFolder();
-        $icon   = "/images/icon?" . http_build_query(['size' => $this->iconSize, 'icon' => 'work']);
+        $icon   = "/images/icon.php?" . http_build_query(['size' => $this->iconSize, 'icon' => NSMapper::NS_DUEWORK]);
 
         // Namespace depends on kind of assessment
         $namespace = null;
