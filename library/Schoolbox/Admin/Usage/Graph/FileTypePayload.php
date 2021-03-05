@@ -38,6 +38,8 @@ class FileTypePayload
 
 
     /**
+     * Generate usage occupied by each mime type in storage
+     *
      * @return array
      * @throws \Alaress\Database\Exception
      */

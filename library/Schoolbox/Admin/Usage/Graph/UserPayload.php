@@ -37,6 +37,13 @@ class UserPayload
 
 
     /**
+     * Get a list of users and their total usage in four specific areas
+     *
+     * File
+     * MyFile
+     * Student Submissions
+     * Submission Returns
+     *
      * @return array
      * @throws \Alaress\Database\Exception
      */

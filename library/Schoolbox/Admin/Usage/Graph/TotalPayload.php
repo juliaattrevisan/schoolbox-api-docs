@@ -36,6 +36,9 @@ class TotalPayload
 
 
     /**
+     * Find out how much space was used out of what could be used,
+     * expressed as a percentage
+     *
      * @return array
      */
     public function generate(): array

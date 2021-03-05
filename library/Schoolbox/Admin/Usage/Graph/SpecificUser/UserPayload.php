@@ -39,6 +39,9 @@ class UserPayload
 
 
     /**
+     * Generate a list of files and their locations
+     * Each file is owned by $user
+     *
      * @param User $user
      * @return array
      * @throws \Alaress\Database\Exception

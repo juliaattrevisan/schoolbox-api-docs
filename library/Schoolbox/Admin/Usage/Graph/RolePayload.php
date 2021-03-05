@@ -38,6 +38,8 @@ class RolePayload
 
 
     /**
+     * Generate usage occupied by each of the Roles
+     *
      * @return array
      * @throws \Alaress\Database\Exception
      */
