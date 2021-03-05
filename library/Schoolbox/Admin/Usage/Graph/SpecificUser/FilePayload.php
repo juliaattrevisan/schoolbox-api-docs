@@ -79,7 +79,7 @@ class FilePayload
                     '' AS categoryId,
                     '' AS categoryName
                 FROM `myFile` `f`
-                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`'
+                INNER JOIN `storage` `s` ON `f`.`hash` = `s`.`hash`
                 LEFT JOIN `allowedFileExtension` `e` ON `s`.`ext` = `e`.`extension`
                 LEFT JOIN `allowedFileTypes` `t` ON `e`.`fileTypeId` = `t`.`fileTypeId`
                 WHERE `f`.`owner` = :userId
