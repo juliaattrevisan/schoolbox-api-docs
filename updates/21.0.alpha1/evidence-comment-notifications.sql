@@ -3,7 +3,7 @@ INSERT INTO `msg_namespace` (`slug`, `label`) VALUES
 INSERT INTO `msg_source` (`namespace`, `key`, `role_type`, `description`)
 VALUES (
            (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'evidence_comment'),
-           'commented', 'staff', 'someone comments on a learning moment your you have posted');
+           'commented', 'staff', 'someone comments on a learning moment you have posted');
 INSERT INTO `msg_source` (`namespace`, `key`, `role_type`, `description`)
 VALUES (
            (SELECT `id` FROM `msg_namespace` WHERE `slug` = 'evidence_comment'),

@@ -23,6 +23,7 @@ use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
@@ -34,8 +35,9 @@ class Notifier extends AbstractModuleNotifier
 {
     public const TRIGGER_COMMENTED = 'commented';
 
-    private const PATTERN_COMMENTED_TITLE = ':user commented on :student :evidence';
-    private const PATTERN_EVIDENCE_HREF   = '/learning/evidence/%d';
+    private const PATTERN_COMMENTED_OWN_TITLE = ':user commented on :student :evidence';
+    private const PATTERN_COMMENTED_TITLE     = ":user commented on :student's :evidence";
+    private const PATTERN_EVIDENCE_HREF       = '/learning/evidence/%d';
 
     private ThreadMapper $threadMapper;
 
@@ -197,8 +199,7 @@ class Notifier extends AbstractModuleNotifier
 
         $bob = new Builder();
 
-        $bob->setTitle(self::PATTERN_COMMENTED_TITLE)
-            ->setNamespace($this->getSlug())
+        $bob->setNamespace($this->getSlug())
             ->setIcon($this->getUserIcon($effector))
             ->setSeverity(Logger::INFO)
             ->setFilter(['roletype' => $roleType])
@@ -206,34 +207,42 @@ class Notifier extends AbstractModuleNotifier
             ->addTopic("{$this->getSlug()}.{$comment->getId()}." . self::TRIGGER_COMMENTED)
             ->setBody($comment->getContent());
 
+        $isOwn = $effector->getId() === $student->getId();
         if ($roleType === Role::STUDENT) {
-            $bob->setParams(
-                [
-                    'user'     => new UserParam($effector),
-                    'student'  => new Param('your', null, Param::STACKING_REPLACE_NO_DECORATION),
-                    'evidence' => new Param('learning moment', $evidenceHref, Param::STACKING_REPLACE_NO_DECORATION),
-                ]
-            );
+            $bob->setTitle(self::PATTERN_COMMENTED_OWN_TITLE)
+                ->setParams(
+                    [
+                        'user'     => new UserParam($effector),
+                        'student'  => new Param('your', null, Param::STACKING_REPLACE_NO_DECORATION),
+                        'evidence' => new Param('learning moment', $evidenceHref, Param::STACKING_REPLACE_NO_DECORATION),
+                    ]
+                );
             $instance = $bob->build();
             $envelope->targetToUser($student, $instance);
         } elseif ($roleType === Role::PARENT) {
-            $bob->setParams(
-                [
-                    'user'     => new UserParam($effector),
-                    'student'  => new Param("your child's", null, Param::STACKING_REPLACE_NO_DECORATION),
-                    'evidence' => new Param('learning moment', $evidenceHref, Param::STACKING_REPLACE_NO_DECORATION),
-                ]
-            );
+            $bob->setTitle($isOwn ? self::PATTERN_COMMENTED_OWN_TITLE : self::PATTERN_COMMENTED_TITLE)
+                ->setParams(
+                    [
+                        'user'     => new UserParam($effector),
+                        'student'  => $isOwn
+                            ? new Param('their', null, Param::STACKING_REPLACE_NO_DECORATION)
+                            : new ChildParam($student),
+                        'evidence' => new Param('learning moment', $evidenceHref, Param::STACKING_REPLACE_NO_DECORATION),
+                    ]
+                );
             $instance = $bob->build();
             $envelope->targetToParent($student->getId(), $instance);
         } elseif ($roleType === Role::STAFF) {
-            $bob->setParams(
-                [
-                    'user'     => new UserParam($effector),
-                    'student'  => new UserParam($student),
-                    'evidence' => new Param('learning moment', $evidenceHref, Param::STACKING_REPLACE_NO_DECORATION),
-                ]
-            );
+            $bob->setTitle($isOwn ? self::PATTERN_COMMENTED_OWN_TITLE : self::PATTERN_COMMENTED_TITLE)
+                ->setParams(
+                    [
+                        'user'     => new UserParam($effector),
+                        'student'  => $isOwn
+                            ? new Param('their', null, Param::STACKING_REPLACE_NO_DECORATION)
+                            : new UserParam($student),
+                        'evidence' => new Param('learning moment', $evidenceHref, Param::STACKING_REPLACE_NO_DECORATION),
+                    ]
+                );
             $instance = $bob->build();
             $envelope->targetToUser($evidence->getCreator(), $instance);
         } else {
