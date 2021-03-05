@@ -22,8 +22,10 @@ class Model
     use UpdatedAtDate;
 
     public const STATE_PROCESSING = 'processing'; // initial state
-    public const STATE_DONE       = 'done';       // successfully transformed, file saved to disk
-    public const STATE_FAILED     = 'failed';     // transform failed, file not on disk
+    public const STATE_DONE       = 'done';       // successfully transformed, transform file saved to disk
+    public const STATE_FAILED     = 'failed';     // transform failed, transform file not on disk
+                                                  // Reasons include: - original hash missing on disk
+                                                  //                  - corrupt image
 
     public const STATES = [
         self::STATE_PROCESSING,
