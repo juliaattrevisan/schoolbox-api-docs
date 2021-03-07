@@ -42,7 +42,7 @@ the limitations of CSS variables, and the workarounds for those limitations.
 | Form Input Border Colour                           | `skin_colour_form_input_border_color`      | `$form-border-color`            | `--form-border-color`            |
 | Form Input Hover Colour                            | `skin_colour_form_background_hover_color`  | `$form-bg-hover-color`          | `--form-bg-hover-color`          |
 
-The SASS variables are defined in `www/css/foundation/utils/_variables.scss`, as
+The SASS variables are defined in `www/static/css/foundation/utils/_variables.scss`, as
 they were before CSS variables: however, their value is now set to the CSS
 variable instead of to an overridable color value.
 
@@ -102,7 +102,7 @@ e.g. CSS var `--body-foreground` will have corresponding vars:
 
 ### CSS color manipulation functions
 
-The new functions in `www/css/foundation/utils/_functions.scss` rely upon the
+The new functions in `www/static/css/foundation/utils/_functions.scss` rely upon the
 existence of these variables to be able to create new color definitions based on
 CSS variables.
 

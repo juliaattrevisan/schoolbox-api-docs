@@ -110,7 +110,7 @@ For full information on the build process of making a APT package and deploying 
   * [Meriden: Pastoral](./library/Custom/Meriden/Pastoral/README.md)
 * Javascript
   * [Vue](./docs/vue/00-intro.md)
-  * [Selectize](./www/css/core/selectize/README.md)
+  * [Selectize](./www/static/css/core/selectize/README.md)
 * Custom Templates:
   * [For Aura modules](./docs/custom/custom-templates-for-aura-modules.md)
   * [Outside Aura modules](./docs/custom/custom-templates-outside-aura-modules.md)
