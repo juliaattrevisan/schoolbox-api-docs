@@ -106,7 +106,7 @@ then
         rm -fR $tempdir/schoolbox-$tag/tools/git*;
         rm -fR $tempdir/schoolbox-$tag/www/test;
         rm -fR $tempdir/schoolbox-$tag/Vagrantfile;
-        rm -fR $tempdir/schoolbox-$tag/www/javascript/components/*/node_modules;
+        rm -fR $tempdir/schoolbox-$tag/www/static/javascript/components/*/node_modules;
         # Remove as not a deb build
         rm -fR $tempdir/schoolbox-$tag/debian;
 

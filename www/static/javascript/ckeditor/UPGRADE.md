@@ -39,7 +39,7 @@ Restore Schoolbox's CKEditor configuration and styles by reverting the changes
 made to them:
 
 ```
-git restore www/javascript/ckeditor/config.js www/javascript/ckeditor/styles.js
+git restore www/static/javascript/ckeditor/config.js www/static/javascript/ckeditor/styles.js
 ```
 
 ## Commit CKEditor build
@@ -47,6 +47,6 @@ git restore www/javascript/ckeditor/config.js www/javascript/ckeditor/styles.js
 As with any other code change, the new CKEditor build needs to be committed:
 
 ```
-git add www/javascript/ckeditor/
+git add www/static/javascript/ckeditor/
 git commit
 ```

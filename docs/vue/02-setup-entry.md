@@ -153,7 +153,7 @@ If you visit the Greenhouse now, it just won't have done anything...but why? It 
 
 ### 2.1.5 Include the js npm built for you
 
-If you look in `www/javascript/components`, you'll find a `userList.bundle.js` which npm built for you in the previous step. It won't have existed earlier.
+If you look in `www/static/javascript/components`, you'll find a `userList.bundle.js` which npm built for you in the previous step. It won't have existed earlier.
 
 You need to include this in the `container.twig` file we built earlier.
 
