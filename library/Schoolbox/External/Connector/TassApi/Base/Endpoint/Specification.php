@@ -58,9 +58,9 @@ class Specification implements ISpecification
     public function check(): array
     {
         $modules = [
-            DSN::MODULE_LMS_INTEGRATION,
-            DSN::MODULE_STUDENT_DETAILS,
-            DSN::MODULE_IDENTITY_MANAGEMENT
+            Codec\DSN::MODULE_LMS_INTEGRATION,
+            Codec\DSN::MODULE_STUDENT_DETAILS,
+            Codec\DSN::MODULE_IDENTITY_MANAGEMENT
         ];
 
         foreach ($modules as $module) {
@@ -90,7 +90,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
             [
-                'api' => DSN::MODULE_LMS_INTEGRATION,
+                'api' => Codec\DSN::MODULE_LMS_INTEGRATION,
                 'method' => 'getStudentSubjects',
                 'version' => 3,
                 'args' => [
@@ -98,7 +98,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSN::MODULE_LMS_INTEGRATION,
+                'api' => Codec\DSN::MODULE_LMS_INTEGRATION,
                 'method' => 'getStudentTimetable',
                 'version' => 3,
                 'args' => [
@@ -106,7 +106,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSN::MODULE_LMS_INTEGRATION,
+                'api' => Codec\DSN::MODULE_LMS_INTEGRATION,
                 'method' => 'getStudents',
                 'version' => 3,
                 'args' => [
@@ -114,7 +114,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSN::MODULE_LMS_INTEGRATION,
+                'api' => Codec\DSN::MODULE_LMS_INTEGRATION,
                 'method' => 'getTeacherSubjects',
                 'version' => 3,
                 'args' => [
@@ -122,7 +122,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSN::MODULE_LMS_INTEGRATION,
+                'api' => Codec\DSN::MODULE_LMS_INTEGRATION,
                 'method' => 'getTeacherTimetable',
                 'version' => 3,
                 'args' => [
@@ -132,7 +132,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSN::MODULE_LMS_INTEGRATION,
+                'api' => Codec\DSN::MODULE_LMS_INTEGRATION,
                 'method' => 'getTeachers',
                 'version' => 3,
                 'args' => [
@@ -140,7 +140,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSN::MODULE_LMS_INTEGRATION,
+                'api' => Codec\DSN::MODULE_LMS_INTEGRATION,
                 'method' => 'getTimetableCalendar',
                 'version' => 3,
                 'args' => [
@@ -148,7 +148,7 @@ class Specification implements ISpecification
                 ]
             ],
 //            [
-//                'api' => DSNCodec::MODULE_LMS_INTEGRATION,
+//                'api' => Codec\DSN::MODULE_LMS_INTEGRATION,
 //                'method' => 'getTimetables',
 //                'version' => 3,
 //                'args' => [
@@ -164,7 +164,7 @@ class Specification implements ISpecification
             [
                 /* Emergency contacts
                  */
-                'api' => DSN::MODULE_STUDENT_DETAILS,
+                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
                 'method' => 'getCommunicationRulesDetails',
                 'version' => 3,
                 'args' => [
@@ -175,7 +175,7 @@ class Specification implements ISpecification
             [
                 /* Parents come out in the m_* and f_* nodes
                  */
-                'api' => DSN::MODULE_STUDENT_DETAILS,
+                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
                 'method' => 'getCommunicationRulesDetails',
                 'version' => 3,
                 'args' => [
@@ -184,7 +184,7 @@ class Specification implements ISpecification
                 ]
             ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getConfNote',
 //                'version' => 3,
 //                'args' => [
@@ -194,7 +194,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getConfAttachment',
 //                'version' => 3,
 //                'args' => [
@@ -209,7 +209,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getConfNotes',
 //                'version' => 3,
 //                'args' => [
@@ -217,7 +217,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalAsthmaManagement',
 //                'version' => 3,
 //                'args' => [
@@ -225,7 +225,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalCondition',
 //                'version' => 3,
 //                'args' => [
@@ -234,7 +234,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalConditionAttachment',
 //                'version' => 3,
 //                'args' => [
@@ -244,7 +244,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
             [
-                'api' => DSN::MODULE_STUDENT_DETAILS,
+                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
                 'method' => 'getMedicalConditions',
                 'version' => 3,
                 'args' => [
@@ -252,7 +252,7 @@ class Specification implements ISpecification
                 ]
             ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalConfNote',
 //                'version' => 3,
 //                'args' => [
@@ -262,7 +262,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalConfNoteAttachment',
 //                'version' => 3,
 //                'args' => [
@@ -273,7 +273,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalConfNotes',
 //                'version' => 3,
 //                'args' => [
@@ -281,7 +281,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalGeneral',
 //                'version' => 3,
 //                'args' => [
@@ -289,7 +289,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalIllness',
 //                'version' => 3,
 //                'args' => [
@@ -300,7 +300,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalImmunisation',
 //                'version' => 3,
 //                'args' => [
@@ -309,7 +309,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalImmunisations',
 //                'version' => 3,
 //                'args' => [
@@ -317,7 +317,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalNote',
 //                'version' => 3,
 //                'args' => [
@@ -327,7 +327,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalNoteAttachment',
 //                'version' => 3,
 //                'args' => [
@@ -338,7 +338,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalNotes',
 //                'version' => 3,
 //                'args' => [
@@ -346,7 +346,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalPractitioner',
 //                'version' => 3,
 //                'args' => [
@@ -355,7 +355,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalPractitioners',
 //                'version' => 3,
 //                'args' => [
@@ -363,7 +363,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalSupplementaries',
 //                'version' => 3,
 //                'args' => [
@@ -371,7 +371,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getMedicalSupplementary',
 //                'version' => 3,
 //                'args' => [
@@ -380,7 +380,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getNote',
 //                'version' => 3,
 //                'args' => [
@@ -390,7 +390,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getNoteAttachment',
 //                'version' => 3,
 //                'args' => [
@@ -401,7 +401,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getNotes',
 //                'version' => 3,
 //                'args' => [
@@ -409,7 +409,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getStudentUD',
 //                'version' => 3,
 //                'args' => [
@@ -417,7 +417,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getStudentUDArea',
 //                'version' => 3,
 //                'args' => [
@@ -426,7 +426,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getStudentUDAreaSetup',
 //                'version' => 3,
 //                'args' => [
@@ -434,7 +434,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getStudentUDSetup',
 //                'version' => 3,
 //                'args' => [
@@ -442,7 +442,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
 //            [
-//                'api' => DSNCodec::MODULE_STUDENT_DETAILS,
+//                'api' => Codec\DSN::MODULE_STUDENT_DETAILS,
 //                'method' => 'getStudentsDetails',
 //                'version' => 3,
 //                'args' => [
@@ -454,7 +454,7 @@ class Specification implements ISpecification
              * https://github.com/TheAlphaSchoolSystemPTYLTD/IdM
              */
 //            [
-//                'api' => DSNCodec::MODULE_IDENTITY_MANAGEMENT,
+//                'api' => Codec\DSN::MODULE_IDENTITY_MANAGEMENT,
 //                'method' => 'getAdmins',
 //                'version' => 3,
 //                'args' => [
@@ -462,7 +462,7 @@ class Specification implements ISpecification
 //                ]
 //            ],
             [
-                'api' => DSN::MODULE_IDENTITY_MANAGEMENT,
+                'api' => Codec\DSN::MODULE_IDENTITY_MANAGEMENT,
                 'method' => 'getEmployees',
                 'version' => 3,
                 'args' => [
@@ -470,7 +470,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSN::MODULE_IDENTITY_MANAGEMENT,
+                'api' => Codec\DSN::MODULE_IDENTITY_MANAGEMENT,
                 'method' => 'getParents',
                 'version' => 3,
                 'args' => [
@@ -478,7 +478,7 @@ class Specification implements ISpecification
                 ]
             ],
             [
-                'api' => DSN::MODULE_IDENTITY_MANAGEMENT,
+                'api' => Codec\DSN::MODULE_IDENTITY_MANAGEMENT,
                 'method' => 'getStudents',
                 'version' => 3,
                 'args' => [

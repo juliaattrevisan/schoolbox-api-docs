@@ -74,7 +74,7 @@ class ConflictingExternalIds
 
         /* Process each current student, and their parents too
          */
-        $students = $this->api[Endpoint\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
+        $students = $this->api[Endpoint\Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getStudents', [
             'currentstatus' => 'current'
         ]);
 
@@ -88,7 +88,7 @@ class ConflictingExternalIds
 
         /* Get a list of teaching staff
          */
-        $teachers = $this->api[Endpoint\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', [
+        $teachers = $this->api[Endpoint\Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument('getTeachers', [
             'currentstatus' => 'current'
         ]);
 
@@ -103,7 +103,7 @@ class ConflictingExternalIds
 
         /* Get a list of non-teaching staff
          */
-        $employees = $this->api[Endpoint\DSN::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getEmployees', [
+        $employees = $this->api[Endpoint\Codec\DSN::MODULE_IDENTITY_MANAGEMENT]->retrieveDocument('getEmployees', [
             'user_code' => 'all'
         ]);
 
