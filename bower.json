@@ -33,7 +33,7 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "www/javascript/components/",
+    "www/static/javascript/components/",
     "test",
     "tests"
   ]
