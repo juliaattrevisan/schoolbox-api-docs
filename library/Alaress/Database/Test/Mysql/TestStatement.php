@@ -49,7 +49,9 @@ class TestStatement extends TestCase
      */
     public function testStatementWithConciseBinding()
     {
-        $statement = $this->schoolbox->prepareQuery('SELECT `title` FROM `term` WHERE `code` = :code');
+        $statement = $this->schoolbox->prepareQuery(
+            'SELECT `title` FROM `term` WHERE `code` = :code AND archived = FALSE'
+        );
         $statement->bindInputs(['code' => 'T1000']);
         $statement->execute();
 
@@ -69,7 +71,9 @@ class TestStatement extends TestCase
      */
     public function testStatementWithVerboseBinding()
     {
-        $statement = $this->schoolbox->prepareQuery('SELECT `title` FROM `term` WHERE `code` = :code');
+        $statement = $this->schoolbox->prepareQuery(
+            'SELECT `title` FROM `term` WHERE `code` = :code AND archived = FALSE'
+        );
         $statement->bindInputs([
             'code' => [
                 'value'  => 'T1000',
@@ -95,7 +99,7 @@ class TestStatement extends TestCase
     public function testStatementWithNamedParameters()
     {
         $statement = $this->schoolbox->executeQuery(
-            'SELECT `title` FROM `term` WHERE `code` = :code',
+            'SELECT `title` FROM `term` WHERE `code` = :code AND archived = FALSE',
             ['code' => 'T1000']
         );
 
@@ -116,7 +120,7 @@ class TestStatement extends TestCase
     {
         // Test a second positional parameter, to ensure they're positioned appropriately
         $statement = $this->schoolbox->executeQuery(
-            'SELECT `title` FROM `term` WHERE `code` = ? AND `id` = ?',
+            'SELECT `title` FROM `term` WHERE `code` = ? AND `id` = ? AND archived = FALSE',
             ['T1000', 1000]
         );
 
@@ -136,7 +140,7 @@ class TestStatement extends TestCase
     public function testStatementIterator()
     {
         $iterator = $this->schoolbox->getQueryIterator(
-            'SELECT `title` FROM `term` WHERE `code` = :code',
+            'SELECT `title` FROM `term` WHERE `code` = :code AND archived = FALSE',
             ['code' => 'T1000']
         );
 
@@ -164,7 +168,7 @@ class TestStatement extends TestCase
     public function testStatementFetchColumn()
     {
         $statement = $this->schoolbox->executeQuery(
-            'SELECT `title` FROM `term` WHERE `code` = :code',
+            'SELECT `title` FROM `term` WHERE `code` = :code AND archived = FALSE',
             ['code' => 'T1000']
         );
 
@@ -181,7 +185,7 @@ class TestStatement extends TestCase
     public function testStatementFetchColumnArray()
     {
         $statement = $this->schoolbox->executeQuery(
-            'SELECT `title` FROM `term` WHERE `code` = :code',
+            'SELECT `title` FROM `term` WHERE `code` = :code AND archived = FALSE',
             ['code' => 'T1000']
         );
 
