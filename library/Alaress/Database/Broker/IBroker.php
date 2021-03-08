@@ -14,7 +14,6 @@ use Alaress\Database\Collector;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Iterator\IIterator;
-use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\Query\IQuery;
@@ -23,7 +22,7 @@ use PDO;
 use PDOException;
 use PDOStatement;
 
-interface IBroker extends IQuoter
+interface IBroker
 {
     /**
      * Is this broker available?

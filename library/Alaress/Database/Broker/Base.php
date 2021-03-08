@@ -335,30 +335,4 @@ abstract class Base implements IBroker
      * @return IQuoter
      */
     protected abstract function buildQuoter();
-
-    /**
-     * @inheritdoc
-     */
-    public function quoteIdentifier($string)
-    {
-        return $this->quoter->quoteIdentifier($string);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function escapeForLike($string)
-    {
-        return $this->quoter->escapeForLike($string);
-    }
-
-
-    /**
-     * @inheritdoc
-     * @todo This should not live here. This class should NOT implement IQuoter
-     */
-    public function getEscapedOperand(string $defaultTable, string $columnName): string
-    {
-        return $this->quoter->getEscapedOperand($defaultTable, $columnName);
-    }
 }
