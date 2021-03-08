@@ -14,7 +14,6 @@ namespace Alaress\Database\Broker;
 use Alaress\Database\Collector;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
-use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\Query\Base as Query;
 use Alaress\DebugBar\Instance as DebugBar;
 use DebugBar\DataCollector\DataCollectorInterface;
@@ -57,17 +56,6 @@ abstract class Base implements IBroker
 
     /** @var callable[] $postProcessors This contains an array of callbacks that need to be run on all database queries */
     protected $postProcessors = [];
-
-    /** @var IQuoter */
-    private $quoter;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->quoter = $this->buildQuoter();
-    }
 
     /**
      * @inheritdoc
@@ -322,17 +310,4 @@ abstract class Base implements IBroker
     {
         return $this->postProcessors;
     }
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Quoter stuff
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Builds the quoter object to which IQuoter method calls are passed to.
-     *
-     * This will be called on construction.
-     *
-     * @return IQuoter
-     */
-    protected abstract function buildQuoter();
 }

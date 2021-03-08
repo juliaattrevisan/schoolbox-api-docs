@@ -13,7 +13,6 @@ namespace Alaress\Database\Broker\Sqlsrv;
 use Alaress\Database\Broker\Base;
 use Alaress\Database\Factory;
 use Alaress\Database\Iterator\Sqlsrv\Iterator;
-use Alaress\Database\Quoter\Sqlsrv\Quoter as SqlsrvQuoter;
 use Alaress\Database\Statement\Query\Sqlsrv\Query;
 use Alaress\Database\Statement\FunctionCall\Sqlsrv\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Sqlsrv\StoredProcedure;
@@ -32,14 +31,6 @@ class Broker extends Base
     public static function isAvailable(): bool
     {
         return in_array(Factory::PDO_DRIVER_SQLSRV, PDO::getAvailableDrivers(), true);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildQuoter()
-    {
-        return new SqlsrvQuoter();
     }
 
     /**

@@ -13,7 +13,6 @@ namespace Alaress\Database\Broker\Db2;
 use Alaress\Database\Broker\Base;
 use Alaress\Database\Exception;
 use Alaress\Database\Iterator\Db2\Iterator;
-use Alaress\Database\Quoter\Db2\Quoter as Db2Quoter;
 use Alaress\Database\Statement\FunctionCall\Db2\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Db2\StoredProcedure;
 use Alaress\Database\Wrapper\Db2\PDO;
@@ -32,15 +31,6 @@ class Broker extends Base
         // DB2 is loaded as a PHP extension, not a PDO module
         return extension_loaded('ibm_db2');
     }
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildQuoter()
-    {
-        return new Db2Quoter();
-    }
-
 
     /**
      * @inheritdoc
