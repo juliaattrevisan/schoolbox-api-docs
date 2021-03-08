@@ -200,54 +200,6 @@ abstract class Base implements IBroker
     }
 
     // ----------------------------------------------------------------------------------------------------------------
-    // PDO pass-through functions
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * @inheritdoc
-     */
-    public function lastInsertId($name = null)
-    {
-        return $this->pdo->lastInsertId($name);
-    }
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Database transaction stuff
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * @inheritdoc
-     */
-    public function beginTransaction()
-    {
-        return $this->pdo->beginTransaction();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function inTransaction()
-    {
-        return $this->pdo->inTransaction();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function commit()
-    {
-        return $this->pdo->commit();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function rollBack()
-    {
-        return $this->pdo->rollBack();
-    }
-
-    // ----------------------------------------------------------------------------------------------------------------
     // Debugging collector
     // ----------------------------------------------------------------------------------------------------------------
 

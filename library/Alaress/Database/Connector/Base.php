@@ -393,8 +393,9 @@ class Base implements Serializable, IConnector
     /**
      * @inheritdoc
      */
-    public function lastInsertId($name = null) {
-        return $this->broker->lastInsertId($name);
+    public function lastInsertId($name = null)
+    {
+        return $this->broker->getPdo()->lastInsertId($name);
     }
 
     // ----------------------------------------------------------------------------------------------------------------
