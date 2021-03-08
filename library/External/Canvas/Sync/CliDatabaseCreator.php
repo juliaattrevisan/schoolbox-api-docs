@@ -87,7 +87,8 @@ class CliDatabaseCreator extends CliTool\App
         }
 
         // Check whether the credential is correct by connecting to schoolbox database.
-        $rootDb = new Base(new Broker(), new Transactor(new Strategy\Savepoint()));
+        $rootDb = new Base(new Broker(), new Transactor(new Strategy\Savepoint()), new Database\Quoter\Mysql\Quoter());
+        $quoter = new Database\Quoter\Mysql\Quoter();
         try {
             $rootDb->connect($this->dbHost, SQL_db, $this->dbRootUser, $this->dbRootPassword);
         } catch (Database\Exception $e) {
@@ -219,13 +220,13 @@ SYNOPSIS:
 OPTIONS:
     $yellow-h, --help$white
         Print this help and exit
-        
+
     $yellow-p, --perform$white
         If set, updates DB - otherwise, performs a dry run
-        
+
     $yellow--db-user=DB_USER$white
         Username to access schoolbox database
-        
+
     $yellow--db-password=DB_PASSWORD$white
         Password to access schoolbox database
 ";

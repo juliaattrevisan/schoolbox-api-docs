@@ -329,4 +329,12 @@ interface IConnector extends IQuoter
      * @return IBuilder
      */
     public function buildPredicateBuilder($table);
+
+
+    /**
+     * Retrieve this connector's quoter.
+     *
+     * @return IQuoter
+     */
+    public function getQuoter(): IQuoter;
 }

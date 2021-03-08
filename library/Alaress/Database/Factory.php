@@ -14,6 +14,9 @@ use Alaress\Database\Broker\Db2\Broker as Db2Broker;
 use Alaress\Database\Broker\Mysql\Broker as MysqlBroker;
 use Alaress\Database\Broker\Sqlsrv\Broker as SqlsrvBroker;
 use Alaress\Database\Connector\Base as Connector;
+use Alaress\Database\Quoter\Db2\Quoter as Db2Quoter;
+use Alaress\Database\Quoter\Mysql\Quoter as MysqlQuoter;
+use Alaress\Database\Quoter\Sqlsrv\Quoter as SqlsrvQuoter;
 use Alaress\Database\Transactor\Base as Transactor;
 use Alaress\Database\Transactor\Strategy;
 
@@ -30,7 +33,7 @@ class Factory
     public function createMysql()
     {
         $broker = new MysqlBroker();
-        return new Connector($broker, new Transactor(new Strategy\Savepoint()));
+        return new Connector($broker, new Transactor(new Strategy\Savepoint()), new MysqlQuoter());
     }
 
     /**
@@ -41,7 +44,7 @@ class Factory
     public function createSqlsrv()
     {
         $broker = new SqlsrvBroker();
-        return new Connector($broker, new Transactor(new Strategy\Nested()));
+        return new Connector($broker, new Transactor(new Strategy\Nested()), new SqlsrvQuoter());
     }
 
     /**
@@ -52,6 +55,6 @@ class Factory
     public function createDb2()
     {
         $broker = new Db2Broker();
-        return new Connector($broker, new Transactor(new Strategy\Savepoint()));
+        return new Connector($broker, new Transactor(new Strategy\Savepoint()), new Db2Quoter());
     }
 }
