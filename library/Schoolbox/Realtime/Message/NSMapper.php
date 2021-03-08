@@ -40,6 +40,7 @@ class NSMapper extends Mapper
     const NS_UPS                     = 'ups';
     const NS_NEWS_DISCUSSION_COMMENT = 'news_discussion_comment';
     const NS_EVIDENCE                = 'evidence';
+    const NS_EVIDENCE_COMMENT        = 'evidence_comment';
     const NS_BADGE                   = 'badge';
 
 
