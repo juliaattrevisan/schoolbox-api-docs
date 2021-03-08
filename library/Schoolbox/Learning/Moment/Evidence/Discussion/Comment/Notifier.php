@@ -223,7 +223,9 @@ class Notifier extends AbstractModuleNotifier
             $bob->setTitle($isOwn ? self::PATTERN_COMMENTED_OWN_TITLE : self::PATTERN_COMMENTED_TITLE)
                 ->setParams(
                     [
-                        'user'     => new UserParam($effector),
+                        'user'     => $isOwn
+                            ? new ChildParam($student)
+                            : new UserParam($effector),
                         'student'  => $isOwn
                             ? new Param('their', null, Param::STACKING_REPLACE_NO_DECORATION)
                             : new ChildParam($student),
