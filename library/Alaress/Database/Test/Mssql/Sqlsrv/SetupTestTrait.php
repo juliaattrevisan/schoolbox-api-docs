@@ -18,7 +18,7 @@ trait SetupTestTrait
     use TestConnectorTrait;
 
     /**
-     * Skip if DBLib driver is not available
+     * Skip if SQLSrv driver is not available
      */
     public function skipIfDriverNotAvailable()
     {
@@ -28,7 +28,7 @@ trait SetupTestTrait
     }
 
     /**
-     * Connect using DBLib
+     * Connect using SQLSrv
      *
      * @return bool
      */

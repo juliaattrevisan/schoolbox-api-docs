@@ -105,7 +105,7 @@ abstract class AbstractTestStatement extends TestCase
 
 
         // Because of some object reference voodoo which I can't figure out;
-        // running the statement again fails under DBLib
+        // running the statement again failed under DBLib, and possibly SQLSrv
         // (presumably because the object reference isn't cleaned up)
         // All I can do for now is to unset the statement object.
         unset($statement);

@@ -109,30 +109,4 @@ trait TestConnectorTrait
             'Synergetic#1'
         );
     }
-
-    /**
-     * Connect to MSSQL test database using DbLib
-     *
-     * @return bool Was connection successful?
-     */
-    private function connectDblibTest()
-    {
-        // We have to load up a connection using the old database class, otherwise the ConfigMapper is going to fail when
-        // it tries to work out if we need to be in debug mode.
-        //
-        // TODO: Remove this once ConfigMapper has been migrated to these new database classes
-
-        $database = Database::getInstance();
-        $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true]);
-
-        $factory = new Factory();
-
-        $this->mssqlTest = $factory->createDblib();
-        return $this->mssqlTest->connect(
-            '172.31.15.10',
-            'Synergetic_AUVIC_ALARESS_PRD',
-            'sa',
-            'Synergetic#1'
-        );
-    }
 }
