@@ -358,10 +358,10 @@ class Controller extends Base
             return $assessments;
         }
 
-        $pb = (new Database\Predicate\Builder($this->internalDb, ''))->in('vr.assessment_id', $assessmentIds);
+        $pb = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))->in('vr.assessment_id', $assessmentIds);
 
         if ($filteringByRubricUsage) {
-            $usagePb = new Database\Predicate\Builder($this->internalDb, '');
+            $usagePb = new Database\Predicate\Builder($this->internalDb->getQuoter(), '');
             if (is_array($selectedCapabilities) && count($selectedCapabilities)) {
                 $usagePb->in('vr.capability_id', $selectedCapabilities);
             }
@@ -489,18 +489,18 @@ class Controller extends Base
             return $assessments;
         }
 
-        $innerPb    = (new Database\Predicate\Builder($this->internalDb, ''))
+        $innerPb    = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
             ->isNull('sr.deleted_at')
             ->notNull('sr.published_at')
             ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
         $innerWhere = implode(' AND ', $innerPb->getWhere());
 
-        $outerPb = (new Database\Predicate\Builder($this->internalDb, ''))
+        $outerPb = (new Database\Predicate\Builder($this->internalDb->getQuoter(), ''))
             ->equals('vrm.feedback_type', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->in('vrm.assessment_id', array_keys($assessments));
 
         if ($filteringByRubricUsage) {
-            $usagePb = new Database\Predicate\Builder($this->internalDb, '');
+            $usagePb = new Database\Predicate\Builder($this->internalDb->getQuoter(), '');
             if (is_array($selectedCapabilities) && count($selectedCapabilities)) {
                 $usagePb->in('vrm.capability_id', $selectedCapabilities);
             }

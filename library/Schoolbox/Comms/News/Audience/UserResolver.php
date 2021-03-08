@@ -313,7 +313,7 @@ class UserResolver implements IUserResolver
             return [null, []];
         }
 
-        $pb  = (new Predicate\Builder($this->db, $userTableAlias))
+        $pb  = (new Predicate\Builder($this->db->getQuoter(), $userTableAlias))
             ->setParamPrefix("_{$subQueryId}_x")
             ->in("{$userTableAlias}.id", $relatedUsers)
             ->isNull("{$userTableAlias}.deleted_at");

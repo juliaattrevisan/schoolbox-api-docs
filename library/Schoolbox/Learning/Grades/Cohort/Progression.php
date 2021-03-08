@@ -217,7 +217,7 @@ class Progression
     private function getVieweeFeedbacks(User $viewee): array
     {
         // Find the most recent feedback for each of these due works
-        $pb = (new Builder($this->database, ''))
+        $pb = (new Builder($this->database->getQuoter(), ''))
             ->in('a.id', $this->assessments->getPropertyValues('id'))
             ->isNull('a.deleted_at')
             ->equals('sr.owner', $viewee->getId())
@@ -264,7 +264,7 @@ class Progression
     private function setupVieweeSeries(array $feedbackIds): array
     {
         // Find the descriptors selected for each of these feedback IDs
-        $pb = new Builder($this->database, '');
+        $pb = new Builder($this->database->getQuoter(), '');
         $pb->in('sr.id', $feedbackIds);
 
         $where = implode(' AND ', $pb->getWhere());
@@ -351,7 +351,7 @@ class Progression
     {
 
         // Find the most recent feedback for each of these due works
-        $pb = (new Builder($this->database, ''))
+        $pb = (new Builder($this->database->getQuoter(), ''))
             ->in('a.id', array_keys($this->tuples))
             ->isNull('a.deleted_at')
             ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
@@ -405,7 +405,7 @@ class Progression
         $allResults = [];
 
         // Find the descriptors selected for each of these feedback IDs
-        $pb = (new Builder($this->database, ''))
+        $pb = (new Builder($this->database->getQuoter(), ''))
             ->in('sr.id', $allFeedbackIds);
 
         $where = implode(' AND ', $pb->getWhere());

@@ -80,7 +80,7 @@ class CourseGroup
             ->equalsAccountFolder($accountCanvasId, $parentFolderAlias)
             ->regex("$folderAlias.name", "^.+\\({$this::codePrefix()}-{$courseCode}\\)$");
 
-        return (new Builder($this->schoolboxDb, $folderAlias))->all($innerPb);
+        return (new Builder($this->schoolboxDb->getQuoter(), $folderAlias))->all($innerPb);
     }
 
 
@@ -93,7 +93,7 @@ class CourseGroup
      */
     public function equalsAnyCourseGroupFolder(string $folderAlias = 'folder'): Builder
     {
-        return (new Builder($this->schoolboxDb, $folderAlias))
+        return (new Builder($this->schoolboxDb->getQuoter(), $folderAlias))
             ->regex("$folderAlias.name", "^.+\\({$this::codePrefix()}-[^)]+\\)$");
     }
 
@@ -160,16 +160,16 @@ class CourseGroup
         $courseGroupFolderWhere = $courseGroupFolderPb->getWhere()[0];
 
         $sql = "
-            SELECT 
+            SELECT
                    {$folderMapper->getColumnString('f')},
                    cs.id    'cs.id'
-            FROM folder f 
+            FROM folder f
             JOIN folder p ON p.id = f.parent
             JOIN course_specification cs ON f.id = cs.folder_id
-            WHERE 
+            WHERE
                   {$courseGroupFolderWhere} AND
                   p.deleted_at IS NULL AND
-                  f.deleted_at IS NULL AND 
+                  f.deleted_at IS NULL AND
                   cs.deleted_at IS NULL
         ";
 

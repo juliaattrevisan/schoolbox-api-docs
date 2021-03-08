@@ -58,7 +58,7 @@ class Course
      */
     public function equalsCanvasCourse(int $courseCanvasId, string $folderTableAlias = null): Builder
     {
-        return (new Builder($this->schoolboxDb, $folderTableAlias ?? 'folder'))
+        return (new Builder($this->schoolboxDb->getQuoter(), $folderTableAlias ?? 'folder'))
             ->regex('name', "^.+\\({$this::canvasIdPrefix()}-{$courseCanvasId}\\)$");
     }
 
@@ -72,7 +72,7 @@ class Course
      */
     public function equalsAnyCanvasCourse(string $folderTableAlias = 'folder'): Builder
     {
-        return (new Builder($this->schoolboxDb, $folderTableAlias))
+        return (new Builder($this->schoolboxDb->getQuoter(), $folderTableAlias))
             ->regex('name', "^.+\\({$this::canvasIdPrefix()}-\\d+\\)$");
     }
 
@@ -116,9 +116,9 @@ class Course
      */
     public function getCanvasCoursesToImport(string $courseAlias = 'c', string $sectionAlias = 'cs'): Builder
     {
-        $pb = (new Builder($this->canvasDb, ''))
+        $pb = (new Builder($this->canvasDb->getQuoter(), ''))
             ->in("{$courseAlias}.workflow_state", ['available', 'completed']);
-        return (new Builder($this->canvasDb, ''))
+        return (new Builder($this->canvasDb->getQuoter(), ''))
             ->all($pb);
     }
 }
