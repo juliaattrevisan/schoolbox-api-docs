@@ -3,6 +3,7 @@
 import Vue from 'vue';
 import moment from 'moment';
 import axios from 'axios';
+import MediaArticle from '@schoolbox/media-article';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
 
@@ -11,6 +12,7 @@ export default {
     name: 'article-threads',
 
     components: {
+        MediaArticle,
         Toast,
         RevealModal
     },
@@ -26,7 +28,7 @@ export default {
         siteVersion: String //for cache busting
     },
 
-    data: function() {
+    data () {
         return {
             threadId: 0,
             isThreadCheckboxVisible: undefined,
@@ -63,14 +65,13 @@ export default {
         },
 
         /**
-         * Don't allow purely white space comments
+         * Ensure there's something (anything) in the comment and that the form is not already processing
          *
          * @returns {Boolean}
          */
-        isCommentJustWhiteSpace () {
-            const htmlStripped = new DOMParser().parseFromString(this.newComment, 'text/html'); //as the comment is from a CKEditor, strip the html entities
-            if (!htmlStripped.body.textContent.replace(/\s/g, '').length) { //ain't nothing but white space
-                return true;
+        isPostCommentDisabled () {
+            if (this.newComment.trim() === '' || this.isProcessActive) {
+                return true; 
             } else {
                 return false;
             }
@@ -146,14 +147,6 @@ export default {
                 this.$refs.toast.activate('Unable to load comments');
                 this.$refs.toast.timeout('Unable to load comments', false);
             }).finally(() => {
-                /**
-                 * Since schoolbox.min.js is being executed first before VueJS content gets rendered,
-                 * the schoolboxResource_ProxyReplacement is unable to locate the DOM yet.
-                 * With that for a quick fix, we need to read the DOM when the contents has been loaded and let
-                 * schoolboxResource_ProxyReplacement do what it's supposed to do.
-                 */
-                this.reInitialiseMediaPlayer();
-
                 if (this.isInitialLoad) {
                     // Anchored? go to the element once the component has been loaded
                     if (window.location.hash === '#discussion') {
@@ -288,44 +281,6 @@ export default {
         },
 
         /**
-         * Comments can contain media elements,
-         * so ensure they display properly
-         *
-         */
-        reInitialiseMediaPlayer: function () {
-
-            Object.keys(this.comments).forEach((key) => {
-                let content = $('<div>' + this.comments[key].content + '</div>');
-                let replaced = false;
-                $(content).each((index, element) => {
-                    replaced = $.fn.schoolboxResource_ReplaceAll($(element));
-                    // Before we render the elements into the front-end, let's try to update the Vue comments model
-                    // first so that we can easily initialise mediaelementplayer().
-                    // And only update those models who's data has been updated.
-                    // Basically those elements that has a videos/audios.
-                    if (replaced) {
-                        this.comments[key].content = $(element).html();
-                    }
-                });
-            });
-
-            this.initMediaElementPlayers();
-
-        },
-
-        /**
-         * to ensure media elements are available after Vue has updated the DOM
-         * https://vuejs.org/v2/api/#Vue-nextTick
-         *
-         */
-        initMediaElementPlayers () {
-            Vue.nextTick()
-            .then(() => {
-                $.fn.schoolboxResource_InitialiseMediaElementPlayer('#threads-section');
-            });
-        },
-
-        /**
          * Post a comment
          *
          */
@@ -350,7 +305,6 @@ export default {
                 this.isProcessActive = false;
                 this.$refs.toast.timeout('Unable to post comment', false);
             }).finally(() => {
-                this.reInitialiseMediaPlayer();
                 this.isProcessActive = false;
             });
 
@@ -390,8 +344,6 @@ export default {
                 if (this.comments.length < 1 && this.totalCommentsCount > 0) {
                     this.getThread();
                 }
-
-                this.initMediaElementPlayers();
 
                 this.$refs.deleteModal.close();
 
@@ -433,7 +385,7 @@ export default {
                     </div>
                 </div>
                 <template v-if="!isInitialLoad">
-                    <template v-if="isThreadEnabled">
+                    <div v-show="isThreadEnabled">
                         <template v-if="isPublished">
                             <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
                             <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
@@ -441,7 +393,7 @@ export default {
                                 <textarea id="comment" name="comment" rows="5"></textarea>
                                 <a class="button submit"
                                     @click="postComment"
-                                    :disabled="isCommentJustWhiteSpace || isProcessActive">Post Comment</a>
+                                    :disabled="isPostCommentDisabled">Post Comment</a>
                             </div>
                         </template>
                         <template v-else>
@@ -449,7 +401,7 @@ export default {
                                 <span class="icon-locked">Comments will be available once this article is published.</span>
                             </div>
                         </template>
-                    </template>
+                    </div>
                     <template v-if="isPublished && !isThreadEnabled">
                         <div data-alert="" class="alert-box">
                             <span class="icon-locked">Comments are currently disabled for this article.</span>
@@ -471,7 +423,7 @@ export default {
                 </template>
                 <template v-else>
                     <ul class="information-list">
-                        <li class="actions-small-2" v-for="(comment, index) in comments" :key="index">
+                        <li class="actions-small-2" v-for="(comment, index) in comments" :key="comment.id">
                             <div class="list-item">
                                 <div class="card compact small-12">
                                     <a :href="'/search/user/' + comment.author.id" title="View Profile">
@@ -486,7 +438,7 @@ export default {
                             <nav>
                                 <a v-if="comment._links.delete.auth" @click.prevent="showDeleteModal(index)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
                             </nav>
-                            <article v-html="comment.content"></article>
+                            <media-article v-html="comment.content"></media-article>
                         </li>
                     </ul>
                     <a v-if="showLoadMoreButton" @click="getThread" class="button expand" :disabled="isProcessActive">Show older comments</a>
