@@ -329,7 +329,7 @@ abstract class AbstractTestStatement extends TestCase
         $this->assertEquals($calendarDate, 'Dec 30 1899 12:00AM');
         $this->assertEquals($calendarDay, 0);
         $this->assertEquals($message, 'No classes on this day');
-        $this->assertNull($definitionDay, null);
+        $this->assertNull($definitionDay);
         $this->assertEquals($result, 1);
     }
 

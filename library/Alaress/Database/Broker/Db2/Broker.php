@@ -79,12 +79,11 @@ class Broker extends Base
         // Close any existing connection (this seems a bit flaky- why is there no close function?)
         unset($this->pdo);
 
-        if($options['schema']) {
+        if ($options['schema'] ?? null) {
             $this->postConnectQueries = ['SET SCHEMA ' . $options['schema']];
         }
 
         try {
-
             // Create a new PDO wrapper instance using the DSN string and supplied username/password parameters
 
             $this->pdo = new PDO($this->getDsn());
