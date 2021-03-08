@@ -24,6 +24,24 @@ class TestStatement extends TestCase
     public function setUp(): void
     {
         $this->connectSchoolbox();
+        $this->schoolbox->beginTransaction();
+
+        // Test with inserting terms
+        $this->schoolbox->executeQuery('UPDATE term SET archived=TRUE');
+        $termQuery = $this->schoolbox->prepareQuery('
+            INSERT INTO term (id, title, code, start, display_finish, actual_finish, archived)
+            VALUES (:id, :title, :code, NOW(), NOW(), NULL, FALSE)
+        ');
+        $termQuery->execute(['id' => 1000, 'title' => 'Term 1000', 'code' => 'T1000']);
+        $termQuery->execute(['id' => 1001, 'title' => 'Term 1001', 'code' => 'T1001']);
+    }
+
+    /**
+     * Roll back when test finishes
+     */
+    public function tearDown(): void
+    {
+        $this->schoolbox->rollBack();
     }
 
     /**
@@ -31,20 +49,18 @@ class TestStatement extends TestCase
      */
     public function testStatementWithConciseBinding()
     {
-        $this->schoolbox->transact(function () {
-            $statement = $this->schoolbox->prepareQuery('SELECT `lastname` FROM `user` WHERE `lastname` = :lastname');
-            $statement->bindInputs(['lastname' => 'rhodes']);
-            $statement->execute();
+        $statement = $this->schoolbox->prepareQuery('SELECT `title` FROM `term` WHERE `code` = :code');
+        $statement->bindInputs(['code' => 'T1000']);
+        $statement->execute();
 
-            $count = 0;
+        $count = 0;
 
-            while ($row = $statement->fetch()) {
-                $count++;
-                $this->assertSame(strtolower($row['lastname']), 'rhodes');
-            }
+        while ($row = $statement->fetch()) {
+            $count++;
+            $this->assertSame($row['title'], 'Term 1000');
+        }
 
-            $this->assertGreaterThan(1, $count);
-        });
+        $this->assertEquals(1, $count);
     }
 
     /**
@@ -53,26 +69,24 @@ class TestStatement extends TestCase
      */
     public function testStatementWithVerboseBinding()
     {
-        $this->schoolbox->transact(function () {
-            $statement = $this->schoolbox->prepareQuery('SELECT `lastname` FROM `user` WHERE `lastname` = :lastname');
-            $statement->bindInputs([
-                'lastname' => [
-                    'value'  => 'rhodes',
-                    'type'   => PDO::PARAM_STR,
-                    'length' => 50,
-                ],
-            ]);
-            $statement->execute();
+        $statement = $this->schoolbox->prepareQuery('SELECT `title` FROM `term` WHERE `code` = :code');
+        $statement->bindInputs([
+            'code' => [
+                'value'  => 'T1000',
+                'type'   => PDO::PARAM_STR,
+                'length' => 50,
+            ],
+        ]);
+        $statement->execute();
 
-            $count = 0;
+        $count = 0;
 
-            while ($row = $statement->fetch()) {
-                $count++;
-                $this->assertSame(strtolower($row['lastname']), 'rhodes');
-            }
+        while ($row = $statement->fetch()) {
+            $count++;
+            $this->assertSame($row['title'], 'Term 1000');
+        }
 
-            $this->assertGreaterThan(1, $count);
-        });
+        $this->assertEquals(1, $count);
     }
 
     /**
@@ -80,20 +94,19 @@ class TestStatement extends TestCase
      */
     public function testStatementWithNamedParameters()
     {
-        $this->schoolbox->transact(function () {
-            $statement = $this->schoolbox->executeQuery('SELECT `lastname` FROM `user` WHERE `lastname` = :lastname',
-                ['lastname' => 'rhodes']
-            );
+        $statement = $this->schoolbox->executeQuery(
+            'SELECT `title` FROM `term` WHERE `code` = :code',
+            ['code' => 'T1000']
+        );
 
-            $count = 0;
+        $count = 0;
 
-            while ($row = $statement->fetch()) {
-                $count++;
-                $this->assertSame(strtolower($row['lastname']), 'rhodes');
-            }
+        while ($row = $statement->fetch()) {
+            $count++;
+            $this->assertSame($row['title'], 'Term 1000');
+        }
 
-            $this->assertGreaterThan(1, $count);
-        });
+        $this->assertEquals(1, $count);
     }
 
     /**
@@ -101,23 +114,20 @@ class TestStatement extends TestCase
      */
     public function testStatementWithPositionalParameters()
     {
-        $this->schoolbox->transact(function () {
-            // Test a second positional parameter, to ensure they're positioned appropriately
-            $statement = $this->schoolbox->executeQuery(
-                'SELECT `firstname`, `lastname` FROM `user` WHERE `lastname` = ? AND `firstname` = ?',
-                ['rhodes', 'rachel']
-            );
+        // Test a second positional parameter, to ensure they're positioned appropriately
+        $statement = $this->schoolbox->executeQuery(
+            'SELECT `title` FROM `term` WHERE `code` = ? AND `id` = ?',
+            ['T1000', 1000]
+        );
 
-            $count = 0;
+        $count = 0;
 
-            while ($row = $statement->fetch()) {
-                $count++;
-                $this->assertSame(strtolower($row['lastname']), 'rhodes');
-                $this->assertSame(strtolower($row['firstname']), 'rachel');
-            }
+        while ($row = $statement->fetch()) {
+            $count++;
+            $this->assertSame($row['title'], 'Term 1000');
+        }
 
-            $this->assertEquals(1, $count);
-        });
+        $this->assertEquals(1, $count);
     }
 
     /**
@@ -125,29 +135,27 @@ class TestStatement extends TestCase
      */
     public function testStatementIterator()
     {
-        $this->schoolbox->transact(function () {
-            $iterator = $this->schoolbox->getQueryIterator(
-                'SELECT `lastname` FROM `user` WHERE `lastname` = :lastname',
-                ['lastname' => 'Rhodes']
-            );
+        $iterator = $this->schoolbox->getQueryIterator(
+            'SELECT `title` FROM `term` WHERE `code` = :code',
+            ['code' => 'T1000']
+        );
 
-            $count1 = 0;
-            foreach ($iterator as $row) {
-                $count1++;
-                $this->assertSame(strtolower($row['lastname']), 'rhodes');
-            }
-            $iterator->rewind();
+        $count1 = 0;
+        foreach ($iterator as $row) {
+            $count1++;
+            $this->assertSame($row['title'], 'Term 1000');
+        }
+        $iterator->rewind();
 
-            $count2 = 0;
-            foreach ($iterator as $row) {
-                $count2++;
-                $this->assertSame(strtolower($row['lastname']), 'rhodes');
-            }
+        $count2 = 0;
+        foreach ($iterator as $row) {
+            $count2++;
+            $this->assertSame($row['title'], 'Term 1000');
+        }
 
-            // Test both iterations returned same number of results
+        // Test both iterations returned same number of results
 
-            $this->assertSame($count1, $count2);
-        });
+        $this->assertSame($count1, $count2);
     }
 
     /**
@@ -155,18 +163,16 @@ class TestStatement extends TestCase
      */
     public function testStatementFetchColumn()
     {
-        $this->schoolbox->transact(function () {
-            $statement = $this->schoolbox->executeQuery(
-                'SELECT `lastname` FROM `user` WHERE `lastname` = :lastname',
-                ['lastname' => 'Rhodes']
-            );
+        $statement = $this->schoolbox->executeQuery(
+            'SELECT `title` FROM `term` WHERE `code` = :code',
+            ['code' => 'T1000']
+        );
 
-            $statement->execute();
+        $statement->execute();
 
-            while ($lastName = $statement->fetchColumn()) {
-                $this->assertSame(strtolower($lastName), 'rhodes');
-            }
-        });
+        while ($title = $statement->fetchColumn()) {
+            $this->assertSame($title, 'Term 1000');
+        }
     }
 
     /**
@@ -174,20 +180,18 @@ class TestStatement extends TestCase
      */
     public function testStatementFetchColumnArray()
     {
-        $this->schoolbox->transact(function () {
-            $statement = $this->schoolbox->executeQuery(
-                'SELECT `lastname` FROM `user` WHERE `lastname` = :lastname',
-                ['lastname' => 'Rhodes']
-            );
+        $statement = $this->schoolbox->executeQuery(
+            'SELECT `title` FROM `term` WHERE `code` = :code',
+            ['code' => 'T1000']
+        );
 
-            $statement->execute();
+        $statement->execute();
 
-            $arrayLastName = $statement->fetchColumnArray('lastname');
+        $arrayTerm = $statement->fetchColumnArray('title');
 
-            foreach ($arrayLastName as $lastName) {
-                $this->assertSame(strtolower($lastName), 'rhodes');
-            }
-        });
+        foreach ($arrayTerm as $term) {
+            $this->assertSame($term, 'Term 1000');
+        }
     }
 
     /**
@@ -195,34 +199,19 @@ class TestStatement extends TestCase
      */
     public function testStatementFetchRowArray()
     {
-        $this->schoolbox->transact(function () {
-            $statement = $this->schoolbox->executeQuery(
-                'SELECT `id`, `firstname`, `lastname` FROM `user` WHERE `lastname` = :lastname',
-                ['lastname' => 'Rhodes']
-            );
+        $statement = $this->schoolbox->executeQuery(
+            'SELECT `id`, `title`, `code` FROM `term` WHERE `archived` = FALSE'
+        );
 
-            $statement->execute();
+        $statement->execute();
 
-            $users = $statement->fetchRowArray('id');
+        $users = $statement->fetchRowArray('id');
 
-            $this->assertSame(strtolower($users[74]['firstname']), 'peter');
-            $this->assertSame(strtolower($users[74]['lastname']), 'rhodes');
+        $this->assertSame($users[1000]['title'], 'Term 1000');
+        $this->assertSame($users[1000]['code'], 'T1000');
 
-            $this->assertSame(strtolower($users[75]['firstname']), 'jo');
-            $this->assertSame(strtolower($users[75]['lastname']), 'rhodes');
-
-            $this->assertSame(strtolower($users[206]['firstname']), 'maddison');
-            $this->assertSame(strtolower($users[206]['lastname']), 'rhodes');
-
-            $this->assertSame(strtolower($users[229]['firstname']), 'rachel');
-            $this->assertSame(strtolower($users[229]['lastname']), 'rhodes');
-
-            $this->assertSame(strtolower($users[230]['firstname']), 'david');
-            $this->assertSame(strtolower($users[230]['lastname']), 'rhodes');
-
-            $this->assertSame(strtolower($users[245]['firstname']), 'caleb');
-            $this->assertSame(strtolower($users[245]['lastname']), 'rhodes');
-        });
+        $this->assertSame($users[1001]['title'], 'Term 1001');
+        $this->assertSame($users[1001]['code'], 'T1001');
     }
 
     /**
@@ -231,12 +220,10 @@ class TestStatement extends TestCase
      */
     public function testFunctionCall()
     {
-        $this->schoolbox->transact(function () {
-            $function = $this->schoolbox->executeFunctionCall('REVERSE', [
-                'input' => '12345',
-            ]);
+        $function = $this->schoolbox->executeFunctionCall('REVERSE', [
+            'input' => '12345',
+        ]);
 
-            $this->assertSame($function->fetchColumn(), '54321');
-        });
+        $this->assertSame($function->fetchColumn(), '54321');
     }
 }
