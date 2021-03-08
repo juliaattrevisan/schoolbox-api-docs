@@ -123,7 +123,7 @@ class CliDatabaseCreator extends CliTool\App
             // Create database.
             try {
                 $rootDb->execute(
-                    "CREATE DATABASE {$rootDb->quoteIdentifier($canvasDbName)} CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'"
+                    "CREATE DATABASE {$quoter->quoteIdentifier($canvasDbName)} CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'"
                 );
             } catch (Database\Exception $e) {
                 $this->getLogger()->warning("Error creating database {$canvasDbName}: {$e->getMessage()}");
@@ -134,10 +134,10 @@ class CliDatabaseCreator extends CliTool\App
             // Grant permissions to schoolbox user to new database
             try {
                 $rootDb->execute(
-                    "GRANT ALL ON {$rootDb->quoteIdentifier($canvasDbName)}.* TO {$rootDb->quoteIdentifier($dbSchoolboxUser)}@{$rootDb->quoteIdentifier($allowedHost)}"
+                    "GRANT ALL ON {$quoter->quoteIdentifier($canvasDbName)}.* TO {$quoter->quoteIdentifier($dbSchoolboxUser)}@{$quoter->quoteIdentifier($allowedHost)}"
                 );
                 $rootDb->execute(
-                    "GRANT file ON *.* TO {$rootDb->quoteIdentifier($dbSchoolboxUser)}@{$rootDb->quoteIdentifier($allowedHost)}"
+                    "GRANT file ON *.* TO {$quoter->quoteIdentifier($dbSchoolboxUser)}@{$quoter->quoteIdentifier($allowedHost)}"
                 );
             } catch (Database\Exception $e) {
                 $this->getLogger()->warning("Error granting access to {$dbSchoolboxUser}@{$allowedHost}: {$e->getMessage()}");

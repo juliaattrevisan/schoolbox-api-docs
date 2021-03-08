@@ -81,7 +81,7 @@ class Controller extends Base
         }
         // We can UNION ALL and avoid de-duplication logic as each sub-query has a distinct entity type
         $statement       = $this->db->prepareQuery(\implode(' UNION ALL ', $pieces));
-        $escapedKeyword  = $this->db->escapeForLike($this->getRequest()->query['query']);
+        $escapedKeyword  = $this->db->getQuoter()->escapeForLike($this->getRequest()->query['query']);
 
         $statement->execute([$placeholder => "%{$escapedKeyword}%"]);
 

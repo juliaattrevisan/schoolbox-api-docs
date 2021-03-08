@@ -61,7 +61,7 @@ HELP;
         $db      = $this->getDatabaseInternal();
         $logger  = $this->getLogger();
 
-        $folderName = $db->quoteIdentifier(self::FOLDER_NAME);
+        $folderName = $db->getQuoter()->quoteIdentifier(self::FOLDER_NAME);
 
         $lostQuery = $db->prepareQuery('SELECT `id` FROM `folder` WHERE `name` = :folder_name');
         $lostQuery->execute(['folder_name' => self::FOLDER_NAME]);
