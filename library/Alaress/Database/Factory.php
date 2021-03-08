@@ -32,8 +32,7 @@ class Factory
      */
     public function createMysql()
     {
-        $broker = new MysqlBroker();
-        return new Connector($broker, new Transactor(new Strategy\Savepoint()), new MysqlQuoter());
+        return new Connector(new MysqlBroker(), new Transactor(new Strategy\Savepoint()), new MysqlQuoter());
     }
 
     /**
@@ -43,8 +42,7 @@ class Factory
      */
     public function createSqlsrv()
     {
-        $broker = new SqlsrvBroker();
-        return new Connector($broker, new Transactor(new Strategy\Nested()), new SqlsrvQuoter());
+        return new Connector(new SqlsrvBroker(), new Transactor(new Strategy\Nested()), new SqlsrvQuoter());
     }
 
     /**
@@ -54,7 +52,6 @@ class Factory
      */
     public function createDb2()
     {
-        $broker = new Db2Broker();
-        return new Connector($broker, new Transactor(new Strategy\Savepoint()), new Db2Quoter());
+        return new Connector(new Db2Broker(), new Transactor(new Strategy\Savepoint()), new Db2Quoter());
     }
 }
