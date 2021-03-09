@@ -53,6 +53,7 @@
     const EVENT_SOURCE_ID = 'events';
 
     export default {
+        name: 'sb-full-calendar',
         components: {
             FilterModal,
             ExportModal,
@@ -64,21 +65,15 @@
         beforeMount() {
             this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
         },
-        data() {
+        data () {
             return {
-                calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
                 currentDisplay: null,
                 duration: 31,
                 listViewDateRange: {
                     start: null,
                     end: null,
                 },
-                eventSources: [
-                    {
-                        id:     EVENT_SOURCE_ID,
-                        events: this.events,
-                    }
-                ]
+                calendarOptions: {}
             }
         },
         computed: {
@@ -106,6 +101,82 @@
                     displayDatetime: FORMAT_DISPLAY_DATETIME,
                     displayWeekDay: FORMAT_DISPLAY_WEEK_DAY,
                 };
+            }
+        },
+        created () {
+            this.calendarOptions = {
+                plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
+                views: {
+                    day: {
+                        titleFormat: this.dayTitleFormat,
+                        columnHeader: false
+                    },
+                    week: {
+                        columnHeaderFormat: this.formats.displayWeekDay
+                    },
+                    list: {
+                        buttonText: 'List',
+                        duration: { days: this.duration },
+                        listDayFormat: this.config.momentJsDateShort
+                    }
+                },
+                eventTimeFormat: this.helper.eventTimeFormat,
+                contentHeight: this.contentHeight,
+                customButtons: {
+                    customExport: {
+                        text: 'Export',
+                        click: this.onExportClick
+                    },
+                    customFilters: {
+                        text: 'Filters',
+                        click: this.onFilterClick
+                    },
+                    quickSwitchButton: {
+                        text: ' ',
+                    },
+                    customPrev: {
+                        icon: 'chevron-left',
+                        click: this.clickPrev.bind(this),
+                    },
+                    customNext: {
+                        icon: 'chevron-right',
+                        click: this.clickNext.bind(this),
+                    },
+                    customToday: {
+                        text: 'Today',
+                        click: this.clickToday.bind(this),
+                    },
+                },
+                headerToolbar: {
+                    left: 'quickSwitchButton,customToday,customPrev,customNext',
+                    center: 'title',
+                    right: 'customFilters,list,dayGridMonth,timeGridWeek,timeGridDay,customExport'
+                },
+                buttonText: {
+                    today:    'Today',
+                    month:    'Month',
+                    week:     'Week',
+                    day:      'Day',
+                    list:     'List',
+                },
+                initialDate: this.config.defaultDate,
+                initialView: this.config.defaultView || 'dayGridMonth',
+                scrollTime: this.config.dateDisplayFormats.calendarStartTime,
+                dayMaxEventRows: this.config.eventLimit,
+                firstDay: this.config.firstDay,
+                eventSources: [
+                    {
+                        id:     EVENT_SOURCE_ID,
+                        events: this.events,
+                    }
+                ],
+                eventContent: this.eventRender,
+                viewDidMount: this.viewSkeletonRender,
+                loading: this.onLoading,
+                dateClick: this.onDateClick,
+                eventClick: this.onEventClick,
+                eventResize: this.onEventResize,
+                eventDrop: this.onEventDrop
             }
         },
         methods: {
@@ -719,83 +790,17 @@
 
         <full-calendar
             ref="fullCalendar"
-            :plugins="calendarPlugins"
-            :views="{
-                day: {
-                    titleFormat: dayTitleFormat,
-                    columnHeader: false
-                },
-                week: {
-                    columnHeaderFormat: formats.displayWeekDay
-                },
-                list: {
-                    buttonText: 'List',
-                    duration: { days: this.duration },
-                    listDayFormat: this.config.momentJsDateShort
-                }
-            }"
-            :event-time-format="helper.eventTimeFormat"
-            :content-height="this.contentHeight"
-            :custom-buttons="{
-                customExport: {
-                    text: 'Export',
-                    click: onExportClick
-                },
-                customFilters: {
-                    text: 'Filters',
-                    click: onFilterClick
-                },
-                quickSwitchButton: {
-                    text: ' ',
-                },
-                customPrev: {
-                    icon: 'chevron-left',
-                    click: this.clickPrev.bind(this),
-                },
-                customNext: {
-                    icon: 'chevron-right',
-                    click: this.clickNext.bind(this),
-                },
-                customToday: {
-                    text: 'Today',
-                    click: this.clickToday.bind(this),
-                },
-            }"
-            :header="{
-                left: 'quickSwitchButton,customToday,customPrev,customNext',
-                center: 'title',
-                right: 'customFilters,list,dayGridMonth,timeGridWeek,timeGridDay,customExport'
-            }"
-            :buttonText="{
-                today:    'Today',
-                month:    'Month',
-                week:     'Week',
-                day:      'Day',
-                list:     'List',
-            }"
-            :default-date="config.defaultDate"
-            :default-view="config.defaultView || 'dayGridMonth'"
-            :scroll-time="config.dateDisplayFormats.calendarStartTime"
-            :event-limit="config.eventLimit"
-            :first-day="config.firstDay"
-            :event-sources="eventSources"
-            :event-render="eventRender"
-            :view-skeleton-render="viewSkeletonRender"
-            @loading="onLoading"
-            @dateClick="onDateClick"
-            @eventClick="onEventClick"
-            @eventResize="onEventResize"
-            @eventDrop="onEventDrop"
+            :options="calendarOptions"
         />
 
         <flat-pickr
-                ref="flatPickr"
-                :config="{
-                    defaultDate: config.defaultDate,
-                    selector: '.fc-quickSwitchButton-button',
-                    disableMobile: true,
-                }"
-                @dateSelected="onQuickSwitch"
+            ref="flatPickr"
+            :config="{
+                defaultDate: config.defaultDate,
+                selector: '.fc-quickSwitchButton-button',
+                disableMobile: true,
+            }"
+            @dateSelected="onQuickSwitch"
         />
 
     </div>
@@ -811,8 +816,8 @@
 </style>
 
 <style lang="scss">
-    @import '~@fullcalendar/core/main.css';
-    @import '~@fullcalendar/daygrid/main.css';
-    @import '~@fullcalendar/timegrid/main.css';
-    @import '~@fullcalendar/list/main.css';
+    // @import '~@fullcalendar/core/main.css';
+    // @import '~@fullcalendar/daygrid/main.css';
+    // @import '~@fullcalendar/timegrid/main.css';
+    // @import '~@fullcalendar/list/main.css';
 </style>
