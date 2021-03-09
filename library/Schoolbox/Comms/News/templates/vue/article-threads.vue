@@ -379,7 +379,7 @@ export default {
                     <div class="small-6 columns">
                         <h2>Comments <span v-if="!isInitialLoad">({{ totalCommentsCount }})</span></h2>
                     </div>
-                    <div v-if="isPublished && !isInitialLoad && isThreadCheckboxVisible" class="checklist small-6 columns">
+                    <div v-if="!isInitialLoad && isThreadCheckboxVisible" class="checklist small-6 columns">
                         <input id="allow-comments" name="allowComments" type="checkbox" @click="changeThreadStatus" v-model="isThreadCheckboxEnabled" />
                         <label for="allow-comments">Allow comments</label>
                     </div>
@@ -402,7 +402,7 @@ export default {
                             </div>
                         </template>
                     </div>
-                    <template v-if="isPublished && !isThreadEnabled">
+                    <template v-if="!isThreadEnabled">
                         <div data-alert="" class="alert-box">
                             <span class="icon-locked">Comments are currently disabled for this article.</span>
                         </div>
