@@ -23,10 +23,8 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\MapperFactory;
-use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
-use GuzzleHttp\Client;
 use Schoolbox\User;
 
 use function count;
@@ -39,31 +37,15 @@ use function in_array;
 class CliPdfGenerator extends CliTool\PdfGenerator\App
 {
     // This tools CLI options
-    private const OPT_SHORT_HELP            = 'h';                 // print help
-    private const OPT_LONG_HELP             = 'help';              // print help
-    private const OPT_LONG_HASH             = 'hash:';             // session hash
-    private const OPT_LONG_USERNAME         = 'username:';         // username
     private const OPT_LONG_STUDENT_ID       = 'student-id:';       // student external id
     private const OPT_LONG_YEAR_LEVEL       = 'year-level:';       // year-level
     private const OPT_LONG_CURRICULUM       = 'curriculum:';       // curriculum
-    private const OPT_LONG_MAX_FAILS        = 'max-fails:';        // Number of consecutive fails after which to abort the script's execution.
-    private const OPT_LONG_JS_DELAY         = 'js-delay:';         // How many milliseconds to let JS run before attempting to print page
     private const OPT_LONG_REPORT_DATE      = 'report-date:';      // to generate a report for some point in time
-    private const OPT_LONG_USER_STYLE_SHEET = 'user-style-sheet:'; // user style sheet
     private const OPT_LONG_ROLE_TYPE        = 'role-type:';        // role-type override
     private const OPT_LONG_INCLUDE_SUBJECTS = 'include-subjects';  // include subject reports
 
-    private const DEFAULT_MAX_FAILS   = 3;
-    private const DEFAULT_JS_DELAY    = 1000;
-
     private const CURRICULUM_IB  = 'ib';
     private const CURRICULUM_HSC = 'hsc';
-
-    /** @var string|null */
-    private $sessionHash;
-
-    /** @var string|null */
-    private $username;
 
     /** @var string|null */
     private $studentExternalId;
@@ -95,28 +77,8 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
      */
     private $fqdn;
 
-    /** @var int */
-    private $maxFailures;
-
     /** @var FolderFetcher */
     private $folderFetcher;
-
-    /**
-     * How many milliseconds to let javascript to run before snapping page.
-     *
-     * Setting this too low will cause either total failure, or some URLs to be skipped
-     *
-     * Use low value for testing, high/default value for production
-     *
-     * @var int
-     */
-    private $jsDelay;
-
-    /**
-     * A user style sheet, to load with every page
-     * @var string
-     */
-    private $userStyleSheet;
 
     /**
      * Enable user to print reports with grade visibility for a role other than current user
@@ -124,45 +86,20 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
      */
     private $roleTypeOverride;
 
-    /**
-     * A guzzle client to request each Subject Report
-     *
-     * @var Client
-     */
-    private $guzzleClient;
-
-    /**
-     * For now, just a flat array of all URLs that contain errors. May group by student/folder in the future.
-     *
-     * @var string[]
-     */
-    private $pageErrors = [];
-
-
-    /** @inheritdoc */
-    public function getShortOpts(): array
-    {
-        return [self::OPT_SHORT_HELP];
-    }
-
-
     /** @inheritdoc */
     public function getLongOpts(): array
     {
-        return [
-            self::OPT_LONG_HELP,
-            self::OPT_LONG_HASH,
-            self::OPT_LONG_USERNAME,
-            self::OPT_LONG_STUDENT_ID,
-            self::OPT_LONG_YEAR_LEVEL,
-            self::OPT_LONG_CURRICULUM,
-            self::OPT_LONG_MAX_FAILS,
-            self::OPT_LONG_JS_DELAY,
-            self::OPT_LONG_REPORT_DATE,
-            self::OPT_LONG_USER_STYLE_SHEET,
-            self::OPT_LONG_ROLE_TYPE,
-            self::OPT_LONG_INCLUDE_SUBJECTS,
-        ];
+        return array_merge(
+            parent::getLongOpts(),
+            [
+                self::OPT_LONG_STUDENT_ID,
+                self::OPT_LONG_YEAR_LEVEL,
+                self::OPT_LONG_CURRICULUM,
+                self::OPT_LONG_REPORT_DATE,
+                self::OPT_LONG_ROLE_TYPE,
+                self::OPT_LONG_INCLUDE_SUBJECTS,
+            ]
+        );
     }
 
 
@@ -181,12 +118,6 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
      */
     public function run(): void
     {
-        // Did user request help?
-        if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
-            $this->printHelp();
-            exit(CliKernelAbstract::EXIT_STATUS_OK);
-        }
-
         // Parse command-line options. If invalid options detected, then print help and exit.
         if (!$this->parseAppOptions()) {
             $this->printHelp();
@@ -241,53 +172,12 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
      */
     private function parseAppOptions(): bool
     {
-        $valid                      = true;
-        $this->sessionHash          = $this->getOpt(self::OPT_LONG_HASH);
-        $this->username             = $this->getOpt(self::OPT_LONG_USERNAME);
-        $this->studentExternalId    = $this->getOpt(self::OPT_LONG_STUDENT_ID);
-        $this->yearLevel            = $this->getOpt(self::OPT_LONG_YEAR_LEVEL);
-        $this->curriculum           = $this->getOpt(self::OPT_LONG_CURRICULUM);
-        $this->reportDateOverride   = $this->getOpt(self::OPT_LONG_REPORT_DATE);
-        $maxFailures                = $this->getOpt(self::OPT_LONG_MAX_FAILS);
-        $jsDelay                    = $this->getOpt(self::OPT_LONG_JS_DELAY);
-        $userStyleSheet             = $this->getOpt(self::OPT_LONG_USER_STYLE_SHEET);
-        $roleTypeOverride           = $this->getOpt(self::OPT_LONG_ROLE_TYPE);
-
-        if ($this->sessionHash) {
-            $this->getLogger()->info('Command-line session hash supplied, validating...');
-            $redis = \Alaress\Redis::getClientInstance();
-            if (!$redis) {
-                $this->getLogger()->alert("Unable to fetch redis client");
-                $valid = false;
-            } else {
-                $redisData = $redis->get(\sprintf('%s%s', PipeManager::REDIS_SESSION_PREFIX, $this->sessionHash));
-                if (null === $redisData) {
-                    $this->getLogger()->alert("No redis data found for hash: {$this->sessionHash}");
-                    $valid = false;
-                } else {
-                    // TODO This is too low-level and implementation specific.
-                    // TODO It should be abstracted out.
-                    \session_start();
-                    \session_decode($redisData);
-                    /** @var User $user */
-                    $user     = $_SESSION['user'] ?? null;
-                    $lastTime = $_SESSION['lasttime'] ?? null;
-                    \session_unset();
-                    if (!$user) {
-                        $this->getLogger()->alert("No user object found in session data");
-                        $valid = false;
-                    } elseif (!$lastTime || time() - $lastTime > $this->getConfig()->get('session_length')) {
-                        $this->getLogger()->alert("Session has expired");
-                        $valid = false;
-                    } elseif (!$user->isSuperuser()) {
-                        $this->getLogger()->alert("Session user '{$user->getUsername()}' is not a superuser");
-                        $valid = false;
-                    } else {
-                        $this->getLogger()->notice("Session user '{$user->getUsername()}' IS a superuser, user is authorised");
-                    }
-                }
-            }
-        }
+        $valid                    = true;
+        $this->studentExternalId  = $this->getOpt(self::OPT_LONG_STUDENT_ID);
+        $this->yearLevel          = $this->getOpt(self::OPT_LONG_YEAR_LEVEL);
+        $this->curriculum         = $this->getOpt(self::OPT_LONG_CURRICULUM);
+        $this->reportDateOverride = $this->getOpt(self::OPT_LONG_REPORT_DATE);
+        $roleTypeOverride         = $this->getOpt(self::OPT_LONG_ROLE_TYPE);
 
         if ($this->curriculum && !in_array($this->curriculum, [self::CURRICULUM_IB, self::CURRICULUM_HSC], true)) {
             $this->getLogger()->alert("Invalid 'curriculum' option: '$this->curriculum'");
@@ -299,34 +189,6 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
             $valid = false;
         }
 
-        if ($maxFailures === null) {
-            $this->maxFailures = self::DEFAULT_MAX_FAILS;
-        } elseif (!\is_numeric($maxFailures) || $maxFailures < 0) {
-            $this->getLogger()->alert("Invalid 'max-failures' option: '$maxFailures'");
-            $valid = false;
-        } else {
-            $this->maxFailures = (int)$maxFailures;
-        }
-
-        if ($jsDelay === null) {
-            $this->jsDelay = self::DEFAULT_JS_DELAY;
-        } elseif (!\is_numeric($jsDelay)) {
-            $this->getLogger()->alert("Invalid 'js-delay' option: '$jsDelay'");
-            $valid = false;
-        } else {
-            $this->jsDelay = (int)$jsDelay;
-        }
-
-        if ($userStyleSheet === null) {
-            // this option is not specified
-            $this->userStyleSheet = '';
-        } else if (!\file_exists($userStyleSheet)) {
-            $this->getLogger()->alert("Invalid 'user-style-sheet' option: '$userStyleSheet'");
-            $valid = false;
-        } else {
-            $this->userStyleSheet = $userStyleSheet;
-        }
-
         if ($roleTypeOverride === null || in_array($roleTypeOverride, Role::getRoleTypes(), true)) {
             $this->roleTypeOverride = $roleTypeOverride;
         } else {
@@ -334,26 +196,23 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
             $valid = false;
         }
 
-
         /* Include Subjects requires Role Type override
          */
-        if (!$this->roleTypeOverride && (bool)$this->getOpt(self::OPT_LONG_INCLUDE_SUBJECTS)) {
+        $includeSubjects = (bool)$this->getOpt(self::OPT_LONG_INCLUDE_SUBJECTS);
+        if (!$this->roleTypeOverride && $includeSubjects) {
             $this->getLogger()->alert("A valid 'role-type' option must be set if using 'include-subjects'");
             $valid = false;
         }
 
-
         $this->getLogger()->debug("Command Line Options:");
-        $this->getLogger()->debug("    sessionHash: {$this->sessionHash}");
-        $this->getLogger()->debug("    username: {$this->username}");
         $this->getLogger()->debug("    studentExternalId: {$this->studentExternalId}");
         $this->getLogger()->debug("    yearLevel: {$this->yearLevel}");
         $this->getLogger()->debug("    curriculum: {$this->curriculum}");
-        $this->getLogger()->debug("    max-fails: {$this->maxFailures}");
-        $this->getLogger()->debug("    js-delay: {$this->jsDelay}");
         $this->getLogger()->debug("    report-date: {$this->reportDateOverride}");
-        $this->getLogger()->debug("    user-style-sheet: {$this->userStyleSheet}");
         $this->getLogger()->debug("    role-type: {$this->roleTypeOverride}");
+        if ($includeSubjects) {
+            $this->getLogger()->debug("    include-subjects");
+        }
 
         return $valid;
     }
@@ -605,14 +464,11 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
      */
     protected function printHelp(): void
     {
-        $file            = $this->getToolFilename();
-        $defaultMaxFails = self::DEFAULT_MAX_FAILS;
-        $defaultJsDelay  = self::DEFAULT_JS_DELAY;
-        $roleTypes       = implode(', ', Role::getRoleTypes());
-
-        $green  = self::COLOUR_GREEN;
-        $white  = self::COLOUR_WHITE;
-        $yellow = self::COLOUR_YELLOW;
+        $file      = $this->getToolFilename();
+        $roleTypes = implode(', ', Role::getRoleTypes());
+        $green     = self::COLOUR_GREEN;
+        $white     = self::COLOUR_WHITE;
+        $yellow    = self::COLOUR_YELLOW;
 
         $help = "$white
 
@@ -630,23 +486,8 @@ DESCRIPTION
     To authenticate the app, you can either provide a session hash, or a username + password. If the latter, this app will prompt you to
     enter the password on STDIN and STDOUT.
 
-    $yellow-h, --help$white
-        Print this help and exit
-
-    $yellow-o=OUT_FILE$white
-        Filename to write archive to, eg '-o=output.zip'
-
-    $yellow-l=LOG_FILE$white
-        Filename to append logs to, eg '-l=error.log'
-
-    $yellow-v[v[v]]$white
-        Log verbosity. Max 3 levels, eg -vvv
-
-    $yellow--hash=HASH$white
-        A valid session hash, you can extract this from a browser session
-
-    $yellow--username=USERNAME$white
-        A username to run the tool as
+OPTIONS
+{$this->generateHelpMessageForBaseOptions()}
 
     $yellow--student-id=ID$white
         Just generate the report for this student. (Value is SIS id, not Schoolbox id)
@@ -657,20 +498,9 @@ DESCRIPTION
     $yellow--curriculum=[ib|hsc]$white
         Just generate reports for students enrolled in this curriculum
 
-    $yellow--max-fails=COUNT$white
-         If the tool fails for this many students in a row, exit immediately.
-         Defaults to $defaultMaxFails.
-
-    $yellow--js-delay=COUNT$white
-         Number of milliseconds to wait before printing a page to allow javascript to execute.
-         Defaults to $defaultJsDelay.
-
     $yellow--report-date=REPORT_DATE$white
          Attempt to produce a report for some specific point in time.
          Supports any format accepted by PHP's strtotime()
-
-    $yellow--user-style-sheet=STYLE_FILE$white
-         Filename of a style sheet to load with every page.
 
     $yellow--role-type=ROLE_TYPE$white
          Print Subject Reports as they would appear to users with this role type.
