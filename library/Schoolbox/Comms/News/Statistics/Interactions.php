@@ -429,6 +429,9 @@ class Interactions
      */
     private function uniqueOpens(News\Model $article, array $audience): int
     {
+        if (!count($audience)) {
+            return 0;
+        }
         $pb = $this->statisticsMapper->getPredicateBuilder();
         $pb->equals('article_id', $article->getId());
         $pb->in('user_id', $audience);
