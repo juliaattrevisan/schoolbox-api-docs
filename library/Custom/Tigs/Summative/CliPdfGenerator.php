@@ -14,12 +14,10 @@ use Zend\Uri\UriInterface;
 use function count;
 use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use External_UserInterface;
-use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Psr7\Uri;
 use function implode;
 use function in_array;
 use InvalidArgumentException;
-use Knp\Snappy\Pdf;
 use RuntimeException;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder;
@@ -31,7 +29,6 @@ use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use GuzzleHttp\Client;
 use Schoolbox\User;
-use ZipArchive;
 
 /**
  * A CLI App for batch printing PDFs to an archive
@@ -55,9 +52,6 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
 
     private const DEFAULT_MAX_FAILS   = 3;
     private const DEFAULT_JS_DELAY    = 1000;
-
-    private const EXIT_STATUS_AUTHENTICATION_FAILURE = 100;
-    private const EXIT_STATUS_AUTHORISATION_FAILURE  = 101;
 
     private const CURRICULUM_IB  = 'ib';
     private const CURRICULUM_HSC = 'hsc';
@@ -362,58 +356,6 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
     }
 
 
-//    /**
-//     * Start doing the work.
-//     *
-//     * @throws RuntimeException
-//     * @throws \Alaress\Database\Predicate\InvalidColumnException
-//     * @throws \Aura\Router\Exception\RouteNotFound
-//     * @throws \GuzzleHttp\Exception\GuzzleException
-//     * @throws InvalidArgumentException
-//     * @throws \Schoolbox\Mapper\DefinitionException
-//     * @throws \Schoolbox\Mapper\Exception
-//     * @throws \Schoolbox\Mapper\Exception\Deleted
-//     * @throws \UnderflowException
-//     */
-//    private function execute(): void
-//    {
-//        $this->guzzleClient  = new Client();
-//        $excludedClassCodes  = $this->getExcludedClassCodes();
-//        $sessionHash         = $this->getSessionHash();
-//        $studentsIds         = $this->getStudentIds();
-//        $maxIdLength         = $this->calculateMaxIdLength($studentsIds);
-//        $tempDir             = $this->createTempDir();
-//        $pdfFilenames        = [];
-//        $consecutiveFailures = 0;
-//        $index               = 1;
-//        $count               = count($studentsIds);
-//
-//        foreach ($studentsIds as $studentId) {
-//            $this->getLogger()->notice(\sprintf("Processing student %s of %s", $index++, $count));
-//            if($consecutiveFailures >= $this->maxFailures){
-//                $this->getLogger()->error("$consecutiveFailures consecutive failures, giving up...");
-//                break;
-//            }
-//            $student         = $this->userMapper->findById($studentId);
-//            $externalStudent = $this->externalUser->getStudent($student->getExternalId());
-//            $message         = \sprintf("Printing PDF for student. (id: %{$maxIdLength}d), (externalId: %-s)", $studentId, $student->getExternalId());
-//            $this->getLogger()->notice($message);
-//            try {
-//                $pdfFilenames[]      = $this->generatePdf($student, $externalStudent, $sessionHash, $excludedClassCodes, $tempDir);
-//                $consecutiveFailures = 0;
-//            } catch (RuntimeException $e) {
-//                $this->getLogger()->warning($e->getMessage());
-//                $consecutiveFailures++;
-//                continue;
-//            }
-//        }
-//
-//        $this->createZipArchive($pdfFilenames, $tempDir);
-//        $this->cleanUpTempFiles($pdfFilenames, $tempDir);
-//        $this->printPageErrorSummary();
-//    }
-
-
     /**
      * Returns the length of the largest user.id in the collection
      *
@@ -430,22 +372,6 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
     }
 
 
-//    /**
-//     * Create a temp directory to store files and return its name
-//     *
-//     * @return string
-//     * @throws RuntimeException If unable to create the temp directory
-//     */
-//    private function createTempDir(): string
-//    {
-//        $tempDir = $this->getConfig()->get('zip_dir') . '/' . \time();
-//        if (!\mkdir($tempDir) && !\is_dir($tempDir)) {
-//            throw new \RuntimeException(sprintf('Directory "%s" was not created', $tempDir));
-//        }
-//        return $tempDir;
-//    }
-
-
     /**
      * Returns configured class codes to exclude from reporting
      *
@@ -458,33 +384,6 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
         $this->getLogger()->debug("Class code exclusions: " . $excluded);
         return $excluded;
     }
-
-
-//    /**
-//     * Gets a session hash to be used to enable web requests
-//     *
-//     * @return string
-//     * @throws \GuzzleHttp\Exception\GuzzleException
-//     * @throws InvalidArgumentException
-//     */
-//    private function getSessionHash(): string
-//    {
-//        // Did user provide a session hash on the command line?
-//        if ($this->sessionHash) {
-//            $this->getLogger()->debug('Using hash provided on command line');
-//            return $this->sessionHash;
-//        }
-//
-//        $username = $this->getUsername();
-//
-//        // Use web login form to support multiple identity providers
-//        $sessionHash = $this->generateSessionHashViaLoginForm($username);
-//
-//        // But ensure user is a superuser
-//        $this->authoriseUser($username);
-//
-//        return $sessionHash;
-//    }
 
 
     /**
@@ -590,96 +489,43 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
 
 
 //    /**
-//     * Generate a PDF report for a single user and returns the filename
+//     * Download each URL as it would be rendered for staff and checks for rendered page errors
 //     *
-//     * @param User     $student
-//     * @param array    $externalStudent
-//     * @param string   $sessionHash
-//     * @param null|string $excludedClassCodes
-//     * @param string   $tempDir
-//     * @return string The filename of the PDF
-//     * @throws RuntimeException If unable to generate a PDF Report for this student
-//     * @throws InvalidArgumentException
-//     * @throws \Aura\Router\Exception\RouteNotFound
-//     * @throws \Schoolbox\Mapper\DefinitionException
-//     * @throws \UnexpectedValueException
+//     * @param User   $student
+//     * @param Uri[]  $urls
+//     * @param string $sessionHash
 //     */
-//    private function generatePdf(User $student, array $externalStudent, string $sessionHash, ?string $excludedClassCodes, string $tempDir): string
+//    private function detectRenderedErrors(User $student, array $urls, string $sessionHash): void
 //    {
-//        $filename = "{$tempDir}/{$student->getExternalId()}.pdf";
-//        $this->getLogger()->debug("Attempting to create temp PDF file: $filename");
-//        $fp = \fopen($filename, 'wb');
-//        if (!$fp) {
-//            throw new RuntimeException("Unable to create file: '{$filename}'");
-//        }
+//        $this->getLogger()->info("Checking report for student {$student->getId()} for errors...");
 //
-//        $urls = $this->generateUrlsForStudent($student, $externalStudent, $excludedClassCodes);
-//        $this->detectRenderedErrors($student, $urls, $sessionHash);
-//        $this->getLogger()->info("Generating PDF...");
-//        $javascriptDelayMs = $this->jsDelay;
-//        $userStyleSheet    = $this->userStyleSheet;
-//        $maxAttempts       = 10;
-//        $attempts          = 0;
-//        $previousException = null;
-//        while (true) {
-//            if ($attempts++ >= $maxAttempts) {
-//                \unlink($filename);
-//                throw new RuntimeException("Unable to generate report after $maxAttempts attempts, skipping", 0, $previousException);
-//            }
+//        $cookieJar = CookieJar::fromArray([PipeManager::PHP_SESSION_PREFIX => $sessionHash,], $this->fqdn);
+//        $options   = ['cookies' => $cookieJar,];
+//        foreach ($urls as $url) {
 //            try {
-//                $this->snapshotUrlsToPdf($urls, $sessionHash, $fp, $javascriptDelayMs, $userStyleSheet);
-//                break;
+//                $staffUrl = $url->withQuery('role-type=' . Role::STAFF);
+//            } catch (InvalidArgumentException $e) {
+//                $this->getLogger()->error("Unable to generate staff version of '$url'");
+//                $this->getLogger()->error($e->getMessage());
+//                $this->getLogger()->error($e->getTraceAsString());
+//                continue;
+//            }
+//
+//            $response = $this->guzzleClient->get($staffUrl, $options);
+//            try {
+//                $contents = $response->getBody()->getContents();
+//                if (strpos($contents, Config::ERROR_DATA_ATTRIBUTE) !== false) {
+//                    $this->getLogger()->error("'$staffUrl' contains an error.");
+//                    $this->pageErrors[] = $staffUrl;
+//                }
 //            } catch (RuntimeException $e) {
-//                $this->getLogger()->warning($e->getMessage());
-//                $this->getLogger()->warning($e->getTraceAsString());
-//                $javascriptDelayMs *= 2;
-//                $previousException = $e;
+//                $this->getLogger()->error("Unable to check '$staffUrl' for errors");
+//                $this->getLogger()->error($e->getMessage());
+//                $this->getLogger()->error($e->getTraceAsString());
+//                continue;
 //            }
 //        }
-//
-//        $this->getLogger()->info("Wrote PDF to '$filename'");
-//        return $filename;
 //    }
-
-
-    /**
-     * Download each URL as it would be rendered for staff and checks for rendered page errors
-     *
-     * @param User   $student
-     * @param Uri[]  $urls
-     * @param string $sessionHash
-     */
-    private function detectRenderedErrors(User $student, array $urls, string $sessionHash): void
-    {
-        $this->getLogger()->info("Checking report for student {$student->getId()} for errors...");
-
-        $cookieJar = CookieJar::fromArray([PipeManager::PHP_SESSION_PREFIX => $sessionHash,], $this->fqdn);
-        $options   = ['cookies' => $cookieJar,];
-        foreach ($urls as $url) {
-            try {
-                $staffUrl = $url->withQuery('role-type=' . Role::STAFF);
-            } catch (InvalidArgumentException $e) {
-                $this->getLogger()->error("Unable to generate staff version of '$url'");
-                $this->getLogger()->error($e->getMessage());
-                $this->getLogger()->error($e->getTraceAsString());
-                continue;
-            }
-
-            $response = $this->guzzleClient->get($staffUrl, $options);
-            try {
-                $contents = $response->getBody()->getContents();
-                if (strpos($contents, Config::ERROR_DATA_ATTRIBUTE) !== false) {
-                    $this->getLogger()->error("'$staffUrl' contains an error.");
-                    $this->pageErrors[] = $staffUrl;
-                }
-            } catch (RuntimeException $e) {
-                $this->getLogger()->error("Unable to check '$staffUrl' for errors");
-                $this->getLogger()->error($e->getMessage());
-                $this->getLogger()->error($e->getTraceAsString());
-                continue;
-            }
-        }
-    }
 
 
     /**
@@ -749,234 +595,6 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
          */
         return $this->folderFetcher->findForStudent($student, $attributes, $this->reportDateOverride, $excludedClassCodes, null, $roleTypeOverride);
     }
-
-
-//    /** @noinspection PhpDocRedundantThrowsInspection (the call to $snappy->getOutput() can throw a RuntimeException)) */
-//    /**
-//     * Attempts to snapshot a set of URLs as a PDF, and return the PDF contents
-//     *
-//     * @param Uri[]    $urls
-//     * @param string   $sessionHash
-//     * @param resource $fp The temp file to write the PDF to
-//     * @param int      $javascriptDelayMs
-//     * @param string   $userStyleSheet
-//     * @throws RuntimeException If unable to generate the PDF contents
-//     * @throws InvalidArgumentException
-//     */
-//    private function snapshotUrlsToPdf(array $urls, string $sessionHash, $fp, int $javascriptDelayMs, string $userStyleSheet): void
-//    {
-//        $this->getLogger()->debug("Setting 'javascript-delay' to $javascriptDelayMs ms");
-//
-//        // @see https://wkhtmltopdf.org/usage/wkhtmltopdf.txt for list of options
-//        $snappy = new Pdf('/usr/local/bin/wkhtmltopdf');
-//        $snappy->setTimeout(120); // TODO expose as CLI option
-//        $snappy->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
-//        $snappy->setOption('orientation', 'Landscape');
-//        $snappy->setOption('disable-external-links', true);
-//        $snappy->setOption('viewport-size', 1024);
-//        $snappy->setOption('javascript-delay', $javascriptDelayMs);
-//        if ($userStyleSheet !== '') {
-//            $this->getLogger()->debug("Setting 'user-style-sheet' to $userStyleSheet");
-//            $snappy->setOption('user-style-sheet', $userStyleSheet);
-//        }
-//
-//        \fwrite($fp, $snappy->getOutput($urls));
-//    }
-//
-//
-//    /**
-//     * Create a single ZIP archive of all the PDF documents
-//     *
-//     * @param string[] $pdfFilenames
-//     * @param string   $tempDir
-//     */
-//    private function createZipArchive(array $pdfFilenames, string $tempDir): void
-//    {
-//        $zipFilename = \tempnam($tempDir, 'zip');
-//
-//        /* https://stackoverflow.com/questions/32694148/ziparchivegetstatusstring-invalid-or-uninitialized-zip-object
-//         * Also, SA-10419
-//         *
-//         * ZipArchive doesn't expect a file to exist when it's creating its zip archive
-//         */
-//        @unlink($zipFilename);
-//
-//        $zipArchive  = new ZipArchive();
-//        $this->getLogger()->debug("Creating temp zip archive: $zipFilename");
-//        $zipArchive->open($zipFilename, ZipArchive::CREATE);
-//
-//        // To avoid exceeding open file limit, may need to batch zip
-//        $openFileLimit = (int)\exec('ulimit -n');
-//        $batchSize     = \round($openFileLimit - 20, -2); // buffer of 20, round to nearest 100
-//        $this->getLogger()->debug(sprintf('Open file limit: %d, setting batch size to %d', $openFileLimit, $batchSize));
-//        $batchIndex = 1;
-//        $batches    = \ceil(count($pdfFilenames) / $batchSize);
-//        foreach ($pdfFilenames as $pdfFilename) {
-//            if ($batchIndex++ % $batchSize === 0) {
-//                $batchCount = (int)($batchIndex / $batchSize);
-//                $this->getLogger()->info("Writing zip batch $batchCount/$batches...");
-//                $zipArchive->close();
-//                $zipArchive->open($zipFilename);
-//            }
-//            $this->getLogger()->debug("Adding PDF file to zip archive: $pdfFilename");
-//            $zipArchive->addFile($pdfFilename, \basename($pdfFilename));
-//        }
-//        $this->getLogger()->info("Writing zip batch $batches/$batches...");
-//        $zipArchive->close();
-//
-//        $this->getLogger()->debug("Writing zip archive to output stream");
-//        if (false === \stream_copy_to_stream(\fopen($zipFilename, 'rb'), $this->getOutStream())) {
-//            $this->getLogger()->error('Unable to write zip archive to output stream');
-//        }
-//
-//        $this->getLogger()->debug("Deleting zip archive: $zipFilename");
-//        \unlink($zipFilename);
-//    }
-//
-//
-//    /**
-//     * Explicitly deletes temporary files
-//     *
-//     * @param array  $pdfFilenames
-//     * @param string $tempDir
-//     */
-//    private function cleanUpTempFiles(array $pdfFilenames, string $tempDir): void
-//    {
-//        $this->getLogger()->debug("Cleaning up temporary files");
-//        foreach ($pdfFilenames as $pdfFilename) {
-//            $this->getLogger()->debug("Deleting $pdfFilename");
-//            \unlink($pdfFilename);
-//        }
-//
-//        $this->getLogger()->debug("Deleting temp directory $tempDir");
-//        \rmdir($tempDir);
-//    }
-//
-//
-//    /**
-//     * Return a username, either from command line options, or by prompting the user
-//     *
-//     * @return string
-//     */
-//    private function getUsername(): string
-//    {
-//        // Revert to username and password
-//        if ($this->username) {
-//            $this->getLogger()->debug('Using username provided on command line');
-//            return $this->username;
-//        }
-//        $username = null;
-//        while (true) {
-//            $this->getLogger()->debug("Requesting username");
-//            $username = \trim($this->readLine('Please provide a schoolbox username: '));
-//            // TODO use a regex
-//            if ($username) {
-//                $this->getLogger()->debug("Username set to '$username'");
-//                break;
-//            }
-//            $this->getLogger()->warning("Username '$username' appears invalid");
-//        }
-//        return $username;
-//    }
-//
-//
-//    /**
-//     * Attempt to login via the web form, and return the generated session hash
-//     *
-//     * @param string $username
-//     * @return string
-//     * @throws \GuzzleHttp\Exception\GuzzleException
-//     * @throws InvalidArgumentException
-//     */
-//    private function generateSessionHashViaLoginForm(string $username): string
-//    {
-//        $attempts    = 0;
-//        $maxAttempts = 3;
-//        $sessionHash = '';
-//        while (true) {
-//            $attempts++;
-//            if ($attempts > $maxAttempts) {
-//                $this->getLogger()->warning("Login failed");
-//                exit(self::EXIT_STATUS_AUTHENTICATION_FAILURE);
-//            }
-//            $remaining = $maxAttempts - $attempts + 1;
-//            $this->getLogger()->debug("Requesting password, ($remaining attempts remaining)");
-//            $password = $this->readPassword("Please provide your password ($remaining attempts remaining): ");
-//            // TODO use regex
-//            if ($password) {
-//                $this->getLogger()->info("Password provided, attempting login");
-//                $sessionHash = $this->attemptLogin($username, $password);
-//                if ($sessionHash) {
-//                    break;
-//                }
-//            }
-//            $this->getLogger()->warning("Password appears invalid");
-//        }
-//        return $sessionHash;
-//    }
-//
-//
-//    /**
-//     * Attempt to login. Returns session hash on success, empty string on failure
-//     *
-//     * @param string $username
-//     * @param string $password
-//     * @return string
-//     * @throws \GuzzleHttp\Exception\GuzzleException
-//     * @throws InvalidArgumentException
-//     */
-//    private function attemptLogin(string $username, string $password): string
-//    {
-//        $url = "https://{$this->fqdn}/login";
-//
-//        $headers  = ['Origin' => $this->fqdn];
-//        $postData = [
-//            'page'     => '/login/',
-//            'username' => $username,
-//            'password' => $password,
-//            'Submit'   => 'Sign in',
-//        ];
-//
-//        $options = [
-//            'headers'         => $headers,
-//            'form_params'     => $postData,
-//            'allow_redirects' => false,
-//        ];
-//
-//        $response = (new Client())->request('POST', $url, $options);
-//
-//        if (303 !== $response->getStatusCode()) {
-//            $this->getLogger()->warning("Login failure. Status code: {$response->getStatusCode()}");
-//            return '';
-//        }
-//
-//        $cookieName = PipeManager::PHP_SESSION_PREFIX;
-//        foreach ($response->getHeader('Set-Cookie') as $cookieString) {
-//            if (preg_match("/^{$cookieName}=([a-z0-9]+);/", $cookieString, $matches)) {
-//                $this->getLogger()->info("Session cookie found");
-//                return $matches[1];
-//            }
-//        }
-//        return '';
-//    }
-//
-//
-//    /**
-//     * Checks that the specified user is a superuser
-//     *
-//     * @param string $username
-//     * @return bool
-//     */
-//    private function authoriseUser(string $username): bool
-//    {
-//        $user = $this->userMapper->findByUsername($username);
-//        if ($user && $user->isSuperuser()) {
-//            $this->getLogger()->debug("User '$username' authorised to print reports");
-//            return true;
-//        }
-//        $this->getLogger()->error("User '$username' is not authorised to print reports, exiting");
-//        exit(self::EXIT_STATUS_AUTHORISATION_FAILURE);
-//    }
 
 
     /**
