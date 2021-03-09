@@ -189,7 +189,7 @@ $accordion-content-padding: rem-calc(($base-font-size - 4));
 
 // These control the background color for the table and even rows
 $table-bg: $white;
-$table-even-row-bg: $table-bg;
+$table-even-row-bg: transparent;
 
 // These control the table cell border style
 // $table-border-style: solid;
@@ -467,7 +467,7 @@ table {
   .card {
     padding: 0;
     img {
-      margin: -0.6rem 1rem 0 -0.6rem;
+      margin: -0.625rem 1rem 0 -0.6rem;
     }
   }
   .profile-cell {
