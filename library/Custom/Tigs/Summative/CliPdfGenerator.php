@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Tigs\Summative;
@@ -11,12 +13,9 @@ use Aura\Router\Router;
 use Schoolbox\GenericCollection;
 use Schoolbox\YearLevel;
 use Zend\Uri\UriInterface;
-use function count;
 use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use External_UserInterface;
 use GuzzleHttp\Psr7\Uri;
-use function implode;
-use function in_array;
 use InvalidArgumentException;
 use RuntimeException;
 use Schoolbox\Collection;
@@ -29,6 +28,10 @@ use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use GuzzleHttp\Client;
 use Schoolbox\User;
+
+use function count;
+use function implode;
+use function in_array;
 
 /**
  * A CLI App for batch printing PDFs to an archive
@@ -273,7 +276,7 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
                     if (!$user) {
                         $this->getLogger()->alert("No user object found in session data");
                         $valid = false;
-                    } elseif(!$lastTime || time() - $lastTime > $this->getConfig()->get('session_length')) {
+                    } elseif (!$lastTime || time() - $lastTime > $this->getConfig()->get('session_length')) {
                         $this->getLogger()->alert("Session has expired");
                         $valid = false;
                     } elseif (!$user->isSuperuser()) {
@@ -298,7 +301,7 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
 
         if ($maxFailures === null) {
             $this->maxFailures = self::DEFAULT_MAX_FAILS;
-        } elseif(!\is_numeric($maxFailures) || $maxFailures < 0) {
+        } elseif (!\is_numeric($maxFailures) || $maxFailures < 0) {
             $this->getLogger()->alert("Invalid 'max-failures' option: '$maxFailures'");
             $valid = false;
         } else {
@@ -307,7 +310,7 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
 
         if ($jsDelay === null) {
             $this->jsDelay = self::DEFAULT_JS_DELAY;
-        } elseif(!\is_numeric($jsDelay)) {
+        } elseif (!\is_numeric($jsDelay)) {
             $this->getLogger()->alert("Invalid 'js-delay' option: '$jsDelay'");
             $valid = false;
         } else {
