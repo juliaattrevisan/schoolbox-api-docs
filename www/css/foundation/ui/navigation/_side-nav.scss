@@ -24,6 +24,7 @@ $border-bottom-width: 2px;
   li {
     a {
       padding: 0.5rem 0.75rem;
+      display: block;
       border-left: $border-bottom-width solid transparent;
 
       &:hover {
