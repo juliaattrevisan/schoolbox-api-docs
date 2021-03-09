@@ -133,7 +133,7 @@ class Subnav
                     ],
                 ]
             ],
-            'ePortfolio' => [
+            'eportfolio' => [
                 'name' => 'ePortfolio',
                 'visible' =>  true,
                 'children' => [
@@ -159,7 +159,7 @@ class Subnav
                 'visible' =>  true,
                 'children' => []
             ],
-            'import' => [
+            'import/directImport' => [
                 'name' => 'Import',
                 'visible' =>  true,
                 'children' => [
@@ -178,7 +178,7 @@ class Subnav
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'import/photos/userAccount' => [
+                    'import/userAccount' => [
                         'name' => 'User Accounts',
                         'visible' =>  true,
                         'children' => []
@@ -194,12 +194,12 @@ class Subnav
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lms/rollover' => [
+                    'rollover' => [
                         'name' => 'Class Rollover',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lms/course-builder' => [
+                    'course-builder' => [
                         'name' => 'Course Builder',
                         'visible' =>  true,
                         'children' => []
@@ -236,7 +236,7 @@ class Subnav
                 'visible' =>  true,
                 'children' => [
                     'lists/achievement-category' => [
-                        'badgeCategories' => 'Badge Categories',
+                        'name' => 'Badge Categories',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -368,7 +368,7 @@ class Subnav
                 'visible' =>  true,
                 'children' => []
             ],
-            'notifications' => [
+            'messages' => [
                 'name' => 'Notifications',
                 'visible' =>  true,
                 'children' => [
@@ -425,7 +425,7 @@ class Subnav
                     ],
                 ]
             ],
-            'resources' => [
+            'setting/Resources' => [
                 'name' => 'Resources',
                 'visible' =>  true,
                 'children' => [
@@ -456,77 +456,77 @@ class Subnav
                     ],
                 ]
             ],
-            'schoolDataImport' => [
+            'import/schoolDataImport' => [
                 'name' => 'School Data Import',
                 'visible' =>  $this->configLoader->get('external_type') === 'schoolbox',
                 'children' => []
             ],
-            'systemSettings' => [
+            'setting' => [
                 'name' => 'System Settings',
                 'visible' =>  true,
                 'children' => [
-                    '3rdPartyServices' => [
+                    'setting/3rd+Party+Services' => [
                         'name' => '3rd Party Services',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'debugging' => [
+                    'setting/Debugging' => [
                         'name' => 'Debugging',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'email' => [
+                    'setting/Email' => [
                         'name' => 'Email',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'externalDb' => [
+                    'setting/External+DB' => [
                         'name' => 'External DB',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'ldap' => [
+                    'setting/LDAP' => [
                         'name' => 'LDAP',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'localisation' => [
+                    'setting/Localisation' => [
                         'name' => 'Localisation',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'paths' => [
+                    'oauth' => [
+                        'name' => 'oAuth',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'setting/Paths' => [
                         'name' => 'Paths',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'policy' => [
+                    'setting/Policy' => [
                         'name' => 'Policy',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'proxy' => [
+                    'setting/Proxy' => [
                         'name' => 'Proxy',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'saml' => [
+                    'setting/SAML' => [
                         'name' => 'SAML',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'security' => [
+                    'setting/Security' => [
                         'name' => 'Security',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'site' => [
+                    'setting/Site' => [
                         'name' => 'Site',
-                        'visible' =>  true,
-                        'children' => []
-                    ],
-                    'oAuth' => [
-                        'name' => 'oAuth',
                         'visible' =>  true,
                         'children' => []
                     ],

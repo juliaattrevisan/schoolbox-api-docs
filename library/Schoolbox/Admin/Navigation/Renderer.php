@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Admin\Navigation;
 
+use Schoolbox\Admin\Menu\Subnav;
 use Schoolbox\Config\Loader;
 use Twig\Environment;
 use Twig\Extension;
@@ -44,13 +45,11 @@ class Renderer extends Extension\AbstractExtension
     {
         // Grab navigation items from old admin class
         // TODO SA-8354: inject this
-        $nav = new \AdminV2_Nav(new Loader());
 
         // Render this thing out
-
         return $twig->render('@adminNavigation/index.twig', array(
+            'adminSubnav' => (new Subnav(new Loader()))->generate(),
             'pageCurrent' => $pageCurrent,
-            'links' => $nav->getNavigation()
         ));
     }
 
