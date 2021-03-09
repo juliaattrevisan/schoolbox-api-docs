@@ -258,3 +258,17 @@ $(function () {
         resizeTimeout = setTimeout(updateTopNavItems, 100);
     });
 });
+
+/**
+ * Convert to human-readable format
+ * https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/10420404
+ * For some reason this has to exist outside of document.ready specifically because highcharts
+ *
+ * @param size
+ * @param base
+ * @returns {string}
+ */
+function humanFileSize(size, base) {
+    const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(base));
+    return (size / Math.pow(base, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+}
