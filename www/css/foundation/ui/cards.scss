@@ -420,8 +420,7 @@
     .related {
       position: absolute;
       bottom: 0;
-      display: flex;
-      margin: 0 0 6px 6px;
+      margin-left: 6px;
 
       &.groups {
         bottom: -.5rem;
@@ -433,7 +432,8 @@
         box-shadow: 0 2px 3px 0 rgba(0,0,0,0.1);
       }
       img {
-        margin-right: 6px;
+        margin-bottom: 6px;
+        margin-right: 2px;
       }
       .plus-more {
         background-color: rgba(198,198,198,0.9);
