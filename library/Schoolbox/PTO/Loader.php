@@ -1,9 +1,5 @@
 <?php
 /**
- * Loader
- *
- * Loads Parent Teacher Online authentication stuff
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -13,6 +9,11 @@ namespace Schoolbox\PTO;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 
+/**
+ * Loads Parent Teacher Online authentication stuff
+ *
+ * @deprecated PTO doesn't support SSO anymore
+ */
 class Loader
 {
     /**

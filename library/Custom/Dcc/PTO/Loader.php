@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: matt.schembri
@@ -7,9 +8,14 @@
  */
 
 namespace Custom\Dcc\PTO;
+
 use Schoolbox\Error\Mapper as ErrorMapper;
 
-
+/**
+ * Loads Parent Teacher Online authentication stuff for DCC
+ *
+ * @deprecated PTO doesn't support SSO anymore
+ */
 class Loader extends \Schoolbox\PTO\Loader
 {
     /**
