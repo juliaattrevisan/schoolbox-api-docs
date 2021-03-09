@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings;
@@ -12,6 +14,7 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Alaress;
 use Alaress\Database\Predicate;
@@ -76,6 +79,49 @@ class Controller extends ConfigController
         );
     }
 
+    /**
+     * Provides a JSON list of settings that match the provided keyword;
+     * Searches on; name, title and description
+     * @api /adminv2/setting/search
+     */
+    public function searchSettings(): void
+    {
+        $searchString = $this->request->query->get('keyword');
+        if(strlen($searchString) < 2) {
+            throw $this->generateException(ErrorMapper::ERROR_SEARCH_LENGTH);
+        }
+
+        $pb = $this->getConfigMapper()->getPredicateBuilder();
+        $pb->any($pb->like('name', '%' . $searchString . '%')
+                    ->like('title', '%' . $searchString . '%')
+                    ->like('description', '%' . $searchString . '%'))
+           ->equals('hidden', 'false');
+
+
+        $foundConfig = $this->getConfigMapper()->findByPredicates($pb);
+
+        $jsonPayload = [];
+
+        $module = [
+            'settings'   => '/adminv2/setting/%s',
+            'comms'      => '/adminv2/news',
+            'oauth'      => '/adminv2/oauth',
+            'schoolData' => '/adminv2/import/schoolDataImport'
+        ];
+
+
+        foreach($foundConfig as $config) {
+            /** @var $config Config */
+            $jsonPayload[] = [
+                'name'          => $config->getName(),
+                'title'         => $config->getTitle(),
+                'description'   => $config->getDescription(),
+                'module'        => $config->getModule(),
+                'url'           => sprintf($module[$config->getModule()], $config->getTypeId())
+            ];
+        }
+        $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
+    }
 
     /**
      * @since 18.
