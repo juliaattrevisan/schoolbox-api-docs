@@ -5,7 +5,7 @@ import { VueGoodTable } from 'vue-good-table';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
 import { fetchAsJson } from '@shared/fetch/fetch';
-import { format, parseISO } from 'date-fns';
+import dayjs from 'dayjs';
 
 export default {
 
@@ -142,7 +142,7 @@ export default {
          *
          */
 		formatLastUpdated (value) {
-			return format(parseISO(value), 'dd/LL/yyyy');
+			return dayjs(value).format(this.dateFormat);
 		},
 
 		/**
