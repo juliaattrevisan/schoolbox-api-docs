@@ -3,11 +3,12 @@
 import { VueGoodTable } from 'vue-good-table';
 import { fetchAsJson } from '@shared/fetch/fetch';
 import { ENDPOINTS } from '@schoolboxCommsNews/Statistics/templates/visitation/endpoints.js';
-import { format, parseISO, formatDistance } from 'date-fns';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 export default {
 
-    name: "visitation-list-full",
+    name: 'visitation-list-full',
 
     components: {
         VueGoodTable
@@ -61,6 +62,10 @@ export default {
 
     },
 
+    created () {
+        dayjs.extend(relativeTime);
+    },
+
     mounted () {
         this.loadRows();
     },
@@ -95,8 +100,8 @@ export default {
          *
          */
         formatLastVisited (value) {
-            const nice = format(parseISO(value), 'dd/LL/yyyy');
-            const relative = formatDistance(parseISO(value), new Date(), { addSuffix: true });
+            const nice = dayjs(value).format('MMM D, YYYY hh:mma');
+            const relative = dayjs(value).fromNow();
             return nice + ' (' + relative + ')';
         },
         
