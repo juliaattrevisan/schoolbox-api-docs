@@ -982,7 +982,7 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
     /**
      * Prints a help message, always to STDOUT, regardless of Kernel's output file option
      */
-    private function printHelp(): void
+    protected function printHelp(): void
     {
         $file            = $this->getToolFilename();
         $defaultMaxFails = self::DEFAULT_MAX_FAILS;
