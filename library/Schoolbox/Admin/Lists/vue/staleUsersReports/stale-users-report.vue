@@ -1,9 +1,16 @@
 <script>
 
+/**
+ * To be able to bulk delete users from the system
+ * A sortable/searchable table is displayed to select the users to delete
+ * 
+ */
+
 import Vue from 'vue';
 import { VueGoodTable } from 'vue-good-table';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
+import { vgtSelectRows } from '@schoolbox/vueGoodTable/vgtSelectRows';
 import { fetchAsJson } from '@shared/fetch/fetch';
 import dayjs from 'dayjs';
 
@@ -16,6 +23,10 @@ export default {
         Toast,
         RevealModal
 	},
+
+	mixins: [
+		vgtSelectRows //contains row selection functionality
+	],
 
 	props: {
 		dateFormat: {
@@ -69,50 +80,16 @@ export default {
 					hidden: true
 				}
       		],
-            rowsToDelete: [], //keep track of which rows could be deleted
-			isShiftKeySelected: false, //to multi-select fields,
-			hasShiftKeySelected: false, //to hide a UI note
-			consecutiveRowSelectionCount: 0, //to increment on every consecutive row selection, to monitor for shift-select rows
-			currentPage: 1, //which page within pagination is active
-			currentPerPage: 1 //how many rows per pagination
+			singleRowName: 'User',
+			pluralRowName: 'Users'
     	};
   	},
 
 	mounted () {
-		this.initShiftKeyDetection();
 		this.loadRows();
 	},
 
-	computed: {
-
-		getUsersToDeleteCount () {
-			if (this.rowsToDelete.length > 1) {
-				return this.rowsToDelete.length + ' Users'
-			} else {
-				return this.rowsToDelete.length + ' User';			
-			}
-		}
-
-	},
-
 	methods: {
-
-		/**
-         * to allow multi select while holding the shift key
-         *
-         */
-		initShiftKeyDetection () {
-            document.addEventListener('keydown', (event) => {
-				if (event.key === "Shift") {
-					this.isShiftKeySelected = true;
-				}
-			});
-			document.addEventListener('keyup', (event) => {
-				if (event.key === "Shift") {
-					this.isShiftKeySelected = false;
-				}
-			});
-		},
 
 		/**
          * load the stale users for display
@@ -146,120 +123,6 @@ export default {
 		},
 
 		/**
-         * to reset shift-selections
-         *
-         */
-		onSortChange () {
-			this.consecutiveRowSelectionCount = 0;
-		},
-
-		/**
-         * to know which page is currently selected
-         *
-         * @param {Object: selectedRows} params
-         */
-		onPageChange (params) {
-			this.consecutiveRowSelectionCount = 0;
-            this.currentPage = params.currentPage;
-            this.currentPerPage = params.currentPerPage;
-		},
-
-		/**
-         * to keep track of the rows to delete
-         *
-         * @param {Object} params
-         */
-		onRowClick (params) {
-			document.getSelection().removeAllRanges(); //to avoid selecting text on shift-select
-			this.checkRowSelection(params);
-			this.checkForShiftSelectRows();
-		},
-
-		/**
-         * allow easier selection of users with shift-select
-         *
-		 * @param {Object} params
-         */
-		checkRowSelection (params) {
-			if (params.selected) { //whether the row is selected or not
-				this.addRow(params);
-			} else { 
-				this.removeRow(params)
-			}
-		},
-
-		/**
-         * add the row if not in already
-         *
-		 * @param {Object} params 
-         */
-		addRow (params) {
-			if (!this.rowsToDelete.some(rowToDelete => rowToDelete.id === params.row.id)) { //not already in
-				this.rowsToDelete.push(params.row);
-				params.row.pageIndex = params.pageIndex + ((this.currentPage-1) * this.currentPerPage);  //to track which rows to select if shift-select
-				this.consecutiveRowSelectionCount++;
-			}
-		},
-
-		/**
-         * remove the row if in already
-         *
-		 * @param {Object} params
-         */
-		removeRow (params) {
-			if (this.rowsToDelete.some(rowToDelete => rowToDelete.id === params.row.id)) { //is in already
-				this.rowsToDelete = this.rowsToDelete.filter(rowToDelete => rowToDelete.id !== params.row.id); //return all but matching id
-				params.row.pageIndex = params.pageIndex + ((this.currentPage-1) * this.currentPerPage);
-				this.consecutiveRowSelectionCount = 0;
-			}
-		},
-
-		/**
-         * allow easier selection of rows with shift-select
-		 * retrieve all rows in between the last two selections 
-		 * and set them as selected when shift is pressed
-         *
-         */
-		checkForShiftSelectRows () {
-            
-			if (this.isShiftKeySelected && this.consecutiveRowSelectionCount >= 2)  {
-				
-				this.hasShiftKeySelected = true;
-
-				const rowsInCurrentOrder = this.$refs.vueGoodTable.filteredRows[0].children; //the current row list, as reflected by current sorting
-
-				const previousCheckedRowIndex = this.rowsToDelete[this.rowsToDelete.length - 2].pageIndex;
-				const latestCheckedRowIndex = this.rowsToDelete[this.rowsToDelete.length - 1].pageIndex;
-				
-				let rowsBetweenSelection;
-				if (latestCheckedRowIndex > previousCheckedRowIndex) {
-					rowsBetweenSelection = rowsInCurrentOrder.slice((previousCheckedRowIndex+1), latestCheckedRowIndex);
-				} else {
-					rowsBetweenSelection = rowsInCurrentOrder.slice((latestCheckedRowIndex+1), previousCheckedRowIndex);
-				}
-				
-				rowsBetweenSelection.forEach( row => {
-					if (!this.rowsToDelete.some(rowToDelete => rowToDelete.id === row.id)) { //if it's not already in, add it in
-						this.$set(row, 'vgtSelected', true);
-						this.rowsToDelete.unshift(row); //to not impact previousCheckedRowIndex on possible further shift-selections
-					}
-				} );
-
-			}
-
-		},
-
-        /**
-         * to ensure ALL items, not just those within 
-         * the current pagination group are selected
-         *
-         * @param {Object: selected, selectedRows} params
-         */
-        onSelectAllRows (params) {
-			this.rowsToDelete = params.selectedRows;
-		},
-		
-		/**
          * To confirm/cancel selected users deletion
          *
          */
@@ -278,7 +141,7 @@ export default {
 			this.$refs.deleteModal.close();
 			
 			this.rows = this.getUpdatedRowsAfterUserDeletion();
-			this.rowsToDelete = [];
+			this.selectedRows = [];
 
         },
 
@@ -289,7 +152,7 @@ export default {
          */
         getUpdatedRowsAfterUserDeletion () {
 			return this.rows.filter((row) => {
-				if (this.rowsToDelete.some(rowToDelete => rowToDelete.id === row.id)) {
+				if (this.selectedRows.some(rowToDelete => rowToDelete.id === row.id)) {
 					return false;
 				}
 				return true;
@@ -309,7 +172,7 @@ export default {
          *
          */
         onClearUsersToSelected () {
-            this.rowsToDelete = [];
+            this.selectedRows = [];
 			this.$refs.vueGoodTable.unselectAllInternal(true);
         },
 
@@ -366,7 +229,7 @@ export default {
         <reveal-modal ref="deleteModal">
             <h2>Please confirm</h2>
 			<div data-alert class="alert-box alert">
-                <h4>You are about to delete <strong>{{ getUsersToDeleteCount }}</strong>. Deleting users will prevent them from logging into the system and from accessing resources that belong to them.  Attached resources that will be removed include; ePortfolio, My Files, Pastoral Records and My Links.  Resources shared with or by the user like Files, Grades, News, Forum Posts and other collaborative activities will remain available.</h4>
+                <h4>You are about to delete <strong>{{ getSelectedRowsCount }}</strong>. Deleting users will prevent them from logging into the system and from accessing resources that belong to them.  Attached resources that will be removed include; ePortfolio, My Files, Pastoral Records and My Links.  Resources shared with or by the user like Files, Grades, News, Forum Posts and other collaborative activities will remain available.</h4>
             </div>
             <ul class="flex-list buttons">
                 <li><a @click.prevent="onConfirmDeleteUsersSelected" class="button submit">Confirm Deletion</a></li>
@@ -374,9 +237,9 @@ export default {
             </ul>
         </reveal-modal>
 		<transition name="slide">
-			<div v-if="rowsToDelete.length > 0" class="delete-container">
+			<div v-if="selectedRows.length > 0" class="delete-container">
 				<section class="content">
-					<h3><em>{{ getUsersToDeleteCount }} Selected</em></h3>
+					<h3><em>{{ getSelectedRowsCount }} Selected</em></h3>
 					<span v-if="!hasShiftKeySelected" class="shift-select-note">Use Shift+Select to select multiple Users</span>
 					<button @click.prevent="onClearUsersToSelected" class="button-clear">Clear User Selection</button>
 					<button @click.prevent="onDeleteUsersSelected" class="button submit">Delete Users</button>
