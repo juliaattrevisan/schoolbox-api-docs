@@ -13,23 +13,18 @@ use Schoolbox\IConfigLoader;
 /**
  * Class Subnav
  *
- * A data structure which populates the little vertical sidemenu in admi
+ * A data structure which populates the little vertical sidemenu in admin
  *
  * @package Schoolbox\Admin\Menu
  */
 class Subnav
 {
 
-    /**
-     * The pre-generated menu structure
-     * @var array
-     */
-    private array $nav = [];
-
 
     /**
      * For access to booleans that determine availability/visibility of certain menu
      * items based on plan, configuration, etc.
+     *
      * @var IConfigLoader
      */
     private IConfigLoader $configLoader;
@@ -48,10 +43,14 @@ class Subnav
 
     /**
      * Generate the menu navigation
+     * These are stored in (url, data) tuples where the key is the url fragment
+     *
+     * Some nodes are hybrids of other unrelated url sets, such as LMS. Its items
+     * come from all over the place
      */
-    public function generate()
+    public function generate(): array
     {
-        $stack = [
+        return [
             'home' => [
                 'name' => 'Home',
                 'visible' =>  true,
@@ -61,17 +60,17 @@ class Subnav
                 'name' => 'Calendar',
                 'visible' =>  true,
                 'children' => [
-                    'cleanup' => [
+                    'calendar/Cleanup' => [
                         'name' => 'Cleanup',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'import' => [
+                    'calendar/Import' => [
                         'name' => 'Import',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'subscribe' => [
+                    'calendar/Subscribe' => [
                         'name' => 'Subscribe',
                         'visible' =>  true,
                         'children' => []
@@ -82,52 +81,52 @@ class Subnav
                 'name' => 'Engagement',
                 'visible' =>  true,
                 'children' => [
-                    'collaboration' => [
+                    'engagement/index/collaboration' => [
                         'name' => 'Collaboration',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'componentUsage' => [
+                    'engagement/index/components' => [
                         'name' => 'Component Usage',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'dueWork' => [
+                    'engagement/index/dueWork' => [
                         'name' => 'Due Work',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'files' => [
+                    'engagement/index/files' => [
                         'name' => 'Files',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'fileTypes' => [
+                    'engagement/index/fileTypes' => [
                         'name' => 'File Types',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'links' => [
+                    'engagement/index/links' => [
                         'name' => 'Links',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'login' => [
+                    'engagement/index/login' => [
                         'name' => 'Login',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'mobileApps' => [
+                    'engagement/index/mobile' => [
                         'name' => 'Mobile Apps',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'newsPosted' => [
+                    'engagement/index/news' => [
                         'name' => 'News Posted',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'quizzes' => [
+                    'engagement/index/quiz' => [
                         'name' => 'Quizzes',
                         'visible' =>  true,
                         'children' => []
@@ -137,154 +136,232 @@ class Subnav
             'ePortfolio' => [
                 'name' => 'ePortfolio',
                 'visible' =>  true,
-                'children' => []
+                'children' => [
+                    'ePortfolio' => [
+                        'name' => 'Templates',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'ePortfolio/deploy' => [
+                        'name' => 'Deployment',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                ]
             ],
             'filters' => [
                 'name' => 'Filters',
                 'visible' =>  true,
                 'children' => []
             ],
-            'homepageTemplates' => [
+            'homepage' => [
                 'name' => 'Homepage Templates',
                 'visible' =>  true,
+                'children' => []
+            ],
+            'import' => [
+                'name' => 'Import',
+                'visible' =>  true,
                 'children' => [
-                    'cleanup' => [
-                        'name' => 'Cleanup',
+                    'import/folder' => [
+                        'name' => 'Pages',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'import' => [
-                        'name' => 'Import',
+                    'import/pastoral' => [
+                        'name' => 'Pastoral Care',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'subscribe' => [
-                        'name' => 'Subscribe',
+                    'import/photos/upload' => [
+                        'name' => 'Portrait Photos',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'import/photos/userAccount' => [
+                        'name' => 'User Accounts',
                         'visible' =>  true,
                         'children' => []
                     ],
                 ]
             ],
-            'import' => [
-                'name' => 'Import',
-                'visible' =>  true,
-                'children' => []
-            ],
             'lms' => [
                 'name' => 'LMS',
                 'visible' =>  true,
-                'children' => []
+                'children' => [
+                    'terms' => [
+                        'name' => 'Academic Period',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'lms/rollover' => [
+                        'name' => 'Class Rollover',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'lms/course-builder' => [
+                        'name' => 'Course Builder',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'setting/Document+Management' => [
+                        'name' => 'Document Management',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'grades' => [
+                        'name' => 'Grades',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'setting/LMS+Policy' => [
+                        'name' => 'LMS Policy',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'lti' => [
+                        'name' => 'LTI Providers',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'rubric-results' => [
+                        'name' => 'Rubrics',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                ]
             ],
             'lists' => [
                 'name' => 'Lists',
                 'visible' =>  true,
                 'children' => [
-                    'cleanup' => [
+                    'lists/achievement-category' => [
                         'badgeCategories' => 'Badge Categories',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'campus' => [
+                    'lists/campus' => [
                         'name' => 'Campus',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'components' => [
+                    'lists/component-definition' => [
                         'name' => 'Components',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'drives' => [
+                    'lists/webdav' => [
                         'name' => 'Drives',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'eventTypes' => [
+                    'lists/event-type' => [
                         'name' => 'Event Types',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'houses' => [
+                    'lists/house' => [
                         'name' => 'Houses',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'learningMoments' => [
+                    'lists/evidence-tag' => [
                         'name' => 'Learning Moments',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'newsTopics' => [
+                    'lists/news-topic' => [
                         'name' => 'News Topics',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'pastoralRecordSeverity' => [
+                    'lists/pastoral-severity' => [
                         'name' => 'Pastoral Record Severity',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'pastoralRecordTags' => [
+                    'lists/pastoral-tags' => [
                         'name' => 'Pastoral Record Tags',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'pastoralSisDocumentClassifications' => [
+                    'lists/pastoral-document-classification' => [
                         'name' => 'Pastoral SIS Document Classifications',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'pastoralSubTypes' => [
+                    'lists/pastoral-category' => [
                         'name' => 'Pastoral Sub-Types',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'pastoralTypes' => [
+                    'lists/pastoral-type' => [
                         'name' => 'Pastoral Types',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'residentialHouses' => [
+                    'lists/residential-house' => [
                         'name' => 'Residential Houses',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'roles' => [
+                    'lists/roles' => [
                         'name' => 'Roles',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'submissionStates' => [
+                    'lists/submission-errors' => [
                         'name' => 'Submission States',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'timetableColours' => [
+                    'lists/timetable-colour' => [
                         'name' => 'Timetable Colours',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'userTitles' => [
+                    'lists/user-title' => [
                         'name' => 'User Titles',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'workTypes' => [
+                    'lists/submission-type' => [
                         'name' => 'Work Types',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'yearLevels' => [
+                    'lists/year-levels' => [
                         'name' => 'Year Levels',
                         'visible' =>  true,
                         'children' => []
                     ],
                 ]
             ],
-            'modules' => [
+            'setting/Modules' => [
                 'name' => 'Modules',
                 'visible' =>  true,
-                'children' => []
+                'children' => [
+                    'setting/Board+Leave' => [
+                        'name' => 'Board Leave',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'feature-tours' => [
+                        'name' => 'Feature Tours',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'package' => [
+                        'name' => 'Packages',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'setting/Pastoral+Care' => [
+                        'name' => 'Pastoral Care',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                ]
             ],
             'news' => [
                 'name' => 'News',
@@ -294,17 +371,90 @@ class Subnav
             'notifications' => [
                 'name' => 'Notifications',
                 'visible' =>  true,
-                'children' => []
+                'children' => [
+                    'messages/apps' => [
+                        'name' => 'Delivery Providers',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'messages/puush' => [
+                        'name' => 'Mobile App Registrations',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'messages/configure' => [
+                        'name' => 'Settings',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                ]
             ],
             'personalisation' => [
                 'name' => 'Personalisation',
                 'visible' =>  true,
-                'children' => []
+                'children' => [
+                    'dashboard' => [
+                        'name' => 'Dashboard',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'profile-button' => [
+                        'name' => 'Profile Buttons',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'menu-side' => [
+                        'name' => 'Side Menu',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'setting/Skin+Config' => [
+                        'name' => 'Skin Config',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'terminology' => [
+                        'name' => 'Terminology',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'menu-top' => [
+                        'name' => 'Top Menu',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                ]
             ],
             'resources' => [
                 'name' => 'Resources',
                 'visible' =>  true,
-                'children' => []
+                'children' => [
+                    'allowed-file' => [
+                        'name' => 'Allowed File',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'video' => [
+                        'name' => 'Media Queue',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'setting/Resources' => [
+                        'name' => 'Settings',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'restore' => [
+                        'name' => 'Restore',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    'usage' => [
+                        'name' => 'Usage',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                ]
             ],
             'schoolDataImport' => [
                 'name' => 'School Data Import',
@@ -320,18 +470,8 @@ class Subnav
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'boardLeave' => [
-                        'name' => 'Board Leave',
-                        'visible' =>  true,
-                        'children' => []
-                    ],
                     'debugging' => [
                         'name' => 'Debugging',
-                        'visible' =>  true,
-                        'children' => []
-                    ],
-                    'documentManagement' => [
-                        'name' => 'Document Management',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -350,23 +490,8 @@ class Subnav
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lmsPolicy' => [
-                        'name' => 'LMS Policy',
-                        'visible' =>  true,
-                        'children' => []
-                    ],
                     'localisation' => [
                         'name' => 'Localisation',
-                        'visible' =>  true,
-                        'children' => []
-                    ],
-                    'modules' => [
-                        'name' => 'Modules',
-                        'visible' =>  true,
-                        'children' => []
-                    ],
-                    'pastoralCare' => [
-                        'name' => 'Pastoral Care',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -385,11 +510,6 @@ class Subnav
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'resources' => [
-                        'name' => 'Resources',
-                        'visible' =>  true,
-                        'children' => []
-                    ],
                     'saml' => [
                         'name' => 'SAML',
                         'visible' =>  true,
@@ -405,29 +525,29 @@ class Subnav
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'skinConfig' => [
-                        'name' => 'Skin Config',
+                    'oAuth' => [
+                        'name' => 'oAuth',
                         'visible' =>  true,
                         'children' => []
                     ],
                 ]
             ],
-            'userManagement' => [
+            'user' => [
                 'name' => 'User Management',
                 'visible' =>  true,
                 'children' => [
-                    'users' => [
-                        'name' => 'Users',
+                    'reports/activity/all' => [
+                        'name' => 'Activity Report',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'bulkModify' => [
+                    'user/bulk/modify' => [
                         'name' => 'Bulk Modify',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'ups' => [
-                        'name' => 'User Provisioning System',
+                    'reports/login/all' => [
+                        'name' => 'Login Log',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -436,13 +556,12 @@ class Subnav
                         'visible' =>  true,
                         'children' => []
                     ],
-
+                    'ups' => [
+                        'name' => 'User Provisioning System',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
                 ]
-            ],
-            '' => [
-                'name' => '',
-                'visible' =>  true,
-                'children' => []
             ],
         ];
     }
