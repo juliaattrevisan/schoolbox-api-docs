@@ -54,7 +54,7 @@ export const vgtSelectRows = {
 		},
 
 		/**
-         * to reset shift-selections
+		 * to reset shift-selections
          *
          */
 		onSortChange () {
