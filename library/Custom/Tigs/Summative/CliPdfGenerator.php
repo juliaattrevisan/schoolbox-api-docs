@@ -169,45 +169,45 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
     }
 
 
-//    /**
-//     * @inheritdoc
-//     * @throws RuntimeException
-//     * @throws \Alaress\Database\Predicate\InvalidColumnException
-//     * @throws \Aura\Di\Exception\ServiceNotFound
-//     * @throws \Aura\Router\Exception\RouteNotFound
-//     * @throws \GuzzleHttp\Exception\GuzzleException
-//     * @throws InvalidArgumentException
-//     * @throws \Schoolbox\Mapper\DefinitionException
-//     * @throws \Schoolbox\Mapper\Exception
-//     * @throws \Schoolbox\Mapper\Exception\Deleted
-//     * @throws \UnderflowException
-//     */
-//    public function run(): void
-//    {
-//        // Did user request help?
-//        if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
-//            $this->printHelp();
-//            exit(CliKernelAbstract::EXIT_STATUS_OK);
-//        }
-//
-//        // Parse command-line options. If invalid options detected, then print help and exit.
-//        if (!$this->parseAppOptions()) {
-//            $this->printHelp();
-//            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
-//        }
-//
-//        $di = $this->getDi();
-//        /** @var MapperFactory $mapperFactory */
-//        $mapperFactory       = $this->getDi()->get('mapperFactory');
-//        $this->userMapper    = $mapperFactory->get(UserMapper::class);
-//        $this->folderMapper  = $mapperFactory->get(Folder\Mapper::class);
-//        $this->externalUser  = $di->get('externalUser');
-//        $this->fqdn          = \trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}");
-//        $this->router        = $di->get('router');
-//        $this->folderFetcher = new FolderFetcher($this->folderMapper, $this->externalUser);
-//
-//        $this->execute();
-//    }
+    /**
+     * @inheritdoc
+     * @throws RuntimeException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws InvalidArgumentException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \UnderflowException
+     */
+    public function run(): void
+    {
+        // Did user request help?
+        if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
+            $this->printHelp();
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
+        // Parse command-line options. If invalid options detected, then print help and exit.
+        if (!$this->parseAppOptions()) {
+            $this->printHelp();
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+        }
+
+        $di = $this->getDi();
+        /** @var MapperFactory $mapperFactory */
+        $mapperFactory       = $this->getDi()->get('mapperFactory');
+        $this->userMapper    = $mapperFactory->get(UserMapper::class);
+        $this->folderMapper  = $mapperFactory->get(Folder\Mapper::class);
+        $this->externalUser  = $di->get('externalUser');
+        $this->fqdn          = \trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}");
+        $this->router        = $di->get('router');
+        $this->folderFetcher = new FolderFetcher($this->folderMapper, $this->externalUser);
+
+        parent::run();
+    }
 
 
     /**
@@ -237,131 +237,131 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
     }
 
 
-//    /**
-//     * Parses options and returns whether all options are valid
-//     *
-//     * @return bool
-//     */
-//    private function parseAppOptions(): bool
-//    {
-//        $valid                      = true;
-//        $this->sessionHash          = $this->getOpt(self::OPT_LONG_HASH);
-//        $this->username             = $this->getOpt(self::OPT_LONG_USERNAME);
-//        $this->studentExternalId    = $this->getOpt(self::OPT_LONG_STUDENT_ID);
-//        $this->yearLevel            = $this->getOpt(self::OPT_LONG_YEAR_LEVEL);
-//        $this->curriculum           = $this->getOpt(self::OPT_LONG_CURRICULUM);
-//        $this->reportDateOverride   = $this->getOpt(self::OPT_LONG_REPORT_DATE);
-//        $maxFailures                = $this->getOpt(self::OPT_LONG_MAX_FAILS);
-//        $jsDelay                    = $this->getOpt(self::OPT_LONG_JS_DELAY);
-//        $userStyleSheet             = $this->getOpt(self::OPT_LONG_USER_STYLE_SHEET);
-//        $roleTypeOverride           = $this->getOpt(self::OPT_LONG_ROLE_TYPE);
-//
-//        if ($this->sessionHash) {
-//            $this->getLogger()->info('Command-line session hash supplied, validating...');
-//            $redis = \Alaress\Redis::getClientInstance();
-//            if (!$redis) {
-//                $this->getLogger()->alert("Unable to fetch redis client");
-//                $valid = false;
-//            } else {
-//                $redisData = $redis->get(\sprintf('%s%s', PipeManager::REDIS_SESSION_PREFIX, $this->sessionHash));
-//                if (null === $redisData) {
-//                    $this->getLogger()->alert("No redis data found for hash: {$this->sessionHash}");
-//                    $valid = false;
-//                } else {
-//                    // TODO This is too low-level and implementation specific.
-//                    // TODO It should be abstracted out.
-//                    \session_start();
-//                    \session_decode($redisData);
-//                    /** @var User $user */
-//                    $user     = $_SESSION['user'] ?? null;
-//                    $lastTime = $_SESSION['lasttime'] ?? null;
-//                    \session_unset();
-//                    if (!$user) {
-//                        $this->getLogger()->alert("No user object found in session data");
-//                        $valid = false;
-//                    } elseif(!$lastTime || time() - $lastTime > $this->getConfig()->get('session_length')) {
-//                        $this->getLogger()->alert("Session has expired");
-//                        $valid = false;
-//                    } elseif (!$user->isSuperuser()) {
-//                        $this->getLogger()->alert("Session user '{$user->getUsername()}' is not a superuser");
-//                        $valid = false;
-//                    } else {
-//                        $this->getLogger()->notice("Session user '{$user->getUsername()}' IS a superuser, user is authorised");
-//                    }
-//                }
-//            }
-//        }
-//
-//        if ($this->curriculum && !in_array($this->curriculum, [self::CURRICULUM_IB, self::CURRICULUM_HSC], true)) {
-//            $this->getLogger()->alert("Invalid 'curriculum' option: '$this->curriculum'");
-//            $valid = false;
-//        }
-//
-//        if ($this->reportDateOverride && false === \strtotime($this->reportDateOverride)) {
-//            $this->getLogger()->alert("Invalid 'report-date' option: '$this->reportDateOverride'");
-//            $valid = false;
-//        }
-//
-//        if ($maxFailures === null) {
-//            $this->maxFailures = self::DEFAULT_MAX_FAILS;
-//        } elseif(!\is_numeric($maxFailures) || $maxFailures < 0) {
-//            $this->getLogger()->alert("Invalid 'max-failures' option: '$maxFailures'");
-//            $valid = false;
-//        } else {
-//            $this->maxFailures = (int)$maxFailures;
-//        }
-//
-//        if ($jsDelay === null) {
-//            $this->jsDelay = self::DEFAULT_JS_DELAY;
-//        } elseif(!\is_numeric($jsDelay)) {
-//            $this->getLogger()->alert("Invalid 'js-delay' option: '$jsDelay'");
-//            $valid = false;
-//        } else {
-//            $this->jsDelay = (int)$jsDelay;
-//        }
-//
-//        if ($userStyleSheet === null) {
-//            // this option is not specified
-//            $this->userStyleSheet = '';
-//        } else if (!\file_exists($userStyleSheet)) {
-//            $this->getLogger()->alert("Invalid 'user-style-sheet' option: '$userStyleSheet'");
-//            $valid = false;
-//        } else {
-//            $this->userStyleSheet = $userStyleSheet;
-//        }
-//
-//        if ($roleTypeOverride === null || in_array($roleTypeOverride, Role::getRoleTypes(), true)) {
-//            $this->roleTypeOverride = $roleTypeOverride;
-//        } else {
-//            $this->getLogger()->alert("Invalid 'role-type' option: '$roleTypeOverride'");
-//            $valid = false;
-//        }
-//
-//
-//        /* Include Subjects requires Role Type override
-//         */
-//        if (!$this->roleTypeOverride && (bool)$this->getOpt(self::OPT_LONG_INCLUDE_SUBJECTS)) {
-//            $this->getLogger()->alert("A valid 'role-type' option must be set if using 'include-subjects'");
-//            $valid = false;
-//        }
-//
-//
-//        $this->getLogger()->debug("Command Line Options:");
-//        $this->getLogger()->debug("    sessionHash: {$this->sessionHash}");
-//        $this->getLogger()->debug("    username: {$this->username}");
-//        $this->getLogger()->debug("    studentExternalId: {$this->studentExternalId}");
-//        $this->getLogger()->debug("    yearLevel: {$this->yearLevel}");
-//        $this->getLogger()->debug("    curriculum: {$this->curriculum}");
-//        $this->getLogger()->debug("    max-fails: {$this->maxFailures}");
-//        $this->getLogger()->debug("    js-delay: {$this->jsDelay}");
-//        $this->getLogger()->debug("    report-date: {$this->reportDateOverride}");
-//        $this->getLogger()->debug("    user-style-sheet: {$this->userStyleSheet}");
-//        $this->getLogger()->debug("    role-type: {$this->roleTypeOverride}");
-//
-//        return $valid;
-//    }
-//
-//
+    /**
+     * Parses options and returns whether all options are valid
+     *
+     * @return bool
+     */
+    private function parseAppOptions(): bool
+    {
+        $valid                      = true;
+        $this->sessionHash          = $this->getOpt(self::OPT_LONG_HASH);
+        $this->username             = $this->getOpt(self::OPT_LONG_USERNAME);
+        $this->studentExternalId    = $this->getOpt(self::OPT_LONG_STUDENT_ID);
+        $this->yearLevel            = $this->getOpt(self::OPT_LONG_YEAR_LEVEL);
+        $this->curriculum           = $this->getOpt(self::OPT_LONG_CURRICULUM);
+        $this->reportDateOverride   = $this->getOpt(self::OPT_LONG_REPORT_DATE);
+        $maxFailures                = $this->getOpt(self::OPT_LONG_MAX_FAILS);
+        $jsDelay                    = $this->getOpt(self::OPT_LONG_JS_DELAY);
+        $userStyleSheet             = $this->getOpt(self::OPT_LONG_USER_STYLE_SHEET);
+        $roleTypeOverride           = $this->getOpt(self::OPT_LONG_ROLE_TYPE);
+
+        if ($this->sessionHash) {
+            $this->getLogger()->info('Command-line session hash supplied, validating...');
+            $redis = \Alaress\Redis::getClientInstance();
+            if (!$redis) {
+                $this->getLogger()->alert("Unable to fetch redis client");
+                $valid = false;
+            } else {
+                $redisData = $redis->get(\sprintf('%s%s', PipeManager::REDIS_SESSION_PREFIX, $this->sessionHash));
+                if (null === $redisData) {
+                    $this->getLogger()->alert("No redis data found for hash: {$this->sessionHash}");
+                    $valid = false;
+                } else {
+                    // TODO This is too low-level and implementation specific.
+                    // TODO It should be abstracted out.
+                    \session_start();
+                    \session_decode($redisData);
+                    /** @var User $user */
+                    $user     = $_SESSION['user'] ?? null;
+                    $lastTime = $_SESSION['lasttime'] ?? null;
+                    \session_unset();
+                    if (!$user) {
+                        $this->getLogger()->alert("No user object found in session data");
+                        $valid = false;
+                    } elseif(!$lastTime || time() - $lastTime > $this->getConfig()->get('session_length')) {
+                        $this->getLogger()->alert("Session has expired");
+                        $valid = false;
+                    } elseif (!$user->isSuperuser()) {
+                        $this->getLogger()->alert("Session user '{$user->getUsername()}' is not a superuser");
+                        $valid = false;
+                    } else {
+                        $this->getLogger()->notice("Session user '{$user->getUsername()}' IS a superuser, user is authorised");
+                    }
+                }
+            }
+        }
+
+        if ($this->curriculum && !in_array($this->curriculum, [self::CURRICULUM_IB, self::CURRICULUM_HSC], true)) {
+            $this->getLogger()->alert("Invalid 'curriculum' option: '$this->curriculum'");
+            $valid = false;
+        }
+
+        if ($this->reportDateOverride && false === \strtotime($this->reportDateOverride)) {
+            $this->getLogger()->alert("Invalid 'report-date' option: '$this->reportDateOverride'");
+            $valid = false;
+        }
+
+        if ($maxFailures === null) {
+            $this->maxFailures = self::DEFAULT_MAX_FAILS;
+        } elseif(!\is_numeric($maxFailures) || $maxFailures < 0) {
+            $this->getLogger()->alert("Invalid 'max-failures' option: '$maxFailures'");
+            $valid = false;
+        } else {
+            $this->maxFailures = (int)$maxFailures;
+        }
+
+        if ($jsDelay === null) {
+            $this->jsDelay = self::DEFAULT_JS_DELAY;
+        } elseif(!\is_numeric($jsDelay)) {
+            $this->getLogger()->alert("Invalid 'js-delay' option: '$jsDelay'");
+            $valid = false;
+        } else {
+            $this->jsDelay = (int)$jsDelay;
+        }
+
+        if ($userStyleSheet === null) {
+            // this option is not specified
+            $this->userStyleSheet = '';
+        } else if (!\file_exists($userStyleSheet)) {
+            $this->getLogger()->alert("Invalid 'user-style-sheet' option: '$userStyleSheet'");
+            $valid = false;
+        } else {
+            $this->userStyleSheet = $userStyleSheet;
+        }
+
+        if ($roleTypeOverride === null || in_array($roleTypeOverride, Role::getRoleTypes(), true)) {
+            $this->roleTypeOverride = $roleTypeOverride;
+        } else {
+            $this->getLogger()->alert("Invalid 'role-type' option: '$roleTypeOverride'");
+            $valid = false;
+        }
+
+
+        /* Include Subjects requires Role Type override
+         */
+        if (!$this->roleTypeOverride && (bool)$this->getOpt(self::OPT_LONG_INCLUDE_SUBJECTS)) {
+            $this->getLogger()->alert("A valid 'role-type' option must be set if using 'include-subjects'");
+            $valid = false;
+        }
+
+
+        $this->getLogger()->debug("Command Line Options:");
+        $this->getLogger()->debug("    sessionHash: {$this->sessionHash}");
+        $this->getLogger()->debug("    username: {$this->username}");
+        $this->getLogger()->debug("    studentExternalId: {$this->studentExternalId}");
+        $this->getLogger()->debug("    yearLevel: {$this->yearLevel}");
+        $this->getLogger()->debug("    curriculum: {$this->curriculum}");
+        $this->getLogger()->debug("    max-fails: {$this->maxFailures}");
+        $this->getLogger()->debug("    js-delay: {$this->jsDelay}");
+        $this->getLogger()->debug("    report-date: {$this->reportDateOverride}");
+        $this->getLogger()->debug("    user-style-sheet: {$this->userStyleSheet}");
+        $this->getLogger()->debug("    role-type: {$this->roleTypeOverride}");
+
+        return $valid;
+    }
+
+
 //    /**
 //     * Start doing the work.
 //     *
@@ -702,7 +702,7 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
             $participationReportUrl .= "&role-type={$this->roleTypeOverride}";
         }
         $this->getLogger()->debug("Adding url '$participationReportUrl' to list");
-        $urls = [new Uri($participationReportUrl)];
+        $urls = [$participationReportUrl];
 
         /* Optionally include subject reports if specified
          */
@@ -721,7 +721,7 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
             ];
             $subjectReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsSubjectReport.getReport', $data) . $queryArgs;
             $this->getLogger()->debug("Adding url '$subjectReportUrl' to list");
-            $urls[] = new Uri($subjectReportUrl);
+            $urls[] = $subjectReportUrl;
         }
         return $urls;
     }

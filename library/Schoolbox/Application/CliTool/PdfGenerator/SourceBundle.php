@@ -27,7 +27,7 @@ class SourceBundle
      *
      * @var array|string[]
      */
-    private $urls = [];
+    private $urls;
 
 
     /**
@@ -41,9 +41,9 @@ class SourceBundle
     /**
      * Constructor
      *
-     * @param string      $filename
-     * @param array       $urls
-     * @param string|null $message
+     * @param string         $filename
+     * @param array|string[] $urls
+     * @param string|null    $message
      */
     public function __construct(string $filename, array $urls, string $message = null)
     {
