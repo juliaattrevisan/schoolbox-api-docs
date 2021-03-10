@@ -30,11 +30,12 @@
     });
 </script>
 <nav id="admin-nav">
-    <h2 class="subheader">Menu</h2> {{ pageCurrent }} > {{ subpageCurrent }}
+    <h2 class="subheader">Menu</h2>
     <a href="#" class="dropdown-btn" data-admin-subnav-dropdown>Go to...</a>
     <ul class="admin side-nav" role="navigation" data-admin>
 
         {% for parentUrl, parentData in adminSubnav %}
+
             {# Decide if the current node is selected
              #
              # Each phplib controller specifies a string for pageCurrent so you have to match

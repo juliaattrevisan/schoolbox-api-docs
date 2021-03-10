@@ -56,8 +56,6 @@ class Controller extends ConfigController
 
         /* Settings are now recategorised by the feature to which they are relevant
          */
-        new \Alaress_Probe($typeLabel);
-
         switch ($typeLabel) {
             case 'Document Management':
                 $pageCurrent = Subnav::PARENT_LMS;
