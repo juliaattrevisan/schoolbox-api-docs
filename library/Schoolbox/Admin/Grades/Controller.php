@@ -55,6 +55,7 @@ class Controller extends Base
                 '@adminGrades/index.twig',
                 [
                     'pageCurrent' => Subnav::PARENT_LMS,
+                    'subpageCurrent' => Subnav::CHILD_LMS_GRADES,
                     'gradeGroups' => $this->retrieveAllGradeGroups(),
                 ]
             )

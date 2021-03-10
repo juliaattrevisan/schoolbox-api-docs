@@ -63,8 +63,17 @@ class Subnav
     public const CHILD_IMPORT_PORTRAIT = 'portrait';
     public const CHILD_IMPORT_USER_ACCOUNTS = 'userAccounts';
 
-    public const PARENT_LISTS = 'lists';
     public const PARENT_LMS = 'lms';
+    public const CHILD_LMS_ACADEMIC_PERIOD = 'terms';
+    public const CHILD_LMS_CLASS_ROLLOVER = 'rollover';
+    public const CHILD_LMS_COURSE_BUILDER = 'courseBuilder';
+    public const CHILD_LMS_DOCUMENT_MANAGEMENT = 'documentManagement';
+    public const CHILD_LMS_GRADES = 'grades';
+    public const CHILD_LMS_POLICY = 'policy';
+    public const CHILD_LMS_LTI = 'lti';
+    public const CHILD_LMS_RUBRICS = 'rubrics';
+
+    public const PARENT_LISTS = 'lists';
     public const PARENT_MESSAGES = 'messages';
     public const PARENT_MODULES = 'Modules';
     public const PARENT_PERSONALISATION = 'personalisation';
@@ -273,49 +282,49 @@ class Subnav
                 'children' => [
                     'terms' => [
                         'name' => 'Academic Period',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LMS_ACADEMIC_PERIOD,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'rollover' => [
                         'name' => 'Class Rollover',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LMS_CLASS_ROLLOVER,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'course-builder' => [
                         'name' => 'Course Builder',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LMS_COURSE_BUILDER,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Document+Management' => [
                         'name' => 'Document Management',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LMS_DOCUMENT_MANAGEMENT,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'grades' => [
                         'name' => 'Grades',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LMS_GRADES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/LMS+Policy' => [
                         'name' => 'LMS Policy',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LMS_POLICY,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lti' => [
                         'name' => 'LTI Providers',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LMS_LTI,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'rubric-results' => [
                         'name' => 'Rubrics',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LMS_RUBRICS,
                         'visible' =>  true,
                         'children' => []
                     ],

@@ -57,10 +57,19 @@ class Controller extends ConfigController
         /* Settings are now recategorised by the feature to which they are relevant
          */
         echo $typeLabel;
+
+        $pageCurrent = '';
+        $subpageCurrent = '';
+
         switch ($typeLabel) {
             case 'Document Management':
+                $pageCurrent = Subnav::PARENT_LMS;
+                $subpageCurrent = Subnav::CHILD_LMS_DOCUMENT_MANAGEMENT;
+                break;
+
             case 'LMS Policy':
                 $pageCurrent = Subnav::PARENT_LMS;
+                $subpageCurrent = Subnav::CHILD_LMS_POLICY;
                 break;
 
             case 'Modules':
@@ -99,6 +108,7 @@ class Controller extends ConfigController
         $this->getResponse()->content->set(
             $this->buildContent('@settings/settings.twig', [
                 'pageCurrent'    => $pageCurrent,
+                'subpageCurrent' => $subpageCurrent,
                 'settingsTabs'   => $settingsTabs,
                 'configContext'  => $configContext,
                 'isLocalisation' => $typeLabel === 'Localisation',  // TODO replace string literals with enums

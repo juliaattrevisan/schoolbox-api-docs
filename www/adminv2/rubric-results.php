@@ -21,7 +21,7 @@ $this->setBlock(TEMPLATE_content, 'list', 'list_block');
 $this->setBlock('list', 'list_item', 'list_item_block');
 
 // include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this, \Schoolbox\Admin\Navigation\Subnav::PARENT_LMS);
+(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this, \Schoolbox\Admin\Navigation\Subnav::PARENT_LMS, \Schoolbox\Admin\Navigation\Subnav::CHILD_LMS_RUBRICS);
 
 $stmt = Database::getInstance()->prepare("
     SELECT * FROM rubric_result ORDER BY resultset_id ASC, `value` ASC

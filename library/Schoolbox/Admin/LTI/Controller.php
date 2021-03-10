@@ -12,8 +12,6 @@ namespace Schoolbox\Admin\LTI;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Mapper\Exception as MapperException;
-use IMSGlobal\LTI\ToolProvider as LTI;
-use IMSGlobal\LTI\ToolProvider\Service as LTIService;
 use Schoolbox\LTI\Provider\Model as Provider;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
 
@@ -37,7 +35,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminLti/modify.twig',
             'data'     => [
-                'pageCurrent' => Subnav::PARENT_LMS
+                'pageCurrent' => Subnav::PARENT_LMS,
+                'subpageCurrent' => Subnav::CHILD_LMS_LTI,
             ],
         ]);
     }
@@ -53,6 +52,7 @@ class Controller extends Base
             'template' => '@adminLti/index.twig',
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_LMS,
+                'subpageCurrent' => Subnav::CHILD_LMS_LTI,
                 'providers' => $this->providerMapper->findAll()
             ],
         ]);
@@ -72,6 +72,7 @@ class Controller extends Base
             'template' => '@adminLti/modify.twig',
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_LMS,
+                'subpageCurrent' => Subnav::CHILD_LMS_LTI,
                 'provider' => $provider
             ],
         ]);

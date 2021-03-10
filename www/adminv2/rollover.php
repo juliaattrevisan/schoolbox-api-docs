@@ -25,7 +25,7 @@ if (!$group->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'adminv2/rollover.html');
 
 // include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_LMS);
+(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_LMS, \Schoolbox\Admin\Navigation\Subnav::CHILD_LMS_CLASS_ROLLOVER);
 
 $openCategory = 0;
 
