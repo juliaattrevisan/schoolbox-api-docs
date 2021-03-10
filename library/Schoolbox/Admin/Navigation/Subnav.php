@@ -122,6 +122,12 @@ class Subnav
     public const CHILD_PERSONALISATION_TOP_MENU = 'topMenu';
 
     public const PARENT_RESOURCES = 'resources';
+    public const CHILD_RESOURCES_ALLOWED_FILE = 'allowedFile';
+    public const CHILD_RESOURCES_MEDIA_QUEUE = 'mediaQueue';
+    public const CHILD_RESOURCES_SETTINGS = 'settings';
+    public const CHILD_RESOURCES_RESTORE = 'restore';
+    public const CHILD_RESOURCES_USAGE = 'usage';
+
     public const PARENT_SUDS = 'import/schoolDataImport';
     public const PARENT_SYSTEM_SETTINGS = 'systemSettings';
     public const PARENT_USER_MANAGEMENT = 'userManagement';
@@ -613,31 +619,31 @@ class Subnav
                 'children' => [
                     'allowed-file' => [
                         'name' => 'Allowed File',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_RESOURCES_ALLOWED_FILE,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'video' => [
                         'name' => 'Media Queue',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_RESOURCES_MEDIA_QUEUE,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Resources' => [
                         'name' => 'Settings',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_RESOURCES_SETTINGS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'restore' => [
                         'name' => 'Restore',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_RESOURCES_RESTORE,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'usage' => [
                         'name' => 'Usage',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_RESOURCES_USAGE,
                         'visible' =>  true,
                         'children' => []
                     ],

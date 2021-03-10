@@ -18,7 +18,6 @@ use Schoolbox\Learning\Assessment\DataModel\Model as Assessment;
 
 class Controller extends Base
 {
-    private const PAGE_CURRENT = 'restore';
 
     /**
      * Period of time that you can restore items, older than this will not be displayed
@@ -86,6 +85,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@restore/index.twig', [
             'pageCurrent' => Subnav::PARENT_RESOURCES,
+            'subpageCurrent' => Subnav::CHILD_RESOURCES_RESTORE,
             'deletedFolders' => $deletedFolders,
             'deletedAssessments' => $deletedAssessments,
         ]));

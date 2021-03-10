@@ -93,6 +93,7 @@ class Controller extends ConfigController
 
             case 'Resources':
                 $pageCurrent = Subnav::PARENT_RESOURCES;
+                $subpageCurrent = Subnav::CHILD_RESOURCES_SETTINGS;
                 break;
 
             case '3rd Party Services':
