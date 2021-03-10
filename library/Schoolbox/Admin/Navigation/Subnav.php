@@ -35,6 +35,7 @@ class Subnav
     public const PARENT_MODULES = 'Modules';
     public const PARENT_PERSONALISATION = 'personalisation';
     public const PARENT_RESOURCES = 'resources';
+    public const PARENT_SUDS = 'import/schoolDataImport';
 
     /**
      * For access to booleans that determine availability/visibility of certain menu
@@ -489,7 +490,7 @@ class Subnav
             ],
             'import/schoolDataImport' => [
                 'name' => 'School Data Import',
-                'identifier' => 'import/schoolDataImport',
+                'identifier' => self::PARENT_SUDS,
                 'visible' =>  $this->configLoader->get('external_type') === 'schoolbox',
                 'children' => []
             ],

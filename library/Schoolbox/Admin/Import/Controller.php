@@ -17,6 +17,7 @@ use PDOException;
 use ReflectionException;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
@@ -77,7 +78,7 @@ class Controller extends ConfigController
         $hasIndicator = $host !== '' && $key !== '';
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
-            'pageCurrent' => 'import/schoolDataImport',
+            'pageCurrent' => Subnav::PARENT_SUDS,
             'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
             'dataSource' => $this->getConfigLoader()->get('schooldata_import_data_source'),
             'configContext' => $configContext,
@@ -169,7 +170,7 @@ class Controller extends ConfigController
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/statusReport.twig', [
-            'pageCurrent' => 'import/schoolDataImport',
+            'pageCurrent' => Subnav::PARENT_SUDS,
             'report' => $report ?: [[
                 'message' => $message,
                 'reason' => '',
