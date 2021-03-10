@@ -16,6 +16,7 @@ use Alaress_Date_Format;
 use Aws\CloudWatch\CloudWatchClient;
 use Aws\S3\S3Client;
 use InvalidArgumentException;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database;
 use Schoolbox\Resource\FilesystemFactory;
@@ -264,7 +265,8 @@ class Controller extends Base
             array(
                 'template' => '@adminHome/index.twig',
                 'data' => array(
-                    'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                    'pageCurrent' => Subnav::PARENT_HOME,
+                    'subpageCurrent' => null,
                     'usageInGraph' => $usageInGraph,
                     'disk_used' => $disk_used,
             //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
