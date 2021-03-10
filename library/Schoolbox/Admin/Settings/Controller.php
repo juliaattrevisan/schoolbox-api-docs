@@ -73,9 +73,17 @@ class Controller extends ConfigController
                 break;
 
             case 'Modules':
+                $pageCurrent = Subnav::PARENT_MODULES;
+                break;
+
             case 'Board Leave':
+                $pageCurrent = Subnav::PARENT_MODULES;
+                $subpageCurrent = Subnav::CHILD_MODULES_BOARD_LEAVE;
+                break;
+
             case 'Pastoral Care':
                 $pageCurrent = Subnav::PARENT_MODULES;
+                $subpageCurrent = Subnav::CHILD_MODULES_PASTORAL_CARE;
                 break;
 
             case 'Skin Config':

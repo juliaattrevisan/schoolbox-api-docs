@@ -40,6 +40,7 @@ class Controller extends Base
                 '@adminPackage/index.twig',
                 [
                     'pageCurrent' => Subnav::PARENT_MODULES,
+                    'subpageCurrent' => Subnav::CHILD_MODULES_PACKAGES,
                     'packages'    => $this->packageMapper->findAll(),
                 ]
             )

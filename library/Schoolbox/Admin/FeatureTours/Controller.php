@@ -35,6 +35,7 @@ class Controller extends Base
         $twigData = [
             'toursEnabled' => $this->getConfigLoader()->get('tours_enabled'),
             'pageCurrent' => Subnav::PARENT_MODULES,
+            'subpageCurrent' => Subnav::CHILD_MODULES_FEATURE_TOURS,
             'tours' => $this->tourMapper->findAll()
         ];
 

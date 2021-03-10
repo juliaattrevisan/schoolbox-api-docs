@@ -101,6 +101,10 @@ class Subnav
     public const CHILD_LISTS_YEAR_LEVELS = 'year-levels';
 
     public const PARENT_MODULES = 'Modules';
+    public const CHILD_MODULES_BOARD_LEAVE = 'boardLeave';
+    public const CHILD_MODULES_FEATURE_TOURS = 'featureTours';
+    public const CHILD_MODULES_PACKAGES = 'packages';
+    public const CHILD_MODULES_PASTORAL_CARE = 'pastoralCare';
 
     public const PARENT_MESSAGES = 'messages';
     public const PARENT_PERSONALISATION = 'personalisation';
@@ -491,25 +495,25 @@ class Subnav
                 'children' => [
                     'setting/Board+Leave' => [
                         'name' => 'Board Leave',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_MODULES_BOARD_LEAVE,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'feature-tours' => [
                         'name' => 'Feature Tours',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_MODULES_FEATURE_TOURS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'package' => [
                         'name' => 'Packages',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_MODULES_PACKAGES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Pastoral+Care' => [
                         'name' => 'Pastoral Care',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_MODULES_PASTORAL_CARE,
                         'visible' =>  true,
                         'children' => []
                     ],
