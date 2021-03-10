@@ -1,75 +1,5 @@
-<template>
-    <div>
-        <view-event-modal ref="event"
-                          :to-moment="toMoment"
-                          :format-display-date="formats.displayDate"
-                          :format-display-time="formats.displayTime"
-                          :format-display-datetime="formats.displayDatetime"
-        />
-
-        <full-calendar
-                ref="fullCalendar"
-                :plugins="calendarPlugins"
-                :views="{
-                    day: {
-                        titleFormat: dayTitleFormat,
-                        columnHeader: false
-                    },
-                    week: {
-                        columnHeaderFormat: formats.displayWeekDay
-                    }
-                }"
-                :event-time-format="helper.eventTimeFormat"
-                :content-height="this.contentHeight"
-                :custom-buttons="{
-                    quickSwitchButton: {
-                        text: ' ',
-                    },
-                    customPrev: {
-                        icon: 'chevron-left',
-                        click: this.clickPrev.bind(this),
-                    },
-                    customNext: {
-                        icon: 'chevron-right',
-                        click: this.clickNext.bind(this),
-                    },
-                    customToday: {
-                        text: 'Today',
-                        click: this.clickToday.bind(this),
-                    },
-                }"
-                :header="{
-                    left: 'quickSwitchButton,customToday,customPrev,customNext',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                }"
-                :buttonText="{
-                    today:    'Today',
-                    month:    'Month',
-                    week:     'Week',
-                    day:      'Day'
-                }"
-                default-view="dayGridMonth"
-                :event-render="eventRender"
-                :events="events"
-                @loading="onLoading"
-                @eventClick="onEventClick"
-        />
-
-        <flat-pickr
-                ref="flatPickr"
-                :config="{
-                    defaultDate: config.defaultDate,
-                    selector: '.fc-quickSwitchButton-button',
-                    disableMobile: true,
-                }"
-                @dateSelected="onQuickSwitch"
-        />
-
-    </div>
-</template>
-
 <script>
+
     import FullCalendar       from '@fullcalendar/vue'
     import interactionPlugin  from '@fullcalendar/interaction'
     import dayGridPlugin      from '@fullcalendar/daygrid'
@@ -97,21 +27,68 @@
     const FORMAT_DISPLAY_WEEK_DAY = 'ddd D/M';
 
     export default {
+
         components: {
             ViewEventModal,
             FullCalendar,
             RevealModal,
             FlatPickr,
         },
-        beforeMount() {
-            this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
-        },
-        data() {
+
+        data () {
             return {
-                calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
                 selectedFilters: null,
+                calendarOptions: {}
+                // calendarOptions: {
+                //     plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
+                //     views: {
+                //         day: {
+                //             // titleFormat: dayTitleFormat,
+                //             columnHeader: false
+                //         },
+                //         week: {
+                //             columnHeaderFormat: this.formats.displayWeekDay
+                //         }
+                //     },
+                //     eventTimeFormat: this.helper.eventTimeFormat,
+                //     // contentHeight: 'this.contentHeight',
+                //     customButtons: {
+                //         quickSwitchButton: {
+                //             text: ' ',
+                //         },
+                //         customPrev: {
+                //             icon: 'chevron-left',
+                //             click: this.clickPrev,
+                //         },
+                //         customNext: {
+                //             icon: 'chevron-right',
+                //             click: this.clickNext,
+                //         },
+                //         customToday: {
+                //             text: 'Today',
+                //             click: this.clickToday,
+                //         },
+                //     },
+                //     headerToolbar: {
+                //         left: 'quickSwitchButton,customToday,customPrev,customNext',
+                //         center: 'title',
+                //         right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                //     },
+                //     buttonText: {
+                //         today: 'Today',
+                //         month: 'Month',
+                //         week: 'Week',
+                //         day: 'Day'
+                //     },
+                //     initialView: 'dayGridMonth',
+                //     eventContent: this.eventRender,
+                //     events: this.events,
+                //     loading: this.onLoading,
+                //     eventClick: this.onEventClick
+                // }
             }
         },
+
         computed: {
             jQuery: () => window.jQuery,
             config: () => window.fullCalendarConfig,
@@ -126,7 +103,64 @@
                 };
             },
         },
+
+        beforeMount () {
+            this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
+            this.calendarOptions = {
+                plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
+                views: {
+                    day: {
+                        // titleFormat: dayTitleFormat,
+                        columnHeader: false
+                    },
+                    week: {
+                        columnHeaderFormat: this.formats.displayWeekDay
+                    }
+                },
+                eventTimeFormat: this.helper.eventTimeFormat,
+                // contentHeight: 'this.contentHeight',
+                customButtons: {
+                    quickSwitchButton: {
+                        text: ' ',
+                    },
+                    customPrev: {
+                        icon: 'chevron-left',
+                        click: this.clickPrev,
+                    },
+                    customNext: {
+                        icon: 'chevron-right',
+                        click: this.clickNext,
+                    },
+                    customToday: {
+                        text: 'Today',
+                        click: this.clickToday,
+                    },
+                },
+                headerToolbar: {
+                    left: 'quickSwitchButton,customToday,customPrev,customNext',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                buttonText: {
+                    today: 'Today',
+                    month: 'Month',
+                    week: 'Week',
+                    day: 'Day'
+                },
+                initialView: 'dayGridMonth',
+                eventContent: this.eventRender,
+                events: this.events,
+                loading: this.onLoading,
+                eventClick: this.onEventClick
+            }
+        },
+
+        mounted () {
+            this.$refs.fullCalendar.setOption('contentHeight', this.contentHeight);
+        },
+
         methods: {
+
             contentHeight() {
                 return this.helper.contentHeight();
             },
@@ -275,7 +309,9 @@
                 this.selectedFilters = selectedFilters;
                 this.$refs.fullCalendar.getApi().refetchEvents();
             },
+
         },
+
         mounted() {
             // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
             let quickSwitchIcon = document.createElement('a');
@@ -284,12 +320,41 @@
 
             document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
         }
+
     }
 </script>
 
+<template>
+    <div>
+        <view-event-modal 
+            ref="event"
+            :to-moment="toMoment"
+            :format-display-date="formats.displayDate"
+            :format-display-time="formats.displayTime"
+            :format-display-datetime="formats.displayDatetime"
+        />
+
+        <full-calendar
+            ref="fullCalendar"
+            :options="calendarOptions"
+        />
+
+        <flat-pickr
+            ref="flatPickr"
+            :config="{
+                defaultDate: config.defaultDate,
+                selector: '.fc-quickSwitchButton-button',
+                disableMobile: true,
+            }"
+            @dateSelected="onQuickSwitch"
+        />
+
+    </div>
+</template>
+
 <style lang="scss">
-    @import '~@fullcalendar/core/main.css';
-    @import '~@fullcalendar/daygrid/main.css';
-    @import '~@fullcalendar/timegrid/main.css';
-    @import '~@fullcalendar/list/main.css';
+    // @import '~@fullcalendar/core/main.css';
+    // @import '~@fullcalendar/daygrid/main.css';
+    // @import '~@fullcalendar/timegrid/main.css';
+    // @import '~@fullcalendar/list/main.css';
 </style>
