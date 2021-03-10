@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Admin\Navigation;
 
-use Schoolbox\Admin\Menu\Subnav;
 use Schoolbox\Config\Loader;
 use Twig\Environment;
 use Twig\Extension;

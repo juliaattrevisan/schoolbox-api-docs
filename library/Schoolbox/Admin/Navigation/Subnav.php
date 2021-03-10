@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Menu;
+namespace Schoolbox\Admin\Navigation;
 
 use Schoolbox\IConfigLoader;
 
