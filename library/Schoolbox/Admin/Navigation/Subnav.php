@@ -50,6 +50,9 @@ class Subnav
     public const CHILD_ENGAGEMENT_QUIZZES = 'quiz';
 
     public const PARENT_EPORTFOLIO = 'eportfolio';
+    public const CHILD_EPORTFOLIO_TEMPLATES = 'templates';
+    public const CHILD_EPORTFOLIO_DEPLOYMENT = 'deployment';
+
     public const PARENT_FILTERS = 'filters';
     public const PARENT_HOMEPAGE = 'homepage';
     public const PARENT_IMPORT = 'import/directImport';
@@ -201,13 +204,13 @@ class Subnav
                 'children' => [
                     'eportfolio' => [
                         'name' => 'Templates',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_EPORTFOLIO_TEMPLATES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'eportfolio/deploy' => [
                         'name' => 'Deployment',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_EPORTFOLIO_DEPLOYMENT,
                         'visible' =>  true,
                         'children' => []
                     ],

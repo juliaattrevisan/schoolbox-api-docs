@@ -20,7 +20,7 @@
 
 <div class="admin-container row">
     {# Shared navigation profile #}
-    {{ renderAdminNavigation(pageCurrent) }}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
 
     <div class="admin-content">
         <div class="small-12 island {% if profile|length > 0 %}hide{% endif %}" id="profile-button-empty-state">

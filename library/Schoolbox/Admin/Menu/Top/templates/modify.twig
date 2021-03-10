@@ -21,7 +21,7 @@
 </script>
 
 {# Shared navigation menu #}
-{{ renderAdminNavigation(pageCurrent) }}
+{{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
 
 <form id="itemForm" action="{{ routeLookup('adminMenuTop.postModify') }}" method="post">
     <input type="hidden" name="id" value="{{ item.id ?? '' }}">
