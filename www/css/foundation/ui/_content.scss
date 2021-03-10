@@ -739,6 +739,8 @@ $rotate-span-width: 11rem;
 
 // Labels
 .label {
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
   text-transform: uppercase;
   margin: 0 rem-calc(($base-font-size - 8)) rem-calc(($base-font-size - 8)) 0;
 
@@ -1306,6 +1308,8 @@ $selector-width: 2.25rem;
 
   .grade {
     align-items: center;
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
     display: flex;
     flex: 0 0 auto;
     justify-content: center;
