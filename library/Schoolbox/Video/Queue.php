@@ -199,9 +199,10 @@ class Queue extends ResourceVideo
 
         // Get parameters
 
+        $cpus = shell_exec('nproc');
         $commandTranscode              = $this->getCommandTranscode();
         $audioBitrateEscaped           = escapeshellarg("{$this->audioBitrate}k");
-        $processTimeoutEscaped         = escapeshellarg($this->processTimeout);
+        $processTimeoutEscaped         = escapeshellarg($this->processTimeout * $cpus);
         $filenameSourceEscaped         = escapeshellarg($filenameSource);
         $filenameTranscodeAudioEscaped = escapeshellarg($filenameTranscodeAudio);
 
