@@ -5,13 +5,34 @@
  #
  # @param array adminSubnav
  #}
+
+<script type="text/javascript">
+    $(function() {
+        const mq = window.matchMedia( "(max-width: 950px)" );
+        if (mq.matches) {
+            $("[data-parent-item] a").on('click', function(event) {
+                event.preventDefault();
+
+                let $target = $(this).closest('[data-parent-item]').find("[data-admin-subnav-flyout]").slideToggle();
+
+                $('[data-admin-subnav-flyout]').not($target).slideUp();
+            });
+        }
+
+        $('[data-admin-subnav-dropdown]').on('click', function(event) {
+            event.preventDefault();
+
+            $('[data-admin]').toggle();
+        });
+    });
+</script>
 <nav id="admin-nav">
     <h2 class="subheader">Menu</h2>
-    <a href="#" class="dropdown-btn">Go to...</a>
-    <ul class="admin side-nav" role="navigation">
+    <a href="#" class="dropdown-btn" data-admin-subnav-dropdown>Go to...</a>
+    <ul class="admin side-nav" role="navigation" data-admin>
 
         {% for parentUrl, parentData in adminSubnav %}
-            <li {% if parentData.children|length %}class="parent-item"{% endif %} role="menuitem">
+            <li {% if parentData.children|length %}class="parent-item"{% endif %} role="menuitem" data-parent-item>
 
                 {# LMS is a node that doesn't actually exist
                  # Personalisation is a node that doesn't actually exist
@@ -25,7 +46,7 @@
                 {% endif %}
 
                 {% if parentData.children|length %}
-                    <ul class="flyout" role="navigation">
+                    <ul class="flyout" role="navigation" data-admin-subnav-flyout>
                         {% for childUrl, childData in parentData.children %}
                             <li role="menuitem"><a href="/adminv2/{{ childUrl }}">{{ childData.name }}</a></li>
                         {% endfor %}

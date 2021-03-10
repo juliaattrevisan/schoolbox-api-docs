@@ -47,8 +47,11 @@ class Subnav
      *
      * Some nodes are hybrids of other unrelated url sets, such as LMS. Its items
      * come from all over the place
+     *
+     * @param string|null $pageCurrent
+     * @return array
      */
-    public function generate(): array
+    public function generate(?string $pageCurrent): array
     {
         return [
             'home' => [
