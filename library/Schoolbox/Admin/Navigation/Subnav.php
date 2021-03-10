@@ -34,6 +34,7 @@ class Subnav
     public const PARENT_MESSAGES = 'messages';
     public const PARENT_MODULES = 'Modules';
     public const PARENT_PERSONALISATION = 'personalisation';
+    public const PARENT_RESOURCES = 'resources';
 
     /**
      * For access to booleans that determine availability/visibility of certain menu
@@ -456,7 +457,7 @@ class Subnav
             ],
             'setting/Resources' => [
                 'name' => 'Resources',
-                'identifier' => '',
+                'identifier' => self::PARENT_RESOURCES,
                 'visible' =>  true,
                 'children' => [
                     'allowed-file' => [

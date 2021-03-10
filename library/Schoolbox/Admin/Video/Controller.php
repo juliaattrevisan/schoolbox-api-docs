@@ -8,6 +8,7 @@
 namespace Schoolbox\Admin\Video;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Video\QueueMapper as VideoQueueMapper;
 use Schoolbox\Video\Queue as VideoQueue;
@@ -42,7 +43,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminVideo/index.twig',
             'data' => [
-                'pageCurrent' => self::PAGE_CURRENT,
+                'pageCurrent' => Subnav::PARENT_RESOURCES,
                 'queue' => $queueItems,
                 'statusOrder' => $statuses
             ],

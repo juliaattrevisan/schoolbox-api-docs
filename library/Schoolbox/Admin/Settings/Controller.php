@@ -73,6 +73,10 @@ class Controller extends ConfigController
                 $pageCurrent = Subnav::PARENT_PERSONALISATION;
                 break;
 
+            case 'Resources':
+                $pageCurrent = Subnav::PARENT_RESOURCES;
+                break;
+                
             default:
                 $pageCurrent = 'setting';
                 break;

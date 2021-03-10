@@ -8,6 +8,7 @@ namespace Schoolbox\Admin\Restore;
 
 use Alaress\Web\Controller\Base;
 use Psr\Log\NullLogger;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\RecursiveUndeleter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -84,7 +85,7 @@ class Controller extends Base
         });
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@restore/index.twig', [
-            'pageCurrent' => self::PAGE_CURRENT,
+            'pageCurrent' => Subnav::PARENT_RESOURCES,
             'deletedFolders' => $deletedFolders,
             'deletedAssessments' => $deletedAssessments,
         ]));
