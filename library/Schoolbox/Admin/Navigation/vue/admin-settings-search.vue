@@ -2,6 +2,7 @@
 
 import AdminSettingsSearchResult from './admin-settings-search-result';
 import { fetchAsJson } from '@shared/fetch/fetch';
+import { gsap } from 'gsap/all'
 
 export default {
     
@@ -39,7 +40,7 @@ export default {
          * only when started typing beyond minSearchStringLength count and there's actual results
          */
         isSearchActive () {
-			if ((this.currentSearchString.length > this.minSearchStringLength) && (this.filteredSearchList.length > 0)) {
+			if ((this.currentSearchString.length >= this.minSearchStringLength) && (this.filteredSearchList.length > 0)) {
                 return true
             } else {
                 return false;
@@ -140,7 +141,32 @@ export default {
          */
 		clearInput () {
 			this.currentSearchString = '';
-		}
+		},
+
+        /**
+         * experimental - does it help show changes in search? 
+         *
+         */
+        beforeEnterResult (el) {
+            gsap.set(el, { opacity: 0, y: 10, height: 0 });
+        },
+
+        /**
+         * experimental - does it help show changes in search? 
+         *
+         */
+        enterResult (el, done) {
+            let delay = el.dataset.index * 0.05;
+            gsap.to(el, 0.3, { opacity: 1, y: 0, height: 'auto', delay: delay, onComplete: done } );
+        },
+
+        /**
+         * experimental - does it help show changes in search? 
+         *
+         */
+        leaveResult (el, done) {
+            gsap.to(el, 0.3, { opacity: 0, y: 10, height: 0, onComplete: done } );
+        },
 
     }
 
@@ -158,28 +184,34 @@ export default {
             class="" 
         />
         <button v-show="currentSearchString.length != 0" @click.prevent="onClearInputSelected" class="">Clear Search</button>
-        <transition-group name="fade">
-            <template v-if="isSearchActive">
-                <div v-for="(result, index) in filteredSearchListLimited" :key="index">
+            <transition-group
+                name="staggered-fade"
+                tag="ul"
+                v-bind:css="false"
+                v-on:before-enter="beforeEnterResult"
+                v-on:enter="enterResult"
+                v-on:leave="leaveResult"
+            >
+                <li v-for="(result, index) in filteredSearchListLimited" :key="result.name" :data-index="index">
                     <admin-settings-search-result 
                         :result="result"
                         :current-search-string="currentSearchString"
                     />
-                </div>
-            </template>
-        </transition-group>
+                </li>
+            </transition-group>
         <div v-if="isSearchActive && hasResultsBeydondsearchResultsShownLimit">{{ resultsBeydondsearchResultsShownLimitCount }} search results not shown, try refining your search further.</div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.25s;
+ul {
+    margin: 0px;
+    padding: 0px;
 }
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
+
+ul li {
+    list-style-type: none;
 }
 
 </style>
