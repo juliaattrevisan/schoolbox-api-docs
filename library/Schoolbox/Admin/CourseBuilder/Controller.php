@@ -110,7 +110,7 @@ class Controller extends Base
             array(
                 'template' => '@adminCourseBuilder/index.twig',
                 'data'     => array(
-                    'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                    'pageCurrent' => 'lms',
                     'tab' => $tab != '' ? $tab : 'course',
                     'roles' => $this->roleMapper->findAll(),
                     'permissions' => $permissions,

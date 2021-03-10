@@ -22,6 +22,15 @@ use Twig\Loader\FilesystemLoader;
 class Subnav
 {
 
+    public const PARENT_HOME = 'home';
+    public const PARENT_CALENDAR = 'calendar';
+    public const PARENT_ENGAGEMENT = 'engagement';
+    public const PARENT_EPORTFOLIO = 'eportfolio';
+    public const PARENT_FILTERS = 'filters';
+    public const PARENT_HOMEPAGE = 'homepage';
+    public const PARENT_IMPORT = 'import/directImport';
+    public const PARENT_LMS = 'lms';
+    public const PARENT_MESSAGES = 'messages';
 
     /**
      * For access to booleans that determine availability/visibility of certain menu
@@ -57,13 +66,13 @@ class Subnav
         return [
             'home' => [
                 'name' => 'Home',
-                'identifier' => 'home',
+                'identifier' => self::PARENT_HOME,
                 'visible' =>  true,
                 'children' => []
             ],
             'calendar' => [
                 'name' => 'Calendar',
-                'identifier' => 'calendar',
+                'identifier' => self::PARENT_CALENDAR,
                 'visible' =>  true,
                 'children' => [
                     'calendar/Cleanup' => [
@@ -85,7 +94,7 @@ class Subnav
             ],
             'engagement' => [
                 'name' => 'Engagement',
-                'identifier' => 'engagement',
+                'identifier' => self::PARENT_ENGAGEMENT,
                 'visible' =>  true,
                 'children' => [
                     'engagement/index/collaboration' => [
@@ -142,7 +151,7 @@ class Subnav
             ],
             'eportfolio' => [
                 'name' => 'ePortfolio',
-                'identifier' => 'eportfolio',
+                'identifier' => self::PARENT_EPORTFOLIO,
                 'visible' =>  true,
                 'children' => [
                     'eportfolio' => [
@@ -159,19 +168,19 @@ class Subnav
             ],
             'filters' => [
                 'name' => 'Filters',
-                'identifier' => 'filters',
+                'identifier' => self::PARENT_FILTERS,
                 'visible' =>  true,
                 'children' => []
             ],
             'homepage' => [
                 'name' => 'Homepage Templates',
-                'identifier' => 'homepage',
+                'identifier' => self::PARENT_HOMEPAGE,
                 'visible' =>  true,
                 'children' => []
             ],
             'import/directImport' => [
                 'name' => 'Import',
-                'identifier' => 'import/directImport',
+                'identifier' => self::PARENT_IMPORT,
                 'visible' =>  true,
                 'children' => [
                     'import/folder' => [
@@ -198,7 +207,7 @@ class Subnav
             ],
             'lms' => [
                 'name' => 'LMS',
-                'identifier' => '',
+                'identifier' => self::PARENT_LMS,
                 'visible' =>  true,
                 'children' => [
                     'terms' => [

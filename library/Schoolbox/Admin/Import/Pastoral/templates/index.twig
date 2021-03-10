@@ -33,108 +33,113 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="row">
-    <div class="small-12 island">
-        <h1>Import {{ locale.pastoralCare.proper }} Records</h1>
-    </div>
-{% if externalEnabled == '1' %}
-    <div class="small-12 island">
-        <form data-form-import method="post" action="{{ routeLookupIfAuthorized('adminImportPastoral.postImport') }}">
-            <section>
-                <div class="content">
-                    <p>
-                        This screen will import all pastoral records currently stored in your SIS to the Schoolbox Pastoral
-                        Care module. This is intended for a one-time import when first enabling the Pastoral Care module, any
-                        records created using the import feature (and associated comments/attachment) will be removed on
-                        subsequent imports.
-                    </p>
+<div class="admin-container row">
 
-                    <p>
-                        <b>Before importing pastoral records you must specify a fallback owner below.</b>
-                        This is the owner that will be assigned to pastoral records when the original author can not be
-                        located in the Schoolbox database.
-                    </p>
-                </div>
-                <div class="component-action">
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation('import/directImport') }}
+
+    <div class="admin-content">
+        <div class="row">
+            {% if externalEnabled == '1' %}
+            <div class="small-12 island">
+                <form data-form-import method="post" action="{{ routeLookupIfAuthorized('adminImportPastoral.postImport') }}">
                     <section>
-                        <a href="{{ routeLookupIfAuthorized('adminImportPastoral.getLog') }}" class="button">View Import Logs</a>
+                        <div class="content">
+                            <p>
+                                This screen will import all pastoral records currently stored in your SIS to the Schoolbox Pastoral
+                                Care module. This is intended for a one-time import when first enabling the Pastoral Care module, any
+                                records created using the import feature (and associated comments/attachment) will be removed on
+                                subsequent imports.
+                            </p>
+
+                            <p>
+                                <b>Before importing pastoral records you must specify a fallback owner below.</b>
+                                This is the owner that will be assigned to pastoral records when the original author can not be
+                                located in the Schoolbox database.
+                            </p>
+                        </div>
+                        <div class="component-action">
+                            <section>
+                                <a href="{{ routeLookupIfAuthorized('adminImportPastoral.getLog') }}" class="button">View Import Logs</a>
+                            </section>
+                        </div>
                     </section>
-                </div>
-            </section>
-            <section class="content">
-                <label>
-                    Fallback Record Owner
-                    <span class="hint has-tip tip-top" data-tooltip title="This is the owner that will be assigned when the original author of the pastoral record can not be located in the Schoolbox database.">?</span>
-                    <select id="defaultOwner" name="defaultOwnerId" placeholder="Fallback Record Owner"></select>
-                </label>
+                    <section class="content">
+                        <label>
+                            Fallback Record Owner
+                            <span class="hint has-tip tip-top" data-tooltip title="This is the owner that will be assigned when the original author of the pastoral record can not be located in the Schoolbox database.">?</span>
+                            <select id="defaultOwner" name="defaultOwnerId" placeholder="Fallback Record Owner"></select>
+                        </label>
 
-                <label for="importRecordsGroup">
-                    Import pastoral records
-                    <span class="hint has-tip tip-top" data-tooltip
-                          title="Import records from your SIS overwriting any matching existing records in Schoolbox.">?</span>
-                </label>
-                <div class="switch">
-                    <input id="importRecords" type="checkbox" name="importRecords" checked="" data-checkbox-group="importRecordsGroup">
-                    <label for="importRecords">
-                        <span>Yes</span>
-                        <span>No</span>
-                    </label>
-                </div>
-                <label for="deleteRecords">
-                    Override existing records
-                    <span class="hint has-tip tip-top" data-tooltip
-                          title="Records that already exist will be deleted and replaced with new versions from the SIS">?</span>
-                </label>
-                <div class="switch">
-                    <input id="deleteRecords" type="checkbox" name="deleteRecords" data-checkbox-group="deleteRecordsGroup">
-                    <label for="deleteRecords">
-                        <span>Yes</span>
-                        <span>No</span>
-                    </label>
-                </div>
+                        <label for="importRecordsGroup">
+                            Import pastoral records
+                            <span class="hint has-tip tip-top" data-tooltip
+                                  title="Import records from your SIS overwriting any matching existing records in Schoolbox.">?</span>
+                        </label>
+                        <div class="switch">
+                            <input id="importRecords" type="checkbox" name="importRecords" checked="" data-checkbox-group="importRecordsGroup">
+                            <label for="importRecords">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
+                        <label for="deleteRecords">
+                            Override existing records
+                            <span class="hint has-tip tip-top" data-tooltip
+                                  title="Records that already exist will be deleted and replaced with new versions from the SIS">?</span>
+                        </label>
+                        <div class="switch">
+                            <input id="deleteRecords" type="checkbox" name="deleteRecords" data-checkbox-group="deleteRecordsGroup">
+                            <label for="deleteRecords">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
 
-                <label for="importAttachmentsGroup">
-                    Import documents/attachments
-                    <span class="hint has-tip tip-top" data-tooltip
-                          title="Import pastoral records file attachments from your SIS.">?</span>
-                </label>
-                <div class="switch">
-                    <input id="importAttachments" type="checkbox" name="importAttachments" checked="" data-checkbox-group="importAttachmentsGroup">
-                    <label for="importAttachments">
-                        <span>Yes</span>
-                        <span>No</span>
-                    </label>
+                        <label for="importAttachmentsGroup">
+                            Import documents/attachments
+                            <span class="hint has-tip tip-top" data-tooltip
+                                  title="Import pastoral records file attachments from your SIS.">?</span>
+                        </label>
+                        <div class="switch">
+                            <input id="importAttachments" type="checkbox" name="importAttachments" checked="" data-checkbox-group="importAttachmentsGroup">
+                            <label for="importAttachments">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
+
+                        <label for="importParentAccessGroup">
+                            Add parent contacts in your SIS as Individual Access Users in pastoral records
+                            <span class="hint has-tip tip-top" data-tooltip
+                                  title="All Schoolbox Users that are listed as Contacts on your SIS' pastoral care records will be added as 'Individual Access Users' on students' pastoral care records. If you do not want parents to have access to these records ensure you disable this option.">?</span>
+                        </label>
+                        <div class="switch">
+                            <input id="importParentAccess" type="checkbox" name="importParentAccess" checked="" data-checkbox-group="importParentAccessGroup">
+                            <label for="importParentAccess">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
+
+                        <label id="defaultOwnerError" for="defaultOwner" class="error hide">You must select a fallback record owner before you can proceed.</label>
+
+                    </section>
+                    <input type="submit" data-import value="Import Pastoral Care Records">
+                </form>
+            </div>
+        {% else %}
+            <div class="small-12 island">
+                <div class="empty-state">
+                    <i class="icon-pastoral"></i>
+                    <p>
+                        Sorry, importing of pastoral care records is only possible if
+                        <a href='/adminv2/setting/Pastoral+Care#external_pastoral'>External Pastoral Synchronisation</a> is enabled on the
+                        Pastoral Care configuration screen.
+                    </p>
                 </div>
-
-                <label for="importParentAccessGroup">
-                    Add parent contacts in your SIS as Individual Access Users in pastoral records
-                    <span class="hint has-tip tip-top" data-tooltip
-                          title="All Schoolbox Users that are listed as Contacts on your SIS' pastoral care records will be added as 'Individual Access Users' on students' pastoral care records. If you do not want parents to have access to these records ensure you disable this option.">?</span>
-                </label>
-                <div class="switch">
-                    <input id="importParentAccess" type="checkbox" name="importParentAccess" checked="" data-checkbox-group="importParentAccessGroup">
-                    <label for="importParentAccess">
-                        <span>Yes</span>
-                        <span>No</span>
-                    </label>
-                </div>
-
-                <label id="defaultOwnerError" for="defaultOwner" class="error hide">You must select a fallback record owner before you can proceed.</label>
-
-            </section>
-            <input type="submit" data-import value="Import Pastoral Care Records">
-        </form>
-    </div>
-{% else %}
-    <div class="small-12 island">
-        <div class="empty-state">
-            <i class="icon-pastoral"></i>
-            <p>
-                Sorry, importing of pastoral care records is only possible if
-                <a href='/adminv2/setting/Pastoral+Care#external_pastoral'>External Pastoral Synchronisation</a> is enabled on the
-                Pastoral Care configuration screen.
-            </p>
+            </div>
+        {% endif %}
         </div>
     </div>
-{% endif %}
 </div>

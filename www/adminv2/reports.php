@@ -26,7 +26,7 @@ $this->setBlock(TEMPLATE_content, 'download_report', 'download_report_block');
 $this->setVar('filter_block', '');
 
 // include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,'home');
+(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_HOME);
 
 $this->setTitle('Admin - Reports');
 

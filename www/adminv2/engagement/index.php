@@ -8,7 +8,7 @@ $this->setFile(TEMPLATE_content, 'adminv2/engagement/index.html');
 $this->setTitle('Admin - Engagement');
 
 // include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,'engagement');
+(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_ENGAGEMENT);
 
 $validPages = array('dueWork','quiz','files', 'links','fileTypes','news','collaboration','login','components','mobile');
 

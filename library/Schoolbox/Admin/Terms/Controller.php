@@ -82,7 +82,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminTerms/index.twig',
             'data'     => [
-                'pageCurrent'      => basename($this->getRequest()->query->get('page')),
+                'pageCurrent'      => 'lms',
                 'terms'            => $terms,
                 'yearLevelValues'  => $yearLevelValues,
                 'yearLevelOptions' => $yearLevelOptions,
