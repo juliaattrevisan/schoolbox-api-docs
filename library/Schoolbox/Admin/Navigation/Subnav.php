@@ -113,6 +113,8 @@ class Subnav
     public const CHILD_MESSAGES_APP_REGISTRATIONS = 'mobileAppRegistrations';
     public const CHILD_MESSAGES_SETTINGS = 'settings';
 
+    public const PARENT_NEWS = 'news';
+
     public const PARENT_PERSONALISATION = 'personalisation';
     public const CHILD_PERSONALISATION_DASHBOARD = 'dashboard';
     public const CHILD_PERSONALISATION_PROFILE_BUTTONS = 'profileButtons';
@@ -563,7 +565,7 @@ class Subnav
             ],
             'news' => [
                 'name' => 'News',
-                'identifier' => '',
+                'identifier' => self::PARENT_NEWS,
                 'visible' =>  true,
                 'children' => []
             ],

@@ -5,10 +5,11 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Comms\News\Policy;
+namespace Schoolbox\Admin\News\Policy;
 
 use Alaress\Database\Predicate;
 use Alaress\Web\Controller\ConfigController;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -64,7 +65,8 @@ class Controller extends ConfigController
         );
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@commsNewsPolicy/index.twig', [
-            'pageCurrent'   => 'news',
+            'pageCurrent'   => Subnav::PARENT_NEWS,
+            'subpageCurrent' => null,
             'commsOfficers' => $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_NEWS, null, UserAccess::ACCESS_FULL)->indexBy('id'),
             'configContext' => $configContext,
             'topics'        => $this->topicMapper->findAll(['order' => ['sequence' => 'asc']]),

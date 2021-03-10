@@ -4,7 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-namespace Schoolbox\Comms\News\Policy;
+namespace Schoolbox\Admin\News\Policy;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
