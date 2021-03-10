@@ -30,28 +30,28 @@
     });
 </script>
 <nav id="admin-nav">
-    <h2 class="subheader">Menu</h2> {{ pageCurrent }}
+    <h2 class="subheader">Menu</h2> {{ pageCurrent }} > {{ subpageCurrent }}
     <a href="#" class="dropdown-btn" data-admin-subnav-dropdown>Go to...</a>
     <ul class="admin side-nav" role="navigation" data-admin>
 
         {% for parentUrl, parentData in adminSubnav %}
             {# Decide if the current node is selected
-                 #
-                 # Each phplib controller specifies a string for pageCurrent so you have to match
-                 # them up here, circumstantially, to provide indication of which node is active
-            #}
-            {% set selected = '' %}
+             #
+             # Each phplib controller specifies a string for pageCurrent so you have to match
+             # them up here, circumstantially, to provide indication of which node is active
+             #}
+            {% set parentSelected = '' %}
 
             {% if parentData.identifier == pageCurrent %}
-                {% set selected = 'active' %}
+                {% set parentSelected = 'active' %}
             {% endif %}
 
-            <li class="{{ selected }} {% if parentData.children|length %}parent-item{% endif %}" role="menuitem" data-parent-item>
+            <li class="{{ parentSelected }} {% if parentData.children|length %}parent-item{% endif %}" role="menuitem" data-parent-item>
 
                 {# These are nodes that doesn't actually exist
                  # They are a hybrid concoction of a variety of urls
                  #}
-                {% if parentUrl in ['lms', 'personalisation', 'eportfolio'] %}
+                {% if parentUrl in ['calendar', 'lms', 'personalisation', 'eportfolio'] %}
                     <a>{{ parentData.name }}</a>
                 {% else %}
                     <a href="/adminv2/{{ parentUrl }}">{{ parentData.name }}</a>
@@ -60,7 +60,15 @@
                 {% if parentData.children|length %}
                     <ul class="flyout" role="navigation" data-admin-subnav-flyout>
                         {% for childUrl, childData in parentData.children %}
-                            <li role="menuitem"><a href="/adminv2/{{ childUrl }}">{{ childData.name }}</a></li>
+                            {% set childSelected = '' %}
+
+                            {% if parentSelected|length %}
+                                {% if childData.identifier == subpageCurrent %}
+                                    {% set childSelected = 'active' %}
+                                {% endif %}
+                            {% endif %}
+
+                            <li class='{{ childSelected }}' role="menuitem"><a href="/adminv2/{{ childUrl }}">{{ childData.name }}</a></li>
                         {% endfor %}
                     </ul>
                 {% endif %}

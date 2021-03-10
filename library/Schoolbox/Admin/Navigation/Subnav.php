@@ -22,8 +22,17 @@ use Twig\Loader\FilesystemLoader;
 class Subnav
 {
 
+    /* Arbitrary strings that uniquely identify a page and its subpages
+     * Used to preselect menu options so users have a sense of where they are
+     * The strings can actually be anything, there's no particular format
+     */
     public const PARENT_HOME = 'home';
+
     public const PARENT_CALENDAR = 'calendar';
+    public const CHILD_CALENDAR_CLEANUP = 'Cleanup';
+    public const CHILD_CALENDAR_IMPORT = 'Import';
+    public const CHILD_CALENDAR_SUBSCRIBE = 'Subscribe';
+
     public const PARENT_ENGAGEMENT = 'engagement';
     public const PARENT_EPORTFOLIO = 'eportfolio';
     public const PARENT_FILTERS = 'filters';
@@ -85,16 +94,19 @@ class Subnav
                 'children' => [
                     'calendar/Cleanup' => [
                         'name' => 'Cleanup',
+                        'identifier' => self::CHILD_CALENDAR_CLEANUP,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'calendar/Import' => [
                         'name' => 'Import',
+                        'identifier' => self::CHILD_CALENDAR_IMPORT,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'calendar/Subscribe' => [
                         'name' => 'Subscribe',
+                        'identifier' => self::CHILD_CALENDAR_SUBSCRIBE,
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -107,51 +119,61 @@ class Subnav
                 'children' => [
                     'engagement/index/collaboration' => [
                         'name' => 'Collaboration',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/components' => [
                         'name' => 'Component Usage',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/dueWork' => [
                         'name' => 'Due Work',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/files' => [
                         'name' => 'Files',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/fileTypes' => [
                         'name' => 'File Types',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/links' => [
                         'name' => 'Links',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/login' => [
                         'name' => 'Login',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/mobile' => [
                         'name' => 'Mobile Apps',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/news' => [
                         'name' => 'News Posted',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/quiz' => [
                         'name' => 'Quizzes',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -164,11 +186,13 @@ class Subnav
                 'children' => [
                     'eportfolio' => [
                         'name' => 'Templates',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'eportfolio/deploy' => [
                         'name' => 'Deployment',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -220,41 +244,49 @@ class Subnav
                 'children' => [
                     'terms' => [
                         'name' => 'Academic Period',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'rollover' => [
                         'name' => 'Class Rollover',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'course-builder' => [
                         'name' => 'Course Builder',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Document+Management' => [
                         'name' => 'Document Management',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'grades' => [
                         'name' => 'Grades',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/LMS+Policy' => [
                         'name' => 'LMS Policy',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lti' => [
                         'name' => 'LTI Providers',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'rubric-results' => [
                         'name' => 'Rubrics',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -267,101 +299,121 @@ class Subnav
                 'children' => [
                     'lists/achievement-category' => [
                         'name' => 'Badge Categories',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/campus' => [
                         'name' => 'Campus',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/component-definition' => [
                         'name' => 'Components',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/webdav' => [
                         'name' => 'Drives',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/event-type' => [
                         'name' => 'Event Types',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/house' => [
                         'name' => 'Houses',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/evidence-tag' => [
                         'name' => 'Learning Moments',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/news-topic' => [
                         'name' => 'News Topics',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/pastoral-severity' => [
                         'name' => 'Pastoral Record Severity',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/pastoral-tags' => [
                         'name' => 'Pastoral Record Tags',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/pastoral-document-classification' => [
                         'name' => 'Pastoral SIS Document Classifications',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/pastoral-category' => [
                         'name' => 'Pastoral Sub-Types',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/pastoral-type' => [
                         'name' => 'Pastoral Types',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/residential-house' => [
                         'name' => 'Residential Houses',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/roles' => [
                         'name' => 'Roles',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/submission-errors' => [
                         'name' => 'Submission States',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/timetable-colour' => [
                         'name' => 'Timetable Colours',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/user-title' => [
                         'name' => 'User Titles',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/submission-type' => [
                         'name' => 'Work Types',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/year-levels' => [
                         'name' => 'Year Levels',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -374,21 +426,25 @@ class Subnav
                 'children' => [
                     'setting/Board+Leave' => [
                         'name' => 'Board Leave',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'feature-tours' => [
                         'name' => 'Feature Tours',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'package' => [
                         'name' => 'Packages',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Pastoral+Care' => [
                         'name' => 'Pastoral Care',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -407,16 +463,19 @@ class Subnav
                 'children' => [
                     'messages/apps' => [
                         'name' => 'Delivery Providers',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'messages/puush' => [
                         'name' => 'Mobile App Registrations',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'messages/configure' => [
                         'name' => 'Settings',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -429,31 +488,37 @@ class Subnav
                 'children' => [
                     'dashboard' => [
                         'name' => 'Dashboard',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'profile-button' => [
                         'name' => 'Profile Buttons',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'menu-side' => [
                         'name' => 'Side Menu',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Skin+Config' => [
                         'name' => 'Skin Config',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'terminology' => [
                         'name' => 'Terminology',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'menu-top' => [
                         'name' => 'Top Menu',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -466,26 +531,31 @@ class Subnav
                 'children' => [
                     'allowed-file' => [
                         'name' => 'Allowed File',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'video' => [
                         'name' => 'Media Queue',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Resources' => [
                         'name' => 'Settings',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'restore' => [
                         'name' => 'Restore',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'usage' => [
                         'name' => 'Usage',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -504,66 +574,79 @@ class Subnav
                 'children' => [
                     'setting/3rd+Party+Services' => [
                         'name' => '3rd Party Services',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Debugging' => [
                         'name' => 'Debugging',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Email' => [
                         'name' => 'Email',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/External+DB' => [
                         'name' => 'External DB',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/LDAP' => [
                         'name' => 'LDAP',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Localisation' => [
                         'name' => 'Localisation',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'oauth' => [
                         'name' => 'oAuth Provider Configuration',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Paths' => [
                         'name' => 'Paths',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Policy' => [
                         'name' => 'Policy',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Proxy' => [
                         'name' => 'Proxy',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/SAML' => [
                         'name' => 'SAML',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Security' => [
                         'name' => 'Security',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Site' => [
                         'name' => 'Site',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -576,26 +659,31 @@ class Subnav
                 'children' => [
                     'reports/activity/all' => [
                         'name' => 'Activity Report',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'user/bulk/modify' => [
                         'name' => 'Bulk Modify',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'reports/login/all' => [
                         'name' => 'Login Log',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'shaps' => [
                         'name' => 'Schoolbox Help Provisioning',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     'ups' => [
                         'name' => 'User Provisioning System',
+                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -609,13 +697,14 @@ class Subnav
      * Render the self-contained subnav as a purely html fragment
      * so you can slam it straight into a phplib sigh
      *
-     * @param string|null $pageCurrent
+     * @param string      $pageCurrent
+     * @param string|null $subpageCurrent
      * @return string
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function generateHtml(?string $pageCurrent): string
+    public function generateHtml(string $pageCurrent, ?string $subpageCurrent): string
     {
         $paths[] = SITE_root . '/library/Schoolbox/Admin/Navigation/templates';
 
@@ -633,7 +722,8 @@ class Subnav
 
         return $twig->render('subnav.twig', [
             'adminSubnav' => $this->generate(),
-            'pageCurrent' => $pageCurrent
+            'pageCurrent' => $pageCurrent,
+            'subpageCurrent' => (string)$subpageCurrent
         ]);
     }
 
@@ -642,15 +732,16 @@ class Subnav
      * Shank the html menu directly into a phplib
      *
      * @param \Sitepage   $page
-     * @param string|null $pageCurrent
+     * @param string      $pageCurrent
+     * @param string|null $subpageCurrent
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function generatePhplib(\Sitepage $page, ?string $pageCurrent): void
+    public function generatePhplib(\Sitepage $page, string $pageCurrent, ?string $subpageCurrent): void
     {
         $page->setVar([
-            'ADMIN_NAV' => $this->generateHtml($pageCurrent)
+            'ADMIN_NAV' => $this->generateHtml($pageCurrent, $subpageCurrent)
         ]);
     }
 }

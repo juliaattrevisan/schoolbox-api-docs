@@ -10,12 +10,18 @@ if (!$_SESSION['user']->isSuperuser()) {
     error(19, "", 401);
 }
 
+if ($this->arg[0]) {
+    $selectedType = urldecode($this->arg[0]);
+} else {
+    $selectedType = 'Import';
+}
+
 /** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'adminv2/calendar.html');
 $this->setTitle('Admin - Calendar');
 
 // include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_CALENDAR);
+(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_CALENDAR, $selectedType);
 
 $userHandler = new User();
 
@@ -68,11 +74,7 @@ $this->setVar('cleanup_has_events_block', '');
 $this->setVar('cleanup_has_no_events_block', '');
 $this->setVar('cleanup_event_block', '');
 
-if ($this->arg[0]) {
-    $selectedType = urldecode($this->arg[0]);
-} else {
-    $selectedType = 'Import';
-}
+
 
 $typeList = [
     ['type' => 'Import'],
