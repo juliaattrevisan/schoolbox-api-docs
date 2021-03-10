@@ -9,6 +9,7 @@ namespace Schoolbox\Filter;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
@@ -104,7 +105,8 @@ class Controller extends BaseController
             'showCourseMarkbook' => $this->getConfigLoader()->get('course_markbook_enable'),
             'ENTITY_ASSESSMENTS' => Assessment\Mapper::class,
             'ENTITY_BADGES'      => Badge\Mapper::class,
-            'pageCurrent'        => basename($this->getRequest()->query->get('page')),
+            'pageCurrent'        => Subnav::PARENT_FILTERS,
+            'subpageCurrent'     => null
         ])->setTitle('Filterable pages'));
     }
 
