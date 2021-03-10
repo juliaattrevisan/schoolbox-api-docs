@@ -56,10 +56,7 @@ class Controller extends ConfigController
 
         /* Settings are now recategorised by the feature to which they are relevant
          */
-        echo $typeLabel;
-
-        $pageCurrent = '';
-        $subpageCurrent = '';
+        new \Alaress_Probe($typeLabel);
 
         switch ($typeLabel) {
             case 'Document Management':
@@ -74,6 +71,7 @@ class Controller extends ConfigController
 
             case 'Modules':
                 $pageCurrent = Subnav::PARENT_MODULES;
+                $subpageCurrent = '';
                 break;
 
             case 'Board Leave':
@@ -97,21 +95,68 @@ class Controller extends ConfigController
                 break;
 
             case '3rd Party Services':
+                $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
+                $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_3RD_PARTY;
+                break;
+
             case 'Debugging':
+                $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
+                $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_DEBUGGING;
+                break;
+
             case 'Email':
+                $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
+                $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_EMAIL;
+                break;
+
             case 'External DB':
+                $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
+                $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_EXTERNAL_DB;
+                break;
+
             case 'LDAP':
+                $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
+                $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_LDAP;
+                break;
+
             case 'Localisation':
+                $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
+                $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_LOCALISATION;
+                break;
+
             case 'Paths':
+                $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
+                $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_PATHS;
+                break;
+
             case 'Policy':
+                $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
+                $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_POLICY;
+                break;
+
+            case 'Proxy':
+                $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
+                $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_PROXY;
+                break;
+
             case 'SAML':
+                $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
+                $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_SAML;
+                break;
+
             case 'Security':
+                $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
+                $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_SECURITY;
+                break;
+
             case 'Site':
                 $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
+                $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_SITE;
                 break;
 
             default:
                 $pageCurrent = 'setting';
+                $subpageCurrent = '';
                 break;
         }
 

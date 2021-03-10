@@ -129,7 +129,22 @@ class Subnav
     public const CHILD_RESOURCES_USAGE = 'usage';
 
     public const PARENT_SUDS = 'import/schoolDataImport';
+
     public const PARENT_SYSTEM_SETTINGS = 'systemSettings';
+    public const CHILD_SYSTEM_SETTINGS_3RD_PARTY = 'thirdParty';
+    public const CHILD_SYSTEM_SETTINGS_DEBUGGING = 'debugging';
+    public const CHILD_SYSTEM_SETTINGS_EMAIL = 'email';
+    public const CHILD_SYSTEM_SETTINGS_EXTERNAL_DB = 'externalDb';
+    public const CHILD_SYSTEM_SETTINGS_LDAP = 'ldap';
+    public const CHILD_SYSTEM_SETTINGS_LOCALISATION = 'localisation';
+    public const CHILD_SYSTEM_SETTINGS_OAUTH = 'oauth';
+    public const CHILD_SYSTEM_SETTINGS_PATHS = 'paths';
+    public const CHILD_SYSTEM_SETTINGS_POLICY = 'policy';
+    public const CHILD_SYSTEM_SETTINGS_PROXY = 'proxy';
+    public const CHILD_SYSTEM_SETTINGS_SAML = 'saml';
+    public const CHILD_SYSTEM_SETTINGS_SECURITY = 'security';
+    public const CHILD_SYSTEM_SETTINGS_SITE = 'site';
+
     public const PARENT_USER_MANAGEMENT = 'userManagement';
 
 
@@ -662,79 +677,79 @@ class Subnav
                 'children' => [
                     'setting/3rd+Party+Services' => [
                         'name' => '3rd Party Services',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_SYSTEM_SETTINGS_3RD_PARTY,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Debugging' => [
                         'name' => 'Debugging',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_SYSTEM_SETTINGS_DEBUGGING,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Email' => [
                         'name' => 'Email',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_SYSTEM_SETTINGS_EMAIL,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/External+DB' => [
                         'name' => 'External DB',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_SYSTEM_SETTINGS_EXTERNAL_DB,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/LDAP' => [
                         'name' => 'LDAP',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_SYSTEM_SETTINGS_LDAP,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Localisation' => [
                         'name' => 'Localisation',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_SYSTEM_SETTINGS_LOCALISATION,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'oauth' => [
                         'name' => 'oAuth Provider Configuration',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_SYSTEM_SETTINGS_OAUTH,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Paths' => [
                         'name' => 'Paths',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_SYSTEM_SETTINGS_PATHS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Policy' => [
                         'name' => 'Policy',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_SYSTEM_SETTINGS_POLICY,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Proxy' => [
                         'name' => 'Proxy',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_SYSTEM_SETTINGS_PROXY,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/SAML' => [
                         'name' => 'SAML',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_SYSTEM_SETTINGS_SAML,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Security' => [
                         'name' => 'Security',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_SYSTEM_SETTINGS_SECURITY,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Site' => [
                         'name' => 'Site',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_SYSTEM_SETTINGS_SITE,
                         'visible' =>  true,
                         'children' => []
                     ],
