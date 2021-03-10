@@ -76,7 +76,21 @@ class Controller extends ConfigController
             case 'Resources':
                 $pageCurrent = Subnav::PARENT_RESOURCES;
                 break;
-                
+
+            case '3rd Party Services':
+            case 'Debugging':
+            case 'Email':
+            case 'External DB':
+            case 'LDAP':
+            case 'Localisation':
+            case 'Paths':
+            case 'Policy':
+            case 'SAML':
+            case 'Security':
+            case 'Site':
+                $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
+                break;
+
             default:
                 $pageCurrent = 'setting';
                 break;

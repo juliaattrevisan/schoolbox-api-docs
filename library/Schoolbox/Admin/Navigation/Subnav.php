@@ -36,6 +36,7 @@ class Subnav
     public const PARENT_PERSONALISATION = 'personalisation';
     public const PARENT_RESOURCES = 'resources';
     public const PARENT_SUDS = 'import/schoolDataImport';
+    public const PARENT_SYSTEM_SETTINGS = 'systemSettings';
 
     /**
      * For access to booleans that determine availability/visibility of certain menu
@@ -496,7 +497,7 @@ class Subnav
             ],
             'setting' => [
                 'name' => 'System Settings',
-                'identifier' => '',
+                'identifier' => self::PARENT_SYSTEM_SETTINGS,
                 'visible' =>  true,
                 'children' => [
                     'setting/3rd+Party+Services' => [
@@ -530,7 +531,7 @@ class Subnav
                         'children' => []
                     ],
                     'oauth' => [
-                        'name' => 'oAuth',
+                        'name' => 'oAuth Provider Configuration',
                         'visible' =>  true,
                         'children' => []
                     ],

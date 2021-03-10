@@ -9,10 +9,12 @@
     [ 'oAuth Provider Configuration', routeLookup('adminOauth.getAdmin') ]
 ) }}
 
-<div class="row">
-    <div class="island small-12">
-        <h1>oAuth Provider Configuration</h1>
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        {% include '@settings/moduleConfig.twig' with configContext only %}
     </div>
 </div>
-
-{% include '@settings/moduleConfig.twig' with configContext only %}
