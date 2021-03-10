@@ -8,6 +8,7 @@
 namespace Schoolbox\Admin\Menu\Side;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\GenericCollection;
 use Schoolbox\Menu\Side\Campus\Mapper as MenuSideCampusMapper;
 use \Schoolbox\Menu\Side\Role\Mapper as MenuSideRoleMapper;
@@ -29,7 +30,6 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class Controller extends Base
 {
-    const PAGE_CURRENT = 'menu-side';
 
     /** @var MenuSideMapper $menuSideMapper */
     private $menuSideMapper;
@@ -112,7 +112,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminMenuSide/index.twig',
             'data' => [
-                'pageCurrent' => self::PAGE_CURRENT,
+                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
                 'tree' => $treeList,
                 'sections' => $sections,
                 'configTitle' => $this->getConfigLoader()->get('title'),
@@ -198,7 +198,7 @@ class Controller extends Base
             'template' => '@adminMenuSide/modify.twig',
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
-                'pageCurrent' => self::PAGE_CURRENT,
+                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
                 'item' => $this->getMenuSideMapper()->findById($id),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'rolesSelected' => $rolesSelected,
@@ -221,7 +221,7 @@ class Controller extends Base
             'template' => '@adminMenuSide/modify.twig',
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
-                'pageCurrent' => self::PAGE_CURRENT,
+                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
             ],

@@ -69,6 +69,10 @@ class Controller extends ConfigController
                 $pageCurrent = Subnav::PARENT_MODULES;
                 break;
 
+            case 'Skin Config':
+                $pageCurrent = Subnav::PARENT_PERSONALISATION;
+                break;
+
             default:
                 $pageCurrent = 'setting';
                 break;

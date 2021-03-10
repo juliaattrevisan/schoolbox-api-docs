@@ -8,13 +8,12 @@
 namespace Schoolbox\Admin\Terminology;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\L10n\Mapper as L10nMapper;
-use Schoolbox\L10n\Model as L10n;
 
 class Controller extends Base
 {
-    const PAGE_CURRENT = 'terminology';
 
     /**
      * @var L10nMapper
@@ -37,7 +36,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminTerminology/index.twig',
             'data'     => [
-                'pageCurrent' => self::PAGE_CURRENT,
+                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
                 'terms' => $this->l10nMapper->findAll()
             ],
             'title' => 'Admin - Terminology'

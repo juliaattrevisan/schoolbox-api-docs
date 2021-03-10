@@ -33,6 +33,7 @@ class Subnav
     public const PARENT_LMS = 'lms';
     public const PARENT_MESSAGES = 'messages';
     public const PARENT_MODULES = 'Modules';
+    public const PARENT_PERSONALISATION = 'personalisation';
 
     /**
      * For access to booleans that determine availability/visibility of certain menu
@@ -418,7 +419,7 @@ class Subnav
             ],
             'personalisation' => [
                 'name' => 'Personalisation',
-                'identifier' => '',
+                'identifier' => self::PARENT_PERSONALISATION,
                 'visible' =>  true,
                 'children' => [
                     'dashboard' => [

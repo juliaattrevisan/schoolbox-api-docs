@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Button;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Collection;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -19,7 +20,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  */
 class Controller extends Base
 {
-    private const PAGE_CURRENT = 'profile-button';
 
     /** @var ErrorMapper $errorMapper */
     private $errorMapper;
@@ -117,7 +117,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/index.twig',
             'data'     => [
-                'pageCurrent' => self::PAGE_CURRENT,
+                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
                 'profile' => $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
@@ -162,7 +162,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/modify.twig',
             'data' => [
-                'pageCurrent' => self::PAGE_CURRENT,
+                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
                 'item' => $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [ 'cache' => false ]),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
@@ -189,7 +189,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/modify.twig',
             'data'     => [
-                'pageCurrent' => self::PAGE_CURRENT,
+                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc')
