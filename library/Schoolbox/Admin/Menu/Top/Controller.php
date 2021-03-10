@@ -71,6 +71,7 @@ class Controller extends Base
             'template' => '@adminMenuTop/index.twig',
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
+                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_TOP_MENU,
                 'menu' => $this->getMenuTopMapper()->findByColumn('plan_hide', 0, ['order' => ['sort_order' => BaseMapper::SORT_ORDER_ASC]])
             ],
             'title' => 'Admin - Top Menu'
@@ -112,6 +113,7 @@ class Controller extends Base
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
+                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_TOP_MENU,
                 'item' => $this->getMenuTopMapper()->findOneByColumn($this->getMenuTopMapper()->getIdentifierColumn(), $id, ['cache' => false]),
                 'icons' => $this->getMenuIconMapper()->findAll(['order' => ['title' => BaseMapper::SORT_ORDER_ASC]]),
                 'roles' => $this->getRoleMapper()->findAll(['order' => ['sequence' => BaseMapper::SORT_ORDER_ASC]]),
@@ -136,6 +138,7 @@ class Controller extends Base
             'template' => '@adminMenuTop/modify.twig',
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
+                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_TOP_MENU,
                 'icons' => $this->getMenuIconMapper()->findAll(['order' => ['title' => BaseMapper::SORT_ORDER_ASC]]),
                 'roles' => $this->getRoleMapper()->findAll(['order' => ['sequence' => BaseMapper::SORT_ORDER_ASC]]),
                 'campuses' => $this->getCampusMapper()->findAll(['order' => ['sequence' => BaseMapper::SORT_ORDER_ASC]])

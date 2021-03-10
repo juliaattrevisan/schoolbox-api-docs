@@ -37,6 +37,7 @@ class Controller extends Base
             'template' => '@adminTerminology/index.twig',
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
+                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_TERMINOLOGY,
                 'terms' => $this->l10nMapper->findAll()
             ],
             'title' => 'Admin - Terminology'

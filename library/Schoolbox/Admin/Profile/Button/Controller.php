@@ -118,6 +118,7 @@ class Controller extends Base
             'template' => '@adminProfileButton/index.twig',
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
+                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS,
                 'profile' => $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),

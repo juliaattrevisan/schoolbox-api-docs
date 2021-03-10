@@ -88,6 +88,7 @@ class Controller extends ConfigController
 
             case 'Skin Config':
                 $pageCurrent = Subnav::PARENT_PERSONALISATION;
+                $subpageCurrent = Subnav::CHILD_PERSONALISATION_SKIN_CONFIG;
                 break;
 
             case 'Resources':

@@ -114,6 +114,13 @@ class Subnav
     public const CHILD_MESSAGES_SETTINGS = 'settings';
 
     public const PARENT_PERSONALISATION = 'personalisation';
+    public const CHILD_PERSONALISATION_DASHBOARD = 'dashboard';
+    public const CHILD_PERSONALISATION_PROFILE_BUTTONS = 'profileButtons';
+    public const CHILD_PERSONALISATION_SIDE_MENU = 'sideMenu';
+    public const CHILD_PERSONALISATION_SKIN_CONFIG = 'skinConfig';
+    public const CHILD_PERSONALISATION_TERMINOLOGY = 'terminology';
+    public const CHILD_PERSONALISATION_TOP_MENU = 'topMenu';
+
     public const PARENT_RESOURCES = 'resources';
     public const PARENT_SUDS = 'import/schoolDataImport';
     public const PARENT_SYSTEM_SETTINGS = 'systemSettings';
@@ -563,37 +570,37 @@ class Subnav
                 'children' => [
                     'dashboard' => [
                         'name' => 'Dashboard',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_PERSONALISATION_DASHBOARD,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'profile-button' => [
                         'name' => 'Profile Buttons',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_PERSONALISATION_PROFILE_BUTTONS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'menu-side' => [
                         'name' => 'Side Menu',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_PERSONALISATION_SIDE_MENU,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'setting/Skin+Config' => [
                         'name' => 'Skin Config',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_PERSONALISATION_SKIN_CONFIG,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'terminology' => [
                         'name' => 'Terminology',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_PERSONALISATION_TERMINOLOGY,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'menu-top' => [
                         'name' => 'Top Menu',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_PERSONALISATION_TOP_MENU,
                         'visible' =>  true,
                         'children' => []
                     ],

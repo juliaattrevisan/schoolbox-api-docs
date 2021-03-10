@@ -113,6 +113,7 @@ class Controller extends Base
             'template' => '@adminMenuSide/index.twig',
             'data' => [
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
+                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_SIDE_MENU,
                 'tree' => $treeList,
                 'sections' => $sections,
                 'configTitle' => $this->getConfigLoader()->get('title'),
@@ -199,6 +200,7 @@ class Controller extends Base
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
+                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_SIDE_MENU,
                 'item' => $this->getMenuSideMapper()->findById($id),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'rolesSelected' => $rolesSelected,
@@ -222,6 +224,7 @@ class Controller extends Base
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
+                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_SIDE_MENU,
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
             ],
