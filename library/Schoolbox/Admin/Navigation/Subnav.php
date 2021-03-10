@@ -25,6 +25,10 @@ class Subnav
     /* Arbitrary strings that uniquely identify a page and its subpages
      * Used to preselect menu options so users have a sense of where they are
      * The strings can actually be anything, there's no particular format
+     *
+     * Although, sometimes controllers get these values from a url parameter
+     * and won't be explicitly stated as one of these consts, so be mindful
+     * that there are multiple ways to match these identifiers
      */
     public const PARENT_HOME = 'home';
 
@@ -34,6 +38,17 @@ class Subnav
     public const CHILD_CALENDAR_SUBSCRIBE = 'Subscribe';
 
     public const PARENT_ENGAGEMENT = 'engagement';
+    public const CHILD_ENGAGEMENT_COLLABORATION = 'collaboration';
+    public const CHILD_ENGAGEMENT_COMPONENT_USAGE = 'components';
+    public const CHILD_ENGAGEMENT_DUE_WORK = 'dueWork';
+    public const CHILD_ENGAGEMENT_FILES = 'files';
+    public const CHILD_ENGAGEMENT_FILETYPES = 'fileTypes';
+    public const CHILD_ENGAGEMENT_LINKS = 'links';
+    public const CHILD_ENGAGEMENT_LOGIN = 'login';
+    public const CHILD_ENGAGEMENT_MOBILE_APPS = 'mobile';
+    public const CHILD_ENGAGEMENT_NEWS_POSTED = 'news';
+    public const CHILD_ENGAGEMENT_QUIZZES = 'quiz';
+
     public const PARENT_EPORTFOLIO = 'eportfolio';
     public const PARENT_FILTERS = 'filters';
     public const PARENT_HOMEPAGE = 'homepage';
@@ -119,61 +134,61 @@ class Subnav
                 'children' => [
                     'engagement/index/collaboration' => [
                         'name' => 'Collaboration',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_ENGAGEMENT_COLLABORATION,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/components' => [
                         'name' => 'Component Usage',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_ENGAGEMENT_COMPONENT_USAGE,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/dueWork' => [
                         'name' => 'Due Work',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_ENGAGEMENT_DUE_WORK,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/files' => [
                         'name' => 'Files',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_ENGAGEMENT_FILES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/fileTypes' => [
                         'name' => 'File Types',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_ENGAGEMENT_FILETYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/links' => [
                         'name' => 'Links',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_ENGAGEMENT_LINKS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/login' => [
                         'name' => 'Login',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_ENGAGEMENT_LOGIN,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/mobile' => [
                         'name' => 'Mobile Apps',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_ENGAGEMENT_MOBILE_APPS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/news' => [
                         'name' => 'News Posted',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_ENGAGEMENT_NEWS_POSTED,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'engagement/index/quiz' => [
                         'name' => 'Quizzes',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_ENGAGEMENT_QUIZZES,
                         'visible' =>  true,
                         'children' => []
                     ],

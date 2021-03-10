@@ -7,9 +7,6 @@ if (!$_SESSION['user']->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'adminv2/engagement/index.html');
 $this->setTitle('Admin - Engagement');
 
-// include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_ENGAGEMENT);
-
 $validPages = array('dueWork','quiz','files', 'links','fileTypes','news','collaboration','login','components','mobile');
 
 /* Setup period **/
@@ -36,6 +33,9 @@ if(in_array($this->arg[0],$validPages)) {
 else {
     $page = 'collaboration';
 }
+
+// include the admin navigation
+(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_ENGAGEMENT, $page);
 
 $this->setVar(array(
     'CURRENT_PAGE'              => $page,
