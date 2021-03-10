@@ -54,8 +54,15 @@ class Subnav
     public const CHILD_EPORTFOLIO_DEPLOYMENT = 'deployment';
 
     public const PARENT_FILTERS = 'filters';
+
     public const PARENT_HOMEPAGE = 'homepage';
+
     public const PARENT_IMPORT = 'import/directImport';
+    public const CHILD_IMPORT_PAGES = 'pages';
+    public const CHILD_IMPORT_PASTORAL_CARE = 'pastoralCare';
+    public const CHILD_IMPORT_PORTRAIT = 'portrait';
+    public const CHILD_IMPORT_USER_ACCOUNTS = 'userAccounts';
+
     public const PARENT_LISTS = 'lists';
     public const PARENT_LMS = 'lms';
     public const PARENT_MESSAGES = 'messages';
@@ -235,21 +242,25 @@ class Subnav
                 'children' => [
                     'import/folder' => [
                         'name' => 'Pages',
+                        'identifier' => self::CHILD_IMPORT_PAGES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'import/pastoral' => [
                         'name' => 'Pastoral Care',
+                        'identifier' => self::CHILD_IMPORT_PASTORAL_CARE,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'import/photos/upload' => [
                         'name' => 'Portrait Photos',
+                        'identifier' => self::CHILD_IMPORT_PORTRAIT,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'import/userAccount' => [
                         'name' => 'User Accounts',
+                        'identifier' => self::CHILD_IMPORT_USER_ACCOUNTS,
                         'visible' =>  true,
                         'children' => []
                     ],

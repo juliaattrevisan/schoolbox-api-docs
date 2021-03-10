@@ -13,6 +13,7 @@ use InvalidArgumentException;
 use PDOException;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\INavigation;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Application;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
@@ -97,6 +98,8 @@ class Controller extends Base
             [
                 'template' => '@adminImportFolder/index.twig',
                 'data' => [
+                    'pageCurrent' => Subnav::PARENT_IMPORT,
+                    'subpageCurrent' => Subnav::CHILD_IMPORT_PAGES,
                     'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
                     'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), 'adminImportFolder')->getAllNodes(),
                     'templates' => $this->homepageTemplateMapper->findAll()->sortBy('name', 'asc'),

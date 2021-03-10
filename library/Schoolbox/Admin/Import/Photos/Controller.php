@@ -9,6 +9,7 @@ namespace Schoolbox\Admin\Import\Photos;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\INavigation;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -179,6 +180,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminImportPhotos/index.twig',
             'data' => [
+                'pageCurrent' => Subnav::PARENT_IMPORT,
+                'subpageCurrent' => Subnav::CHILD_IMPORT_PORTRAIT,
                 'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
                 'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
                 'attachzone' => $this->getAttachZone(),

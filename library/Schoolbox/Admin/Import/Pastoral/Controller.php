@@ -11,6 +11,7 @@ use Exception;
 use External_Pastoral;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\INavigation;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -69,6 +70,8 @@ class Controller extends Base
             [
                 'template' => '@adminImportPastoral/index.twig',
                 'data'     => [
+                    'pageCurrent' => Subnav::PARENT_IMPORT,
+                    'subpageCurrent' => Subnav::CHILD_IMPORT_PASTORAL_CARE,
                     'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
                     'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
                     'externalEnabled' => $this->getConfigLoader()->get("external_pastoral"),
@@ -85,6 +88,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminImportPastoral/log.twig',
             'data'     => [
+                'pageCurrent' => Subnav::PARENT_IMPORT,
+                'subpageCurrent' => Subnav::CHILD_IMPORT_PASTORAL_CARE,
                 'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
                 'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
                 'logs'           => $this->getPastoralLogMapper()->findImportIds(),
@@ -102,6 +107,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminImportPastoral/logDetail.twig',
             'data'     => [
+                'pageCurrent' => Subnav::PARENT_IMPORT,
+                'subpageCurrent' => Subnav::CHILD_IMPORT_PASTORAL_CARE,
                 'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
                 'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
                 'log'            => $log,
@@ -133,6 +140,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template'   => '@adminImportPastoral/log.twig',
             'data'       => [
+                'pageCurrent' => Subnav::PARENT_IMPORT,
+                'subpageCurrent' => Subnav::CHILD_IMPORT_PASTORAL_CARE,
                 'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
                 'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
                 'logs'           => $this->getPastoralLogMapper()->findImportIds(),

@@ -52,6 +52,7 @@ class Controller extends ConfigController
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/direct/index.twig', [
             'pageCurrent' => 'import/directImport',
+            'subpageCurrent' => null,
             'allNavigation'  => (new Direct($this->getConfigLoader()))->buildNavigation($this->getRouter())->getAllNodes()
         ])->setTitle('Direct Import'));
     }
