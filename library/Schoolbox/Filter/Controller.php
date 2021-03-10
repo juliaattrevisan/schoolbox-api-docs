@@ -151,6 +151,8 @@ class Controller extends BaseController
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/settings.twig', [
             'page'               => $page,
+            'pageCurrent'        => Subnav::PARENT_FILTERS,
+            'subpageCurrent'     => null,
             'definitions'        => $definitions,
             'pageFilters'        => $pageFilters,
             'roleTypes'          => $roleTypes,
