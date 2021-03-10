@@ -18,8 +18,7 @@ $this->setBlock('file', 'enabled', 'enabled_block');
 $this->setBlock(TEMPLATE_content, 'image', 'image_block');
 
 // include the admin navigation
-$nav = new AdminV2_Nav($this->getDi()->get('config'));
-$nav->parse($this, 'allowed-file');
+(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,'allowed-file');
 
 /** @var Collection|Mimetype[] $mimes */
 $mimes = MimetypeMapper::getInstance()->findAll([ 'deleted' => false, 'order' => [ 'mime' => 'asc' ] ]);

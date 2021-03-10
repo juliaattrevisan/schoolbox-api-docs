@@ -15,8 +15,7 @@ $this->setFile(TEMPLATE_content, 'adminv2/calendar.html');
 $this->setTitle('Admin - Calendar');
 
 // include the admin navigation
-$nav = new AdminV2_Nav($this->getDi()->get('config'));
-$nav->parse($this, 'calendar');
+(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,'calendar');
 
 $userHandler = new User();
 

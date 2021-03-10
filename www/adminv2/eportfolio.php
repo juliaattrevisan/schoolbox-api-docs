@@ -27,8 +27,7 @@ $this->setBlock('layout', 'position_right', 'position_right_block');
 $this->setBlock(TEMPLATE_content, 'component', 'component_block');
 
 // include the admin navigation
-$nav = new AdminV2_Nav($this->getDi()->get('config'));
-$nav->parse($this, 'eportfolio');
+(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,'eportfolio');
 
 // Get list of templates
 $templateHandler = new EportfolioTemplate();

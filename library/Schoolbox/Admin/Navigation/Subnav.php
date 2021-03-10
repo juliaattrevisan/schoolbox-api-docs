@@ -8,6 +8,8 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Navigation;
 
 use Schoolbox\IConfigLoader;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 
 /**
@@ -140,12 +142,12 @@ class Subnav
                 'name' => 'ePortfolio',
                 'visible' =>  true,
                 'children' => [
-                    'ePortfolio' => [
+                    'eportfolio' => [
                         'name' => 'Templates',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'ePortfolio/deploy' => [
+                    'eportfolio/deploy' => [
                         'name' => 'Deployment',
                         'visible' =>  true,
                         'children' => []
@@ -567,5 +569,54 @@ class Subnav
                 ]
             ],
         ];
+    }
+
+
+    /**
+     * Render the self-contained subnav as a purely html fragment
+     * so you can slam it straight into a phplib sigh
+     *
+     * @param string|null $pageCurrent
+     * @return string
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function generateHtml(?string $pageCurrent): string
+    {
+        $paths[] = SITE_root . '/library/Schoolbox/Admin/Navigation/templates';
+
+        $options = [
+            'debug'            => $this->configLoader->get('debug_templates'),
+            'strict_variables' => $this->configLoader->get('strict_templates'),
+        ];
+
+        // do not cache when in debug mode
+        if (!$this->configLoader->get('debug_mode')) {
+            $options['cache'] = $this->configLoader->get('twig_cache_dir');
+        }
+
+        $twig = new Environment(new FilesystemLoader($paths), $options);
+
+        return $twig->render('subnav.twig', [
+            'adminSubnav' => $this->generate($pageCurrent)
+        ]);
+    }
+
+
+    /**
+     * Shank the html menu directly into a phplib
+     *
+     * @param \Sitepage   $page
+     * @param string|null $pageCurrent
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function generatePhplib(\Sitepage $page, ?string $pageCurrent): void
+    {
+        $page->setVar([
+            'ADMIN_NAV' => $this->generateHtml($pageCurrent)
+        ]);
     }
 }
