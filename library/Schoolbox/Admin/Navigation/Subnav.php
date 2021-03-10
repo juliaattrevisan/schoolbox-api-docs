@@ -37,6 +37,8 @@ class Subnav
     public const PARENT_RESOURCES = 'resources';
     public const PARENT_SUDS = 'import/schoolDataImport';
     public const PARENT_SYSTEM_SETTINGS = 'systemSettings';
+    public const PARENT_USER_MANAGEMENT = 'userManagement';
+
 
     /**
      * For access to booleans that determine availability/visibility of certain menu
@@ -569,7 +571,7 @@ class Subnav
             ],
             'user' => [
                 'name' => 'User Management',
-                'identifier' => 'user',
+                'identifier' => self::PARENT_USER_MANAGEMENT,
                 'visible' =>  true,
                 'children' => [
                     'reports/activity/all' => [

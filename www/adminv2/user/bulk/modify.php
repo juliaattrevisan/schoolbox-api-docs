@@ -16,6 +16,9 @@ if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
 
 $this->setFile(TEMPLATE_content, 'adminv2/user/bulk/modify.html');
 
+// include the admin navigation
+(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_USER_MANAGEMENT);
+
 /* Search options
  */
 $this->setBlock(TEMPLATE_content, 'search_campus', 'search_campus_block');
