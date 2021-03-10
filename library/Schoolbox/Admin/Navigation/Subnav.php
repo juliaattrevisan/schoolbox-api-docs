@@ -32,6 +32,8 @@ class Subnav
      */
     public const PARENT_HOME = 'home';
 
+    /* These are derived from a url param
+     */
     public const PARENT_CALENDAR = 'calendar';
     public const CHILD_CALENDAR_CLEANUP = 'Cleanup';
     public const CHILD_CALENDAR_IMPORT = 'Import';
