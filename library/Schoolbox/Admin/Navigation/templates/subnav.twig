@@ -2,10 +2,12 @@
  # subnav
  #
  # Render the Admin subnav independently of everything else via Subnav.php
+ # This is purely the menu only, it doesn't include the heading for the page
+ # you're currently viewing; you get that by combining this with index.twig
+ # via renderAdminNavigation() twig extension
  #
  # @param array adminSubnav
  #}
-
 <script type="text/javascript">
     $(function() {
         const mq = window.matchMedia( "(max-width: 950px)" );
@@ -38,7 +40,7 @@
                  # Personalisation is a node that doesn't actually exist
                  #
                  # They are a hybrid concoction of a variety of urls
-                #}
+                 #}
                 {% if parentUrl in ['lms', 'personalisation'] %}
                     <a>{{ parentData.name }}</a>
                 {% else %}
