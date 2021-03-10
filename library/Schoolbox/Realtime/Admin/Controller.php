@@ -184,7 +184,8 @@ class Controller extends BaseController
         }
 
         $data = [
-            'pageCurrent' => 'messages',
+            'pageCurrent' => Subnav::PARENT_MESSAGES,
+            'subpageCurrent' => Subnav::CHILD_MESSAGES_DELIVERY_PROVIDERS,
             'apps'        => $apps,
             'attachzones' => $zones,
             'providers'   => [
@@ -342,6 +343,7 @@ class Controller extends BaseController
             'template' => '@adminMessages/configure.twig',
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_MESSAGES,
+                'subpageCurrent' => Subnav::CHILD_MESSAGES_SETTINGS,
                 'filters' => $filters,
                 'roles'   => $roles,
                 'ns'      => $ns,
@@ -477,7 +479,8 @@ class Controller extends BaseController
         $content = [
             'template' => '@adminMessages/puush.twig',
             'data'     => [
-                'pageCurrent' => Subnav::PARENT_MESSAGES
+                'pageCurrent' => Subnav::PARENT_MESSAGES,
+                'subpageCurrent' => Subnav::CHILD_MESSAGES_APP_REGISTRATIONS
             ],
         ];
 

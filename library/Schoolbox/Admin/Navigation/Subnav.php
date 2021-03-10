@@ -107,6 +107,10 @@ class Subnav
     public const CHILD_MODULES_PASTORAL_CARE = 'pastoralCare';
 
     public const PARENT_MESSAGES = 'messages';
+    public const CHILD_MESSAGES_DELIVERY_PROVIDERS = 'deliveryProviders';
+    public const CHILD_MESSAGES_APP_REGISTRATIONS = 'mobileAppRegistrations';
+    public const CHILD_MESSAGES_SETTINGS = 'settings';
+
     public const PARENT_PERSONALISATION = 'personalisation';
     public const PARENT_RESOURCES = 'resources';
     public const PARENT_SUDS = 'import/schoolDataImport';
@@ -532,19 +536,19 @@ class Subnav
                 'children' => [
                     'messages/apps' => [
                         'name' => 'Delivery Providers',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_MESSAGES_DELIVERY_PROVIDERS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'messages/puush' => [
                         'name' => 'Mobile App Registrations',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_MESSAGES_APP_REGISTRATIONS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'messages/configure' => [
                         'name' => 'Settings',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_MESSAGES_SETTINGS,
                         'visible' =>  true,
                         'children' => []
                     ],
