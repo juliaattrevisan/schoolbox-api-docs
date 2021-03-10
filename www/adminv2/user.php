@@ -18,7 +18,7 @@ $this->setBlock(TEMPLATE_content, 'superusers', 'superusers_block');
 $this->setBlock(TEMPLATE_content, 'service', 'service_block');
 
 // include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_USER_MANAGEMENT);
+(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_USER_MANAGEMENT, null);
 
 $userHandler = new User();
 

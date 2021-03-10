@@ -24,10 +24,6 @@ $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
 $this->setBlock(TEMPLATE_content, 'filter', 'filter_block');
 $this->setBlock(TEMPLATE_content, 'download_report', 'download_report_block');
 $this->setVar('filter_block', '');
-
-// include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_USER_MANAGEMENT);
-
 $this->setTitle('Admin - Reports');
 
 if(count($this->arg) < 2) {
@@ -78,6 +74,10 @@ else {
         $page = $this->arg[4];
     }
 }
+
+// include the admin navigation
+(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_USER_MANAGEMENT, $reportType);
+
 
 /* Don't worry about bounds checking here - the implementation takes care of it */
 

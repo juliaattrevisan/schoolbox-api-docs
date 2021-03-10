@@ -93,6 +93,7 @@ class Controller extends Base
             'template' => '@upsRuleset/intro.twig',
             'data' => [
                 'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_UPS,
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'allNavigation' => $allNavigation->getAllNodes(),
                 'logs' => $this->findLogs(3)
@@ -196,6 +197,7 @@ class Controller extends Base
             'template' => '@upsRuleset/log/list.twig',
             'data'     => [
                 'pageCurrent'    => Subnav::PARENT_USER_MANAGEMENT,
+                'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_UPS,
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'logs'           => $this->findLogs()
             ]

@@ -17,7 +17,7 @@ if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'adminv2/user/bulk/modify.html');
 
 // include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_USER_MANAGEMENT);
+(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_USER_MANAGEMENT, \Schoolbox\Admin\Navigation\Subnav::CHILD_USER_MANAGEMENT_BULK_MODIFY);
 
 /* Search options
  */

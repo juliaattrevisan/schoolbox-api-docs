@@ -105,6 +105,7 @@ class Controller extends Base
             $this->getResponse()->content->set(
                 $this->buildHtmlOutput('@shaps/provisioning/index.twig', [
                     'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                    'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
                     'errorMessage' => $this->getReasonPhrase($e)
                 ])->setTitle($title)
             );
@@ -121,6 +122,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@shaps/provisioning/index.twig', [
                 'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
                 'allUsers' => $allStaff,
                 'provisionedUsers' => $provisionedUsers,
                 'errors' => $errors,
@@ -151,6 +153,7 @@ class Controller extends Base
             $this->getResponse()->content->set(
                 $this->buildHtmlOutput('@shaps/provisioning/provisioned.twig', [
                     'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                    'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
                     'errorMessage' => $this->getReasonPhrase($e),
                 ])->setTitle($title)
             );
@@ -167,6 +170,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@shaps/provisioning/provisioned.twig', [
                     'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                    'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
                     'allUsers' => $provisionedUsers,
                     'provisionedUsers' => $provisionedUsers,
                     'errors' => $errors,
@@ -194,6 +198,7 @@ class Controller extends Base
             $this->getResponse()->content->set(
                 $this->buildHtmlOutput('@shaps/provisioning/unprovisioned.twig', [
                     'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                    'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
                     'errorMessage' => $this->getReasonPhrase($e),
                 ])->setTitle($title)
             );
@@ -210,6 +215,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@shaps/provisioning/unprovisioned.twig', [
                     'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                    'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
                     'allUsers' => $allStaff->diff($provisionedUsers),
                     'errors' => $errors,
                     'errorMessage' => null,
@@ -231,6 +237,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@shaps/provisioning/search.twig', [
                 'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
                 'allUsers' => [],
                 'errorMessage' => null,
             ])->setTitle('Search - Schoolbox Help Staff Provisioning')
@@ -260,6 +267,7 @@ class Controller extends Base
             $this->getResponse()->status->setCode(400);
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
                 'errorMessage' => $this->getReasonPhrase($e),
             ]));
 

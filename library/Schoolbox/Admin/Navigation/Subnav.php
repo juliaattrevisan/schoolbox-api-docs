@@ -145,7 +145,15 @@ class Subnav
     public const CHILD_SYSTEM_SETTINGS_SECURITY = 'security';
     public const CHILD_SYSTEM_SETTINGS_SITE = 'site';
 
+    /* Activity Report is derived from a url param
+     * Login Report is derived from a url param
+     */
     public const PARENT_USER_MANAGEMENT = 'userManagement';
+    public const CHILD_USER_MANAGEMENT_ACTIVITY_REPORT = 'activity';
+    public const CHILD_USER_MANAGEMENT_BULK_MODIFY = 'bulkModify';
+    public const CHILD_USER_MANAGEMENT_LOGIN_LOG = 'login';
+    public const CHILD_USER_MANAGEMENT_SHAPS = 'shaps';
+    public const CHILD_USER_MANAGEMENT_UPS = 'ups';
 
 
     /**
@@ -762,31 +770,31 @@ class Subnav
                 'children' => [
                     'reports/activity/all' => [
                         'name' => 'Activity Report',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_USER_MANAGEMENT_ACTIVITY_REPORT,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'user/bulk/modify' => [
                         'name' => 'Bulk Modify',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_USER_MANAGEMENT_BULK_MODIFY,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'reports/login/all' => [
                         'name' => 'Login Log',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_USER_MANAGEMENT_LOGIN_LOG,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'shaps' => [
                         'name' => 'Schoolbox Help Provisioning',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_USER_MANAGEMENT_SHAPS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'ups' => [
                         'name' => 'User Provisioning System',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_USER_MANAGEMENT_UPS,
                         'visible' =>  true,
                         'children' => []
                     ],
