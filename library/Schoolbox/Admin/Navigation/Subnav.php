@@ -37,6 +37,8 @@ class Subnav
     public const CHILD_CALENDAR_IMPORT = 'Import';
     public const CHILD_CALENDAR_SUBSCRIBE = 'Subscribe';
 
+    /* These are in a hardcoded array in the controller
+     */
     public const PARENT_ENGAGEMENT = 'engagement';
     public const CHILD_ENGAGEMENT_COLLABORATION = 'collaboration';
     public const CHILD_ENGAGEMENT_COMPONENT_USAGE = 'components';
@@ -73,9 +75,34 @@ class Subnav
     public const CHILD_LMS_LTI = 'lti';
     public const CHILD_LMS_RUBRICS = 'rubrics';
 
+    /* The values here are actually derived from db table names,
+     * so you can't just call it anything without consulting $table in Lists/Controller.php
+     */
     public const PARENT_LISTS = 'lists';
-    public const PARENT_MESSAGES = 'messages';
+    public const CHILD_LISTS_BADGE_CATEGORIES = 'achievement-category';
+    public const CHILD_LISTS_CAMPUS = 'campus';
+    public const CHILD_LISTS_COMPONENTS = 'component-definition';
+    public const CHILD_LISTS_DRIVES = 'webdav';
+    public const CHILD_LISTS_EVENT_TYPES = 'event-type';
+    public const CHILD_LISTS_HOUSES = 'house';
+    public const CHILD_LISTS_LEARNING_MOMENTS = 'evidence-tag';
+    public const CHILD_LISTS_NEWS_TOPICS = 'news-topic';
+    public const CHILD_LISTS_PASTORAL_SEVERITY = 'pastoral-severity';
+    public const CHILD_LISTS_PASTORAL_TAGS = 'pastoral-tags';
+    public const CHILD_LISTS_PASTORAL_SIS_CLASSIFICATIONS = 'pastoral-document-classification';
+    public const CHILD_LISTS_PASTORAL_SUBTYPES = 'pastoral-category';
+    public const CHILD_LISTS_PASTORAL_TYPES = 'pastoral-type';
+    public const CHILD_LISTS_RESIDENTIAL_HOUSES = 'residential-house';
+    public const CHILD_LISTS_ROLES = 'roles';
+    public const CHILD_LISTS_SUBMISSION_STATES = 'submission-errors';
+    public const CHILD_LISTS_TIMETABLE_COLOURS = 'timetable-colour';
+    public const CHILD_LISTS_USER_TITLES = 'user-title';
+    public const CHILD_LISTS_WORK_TYPES = 'submission-type';
+    public const CHILD_LISTS_YEAR_LEVELS = 'year-levels';
+
     public const PARENT_MODULES = 'Modules';
+
+    public const PARENT_MESSAGES = 'messages';
     public const PARENT_PERSONALISATION = 'personalisation';
     public const PARENT_RESOURCES = 'resources';
     public const PARENT_SUDS = 'import/schoolDataImport';
@@ -337,121 +364,121 @@ class Subnav
                 'children' => [
                     'lists/achievement-category' => [
                         'name' => 'Badge Categories',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_BADGE_CATEGORIES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/campus' => [
                         'name' => 'Campus',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_CAMPUS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/component-definition' => [
                         'name' => 'Components',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_COMPONENTS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/webdav' => [
                         'name' => 'Drives',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_DRIVES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/event-type' => [
                         'name' => 'Event Types',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_EVENT_TYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/house' => [
                         'name' => 'Houses',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_HOUSES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/evidence-tag' => [
                         'name' => 'Learning Moments',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_LEARNING_MOMENTS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/news-topic' => [
                         'name' => 'News Topics',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_NEWS_TOPICS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/pastoral-severity' => [
                         'name' => 'Pastoral Record Severity',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_PASTORAL_SEVERITY,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/pastoral-tags' => [
                         'name' => 'Pastoral Record Tags',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_PASTORAL_TAGS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/pastoral-document-classification' => [
                         'name' => 'Pastoral SIS Document Classifications',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_PASTORAL_SIS_CLASSIFICATIONS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/pastoral-category' => [
                         'name' => 'Pastoral Sub-Types',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_PASTORAL_SUBTYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/pastoral-type' => [
                         'name' => 'Pastoral Types',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_PASTORAL_TYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/residential-house' => [
                         'name' => 'Residential Houses',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_RESIDENTIAL_HOUSES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/roles' => [
                         'name' => 'Roles',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_ROLES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/submission-errors' => [
                         'name' => 'Submission States',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_SUBMISSION_STATES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/timetable-colour' => [
                         'name' => 'Timetable Colours',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_TIMETABLE_COLOURS,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/user-title' => [
                         'name' => 'User Titles',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_USER_TITLES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/submission-type' => [
                         'name' => 'Work Types',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_WORK_TYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
                     'lists/year-levels' => [
                         'name' => 'Year Levels',
-                        'identifier' => '',
+                        'identifier' => self::CHILD_LISTS_YEAR_LEVELS,
                         'visible' =>  true,
                         'children' => []
                     ],
