@@ -396,7 +396,7 @@ class Subnav
             ],
             'messages' => [
                 'name' => 'Notifications',
-                'identifier' => 'messages',
+                'identifier' => self::PARENT_MESSAGES,
                 'visible' =>  true,
                 'children' => [
                     'messages/apps' => [
