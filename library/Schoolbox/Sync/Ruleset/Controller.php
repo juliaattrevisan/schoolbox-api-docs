@@ -7,6 +7,7 @@
 namespace Schoolbox\Sync\Ruleset;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 use \Schoolbox\Sync\Condition;
 use \Schoolbox\Sync\Effect;
 use Schoolbox\Sync\Effect\Type\Model as EffectType;
@@ -91,9 +92,10 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/intro.twig',
             'data' => [
+                'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'allNavigation' => $allNavigation->getAllNodes(),
-                'logs'         => $this->findLogs(3)
+                'logs' => $this->findLogs(3)
             ]
         ]);
     }
@@ -130,6 +132,8 @@ class Controller extends Base
             // This mimetype don't exist
             $twigData['logExtensionExists'] = false;
         }
+
+        $twigData['pageCurrent'] = Subnav::PARENT_USER_MANAGEMENT;
 
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/ruleset.twig',
@@ -191,6 +195,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/log/list.twig',
             'data'     => [
+                'pageCurrent'    => Subnav::PARENT_USER_MANAGEMENT,
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'logs'           => $this->findLogs()
             ]

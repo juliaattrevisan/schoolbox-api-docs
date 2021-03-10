@@ -2,16 +2,14 @@
 
 <div class="admin-container row">
 
-    <div class="small-12 columns">
-        <h1>User Provisioning System</h1>
-
-        {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
-    </div>
-
     {# Shared navigation menu #}
-{#    {{ renderAdminNavigation(pageCurrent) }}#}
+    {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
+        <div class="small-12 columns">
+            {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
+        </div>
+
         <div class="small-12 island">
             <section class="content">
                 <p>The user provisioning system is used to automatically provision user accounts from your SIS data into Schoolbox</p>
@@ -26,7 +24,8 @@
                 <div class="empty-state">
                     <i class="icon-info"></i>
                     <p>The user provisioning system is yet to run, please start by configuring rules for
-                        <a href="/adminv2/ups/staff">staff</a>, <a href="/adminv2/ups/student">students</a> or <a href="/adminv2/ups/parent">parents</a>.</p>
+                        <a href="/adminv2/ups/staff">staff</a>, <a href="/adminv2/ups/student">students</a> or <a href="/adminv2/ups/parent">parents</a>.
+                    </p>
                 </div>
             {% else %}
             {% include '@upsRuleset/log/table.twig' %}
