@@ -670,7 +670,6 @@ class Connector implements IConnector
             RequestOptions::HEADERS     => $this->getHeaderAuthorisation(),
             RequestOptions::HTTP_ERRORS => false,
             'base_uri'                  => static::BASE_URI,
-            'timeout'                   => 5
         ];
     }
 
