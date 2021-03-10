@@ -267,16 +267,18 @@ class Queue extends ResourceVideo
 
         // Get parameters
 
+        $cpus = shell_exec('nproc');
         $commandMediaInformation           = $this->getCommandMediaInformation();
         $commandTranscode                  = $this->getCommandTranscode();
         $strictMode                        = " -strict -2 ";
         $videoBitrateEscaped               = escapeshellarg("{$this->videoBitrate}k");
         $audioBitrateEscaped               = escapeshellarg("{$this->audioBitrate}k");
-        $processTimeoutEscaped             = escapeshellarg($this->processTimeout);
+        $processTimeoutEscaped             = escapeshellarg($this->processTimeout * $cpus);
         $filenameTranscodeVideoEscaped     = escapeshellarg($filenameTranscodeVideo);
         $filenameTranscodeThumbnailEscaped = escapeshellarg($filenameTranscodeThumbnail);
         $filenameTranscodePosterEscaped    = escapeshellarg($filenameTranscodePoster);
         $filenameSourceEscaped             = escapeshellarg($filenameSource);
+        $this->log($processTimeoutEscaped);
 
         // ------------------------------------------------------------------------------------------------------------
         // Get video metadata
