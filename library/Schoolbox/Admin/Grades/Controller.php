@@ -8,12 +8,12 @@
 namespace Schoolbox\Admin\Grades;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Collection;
 
 class Controller extends Base
 {
-    private const PAGE_CURRENT = 'grades';
 
 
     /**
@@ -54,7 +54,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@adminGrades/index.twig',
                 [
-                    'pageCurrent' => self::PAGE_CURRENT,
+                    'pageCurrent' => Subnav::PARENT_LMS,
                     'gradeGroups' => $this->retrieveAllGradeGroups(),
                 ]
             )

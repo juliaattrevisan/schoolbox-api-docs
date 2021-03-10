@@ -8,11 +8,11 @@
 namespace Schoolbox\Admin\Package;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Controller extends Base
 {
-    private const PAGE_CURRENT = 'package';
 
     /**
      * @var Mapper
@@ -39,7 +39,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@adminPackage/index.twig',
                 [
-                    'pageCurrent' => self::PAGE_CURRENT,
+                    'pageCurrent' => Subnav::PARENT_MODULES,
                     'packages'    => $this->packageMapper->findAll(),
                 ]
             )

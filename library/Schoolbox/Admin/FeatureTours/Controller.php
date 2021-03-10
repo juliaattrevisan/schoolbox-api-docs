@@ -3,6 +3,7 @@
 namespace Schoolbox\Admin\FeatureTours;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Tour;
@@ -33,7 +34,7 @@ class Controller extends Base
     {
         $twigData = [
             'toursEnabled' => $this->getConfigLoader()->get('tours_enabled'),
-            'pageCurrent' => 'feature-tours',
+            'pageCurrent' => Subnav::PARENT_MODULES,
             'tours' => $this->tourMapper->findAll()
         ];
 

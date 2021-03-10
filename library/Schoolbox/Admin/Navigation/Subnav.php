@@ -29,8 +29,10 @@ class Subnav
     public const PARENT_FILTERS = 'filters';
     public const PARENT_HOMEPAGE = 'homepage';
     public const PARENT_IMPORT = 'import/directImport';
+    public const PARENT_LISTS = 'lists';
     public const PARENT_LMS = 'lms';
     public const PARENT_MESSAGES = 'messages';
+    public const PARENT_MODULES = 'Modules';
 
     /**
      * For access to booleans that determine availability/visibility of certain menu
@@ -254,7 +256,7 @@ class Subnav
             ],
             'lists' => [
                 'name' => 'Lists',
-                'identifier' => 'lists',
+                'identifier' => self::PARENT_LISTS,
                 'visible' =>  true,
                 'children' => [
                     'lists/achievement-category' => [
@@ -361,7 +363,7 @@ class Subnav
             ],
             'setting/Modules' => [
                 'name' => 'Modules',
-                'identifier' => '',
+                'identifier' => self::PARENT_MODULES,
                 'visible' =>  true,
                 'children' => [
                     'setting/Board+Leave' => [

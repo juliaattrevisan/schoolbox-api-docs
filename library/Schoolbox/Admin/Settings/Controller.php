@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Settings;
 
 use Alaress\Web\Controller\ConfigController;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
@@ -53,9 +54,29 @@ class Controller extends ConfigController
             ];
         }
 
+        /* Settings are now recategorised by the feature to which they are relevant
+         */
+        echo $typeLabel;
+        switch ($typeLabel) {
+            case 'Document Management':
+            case 'LMS Policy':
+                $pageCurrent = Subnav::PARENT_LMS;
+                break;
+
+            case 'Modules':
+            case 'Board Leave':
+            case 'Pastoral Care':
+                $pageCurrent = Subnav::PARENT_MODULES;
+                break;
+
+            default:
+                $pageCurrent = 'setting';
+                break;
+        }
+
         $this->getResponse()->content->set(
             $this->buildContent('@settings/settings.twig', [
-                'pageCurrent'    => 'setting',
+                'pageCurrent'    => $pageCurrent,
                 'settingsTabs'   => $settingsTabs,
                 'configContext'  => $configContext,
                 'isLocalisation' => $typeLabel === 'Localisation',  // TODO replace string literals with enums
