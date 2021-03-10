@@ -6,7 +6,8 @@
  # you're currently viewing; you get that by combining this with index.twig
  # via renderAdminNavigation() twig extension
  #
- # @param array adminSubnav
+ # @param array $adminSubnav   A set of tuples for each node in the menu
+ # @param string $pageCurrent  A string corresponding to identifier in a tuple
  #}
 <script type="text/javascript">
     $(function() {
@@ -34,11 +35,20 @@
     <ul class="admin side-nav" role="navigation" data-admin>
 
         {% for parentUrl, parentData in adminSubnav %}
-            <li {% if parentData.children|length %}class="parent-item"{% endif %} role="menuitem" data-parent-item>
-
-                {# LMS is a node that doesn't actually exist
-                 # Personalisation is a node that doesn't actually exist
+            {# Decide if the current node is selected
                  #
+                 # Each phplib controller specifies a string for pageCurrent so you have to match
+                 # them up here, circumstantially, to provide indication of which node is active
+            #}
+            {% set selected = '' %}
+
+            {% if parentData.identifier == pageCurrent %}
+                {% set selected = 'active' %}
+            {% endif %}
+
+            <li class="{{ selected }} {% if parentData.children|length %}parent-item{% endif %}" role="menuitem" data-parent-item>
+
+                {# These are nodes that doesn't actually exist
                  # They are a hybrid concoction of a variety of urls
                  #}
                 {% if parentUrl in ['lms', 'personalisation', 'eportfolio'] %}

@@ -50,19 +50,20 @@ class Subnav
      * Some nodes are hybrids of other unrelated url sets, such as LMS. Its items
      * come from all over the place
      *
-     * @param string|null $pageCurrent
      * @return array
      */
-    public function generate(?string $pageCurrent): array
+    public function generate(): array
     {
         return [
             'home' => [
                 'name' => 'Home',
+                'identifier' => 'home',
                 'visible' =>  true,
                 'children' => []
             ],
             'calendar' => [
                 'name' => 'Calendar',
+                'identifier' => 'calendar',
                 'visible' =>  true,
                 'children' => [
                     'calendar/Cleanup' => [
@@ -84,6 +85,7 @@ class Subnav
             ],
             'engagement' => [
                 'name' => 'Engagement',
+                'identifier' => 'engagement',
                 'visible' =>  true,
                 'children' => [
                     'engagement/index/collaboration' => [
@@ -140,6 +142,7 @@ class Subnav
             ],
             'eportfolio' => [
                 'name' => 'ePortfolio',
+                'identifier' => 'eportfolio',
                 'visible' =>  true,
                 'children' => [
                     'eportfolio' => [
@@ -156,16 +159,19 @@ class Subnav
             ],
             'filters' => [
                 'name' => 'Filters',
+                'identifier' => 'filters',
                 'visible' =>  true,
                 'children' => []
             ],
             'homepage' => [
                 'name' => 'Homepage Templates',
+                'identifier' => 'homepage',
                 'visible' =>  true,
                 'children' => []
             ],
             'import/directImport' => [
                 'name' => 'Import',
+                'identifier' => 'import/directImport',
                 'visible' =>  true,
                 'children' => [
                     'import/folder' => [
@@ -192,6 +198,7 @@ class Subnav
             ],
             'lms' => [
                 'name' => 'LMS',
+                'identifier' => '',
                 'visible' =>  true,
                 'children' => [
                     'terms' => [
@@ -238,6 +245,7 @@ class Subnav
             ],
             'lists' => [
                 'name' => 'Lists',
+                'identifier' => 'lists',
                 'visible' =>  true,
                 'children' => [
                     'lists/achievement-category' => [
@@ -344,6 +352,7 @@ class Subnav
             ],
             'setting/Modules' => [
                 'name' => 'Modules',
+                'identifier' => '',
                 'visible' =>  true,
                 'children' => [
                     'setting/Board+Leave' => [
@@ -370,11 +379,13 @@ class Subnav
             ],
             'news' => [
                 'name' => 'News',
+                'identifier' => '',
                 'visible' =>  true,
                 'children' => []
             ],
             'messages' => [
                 'name' => 'Notifications',
+                'identifier' => 'messages',
                 'visible' =>  true,
                 'children' => [
                     'messages/apps' => [
@@ -396,6 +407,7 @@ class Subnav
             ],
             'personalisation' => [
                 'name' => 'Personalisation',
+                'identifier' => '',
                 'visible' =>  true,
                 'children' => [
                     'dashboard' => [
@@ -432,6 +444,7 @@ class Subnav
             ],
             'setting/Resources' => [
                 'name' => 'Resources',
+                'identifier' => '',
                 'visible' =>  true,
                 'children' => [
                     'allowed-file' => [
@@ -463,11 +476,13 @@ class Subnav
             ],
             'import/schoolDataImport' => [
                 'name' => 'School Data Import',
+                'identifier' => 'import/schoolDataImport',
                 'visible' =>  $this->configLoader->get('external_type') === 'schoolbox',
                 'children' => []
             ],
             'setting' => [
                 'name' => 'System Settings',
+                'identifier' => '',
                 'visible' =>  true,
                 'children' => [
                     'setting/3rd+Party+Services' => [
@@ -539,6 +554,7 @@ class Subnav
             ],
             'user' => [
                 'name' => 'User Management',
+                'identifier' => 'user',
                 'visible' =>  true,
                 'children' => [
                     'reports/activity/all' => [
@@ -599,7 +615,8 @@ class Subnav
         $twig = new Environment(new FilesystemLoader($paths), $options);
 
         return $twig->render('subnav.twig', [
-            'adminSubnav' => $this->generate($pageCurrent)
+            'adminSubnav' => $this->generate(),
+            'pageCurrent' => $pageCurrent
         ]);
     }
 
