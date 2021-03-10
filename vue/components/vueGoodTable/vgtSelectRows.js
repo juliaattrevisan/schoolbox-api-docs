@@ -20,13 +20,21 @@ export const vgtSelectRows = {
 
 	computed: {
 
-		getSelectedRowsCount () {
+		$_vgtSelectRows_selectedRowsCount () {
+			return this.selectedRows.length
+		},
+
+		$_vgtSelectRows_selectedRowsCountWithRowName () {
 			if (this.selectedRows.length > 1) {
 				return this.selectedRows.length + ' ' + this.pluralRowName;
 			} else {
 				return this.selectedRows.length + ' ' + this.singleRowName;		
 			}
-		}
+		},
+
+		$_vgtSelectRows_hasShiftKeySelected () {
+			return this.hasShiftKeySelected;
+		},
 
 	},
 
@@ -57,7 +65,7 @@ export const vgtSelectRows = {
 		 * to reset shift-selections
          *
          */
-		onSortChange () {
+		$_vgtSelectRows_onSortChange () {
 			this.consecutiveRowSelectionCount = 0;
 		},
 
@@ -66,10 +74,10 @@ export const vgtSelectRows = {
          *
          * @param {Object: selectedRows} params
          */
-		onPageChange (params) {
+		$_vgtSelectRows_onPageChange (params) {
 			this.consecutiveRowSelectionCount = 0;
             this.currentPage = params.currentPage;
-            this.currentPerPage = params.currentPerPage;
+			this.currentPerPage = params.currentPerPage;
 		},
 
 		/**
@@ -77,7 +85,7 @@ export const vgtSelectRows = {
          *
          * @param {Object} params
          */
-		onRowClick (params) {
+		$_vgtSelectRows_onRowClick (params) {
 			document.getSelection().removeAllRanges(); //to avoid selecting text on shift-select
 			this.checkRowSelection(params);
 			this.checkForShiftSelectRows();
@@ -163,8 +171,25 @@ export const vgtSelectRows = {
          *
          * @param {Object: selected, selectedRows} params
          */
-        onSelectAllRows (params) {
+        $_vgtSelectRows_onSelectAllRows (params) {
 			this.selectedRows = params.selectedRows;
+		},
+
+		/**
+		 * clear the selection
+         *
+		 * @returns {Number}
+         */
+		$_vgtSelectRows_getSelectedRows () {
+			return this.selectedRows;
+		},
+
+		/**
+		 * clear the selection
+         *
+         */
+		$_vgtSelectRows_clearRows () {
+			this.selectedRows = [];
 		},
 
 	}

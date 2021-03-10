@@ -141,7 +141,7 @@ export default {
 			this.$refs.deleteModal.close();
 			
 			this.rows = this.getUpdatedRowsAfterUserDeletion();
-			this.selectedRows = [];
+			this.$_vgtSelectRows_clearRows();
 
         },
 
@@ -152,7 +152,7 @@ export default {
          */
         getUpdatedRowsAfterUserDeletion () {
 			return this.rows.filter((row) => {
-				if (this.selectedRows.some(rowToDelete => rowToDelete.id === row.id)) {
+				if (this.$_vgtSelectRows_getSelectedRows().some(rowToDelete => rowToDelete.id === row.id)) {
 					return false;
 				}
 				return true;
@@ -172,7 +172,7 @@ export default {
          *
          */
         onClearUsersToSelected () {
-            this.selectedRows = [];
+            this.$_vgtSelectRows_clearRows();
 			this.$refs.vueGoodTable.unselectAllInternal(true);
         },
 
@@ -216,10 +216,10 @@ export default {
 				enabled: true,
 				disableSelectInfo: true,
 			}"
-			@on-sort-change="onSortChange"
-			@on-page-change="onPageChange"
-			@on-row-click="onRowClick"
-			@on-select-all="onSelectAllRows"
+			@on-sort-change="$_vgtSelectRows_onSortChange"
+			@on-page-change="$_vgtSelectRows_onPageChange"
+			@on-row-click="$_vgtSelectRows_onRowClick"
+			@on-select-all="$_vgtSelectRows_onSelectAllRows"
 		>
 			<div slot="emptystate">
 				<p>There are currently no users to delete.</p>
@@ -229,7 +229,7 @@ export default {
         <reveal-modal ref="deleteModal">
             <h2>Please confirm</h2>
 			<div data-alert class="alert-box alert">
-                <h4>You are about to delete <strong>{{ getSelectedRowsCount }}</strong>. Deleting users will prevent them from logging into the system and from accessing resources that belong to them.  Attached resources that will be removed include; ePortfolio, My Files, Pastoral Records and My Links.  Resources shared with or by the user like Files, Grades, News, Forum Posts and other collaborative activities will remain available.</h4>
+                <h4>You are about to delete <strong>{{ $_vgtSelectRows_selectedRowsCountWithRowName }}</strong>. Deleting users will prevent them from logging into the system and from accessing resources that belong to them.  Attached resources that will be removed include; ePortfolio, My Files, Pastoral Records and My Links.  Resources shared with or by the user like Files, Grades, News, Forum Posts and other collaborative activities will remain available.</h4>
             </div>
             <ul class="flex-list buttons">
                 <li><a @click.prevent="onConfirmDeleteUsersSelected" class="button submit">Confirm Deletion</a></li>
@@ -237,10 +237,10 @@ export default {
             </ul>
         </reveal-modal>
 		<transition name="slide">
-			<div v-if="selectedRows.length > 0" class="delete-container">
+			<div v-if="$_vgtSelectRows_selectedRowsCount  > 0" class="delete-container">
 				<section class="content">
-					<h3><em>{{ getSelectedRowsCount }} Selected</em></h3>
-					<span v-if="!hasShiftKeySelected" class="shift-select-note">Use Shift+Select to select multiple Users</span>
+					<h3><em>{{ $_vgtSelectRows_selectedRowsCountWithRowName }} Selected</em></h3>
+					<span v-if="!$_vgtSelectRows_hasShiftKeySelected" class="shift-select-note">Use Shift+Select to select multiple Users</span>
 					<button @click.prevent="onClearUsersToSelected" class="button-clear">Clear User Selection</button>
 					<button @click.prevent="onDeleteUsersSelected" class="button submit">Delete Users</button>
 				</section>
