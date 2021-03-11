@@ -224,7 +224,24 @@ class Controller extends Base\Base
 
         // Create Course if required
         if (!$courseExists) {
-            $course = $this->courseSpecificationMapper->createModel();
+            /* Course might have been deleted at some point in the past
+             * See if there's a deleted row we can recycle since foreign keys
+             * will stop us from inserting a tuple that already exists
+             */
+            try {
+                $course = $this->courseSpecificationMapper->findOneByColumn(
+                    'folder_id', $courseFolder->getId(), [
+                    'deleted' => true,
+                ]
+                );
+            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+                /** @var CourseSpecification $deletedCourse */
+                $deletedCourse = $e->getDeletedObject();
+
+                $course = $deletedCourse->setDeletedAt(null);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $course = $this->courseSpecificationMapper->createModel();
+            }
             $course->setFolder($courseFolder);
         }
 
