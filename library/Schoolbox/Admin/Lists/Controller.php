@@ -1001,6 +1001,7 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_LISTS,
                 'subpageCurrent' => $table,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LISTS, $table),
                 'tables'      => $tables,
                 'table'       => $table,
                 'records'     => $records
