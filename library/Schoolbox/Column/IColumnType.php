@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base interface for column type classes.
  *
@@ -9,28 +10,29 @@
 
 namespace Schoolbox\Column;
 
-interface IColumnType {
-	/**
-	 * Translates a value from a database field or other data store, into a
-	 * string, integer or object value for use in a model object.
-	 *
-	 * @param mixed             $value
-	 * @param \Schoolbox\Mapper $mapper
-	 *
-	 * @return mixed
-	 */
-	public function hydrate($value, $mapper = null);
+interface IColumnType
+{
+    /**
+     * Translates a value from a database field or other data store, into a
+     * string, integer or object value for use in a model object.
+     *
+     * @param mixed             $value
+     * @param \Schoolbox\Mapper $mapper
+     *
+     * @return mixed
+     */
+    public function hydrate($value, $mapper = null);
 
-	/**
-	 * Translates a value from a value in a model object into a value for a
-	 * database field or other data store.
-	 *
-	 * @param mixed             $value
-	 * @param \Schoolbox\Mapper $mapper
-	 *
-	 * @return mixed
-	 */
-	public function dehydrate($value, $mapper = null);
+    /**
+     * Translates a value from a value in a model object into a value for a
+     * database field or other data store.
+     *
+     * @param mixed             $value
+     * @param \Schoolbox\Mapper $mapper
+     *
+     * @return mixed
+     */
+    public function dehydrate($value, $mapper = null);
 
 
     /**
