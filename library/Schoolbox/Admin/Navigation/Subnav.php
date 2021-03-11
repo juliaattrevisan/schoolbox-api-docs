@@ -857,4 +857,39 @@ class Subnav
             'ADMIN_NAV' => $this->generateHtml($pageCurrent, $subpageCurrent)
         ]);
     }
+
+
+    /**
+     * Generate breadcrumbs from the adminSubnav stack, for the consistency of names
+     * in both the breadcrumbs themselves and also the submenu
+     *
+     * There are multiple implementations of breadcrumbs but there should be only one
+     * Those should be removed in favour of this implementation
+     *
+     * @param string      $pageCurrent
+     * @param string|null $subpageCurrent
+     * @return array
+     */
+    public function generateBreadcrumbs(string $pageCurrent, ?string $subpageCurrent): array
+    {
+        $allCrumbs = [
+            ['Administration', '/adminv2/home']
+        ];
+
+        foreach ($this->generate() as $parentUrl => $parentData) {
+            if ($parentData['identifier'] === $pageCurrent) {
+                $allCrumbs[] = [$parentData['name'], $parentUrl];
+            }
+
+            if (\count($parentData['children'])) {
+                foreach ($parentData['children'] as $childUrl => $childData) {
+                    if ($childData['identifier'] === $subpageCurrent) {
+                        $allCrumbs[] = [$childData['name'],  $childUrl];
+                    }
+                }
+            }
+        }
+
+        return $allCrumbs;
+    }
 }

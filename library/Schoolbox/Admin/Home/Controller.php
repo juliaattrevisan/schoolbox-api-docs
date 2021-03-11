@@ -26,6 +26,8 @@ use Healthcheck;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 
+use Schoolbox\Sync\Navigator\Navigator;
+use Schoolbox\Sync\Navigator\Node;
 use function array_column;
 use function array_map;
 use function array_merge;
@@ -267,6 +269,7 @@ class Controller extends Base
                 'data' => array(
                     'pageCurrent' => Subnav::PARENT_HOME,
                     'subpageCurrent' => null,
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_HOME, null),
                     'usageInGraph' => $usageInGraph,
                     'disk_used' => $disk_used,
             //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
