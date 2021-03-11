@@ -14,7 +14,7 @@ interface IColumnType {
 	 * Translates a value from a database field or other data store, into a
 	 * string, integer or object value for use in a model object.
 	 *
-	 * @param string            $value
+	 * @param mixed             $value
 	 * @param \Schoolbox\Mapper $mapper
 	 *
 	 * @return mixed
@@ -28,7 +28,7 @@ interface IColumnType {
 	 * @param mixed             $value
 	 * @param \Schoolbox\Mapper $mapper
 	 *
-	 * @return string
+	 * @return mixed
 	 */
 	public function dehydrate($value, $mapper = null);
 
