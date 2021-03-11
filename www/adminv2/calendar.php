@@ -2,6 +2,7 @@
 
 use Calendar\Api\ApiHierarchyGenerator;
 use Calendar\Api\ModuleChecker;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Calendar\Relation;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -21,7 +22,9 @@ $this->setFile(TEMPLATE_content, 'adminv2/calendar.html');
 $this->setTitle('Admin - Calendar');
 
 // include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_CALENDAR, $selectedType);
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_CALENDAR, $selectedType)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_CALENDAR, $selectedType);
 
 $userHandler = new User();
 

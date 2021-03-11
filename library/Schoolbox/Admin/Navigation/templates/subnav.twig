@@ -55,8 +55,9 @@
 {% endfor %}
 
 <div class="small-12 columns">
-    <h1>Admin › {{ parentSelected }} {% if childSelected %} › {{ childSelected }}{% endif %}</h1>
+    <h1>{{ parentSelected }}{% if childSelected %} › {{ childSelected }}{% endif %}</h1>
 </div>
+
 <nav id="admin-nav">
     <h2 class="subheader">Menu</h2>
     <a href="#" class="dropdown-btn" data-admin-subnav-dropdown>Go to...</a>

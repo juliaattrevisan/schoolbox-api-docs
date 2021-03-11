@@ -168,6 +168,15 @@ class Subnav
 
 
     /**
+     * A twig rendering environment. I know it's spawned in the constructor, but half
+     * the screens use phplib and the other half use twig
+     *
+     * @var Environment
+     */
+    private Environment $twig;
+
+
+    /**
      * Subnav constructor.
      *
      * @param IConfigLoader $configLoader
@@ -175,6 +184,21 @@ class Subnav
     public function __construct(IConfigLoader $configLoader)
     {
         $this->configLoader = $configLoader;
+
+        $paths[] = SITE_root . '/library/Schoolbox/Admin/Navigation/templates';
+        $paths[] = SITE_root . '/templates/core/sub';
+
+        $options = [
+            'debug'            => $this->configLoader->get('debug_templates'),
+            'strict_variables' => $this->configLoader->get('strict_templates'),
+        ];
+
+        // do not cache when in debug mode
+        if (!$this->configLoader->get('debug_mode')) {
+            $options['cache'] = $this->configLoader->get('twig_cache_dir');
+        }
+
+        $this->twig = new Environment(new FilesystemLoader($paths), $options);
     }
 
 
@@ -819,21 +843,7 @@ class Subnav
      */
     public function generateHtml(string $pageCurrent, ?string $subpageCurrent): string
     {
-        $paths[] = SITE_root . '/library/Schoolbox/Admin/Navigation/templates';
-
-        $options = [
-            'debug'            => $this->configLoader->get('debug_templates'),
-            'strict_variables' => $this->configLoader->get('strict_templates'),
-        ];
-
-        // do not cache when in debug mode
-        if (!$this->configLoader->get('debug_mode')) {
-            $options['cache'] = $this->configLoader->get('twig_cache_dir');
-        }
-
-        $twig = new Environment(new FilesystemLoader($paths), $options);
-
-        return $twig->render('subnav.twig', [
+        return $this->twig->render('subnav.twig', [
             'adminSubnav' => $this->generate(),
             'pageCurrent' => $pageCurrent,
             'subpageCurrent' => (string)$subpageCurrent
@@ -844,18 +854,21 @@ class Subnav
     /**
      * Shank the html menu directly into a phplib
      *
-     * @param \Sitepage   $page
+     * @param \SitePage   $page
      * @param string      $pageCurrent
      * @param string|null $subpageCurrent
+     * @return Subnav
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function generatePhplib(\Sitepage $page, string $pageCurrent, ?string $subpageCurrent): void
+    public function generatePhplib(\SitePage $page, string $pageCurrent, ?string $subpageCurrent): self
     {
         $page->setVar([
             'ADMIN_NAV' => $this->generateHtml($pageCurrent, $subpageCurrent)
         ]);
+
+        return $this;
     }
 
 
@@ -891,5 +904,28 @@ class Subnav
         }
 
         return $allCrumbs;
+    }
+
+
+    /**
+     * Shank a breadcrumbs html right into a phplib
+     *
+     * @param \SitePage   $page
+     * @param string      $pageCurrent
+     * @param string|null $subpageCurrent
+     * @return Subnav
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    public function generateBreadcrumbsHtml(\SitePage $page, string $pageCurrent, ?string $subpageCurrent): self
+    {
+        $page->setVar([
+            'ADMIN_BREADCRUMBS' => $this->twig->render('adminBreadcrumbs.twig', [
+                'allBreadcrumbs' => $this->generateBreadcrumbs($pageCurrent, $subpageCurrent)
+            ])
+        ]);
+
+        return $this;
     }
 }
