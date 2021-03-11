@@ -10,14 +10,16 @@
 
 namespace Schoolbox\Column;
 
+use Schoolbox\Mapper;
+
 interface IColumnType
 {
     /**
      * Translates a value from a database field or other data store, into a
      * string, integer or object value for use in a model object.
      *
-     * @param mixed             $value
-     * @param \Schoolbox\Mapper $mapper
+     * @param mixed  $value
+     * @param Mapper $mapper
      *
      * @return mixed
      */
@@ -27,8 +29,8 @@ interface IColumnType
      * Translates a value from a value in a model object into a value for a
      * database field or other data store.
      *
-     * @param mixed             $value
-     * @param \Schoolbox\Mapper $mapper
+     * @param mixed  $value
+     * @param Mapper $mapper
      *
      * @return mixed
      */
