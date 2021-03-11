@@ -12,6 +12,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Import\Navigation\INavigation;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\External;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -103,6 +104,8 @@ class Controller extends Base
     public function getIndex()
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/index.twig', [
+            'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+            'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_UPS,
             'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
             'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
             'attachzone' => [
