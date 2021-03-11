@@ -63,7 +63,7 @@
                 plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
                 views: {
                     day: {
-                        // titleFormat: dayTitleFormat,
+                        titleFormat: this.helper.dayTitleFormat.bind(this),
                         columnHeader: false
                     },
                     week: {
@@ -101,17 +101,21 @@
                     day: 'Day'
                 },
                 initialView: 'dayGridMonth',
-                eventContent: this.eventRender,
+                eventDidMount: this.helper.eventRender.bind(this),
                 events: this.events,
-                loading: this.onLoading,
+                loading: this.helper.onLoading.bind(this),
                 eventClick: this.onEventClick
             }
         },
 
         mounted() {
-            
-            this.$refs.fullCalendar.setOption('contentHeight', this.contentHeight);
-            
+
+            // this.$nextTick()
+            // .then(() => {
+            //     // this.$refs.fullCalendar.setOption('contentHeight', this.contentHeight);
+            //     debugger
+            // });
+
             // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
             let quickSwitchIcon = document.createElement('a');
             quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
@@ -134,11 +138,12 @@
              * @param isLoading True when events start loading,
              *                  false once they are finished.
              */
-            onLoading(isLoading) {
-                // TODO this method should be unnecessary
-                // (for the same reason as `onLoading` in the main fullCalendar)
-                this.helper.onLoading(isLoading);
-            },
+            // onLoading(isLoading) {
+            //     // TODO this method should be unnecessary
+            //     // (for the same reason as `onLoading` in the main fullCalendar)
+            //     this.helper.onLoading(isLoading);
+            // },
+
             /**
              * Helper for rendering the title of the day view.
              * Without this the calendar renders the date twice for some reason.
@@ -146,11 +151,11 @@
              * @param dateObject
              * @return {*}
              */
-            dayTitleFormat(dateObject) {
-                // TODO this method should be unnecessary
-                // (for the same reason as `onLoading` in the main fullCalendar)
-                return this.helper.dayTitleFormat(dateObject);
-            },
+            // dayTitleFormat(dateObject) {
+            //     // TODO this method should be unnecessary
+            //     // (for the same reason as `onLoading` in the main fullCalendar)
+            //     return this.helper.dayTitleFormat(dateObject);
+            // },
 
             /**
              * Additional customisation for prev button to sync flatpickr's selected date with fullCalendar's
@@ -242,11 +247,11 @@
              * @param eventRenderInfo
              * @return {boolean}
              */
-            eventRender(eventRenderInfo) {
-                // TODO this method should be unnecessary
-                // (for the same reason as `onLoading` in the main fullCalendar)
-                return this.helper.eventRender(eventRenderInfo);
-            },
+            // eventRender(eventRenderInfo) {
+            //     // TODO this method should be unnecessary
+            //     // (for the same reason as `onLoading` in the main fullCalendar)
+            //     return this.helper.eventRender(eventRenderInfo);
+            // },
 
             /**
              * Click an event on the calendar callback: opens the view event
