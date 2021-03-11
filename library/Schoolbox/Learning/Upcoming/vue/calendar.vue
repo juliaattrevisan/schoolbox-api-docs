@@ -108,8 +108,16 @@
             }
         },
 
-        mounted () {
+        mounted() {
+            
             this.$refs.fullCalendar.setOption('contentHeight', this.contentHeight);
+            
+            // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
+            let quickSwitchIcon = document.createElement('a');
+            quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
+            quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
+
+            document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
         },
 
         methods: {
@@ -263,15 +271,6 @@
                 this.$refs.fullCalendar.getApi().refetchEvents();
             },
 
-        },
-
-        mounted() {
-            // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
-            let quickSwitchIcon = document.createElement('a');
-            quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
-            quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
-
-            document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
         }
 
     }
