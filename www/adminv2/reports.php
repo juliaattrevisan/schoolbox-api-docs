@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Admin\Navigation\Subnav;
+
 
 $userHandler = new User();
 
@@ -76,8 +78,9 @@ else {
 }
 
 // include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_USER_MANAGEMENT, $reportType);
-
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_USER_MANAGEMENT, $reportType)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_USER_MANAGEMENT, $reportType);
 
 /* Don't worry about bounds checking here - the implementation takes care of it */
 

@@ -75,7 +75,8 @@ class Controller extends Base
         /* Breadcrumbs
          */
         $allBreadcrumbs = new Navigator([
-            new Node('Home', '/adminv2/home', false),
+            new Node('Administration', '/adminv2/home', false),
+            new Node('User Management', '/adminv2/user', false),
             new Node('User Provisioning System', $this->getBasePath(), true)
         ]);
 

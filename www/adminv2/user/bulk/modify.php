@@ -8,6 +8,7 @@
 /* Superusers only
  */
 
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
 if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
@@ -17,7 +18,9 @@ if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'adminv2/user/bulk/modify.html');
 
 // include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_USER_MANAGEMENT, \Schoolbox\Admin\Navigation\Subnav::CHILD_USER_MANAGEMENT_BULK_MODIFY);
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_BULK_MODIFY)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_BULK_MODIFY);
 
 /* Search options
  */
