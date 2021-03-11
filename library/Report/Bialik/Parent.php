@@ -1,4 +1,7 @@
 <?php
+
+use Schoolbox\Database\Factory as DatabaseFactory;
+
 /**
  *
  * @author      James Leckie <jleckie@alaress.com.au>
@@ -76,7 +79,7 @@ class Report_Bialik_Parent extends \Report_Parent
      */
     protected function getStudentContactList($yearlevel, $name, $boardingStatus, $form, $fileYear, $fileSemester) {
 
-        $db = new MSSQL();
+        $db = DatabaseFactory::getInstanceExternal();
 
         $query = "
             SELECT
@@ -152,33 +155,39 @@ class Report_Bialik_Parent extends \Report_Parent
             LEFT JOIN dbo.luCountry StudentHomeCountry
                 ON StudentContactHomeCountryCode = StudentHomeCountry.Code
             WHERE StudentContactType IN ('SC1', 'SC2', 'SC3')
-            AND FileSemester = '" . $db->quote($fileSemester) . "'
-            AND FileYear = '" . $db->quote($fileYear) ."'";
+            AND FileSemester = :fileSemester
+            AND FileYear = :fileYear";
+        $params = [
+            'fileSemester' => $fileSemester,
+            'fileYear'     => $fileYear
+        ];
+
         /* Search for a particular year level
          */
         if (strlen($yearlevel)) {
+            $params['yearLevelDescription'] = $yearlevel;
             if (is_numeric($yearlevel)) {
-                // forcibly cast to int in case it's a something non-int that's still numeric
-                $yearlevel = (int)$yearlevel;
                 $query .= "
-                AND (StudentYearLevel = '{$yearlevel}' OR Year.Description = '{$yearlevel}')";
+                AND (StudentYearLevel = :yearLevelStudent OR Year.Description = :yearLevelDescription)";
+                // forcibly cast to int in case it's a something non-int that's still numeric
+                $params['yearLevelStudent'] = (int)$yearlevel;
             } else {
                 // if year is NOT numeric, don't attempt to compare StudentYearLevel (will bug out)
                 $query .= "
-                AND Year.Description = '{$db->quote($yearlevel)}'";
+                AND Year.Description = :yearLevelDescription'";
             }
         }
         /* Search for a student name
          */
         if (strlen($name)) {
-            $name = $db->quote($name);
             $query .= "
                 AND (
-                    (StudentSurname LIKE '%{$name}%')
+                    (StudentSurname LIKE :surname)
                     OR
-                    (StudentPreferred LIKE '%{$name}%')
+                    (StudentPreferred LIKE :preferredName)
                 )
             ";
+            $params['surname'] = $params['preferredName'] = $db->getQuoter()->escapeForLike($name);
         }
         /* Search for a particular boarding status
          *
@@ -202,15 +211,15 @@ class Report_Bialik_Parent extends \Report_Parent
         /* Search for a particular form
          */
         if ($form) {
-            $form = $db->quote($form);
             $query .= "
-                AND StudentForm = '{$form}'
+                AND StudentForm = :studentForm
             ";
+            $params['studentForm'] = $form;
         }
         $query .= "
             ORDER BY StudentSurname, StudentID, StudentContactType
         ";
-        $contactList = $db->getAll($query);
+        $contactList = $db->executeQuery($query)->getIterator();
 
         foreach ($contactList as &$row) {
            if ($row['ValidAddressFlag'] == 0 || ($row['AddressUserFlag1'] == 1 && $row['AddressUserFlag3'] != 1)) {
