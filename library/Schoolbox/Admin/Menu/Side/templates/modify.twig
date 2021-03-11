@@ -34,106 +34,113 @@
     });
 </script>
 
-{# Shared navigation menu #}
-{{ renderAdminNavigation(pageCurrent) }}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="row actions-small-2">
-    <div class="small-12 column list-item">
-        {% if item is defined %}
-            <h2 class="subheader">Create Menu Item</h2>
-        {% else %}
-            <h2 class="subheader">Modify Menu Item</h2>
-        {% endif %}
+<div class="admin-container row">
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+
+    <div class="admin-content">
+        <div class="row actions-small-2">
+            <div class="small-12 column list-item">
+                {% if item is defined %}
+                    <h2 class="subheader">Create Menu Item</h2>
+                {% else %}
+                    <h2 class="subheader">Modify Menu Item</h2>
+                {% endif %}
+            </div>
+            {% if item is defined %}
+            <nav>
+                <a class="icon-more" title="Actions" data-dropdown="header-options2" aria-expanded="false"></a>
+            </nav>
+            <ul id="header-options2" class="f-dropdown" data-dropdown-content>
+                <li><a class="icon-delete" title="Delete Item" data-delete="{{ item.id }}">Delete Item</a></li>
+            </ul>
+            {% endif %}
+        </div>
+
+        <form id="itemForm" action="{{ routeLookup('adminMenuSide.postModify') }}" method="post">
+            <input type="hidden" name="id" value="{{ item.id ?? '' }}">
+
+            <div class="row">
+                <div class="small-12 island">
+                    <section>
+                        <fieldset class="content">
+                            <div class="small-12 columns">
+                                <label>
+                                    Title
+                                    <input name='title' type="text" placeholder="Item Label" value="{{ item.title  ?? '' }}">
+                                </label>
+                            </div>
+                            <div class="small-12 columns">
+                                <label for="url">
+                                    Destination URL
+                                    <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You can use [id], [firstName], [lastName], [externalId], [username], [email] in your URLs, these will be replaced for the user">?</span>
+                                </label>
+                                <script>
+                                    $(function() {
+                                        $('#modalLinkButton').schoolboxLink({
+                                            onSelect: function(url, name, mime, dialog) {
+                                                $('input[name="url"]').val(url);
+                                            }
+                                        });
+                                    });
+                                </script>
+                                <div class="input-group">
+                                    <input name="url" type="text" size="40" maxlength="2048" placeholder="Destination URL" value="{{ item.url ?? '' }}">
+                                    <a id="modalLinkButton" class="button icon-link">Browse</a>
+                                </div>
+                            </div>
+                            <div class="small-11 columns">
+                                <label>
+                                    Destination Target
+                                    <select name="target">
+                                        <option {% if item is defined and item.target == '' %}selected{% endif %} value="">Same Window</option>
+                                        <option {% if item is defined and item.target == '_blank' %}selected{% endif %} value="_blank">New Window</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="small-12 medium-6 columns">
+                                <fieldset class="checklist">
+                                    <legend>
+                                        Visible Campus
+                                        <span data-tooltip="" class="hint has-tip tip-top" data-width="200" title="Users in these campus will see the tab, remember users can be in multiple campus">?</span>
+                                    </legend>
+                                    <input id="campus-all" type="checkbox">
+                                    <label for="campus-all">Select All</label>
+                                    {% for campus in campuses %}
+                                        <input name="campuses[]" data-campus id="campus-{{ campus.id }}" type="checkbox" {% if campusesSelected[campus.id] ?? false %}checked{% endif %} value="{{ campus.id }}">
+                                        <label for="campus-{{ campus.id }}">{{ campus.name }}</label>
+                                    {% endfor %}
+                                </fieldset>
+                            </div>
+                            <div class="small-12 medium-6 columns">
+                                <fieldset class="checklist">
+                                    <legend>
+                                        Visible Roles
+                                        <span data-tooltip="" class="hint has-tip tip-top" data-width="200" title="Users in these roles will see the tab">?</span>
+                                    </legend>
+                                    <input id="role-all" type="checkbox">
+                                    <label for="role-all">Select All</label>
+                                    {% for role in roles %}
+                                        <input name="roles[]" data-role id="role-{{ role.id }}" type="checkbox" {% if rolesSelected[role.id] ?? false %}checked{% endif %} value="{{ role.id }}">
+                                        <label for="role-{{ role.id }}">{{ role.name }}</label>
+                                    {% endfor %}
+                                </fieldset>
+                            </div>
+                        </fieldset>
+                    </section>
+                </div>
+            </div>
+            <div class="row">
+                <div class="small-12 column">
+                    <input data-submit type="submit" value="Save">
+                </div>
+            </div>
+        </form>
     </div>
-    {% if item is defined %}
-    <nav>
-        <a class="icon-more" title="Actions" data-dropdown="header-options2" aria-expanded="false"></a>
-    </nav>
-    <ul id="header-options2" class="f-dropdown" data-dropdown-content>
-        <li><a class="icon-delete" title="Delete Item" data-delete="{{ item.id }}">Delete Item</a></li>
-    </ul>
-    {% endif %}
 </div>
-
-<form id="itemForm" action="{{ routeLookup('adminMenuSide.postModify') }}" method="post">
-    <input type="hidden" name="id" value="{{ item.id ?? '' }}">
-
-    <div class="row">
-        <div class="small-12 island">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>
-                            Title
-                            <input name='title' type="text" placeholder="Item Label" value="{{ item.title  ?? '' }}">
-                        </label>
-                    </div>
-                    <div class="small-12 columns">
-                        <label for="url">
-                            Destination URL
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="You can use [id], [firstName], [lastName], [externalId], [username], [email] in your URLs, these will be replaced for the user">?</span>
-                        </label>
-                        <script>
-                            $(function() {
-                                $('#modalLinkButton').schoolboxLink({
-                                    onSelect: function(url, name, mime, dialog) {
-                                        $('input[name="url"]').val(url);
-                                    }
-                                });
-                            });
-                        </script>
-                        <div class="input-group">
-                            <input name="url" type="text" size="40" maxlength="2048" placeholder="Destination URL" value="{{ item.url ?? '' }}">
-                            <a id="modalLinkButton" class="button icon-link">Browse</a>
-                        </div>
-                    </div>
-                    <div class="small-11 columns">
-                        <label>
-                            Destination Target
-                            <select name="target">
-                                <option {% if item is defined and item.target == '' %}selected{% endif %} value="">Same Window</option>
-                                <option {% if item is defined and item.target == '_blank' %}selected{% endif %} value="_blank">New Window</option>
-                            </select>
-                        </label>
-                    </div>
-                    <div class="small-12 medium-6 columns">
-                        <fieldset class="checklist">
-                            <legend>
-                                Visible Campus
-                                <span data-tooltip="" class="hint has-tip tip-top" data-width="200" title="Users in these campus will see the tab, remember users can be in multiple campus">?</span>
-                            </legend>
-                            <input id="campus-all" type="checkbox">
-                            <label for="campus-all">Select All</label>
-                            {% for campus in campuses %}
-                                <input name="campuses[]" data-campus id="campus-{{ campus.id }}" type="checkbox" {% if campusesSelected[campus.id] ?? false %}checked{% endif %} value="{{ campus.id }}">
-                                <label for="campus-{{ campus.id }}">{{ campus.name }}</label>
-                            {% endfor %}
-                        </fieldset>
-                    </div>
-                    <div class="small-12 medium-6 columns">
-                        <fieldset class="checklist">
-                            <legend>
-                                Visible Roles
-                                <span data-tooltip="" class="hint has-tip tip-top" data-width="200" title="Users in these roles will see the tab">?</span>
-                            </legend>
-                            <input id="role-all" type="checkbox">
-                            <label for="role-all">Select All</label>
-                            {% for role in roles %}
-                                <input name="roles[]" data-role id="role-{{ role.id }}" type="checkbox" {% if rolesSelected[role.id] ?? false %}checked{% endif %} value="{{ role.id }}">
-                                <label for="role-{{ role.id }}">{{ role.name }}</label>
-                            {% endfor %}
-                        </fieldset>
-                    </div>
-                </fieldset>
-            </section>
-        </div>
-    </div>
-    <div class="row">
-        <div class="small-12 column">
-            <input data-submit type="submit" value="Save">
-        </div>
-    </div>
-</form>
 
 <script>
     $(function() {
@@ -187,6 +194,5 @@
                 $(this).prop('checked', status);
             });
         });
-
     });
 </script>

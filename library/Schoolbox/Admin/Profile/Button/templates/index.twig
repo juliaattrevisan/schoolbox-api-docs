@@ -10,7 +10,7 @@
     {% set n = selectedCollection[item.id] | length %}
 
     {% for obj in collection %}
-        {% if selectedCollection[item.id][obj.id] %}
+        {% if selectedCollection[item.id][obj.id] ?? false %}
             {{ obj.name }}{% if i < n %}, {% endif %}
             {% set i = i+1 %}
         {% endif %}
@@ -18,18 +18,22 @@
 {% endmacro %}
 {% import _self as macro %}
 
-{# Shared navigation profile #}
-{{ renderAdminNavigation(pageCurrent) }}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="row">
-    <div class="small-12 island {% if profile|length > 0 %}hide{% endif %}" id="profile-button-empty-state">
-        <div class="empty-state">
-            <i class="icon-staff-students"></i>
-            <p><a href="{{ routeLookup('adminProfileButton.getCreate') }}">Add a custom button</a> to the profile page and 'My Students' dashboard component for certain users.</p>
+<div class="admin-container row">
+    {# Shared navigation profile #}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island {% if profile|length > 0 %}hide{% endif %}" id="profile-button-empty-state">
+            <div class="empty-state">
+                <i class="icon-staff-students"></i>
+                <p><a href="{{ routeLookup('adminProfileButton.getCreate') }}">Add a custom button</a> to the profile page and 'My Students' dashboard component for certain users.</p>
+            </div>
         </div>
-    </div>
 
-    {% if profile | length > 0 %}
+        {% if profile | length > 0 %}
         <div class="small-12 island" id="profile-button-container">
 
             <div class="row actions-small-1">
@@ -50,7 +54,7 @@
                             <div class="actions-small-2">
                                 <div class="grip"></div>
                                 <div class="list-item">
-                                    <div class="card small-12">
+                                    <div class="card small-12 wrap-down">
                                         <a>
                                             <div class="icon-{{ item.icon }} size-64"></div>
                                             <h3>{{ item.text }}</h3>
@@ -82,9 +86,9 @@
                     {% endfor %}
                 </ul>
             </section>
-
         </div>
-    {% endif %}
+        {% endif %}
+    </div>
 </div>
 
 <div class="toast" data-button-toast></div>

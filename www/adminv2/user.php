@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Collection;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -17,10 +18,10 @@ $this->setTitle('Admin - Users');
 $this->setBlock(TEMPLATE_content, 'superusers', 'superusers_block');
 $this->setBlock(TEMPLATE_content, 'service', 'service_block');
 
-
 // include the admin navigation
-$nav = new AdminV2_Nav($this->getDi()->get('config'));
-$nav->parse($this, 'user');
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_USER_MANAGEMENT, null)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_USER_MANAGEMENT, null);
 
 $userHandler = new User();
 

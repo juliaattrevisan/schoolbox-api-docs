@@ -21,3 +21,21 @@
         padding: 1rem;
     }
 }
+
+.admin-container {
+  display: flex;
+  flex-wrap: wrap;
+
+  #admin-nav {
+    flex: 0 0 240px;
+    @include responsive-sides(1, padding);
+
+    @media #{$medium-down} {
+      flex: 1 100%;
+    }
+  }
+
+  .admin-content {
+    flex: 1;
+  }
+}

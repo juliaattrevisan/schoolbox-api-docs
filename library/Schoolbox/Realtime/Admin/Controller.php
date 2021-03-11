@@ -12,6 +12,7 @@ use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base as BaseController;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Collection;
 use Schoolbox\MobileApp\Service;
 use Schoolbox\Realtime\Config;
@@ -183,7 +184,9 @@ class Controller extends BaseController
         }
 
         $data = [
-            'pageCurrent' => 'messages',
+            'pageCurrent' => Subnav::PARENT_MESSAGES,
+            'subpageCurrent' => Subnav::CHILD_MESSAGES_DELIVERY_PROVIDERS,
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_MESSAGES, Subnav::CHILD_MESSAGES_DELIVERY_PROVIDERS),
             'apps'        => $apps,
             'attachzones' => $zones,
             'providers'   => [
@@ -340,6 +343,9 @@ class Controller extends BaseController
             'title'    => 'Global Message Configuration',
             'template' => '@adminMessages/configure.twig',
             'data'     => [
+                'pageCurrent' => Subnav::PARENT_MESSAGES,
+                'subpageCurrent' => Subnav::CHILD_MESSAGES_SETTINGS,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_MESSAGES, Subnav::CHILD_MESSAGES_SETTINGS),
                 'filters' => $filters,
                 'roles'   => $roles,
                 'ns'      => $ns,
@@ -474,7 +480,11 @@ class Controller extends BaseController
 
         $content = [
             'template' => '@adminMessages/puush.twig',
-            'data'     => [],
+            'data'     => [
+                'pageCurrent' => Subnav::PARENT_MESSAGES,
+                'subpageCurrent' => Subnav::CHILD_MESSAGES_APP_REGISTRATIONS,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_MESSAGES, Subnav::CHILD_MESSAGES_APP_REGISTRATIONS),
+            ],
         ];
 
         if ($userId) {

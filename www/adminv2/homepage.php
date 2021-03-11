@@ -9,6 +9,10 @@
  */
 
 /** @var SitePage $this */
+
+use Schoolbox\Admin\Navigation\Subnav;
+
+
 if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
     error(19, "", 401);
 }
@@ -30,8 +34,10 @@ $this->setBlock(TEMPLATE_content, 'component_page', 'component_page_block');
 $this->setBlock('component_page', 'component', 'component_block');
 
 // include the admin navigation
-$nav = new AdminV2_Nav($this->getDi()->get('config'));
-$nav->parse($this, 'homepage');
+// include the admin navigation
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_HOMEPAGE, null)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_HOMEPAGE, null);
 
 // Get list of templates
 $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();

@@ -8,6 +8,7 @@ namespace Schoolbox\Admin\Restore;
 
 use Alaress\Web\Controller\Base;
 use Psr\Log\NullLogger;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\RecursiveUndeleter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -17,7 +18,6 @@ use Schoolbox\Learning\Assessment\DataModel\Model as Assessment;
 
 class Controller extends Base
 {
-    private const PAGE_CURRENT = 'restore';
 
     /**
      * Period of time that you can restore items, older than this will not be displayed
@@ -84,7 +84,9 @@ class Controller extends Base
         });
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@restore/index.twig', [
-            'pageCurrent' => self::PAGE_CURRENT,
+            'pageCurrent' => Subnav::PARENT_RESOURCES,
+            'subpageCurrent' => Subnav::CHILD_RESOURCES_RESTORE,
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_RESOURCES, Subnav::CHILD_RESOURCES_RESTORE),
             'deletedFolders' => $deletedFolders,
             'deletedAssessments' => $deletedAssessments,
         ]));

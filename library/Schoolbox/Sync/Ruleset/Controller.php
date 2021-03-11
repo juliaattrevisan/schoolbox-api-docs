@@ -7,6 +7,7 @@
 namespace Schoolbox\Sync\Ruleset;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 use \Schoolbox\Sync\Condition;
 use \Schoolbox\Sync\Effect;
 use Schoolbox\Sync\Effect\Type\Model as EffectType;
@@ -69,14 +70,8 @@ class Controller extends Base
     /**
      * Render intro
      */
-    public function intro() {
-
-        /* Breadcrumbs
-         */
-        $allBreadcrumbs = new Navigator([
-            new Node('Home', '/adminv2/home', false),
-            new Node('User Provisioning System', $this->getBasePath(), true)
-        ]);
+    public function intro()
+    {
 
         /* Navigation
          */
@@ -91,9 +86,11 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/intro.twig',
             'data' => [
-                'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
+                'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_UPS,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_UPS),
                 'allNavigation' => $allNavigation->getAllNodes(),
-                'logs'         => $this->findLogs(3)
+                'logs' => $this->findLogs(3)
             ]
         ]);
     }
@@ -130,6 +127,10 @@ class Controller extends Base
             // This mimetype don't exist
             $twigData['logExtensionExists'] = false;
         }
+
+        $twigData['pageCurrent'] = Subnav::PARENT_USER_MANAGEMENT;
+        $twigData['subpageCurrent'] = Subnav::CHILD_USER_MANAGEMENT_UPS;
+        $twigData['allBreadcrumbs'] = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_UPS);
 
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/ruleset.twig',
@@ -182,16 +183,12 @@ class Controller extends Base
      */
     public function logs()
     {
-        $allBreadcrumbs = new Navigator([
-            new Node('Home', '/adminv2/home', false),
-            new Node('User Provisioning System', $this->getBasePath(), false),
-            new Node('Logs', $this->getBasePath() . '/logs', true)
-        ]);
-
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/log/list.twig',
             'data'     => [
-                'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
+                'pageCurrent'    => Subnav::PARENT_USER_MANAGEMENT,
+                'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_UPS,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_UPS),
                 'logs'           => $this->findLogs()
             ]
         ]);
@@ -278,19 +275,11 @@ class Controller extends Base
                     'lines' => $this->getLogPartial($model->getStorage(), $page, $this->parseFilterString($filter), $linesPerPage)
                 ];
 
-                $allBreadcrumbs = new Navigator([
-                    new Node('Home', '/adminv2/home', false),
-                    new Node('User Provisioning System', $this->getBasePath(), false),
-                    new Node('Logs', $this->getBasePath() . '/logs', false),
-                    new Node("{$log['timestamp']->getDatabase()} ({$log['roleType']})",
-                        $this->getBasePath() . "/log/$logId", true)
-                ]);
-
                 $data = [
                     'id' => $logId,
                     'filterBlacklist' => ['rulestring'],
                     'log' => $log,
-                    'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_UPS),
                     'filterSummary' => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
                 ];
 

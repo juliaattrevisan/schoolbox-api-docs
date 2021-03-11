@@ -14,6 +14,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\INavigation;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\External\Importer\AbstractImporter;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Import\ImporterFactory;
@@ -91,7 +92,9 @@ class Controller extends Base
     protected function getBaseData(): array
     {
         return [
-            'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+            'pageCurrent' => Subnav::PARENT_IMPORT,
+            'subpageCurrent' => Subnav::CHILD_IMPORT_USER_ACCOUNTS,
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_IMPORT, Subnav::CHILD_IMPORT_PAGES),
             'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
             'basename' => $this->basename,
             'now' => \Alaress_Date_Format::now(),

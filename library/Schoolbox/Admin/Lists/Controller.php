@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\Lists;
 
 use Alaress\Diff\Differ;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
 use Schoolbox\Learning\Moment\Evidence\Tag\Mapper as LearningMomentEvidenceTag;
 use Schoolbox\Mapper;
@@ -995,11 +996,12 @@ class Controller extends Base
         }
 
         // Render this thing out
-
         $this->getResponse()->content->set([
             'template' => '@adminLists/index.twig',
             'data'     => [
-                'pageCurrent' => 'lists',
+                'pageCurrent' => Subnav::PARENT_LISTS,
+                'subpageCurrent' => $table,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LISTS, $table),
                 'tables'      => $tables,
                 'table'       => $table,
                 'records'     => $records

@@ -35,22 +35,26 @@ class Renderer extends Extension\AbstractExtension
         );
     }
 
+
     /**
      * @param Environment $twig
-     * @param string            $pageCurrent
+     * @param string      $pageCurrent
+     * @param string|null $subpageCurrent
      * @return string
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
-    public function renderAdminNavigation(Environment $twig, $pageCurrent): string
+    public function renderAdminNavigation(Environment $twig, string $pageCurrent, ?string $subpageCurrent): string
     {
         // Grab navigation items from old admin class
         // TODO SA-8354: inject this
-        $nav = new \AdminV2_Nav(new Loader());
 
         // Render this thing out
-
-        return $twig->render('@adminNavigation/index.twig', array(
+        return $twig->render('@adminNavigation/subnav.twig', array(
+            'adminSubnav' => (new Subnav(new Loader()))->generate(),
             'pageCurrent' => $pageCurrent,
-            'links' => $nav->getNavigation()
+            'subpageCurrent' => $subpageCurrent
         ));
     }
 

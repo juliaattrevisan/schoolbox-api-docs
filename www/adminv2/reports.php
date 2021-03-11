@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Admin\Navigation\Subnav;
+
 
 $userHandler = new User();
 
@@ -24,11 +26,6 @@ $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
 $this->setBlock(TEMPLATE_content, 'filter', 'filter_block');
 $this->setBlock(TEMPLATE_content, 'download_report', 'download_report_block');
 $this->setVar('filter_block', '');
-
-// include the admin navigation
-$nav = new AdminV2_Nav($this->getDi()->get('config'));
-$nav->parse($this, 'home');
-
 $this->setTitle('Admin - Reports');
 
 if(count($this->arg) < 2) {
@@ -79,6 +76,11 @@ else {
         $page = $this->arg[4];
     }
 }
+
+// include the admin navigation
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_USER_MANAGEMENT, $reportType)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_USER_MANAGEMENT, $reportType);
 
 /* Don't worry about bounds checking here - the implementation takes care of it */
 

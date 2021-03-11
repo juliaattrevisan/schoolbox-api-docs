@@ -1,11 +1,21 @@
-{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="row">
-    <div class="small-12 island">
-        <h1>User Provisioning Logs</h1>
-        {% include '@upsRuleset/log/table.twig' %}
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader">Logs</h2>
+        </div>
+        <div class="small-12 island">
+            {% include '@upsRuleset/log/table.twig' %}
+        </div>
     </div>
 </div>
+
 <script type="text/javascript">
     $(function(){
         $('[data-tablesorter]').DataTable({

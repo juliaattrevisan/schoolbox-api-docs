@@ -8,6 +8,7 @@
 namespace Schoolbox\Admin\Video;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Video\QueueMapper as VideoQueueMapper;
 use Schoolbox\Video\Queue as VideoQueue;
@@ -42,7 +43,9 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminVideo/index.twig',
             'data' => [
-                'pageCurrent' => self::PAGE_CURRENT,
+                'pageCurrent' => Subnav::PARENT_RESOURCES,
+                'subpageCurrent' => Subnav::CHILD_RESOURCES_MEDIA_QUEUE,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_RESOURCES, Subnav::CHILD_RESOURCES_MEDIA_QUEUE),
                 'queue' => $queueItems,
                 'statusOrder' => $statuses
             ],

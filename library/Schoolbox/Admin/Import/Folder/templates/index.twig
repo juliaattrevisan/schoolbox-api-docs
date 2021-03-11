@@ -1,118 +1,124 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="row">
-    <div class="small-12 island">
-        <h1>Import Folders</h1>
-        {% include '@adminImportIndex/subnavigation.twig' with { allNodes: allNavigation } %}
-    </div>
-</div>
+<div class="admin-container row">
 
-<script>
-    $(function() {
-        $('[data-checkbox-inherit]').change(function(event) {
-            if ($(event.target).prop('checked')) {
-                $('#permissions').addClass('hide');
-            } else {
-                $('#permissions').removeClass('hide');
-            }
-        });
-    });
-</script>
-<script type="text/javascript" src="/javascript/shared/attacher.checkbox-group.js"></script>
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation('import/directImport', subpageCurrent) }}
 
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader">Pages</h2>
+        </div>
 
-{# Config page contents #}
+        <div class="small-12 island">
+            {% include '@adminImportIndex/subnavigation.twig' with { allNodes: allNavigation } %}
+        </div>
 
-<div class="row">
-    <div class="small-12 island">
-        <section>
-            <fieldset class="content">
-                <div class="small-12 columns">
-                    <p>From this screen you can bulk create homepages and folders for class pages or general use. This import uses a specific CSV format which you can download from the link below, then enter your required class pages or folders and upload your CSV.</p>
-                </div>
-            </fieldset>
-            <div class="component-action">
-                <section>
-                    <a href="/adminv2/csv/folderBulkAdd.csv" class="button" title="Download template">Download Template</a>
-                </section>
-            </div>
-        </section>
-        <form action="{{ routeLookupIfAuthorized('adminImportFolder.postImportResults') }}" method="post" enctype="multipart/form-data" name="form" id="form">
+        <script>
+            $(function() {
+                $('[data-checkbox-inherit]').change(function(event) {
+                    if ($(event.target).prop('checked')) {
+                        $('#permissions').addClass('hide');
+                    } else {
+                        $('#permissions').removeClass('hide');
+                    }
+                });
+            });
+        </script>
+        <script type="text/javascript" src="/javascript/shared/attacher.checkbox-group.js"></script>
+
+        {# Config page contents #}
+
+        <div class="small-12 island">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>Folder Access Permissions</label>
-                    </div>
-                    <div class="small-12 columns">
-                        <input data-checkbox-inherit type="checkbox" id="inherit" name="inherit" value="1" />
-                        <label for="inherit" class="checkbox-label">Inherit permissions from parent folder</label>
+                        <p>From this screen you can bulk create homepages and folders for class pages or general use. This import uses a specific CSV format which you can download from the link below, then enter your required class pages or folders and upload your CSV.</p>
                     </div>
                 </fieldset>
-                <table id="permissions" class="no-margin">
-                    <thead>
-                        <tr>
-                            <th>Role</th>
-                            <th>None</th>
-                            <th>Read</th>
-                            <th>Write</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for role in roles %}
+                <div class="component-action">
+                    <section>
+                        <a href="/adminv2/csv/folderBulkAdd.csv" class="button" title="Download template">Download Template</a>
+                    </section>
+                </div>
+            </section>
+            <form action="{{ routeLookupIfAuthorized('adminImportFolder.postImportResults') }}" method="post" enctype="multipart/form-data" name="form" id="form">
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label>Folder Access Permissions</label>
+                        </div>
+                        <div class="small-12 columns">
+                            <input data-checkbox-inherit type="checkbox" id="inherit" name="inherit" value="1" />
+                            <label for="inherit" class="checkbox-label">Inherit permissions from parent folder</label>
+                        </div>
+                    </fieldset>
+                    <table id="permissions" class="no-margin">
+                        <thead>
                             <tr>
-                                <td>{{ role.getName }}</td>
-                                <td>
-                                    <input type="radio" name="groupPerm[{{ role.getId }}]" checked id="groupNone{{ role.getId }}" value="0">
-                                    <label class="radio-label" for="groupNone{{ role.getId }}"></label>
-                                </td>
-                                <td>
-                                    <input type="radio" name="groupPerm[{{ role.getId }}]" id="groupRead{{ role.getId }}" value="1"}}>
-                                    <label class="radio-label" for="groupRead{{ role.getId }}"></label>
-                                </td>
-                                <td>
-                                    <input type="radio" name="groupPerm[{{ role.getId }}]" id="groupWrite{{ role.getId }}" value="2"}}>
-                                    <label class="radio-label" for="groupWrite{{ role.getId }}"></label>
-                                </td>
+                                <th>Role</th>
+                                <th>None</th>
+                                <th>Read</th>
+                                <th>Write</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label for='template'>
-                            Homepage Template
-                            <span data-tooltip class="hint has-tip tip-right" title="This homepage template will be applied to each created folder.">?</span>
-                        </label>
-                    </div>
-                    <div class="small-12 columns">
-                        <select name='template'>
-                            <option value='0'>No template</option>
-                            {% for template in templates %}
-                                <option value="{{ template.getId }}">{{ template.getName }}</option>
+                        </thead>
+                        <tbody>
+                            {% for role in roles %}
+                                <tr>
+                                    <td>{{ role.getName }}</td>
+                                    <td>
+                                        <input type="radio" name="groupPerm[{{ role.getId }}]" checked id="groupNone{{ role.getId }}" value="0">
+                                        <label class="radio-label" for="groupNone{{ role.getId }}"></label>
+                                    </td>
+                                    <td>
+                                        <input type="radio" name="groupPerm[{{ role.getId }}]" id="groupRead{{ role.getId }}" value="1"}}>
+                                        <label class="radio-label" for="groupRead{{ role.getId }}"></label>
+                                    </td>
+                                    <td>
+                                        <input type="radio" name="groupPerm[{{ role.getId }}]" id="groupWrite{{ role.getId }}" value="2"}}>
+                                        <label class="radio-label" for="groupWrite{{ role.getId }}"></label>
+                                    </td>
+                                </tr>
                             {% endfor %}
-                        </select>
-                    </div>
-                </fieldset>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>Apply Changes<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Leaving this off will show you what would happen, but not actually make the change. ">?</span></label>
-                    </div>
-                    <div class="small-12 columns">
-                        <div class="switch">
-                            <input id="perform" name="perform" type="checkbox" data-ordinary-checkbox="">
-                            <label for="perform">
-                                <span>On</span>
-                                <span>Off</span>
+                        </tbody>
+                    </table>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for='template'>
+                                Homepage Template
+                                <span data-tooltip class="hint has-tip tip-right" title="This homepage template will be applied to each created folder.">?</span>
                             </label>
                         </div>
-                    </div>
-                    <div class="small-12 columns">
-                        {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
-                    </div>
-                </fieldset>
-            </section>
-            <input type="submit" value="Import" />
-        </form>
+                        <div class="small-12 columns">
+                            <select name='template'>
+                                <option value='0'>No template</option>
+                                {% for template in templates %}
+                                    <option value="{{ template.getId }}">{{ template.getName }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </fieldset>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label>Apply Changes<span data-tooltip class="hint has-tip tip-top" data-width="200" title="Leaving this off will show you what would happen, but not actually make the change. ">?</span></label>
+                        </div>
+                        <div class="small-12 columns">
+                            <div class="switch">
+                                <input id="perform" name="perform" type="checkbox" data-ordinary-checkbox="">
+                                <label for="perform">
+                                    <span>On</span>
+                                    <span>Off</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="small-12 columns">
+                            {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+                        </div>
+                    </fieldset>
+                </section>
+                <input type="submit" value="Import" />
+            </form>
+        </div>
     </div>
 </div>

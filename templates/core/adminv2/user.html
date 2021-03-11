@@ -81,120 +81,122 @@
 </script>
 <!-- END custom_head -->
 
-{ADMIN_NAV}
+{ADMIN_BREADCRUMBS}
 
-<div class="row">
-    <div class="small-12 large-6 island">
-        <form data-action="modify-user" action="" method="post" >
-            <h2 class="subheader">Modify User</h2>
+<div class="admin-container row">
+
+    {ADMIN_NAV}
+    <div class="admin-content">
+        <div class="small-12 large-6 island">
+            <form data-action="modify-user" action="" method="post" >
+                <h2 class="subheader">Modify User</h2>
+                <section>
+                    <div class="content">
+                        <input data-selectizeuser type="text" name="userId" placeholder="Search Users">
+                    </div>
+                    <div class="component-action">
+                        <section>
+                            <button type="submit" disabled>Modify</button>
+                            <a class="button" href="/adminv2/user/create">Add User</a>
+                        </section>
+                    </div>
+                </section>
+            </form>
+
+            <h2 class="subheader">Superusers</h2>
+            <table>
+                <colgroup>
+                    <col width="40%" />
+                    <col width="40%" />
+                    <col width="20%" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Last Login</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- BEGIN superusers -->
+                <tr>
+                    <td>{SUPERUSER_NAME}</td>
+                    <td>{SUPERUSER_LOGIN}</td>
+                    <td><a class="no-text icon-modify" title="Modify" href="/adminv2/user/{SUPERUSER_ID}/modify"></a></td>
+                </tr>
+                <!-- END superusers -->
+                </tbody>
+            </table>
+            <h2 class="subheader">Service Permissions</h2>
+            <section>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Members</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- BEGIN service -->
+                        <tr>
+                            <td><a href="/adminv2/service/permissions#{SERVICE_NAME}">{SERVICE_NAME}</a></td>
+                            <td>{SERVICE_COUNT}</td>
+                        </tr>
+                        <!-- END service -->
+                        </tbody>
+                    </table>
+                    <div class="component-action">
+                        <section>
+                            <a href="/adminv2/service/permissions" class="button">View All</a>
+                        </section>
+                    </div>
+            </section>
+        </div>
+
+        <div class="small-12 large-6 island">
+            <!--<h2>Bulk Options <span data-tooltip class="hint has-tip tip-top" title="If you are wanting to deal with large lists at once, use this section.">?</span></h2>-->
+            <h2 class="subheader">Bulk Modify Users</h2>
             <section>
                 <div class="content">
-                    <input data-selectizeuser type="text" name="userId" placeholder="Search Users">
+                    <p>You may bulk modify users using either a CSV import or the bulk modify user form.  The import user will accept a CSV containing user data.  This will additionally allow you to add new users.  Alternatively if you just want to modify users, you can use the bulk modify page to make changes to user attributes.</p>
                 </div>
                 <div class="component-action">
                     <section>
-                        <button type="submit" disabled>Modify</button>
-                        <a class="button" href="/adminv2/user/create">Add User</a>
+                        <a href="/adminv2/import/userAccount" class="button">Import CSV</a>
+                        <a href="/adminv2/user/bulk/modify" class="button">Bulk Modify</a>
                     </section>
                 </div>
             </section>
-        </form>
 
-        <h2 class="subheader">Superusers</h2>
-        <table>
-            <colgroup>
-                <col width="40%" />
-                <col width="40%" />
-                <col width="20%" />
-            </colgroup>
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Last Login</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- BEGIN superusers -->
-            <tr>
-                <td>{SUPERUSER_NAME}</td>
-                <td>{SUPERUSER_LOGIN}</td>
-                <td><a class="no-text icon-modify" title="Modify" href="/adminv2/user/{SUPERUSER_ID}/modify"></a></td>
-            </tr>
-            <!-- END superusers -->
-            </tbody>
-        </table>
-        <h2 class="subheader">Service Permissions</h2>
-        <section>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Service</th>
-                        <th>Members</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- BEGIN service -->
-                    <tr>
-                        <td><a href="/adminv2/service/permissions#{SERVICE_NAME}">{SERVICE_NAME}</a></td>
-                        <td>{SERVICE_COUNT}</td>
-                    </tr>
-                    <!-- END service -->
-                    </tbody>
-                </table>
-                <div class="component-action">
-                    <section>
-                        <a href="/adminv2/service/permissions" class="button">View All</a>
-                    </section>
-                </div>
-        </section>
-    </div>
-
-
-
-    <div class="small-12 large-6 island">
-        <!--<h2>Bulk Options <span data-tooltip class="hint has-tip tip-top" title="If you are wanting to deal with large lists at once, use this section.">?</span></h2>-->
-        <h2 class="subheader">Bulk Modify Users</h2>
-        <section>
-            <div class="content">
-                <p>You may bulk modify users using either a CSV import or the bulk modify user form.  The import user will accept a CSV containing user data.  This will additionally allow you to add new users.  Alternatively if you just want to modify users, you can use the bulk modify page to make changes to user attributes.</p>
-            </div>
-            <div class="component-action">
-                <section>
-                    <a href="/adminv2/import/userAccount" class="button">Import CSV</a>
-                    <a href="/adminv2/user/bulk/modify" class="button">Bulk Modify</a>
-                </section>
-            </div>
-        </section>
-
-        <h2 class="subheader">Clone Role</h2>
-        <section class="content">
-            <form data-action="clone" action="/adminv2/user/cloneForm.php" method="post" class="level clearfix">
-                <p>
-                    This cloning process will be destructive: any existing permissions will first be deleted from the destination role before new permissions are added.
-                    It should only be carried out on new roles, or roles you no longer require.
-                </p>
-                <!-- BEGIN select_clone -->
-                <label>{CLONE_LABEL} Role
-                    <select data-role="clone-{CLONE_KEY}" name="clone[{CLONE_KEY}]" required>
-                        <option disabled="disabled" selected="selected">(Choose Role)</option>
-                        <!-- BEGIN select_new -->
-                        <option value="0">(New Role...)</option>
-                        <!-- END select_new -->
-                        <!-- BEGIN select_clone_opt -->
-                        <option value="{CLONE_OPT_VALUE}" {CLONE_OPT_VALUE_SELECTED}>{CLONE_OPT_NAME}</option>
-                        <!-- END select_clone_opt -->
-                    </select>
-                </label>
-                <!-- BEGIN new_role -->
-                <label class="hide" data-container="clone-new">
-                    New Role name
-                    <input data-role="clone-new" name="clone[new]" type="text" value="" />
-                </label>
-                <!-- END new_role -->
-                <!-- END select_clone -->
-                <input type="submit" class="icon-copy" value="Clone" />
-            </form>
-        </section>
+            <h2 class="subheader">Clone Role</h2>
+            <section class="content">
+                <form data-action="clone" action="/adminv2/user/cloneForm.php" method="post" class="level clearfix">
+                    <p>
+                        This cloning process will be destructive: any existing permissions will first be deleted from the destination role before new permissions are added.
+                        It should only be carried out on new roles, or roles you no longer require.
+                    </p>
+                    <!-- BEGIN select_clone -->
+                    <label>{CLONE_LABEL} Role
+                        <select data-role="clone-{CLONE_KEY}" name="clone[{CLONE_KEY}]" required>
+                            <option disabled="disabled" selected="selected">(Choose Role)</option>
+                            <!-- BEGIN select_new -->
+                            <option value="0">(New Role...)</option>
+                            <!-- END select_new -->
+                            <!-- BEGIN select_clone_opt -->
+                            <option value="{CLONE_OPT_VALUE}" {CLONE_OPT_VALUE_SELECTED}>{CLONE_OPT_NAME}</option>
+                            <!-- END select_clone_opt -->
+                        </select>
+                    </label>
+                    <!-- BEGIN new_role -->
+                    <label class="hide" data-container="clone-new">
+                        New Role name
+                        <input data-role="clone-new" name="clone[new]" type="text" value="" />
+                    </label>
+                    <!-- END new_role -->
+                    <!-- END select_clone -->
+                    <input type="submit" class="icon-copy" value="Clone" />
+                </form>
+            </section>
+        </div>
     </div>
 </div>

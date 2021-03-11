@@ -13,6 +13,7 @@ use InvalidArgumentException;
 use PDOException;
 use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\INavigation;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Application;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper;
@@ -97,7 +98,9 @@ class Controller extends Base
             [
                 'template' => '@adminImportFolder/index.twig',
                 'data' => [
-                    'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+                    'pageCurrent' => Subnav::PARENT_IMPORT,
+                    'subpageCurrent' => Subnav::CHILD_IMPORT_PAGES,
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_IMPORT, Subnav::CHILD_IMPORT_PAGES),
                     'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), 'adminImportFolder')->getAllNodes(),
                     'templates' => $this->homepageTemplateMapper->findAll()->sortBy('name', 'asc'),
                     'roles' => $this->roleMapper->findAll(),
@@ -108,7 +111,6 @@ class Controller extends Base
     }
 
 
-    /** @noinspection PhpUnused */
     /**
      * Create folders and render results
      *
@@ -152,7 +154,9 @@ class Controller extends Base
             [
                 'template' => '@adminImportFolder/importResults.twig',
                 'data' => [
-                    'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+                    'pageCurrent'    => Subnav::PARENT_IMPORT,
+                    'subpageCurrent' => Subnav::CHILD_IMPORT_PAGES,
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_IMPORT, Subnav::CHILD_IMPORT_PAGES),
                     'results'        => $allFolders,
                     'perform'        => $performMode,
                 ],
@@ -165,7 +169,6 @@ class Controller extends Base
      * Insert an attach zone into the template
      *
      * @return array
-     * @throws UnexpectedValueException
      */
     private function getAttachZone(): array
     {

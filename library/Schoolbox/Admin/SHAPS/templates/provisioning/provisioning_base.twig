@@ -1,123 +1,126 @@
-{{ renderAdminNavigation(pageCurrent ?? 'shaps') }}
-<div class="row">
-    <div class="small-12 island">
-        <ul class="sub-nav">
-            {% block pageStaffProvisioning %}<li>{% endblock %}
-                <a href="{{ routeLookup('shaps.getAll') }}">Staff Provisioning</a>
-            </li>
-            {% block pageHelpCourses %}<li>{% endblock %}
-                <a href="{{ routeLookup('shaps.getUsersInCourses') }}">Help Courses</a>
-            </li>
-        </ul>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-        <h1>Staff Provisioning</h1>
+<div class="admin-container row">
 
-        <ul class="sub-nav">
-            {% block pageAll %}<li>{% endblock %}
-                <a href="{{ routeLookup('shaps.getAll') }}">All</a>
-            </li>
-            {% block pageProvisioned %}<li>{% endblock %}
-                <a href="{{ routeLookup('shaps.getProvisioned') }}">Provisioned</a>
-            </li>
-            {% block pageUnprovisioned %}<li>{% endblock %}
-                <a href="{{ routeLookup('shaps.getUnprovisioned') }}">Not Provisioned</a>
-            </li>
-            {% block pageSearch %}<li>{% endblock %}
-                <a href="{{ routeLookup('shaps.getUserProvisioningSearch') }}">Search</a>
-            </li>
-        </ul>
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
 
-        {% if errorMessage %}
-            <div class="empty-state">
-                <i class="icon-info"></i>
-                <h2>Sorry, we are unable to complete this request </h2>
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader">Schoolbox Help Provisioning</h2>
+        </div>
+        <div class="small-12 island">
+            <dl class="tabs" data-tab>
+                {% block pageAll %}<dd>{% endblock %}
+                    <a href="{{ routeLookup('shaps.getAll') }}">All</a>
+                </dd>
+                {% block pageProvisioned %}<dd>{% endblock %}
+                    <a href="{{ routeLookup('shaps.getProvisioned') }}">Provisioned</a>
+                </dd>
+                {% block pageUnprovisioned %}<dd>{% endblock %}
+                    <a href="{{ routeLookup('shaps.getUnprovisioned') }}">Not Provisioned</a>
+                </dd>
+                {% block pageHelpCourses %}<dd>{% endblock %}
+                    <a href="{{ routeLookup('shaps.getUsersInCourses') }}">Help Courses</a>
+                </dd>
+                {% block pageSearch %}<dd>{% endblock %}
+                    <a href="{{ routeLookup('shaps.getUserProvisioningSearch') }}">Search</a>
+                </dd>
+            </dl>
 
-                <p>{{ errorMessage }}</p>
-            </div>
-        {% else %}
-            {% block page_specific_content %}{% endblock %}
+            {% if errorMessage %}
+                <div class="empty-state">
+                    <i class="icon-info"></i>
+                    <h2>Sorry, we are unable to complete this request </h2>
 
-            <div id="statusFormContainer" {% if allUsers | length == 0 %}class="hide"{% endif %}>
-                <form id="statusForm" action="{{ routeLookup('shaps.postProvision') }}" method="post">
-                    <section id="statusTable">
-                        <table>
-                            <tr>
-                                <th>Status</th>
-                                <th>User</th>
-                                {% block provisioned_column_heading %}
-                                <th>
-                                    <div class="checklist">
-                                        <input id="select-all" type="checkbox">
-                                        <label for="select-all" title="Select All">Provision?</label>
-                                    </div>
-                                </th>
-                                {% endblock %}
-                            </tr>
+                    <p>{{ errorMessage }}</p>
+                </div>
+            {% else %}
+                {% block page_specific_content %}{% endblock %}
 
-                            {% for user in allUsers %}
-                                {% set provisioned = provisionedUsers[user.id] is defined %}
-                                {% if not provisioned %}
-                                    {% if errors[user.id] %}
-                                        <tr class="highlight-alert">
-                                    {% else %}
-                                        <tr class="highlight-warning">
-                                    {% endif %}
-                                {% else %}
-                                    <tr>
-                                {% endif %}
-                                <td>
-                                    {% if provisioned %}
-                                        <span data-provision-status class="icon-course-outline" title="Provisioned"></span>
-                                    {% else %}
+                <div id="statusFormContainer" {% if allUsers | length == 0 %}class="hide"{% endif %}>
+                    <form id="statusForm" action="{{ routeLookup('shaps.postProvision') }}" method="post">
+                        <section id="statusTable">
+                            <table>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>User</th>
+                                    {% block provisioned_column_heading %}
+                                    <th>
+                                        <div class="checklist">
+                                            <input id="select-all" type="checkbox">
+                                            <label for="select-all" title="Select All">Provision?</label>
+                                        </div>
+                                    </th>
+                                    {% endblock %}
+                                </tr>
+
+                                {% for user in allUsers %}
+                                    {% set provisioned = provisionedUsers[user.id] is defined %}
+                                    {% if not provisioned %}
                                         {% if errors[user.id] %}
-                                            <span data-provision-status>Required field/s missing -
-                                                <span class="errorList">{{ errors[user.id] | join(', ') }}</span>
-                                            </span>
+                                            <tr class="highlight-alert">
                                         {% else %}
-                                            <span data-provision-status>Not Provisioned</span>
+                                            <tr class="highlight-warning">
                                         {% endif %}
+                                    {% else %}
+                                        <tr>
                                     {% endif %}
-                                </td>
-                                <td>
-                                    <a href="/search/user/{{ user.id }}">{{ user.fullname }}</a>
-                                </td>
-
-                                {% block provisioned_column %}
                                     <td>
                                         {% if provisioned %}
-                                            <div class="checklist">
-                                                <input id="provision-{{ user.id }}" name="userId[]" value="{{ user.id }}" type="checkbox" disabled>
-                                                <label for="provision-{{ user.id }}" title="Already provisioned"></label>
-                                            </div>
+                                            <span data-provision-status class="icon-course-outline" title="Provisioned"></span>
                                         {% else %}
-                                            <div class="checklist">
-                                                {% if errors[user.id] %}
-                                                    <input id="provision-{{ user.id }}" name="userId[]" value="{{ user.id }}" type="checkbox" data-checkbox disabled>
-                                                    <label for="provision-{{ user.id }}" title="Cannot provision - missing fields"></label>
-                                                {% else %}
-                                                    <input id="provision-{{ user.id }}" name="userId[]" value="{{ user.id }}" type="checkbox" data-checkbox>
-                                                {% endif %}
-                                                <label for="provision-{{ user.id }}"></label>
-                                            </div>
+                                            {% if errors[user.id] %}
+                                                <span data-provision-status>Required field/s missing -
+                                                    <span class="errorList">{{ errors[user.id] | join(', ') }}</span>
+                                                </span>
+                                            {% else %}
+                                                <span data-provision-status>Not Provisioned</span>
+                                            {% endif %}
                                         {% endif %}
                                     </td>
-                                {% endblock %}
-                                </tr>
-                            {% endfor %}
-                        </table>
-                    </section>
+                                    <td>
+                                        <a href="/search/user/{{ user.id }}">{{ user.fullname }}</a>
+                                    </td>
 
-                    {% block submit_button %}
-                        <input type="submit" value="Save changes">
-                    {% endblock %}
-                </form>
-            </div>
+                                    {% block provisioned_column %}
+                                        <td>
+                                            {% if provisioned %}
+                                                <div class="checklist">
+                                                    <input id="provision-{{ user.id }}" name="userId[]" value="{{ user.id }}" type="checkbox" disabled>
+                                                    <label for="provision-{{ user.id }}" title="Already provisioned"></label>
+                                                </div>
+                                            {% else %}
+                                                <div class="checklist">
+                                                    {% if errors[user.id] %}
+                                                        <input id="provision-{{ user.id }}" name="userId[]" value="{{ user.id }}" type="checkbox" data-checkbox disabled>
+                                                        <label for="provision-{{ user.id }}" title="Cannot provision - missing fields"></label>
+                                                    {% else %}
+                                                        <input id="provision-{{ user.id }}" name="userId[]" value="{{ user.id }}" type="checkbox" data-checkbox>
+                                                    {% endif %}
+                                                    <label for="provision-{{ user.id }}"></label>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    {% endblock %}
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </section>
 
-            <div class="empty-state{% if allUsers | length > 0 %} hide{% endif %}" data-empty-state>
-                <i class="icon-staff-students"></i>
-                <p>{% block emptyStateText %}No matching users found.{% endblock %}</p>
-            </div>
-        {% endif %}
+                        {% block submit_button %}
+                            <input type="submit" value="Save changes">
+                        {% endblock %}
+                    </form>
+                </div>
+
+                <div class="empty-state{% if allUsers | length > 0 %} hide{% endif %}" data-empty-state>
+                    <i class="icon-staff-students"></i>
+                    <p>{% block emptyStateText %}No matching users found.{% endblock %}</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 

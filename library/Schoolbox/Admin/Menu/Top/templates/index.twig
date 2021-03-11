@@ -1,8 +1,12 @@
-{# Shared navigation menu #}
-{{ renderAdminNavigation(pageCurrent) }}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-{% if menu | length == 0 %}
-    <div class="row">
+<div class="admin-container row">
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+
+    <div class="admin-content">
+        {% if menu | length == 0 %}
         <div class="small-12 island">
             <div class="empty-state">
                 <i class="icon-month-view"></i>
@@ -10,21 +14,16 @@
                 <p><a href="{{ routeLookup('adminMenuTop.getCreate') }}" title="Post some news">Create first top menu item</a></p>
             </div>
         </div>
-    </div>
-{% else %}
-    <div class="row hide" data-tabs-empty>
-        <div class="small-12 island">
+        {% else %}
+        <div class="small-12 hide" data-tabs-empty>
             <div class="empty-state">
                 <i class="icon-month-view"></i>
                 <p>Your top menu is empty.</p>
                 <p><a href="{{ routeLookup('adminMenuTop.getCreate') }}" title="Post some news">Create first top menu item</a></p>
             </div>
         </div>
-    </div>
-    <div class="row" data-tabs>
 
-        <div class="small-12 island">
-
+        <div class="small-12 island" data-tab>
             <div class="row actions-small-1">
                 <div class="list-item">
                     <div class="small-12 island">
@@ -60,11 +59,10 @@
                     {% endfor %}
                 </ul>
             </section>
-
         </div>
+        {% endif %}
     </div>
-
-{% endif %}
+</div>
 
 <!-- BEGIN custom_head -->
 <script>

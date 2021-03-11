@@ -6,6 +6,9 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Admin\Navigation\Subnav;
+
+
 if(!isset($this)) {
     require_once __DIR__ . '/../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -21,8 +24,9 @@ $this->setBlock(TEMPLATE_content, 'list', 'list_block');
 $this->setBlock('list', 'list_item', 'list_item_block');
 
 // include the admin navigation
-$nav = new AdminV2_Nav($this->getDi()->get('config'));
-$nav->parse($this, 'rubric-results');
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_LMS, Subnav::CHILD_LMS_RUBRICS)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_LMS, Subnav::CHILD_LMS_RUBRICS);
 
 $stmt = Database::getInstance()->prepare("
     SELECT * FROM rubric_result ORDER BY resultset_id ASC, `value` ASC

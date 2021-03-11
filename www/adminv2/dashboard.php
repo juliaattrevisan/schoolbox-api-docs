@@ -9,6 +9,10 @@
  */
 
 /** @var SitePage $this */
+
+use Schoolbox\Admin\Navigation\Subnav;
+
+
 if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
     error(19, "", 401);
 }
@@ -29,8 +33,9 @@ $this->setBlock('layout', 'position_right', 'position_right_block');
 $this->setBlock(TEMPLATE_content, 'component', 'component_block');
 
 // include the admin navigation
-$nav = new AdminV2_Nav($this->getDi()->get('config'));
-$nav->parse($this, 'dashboard');
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_DASHBOARD)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_DASHBOARD);
 
 // Get list of roles
 $userHandle = new User;

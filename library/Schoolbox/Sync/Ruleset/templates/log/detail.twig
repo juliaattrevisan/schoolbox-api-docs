@@ -1,54 +1,64 @@
 <script type="text/javascript" src="/javascript/shared/jquery.infiniscroll.js"></script>
-{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
-<div class="row actions-small-1">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>User Provisioning Log Details</h1>
-            <ul class="meta">
-                <li class="icon-calendar">Finished at {{ log.timestamp.database }}</li>
-                <li class="icon-staff">Limited to {{ log.roleType }} roles</li>
-                {% if log.dryRun %}
-                    <li class="icon-info">Dry run: no data affected</li>
-                {% else %}
-                    <li class="icon-danger">Actual run: data was changed</li>
-                {% endif %}
-                <li class="icon-task">
-                    {{- log.created }} user{{ log.created == 1 ? '' : 's' }} created,
-                    {{ log.updated }} user{{ log.updated == 1 ? '' : 's' }} updated,
-                    {{ log.skipped }} user{{ log.skipped == 1 ? '' : 's' }} skipped
-                </li>
-                {% if filterSummary %}
-                    <li class="icon-filter">{{ filterSummary }}</li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-    <nav>
-        {% if filterSummary %}
-        <a class="icon-filter" title="Clear Filter" href="{{ routeLookup('upsRuleset.log', { logId: id }) }}"></a>
-        {% endif %}
-    </nav>
-</div>
 
-<div class="row">
-    <div class="small-12 island">
-        <label>Display
-            <select id="verbosity">
-                <option value="100" selected="selected">Everything</option>
-                <option value="200">Detailed</option>
-                <option value="250">Summarised</option>
-                <option value="300">Overview</option>
-                <option value="400">Errors Only</option>
-            </select>
-        </label>
-        <section class="ups">
-            <div class="scroll-window" data-cinnamon>
-                <ul class="information-list" id="datalist">
-                    {% include '@upsRuleset/log/lines.twig' %}
-                </ul>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+
+    <div class="admin-content">
+        <div class="row actions-small-1">
+            <div class="list-item">
+                <div class="small-12 column">
+                    <h1>User Provisioning Log Details</h1>
+                    <ul class="meta">
+                        <li class="icon-calendar">Finished at {{ log.timestamp.database }}</li>
+                        <li class="icon-staff">Limited to {{ log.roleType }} roles</li>
+                        {% if log.dryRun %}
+                            <li class="icon-info">Dry run: no data affected</li>
+                        {% else %}
+                            <li class="icon-danger">Actual run: data was changed</li>
+                        {% endif %}
+                        <li class="icon-task">
+                            {{- log.created }} user{{ log.created == 1 ? '' : 's' }} created,
+                            {{ log.updated }} user{{ log.updated == 1 ? '' : 's' }} updated,
+                            {{ log.skipped }} user{{ log.skipped == 1 ? '' : 's' }} skipped
+                        </li>
+                        {% if filterSummary %}
+                            <li class="icon-filter">{{ filterSummary }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
-        </section>
+            <nav>
+                {% if filterSummary %}
+                <a class="icon-filter" title="Clear Filter" href="{{ routeLookup('upsRuleset.log', { logId: id }) }}"></a>
+                {% endif %}
+            </nav>
+        </div>
 
+        <div class="row">
+            <div class="small-12 island">
+                <label>Display
+                    <select id="verbosity">
+                        <option value="100" selected="selected">Everything</option>
+                        <option value="200">Detailed</option>
+                        <option value="250">Summarised</option>
+                        <option value="300">Overview</option>
+                        <option value="400">Errors Only</option>
+                    </select>
+                </label>
+                <section class="ups">
+                    <div class="scroll-window" data-cinnamon>
+                        <ul class="information-list" id="datalist">
+                            {% include '@upsRuleset/log/lines.twig' %}
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
     </div>
 </div>
 <script type="text/javascript">
@@ -96,6 +106,5 @@
 
             }
         });
-
     });
 </script>

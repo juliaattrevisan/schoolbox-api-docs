@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\SHAPS;
 use Alaress\Web\Controller\Base;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\UserMapper;
 use Schoolbox\Collection;
 use Custom\Help\CourseParticipation;
@@ -102,8 +103,12 @@ class Controller extends Base
             $provisionedUsers = $this->helpRequest->findProvisionedUsers();
         } catch (GuzzleException $e) {
             $this->getResponse()->content->set(
-                $this->buildHtmlOutput('@shaps/provisioning/index.twig', ['errorMessage' => $this->getReasonPhrase($e)])
-                     ->setTitle($title)
+                $this->buildHtmlOutput('@shaps/provisioning/index.twig', [
+                    'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                    'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_SHAPS),
+                    'errorMessage' => $this->getReasonPhrase($e)
+                ])->setTitle($title)
             );
             return;
         }
@@ -117,9 +122,11 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/index.twig', [
+                'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_SHAPS),
                 'allUsers' => $allStaff,
                 'provisionedUsers' => $provisionedUsers,
-                'pageCurrent' => 'shaps',
                 'errors' => $errors,
                 'errorMessage' => null,
             ])->setTitle($title)
@@ -146,8 +153,12 @@ class Controller extends Base
             $provisionedUsers = $this->helpRequest->findProvisionedUsers();
         } catch (GuzzleException $e) {
             $this->getResponse()->content->set(
-                $this->buildHtmlOutput('@shaps/provisioning/provisioned.twig', ['errorMessage' => $this->getReasonPhrase($e),])
-                     ->setTitle($title)
+                $this->buildHtmlOutput('@shaps/provisioning/provisioned.twig', [
+                    'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                    'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_SHAPS),
+                    'errorMessage' => $this->getReasonPhrase($e),
+                ])->setTitle($title)
             );
             return;
         }
@@ -161,9 +172,11 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/provisioned.twig', [
+                    'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                    'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_SHAPS),
                     'allUsers' => $provisionedUsers,
                     'provisionedUsers' => $provisionedUsers,
-                    'pageCurrent' => 'shaps',
                     'errors' => $errors,
                     'errorMessage' => null,
             ])->setTitle($title)
@@ -187,8 +200,12 @@ class Controller extends Base
             $provisionedUsers = $this->helpRequest->findProvisionedUsers();
         } catch (GuzzleException $e) {
             $this->getResponse()->content->set(
-                $this->buildHtmlOutput('@shaps/provisioning/unprovisioned.twig', ['errorMessage' => $this->getReasonPhrase($e),])
-                     ->setTitle($title)
+                $this->buildHtmlOutput('@shaps/provisioning/unprovisioned.twig', [
+                    'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                    'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_SHAPS),
+                    'errorMessage' => $this->getReasonPhrase($e),
+                ])->setTitle($title)
             );
             return;
         }
@@ -202,8 +219,10 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/unprovisioned.twig', [
+                    'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                    'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_SHAPS),
                     'allUsers' => $allStaff->diff($provisionedUsers),
-                    'pageCurrent' => 'shaps',
                     'errors' => $errors,
                     'errorMessage' => null,
             ])->setTitle($title)
@@ -223,8 +242,10 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@shaps/provisioning/search.twig', [
+                'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_SHAPS),
                 'allUsers' => [],
-                'pageCurrent' => 'shaps',
                 'errorMessage' => null,
             ])->setTitle('Search - Schoolbox Help Staff Provisioning')
         );
@@ -251,7 +272,13 @@ class Controller extends Base
             $provisionedUsers = $this->helpRequest->findProvisionedUsers();
         } catch (GuzzleException $e) {
             $this->getResponse()->status->setCode(400);
-            $this->getResponse()->content->set($this->buildJsonOutput(['errorMessage' => $this->getReasonPhrase($e),]));
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_SHAPS),
+                'errorMessage' => $this->getReasonPhrase($e),
+            ]));
+
             return;
         }
 
@@ -289,10 +316,12 @@ class Controller extends Base
             $errorMessage = $this->getReasonPhrase($e);
         }
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
+            'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+            'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_SHAPS),
             'errorMessage' => $errorMessage,
             'courses' => $courses,
             'serverUrl' => $this->helpRequest->getServerUrl(),
-            'pageCurrent' => 'shaps'
         ])->setTitle('Schoolbox Help Course Enrolments'));
     }
 
@@ -306,7 +335,9 @@ class Controller extends Base
      */
     public function getUserEnrolmentSearch() {
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/search.twig', [
-            'pageCurrent' => 'shaps'
+            'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+            'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_SHAPS),
         ])->setTitle('Schoolbox Help Course Enrolments - User Search'));
     }
 

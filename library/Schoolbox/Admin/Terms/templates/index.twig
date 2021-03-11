@@ -1,22 +1,27 @@
-{# Shared navigation menu #}
-{{ renderAdminNavigation(pageCurrent) }}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
 {# show each term #}
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Terms</h2>
-    </div>
-</div>
-<div class="row">
-    <div class="small-12 island">
-        <section>
-            <ul class="action-list">
-                {% for term in terms %}
-                    {% include '@adminTerms/listItem.twig' with {term: term} %}
-                {% endfor %}
-            </ul>
-        </section>
-        <a href="#" class="button submit" data-reveal-id="addTermModal">Add Term</a>
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+            <h2 class="subheader">Terms</h2>
+        </div>
+
+        <div class="small-12 island">
+            <section>
+                <ul class="action-list">
+                    {% for term in terms %}
+                        {% include '@adminTerms/listItem.twig' with {term: term} %}
+                    {% endfor %}
+                </ul>
+            </section>
+            <a href="#" class="button submit" data-reveal-id="addTermModal">Add Term</a>
+        </div>
     </div>
 </div>
 

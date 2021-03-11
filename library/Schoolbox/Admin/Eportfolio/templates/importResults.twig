@@ -43,23 +43,30 @@
     });
 </script>
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1 id="progress">Deployment In Progress</h1>
-    </div>
-</div>
+<div class="admin-container row">
 
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">ePortfolio Deployment Log</h2>
-        <table>
-            <thead>
-            <tr>
-                <th>Time</th>
-                <th width="100%">Description</th>
-            </tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-        </table>
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+
+    <div class="admin-content">
+        <div class="row">
+            <div class="small-12 columns">
+                <h1 id="progress">Deployment In Progress</h1>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="small-12 island">
+                <h2 class="subheader">ePortfolio Deployment Log</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th width="100%">Description</th>
+                    </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>

@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Collection;
 use Schoolbox\File\ExtensionMapper;
 use Schoolbox\File\Mimetype;
@@ -18,8 +19,9 @@ $this->setBlock('file', 'enabled', 'enabled_block');
 $this->setBlock(TEMPLATE_content, 'image', 'image_block');
 
 // include the admin navigation
-$nav = new AdminV2_Nav($this->getDi()->get('config'));
-$nav->parse($this, 'allowed-file');
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_RESOURCES, Subnav::CHILD_RESOURCES_ALLOWED_FILE)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_RESOURCES, Subnav::CHILD_RESOURCES_ALLOWED_FILE);
 
 /** @var Collection|Mimetype[] $mimes */
 $mimes = MimetypeMapper::getInstance()->findAll([ 'deleted' => false, 'order' => [ 'mime' => 'asc' ] ]);

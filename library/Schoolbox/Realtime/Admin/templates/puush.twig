@@ -9,56 +9,60 @@
 </style>
 
 {% import 'sub/breadcrumbs.twig' as bread  %}
-{{ bread.crumbs(
-    [ 'Admin', '/adminv2/home' ],
-    [ 'Messages', '/adminv2/messages' ],
-    [ 'App Registrations', '/adminv2/messages/puush']
-) }}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="row">
-    <div class="small-12 island">
-        <h1>App Registrations</h1>
-        {% if logs | length %}
-        <h2 class="subheader">{% if user.id %}Attempting push to {{ user.formatName }} (user {{ user.id }}){% else %}Configuration Result{% endif %}</h2>
-        <section class="content">
-            <ul class="no-margin">
-                {% for line in logs %}
-                    <li><pre>{{ line }}</pre></li>
-                {% endfor %}
-            </ul>
-        </section>
-        {% endif %}
-        {% if registry | length %}
-            <h2 class="subheader">Applications Registered</h2>
-            <table>
-                <thead>
-                <tr>
-                    <th>User</th>
-                    <th>App Token</th>
-                    <th>Device</th>
-                    <th>App</th>
-                    <th>Created</th>
-                    <th>Last Used</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for registration in registry %}
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader">Mobile App Registrations</h2>
+        </div>
+        <div class="small-12 island">
+            {% if logs | length %}
+            <h2 class="subheader">{% if user.id %}Attempting push to {{ user.formatName }} (user {{ user.id }}){% else %}Configuration Result{% endif %}</h2>
+            <section class="content">
+                <ul class="no-margin">
+                    {% for line in logs %}
+                        <li><pre>{{ line }}</pre></li>
+                    {% endfor %}
+                </ul>
+            </section>
+            {% endif %}
+            {% if registry | length %}
+                <h2 class="subheader">Applications Registered</h2>
+                <table>
+                    <thead>
                     <tr>
-                        <td><a href="{{ routeLookup('adminMessages.testPush', { userId: registration.user.id }) }}">{{ registration.user.formatName }}</a></td>
-                        <td><span class="tkn" title="{{ registration.token }}">{{ registration.token }}</span></td>
-                        <td><span class="tkn" title="{{ registration.deviceId }}">{{ registration.deviceId }}</span></td>
-                        <td><a href="{{ routeLookup('adminMessages.getApps') }}" class="tkn" title="{{ registration.service.appIdentifier }}">{{ registration.service.appIdentifier }}</a> ({{ registration.service.providerName }})</td>
-                        <td title="{{ registration.createdAt.database }}">{{ registration.createdAt.local }}</td>
-                        <td title="{{ registration.touchedAt.database }}">{{ registration.touchedAt.local }}</td>
+                        <th>User</th>
+                        <th>App Token</th>
+                        <th>Device</th>
+                        <th>App</th>
+                        <th>Created</th>
+                        <th>Last Used</th>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <div class="empty-state">
-                <i class="icon-mobile"></i>
-                <p>No users currently have any apps registered.</p>
-            </div>
-        {% endif %}
+                    </thead>
+                    <tbody>
+                    {% for registration in registry %}
+                        <tr>
+                            <td><a href="{{ routeLookup('adminMessages.testPush', { userId: registration.user.id }) }}">{{ registration.user.formatName }}</a></td>
+                            <td><span class="tkn" title="{{ registration.token }}">{{ registration.token }}</span></td>
+                            <td><span class="tkn" title="{{ registration.deviceId }}">{{ registration.deviceId }}</span></td>
+                            <td><a href="{{ routeLookup('adminMessages.getApps') }}" class="tkn" title="{{ registration.service.appIdentifier }}">{{ registration.service.appIdentifier }}</a> ({{ registration.service.providerName }})</td>
+                            <td title="{{ registration.createdAt.database }}">{{ registration.createdAt.local }}</td>
+                            <td title="{{ registration.touchedAt.database }}">{{ registration.touchedAt.local }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty-state">
+                    <i class="icon-mobile"></i>
+                    <p>No users currently have any apps registered.</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>

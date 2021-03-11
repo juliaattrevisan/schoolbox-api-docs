@@ -6,50 +6,57 @@
             showCourseMarkbook       bool
             ENTITY_ASSESSMENTS       string
             pageCurrent              string
+            subpageCurrent           string
             pageLabels               string[]
+            allBreadcrumbs           array
 #}
 
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-{{ renderAdminNavigation(pageCurrent) }}
+<div class="admin-container row">
 
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Filterable Pages</h2>
-        <section>
-            <ul class="information-list">
-                {% if showCourseMarkbook %}
-                {% for page, pageFilters in filtersPerPage | filter(page => page != 'courseMarkbook' )  %}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
 
-                    {% set pageName = pageLabels[page]|default(page) %}
+    <div class="admin-content">
+        <div class="small-12 island">
+            <h2 class="subheader">Filterable Pages</h2>
+            <section>
+                <ul class="information-list">
+                    {% if showCourseMarkbook %}
+                    {% for page, pageFilters in filtersPerPage | filter(page => page != 'courseMarkbook' )  %}
 
-                    {# Filters on a page are all for same entity type, so just inspect first #}
-                    {% set entity = (pageFilters | first).entity %}
-                    {%- if ENTITY_ASSESSMENTS == entity -%}
-                        {% set icon = 'due-work' %}
-                    {%- elseif ENTITY_BADGES == entity -%}
-                        {% set icon = 'showcase' %}
-                    {%- else -%}
-                     {# Graceful degradation to generic filter icon if constant not injected into twig #}
-                        {%- set icon = 'filter' -%}
-                    {%- endif -%}
-                    <li>
-                        <div class="list-item">
-                            <div class="card small-12">
-                                <a href="{{ routeLookup('filters.getPageSettings', { page: page }) }}">
-                                    <h3><i class="icon-{{ icon }} size-24"></i>{{ pageName }}</h3>
-                                    <p class="meta">
-                                        {%- for className, filterInstance in pageFilters -%}
-                                            {%- if not loop.first -%}, {% endif -%}{{ className }}
-                                        {%- endfor -%}
-                                    </p>
-                                </a>
+                        {% set pageName = pageLabels[page]|default(page) %}
+
+                        {# Filters on a page are all for same entity type, so just inspect first #}
+                        {% set entity = (pageFilters | first).entity %}
+                        {%- if ENTITY_ASSESSMENTS == entity -%}
+                            {% set icon = 'due-work' %}
+                        {%- elseif ENTITY_BADGES == entity -%}
+                            {% set icon = 'showcase' %}
+                        {%- else -%}
+                         {# Graceful degradation to generic filter icon if constant not injected into twig #}
+                            {%- set icon = 'filter' -%}
+                        {%- endif -%}
+                        <li>
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <a href="{{ routeLookup('filters.getPageSettings', { page: page }) }}">
+                                        <h3><i class="icon-{{ icon }} size-24"></i>{{ pageName }}</h3>
+                                        <p class="meta">
+                                            {%- for className, filterInstance in pageFilters -%}
+                                                {%- if not loop.first -%}, {% endif -%}{{ className }}
+                                            {%- endfor -%}
+                                        </p>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                {% endfor %}
-                {% endif %}
-            </ul>
-        </section>
+                        </li>
+                    {% endfor %}
+                    {% endif %}
+                </ul>
+            </section>
+        </div>
     </div>
 </div>
 

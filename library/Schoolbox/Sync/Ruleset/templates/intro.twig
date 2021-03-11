@@ -1,35 +1,44 @@
-{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>User Provisioning System</h1>
+<div class="admin-container row">
 
-        {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
-    </div>
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
 
-    <div class="small-12 island">
-        <section class="content">
-            <p>The user provisioning system is used to automatically provision user accounts from your SIS data into Schoolbox</p>
-            <p>Each set of rules is defined based on the role type (Student, Parent, Staff).  A rule is made up of a condition which controls if and when the rule runs.
-                A rule also may contain multiple effects which perform the mapping of the SIS data to the appropriate field in Schoolbox.<p>
-            <p>Once you have made changes to the UPS you can test your changes with a dry-run without consequences. After a dry run you can view the log output of what would of occurred.</p>
-            <p>You can also enable or disabled the UPS individually for each role type at any time.  Make sure you keep the role deactivated till you have completed some dry run tests and are confident it is ready to run.</p>
-            <p>The UPS will run nightly and only perform changes for the role types that have been activated to run.</p>
-        </section>
-        <h2 class="subheader">Recent Runs</h2>
-        {% if logs is empty %}
-            <div class="empty-state">
-                <i class="icon-info"></i>
-                <p>The user provisioning system is yet to run, please start by configuring rules for
-                    <a href="/adminv2/ups/staff">staff</a>, <a href="/adminv2/ups/student">students</a> or <a href="/adminv2/ups/parent">parents</a>.</p>
-            </div>
-        {% else %}
-        {% include '@upsRuleset/log/table.twig' %}
-        {% endif %}
-    </div>
-    <div class="small-12 column">
-        <section>
-            <a href="{{ routeLookup('upsRuleset.logs') }}" class="expand button icon-view">View All Logs</a>
-        </section>
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader">Rulesets</h2>
+        </div>
+        <div class="small-12 columns">
+            {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
+        </div>
+
+        <div class="small-12 island">
+            <section class="content">
+                <p>The user provisioning system is used to automatically provision user accounts from your SIS data into Schoolbox</p>
+                <p>Each set of rules is defined based on the role type (Student, Parent, Staff).  A rule is made up of a condition which controls if and when the rule runs.
+                    A rule also may contain multiple effects which perform the mapping of the SIS data to the appropriate field in Schoolbox.<p>
+                <p>Once you have made changes to the UPS you can test your changes with a dry-run without consequences. After a dry run you can view the log output of what would of occurred.</p>
+                <p>You can also enable or disabled the UPS individually for each role type at any time.  Make sure you keep the role deactivated till you have completed some dry run tests and are confident it is ready to run.</p>
+                <p>The UPS will run nightly and only perform changes for the role types that have been activated to run.</p>
+            </section>
+            <h2 class="subheader">Recent Runs</h2>
+            {% if logs is empty %}
+                <div class="empty-state">
+                    <i class="icon-info"></i>
+                    <p>The user provisioning system is yet to run, please start by configuring rules for
+                        <a href="/adminv2/ups/staff">staff</a>, <a href="/adminv2/ups/student">students</a> or <a href="/adminv2/ups/parent">parents</a>.
+                    </p>
+                </div>
+            {% else %}
+            {% include '@upsRuleset/log/table.twig' %}
+            {% endif %}
+        </div>
+        <div class="small-12 column">
+            <section>
+                <a href="{{ routeLookup('upsRuleset.logs') }}" class="expand button icon-view">View All Logs</a>
+            </section>
+        </div>
     </div>
 </div>

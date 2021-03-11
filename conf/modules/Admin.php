@@ -86,7 +86,7 @@ class Admin implements ModuleConfigInterface
         (new \Schoolbox\Admin\Video\Module($di))->init('/adminv2/video');
 
         // News
-        (new \Schoolbox\Comms\News\Policy\Module($di))->init('/adminv2/news');
+        (new \Schoolbox\Admin\News\Policy\Module($di))->init('/adminv2/news');
 
         // Messages
         (new \Schoolbox\Realtime\Admin\Module($di))->init('/adminv2/messages');

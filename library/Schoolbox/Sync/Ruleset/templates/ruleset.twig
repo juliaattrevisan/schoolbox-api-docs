@@ -15,351 +15,10 @@ set upsConfig = {
 
 <script type="text/javascript" src="/javascript/shared/jquery.retry-promise.js"></script>
 <script type="text/javascript" src="/javascript/shared/ups/jquery.ups.js"></script>
-
 <script type="text/javascript">
     $(function() {
         $('#ruleset').ups();
-    });
-</script>
 
-{# For obscenely large jelly tot menu #}
-<style type="text/css">
-    #footer {
-        margin-bottom: 22rem;
-    }
-</style>
-
-{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1>User Provisioning System</h1>
-
-        {% if not logExtensionExists %}
-        <div class="alert-box alert">
-            <h2>You have no log extension file type!</h2>
-            <p>The User Provisioning System will not run if it cannot create logs.</p>
-            <p>Add a new file type with the "log" extension, or add this extension to an existing file type.</p>
-            <a href="/adminv2/allowed-file/" class="button icon-next">Fix this now</a>
-        </div>
-        {% endif %}
-
-        {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
-    </div>
-
-    <div class="small-12 island">
-        {% if hasDryRun ?? false %}
-            <div data-alert class="alert-box">
-                <h2>Processing {{ rulesetId|capitalize }} Dry Run</h2>
-                {% if config.messaging_enabled %}
-                    <p>Please be patient - we'll notify you when it's done.</p>
-                {% else %}
-                    <p>
-                        If messaging was enabled, you would have been notified when the dry run was completed.
-                        It isn't though, so maybe check again in a few minutes?
-                    </p>
-                {% endif %}
-                <a href="" class="close">×</a>
-            </div>
-        {% endif %}
-        {% if hasPerformUpdate ?? false %}
-            <div data-alert class="alert-box">
-                <h2>Processing {{ rulesetId|capitalize }} Update</h2>
-                {% if config.messaging_enabled %}
-                    <p>Please be patient - we'll notify you when it's done.</p>
-                {% else %}
-                    <p>
-                        If messaging was enabled, you would have been notified when the UPS run was completed.
-                        It isn't though, so maybe check again in a few minutes?
-                    </p>
-                {% endif %}
-                <a href="" class="close">×</a>
-            </div>
-        {% endif %}
-        <div class="row actions-small-3">
-            <div class="list-item">
-                <div class="small-12 columns">
-                    <h2 class="subheader">{{ rulesetId|capitalize }} Rules</h2>
-                </div>
-            </div>
-            <nav>
-                    <span class="switch inline" data-ruleset-enabled>
-                        <input type="hidden"
-                               name="config[{{ rulesetId }}][enabled]"
-                               value="0">
-                        <input type="checkbox"
-                               id="config-{{ rulesetId }}-switch"
-                               name="config[{{ rulesetId }}][enabled]"
-                               {% if ruleset.getConfig().getEnabled() %}checked{% endif %}
-                               value="1">
-                        <label for="config-{{ rulesetId }}-switch">
-                            <span>On</span>
-                            <span>Off</span>
-                        </label>
-                    </span>
-                <a class="icon-down-arrow" title="Expand/Collapse All Rules" data-expand-all data-collapse-state="collapsed"></a>
-                <a class="icon-more" title="Actions" data-dropdown="ruleset-options"></a>
-            </nav>
-            <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>
-                <li class="separator">Ruleset</li>
-                <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
-                <li><a href='{{ routeLookup('upsRuleset.dryRun', {rulesetId: rulesetId}) }}' class="icon-export" title="Perform Dry Run">Perform Dry Run</a></li>
-                <li><a data-perform-update href='#' class="icon-export" title="Perform Live Update">Perform Live Update</a></li>
-            </ul>
-        </div>
-        <div id='ruleset'>
-            <input type="hidden" name="rulesetId" id="rulesetId" value="{{ rulesetId }}" />
-
-            {% if ruleset.getRules() is not empty %}
-            <section>
-                <ul class="sortable information-list" data-sortable>
-
-                    {% for currentRule in ruleset.getRules() %}
-                    <li id="rule-{{ currentRule.id }}" data-rule="{{ currentRule.id }}">
-
-                        {# Ensure rule[] gets POSTed, even when it has no Conditions or Effects
-                         # We do that so the Rule can be sequenced prior to creation of Conditions
-                         # and/or Effects
-                         #}
-                        {% if currentRule.conditions|length == 0 %}
-                            <input type="hidden" name="rule[{{ currentRule.id }}]" value="" />
-                            <input type="hidden" name="rule[{{ currentRule.id }}][conditions]" value="" />
-                            <input type="hidden" name="rule[{{ currentRule.id }}][effects]" value="" />
-                        {% endif %}
-
-                        <div class="actions-small-2">
-                            <div class="grip ui-sortable-handle"></div>
-
-                            <div class="list-item">
-                                <div class="card small-12">
-                                    <h3>
-                                        {% if currentRule.name|length %}
-                                            {{ currentRule.name }}
-                                        {% else %}
-                                            Rule {{ currentRule.id }}
-                                        {% endif %}
-                                    </h3>
-                                    {% if currentRule.description|length %}
-                                        <p class="meta" title="{{ currentRule.description }}">
-                                            {{ currentRule.description }}
-                                        </p>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <nav>
-                                <a href="#" class="icon-down-arrow" data-collapser="rule-{{ currentRule.id }}-contents" title="Expand/Collapse Content"></a>
-                                <a class="icon-more" title="Actions" data-dropdown="rule-{{ currentRule.id }}-options"></a>
-                            </nav>
-                        </div>
-
-                        <div class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
-                            <h4 class="no-margin">Conditions</h4>
-                            <div class="empty-state {{ currentRule.conditions is empty ? '' : 'hide' }}" data-empty-state-conditions >
-                                <i class="icon-help"></i>
-                                <p>Conditions are optional, but you may prevent the effects below by creating one.</p>
-                                <p>You can <a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.general }}" data-condition-create="{{ currentRule.id }}">create a general condition</a>
-                                    or if you prefer to run these rules only on initial user creation use the
-                                    <a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.userExists }}" title="Create user exists condition" data-condition-create="{{ currentRule.id }}">user exists condition</a></p>
-                            </div>
-
-                            <ul class="information-list" id="rule-{{ currentRule.id }}-conditions">
-                                {% for currentCondition in currentRule.conditions %}
-                                {% include allConditionStructures.fragments[currentCondition.id].fragment.getFilename() %}
-                                {% endfor %}
-                            </ul>
-
-                            <h4 class="no-margin">Effects</h4>
-                            <div class="empty-state {{ currentRule.effects is empty ? '' : 'hide' }}" data-empty-state-effects>
-                                <i class="icon-help"></i>
-                                <p>Use effects to map data fields from your SIS to user account attributes.</p>
-                                <p>When <a href="/adminv2/ups/effect/add/{{ currentRule.id }}" title="Add new Effect" data-effect-create="{{ currentRule.id }}">creating a data mapping</a> they may either be directly copied, altered using <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">filters</a> or mapped using a lookup table.</p>
-                                <p>Start by selecting your user account field you wish to populate, then select a method and finally add a <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">token</a> to use as a modifier.</p>
-                            </div>
-                            <ul class="information-list" id="rule-{{ currentRule.id }}-effects">
-                                {% for currentEffect in currentRule.effects %}
-                                {% include allEffectStructures.containers[currentEffect.id] %}
-                                {% endfor %}
-                            </ul>
-
-                            <div class="row {{ currentRule.effects is empty and currentRule.conditions is empty ? 'hide' : '' }}" data-ruleset-save-rule-row>
-                                <div class="small-12 medium-8 column"></div>
-                                <div class="small-12 medium-4 column">
-                                    <input type="submit" value="Save Rule" data-ruleset-save-rule />
-                                </div>
-                            </div
-
-                            <span class="label full-width hide" data-relation="response-message"></span>
-                        </div>
-
-
-                        <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
-                            <li class="separator">Rule</li>
-                            <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
-                            <li><a href="/adminv2/ups/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule">Edit Rule</a></li>
-                            <li><a href="/adminv2/ups/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule">Delete Rule</a></li>
-                            <li class="separator">Conditions</li>
-                            <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.general }}" class="icon-add" title="Add new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
-                            <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.userExists }}" class="icon-add" title="Add new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
-                            <li class="separator">Effects</li>
-                            <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}" class="icon-add" title="Add new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
-                            <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip User</a></li>
-                            <li class="separator">Help</li>
-                            <li><a class="icon-help" title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">About Tokens and Filters</a></li>
-                        </ul>
-                    </li>
-                    {% endfor %}
-
-                </ul>
-            </section>
-            {% endif %}
-
-            {# Javascript controls visibility of this, because
-             # Rules can be deleted asynchronously
-             #}
-            {% if ruleset.getRules() is empty  %}
-                {% set emptyRulesetAlert = '' %}
-            {% else %}
-                {% set emptyRulesetAlert = 'hide' %}
-            {% endif %}
-            <div class="row {{ emptyRulesetAlert }}" id="emptyRulesetAlert">
-                <div class="small-12 island">
-                    <div class="empty-state" data-empty-state-rules>
-                        <i class="icon-info"></i>
-                        <p>No rules, means no users will be synced</p>
-                        <p><a href='/adminv2/ups/rule/add/{{ rulesetId }}' title="Add New Rule">Start by adding your first rule</a></p>
-                    </div>
-                </div>
-            </div>
-
-            {# Display custom rules #}
-            {% if ruleset.getCustomRules() is not empty %}
-
-            <h2 class="subheader">Custom Rules</h2>
-
-            {% for customRule in ruleset.getCustomRules() %}
-            <div class="row" id="customRule-{{ customRule.getId() }}" data-custom-rule="{{ customRule.getId() }}">
-                <div class="small-12 island">
-                    <section class="content">
-                        <h3 class="subheader">
-                            {{ customRule.getHydrator().getName() }}
-                            <span class='hint has-tip tip-top'
-                                  data-tooltip
-                                  title="{{ customRule.getHydrator().getDescription() }}">?</span>
-                        </h3>
-                        <span class="switch">
-                            <input type="hidden"
-                                   name="customRule[{{ customRule.getId() }}][enabled]"
-                                   value="0">
-                            <input type="checkbox"
-                                   id="customRule-{{ customRule.getId() }}-switch"
-                                   name="customRule[{{ customRule.getId() }}][enabled]"
-                                   {% if customRule.getEnabled() %}checked{% endif %}
-                                   value="1">
-                            <label for="customRule-{{ customRule.getId() }}-switch">
-                                <span>On</span>
-                                <span>Off</span>
-                            </label>
-                        </span>
-                   </section>
-                </div>
-            </div>
-            {% endfor %}
-            {% endif %}
-
-            <input type="submit" value="Save All Rules" data-ruleset-save />
-            <div class="toast" data-alert data-relation="response-message"></div>
-        </div>
-
-        <div id="token-list" class="reveal-modal" data-reveal>
-            <div class="row">
-                <div class="small-12 columns">
-                    <h2>Tokens and Filters</h2>
-                    <p>
-                        Tokens and Filters allow you to modify your SIS Output value.
-                        The modified output value can be used in Effects to construct
-                        or match complicated text strings. They are entirely optional.
-                    </p>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="small-12 large-6 columns">
-                    <h3>Available Tokens</h3>
-
-                    <dl class="inline-dl">
-                        {% for token, description in allNDSField %}
-                        <dt class="small-6">{:{{ token|replace({'[]': ''}) }}}</dt>
-                        <dd class="small-6">{{ description }}</dd>
-                        {% endfor %}
-                    </dl>
-
-                    <p>
-                        Note that you can use square brackets to reference nth elements.
-                        This applies to tokens for {:email.address} and {:campus.code}
-                    </p>
-                    <p>
-                        For example, you can use them like this:<br />
-                        {:email[0].address}<br />
-                        {:campus[2].code}
-                    </p>
-                </div>
-                <div class="small-12 large-6 columns">
-                    <h3>Available Filters</h3>
-
-                    <dl class="inline-dl">
-                        <dt class="small-6">uc</dt>
-                        <dd class="small-6">Converts to uppercase</dd>
-
-                        <dt class="small-6">lc</dt>
-                        <dd class="small-6">Converts to lowercase</dd>
-
-                        <dt class="small-6">first</dt>
-                        <dd class="small-6">Returns only the first character</dd>
-
-                        <dt class="small-6">alpha</dt>
-                        <dd class="small-6">Strips all non-alpha characters</dd>
-
-                        <dt class="small-6">num</dt>
-                        <dd class="small-6">Strips all non-numeric characters</dd>
-
-                        <dt class="small-6">preat</dt>
-                        <dd class="small-6">Only characters before the first '@'</dd>
-
-                        <dt class="small-6">postslash</dt>
-                        <dd class="small-6">Only characters after the last '\'</dd>
-                    </dl>
-
-                    <p>
-                        Token with filter examples:
-                    </p>
-                    <p>
-                        {:lastname} = Allen-Smith<br />
-                        {:lastname|uc} = ALLEN-SMITH<br />
-                        {:lastname|lc} = allen-smith<br />
-                        {:lastname|first} = A<br />
-                        {:lastname|alpha} = AllenSmith<br />
-                        {:lastname|alpha|lc} = allensmith<br />
-                        <br />
-                        {:id} = P1234<br />
-                        {:id|num} = 1234<br />
-                        <br />
-                        {:email.address} = myusername@school.edu<br />
-                        {:email.address|preat} = myusername<br />
-                        <br />
-                        {:account.login} = DOMAIN\myusername<br />
-                        {:account.login|postslash} = myusername<br />
-                    </p>
-                </div>
-            </div>
-
-            <a class="close-reveal-modal">&#215;</a>
-        </div>
-    </div>
-</div>
-
-<script>
-    $(function() {
         $('[data-perform-update]').click(function(e) {
             e.preventDefault();
 
@@ -374,3 +33,346 @@ set upsConfig = {
         });
     });
 </script>
+
+{# For obscenely large jelly tot menu #}
+<style type="text/css">
+    #footer {
+        margin-bottom: 22rem;
+    }
+</style>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader">Rulesets</h2>
+        </div>
+        <div class="small-12 columns">
+            {% if not logExtensionExists %}
+            <div class="alert-box alert">
+                <h2>You have no log extension file type!</h2>
+                <p>The User Provisioning System will not run if it cannot create logs.</p>
+                <p>Add a new file type with the "log" extension, or add this extension to an existing file type.</p>
+                <a href="/adminv2/allowed-file/" class="button icon-next">Fix this now</a>
+            </div>
+            {% endif %}
+
+            {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
+        </div>
+
+        <div class="small-12 island">
+            {% if hasDryRun ?? false %}
+                <div data-alert class="alert-box">
+                    <h2>Processing {{ rulesetId|capitalize }} Dry Run</h2>
+                    {% if config.messaging_enabled %}
+                        <p>Please be patient - we'll notify you when it's done.</p>
+                    {% else %}
+                        <p>
+                            If messaging was enabled, you would have been notified when the dry run was completed.
+                            It isn't though, so maybe check again in a few minutes?
+                        </p>
+                    {% endif %}
+                    <a href="" class="close">×</a>
+                </div>
+            {% endif %}
+            {% if hasPerformUpdate ?? false %}
+                <div data-alert class="alert-box">
+                    <h2>Processing {{ rulesetId|capitalize }} Update</h2>
+                    {% if config.messaging_enabled %}
+                        <p>Please be patient - we'll notify you when it's done.</p>
+                    {% else %}
+                        <p>
+                            If messaging was enabled, you would have been notified when the UPS run was completed.
+                            It isn't though, so maybe check again in a few minutes?
+                        </p>
+                    {% endif %}
+                    <a href="" class="close">×</a>
+                </div>
+            {% endif %}
+            <div class="row actions-small-3">
+                <div class="list-item">
+                    <div class="small-12 columns">
+                        <h2 class="subheader">{{ rulesetId|capitalize }} Rules</h2>
+                    </div>
+                </div>
+                <nav>
+                    <span class="switch inline" data-ruleset-enabled>
+                        <input type="hidden"
+                               name="config[{{ rulesetId }}][enabled]"
+                               value="0">
+                        <input type="checkbox"
+                               id="config-{{ rulesetId }}-switch"
+                               name="config[{{ rulesetId }}][enabled]"
+                               {% if ruleset.getConfig().getEnabled() %}checked{% endif %}
+                               value="1">
+                        <label for="config-{{ rulesetId }}-switch">
+                            <span>On</span>
+                            <span>Off</span>
+                        </label>
+                    </span>
+                    <a class="icon-down-arrow" title="Expand/Collapse All Rules" data-expand-all data-collapse-state="collapsed"></a>
+                    <a class="icon-more" title="Actions" data-dropdown="ruleset-options"></a>
+                </nav>
+                <ul id="ruleset-options" class="f-dropdown" data-dropdown-content>
+                    <li class="separator">Ruleset</li>
+                    <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
+                    <li><a href='{{ routeLookup('upsRuleset.dryRun', {rulesetId: rulesetId}) }}' class="icon-export" title="Perform Dry Run">Perform Dry Run</a></li>
+                    <li><a data-perform-update href='#' class="icon-export" title="Perform Live Update">Perform Live Update</a></li>
+                </ul>
+            </div>
+            <div id='ruleset'>
+                <input type="hidden" name="rulesetId" id="rulesetId" value="{{ rulesetId }}" />
+
+                {% if ruleset.getRules() is not empty %}
+                <section>
+                    <ul class="sortable information-list" data-sortable>
+
+                        {% for currentRule in ruleset.getRules() %}
+                        <li id="rule-{{ currentRule.id }}" data-rule="{{ currentRule.id }}">
+
+                            {# Ensure rule[] gets POSTed, even when it has no Conditions or Effects
+                             # We do that so the Rule can be sequenced prior to creation of Conditions
+                             # and/or Effects
+                             #}
+                            {% if currentRule.conditions|length == 0 %}
+                                <input type="hidden" name="rule[{{ currentRule.id }}]" value="" />
+                                <input type="hidden" name="rule[{{ currentRule.id }}][conditions]" value="" />
+                                <input type="hidden" name="rule[{{ currentRule.id }}][effects]" value="" />
+                            {% endif %}
+
+                            <div class="actions-small-2">
+                                <div class="grip ui-sortable-handle"></div>
+
+                                <div class="list-item">
+                                    <div class="card small-12 wrap-down">
+                                        <h3>
+                                            {% if currentRule.name|length %}
+                                                {{ currentRule.name }}
+                                            {% else %}
+                                                Rule {{ currentRule.id }}
+                                            {% endif %}
+                                        </h3>
+                                        {% if currentRule.description|length %}
+                                            <p class="meta" title="{{ currentRule.description }}">
+                                                {{ currentRule.description }}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <nav>
+                                    <a href="#" class="icon-down-arrow" data-collapser="rule-{{ currentRule.id }}-contents" title="Expand/Collapse Content"></a>
+                                    <a class="icon-more" title="Actions" data-dropdown="rule-{{ currentRule.id }}-options"></a>
+                                </nav>
+                            </div>
+
+                            <div class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
+                                <h4 class="no-margin">Conditions</h4>
+                                <div class="empty-state {{ currentRule.conditions is empty ? '' : 'hide' }}" data-empty-state-conditions >
+                                    <i class="icon-help"></i>
+                                    <p>Conditions are optional, but you may prevent the effects below by creating one.</p>
+                                    <p>You can <a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.general }}" data-condition-create="{{ currentRule.id }}">create a general condition</a>
+                                        or if you prefer to run these rules only on initial user creation use the
+                                        <a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.userExists }}" title="Create user exists condition" data-condition-create="{{ currentRule.id }}">user exists condition</a></p>
+                                </div>
+
+                                <ul class="information-list" id="rule-{{ currentRule.id }}-conditions">
+                                    {% for currentCondition in currentRule.conditions %}
+                                    {% include allConditionStructures.fragments[currentCondition.id].fragment.getFilename() %}
+                                    {% endfor %}
+                                </ul>
+
+                                <h4 class="no-margin">Effects</h4>
+                                <div class="empty-state {{ currentRule.effects is empty ? '' : 'hide' }}" data-empty-state-effects>
+                                    <i class="icon-help"></i>
+                                    <p>Use effects to map data fields from your SIS to user account attributes.</p>
+                                    <p>When <a href="/adminv2/ups/effect/add/{{ currentRule.id }}" title="Add new Effect" data-effect-create="{{ currentRule.id }}">creating a data mapping</a> they may either be directly copied, altered using <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">filters</a> or mapped using a lookup table.</p>
+                                    <p>Start by selecting your user account field you wish to populate, then select a method and finally add a <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">token</a> to use as a modifier.</p>
+                                </div>
+                                <ul class="information-list" id="rule-{{ currentRule.id }}-effects">
+                                    {% for currentEffect in currentRule.effects %}
+                                    {% include allEffectStructures.containers[currentEffect.id] %}
+                                    {% endfor %}
+                                </ul>
+
+                                <div class="row {{ currentRule.effects is empty and currentRule.conditions is empty ? 'hide' : '' }}" data-ruleset-save-rule-row>
+                                    <div class="small-12 medium-8 column"></div>
+                                    <div class="small-12 medium-4 column">
+                                        <input type="submit" value="Save Rule" data-ruleset-save-rule />
+                                    </div>
+                                </div>
+
+                                <span class="label full-width hide" data-relation="response-message"></span>
+                            </div>
+
+                            <ul id="rule-{{ currentRule.id }}-options" class="f-dropdown" data-dropdown-content>
+                                <li class="separator">Rule</li>
+                                <li><a href='/adminv2/ups/rule/add/{{ rulesetId }}' class="icon-add" title="Add New Rule">Add New Rule</a></li>
+                                <li><a href="/adminv2/ups/rule/edit/{{ currentRule.id }}" class="icon-modify" title="Edit Rule">Edit Rule</a></li>
+                                <li><a href="/adminv2/ups/rule/delete/{{ currentRule.id }}" class="icon-delete" data-rule-delete="{{ currentRule.id }}" title="Delete Rule">Delete Rule</a></li>
+                                <li class="separator">Conditions</li>
+                                <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.general }}" class="icon-add" title="Add new General Condition" data-condition-create="{{ currentRule.id }}">General Condition</a></li>
+                                <li><a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.userExists }}" class="icon-add" title="Add new User Exists Condition" data-condition-create="{{ currentRule.id }}">User Exists Condition</a></li>
+                                <li class="separator">Effects</li>
+                                <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}" class="icon-add" title="Add new Effect" data-effect-create="{{ currentRule.id }}">Add New Effect</a></li>
+                                <li><a href="/adminv2/ups/effect/add/{{ currentRule.id }}/skip" class="icon-add" title="Skip" data-effect-create="{{ currentRule.id }}">Skip User</a></li>
+                                <li class="separator">Help</li>
+                                <li><a class="icon-help" title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">About Tokens and Filters</a></li>
+                            </ul>
+                        </li>
+                        {% endfor %}
+
+                    </ul>
+                </section>
+                {% endif %}
+
+                {# Javascript controls visibility of this, because
+                 # Rules can be deleted asynchronously
+                 #}
+                {% if ruleset.getRules() is empty  %}
+                    {% set emptyRulesetAlert = '' %}
+                {% else %}
+                    {% set emptyRulesetAlert = 'hide' %}
+                {% endif %}
+                <div class="row {{ emptyRulesetAlert }}" id="emptyRulesetAlert">
+                    <div class="small-12 island">
+                        <div class="empty-state" data-empty-state-rules>
+                            <i class="icon-info"></i>
+                            <p>No rules, means no users will be synced</p>
+                            <p><a href='/adminv2/ups/rule/add/{{ rulesetId }}' title="Add New Rule">Start by adding your first rule</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                {# Display custom rules #}
+                {% if ruleset.getCustomRules() is not empty %}
+
+                <h2 class="subheader">Custom Rules</h2>
+
+                {% for customRule in ruleset.getCustomRules() %}
+                <div class="row" id="customRule-{{ customRule.getId() }}" data-custom-rule="{{ customRule.getId() }}">
+                    <div class="small-12 island">
+                        <section class="content">
+                            <h3 class="subheader">
+                                {{ customRule.getHydrator().getName() }}
+                                <span class='hint has-tip tip-top'
+                                      data-tooltip
+                                      title="{{ customRule.getHydrator().getDescription() }}">?</span>
+                            </h3>
+                            <span class="switch">
+                                <input type="hidden"
+                                       name="customRule[{{ customRule.getId() }}][enabled]"
+                                       value="0">
+                                <input type="checkbox"
+                                       id="customRule-{{ customRule.getId() }}-switch"
+                                       name="customRule[{{ customRule.getId() }}][enabled]"
+                                       {% if customRule.getEnabled() %}checked{% endif %}
+                                       value="1">
+                                <label for="customRule-{{ customRule.getId() }}-switch">
+                                    <span>On</span>
+                                    <span>Off</span>
+                                </label>
+                            </span>
+                       </section>
+                    </div>
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <input type="submit" value="Save All Rules" data-ruleset-save />
+                <div class="toast" data-alert data-relation="response-message"></div>
+            </div>
+            <div id="token-list" class="reveal-modal" data-reveal>
+                <div class="row">
+                    <div class="small-12 columns">
+                        <h2>Tokens and Filters</h2>
+                        <p>
+                            Tokens and Filters allow you to modify your SIS Output value.
+                            The modified output value can be used in Effects to construct
+                            or match complicated text strings. They are entirely optional.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="small-12 large-6 columns">
+                        <h3>Available Tokens</h3>
+
+                        <dl class="inline-dl">
+                            {% for token, description in allNDSField %}
+                            <dt class="small-6">{:{{ token|replace({'[]': ''}) }}}</dt>
+                            <dd class="small-6">{{ description }}</dd>
+                            {% endfor %}
+                        </dl>
+
+                        <p>
+                            Note that you can use square brackets to reference nth elements.
+                            This applies to tokens for {:email.address} and {:campus.code}
+                        </p>
+                        <p>
+                            For example, you can use them like this:<br />
+                            {:email[0].address}<br />
+                            {:campus[2].code}
+                        </p>
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <h3>Available Filters</h3>
+
+                        <dl class="inline-dl">
+                            <dt class="small-6">uc</dt>
+                            <dd class="small-6">Converts to uppercase</dd>
+
+                            <dt class="small-6">lc</dt>
+                            <dd class="small-6">Converts to lowercase</dd>
+
+                            <dt class="small-6">first</dt>
+                            <dd class="small-6">Returns only the first character</dd>
+
+                            <dt class="small-6">alpha</dt>
+                            <dd class="small-6">Strips all non-alpha characters</dd>
+
+                            <dt class="small-6">num</dt>
+                            <dd class="small-6">Strips all non-numeric characters</dd>
+
+                            <dt class="small-6">preat</dt>
+                            <dd class="small-6">Only characters before the first '@'</dd>
+
+                            <dt class="small-6">postslash</dt>
+                            <dd class="small-6">Only characters after the last '\'</dd>
+                        </dl>
+
+                        <p>
+                            Token with filter examples:
+                        </p>
+                        <p>
+                            {:lastname} = Allen-Smith<br />
+                            {:lastname|uc} = ALLEN-SMITH<br />
+                            {:lastname|lc} = allen-smith<br />
+                            {:lastname|first} = A<br />
+                            {:lastname|alpha} = AllenSmith<br />
+                            {:lastname|alpha|lc} = allensmith<br />
+                            <br />
+                            {:id} = P1234<br />
+                            {:id|num} = 1234<br />
+                            <br />
+                            {:email.address} = myusername@school.edu<br />
+                            {:email.address|preat} = myusername<br />
+                            <br />
+                            {:account.login} = DOMAIN\myusername<br />
+                            {:account.login|postslash} = myusername<br />
+                        </p>
+                    </div>
+                </div>
+
+                <a class="close-reveal-modal">&#215;</a>
+            </div>
+        </div>
+    </div>
+</div>
+

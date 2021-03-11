@@ -22,78 +22,81 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="row">
-    <div class="small-12 island collapse">
-        <h1>User Photos</h1>
-        {% include '@adminImportIndex/subnavigation.twig' with { allNodes: allNavigation } %}
-    </div>
-</div>
+<div class="admin-container row">
 
-<div class="row">
-    <div class="small-12 island collapse">
-        <form method="post" action="/adminv2/import/photos/upload">
-            <section class="content">
-                <p>
-                    This page is for Schools whose SIS product does not store staff/student photos in a format that is accessible by Schoolbox.
-                    If you are using a SIS with photos, you can disable the SIS photos in the <a href="/adminv2/setting/External+DB" title="External DB Settings">External DB</a>.
-                </p>
-                <p>
-                    <b>All photos uploaded must be named using the ID of the individual (e.g. 10255.jpg)</b>
-                </p>
-            </section>
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation('import/directImport', subpageCurrent) }}
 
-            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-
-            <input type="submit" class="button" value="Upload Photos">
-        </form>
-    </div>
-</div>
-
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">Uploaded Photos</h2>
-        <section class="content">
-            <h3>Filter By Surname</h3>
-            <dl class="sub-nav no-margin">
-                {% for letter in 'a'..'z' %}
-                    {% set css = '' %}
-
-                    {% if surname == letter %}
-                        {% set css = 'class="active"' %}
-                    {% endif %}
-
-                    <dd {{ css|raw }}><a href="?surname={{ letter }}">{{ letter|upper }}</a></dd>
-                {% endfor %}
-            </dl>
-        </section>
-
-        {% if users | length == 0 %}
-        <div class="empty-state">
-            <i class="icon-user"></i>
-            <p>No user photos found for surnames starting with '{{ surname | upper }}'</p>
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader">Portrait Photos</h2>
         </div>
-        {% else %}
-            <section>
-                <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-                    {% for user in users %}
-                        <li class="actions-small-1">
-                            <div class="card small-12">
-                                <a href="/search/user/{{ user.getId }}" title="View Profile">
-                                    <img src='/portrait.php?userId={{ user.getExternalId }}&size=square64&cb={{ date().timestamp }}' alt="View Profile" />
-                                    <p>{{ user.getFirstName }} {{ user.getLastName }}</p>
-                                </a>
-                                <p class="meta">{{ user.getRole.getName }}</p>
-                            </div>
-                            <nav>
-                                <span>
-                                    <a data-delete="{{ user.getExternalId }}" href="#" class="icon-close" title="Delete Photo"></a>
-                                </span>
-                            </nav>
-                        </li>
+        <div class="small-12 island collapse">
+            {% include '@adminImportIndex/subnavigation.twig' with { allNodes: allNavigation } %}
+        </div>
+
+        <div class="small-12 island collapse">
+            <form method="post" action="/adminv2/import/photos/upload">
+                <section class="content">
+                    <p>
+                        This page is for Schools whose SIS product does not store staff/student photos in a format that is accessible by Schoolbox.
+                        If you are using a SIS with photos, you can disable the SIS photos in the <a href="/adminv2/setting/External+DB" title="External DB Settings">External DB</a>.
+                    </p>
+                    <p>
+                        <b>All photos uploaded must be named using the ID of the individual (e.g. 10255.jpg)</b>
+                    </p>
+                </section>
+
+                {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+
+                <input type="submit" class="button" value="Upload Photos">
+            </form>
+        </div>
+
+        <div class="small-12 island">
+            <h2 class="subheader">Uploaded Photos</h2>
+            <section class="content">
+                <h3>Filter By Surname</h3>
+                <dl class="sub-nav no-margin">
+                    {% for letter in 'a'..'z' %}
+                        {% set css = '' %}
+
+                        {% if surname == letter %}
+                            {% set css = 'class="active"' %}
+                        {% endif %}
+
+                        <dd {{ css|raw }}><a href="?surname={{ letter }}">{{ letter|upper }}</a></dd>
                     {% endfor %}
-                </ul>
+                </dl>
             </section>
-        {% endif %}
+
+            {% if users | length == 0 %}
+            <div class="empty-state">
+                <i class="icon-user"></i>
+                <p>No user photos found for surnames starting with '{{ surname | upper }}'</p>
+            </div>
+            {% else %}
+                <section>
+                    <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                        {% for user in users %}
+                            <li class="actions-small-1">
+                                <div class="card small-12">
+                                    <a href="/search/user/{{ user.getId }}" title="View Profile">
+                                        <img src='/portrait.php?userId={{ user.getExternalId }}&size=square64&cb={{ date().timestamp }}' alt="View Profile" />
+                                        <p>{{ user.getFirstName }} {{ user.getLastName }}</p>
+                                    </a>
+                                    <p class="meta">{{ user.getRole.getName }}</p>
+                                </div>
+                                <nav>
+                                    <span>
+                                        <a data-delete="{{ user.getExternalId }}" href="#" class="icon-close" title="Delete Photo"></a>
+                                    </span>
+                                </nav>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
+        </div>
     </div>
 </div>

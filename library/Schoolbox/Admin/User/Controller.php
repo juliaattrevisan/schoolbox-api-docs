@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use HouseMapper;
 use HouseResidentialMapper;
 use Monolog\Logger;
+use Schoolbox\Admin\Navigation\Subnav;
 use Scrub;
 use UnexpectedValueException;
 use Schoolbox\API\Token\Jwt;
@@ -337,7 +338,9 @@ class Controller extends Base
                 'serviceMapping' => self::SERVICE_MAPPING,
                 'identifiers' => self::IDENTIFIERS,
                 'accessLevel' => self::ACCESS_LEVELS,
-                'pageCurrent' => 'user',
+                'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                'subpageCurrent' => null,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, null),
                 'method' => 'Update',
                 'yearLevels' => $this->yearLevelMapper->findAll(),
                 'campuses' => $this->campusMapper->findAll(),
@@ -390,7 +393,9 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminUser/modify.twig',
             'data' => [
-                'pageCurrent' => 'user',
+                'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+                'subpageCurrent' => null,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, null),
                 'method'    => 'Create',
                 'user' => $user,
                 'yearLevels' => $this->yearLevelMapper->findAll(),

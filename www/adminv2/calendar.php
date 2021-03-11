@@ -2,6 +2,7 @@
 
 use Calendar\Api\ApiHierarchyGenerator;
 use Calendar\Api\ModuleChecker;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Calendar\Relation;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -10,13 +11,20 @@ if (!$_SESSION['user']->isSuperuser()) {
     error(19, "", 401);
 }
 
+if ($this->arg[0]) {
+    $selectedType = urldecode($this->arg[0]);
+} else {
+    $selectedType = 'Import';
+}
+
 /** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'adminv2/calendar.html');
 $this->setTitle('Admin - Calendar');
 
 // include the admin navigation
-$nav = new AdminV2_Nav($this->getDi()->get('config'));
-$nav->parse($this, 'calendar');
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_CALENDAR, $selectedType)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_CALENDAR, $selectedType);
 
 $userHandler = new User();
 
@@ -69,11 +77,7 @@ $this->setVar('cleanup_has_events_block', '');
 $this->setVar('cleanup_has_no_events_block', '');
 $this->setVar('cleanup_event_block', '');
 
-if ($this->arg[0]) {
-    $selectedType = urldecode($this->arg[0]);
-} else {
-    $selectedType = 'Import';
-}
+
 
 $typeList = [
     ['type' => 'Import'],

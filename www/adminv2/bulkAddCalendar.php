@@ -1,4 +1,8 @@
 <?php
+
+use Schoolbox\Admin\Navigation\Subnav;
+
+
 SitePage::extendExecutionTime(300);
 
 if (!$_SESSION['user']->isSuperuser()) {
@@ -11,8 +15,9 @@ $this->setFile(TEMPLATE_content, 'adminv2/bulkAddCalendar.html');
 $this->setBlock(TEMPLATE_content, 'event', 'event_block');
 
 // include the admin navigation
-$nav = new AdminV2_Nav($this->getDi()->get('config'));
-$nav->parse($this, 'calendar');
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_CALENDAR, Subnav::CHILD_CALENDAR_IMPORT)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_CALENDAR, Subnav::CHILD_CALENDAR_IMPORT);
 
 /* Two types of upload.. either single user.. or via csv file..
  */

@@ -24,6 +24,7 @@ use Eportfolio\PageMapper as EportfolioPageMapper;
 use Eportfolio\Permission as EportfolioPermission;
 use Eportfolio\PermissionMapper as EportfolioPermissionMapper;
 use Exception;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
@@ -120,7 +121,9 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminEportfolio/index.twig',
             'data' => [
-                'pageCurrent' => 'eportfolio/deploy',
+                'pageCurrent' => Subnav::PARENT_EPORTFOLIO,
+                'subpageCurrent' => Subnav::CHILD_EPORTFOLIO_DEPLOYMENT,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_EPORTFOLIO, Subnav::CHILD_EPORTFOLIO_DEPLOYMENT),
                 'roles' => $this->roleMapper->findAll(['order' => ['name' => 'asc']]),
                 'campuses' => $this->campusMapper->findAll(['order' => ['name' => 'asc']])
             ],
@@ -145,7 +148,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminEportfolio/importResults.twig',
             'data' => array(
-                'pageCurrent' => 'eportfolio',
+                'pageCurrent' => Subnav::PARENT_EPORTFOLIO,
+                'subpageCurrent' => Subnav::CHILD_EPORTFOLIO_DEPLOYMENT,
                 'id' => $id
             ),
             'postOutput' => [

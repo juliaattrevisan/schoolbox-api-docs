@@ -10,6 +10,7 @@ namespace Schoolbox\Admin\Terms;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Web\Request;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Term;
 use Schoolbox\YearLevel;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -82,7 +83,9 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminTerms/index.twig',
             'data'     => [
-                'pageCurrent'      => basename($this->getRequest()->query->get('page')),
+                'pageCurrent'      => Subnav::PARENT_LMS,
+                'subpageCurrent'   => Subnav::CHILD_LMS_ACADEMIC_PERIOD,
+                'allBreadcrumbs'   => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LMS, Subnav::CHILD_LMS_ACADEMIC_PERIOD),
                 'terms'            => $terms,
                 'yearLevelValues'  => $yearLevelValues,
                 'yearLevelOptions' => $yearLevelOptions,

@@ -1,5 +1,8 @@
 <?php
 
+use Schoolbox\Admin\Navigation\Subnav;
+
+
 if (!$_SESSION['user']->isSuperuser()) {
     error(19, "", 401);
 }
@@ -7,11 +10,18 @@ if (!$_SESSION['user']->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'adminv2/engagement/index.html');
 $this->setTitle('Admin - Engagement');
 
-// include the admin navigation
-$nav = new AdminV2_Nav($this->getDi()->get('config'));
-$nav->parse($this, 'engagement');
-
-$validPages = array('dueWork','quiz','files', 'links','fileTypes','news','collaboration','login','components','mobile');
+$validPages = [
+    Subnav::CHILD_ENGAGEMENT_DUE_WORK,
+    Subnav::CHILD_ENGAGEMENT_QUIZZES,
+    Subnav::CHILD_ENGAGEMENT_FILES,
+    Subnav::CHILD_ENGAGEMENT_LINKS,
+    Subnav::CHILD_ENGAGEMENT_FILETYPES,
+    Subnav::CHILD_ENGAGEMENT_NEWS_POSTED,
+    Subnav::CHILD_ENGAGEMENT_COLLABORATION,
+    Subnav::CHILD_ENGAGEMENT_LOGIN,
+    Subnav::CHILD_ENGAGEMENT_COMPONENT_USAGE,
+    Subnav::CHILD_ENGAGEMENT_MOBILE_APPS,
+];
 
 /* Setup period **/
 if($this->arg[1]) {
@@ -37,6 +47,11 @@ if(in_array($this->arg[0],$validPages)) {
 else {
     $page = 'collaboration';
 }
+
+// include the admin navigation
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_ENGAGEMENT, $page)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_ENGAGEMENT, $page);
 
 $this->setVar(array(
     'CURRENT_PAGE'              => $page,

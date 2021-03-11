@@ -1,0 +1,29 @@
+{#
+    pageCurrent:    string
+    subpageCurrent: string
+    commsOfficers:  User[]
+    configContext:  array     - Data required to render a config settings form
+    topics:         Topic[]
+#}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+
+    <div class="admin-content">
+        {% include '@commsNewsPolicy/comms-officers.twig' with {
+            pageCurrent: pageCurrent,
+            subpageCurrent: subpageCurrent,
+            commsOfficers: commsOfficers
+        } only %}
+
+        {% include '@settings/moduleConfig.twig' with configContext only %}
+
+        <div class="small-12 columns">
+            {% include '@commsNewsPolicy/topics.twig' with {topics: topics} only %}
+        </div>
+    </div>
+</div>

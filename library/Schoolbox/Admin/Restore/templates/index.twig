@@ -1,6 +1,3 @@
-{# Shared navigation menu #}
-{{ renderAdminNavigation(pageCurrent) }}
-
 {% autoescape 'js' %}
 <script>
     $(function() {
@@ -79,67 +76,79 @@
 </script>
 {% endautoescape %}
 
-<div class="row">
-    <div class="small-12 island">
-        <dl class="tabs" data-tab>
-            <dd class="active"><a href="#panel1-1">Folder</a></dd>
-            <dd><a href="#panel1-2">Assessment</a></dd>
-        </dl>
-        <section class="content tabs-content">
-            <div class="content active" id="panel1-1">
-                <table>
-                    <thead>
-                    <tr>
-                        <td>Folder Name</td>
-                        <td>Deleted On</td>
-                        <td>Restore</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for folder in deletedFolders %}
-                    <tr>
-                        <td>{{ folder.nameWithCodes }}</td>
-                        <td>{{ folder.deletedAt.long }}</td>
-                        <td><a data-restore-folder="{{ folder.id }}" href="#" class="icon-upload" title="Restore"></a></td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="content" id="panel1-2">
-                <table>
-                    <thead>
-                    <tr>
-                        <td>Assessment Name</td>
-                        <td>Type</td>
-                        <td>Location</td>
-                        <td>Deleted On</td>
-                        <td>Restore</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for assessment in deletedAssessments %}
-                    <tr>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-                        <td>{{ assessment.title }}</td>
-                        <td>    {% if assessment.hasProject %}
-                                Project
-                            {% elseif assessment.hasTask %}
-                                Task
-                            {% elseif assessment.hasQuiz %}
-                                Quiz
-                            {% elseif assessment.hasDueWork %}
-                                Due Work
-                            {% endif %}</td>
-                        <td>{{ assessment.assessmentContext.folder.nameWithCodes }}</td>
-                        <td>{{ assessment.deletedAt.long }}</td>
-                        <td><span><a data-restore-assessment="{{ assessment.id }}" href="#" class="icon-upload" title="Restore"></a></span></td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </section>
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader">Restore</h2>
+        </div>
+        <div class="small-12 island">
+            <dl class="tabs" data-tab>
+                <dd class="active"><a href="#panel1-1">Folder</a></dd>
+                <dd><a href="#panel1-2">Assessment</a></dd>
+            </dl>
+            <section class="content tabs-content">
+                <div class="content active" id="panel1-1">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>Folder Name</td>
+                            <td>Deleted On</td>
+                            <td>Restore</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for folder in deletedFolders %}
+                        <tr>
+                            <td>{{ folder.nameWithCodes }}</td>
+                            <td>{{ folder.deletedAt.long }}</td>
+                            <td><a data-restore-folder="{{ folder.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="content" id="panel1-2">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>Assessment Name</td>
+                            <td>Type</td>
+                            <td>Location</td>
+                            <td>Deleted On</td>
+                            <td>Restore</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for assessment in deletedAssessments %}
+                        <tr>
+
+                            <td>{{ assessment.title }}</td>
+                            <td>    {% if assessment.hasProject %}
+                                    Project
+                                {% elseif assessment.hasTask %}
+                                    Task
+                                {% elseif assessment.hasQuiz %}
+                                    Quiz
+                                {% elseif assessment.hasDueWork %}
+                                    Due Work
+                                {% endif %}</td>
+                            <td>{{ assessment.assessmentContext.folder.nameWithCodes }}</td>
+                            <td>{{ assessment.deletedAt.long }}</td>
+                            <td><span><a data-restore-assessment="{{ assessment.id }}" href="#" class="icon-upload" title="Restore"></a></span></td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
     </div>
 </div>
 <div id='toaster' class="toast" data-toast></div>

@@ -10,6 +10,7 @@ namespace Schoolbox\Admin\Oauth;
 use Alaress\Database\Predicate;
 use Alaress\Database\Quoter\Mysql\Quoter;
 use Alaress\Web\Controller\ConfigController;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 
@@ -49,7 +50,12 @@ class Controller extends ConfigController
             $this->getRouter()->generate(Module::BASE_NAME . '.postAdmin')
         );
 
-        $data = ['configContext' => $configContext,];
+        $data = [
+            'pageCurrent' => Subnav::PARENT_SYSTEM_SETTINGS,
+            'subpageCurrent' => Subnav::CHILD_SYSTEM_SETTINGS_OAUTH,
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, Subnav::CHILD_SYSTEM_SETTINGS_OAUTH),
+            'configContext' => $configContext,
+        ];
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(

@@ -10,6 +10,7 @@
 namespace Schoolbox\Admin\CourseBuilder;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\RoleMapper;
@@ -110,7 +111,9 @@ class Controller extends Base
             array(
                 'template' => '@adminCourseBuilder/index.twig',
                 'data'     => array(
-                    'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                    'pageCurrent' => Subnav::PARENT_LMS,
+                    'subpageCurrent' => Subnav::CHILD_LMS_COURSE_BUILDER,
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LMS, Subnav::CHILD_LMS_COURSE_BUILDER),
                     'tab' => $tab != '' ? $tab : 'course',
                     'roles' => $this->roleMapper->findAll(),
                     'permissions' => $permissions,

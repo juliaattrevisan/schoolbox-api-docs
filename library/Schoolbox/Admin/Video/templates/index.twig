@@ -42,78 +42,86 @@
     });
 </script>
 
-{# Shared navigation menu #}
-{{ renderAdminNavigation(pageCurrent) }}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="row">
-    <div class="small-12 island">
-        {% if queue | length %}
+<div class="admin-container row">
 
-            {% for status in statusOrder %}
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
 
-                {% for video in queue[status]|default([]) %}
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader">Media Queue</h2>
+        </div>
+        <div class="small-12 island">
+            {% if queue | length %}
 
-                    {% if loop.first %}
-                        <h2 class="subheader">
-                            {{ status }} Media Conversions
-                        </h2>
-                        <table data-sortable>
-                            <thead>
-                            <tr>
-                                <th>Uploaded At</th>
-                                <th>Uploaded By</th>
-                                <th>File Name</th>
-                                <th>Duration</th>
-                                <th>Size</th>
-                                <th>Mime</th>
-                                <th data-sortable="false"></th>
-                            </tr>
-                            </thead>
-                    {% endif %}
-                            <tr>
-                                <td>{{ video.createdAt.database }}</td>
-                                <td>{% if video.user %}<a href="/search/user/{{ video.user.id }}">{{ video.user.fullName }}</a>{% else %}Unknown{% endif %}</td>
-                                <td>{{ video.storage.filename }}</td>
-                                <td>{{ video.duration }}</td>
-                                <td data-order="{{ video.storage.size  }}">{{ video.storage.size | bytes }}</td>
-                                <td>{{ video.storage.mime }}</td>
-                                <td class="actions-small-3">
-                                    <nav>
-                                        {% if video.isFailed %}
-                                            <form id="update{{ video.id }}" method="post" action="{{ routeLookup('adminVideo.postSubmit') }}">
-                                                <input type="hidden" value="{{ video.id }}" name="videoId">
-                                                <input type="hidden" value="" name="videoAction">
-                                                <a class="icon-download no-text" href="/storage/fetch.php?hash={{ video.storage.hash }}" title="Download file"></a>
-                                                <a class="icon-search no-text" data-view="{{ video.id }}" href="#" title="View Transcode Results" data-reveal-id="ajax-load" data-reveal-ajax="/adminv2/video/{{ video.id }}"></a>
-                                                <a class="icon-refresh no-text" data-submit="{{ video.id }}" href="#" title="Restart Processing"></a>
-                                                <a class="icon-delete no-text" data-delete="{{ video.id }}" href="#" title="Delete From Queue"></a>
-                                            </form>
-                                        {% endif %}
-                                    </nav>
-                                </td>
-                            </tr>
-                    {% if loop.last %}
-                        </table>
-                    {% endif %}
+                {% for status in statusOrder %}
+
+                    {% for video in queue[status]|default([]) %}
+
+                        {% if loop.first %}
+                            <h2 class="subheader">
+                                {{ status }} Media Conversions
+                            </h2>
+                            <table data-sortable>
+                                <thead>
+                                <tr>
+                                    <th>Uploaded At</th>
+                                    <th>Uploaded By</th>
+                                    <th>File Name</th>
+                                    <th>Duration</th>
+                                    <th>Size</th>
+                                    <th>Mime</th>
+                                    <th data-sortable="false"></th>
+                                </tr>
+                                </thead>
+                        {% endif %}
+                                <tr>
+                                    <td>{{ video.createdAt.database }}</td>
+                                    <td>{% if video.user %}<a href="/search/user/{{ video.user.id }}">{{ video.user.fullName }}</a>{% else %}Unknown{% endif %}</td>
+                                    <td>{{ video.storage.filename }}</td>
+                                    <td>{{ video.duration }}</td>
+                                    <td data-order="{{ video.storage.size  }}">{{ video.storage.size | bytes }}</td>
+                                    <td>{{ video.storage.mime }}</td>
+                                    <td class="actions-small-3">
+                                        <nav>
+                                            {% if video.isFailed %}
+                                                <form id="update{{ video.id }}" method="post" action="{{ routeLookup('adminVideo.postSubmit') }}">
+                                                    <input type="hidden" value="{{ video.id }}" name="videoId">
+                                                    <input type="hidden" value="" name="videoAction">
+                                                    <a class="icon-download no-text" href="/storage/fetch.php?hash={{ video.storage.hash }}" title="Download file"></a>
+                                                    <a class="icon-search no-text" data-view="{{ video.id }}" href="#" title="View Transcode Results" data-reveal-id="ajax-load" data-reveal-ajax="/adminv2/video/{{ video.id }}"></a>
+                                                    <a class="icon-refresh no-text" data-submit="{{ video.id }}" href="#" title="Restart Processing"></a>
+                                                    <a class="icon-delete no-text" data-delete="{{ video.id }}" href="#" title="Delete From Queue"></a>
+                                                </form>
+                                            {% endif %}
+                                        </nav>
+                                    </td>
+                                </tr>
+                        {% if loop.last %}
+                            </table>
+                        {% endif %}
+
+                    {% endfor %}
 
                 {% endfor %}
 
-            {% endfor %}
+                <div id="empty" class="empty-state hide">
+                    <i class="icon-video"></i>
+                    <p>There are no failed, pending or processing media transcodes.</p>
+                </div>
 
-            <div id="empty" class="empty-state hide">
-                <i class="icon-video"></i>
-                <p>There are no failed, pending or processing media transcodes!</p>
-            </div>
+            {% else %}
 
-        {% else %}
+                <div class="empty-state">
+                    <i class="icon-video"></i>
+                    <p>There are no failed, pending or processing media transcodes.</p>
+                </div>
 
-            <div class="empty-state">
-                <i class="icon-video"></i>
-                <p>There are no failed, pending or processing media transcodes!</p>
-            </div>
-
-        {% endif %}
-
+            {% endif %}
+        </div>
     </div>
 </div>
 
