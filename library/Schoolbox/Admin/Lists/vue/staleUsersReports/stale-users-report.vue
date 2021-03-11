@@ -3,7 +3,7 @@
 /**
  * To be able to bulk delete users from the system
  * A sortable/searchable table is displayed to select the users to delete
- * 
+ *
  */
 
 import { VueGoodTable } from 'vue-good-table';
@@ -34,10 +34,10 @@ export default {
 			default: 'DD/MM/YYYY'
 		}
 	},
-	
+
   	data () {
     	return {
-			hasRowsLoaded: false, 
+			hasRowsLoaded: false,
 			hasLoadError: false,
       		columns: [
 				{
@@ -97,25 +97,26 @@ export default {
 		loadRows () {
 			fetchAsJson('/adminv2/user/stale/list')
 			.then((response) => {
+
 				this.rows = response;
 				this.hasRowsLoaded = true;
 				this.customVueGoodTableSetup();
-			}).catch((error) => {
-				this.hasLoadError = true; //display error note in the DOM
-			});
+      }).catch((error) => {
+        this.hasLoadError = true; //display error note in the DOM
+      });
 		},
 
-		/**
-         * custom fixes to get VGT to do exactly what we want it to
-         *
-         */
+	  /**
+     * custom fixes to get VGT to do exactly what we want it to
+     *
+     */
 		customVueGoodTableSetup () {
 			this.$nextTick()
 			.then(() => { //to ensure it exists in the DOM
 				this.$refs.vueGoodTable.selectAllByPage = false; //defaults to true, not currently provided as a prop, but works as expected
 			})
 			.then(() => { //to ensure it exists in the DOM
-				this.$el.querySelector('.vgt-global-search__input input').placeholder = this.$refs.vueGoodTable.searchPlaceholder; //temp fix for https://github.com/xaksis/vue-good-table/issues/829 
+				this.$el.querySelector('.vgt-global-search__input input').placeholder = this.$refs.vueGoodTable.searchPlaceholder; //temp fix for https://github.com/xaksis/vue-good-table/issues/829
 			});
 		},
 
@@ -144,7 +145,7 @@ export default {
             this.$refs.toast.activate('Deleting...');
 			this.$refs.toast.timeout('Deleted', true, 2000);
 			this.$refs.deleteModal.close();
-			
+
 			this.rows = this.getUpdatedRowsAfterUserDeletion();
 			this.$_vgtSelectRows_clearRows();
 
@@ -182,29 +183,28 @@ export default {
         },
 
 	}
-	
+
 }
 
 </script>
 
 <template>
 	<div>
-        <div v-if="!hasRowsLoaded && !hasLoadError" class="loader"></div>
-        <div v-else-if="!hasRowsLoaded && hasLoadError" data-alert class="alert-box alert">Sorry, we are currently unable to load the Stale Users Report.</div>
+    <div v-if="!hasRowsLoaded && !hasLoadError" class="loader"></div>
+    <div v-else-if="!hasRowsLoaded && hasLoadError" data-alert class="alert-box alert">Sorry, we are currently unable to load the Stale Users Report.</div>
 		<vue-good-table
 			v-if="hasRowsLoaded"
 			ref="vueGoodTable"
-			styleClass="vgt-table striped bordered"
-			compactMode
+			styleClass="vgt-table"
 			:columns="columns"
 			:rows="rows"
-			:search-options="{
-				enabled: true,
-				placeholder: 'Search for users...',
-			}"
+      :search-options="{
+        enabled: true,
+        placeholder: 'Search for users...',
+      }"
 			:sort-options="{
 				enabled: true,
-				initialSortBy: { 
+				initialSortBy: {
 					field: 'updated_at',
 					type: 'asc'
 				}
@@ -217,7 +217,7 @@ export default {
 				infoFn: (params) => `${params.firstRecordOnPage} - ${params.lastRecordOnPage} of ${params.totalRecords} Users`,
 
 			}"
-			:select-options="{ 
+			:select-options="{
 				enabled: true,
 				disableSelectInfo: true,
 			}"
@@ -226,21 +226,24 @@ export default {
 			@on-row-click="$_vgtSelectRows_onRowClick"
 			@on-select-all="$_vgtSelectRows_onSelectAllRows"
 		>
-			<div slot="emptystate">
-				<p>There are currently no users to delete.</p>
-			</div>
+      <div slot="emptystate">
+        <p>There are currently no users to delete.</p>
+      </div>
 		</vue-good-table>
-        <toast ref="toast"></toast>
-        <reveal-modal ref="deleteModal">
-            <h2>Please confirm</h2>
-			<div data-alert class="alert-box alert">
-                <h4>You are about to delete <strong>{{ $_vgtSelectRows_selectedRowsCountWithRowName }}</strong>. Deleting users will prevent them from logging into the system and from accessing resources that belong to them.  Attached resources that will be removed include; ePortfolio, My Files, Pastoral Records and My Links.  Resources shared with or by the user like Files, Grades, News, Forum Posts and other collaborative activities will remain available.</h4>
-            </div>
-            <ul class="flex-list buttons">
-                <li><a @click.prevent="onConfirmDeleteUsersSelected" class="button submit">Confirm Deletion</a></li>
-                <li><a @click.prevent="onCancelDeleteUsersSelected" class="button">Cancel</a></li>
-            </ul>
-        </reveal-modal>
+
+    <toast ref="toast"></toast>
+
+    <reveal-modal ref="deleteModal">
+        <h2>Please confirm</h2>
+      <div data-alert class="alert-box alert">
+        <h4>You are about to delete <strong>{{ $_vgtSelectRows_selectedRowsCountWithRowName }}</strong>. Deleting users will prevent them from logging into the system and from accessing resources that belong to them. Attached resources that will be removed include; ePortfolio, My Files, Pastoral Records and My Links. Resources shared with or by the user like Files, Grades, News, Forum Posts and other collaborative activities will remain available.</h4>
+      </div>
+      <ul class="flex-list buttons">
+        <li><a @click.prevent="onConfirmDeleteUsersSelected" class="button submit">Confirm Deletion</a></li>
+        <li><a @click.prevent="onCancelDeleteUsersSelected" class="button">Cancel</a></li>
+      </ul>
+    </reveal-modal>
+
 		<transition name="slide">
 			<div v-if="$_vgtSelectRows_selectedRowsCount  > 0" class="delete-container">
 				<section class="content">
@@ -256,73 +259,6 @@ export default {
 
 <style lang="scss">
 
-@import 'vue-good-table/dist/vue-good-table';
-
-.vgt-wrap {
-	padding-bottom: 100px; //to allow space for .delete-container at the bottom
-}
-
-.vgt-table input[type=checkbox] {
-    position: static; 
-    width: 1rem; 
-    height: 1rem; 
-    min-height: 1rem; 
-    opacity: 1; 
-}
-
-.vgt-wrap__footer .footer__row-count__select {
-	width: 100px;
-	margin: 0;
-	padding: 0px 10px;
-}
-
-.vgt-global-search__input {
-	padding-left: 10px;
-}
-
-.vgt-global-search__input .input__icon {
-	display: none;
-}
-
-.delete-container {
-	position: fixed;
-	width: 80%;
-	height: 120px;
-	bottom: 0px;
-	border: 1px solid #dcdfe6;
-	padding: 10px 20px;
-	background: linear-gradient(#f4f5f8, #f1f3f6);
-	h3, button {
-		display: inline-block;
-	}
-	h3 {
-		margin-right: 5px;
-	}
-	.shift-select-note {
-		padding-right: 20px;
-		font-size: 0.8rem;
-		font-style: italic;
-	}
-	.button-clear {
-		padding: 0px;
-		background: none;
-		vertical-align: baseline;
-		font-size: 0.8rem;
-	}
-}
-
-.slide-enter-active,
-.slide-leave-active {
-  	transition: transform 0.3s ease-out;
-}
-.slide-enter-active {
-	transform: translateY(100%);
-}
-.slide-enter-to {
-	transform: translateY(0%);
-}
-.slide-leave-to {
-	transform: translateY(100%);
-}
+@import './styles/staleUsersReports.scss';
 
 </style>
