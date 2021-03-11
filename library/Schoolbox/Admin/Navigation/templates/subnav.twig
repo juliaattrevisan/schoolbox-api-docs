@@ -29,6 +29,34 @@
         });
     });
 </script>
+
+{# Top level breadcrumby title
+ # Its crumbs are derived from the cosmetic names given in the adminSubnav stack
+ # 'Home' is the default node which circumstantially matches one in the stack
+ #}
+{% set parentSelected = 'Home' %}
+{% set childSelected = false %}
+
+{% for parentUrl, parentData in adminSubnav %}
+    {% if parentData.identifier == pageCurrent %}
+        {% set parentSelected = parentData.name %}
+
+        {# Find out if there's a subpage breadcrumby title
+         # This is also derived from the adminSubnav stack
+         #}
+        {% if parentData.children|length %}
+            {% for childUrl, childData in parentData.children %}
+                {% if childData.identifier == subpageCurrent %}
+                    {% set childSelected = childData.name %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+<div class="small-12 columns">
+    <h1>Admin › {{ parentSelected }} {% if childSelected %} › {{ childSelected }}{% endif %}</h1>
+</div>
 <nav id="admin-nav">
     <h2 class="subheader">Menu</h2>
     <a href="#" class="dropdown-btn" data-admin-subnav-dropdown>Go to...</a>
