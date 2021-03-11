@@ -111,7 +111,6 @@ class Controller extends Base
     }
 
 
-    /** @noinspection PhpUnused */
     /**
      * Create folders and render results
      *
@@ -155,6 +154,8 @@ class Controller extends Base
             [
                 'template' => '@adminImportFolder/importResults.twig',
                 'data' => [
+                    'pageCurrent'    => Subnav::PARENT_IMPORT,
+                    'subpageCurrent' => Subnav::CHILD_IMPORT_PAGES,
                     'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
                     'results'        => $allFolders,
                     'perform'        => $performMode,
@@ -168,7 +169,6 @@ class Controller extends Base
      * Insert an attach zone into the template
      *
      * @return array
-     * @throws UnexpectedValueException
      */
     private function getAttachZone(): array
     {
