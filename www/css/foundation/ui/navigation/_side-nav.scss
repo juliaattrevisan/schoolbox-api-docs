@@ -55,6 +55,8 @@ $border-bottom-width: 2px;
         display: none;
         background-color: $white;
         width: 100%;
+        max-height: 348px;
+        overflow-y: scroll;
         z-index: 2;
 
         @media #{$large-up} {
