@@ -1,25 +1,32 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>
-            {% block title %}
-            {% endblock %}
-        </h1>
-    </div>
+<div class="admin-container row">
 
-    <div class="small-12 island">
-        <h2 class="subheader">
-            {% block subtitle %}
-            {% endblock %}
-        </h2>
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
 
-        <section class="no-margin">
-            <ul class="information-list ups" data-log>
-                {% include '@upsRuleset/log/lines.twig' %}
-            </ul>
-        </section>
+    <div class="admin-content">
+        <div class="row">
+            <div class="small-12 columns">
+                <h1>
+                    {% block title %}
+                    {% endblock %}
+                </h1>
+            </div>
+
+            <div class="small-12 island">
+                <h2 class="subheader">
+                    {% block subtitle %}
+                    {% endblock %}
+                </h2>
+
+                <section class="no-margin">
+                    <ul class="information-list ups" data-log>
+                        {% include '@upsRuleset/log/lines.twig' %}
+                    </ul>
+                </section>
+            </div>
+        </div>
     </div>
 </div>
 <script type="text/javascript">
