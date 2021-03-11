@@ -45,7 +45,7 @@ class Renderer extends Extension\AbstractExtension
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function renderAdminNavigation(Environment $twig, string $pageCurrent, ?string $subpageCurrent): string
+    public function renderAdminNavigation(Environment $twig, string $pageCurrent): string
     {
         // Grab navigation items from old admin class
         // TODO SA-8354: inject this
@@ -54,7 +54,6 @@ class Renderer extends Extension\AbstractExtension
         return $twig->render('@adminNavigation/subnav.twig', array(
             'adminSubnav' => (new Subnav(new Loader()))->generate(),
             'pageCurrent' => $pageCurrent,
-            'subpageCurrent' => $subpageCurrent
         ));
     }
 

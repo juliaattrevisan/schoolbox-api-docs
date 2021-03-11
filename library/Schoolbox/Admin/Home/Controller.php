@@ -267,9 +267,8 @@ class Controller extends Base
             array(
                 'template' => '@adminHome/index.twig',
                 'data' => array(
-                    'pageCurrent' => Subnav::PARENT_HOME,
-                    'subpageCurrent' => null,
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_HOME, null),
+                    'pageCurrent' => $this->router->generate('adminHome.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
                     'usageInGraph' => $usageInGraph,
                     'disk_used' => $disk_used,
             //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),

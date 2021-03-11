@@ -30,7 +30,6 @@ class Subnav
      * and won't be explicitly stated as one of these consts, so be mindful
      * that there are multiple ways to match these identifiers
      */
-    public const PARENT_HOME = 'home';
 
     /* These are derived from a url param
      */
@@ -214,9 +213,9 @@ class Subnav
     public function generate(): array
     {
         return [
-            'home' => [
+            '/adminv2/home' => [
                 'name' => 'Home',
-                'identifier' => self::PARENT_HOME,
+                'identifier' => '',
                 'visible' =>  true,
                 'children' => []
             ],
@@ -879,23 +878,23 @@ class Subnav
      * There are multiple implementations of breadcrumbs but there should be only one
      * Those should be removed in favour of this implementation
      *
-     * @param string      $pageCurrent
-     * @param string|null $subpageCurrent
+     * @param string $url
      * @return array
      */
-    public function generateBreadcrumbs(string $pageCurrent, ?string $subpageCurrent): array
+    public function generateBreadcrumbs(string $url): array
     {
         $allCrumbs = [
             ['Administration', '/adminv2/home']
         ];
 
         foreach ($this->generate() as $parentUrl => $parentData) {
-            if ($parentData['identifier'] === $pageCurrent) {
+            if ($parentUrl === $url) {
                 $allCrumbs[] = [$parentData['name'], $parentUrl];
 
                 if (\count($parentData['children'])) {
                     foreach ($parentData['children'] as $childUrl => $childData) {
-                        if ($childData['identifier'] === $subpageCurrent) {
+                        if ($childUrl === $url) {
+                            $allCrumbs[] = [$parentData['name'], $parentUrl];
                             $allCrumbs[] = [$childData['name'],  $childUrl];
                         }
                     }

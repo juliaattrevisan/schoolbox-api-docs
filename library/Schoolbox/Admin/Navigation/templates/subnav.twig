@@ -85,7 +85,7 @@
                 {% if parentUrl in ['calendar', 'lms', 'personalisation', 'eportfolio'] %}
                     <a>{{ parentData.name }}</a>
                 {% else %}
-                    <a href="/adminv2/{{ parentUrl }}">{{ parentData.name }}</a>
+                    <a href="{{ parentUrl }}">{{ parentData.name }}</a>
                 {% endif %}
 
                 {% if parentData.children|length %}
@@ -99,7 +99,7 @@
                                 {% endif %}
                             {% endif %}
 
-                            <li class='{{ childSelected }}' role="menuitem"><a href="/adminv2/{{ childUrl }}">{{ childData.name }}</a></li>
+                            <li class='{{ childSelected }}' role="menuitem"><a href="{{ childUrl }}">{{ childData.name }}</a></li>
                         {% endfor %}
                     </ul>
                 {% endif %}
