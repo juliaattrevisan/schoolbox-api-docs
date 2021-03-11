@@ -116,13 +116,9 @@ export default {
         <div class="row">
             <div class="small-12 island">
                 <template v-if="this.isLoading">
-                    <table class="skeleton">
-                        <tbody>
-                        <tr v-for="n in 3" :key="n">
-                            <td></td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <section class="content">
+                        <div class="loader"></div>
+                    </section>
                 </template>
                 <template v-else-if="!this.isLoading && rows.length === 0">
                     <div class="empty-state">
@@ -163,13 +159,7 @@ export default {
 
 <style lang="scss">
 
-@import 'vue-good-table/dist/vue-good-table';
-
-.vgt-wrap__footer .footer__row-count__select {
-	width: 100px;
-	margin: 0;
-	padding: 0px 10px;
-}
+@import '@schoolbox/vueGoodTable/vueGoodTable';
 
 </style>
 
