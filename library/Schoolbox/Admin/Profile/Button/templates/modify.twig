@@ -1,5 +1,8 @@
 {% set createForm = item is not defined %}
 
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
 <div class="admin-container row">
     {# Shared navigation profile #}
     {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}

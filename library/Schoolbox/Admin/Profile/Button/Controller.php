@@ -5,7 +5,6 @@ namespace Schoolbox\Admin\Profile\Button;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Collection;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Campus;
@@ -118,6 +117,7 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
                 'subpageCurrent' => Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS),
                 'profile' => $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
@@ -164,6 +164,7 @@ class Controller extends Base
             'data' => [
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
                 'subpageCurrent' => Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS),
                 'item' => $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [ 'cache' => false ]),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
@@ -192,6 +193,7 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
                 'subpageCurrent' => Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc')

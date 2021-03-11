@@ -38,6 +38,7 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
                 'subpageCurrent' => Subnav::CHILD_PERSONALISATION_TERMINOLOGY,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_TERMINOLOGY),
                 'terms' => $this->l10nMapper->findAll()
             ],
             'title' => 'Admin - Terminology'

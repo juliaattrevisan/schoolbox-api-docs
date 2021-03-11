@@ -114,6 +114,7 @@ class Controller extends Base
             'data' => [
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
                 'subpageCurrent' => Subnav::CHILD_PERSONALISATION_SIDE_MENU,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_SIDE_MENU),
                 'tree' => $treeList,
                 'sections' => $sections,
                 'configTitle' => $this->getConfigLoader()->get('title'),
@@ -225,6 +226,7 @@ class Controller extends Base
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
                 'subpageCurrent' => Subnav::CHILD_PERSONALISATION_SIDE_MENU,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_SIDE_MENU),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
             ],
