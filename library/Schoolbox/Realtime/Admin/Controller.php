@@ -186,6 +186,7 @@ class Controller extends BaseController
         $data = [
             'pageCurrent' => Subnav::PARENT_MESSAGES,
             'subpageCurrent' => Subnav::CHILD_MESSAGES_DELIVERY_PROVIDERS,
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_MESSAGES, Subnav::CHILD_MESSAGES_DELIVERY_PROVIDERS),
             'apps'        => $apps,
             'attachzones' => $zones,
             'providers'   => [
@@ -344,6 +345,7 @@ class Controller extends BaseController
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_MESSAGES,
                 'subpageCurrent' => Subnav::CHILD_MESSAGES_SETTINGS,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_MESSAGES, Subnav::CHILD_MESSAGES_SETTINGS),
                 'filters' => $filters,
                 'roles'   => $roles,
                 'ns'      => $ns,
@@ -480,7 +482,8 @@ class Controller extends BaseController
             'template' => '@adminMessages/puush.twig',
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_MESSAGES,
-                'subpageCurrent' => Subnav::CHILD_MESSAGES_APP_REGISTRATIONS
+                'subpageCurrent' => Subnav::CHILD_MESSAGES_APP_REGISTRATIONS,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_MESSAGES, Subnav::CHILD_MESSAGES_APP_REGISTRATIONS),
             ],
         ];
 

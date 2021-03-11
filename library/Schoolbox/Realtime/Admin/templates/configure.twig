@@ -194,11 +194,8 @@
     }
 </script>
 
-<ul class="breadcrumb">
-    <li><a href="/adminv2/home">Admin</a></li>
-    <li><a href="/adminv2/messages">Notifications</a></li>
-    <li class="active"><a href="">Global Notification Settings</a></li>
-</ul>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="admin-container row">
 
