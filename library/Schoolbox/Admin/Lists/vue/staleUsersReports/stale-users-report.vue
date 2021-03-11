@@ -9,7 +9,7 @@
 import { VueGoodTable } from 'vue-good-table';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
-import { vgtSelectRows } from '@schoolbox/vueGoodTable/vgtSelectRows';
+import { mixinVgtSelectRows } from '@schoolbox/vueGoodTable/mixinVgtSelectRows';
 import { fetchAsJson } from '@shared/fetch/fetch';
 import dayjs from 'dayjs';
 
@@ -24,7 +24,7 @@ export default {
 	},
 
 	mixins: [
-		vgtSelectRows //contains row selection functionality
+		mixinVgtSelectRows //contains row selection functionality
 	],
 
 	props: {
@@ -114,9 +114,6 @@ export default {
 			this.$nextTick()
 			.then(() => { //to ensure it exists in the DOM
 				this.$refs.vueGoodTable.selectAllByPage = false; //defaults to true, not currently provided as a prop, but works as expected
-			})
-			.then(() => { //to ensure it exists in the DOM
-				this.$el.querySelector('.vgt-global-search__input input').placeholder = this.$refs.vueGoodTable.searchPlaceholder; //temp fix for https://github.com/xaksis/vue-good-table/issues/829
 			});
 		},
 
@@ -190,18 +187,20 @@ export default {
 
 <template>
 	<div>
-    <div v-if="!hasRowsLoaded && !hasLoadError" class="loader"></div>
-    <div v-else-if="!hasRowsLoaded && hasLoadError" data-alert class="alert-box alert">Sorry, we are currently unable to load the Stale Users Report.</div>
+
+		<div v-if="!hasRowsLoaded && !hasLoadError" class="loader"></div>
+		<div v-else-if="!hasRowsLoaded && hasLoadError" data-alert class="alert-box alert">Sorry, we are currently unable to load the Stale Users Report.</div>
+
 		<vue-good-table
 			v-if="hasRowsLoaded"
 			ref="vueGoodTable"
 			styleClass="vgt-table"
 			:columns="columns"
 			:rows="rows"
-      :search-options="{
-        enabled: true,
-        placeholder: 'Search for users...',
-      }"
+			:search-options="{
+				enabled: true,
+				placeholder: 'Search for users...',
+			}"
 			:sort-options="{
 				enabled: true,
 				initialSortBy: {
@@ -226,26 +225,26 @@ export default {
 			@on-row-click="$_vgtSelectRows_onRowClick"
 			@on-select-all="$_vgtSelectRows_onSelectAllRows"
 		>
-      <div slot="emptystate">
-        <p>There are currently no users to delete.</p>
-      </div>
+			<div slot="emptystate">
+				<p>There are currently no users to delete.</p>
+			</div>
 		</vue-good-table>
 
-    <toast ref="toast"></toast>
+    	<toast ref="toast"></toast>
 
-    <reveal-modal ref="deleteModal">
-        <h2>Please confirm</h2>
-      <div data-alert class="alert-box alert">
-        <h4>You are about to delete <strong>{{ $_vgtSelectRows_selectedRowsCountWithRowName }}</strong>. Deleting users will prevent them from logging into the system and from accessing resources that belong to them. Attached resources that will be removed include; ePortfolio, My Files, Pastoral Records and My Links. Resources shared with or by the user like Files, Grades, News, Forum Posts and other collaborative activities will remain available.</h4>
-      </div>
-      <ul class="flex-list buttons">
-        <li><a @click.prevent="onConfirmDeleteUsersSelected" class="button submit">Confirm Deletion</a></li>
-        <li><a @click.prevent="onCancelDeleteUsersSelected" class="button">Cancel</a></li>
-      </ul>
-    </reveal-modal>
+		<reveal-modal ref="deleteModal">
+			<h2>Please confirm</h2>
+			<div data-alert class="alert-box alert">
+				<h4>You are about to delete <strong>{{ $_vgtSelectRows_selectedRowsCountWithRowName }}</strong>. Deleting users will prevent them from logging into the system and from accessing resources that belong to them. Attached resources that will be removed include; ePortfolio, My Files, Pastoral Records and My Links. Resources shared with or by the user like Files, Grades, News, Forum Posts and other collaborative activities will remain available.</h4>
+			</div>
+			<ul class="flex-list buttons">
+				<li><a @click.prevent="onConfirmDeleteUsersSelected" class="button submit">Confirm Deletion</a></li>
+				<li><a @click.prevent="onCancelDeleteUsersSelected" class="button">Cancel</a></li>
+			</ul>
+		</reveal-modal>
 
 		<transition name="slide">
-			<div v-if="$_vgtSelectRows_selectedRowsCount  > 0" class="delete-container">
+			<div v-if="$_vgtSelectRows_selectedRowsCount  > 0" class="selected-action-container">
 				<section class="content">
 					<h3><em>{{ $_vgtSelectRows_selectedRowsCountWithRowName }} Selected</em></h3>
 					<span v-if="!$_vgtSelectRows_hasShiftKeySelected" class="shift-select-note">Use Shift+Select to select multiple Users</span>
@@ -254,11 +253,12 @@ export default {
 				</section>
 			</div>
 		</transition>
+
 	</div>
 </template>
 
 <style lang="scss">
 
-@import './styles/staleUsersReports.scss';
+@import '@schoolbox/vueGoodTable/vueGoodTable';
 
 </style>

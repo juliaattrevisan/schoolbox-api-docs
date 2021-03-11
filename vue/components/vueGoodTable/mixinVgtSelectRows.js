@@ -5,7 +5,7 @@
  * https://xaksis.github.io/vue-good-table/guide/advanced/checkbox-table.html#configuration
  */
 
-export const vgtSelectRows = {
+export const mixinVgtSelectRows = {
   
 	data () {
     	return {
