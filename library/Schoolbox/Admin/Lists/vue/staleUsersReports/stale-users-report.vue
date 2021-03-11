@@ -6,7 +6,6 @@
  * 
  */
 
-import Vue from 'vue';
 import { VueGoodTable } from 'vue-good-table';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
@@ -96,22 +95,28 @@ export default {
          *
          */
 		loadRows () {
-
 			fetchAsJson('/adminv2/user/stale/list')
 			.then((response) => {
-				
 				this.rows = response;
 				this.hasRowsLoaded = true;
-
-				Vue.nextTick()
-				.then(() => { //to ensure it exists in the DOM
-					this.$refs.vueGoodTable.selectAllByPage = false; //defaults to true, not currently provided as a prop, but works as expected
-				});	
-
+				this.customVueGoodTableSetup();
 			}).catch((error) => {
 				this.hasLoadError = true; //display error note in the DOM
 			});
+		},
 
+		/**
+         * custom fixes to get VGT to do exactly what we want it to
+         *
+         */
+		customVueGoodTableSetup () {
+			this.$nextTick()
+			.then(() => { //to ensure it exists in the DOM
+				this.$refs.vueGoodTable.selectAllByPage = false; //defaults to true, not currently provided as a prop, but works as expected
+			})
+			.then(() => { //to ensure it exists in the DOM
+				this.$el.querySelector('.vgt-global-search__input input').placeholder = this.$refs.vueGoodTable.searchPlaceholder; //temp fix for https://github.com/xaksis/vue-good-table/issues/829 
+			});
 		},
 
 		/**
@@ -269,6 +274,14 @@ export default {
 	width: 100px;
 	margin: 0;
 	padding: 0px 10px;
+}
+
+.vgt-global-search__input {
+	padding-left: 10px;
+}
+
+.vgt-global-search__input .input__icon {
+	display: none;
 }
 
 .delete-container {
