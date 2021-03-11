@@ -86,18 +86,9 @@ class Controller extends ConfigController
      */
     public function searchSettings(): void
     {
-        $searchString = $this->request->query->get('keyword');
-        if(strlen($searchString) < 2) {
-            throw $this->generateException(ErrorMapper::ERROR_SEARCH_LENGTH);
-        }
-
         $pb = $this->getConfigMapper()->getPredicateBuilder();
-        $pb->any($pb->like('name', '%' . $searchString . '%')
-                    ->like('title', '%' . $searchString . '%')
-                    ->like('description', '%' . $searchString . '%'))
-           ->equals('hidden', 'false');
-
-
+        $pb->equals('hidden', 'false')
+            ->notEquals('module', 'custom');
         $foundConfig = $this->getConfigMapper()->findByPredicates($pb);
 
         $jsonPayload = [];
@@ -109,15 +100,16 @@ class Controller extends ConfigController
             'schoolData' => '/adminv2/import/schoolDataImport'
         ];
 
-
         foreach($foundConfig as $config) {
-            /** @var $config Config */
+            /** @var Config $config */
+            $type = $config->getType() ? $config->getType()->getType() : '';
+
             $jsonPayload[] = [
                 'name'          => $config->getName(),
                 'title'         => $config->getTitle(),
                 'description'   => $config->getDescription(),
                 'module'        => $config->getModule(),
-                'url'           => sprintf($module[$config->getModule()], $config->getTypeId())
+                'url'           => sprintf($module[$config->getModule()], $type)
             ];
         }
         $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
