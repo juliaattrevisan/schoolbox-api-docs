@@ -38,54 +38,7 @@
         data () {
             return {
                 selectedFilters: null,
-                calendarOptions: {}
-                // calendarOptions: {
-                //     plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
-                //     views: {
-                //         day: {
-                //             // titleFormat: dayTitleFormat,
-                //             columnHeader: false
-                //         },
-                //         week: {
-                //             columnHeaderFormat: this.formats.displayWeekDay
-                //         }
-                //     },
-                //     eventTimeFormat: this.helper.eventTimeFormat,
-                //     // contentHeight: 'this.contentHeight',
-                //     customButtons: {
-                //         quickSwitchButton: {
-                //             text: ' ',
-                //         },
-                //         customPrev: {
-                //             icon: 'chevron-left',
-                //             click: this.clickPrev,
-                //         },
-                //         customNext: {
-                //             icon: 'chevron-right',
-                //             click: this.clickNext,
-                //         },
-                //         customToday: {
-                //             text: 'Today',
-                //             click: this.clickToday,
-                //         },
-                //     },
-                //     headerToolbar: {
-                //         left: 'quickSwitchButton,customToday,customPrev,customNext',
-                //         center: 'title',
-                //         right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                //     },
-                //     buttonText: {
-                //         today: 'Today',
-                //         month: 'Month',
-                //         week: 'Week',
-                //         day: 'Day'
-                //     },
-                //     initialView: 'dayGridMonth',
-                //     eventContent: this.eventRender,
-                //     events: this.events,
-                //     loading: this.onLoading,
-                //     eventClick: this.onEventClick
-                // }
+                calendarOptions: {} //will init in beforeMount due to this.helper being needed
             }
         },
 
