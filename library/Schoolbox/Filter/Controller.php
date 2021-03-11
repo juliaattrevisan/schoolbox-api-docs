@@ -106,7 +106,8 @@ class Controller extends BaseController
             'ENTITY_ASSESSMENTS' => Assessment\Mapper::class,
             'ENTITY_BADGES'      => Badge\Mapper::class,
             'pageCurrent'        => Subnav::PARENT_FILTERS,
-            'subpageCurrent'     => null
+            'subpageCurrent'     => null,
+            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_FILTERS, null),
         ])->setTitle('Filterable pages'));
     }
 
@@ -153,6 +154,7 @@ class Controller extends BaseController
             'page'               => $page,
             'pageCurrent'        => Subnav::PARENT_FILTERS,
             'subpageCurrent'     => null,
+            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_FILTERS, null),
             'definitions'        => $definitions,
             'pageFilters'        => $pageFilters,
             'roleTypes'          => $roleTypes,

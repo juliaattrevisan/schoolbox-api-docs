@@ -6,8 +6,13 @@
             showCourseMarkbook       bool
             ENTITY_ASSESSMENTS       string
             pageCurrent              string
+            subpageCurrent           string
             pageLabels               string[]
+            allBreadcrumbs           array
 #}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="admin-container row">
 
