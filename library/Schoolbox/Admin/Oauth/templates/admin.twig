@@ -2,12 +2,8 @@
     configContext:  array     - Data required to render a config settings form
 #}
 
-{% import 'sub/breadcrumbs.twig' as bread  %}
-{{ bread.crumbs(
-    [ 'Admin', routeLookup('adminHome.getIndex') ],
-    [ 'Messages', '/adminv2/messages' ],
-    [ 'oAuth Provider Configuration', routeLookup('adminOauth.getAdmin') ]
-) }}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="admin-container row">
 
