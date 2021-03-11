@@ -10,7 +10,7 @@
     import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
     import FlatPickr          from '@schoolbox/fullcalendar/flatPickr';
     import axios              from 'axios'
-    import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
+    import { mixinFullCalendarHelper } from "@schoolbox/fullcalendar/mixinFullCalendarHelper";
     import {stringify}        from 'qs';
 
     // Various URLs that FullCalendar may make use of.
@@ -35,6 +35,10 @@
             FlatPickr,
         },
 
+        mixins: [
+            mixinFullCalendarHelper
+        ],
+
         data () {
             return {
                 selectedFilters: null,
@@ -45,7 +49,7 @@
         computed: {
             jQuery: () => window.jQuery,
             config: () => window.fullCalendarConfig,
-            formats() {
+            formats () {
                 return {
                     formDate: FORMAT_FORM_DATE,
                     formDatetime: FORMAT_FORM_DATETIME,
@@ -58,19 +62,18 @@
         },
 
         beforeMount () {
-            this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
             this.calendarOptions = {
                 plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
                 views: {
                     day: {
-                        titleFormat: this.helper.dayTitleFormat.bind(this),
+                        titleFormat: this.dayTitleFormat,
                         columnHeader: false
                     },
                     week: {
                         columnHeaderFormat: this.formats.displayWeekDay
                     }
                 },
-                eventTimeFormat: this.helper.eventTimeFormat,
+                eventTimeFormat: this.eventTimeFormat,
                 // contentHeight: 'this.contentHeight',
                 customButtons: {
                     quickSwitchButton: {
@@ -101,9 +104,9 @@
                     day: 'Day'
                 },
                 initialView: 'dayGridMonth',
-                eventDidMount: this.helper.eventRender.bind(this),
+                eventDidMount: this.eventRender,
                 events: this.events,
-                loading: this.helper.onLoading.bind(this),
+                loading: this.onLoading,
                 eventClick: this.onEventClick
             }
         },
@@ -117,7 +120,7 @@
             // });
 
             // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
-            let quickSwitchIcon = document.createElement('a');
+            const quickSwitchIcon = document.createElement('a');
             quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
             quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
 
@@ -126,35 +129,8 @@
 
         methods: {
 
-            contentHeight() {
-                return this.helper.contentHeight();
-            },
-
-            /**
-             * Event loading callback: show a spinner whilst events are loading,
-             * remove the spinner once they have finished.
-             * @see https://fullcalendar.io/docs/loading
-             *
-             * @param isLoading True when events start loading,
-             *                  false once they are finished.
-             */
-            // onLoading(isLoading) {
-            //     // TODO this method should be unnecessary
-            //     // (for the same reason as `onLoading` in the main fullCalendar)
-            //     this.helper.onLoading(isLoading);
-            // },
-
-            /**
-             * Helper for rendering the title of the day view.
-             * Without this the calendar renders the date twice for some reason.
-             *
-             * @param dateObject
-             * @return {*}
-             */
-            // dayTitleFormat(dateObject) {
-            //     // TODO this method should be unnecessary
-            //     // (for the same reason as `onLoading` in the main fullCalendar)
-            //     return this.helper.dayTitleFormat(dateObject);
+            // contentHeight() {
+            //     return this.helper.contentHeight();
             // },
 
             /**
@@ -193,18 +169,6 @@
             },
 
             /**
-             * Helper function for converting a Date object to a Moment object.
-             * @see https://fullcalendar.io/docs/moment-plugins
-             *
-             * @param date
-             */
-            toMoment(date) {
-                // TODO this method should be unnecessary
-                // (for the same reason as `onLoading` in the main fullCalendar)
-                return this.helper.toMoment(date);
-            },
-
-            /**
              * Event source.
              * @see https://fullcalendar.io/docs/events-function
              *
@@ -238,20 +202,6 @@
                 );
                 // Fail callback: consider a message saying something failed
             },
-
-            /**
-             * Event render callback: manually tweaks the event's rendering, and
-             * can also conditionally show/hide the event.
-             * @see https://fullcalendar.io/docs/eventRender
-             *
-             * @param eventRenderInfo
-             * @return {boolean}
-             */
-            // eventRender(eventRenderInfo) {
-            //     // TODO this method should be unnecessary
-            //     // (for the same reason as `onLoading` in the main fullCalendar)
-            //     return this.helper.eventRender(eventRenderInfo);
-            // },
 
             /**
              * Click an event on the calendar callback: opens the view event
@@ -290,12 +240,10 @@
             :format-display-time="formats.displayTime"
             :format-display-datetime="formats.displayDatetime"
         />
-
         <full-calendar
             ref="fullCalendar"
             :options="calendarOptions"
         />
-
         <flat-pickr
             ref="flatPickr"
             :config="{
@@ -305,7 +253,6 @@
             }"
             @dateSelected="onQuickSwitch"
         />
-
     </div>
 </template>
 
