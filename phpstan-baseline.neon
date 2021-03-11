@@ -4653,12 +4653,12 @@ parameters:
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
-			path: library/Schoolbox/Comms/News/Policy/Module.php
+			path: library/Schoolbox/Admin/News/Policy/Module.php
 
 		-
 			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
 			count: 1
-			path: library/Schoolbox/Comms/News/Policy/Module.php
+			path: library/Schoolbox/Admin/News/Policy/Module.php
 
 		-
 			message: "#^Property Schoolbox\\\\Comms\\\\News\\\\Querystring\\:\\:\\$querystring \\(ArrayAccess\\) does not accept array\\<string, mixed\\>\\.$#"
