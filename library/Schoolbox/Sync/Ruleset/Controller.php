@@ -135,6 +135,7 @@ class Controller extends Base
         }
 
         $twigData['pageCurrent'] = Subnav::PARENT_USER_MANAGEMENT;
+        $twigData['subpageCurrent'] = Subnav::CHILD_USER_MANAGEMENT_UPS;
 
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/ruleset.twig',
