@@ -123,6 +123,7 @@ class Controller extends Base
             'data' => [
                 'pageCurrent' => Subnav::PARENT_EPORTFOLIO,
                 'subpageCurrent' => Subnav::CHILD_EPORTFOLIO_DEPLOYMENT,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_EPORTFOLIO, Subnav::CHILD_EPORTFOLIO_DEPLOYMENT),
                 'roles' => $this->roleMapper->findAll(['order' => ['name' => 'asc']]),
                 'campuses' => $this->campusMapper->findAll(['order' => ['name' => 'asc']])
             ],

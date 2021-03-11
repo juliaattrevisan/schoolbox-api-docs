@@ -8,6 +8,9 @@
  *
  */
 
+use Schoolbox\Admin\Navigation\Subnav;
+
+
 if (!$_SESSION['user']->isSuperuser()) {
     error(19, "", 401);
 }
@@ -27,7 +30,9 @@ $this->setBlock('layout', 'position_right', 'position_right_block');
 $this->setBlock(TEMPLATE_content, 'component', 'component_block');
 
 // include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_EPORTFOLIO, \Schoolbox\Admin\Navigation\Subnav::CHILD_EPORTFOLIO_TEMPLATES);
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_EPORTFOLIO, Subnav::CHILD_EPORTFOLIO_TEMPLATES)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_EPORTFOLIO, Subnav::CHILD_EPORTFOLIO_TEMPLATES);
 
 // Get list of templates
 $templateHandler = new EportfolioTemplate();
