@@ -18,14 +18,6 @@
     <div class="admin-content">
         {% if isLocalisation %}
         {% include '@settings/fragments/localisation.twig' %}
-        {% elseif isSkinConfig %}
-        <div class="small-12 column">
-            <div class="alert-box warning">
-                Any changes made to the skin configuration may not be visible immediately to you or other users, as they
-                are cached for efficiency.
-                To see your changes immediately, press Ctrl-F5 in the browser.
-            </div>
-        </div>
         {% endif %}
         {% include '@settings/moduleConfig.twig' with configContext only %}
     </div>
