@@ -91,7 +91,6 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        /** @var Collection $buttons */
         $buttons = $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc');
 
         $roleAvailabilitySelected = [];
@@ -164,6 +163,7 @@ class Controller extends Base
             'template' => '@adminProfileButton/modify.twig',
             'data' => [
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
+                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS,
                 'item' => $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [ 'cache' => false ]),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
@@ -191,6 +191,7 @@ class Controller extends Base
             'template' => '@adminProfileButton/modify.twig',
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_PERSONALISATION,
+                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS,
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc')

@@ -1,22 +1,22 @@
 {% set createForm = item is not defined %}
 
-<form id="itemForm" action="{{ routeLookup('adminProfileButton.postModify') }}" method="post">
-    <input type="hidden" name="id" value="{{ item.id ?? '' }}">
-    <div class="admin-container row">
+<div class="admin-container row">
+    {# Shared navigation profile #}
+    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
 
-        {# Shared navigation profile #}
-        {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+    <div class="admin-content">
+        <h2 class="subheader">
+            {% if createForm %}
+                Create Profile Button
+            {% else %}
+                Modify Profile Button
+            {% endif %}
+        </h2>
 
-        <div class="admin-content">
+        <form id="itemForm" action="{{ routeLookup('adminProfileButton.postModify') }}" method="post">
+            <input type="hidden" name="id" value="{{ item.id ?? '' }}">
+
             <div class="small-12 island">
-                <h2 class="subheader">
-                    {% if createForm %}
-                        Create Profile Button
-                    {% else %}
-                        Modify Profile Button
-                    {% endif %}
-                </h2>
-
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
@@ -143,26 +143,26 @@
                     </fieldset>
                 </section>
             </div>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="small-12 column">
-            <ul class="flex-list buttons">
-                <li><a href="{{ routeLookup('adminProfileButton.getIndex') }}" class="button">Cancel</a>
-                <li>
-                    <button type="submit" class="submit" id="profile-button-submit">
-                        {% if createForm %}
-                            Create profile button
-                        {% else %}
-                            Save
-                        {% endif %}
-                    </button>
-                </li>
-            </ul>
-        </div>
+            <div class="row">
+                <div class="small-12 column">
+                    <ul class="flex-list buttons">
+                        <li><a href="{{ routeLookup('adminProfileButton.getIndex') }}" class="button">Cancel</a>
+                        <li>
+                            <button type="submit" class="submit" id="profile-button-submit">
+                                {% if createForm %}
+                                    Create profile button
+                                {% else %}
+                                    Save
+                                {% endif %}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
 <script src="/javascript/shared/select-all/jquery.select-all.js"></script>
 <script>
