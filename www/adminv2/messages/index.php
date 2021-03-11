@@ -8,6 +8,7 @@
  */
 
 use Cron\CronExpression;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\IConfigLoader;
 
 if (!isset($this)) {
@@ -30,7 +31,9 @@ if (in_array($this->arg[0], array('enable','disable'))) {
 $this->setFile(TEMPLATE_content, '/adminv2/messages/index.html');
 
 // include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_MESSAGES, null);
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_MESSAGES, null)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_MESSAGES, null);
 
 $this->setTitle('Admin - Messages');
 
