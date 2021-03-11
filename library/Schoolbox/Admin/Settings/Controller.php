@@ -45,6 +45,11 @@ class Controller extends ConfigController
             $this->router->generate('settings.postSettings', ['typeLabel' => $typeLabel])
         );
 
+        /* Not sure if this was intended to be in configContext?
+         * Frontend ui needs it
+         */
+        $configContext['typeLabel'] = $typeLabel;
+
         $settingsTabs = [];
         foreach ($typeLabels as $label) {
             $settingsTabs[] = [

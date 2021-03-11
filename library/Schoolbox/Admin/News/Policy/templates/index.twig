@@ -19,6 +19,8 @@
 
         {% include '@settings/moduleConfig.twig' with configContext only %}
 
-        {% include '@commsNewsPolicy/topics.twig' with {topics: topics} only %}
+        <div class="small-12 columns">
+            {% include '@commsNewsPolicy/topics.twig' with {topics: topics} only %}
+        </div>
     </div>
 </div>

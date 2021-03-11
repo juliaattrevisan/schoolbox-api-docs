@@ -138,7 +138,7 @@
 
     <div class="admin-content">
         <div class="small-12 island">
-            <h2 class="subheader">Page Name</h2>
+            <h2 class="subheader">{{ tables[table].title }}</h2>
             {% if records | length > 0 %}
                 {% set emptyStateClass = 'hide' %}
             {% else %}

@@ -5,13 +5,15 @@
     {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
 
     <div class="admin-content">
-        <h2 class="subheader">
-            {% if createForm %}
-                Create Profile Button
-            {% else %}
-                Modify Profile Button
-            {% endif %}
-        </h2>
+        <div class="small-12 columns">
+            <h2 class="subheader">
+                {% if createForm %}
+                    Create Profile Button
+                {% else %}
+                    Modify Profile Button
+                {% endif %}
+            </h2>
+        </div>
 
         <form id="itemForm" action="{{ routeLookup('adminProfileButton.postModify') }}" method="post">
             <input type="hidden" name="id" value="{{ item.id ?? '' }}">

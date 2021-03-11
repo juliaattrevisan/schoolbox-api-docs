@@ -10,7 +10,7 @@
     {% set n = selectedCollection[item.id] | length %}
 
     {% for obj in collection %}
-        {% if selectedCollection[item.id][obj.id] %}
+        {% if selectedCollection[item.id][obj.id] ?? false %}
             {{ obj.name }}{% if i < n %}, {% endif %}
             {% set i = i+1 %}
         {% endif %}
