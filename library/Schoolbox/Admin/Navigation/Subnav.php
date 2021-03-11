@@ -667,7 +667,7 @@ class Subnav
                 'visible' =>  true,
                 'children' => [
                     'allowed-file' => [
-                        'name' => 'Allowed File',
+                        'name' => 'Allowed Files',
                         'identifier' => self::CHILD_RESOURCES_ALLOWED_FILE,
                         'visible' =>  true,
                         'children' => []

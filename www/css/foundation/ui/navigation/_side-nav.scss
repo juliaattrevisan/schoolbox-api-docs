@@ -58,7 +58,7 @@ $border-bottom-width: 2px;
         z-index: 2;
 
         @media #{$large-up} {
-          @include box-shadow(10px, 10px, 0, rgba(0,0,0,0.2));
+          @include box-shadow(2px, 2px, 4px, rgba(0,0,0,0.2));
           position: absolute;
           margin-top: -35px;
           right: -100%;
