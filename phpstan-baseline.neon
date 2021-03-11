@@ -4211,11 +4211,6 @@ parameters:
 			path: library/Schoolbox/Column/Collection.php
 
 		-
-			message: "#^Return type \\(array\\) of method Schoolbox\\\\Column\\\\Collection\\:\\:dehydrate\\(\\) should be compatible with return type \\(string\\) of method Schoolbox\\\\Column\\\\IColumnType\\:\\:dehydrate\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Column/Collection.php
-
-		-
 			message: "#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/Column/Collection.php
@@ -4241,16 +4236,6 @@ parameters:
 			path: library/Schoolbox/Column/Collection.php
 
 		-
-			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Color.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Color\\:\\:dehydrate\\(\\) should return string but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Color.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Column/Date.php
@@ -4271,22 +4256,12 @@ parameters:
 			path: library/Schoolbox/Column/Datetime.php
 
 		-
-			message: "#^Return type \\(float\\|null\\) of method Schoolbox\\\\Column\\\\Decimal\\:\\:dehydrate\\(\\) should be compatible with return type \\(string\\) of method Schoolbox\\\\Column\\\\IColumnType\\:\\:dehydrate\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Column/Decimal.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between float\\|null and '' will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Column/Decimal.php
 
 		-
 			message: "#^Method Schoolbox\\\\Column\\\\Interval\\:\\:hydrate\\(\\) should return Alaress\\\\Date\\\\Interval but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Interval.php
-
-		-
-			message: "#^Return type \\(int\\|null\\) of method Schoolbox\\\\Column\\\\Interval\\:\\:dehydrate\\(\\) should be compatible with return type \\(string\\) of method Schoolbox\\\\Column\\\\IColumnType\\:\\:dehydrate\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Column/Interval.php
 
@@ -4376,27 +4351,12 @@ parameters:
 			path: library/Schoolbox/Column/Test/TimestampTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$value \\(int\\|null\\) of method Schoolbox\\\\Column\\\\Timespan\\:\\:hydrate\\(\\) should be compatible with parameter \\$value \\(string\\) of method Schoolbox\\\\Column\\\\IColumnType\\:\\:hydrate\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Column/Timespan.php
-
-		-
 			message: "#^Property DateInterval\\:\\:\\$invert \\(int\\) does not accept true\\.$#"
 			count: 1
 			path: library/Schoolbox/Column/Timespan.php
 
 		-
-			message: "#^Return type \\(int\\|null\\) of method Schoolbox\\\\Column\\\\Timespan\\:\\:dehydrate\\(\\) should be compatible with return type \\(string\\) of method Schoolbox\\\\Column\\\\IColumnType\\:\\:dehydrate\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Column/Timespan.php
-
-		-
 			message: "#^Return type \\(int\\) of method Schoolbox\\\\Column\\\\Timestamp\\:\\:dehydrate\\(\\) should be compatible with return type \\(string\\) of method Schoolbox\\\\Column\\\\Datetime\\:\\:dehydrate\\(\\)$#"
-			count: 1
-			path: library/Schoolbox/Column/Timestamp.php
-
-		-
-			message: "#^Return type \\(int\\) of method Schoolbox\\\\Column\\\\Timestamp\\:\\:dehydrate\\(\\) should be compatible with return type \\(string\\) of method Schoolbox\\\\Column\\\\IColumnType\\:\\:dehydrate\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Column/Timestamp.php
 
