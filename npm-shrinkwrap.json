@@ -3302,15 +3302,20 @@
       "dev": true
     },
     "date-fns": {
-      "version": "2.18.0",
-      "resolved": "https://registry.npmjs.org/date-fns/-/date-fns-2.18.0.tgz",
-      "integrity": "sha512-NYyAg4wRmGVU4miKq5ivRACOODdZRY3q5WLmOJSq8djyzftYphU7dTHLcEtLqEvfqMKQ0jVv91P4BAwIjsXIcw=="
+      "version": "2.19.0",
+      "resolved": "https://registry.npmjs.org/date-fns/-/date-fns-2.19.0.tgz",
+      "integrity": "sha512-X3bf2iTPgCAQp9wvjOQytnf5vO5rESYRXlPIVcgSbtT5OTScPcsf9eZU+B/YIkKAtYr5WeCii58BgATrNitlWg=="
     },
     "dateformat": {
       "version": "3.0.3",
       "resolved": "https://registry.npmjs.org/dateformat/-/dateformat-3.0.3.tgz",
       "integrity": "sha1-puN0maTZqc+F71hyBE1ikByYia4=",
       "dev": true
+    },
+    "dayjs": {
+      "version": "1.10.4",
+      "resolved": "https://registry.npmjs.org/dayjs/-/dayjs-1.10.4.tgz",
+      "integrity": "sha512-RI/Hh4kqRc1UKLOAf/T5zdMMX5DQIlDxwUe3wSyMMnEbGunnpENCdbUgM+dW7kXidZqCttBrmw7BhN4TMddkCw=="
     },
     "de-indent": {
       "version": "1.0.2",
@@ -3480,24 +3485,30 @@
       "dev": true
     },
     "elliptic": {
-      "version": "6.5.3",
-      "resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.5.3.tgz",
-      "integrity": "sha1-y1nrLv2vc6C9eMzXAVpirW4Pk9Y=",
+      "version": "6.5.4",
+      "resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.5.4.tgz",
+      "integrity": "sha512-iLhC6ULemrljPZb+QutR5TQGB+pdW6KGD5RSegS+8sorOZT+rdQFbsQFJgvN3eRqNALqJer4oQ16YvJHlU8hzQ==",
       "dev": true,
       "requires": {
-        "bn.js": "^4.4.0",
-        "brorand": "^1.0.1",
+        "bn.js": "^4.11.9",
+        "brorand": "^1.1.0",
         "hash.js": "^1.0.0",
-        "hmac-drbg": "^1.0.0",
-        "inherits": "^2.0.1",
-        "minimalistic-assert": "^1.0.0",
-        "minimalistic-crypto-utils": "^1.0.0"
+        "hmac-drbg": "^1.0.1",
+        "inherits": "^2.0.4",
+        "minimalistic-assert": "^1.0.1",
+        "minimalistic-crypto-utils": "^1.0.1"
       },
       "dependencies": {
         "bn.js": {
-          "version": "4.11.9",
-          "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-4.11.9.tgz",
-          "integrity": "sha1-JtVWgpRY+dHoH8SJUkk9C6NQeCg=",
+          "version": "4.12.0",
+          "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-4.12.0.tgz",
+          "integrity": "sha512-c98Bf3tPniI+scsdk237ku1Dc3ujXQTSgyiPUDEOe7tRkhrqridvh8klBv0HCEso1OLOYcHuCv/cS6DNxKH+ZA==",
+          "dev": true
+        },
+        "inherits": {
+          "version": "2.0.4",
+          "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz",
+          "integrity": "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==",
           "dev": true
         }
       }
