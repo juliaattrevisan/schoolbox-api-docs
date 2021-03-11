@@ -100,7 +100,7 @@ class Controller extends Base
                 'data' => [
                     'pageCurrent' => Subnav::PARENT_IMPORT,
                     'subpageCurrent' => Subnav::CHILD_IMPORT_PAGES,
-                    'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_IMPORT, Subnav::CHILD_IMPORT_PAGES),
                     'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), 'adminImportFolder')->getAllNodes(),
                     'templates' => $this->homepageTemplateMapper->findAll()->sortBy('name', 'asc'),
                     'roles' => $this->roleMapper->findAll(),
@@ -156,7 +156,7 @@ class Controller extends Base
                 'data' => [
                     'pageCurrent'    => Subnav::PARENT_IMPORT,
                     'subpageCurrent' => Subnav::CHILD_IMPORT_PAGES,
-                    'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_IMPORT, Subnav::CHILD_IMPORT_PAGES),
                     'results'        => $allFolders,
                     'perform'        => $performMode,
                 ],

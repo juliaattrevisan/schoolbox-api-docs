@@ -94,7 +94,7 @@ class Controller extends Base
         return [
             'pageCurrent' => Subnav::PARENT_IMPORT,
             'subpageCurrent' => Subnav::CHILD_IMPORT_USER_ACCOUNTS,
-            'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_IMPORT, Subnav::CHILD_IMPORT_PAGES),
             'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
             'basename' => $this->basename,
             'now' => \Alaress_Date_Format::now(),

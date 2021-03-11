@@ -3,7 +3,10 @@
  #
  # @param string pageCurrent
  # @param array allNavigation
+ # @param array allBreadcrumbs
  #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="admin-container row">
 

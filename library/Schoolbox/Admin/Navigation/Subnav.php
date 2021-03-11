@@ -892,12 +892,12 @@ class Subnav
         foreach ($this->generate() as $parentUrl => $parentData) {
             if ($parentData['identifier'] === $pageCurrent) {
                 $allCrumbs[] = [$parentData['name'], $parentUrl];
-            }
 
-            if (\count($parentData['children'])) {
-                foreach ($parentData['children'] as $childUrl => $childData) {
-                    if ($childData['identifier'] === $subpageCurrent) {
-                        $allCrumbs[] = [$childData['name'],  $childUrl];
+                if (\count($parentData['children'])) {
+                    foreach ($parentData['children'] as $childUrl => $childData) {
+                        if ($childData['identifier'] === $subpageCurrent) {
+                            $allCrumbs[] = [$childData['name'],  $childUrl];
+                        }
                     }
                 }
             }

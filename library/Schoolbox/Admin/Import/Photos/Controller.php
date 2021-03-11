@@ -182,7 +182,7 @@ class Controller extends Base
             'data' => [
                 'pageCurrent' => Subnav::PARENT_IMPORT,
                 'subpageCurrent' => Subnav::CHILD_IMPORT_PORTRAIT,
-                'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_IMPORT, Subnav::CHILD_IMPORT_PORTRAIT),
                 'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
                 'attachzone' => $this->getAttachZone(),
                 'users' => $users,
