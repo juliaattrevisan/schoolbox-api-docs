@@ -41,7 +41,8 @@ set upsConfig = {
     }
 </style>
 
-{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="admin-container row">
 
