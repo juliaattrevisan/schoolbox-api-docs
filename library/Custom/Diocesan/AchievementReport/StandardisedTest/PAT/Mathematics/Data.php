@@ -48,7 +48,7 @@ class Data extends Base
             AND Fileyear = :year
             ORDER BY seq';
 
-        $result = $this->db->getAll($query, $params);
+        $result = $this->db->executeQuery($query, $params)->fetchAll();
 
         /* Find data for each of the three series
          */
@@ -83,6 +83,6 @@ class Data extends Base
             AND IndividualMathsPATStanineMarker <> 0
         ";
 
-        return (bool)$this->db->getOne($query, $params);
+        return (bool)$this->db->executeQuery($query, $params)->fetchColumn();
     }
 }

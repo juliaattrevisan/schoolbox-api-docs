@@ -35,7 +35,7 @@ class CommentsNavigation extends Base
             ORDER BY StudentYear DESC
         ';
 
-        $result = $this->db->getAll($query, $params);
+        $result = $this->db->executeQuery($query, $params)->fetchAll();
 
         $allYears = [];
 

@@ -167,7 +167,7 @@ class EntriesAndResults extends Base
                 AssessAreaHeading
         ";
 
-        $result = $this->db->getAll($query, $params);
+        $result = $this->db->executeQuery($query, $params)->fetchAll();
 
         if (is_array($result)) {
             return $result;

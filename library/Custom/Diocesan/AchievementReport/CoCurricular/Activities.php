@@ -34,7 +34,7 @@ class Activities extends Base
             ORDER BY StudentID, StudentFileYear Desc, OrderSort, SubjectClassesDescription
         ';
 
-        $result = $this->db->getAll($query, $params) ?: [];
+        $result = $this->db->executeQuery($query, $params)->fetchAll();
 
         /* Group activities by year
          *
