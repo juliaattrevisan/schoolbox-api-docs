@@ -1,5 +1,12 @@
 <script>
 
+/**
+ * To help users find admin settings faster (hopefully!)
+ * Search field is used to filter the results, then the relevant
+ * search result can be selected to move to the relevant page/setting
+ *
+ */
+
 import AdminSettingsSearchResult from './admin-settings-search-result';
 import { fetchAsJson } from '@shared/fetch/fetch';
 import { gsap } from 'gsap/all'
