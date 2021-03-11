@@ -1,67 +1,71 @@
 <?php
+
 /**
- * Test for
+ * Test for the boolean column type.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
-
 namespace Schoolbox\Column\Test;
+
 use Schoolbox\Column\Boolean;
 
-class BooleanTest extends TestCase {
-
-	/**
-	 * @var Boolean
-	 */
-	protected $object;
+class BooleanTest extends TestCase
+{
+    /**
+     * @var Boolean
+     */
+    protected $object;
 
     /**
      * @inheritdoc
      */
-    public function setupObject() {
-		$this->object = new Boolean();
-	}
+    public function setupObject()
+    {
+        $this->object = new Boolean();
+    }
 
     /**
      * @inheritdoc
      */
-    public function getTestHydrate() {
-		return array(
-			array(true, true),
-			array(false, false),
-			array(0, false),
-			array(1, true),
-			array('0', false),
-			array('00', false),
-			array('0.0', false),
-			array('0.01', true),
-			array('-0.01', true),
-			array(null, false),
-			array('', false),
-			array(' ', false),
-		);
-	}
+    public function getTestHydrate()
+    {
+        return [
+            [true, true],
+            [false, false],
+            [0, false],
+            [1, true],
+            ['0', false],
+            ['00', false],
+            ['0.0', false],
+            ['0.01', true],
+            ['-0.01', true],
+            [null, false],
+            ['', false],
+            [' ', false],
+        ];
+    }
 
     /**
      * @inheritdoc
      */
-    public function getTestDehydrate() {
-		return array(
-			array(true, true),
-			array(false, false),
-			array(0, false),
-			array(1, true),
-			array('0', false),
-			array('00', false),
-			array('0.0', false),
-			array('0.01', true),
-			array('-0.01', true),
-			array(null, false),
-			array('', false),
-			array(' ', false),
-		);
-	}
+    public function getTestDehydrate()
+    {
+        return [
+            [true, 1],
+            [false, 0],
+            [0, 0],
+            [1, 1],
+            ['0', 0],
+            ['00', 0],
+            ['0.0', 0],
+            ['0.01', 1],
+            ['-0.01', 1],
+            [null, 0],
+            ['', 0],
+            [' ', 0],
+        ];
+    }
 }
