@@ -309,6 +309,7 @@ class Controller extends Base
         }
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/index.twig', [
             'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+            'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
             'errorMessage' => $errorMessage,
             'courses' => $courses,
             'serverUrl' => $this->helpRequest->getServerUrl(),
@@ -326,6 +327,7 @@ class Controller extends Base
     public function getUserEnrolmentSearch() {
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/search.twig', [
             'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
+            'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_SHAPS,
         ])->setTitle('Schoolbox Help Course Enrolments - User Search'));
     }
 
