@@ -41,6 +41,7 @@ class Controller extends Base
                 [
                     'pageCurrent' => Subnav::PARENT_MODULES,
                     'subpageCurrent' => Subnav::CHILD_MODULES_PACKAGES,
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_MODULES, Subnav::CHILD_MODULES_PACKAGES),
                     'packages'    => $this->packageMapper->findAll(),
                 ]
             )
