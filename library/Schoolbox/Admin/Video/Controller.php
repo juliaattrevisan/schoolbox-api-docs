@@ -45,6 +45,7 @@ class Controller extends Base
             'data' => [
                 'pageCurrent' => Subnav::PARENT_RESOURCES,
                 'subpageCurrent' => Subnav::CHILD_RESOURCES_MEDIA_QUEUE,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_RESOURCES, Subnav::CHILD_RESOURCES_MEDIA_QUEUE),
                 'queue' => $queueItems,
                 'statusOrder' => $statuses
             ],

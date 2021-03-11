@@ -42,6 +42,9 @@
     });
 </script>
 
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
 <div class="admin-container row">
 
     {# Shared navigation menu #}

@@ -86,6 +86,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@restore/index.twig', [
             'pageCurrent' => Subnav::PARENT_RESOURCES,
             'subpageCurrent' => Subnav::CHILD_RESOURCES_RESTORE,
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_RESOURCES, Subnav::CHILD_RESOURCES_RESTORE),
             'deletedFolders' => $deletedFolders,
             'deletedAssessments' => $deletedAssessments,
         ]));
