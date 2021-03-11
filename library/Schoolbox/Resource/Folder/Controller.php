@@ -390,6 +390,7 @@ class Controller extends BaseController
         $yearLevels = array_filter(array_map('trim', explode(',', $post['yearLevelIds'])));
 
         try {
+            $rolePermissions = $post['group'] ?? null;
             $model = $this->persistFolder(
                 $folder,
                 $post['name'],
@@ -398,7 +399,7 @@ class Controller extends BaseController
                 $post['colour'] ?: null,
                 $post['attachment'][0] ?? null,
                 isset($post['curriculumCodes']) ? array_filter($post['curriculumCodes']) : null,
-                $post['group'],
+                is_array($rolePermissions) ? $rolePermissions : [],
                 (bool)($post['recursive-permissions'] ?? false),
                 $classCodes,
                 $yearLevels,
