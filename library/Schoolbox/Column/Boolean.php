@@ -28,7 +28,7 @@ class Boolean implements IColumnType {
 	}
 
 	public function dehydrate($value, $mapper = null) {
-		return $this->isBoolean($value);
+		return $this->isBoolean($value) ? 1 : 0;
 	}
 
 

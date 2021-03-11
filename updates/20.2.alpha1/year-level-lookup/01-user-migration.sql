@@ -29,8 +29,8 @@ WHERE `year` = '';
 /* Only add the ones that don't already exist
  * Set all the checkboxes on by default
  */
-INSERT INTO lu_year_level (`name`, `created_at`, `updated_at`) (
-    SELECT `user`.`year`, NOW(), NOW()
+INSERT INTO lu_year_level (`name`, `created_at`, `updated_at`, `sequence`) (
+    SELECT `user`.`year`, NOW(), NOW(), 0
     FROM `user`
     LEFT JOIN lu_year_level lyl ON `user`.`year` = lyl.`name` AND lyl.deleted_at IS NULL
     WHERE lyl.id IS NULL
