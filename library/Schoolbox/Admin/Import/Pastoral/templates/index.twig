@@ -39,8 +39,7 @@
     {{ renderAdminNavigation('import/directImport', subpageCurrent) }}
 
     <div class="admin-content">
-        <div class="row">
-            {% if externalEnabled == '1' %}
+        {% if externalEnabled == '1' %}
             <div class="small-12 columns">
                 <h2 class="subheader">Pastoral Care</h2>
             </div>
@@ -144,6 +143,5 @@
                 </div>
             </div>
         {% endif %}
-        </div>
     </div>
 </div>
