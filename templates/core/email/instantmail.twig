@@ -1,5 +1,3 @@
-{% import 'macro/spacer.twig' as fn %}
-
 {% extends 'schoolmail.twig' %}
 
 {% block content %}
@@ -9,25 +7,20 @@
     {% set msg = row.messages|first %}
 
     <table cellpadding="0" cellspacing="0" border="0" align="center" width="100%">
-    <tr>{{ fn.spacer(config.fqdn, 16, 0) }}</tr>
     <tr>
-        <td width="640" colspan="2">
-            <p>Hi {{ recipient }},</p>
+        <td width="670" colspan="2" class="fullwidth">
+            <h1>Hi {{ recipient }},</h1>
         </td>
     </tr>
-    <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
-    <tr>
+    <tr class="island">
         {% if msg.icon %}
-        <td width="48" height="48" valign="top">
+        <td width="32" height="32" valign="top">
             <table>
                 <tr>
                     <td><img src="{{ msg.icon }}" width="32" height="32" /></td>
-                    {{ fn.spacer(config.fqdn, 0, 16) }}
                 </tr>
             </table>
         </td>
-        {% else %}
-        {{ fn.spacer(config.fqdn, 36, 0, 2) }}
         {% endif %}
         <td valign="middle">
             <table>
@@ -36,8 +29,6 @@
                     <td>{{ msg.title | raw }}</td>
                 </tr>
                 {% if msg.meta %}
-                <tr class="underline">{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
-                <tr>{{ fn.spacer(config.fqdn, 4, 0) }}</tr>
                 <tr>
                     <td>
                         <p>
@@ -57,12 +48,10 @@
             </table>
         </td>
     </tr>
-    <tr>{{ fn.spacer(config.fqdn, 24, 0, 2) }}</tr>
-    <tr>
-        <td width="640" colspan="2">
+    <tr class="island padding">
+        <td width="670" colspan="2" class="fullwidth">
           <a class="cta" href="{{ msg.href }}">View in {{ config.title }}</a>
         </td>
     </tr>
-    <tr>{{ fn.spacer(config.fqdn, 16, 0, 2) }}</tr>
 </table>
 {% endblock %}

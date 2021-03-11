@@ -3,7 +3,9 @@
 
 {# will be truncated by mail clients, but we use it for styling #}
 body {
+    background-color: #EDEDED;
     margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 table {
@@ -11,17 +13,23 @@ table {
     border-width: 0;
     border-collapse: collapse;
 }
+
 td {
     padding: 0;
-    font-family: Arial, sans-serif;
     font-size: 13px;
+}
+
+h1 {
+    font-size: 28px;
+    font-weight: normal;
 }
 
 a {
     text-decoration: none;
 }
-a[href] {
-    text-decoration: underline;
+
+em {
+    color: #9a9a9a;
 }
 
 img {
@@ -33,7 +41,7 @@ img {
 }
 
 .inner-wrap {
-    background-color: {{ colours.skin_colour_body_bg }};
+    background-color: #EDEDED;
     width: 100%;
 }
 
@@ -46,55 +54,80 @@ img {
 }
 
 .header img {
-    color: {{ colours.skin_colour_offcanvas_background }}
+    color: {{ colours.skin_colour_offcanvas_background }};
+    height: auto;
+    max-height: 100px;
+    max-width: 670px;
 }
 
-.content {
-    background-color: {{ 'white' }};
+.island {
+    background-color: #fff;
+    border-bottom: 1px solid #EDEDED;
+}
+
+.island > td:first-child {
+    padding: 16px 0 16px 16px;
+}
+
+ .island > td,
+ .island.padding > td {
+    padding: 16px;
 }
 
 .content a {
     color: {{ colours.skin_colour_content_ui_foreground }};
 }
+
 .content p {
     line-height: 20px;
     font-size: 13px;
-    margin: 0;
+    margin-bottom: 8px;
+    margin-top: 4px;
 }
 
 .content .heading {
     line-height: 36px;
-    font-weight: bold;
     font-size: 18px;
-    color: #222;
-    {#background: {{ colours.module_background }};#}
+    color: #9a9a9a;
+    text-transform: uppercase;
 }
 
 .content a.cta {
     background-color: {{ colours.skin_colour_content_ui_submit_background }};
-    padding: 4px 8px 6px;
-    text-decoration: none;
     color: {{ colours.skin_colour_content_ui_submit_foreground }};
+    padding: 8px 16px;
+    font-size: 16px;
+    font-weight: normal;
+    display: block;
+    text-align: center;
+    text-decoration: none;
 }
 
 .content .title {
     line-height: 24px;
-    font-weight: bold;
     font-size: 16px;
     text-decoration: none;
+    margin-bottom: 8px;
+}
+
+.more {
+    text-transform: uppercase;
+}
+
+.footer td {
+    padding: 16px 0;
 }
 
 .footer p {
-    color: {{ 'black' }};
+    color: #9a9a9a;
     font-family: Arial, sans-serif;
     font-size: 11px;
     line-height: 18px;
-    text-align: right;
     margin: 0; {# ignored by 50% of mail clients #}
 }
 
 .footer a {
-    color: {{ colours.skin_colour_content_ui_foreground }};
+    color: #9a9a9a;
     text-decoration: underline;
 }
 
@@ -102,17 +135,17 @@ tr.underline td, td.underline {
     border-bottom: solid 1px {{ colours.skin_colour_navigation_background }};
 }
 
-
 {# module specifics #}
 .work-month, .work-day {
     text-align: center;
     border: solid 2px {{ colours.skin_colour_navigation_background }};
 }
+
 .work-month {
     text-transform: uppercase;
     font-size: 12px;
     background-color: {{ colours.skin_colour_navigation_background }};
-    color: {{ colours.skin_colour_navigation_foreground }};
+    color: #fff;
     border-bottom: solid 1px #fff;
 }
 
@@ -121,4 +154,16 @@ tr.underline td, td.underline {
     line-height: 35px;
     color: {{ colours.skin_colour_navigation_background }};
     background-color: #fff;
+}
+
+@media screen and (max-width: 670px) {
+    .fullwidth {
+        width: 100% !important;
+    }
+    h1, .heading, .footer p {
+        padding-left: 16px !important;
+    }
+    .header img {
+        margin-left: 16px;
+    }
 }

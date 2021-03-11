@@ -2,18 +2,18 @@
 
 {% block image %}
     {% set msg = row.messages | first %}
-    <img src="{{ msg.icon }}" width="64" height="64" />
+    {% if msg.meta.thumb %}
+    <img src="{{ msg.meta.thumb }}" />
+    {% endif %}
 {% endblock %}
 
 {% block pretty %}
     {% set msg = row.messages | first %}
     {% if msg.meta.title %}
-        {# use the meta title if possible, it looks nicer #}
-        {# Blurb only? show no link #}
-        {% if msg.meta.body|length %}
-            <a href="{{ msg.href }}" class="title">{{ msg.meta.title }}</a>
-        {% else %}
+        {% if config.read_more | length %}
             <span class="title">{{ msg.meta.title }}</span>
+        {% else %}
+            <a href="{{ msg.href }}" class="title">{{ msg.meta.title }}</a>
         {% endif %}
     {% else %}
         {# raw HTML unable to be sanctioned or rejected - I don't know whether this could be HTML or not. #}
@@ -37,10 +37,13 @@
     <tr>
         <td>
             {% if msg.meta.blurb | length %}
-                {# blurb already has a <p> tag #}
-                {{ msg.meta.blurb | purifyAbsoluteUri('https://'~config.fqdn) }}
+            {# blurb already has a <p> tag #}
+            {{ msg.meta.blurb | purifyAbsoluteUri('https://'~config.fqdn) }}
             {% else %}
-                <p>{{ msg.meta.body | cutSentence(300, true) }}</p>
+            <p>{{ msg.meta.body | cutSentence(200, true) }}</p>
+            {% endif %}
+            {% if config.read_more | length %}
+            <a href="{{ msg.href }}" class="more">{{ config.read_more }}</a>
             {% endif %}
         </td>
     </tr>

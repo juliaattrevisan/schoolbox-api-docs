@@ -4,18 +4,29 @@
 {# parent DOM: you are directly inside a <td/> right now #}
 {% block content %}
     <table>
+    {% if config.digest_email_intro %}
+        <tr>{{ fn.spacer(config.fqdn, 16, 0, 3) }}</tr>
+        <tr class="island padding">
+            <td valign="top">
+                <table width="100%">
+                    <tr>
+                        <td>{{ config.digest_email_intro | purify }}</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    {% endif %}
     {% for ns, group in groups %}
         <tr>{{ fn.spacer(config.fqdn, 16, 0, 3) }}</tr>
         <tr class="heading">
-            {{ fn.spacer(config.fqdn, 0, 8) }}
             <td class="heading" valign="middle" height="32">{{ group.heading }}</td>
         </tr>
         <tr>
             <td colspan="2">
-                <table width="624">
+                <table width="670" class="fullwidth">
                     <tr>
                         <td>
-                            <table width="624">
+                            <table width="670" class="fullwidth">
                             {% for row in group.rows %}
                                 {% include "digestmail/grouping/#{ns}.twig" %}
                             {% endfor %}

@@ -149,9 +149,9 @@ switch ($this->arg[0]) {
                 ->setTitle(":user posted :name under :topic")
                 ->setParams(array(
                     'user'  => new Param($article->getAuthor()->formatName()),
-                    'name'  => new Param($article->getTitle(), '/news/item/' . $article->getId())
+                    'name'  => new Param($article->getTitle(), '/news/' . $article->getId())
                 ))
-                ->setHref('/news/item/' . $article->getId())
+                ->setHref('/news/' . $article->getId())
                 ->setIcon($image)
                 ->setMeta(array(
                     'title'  => $article->getTitle(),

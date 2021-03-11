@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -30,7 +30,10 @@ class CoreContext {
             'site_domain',
             'forgotten_password',
             'feedback_url',
-            'feedback_text'
+            'feedback_text',
+            'read_more',
+            'email_banner_image',
+            'digest_email_intro'
         );
 
         foreach($required as $key) {

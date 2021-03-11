@@ -1,10 +1,9 @@
-{% import 'macro/spacer.twig' as fn %}
-
-<tr>{{ fn.spacer(config.fqdn, 8, 4, 3) }}</tr>
 <tr>
-  {{ fn.spacer(config.fqdn, 32, 4) }}
   <td colspan="2" valign="middle">
-      <img src="https://{{ config.fqdn }}/images/logo.php?logo=skin_logo_square&amp;size=normal" alt="{{ config.title }}" border="0" height="72" />
+      {% if config.email_banner_image %}
+          <img src="https://{{ config.fqdn }}/storage/image.php?hash={{ config.email_banner_image }}" alt="{{ config.title }}" border="0" />
+      {% else %}
+      <img src="https://{{ config.fqdn }}/images/logo.php?logo=skin_logo_square&amp;size=normal" alt="{{ config.title }}" border="0" />
+      {% endif %}
   </td>
 </tr>
-<tr>{{ fn.spacer(config.fqdn, 8, 4, 3) }}</tr>
