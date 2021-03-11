@@ -163,13 +163,7 @@ export default {
 
 <style lang="scss">
 
-@import 'vue-good-table/dist/vue-good-table';
-
-.vgt-wrap__footer .footer__row-count__select {
-	width: 100px;
-	margin: 0;
-	padding: 0px 10px;
-}
+@import '@schoolbox/vueGoodTable/vueGoodTable';
 
 </style>
 
