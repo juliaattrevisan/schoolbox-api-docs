@@ -93,6 +93,7 @@ class Controller extends Base
                 'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
                 'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
                 'logs'           => $this->getPastoralLogMapper()->findImportIds(),
+                'message'        => false,
             ],
         ]);
     }
@@ -112,6 +113,7 @@ class Controller extends Base
                 'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
                 'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPastoral')->getAllNodes(),
                 'log'            => $log,
+                'message'        => false,
             ],
         ]);
     }
