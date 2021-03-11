@@ -113,6 +113,7 @@ class Controller extends Base
                 'data'     => array(
                     'pageCurrent' => Subnav::PARENT_LMS,
                     'subpageCurrent' => Subnav::CHILD_LMS_COURSE_BUILDER,
+                    'allBreadcrumbs'   => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LMS, Subnav::CHILD_LMS_COURSE_BUILDER),
                     'tab' => $tab != '' ? $tab : 'course',
                     'roles' => $this->roleMapper->findAll(),
                     'permissions' => $permissions,

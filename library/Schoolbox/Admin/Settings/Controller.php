@@ -65,101 +65,121 @@ class Controller extends ConfigController
             case 'Document Management':
                 $pageCurrent = Subnav::PARENT_LMS;
                 $subpageCurrent = Subnav::CHILD_LMS_DOCUMENT_MANAGEMENT;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LMS, Subnav::CHILD_LMS_DOCUMENT_MANAGEMENT);
                 break;
 
             case 'LMS Policy':
                 $pageCurrent = Subnav::PARENT_LMS;
                 $subpageCurrent = Subnav::CHILD_LMS_POLICY;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LMS, Subnav::CHILD_LMS_POLICY);
                 break;
 
             case 'Modules':
                 $pageCurrent = Subnav::PARENT_MODULES;
-                $subpageCurrent = '';
+                $subpageCurrent = null;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_MODULES, null);
                 break;
 
             case 'Board Leave':
                 $pageCurrent = Subnav::PARENT_MODULES;
                 $subpageCurrent = Subnav::CHILD_MODULES_BOARD_LEAVE;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_MODULES, Subnav::CHILD_MODULES_BOARD_LEAVE);
                 break;
 
             case 'Pastoral Care':
                 $pageCurrent = Subnav::PARENT_MODULES;
                 $subpageCurrent = Subnav::CHILD_MODULES_PASTORAL_CARE;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_MODULES, Subnav::CHILD_MODULES_PASTORAL_CARE);
                 break;
 
             case 'Skin Config':
                 $pageCurrent = Subnav::PARENT_PERSONALISATION;
                 $subpageCurrent = Subnav::CHILD_PERSONALISATION_SKIN_CONFIG;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_SKIN_CONFIG);
                 break;
 
             case 'Resources':
                 $pageCurrent = Subnav::PARENT_RESOURCES;
                 $subpageCurrent = Subnav::CHILD_RESOURCES_SETTINGS;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_RESOURCES, Subnav::CHILD_RESOURCES_SETTINGS);
                 break;
 
             case '3rd Party Services':
                 $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
                 $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_3RD_PARTY;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, Subnav::CHILD_SYSTEM_SETTINGS_3RD_PARTY);
                 break;
 
             case 'Debugging':
                 $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
                 $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_DEBUGGING;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, Subnav::CHILD_SYSTEM_SETTINGS_DEBUGGING);
                 break;
 
             case 'Email':
                 $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
                 $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_EMAIL;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, Subnav::CHILD_SYSTEM_SETTINGS_EMAIL);
                 break;
 
             case 'External DB':
                 $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
                 $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_EXTERNAL_DB;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, Subnav::CHILD_SYSTEM_SETTINGS_EXTERNAL_DB);
                 break;
 
             case 'LDAP':
                 $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
                 $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_LDAP;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, Subnav::CHILD_SYSTEM_SETTINGS_LDAP);
                 break;
 
             case 'Localisation':
                 $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
                 $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_LOCALISATION;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, Subnav::CHILD_SYSTEM_SETTINGS_LOCALISATION);
                 break;
 
             case 'Paths':
                 $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
                 $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_PATHS;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, Subnav::CHILD_SYSTEM_SETTINGS_PATHS);
                 break;
 
             case 'Policy':
                 $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
                 $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_POLICY;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, Subnav::CHILD_SYSTEM_SETTINGS_POLICY);
                 break;
 
             case 'Proxy':
                 $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
                 $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_PROXY;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, Subnav::CHILD_SYSTEM_SETTINGS_PROXY);
                 break;
 
             case 'SAML':
                 $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
                 $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_SAML;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, Subnav::CHILD_SYSTEM_SETTINGS_SAML);
                 break;
 
             case 'Security':
                 $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
                 $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_SECURITY;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, Subnav::CHILD_SYSTEM_SETTINGS_SECURITY);
                 break;
 
             case 'Site':
                 $pageCurrent = Subnav::PARENT_SYSTEM_SETTINGS;
                 $subpageCurrent = Subnav::CHILD_SYSTEM_SETTINGS_SITE;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, Subnav::CHILD_SYSTEM_SETTINGS_SITE);
                 break;
 
             default:
                 $pageCurrent = 'setting';
-                $subpageCurrent = '';
+                $subpageCurrent = null;
+                $allBreadcrumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, null);
                 break;
         }
 
@@ -167,6 +187,7 @@ class Controller extends ConfigController
             $this->buildContent('@settings/settings.twig', [
                 'pageCurrent'    => $pageCurrent,
                 'subpageCurrent' => $subpageCurrent,
+                'allBreadcrumbs' => $allBreadcrumbs,
                 'settingsTabs'   => $settingsTabs,
                 'configContext'  => $configContext,
                 'isLocalisation' => $typeLabel === 'Localisation',  // TODO replace string literals with enums

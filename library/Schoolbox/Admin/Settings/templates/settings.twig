@@ -8,6 +8,8 @@
     configContext:            array       - Data required to render a config settings form
     typeLabel:                string      - A heading
 #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="admin-container row">
 

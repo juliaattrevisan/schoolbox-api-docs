@@ -56,6 +56,7 @@ class Controller extends Base
                 [
                     'pageCurrent' => Subnav::PARENT_LMS,
                     'subpageCurrent' => Subnav::CHILD_LMS_GRADES,
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LMS, Subnav::CHILD_LMS_GRADES),
                     'gradeGroups' => $this->retrieveAllGradeGroups(),
                 ]
             )

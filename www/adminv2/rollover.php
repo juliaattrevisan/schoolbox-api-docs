@@ -7,9 +7,7 @@
  */
 
 use Alaress\Web\Template\DebugTwig;
-use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Resource\Folder;
 
 $group = new Group();
@@ -25,7 +23,9 @@ if (!$group->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'adminv2/rollover.html');
 
 // include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_LMS, \Schoolbox\Admin\Navigation\Subnav::CHILD_LMS_CLASS_ROLLOVER);
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, Subnav::PARENT_LMS, Subnav::CHILD_LMS_CLASS_ROLLOVER)
+    ->generateBreadcrumbsHtml($this, Subnav::PARENT_LMS, Subnav::CHILD_LMS_CLASS_ROLLOVER);
 
 $openCategory = 0;
 

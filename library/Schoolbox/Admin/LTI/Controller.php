@@ -37,6 +37,7 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_LMS,
                 'subpageCurrent' => Subnav::CHILD_LMS_LTI,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LMS, Subnav::CHILD_LMS_LTI),
             ],
         ]);
     }
@@ -53,6 +54,7 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_LMS,
                 'subpageCurrent' => Subnav::CHILD_LMS_LTI,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LMS, Subnav::CHILD_LMS_LTI),
                 'providers' => $this->providerMapper->findAll()
             ],
         ]);
@@ -73,6 +75,7 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent' => Subnav::PARENT_LMS,
                 'subpageCurrent' => Subnav::CHILD_LMS_LTI,
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LMS, Subnav::CHILD_LMS_LTI),
                 'provider' => $provider
             ],
         ]);
