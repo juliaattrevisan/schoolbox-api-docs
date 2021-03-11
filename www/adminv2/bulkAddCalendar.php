@@ -11,7 +11,7 @@ $this->setFile(TEMPLATE_content, 'adminv2/bulkAddCalendar.html');
 $this->setBlock(TEMPLATE_content, 'event', 'event_block');
 
 // include the admin navigation
-(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_CALENDAR);
+(new \Schoolbox\Admin\Navigation\Subnav($this->getDi()->get('config')))->generatePhplib($this,\Schoolbox\Admin\Navigation\Subnav::PARENT_CALENDAR, \Schoolbox\Admin\Navigation\Subnav::CHILD_CALENDAR_IMPORT);
 
 /* Two types of upload.. either single user.. or via csv file..
  */
