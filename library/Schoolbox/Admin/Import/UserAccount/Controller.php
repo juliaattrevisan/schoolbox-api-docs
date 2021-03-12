@@ -92,9 +92,8 @@ class Controller extends Base
     protected function getBaseData(): array
     {
         return [
-            'pageCurrent' => Subnav::PARENT_IMPORT,
-            'subpageCurrent' => Subnav::CHILD_IMPORT_USER_ACCOUNTS,
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_IMPORT, Subnav::CHILD_IMPORT_PAGES),
+            'pageCurrent' => $this->router->generate("{$this->basename}.getUpload"),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs("@{$this->basename}.getUpload"),
             'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
             'basename' => $this->basename,
             'now' => \Alaress_Date_Format::now(),

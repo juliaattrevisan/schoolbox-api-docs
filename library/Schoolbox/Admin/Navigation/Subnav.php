@@ -342,30 +342,30 @@ class Subnav
                 'visible' =>  true,
                 'children' => []
             ],
-            'import/directImport' => [
+            '/adminv2/import/directImport' => [
                 'name' => 'Import',
                 'identifier' => self::PARENT_IMPORT,
                 'visible' =>  true,
                 'children' => [
-                    'import/folder' => [
+                    '/adminv2/import/folder' => [
                         'name' => 'Pages',
                         'identifier' => self::CHILD_IMPORT_PAGES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'import/pastoral' => [
+                    '/adminv2/import/pastoral' => [
                         'name' => 'Pastoral Care',
                         'identifier' => self::CHILD_IMPORT_PASTORAL_CARE,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'import/photos/upload' => [
+                    '/adminv2/import/photos/upload' => [
                         'name' => 'Portrait Photos',
                         'identifier' => self::CHILD_IMPORT_PORTRAIT,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'import/userAccount' => [
+                    '/adminv2/import/userAccount' => [
                         'name' => 'User Accounts',
                         'identifier' => self::CHILD_IMPORT_USER_ACCOUNTS,
                         'visible' =>  true,

@@ -51,9 +51,8 @@ class Controller extends ConfigController
     public function getDirectIndex(): void
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/direct/index.twig', [
-            'pageCurrent' => Subnav::PARENT_IMPORT,
-            'subpageCurrent' => null,
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_IMPORT, null),
+            'pageCurrent' => $this->router->generate('adminImportIndex.getDirectIndex'),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportIndex.getDirectIndex')),
             'allNavigation'  => (new Direct($this->getConfigLoader()))->buildNavigation($this->getRouter())->getAllNodes()
         ])->setTitle('Direct Import'));
     }

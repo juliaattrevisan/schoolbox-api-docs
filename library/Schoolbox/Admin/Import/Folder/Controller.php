@@ -98,9 +98,8 @@ class Controller extends Base
             [
                 'template' => '@adminImportFolder/index.twig',
                 'data' => [
-                    'pageCurrent' => Subnav::PARENT_IMPORT,
-                    'subpageCurrent' => Subnav::CHILD_IMPORT_PAGES,
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_IMPORT, Subnav::CHILD_IMPORT_PAGES),
+                    'pageCurrent'    => $this->router->generate('adminImportFolder.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportFolder.getIndex')),
                     'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), 'adminImportFolder')->getAllNodes(),
                     'templates' => $this->homepageTemplateMapper->findAll()->sortBy('name', 'asc'),
                     'roles' => $this->roleMapper->findAll(),
@@ -154,9 +153,8 @@ class Controller extends Base
             [
                 'template' => '@adminImportFolder/importResults.twig',
                 'data' => [
-                    'pageCurrent'    => Subnav::PARENT_IMPORT,
-                    'subpageCurrent' => Subnav::CHILD_IMPORT_PAGES,
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_IMPORT, Subnav::CHILD_IMPORT_PAGES),
+                    'pageCurrent'    => $this->router->generate('adminImportFolder.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportFolder.getIndex')),
                     'results'        => $allFolders,
                     'perform'        => $performMode,
                 ],
