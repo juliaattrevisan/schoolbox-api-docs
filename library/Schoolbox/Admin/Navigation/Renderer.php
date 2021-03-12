@@ -39,7 +39,6 @@ class Renderer extends Extension\AbstractExtension
     /**
      * @param Environment $twig
      * @param string      $pageCurrent
-     * @param string|null $subpageCurrent
      * @return string
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError

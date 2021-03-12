@@ -31,8 +31,8 @@ $this->setBlock(TEMPLATE_content, 'component', 'component_block');
 
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
-    ->generatePhplib($this, Subnav::PARENT_EPORTFOLIO, Subnav::CHILD_EPORTFOLIO_TEMPLATES)
-    ->generateBreadcrumbsHtml($this, Subnav::PARENT_EPORTFOLIO, Subnav::CHILD_EPORTFOLIO_TEMPLATES);
+    ->generatePhplib($this, '/adminv2/eportfolio')
+    ->generateBreadcrumbsHtml($this, '/adminv2/eportfolio');
 
 // Get list of templates
 $templateHandler = new EportfolioTemplate();

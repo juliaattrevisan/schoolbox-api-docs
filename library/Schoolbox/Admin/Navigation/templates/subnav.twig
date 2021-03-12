@@ -31,16 +31,20 @@
     });
 </script>
 
-{# Top level breadcrumby title
+{# Lookahead to figure out which urls are selected
+ # Shared among the vertical menu and also the top level breadcrumby title
  # Its crumbs are derived from the cosmetic names given in the adminSubnav stack
  # 'Home' is the default node which circumstantially matches one in the stack
  #}
 {% set parentSelected = 'Home' %}
+{% set parentSelectedUrl = '/adminv2/home' %}
 {% set childSelected = false %}
+{% set childSelectedUrl = false %}
 
 {% for parentUrl, parentData in adminSubnav %}
     {% if parentUrl == pageCurrent %}
         {% set parentSelected = parentData.name %}
+        {% set parentSelectedUrl = parentUrl %}
     {% endif %}
 
     {# Find out if there's a subpage breadcrumby title
@@ -48,8 +52,14 @@
      #}
     {% if parentData.children|length %}
         {% for childUrl, childData in parentData.children %}
-            {% if childUrl == subpageCurrent ?? null %}
+            {% if childUrl == pageCurrent %}
+                {% if parentUrl != pageCurrent %}
+                    {% set parentSelected = parentData.name %}
+                    {% set parentSelectedUrl = parentUrl %}
+                {% endif %}
+
                 {% set childSelected = childData.name %}
+                {% set childSelectedUrl = childUrl %}
             {% endif %}
         {% endfor %}
     {% endif %}
@@ -71,27 +81,25 @@
              # Each phplib controller specifies a string for pageCurrent so you have to match
              # them up here, circumstantially, to provide indication of which node is active
              #}
-            {% set parentSelected = '' %}
+            {% set parentSelectedCss = '' %}
 
-            {% if parentUrl == pageCurrent %}
-                {% set parentSelected = 'active' %}
+            {% if parentUrl == parentSelectedUrl %}
+                {% set parentSelectedCss = 'active' %}
             {% endif %}
 
-            <li class="{{ parentSelected }} {% if parentData.children|length %}parent-item{% endif %}" role="menuitem" data-parent-item>
+            <li class="{{ parentSelectedCss }} {% if parentData.children|length %}parent-item{% endif %}" role="menuitem" data-parent-item>
                 <a href="{{ parentUrl }}">{{ parentData.name }}</a>
 
                 {% if parentData.children|length %}
                     <ul class="flyout" role="navigation" data-admin-subnav-flyout>
                         {% for childUrl, childData in parentData.children %}
-                            {% set childSelected = '' %}
+                            {% set childSelectedCss = '' %}
 
-                            {% if parentSelected|length %}
-                                {% if childUrl == subpageCurrent %}
-                                    {% set childSelected = 'active' %}
-                                {% endif %}
+                            {% if childUrl == childSelectedUrl %}
+                                {% set childSelectedCss = 'active' %}
                             {% endif %}
 
-                            <li class='{{ childSelected }}' role="menuitem"><a href="{{ childUrl }}">{{ childData.name }}</a></li>
+                            <li class='{{ childSelectedCss }}' role="menuitem"><a href="{{ childUrl }}">{{ childData.name }}</a></li>
                         {% endfor %}
                     </ul>
                 {% endif %}

@@ -311,18 +311,18 @@ class Subnav
                     ],
                 ]
             ],
-            'eportfolio' => [
+            '/adminv2/eportfolio' => [
                 'name' => 'ePortfolio',
                 'identifier' => self::PARENT_EPORTFOLIO,
                 'visible' =>  true,
                 'children' => [
-                    'eportfolio' => [
+                    '/adminv2/eportfolio' => [
                         'name' => 'Templates',
                         'identifier' => self::CHILD_EPORTFOLIO_TEMPLATES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'eportfolio/deploy' => [
+                    '/adminv2/eportfolio/deploy' => [
                         'name' => 'Deployment',
                         'identifier' => self::CHILD_EPORTFOLIO_DEPLOYMENT,
                         'visible' =>  true,
@@ -841,6 +841,7 @@ class Subnav
      */
     public function generateHtml(string $url): string
     {
+
         /* Look ahead for $url
          * If it's in a child node, remember its parent and pass that too
          */
