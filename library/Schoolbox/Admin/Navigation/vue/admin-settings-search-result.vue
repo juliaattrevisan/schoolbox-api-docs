@@ -39,10 +39,6 @@ export default {
 			return this.highlightSearchInElement(this.result.title);
 		},
 
-		highlightNameSearch () {
-			return this.highlightSearchInElement(this.result.name);
-		},
-
 		highlightDescriptionSearch () {
             return this.highlightSearchInElement(this.result.description);
 		}
@@ -72,7 +68,7 @@ export default {
 
 <template>
     <a class="search-result" :href="linkUrl">
-        <h1 class="result-title" v-html="highlightTitleSearch"></h1>
+        <h4 class="result-title" v-html="highlightTitleSearch"></h4>
         <p class="result-description" v-html="highlightDescriptionSearch"></p>
     </a>
 </template>
@@ -84,9 +80,18 @@ export default {
     margin-top: -1px; //so don't get double borders when stacked
     border: 1px solid black;
     padding: 10px;
+    background: white;
     transition: background 0.2s;
     &:hover {
         background: whitesmoke;
+    }
+    h4 {
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+    p {
+        font-size: 12px;
+        font-style: italic;
     }
 }
 

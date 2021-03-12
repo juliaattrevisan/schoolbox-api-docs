@@ -182,7 +182,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div class="admin-search-container">
         <input 
             v-model="currentSearchString"
             :readonly="!isLoaded" 
@@ -190,7 +190,6 @@ export default {
             type="text"
             class="" 
         />
-        <button v-show="currentSearchString.length != 0" @click.prevent="onClearInputSelected" class="">Clear Search</button>
         <transition-group
             name="staggered-fade"
             tag="ul"
@@ -206,11 +205,15 @@ export default {
                 />
             </li>
         </transition-group>
-        <div v-if="isSearchActive && hasResultsBeydondSearchResultsShownLimit" class="search-refine-note">{{ resultsBeydondSearchResultsShownLimitCount }} search results not shown, try refining your search further.</div>
+        <aside v-if="isSearchActive && hasResultsBeydondSearchResultsShownLimit" class="search-refine-note">{{ resultsBeydondSearchResultsShownLimitCount }} search results not shown, try refining your search further.</aside>
     </div>
 </template>
 
 <style lang="scss" scoped>
+
+.admin-search-container {
+    margin-bottom: 15px;
+}
 
 ul {
     margin: 0px;
@@ -227,6 +230,7 @@ ul li {
     margin-top: -1px; //so don't get double borders when stacked
     padding: 10px;
     background: lightsteelblue;
+    font-size: 12px;
     font-style: italic;
 }
 
