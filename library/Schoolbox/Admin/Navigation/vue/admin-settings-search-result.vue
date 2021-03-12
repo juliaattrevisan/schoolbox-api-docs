@@ -1,5 +1,10 @@
 <script>
 
+/**
+ * An individual search result that matches the search query with search result
+ * highlighted within. Selecting will take the user to relevant page/setting
+ *
+ */
 
 export default {
 
@@ -9,11 +14,11 @@ export default {
 			required: true,
             default: () => {
                 return { 
-                    title: 'title',
                     name: 'name',
-                    module: 'module',
+                    title: 'title',
                     description: 'description',
-                    url: 'description'
+                    module: 'module',
+                    url: 'url'
                 }
             }
 		},
@@ -25,6 +30,10 @@ export default {
 	},
 
 	computed: {
+
+        linkUrl () {
+			return this.result.url + '?=target-setting=' + this.result.name;
+		},
 
         highlightTitleSearch () {
 			return this.highlightSearchInElement(this.result.title);
@@ -62,9 +71,8 @@ export default {
 </script>
 
 <template>
-    <a class="search-result" :href="result.url">
-        <!-- <h1 class="result-title" v-html="highlightTitleSearch"></h1> -->
-        <h2 class="result-name" v-html="highlightNameSearch"></h2>
+    <a class="search-result" :href="linkUrl">
+        <h1 class="result-title" v-html="highlightTitleSearch"></h1>
         <p class="result-description" v-html="highlightDescriptionSearch"></p>
     </a>
 </template>
@@ -73,21 +81,25 @@ export default {
 
 .search-result {
     display: block;
-    margin-top: -1px;
+    margin-top: -1px; //so don't get double borders when stacked
     border: 1px solid black;
     padding: 10px;
+    transition: background 0.2s;
+    &:hover {
+        background: whitesmoke;
+    }
 }
 
 //::v-deep to target the deep nest
 //https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors
 .result-title ::v-deep .highlight-text {
-	background: red;
+	background: greenyellow;
 }
 .result-name ::v-deep .highlight-text {
-	background: red;
+	background: greenyellow;
 }
 .result-description ::v-deep .highlight-text {
-	background: red;
+	background: greenyellow;
 }
 
 </style>

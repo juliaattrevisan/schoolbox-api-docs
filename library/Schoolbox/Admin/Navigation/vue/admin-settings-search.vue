@@ -62,7 +62,8 @@ export default {
 				return [];
 			}
 			return this.settingsList.filter(setting => { //retrieve all settings that match
-				if (setting.name.toLowerCase().includes(this.currentSearchString.toLowerCase())
+				if (setting.title.toLowerCase().includes(this.currentSearchString.toLowerCase())
+					|| setting.name.toLowerCase().includes(this.currentSearchString.toLowerCase())
 					|| setting.description.toLowerCase().includes(this.currentSearchString.toLowerCase())) {
 					return true;
 				} else {
@@ -75,9 +76,9 @@ export default {
          * the settings relevant to the search input and capped to searchResultsShownLimit
          */
 		filteredSearchListLimited () {
-            if (this.filteredSearchList.length > this.searchResultsShownLimit) { 
+            if (this.filteredSearchList.length > this.searchResultsShownLimit) { //return the capped results
                 return this.filteredSearchList.filter((setting, index) => index < this.searchResultsShownLimit);
-            } else {
+            } else { //otherwise just return
                 return this.filteredSearchList;
             }
 
@@ -86,7 +87,7 @@ export default {
         /**
          * to show the search refine note
          */
-        hasResultsBeydondsearchResultsShownLimit () {
+        hasResultsBeydondSearchResultsShownLimit () {
 			if (this.filteredSearchList.length > this.searchResultsShownLimit) { 
 				return true
 			} else {
@@ -97,42 +98,31 @@ export default {
         /**
          * to show how many aren't appearing in the search 
          */
-        resultsBeydondsearchResultsShownLimitCount () {
+        resultsBeydondSearchResultsShownLimitCount () {
 			return this.filteredSearchList.length - this.searchResultsShownLimit;
 		} 
 
 	},
 
     mounted () {
-        // this.loadSettings();
-        this.addBeers();
+        this.loadSettings();
     },
 
     methods: {
-
-        addBeers () {
-			fetch("https://api.punkapi.com/v2/beers?per_page=80")
-			.then((response) => response.json())
-			.then((response) => {
-				this.settingsList = response;
-                this.isLoaded = true;
-      		});
-		},
 
         /**
          * load the settings for possible retrieval
          *
          */
-		// loadSettings () {
-		// 	fetchAsJson('/adminv2/setting/search?keyword=news')
-		// 	.then((response) => {
-		// 		this.settingsList = response;
-		// 		this.isLoaded = true;
-        //         debugger;
-		// 	}).catch((error) => {
-		// 		this.hasLoadError = true; //display error note in the DOM
-		// 	});
-		// },
+		loadSettings () {
+			fetchAsJson('/adminv2/setting/search')
+			.then((response) => {
+				this.settingsList = response;
+				this.isLoaded = true;
+			}).catch((error) => {
+				this.hasLoadError = true; //display error note in the DOM
+			});
+		},
 
         /**
          * clear the search button selected
@@ -151,28 +141,38 @@ export default {
 		},
 
         /**
-         * experimental - does it help show changes in search? 
+         * animate settings to help context when filtering
+         * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
+         * what happens before shown
          *
+         * @param {DOMElement} element - the element that's animating
+         * 
          */
-        beforeEnterResult (el) {
-            gsap.set(el, { opacity: 0, y: 10, height: 0 });
+        onBeforeOnEnter (element) {
+            gsap.set(element, { opacity: 0, y: 10, height: 0 });
         },
 
         /**
-         * experimental - does it help show changes in search? 
+         * how it element animates on
          *
+         * @param {DOMElement} element - the element that's animating
+         * @param {Function} done - to be called once animation is complete
+         * 
          */
-        enterResult (el, done) {
-            let delay = el.dataset.index * 0.05;
-            gsap.to(el, 0.3, { opacity: 1, y: 0, height: 'auto', delay: delay, onComplete: done } );
+        onEnter (element, done) {
+            let delay = element.dataset.index * 0.025;
+            gsap.to(element, 0.3, { opacity: 1, y: 0, height: 'auto', delay: delay, onComplete: done } );
         },
 
         /**
-         * experimental - does it help show changes in search? 
+         * how the element animates off
          *
+         * @param {DOMElement} element - the element that's animating
+         * @param {Function} done - to be called once animation is complete
+         * 
          */
-        leaveResult (el, done) {
-            gsap.to(el, 0.3, { opacity: 0, y: 10, height: 0, onComplete: done } );
+        onLeaveResult (element, done) {
+            gsap.to(element, 0.3, { opacity: 0, y: 10, height: 0, onComplete: done } );
         },
 
     }
@@ -191,22 +191,22 @@ export default {
             class="" 
         />
         <button v-show="currentSearchString.length != 0" @click.prevent="onClearInputSelected" class="">Clear Search</button>
-            <transition-group
-                name="staggered-fade"
-                tag="ul"
-                v-bind:css="false"
-                v-on:before-enter="beforeEnterResult"
-                v-on:enter="enterResult"
-                v-on:leave="leaveResult"
-            >
-                <li v-for="(result, index) in filteredSearchListLimited" :key="result.name" :data-index="index">
-                    <admin-settings-search-result 
-                        :result="result"
-                        :current-search-string="currentSearchString"
-                    />
-                </li>
-            </transition-group>
-        <div v-if="isSearchActive && hasResultsBeydondsearchResultsShownLimit">{{ resultsBeydondsearchResultsShownLimitCount }} search results not shown, try refining your search further.</div>
+        <transition-group
+            name="staggered-fade"
+            tag="ul"
+            v-bind:css="false"
+            @before-enter="onBeforeOnEnter"
+            @enter="onEnter"
+            @leave="onLeaveResult"
+        >
+            <li v-for="(result, index) in filteredSearchListLimited" :key="result.name" :data-index="index">
+                <admin-settings-search-result 
+                    :result="result"
+                    :current-search-string="currentSearchString"
+                />
+            </li>
+        </transition-group>
+        <div v-if="isSearchActive && hasResultsBeydondSearchResultsShownLimit" class="search-refine-note">{{ resultsBeydondSearchResultsShownLimitCount }} search results not shown, try refining your search further.</div>
     </div>
 </template>
 
@@ -219,6 +219,15 @@ ul {
 
 ul li {
     list-style-type: none;
+}
+
+.search-refine-note {
+    width: 100%;
+    border: 1px solid black;
+    margin-top: -1px; //so don't get double borders when stacked
+    padding: 10px;
+    background: lightsteelblue;
+    font-style: italic;
 }
 
 </style>
