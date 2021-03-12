@@ -244,66 +244,66 @@ class Subnav
                     ],
                 ]
             ],
-            'engagement' => [
+            '/adminv2/engagement/index/collaboration' => [
                 'name' => 'Engagement',
                 'identifier' => self::PARENT_ENGAGEMENT,
                 'visible' =>  true,
                 'children' => [
-                    'engagement/index/collaboration' => [
+                    '/adminv2/engagement/index/collaboration' => [
                         'name' => 'Collaboration',
                         'identifier' => self::CHILD_ENGAGEMENT_COLLABORATION,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/components' => [
+                    '/adminv2/engagement/index/components' => [
                         'name' => 'Component Usage',
                         'identifier' => self::CHILD_ENGAGEMENT_COMPONENT_USAGE,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/dueWork' => [
+                    '/adminv2/engagement/index/dueWork' => [
                         'name' => 'Due Work',
                         'identifier' => self::CHILD_ENGAGEMENT_DUE_WORK,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/files' => [
+                    '/adminv2/engagement/index/files' => [
                         'name' => 'Files',
                         'identifier' => self::CHILD_ENGAGEMENT_FILES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/fileTypes' => [
+                    '/adminv2/engagement/index/fileTypes' => [
                         'name' => 'File Types',
                         'identifier' => self::CHILD_ENGAGEMENT_FILETYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/links' => [
+                    '/adminv2/engagement/index/links' => [
                         'name' => 'Links',
                         'identifier' => self::CHILD_ENGAGEMENT_LINKS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/login' => [
+                    '/adminv2/engagement/index/login' => [
                         'name' => 'Login',
                         'identifier' => self::CHILD_ENGAGEMENT_LOGIN,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/mobile' => [
+                    '/adminv2/engagement/index/mobile' => [
                         'name' => 'Mobile Apps',
                         'identifier' => self::CHILD_ENGAGEMENT_MOBILE_APPS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/news' => [
+                    '/adminv2/engagement/index/news' => [
                         'name' => 'News Posted',
                         'identifier' => self::CHILD_ENGAGEMENT_NEWS_POSTED,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/quiz' => [
+                    '/adminv2/engagement/index/quiz' => [
                         'name' => 'Quizzes',
                         'identifier' => self::CHILD_ENGAGEMENT_QUIZZES,
                         'visible' =>  true,

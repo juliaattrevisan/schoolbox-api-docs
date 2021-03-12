@@ -50,8 +50,8 @@ else {
 
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
-    ->generatePhplib($this, Subnav::PARENT_ENGAGEMENT, $page)
-    ->generateBreadcrumbsHtml($this, Subnav::PARENT_ENGAGEMENT, $page);
+    ->generatePhplib($this, "/adminv2/engagement/index/{$page}")
+    ->generateBreadcrumbsHtml($this, "/adminv2/engagement/index/{$page}");
 
 $this->setVar(array(
     'CURRENT_PAGE'              => $page,
