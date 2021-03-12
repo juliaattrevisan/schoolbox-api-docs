@@ -8,6 +8,8 @@
  */
 declare(strict_types=1);
 
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
 use Schoolbox\External\Connector\Pcschools\QueryHelper;
 use Schoolbox\External\Connector\Pcschools\QueryHelper\Freedom;
 use Schoolbox\External\Connector\Pcschools\QueryHelper\IQueryHelper;
@@ -34,7 +36,7 @@ class External_Pcschools_User implements External_UserInterface
     protected $timetableStoredProc = 'spSelTimeTable';
 
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -51,7 +53,7 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = Factory::getInstanceExternal();
 //        // Required, as using @LOGIC_NO
 //        $this->getDatabase()->query('SET ANSI_PADDING ON');
 //        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
@@ -514,7 +516,7 @@ class External_Pcschools_User implements External_UserInterface
     // Local methods
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
     private function getDatabase()
     {
@@ -522,7 +524,7 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * @param  MSSQL $database
+     * @param  IConnector $database
      *
      * @return $this
      */

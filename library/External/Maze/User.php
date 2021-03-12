@@ -8,6 +8,8 @@
  */
 declare(strict_types=1);
 
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
 use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -20,7 +22,7 @@ class External_Maze_User implements External_UserInterface
     /**
      * An instance of MSSQL
      *
-     * @var MSSQL $db
+     * @var IConnector $db
      */
     protected $db;
 
@@ -43,7 +45,7 @@ class External_Maze_User implements External_UserInterface
      */
     public function __construct()
     {
-        $this->setDb(MSSQL::getInstance());
+        $this->db = Factory::getInstanceExternal();
         $this->setGroup(new Group());
         $this->setHelper(new External_Maze_Helper());
     }
@@ -913,7 +915,7 @@ class External_Maze_User implements External_UserInterface
     /**
      * Set db
      *
-     * @param MSSQL $db
+     * @param IConnector $db
      */
     protected function setDb($db)
     {
@@ -923,7 +925,7 @@ class External_Maze_User implements External_UserInterface
     /**
      * Get db
      *
-     * @return MSSQL
+     * @return IConnector
      */
     protected function getDb()
     {

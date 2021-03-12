@@ -1,4 +1,8 @@
 <?php
+
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
+
 /**
  * Synergetic implementation of External_UserDetentionInterface
  *
@@ -12,12 +16,12 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
     use External_Synergetic_ValidateExternalIdTrait;
 
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     protected $database;
 
     public function __construct() {
-        $this->database = MSSQL::getInstance();
+        $this->database = Factory::getInstanceExternal();
     }
 
     /**
@@ -96,7 +100,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
                 ':semester'   => "'".$this->database->quote($semester)."'",
             )
         );
-        
+
         return $this->database->getAll($query);
     }
 
@@ -118,7 +122,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
             %s
             ORDER BY DetentionDate DESC
         ";
-        list($wherePart, $params) = $this->buildWherePart(
+        [$wherePart, $params] = $this->buildWherePart(
             $externalId, 'DetentionDate', $fromDate, $toDate
         );
         $query = strtr(sprintf($query, $wherePart), $params);
@@ -152,7 +156,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
             -- AND AbsenceTypeCode != ''
             ORDER BY EventDateTime DESC
         ";
-        list($wherePart, $params) = $this->buildWherePart(
+        [$wherePart, $params] = $this->buildWherePart(
             $externalId, 'EventDateTime', $fromDate, $toDate
         );
         $query = strtr(sprintf($query, $wherePart), $params);

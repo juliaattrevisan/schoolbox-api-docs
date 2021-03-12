@@ -1,4 +1,8 @@
 <?php
+
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
+
 /**
  * This file provides access to TASS class info
  *
@@ -8,7 +12,7 @@
 
 class External_Tass_Class implements External_ClassInterface {
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -23,7 +27,7 @@ class External_Tass_Class implements External_ClassInterface {
     private $externalUser;
 
     function __construct () {
-        $this->database = MSSQL::getInstance();
+        $this->database = Factory::getInstanceExternal();
         $this->externalUser = new External_User('tass');
     }
 
@@ -42,7 +46,7 @@ class External_Tass_Class implements External_ClassInterface {
         if(stristr($classCode, ',')) {
             $subCodeArray = explode(',',$classCode);
             foreach($subCodeArray as $code) {
-                list($year, $code, $class) = self::parseClassCode($code);
+                [$year, $code, $class] = self::parseClassCode($code);
                 $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 
                 $classQuery .= " ( $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ) OR ";
@@ -50,7 +54,7 @@ class External_Tass_Class implements External_ClassInterface {
             $classQuery .= '1=0';
         }
         else {
-            list($year, $code, $class) = self::parseClassCode($classCode);
+            [$year, $code, $class] = self::parseClassCode($classCode);
             $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 
             $classQuery = " $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ";

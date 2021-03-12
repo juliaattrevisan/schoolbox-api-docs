@@ -11,9 +11,6 @@ namespace Schoolbox\External\Connector\Tass\Bbc;
 
 use Schoolbox\External\Connector\Tass\Base\Sync as BaseSync;
 use Config;
-use External_Tass_Helper;
-use MSSQL;
-use Schoolbox\External\Connector\SyncInterface;
 use Schoolbox\Sync\Iterator;
 
 class Sync extends BaseSync

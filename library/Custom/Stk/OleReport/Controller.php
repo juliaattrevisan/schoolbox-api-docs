@@ -7,11 +7,11 @@
 
 namespace Custom\Stk\OleReport;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use \OutOfBoundsException;
 use Schoolbox\User;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use \MSSQL;
 
 
 /**
@@ -22,7 +22,7 @@ use \MSSQL;
 class Controller extends Base
 {
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -33,9 +33,9 @@ class Controller extends Base
 
     /**
      * Controller constructor.
-     * @param MSSQL $database
+     * @param IConnector $database
      */
-    public function __construct(MSSQL $database)
+    public function __construct(IConnector $database)
     {
         $this->database = $database;
         $this->schema = $this->retrieveDocumentSchema();
@@ -154,17 +154,17 @@ class Controller extends Base
     // Getters / Setters
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
     protected function getDatabase(){
         return $this->database;
     }
 
     /**
-     * @param MSSQL $database
+     * @param IConnector $database
      * @return static
      */
-    protected function setDatabase(MSSQL $database){
+    protected function setDatabase(IConnector $database){
         $this->database = $database;
         return $this;
     }

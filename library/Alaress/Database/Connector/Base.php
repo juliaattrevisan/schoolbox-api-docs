@@ -11,9 +11,11 @@
 namespace Alaress\Database\Connector;
 
 use Alaress\Database\Broker\IBroker;
+use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
+use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Alaress\Database\Transactor\ITransactor;
@@ -517,5 +519,60 @@ class Base implements Serializable, IConnector
     public function getQuoter(): IQuoter
     {
         return $this->quoter;
+    }
+
+
+    /**
+     * Temporary MSSQL methods
+     */
+
+    /**
+     * @inheritdoc
+     */
+    public function getRow(string $sql, array $parameters = null): array
+    {
+        return $this->executeQuery($sql, $parameters)->fetch();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getOne(string $sql, array $parameters = null)
+    {
+        return $this->executeQuery($sql, $parameters)->fetchColumn();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAll(string $sql, array $parameters = null): array
+    {
+        return $this->executeQuery($sql, $parameters)->fetchAll();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getIterator(string $sql, array $parameters = null): IIterator
+    {
+        return $this->getQueryIterator($sql, $parameters);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function query(string $sql, array $parameters = null): IStatement
+    {
+        $result = $this->prepareQuery($sql, $parameters);
+        $result->execute();
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function prepareProcedure(string $name): IStoredProcedure
+    {
+        return $this->prepareStoredProcedure($name);
     }
 }

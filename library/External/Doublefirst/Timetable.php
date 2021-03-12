@@ -5,7 +5,10 @@
  * @link        https://schoolbox.com.au/
  *
  */
+
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Campus as CampusModel;
+use Schoolbox\Database\Factory;
 
 /**
  * Class External_Doublefirst_Timetable
@@ -14,7 +17,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 {
 
     /**
-     * @var MSSQL $database
+     * @var IConnector $database
      */
     private $database;
 
@@ -36,7 +39,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = Factory::getInstanceExternal();
         $this->externalUser = new External_User('doublefirst');
         $this->helper = new External_Doublefirst_Helper();
     }
@@ -860,7 +863,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
 
     /**
-     * @var MSSQL $database
+     * @var IConnector $database
      */
     private function setDatabase($database)
     {
@@ -869,7 +872,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
     private function getDatabase()
     {

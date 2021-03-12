@@ -5,6 +5,8 @@
  */
 declare(strict_types=1);
 
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
 use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -22,7 +24,7 @@ class External_Doublefirst_User implements External_UserInterface
     private const FORMAT_ISO8601 = 126;
 
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -38,7 +40,7 @@ class External_Doublefirst_User implements External_UserInterface
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = Factory::getInstanceExternal();
         $this->setGroup(new Group());
         $this->helper = new External_Doublefirst_Helper();
     }
@@ -1023,7 +1025,7 @@ class External_Doublefirst_User implements External_UserInterface
     /**
      * Set database
      *
-     * @param MSSQL $database
+     * @param IConnector $database
      */
     private function setDatabase($database)
     {
@@ -1033,7 +1035,7 @@ class External_Doublefirst_User implements External_UserInterface
     /**
      * Get database
      *
-     * @return MSSQL
+     * @return IConnector
      */
     private function getDatabase()
     {

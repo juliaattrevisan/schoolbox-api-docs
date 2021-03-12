@@ -9,6 +9,8 @@
 
 declare(strict_types=1);
 
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
 use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -24,7 +26,7 @@ class External_Tass_User implements External_UserInterface
 
 
     /**
-     * @var MSSQL
+     * @var IConnector
     */
     protected $database;
 
@@ -48,7 +50,7 @@ class External_Tass_User implements External_UserInterface
      */
     public function __construct()
     {
-        $this->database    = MSSQL::getInstance();
+        $this->database = Factory::getInstanceExternal();
         $this->companyCode = Config::get('external_tass_company_code');
         $this->helper      = new External_Tass_Helper();
     }

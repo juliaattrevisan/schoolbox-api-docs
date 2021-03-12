@@ -17,7 +17,6 @@ use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
-use \MSSQL;
 
 /**
  * Module definition for SaintKentigern's custom OLE report.
@@ -92,9 +91,7 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'database' => $injector->lazy(function () {
-                    return MSSQL::getInstance();
-                }),
+                'database' => $injector->lazyGet('databaseExternal'),
             ])
         );
     }

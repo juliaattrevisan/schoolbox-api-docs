@@ -4,8 +4,11 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
+use Schoolbox\Database\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
@@ -24,7 +27,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
 
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -40,7 +43,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = Factory::getInstanceExternal();
         $this->userMapper = UserMapper::getInstance();
     }
 
@@ -646,7 +649,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
     private function getDatabase()
     {
@@ -655,7 +658,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param  MSSQL $database
+     * @param  IConnector $database
      *
      * @return $this
      */

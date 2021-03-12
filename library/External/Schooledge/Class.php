@@ -6,14 +6,17 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\CampusMapper;
+use Schoolbox\Database\Factory;
 
 class External_Schooledge_Class implements External_ClassInterface
 {
 
 
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -23,7 +26,7 @@ class External_Schooledge_Class implements External_ClassInterface
      */
     public function __construct()
     {
-        $this->database = MSSQL::getInstance();
+        $this->database = Factory::getInstanceExternal();
     }
 
 

@@ -4,7 +4,10 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Campus;
+use Schoolbox\Database\Factory;
 use Schoolbox\UserMapper;
 
 /**
@@ -114,7 +117,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
 
 
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -124,7 +127,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
      */
     public function __construct()
     {
-        $this->database = MSSQL::getInstance();
+        $this->database = Factory::getInstanceExternal();
     }
 
 

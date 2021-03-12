@@ -4,8 +4,10 @@
  * @link      https://schoolbox.com.au/
  */
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate;
 use Alaress\Database\Quoter\Sqlsrv\Quoter;
+use Schoolbox\Database\Factory;
 
 /**
  * This file provides access to synergetic class info
@@ -16,7 +18,7 @@ class External_Synergetic_Class implements External_ClassInterface
     use External_Synergetic_ClearInvalidValuesTrait;
 
     /**
-     * @var MSSQL $database
+     * @var IConnector $database
      */
     private $database;
 
@@ -30,7 +32,7 @@ class External_Synergetic_Class implements External_ClassInterface
      */
     function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = Factory::getInstanceExternal();
         $this->setExternalUser(new External_User('synergetic'));
     }
 
@@ -300,7 +302,7 @@ class External_Synergetic_Class implements External_ClassInterface
     }
 
     /**
-     * @param MSSQL $database
+     * @param IConnector $database
      */
     private function setDatabase($database)
     {
@@ -308,7 +310,7 @@ class External_Synergetic_Class implements External_ClassInterface
     }
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
     protected function getDatabase()
     {

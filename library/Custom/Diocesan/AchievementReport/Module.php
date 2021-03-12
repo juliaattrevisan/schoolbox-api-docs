@@ -103,7 +103,7 @@ class Module extends BaseModule
          */
         return [
             'id' => $user->getId(),
-            'db' => \MSSQL::getInstance(),
+            'db' => $this->getInjector()->get('databaseExternal'),
             'externalUser' => $externalUser,
             'user' => $user
         ];

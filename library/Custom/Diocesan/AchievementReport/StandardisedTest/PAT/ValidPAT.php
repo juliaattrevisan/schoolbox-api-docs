@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
 
-use MSSQL;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\User;
 
 /**
@@ -37,7 +37,7 @@ class ValidPAT
     /**
      * MSSQL db handler
      *
-     * @var MSSQL
+     * @var IConnector
      */
     protected $db;
 
@@ -53,9 +53,9 @@ class ValidPAT
     /**
      * ValidPAT constructor.
      *
-     * @param MSSQL $db
+     * @param IConnector $db
      */
-    public function __construct(MSSQL $db)
+    public function __construct(IConnector $db)
     {
         $this->db = $db;
     }

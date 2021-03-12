@@ -6,7 +6,9 @@
  */
 declare(strict_types=1);
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\CampusMapper;
+use Schoolbox\Database\Factory;
 use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\User;
@@ -25,7 +27,7 @@ class External_Schooledge_User implements External_UserInterface
 
 
     /**
-     * @var MSSQL $database
+     * @var IConnector $database
      */
     private $database;
 
@@ -35,7 +37,7 @@ class External_Schooledge_User implements External_UserInterface
      */
     public function __construct()
     {
-        $this->database = MSSQL::getInstance();
+        $this->database = Factory::getInstanceExternal();
     }
 
 

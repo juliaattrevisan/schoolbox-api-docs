@@ -4,7 +4,10 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Campus;
+use Schoolbox\Database\Factory;
 
 /**
  * Class External_Maze_Timetable
@@ -15,7 +18,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * An instance of MSSQL
      *
-     * @var MSSQL
+     * @var IConnector
      */
     private $db;
 
@@ -73,7 +76,7 @@ class External_Maze_Timetable implements External_TimetableInterface
      */
     public function __construct()
     {
-        $this->setDb(MSSQL::getInstance());
+        $this->db = Factory::getInstanceExternal();
         $this->setHelper(new External_Maze_Helper());
         $this->setGroupHandler(new Group());
         $this->setUserMapper(\Schoolbox\UserMapper::getInstance());
@@ -681,7 +684,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * Set db
      *
-     * @param MSSQL $db
+     * @param IConnector $db
      */
     private function setDb($db)
     {
@@ -692,7 +695,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * Get db
      *
-     * @return MSSQL
+     * @return IConnector
      */
     private function getDb()
     {

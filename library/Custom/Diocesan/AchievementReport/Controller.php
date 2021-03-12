@@ -6,6 +6,7 @@
  */
 namespace Custom\Diocesan\AchievementReport;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Custom\Diocesan\AchievementReport\Comments;
@@ -17,7 +18,6 @@ use Custom\Diocesan\AchievementReport\StandardisedTest\Reading;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Writing;
 use Custom\Diocesan\AchievementReport\StandardisedTest\Mathematics;
 use Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy;
-use MSSQL;
 use Schoolbox\User;
 
 /**
@@ -53,13 +53,13 @@ class Controller extends Base
      * Selects which report to redirect towards, based on certain
      * conditions particular to a student
      *
-     * @param MSSQL    $db
-     * @param User     $user
-     * @param array    $externalUser
-     * @param int|null $year
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function getSelector(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getSelector(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
         /* Check whether the Achievement Reports are enabled
          */
@@ -165,13 +165,13 @@ class Controller extends Base
     /**
      * Standardised Tests index
      *
-     * @param MSSQL    $db
-     * @param User     $user
-     * @param array    $externalUser
-     * @param int|null $year
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function getStandardisedTests(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getStandardisedTests(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
 
         /* TODO: Redirect to the first available section of the standardised test
@@ -190,13 +190,13 @@ class Controller extends Base
     /**
      * PAT section of Standardised Test
      *
-     * @param MSSQL    $db
-     * @param User     $user
-     * @param array    $externalUser
-     * @param int|null $year
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function getStandardisedTestsPAT(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getStandardisedTestsPAT(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
         /* Default to this year if none specified
          */
@@ -278,13 +278,13 @@ class Controller extends Base
 
 
     /**
-     * @param MSSQL    $db
-     * @param User     $user
-     * @param array    $externalUser
-     * @param int|null $year
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function getStandardisedTestsSTAR(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getStandardisedTestsSTAR(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
         /* Default to this year if none specified
          */
@@ -336,13 +336,13 @@ class Controller extends Base
 
 
     /**
-     * @param MSSQL    $db
-     * @param User     $user
-     * @param array    $externalUser
-     * @param int|null $year
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function getStandardisedTestsReading(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getStandardisedTestsReading(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
         /* Default to this year if none specified
          */
@@ -380,13 +380,13 @@ class Controller extends Base
 
 
     /**
-     * @param MSSQL    $db
-     * @param User     $user
-     * @param array    $externalUser
-     * @param int|null $year
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function getStandardisedTestsWriting(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getStandardisedTestsWriting(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
         /* Default to this year if none specified
          */
@@ -424,13 +424,13 @@ class Controller extends Base
 
 
     /**
-     * @param MSSQL    $db
-     * @param User     $user
-     * @param array    $externalUser
-     * @param int|null $year
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function getStandardisedTestsMathematics(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getStandardisedTestsMathematics(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
         /* Default to this year if none specified
          */
@@ -468,13 +468,13 @@ class Controller extends Base
 
 
     /**
-     * @param MSSQL    $db
-     * @param User     $user
-     * @param array    $externalUser
-     * @param int|null $year
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function getStandardisedTestsLiteracyNumeracy(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getStandardisedTestsLiteracyNumeracy(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
         /* Default to this year if none specified
          */
@@ -524,13 +524,13 @@ class Controller extends Base
     /**
      * School Grades page
      *
-     * @param MSSQL    $db
-     * @param User     $user
-     * @param array    $externalUser
-     * @param int|null $year
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function getSchoolGrades(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getSchoolGrades(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
         $footer = new SchoolGrades\Footer($user, $externalUser, $db, null);
 
@@ -576,13 +576,13 @@ class Controller extends Base
     /**
      * IB page
      *
-     * @param MSSQL    $db
-     * @param User     $user
-     * @param array    $externalUser
-     * @param int|null $year
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function getIb(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getIb(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
         /* The selected year should contain data. If a selected
          * year contains no data, probably 404 or something - you
@@ -632,13 +632,13 @@ class Controller extends Base
     /**
      * NCEA page
      *
-     * @param MSSQL    $db
-     * @param User     $user
-     * @param array    $externalUser
-     * @param int|null $year
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function getNcea(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getNcea(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
         $footer = new NCEA\Footer($user, $externalUser, $db, null);
 
@@ -758,13 +758,13 @@ class Controller extends Base
     /**
      * Get all the comments for $externalUser
      *
-     * @param MSSQL    $db
-     * @param User     $user
-     * @param array    $externalUser
-     * @param int|null $year
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function getComments(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getComments(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
         /* The selected year should contain data. If a selected
          * year contains no data, probably 404 or something - you
@@ -810,13 +810,13 @@ class Controller extends Base
     /**
      * Get all the cocurricular activities for $externalUser
      *
-     * @param MSSQL    $db
-     * @param User     $user
-     * @param array    $externalUser
-     * @param int|null $year
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function getCoCurricular(MSSQL $db, User $user, array $externalUser, ?int $year): void
+    public function getCoCurricular(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
         $output = [
             'template' => '@coCurricular/index.twig',

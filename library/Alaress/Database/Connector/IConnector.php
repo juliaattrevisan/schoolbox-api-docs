@@ -15,6 +15,7 @@ use Alaress\Database\Iterator\IIterator;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
+use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use PDOException;
@@ -337,4 +338,63 @@ interface IConnector
      * @return IQuoter
      */
     public function getQuoter(): IQuoter;
+
+    /**
+     * Temporary implementation of `\MSSQL::getRow`, to ease transition.
+     *
+     * @deprecated
+     * @param string     $sql
+     * @param array|null $parameters
+     * @return array
+     */
+    public function getRow(string $sql, array $parameters = null): array;
+
+    /**
+     * Temporary implementation of `\MSSQL::getOne`, to ease transition.
+     *
+     * @deprecated
+     * @param string     $sql
+     * @param array|null $parameters
+     * @return mixed
+     */
+    public function getOne(string $sql, array $parameters = null);
+
+    /**
+     * Temporary implementation of `\MSSQL::getAll`, to ease transition.
+     *
+     * @deprecated
+     * @param string     $sql
+     * @param array|null $parameters
+     * @return array
+     */
+    public function getAll(string $sql, array $parameters = null): array;
+
+    /**
+     * Temporary implementation of `\MSSQL::getIterator`, to ease transition.
+     *
+     * @deprecated
+     * @param string     $sql
+     * @param array|null $parameters
+     * @return IIterator
+     */
+    public function getIterator(string $sql, array $parameters = null): IIterator;
+
+    /**
+     * Temporary implementation of `\MSSQL::query`, to ease transition.
+     *
+     * @deprecated
+     * @param string     $sql
+     * @param array|null $parameters
+     * @return IStatement
+     */
+    public function query(string $sql, array $parameters = null): IStatement;
+
+    /**
+     * Temporary implementation of `\MSSQL::prepareProcedure`, to ease transition.
+     *
+     * @deprecated
+     * @param string $name
+     * @return IStoredProcedure
+     */
+    public function prepareProcedure(string $name): IStoredProcedure;
 }

@@ -1,7 +1,9 @@
 <?php
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Bindings;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\Database\Factory;
 
 class External_Tass_Helper
 {
@@ -24,7 +26,7 @@ class External_Tass_Helper
 
     /**
      * An instance of MSSQL
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -34,7 +36,7 @@ class External_Tass_Helper
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = Factory::getInstanceExternal();
     }
 
 
@@ -50,7 +52,7 @@ class External_Tass_Helper
 
 
     /**
-     * @param MSSQL $database
+     * @param IConnector $database
      */
     private function setDatabase($database)
     {
@@ -58,7 +60,7 @@ class External_Tass_Helper
     }
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
     private function getDatabase()
     {

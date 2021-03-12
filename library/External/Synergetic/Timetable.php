@@ -4,8 +4,10 @@
  * @link      https://schoolbox.com.au/
  */
 use Alaress\Cache;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
+use Schoolbox\Database\Factory;
 
 /**
  * Class External_Synergetic_Timetable
@@ -31,7 +33,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @var MSSQL $database
+     * @var IConnector $database
      */
     private $database;
 
@@ -89,7 +91,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = Factory::getInstanceExternal();
         $this->externalUser = new External_User('synergetic');
         $this->groupHandler = new Group();
 
@@ -997,7 +999,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @var MSSQL $database
+     * @var IConnector $database
      */
     private function setDatabase($database)
     {
@@ -1005,7 +1007,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     }
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
     private function getDatabase()
     {
