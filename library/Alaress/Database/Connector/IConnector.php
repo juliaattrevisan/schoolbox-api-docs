@@ -397,4 +397,49 @@ interface IConnector
      * @return IStoredProcedure
      */
     public function prepareProcedure(string $name): IStoredProcedure;
+
+    /**
+     * Temporary implementation of `\MSSQL::quote`, to ease transition.
+     *
+     * @deprecated
+     * @param mixed $value
+     * @return string
+     */
+    public function quote($value): string;
+
+    /**
+     * Temporary implementation of `\MSSQL::smartQuote`, to ease transition.
+     *
+     * @deprecated
+     * @param mixed $value
+     * @return string
+     */
+    public function smartQuote($value): string;
+
+    /**
+     * Temporary implementation of `\MSSQL::trimAll`, to ease transition.
+     *
+     * @deprecated
+     * @param array $rowset
+     * @return array
+     */
+    public function trimAll(array $rowset): array;
+
+    /**
+     * Temporary implementation of `\MSSQL::trimRow`, to ease transition.
+     *
+     * @deprecated
+     * @param array $row)
+     * @return array
+     */
+    public function trimRow(array $row): array;
+
+    /**
+     * Temporary implementation of `\MSSQL::trimField`, to ease transition.
+     *
+     * @deprecated
+     * @param mixed $fieldValue
+     * @return mixed
+     */
+    public function trimField($fieldValue);
 }

@@ -575,4 +575,44 @@ class Base implements Serializable, IConnector
     {
         return $this->prepareStoredProcedure($name);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function quote($value): string
+    {
+        return str_replace("'", "''", $value);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function smartQuote($value): string
+    {
+        return "'" . $this->quote($value) . "'";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function trimAll(array $rowset): array
+    {
+        return array_map([$this, 'trimRow'], $rowset);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function trimRow(array $row): array
+    {
+        return array_map([$this, 'trimField'], $row);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function trimField($fieldValue)
+    {
+        return isset($fieldValue) ? trim($fieldValue) : null;
+    }
 }
