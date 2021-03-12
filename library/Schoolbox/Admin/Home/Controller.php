@@ -26,8 +26,6 @@ use Healthcheck;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 
-use Schoolbox\Sync\Navigator\Navigator;
-use Schoolbox\Sync\Navigator\Node;
 use function array_column;
 use function array_map;
 use function array_merge;

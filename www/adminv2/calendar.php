@@ -23,8 +23,8 @@ $this->setTitle('Admin - Calendar');
 
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
-    ->generatePhplib($this, Subnav::PARENT_CALENDAR, $selectedType)
-    ->generateBreadcrumbsHtml($this, Subnav::PARENT_CALENDAR, $selectedType);
+    ->generatePhplib($this, "/adminv2/calendar/{$selectedType}")
+    ->generateBreadcrumbsHtml($this, "/adminv2/calendar/{$selectedType}");
 
 $userHandler = new User();
 

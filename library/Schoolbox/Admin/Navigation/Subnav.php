@@ -219,24 +219,24 @@ class Subnav
                 'visible' =>  true,
                 'children' => []
             ],
-            'calendar' => [
+            '/adminv2/calendar/Cleanup' => [
                 'name' => 'Calendar',
                 'identifier' => self::PARENT_CALENDAR,
                 'visible' =>  true,
                 'children' => [
-                    'calendar/Cleanup' => [
+                    '/adminv2/calendar/Cleanup' => [
                         'name' => 'Cleanup',
                         'identifier' => self::CHILD_CALENDAR_CLEANUP,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'calendar/Import' => [
+                    '/adminv2/calendar/Import' => [
                         'name' => 'Import',
                         'identifier' => self::CHILD_CALENDAR_IMPORT,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'calendar/Subscribe' => [
+                    '/adminv2/calendar/Subscribe' => [
                         'name' => 'Subscribe',
                         'identifier' => self::CHILD_CALENDAR_SUBSCRIBE,
                         'visible' =>  true,
@@ -833,19 +833,47 @@ class Subnav
      * Render the self-contained subnav as a purely html fragment
      * so you can slam it straight into a phplib sigh
      *
-     * @param string      $pageCurrent
-     * @param string|null $subpageCurrent
+     * @param string $url
      * @return string
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function generateHtml(string $pageCurrent, ?string $subpageCurrent): string
+    public function generateHtml(string $url): string
     {
+        /* Look ahead for $url
+         * If it's in a child node, remember its parent and pass that too
+         */
+        $pageCurrent = '';
+        $subpageCurrent = '';
+
+        foreach ($this->generate() as $parentUrl => $parentData) {
+            if ($parentUrl === $url) {
+                $pageCurrent = $parentUrl;
+            }
+
+            if (\count($parentData['children'])) {
+                foreach ($parentData['children'] as $childUrl => $childData) {
+                    if ($childUrl === $url) {
+
+                        /* parentUrl is sometimes the same as a childUrl
+                         * and manifest twice in the breadcrumb trail; we only
+                         * need the parent node if it was different to its child node
+                         */
+                        if ($parentUrl !== $url) {
+                            $pageCurrent = $parentUrl;
+                        }
+
+                        $subpageCurrent = $childUrl;
+                    }
+                }
+            }
+        }
+
         return $this->twig->render('subnav.twig', [
             'adminSubnav' => $this->generate(),
             'pageCurrent' => $pageCurrent,
-            'subpageCurrent' => (string)$subpageCurrent
+            'subpageCurrent' => $subpageCurrent
         ]);
     }
 
@@ -855,16 +883,15 @@ class Subnav
      *
      * @param \SitePage   $page
      * @param string      $pageCurrent
-     * @param string|null $subpageCurrent
      * @return Subnav
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function generatePhplib(\SitePage $page, string $pageCurrent, ?string $subpageCurrent): self
+    public function generatePhplib(\SitePage $page, string $pageCurrent): self
     {
         $page->setVar([
-            'ADMIN_NAV' => $this->generateHtml($pageCurrent, $subpageCurrent)
+            'ADMIN_NAV' => $this->generateHtml($pageCurrent)
         ]);
 
         return $this;
@@ -890,13 +917,21 @@ class Subnav
         foreach ($this->generate() as $parentUrl => $parentData) {
             if ($parentUrl === $url) {
                 $allCrumbs[] = [$parentData['name'], $parentUrl];
+            }
 
-                if (\count($parentData['children'])) {
-                    foreach ($parentData['children'] as $childUrl => $childData) {
-                        if ($childUrl === $url) {
+            if (\count($parentData['children'])) {
+                foreach ($parentData['children'] as $childUrl => $childData) {
+                    if ($childUrl === $url) {
+
+                        /* parentUrl is sometimes the same as a childUrl
+                         * and manifest twice in the breadcrumb trail; we only
+                         * need the parent node if it was different to its child node
+                         */
+                        if ($parentUrl !== $url) {
                             $allCrumbs[] = [$parentData['name'], $parentUrl];
-                            $allCrumbs[] = [$childData['name'],  $childUrl];
                         }
+
+                        $allCrumbs[] = [$childData['name'],  $childUrl];
                     }
                 }
             }
@@ -911,17 +946,16 @@ class Subnav
      *
      * @param \SitePage   $page
      * @param string      $pageCurrent
-     * @param string|null $subpageCurrent
      * @return Subnav
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function generateBreadcrumbsHtml(\SitePage $page, string $pageCurrent, ?string $subpageCurrent): self
+    public function generateBreadcrumbsHtml(\SitePage $page, string $pageCurrent): self
     {
         $page->setVar([
             'ADMIN_BREADCRUMBS' => $this->twig->render('adminBreadcrumbs.twig', [
-                'allBreadcrumbs' => $this->generateBreadcrumbs($pageCurrent, $subpageCurrent)
+                'allBreadcrumbs' => $this->generateBreadcrumbs($pageCurrent)
             ])
         ]);
 
