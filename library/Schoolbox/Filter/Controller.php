@@ -105,9 +105,8 @@ class Controller extends BaseController
             'showCourseMarkbook' => $this->getConfigLoader()->get('course_markbook_enable'),
             'ENTITY_ASSESSMENTS' => Assessment\Mapper::class,
             'ENTITY_BADGES'      => Badge\Mapper::class,
-            'pageCurrent'        => Subnav::PARENT_FILTERS,
-            'subpageCurrent'     => null,
-            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_FILTERS, null),
+            'pageCurrent'        => $this->router->generate('filters.getIndex'),
+            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('filters.getIndex')),
         ])->setTitle('Filterable pages'));
     }
 
@@ -152,9 +151,8 @@ class Controller extends BaseController
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/settings.twig', [
             'page'               => $page,
-            'pageCurrent'        => Subnav::PARENT_FILTERS,
-            'subpageCurrent'     => null,
-            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_FILTERS, null),
+            'pageCurrent'        => $this->router->generate('filters.getIndex'),
+            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('filters.getIndex')),
             'definitions'        => $definitions,
             'pageFilters'        => $pageFilters,
             'roleTypes'          => $roleTypes,

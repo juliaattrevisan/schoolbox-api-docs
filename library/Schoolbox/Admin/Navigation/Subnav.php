@@ -330,7 +330,7 @@ class Subnav
                     ],
                 ]
             ],
-            'filters' => [
+            '/adminv2/filters' => [
                 'name' => 'Filters',
                 'identifier' => self::PARENT_FILTERS,
                 'visible' =>  true,
