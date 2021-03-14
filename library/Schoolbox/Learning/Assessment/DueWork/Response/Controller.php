@@ -249,7 +249,7 @@ class Controller extends Base
         DueWork $assessment,
         User $student,
         Model $response = null,
-        ?bool $blindMode = false 
+        ?bool $blindMode = false
     ): void {
 
         $participant = $assessment->getParticipant($student);
@@ -506,10 +506,6 @@ class Controller extends Base
      * @param SubmissionFile $file
      * @return array
      * @throws ApplicationException\Exception If a Kami exception occurs
-     * @throws \InvalidArgumentException If cannot convert Kami request or response to a string
-     * @throws \LogicException If attempting to update the status of a kami doc that is not processing.
-     * @throws \PDOException If something went wrong when saving the kami document's status
-     * @throws \UnexpectedValueException If unexpected status change is reported from Kami API
      */
     private function getSubFragment(SubmissionFile $file): array
     {
@@ -518,9 +514,9 @@ class Controller extends Base
                 $this->kamiMapper,
                 $this->kamiConnector
             ))->produce($file, $this->getUser());
-        } catch (Kami\Exception\IKamiException $e) {
+        } catch (\Exception $e) {
+            // catching all exceptions, as we don't want to break inline grader.
             $this->captureException($e);
-            // Kami Exceptions
             return [
                 'strategy' => 'kami_error.twig',
                 'data'     => [

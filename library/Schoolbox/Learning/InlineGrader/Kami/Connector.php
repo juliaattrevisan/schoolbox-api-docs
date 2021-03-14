@@ -404,7 +404,7 @@ class Connector implements IConnector
         ];
         $request  = new Request('POST', self::BASE_URI . 'embed/exports');
         $response = $this->client->send($request, $this->getOptions($options));
-        if($this->isValidNotFound($response)){
+        if ($this->isValidNotFound($response)){
             throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
         }
         return $this->buildExport($this->decodeResponseContent($response->getBody()));
@@ -479,7 +479,7 @@ class Connector implements IConnector
         $decodedPayload = json_decode($payload, false);
 
         if (!is_object($decodedPayload)) {
-            throw new Exception\ResponseDecodeException('Cannot decode kami payload; not json');
+            throw new Exception\ResponseDecodeException('Cannot decode kami payload; not json: ' . $payload);
         }
 
         return $decodedPayload;
