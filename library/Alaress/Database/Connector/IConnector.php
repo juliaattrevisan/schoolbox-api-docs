@@ -342,7 +342,7 @@ interface IConnector
     /**
      * Temporary implementation of `\MSSQL::getRow`, to ease transition.
      *
-     * @deprecated
+     * @deprecated Replace with `$this->executeQuery($sql, $parameters)->fetch()`
      * @param string     $sql
      * @param array|null $parameters
      * @return array
@@ -352,7 +352,7 @@ interface IConnector
     /**
      * Temporary implementation of `\MSSQL::getOne`, to ease transition.
      *
-     * @deprecated
+     * @deprecated Replace with `$this->executeQuery($sql, $parameters)->fetchColumn()`
      * @param string     $sql
      * @param array|null $parameters
      * @return mixed
@@ -362,7 +362,7 @@ interface IConnector
     /**
      * Temporary implementation of `\MSSQL::getAll`, to ease transition.
      *
-     * @deprecated
+     * @deprecated Replace with `$this->executeQuery($sql, $parameters)->getAll()`
      * @param string     $sql
      * @param array|null $parameters
      * @return array
@@ -372,7 +372,7 @@ interface IConnector
     /**
      * Temporary implementation of `\MSSQL::getIterator`, to ease transition.
      *
-     * @deprecated
+     * @deprecated Replace with `$this->executeQuery($sql, $parameters)->getIterator()`
      * @param string     $sql
      * @param array|null $parameters
      * @return IIterator
@@ -382,17 +382,17 @@ interface IConnector
     /**
      * Temporary implementation of `\MSSQL::query`, to ease transition.
      *
-     * @deprecated
+     * @deprecated Replace with `$this->executeQuery($sql, $parameters)`
      * @param string     $sql
      * @param array|null $parameters
-     * @return IStatement
+     * @return IQuery
      */
-    public function query(string $sql, array $parameters = null): IStatement;
+    public function query(string $sql, array $parameters = null): IQuery;
 
     /**
      * Temporary implementation of `\MSSQL::prepareProcedure`, to ease transition.
      *
-     * @deprecated
+     * @deprecated Replace with `$this->prepareStoredProcedure($name)`
      * @param string $name
      * @return IStoredProcedure
      */
@@ -401,7 +401,7 @@ interface IConnector
     /**
      * Temporary implementation of `\MSSQL::quote`, to ease transition.
      *
-     * @deprecated
+     * @deprecated Replace with query parameters
      * @param mixed $value
      * @return string
      */
@@ -410,7 +410,7 @@ interface IConnector
     /**
      * Temporary implementation of `\MSSQL::smartQuote`, to ease transition.
      *
-     * @deprecated
+     * @deprecated Replace with query parameters
      * @param mixed $value
      * @return string
      */
@@ -419,7 +419,7 @@ interface IConnector
     /**
      * Temporary implementation of `\MSSQL::trimAll`, to ease transition.
      *
-     * @deprecated
+     * @deprecated replace with a helper class? field value massage isn't really a responsibility of the connector
      * @param array $rowset
      * @return array
      */
@@ -428,7 +428,7 @@ interface IConnector
     /**
      * Temporary implementation of `\MSSQL::trimRow`, to ease transition.
      *
-     * @deprecated
+     * @deprecated replace with a helper class? field value massage isn't really a responsibility of the connector
      * @param array $row)
      * @return array
      */
@@ -437,7 +437,7 @@ interface IConnector
     /**
      * Temporary implementation of `\MSSQL::trimField`, to ease transition.
      *
-     * @deprecated
+     * @deprecated replace with a helper class? field value massage isn't really a responsibility of the connector
      * @param mixed $fieldValue
      * @return mixed
      */
