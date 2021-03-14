@@ -581,7 +581,13 @@ class Base implements Serializable, IConnector
      */
     public function quote($value): string
     {
-        return str_replace("'", "''", $value);
+        // Hopefully this driver supports quoting.
+        // Better yet use prepared statements.
+
+        // quote() adds quote-marks, this methods expects they not be there so
+        // remove them.
+        // (This feels really unsafe)
+        return mb_substr($this->smartQuote($value), 1, -1, 'UTF-8');
     }
 
     /**
@@ -589,7 +595,7 @@ class Base implements Serializable, IConnector
      */
     public function smartQuote($value): string
     {
-        return "'" . $this->quote($value) . "'";
+        return $this->broker->getPdo()->quote($value);
     }
 
     /**
