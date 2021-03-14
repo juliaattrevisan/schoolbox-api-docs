@@ -65,7 +65,12 @@ for($i=0; $i < $months; $i++) {
             }
         }
 
-        $percentageTable[$row['name']][$i] = round(($row['total'])*100 / $groupTotal) ;
+        if ($groupTotal) {
+            $percentageTable[$row['name']][$i] = round(($row['total']) * 100 / $groupTotal);
+        } else {
+            $percentageTable[$row['name']][$i] = 0;
+        }
+
     }
 
     $currentMonth->addMonths(1);
