@@ -11,16 +11,16 @@ $this->setFile(TEMPLATE_content, 'adminv2/engagement/index.html');
 $this->setTitle('Admin - Engagement');
 
 $validPages = [
-    Subnav::CHILD_ENGAGEMENT_DUE_WORK,
-    Subnav::CHILD_ENGAGEMENT_QUIZZES,
-    Subnav::CHILD_ENGAGEMENT_FILES,
-    Subnav::CHILD_ENGAGEMENT_LINKS,
-    Subnav::CHILD_ENGAGEMENT_FILETYPES,
-    Subnav::CHILD_ENGAGEMENT_NEWS_POSTED,
-    Subnav::CHILD_ENGAGEMENT_COLLABORATION,
-    Subnav::CHILD_ENGAGEMENT_LOGIN,
-    Subnav::CHILD_ENGAGEMENT_COMPONENT_USAGE,
-    Subnav::CHILD_ENGAGEMENT_MOBILE_APPS,
+    'dueWork',
+    'quiz',
+    'files',
+    'links',
+    'fileTypes',
+    'news',
+    'collaboration',
+    'login',
+    'components',
+    'mobile',
 ];
 
 /* Setup period **/
