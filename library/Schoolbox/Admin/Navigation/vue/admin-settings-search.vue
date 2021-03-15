@@ -12,7 +12,7 @@ import { fetchAsJson } from '@shared/fetch/fetch';
 import { gsap } from 'gsap/all'
 
 export default {
-    
+
     name: 'admin-settings-search',
 
 	components: {
@@ -39,7 +39,7 @@ export default {
 			if (!this.isLoaded) {
                 return 'Loading settings, please wait...'
             } else {
-                return 'Search admin settings..'; 
+                return 'Search admin settings...';
             }
 		},
 
@@ -58,7 +58,7 @@ export default {
          * the settings relevant to the search input
          */
 		filteredSearchList () {
-			if (this.currentSearchString.length < this.minSearchStringLength) { 
+			if (this.currentSearchString.length < this.minSearchStringLength) {
 				return [];
 			}
 			return this.settingsList.filter(setting => { //retrieve all settings that match
@@ -88,7 +88,7 @@ export default {
          * to show the search refine note
          */
         hasResultsBeydondSearchResultsShownLimit () {
-			if (this.filteredSearchList.length > this.searchResultsShownLimit) { 
+			if (this.filteredSearchList.length > this.searchResultsShownLimit) {
 				return true
 			} else {
                 return false;
@@ -96,11 +96,11 @@ export default {
 		},
 
         /**
-         * to show how many aren't appearing in the search 
+         * to show how many aren't appearing in the search
          */
         resultsBeydondSearchResultsShownLimitCount () {
 			return this.filteredSearchList.length - this.searchResultsShownLimit;
-		} 
+		}
 
 	},
 
@@ -146,7 +146,7 @@ export default {
          * what happens before shown
          *
          * @param {DOMElement} element - the element that's animating
-         * 
+         *
          */
         onBeforeOnEnter (element) {
             gsap.set(element, { opacity: 0, y: 10, height: 0 });
@@ -157,7 +157,7 @@ export default {
          *
          * @param {DOMElement} element - the element that's animating
          * @param {Function} done - to be called once animation is complete
-         * 
+         *
          */
         onEnter (element, done) {
             let delay = element.dataset.index * 0.025;
@@ -169,7 +169,7 @@ export default {
          *
          * @param {DOMElement} element - the element that's animating
          * @param {Function} done - to be called once animation is complete
-         * 
+         *
          */
         onLeaveResult (element, done) {
             gsap.to(element, 0.3, { opacity: 0, y: 10, height: 0, onComplete: done } );
@@ -183,55 +183,68 @@ export default {
 
 <template>
     <div class="admin-search-container">
-        <input 
+        <input
             v-model="currentSearchString"
-            :readonly="!isLoaded" 
+            :readonly="!isLoaded"
             :placeholder="searchInputPlaceholder"
             type="text"
-            class="" 
+            class=""
         />
-        <transition-group
-            name="staggered-fade"
-            tag="ul"
-            v-bind:css="false"
-            @before-enter="onBeforeOnEnter"
-            @enter="onEnter"
-            @leave="onLeaveResult"
-        >
-            <li v-for="(result, index) in filteredSearchListLimited" :key="result.name" :data-index="index">
-                <admin-settings-search-result 
-                    :result="result"
-                    :current-search-string="currentSearchString"
-                />
-            </li>
-        </transition-group>
-        <aside v-if="isSearchActive && hasResultsBeydondSearchResultsShownLimit" class="search-refine-note">{{ resultsBeydondSearchResultsShownLimitCount }} search results not shown, try refining your search further.</aside>
+        <div>
+            <transition-group
+                name="staggered-fade"
+                tag="ul"
+                v-bind:css="false"
+                @before-enter="onBeforeOnEnter"
+                @enter="onEnter"
+                @leave="onLeaveResult"
+            >
+                <li v-for="(result, index) in filteredSearchListLimited" :key="result.name" :data-index="index">
+                    <admin-settings-search-result
+                        :result="result"
+                        :current-search-string="currentSearchString"
+                    />
+                </li>
+            </transition-group>
+            <aside v-if="isSearchActive && hasResultsBeydondSearchResultsShownLimit" class="search-refine-note">{{ resultsBeydondSearchResultsShownLimitCount }} search results not shown, try refining your search further.</aside>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 
 .admin-search-container {
-    margin-bottom: 15px;
+  position: relative;
+
+  > div {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: 41px;
+    z-index: 10;
+  }
 }
 
 ul {
-    margin: 0px;
-    padding: 0px;
-}
+  margin: 0;
+  list-style: none;
+  width: 500px;
 
-ul li {
-    list-style-type: none;
+  @media only screen and (max-width: 640px) {
+    width: 100%;
+  }
+
+  li {
+    transform: none !important;
+  }
 }
 
 .search-refine-note {
-    width: 100%;
-    border: 1px solid black;
-    margin-top: -1px; //so don't get double borders when stacked
-    padding: 10px;
-    background: lightsteelblue;
-    font-size: 12px;
-    font-style: italic;
+  background-color: #FAFAFA;
+  border: 1px solid #EDEDED;
+  width: 100%;
+  padding: .75rem;
+  font-size: 13px;
+  font-style: italic;
 }
 
 </style>

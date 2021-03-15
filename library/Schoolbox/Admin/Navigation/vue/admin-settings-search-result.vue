@@ -13,7 +13,7 @@ export default {
 			type: Object,
 			required: true,
             default: () => {
-                return { 
+                return {
                     name: 'name',
                     title: 'title',
                     description: 'description',
@@ -23,7 +23,7 @@ export default {
             }
 		},
 		currentSearchString: {
-			type: String, 
+			type: String,
 			required: true,
             default: ''
 		}
@@ -49,7 +49,7 @@ export default {
 
         /**
          * To highlight where the search string matches within the settings result
-         * 
+         *
          * @params {String} the string to find all instanced of the current search string in
          *
 		 * @returns {String} string for v-html with <span></span> wrapped around each found result
@@ -78,20 +78,21 @@ export default {
 .search-result {
     display: block;
     margin-top: -1px; //so don't get double borders when stacked
-    border: 1px solid black;
-    padding: 10px;
+    border: 1px solid #0066b0;
+    padding: .75rem;
     background: white;
-    transition: background 0.2s;
+    transition: back ground 0.2s;
     &:hover {
-        background: whitesmoke;
+        background: #C1E5FF;
     }
     h4 {
-        font-size: 13px;
-        margin-bottom: 10px;
+        margin-bottom: .5rem;
     }
     p {
-        font-size: 12px;
+        color: #9A9A9A;
+        font-size: 13px;
         font-style: italic;
+        margin-bottom: 0;
     }
 }
 
