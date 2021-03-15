@@ -79,9 +79,8 @@ class Controller extends ConfigController
         $hasIndicator = $host !== '' && $key !== '';
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
-            'pageCurrent' => Subnav::PARENT_SUDS,
-            'subpageCurrent' => null,
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SUDS, null),
+            'pageCurrent' => $this->router->generate('adminImportIndex.getSchoolDataIndex'),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportIndex.getSchoolDataIndex')),
             'allNavigation'  => (new SchoolData())->buildNavigation($this->getRouter())->getAllNodes(),
             'dataSource' => $this->getConfigLoader()->get('schooldata_import_data_source'),
             'configContext' => $configContext,

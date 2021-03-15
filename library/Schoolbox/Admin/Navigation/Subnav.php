@@ -697,11 +697,36 @@ class Subnav
                     ],
                 ]
             ],
-            'import/schoolDataImport' => [
+            '/adminv2/import/schoolDataImport' => [
                 'name' => 'School Data Import',
                 'identifier' => self::PARENT_SUDS,
                 'visible' =>  $this->configLoader->get('external_type') === 'schoolbox',
-                'children' => []
+                'children' => [
+                    '/adminv2/import/profile' => [
+                        'name' => 'User Profiles',
+                        'identifier' => '',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/import/timetableStructure' => [
+                        'name' => 'Timetable Structure',
+                        'identifier' => '',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/import/timetable' => [
+                        'name' => 'Timetable',
+                        'identifier' => '',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/import/timetableEnrolment' => [
+                        'name' => 'Timetable Enrolment',
+                        'identifier' => '',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                ]
             ],
             'setting' => [
                 'name' => 'System Settings',
