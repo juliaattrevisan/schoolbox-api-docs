@@ -73,7 +73,7 @@ DESCRIPTION
         if (!$plagscanMapper->getConnector()) {
             /* Plagscan not configured - nothing to do
              */
-            $this->getLogger()->warning('Kami has not been enabled. Aborting');
+            $this->getLogger()->warning('Plagscan has not been enabled. Aborting');
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
