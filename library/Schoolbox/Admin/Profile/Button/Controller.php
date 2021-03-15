@@ -115,9 +115,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/index.twig',
             'data'     => [
-                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
-                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS),
+                'pageCurrent' => $this->router->generate('adminProfileButton.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminProfileButton.getIndex')),
                 'profile' => $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
@@ -162,9 +161,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/modify.twig',
             'data' => [
-                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
-                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS),
+                'pageCurrent' => $this->router->generate('adminProfileButton.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminProfileButton.getIndex')),
                 'item' => $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [ 'cache' => false ]),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
@@ -191,9 +189,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminProfileButton/modify.twig',
             'data'     => [
-                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
-                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_PROFILE_BUTTONS),
+                'pageCurrent' => $this->router->generate('adminProfileButton.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminProfileButton.getIndex')),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc')

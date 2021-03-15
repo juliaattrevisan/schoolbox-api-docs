@@ -112,9 +112,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminMenuSide/index.twig',
             'data' => [
-                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
-                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_SIDE_MENU,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_SIDE_MENU),
+                'pageCurrent' => $this->router->generate('adminMenuSide.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuSide.getIndex')),
                 'tree' => $treeList,
                 'sections' => $sections,
                 'configTitle' => $this->getConfigLoader()->get('title'),
@@ -200,8 +199,8 @@ class Controller extends Base
             'template' => '@adminMenuSide/modify.twig',
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
-                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
-                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_SIDE_MENU,
+                'pageCurrent' => $this->router->generate('adminMenuSide.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuSide.getIndex')),
                 'item' => $this->getMenuSideMapper()->findById($id),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'rolesSelected' => $rolesSelected,
@@ -224,9 +223,8 @@ class Controller extends Base
             'template' => '@adminMenuSide/modify.twig',
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
-                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
-                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_SIDE_MENU,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_SIDE_MENU),
+                'pageCurrent' => $this->router->generate('adminMenuSide.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuSide.getIndex')),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
             ],

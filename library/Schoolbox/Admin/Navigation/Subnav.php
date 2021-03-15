@@ -617,42 +617,42 @@ class Subnav
                     ],
                 ]
             ],
-            'personalisation' => [
+            '/adminv2/dashboard' => [
                 'name' => 'Personalisation',
                 'identifier' => self::PARENT_PERSONALISATION,
                 'visible' =>  true,
                 'children' => [
-                    'dashboard' => [
+                    '/adminv2/dashboard' => [
                         'name' => 'Dashboard',
                         'identifier' => self::CHILD_PERSONALISATION_DASHBOARD,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'profile-button' => [
+                    '/adminv2/profile-button' => [
                         'name' => 'Profile Buttons',
                         'identifier' => self::CHILD_PERSONALISATION_PROFILE_BUTTONS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'menu-side' => [
+                    '/adminv2/menu-side' => [
                         'name' => 'Side Menu',
                         'identifier' => self::CHILD_PERSONALISATION_SIDE_MENU,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Skin+Config' => [
+                    '/adminv2/setting/Skin%20Config' => [
                         'name' => 'Skin Config',
                         'identifier' => self::CHILD_PERSONALISATION_SKIN_CONFIG,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'terminology' => [
+                    '/adminv2/terminology' => [
                         'name' => 'Terminology',
                         'identifier' => self::CHILD_PERSONALISATION_TERMINOLOGY,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'menu-top' => [
+                    '/adminv2/menu-top' => [
                         'name' => 'Top Menu',
                         'identifier' => self::CHILD_PERSONALISATION_TOP_MENU,
                         'visible' =>  true,
