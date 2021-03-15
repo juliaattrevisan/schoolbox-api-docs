@@ -51,9 +51,8 @@ class Controller extends ConfigController
         );
 
         $data = [
-            'pageCurrent' => Subnav::PARENT_SYSTEM_SETTINGS,
-            'subpageCurrent' => Subnav::CHILD_SYSTEM_SETTINGS_OAUTH,
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_SYSTEM_SETTINGS, Subnav::CHILD_SYSTEM_SETTINGS_OAUTH),
+            'pageCurrent' => $this->router->generate('adminOauth.postAdmin'),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminOauth.postAdmin')),
             'configContext' => $configContext,
         ];
 

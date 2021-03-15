@@ -728,84 +728,84 @@ class Subnav
                     ],
                 ]
             ],
-            'setting' => [
+            '/adminv2/setting' => [
                 'name' => 'System Settings',
                 'identifier' => self::PARENT_SYSTEM_SETTINGS,
                 'visible' =>  true,
                 'children' => [
-                    'setting/3rd+Party+Services' => [
+                    '/adminv2/setting/3rd%20Party%20Services' => [
                         'name' => '3rd Party Services',
                         'identifier' => self::CHILD_SYSTEM_SETTINGS_3RD_PARTY,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Debugging' => [
+                    '/adminv2/setting/Debugging' => [
                         'name' => 'Debugging',
                         'identifier' => self::CHILD_SYSTEM_SETTINGS_DEBUGGING,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Email' => [
+                    '/adminv2/setting/Email' => [
                         'name' => 'Email',
                         'identifier' => self::CHILD_SYSTEM_SETTINGS_EMAIL,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/External+DB' => [
+                    '/adminv2/setting/External%20DB' => [
                         'name' => 'External DB',
                         'identifier' => self::CHILD_SYSTEM_SETTINGS_EXTERNAL_DB,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/LDAP' => [
+                    '/adminv2/setting/LDAP' => [
                         'name' => 'LDAP',
                         'identifier' => self::CHILD_SYSTEM_SETTINGS_LDAP,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Localisation' => [
+                    '/adminv2/setting/Localisation' => [
                         'name' => 'Localisation',
                         'identifier' => self::CHILD_SYSTEM_SETTINGS_LOCALISATION,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'oauth' => [
+                    '/adminv2/oauth' => [
                         'name' => 'oAuth Provider Configuration',
                         'identifier' => self::CHILD_SYSTEM_SETTINGS_OAUTH,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Paths' => [
+                    '/adminv2/setting/Paths' => [
                         'name' => 'Paths',
                         'identifier' => self::CHILD_SYSTEM_SETTINGS_PATHS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Policy' => [
+                    '/adminv2/setting/Policy' => [
                         'name' => 'Policy',
                         'identifier' => self::CHILD_SYSTEM_SETTINGS_POLICY,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Proxy' => [
+                    '/adminv2/setting/Proxy' => [
                         'name' => 'Proxy',
                         'identifier' => self::CHILD_SYSTEM_SETTINGS_PROXY,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/SAML' => [
+                    '/adminv2/setting/SAML' => [
                         'name' => 'SAML',
                         'identifier' => self::CHILD_SYSTEM_SETTINGS_SAML,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Security' => [
+                    '/adminv2/setting/Security' => [
                         'name' => 'Security',
                         'identifier' => self::CHILD_SYSTEM_SETTINGS_SECURITY,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Site' => [
+                    '/adminv2/setting/Site' => [
                         'name' => 'Site',
                         'identifier' => self::CHILD_SYSTEM_SETTINGS_SITE,
                         'visible' =>  true,
