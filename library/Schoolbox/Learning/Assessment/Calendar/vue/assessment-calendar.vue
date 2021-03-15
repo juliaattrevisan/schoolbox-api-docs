@@ -8,7 +8,6 @@ import momentPlugin       from '@fullcalendar/moment'
 import RevealModal        from '@schoolbox/reveal-modal'
 import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
 import axios              from 'axios'
-// import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
 import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
 import {stringify}        from 'qs';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
@@ -66,6 +65,8 @@ export default {
     data () {
         return {
             calendarOptions: {},
+            resourceTimelineSemester: {},
+            resourceTimelineWeek: {},
             selectedFilters: null,
             eventTypeResources: [],
             folderResources: [],
@@ -128,42 +129,44 @@ export default {
     },
 
     beforeMount () {
+        this.resourceTimelineSemester = {
+            type: 'resourceTimeline',
+            visibleRange: this.determineVisibleRange,
+            slotDuration: { weeks: 1 },
+            weekNumbers: true,
+            slotLabelFormat: [
+                'MMM',
+                'w'
+            ],
+            resourceAreaWidth: '15%',
+            filterResourcesWithEvents: true,
+            validRange: {
+                start: this.minDate,
+                end: this.maxDate,
+            },
+            resourceLabelText: 'Week',
+            slotWidth: '50'
+        },
+        this.resourceTimelineWeek = {
+            columnHeaderFormat: this.formats.displayWeekDay,
+            duration: { weeks: 1 },
+            slotDuration: { days: 1 },
+            slotLabelFormat: [
+                'ddd DD',
+            ],
+            resourceAreaWidth: '15%',
+            filterResourcesWithEvents: true,
+        },
         this.calendarOptions = {
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, resourceTimelinePlugin, momentPlugin ],
-            initialView: "resourceTimelineSemester",
-            views: {
-                resourceTimelineSemester: {
-                    type: 'resourceTimeline',
-                    visibleRange: this.determineVisibleRange,
-                    slotDuration: { weeks: 1 },
-                    weekNumbers: true,
-                    slotLabelFormat: [
-                        'MMM',
-                        'w'
-                    ],
-                    resourceAreaWidth: '15%',
-                    filterResourcesWithEvents: true,
-                    validRange: {
-                        start: this.minDate,
-                        end: this.maxDate,
-                    },
-                    resourceLabelText: 'Week',
-                    slotWidth: '50'
-                },
-                resourceTimelineWeek: {
-                    columnHeaderFormat: this.formats.displayWeekDay,
-                    duration: { weeks: 1 },
-                    slotDuration: { days: 1 },
-                    slotLabelFormat: [
-                        'ddd DD',
-                    ],
-                    resourceAreaWidth: '15%',
-                    filterResourcesWithEvents: true,
-                }
+            views: { 
+                resourceTimelineSemester: this.resourceTimelineSemester, 
+                resourceTimelineWeek: this.resourceTimelineWeek
             },
+            initialView: this.resourceTimelineSemester,
             weekLabel: "''",
             eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,
-            header: {
+            headerToolbar: {
                 left: 'customToday,customPrev,customNext',
                 center: 'title',
                 right: 'resourceTimelineSemester,customDayGridMonth,customResourceTimelineWeek'
@@ -204,7 +207,7 @@ export default {
             resources: this.resources,
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             firstDay: '1',
-            defaultDate: this.termStartDate,
+            initialDate: this.termStartDate,
             viewSkeletonRender: this.viewSkeletonRender,
             weekNumberCalculation: "'ISO'",
             // contentHeight:"this.contentHeight",
@@ -835,7 +838,6 @@ export default {
                 });
         },
 
-
         /**
          * Convert a Date object to a `YYYY-MM-DD` format string without
          * MomentJS.
@@ -853,7 +855,6 @@ export default {
             let actualDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
             return actualDate.toISOString().slice(0, 10);
         },
-
 
         /**
          * Builds the list of all event type resources, based on
@@ -940,31 +941,31 @@ export default {
 
 <template>
     <div>
-        <view-event-modal ref="event"
-                          return-to="assessmentCalendar"
-                          :to-moment="toMoment"
-                          :event-create-form-url="urls.createForm"
-                          :event-modify-form-url="urls.modifyForm"
-                          :event-modify-form-action-url="urls.modifyFormAction"
-                          :event-delete-url="urls.delete"
-                          :event-update-url="urls.update"
-                          :attendance-list-url="urls.attendanceList"
-                          :attendance-toggle-url="urls.attendanceToggle"
-                          :format-display-date="formats.displayDate"
-                          :format-display-time="formats.displayTime"
-                          :format-display-datetime="formats.displayDatetime"
-                          @eventModified="reloadEvents"
-                          @eventDeleted="reloadEvents"
+        <view-event-modal 
+            ref="event"
+            return-to="assessmentCalendar"
+            :to-moment="toMoment"
+            :event-create-form-url="urls.createForm"
+            :event-modify-form-url="urls.modifyForm"
+            :event-modify-form-action-url="urls.modifyFormAction"
+            :event-delete-url="urls.delete"
+            :event-update-url="urls.update"
+            :attendance-list-url="urls.attendanceList"
+            :attendance-toggle-url="urls.attendanceToggle"
+            :format-display-date="formats.displayDate"
+            :format-display-time="formats.displayTime"
+            :format-display-datetime="formats.displayDatetime"
+            @eventModified="reloadEvents"
+            @eventDeleted="reloadEvents"
         />
-
-        <view-grouped-events-modal ref="groupedEvents"
-                                   :to-moment="toMoment"
-                                   :format-display-date="formats.displayDate"
-                                   :format-display-time="formats.displayTime"
-                                   :format-display-datetime="formats.displayDatetime"
-                                   @eventViewWeek="viewWeek"
+        <view-grouped-events-modal 
+            ref="groupedEvents"
+            :to-moment="toMoment"
+            :format-display-date="formats.displayDate"
+            :format-display-time="formats.displayTime"
+            :format-display-datetime="formats.displayDatetime"
+            @eventViewWeek="viewWeek"
         />
-
         <full-calendar
             ref="fullCalendar"
             :options="calendarOptions"
@@ -973,128 +974,130 @@ export default {
 </template>
 
 <style lang="scss">
-    // @import '~@fullcalendar/core/main.css';
-    // @import '~@fullcalendar/daygrid/main.css';
-    // @import '~@fullcalendar/timegrid/main.css';
-    // @import '~@fullcalendar/list/main.css';
-    // @import '~@fullcalendar/timeline/main.css';
-    // @import '~@fullcalendar/resource-timeline/main.css';
 
-    // Please forgive me...
+// @import '~@fullcalendar/core/main.css';
+// @import '~@fullcalendar/daygrid/main.css';
+// @import '~@fullcalendar/timegrid/main.css';
+// @import '~@fullcalendar/list/main.css';
+// @import '~@fullcalendar/timeline/main.css';
+// @import '~@fullcalendar/resource-timeline/main.css';
 
-    .fc-resourceTimelineSemester-view .fc-timeline-event .fc-title-wrap {
-        text-align: center !important;
-    }
+// Please forgive me...
 
-    .fc-resourceTimelineSemester-view .fc-timeline-event.placeholder .fc-title-wrap {
-        padding: 5px;
-        font-size: .8rem;
-        line-height: 1.7;
-    }
+.fc-resourceTimelineSemester-view .fc-timeline-event .fc-title-wrap {
+    text-align: center !important;
+}
 
-    .placeholder .fc-title {
-        padding-left: 0 !important;
+.fc-resourceTimelineSemester-view .fc-timeline-event.placeholder .fc-title-wrap {
+    padding: 5px;
+    font-size: .8rem;
+    line-height: 1.7;
+}
+
+.placeholder .fc-title {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+}
+
+.fc-direction-ltr .fc-timeline-event .fc-title {
+        padding-left: 3px !important;
         margin-left: 0 !important;
     }
 
-    .fc-direction-ltr .fc-timeline-event .fc-title {
-         padding-left: 3px !important;
-         margin-left: 0 !important;
-     }
+.fc-timeline-event, .fc-day-grid-event {
+    border: 0 !important;
+}
 
-    .fc-timeline-event, .fc-day-grid-event {
-        border: 0 !important;
-    }
+.fc-event .fc-title, .fc-event .fc-title:hover {
+    color: #FFF !important;
+}
 
-    .fc-event .fc-title, .fc-event .fc-title:hover {
-        color: #FFF !important;
-    }
+.fc-resourceTimelineSemester-view .fc-direction-ltr .fc-timeline-event {
+    margin-right: 0 !important;
+}
 
-    .fc-resourceTimelineSemester-view .fc-direction-ltr .fc-timeline-event {
-        margin-right: 0 !important;
-    }
+.fc-resourceTimelineSemester-view a.fc-more {
+    margin: 0 !important;
+}
 
-    .fc-resourceTimelineSemester-view a.fc-more {
-        margin: 0 !important;
-    }
+.fc-resourceTimelineSemester-view span.fc-title.fc-sticky {
+    left: 0 !important;
+    width: 100% !important;
+}
 
-    .fc-resourceTimelineSemester-view span.fc-title.fc-sticky {
-        left: 0 !important;
-        width: 100% !important;
-    }
+.fc-timeline-event-div {
+    padding-bottom: 2px !important;
+}
 
-    .fc-timeline-event-div {
-        padding-bottom: 2px !important;
-    }
+.fc-resourceTimelineSemester-view .fc-event-container > .fc-timeline-event {
+    position: absolute !important;
+    top: 1px !important;
+    height: 31px !important;
+}
 
-    .fc-resourceTimelineSemester-view .fc-event-container > .fc-timeline-event {
-        position: absolute !important;
-        top: 1px !important;
-        height: 31px !important;
-    }
+.fc-resourceTimelineSemester-view .fc-event-container .fc-timeline-event:not(.placeholder),
+.fc-dayGridMonth-view .placeholder,
+.fc-resourceTimelineWeek-view .placeholder {
+    display: none;
+    max-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
 
-    .fc-resourceTimelineSemester-view .fc-event-container .fc-timeline-event:not(.placeholder),
-    .fc-dayGridMonth-view .placeholder,
-    .fc-resourceTimelineWeek-view .placeholder {
-        display: none;
-        max-height: 0 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
+.fc-resourceTimelineSemester-view .fc-resource-area .fc-widget-content div {
+    height: 35px !important;
+}
 
-    .fc-resourceTimelineSemester-view .fc-resource-area .fc-widget-content div {
-        height: 35px !important;
-    }
+.fc-resourceTimelineSemester-view .fc-time-area .fc-rows .fc-widget-content div {
+    height: 35px !important;
+}
 
-    .fc-resourceTimelineSemester-view .fc-time-area .fc-rows .fc-widget-content div {
-        height: 35px !important;
-    }
+.fc-resourceTimelineSemester-view .fc-head tr td:first-child .fc-widget-header div {
+    text-align: right !important;
+    padding-top: .30rem;
+}
 
-    .fc-resourceTimelineSemester-view .fc-head tr td:first-child .fc-widget-header div {
-        text-align: right !important;
-        padding-top: .30rem;
-    }
+.fc-time {
+    color: #fff;
+}
 
-    .fc-time {
-        color: #fff;
-    }
+.fc-resourceTimelineSemester-view span.fc-cell-text.fc-sticky {
+    left: 0 !important;
+}
 
-    .fc-resourceTimelineSemester-view span.fc-cell-text.fc-sticky {
-        left: 0 !important;
-    }
+.fc-resourceTimelineSemester-view .fc-widget-header .fc-cell-content {
+    text-align: center !important;
+}
 
-    .fc-resourceTimelineSemester-view .fc-widget-header .fc-cell-content {
-        text-align: center !important;
-    }
+.fc-dayGridMonth-view a.fc-timeline-event,
+.fc-resourceTimelineWeek-view a.fc-timeline-event {
+    width: auto !important;
+}
 
-    .fc-dayGridMonth-view a.fc-timeline-event,
-    .fc-resourceTimelineWeek-view a.fc-timeline-event {
-        width: auto !important;
-    }
+.fc-theme-standard .fc-popover .fc-header .fc-close {
+    margin: 0 !important;
+}
 
-    .fc-theme-standard .fc-popover .fc-header .fc-close {
-        margin: 0 !important;
-    }
+.fc-icon-x::before {
+    display: none !important;
+    content: none !important;
+}
 
-    .fc-icon-x::before {
-        display: none !important;
-        content: none !important;
-    }
+.fc-icon-x::after {
+    color: #000 !important;
+    font-size: 1.5rem !important;
+    top: 0 !important;
+    right: 1px !important;
+    line-height: 0 !important;
+}
 
-    .fc-icon-x::after {
-        color: #000 !important;
-        font-size: 1.5rem !important;
-        top: 0 !important;
-        right: 1px !important;
-        line-height: 0 !important;
-    }
+a.fc-not-start .fc-title-wrap .fc-title {
+    padding-left: 8px !important;
+}
 
-    a.fc-not-start .fc-title-wrap .fc-title {
-        padding-left: 8px !important;
-    }
+.fc-timeline-event.fc-not-start::before,
+.fc-timeline-event.fc-not-end::after {
+    content: none;
+}
 
-    .fc-timeline-event.fc-not-start::before,
-    .fc-timeline-event.fc-not-end::after {
-        content: none;
-    }
 </style>

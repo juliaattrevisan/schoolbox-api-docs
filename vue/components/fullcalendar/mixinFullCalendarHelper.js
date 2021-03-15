@@ -150,7 +150,7 @@ export const mixinFullCalendarHelper = {
          * @param dateObject
          * @return {string}
          */
-        dayTitleFormat (dateObject) {
+        $_fullCalendarHelper_dayTitleFormat (dateObject) {
             return this.$_fullCalendarHelper_toMoment(dateObject.date).format(this.config.dateDisplayFormats.momentJsDateLong);
         },
 

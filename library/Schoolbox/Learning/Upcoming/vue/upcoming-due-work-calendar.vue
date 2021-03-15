@@ -44,7 +44,7 @@ export default {
     data () {
         return {
             selectedFilters: null,
-            calendarOptions: {} //will init in beforeMount due to this.helper being needed
+            calendarOptions: {} //will init in beforeMount due to vars being needed
         }
     },
 
@@ -113,7 +113,7 @@ export default {
         }
     },
 
-    mounted() {
+    mounted () {
 
         // this.$nextTick()
         // .then(() => {
@@ -238,7 +238,7 @@ export default {
     <div>
         <view-event-modal 
             ref="event"
-            :to-moment="toMoment"
+            :to-moment="$_fullCalendarHelper_toMoment"
             :format-display-date="formats.displayDate"
             :format-display-time="formats.displayTime"
             :format-display-datetime="formats.displayDatetime"
