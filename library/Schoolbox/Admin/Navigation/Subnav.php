@@ -428,126 +428,126 @@ class Subnav
                     ],
                 ]
             ],
-            'lists' => [
+            '/adminv2/lists/achievement-category' => [
                 'name' => 'Lists',
                 'identifier' => self::PARENT_LISTS,
                 'visible' =>  true,
                 'children' => [
-                    'lists/achievement-category' => [
+                    '/adminv2/lists/achievement-category' => [
                         'name' => 'Badge Categories',
                         'identifier' => self::CHILD_LISTS_BADGE_CATEGORIES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/campus' => [
+                    '/adminv2/lists/campus' => [
                         'name' => 'Campus',
                         'identifier' => self::CHILD_LISTS_CAMPUS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/component-definition' => [
+                    '/adminv2/lists/component-definition' => [
                         'name' => 'Components',
                         'identifier' => self::CHILD_LISTS_COMPONENTS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/webdav' => [
+                    '/adminv2/lists/webdav' => [
                         'name' => 'Drives',
                         'identifier' => self::CHILD_LISTS_DRIVES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/event-type' => [
+                    '/adminv2/lists/event-type' => [
                         'name' => 'Event Types',
                         'identifier' => self::CHILD_LISTS_EVENT_TYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/house' => [
+                    '/adminv2/lists/house' => [
                         'name' => 'Houses',
                         'identifier' => self::CHILD_LISTS_HOUSES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/evidence-tag' => [
+                    '/adminv2/lists/evidence-tag' => [
                         'name' => 'Learning Moments',
                         'identifier' => self::CHILD_LISTS_LEARNING_MOMENTS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/news-topic' => [
+                    '/adminv2/lists/news-topic' => [
                         'name' => 'News Topics',
                         'identifier' => self::CHILD_LISTS_NEWS_TOPICS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/pastoral-severity' => [
+                    '/adminv2/lists/pastoral-severity' => [
                         'name' => 'Pastoral Record Severity',
                         'identifier' => self::CHILD_LISTS_PASTORAL_SEVERITY,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/pastoral-tags' => [
+                    '/adminv2/lists/pastoral-tags' => [
                         'name' => 'Pastoral Record Tags',
                         'identifier' => self::CHILD_LISTS_PASTORAL_TAGS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/pastoral-document-classification' => [
+                    '/adminv2/lists/pastoral-document-classification' => [
                         'name' => 'Pastoral SIS Document Classifications',
                         'identifier' => self::CHILD_LISTS_PASTORAL_SIS_CLASSIFICATIONS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/pastoral-category' => [
+                    '/adminv2/lists/pastoral-category' => [
                         'name' => 'Pastoral Sub-Types',
                         'identifier' => self::CHILD_LISTS_PASTORAL_SUBTYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/pastoral-type' => [
+                    '/adminv2/lists/pastoral-type' => [
                         'name' => 'Pastoral Types',
                         'identifier' => self::CHILD_LISTS_PASTORAL_TYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/residential-house' => [
+                    '/adminv2/lists/residential-house' => [
                         'name' => 'Residential Houses',
                         'identifier' => self::CHILD_LISTS_RESIDENTIAL_HOUSES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/roles' => [
+                    '/adminv2/lists/roles' => [
                         'name' => 'Roles',
                         'identifier' => self::CHILD_LISTS_ROLES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/submission-errors' => [
+                    '/adminv2/lists/submission-errors' => [
                         'name' => 'Submission States',
                         'identifier' => self::CHILD_LISTS_SUBMISSION_STATES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/timetable-colour' => [
+                    '/adminv2/lists/timetable-colour' => [
                         'name' => 'Timetable Colours',
                         'identifier' => self::CHILD_LISTS_TIMETABLE_COLOURS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/user-title' => [
+                    '/adminv2/lists/user-title' => [
                         'name' => 'User Titles',
                         'identifier' => self::CHILD_LISTS_USER_TITLES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/submission-type' => [
+                    '/adminv2/lists/submission-type' => [
                         'name' => 'Work Types',
                         'identifier' => self::CHILD_LISTS_WORK_TYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/year-levels' => [
+                    '/adminv2/lists/year-levels' => [
                         'name' => 'Year Levels',
                         'identifier' => self::CHILD_LISTS_YEAR_LEVELS,
                         'visible' =>  true,
