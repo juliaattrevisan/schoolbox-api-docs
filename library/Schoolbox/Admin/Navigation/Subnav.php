@@ -586,7 +586,7 @@ class Subnav
                     ],
                 ]
             ],
-            'news' => [
+            '/adminv2/news' => [
                 'name' => 'News',
                 'identifier' => self::PARENT_NEWS,
                 'visible' =>  true,
