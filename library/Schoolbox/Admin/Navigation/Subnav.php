@@ -592,24 +592,24 @@ class Subnav
                 'visible' =>  true,
                 'children' => []
             ],
-            'messages' => [
+            '/adminv2/messages' => [
                 'name' => 'Notifications',
                 'identifier' => self::PARENT_MESSAGES,
                 'visible' =>  true,
                 'children' => [
-                    'messages/apps' => [
+                    '/adminv2/messages/apps' => [
                         'name' => 'Delivery Providers',
                         'identifier' => self::CHILD_MESSAGES_DELIVERY_PROVIDERS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'messages/puush' => [
+                    '/adminv2/messages/puush' => [
                         'name' => 'Mobile App Registrations',
                         'identifier' => self::CHILD_MESSAGES_APP_REGISTRATIONS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'messages/configure' => [
+                    '/adminv2/messages/configure' => [
                         'name' => 'Settings',
                         'identifier' => self::CHILD_MESSAGES_SETTINGS,
                         'visible' =>  true,

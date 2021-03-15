@@ -32,8 +32,8 @@ $this->setFile(TEMPLATE_content, '/adminv2/messages/index.html');
 
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
-    ->generatePhplib($this, Subnav::PARENT_MESSAGES, null)
-    ->generateBreadcrumbsHtml($this, Subnav::PARENT_MESSAGES, null);
+    ->generatePhplib($this, '/adminv2/messages')
+    ->generateBreadcrumbsHtml($this, '/adminv2/messages');
 
 $this->setTitle('Admin - Messages');
 
