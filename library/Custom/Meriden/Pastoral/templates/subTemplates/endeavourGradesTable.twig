@@ -20,7 +20,7 @@
             <tbody>
             {% for endeavorGrade in endeavorGrades %}
                 <tr>
-                    <th>{{ endeavorGrade.folder.title }}</th>
+                    <th>{{ endeavorGrade.folder.name }}</th>
                     <td>{{ endeavorGrade.assessments.endeavourGrade1.humanReadableMark | default('N/A') }}</td>
                     <td>{{ endeavorGrade.assessments.endeavourGrade2.humanReadableMark | default('N/A') }}</td>
                     <td>{{ endeavorGrade.assessments.endeavourGrade3.humanReadableMark | default('N/A') }}</td>

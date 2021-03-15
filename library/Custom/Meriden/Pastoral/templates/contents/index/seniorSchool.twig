@@ -38,24 +38,6 @@
 
     {# Attendance info #}
     <div class="row" id="attendance-info">
-        <div class="small-12 medium-4 column">
-            <dl>
-                <dt>Days Absent</dt>
-                <dd>{{ report.tutorGroupReport.attendances.absent }}</dd>
-            </dl>
-        </div>
-        <div class="small-12 medium-4 column">
-            <dl>
-                <dt>Days Late</dt>
-                <dd>{{ report.tutorGroupReport.attendances.late }}</dd>
-            </dl>
-        </div>
-        <div class="small-12 medium-4 column">
-            <dl>
-                <dt>Detentions</dt>
-                <dd>{{ report.tutorGroupReport.attendances.detentions }}</dd>
-            </dl>
-        </div>
         {# Don't show endorsed leave at all if there is none #}
         {% if report.tutorGroupReport.attendances.endorsedLeave %}
             <div class="small-12 medium-4 column end">
