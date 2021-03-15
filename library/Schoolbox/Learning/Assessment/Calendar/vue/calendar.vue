@@ -995,7 +995,7 @@
         margin-left: 0 !important;
     }
 
-    .fc-ltr .fc-timeline-event .fc-title {
+    .fc-direction-ltr .fc-timeline-event .fc-title {
          padding-left: 3px !important;
          margin-left: 0 !important;
      }
@@ -1008,7 +1008,7 @@
         color: #FFF !important;
     }
 
-    .fc-resourceTimelineSemester-view .fc-ltr .fc-timeline-event {
+    .fc-resourceTimelineSemester-view .fc-direction-ltr .fc-timeline-event {
         margin-right: 0 !important;
     }
 
@@ -1070,7 +1070,7 @@
         width: auto !important;
     }
 
-    .fc-unthemed .fc-popover .fc-header .fc-close {
+    .fc-theme-standard .fc-popover .fc-header .fc-close {
         margin: 0 !important;
     }
 
