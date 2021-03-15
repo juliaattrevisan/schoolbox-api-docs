@@ -75,6 +75,8 @@ export default {
 
 <style lang="scss" scoped>
 
+@import 'www/css/foundation/utils/_variables.scss';
+
 .search-result {
     display: block;
     margin-top: -1px; //so don't get double borders when stacked
@@ -83,7 +85,7 @@ export default {
     background: white;
     transition: back ground 0.2s;
     &:hover {
-        background: #C1E5FF;
+        background: $content-ui-hover;
     }
     h4 {
         margin-bottom: .5rem;
