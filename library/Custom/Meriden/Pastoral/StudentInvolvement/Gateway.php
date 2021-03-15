@@ -34,7 +34,7 @@ class Gateway
     private const EXCLUDED_SUBJECTS = ['9994', '9995', '9996', '9997', '9998', '9999', '0107', '0074', '4099', '0103'];
 
     private const ACTIVITY_TYPE_AWARD = 'C';
-    private const ACTIVITY_TYPE_COCURRICULAR = 'B';
+    private const ACTIVITY_TYPES_COCURRICULAR = ['B', 'S', 'M'];
     private const ACTIVITY_TYPE_SERVICE = 'O';
     private const ACTIVITY_TYPE_POSITIONS_OF_OFFICE = 'A';
 
@@ -282,7 +282,11 @@ class Gateway
      */
     public function getCocurricular($year, User $student)
     {
-        return $this->queryActivities($year, $student, self::ACTIVITY_TYPE_COCURRICULAR);
+        $activities = [];
+        foreach (self::ACTIVITY_TYPES_COCURRICULAR as $activityType) {
+            $activities[] = $this->queryActivities($year, $student, $activityType);
+        }
+        return array_merge(...$activities);
     }
 
     /**
