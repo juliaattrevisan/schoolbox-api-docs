@@ -1,4 +1,4 @@
-<div class="row" id="endeavour-grades">
+<div class="row" id="endeavour-grades-senior">
     <div class="small-12 column">
         <dl class="small-gap">
             <dt>Endeavour {{ locale.grades.properPlural }}</dt>
@@ -7,7 +7,7 @@
     </div>
 
     <div class="small-12 column">
-        <table class="width-auto bordered-table">
+        <table class="bordered-table">
             <thead>
             <tr>
                 <th>&nbsp;</th>
@@ -20,7 +20,7 @@
             <tbody>
             {% for endeavorGrade in endeavorGrades %}
                 <tr>
-                    <th>{{ endeavorGrade.folder.name }}</th>
+                    <td>{{ endeavorGrade.folder.name }}</td>
                     <td>{{ endeavorGrade.assessments.endeavourGrade1.humanReadableMark | default('N/A') }}</td>
                     <td>{{ endeavorGrade.assessments.endeavourGrade2.humanReadableMark | default('N/A') }}</td>
                     <td>{{ endeavorGrade.assessments.endeavourGrade3.humanReadableMark | default('N/A') }}</td>

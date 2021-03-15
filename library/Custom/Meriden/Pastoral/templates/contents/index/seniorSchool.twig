@@ -52,7 +52,7 @@
     {# Endeavor Grades for all classes: complex enough for its own template #}
     {% if (report.tutorGroupReport.endeavorGrades ?? []) is not empty %}
         {%
-            include '@customMeridenPastoral/subTemplates/endeavourGradesTable.twig'
+            include '@customMeridenPastoral/subTemplates/endeavourGradesSenior.twig'
             with {endeavorGrades: report.tutorGroupReport.endeavorGrades} only
         %}
     {% endif %}
