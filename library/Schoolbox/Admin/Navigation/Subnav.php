@@ -660,36 +660,36 @@ class Subnav
                     ],
                 ]
             ],
-            'setting/Resources' => [
+            '/adminv2/setting/Resources' => [
                 'name' => 'Resources',
                 'identifier' => self::PARENT_RESOURCES,
                 'visible' =>  true,
                 'children' => [
-                    'allowed-file' => [
+                    '/adminv2/allowed-file' => [
                         'name' => 'Allowed Files',
                         'identifier' => self::CHILD_RESOURCES_ALLOWED_FILE,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'video' => [
+                    '/adminv2/video' => [
                         'name' => 'Media Queue',
                         'identifier' => self::CHILD_RESOURCES_MEDIA_QUEUE,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Resources' => [
+                    '/adminv2/setting/Resources' => [
                         'name' => 'Settings',
                         'identifier' => self::CHILD_RESOURCES_SETTINGS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'restore' => [
+                    '/adminv2/restore' => [
                         'name' => 'Restore',
                         'identifier' => self::CHILD_RESOURCES_RESTORE,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'usage' => [
+                    '/adminv2/setting/usage' => [
                         'name' => 'Usage',
                         'identifier' => self::CHILD_RESOURCES_USAGE,
                         'visible' =>  true,
