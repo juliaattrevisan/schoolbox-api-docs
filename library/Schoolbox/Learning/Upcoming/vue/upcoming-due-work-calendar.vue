@@ -10,7 +10,7 @@ import RevealModal        from '@schoolbox/reveal-modal'
 import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
 import FlatPickr          from '@schoolbox/fullcalendar/flatPickr';
 import axios              from 'axios'
-import { mixinFullCalendarHelper } from "@schoolbox/fullcalendar/mixinFullCalendarHelper";
+import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
 import {stringify}        from 'qs';
 
 // Various URLs that FullCalendar may make use of.

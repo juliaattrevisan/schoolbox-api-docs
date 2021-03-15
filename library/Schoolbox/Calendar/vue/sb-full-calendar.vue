@@ -66,6 +66,10 @@ export default {
         FlatPickr,
     },
 
+    mixins: [
+        mixinFullCalendarHelper
+    ],
+
     // beforeMount() {
     //     this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
     // },
@@ -618,7 +622,8 @@ export default {
                 container.appendChild(endDateFieldWrapper);
                 container.appendChild(buttonWrapper);
 
-                document.querySelector('.fc-toolbar > .fc-left').appendChild(container);
+                // document.querySelector('.fc-toolbar > .fc-left').appendChild(container);
+                document.querySelector('.fc-toolbar').getElementsByClassName('fc-toolbar-chunk')[0].appendChild(container);
 
                 // Register an event listener when update button is clicked.
                 document.querySelector('#update_date_range_button').addEventListener('click', function () {
