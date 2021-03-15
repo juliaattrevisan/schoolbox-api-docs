@@ -92,11 +92,14 @@ switch ($_GET['transform_type']) {
         break;
 }
 
+// If transient (503), otherwise likely a 200, regardless if a 4/5xx, to enable caching of broken images
+if ($code === 503) {
+    http_response_code($code);
+}
 // Try to transform the fail image in /resources
 // If even THAT fails, just redirect to the static version.
 // (The redirect should never happen anymore, as an invalid transform falls back
 //  to a valid one now.)
-http_response_code($code);
 try {
     $imageProcessor = new Image\Processor(
         Cache\LocalFS::getStorageModel(WEB_root, '/static' . $path),
