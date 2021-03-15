@@ -555,30 +555,30 @@ class Subnav
                     ],
                 ]
             ],
-            'setting/Modules' => [
+            '/adminv2/setting/Modules' => [
                 'name' => 'Modules',
                 'identifier' => self::PARENT_MODULES,
                 'visible' =>  true,
                 'children' => [
-                    'setting/Board+Leave' => [
+                    '/adminv2/setting/Board%20Leave' => [
                         'name' => 'Board Leave',
                         'identifier' => self::CHILD_MODULES_BOARD_LEAVE,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'feature-tours' => [
+                    '/adminv2/feature-tours' => [
                         'name' => 'Feature Tours',
                         'identifier' => self::CHILD_MODULES_FEATURE_TOURS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'package' => [
+                    '/adminv2/package' => [
                         'name' => 'Packages',
                         'identifier' => self::CHILD_MODULES_PACKAGES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Pastoral+Care' => [
+                    '/adminv2/setting/Pastoral%20Care' => [
                         'name' => 'Pastoral Care',
                         'identifier' => self::CHILD_MODULES_PASTORAL_CARE,
                         'visible' =>  true,
