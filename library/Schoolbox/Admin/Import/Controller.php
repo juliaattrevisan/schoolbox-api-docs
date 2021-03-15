@@ -172,7 +172,7 @@ class Controller extends ConfigController
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/statusReport.twig', [
-            'pageCurrent' => Subnav::PARENT_SUDS,
+            'pageCurrent' => $this->router->generate('adminImportIndex.getSchoolDataIndex'),
             'report' => $report ?: [[
                 'message' => $message,
                 'reason' => '',
