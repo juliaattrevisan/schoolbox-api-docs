@@ -84,13 +84,12 @@ class Subnav
          * since these no longer match hardcoded keys
          *
          * Although, sometimes controllers get these values from a url parameter
-         * and won't be explicitly stated as one of these consts, so be mindful
-         * that there are multiple ways to match these identifiers
+         * and won't be explicitly stated as one of these urls, so be mindful
+         * that there are multiple ways to match these urls
          */
         return [
             '/adminv2/home' => [
                 'name' => 'Home',
-                'identifier' => '',
                 'visible' =>  true,
                 'children' => []
             ],
@@ -500,25 +499,21 @@ class Subnav
                 'children' => [
                     '/adminv2/import/profile' => [
                         'name' => 'User Profiles',
-                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     '/adminv2/import/timetableStructure' => [
                         'name' => 'Timetable Structure',
-                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     '/adminv2/import/timetable' => [
                         'name' => 'Timetable',
-                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
                     '/adminv2/import/timetableEnrolment' => [
                         'name' => 'Timetable Enrolment',
-                        'identifier' => '',
                         'visible' =>  true,
                         'children' => []
                     ],
