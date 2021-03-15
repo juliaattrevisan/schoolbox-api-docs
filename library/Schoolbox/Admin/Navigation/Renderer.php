@@ -50,10 +50,7 @@ class Renderer extends Extension\AbstractExtension
         // TODO SA-8354: inject this
 
         // Render this thing out
-        return $twig->render('@adminNavigation/subnav.twig', array(
-            'adminSubnav' => (new Subnav(new Loader()))->generate(),
-            'pageCurrent' => $pageCurrent,
-        ));
+        return (new Subnav(new Loader()))->generateHtml($pageCurrent);
     }
 
     /**

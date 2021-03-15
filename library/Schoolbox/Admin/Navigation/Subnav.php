@@ -373,54 +373,54 @@ class Subnav
                     ],
                 ]
             ],
-            'lms' => [
+            '/adminv2/terms' => [
                 'name' => 'LMS',
                 'identifier' => self::PARENT_LMS,
                 'visible' =>  true,
                 'children' => [
-                    'terms' => [
+                    '/adminv2/terms' => [
                         'name' => 'Academic Period',
                         'identifier' => self::CHILD_LMS_ACADEMIC_PERIOD,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'rollover' => [
+                    '/adminv2/rollover' => [
                         'name' => 'Class Rollover',
                         'identifier' => self::CHILD_LMS_CLASS_ROLLOVER,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'course-builder' => [
+                    '/adminv2/course-builder' => [
                         'name' => 'Course Builder',
                         'identifier' => self::CHILD_LMS_COURSE_BUILDER,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Document+Management' => [
+                    '/adminv2/setting/Document%20Management' => [
                         'name' => 'Document Management',
                         'identifier' => self::CHILD_LMS_DOCUMENT_MANAGEMENT,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'grades' => [
+                    '/adminv2/grades' => [
                         'name' => 'Grades',
                         'identifier' => self::CHILD_LMS_GRADES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/LMS+Policy' => [
+                    '/adminv2/setting/LMS%20Policy' => [
                         'name' => 'LMS Policy',
                         'identifier' => self::CHILD_LMS_POLICY,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lti' => [
+                    '/adminv2/lti' => [
                         'name' => 'LTI Providers',
                         'identifier' => self::CHILD_LMS_LTI,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'rubric-results' => [
+                    '/adminv2/rubric-results' => [
                         'name' => 'Rubrics',
                         'identifier' => self::CHILD_LMS_RUBRICS,
                         'visible' =>  true,
@@ -856,15 +856,7 @@ class Subnav
             if (\count($parentData['children'])) {
                 foreach ($parentData['children'] as $childUrl => $childData) {
                     if ($childUrl === $url) {
-
-                        /* parentUrl is sometimes the same as a childUrl
-                         * and manifest twice in the breadcrumb trail; we only
-                         * need the parent node if it was different to its child node
-                         */
-                        if ($parentUrl !== $url) {
-                            $pageCurrent = $parentUrl;
-                        }
-
+                        $pageCurrent = $parentUrl;
                         $subpageCurrent = $childUrl;
                     }
                 }

@@ -52,11 +52,9 @@
      #}
     {% if parentData.children|length %}
         {% for childUrl, childData in parentData.children %}
-            {% if childUrl == pageCurrent %}
-                {% if parentUrl != pageCurrent %}
-                    {% set parentSelected = parentData.name %}
-                    {% set parentSelectedUrl = parentUrl %}
-                {% endif %}
+            {% if childUrl == subpageCurrent %}
+                {% set parentSelected = parentData.name %}
+                {% set parentSelectedUrl = parentUrl %}
 
                 {% set childSelected = childData.name %}
                 {% set childSelectedUrl = childUrl %}

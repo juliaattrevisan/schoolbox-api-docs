@@ -25,8 +25,8 @@ $this->setBlock('list', 'list_item', 'list_item_block');
 
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
-    ->generatePhplib($this, Subnav::PARENT_LMS, Subnav::CHILD_LMS_RUBRICS)
-    ->generateBreadcrumbsHtml($this, Subnav::PARENT_LMS, Subnav::CHILD_LMS_RUBRICS);
+    ->generatePhplib($this, '/adminv2/rubric-results')
+    ->generateBreadcrumbsHtml($this, '/adminv2/rubric-results');
 
 $stmt = Database::getInstance()->prepare("
     SELECT * FROM rubric_result ORDER BY resultset_id ASC, `value` ASC
