@@ -20,8 +20,8 @@ $this->setBlock(TEMPLATE_content, 'service', 'service_block');
 
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
-    ->generatePhplib($this, Subnav::PARENT_USER_MANAGEMENT, null)
-    ->generateBreadcrumbsHtml($this, Subnav::PARENT_USER_MANAGEMENT, null);
+    ->generatePhplib($this, '/adminv2/user')
+    ->generateBreadcrumbsHtml($this, '/adminv2/user');
 
 $userHandler = new User();
 

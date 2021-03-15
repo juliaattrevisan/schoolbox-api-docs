@@ -813,36 +813,36 @@ class Subnav
                     ],
                 ]
             ],
-            'user' => [
+            '/adminv2/user' => [
                 'name' => 'User Management',
                 'identifier' => self::PARENT_USER_MANAGEMENT,
                 'visible' =>  true,
                 'children' => [
-                    'reports/activity/all' => [
+                    '/adminv2/reports/activity/all' => [
                         'name' => 'Activity Report',
                         'identifier' => self::CHILD_USER_MANAGEMENT_ACTIVITY_REPORT,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'user/bulk/modify' => [
+                    '/adminv2/user/bulk/modify' => [
                         'name' => 'Bulk Modify',
                         'identifier' => self::CHILD_USER_MANAGEMENT_BULK_MODIFY,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'reports/login/all' => [
+                    '/adminv2/reports/login/all' => [
                         'name' => 'Login Log',
                         'identifier' => self::CHILD_USER_MANAGEMENT_LOGIN_LOG,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'shaps' => [
+                    '/adminv2/shaps' => [
                         'name' => 'Schoolbox Help Provisioning',
                         'identifier' => self::CHILD_USER_MANAGEMENT_SHAPS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'ups' => [
+                    '/adminv2/ups' => [
                         'name' => 'User Provisioning System',
                         'identifier' => self::CHILD_USER_MANAGEMENT_UPS,
                         'visible' =>  true,

@@ -79,8 +79,8 @@ else {
 
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
-    ->generatePhplib($this, Subnav::PARENT_USER_MANAGEMENT, $reportType)
-    ->generateBreadcrumbsHtml($this, Subnav::PARENT_USER_MANAGEMENT, $reportType);
+    ->generatePhplib($this, "/adminv2/reports/{$reportType}/all")
+    ->generateBreadcrumbsHtml($this, "/adminv2/reports/{$reportType}/all");
 
 /* Don't worry about bounds checking here - the implementation takes care of it */
 

@@ -19,8 +19,8 @@ $this->setFile(TEMPLATE_content, 'adminv2/user/bulk/modify.html');
 
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
-    ->generatePhplib($this, Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_BULK_MODIFY)
-    ->generateBreadcrumbsHtml($this, Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_BULK_MODIFY);
+    ->generatePhplib($this, '/adminv2/user/bulk/modify')
+    ->generateBreadcrumbsHtml($this, '/adminv2/user/bulk/modify');
 
 /* Search options
  */
