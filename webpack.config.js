@@ -339,7 +339,8 @@ module.exports = {
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
             '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue'),
             '@shared': path.resolve(__dirname, 'www/static/javascript/shared'),
-            '@css': path.resolve(__dirname, 'www/static/css/foundation')
+            '@css': path.resolve(__dirname, 'www/static/css/foundation'),
+            '@styles': path.resolve(__dirname, 'www/static/css/foundation')
         },
         extensions: ['*', '.js', '.vue', '.json']
     },

@@ -232,7 +232,7 @@
 </script>
 
 <template>
-    <div>
+    <div id="sb-full-calendar">
         <view-event-modal 
             ref="event"
             :to-moment="toMoment"
@@ -257,6 +257,8 @@
 </template>
 
 <style lang="scss">
-   
-
+    // @import '~@fullcalendar/core/main.css';
+    // @import '~@fullcalendar/daygrid/main.css';
+    // @import '~@fullcalendar/timegrid/main.css';
+    // @import '~@fullcalendar/list/main.css';
 </style>
