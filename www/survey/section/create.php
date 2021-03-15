@@ -85,7 +85,7 @@ if (!empty($_POST)) {
         'ASSESS_FINISH_DATE'   => $assessFinishDate->getLocalShort(),
         'ASSESS_CATEGORY_ID'   => $folder->getId(),
         'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
-        'SECTION_ID'           => '',
+        'SECTION_ID'           => 0,
         'SEQUENCE'             => $sectionHandler->getNextSequence($this->arg[0])
     ));
 

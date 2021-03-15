@@ -59,8 +59,8 @@ if (!empty($_POST)) {
             'start'              => $start->getDatabase(),
             'finish'             => $finish->getDatabase(),
             'duration'           => Survey_Main::UNLIMITED_DURATION,
-            'anonymous_result'   => $_POST['anonymous_result'],
-            'notify_author'      => $_POST['notify_author'],
+            'anonymous_result'   => (int)$_POST['anonymous_result'],
+            'notify_author'      => (int)$_POST['notify_author'],
             'max_attempts'       => $_POST['max_attempts'],
             'completion_message' => $_POST['completion_message'],
         )
