@@ -10,9 +10,9 @@ const EVENT_VARIANT_TASK  = 'task';
  */
 export const mixinFullCalendarHelper = {
 
-    data() {
+    data () {
         return {
-            eventTimeFormat: {
+            $_fullCalendarHelper_eventTimeFormat: {
                 hour: 'numeric',
                 hour12: true,
                 minute: '2-digit',
@@ -32,7 +32,7 @@ export const mixinFullCalendarHelper = {
          * @param {boolean} isLoading True when events start loading,
          *                            false once they are finished.
          */
-        onLoading (isLoading) {
+        $_fullCalendarHelper_onLoading (isLoading) {
             // TODO find a non-jQuery dependent way to do this
             if (isLoading === true) {
                 // this.$refs.toast.activate('Loading...');
@@ -59,7 +59,7 @@ export const mixinFullCalendarHelper = {
          * @param {object} eventRenderInfo
          * @return {boolean}
          */
-        eventRender(eventRenderInfo) {
+        $_fullCalendarHelper_eventRender(eventRenderInfo) {
             
             const calEvent = eventRenderInfo.event;
             
@@ -128,7 +128,7 @@ export const mixinFullCalendarHelper = {
          *
          * @param {Date} date
          */
-        toMoment (date) {
+        $_fullCalendarHelper_toMoment (date) {
             // Attempt to pass in the fullCalendar API itself
             return toMoment(date, this.$refs.fullCalendar.getApi());
         },
@@ -151,7 +151,7 @@ export const mixinFullCalendarHelper = {
          * @return {string}
          */
         dayTitleFormat (dateObject) {
-            return this.toMoment(dateObject.date).format(this.config.dateDisplayFormats.momentJsDateLong);
+            return this.$_fullCalendarHelper_toMoment(dateObject.date).format(this.config.dateDisplayFormats.momentJsDateLong);
         },
 
         /**
@@ -162,8 +162,8 @@ export const mixinFullCalendarHelper = {
          * @returns {*}
          */
         dateDiff (start, end, type = 'days') {
-            const startDate = this.toMoment(start);
-            const  endDate = this.toMoment(end);
+            const startDate = this.$_fullCalendarHelper_toMoment(start);
+            const endDate = this.$_fullCalendarHelper_toMoment(end);
             return endDate.diff(startDate, type);
         },
 
