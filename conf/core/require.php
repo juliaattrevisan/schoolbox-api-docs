@@ -15,7 +15,8 @@ if (!defined('INSTANCE_ID') || trim((string)INSTANCE_ID) === '') {
     // Did front-controller not declare that we explicitly wish to permit running without a valid INSTANCE_ID ?
     if (!defined('PERMIT_INVALID_INSTANCE_ID') || !PERMIT_INVALID_INSTANCE_ID) {
         $availableInstanceIds = implode(',', INSTANCE_ID_LIST ?: []);
-        throw new UnexpectedValueException("'INSTANCE_ID' not set. Available: [$availableInstanceIds]");
+        http_response_code(500);
+        die("'INSTANCE_ID' not set. Available: [$availableInstanceIds]\n");
     }
 }
 
