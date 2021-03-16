@@ -39,8 +39,8 @@ if (!empty($_POST)) {
         'section_id' => $_POST['section_id'],
         'sequence' => $_POST['sequence'],
         'title' => $_POST['title'],
-        'random' => $_POST['random'],
-        'pool' => $_POST['pool'],
+        'random' => (int)$_POST['random'],
+        'pool' => (int)$_POST['pool'],
         'description' => $_POST['description'],
     ));
 
