@@ -37,7 +37,8 @@ export default {
      * at the top of the file.
      */
     components: {
-        highcharts: Chart
+        highcharts: Chart,
+        VueGoodTable
     },
 
     /**
@@ -59,7 +60,22 @@ export default {
 
             /* Chart options
              */
-            chartOptions: {}
+            chartOptions: {},
+
+            /* Column options
+             */
+            columns: [
+                {
+                    label: 'Role',
+                    field: 'label'
+                },
+                {
+                    label: 'Size',
+                    field: 'size',
+                    type: 'number',
+                    formatFn: filesize
+                }
+            ],
         }
     },
 
@@ -90,70 +106,71 @@ export default {
                  */
                 self.allData = response.data;
 
-                let categories = Array();
-                let values = Array();
+                if (!self.isS3Adapter) {
+                    let categories = Array();
+                    let values = Array();
 
-                self.allData.forEach(function(element, index)
-                {
-                    categories.push(element.label);
-                    values.push(parseInt(element.size));
-                });
+                    self.allData.forEach(function (element, index) {
+                        categories.push(element.label);
+                        values.push(parseInt(element.size));
+                    });
 
-                self.chartOptions = {
-                    chart: {
-                        spacingRight: 48,
-                        type: 'bar',
-                        zoomType: 'xy'
-                    },
+                    self.chartOptions = {
+                        chart: {
+                            spacingRight: 48,
+                            type: 'bar',
+                            zoomType: 'xy'
+                        },
 
-                    credits: {
-                        enabled: false
-                    },
+                        credits: {
+                            enabled: false
+                        },
 
-                    legend: {
-                        enabled: false
-                    },
+                        legend: {
+                            enabled: false
+                        },
 
-                    plotOptions: {
-                        bar: {
-                            dataLabels: {
-                                enabled: true,
-                                formatter: function() {
-                                    return '<span style="color: #777777">' + filesize(this.y) + '</span>'
+                        plotOptions: {
+                            bar: {
+                                dataLabels: {
+                                    enabled: true,
+                                    formatter: function () {
+                                        return '<span style="color: #777777">' + filesize(this.y) + '</span>'
+                                    }
                                 }
                             }
-                        }
-                    },
+                        },
 
-                    series: [
-                        {
-                            color: '#82b5d8',
-                            name: '',
-                            data: values
-                        }
-                    ],
+                        series: [
+                            {
+                                color: '#82b5d8',
+                                name: '',
+                                data: values
+                            }
+                        ],
 
-                    time: {
-                        useUTC: false
-                    },
+                        time: {
+                            useUTC: false
+                        },
 
-                    title: {
-                        text: 'System Usage'
-                    },
-
-                    tooltip: {
-                        enabled: false
-                    },
-
-                    xAxis: {
-                        categories: categories
-                    },
-
-                    yAxis: {
-                        allowDecimals: false,
-                        min: 0,
                         title: {
-                            text: 'Bytes'
+                            text: 'System Usage'
+                        },
+
+                        tooltip: {
+                            enabled: false
+                        },
+
+                        xAxis: {
+                            categories: categories
+                        },
+
+                        yAxis: {
+                            allowDecimals: false,
+                            min: 0,
+                            title: {
+                                text: 'Bytes'
+                            }
                         }
                     }
                 }
@@ -195,7 +212,28 @@ export default {
             </div>
         </template>
         <template v-else>
-            <highcharts :options="chartOptions"></highcharts>
+            <template v-if="this.isS3Adapter">
+                <vue-good-table
+                    styleClass="vgt-table striped bordered"
+                    :columns="columns"
+                    :rows="allData"
+                    :search-options="{
+                        enabled: false
+                    }"
+                    :sort-options="{
+                        initialSortBy: {
+                            field: 'label',
+                            type: 'asc'
+                        }
+                    }"
+                    :pagination-options="{
+                        enabled: false
+                    }"
+                />
+            </template>
+            <template v-else>
+                <highcharts :options="chartOptions"></highcharts>
+            </template>
         </template>
     </div>
 </template>

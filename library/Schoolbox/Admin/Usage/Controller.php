@@ -51,7 +51,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/global.twig', [
             'pageCurrent' => $this->router->generate('adminUsage.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminUsage.getIndex')),
-            'isS3Adapter' => 1, //$this->isS3Adapter(),
+            'isS3Adapter' => $this->isS3Adapter(),
         ]));
     }
 
