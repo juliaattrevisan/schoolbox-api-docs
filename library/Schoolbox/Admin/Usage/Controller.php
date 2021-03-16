@@ -10,7 +10,9 @@ namespace Schoolbox\Admin\Usage;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\User;
 
 
@@ -45,7 +47,22 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/global.twig', []));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/global.twig', [
+            'isS3Adapter' => $this->isS3Adapter()
+        ]));
+    }
+
+
+    /**
+     * Decide if we're using the S3 adapter
+     * This is basically infinite storage so there's no point representing this data in a graph
+     * Tabulate it instead, in frontend
+     *
+     * @return bool
+     */
+    private function isS3Adapter(): bool
+    {
+        return $this->getConfigLoader()->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3;
     }
 
 
@@ -57,6 +74,7 @@ class Controller extends Base
     public function getSpecificUser(User $user): void
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/specificUser.twig', [
+            'isS3Adapter' => $this->isS3Adapter(),
             'user' => $user
         ]));
     }

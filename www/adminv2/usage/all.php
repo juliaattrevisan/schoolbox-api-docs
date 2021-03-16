@@ -20,7 +20,7 @@ $config = $this->getDi()->get('config');
 if ($config->get(ConfigMapper::NAME_OTFS_ADAPTER) === \Schoolbox\Resource\FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3) {
     $this->setFile(TEMPLATE_content, 'adminv2/usage/allAws.html');
 } else {
-    $this->setFile(TEMPLATE_content, 'adminv2/usage/all.html');
+    $this->setFile(TEMPLATE_content, 'adminv2/usage/allAws.html');
 }
 
 $this->setVar([
@@ -28,5 +28,5 @@ $this->setVar([
 ]);
 
 // include the admin navigation
-$nav = new AdminV2_Nav($config);
-$nav->parse($this, 'usage');
+//$nav = new AdminV2_Nav($config);
+//$nav->parse($this, 'usage');
