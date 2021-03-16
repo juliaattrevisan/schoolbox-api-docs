@@ -128,6 +128,7 @@
         "codeception/module-db": "^1.0",
         "codeception/module-cli": "^1.1",
         "codeception/module-rest": "^1.2",
-        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1"
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
+        "codeception/module-phpbrowser": "^1.0"
     }
 }
