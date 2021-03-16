@@ -1,9 +1,11 @@
 {# Shared navigation menu #}
 
-{{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
 
 {# Display header #}
+<div class="admin-container row">
 
+    {{ renderAdminNavigation(pageCurrent) }}
+    <div class="admin-content">
 {% if method=='Update' %}
 
     {# Display modify user header with drop-down #}
@@ -704,6 +706,8 @@
         </div>
     </div>
 {% endif %}
+    </div>
+</div>
 
 <div id="saveLabel" class="toast"></div>
 
