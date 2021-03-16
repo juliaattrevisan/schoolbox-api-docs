@@ -604,6 +604,11 @@ class Subnav
                         'visible' =>  true,
                         'children' => []
                     ],
+                    '/adminv2/user/create' => [
+                        'name' => 'Create User',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
                     '/adminv2/reports/login/all' => [
                         'name' => 'Login Log',
                         'visible' =>  true,
