@@ -98,7 +98,7 @@ class Controller extends Base
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
 
-        $payload = (new Graph\TotalPayload($database))->generate();
+        $payload = (new Graph\TotalPayload($database, $this->getConfigLoader()->get('storage_dir')))->generate();
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }

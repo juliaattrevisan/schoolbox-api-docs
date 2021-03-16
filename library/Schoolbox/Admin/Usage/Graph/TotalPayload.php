@@ -25,13 +25,21 @@ class TotalPayload
 
 
     /**
+     * @var string
+     */
+    private string $storageDir;
+
+
+    /**
      * System constructor.
      *
      * @param IConnector $database
+     * @param string     $storageDir
      */
-    public function __construct(IConnector $database)
+    public function __construct(IConnector $database, string $storageDir)
     {
         $this->database = $database;
+        $this->storageDir = $storageDir;
     }
 
 
@@ -43,8 +51,8 @@ class TotalPayload
      */
     public function generate(): array
     {
-        $total = disk_total_space(\Config::get('storage_dir'));
-        $free  = disk_free_space(\Config::get('storage_dir'));
+        $total = disk_total_space($this->storageDir);
+        $free  = disk_free_space($this->storageDir);
         $used  = $total - $free;
 
         return [[
