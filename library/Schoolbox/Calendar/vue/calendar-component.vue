@@ -72,7 +72,7 @@ export default {
                 }
             },
             headerToolbar: false,
-            eventTimeFormat: this.helper.eventTimeFormat,
+            eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,
             height: 'auto',
             initialView: 'list',
             events: this.events,
@@ -86,7 +86,6 @@ export default {
         this.$nextTick()
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
-            this.calendarApi.setOption('height', this.$_fullCalendarHelper_contentHeight());
         });
     },
 
@@ -99,7 +98,7 @@ export default {
          * @param fetchInfo The time span of the events to fetch
          * @param callback  A function to call with the list of events.
          */
-        events(fetchInfo, callback) {
+        events (fetchInfo, callback) {
             axios.get(
                 ENDPOINTS.URL_EVENT_SOURCE,
                 {
@@ -144,22 +143,10 @@ export default {
          *
          * @param eventInfo
          */
-        onEventClick(eventInfo) {
+        onEventClick (eventInfo) {
             // Ideally the current event would be a part of the modal,
             // not this component, but :shrug:
             this.$refs.event.open(eventInfo.event);
-        },
-
-        /**
-         * Helper function for converting a Date object to a Moment object.
-         * @see https://fullcalendar.io/docs/moment-plugins
-         *
-         * @param date
-         */
-        toMoment(date) {
-            // TODO this method should be unnecessary
-            // (for the same reason as `onLoading`)
-            return this.$_fullCalendarHelper_toMoment(date);
         },
 
         /**
@@ -169,7 +156,7 @@ export default {
          * Use the base64encoded version of the url's pathname, so it can work in
          * conjunection with Class Redirect in the back end
          */
-        returnUrl() {
+        returnUrl () {
             return btoa(window.location.pathname);
         },
 
@@ -179,7 +166,7 @@ export default {
          * whether an event should be rendered even if it wasn't deleted.
          * @see https://fullcalendar.io/docs/Calendar-refetchEvents
          */
-        reloadEvents() {
+        reloadEvents () {
             this.calendarApi.refetchEvents();
         },
 
@@ -193,7 +180,7 @@ export default {
     <div>
         <view-event-modal
             ref="event"
-            :to-moment="toMoment"
+            :to-moment="$_fullCalendarHelper_toMoment"
             :event-modify-form-url="ENDPOINTS.URL_EVENT_MODIFY_FORM"
             :event-modify-form-action-url="ENDPOINTS.URL_EVENT_MODIFY_FORM_ACTION"
             :event-delete-url="ENDPOINTS.URL_EVENT_DELETE"
@@ -201,7 +188,7 @@ export default {
             :format-display-date="formats.displayDate"
             :format-display-time="formats.displayTime"
             :format-display-datetime="formats.displayDatetime"
-            :return-url="returnUrl()"
+            :return-url="returnUrl"
             @eventModified="reloadEvents"
             @eventDeleted="reloadEvents"
         />
