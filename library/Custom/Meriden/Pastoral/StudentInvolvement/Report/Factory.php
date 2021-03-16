@@ -184,7 +184,10 @@ class Factory
                 // Ensure folder actually exists
                 $folder = $folderWithGrades['folder'] ?? null;
                 if ($folder instanceof Folder && $folder->getId()) {
-                    $allFolders[] = $folderWithGrades['folder'];
+                    // Set the subject's name into the folder,
+                    // so that it doesn't have any rolled-over codes.
+                    // (Clone so this doesn't inadvertently affect any caches)
+                    $allFolders[] = (clone $folder)->setName($subject->getName());
                     $allGrades[]  = $folderWithGrades['grades'];
                 }
             }
