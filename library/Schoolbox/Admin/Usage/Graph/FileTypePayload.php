@@ -93,6 +93,15 @@ class FileTypePayload
             INNER JOIN allowedFileExtension afe on storage.ext = afe.extension
             INNER JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
             WHERE mime LIKE 'text/%'
+            
+            UNION
+            
+            SELECT 
+                'Other' AS label,
+                SUM(filesize) AS size               
+            FROM storage
+            LEFT JOIN allowedFileExtension afe on storage.ext = afe.extension
+            WHERE fileTypeID IS NULL
         ";
 
         $result = $this->database->executeQuery($query);
