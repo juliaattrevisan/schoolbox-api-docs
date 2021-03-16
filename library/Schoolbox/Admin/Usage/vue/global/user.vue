@@ -1,6 +1,7 @@
 <script>
 import axios from 'axios';
 import { VueGoodTable } from 'vue-good-table';
+import filesize from 'filesize';
 
 export default {
 
@@ -70,7 +71,8 @@ export default {
                 {
                     label: 'Filesize',
                     field: 'size',
-                    type: 'number'
+                    type: 'number',
+                    formatFn: filesize
                 }
             ],
         }
@@ -102,14 +104,6 @@ export default {
                 /* Load into vue component
                  */
                 self.allData = response.data;
-
-                response.data.forEach(function(element, index) {
-                    element.size = parseInt(element.size);
-
-                    self.allData.push(element);
-                });
-
-                console.log(self.allData);
             })
             .catch(error => {
                 if (error.response) {

@@ -1,6 +1,7 @@
 <script>
 import axios from 'axios';
-import {Chart} from 'highcharts-vue'
+import {Chart} from 'highcharts-vue';
+import filesize from 'filesize';
 
 export default {
 
@@ -116,7 +117,7 @@ export default {
                             dataLabels: {
                                 enabled: true,
                                 formatter: function() {
-                                    return '<span style="color: #777777">' + this.y + '%</span>'
+                                    return '<span style="color: #777777">' + filesize(this.y) + '</span>'
                                 }
                             }
                         }
@@ -135,7 +136,7 @@ export default {
                     },
 
                     title: {
-                        text: 'CMS Usage'
+                        text: 'Type Usage'
                     },
 
                     tooltip: {
@@ -149,9 +150,8 @@ export default {
                     yAxis: {
                         allowDecimals: false,
                         min: 0,
-                        max: 100,
                         title: {
-                            text: 'Percentage'
+                            text: 'Bytes'
                         }
                     }
                 }
