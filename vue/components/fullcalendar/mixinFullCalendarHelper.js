@@ -79,8 +79,9 @@ export const mixinFullCalendarHelper = {
             }
 
             const element = eventRenderInfo.el;
-            const inner = element.querySelector('.fc-event-main-frame');
-            const title = element.querySelector('.fc-event-title');
+            const inner = element.querySelector('.fc-list-event');
+            const title = element.querySelector('.fc-list-event-title');
+            debugger
 
             if (calEvent?.extendedProps?.data?.attendance?.hasAttendance) {
                 // Add a style depending on attendability
