@@ -370,20 +370,18 @@ Usage:
                                             <span class="icon-add course-new-unit-icon"></span>
                                         </div>
                                         <div class="small-11 column">
-                                            <label>
+                                            <div class="input-group">
                                                 <input type="text" value="" placeholder="New Unit" id="noonit-name" name="newUnitName" maxlength="255"/>
-                                            </label>
+                                                <input name="spawn-unit" type="submit" value="Create {{ locale.unit.proper }}"
+                                                       data-mage-next="spawn-unit" data-mage-working="Working..."
+                                                       formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"/>
+                                            </div>
                                         </div>
                                     </div>
                                     <div>
                                         <div class="small-12 column">
                                             {# Don't delete the inline style, it's needed -#}
                                             <div data-mage-error style="display:none;" class="alert alert-box icon-alert"></div>
-                                        </div>
-                                        <div class="small-12 column">
-                                            <input name="spawn-unit" type="submit" value="Create {{ locale.unit.proper }}"
-                                                   data-mage-next="spawn-unit" data-mage-working="Working..."
-                                                   formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"/>
                                         </div>
                                     </div>
                                 </li>

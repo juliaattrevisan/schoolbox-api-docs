@@ -218,9 +218,14 @@ td {
   .selectize-control,
   .attachzone {
     flex: 1 1 auto;
+
     & + .button {
       flex: 0 0 auto;
     }
+  }
+  input[type="submit"] {
+    line-height: initial;
+    width: auto;
   }
   .adtp-btn {
     line-height: 1.5;
