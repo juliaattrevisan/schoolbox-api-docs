@@ -19,6 +19,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Routing\Filter\RoletypeFilter;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -34,7 +35,7 @@ class Notifier extends AbstractModuleNotifier
 {
     public const TRIGGER_POSTED = 'posted';
 
-    private const PATTERN_STAFF_POSTED_TITLE   = ':teacher posted :evidence for :student';
+    private const PATTERN_SOMEONE_POSTED_TITLE = ':user posted :evidence for :student';
     private const PATTERN_STUDENT_POSTED_TITLE = ':student has posted :evidence';
 
     private const PATTERN_EVIDENCE_HREF = '/learning/evidence/%d';
@@ -151,11 +152,15 @@ class Notifier extends AbstractModuleNotifier
             /** @var Evidence $evidence */
             $evidence = $this->mapper->findById($model->getId());
             $effector = $this->userMapper->findById($effector->getId());
+            $student  = $evidence->getRecipient();
+            if ($effector->getId() !== $student->getId() && $roleType === Role::STAFF) {
+                // hydrate to get teacher collection properly
+                $student = $this->userMapper->findById($evidence->getRecipient()->getId());
+            }
         } catch (MapperException $e) {
             return $envelope;
         }
 
-        $student      = $evidence->getRecipient();
         $evidenceHref = sprintf(self::PATTERN_EVIDENCE_HREF, $evidence->getId());
 
         $bob = new Builder();
@@ -167,31 +172,44 @@ class Notifier extends AbstractModuleNotifier
             ->setTimestamp($evidence->getCreatedAt()->getUnixTimeStamp())
             ->addFilter(RoletypeFilter::NAME, [$roleType]);
 
-        // a teacher posts for a student - to the student, the teachers of the student and parents of the student
-        if ($effector->getRole()->isStaff()) {
-            $bob->setTitle(self::PATTERN_STAFF_POSTED_TITLE)
-                ->setParams([
-                    'teacher'  => new UserParam($effector),
-                    'student'  => $roleType === Role::STUDENT ?
-                        new Param('you', null, Param::STACKING_REPLACE_NO_DECORATION) : new UserParam($student),
-                    'evidence' => new Param('a new learning moment', $evidenceHref, Param::STACKING_REPLACE_NO_DECORATION),
-                ]);
+        $params = ['evidence' => new Param('a new learning moment', $evidenceHref, Param::STACKING_REPLACE_NO_DECORATION)];
 
-        } // a student posts - to the parent and teachers of the student
-        elseif ($effector->getRole()->isStudent() && $student->getId() === $effector->getId()) {
-            $bob->setTitle(self::PATTERN_STUDENT_POSTED_TITLE)
-                ->setParams([
-                    'student'  => new UserParam($effector),
-                    'evidence' => new Param('a new learning moment', $evidenceHref, Param::STACKING_REPLACE_NO_DECORATION),
-                ]);
+        // a teacher or a parent posted for a student - notify the student, the teachers of the student and parents of the student
+        if ($effector->getRole()->isStaff() || $effector->getRole()->isParent()) {
+            $bob->setTitle(self::PATTERN_SOMEONE_POSTED_TITLE);
+            $params['user'] = new UserParam($effector);
+            // set student param
+            $params['student'] = $roleType === Role::STUDENT ?
+                new Param('you', null, Param::STACKING_REPLACE_NO_DECORATION) :
+                ($roleType === Role::PARENT ? new ChildParam($student) : new UserParam($student));
+        } elseif ($effector->getRole()->isStudent() && $student->getId() === $effector->getId()) {
+            // a student posted - notify parents and teachers of the student
+            $bob->setTitle(self::PATTERN_STUDENT_POSTED_TITLE);
+            // set student param
+            $params['student'] = $roleType === Role::PARENT ? new ChildParam($effector) : new UserParam($effector);
+        } else {
+            // should not happen
+            return new Envelope();
         }
+        $bob->setParams($params);
         $instance = $bob->build();
-        $envelope->targetToParent($student->getId(), $instance);
-        $envelope->targetToUser($student, $instance);
-
-        $student->loadTeachers();
-        foreach ($student->getTeacherCollection() as $teacher) {
-            $envelope->targetToUser($teacher, $instance);
+        // This is just to reduce work load of scheduled and routed.
+        switch ($roleType) {
+            case Role::STAFF:
+                $student->loadTeachers();
+                foreach ($student->getTeacherCollection() as $teacher) {
+                    $envelope->targetToUser($teacher, $instance);
+                }
+                break;
+            case Role::STUDENT:
+                $envelope->targetToUser($student, $instance);
+                break;
+            case Role::PARENT:
+                $envelope->targetToParent($student->getId(), $instance);
+                break;
+            default:
+                // should not happen
+                return new Envelope();
         }
         return $envelope;
     }
