@@ -161,7 +161,7 @@ export const mixinFullCalendarHelper = {
          * @param type
          * @returns {*}
          */
-        dateDiff (start, end, type = 'days') {
+        $_fullCalendarHelper_dateDiff (start, end, type = 'days') {
             const startDate = this.$_fullCalendarHelper_toMoment(start);
             const endDate = this.$_fullCalendarHelper_toMoment(end);
             return endDate.diff(startDate, type);
@@ -175,21 +175,23 @@ export const mixinFullCalendarHelper = {
          *
          * @return {number}
          */
-        contentHeight () {
-            // TODO minimize jQuery dependency
-            let windowHeight = this.jQuery(window).height(),
-                // The amount of space between the top of the window and the start of the calendar
-                calendarOffset = this.jQuery(this.$el).find('.fc-view-container').offset().top,
-                // <section> margin-bottom and #container padding-bottom
-                footerHeight = this.jQuery('#footer').outerHeight(),
-                otherPadding = 32,
-                contentHeight = windowHeight - calendarOffset - footerHeight - otherPadding;
+        $_fullCalendarHelper_contentHeight() {
+
+            const windowHeight = window.innerHeight;
+            // The amount of space between the top of the window and the start of the calendar
+            const calendarOffset = this.jQuery(this.$el).find('.fc-view-harness').offset().top;
+            // <section> margin-bottom and #container padding-bottom
+            const footerHeight = this.jQuery('#footer').outerHeight();
+            // const footerHeight = document.getElementById('footer').offsetHeight;
+            const otherPadding = 32;
+            const contentHeight = windowHeight - calendarOffset - footerHeight - otherPadding;
+            
+            // debugger
 
             // Force a min height of 500px
             if (contentHeight < 500) {
                 return 500;
             }
-
             return contentHeight;
         }
 

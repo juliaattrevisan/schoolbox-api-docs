@@ -64,6 +64,7 @@ export default {
 
     data () {
         return {
+            calendarApi: null, //to access the underlying calendar object
             calendarOptions: {},
             resourceTimelineSemester: {},
             resourceTimelineWeek: {},
@@ -120,7 +121,6 @@ export default {
     },
 
     created () {
-        // this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
         this.termStartDate = this.config.termDates.current.start;
         this.termEndDate = this.config.termDates.current.end;
         this.allTerms = this.buildAllTermsList();
@@ -210,19 +210,22 @@ export default {
             initialDate: this.termStartDate,
             viewSkeletonRender: this.viewSkeletonRender,
             weekNumberCalculation: "'ISO'",
-            // contentHeight:"this.contentHeight",
             loading: this.$_fullCalendarHelper_onLoading,
             eventClick: this.onEventClick,
             dateClick: this.onDateClick,
             datesRender: this.datesRender
         }
     },
+
+    mounted () {
+        this.$nextTick()
+        .then(() => {
+            this.calendarApi = this.$refs.fullCalendar.getApi();
+            this.calendarApi.setOption('height', this.$_fullCalendarHelper_contentHeight());
+        });
+    },
     
     methods: {
-
-        contentHeight() {
-            return this.helper.contentHeight();
-        },
 
         /**
          * Event source.
@@ -232,12 +235,11 @@ export default {
          * @param successCallback A function to call with the list of events.
          */
         events(fetchInfo, successCallback) {
-            let self = this;
 
             // No filters loaded yet? Render nothing.
             // The selected filters get populated by `onFilterChange`:
             // this is called by the filter's `filterContentLoaded` trigger.
-            if (self.selectedFilters === null) {
+            if (this.selectedFilters === null) {
                 successCallback([]);
                 return;
             }
@@ -250,49 +252,48 @@ export default {
                 params: {
                     start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                     end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                    filters: self.selectedFilters,
+                    filters: this.selectedFilters,
                 },
                 paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
             };
 
-            axios.get(URL_ASSESSMENT_EVENT_SOURCE, ajaxParams).then(
-                function (response) {
-                    // Assign event grouping and resourceIds into every event
-                    response.data = response.data.map(function(element) {
-                        element.resourceId = self.buildResourceIdFromEvent(element);
-                        return element;
-                    });
+            axios.get(URL_ASSESSMENT_EVENT_SOURCE, ajaxParams)
+            .then((response) => {
 
-                    // Add new resources
-                    response.data.forEach(function(element) {
-                        if (!self.folderResources.some(el => el.id === element.data.meta?.folderId)) {
-                            self.folderResources.push({
-                                id:                   element.resourceId,
-                                title:                element.data.meta.folderName,
-                                eventBackgroundColor: element.data.meta.colour || self.defaultBgColour,
-                            });
-                        }
-                    });
+                // Assign event grouping and resourceIds into every event
+                response.data = response.data.map((element) => {
+                    element.resourceId = this.buildResourceIdFromEvent(element);
+                    return element;
+                });
 
-                    // Reload resources here too
-                    self.$refs.fullCalendar.getApi().refetchResources();
+                // Add new resources
+                response.data.forEach((element) => {
+                    if (!this.folderResources.some(el => el.id === element.data.meta?.folderId)) {
+                        this.folderResources.push({
+                            id:                   element.resourceId,
+                            title:                element.data.meta.folderName,
+                            eventBackgroundColor: element.data.meta.colour || this.defaultBgColour,
+                        });
+                    }
+                });
 
-                    // Filter out events which don't start
-                    successCallback(response.data.filter(v => 'start' in v));
-                }
-            );
+                // Reload resources here too
+                this.calendarApi.refetchResources();
+
+                // Filter out events which don't start
+                successCallback(response.data.filter(v => 'start' in v));
+                
+            } );
             // Fail callback: consider a message saying something failed
         },
 
 
         groupedEvents(fetchInfo, successCallback) {
 
-            let self = this;
-
             // No filters loaded yet? Render nothing.
             // The selected filters get populated by `onFilterChange`:
             // this is called by the filter's `filterContentLoaded` trigger.
-            if (self.selectedFilters === null) {
+            if (this.selectedFilters === null) {
                 successCallback([]);
                 return;
             }
@@ -305,44 +306,45 @@ export default {
                 params: {
                     start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                     end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                    filters: self.selectedFilters,
-                    inContext: self.inContext,
+                    filters: this.selectedFilters,
+                    inContext: this.inContext,
                 },
                 paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
             };
 
-            axios.get(URL_ASSESSMENT_GROUPED_EVENT_SOURCE, ajaxParams).then(
-                function (response) {
-                    // Assign event grouping and resourceIds into every event
-                    response.data = response.data.map(function(element) {
-                        element.resourceId = self.buildResourceIdFromEvent(element);
-                        return element;
-                    });
+            axios.get(URL_ASSESSMENT_GROUPED_EVENT_SOURCE, ajaxParams)
+            .then((response) => {
 
-                    // Add new resources
-                    response.data.forEach(function(element) {
-                        if (!self.folderResources.some(el => el.id === element.data.meta?.folderId)) {
-                            self.folderResources.push({
-                                id:                   element.resourceId,
-                                title:                element.data.meta.folderName,
-                                eventBackgroundColor: element.data.meta.colour || self.defaultBgColour,
-                            });
-                        }
-                    });
-                    self.folderResources.sort(function (a, b) {
-                        if (typeof a?.title === 'string' && typeof b?.title === 'string') {
-                            return a.title.localeCompare(b.title, 'en', { numeric: true, sensitivity: 'accent' });
-                        }
-                        return 0;
-                    });
+                // Assign event grouping and resourceIds into every event
+                response.data = response.data.map((element) => {
+                    element.resourceId = this.buildResourceIdFromEvent(element);
+                    return element;
+                });
 
-                    // Reload resources here too
-                    self.$refs.fullCalendar.getApi().refetchResources();
+                // Add new resources
+                response.data.forEach((element) => {
+                    if (!this.folderResources.some(el => el.id === element.data.meta?.folderId)) {
+                        this.folderResources.push({
+                            id:                   element.resourceId,
+                            title:                element.data.meta.folderName,
+                            eventBackgroundColor: element.data.meta.colour || this.defaultBgColour,
+                        });
+                    }
+                });
+                this.folderResources.sort((a, b) => {
+                    if (typeof a?.title === 'string' && typeof b?.title === 'string') {
+                        return a.title.localeCompare(b.title, 'en', { numeric: true, sensitivity: 'accent' });
+                    }
+                    return 0;
+                });
 
-                    // Filter out events which don't start
-                    successCallback(response.data.filter(v => 'start' in v));
-                }
-            );
+                // Reload resources here too
+                this.calendarApi.refetchResources();
+
+                // Filter out events which don't start
+                successCallback(response.data.filter(v => 'start' in v));
+                
+            });
         },
 
 
@@ -379,12 +381,12 @@ export default {
          * @return {boolean}
          */
         eventRender(eventRenderInfo) {
-            var self = this,
-                eventGrouping = eventRenderInfo.event.extendedProps.data.meta.eventGrouping,
-                element = eventRenderInfo.el;
+            
+            const eventGrouping = eventRenderInfo.event.extendedProps.data.meta.eventGrouping;
+            const element = eventRenderInfo.el;
 
-            if (!self.eventGroups.includes(eventGrouping)) {
-                self.eventGroups.push(eventGrouping);
+            if (!this.eventGroups.includes(eventGrouping)) {
+                this.eventGroups.push(eventGrouping);
             }
 
             if (eventRenderInfo.event.extendedProps.data.placeholder) {
@@ -392,12 +394,12 @@ export default {
                 element.classList.add('placeholder');
                 element.classList.add('fc-more');
             } else {
-                if (self.currentViewIsSemester()) {
+                if (this.currentViewIsSemester()) {
                     element.style.width = 'auto';
                 }
                 element.setAttribute('event-group-id', eventGrouping);
                 element.setAttribute('event-id', eventRenderInfo.event.extendedProps.data.meta.eventId);
-                element.setAttribute('event-group-date', self.toMoment(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
+                element.setAttribute('event-group-date', this.toMoment(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
             }
         },
 
@@ -438,7 +440,7 @@ export default {
          */
         onFilterChange(selectedFilters) {
             this.selectedFilters = selectedFilters;
-            this.$refs.fullCalendar.getApi().refetchEvents();
+            this.calendarApi.refetchEvents();
             this.inContext = false;
         },
 
@@ -458,17 +460,16 @@ export default {
          * @param info
          */
         viewSkeletonRender(info) {
-            var self = this,
-                api  = self.$refs.fullCalendar.getApi(),
-                eventSource = api.getEventSourceById('events'),
-                groupedEventSource = api.getEventSourceById('groupedEvents');
 
-            self.currentView = info.view.type;
+            const eventSource = this.calendarApi.getEventSourceById('events');
+            const groupedEventSource = this.calendarApi.getEventSourceById('groupedEvents');
 
-            self.destroyPopOver();
+            this.currentView = info.view.type;
 
-            if (self.currentViewIsSemester()) {
-                self.redrawWeekNumbers();
+            this.destroyPopOver();
+
+            if (this.currentViewIsSemester()) {
+                this.redrawWeekNumbers();
 
                 // Add grouped events source if it's not there:
                 // remove standard source if it is
@@ -476,7 +477,7 @@ export default {
                     eventSource.remove();
                 }
                 if (!groupedEventSource) {
-                    api.addEventSource(this.eventSources.groupedEvents);
+                    this.calendarApi.addEventSource(this.eventSources.groupedEvents);
                 }
             } else {
                 // Add standard events source if it's not there:
@@ -485,12 +486,12 @@ export default {
                     groupedEventSource.remove();
                 }
                 if (!eventSource) {
-                    api.addEventSource(this.eventSources.events);
+                    this.calendarApi.addEventSource(this.eventSources.events);
                 }
             }
 
-            self.maxDate = self.getMaxTermDate();
-            self.minDate = self.getMinTermDate();
+            this.maxDate = this.getMaxTermDate();
+            this.minDate = this.getMinTermDate();
         },
 
         /**
@@ -498,19 +499,18 @@ export default {
          * navigate into the next available semester
          */
         clickNext() {
-            let api = this.$refs.fullCalendar.getApi();
             if (this.currentViewIsSemester()) {
                 // Figure out which term I'm in: go to the next one
-                let termIndex = this.findTermIndex(this.convertDateToDateString(api.getDate()));
+                let termIndex = this.findTermIndex(this.convertDateToDateString(this.calendarApi.getDate()));
                 if (this.allTerms[termIndex+1]) {
                     // Go to the midpoint of the term, as we can reasonably
                     // assume that will not overlap the view for another
                     // term.
-                    api.gotoDate(this.allTerms[termIndex+1].mid);
+                    this.calendarApi.gotoDate(this.allTerms[termIndex+1].mid);
                     this.redrawWeekNumbers();
                 }
             } else {
-                api.next();
+                this.calendarApi.next();
             }
         },
 
@@ -519,20 +519,19 @@ export default {
          * navigate into the previous available semester
          */
         clickPrev() {
-            let api = this.$refs.fullCalendar.getApi();
             if (this.currentViewIsSemester()) {
                 // Figure out which term I'm in: go to the previous one
-                let termIndex = this.findTermIndex(this.convertDateToDateString(api.getDate()));
+                let termIndex = this.findTermIndex(this.convertDateToDateString(this.calendarApi.getDate()));
                 if (this.allTerms[termIndex-1]) {
                     // As with clickNext():
                     // Go to the midpoint of the term, as we can reasonably
                     // assume that will not overlap the view for another
                     // term.
-                    api.gotoDate(this.allTerms[termIndex-1].mid);
+                    this.calendarApi.gotoDate(this.allTerms[termIndex-1].mid);
                     this.redrawWeekNumbers();
                 }
             } else {
-                api.prev();
+                this.calendarApi.prev();
             }
         },
 
@@ -565,9 +564,6 @@ export default {
          * @param viewType
          */
         switchView(viewType) {
-            let self = this,
-                api = self.$refs.fullCalendar.getApi();
-
             /**
              * Since clicking of month and week view needs to be customised, so that initial loading of month or week
              * view goes to the current date.
@@ -578,20 +574,20 @@ export default {
              *
              * You'll be able to replicate it by just removing all the lines below except for line 519 and 522.
              */
-            new Promise(function(resolve) {
-                self.onLoading(true);
+            new Promise((resolve) => {
+                this.onLoading(true);
                 setTimeout(() => resolve(1), 1000);
-            }).then(function(result) {
+            }).then((result) => {
                 // Semester view, will just use the term start date that's set on page load
                 if (viewType !== VIEW_RESOURCE_TIMELINE_SEMESTER) {
-                    api.gotoDate(self.convertDateToDateString(new Date()));
+                    this.calendarApi.gotoDate(this.convertDateToDateString(new Date()));
                 }
 
-                api.changeView(viewType);
+                this.calendarApi.changeView(viewType);
 
                 return result;
-            }).then(function(result) {
-                self.onLoading(false);
+            }).then((result) => {
+                this.onLoading(false);
 
                 return result;
             });
@@ -604,16 +600,15 @@ export default {
          * today, only if today is in a semester.
          */
         clickToday() {
-            let api = this.$refs.fullCalendar.getApi();
             if (this.currentViewIsSemester()) {
                 // Figure out if today is in a term before going to it
                 let termIndex = this.findTermIndex(this.convertDateToDateString(new Date()));
                 if (this.allTerms[termIndex]) {
-                    api.today();
+                    this.calendarApi.today();
                     this.redrawWeekNumbers();
                 }
             } else {
-                api.today();
+                this.calendarApi.today();
             }
         },
 
@@ -621,14 +616,12 @@ export default {
          * Navigate through the dates via the cursor
          */
         getStartDateByCursor() {
-            var self = this;
-
-            if (self.cursor === 0) {
-                return self.config.termDates.current?.start;
-            } else if (self.cursor < 0) {
-                return self.config.termDates.past[Math.abs(self.cursor) - 1]?.start;
+            if (this.cursor === 0) {
+                return this.config.termDates.current?.start;
+            } else if (this.cursor < 0) {
+                return this.config.termDates.past[Math.abs(this.cursor) - 1]?.start;
             } else {
-                return self.config.termDates.future[Math.abs(self.cursor) - 1]?.start;
+                return this.config.termDates.future[Math.abs(this.cursor) - 1]?.start;
             }
         },
 
@@ -637,12 +630,10 @@ export default {
          * @see: https://fullcalendar.io/docs/validRange
          */
         getMaxTermDate() {
-            var self = this,
-                termStartDates = Object.values(self.config.termDates).flat().map(function(row){
+            const termStartDates = Object.values(this.config.termDates).flat().map((row) => {
                 return new Date(row.end);
             });
-
-            return self.toMoment(new Date(Math.max.apply(null,termStartDates))).format('YYYY-MM-DD');
+            return this.toMoment(new Date(Math.max.apply(null,termStartDates))).format('YYYY-MM-DD');
         },
 
         /**
@@ -650,12 +641,11 @@ export default {
          * @see: https://fullcalendar.io/docs/validRange
          */
         getMinTermDate() {
-            var self = this,
-                termStartDates = Object.values(self.config.termDates).flat().map(function(row){
+            const termStartDates = Object.values(this.config.termDates).flat().map((row) => {
                 return new Date(row.start);
             });
 
-            return self.toMoment(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
+            return this.toMoment(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
         },
 
         /**
@@ -677,7 +667,7 @@ export default {
         },
 
         redrawWeekNumbers() {
-            document.querySelectorAll('.fc-time-area .fc-content tr')[1].querySelectorAll('.fc-cell-text').forEach(function (element, index) {
+            document.querySelectorAll('.fc-time-area .fc-content tr')[1].querySelectorAll('.fc-cell-text').forEach((element, index) => {
                 element.innerHTML = index + 1;
             });
         },
@@ -800,9 +790,8 @@ export default {
          * @return {Array}
          */
         buildAllTermsList() {
-            let self = this;
             return this.config.termDates.past.concat([this.config.termDates.current], this.config.termDates.future)
-                .sort(function (a, b) {
+                .sort((a, b) => {
                     if (a.start < b.start) {
                         return -1;
                     }
@@ -817,7 +806,7 @@ export default {
                     }
                     return 0;
                 })
-                .map(function (term) {
+                .map((term) => {
                     let start = new Date(term.start),
                         mid   = new Date(term.start),
                         end   = new Date(term.end);
@@ -832,8 +821,8 @@ export default {
                     // can reasonably assume it doesn't overlap the view
                     // window for another term.
                     mid.setDate(mid.getDate() + Math.ceil(((end - start) / MILLISECONDS_PER_DAY) / 2))
-                    term.mid = self.convertDateToDateString(mid);
-                    term.end = self.convertDateToDateString(end);
+                    term.mid = this.convertDateToDateString(mid);
+                    term.end = this.convertDateToDateString(end);
                     return term;
                 });
         },
@@ -863,7 +852,7 @@ export default {
          * @return {Array}
          */
         buildEventTypeResourcesList() {
-            return this.config.eventTypes.map(function (a) {
+            return this.config.eventTypes.map((a) => {
                 return {
                     id:                   RESOURCE_EVENT_TYPE_PREFIX + String(a.id),
                     title:                a.type,
@@ -918,7 +907,7 @@ export default {
          * @see https://fullcalendar.io/docs/Calendar-refetchEvents
          */
         reloadEvents() {
-            this.$refs.fullCalendar.getApi().refetchEvents();
+            this.calendarApi.refetchEvents();
         },
 
         /**
@@ -930,11 +919,12 @@ export default {
          * @param date
          */
         viewWeek(date) {
-            let api = this.$refs.fullCalendar.getApi();
-            api.gotoDate(date);
-            api.changeView('resourceTimelineWeek');
+            this.calendarApi.gotoDate(date);
+            this.calendarApi.changeView('resourceTimelineWeek');
         },
+
     }
+
 }
 
 </script>

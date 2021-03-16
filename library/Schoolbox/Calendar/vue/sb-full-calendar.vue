@@ -13,7 +13,6 @@ import FilterModal                from "./filterModal";
 import FlatPickr                  from '@schoolbox/fullcalendar/flatPickr';
 import axios                      from 'axios'
 import qs                         from "qs";
-// import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
 import { mixinFullCalendarHelper } from "@schoolbox/fullcalendar/mixinFullCalendarHelper";
 import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
 
@@ -70,12 +69,9 @@ export default {
         mixinFullCalendarHelper
     ],
 
-    // beforeMount() {
-    //     this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
-    // },
-
     data () {
         return {
+            calendarApi: null, //to access the underlying calendar object
             currentDisplay: null,
             duration: 31,
             listViewDateRange: {
@@ -119,7 +115,7 @@ export default {
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
             views: {
                 day: {
-                    titleFormat: this.dayTitleFormat,
+                    titleFormat: this.$_fullCalendarHelper_dayTitleFormat,
                     columnHeader: false
                 },
                 week: {
@@ -132,7 +128,6 @@ export default {
                 }
             },
             eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,
-            // contentHeight: this.contentHeight,
             customButtons: {
                 customExport: {
                     text: 'Export',
@@ -147,15 +142,15 @@ export default {
                 },
                 customPrev: {
                     icon: 'chevron-left',
-                    click: this.clickPrev.bind(this),
+                    click: this.clickPrev,
                 },
                 customNext: {
                     icon: 'chevron-right',
-                    click: this.clickNext.bind(this),
+                    click: this.clickNext,
                 },
                 customToday: {
                     text: 'Today',
-                    click: this.clickToday.bind(this),
+                    click: this.clickToday,
                 },
             },
             headerToolbar: {
@@ -181,7 +176,7 @@ export default {
                     events: this.events,
                 }
             ],
-            eventDidMount: this.eventRender,
+            // eventDidMount: this.eventRender,
             viewDidMount: this.viewSkeletonRender,
             loading: this.$_fullCalendarHelper_onLoading,
             dateClick: this.onDateClick,
@@ -189,6 +184,25 @@ export default {
             eventResize: this.onEventResize,
             eventDrop: this.onEventDrop
         }
+    },
+
+    mounted() {
+
+        this.$nextTick()
+        .then(() => {
+            this.calendarApi = this.$refs.fullCalendar.getApi();
+            this.calendarApi.setOption('height', this.$_fullCalendarHelper_contentHeight());
+        });
+
+        this.registerListCustomInputFields();
+
+        // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
+        let quickSwitchIcon = document.createElement('a');
+            quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
+            quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
+
+        document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
+        
     },
 
     methods: {
@@ -207,13 +221,6 @@ export default {
         },
 
         /**
-         * contentHeight
-         */
-        // contentHeight() {
-        //     return this.helper.contentHeight();
-        // },
-
-        /**
          * Event source.
          * @see https://fullcalendar.io/docs/events-function
          *
@@ -221,7 +228,6 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events (fetchInfo, callback) {
-            var self = this;
             axios.get(
                 URL_EVENT_SOURCE,
                 {
@@ -231,16 +237,14 @@ export default {
                     params: {
                         start:  Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                         end:    Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                        userId: self.config.userId,
+                        userId: this.config.userId,
                     }
                 }
-            ).then(
-                function (response) {
-                    callback(response.data.filter(function (v) {
-                        return 'start' in v;
-                    }));
-                }
-            );
+            ).then((response) => {
+                callback(response.data.filter((v) => {
+                    return 'start' in v;
+                }));
+            } );
             // Fail callback: consider a message saying something failed
         },
 
@@ -253,13 +257,12 @@ export default {
          */
         viewSkeletonRender(info) {
 
-            let self = this,
-                customGroup = document.querySelector('.fc-custom-group');
+            const customGroup = document.querySelector('.fc-custom-group');
 
-            self.currentDisplay = info.view.type;
+            this.currentDisplay = info.view.type;
 
-            document.querySelectorAll('.fc-toolbar .fc-left .fc-button-group, .fc-toolbar .fc-center').forEach(function (element) {
-                if (self.currentViewIsList()) {
+            document.querySelectorAll('.fc-toolbar .fc-left .fc-button-group, .fc-toolbar .fc-center').forEach((element) => {
+                if (this.currentViewIsList()) {
                     element.classList.add('hide');
                     if (customGroup?.classList && customGroup?.classList.contains('hide') !== null) {
                         customGroup.classList.remove('hide')
@@ -272,21 +275,21 @@ export default {
                 }
             });
 
-            if (self.currentViewIsList()) {
-                self.registerListCustomInputFields();
+            if (this.currentViewIsList()) {
+                this.registerListCustomInputFields();
 
                 /**
                  * Re-initialise datepicker upon date update on list view.
                  * Without this, date picker fields just turns into a normal text field.
                      */
-                let attachAlaressDatePicker = function () {
+                let attachAlaressDatePicker = () => {
                     var $dateinput = $(this);
                     if ($dateinput.attr('data-datepicker-id') === undefined) {
                         $dateinput.alaressDateTimePicker();
                     }
                 };
 
-                $(function () {
+                $(() => {
                     $('[data-datepicker]').each(attachAlaressDatePicker);
                 });
             }
@@ -314,13 +317,12 @@ export default {
             // Extra condition for rendering events on this calendar:
             // All of the event's attributes must match at least one
             // selected filter: if it doesn't, don't render it.
-            let self            = this,
-                calEvent        = eventRenderInfo.event,
-                eventAttributes = {},
-                isEventRendered = true;
+            const calEvent = eventRenderInfo.event;
+            const eventAttributes = {};
+            const isEventRendered = true;
 
             // Build a list of filters from the event
-            calEvent.classNames.forEach(function (className) {
+            calEvent.classNames.forEach((className) => {
                 let match = className.match(/^([a-z]+)(\d+)/i);
                 if (match) {
                     let attributeGroup = match[1],
@@ -336,7 +338,7 @@ export default {
             // All of the event's attributes must match at least one
             // selected filter.
             // If it doesn't, don't render it.
-            Object.keys(eventAttributes).forEach(function (attributeGroup) {
+            Object.keys(eventAttributes).forEach((attributeGroup) => {
                 let ids                = eventAttributes[attributeGroup],
                     eventMatchesFilter = false;
 
@@ -345,31 +347,31 @@ export default {
                 // even if it doesn't match the filter.
                 // This allows events a user has been invited to, but are
                 // outside their list of groups/campuses, to display.
-                if (self.$refs.filter.allSelected(attributeGroup)) {
+                if (this.$refs.filter.allSelected(attributeGroup)) {
                     eventMatchesFilter = true;
                     return;
                 }
 
                 // Otherwise: check id against the list of selected filters.
-                ids.forEach(function (id) {
+                ids.forEach((id) => {
                     let keyspace = [];
                     switch (attributeGroup) {
                         case 'source':
                             // Sources have multiple IDs per selection:
                             // this event needs to only match one of them.
-                            keyspace = (self.config.selectedFilters?.source || []).flat();
+                            keyspace = (this.config.selectedFilters?.source || []).flat();
                             break;
 
                         case 'type':
-                            keyspace = self.config.selectedFilters?.eventType || [];
+                            keyspace = this.config.selectedFilters?.eventType || [];
                             break;
 
                         case 'group':
-                            keyspace = self.config.selectedFilters?.group || [];
+                            keyspace = this.config.selectedFilters?.group || [];
                             break;
 
                         case 'campus':
-                            keyspace = self.config.selectedFilters?.campus || [];
+                            keyspace = this.config.selectedFilters?.campus || [];
                             break;
 
                         default:
@@ -454,19 +456,17 @@ export default {
             this.moveEvent(eventDropInfo.event);
         },
 
-
         /**
          * Moves an existing event to its new start and end time.
          *
          * @param {Object} event
          */
         moveEvent(event) {
-            let self = this,
-                data = {
-                    start:  this.toMoment(event.start).format(),
-                    end:    this.toMoment(event.end).format(),
-                    allDay: event.allDay,
-                };
+            const data = {
+                start:  this.toMoment(event.start).format(),
+                end:    this.toMoment(event.end).format(),
+                allDay: event.allDay,
+            };
 
             // Account for the difference in all-day end date between FullCalendar and Schoolbox:
             // * Schoolbox events are inclusive of the end date
@@ -483,7 +483,6 @@ export default {
                 qs.stringify(data)
             );
         },
-
 
         /**
          * Helper function for converting a Date object to a Moment object.
@@ -513,7 +512,7 @@ export default {
          * @param event
          */
         addEvent(event) {
-            this.$refs.fullCalendar.getApi().addEvent(event, EVENT_SOURCE_ID);
+            this.calendarApi.addEvent(event, EVENT_SOURCE_ID);
         },
 
         /**
@@ -530,7 +529,7 @@ export default {
          * @see https://fullcalendar.io/docs/Calendar-refetchEvents
          */
         reloadEvents() {
-            this.$refs.fullCalendar.getApi().refetchEvents();
+            this.calendarApi.refetchEvents();
         },
 
         /**
@@ -543,21 +542,8 @@ export default {
         updateSelectedFilters(selectedFilters) {
             // The selected filters in config are read-only and passed by reference.
             // TODO pass it by value into the filter modal, and update in this method
-            this.$refs.fullCalendar.getApi().rerenderEvents();
+            this.calendarApi.rerenderEvents();
             axios.post(URL_EVENT_FILTER, qs.stringify({ filters: this.config.selectedFilters, }))
-        },
-
-        /**
-         * Helper for rendering the title of the day view.
-         * Without this the calendar renders the date twice for some reason.
-         *
-         * @param dateObject
-         * @return {*}
-         */
-        dayTitleFormat(dateObject) {
-            // TODO this method should be unnecessary
-            // (for the same reason as `onLoading`)
-            return this.helper.dayTitleFormat(dateObject);
         },
 
         /**
@@ -568,14 +554,13 @@ export default {
             // Make sure that there's only one of the custom input field
             if (!document.querySelector('.fc-custom-group')) {
                 // Prepare input fields
-                let self = this,
-                    container = document.createElement('div'),
-                    startDate = document.createElement('input'),
-                    startDateFieldWrapper = document.createElement('div'),
-                    endDate = document.createElement('input'),
-                    endDateFieldWrapper = document.createElement('div'),
-                    updateRangeButton = document.createElement('input'),
-                    buttonWrapper = document.createElement('div');
+                const container = document.createElement('div');
+                const startDate = document.createElement('input');
+                const startDateFieldWrapper = document.createElement('div');
+                const endDate = document.createElement('input');
+                const endDateFieldWrapper = document.createElement('div');
+                const updateRangeButton = document.createElement('input');
+                const buttonWrapper = document.createElement('div');
 
                 startDateFieldWrapper.setAttribute('class', 'small-4 columns');
                 endDateFieldWrapper.setAttribute('class', 'small-4 columns');
@@ -587,7 +572,7 @@ export default {
                 startDate.setAttribute('data-datepicker', '');
                 startDate.setAttribute('data-datepicker-buttontext', '');
                 startDate.setAttribute('value',
-                    (self.listViewDateRange.start) ? self.listViewDateRange.start : this.toMoment(new Date()).format(FORMAT_FLATPICKR_DATE)
+                    (this.listViewDateRange.start) ? this.listViewDateRange.start : this.toMoment(new Date()).format(FORMAT_FLATPICKR_DATE)
                 );
 
 
@@ -597,7 +582,7 @@ export default {
                 endDate.setAttribute('data-datepicker', '');
                 endDate.setAttribute('data-datepicker-buttontext', '');
                 endDate.setAttribute('value',
-                    (self.listViewDateRange.end) ? self.listViewDateRange.end : this.toMoment(new Date()).add(self.duration, 'days').format(FORMAT_FLATPICKR_DATE)
+                    (this.listViewDateRange.end) ? this.listViewDateRange.end : this.toMoment(new Date()).add(this.duration, 'days').format(FORMAT_FLATPICKR_DATE)
                 );
 
 
@@ -606,7 +591,7 @@ export default {
                 updateRangeButton.setAttribute('type', 'submit');
                 updateRangeButton.setAttribute('value', 'Update');
 
-                if (self.currentViewIsList()) {
+                if (this.currentViewIsList()) {
                     container.setAttribute('class', 'fc-custom-group row');
                 } else {
                     container.setAttribute('class', 'fc-custom-group row hide');
@@ -626,17 +611,17 @@ export default {
                 document.querySelector('.fc-toolbar').getElementsByClassName('fc-toolbar-chunk')[0].appendChild(container);
 
                 // Register an event listener when update button is clicked.
-                document.querySelector('#update_date_range_button').addEventListener('click', function () {
+                document.querySelector('#update_date_range_button').addEventListener('click', () => {
                     if (document.querySelector('#start_date').value && document.querySelector('#end_date').value) {
-                        let startDateValue = moment(document.querySelector('#start_date').value, FORMAT_FLATPICKR_DATE),
-                            endDateValue = moment(document.querySelector('#end_date').value, FORMAT_FLATPICKR_DATE);
+                        const startDateValue = moment(document.querySelector('#start_date').value, FORMAT_FLATPICKR_DATE);
+                        const endDateValue = moment(document.querySelector('#end_date').value, FORMAT_FLATPICKR_DATE);
 
                         if (startDateValue.isValid() && endDateValue.isValid()) {
-                            self.listViewDateRange.start = document.querySelector('#start_date').value;
-                            self.listViewDateRange.end = document.querySelector('#end_date').value;
+                            this.listViewDateRange.start = document.querySelector('#start_date').value;
+                            this.listViewDateRange.end = document.querySelector('#end_date').value;
 
-                            self.duration = self.helper.dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
-                            self.$refs.fullCalendar.getApi().gotoDate(startDateValue.format('YYYY-MM-DD'));
+                            this.duration = this.$_fullCalendarHelper_dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
+                            this.calendarApi.gotoDate(startDateValue.format('YYYY-MM-DD'));
                         }
                     }
                 });
@@ -648,8 +633,7 @@ export default {
          * Wish we can use v-model rather than doing this but because the input fields are being injected via javascript,
          * I'm not sure if we can use it..
          */
-        updateListViewDateRangeField(start, end = null)
-        {
+        updateListViewDateRangeField(start, end = null) {
             window.history.pushState('', '', '/calendar/' + this.toMoment(start).format(FORMAT_FORM_DATE) + '/' + this.config.userId);
             this.listViewDateRange.start = this.toMoment(start).format(FORMAT_FLATPICKR_DATE);
             this.listViewDateRange.end = this.toMoment(end || new Date()).add(this.duration, 'days').format(FORMAT_FLATPICKR_DATE);
@@ -678,33 +662,27 @@ export default {
          * Additional customisation for prev button to sync flatpickr's selected date with fullCalendar's
          */
         clickPrev() {
-            let api = this.$refs.fullCalendar.getApi();
-                api.prev();
-
-                this.$refs.flatPickr.updateActiveDate(api.getDate());
-                this.updateListViewDateRangeField(api.getDate(), api.getDate());
+            this.calendarApi.prev();
+            this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
+            this.updateListViewDateRangeField(this.calendarApi.getDate(), this.calendarApi.getDate());
         },
 
         /**
          * Additional customisation for next button to sync flatpickr's selected date with fullCalendar's
          */
         clickNext() {
-            let api = this.$refs.fullCalendar.getApi();
-                api.next();
-
-                this.$refs.flatPickr.updateActiveDate(api.getDate());
-                this.updateListViewDateRangeField(api.getDate(), api.getDate());
+            this.calendarApi.next();
+            this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
+            this.updateListViewDateRangeField(this.calendarApi.getDate(), this.calendarApi.getDate());
         },
 
         /**
          * Additional customisation for today's button to sync flatpickr's selected date with fullCalendar's
          */
         clickToday() {
-            let api = this.$refs.fullCalendar.getApi();
-                api.today();
-                this.$refs.flatPickr.updateActiveDate(api.getDate());
-
-            this.updateListViewDateRangeField(api.getDate());
+            this.calendarApi.today();
+            this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
+            this.updateListViewDateRangeField(this.calendarApi.getDate());
         },
 
         /**
@@ -712,7 +690,7 @@ export default {
          * When the user clicks on the flatpickr's date, we'll trigger fullcalendar's gotoDate.
          */
         onQuickSwitch(value) {
-            this.$refs.fullCalendar.getApi().gotoDate(value.selectedDate);
+            this.calendarApi.gotoDate(value.selectedDate);
 
             this.updateListViewDateRangeField(
                 value.selectedDate,
@@ -720,68 +698,66 @@ export default {
             );
         },
 
-    },
-    mounted() {
-        this.registerListCustomInputFields();
-
-        // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
-        let quickSwitchIcon = document.createElement('a');
-            quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
-            quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
-
-        document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
-        
     }
+    
 }
 
 </script>
 
 <template>
     <div>
-        <export-modal ref="export"
-                      :event-types="config.eventTypes"
-                      :groups="config.groups"
-                      :campuses="config.campuses"
-                      :translations="config.translations"
-                      :token="config.token"
-                      :event-export-url="urls.export" />
+        <export-modal 
+            ref="export"
+            :event-types="config.eventTypes"
+            :groups="config.groups"
+            :campuses="config.campuses"
+            :translations="config.translations"
+            :token="config.token"
+            :event-export-url="urls.export" 
+        />
 
-        <filter-modal ref="filter"
-                      :selected-filters="config.selectedFilters"
-                      :sources="config.sources"
-                      :event-types="config.eventTypes"
-                      :groups="config.groups"
-                      :campuses="config.campuses"
-                      @filterChanged="updateSelectedFilters" />
+        <filter-modal 
+            ref="filter"
+            :selected-filters="config.selectedFilters"
+            :sources="config.sources"
+            :event-types="config.eventTypes"
+            :groups="config.groups"
+            :campuses="config.campuses"
+            @filterChanged="updateSelectedFilters" 
+        />
 
-        <create-event-modal ref="createEvent"
-                            :user-id="config.userId"
-                            :can-invite="config.canInvite"
-                            :event-types="config.eventTypes"
-                            :to-moment="toMoment"
-                            :event-create-url="urls.create"
-                            :event-create-form-url="urls.createForm"
-                            :event-modify-form-url="urls.modifyForm"
-                            :format-form-date="formats.formDate"
-                            :format-form-datetime="formats.formDatetime"
-                            :format-display-date="formats.displayDate"
-                            :format-display-datetime="formats.displayDatetime"
-                            @eventCreated="addEvent" />
+        <create-event-modal 
+            ref="createEvent"
+            :user-id="config.userId"
+            :can-invite="config.canInvite"
+            :event-types="config.eventTypes"
+            :to-moment="toMoment"
+            :event-create-url="urls.create"
+            :event-create-form-url="urls.createForm"
+            :event-modify-form-url="urls.modifyForm"
+            :format-form-date="formats.formDate"
+            :format-form-datetime="formats.formDatetime"
+            :format-display-date="formats.displayDate"
+            :format-display-datetime="formats.displayDatetime"
+            @eventCreated="addEvent" 
+        />
 
-        <view-event-modal ref="event"
-                          :to-moment="toMoment"
-                          :event-modify-form-url="urls.modifyForm"
-                          :event-modify-form-action-url="urls.modifyFormAction"
-                          :event-delete-url="urls.delete"
-                          :event-update-url="urls.update"
-                          :attendance-list-url="urls.attendanceList"
-                          :attendance-toggle-url="urls.attendanceToggle"
-                          :format-display-date="formats.displayDate"
-                          :format-display-time="formats.displayTime"
-                          :format-display-datetime="formats.displayDatetime"
-                          :return-url="returnUrl()"
-                          @eventModified="reloadEvents"
-                          @eventDeleted="reloadEvents" />
+        <view-event-modal 
+            ref="event"
+            :to-moment="toMoment"
+            :event-modify-form-url="urls.modifyForm"
+            :event-modify-form-action-url="urls.modifyFormAction"
+            :event-delete-url="urls.delete"
+            :event-update-url="urls.update"
+            :attendance-list-url="urls.attendanceList"
+            :attendance-toggle-url="urls.attendanceToggle"
+            :format-display-date="formats.displayDate"
+            :format-display-time="formats.displayTime"
+            :format-display-datetime="formats.displayDatetime"
+            :return-url="returnUrl()"
+            @eventModified="reloadEvents"
+            @eventDeleted="reloadEvents" 
+        />
 
         <full-calendar
             ref="fullCalendar"

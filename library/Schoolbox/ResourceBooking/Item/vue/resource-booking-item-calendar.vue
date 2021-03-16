@@ -47,6 +47,7 @@ export default {
 
     data () {
         return {
+            calendarApi: null, //to access the underlying calendar object
             calendarOptions: {} //will init in beforeMount due to this.helper being needed
         }
     },
@@ -86,7 +87,6 @@ export default {
                 }
             },
             eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,
-            // contentHeight: this.contentHeight,
             customButtons: {
                 customExport: {
                     text: 'Export',
@@ -137,19 +137,23 @@ export default {
     },
 
     mounted() {
+
+        this.$nextTick()
+        .then(() => {
+            this.calendarApi = this.$refs.fullCalendar.getApi();
+            this.calendarApi.setOption('height', this.$_fullCalendarHelper_contentHeight());
+        });
+
         // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
         let quickSwitchIcon = document.createElement('a');
         quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
         quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
 
         document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
+
     },
 
     methods: {
-
-        contentHeight() {
-            return this.helper.contentHeight();
-        },
 
         /**
          * Open the export modal.
@@ -173,9 +177,8 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            var self = this;
             axios.get(
-                self.config.resourceBookingEndpoint,
+                this.config.resourceBookingEndpoint,
                 {
                     headers: {
                         'X-Requested-With' : 'XMLHttpRequest'
@@ -186,13 +189,11 @@ export default {
                         status: this.config.selectedFilters,
                     }
                 }
-            ).then(
-                function (response) {
-                    callback(response.data.filter(function (v) {
-                        return 'start' in v;
-                    }));
-                }
-            );
+            ).then((response) => {
+                callback(response.data.filter((v) => {
+                    return 'start' in v;
+                }));
+            } );
             // Fail callback: consider a message saying something failed
         },
 
@@ -272,7 +273,7 @@ export default {
          * @param event
          */
         addEvent(event) {
-            this.$refs.fullCalendar.getApi().addEvent(event);
+            this.calendarApi.addEvent(event);
         },
 
         /**
@@ -282,34 +283,31 @@ export default {
          * @see https://fullcalendar.io/docs/Calendar-refetchEvents
          */
         reloadEvents() {
-            this.$refs.fullCalendar.getApi().refetchEvents();
+            this.calendarApi.refetchEvents();
         },
 
         /**
          * Additional customisation for prev button to sync flatpickr's selected date with fullCalendar's
          */
         clickPrev() {
-            let api = this.$refs.fullCalendar.getApi();
-            api.prev();
-            this.$refs.flatPickr.updateActiveDate(api.getDate());
+            this.calendarApi.prev();
+            this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
         },
 
         /**
          * Additional customisation for next button to sync flatpickr's selected date with fullCalendar's
          */
         clickNext() {
-            let api = this.$refs.fullCalendar.getApi();
-            api.next();
-            this.$refs.flatPickr.updateActiveDate(api.getDate());
+            this.calendarApi.next();
+            this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
         },
 
         /**
          * Additional customisation for today's button to sync flatpickr's selected date with fullCalendar's
          */
         clickToday() {
-            let api = this.$refs.fullCalendar.getApi();
-            api.today();
-            this.$refs.flatPickr.updateActiveDate(api.getDate());
+            this.calendarApi.today();
+            this.$refs.flatPickr.updateActiveDate(this.calendarApi.getDate());
         },
 
         /**
@@ -317,7 +315,7 @@ export default {
          * When the user clicks on the flatpickr's date, we'll trigger fullcalendar's gotoDate.
          */
         onQuickSwitch(value) {
-            this.$refs.fullCalendar.getApi().gotoDate(value.selectedDate);
+            this.calendarApi.gotoDate(value.selectedDate);
         },
     }
     

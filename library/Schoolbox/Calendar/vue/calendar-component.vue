@@ -31,7 +31,8 @@ export default {
 
     data () {
         return {
-            calendarOptions: {},//will init in beforeMount due to vars being needed
+            calendarApi: null, //to access the underlying calendar object
+            calendarOptions: {}, //will init in beforeMount due to vars being needed
             currentDisplay: null,
             duration: 31,
             listViewDateRange: {
@@ -81,15 +82,15 @@ export default {
         }
     },
 
+    mounted () {
+        this.$nextTick()
+        .then(() => {
+            this.calendarApi = this.$refs.fullCalendar.getApi();
+            this.calendarApi.setOption('height', this.$_fullCalendarHelper_contentHeight());
+        });
+    },
+
     methods: {
-        /**
-         * Callback for determining content height of the component.
-         */
-        // contentHeight() {
-        //     // TODO figure out a more appropriate calculation
-        //     // (This is the same calculation the full calendar uses)
-        //     return this.helper.contentHeight();
-        // },
 
         /**
          * Event source.
@@ -99,7 +100,6 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            let self = this;
             axios.get(
                 ENDPOINTS.URL_EVENT_SOURCE,
                 {
@@ -109,33 +109,31 @@ export default {
                     params: {
                         start:    Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                         end:      Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                        userId:   self.config.userId,
-                        folderId: self.config.folderId,
+                        userId:   this.config.userId,
+                        folderId: this.config.folderId,
                     }
                 }
-            ).then(
-                function (response) {
-                    // Add ability to limit events:
-                    // need to filter, then sort, then slice
-                    self.eventsLoaded = true;
-                    let events = response.data
-                        .filter(v => 'start' in v)
-                        .sort((a, b) => String(a.start).localeCompare(String(b.start)));
-                    if (self.config.limit) {
-                        events = events.slice(0, self.config.limit);
-                    }
+            ).then((response) => {
+                // Add ability to limit events:
+                // need to filter, then sort, then slice
+                this.eventsLoaded = true;
+                let events = response.data
+                    .filter(v => 'start' in v)
+                    .sort((a, b) => String(a.start).localeCompare(String(b.start)));
+                if (this.config.limit) {
+                    events = events.slice(0, this.config.limit);
+                }
 
-                    // Empty? Don't show the calendar at all
-                    if (events.length === 0) {
-                        // self.$refs.emptyState.style.removeProperty('display');
-                        // self.$refs.fullCalendar.getApi().destroy();
-                        self.hasEvents = false;
-                    } else {
-                        self.hasEvents = true;
-                    }
-                    callback(events);
+                // Empty? Don't show the calendar at all
+                if (events.length === 0) {
+                    // self.$refs.emptyState.style.removeProperty('display');
+                    // self.$refs.fullCalendar.getApi().destroy();
+                    this.hasEvents = false;
+                } else {
+                    this.hasEvents = true;
                 }
-            );
+                callback(events);
+            } );
             // Fail callback: consider a message saying something failed
         },
 
@@ -182,7 +180,7 @@ export default {
          * @see https://fullcalendar.io/docs/Calendar-refetchEvents
          */
         reloadEvents() {
-            this.$refs.fullCalendar.getApi().refetchEvents();
+            this.calendarApi.refetchEvents();
         },
 
     },
