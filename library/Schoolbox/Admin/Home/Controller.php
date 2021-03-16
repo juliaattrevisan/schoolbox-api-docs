@@ -17,6 +17,7 @@ use Aws\CloudWatch\CloudWatchClient;
 use Aws\S3\S3Client;
 use InvalidArgumentException;
 use Schoolbox\Admin\Navigation\Subnav;
+use Psr\Log\AbstractLogger;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database;
 use Schoolbox\Resource\FilesystemFactory;
@@ -302,10 +303,30 @@ class Controller extends Base
      */
     public function getHealthcheck()
     {
+        // Anonymous class that just captures the log messages
+        $logger = new class extends AbstractLogger {
+            private array $log = [];
+
+            public function log($level, $message, array $context = []): void
+            {
+                $this->log[] = $message;
+            }
+
+            public function getLog(): string
+            {
+                return implode("\n", $this->log);
+            }
+        };
         try {
-            $healthCheck = new Healthcheck($this->databaseExternal, $this->databaseFactory, $this->getConfigLoader());
+            $healthCheck = new Healthcheck(
+                $this->databaseExternal,
+                $this->databaseFactory,
+                $this->getConfigLoader(),
+                $logger
+            );
             $healthCheck->run();
             $output = $healthCheck->results();
+            $output['log'] = $logger->getLog();
         } catch (InvalidArgumentException | AlaressDatabaseException $e) {
             $output = [
                 'errors' => [

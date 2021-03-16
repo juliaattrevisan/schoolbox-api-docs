@@ -58,11 +58,9 @@ HELP;
         /** @var IConnector $databaseExternal */
         $databaseExternal = $this->getDi()->get('databaseExternal');
 
-        $healthCheck = new Healthcheck($databaseExternal, $factory, $this->getConfig());
+        $healthCheck = new Healthcheck($databaseExternal, $factory, $this->getConfig(), $this->getLogger());
         $healthCheck->run();
         $results = $healthCheck->results();
-
-        $this->getLogger()->info($results['log']);
 
         foreach ($results['errors'] ?? [] as $error) {
             $this->getLogger()->error($error);
@@ -70,5 +68,5 @@ HELP;
     }
 };
 
-$kernel = new CliTool\Kernel($app);
+$kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]);
 $kernel->runApp();
