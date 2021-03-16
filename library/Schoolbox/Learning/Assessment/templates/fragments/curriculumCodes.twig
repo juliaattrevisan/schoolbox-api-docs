@@ -1,6 +1,6 @@
 {% set entityType = entityType ?: 'Folder' %}
 {% if config.curriculum_tagging_enabled %}
-    <script src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+    <script src="{{ CDN_PREFIX }}/curriculum/javascript/jquery.curriculumSelector.js"></script>
     <fieldset>
         <legend>Curriculum</legend>
         <div class="row">

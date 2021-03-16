@@ -190,7 +190,7 @@
 <script src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/curriculum/javascript/jquery.curriculumSelector.js"></script>
 {% autoescape 'js' %}
 <script type="text/javascript">
     let curriculumTaggingEnabled = Boolean('{{ curriculumTaggingEnabled }}');
