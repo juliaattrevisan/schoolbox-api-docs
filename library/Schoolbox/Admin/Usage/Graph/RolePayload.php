@@ -92,25 +92,10 @@ class RolePayload
         $result = $this->database->executeQuery($query);
 
         $stack = [];
-        $max = 0;
 
         while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-            $max += $row['size'];
-
             $stack[] = $row;
         }
-
-        /* Rephrase bytes as a percentage
-         */
-        foreach ($stack as &$current) {
-            if ($max) {
-                $current['size'] = round(100 * $current['size'] / $max);
-            } else {
-                $current['size'] = 0;
-            }
-        }
-
-        unset($current);
 
         return $stack;
     }

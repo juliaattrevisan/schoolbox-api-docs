@@ -135,7 +135,7 @@ export default {
                                 dataLabels: {
                                     enabled: true,
                                     formatter: function () {
-                                        return '<span style="color: #777777">' + this.y + '%</span>'
+                                        return '<span style="color: #777777">' + filesize(this.y) + '</span>'
                                     }
                                 }
                             }
@@ -168,7 +168,6 @@ export default {
                         yAxis: {
                             allowDecimals: false,
                             min: 0,
-                            max: 100,
                             title: {
                                 text: 'Percentage'
                             }
