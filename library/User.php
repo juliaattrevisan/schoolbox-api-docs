@@ -269,9 +269,10 @@ class User extends DeprecatedModel
         /* Allow search on synergy id
          */
         $query = "
-            SELECT user.*, groups.name AS group_name
+            SELECT user.*, groups.name AS group_name, lu_year_level.name AS year_name
             FROM `user`
             LEFT JOIN `groups` ON `user`.group_id = `groups`.id
+            LEFT JOIN `lu_year_level` ON `user`.year_id = `lu_year_level`.id AND `lu_year_level`.deleted_at IS NULL
             WHERE $wherePart
         ";
         $query .= " ORDER BY lastname, firstname ASC
