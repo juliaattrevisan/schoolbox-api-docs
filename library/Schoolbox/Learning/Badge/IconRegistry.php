@@ -144,7 +144,7 @@ class IconRegistry
      */
     public function __construct()
     {
-        $this->root = __DIR__ . '/../../../../www/images/badges';
+        $this->root = __DIR__ . '/../../../../www/static/images/badges';
     }
 
 
