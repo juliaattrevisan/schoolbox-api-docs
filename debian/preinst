@@ -52,6 +52,9 @@ case "$1" in
                 systemctl stop "$service"
             done
         done
+
+        echo "Removing cronjobs" | tee -a /var/log/schoolbox/upgrade.log
+        find /etc/cron.d -iname 'sbc_schoolbox_*' -delete 2>&1 | tee -a /var/log/schoolbox/upgrade.log
     ;;
 
     abort-upgrade)
