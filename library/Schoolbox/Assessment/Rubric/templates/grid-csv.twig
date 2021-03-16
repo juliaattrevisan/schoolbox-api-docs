@@ -1,7 +1,7 @@
 <script type="text/javascript">
     $(function () {
         // listen for the attachzone doing its thing
-        $('#rubric-attachable{{ idSuffix }}').on('addedfile.attachzone success.attachzone', function (e, data) {
+        $('#rubric-attachable{{ idSuffix }}').on('success.attachzone', function (e, data) {
 
             // do nothing
             if (typeof data.hash === 'undefined') {
