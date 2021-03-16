@@ -64,6 +64,17 @@ DESCRIPTION
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
+        $connector = new \Schoolbox\Learning\InlineGrader\Kami\Connector(
+            new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]),
+            $this->getConfig()->get('kami_api_key'),
+            $this->getConfig()->get('site_school_code')
+        );
+
+        if (!$connector->isEnabled()) {
+            $this->getLogger()->warning('Kami has not been enabled. Aborting');
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
         if ($this->getOpt('since')) {
             $date = new Alaress_Date_Format($this->getOpt('since:'), Alaress_Date_Format::DATABASE_DATE_FORMAT);
         } else {

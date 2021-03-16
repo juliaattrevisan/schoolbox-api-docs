@@ -67,6 +67,16 @@ DESCRIPTION
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
+        $plagscanMapper       = PlagscanMapper::getInstance();
+        $submissionFileMapper = SubmissionFileMapper::getInstance();
+
+        if (!$plagscanMapper->getConnector()) {
+            /* Plagscan not configured - nothing to do
+             */
+            $this->getLogger()->warning('Plagscan has not been enabled. Aborting');
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
         if ($this->getOpt('since')) {
             $date = new Alaress_Date_Format($this->getOpt('since:'), Alaress_Date_Format::DATABASE_DATE_FORMAT);
         } else {
@@ -91,9 +101,6 @@ DESCRIPTION
                     AND storage.ext IN ('" . implode("', '", array_keys(ValidFiles::$validDocuments)) . "')";
 
         $db = $this->getDatabaseInternal();
-
-        $plagscanMapper       = PlagscanMapper::getInstance();
-        $submissionFileMapper = SubmissionFileMapper::getInstance();
 
         $result = $db->executeQuery($selectQuery);
         if ($this->perform()) {
