@@ -39,9 +39,8 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@adminPackage/index.twig',
                 [
-                    'pageCurrent' => Subnav::PARENT_MODULES,
-                    'subpageCurrent' => Subnav::CHILD_MODULES_PACKAGES,
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_MODULES, Subnav::CHILD_MODULES_PACKAGES),
+                    'pageCurrent' => $this->router->generate('adminPackage.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminPackage.getIndex')),
                     'packages'    => $this->packageMapper->findAll(),
                 ]
             )

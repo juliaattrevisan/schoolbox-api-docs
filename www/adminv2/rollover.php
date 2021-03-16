@@ -24,8 +24,8 @@ $this->setFile(TEMPLATE_content, 'adminv2/rollover.html');
 
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
-    ->generatePhplib($this, Subnav::PARENT_LMS, Subnav::CHILD_LMS_CLASS_ROLLOVER)
-    ->generateBreadcrumbsHtml($this, Subnav::PARENT_LMS, Subnav::CHILD_LMS_CLASS_ROLLOVER);
+    ->generatePhplib($this, '/adminv2/rollover')
+    ->generateBreadcrumbsHtml($this, '/adminv2/rollover');
 
 $openCategory = 0;
 

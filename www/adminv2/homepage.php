@@ -36,8 +36,8 @@ $this->setBlock('component_page', 'component', 'component_block');
 // include the admin navigation
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
-    ->generatePhplib($this, Subnav::PARENT_HOMEPAGE, null)
-    ->generateBreadcrumbsHtml($this, Subnav::PARENT_HOMEPAGE, null);
+    ->generatePhplib($this, '/adminv2/homepage')
+    ->generateBreadcrumbsHtml($this, '/adminv2/homepage');
 
 // Get list of templates
 $homepageTemplateMapper = new \Schoolbox\Resource\HomepageTemplateMapper();

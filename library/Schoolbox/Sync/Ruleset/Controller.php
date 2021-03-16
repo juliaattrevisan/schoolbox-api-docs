@@ -86,9 +86,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/intro.twig',
             'data' => [
-                'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
-                'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_UPS,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_UPS),
+                'pageCurrent' => $this->router->generate('upsRuleset.intro'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('upsRuleset.intro')),
                 'allNavigation' => $allNavigation->getAllNodes(),
                 'logs' => $this->findLogs(3)
             ]
@@ -128,9 +127,8 @@ class Controller extends Base
             $twigData['logExtensionExists'] = false;
         }
 
-        $twigData['pageCurrent'] = Subnav::PARENT_USER_MANAGEMENT;
-        $twigData['subpageCurrent'] = Subnav::CHILD_USER_MANAGEMENT_UPS;
-        $twigData['allBreadcrumbs'] = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_UPS);
+        $twigData['pageCurrent'] = $this->router->generate('upsRuleset.intro');
+        $twigData['allBreadcrumbs'] = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('upsRuleset.intro'));
 
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/ruleset.twig',
@@ -186,9 +184,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/log/list.twig',
             'data'     => [
-                'pageCurrent'    => Subnav::PARENT_USER_MANAGEMENT,
-                'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_UPS,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_UPS),
+                'pageCurrent' => $this->router->generate('upsRuleset.intro'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('upsRuleset.intro')),
                 'logs'           => $this->findLogs()
             ]
         ]);
@@ -279,7 +276,7 @@ class Controller extends Base
                     'id' => $logId,
                     'filterBlacklist' => ['rulestring'],
                     'log' => $log,
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_USER_MANAGEMENT, Subnav::CHILD_USER_MANAGEMENT_UPS),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('upsRuleset.intro')),
                     'filterSummary' => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
                 ];
 

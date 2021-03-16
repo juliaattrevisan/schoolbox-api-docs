@@ -83,9 +83,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminTerms/index.twig',
             'data'     => [
-                'pageCurrent'      => Subnav::PARENT_LMS,
-                'subpageCurrent'   => Subnav::CHILD_LMS_ACADEMIC_PERIOD,
-                'allBreadcrumbs'   => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LMS, Subnav::CHILD_LMS_ACADEMIC_PERIOD),
+                'pageCurrent'      => $this->router->generate('adminTerms.getIndex'),
+                'allBreadcrumbs'   => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminTerms.getIndex')),
                 'terms'            => $terms,
                 'yearLevelValues'  => $yearLevelValues,
                 'yearLevelOptions' => $yearLevelOptions,

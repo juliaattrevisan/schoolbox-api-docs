@@ -7,8 +7,7 @@
  # via renderAdminNavigation() twig extension
  #
  # @param array $adminSubnav      A set of tuples for each node in the menu
- # @param string $pageCurrent     A string corresponding to identifier in a tuple
- # @param string $subpageCurrent  A string corresponding to identifier in a tuple
+ # @param string $pageCurrent     A string corresponding to url in a tuple
  #}
 <script type="text/javascript">
     $(function() {
@@ -31,27 +30,35 @@
     });
 </script>
 
-{# Top level breadcrumby title
+{# Lookahead to figure out which urls are selected
+ # Shared among the vertical menu and also the top level breadcrumby title
  # Its crumbs are derived from the cosmetic names given in the adminSubnav stack
  # 'Home' is the default node which circumstantially matches one in the stack
  #}
 {% set parentSelected = 'Home' %}
+{% set parentSelectedUrl = '/adminv2/home' %}
 {% set childSelected = false %}
+{% set childSelectedUrl = false %}
 
 {% for parentUrl, parentData in adminSubnav %}
-    {% if parentData.identifier == pageCurrent %}
+    {% if parentUrl == pageCurrent %}
         {% set parentSelected = parentData.name %}
+        {% set parentSelectedUrl = parentUrl %}
+    {% endif %}
 
-        {# Find out if there's a subpage breadcrumby title
-         # This is also derived from the adminSubnav stack
-         #}
-        {% if parentData.children|length %}
-            {% for childUrl, childData in parentData.children %}
-                {% if childData.identifier == subpageCurrent %}
-                    {% set childSelected = childData.name %}
-                {% endif %}
-            {% endfor %}
-        {% endif %}
+    {# Find out if there's a subpage breadcrumby title
+     # This is also derived from the adminSubnav stack
+     #}
+    {% if parentData.children|length %}
+        {% for childUrl, childData in parentData.children %}
+            {% if childUrl == subpageCurrent %}
+                {% set parentSelected = parentData.name %}
+                {% set parentSelectedUrl = parentUrl %}
+
+                {% set childSelected = childData.name %}
+                {% set childSelectedUrl = childUrl %}
+            {% endif %}
+        {% endfor %}
     {% endif %}
 {% endfor %}
 
@@ -71,35 +78,25 @@
              # Each phplib controller specifies a string for pageCurrent so you have to match
              # them up here, circumstantially, to provide indication of which node is active
              #}
-            {% set parentSelected = '' %}
+            {% set parentSelectedCss = '' %}
 
-            {% if parentData.identifier == pageCurrent %}
-                {% set parentSelected = 'active' %}
+            {% if parentUrl == parentSelectedUrl %}
+                {% set parentSelectedCss = 'active' %}
             {% endif %}
 
-            <li class="{{ parentSelected }} {% if parentData.children|length %}parent-item{% endif %}" role="menuitem" data-parent-item>
-
-                {# These are nodes that doesn't actually exist
-                 # They are a hybrid concoction of a variety of urls
-                 #}
-                {% if parentUrl in ['calendar', 'lms', 'personalisation', 'eportfolio'] %}
-                    <a>{{ parentData.name }}</a>
-                {% else %}
-                    <a href="/adminv2/{{ parentUrl }}">{{ parentData.name }}</a>
-                {% endif %}
+            <li class="{{ parentSelectedCss }} {% if parentData.children|length %}parent-item{% endif %}" role="menuitem" data-parent-item>
+                <a href="{{ parentUrl }}">{{ parentData.name }}</a>
 
                 {% if parentData.children|length %}
                     <ul class="flyout" role="navigation" data-admin-subnav-flyout>
                         {% for childUrl, childData in parentData.children %}
-                            {% set childSelected = '' %}
+                            {% set childSelectedCss = '' %}
 
-                            {% if parentSelected|length %}
-                                {% if childData.identifier == subpageCurrent %}
-                                    {% set childSelected = 'active' %}
-                                {% endif %}
+                            {% if childUrl == childSelectedUrl %}
+                                {% set childSelectedCss = 'active' %}
                             {% endif %}
 
-                            <li class='{{ childSelected }}' role="menuitem"><a href="/adminv2/{{ childUrl }}">{{ childData.name }}</a></li>
+                            <li class='{{ childSelectedCss }}' role="menuitem"><a href="{{ childUrl }}">{{ childData.name }}</a></li>
                         {% endfor %}
                     </ul>
                 {% endif %}

@@ -22,142 +22,6 @@ use Twig\Loader\FilesystemLoader;
 class Subnav
 {
 
-    /* Arbitrary strings that uniquely identify a page and its subpages
-     * Used to preselect menu options so users have a sense of where they are
-     * The strings can actually be anything, there's no particular format
-     *
-     * Although, sometimes controllers get these values from a url parameter
-     * and won't be explicitly stated as one of these consts, so be mindful
-     * that there are multiple ways to match these identifiers
-     */
-    public const PARENT_HOME = 'home';
-
-    /* These are derived from a url param
-     */
-    public const PARENT_CALENDAR = 'calendar';
-    public const CHILD_CALENDAR_CLEANUP = 'Cleanup';
-    public const CHILD_CALENDAR_IMPORT = 'Import';
-    public const CHILD_CALENDAR_SUBSCRIBE = 'Subscribe';
-
-    /* These are in a hardcoded array in the controller
-     */
-    public const PARENT_ENGAGEMENT = 'engagement';
-    public const CHILD_ENGAGEMENT_COLLABORATION = 'collaboration';
-    public const CHILD_ENGAGEMENT_COMPONENT_USAGE = 'components';
-    public const CHILD_ENGAGEMENT_DUE_WORK = 'dueWork';
-    public const CHILD_ENGAGEMENT_FILES = 'files';
-    public const CHILD_ENGAGEMENT_FILETYPES = 'fileTypes';
-    public const CHILD_ENGAGEMENT_LINKS = 'links';
-    public const CHILD_ENGAGEMENT_LOGIN = 'login';
-    public const CHILD_ENGAGEMENT_MOBILE_APPS = 'mobile';
-    public const CHILD_ENGAGEMENT_NEWS_POSTED = 'news';
-    public const CHILD_ENGAGEMENT_QUIZZES = 'quiz';
-
-    public const PARENT_EPORTFOLIO = 'eportfolio';
-    public const CHILD_EPORTFOLIO_TEMPLATES = 'templates';
-    public const CHILD_EPORTFOLIO_DEPLOYMENT = 'deployment';
-
-    public const PARENT_FILTERS = 'filters';
-
-    public const PARENT_HOMEPAGE = 'homepage';
-
-    public const PARENT_IMPORT = 'import/directImport';
-    public const CHILD_IMPORT_PAGES = 'pages';
-    public const CHILD_IMPORT_PASTORAL_CARE = 'pastoralCare';
-    public const CHILD_IMPORT_PORTRAIT = 'portrait';
-    public const CHILD_IMPORT_USER_ACCOUNTS = 'userAccounts';
-
-    public const PARENT_LMS = 'lms';
-    public const CHILD_LMS_ACADEMIC_PERIOD = 'terms';
-    public const CHILD_LMS_CLASS_ROLLOVER = 'rollover';
-    public const CHILD_LMS_COURSE_BUILDER = 'courseBuilder';
-    public const CHILD_LMS_DOCUMENT_MANAGEMENT = 'documentManagement';
-    public const CHILD_LMS_GRADES = 'grades';
-    public const CHILD_LMS_POLICY = 'policy';
-    public const CHILD_LMS_LTI = 'lti';
-    public const CHILD_LMS_RUBRICS = 'rubrics';
-
-    /* The values here are actually derived from db table names,
-     * so you can't just call it anything without consulting $table in Lists/Controller.php
-     */
-    public const PARENT_LISTS = 'lists';
-    public const CHILD_LISTS_BADGE_CATEGORIES = 'achievement-category';
-    public const CHILD_LISTS_CAMPUS = 'campus';
-    public const CHILD_LISTS_COMPONENTS = 'component-definition';
-    public const CHILD_LISTS_DRIVES = 'webdav';
-    public const CHILD_LISTS_EVENT_TYPES = 'event-type';
-    public const CHILD_LISTS_HOUSES = 'house';
-    public const CHILD_LISTS_LEARNING_MOMENTS = 'evidence-tag';
-    public const CHILD_LISTS_NEWS_TOPICS = 'news-topic';
-    public const CHILD_LISTS_PASTORAL_SEVERITY = 'pastoral-severity';
-    public const CHILD_LISTS_PASTORAL_TAGS = 'pastoral-tags';
-    public const CHILD_LISTS_PASTORAL_SIS_CLASSIFICATIONS = 'pastoral-document-classification';
-    public const CHILD_LISTS_PASTORAL_SUBTYPES = 'pastoral-category';
-    public const CHILD_LISTS_PASTORAL_TYPES = 'pastoral-type';
-    public const CHILD_LISTS_RESIDENTIAL_HOUSES = 'residential-house';
-    public const CHILD_LISTS_ROLES = 'roles';
-    public const CHILD_LISTS_SUBMISSION_STATES = 'submission-errors';
-    public const CHILD_LISTS_TIMETABLE_COLOURS = 'timetable-colour';
-    public const CHILD_LISTS_USER_TITLES = 'user-title';
-    public const CHILD_LISTS_WORK_TYPES = 'submission-type';
-    public const CHILD_LISTS_YEAR_LEVELS = 'year-levels';
-
-    public const PARENT_MODULES = 'Modules';
-    public const CHILD_MODULES_BOARD_LEAVE = 'boardLeave';
-    public const CHILD_MODULES_FEATURE_TOURS = 'featureTours';
-    public const CHILD_MODULES_PACKAGES = 'packages';
-    public const CHILD_MODULES_PASTORAL_CARE = 'pastoralCare';
-
-    public const PARENT_MESSAGES = 'messages';
-    public const CHILD_MESSAGES_DELIVERY_PROVIDERS = 'deliveryProviders';
-    public const CHILD_MESSAGES_APP_REGISTRATIONS = 'mobileAppRegistrations';
-    public const CHILD_MESSAGES_SETTINGS = 'settings';
-
-    public const PARENT_NEWS = 'news';
-
-    public const PARENT_PERSONALISATION = 'personalisation';
-    public const CHILD_PERSONALISATION_DASHBOARD = 'dashboard';
-    public const CHILD_PERSONALISATION_PROFILE_BUTTONS = 'profileButtons';
-    public const CHILD_PERSONALISATION_SIDE_MENU = 'sideMenu';
-    public const CHILD_PERSONALISATION_SKIN_CONFIG = 'skinConfig';
-    public const CHILD_PERSONALISATION_TERMINOLOGY = 'terminology';
-    public const CHILD_PERSONALISATION_TOP_MENU = 'topMenu';
-
-    public const PARENT_RESOURCES = 'resources';
-    public const CHILD_RESOURCES_ALLOWED_FILE = 'allowedFile';
-    public const CHILD_RESOURCES_MEDIA_QUEUE = 'mediaQueue';
-    public const CHILD_RESOURCES_SETTINGS = 'settings';
-    public const CHILD_RESOURCES_RESTORE = 'restore';
-    public const CHILD_RESOURCES_USAGE = 'usage';
-
-    public const PARENT_SUDS = 'import/schoolDataImport';
-
-    public const PARENT_SYSTEM_SETTINGS = 'systemSettings';
-    public const CHILD_SYSTEM_SETTINGS_3RD_PARTY = 'thirdParty';
-    public const CHILD_SYSTEM_SETTINGS_DEBUGGING = 'debugging';
-    public const CHILD_SYSTEM_SETTINGS_EMAIL = 'email';
-    public const CHILD_SYSTEM_SETTINGS_EXTERNAL_DB = 'externalDb';
-    public const CHILD_SYSTEM_SETTINGS_LDAP = 'ldap';
-    public const CHILD_SYSTEM_SETTINGS_LOCALISATION = 'localisation';
-    public const CHILD_SYSTEM_SETTINGS_OAUTH = 'oauth';
-    public const CHILD_SYSTEM_SETTINGS_PATHS = 'paths';
-    public const CHILD_SYSTEM_SETTINGS_POLICY = 'policy';
-    public const CHILD_SYSTEM_SETTINGS_PROXY = 'proxy';
-    public const CHILD_SYSTEM_SETTINGS_SAML = 'saml';
-    public const CHILD_SYSTEM_SETTINGS_SECURITY = 'security';
-    public const CHILD_SYSTEM_SETTINGS_SITE = 'site';
-
-    /* Activity Report is derived from a url param
-     * Login Report is derived from a url param
-     */
-    public const PARENT_USER_MANAGEMENT = 'userManagement';
-    public const CHILD_USER_MANAGEMENT_ACTIVITY_REPORT = 'activity';
-    public const CHILD_USER_MANAGEMENT_BULK_MODIFY = 'bulkModify';
-    public const CHILD_USER_MANAGEMENT_LOGIN_LOG = 'login';
-    public const CHILD_USER_MANAGEMENT_SHAPS = 'shaps';
-    public const CHILD_USER_MANAGEMENT_UPS = 'ups';
-
-
     /**
      * For access to booleans that determine availability/visibility of certain menu
      * items based on plan, configuration, etc.
@@ -213,614 +77,545 @@ class Subnav
      */
     public function generate(): array
     {
+        /* Keys of this array uniquely identify a page and its subpages
+         * Used to preselect menu options so users have a sense of where they are
+         * URLs are semantically unique but sometimes things get a bit weird
+         * when the url gets agglutinated with a querystring param e.g. /report/activity/after...
+         * since these no longer match hardcoded keys
+         *
+         * Although, sometimes controllers get these values from a url parameter
+         * and won't be explicitly stated as one of these urls, so be mindful
+         * that there are multiple ways to match these urls
+         */
         return [
-            'home' => [
+            '/adminv2/home' => [
                 'name' => 'Home',
-                'identifier' => self::PARENT_HOME,
                 'visible' =>  true,
                 'children' => []
             ],
-            'calendar' => [
+            '/adminv2/calendar/Cleanup' => [
                 'name' => 'Calendar',
-                'identifier' => self::PARENT_CALENDAR,
                 'visible' =>  true,
                 'children' => [
-                    'calendar/Cleanup' => [
+                    '/adminv2/calendar/Cleanup' => [
                         'name' => 'Cleanup',
-                        'identifier' => self::CHILD_CALENDAR_CLEANUP,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'calendar/Import' => [
+                    '/adminv2/calendar/Import' => [
                         'name' => 'Import',
-                        'identifier' => self::CHILD_CALENDAR_IMPORT,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'calendar/Subscribe' => [
+                    '/adminv2/calendar/Subscribe' => [
                         'name' => 'Subscribe',
-                        'identifier' => self::CHILD_CALENDAR_SUBSCRIBE,
                         'visible' =>  true,
                         'children' => []
                     ],
                 ]
             ],
-            'engagement' => [
+            '/adminv2/engagement/index/collaboration' => [
                 'name' => 'Engagement',
-                'identifier' => self::PARENT_ENGAGEMENT,
                 'visible' =>  true,
                 'children' => [
-                    'engagement/index/collaboration' => [
+                    '/adminv2/engagement/index/collaboration' => [
                         'name' => 'Collaboration',
-                        'identifier' => self::CHILD_ENGAGEMENT_COLLABORATION,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/components' => [
+                    '/adminv2/engagement/index/components' => [
                         'name' => 'Component Usage',
-                        'identifier' => self::CHILD_ENGAGEMENT_COMPONENT_USAGE,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/dueWork' => [
+                    '/adminv2/engagement/index/dueWork' => [
                         'name' => 'Due Work',
-                        'identifier' => self::CHILD_ENGAGEMENT_DUE_WORK,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/files' => [
+                    '/adminv2/engagement/index/files' => [
                         'name' => 'Files',
-                        'identifier' => self::CHILD_ENGAGEMENT_FILES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/fileTypes' => [
+                    '/adminv2/engagement/index/fileTypes' => [
                         'name' => 'File Types',
-                        'identifier' => self::CHILD_ENGAGEMENT_FILETYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/links' => [
+                    '/adminv2/engagement/index/links' => [
                         'name' => 'Links',
-                        'identifier' => self::CHILD_ENGAGEMENT_LINKS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/login' => [
+                    '/adminv2/engagement/index/login' => [
                         'name' => 'Login',
-                        'identifier' => self::CHILD_ENGAGEMENT_LOGIN,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/mobile' => [
+                    '/adminv2/engagement/index/mobile' => [
                         'name' => 'Mobile Apps',
-                        'identifier' => self::CHILD_ENGAGEMENT_MOBILE_APPS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/news' => [
+                    '/adminv2/engagement/index/news' => [
                         'name' => 'News Posted',
-                        'identifier' => self::CHILD_ENGAGEMENT_NEWS_POSTED,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'engagement/index/quiz' => [
+                    '/adminv2/engagement/index/quiz' => [
                         'name' => 'Quizzes',
-                        'identifier' => self::CHILD_ENGAGEMENT_QUIZZES,
                         'visible' =>  true,
                         'children' => []
                     ],
                 ]
             ],
-            'eportfolio' => [
+            '/adminv2/eportfolio' => [
                 'name' => 'ePortfolio',
-                'identifier' => self::PARENT_EPORTFOLIO,
                 'visible' =>  true,
                 'children' => [
-                    'eportfolio' => [
+                    '/adminv2/eportfolio' => [
                         'name' => 'Templates',
-                        'identifier' => self::CHILD_EPORTFOLIO_TEMPLATES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'eportfolio/deploy' => [
+                    '/adminv2/eportfolio/deploy' => [
                         'name' => 'Deployment',
-                        'identifier' => self::CHILD_EPORTFOLIO_DEPLOYMENT,
                         'visible' =>  true,
                         'children' => []
                     ],
                 ]
             ],
-            'filters' => [
+            '/adminv2/filters' => [
                 'name' => 'Filters',
-                'identifier' => self::PARENT_FILTERS,
                 'visible' =>  true,
                 'children' => []
             ],
-            'homepage' => [
+            '/adminv2/homepage' => [
                 'name' => 'Homepage Templates',
-                'identifier' => self::PARENT_HOMEPAGE,
                 'visible' =>  true,
                 'children' => []
             ],
-            'import/directImport' => [
+            '/adminv2/import/directImport' => [
                 'name' => 'Import',
-                'identifier' => self::PARENT_IMPORT,
                 'visible' =>  true,
                 'children' => [
-                    'import/folder' => [
+                    '/adminv2/import/folder' => [
                         'name' => 'Pages',
-                        'identifier' => self::CHILD_IMPORT_PAGES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'import/pastoral' => [
+                    '/adminv2/import/pastoral' => [
                         'name' => 'Pastoral Care',
-                        'identifier' => self::CHILD_IMPORT_PASTORAL_CARE,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'import/photos/upload' => [
+                    '/adminv2/import/photos/upload' => [
                         'name' => 'Portrait Photos',
-                        'identifier' => self::CHILD_IMPORT_PORTRAIT,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'import/userAccount' => [
+                    '/adminv2/import/userAccount' => [
                         'name' => 'User Accounts',
-                        'identifier' => self::CHILD_IMPORT_USER_ACCOUNTS,
                         'visible' =>  true,
                         'children' => []
                     ],
                 ]
             ],
-            'lms' => [
+            '/adminv2/terms' => [
                 'name' => 'LMS',
-                'identifier' => self::PARENT_LMS,
                 'visible' =>  true,
                 'children' => [
-                    'terms' => [
+                    '/adminv2/terms' => [
                         'name' => 'Academic Period',
-                        'identifier' => self::CHILD_LMS_ACADEMIC_PERIOD,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'rollover' => [
+                    '/adminv2/rollover' => [
                         'name' => 'Class Rollover',
-                        'identifier' => self::CHILD_LMS_CLASS_ROLLOVER,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'course-builder' => [
+                    '/adminv2/course-builder' => [
                         'name' => 'Course Builder',
-                        'identifier' => self::CHILD_LMS_COURSE_BUILDER,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Document+Management' => [
+                    '/adminv2/setting/Document%20Management' => [
                         'name' => 'Document Management',
-                        'identifier' => self::CHILD_LMS_DOCUMENT_MANAGEMENT,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'grades' => [
+                    '/adminv2/grades' => [
                         'name' => 'Grades',
-                        'identifier' => self::CHILD_LMS_GRADES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/LMS+Policy' => [
+                    '/adminv2/setting/LMS%20Policy' => [
                         'name' => 'LMS Policy',
-                        'identifier' => self::CHILD_LMS_POLICY,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lti' => [
+                    '/adminv2/lti' => [
                         'name' => 'LTI Providers',
-                        'identifier' => self::CHILD_LMS_LTI,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'rubric-results' => [
+                    '/adminv2/rubric-results' => [
                         'name' => 'Rubrics',
-                        'identifier' => self::CHILD_LMS_RUBRICS,
                         'visible' =>  true,
                         'children' => []
                     ],
                 ]
             ],
-            'lists' => [
+            '/adminv2/lists/achievement-category' => [
                 'name' => 'Lists',
-                'identifier' => self::PARENT_LISTS,
                 'visible' =>  true,
                 'children' => [
-                    'lists/achievement-category' => [
+                    '/adminv2/lists/achievement-category' => [
                         'name' => 'Badge Categories',
-                        'identifier' => self::CHILD_LISTS_BADGE_CATEGORIES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/campus' => [
+                    '/adminv2/lists/campus' => [
                         'name' => 'Campus',
-                        'identifier' => self::CHILD_LISTS_CAMPUS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/component-definition' => [
+                    '/adminv2/lists/component-definition' => [
                         'name' => 'Components',
-                        'identifier' => self::CHILD_LISTS_COMPONENTS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/webdav' => [
+                    '/adminv2/lists/webdav' => [
                         'name' => 'Drives',
-                        'identifier' => self::CHILD_LISTS_DRIVES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/event-type' => [
+                    '/adminv2/lists/event-type' => [
                         'name' => 'Event Types',
-                        'identifier' => self::CHILD_LISTS_EVENT_TYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/house' => [
+                    '/adminv2/lists/house' => [
                         'name' => 'Houses',
-                        'identifier' => self::CHILD_LISTS_HOUSES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/evidence-tag' => [
+                    '/adminv2/lists/evidence-tag' => [
                         'name' => 'Learning Moments',
-                        'identifier' => self::CHILD_LISTS_LEARNING_MOMENTS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/news-topic' => [
+                    '/adminv2/lists/news-topic' => [
                         'name' => 'News Topics',
-                        'identifier' => self::CHILD_LISTS_NEWS_TOPICS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/pastoral-severity' => [
+                    '/adminv2/lists/pastoral-severity' => [
                         'name' => 'Pastoral Record Severity',
-                        'identifier' => self::CHILD_LISTS_PASTORAL_SEVERITY,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/pastoral-tags' => [
+                    '/adminv2/lists/pastoral-tags' => [
                         'name' => 'Pastoral Record Tags',
-                        'identifier' => self::CHILD_LISTS_PASTORAL_TAGS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/pastoral-document-classification' => [
+                    '/adminv2/lists/pastoral-document-classification' => [
                         'name' => 'Pastoral SIS Document Classifications',
-                        'identifier' => self::CHILD_LISTS_PASTORAL_SIS_CLASSIFICATIONS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/pastoral-category' => [
+                    '/adminv2/lists/pastoral-category' => [
                         'name' => 'Pastoral Sub-Types',
-                        'identifier' => self::CHILD_LISTS_PASTORAL_SUBTYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/pastoral-type' => [
+                    '/adminv2/lists/pastoral-type' => [
                         'name' => 'Pastoral Types',
-                        'identifier' => self::CHILD_LISTS_PASTORAL_TYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/residential-house' => [
+                    '/adminv2/lists/residential-house' => [
                         'name' => 'Residential Houses',
-                        'identifier' => self::CHILD_LISTS_RESIDENTIAL_HOUSES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/roles' => [
+                    '/adminv2/lists/roles' => [
                         'name' => 'Roles',
-                        'identifier' => self::CHILD_LISTS_ROLES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/submission-errors' => [
+                    '/adminv2/lists/submission-errors' => [
                         'name' => 'Submission States',
-                        'identifier' => self::CHILD_LISTS_SUBMISSION_STATES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/timetable-colour' => [
+                    '/adminv2/lists/timetable-colour' => [
                         'name' => 'Timetable Colours',
-                        'identifier' => self::CHILD_LISTS_TIMETABLE_COLOURS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/user-title' => [
+                    '/adminv2/lists/user-title' => [
                         'name' => 'User Titles',
-                        'identifier' => self::CHILD_LISTS_USER_TITLES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/submission-type' => [
+                    '/adminv2/lists/submission-type' => [
                         'name' => 'Work Types',
-                        'identifier' => self::CHILD_LISTS_WORK_TYPES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'lists/year-levels' => [
+                    '/adminv2/lists/year-levels' => [
                         'name' => 'Year Levels',
-                        'identifier' => self::CHILD_LISTS_YEAR_LEVELS,
                         'visible' =>  true,
                         'children' => []
                     ],
                 ]
             ],
-            'setting/Modules' => [
+            '/adminv2/setting/Modules' => [
                 'name' => 'Modules',
-                'identifier' => self::PARENT_MODULES,
                 'visible' =>  true,
                 'children' => [
-                    'setting/Board+Leave' => [
+                    '/adminv2/setting/Board%20Leave' => [
                         'name' => 'Board Leave',
-                        'identifier' => self::CHILD_MODULES_BOARD_LEAVE,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'feature-tours' => [
+                    '/adminv2/feature-tours' => [
                         'name' => 'Feature Tours',
-                        'identifier' => self::CHILD_MODULES_FEATURE_TOURS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'package' => [
+                    '/adminv2/package' => [
                         'name' => 'Packages',
-                        'identifier' => self::CHILD_MODULES_PACKAGES,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Pastoral+Care' => [
+                    '/adminv2/setting/Pastoral%20Care' => [
                         'name' => 'Pastoral Care',
-                        'identifier' => self::CHILD_MODULES_PASTORAL_CARE,
                         'visible' =>  true,
                         'children' => []
                     ],
                 ]
             ],
-            'news' => [
+            '/adminv2/news' => [
                 'name' => 'News',
-                'identifier' => self::PARENT_NEWS,
                 'visible' =>  true,
                 'children' => []
             ],
-            'messages' => [
+            '/adminv2/messages' => [
                 'name' => 'Notifications',
-                'identifier' => self::PARENT_MESSAGES,
                 'visible' =>  true,
                 'children' => [
-                    'messages/apps' => [
+                    '/adminv2/messages/apps' => [
                         'name' => 'Delivery Providers',
-                        'identifier' => self::CHILD_MESSAGES_DELIVERY_PROVIDERS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'messages/puush' => [
+                    '/adminv2/messages/puush' => [
                         'name' => 'Mobile App Registrations',
-                        'identifier' => self::CHILD_MESSAGES_APP_REGISTRATIONS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'messages/configure' => [
+                    '/adminv2/messages/configure' => [
                         'name' => 'Settings',
-                        'identifier' => self::CHILD_MESSAGES_SETTINGS,
                         'visible' =>  true,
                         'children' => []
                     ],
                 ]
             ],
-            'personalisation' => [
+            '/adminv2/dashboard' => [
                 'name' => 'Personalisation',
-                'identifier' => self::PARENT_PERSONALISATION,
                 'visible' =>  true,
                 'children' => [
-                    'dashboard' => [
+                    '/adminv2/dashboard' => [
                         'name' => 'Dashboard',
-                        'identifier' => self::CHILD_PERSONALISATION_DASHBOARD,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'profile-button' => [
+                    '/adminv2/profile-button' => [
                         'name' => 'Profile Buttons',
-                        'identifier' => self::CHILD_PERSONALISATION_PROFILE_BUTTONS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'menu-side' => [
+                    '/adminv2/menu-side' => [
                         'name' => 'Side Menu',
-                        'identifier' => self::CHILD_PERSONALISATION_SIDE_MENU,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Skin+Config' => [
+                    '/adminv2/setting/Skin%20Config' => [
                         'name' => 'Skin Config',
-                        'identifier' => self::CHILD_PERSONALISATION_SKIN_CONFIG,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'terminology' => [
+                    '/adminv2/terminology' => [
                         'name' => 'Terminology',
-                        'identifier' => self::CHILD_PERSONALISATION_TERMINOLOGY,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'menu-top' => [
+                    '/adminv2/menu-top' => [
                         'name' => 'Top Menu',
-                        'identifier' => self::CHILD_PERSONALISATION_TOP_MENU,
                         'visible' =>  true,
                         'children' => []
                     ],
                 ]
             ],
-            'setting/Resources' => [
+            '/adminv2/setting/Resources' => [
                 'name' => 'Resources',
-                'identifier' => self::PARENT_RESOURCES,
                 'visible' =>  true,
                 'children' => [
-                    'allowed-file' => [
+                    '/adminv2/allowed-file' => [
                         'name' => 'Allowed Files',
-                        'identifier' => self::CHILD_RESOURCES_ALLOWED_FILE,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'video' => [
+                    '/adminv2/video' => [
                         'name' => 'Media Queue',
-                        'identifier' => self::CHILD_RESOURCES_MEDIA_QUEUE,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Resources' => [
+                    '/adminv2/setting/Resources' => [
                         'name' => 'Settings',
-                        'identifier' => self::CHILD_RESOURCES_SETTINGS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'restore' => [
+                    '/adminv2/restore' => [
                         'name' => 'Restore',
-                        'identifier' => self::CHILD_RESOURCES_RESTORE,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'usage' => [
+                    '/adminv2/setting/usage' => [
                         'name' => 'Usage',
-                        'identifier' => self::CHILD_RESOURCES_USAGE,
                         'visible' =>  true,
                         'children' => []
                     ],
                 ]
             ],
-            'import/schoolDataImport' => [
+            '/adminv2/import/schoolDataImport' => [
                 'name' => 'School Data Import',
-                'identifier' => self::PARENT_SUDS,
                 'visible' =>  $this->configLoader->get('external_type') === 'schoolbox',
-                'children' => []
-            ],
-            'setting' => [
-                'name' => 'System Settings',
-                'identifier' => self::PARENT_SYSTEM_SETTINGS,
-                'visible' =>  true,
                 'children' => [
-                    'setting/3rd+Party+Services' => [
-                        'name' => '3rd Party Services',
-                        'identifier' => self::CHILD_SYSTEM_SETTINGS_3RD_PARTY,
+                    '/adminv2/import/profile' => [
+                        'name' => 'User Profiles',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Debugging' => [
-                        'name' => 'Debugging',
-                        'identifier' => self::CHILD_SYSTEM_SETTINGS_DEBUGGING,
+                    '/adminv2/import/timetableStructure' => [
+                        'name' => 'Timetable Structure',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/Email' => [
-                        'name' => 'Email',
-                        'identifier' => self::CHILD_SYSTEM_SETTINGS_EMAIL,
+                    '/adminv2/import/timetable' => [
+                        'name' => 'Timetable',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'setting/External+DB' => [
-                        'name' => 'External DB',
-                        'identifier' => self::CHILD_SYSTEM_SETTINGS_EXTERNAL_DB,
-                        'visible' =>  true,
-                        'children' => []
-                    ],
-                    'setting/LDAP' => [
-                        'name' => 'LDAP',
-                        'identifier' => self::CHILD_SYSTEM_SETTINGS_LDAP,
-                        'visible' =>  true,
-                        'children' => []
-                    ],
-                    'setting/Localisation' => [
-                        'name' => 'Localisation',
-                        'identifier' => self::CHILD_SYSTEM_SETTINGS_LOCALISATION,
-                        'visible' =>  true,
-                        'children' => []
-                    ],
-                    'oauth' => [
-                        'name' => 'oAuth Provider Configuration',
-                        'identifier' => self::CHILD_SYSTEM_SETTINGS_OAUTH,
-                        'visible' =>  true,
-                        'children' => []
-                    ],
-                    'setting/Paths' => [
-                        'name' => 'Paths',
-                        'identifier' => self::CHILD_SYSTEM_SETTINGS_PATHS,
-                        'visible' =>  true,
-                        'children' => []
-                    ],
-                    'setting/Policy' => [
-                        'name' => 'Policy',
-                        'identifier' => self::CHILD_SYSTEM_SETTINGS_POLICY,
-                        'visible' =>  true,
-                        'children' => []
-                    ],
-                    'setting/Proxy' => [
-                        'name' => 'Proxy',
-                        'identifier' => self::CHILD_SYSTEM_SETTINGS_PROXY,
-                        'visible' =>  true,
-                        'children' => []
-                    ],
-                    'setting/SAML' => [
-                        'name' => 'SAML',
-                        'identifier' => self::CHILD_SYSTEM_SETTINGS_SAML,
-                        'visible' =>  true,
-                        'children' => []
-                    ],
-                    'setting/Security' => [
-                        'name' => 'Security',
-                        'identifier' => self::CHILD_SYSTEM_SETTINGS_SECURITY,
-                        'visible' =>  true,
-                        'children' => []
-                    ],
-                    'setting/Site' => [
-                        'name' => 'Site',
-                        'identifier' => self::CHILD_SYSTEM_SETTINGS_SITE,
+                    '/adminv2/import/timetableEnrolment' => [
+                        'name' => 'Timetable Enrolment',
                         'visible' =>  true,
                         'children' => []
                     ],
                 ]
             ],
-            'user' => [
-                'name' => 'User Management',
-                'identifier' => self::PARENT_USER_MANAGEMENT,
+            '/adminv2/setting' => [
+                'name' => 'System Settings',
                 'visible' =>  true,
                 'children' => [
-                    'reports/activity/all' => [
+                    '/adminv2/setting/3rd%20Party%20Services' => [
+                        'name' => '3rd Party Services',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/setting/Debugging' => [
+                        'name' => 'Debugging',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/setting/Email' => [
+                        'name' => 'Email',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/setting/External%20DB' => [
+                        'name' => 'External DB',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/setting/LDAP' => [
+                        'name' => 'LDAP',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/setting/Localisation' => [
+                        'name' => 'Localisation',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/oauth' => [
+                        'name' => 'oAuth Provider Configuration',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/setting/Paths' => [
+                        'name' => 'Paths',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/setting/Policy' => [
+                        'name' => 'Policy',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/setting/Proxy' => [
+                        'name' => 'Proxy',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/setting/SAML' => [
+                        'name' => 'SAML',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/setting/Security' => [
+                        'name' => 'Security',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/setting/Site' => [
+                        'name' => 'Site',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                ]
+            ],
+            '/adminv2/user' => [
+                'name' => 'User Management',
+                'visible' =>  true,
+                'children' => [
+                    '/adminv2/reports/activity/all' => [
                         'name' => 'Activity Report',
-                        'identifier' => self::CHILD_USER_MANAGEMENT_ACTIVITY_REPORT,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'user/bulk/modify' => [
+                    '/adminv2/user/bulk/modify' => [
                         'name' => 'Bulk Modify',
-                        'identifier' => self::CHILD_USER_MANAGEMENT_BULK_MODIFY,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'reports/login/all' => [
+                    '/adminv2/reports/login/all' => [
                         'name' => 'Login Log',
-                        'identifier' => self::CHILD_USER_MANAGEMENT_LOGIN_LOG,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'shaps' => [
+                    '/adminv2/shaps' => [
                         'name' => 'Schoolbox Help Provisioning',
-                        'identifier' => self::CHILD_USER_MANAGEMENT_SHAPS,
                         'visible' =>  true,
                         'children' => []
                     ],
-                    'ups' => [
+                    '/adminv2/ups' => [
                         'name' => 'User Provisioning System',
-                        'identifier' => self::CHILD_USER_MANAGEMENT_UPS,
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -834,19 +629,40 @@ class Subnav
      * Render the self-contained subnav as a purely html fragment
      * so you can slam it straight into a phplib sigh
      *
-     * @param string      $pageCurrent
-     * @param string|null $subpageCurrent
+     * @param string $url
      * @return string
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function generateHtml(string $pageCurrent, ?string $subpageCurrent): string
+    public function generateHtml(string $url): string
     {
+
+        /* Look ahead for $url
+         * If it's in a child node, remember its parent and pass that too
+         */
+        $pageCurrent = '';
+        $subpageCurrent = '';
+
+        foreach ($this->generate() as $parentUrl => $parentData) {
+            if ($parentUrl === $url) {
+                $pageCurrent = $parentUrl;
+            }
+
+            if (\count($parentData['children'])) {
+                foreach ($parentData['children'] as $childUrl => $childData) {
+                    if ($childUrl === $url) {
+                        $pageCurrent = $parentUrl;
+                        $subpageCurrent = $childUrl;
+                    }
+                }
+            }
+        }
+
         return $this->twig->render('subnav.twig', [
             'adminSubnav' => $this->generate(),
             'pageCurrent' => $pageCurrent,
-            'subpageCurrent' => (string)$subpageCurrent
+            'subpageCurrent' => $subpageCurrent
         ]);
     }
 
@@ -856,16 +672,15 @@ class Subnav
      *
      * @param \SitePage   $page
      * @param string      $pageCurrent
-     * @param string|null $subpageCurrent
      * @return Subnav
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function generatePhplib(\SitePage $page, string $pageCurrent, ?string $subpageCurrent): self
+    public function generatePhplib(\SitePage $page, string $pageCurrent): self
     {
         $page->setVar([
-            'ADMIN_NAV' => $this->generateHtml($pageCurrent, $subpageCurrent)
+            'ADMIN_NAV' => $this->generateHtml($pageCurrent)
         ]);
 
         return $this;
@@ -879,25 +694,33 @@ class Subnav
      * There are multiple implementations of breadcrumbs but there should be only one
      * Those should be removed in favour of this implementation
      *
-     * @param string      $pageCurrent
-     * @param string|null $subpageCurrent
+     * @param string $url
      * @return array
      */
-    public function generateBreadcrumbs(string $pageCurrent, ?string $subpageCurrent): array
+    public function generateBreadcrumbs(string $url): array
     {
         $allCrumbs = [
             ['Administration', '/adminv2/home']
         ];
 
         foreach ($this->generate() as $parentUrl => $parentData) {
-            if ($parentData['identifier'] === $pageCurrent) {
+            if ($parentUrl === $url) {
                 $allCrumbs[] = [$parentData['name'], $parentUrl];
+            }
 
-                if (\count($parentData['children'])) {
-                    foreach ($parentData['children'] as $childUrl => $childData) {
-                        if ($childData['identifier'] === $subpageCurrent) {
-                            $allCrumbs[] = [$childData['name'],  $childUrl];
+            if (\count($parentData['children'])) {
+                foreach ($parentData['children'] as $childUrl => $childData) {
+                    if ($childUrl === $url) {
+
+                        /* parentUrl is sometimes the same as a childUrl
+                         * and manifest twice in the breadcrumb trail; we only
+                         * need the parent node if it was different to its child node
+                         */
+                        if ($parentUrl !== $url) {
+                            $allCrumbs[] = [$parentData['name'], $parentUrl];
                         }
+
+                        $allCrumbs[] = [$childData['name'],  $childUrl];
                     }
                 }
             }
@@ -912,17 +735,16 @@ class Subnav
      *
      * @param \SitePage   $page
      * @param string      $pageCurrent
-     * @param string|null $subpageCurrent
      * @return Subnav
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function generateBreadcrumbsHtml(\SitePage $page, string $pageCurrent, ?string $subpageCurrent): self
+    public function generateBreadcrumbsHtml(\SitePage $page, string $pageCurrent): self
     {
         $page->setVar([
             'ADMIN_BREADCRUMBS' => $this->twig->render('adminBreadcrumbs.twig', [
-                'allBreadcrumbs' => $this->generateBreadcrumbs($pageCurrent, $subpageCurrent)
+                'allBreadcrumbs' => $this->generateBreadcrumbs($pageCurrent)
             ])
         ]);
 

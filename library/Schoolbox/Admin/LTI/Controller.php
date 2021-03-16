@@ -35,9 +35,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminLti/modify.twig',
             'data'     => [
-                'pageCurrent' => Subnav::PARENT_LMS,
-                'subpageCurrent' => Subnav::CHILD_LMS_LTI,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LMS, Subnav::CHILD_LMS_LTI),
+                'pageCurrent' => $this->router->generate('adminLti.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
             ],
         ]);
     }
@@ -52,9 +51,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminLti/index.twig',
             'data'     => [
-                'pageCurrent' => Subnav::PARENT_LMS,
-                'subpageCurrent' => Subnav::CHILD_LMS_LTI,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LMS, Subnav::CHILD_LMS_LTI),
+                'pageCurrent' => $this->router->generate('adminLti.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
                 'providers' => $this->providerMapper->findAll()
             ],
         ]);
@@ -73,9 +71,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminLti/modify.twig',
             'data'     => [
-                'pageCurrent' => Subnav::PARENT_LMS,
-                'subpageCurrent' => Subnav::CHILD_LMS_LTI,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LMS, Subnav::CHILD_LMS_LTI),
+                'pageCurrent' => $this->router->generate('adminLti.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLti.getIndex')),
                 'provider' => $provider
             ],
         ]);

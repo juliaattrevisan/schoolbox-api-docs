@@ -70,9 +70,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminMenuTop/index.twig',
             'data'     => [
-                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
-                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_TOP_MENU,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_TOP_MENU),
+                'pageCurrent' => $this->router->generate('adminMenuTop.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuTop.getIndex')),
                 'menu' => $this->getMenuTopMapper()->findByColumn('plan_hide', 0, ['order' => ['sort_order' => BaseMapper::SORT_ORDER_ASC]])
             ],
             'title' => 'Admin - Top Menu'
@@ -113,9 +112,8 @@ class Controller extends Base
             'template' => '@adminMenuTop/modify.twig',
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
-                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
-                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_TOP_MENU,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_TOP_MENU),
+                'pageCurrent' => $this->router->generate('adminMenuTop.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuTop.getIndex')),
                 'item' => $this->getMenuTopMapper()->findOneByColumn($this->getMenuTopMapper()->getIdentifierColumn(), $id, ['cache' => false]),
                 'icons' => $this->getMenuIconMapper()->findAll(['order' => ['title' => BaseMapper::SORT_ORDER_ASC]]),
                 'roles' => $this->getRoleMapper()->findAll(['order' => ['sequence' => BaseMapper::SORT_ORDER_ASC]]),
@@ -139,9 +137,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminMenuTop/modify.twig',
             'data'     => [
-                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
-                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_TOP_MENU,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_TOP_MENU),
+                'pageCurrent' => $this->router->generate('adminMenuTop.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuTop.getIndex')),
                 'icons' => $this->getMenuIconMapper()->findAll(['order' => ['title' => BaseMapper::SORT_ORDER_ASC]]),
                 'roles' => $this->getRoleMapper()->findAll(['order' => ['sequence' => BaseMapper::SORT_ORDER_ASC]]),
                 'campuses' => $this->getCampusMapper()->findAll(['order' => ['sequence' => BaseMapper::SORT_ORDER_ASC]])

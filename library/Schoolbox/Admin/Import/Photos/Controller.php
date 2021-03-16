@@ -180,9 +180,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminImportPhotos/index.twig',
             'data' => [
-                'pageCurrent' => Subnav::PARENT_IMPORT,
-                'subpageCurrent' => Subnav::CHILD_IMPORT_PORTRAIT,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_IMPORT, Subnav::CHILD_IMPORT_PORTRAIT),
+                'pageCurrent' => $this->router->generate('adminImportPhotos.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportPhotos.getIndex')),
                 'allNavigation'  => $this->navigation->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
                 'attachzone' => $this->getAttachZone(),
                 'users' => $users,

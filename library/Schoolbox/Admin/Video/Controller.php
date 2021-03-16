@@ -43,9 +43,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminVideo/index.twig',
             'data' => [
-                'pageCurrent' => Subnav::PARENT_RESOURCES,
-                'subpageCurrent' => Subnav::CHILD_RESOURCES_MEDIA_QUEUE,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_RESOURCES, Subnav::CHILD_RESOURCES_MEDIA_QUEUE),
+                'pageCurrent' => $this->router->generate('adminVideo.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminVideo.getIndex')),
                 'queue' => $queueItems,
                 'statusOrder' => $statuses
             ],

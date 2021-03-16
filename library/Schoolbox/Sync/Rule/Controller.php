@@ -38,8 +38,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@upsRule/add.twig',
             'data' => [
-                'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
-                'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_UPS,
+                'pageCurrent' => $this->router->generate('upsRule.add'),
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'rulesetId' => $params['rulesetId'],
 
@@ -104,8 +103,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@upsRule/add.twig',
             'data' => [
-                'pageCurrent' => Subnav::PARENT_USER_MANAGEMENT,
-                'subpageCurrent' => Subnav::CHILD_USER_MANAGEMENT_UPS,
+                'pageCurrent' => $this->router->generate('upsRule.add'),
                 'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
                 'rulesetId' => $rulesetId,
                 'rule' => $rule

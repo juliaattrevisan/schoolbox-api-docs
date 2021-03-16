@@ -36,9 +36,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminTerminology/index.twig',
             'data'     => [
-                'pageCurrent' => Subnav::PARENT_PERSONALISATION,
-                'subpageCurrent' => Subnav::CHILD_PERSONALISATION_TERMINOLOGY,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_PERSONALISATION, Subnav::CHILD_PERSONALISATION_TERMINOLOGY),
+                'pageCurrent' => $this->router->generate('adminTerminology.getIndex'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminTerminology.getIndex')),
                 'terms' => $this->l10nMapper->findAll()
             ],
             'title' => 'Admin - Terminology'

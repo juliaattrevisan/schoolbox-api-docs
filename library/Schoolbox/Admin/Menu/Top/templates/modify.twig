@@ -26,7 +26,7 @@
 <div class="admin-container row">
 
     {# Shared navigation menu #}
-    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+    {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
         <form id="itemForm" action="{{ routeLookup('adminMenuTop.postModify') }}" method="post">

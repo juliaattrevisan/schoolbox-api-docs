@@ -999,9 +999,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminLists/index.twig',
             'data'     => [
-                'pageCurrent' => Subnav::PARENT_LISTS,
-                'subpageCurrent' => $table,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LISTS, $table),
+                'pageCurrent' => $this->router->generate('adminLists.getIndex') . "/{$table}",
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLists.getIndex') . "/{$table}"),
                 'tables'      => $tables,
                 'table'       => $table,
                 'records'     => $records

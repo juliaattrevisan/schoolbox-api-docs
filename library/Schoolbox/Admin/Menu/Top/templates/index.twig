@@ -2,8 +2,9 @@
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="admin-container row">
+
     {# Shared navigation menu #}
-    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+    {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
         {% if menu | length == 0 %}

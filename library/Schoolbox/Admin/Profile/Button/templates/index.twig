@@ -22,8 +22,9 @@
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="admin-container row">
+
     {# Shared navigation profile #}
-    {{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+    {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
         <div class="small-12 island {% if profile|length > 0 %}hide{% endif %}" id="profile-button-empty-state">

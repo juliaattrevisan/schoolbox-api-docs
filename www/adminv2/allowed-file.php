@@ -20,8 +20,8 @@ $this->setBlock(TEMPLATE_content, 'image', 'image_block');
 
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
-    ->generatePhplib($this, Subnav::PARENT_RESOURCES, Subnav::CHILD_RESOURCES_ALLOWED_FILE)
-    ->generateBreadcrumbsHtml($this, Subnav::PARENT_RESOURCES, Subnav::CHILD_RESOURCES_ALLOWED_FILE);
+    ->generatePhplib($this, '/adminv2/allowed-file')
+    ->generateBreadcrumbsHtml($this, '/adminv2/allowed-file');
 
 /** @var Collection|Mimetype[] $mimes */
 $mimes = MimetypeMapper::getInstance()->findAll([ 'deleted' => false, 'order' => [ 'mime' => 'asc' ] ]);

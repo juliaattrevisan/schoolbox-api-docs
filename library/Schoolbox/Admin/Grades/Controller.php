@@ -54,9 +54,8 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@adminGrades/index.twig',
                 [
-                    'pageCurrent' => Subnav::PARENT_LMS,
-                    'subpageCurrent' => Subnav::CHILD_LMS_GRADES,
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_LMS, Subnav::CHILD_LMS_GRADES),
+                    'pageCurrent' => $this->router->generate('adminGrades.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminGrades.getIndex')),
                     'gradeGroups' => $this->retrieveAllGradeGroups(),
                 ]
             )

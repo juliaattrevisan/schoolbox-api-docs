@@ -121,9 +121,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminEportfolio/index.twig',
             'data' => [
-                'pageCurrent' => Subnav::PARENT_EPORTFOLIO,
-                'subpageCurrent' => Subnav::CHILD_EPORTFOLIO_DEPLOYMENT,
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(Subnav::PARENT_EPORTFOLIO, Subnav::CHILD_EPORTFOLIO_DEPLOYMENT),
+                'pageCurrent' => $this->getRouter()->generate('adminEportfolio.getDeploy'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->getRouter()->generate('adminEportfolio.getDeploy')),
                 'roles' => $this->roleMapper->findAll(['order' => ['name' => 'asc']]),
                 'campuses' => $this->campusMapper->findAll(['order' => ['name' => 'asc']])
             ],
@@ -148,8 +147,8 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'template' => '@adminEportfolio/importResults.twig',
             'data' => array(
-                'pageCurrent' => Subnav::PARENT_EPORTFOLIO,
-                'subpageCurrent' => Subnav::CHILD_EPORTFOLIO_DEPLOYMENT,
+                'pageCurrent' => $this->getRouter()->generate('adminEportfolio.getDeploy'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->getRouter()->generate('adminEportfolio.getDeploy')),
                 'id' => $id
             ),
             'postOutput' => [

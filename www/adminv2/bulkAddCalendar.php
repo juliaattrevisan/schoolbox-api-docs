@@ -16,8 +16,8 @@ $this->setBlock(TEMPLATE_content, 'event', 'event_block');
 
 // include the admin navigation
 (new Subnav($this->getDi()->get('config')))
-    ->generatePhplib($this, Subnav::PARENT_CALENDAR, Subnav::CHILD_CALENDAR_IMPORT)
-    ->generateBreadcrumbsHtml($this, Subnav::PARENT_CALENDAR, Subnav::CHILD_CALENDAR_IMPORT);
+    ->generatePhplib($this, '/adminv2/calendar/Import')
+    ->generateBreadcrumbsHtml($this, '/adminv2/calendar/Import');
 
 /* Two types of upload.. either single user.. or via csv file..
  */
