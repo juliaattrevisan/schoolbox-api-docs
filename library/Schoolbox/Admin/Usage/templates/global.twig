@@ -9,25 +9,25 @@
     <div class="admin-content">
         <div class="small-12 island">
             <div id="usage-global-total-container">
-                <usage-global-total :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}'"></usage-global-total>
+                <usage-global-total :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-global-total>
             </div>
         </div>
 
         <div class="small-12 island">
             <div id="usage-global-role-container">
-                <usage-global-role :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getRolePayload') }}'"></usage-global-role>
+                <usage-global-role :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getRolePayload') }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-global-role>
             </div>
         </div>
 
         <div class="small-12 medium-6 island">
             <div id="usage-global-system-container">
-                <usage-global-system :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSystemPayload') }}'"></usage-global-system>
+                <usage-global-system :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSystemPayload') }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-global-system>
             </div>
         </div>
 
         <div class="small-12 medium-6 island">
             <div id="usage-global-filetype-container">
-                <usage-global-filetype :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getFileTypePayload') }}'"></usage-global-filetype>
+                <usage-global-filetype :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getFileTypePayload') }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-global-filetype>
             </div>
         </div>
 

@@ -51,7 +51,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/global.twig', [
             'pageCurrent' => $this->router->generate('adminUsage.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminUsage.getIndex')),
-            'isS3Adapter' => $this->isS3Adapter(),
+            'isS3Adapter' => 1, //$this->isS3Adapter(),
         ]));
     }
 
@@ -61,11 +61,11 @@ class Controller extends Base
      * This is basically infinite storage so there's no point representing this data in a graph
      * Tabulate it instead, in frontend
      *
-     * @return bool
+     * @return int
      */
-    private function isS3Adapter(): bool
+    private function isS3Adapter(): int
     {
-        return $this->getConfigLoader()->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3;
+        return (int)($this->getConfigLoader()->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3);
     }
 
 

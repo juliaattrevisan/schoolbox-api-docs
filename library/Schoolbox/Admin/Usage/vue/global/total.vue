@@ -1,6 +1,6 @@
 <script>
 import axios from 'axios';
-import {Chart} from 'highcharts-vue'
+import {Chart} from 'highcharts-vue';
 
 export default {
 
@@ -25,7 +25,8 @@ export default {
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
     props: [
-       'endpoint'
+       'endpoint',
+       'isS3Adapter'
     ],
 
     /**
@@ -80,94 +81,99 @@ export default {
             responseType: 'json'
         }
 
-        axios.request(request)
-            .then(function (response) {
+        /* Only works if the adapter is non-aws
+         */
+        if (!self.isS3Adapter) {
+            axios.request(request)
+                .then(function (response) {
 
-                /* Load into vue component
-                 */
-                self.allData = response.data;
+                    /* Load into vue component
+                     */
+                    self.allData = response.data;
 
-                let categories = Array();
-                let values = Array();
+                    let categories = Array();
+                    let values = Array();
 
-                self.allData.forEach(function(element, index)
-                {
-                    categories.push(element.label);
-                    values.push(parseInt(element.size));
-                });
+                    self.allData.forEach(function(element, index)
+                    {
+                        categories.push(element.label);
+                        values.push(parseInt(element.size));
+                    });
 
-                self.chartOptions = {
-                    chart: {
-                        height: 150,
-                        spacingRight: 48,
-                        type: 'bar',
-                        zoomType: 'xy'
-                    },
+                    self.chartOptions = {
+                        chart: {
+                            height: 150,
+                            spacingRight: 48,
+                            type: 'bar',
+                            zoomType: 'xy'
+                        },
 
-                    credits: {
-                        enabled: false
-                    },
+                        credits: {
+                            enabled: false
+                        },
 
-                    legend: {
-                        enabled: false
-                    },
+                        legend: {
+                            enabled: false
+                        },
 
-                    plotOptions: {
-                        bar: {
-                            dataLabels: {
-                                enabled: true,
-                                formatter: function() {
-                                    return '<span style="color: #777777">' + this.y + '%</span>'
+                        plotOptions: {
+                            bar: {
+                                dataLabels: {
+                                    enabled: true,
+                                    formatter: function() {
+                                        return '<span style="color: #777777">' + this.y + '%</span>'
+                                    }
                                 }
                             }
-                        }
-                    },
+                        },
 
-                    time: {
-                        useUTC: false
-                    },
+                        time: {
+                            useUTC: false
+                        },
 
-                    title: {
-                        text: 'Total Usage'
-                    },
-
-                    tooltip: {
-                        enabled: false
-                    },
-
-                    xAxis: {
-                        categories: ['']
-                    },
-
-                    yAxis: {
-                        allowDecimals: false,
-                        min: 0,
-                        max: 100,
                         title: {
-                            text: 'Percentage'
-                        }
-                    },
+                            text: 'Total Usage'
+                        },
 
-                    series: [
-                        {
-                            color: '#82b5d8',
-                            name: '',
-                            data: values
-                        }
-                    ]
-                }
-            })
-            .catch(error => {
-                if (error.response) {
+                        tooltip: {
+                            enabled: false
+                        },
+
+                        xAxis: {
+                            categories: ['']
+                        },
+
+                        yAxis: {
+                            allowDecimals: false,
+                            min: 0,
+                            max: 100,
+                            title: {
+                                text: 'Percentage'
+                            }
+                        },
+
+                        series: [
+                            {
+                                color: '#82b5d8',
+                                name: '',
+                                data: values
+                            }
+                        ]
+                    }
+                })
+                .catch(error => {
+                    if (error.response) {
+                        self.loading = false;
+                    }
+                })
+                .then(function () {
+
+                    /* Hide skeleton
+                     */
                     self.loading = false;
-                }
-            })
-            .then(function () {
+                });
+        }
 
-                /* Hide skeleton
-                 */
-                self.loading = false;
-            });
     },
 
     /**
@@ -188,13 +194,15 @@ export default {
 </script>
 <template>
     <div>
-        <template v-if="this.loading">
-            <div>
-                <h2>Loading data, wait</h2>
-            </div>
-        </template>
-        <template v-else>
-            <highcharts :options="chartOptions"></highcharts>
+        <template v-if="!this.isS3Adapter">
+            <template v-if="this.loading">
+                <div>
+                    <h2>Loading data, wait</h2>
+                </div>
+            </template>
+            <template v-else>
+                <highcharts :options="chartOptions"></highcharts>
+            </template>
         </template>
     </div>
 </template>

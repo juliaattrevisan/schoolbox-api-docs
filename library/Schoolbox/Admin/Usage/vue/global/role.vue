@@ -1,6 +1,8 @@
 <script>
 import axios from 'axios';
-import {Chart} from 'highcharts-vue'
+import {Chart} from 'highcharts-vue';
+import filesize from 'filesize';
+import { VueGoodTable } from 'vue-good-table';
 
 export default {
 
@@ -25,7 +27,8 @@ export default {
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
     props: [
-       'endpoint'
+       'endpoint',
+       'isS3Adapter'
     ],
 
     /**
