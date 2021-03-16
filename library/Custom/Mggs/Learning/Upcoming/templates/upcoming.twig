@@ -613,7 +613,7 @@
             ;
 
             // indicate new date is saving
-            dateField.html('<img class="saving-spinner" src="/images/foundation/preloader.gif" /> Saving new date&hellip;');
+            dateField.html('<img class="saving-spinner" src="{{ CDN_PREFIX }}/images/foundation/preloader.gif" /> Saving new date&hellip;');
 
             // attempt to persist this data
             updateAssessment(eventData, null, onFail, onDone);

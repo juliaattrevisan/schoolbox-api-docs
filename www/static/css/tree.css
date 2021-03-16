@@ -16,7 +16,7 @@
 	line-height: 23px;
 	width: 23px;
 	min-height: 23px;
-	background: transparent url(/images/tree/indent.gif) repeat 0 0px;
+	background: transparent url(../images/tree/indent.gif) repeat 0 0;
 }
 #tree span.blank {
 	background: transparent;
@@ -25,24 +25,24 @@
 	padding: 0;
 	display: block;
 	float: left;
-	background: transparent url(/images/tree/elbow.gif) no-repeat 0 0px;
+	background: transparent url(../images/tree/elbow.gif) no-repeat 0 0;
 }
 #tree tr.last span.elbow {
-	background-image: url(/images/tree/elbow-last.gif);
+	background-image: url(../images/tree/elbow-last.gif);
 }
 #tree tr.expanded span.elbow {
-	background-image: url(/images/tree/elbow-expanded.gif);
+	background-image: url(../images/tree/elbow-expanded.gif);
 	cursor: pointer;
 }
 #tree tr.expanded.last span.elbow {
-	background-image: url(/images/tree/elbow-expanded-last.gif);
+	background-image: url(../images/tree/elbow-expanded-last.gif);
 }
 #tree tr.collapsed span.elbow {
-	background-image: url(/images/tree/elbow-collapsed.gif);
+	background-image: url(../images/tree/elbow-collapsed.gif);
 	cursor: pointer;
 }
 #tree tr.collapsed.last span.elbow {
-	background-image: url(/images/tree/elbow-collapsed-last.gif);
+	background-image: url(../images/tree/elbow-collapsed-last.gif);
 }
 #tree span.label {
 	display: block;
@@ -52,12 +52,12 @@
 	width: auto;
 	line-height: 23px;
 	/*height: 23px;*/
-	background: transparent url(/images/icons/22x22/folder.png) no-repeat 0 0;
+	background: transparent url(../images/icons/22x22/folder.png) no-repeat 0 0;
 	cursor: default;
 	-moz-user-select: none;
 }
 #tree tr.homepage span.label {
-	background-image: url(/images/icons/22x22/home.png);
+	background-image: url(../images/icons/22x22/home.png);
 }
 /** Temporary course label **/
 /*#tree tr.course span.label {*/
@@ -67,10 +67,10 @@
 /*}*/
 
 #tree tr.loading span.label {
-	background: transparent url(/images/tree/loading.gif) no-repeat 0 3px;
+	background: transparent url(../images/tree/loading.gif) no-repeat 0 3px;
 }
 #tree span.server {
-	background: transparent url(/images/tree/server.gif) no-repeat 0 3px;
+	background: transparent url(../images/tree/server.gif) no-repeat 0 3px;
 }
 tr.hidden td {
 	opacity: 0.5;
@@ -127,7 +127,7 @@ span.file.ui-draggable, #tree span.label.ui-draggable {
 	padding: 0.8em;
 }
 #properties-container a.modalCloseImg {
-	background:url(/images/resources/x.png) no-repeat;
+	/*background:url(../images/resources/x.png) no-repeat;*/
 	width:25px;
 	height:29px;
 	display:inline;
