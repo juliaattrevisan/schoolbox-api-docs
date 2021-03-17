@@ -71,7 +71,7 @@ export default {
          */
         isPostCommentDisabled () {
             if (this.newComment.trim() === '' || this.isProcessActive) {
-                return true; 
+                return true;
             } else {
                 return false;
             }
@@ -450,8 +450,8 @@ export default {
             <h2>Please confirm</h2>
             <p>Are you sure you want to delete this comment?</p>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="deleteComment" class="button submit" :disabled="isProcessActive">Delete</a></li>
-                <li><a @click.prevent="$refs.deleteModal.close" class="button" :disabled="isProcessActive">Cancel</a></li>
+                <li><a @click.prevent="deleteComment" class="button submit" id="article-threads-delete-button" :disabled="isProcessActive">Delete</a></li>
+                <li><a @click.prevent="$refs.deleteModal.close" class="button" id="article-threads-cancel-button" :disabled="isProcessActive">Cancel</a></li>
             </ul>
         </reveal-modal>
     </div>

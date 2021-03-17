@@ -2,6 +2,8 @@
 
 use Codeception\Util\Locator;
 
+//TODO: add verification after the actions
+
 class NewsInitialCest
 {
 
@@ -39,10 +41,12 @@ class NewsInitialCest
         $i->waitForElementVisible($element, 5);
         $i->click($element);
         $i->click(['css' => 'a.icon-more[title=Actions]']);
-        $i->click(['css' => 'a.icon-undo']);
+        $i->click('#unpublish-article');
         $i->waitForElementVisible(['css' => 'textarea#rejectedReason'], 5);
         $i->fillField(['css' => "textarea#rejectedReason"], "Testing unpublish");
         $i->click('#confirm-dialog-confirm-button');
+
+        //TODO: Check that article is actually unpublished
     }
 
     public function publishNews(AcceptanceTester $i)
@@ -100,6 +104,9 @@ class NewsInitialCest
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
+        //$i->waitForElementVisible(['css'=>'div#cke_comment'], 5);
+        $i->waitForElementVisible(['css'=>'button.btn-show-ckeditor'], 5);
+        $i->click(['css' => 'button.btn-show-ckeditor']);
         $i->waitForElementVisible(['css'=>'div#cke_comment'], 5);
         $i->executeJS('CKEDITOR.instances[\'comment\'].setData("indeed this is intresting news");');
         sleep(2);
@@ -120,8 +127,8 @@ class NewsInitialCest
         $i->waitForElementVisible($element, 5);
         $i->click($element);
         $i->click(['css'=>'a.icon-delete.no-text']);
-        $i->waitForElementVisible('a.button.icon-approve.submit', 8);
-        $i->click(['css'=>'a.button.icon-approve.submit']);
+        $i->waitForElementVisible(['css'=>'ul.flex-list.buttons'], 8);
+        $i->click('#article-threads-delete-button');
     }
 
     public function disableNewsComments(AcceptanceTester $i)
@@ -132,7 +139,7 @@ class NewsInitialCest
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
-        $i->waitForElementVisible(['css'=>'div#cke_comment'], 1);
+        $i->waitForElementVisible(['css'=>'button.btn-show-ckeditor'], 1);
         $i->click(['css'=> 'label[for=allow-comments]']);
     }
 
@@ -144,10 +151,12 @@ class NewsInitialCest
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
+
+        $i->waitForElementVisible(['css'=>'a.icon-more[title=Actions]'], 5);
         $i->click(['css'=>'a.icon-more[title=Actions]']);
         $i->click(['css'=>'a.icon-delete']);
-        $i->waitForElementVisible(['css'=>'a[class=button\ submit]'], 5);
-        $i->click(['css'=>'a[class=button\ submit]']);
+        $i->waitForElementVisible('#confirm-dialog-confirm-button', 8);
+        $i->click('#confirm-dialog-confirm-button');
     }
 
 }
