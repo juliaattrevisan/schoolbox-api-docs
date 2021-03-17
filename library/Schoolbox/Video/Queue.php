@@ -279,7 +279,6 @@ class Queue extends ResourceVideo
         $filenameTranscodeThumbnailEscaped = escapeshellarg($filenameTranscodeThumbnail);
         $filenameTranscodePosterEscaped    = escapeshellarg($filenameTranscodePoster);
         $filenameSourceEscaped             = escapeshellarg($filenameSource);
-        $this->log($processTimeoutEscaped);
 
         // ------------------------------------------------------------------------------------------------------------
         // Get video metadata
