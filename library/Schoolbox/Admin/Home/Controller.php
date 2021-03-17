@@ -350,7 +350,8 @@ class Controller extends Base
                 'template' => '@adminHome/disaster-recovery.twig',
                 'data'     => array_merge(
                     [
-                        'pageCurrent' => 'home',
+                        'pageCurrent' => $this->router->generate('adminHome.getIndex'),
+                        'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
                         'enabled'     => $isEnabled,
                     ],
                     $enabledData
