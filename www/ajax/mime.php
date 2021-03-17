@@ -8,7 +8,7 @@
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
-define('MIME_URL_PREFIX', __DIR__ . '/../images/mime');
+define('MIME_URL_PREFIX', WEB_root . '/static/images/mime');
 define('DEFAULT_FOLDER_ICON', MIME_URL_PREFIX . '/application-document.svg');
 define('DEFAULT_NONE_ICON', MIME_URL_PREFIX . '/none.svg');
 define('MAX_AGE', 2419200); // 28 days
