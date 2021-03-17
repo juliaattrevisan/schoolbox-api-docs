@@ -136,7 +136,7 @@ export default {
                                 dataLabels: {
                                     enabled: true,
                                     formatter: function() {
-                                        return '<span style="color: #777777">' + filesize(this.y) + '</span>'
+                                        return '<span style="color: #aaaaaa">' + filesize(this.y) + '</span>'
                                     }
                                 }
                             }

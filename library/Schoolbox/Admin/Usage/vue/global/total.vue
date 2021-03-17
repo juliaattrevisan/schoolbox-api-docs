@@ -121,7 +121,7 @@ export default {
                                 dataLabels: {
                                     enabled: true,
                                     formatter: function() {
-                                        return '<span style="color: #777777">' + this.y + '%</span>'
+                                        return '<span style="color: #aaaaaa">' + this.y + '%</span>'
                                     }
                                 }
                             }
