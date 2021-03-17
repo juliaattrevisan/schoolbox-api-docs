@@ -644,6 +644,11 @@ class Subnav
                         'visible' =>  true,
                         'children' => []
                     ],
+                    '/adminv2/user/stale' => [
+                        'name' => 'Remove Users',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
                     '/adminv2/ups' => [
                         'name' => 'User Provisioning System',
                         'visible' =>  true,

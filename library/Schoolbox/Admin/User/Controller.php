@@ -379,7 +379,13 @@ class Controller extends Base
      */
     public function getStaleReport(): void
     {
-        $this->getResponse()->content->set(['template' => '@adminUser/stale.twig']);
+        $this->getResponse()->content->set([
+            'template' => '@adminUser/stale.twig',
+            'data' => [
+                'pageCurrent' => $this->router->generate('adminUser.getStaleReport'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminUser.getStaleReport')),
+            ]]
+        );
     }
 
 
