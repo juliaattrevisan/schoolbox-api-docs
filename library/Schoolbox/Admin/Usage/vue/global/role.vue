@@ -155,6 +155,10 @@ export default {
                         }
                     }
                 }
+
+                setTimeout(function() {
+                    self.$refs.roleGraph.chart.reflow();
+                }, 250);
             })
             .catch(error => {
                 if (error.response) {
@@ -193,7 +197,7 @@ export default {
             </div>
         </template>
         <template v-else>
-            <highcharts :options="chartOptions"></highcharts>
+            <highcharts ref="roleGraph" :options="chartOptions"></highcharts>
         </template>
     </div>
 </template>

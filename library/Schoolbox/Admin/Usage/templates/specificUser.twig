@@ -34,7 +34,7 @@
             </section>
         </div>
 
-        <div class="small-12 island">
+        <div class="small-12 medium-6 island">
             <section class="content">
                 <div id="usage-specific-system-container">
                     <usage-specific-system :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserSystemPayload', {userId: user.id}) }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-specific-system>
@@ -42,7 +42,7 @@
             </section>
         </div>
 
-        <div class="small-12 island">
+        <div class="small-12 medium-6 island">
             <section class="content">
                 <div id="usage-specific-filetype-container">
                     <usage-specific-filetype :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserFileTypePayload', {userId: user.id}) }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-specific-filetype>
@@ -50,12 +50,10 @@
             </section>
         </div>
 
-        <div class="small-12 island">
-            <section class="content">
-                <div id="usage-specific-file-container">
-                    <usage-specific-file :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserFilePayload', {userId: user.id}) }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-specific-file>
-                </div>
-            </section>
+        <div class="small-12 columns">
+            <div id="usage-specific-file-container">
+                <usage-specific-file :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserFilePayload', {userId: user.id}) }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-specific-file>
+            </div>
         </div>
     </div>
 </div>

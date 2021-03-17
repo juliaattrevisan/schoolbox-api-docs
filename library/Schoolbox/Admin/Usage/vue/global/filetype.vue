@@ -89,85 +89,89 @@ export default {
              */
             self.allData = response.data;
 
-                let categories = Array();
-                let values = Array();
+            let categories = Array();
+            let values = Array();
 
-                self.allData.forEach(function(element, index)
-                {
-                    categories.push(element.label);
-                    values.push(parseInt(element.size));
-                });
+            self.allData.forEach(function(element, index)
+            {
+                categories.push(element.label);
+                values.push(parseInt(element.size));
+            });
 
-                self.chartOptions = {
-                    chart: {
-                        spacingRight: 48,
-                        type: 'bar',
-                        zoomType: 'xy'
-                    },
+            self.chartOptions = {
+                chart: {
+                    spacingRight: 48,
+                    type: 'bar',
+                    zoomType: 'xy'
+                },
 
-                    credits: {
-                        enabled: false
-                    },
+                credits: {
+                    enabled: false
+                },
 
-                    legend: {
-                        enabled: false
-                    },
+                legend: {
+                    enabled: false
+                },
 
-                    plotOptions: {
-                        bar: {
-                            dataLabels: {
-                                enabled: true,
-                                formatter: function() {
-                                    return '<span style="color: #aaaaaa">' + filesize(this.y) + '</span>'
-                                }
+                plotOptions: {
+                    bar: {
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function() {
+                                return '<span style="color: #aaaaaa">' + filesize(this.y) + '</span>'
                             }
                         }
-                    },
+                    }
+                },
 
-                    series: [
-                        {
-                            color: '#82b5d8',
-                            name: '',
-                            data: values
-                        }
-                    ],
+                series: [
+                    {
+                        color: '#82b5d8',
+                        name: '',
+                        data: values
+                    }
+                ],
 
-                    time: {
-                        useUTC: false
-                    },
+                time: {
+                    useUTC: false
+                },
 
+                title: {
+                    text: 'Type Usage'
+                },
+
+                tooltip: {
+                    enabled: false
+                },
+
+                xAxis: {
+                    categories: categories
+                },
+
+                yAxis: {
+                    allowDecimals: false,
+                    min: 0,
                     title: {
-                        text: 'Type Usage'
-                    },
-
-                    tooltip: {
-                        enabled: false
-                    },
-
-                    xAxis: {
-                        categories: categories
-                    },
-
-                    yAxis: {
-                        allowDecimals: false,
-                        min: 0,
-                        title: {
-                            text: 'Bytes'
-                        }
+                        text: 'Bytes'
                     }
                 }
-            })
-            .catch(error => {
-                if (error.response) {
-                    self.loading = false;
-                }
-            })
-            .then(function () {
+            }
 
-                /* Hide skeleton
-                 */
+            setTimeout(function() {
+                self.$refs.filetypeGraph.chart.reflow();
+            }, 250);
+        })
+        .catch(error => {
+            if (error.response) {
                 self.loading = false;
-            });
+            }
+        })
+        .then(function () {
+
+            /* Hide skeleton
+             */
+            self.loading = false;
+        });
     },
 
     /**
@@ -194,7 +198,7 @@ export default {
             </div>
         </template>
         <template v-else>
-            <highcharts :options="chartOptions"></highcharts>
+            <highcharts ref="filetypeGraph" :options="chartOptions"></highcharts>
         </template>
     </div>
 </template>

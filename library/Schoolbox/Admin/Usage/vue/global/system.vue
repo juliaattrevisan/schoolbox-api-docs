@@ -155,6 +155,10 @@ export default {
                         }
                     }
                 }
+
+                setTimeout(function() {
+                    self.$refs.systemGraph.chart.reflow();
+                }, 250);
             })
             .catch(error => {
                 if (error.response) {
@@ -193,7 +197,7 @@ export default {
             </div>
         </template>
         <template v-else>
-            <highcharts :options="chartOptions"></highcharts>
+            <highcharts ref="systemGraph" :options="chartOptions"></highcharts>
         </template>
     </div>
 </template>
