@@ -40,9 +40,9 @@ class NewsInitialCest
         $i->click($element);
         $i->click(['css' => 'a.icon-more[title=Actions]']);
         $i->click(['css' => 'a.icon-undo']);
+        $i->waitForElementVisible(['css' => 'textarea#rejectedReason'], 5);
         $i->fillField(['css' => "textarea#rejectedReason"], "Testing unpublish");
-        $i->waitForElementVisible(['css' => 'a[class=button\ submit]'], 5);
-        $i->click(['css' => 'a[class=button\ submit]']);
+        $i->click('#confirm-dialog-confirm-button');
     }
 
     public function publishNews(AcceptanceTester $i)
