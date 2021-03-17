@@ -299,10 +299,9 @@ class SitePage extends Page
             'USER_ROLE'    => $this->user->getRole()->getName(),
             'SITE_NAME'    => $this->config->get('school_name'),
             'SITE_VERSION' => $this->config->get('site_version'),
-            'CDN_PREFIX'   => PrefixGenerator::generate($this->config),
         ];
         $this->setVar($templateVar);
-        $this->localise();
+        $this->injectGlobalVars();
 
 
         // Output the PHPLib using the renderer
@@ -834,6 +833,22 @@ class SitePage extends Page
             set_time_limit($currentLimit + $seconds);
         }
     }
+
+
+    /**
+     * Inject global vars required for Sitepage to do its thing.
+     *
+     * That currently includes:
+     * * the CDN prefix (so that stylesheets and images can be referenced)
+     *   into `CDN_PREFIX`
+     * * localisations
+     */
+    public function injectGlobalVars(): void
+    {
+        $this->setVar('CDN_PREFIX', PrefixGenerator::generate($this->config));
+        $this->localise();
+    }
+
 
     /**
      * Jam localisation vars into the template. Uncomment / modify the list as required

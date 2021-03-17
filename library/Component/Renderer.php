@@ -133,7 +133,7 @@ class Component_Renderer
 
         /* Localise terminologies
          */
-        $page->localise();
+        $page->injectGlobalVars();
 
         $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
     }

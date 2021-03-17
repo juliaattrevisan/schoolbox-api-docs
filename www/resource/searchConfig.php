@@ -11,7 +11,7 @@ define('AJAX_DISABLED', 0);
 // Always use the sitepage from DI
 /** @var SitePage $page */
 $page = $this;
-$page->localise();
+$page->injectGlobalVars();
 
 $handle = [
     'all' => [
