@@ -486,7 +486,7 @@ class Subnav
                         'visible' =>  true,
                         'children' => []
                     ],
-                    '/adminv2/setting/usage' => [
+                    '/adminv2/usage' => [
                         'name' => 'Usage',
                         'visible' =>  true,
                         'children' => []
