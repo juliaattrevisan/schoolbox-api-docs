@@ -78,10 +78,10 @@
 
 <div id="toast-{{ component.instance.id }}" class="toast"></div>
 
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/textbox/jquery.inlineTextboxEditor.js"></script>
 {% autoescape 'js' %}
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/textbox/jquery.inlineTextboxEditor.js"></script>
     <script type="text/javascript">
         $(function() {
 
