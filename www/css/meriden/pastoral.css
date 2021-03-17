@@ -230,4 +230,20 @@ body.login input[type=checkbox]:not(.plain):checked + label:after {
   display: none;
 }
 
+/** Styles for the senior variant of the endeavor grades report **/
+.e-report #endeavour-grades-senior th,
+.e-report #endeavour-grades-senior td {
+    vertical-align: middle;
+    width: 5rem;
+}
+.e-report #endeavour-grades-senior th {
+    background-color: #a4d7f4;
+}
+.e-report #endeavour-grades-senior tr:nth-child(odd) td {
+    background-color: white;
+}
+.e-report #endeavour-grades-senior tr:nth-child(even) td {
+    background-color: #d1ebf9;
+}
+
 /** END eReport CSS **/

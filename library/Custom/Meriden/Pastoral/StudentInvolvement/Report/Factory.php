@@ -180,8 +180,16 @@ class Factory
                     $publishedOnly,
                     $roleTypeOverride
                 );
-                $allFolders[] = $folderWithGrades['folder'];
-                $allGrades[]  = $folderWithGrades['grades'];
+
+                // Ensure folder actually exists
+                $folder = $folderWithGrades['folder'] ?? null;
+                if ($folder instanceof Folder && $folder->getId()) {
+                    // Set the subject's name into the folder,
+                    // so that it doesn't have any rolled-over codes.
+                    // (Clone so this doesn't inadvertently affect any caches)
+                    $allFolders[] = (clone $folder)->setName($subject->getName());
+                    $allGrades[]  = $folderWithGrades['grades'];
+                }
             }
 
             $tutorGroup->injectEndeavorGrades($allFolders, array_merge(...$allGrades), $publishedOnly);
@@ -511,6 +519,7 @@ class Factory
         }
 
         // everything failed? return an empty model
+        // TODO this should return nothing, as there is nothing to show
         return [
             'folder' => $this->folderMapper->createModel(),
             'grades' => [],
