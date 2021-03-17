@@ -61,7 +61,7 @@ class Queue extends ResourceVideo
     /** @var string $videoBitrate */
     private $videoBitrate;
 
-    /** @var string $processTimeout Time that ffmpeg will be allowed to run before it is killed */
+    /** @var int $processTimeout Time that ffmpeg will be allowed to run before it is killed */
     private $processTimeout;
 
     /** @var string $converterExec Primary binary program used for conversion */
@@ -112,7 +112,7 @@ class Queue extends ResourceVideo
 
         // Get timeout
 
-        $timeout = $this->getConfig()->get("video_processing_timeout");
+        $timeout = (int)$this->getConfig()->get("video_processing_timeout");
 
         if ($timeout <= 0) {
             $this->processTimeout = self::MAX_TIMEOUT;
@@ -199,7 +199,7 @@ class Queue extends ResourceVideo
 
         // Get parameters
 
-        $cpus = shell_exec('nproc');
+        $cpus = (int)shell_exec('nproc');
         $commandTranscode              = $this->getCommandTranscode();
         $audioBitrateEscaped           = escapeshellarg("{$this->audioBitrate}k");
         $processTimeoutEscaped         = escapeshellarg($this->processTimeout * $cpus);
@@ -268,7 +268,7 @@ class Queue extends ResourceVideo
 
         // Get parameters
 
-        $cpus = shell_exec('nproc');
+        $cpus = (int)shell_exec('nproc');
         $commandMediaInformation           = $this->getCommandMediaInformation();
         $commandTranscode                  = $this->getCommandTranscode();
         $strictMode                        = " -strict -2 ";
