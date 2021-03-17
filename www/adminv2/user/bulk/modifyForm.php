@@ -8,6 +8,7 @@
 // sitepage context is required
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Admin\Navigation\Subnav;
 
 if (empty($this)) {
     require_once __DIR__ . '/../../../../conf/core/require.php';
@@ -38,6 +39,11 @@ $userIds = array_filter(explode(',', $_POST['userId']));
 if (count($userIds) === 0) {
     error(ErrorMapper::ERROR_PROCESSING, 'No user selected.');
 }
+
+// include the admin navigation
+(new Subnav($this->getDi()->get('config')))
+    ->generatePhplib($this, '/adminv2/user/bulk/modify')
+    ->generateBreadcrumbsHtml($this, '/adminv2/user/bulk/modify');
 
 if (isset($_POST['updateUsers'])) {
     $message = "{$_SESSION['user']->getFullname()} ({$_SESSION['user']->getId()}) started a user bulk modify";
