@@ -7,9 +7,9 @@ import timeGridPlugin             from '@fullcalendar/timegrid'
 import listPlugin                 from '@fullcalendar/list'
 import momentPlugin, {toDuration} from '@fullcalendar/moment'
 import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
-import CreateEventModal           from './createEventModal';
-import ExportModal                from "./exportModal";
-import FilterModal                from "./filterModal";
+import CreateEventModal           from './create-event-modal';
+import ExportModal                from "./export-modal";
+import FilterModal                from "./filter-modal";
 import FlatPickr                  from '@schoolbox/fullcalendar/flatPickr';
 import axios                      from 'axios'
 import qs                         from "qs";
@@ -282,14 +282,14 @@ export default {
                  * Re-initialise datepicker upon date update on list view.
                  * Without this, date picker fields just turns into a normal text field.
                      */
-                let attachAlaressDatePicker = () => {
+                let attachAlaressDatePicker = function () {
                     var $dateinput = $(this);
                     if ($dateinput.attr('data-datepicker-id') === undefined) {
                         $dateinput.alaressDateTimePicker();
                     }
                 };
 
-                $(() => {
+                $(function () {
                     $('[data-datepicker]').each(attachAlaressDatePicker);
                 });
             }

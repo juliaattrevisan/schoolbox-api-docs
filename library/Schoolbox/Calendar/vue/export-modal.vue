@@ -1,69 +1,78 @@
 <script>
-    import RevealModal    from '@schoolbox/reveal-modal'
-    import ExportUrlModal from './exportUrlModal';
-    import qs             from 'qs';
 
-    export default {
-        name: "export-modal",
-        props: [
-            'eventTypes',
-            'groups',
-            'campuses',
-            'translations',
-            'token',
-            'eventExportUrl',
-        ],
-        data() {
-            return {
-                form: {
-                    export: 'all',
-                    campus: '',
-                    group: '',
-                    event_type: '',
-                }
-            };
+import RevealModal    from '@schoolbox/reveal-modal'
+import ExportUrlModal from './export-url-modal';
+import qs             from 'qs';
+
+export default {
+
+    name: "export-modal",
+
+    components: { ExportUrlModal, RevealModal },
+
+    props: [
+        'eventTypes',
+        'groups',
+        'campuses',
+        'translations',
+        'token',
+        'eventExportUrl',
+    ],
+
+    data() {
+        return {
+            form: {
+                export: 'all',
+                campus: '',
+                group: '',
+                event_type: '',
+            }
+        };
+    },
+
+    computed: {
+        window: () => window,
+
+        /**
+         * The export events URL.
+         *
+         * @return {string}
+         */
+        exportUrl() {
+            let values = Object.assign({}, this.form);
+
+            // Add token to object
+            values.token = this.token;
+
+            // remove unused fields
+            if (values['export'] !== 'group') {
+                delete values.group;
+            }
+
+            if (values['export'] !== 'campus') {
+                delete values.campus;
+            }
+
+            return this.window.location.protocol
+                + '//'
+                + this.window.location.host
+                + this.eventExportUrl
+                + '?'
+                + qs.stringify(values);
         },
-        components: {ExportUrlModal, RevealModal},
-        methods: {
-            /**
-             * Open this modal.
-             */
-            open() {
-                this.$refs.modal.open();
-            },
-        },
-        computed: {
-            window: () => window,
-
-            /**
-             * The export events URL.
-             *
-             * @return {string}
-             */
-            exportUrl() {
-                let values = Object.assign({}, this.form);
-
-                // Add token to object
-                values.token = this.token;
-
-                // remove unused fields
-                if (values['export'] !== 'group') {
-                    delete values.group;
-                }
-
-                if (values['export'] !== 'campus') {
-                    delete values.campus;
-                }
-
-                return this.window.location.protocol
-                    + '//'
-                    + this.window.location.host
-                    + this.eventExportUrl
-                    + '?'
-                    + qs.stringify(values);
-            },
+    },
+    
+    methods: {
+        /**
+         * Open this modal.
+         */
+        open() {
+            this.$refs.modal.open();
         },
     }
+
+}
+
 </script>
 
 <template>
@@ -100,7 +109,7 @@
                     <label for="export-campus">Events for campus:
                         <select name="campus" v-model="form.campus">
                             <option value="">-- select --</option>
-                            <option v-for="campus in campuses" :value="campus.id">
+                            <option v-for="campus in campuses" :value="campus.id" :key="campus.id">
                                 {{ campus.name }}
                             </option>
                         </select>
@@ -110,7 +119,7 @@
                     <label for="export-group">Events for group:
                         <select name="group" v-model="form.group">
                             <option value="">-- select --</option>
-                            <option v-for="group in groups" :value="group.id">
+                            <option v-for="group in groups" :value="group.id" :key="group.id">
                                 {{ group.name }} <template v-if="group.code">({{ group.code }})</template>
                             </option>
                         </select>
@@ -120,7 +129,7 @@
                     <label for="export-type">Events by type:
                         <select name="event_type" v-model="form.event_type">
                             <option value="">-- select --</option>
-                            <option v-for="eventType in eventTypes" :value="eventType.id">
+                            <option v-for="eventType in eventTypes" :value="eventType.id" :key="eventType.id">
                                 {{ eventType.name }}
                             </option>
                         </select>

@@ -2,7 +2,7 @@
 
 import FullCalendar       from '@fullcalendar/vue'
 import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
-import ExportUrlModal     from './exportUrlModal';
+import ExportUrlModal     from './export-url-modal';
 import interactionPlugin  from "@fullcalendar/interaction";
 import listPlugin         from "@fullcalendar/list";
 import momentPlugin       from "@fullcalendar/moment";
