@@ -673,7 +673,7 @@ class Controller extends Base\Base
         // Save the folder
         $folder = $courseSpec->getFolder();
 
-        if (\count($curriculumCodes)) {
+        if (is_array($curriculumCodes) && count($curriculumCodes)) {
             $folder->setCurriculumNodes($this->curriculumNodeMapper->findByColumn('id', $curriculumCodes));
         }
 

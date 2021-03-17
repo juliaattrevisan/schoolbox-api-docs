@@ -140,7 +140,7 @@ if ($occupiedDateList) {
 
 // setup pagination for display
 $chatPerPage = Config::get('search_type_limit');
-$totalPages = ceil(count($visibleListSubset) / $chatPerPage);
+$totalPages = is_array($visibleListSubset) ? ceil(count($visibleListSubset) / $chatPerPage) : 0;
 $chatIndex = $chatPerPage * ($filter['page'] - 1);
 
 // figure out which pagination buttons should be displayed
