@@ -94,12 +94,7 @@ class CampusMapper extends Mapper
     {
         $calendarService = UserAccess::SERVICE_CALENDAR;
 
-        /* Superusers get access to all campuses
-         */
-        if ($this->getSessionUser() && $this->getSessionUser()->isSuperuser()) {
-            $collection = $this->findAll();
-        } else {
-            $query = "
+        $query = "
 				SELECT *
 				FROM luCampus
 				INNER JOIN userAccess ON luCampus.id = userAccess.sid
@@ -110,23 +105,21 @@ class CampusMapper extends Mapper
                 ORDER BY luCampus.sequence
 			";
 
-            $statement = $this->database->prepare($query);
+        $statement = $this->database->prepare($query);
 
-            $statement->execute(
-                [
-                    'calendarService' => $calendarService,
-                    'userId'          => $user->getId(),
-                    'accessType'      => $accessType,
-                ]
-            );
+        $statement->execute(
+            [
+                'calendarService' => $calendarService,
+                'userId'          => $user->getId(),
+                'accessType'      => $accessType,
+            ]
+        );
 
-            $collection = $this->createCollection();
+        $collection = $this->createCollection();
 
-            foreach ($statement as $row) {
-                $campus = $this->hydrate($row);
-
-                $collection->add($campus);
-            }
+        foreach ($statement as $row) {
+            $campus = $this->hydrate($row);
+            $collection->add($campus);
         }
 
         return $collection;
