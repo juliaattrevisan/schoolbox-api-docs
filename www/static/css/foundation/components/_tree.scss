@@ -101,7 +101,7 @@ div.jstree-default, ul.jstree-default {
     @extend %browser-icon-colors;
 
     .icon-loading {
-        background-image: url('/images/foundation/preloader.gif');
+        background-image: url("#{$cdn-prefix}/images/foundation/preloader.gif");
         background-size: 1rem 1rem;
         top: 1rem;
     }
@@ -110,7 +110,7 @@ div.jstree-default, ul.jstree-default {
 // override throbber.gif
 .jstree-default > .jstree-container-ul{
     .jstree-loading > i.jstree-ocl  {
-        background: url("/images/foundation/preloader.gif") center center no-repeat;
+        background: url("#{$cdn-prefix}/images/foundation/preloader.gif") center center no-repeat;
         background-size: 1rem 1rem;
     }
 }

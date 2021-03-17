@@ -412,7 +412,7 @@ ul.tileList {
 .eportfolio {
     position: relative;
     .cover-photo {
-        background-image: url(/images/core/eportfolio/coverphotoPlaceholder.jpg);
+        background-image: url("#{$cdn-prefix}/images/core/eportfolio/coverphotoPlaceholder.jpg");
         background-size: cover;
         background-position: center;
         height: 28rem;

@@ -27,7 +27,7 @@ input.course-selector-loader:focus {
     background-position: 99% 50%;
 
     &.course-selector-search-loading {
-        background-image: url('/images/foundation/preloader.gif');
+        background-image: url("#{$cdn-prefix}/images/foundation/preloader.gif");
         background-size: 16px 16px;
     }
 }
@@ -47,7 +47,7 @@ fieldset[disabled] {
 
 input[type="submit"][readonly] {
     background-color: css-change-color($content-ui-submit-background, $alpha: 0.4);
-    background-image: url('/images/foundation/preloader.gif');
+    background-image: url("#{$cdn-prefix}/images/foundation/preloader.gif");
     background-repeat: no-repeat;
     background-size: 1rem;
     background-position: 0.75rem 50%;

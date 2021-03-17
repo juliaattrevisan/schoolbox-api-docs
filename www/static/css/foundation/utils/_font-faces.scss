@@ -1,10 +1,10 @@
 @font-face {
 	font-family: 'schoolbox';
-	src: url('/fonts/schoolbox.eot?hfbgnj');
-	src: url('/fonts/schoolbox.eot?hfbgnj#iefix') format('embedded-opentype'),
-		 url('/fonts/schoolbox.ttf?hfbgnj') format('truetype'),
-		 url('/fonts/schoolbox.woff?hfbgnj') format('woff'),
-		 url('/fonts/schoolbox.svg?hfbgnj#schoolbox') format('svg');
+	src: url("#{$cdn-prefix}/fonts/schoolbox.eot?hfbgnj");
+	src: url("#{$cdn-prefix}/fonts/schoolbox.eot?hfbgnj#iefix") format('embedded-opentype'),
+		 url("#{$cdn-prefix}/fonts/schoolbox.ttf?hfbgnj") format('truetype'),
+		 url("#{$cdn-prefix}/fonts/schoolbox.woff?hfbgnj") format('woff'),
+		 url("#{$cdn-prefix}/fonts/schoolbox.svg?hfbgnj#schoolbox") format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
