@@ -83,97 +83,94 @@ export default {
 
         /* Only works if the adapter is non-aws
          */
-        if (!self.isS3Adapter) {
-            axios.request(request)
-                .then(function (response) {
+        axios.request(request)
+            .then(function (response) {
 
-                    /* Load into vue component
-                     */
-                    self.allData = response.data;
+                /* Load into vue component
+                 */
+                self.allData = response.data;
 
-                    let categories = Array();
-                    let values = Array();
+                let categories = Array();
+                let values = Array();
 
-                    self.allData.forEach(function(element, index)
-                    {
-                        categories.push(element.label);
-                        values.push(parseInt(element.size));
-                    });
+                self.allData.forEach(function(element, index)
+                {
+                    categories.push(element.label);
+                    values.push(parseInt(element.size));
+                });
 
-                    self.chartOptions = {
-                        chart: {
-                            height: 150,
-                            spacingRight: 48,
-                            type: 'bar',
-                            zoomType: 'xy'
-                        },
+                self.chartOptions = {
+                    chart: {
+                        height: 150,
+                        spacingRight: 48,
+                        type: 'bar',
+                        zoomType: 'xy'
+                    },
 
-                        credits: {
-                            enabled: false
-                        },
+                    credits: {
+                        enabled: false
+                    },
 
-                        legend: {
-                            enabled: false
-                        },
+                    legend: {
+                        enabled: false
+                    },
 
-                        plotOptions: {
-                            bar: {
-                                dataLabels: {
-                                    enabled: true,
-                                    formatter: function() {
-                                        return '<span style="color: #aaaaaa">' + this.y + '%</span>'
-                                    }
+                    plotOptions: {
+                        bar: {
+                            dataLabels: {
+                                enabled: true,
+                                formatter: function() {
+                                    return '<span style="color: #aaaaaa">' + this.y + '%</span>'
                                 }
                             }
-                        },
+                        }
+                    },
 
-                        time: {
-                            useUTC: false
-                        },
+                    time: {
+                        useUTC: false
+                    },
 
+                    title: {
+                        text: 'Total Usage'
+                    },
+
+                    tooltip: {
+                        enabled: false
+                    },
+
+                    xAxis: {
+                        categories: ['']
+                    },
+
+                    yAxis: {
+                        allowDecimals: false,
+                        min: 0,
+                        max: 100,
                         title: {
-                            text: 'Total Usage'
-                        },
+                            text: 'Percentage'
+                        }
+                    },
 
-                        tooltip: {
-                            enabled: false
-                        },
-
-                        xAxis: {
-                            categories: ['']
-                        },
-
-                        yAxis: {
-                            allowDecimals: false,
-                            min: 0,
-                            max: 100,
-                            title: {
-                                text: 'Percentage'
-                            }
-                        },
-
-                        series: [
-                            {
-                                color: '#82b5d8',
-                                name: '',
-                                data: values
-                            }
-                        ]
-                    }
-                })
-                .catch(error => {
-                    if (error.response) {
-                        self.loading = false;
-                    }
-                })
-                .then(function () {
-
-                    /* Hide skeleton
-                     */
+                    series: [
+                        {
+                            color: '#82b5d8',
+                            name: '',
+                            data: values
+                        }
+                    ]
+                }
+            })
+            .catch(error => {
+                if (error.response) {
                     self.loading = false;
-                });
-        }
+                }
+            })
+            .then(function () {
 
+                /* Hide skeleton
+                 */
+                self.loading = false;
+            });
     },
 
     /**
