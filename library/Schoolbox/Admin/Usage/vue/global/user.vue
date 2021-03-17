@@ -58,11 +58,13 @@ export default {
             columns: [
                 {
                     label: 'Firstname',
-                    field: 'firstname'
+                    html: true,
+                    field: this.linkFirstname,
                 },
                 {
                     label: 'Lastname',
-                    field: 'lastname'
+                    html: true,
+                    field: this.linkLastname,
                 },
                 {
                     label: 'Role',
@@ -131,6 +133,27 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
+
+        /**
+         * Render firstnames with html links
+         *
+         * @param rowObj
+         * @returns {string}
+         */
+        linkFirstname(rowObj) {
+            return '<a href="/search/user/'+rowObj.userId+'">'+rowObj.firstname+'</a>';
+        },
+
+
+        /**
+         * Render lastnames with html links
+         *
+         * @param rowObj
+         * @returns {string}
+         */
+        linkLastname(rowObj) {
+            return '<a href="/search/user/'+rowObj.userId+'">'+rowObj.lastname+'</a>';
+        },
     }
 }
 </script>
@@ -151,7 +174,7 @@ export default {
                 }"
                 :sort-options="{
                     initialSortBy: {
-                        field: 'lastname',
+                        field: 'size',
                         type: 'desc'
                     }
                 }"
