@@ -141,7 +141,7 @@ export default {
          * @returns {string}
          */
         linkFirstname(rowObj) {
-            return '<a href="/search/user/'+rowObj.userId+'">'+rowObj.firstname+'</a>';
+            return '<a href="/adminv2/usage/specific/'+rowObj.userId+'">'+rowObj.firstname+'</a>';
         },
 
 
@@ -152,7 +152,7 @@ export default {
          * @returns {string}
          */
         linkLastname(rowObj) {
-            return '<a href="/search/user/'+rowObj.userId+'">'+rowObj.lastname+'</a>';
+            return '<a href="/adminv2/usage/specific/'+rowObj.userId+'">'+rowObj.lastname+'</a>';
         },
     }
 }
