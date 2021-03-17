@@ -1,16 +1,5 @@
--- Increment all config ids so we can insert new config immediately after OTFS S3 configs
-UPDATE config
-SET configID = configID + 1
-WHERE configID IN (
-    SELECT * FROM (
-        SELECT configID FROM config WHERE configID > (SELECT MAX(configID) FROM config WHERE name LIKE 'otfs%')
-    ) t1
-)
-ORDER BY configID DESC;
-
 -- Insert new config
 INSERT INTO config (
-    configID,
     name,
     value,
     title,
@@ -22,7 +11,6 @@ INSERT INTO config (
     required,
     module
 ) VALUES (
-    (SELECT * FROM (SELECT MAX(configID) FROM config WHERE name LIKE 'otfs%') t1) + 1,
     'otfs_s3_presigned_urls_enabled',
     '0',
     'AWS S3 PreSigned URLs enabled',
@@ -35,9 +23,4 @@ INSERT INTO config (
     'settings'
 );
 
--- Need to reset auto-increment, as we have manually inserted an ID in this sequence
-SET @s = CONCAT("ALTER TABLE config AUTO_INCREMENT = ",(SELECT MAX(configID) FROM config) + 1);
-PREPARE stmt FROM @s;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
 

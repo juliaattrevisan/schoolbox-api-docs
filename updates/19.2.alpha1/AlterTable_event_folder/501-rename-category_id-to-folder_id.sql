@@ -1,10 +1,13 @@
+# Update foreign keys
+ALTER TABLE `event_folder`
+    DROP FOREIGN KEY `fk_event_category_folder_id`;
+ALTER TABLE `event_folder`
+    DROP FOREIGN KEY `fk_event_category_event_id`;
+
 # Rename column name
 ALTER TABLE `event_folder`
     CHANGE COLUMN `category_id` `folder_id` INT(11) UNSIGNED;
 
-# Update foreign keys
-ALTER TABLE `event_folder`
-    DROP FOREIGN KEY `fk_event_category_folder_id`;
 ALTER TABLE `event_folder`
     ADD CONSTRAINT `fk_event_folder_folder_id`
         FOREIGN KEY (`folder_id`)
@@ -12,8 +15,6 @@ ALTER TABLE `event_folder`
             ON DELETE NO ACTION
             ON UPDATE NO ACTION;
 
-ALTER TABLE `event_folder`
-    DROP FOREIGN KEY `fk_event_category_event_id`;
 ALTER TABLE `event_folder`
     ADD CONSTRAINT `fk_event_folder_event_id`
         FOREIGN KEY (`event_id`)
