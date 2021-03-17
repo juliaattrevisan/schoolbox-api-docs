@@ -99,6 +99,7 @@ export default {
 
                 self.chartOptions = {
                     chart: {
+                        reflow: true,
                         spacingRight: 48,
                         type: 'bar',
                         zoomType: 'xy'
@@ -155,10 +156,6 @@ export default {
                         }
                     }
                 }
-
-                setTimeout(function() {
-                    self.$refs.systemGraph.chart.reflow();
-                }, 250);
             })
             .catch(error => {
                 if (error.response) {

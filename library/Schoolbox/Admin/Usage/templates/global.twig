@@ -1,12 +1,16 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="admin-container row">
+<div class="admin-container usage-charts row">
 
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader">Usage</h2>
+        </div>
+
         <div class="small-12 island">
             <div id="usage-global-total-container">
                 <usage-global-total :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-global-total>
