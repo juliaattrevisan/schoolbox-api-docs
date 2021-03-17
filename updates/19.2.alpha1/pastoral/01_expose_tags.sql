@@ -9,9 +9,9 @@ VALUES
     (SELECT id FROM lu_config_field WHERE `field` = 'boolean'),
     null,
     (SELECT id FROM lu_config_type WHERE `type` = 'Pastoral Care'),
-    true,
-    false,
-    false,
+    'true',
+    'false',
+    'false',
     'settings',
     null
 );
