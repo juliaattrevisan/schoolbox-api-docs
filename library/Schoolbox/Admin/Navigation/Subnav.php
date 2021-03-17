@@ -191,11 +191,6 @@ class Subnav
                 'visible' =>  true,
                 'children' => []
             ],
-            '/adminv2/homepage' => [
-                'name' => 'Homepage Templates',
-                'visible' =>  true,
-                'children' => []
-            ],
             '/adminv2/import/directImport' => [
                 'name' => 'Import',
                 'visible' =>  true,
@@ -431,7 +426,12 @@ class Subnav
                 'visible' =>  true,
                 'children' => [
                     '/adminv2/dashboard' => [
-                        'name' => 'Dashboard',
+                        'name' => 'Dashboard Templates',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/homepage' => [
+                        'name' => 'Homepage Templates',
                         'visible' =>  true,
                         'children' => []
                     ],
