@@ -338,7 +338,7 @@ class Controller extends Base
                 'serviceMapping' => self::SERVICE_MAPPING,
                 'identifiers' => self::IDENTIFIERS,
                 'accessLevel' => self::ACCESS_LEVELS,
-                'pageCurrent' => '/adminv2/user',
+                'pageCurrent' => $this->router->generate('adminUser.getInsert'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminUser.getInsert')),
                 'method' => 'Update',
                 'yearLevels' => $this->yearLevelMapper->findAll(),
