@@ -35,15 +35,28 @@ class TokenParser
 
 
     /**
+     * A set of candidate claims in the JWT.
+     *
+     * Each will be checked in order for whether it contains a value, and if
+     * that user exists within Schoolbox.
+     *
+     * @var string[]|array
+     */
+    private array $candidateClaims;
+
+
+    /**
      * Constructor
      *
      * @param UserMapper  $userMapper
      * @param JwtVerifier $jwtVerifier
+     * @param array       $candidateClaims
      */
-    public function __construct(UserMapper $userMapper, JwtVerifier $jwtVerifier)
+    public function __construct(UserMapper $userMapper, JwtVerifier $jwtVerifier, array $candidateClaims)
     {
-        $this->userMapper  = $userMapper;
-        $this->jwtVerifier = $jwtVerifier;
+        $this->userMapper      = $userMapper;
+        $this->jwtVerifier     = $jwtVerifier;
+        $this->candidateClaims = $candidateClaims;
     }
 
 
