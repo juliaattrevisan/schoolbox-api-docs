@@ -404,6 +404,7 @@ class Controller extends Base
         }
         $headings = array_merge($headings, [
             'Tags'         => 'Tags',
+            'Points'       => 'Points',
             'Body'         => 'Body',
             'Created Date' => 'Created Date',
             'Created By'   => 'Created By',
@@ -433,6 +434,7 @@ class Controller extends Base
             'Type'         => $record->getType() ? $record->getType()->getName() : '',
             'Sub-Type'     => $record->getSubType() ? $record->getSubType()->getName() : '',
             'Tags'         => implode(',', $record->getTags()->getPropertyValues('name')),
+            'Points'       => $record->getPoints() ?: '',
             'Severity'     => $record->getSeverity() ? $record->getSeverity()->getName() : '',
             'Body'         => $record->getBodyPublic(),
             'Created Date' => $record->getCreatedAt()->getDatabase(),
