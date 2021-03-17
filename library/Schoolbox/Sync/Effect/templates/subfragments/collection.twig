@@ -2,8 +2,8 @@
 {% set entireDataset = allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getData() %}
 {% set ajaxUrl = allEffectStructures.fragments[currentEffect.id].subfragments.fragment.getAjaxUrl() %}
 
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function() {
         {# raw HTML NOT sanctioned - this list should be generated elsewhere #}

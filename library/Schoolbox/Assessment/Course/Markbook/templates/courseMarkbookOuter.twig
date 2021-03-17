@@ -3,8 +3,8 @@ Usage:
     filterPanel: FilterPanel - a filter panel that can filter and AJAX in the report
     courseSpec:  CourseSpec
 #}
-<script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
-<script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/submissions/jquery.marksheet.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(['Courses', routeLookupIfAuthorized('course.courseList') ], ['Course Markbook']) }}

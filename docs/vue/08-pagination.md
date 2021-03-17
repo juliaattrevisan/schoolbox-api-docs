@@ -6,8 +6,8 @@ This is already included in a special minified file `schoolbox-vue.min.js` which
 
 ```html
 <!-- You need this; spawns after you "npm run build" for the first time -->
-<script src="/javascript/components/schoolbox-vue.min.js"></script>
-<script src="/javascript/components/userList.bundle.js"></script>
+<script src="{{ CDN_PREFIX }}/javascript/components/schoolbox-vue.min.js"></script>
+<script src="{{ CDN_PREFIX }}/javascript/components/userList.bundle.js"></script>
 ```
 
 ## 8.1 Register this component

@@ -15,7 +15,7 @@
         });
     </script>
     {% if routeLookupIfAuthorized('immersiveReader.getTokenAndSubdomain') %}
-        <script src="/javascript/shared/jquery.immersive-reader.js" type="text/javascript"></script>
+        <script src="{{ CDN_PREFIX }}/javascript/shared/jquery.immersive-reader.js" type="text/javascript"></script>
         <script type="text/javascript">
             $(function () {
                 $('#component{{ component.instance.id }} [data-immersive-reader]').immersiveReader({title: '{{ textbox.heading | escape('js') }}'});
@@ -79,9 +79,9 @@
 <div id="toast-{{ component.instance.id }}" class="toast"></div>
 
 {% autoescape 'js' %}
-    <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-    <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
-    <script type="text/javascript" src="/javascript/shared/textbox/jquery.inlineTextboxEditor.js"></script>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/textbox/jquery.inlineTextboxEditor.js"></script>
     <script type="text/javascript">
         $(function() {
 
@@ -125,14 +125,14 @@
                 editorInline:          editorInline,
             });
 
-            
-            //to start the Text Box editor automatically after creating a Text Box, 
+
+            //to start the Text Box editor automatically after creating a Text Box,
             //previously users had to first select the #modifyButton to start editing
             if ((document.body.hasAttribute('data-new-text-box-id')) && (document.body.getAttribute('data-new-text-box-id') === '{{ component.instance.id }}')) { //check if a new Text Box has been created, and if so enable immediate focus within the relevant component
                 inlineTextboxEditor.data('inlineTextboxEditor').onClickModify(); //implement the existing method within #jquery.inlineTextboxEditor.js used by #modifyButton to fire up the editor straight after creation
                 document.body.removeAttribute('data-new-text-box-id'); //clear the reference to ensure immediate focus only occurs after initial creation
-            } 
-            
+            }
+
             // Before creating an editor: restore any placeholders, so that
             // the editor doesn't let you edit the mediaelement player
             component.on('inlineTextboxEditor.preEditorCreate', function () {
@@ -188,14 +188,14 @@
             .on('inlineTextboxEditor.change inlineTextboxEditor.save', function (event, inlineTextboxEditor) {
                 dirtyIndicator.toggleClass('hide', !inlineTextboxEditor.isDirty());
             });
-            
+
             //when the 'Create Text Box' modal is opened, ensure the Title input field is given immediate focus to allow easier/faster Text Box creation
             $(document).on('opened.fndtn.reveal', '[data-reveal]', function () { //referenced from Event Bindings at https://get.foundation/sites/docs-v5/components/reveal.html
                 const openedModalDOMElement = $(this)[0];
                 const openedModalDOMElementID = openedModalDOMElement.id;
                 if (openedModalDOMElementID.includes('{{ component.instance.id }}')) {  //ensure the id matches the currently active component which contains the 'Create Text Box' modal just opened
                     const titleInputDOMElement = openedModalDOMElement.querySelector('#addTextboxModal-{{ component.instance.id }}-form-heading');
-                    titleInputDOMElement.focus(); 
+                    titleInputDOMElement.focus();
                 }
             });
 
@@ -224,7 +224,7 @@
                             contentType: 'application/json',
                         }
                     ).done(function (response) {
-                        
+
                         //to pass through that a new Text Box has been created, to allow the editor to start automatically
                         document.body.setAttribute('data-new-text-box-id', '{{ component.instance.id }}');
 
@@ -246,7 +246,7 @@
                             .find('input[name="componentname"]')
                             .val(response.heading);
                         configForm.submit();
-                        
+
                     }).fail(function () {
                         toast.toastTimeout({text: 'Could not create text box', css: 'alert'});
                     }).always(function () {

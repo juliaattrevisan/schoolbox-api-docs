@@ -163,7 +163,7 @@ Add this to the bottom of `container.twig`
 
 ```html
 <!-- You need this; spawns after you "npm run build" for the first time -->
-<script src="/javascript/components/userList.bundle.js"></script>
+<script src="{{ CDN_PREFIX }}/javascript/components/userList.bundle.js"></script>
 ```
 
 Now you can reload your Greenhouse and somewhere, it should say:

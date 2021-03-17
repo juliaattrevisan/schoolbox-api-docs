@@ -5,18 +5,9 @@
 }
 .sigPad:not(.readonly) .pad {
     /**
-     * For cross browser compatibility, this should be an absolute URL
-     * In IE the cursor is relative to the HTML document
-     * In all other browsers the cursor is relative to the CSS file
-     *
-     * http://www.useragentman.com/blog/2011/12/21/cross-browser-css-cursor-images-in-depth/
+     * Should no longer need to define this twice (as IE no longer supported)
      */
-    cursor: url("/javascript/signature/assets/pen.cur"), crosshair;
-    /**
-     * IE will ignore this line because of the hotspot position
-     * Unfortunately we need this twice, because some browsers ignore the hotspot inside the .cur
-     */
-    cursor: url("/javascript/signature/assets/pen.cur") 16 16, crosshair;
+    cursor: url("./assets/pen.cur") 16 16, crosshair;
 
     -ms-touch-action: none;
     -webkit-user-select: none;
