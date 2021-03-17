@@ -12,6 +12,7 @@ namespace Alaress\Database\Connector;
 
 use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
@@ -25,6 +26,11 @@ class Base implements Serializable, IConnector
 
     /** @var ITransactor */
     protected $transactor;
+
+    /**
+     * Object for quoting/escaping string literals.
+     */
+    private IQuoter $quoter;
 
     /** @var array */
     protected $options;
@@ -55,11 +61,13 @@ class Base implements Serializable, IConnector
      *
      * @param IBroker     $broker     Type specific broker
      * @param ITransactor $transactor Transactor appropriate for this broker
+     * @param IQuoter     $quoter     Quoter appropriate for this broker
      */
-    public function __construct(IBroker $broker, ITransactor $transactor)
+    public function __construct(IBroker $broker, ITransactor $transactor, IQuoter $quoter)
     {
         $this->broker     = $broker;
         $this->transactor = $transactor;
+        $this->quoter     = $quoter;
     }
 
 
@@ -385,8 +393,9 @@ class Base implements Serializable, IConnector
     /**
      * @inheritdoc
      */
-    public function lastInsertId($name = null) {
-        return $this->broker->lastInsertId($name);
+    public function lastInsertId($name = null)
+    {
+        return $this->broker->getPdo()->lastInsertId($name);
     }
 
     // ----------------------------------------------------------------------------------------------------------------
@@ -499,29 +508,14 @@ class Base implements Serializable, IConnector
      */
     public function buildPredicateBuilder($table)
     {
-        return new Builder($this->broker, $table);
+        return new Builder($this->quoter, $table);
     }
 
     /**
      * @inheritdoc
      */
-    public function quoteIdentifier($string) {
-        return $this->broker->quoteIdentifier($string);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function escapeForLike($string) {
-        return $this->broker->escapeForLike($string);
-    }
-
-    /**
-     * @inheritdoc
-     * @todo This should not live here. This class should NOT implement IQuoter
-     */
-    public function getEscapedOperand(string $defaultTable, string $columnName): string
+    public function getQuoter(): IQuoter
     {
-        return $this->broker->getEscapedOperand($defaultTable, $columnName);
+        return $this->quoter;
     }
 }

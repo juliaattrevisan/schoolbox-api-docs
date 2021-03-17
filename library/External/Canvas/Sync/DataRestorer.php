@@ -270,7 +270,7 @@ class DataRestorer
         foreach ($tables as $idx => $table) {
             $idx++;
             $this->log->debug("Dropping table $idx/$countTables '$table'");
-            $this->executeIfPersisting("DROP TABLE IF EXISTS {$this->canvasDb->quoteIdentifier($table)}");
+            $this->executeIfPersisting("DROP TABLE IF EXISTS {$this->canvasDb->getQuoter()->quoteIdentifier($table)}");
         }
         $this->executeIfPersisting('SET FOREIGN_KEY_CHECKS = 1');
     }

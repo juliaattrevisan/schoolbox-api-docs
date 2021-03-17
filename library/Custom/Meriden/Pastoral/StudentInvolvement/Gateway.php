@@ -87,7 +87,7 @@ class Gateway
             FROM studabsent
         ";
 
-        $pb = new PredicateBuilder($this->database, 'studabsent');
+        $pb = new PredicateBuilder($this->database->getQuoter(), 'studabsent');
         $pb = $pb->equals('stud_code', $externalId)
                  ->between('absent_date', $year . '-01-01', $year . '-12-31');
 
@@ -140,7 +140,7 @@ class Gateway
                 AND eu.ref_code = '2'
         ";
 
-        $pb = new PredicateBuilder($this->database, 'ecactivity');
+        $pb = new PredicateBuilder($this->database->getQuoter(), 'ecactivity');
         $pb = $pb->equals('se.stud_code', $externalId)
                  ->equals('se.act_year', $year)
                  ->equals('ea.act_type', $activityType)
@@ -367,7 +367,7 @@ class Gateway
                 AND subtab.cmpy_code = studsub.cmpy_code
         ";
 
-        $pb = new PredicateBuilder($this->database, 'teacher');
+        $pb = new PredicateBuilder($this->database->getQuoter(), 'teacher');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.cmpy_code', self::COMPANY_CODE)
                  ->in('studsub.sub_code', self::TUTOR_GROUPS)
@@ -407,7 +407,7 @@ class Gateway
                 AND subtab.cmpy_code = studsub.cmpy_code
         ";
 
-        $pb = new PredicateBuilder($this->database, 'studsub');
+        $pb = new PredicateBuilder($this->database->getQuoter(), 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->in('subtab.sub_code', self::TUTOR_GROUPS)
                  ->equals('studsub.cmpy_code', self::COMPANY_CODE);
@@ -447,7 +447,7 @@ class Gateway
                 AND subtab.cmpy_code = studsub.cmpy_code
         ";
 
-        $pb = new PredicateBuilder($this->database, 'studsub');
+        $pb = new PredicateBuilder($this->database->getQuoter(), 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.yr_study', $year)
                  ->in('subtab.sub_code', self::TUTOR_GROUPS)
@@ -496,7 +496,7 @@ class Gateway
                 AND studsub.class = tchsub.class
         ";
 
-        $pb = new PredicateBuilder($this->database, 'studsub');
+        $pb = new PredicateBuilder($this->database->getQuoter(), 'studsub');
         $pb = $pb->equals('studsub.stud_code', $externalId)
                  ->equals('studsub.yr_study', $year)
                  ->notIn('subtab.sub_code', self::EXCLUDED_SUBJECTS)
@@ -576,7 +576,7 @@ class Gateway
                 ON st.sub_code = ts.sub_code AND st.cmpy_code = ts.cmpy_code
         ";
 
-        $pb = new PredicateBuilder($this->database, 'suboutline');
+        $pb = new PredicateBuilder($this->database->getQuoter(), 'suboutline');
         $pb = $pb->equals('so.sub_code', $code)
                  ->equals('ts.year_num', $year)
                  ->equals('ts.class', $class)
@@ -619,7 +619,7 @@ class Gateway
                 AND st.cmpy_code = ss.cmpy_code
         ";
 
-        $pb = new PredicateBuilder($this->database, 'studsub');
+        $pb = new PredicateBuilder($this->database->getQuoter(), 'studsub');
         $pb = $pb->equals('st.sub_code', $code)
                  ->notEquals('ss.class', $class)
                  ->equals('st.cmpy_code', self::COMPANY_CODE);

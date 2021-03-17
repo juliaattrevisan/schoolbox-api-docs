@@ -30,7 +30,7 @@ class CustomSync extends Base implements ISync
             return new Iterator\Student(
                 $this->databaseExternal->getQueryIterator("
                     SELECT DISTINCT *
-                    FROM {$this->databaseExternal->quoteIdentifier($customView)}
+                    FROM {$this->databaseExternal->getQuoter()->quoteIdentifier($customView)}
                     ORDER BY student_id ASC
                 ")
             );
@@ -50,7 +50,7 @@ class CustomSync extends Base implements ISync
             return new Iterator\Guardian(
                 $this->databaseExternal->getQueryIterator("
                     SELECT DISTINCT *
-                    FROM {$this->databaseExternal->quoteIdentifier($customView)}
+                    FROM {$this->databaseExternal->getQuoter()->quoteIdentifier($customView)}
                     ORDER BY student_contact_id ASC
                 ")
             );
@@ -70,7 +70,7 @@ class CustomSync extends Base implements ISync
             return new Iterator\Staff(
                 $this->databaseExternal->getQueryIterator("
                     SELECT DISTINCT *
-                    FROM {$this->databaseExternal->quoteIdentifier($customView)}
+                    FROM {$this->databaseExternal->getQuoter()->quoteIdentifier($customView)}
                     ORDER BY staff_id ASC
                 ")
             );

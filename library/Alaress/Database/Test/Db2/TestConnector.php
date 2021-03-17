@@ -21,6 +21,14 @@ use PHPUnit\Framework\TestCase;
 class TestConnector extends TestCase
 {
     /**
+     * Skip DB2 tests for now.
+     */
+    public function setUp(): void
+    {
+        $this->markTestSkipped('Skipping DB2 tests, as test database is inaccessible');
+    }
+
+    /**
      * Ensure we can establish a connection to DB2 test database
      *
      * @requires extension ibm_db2

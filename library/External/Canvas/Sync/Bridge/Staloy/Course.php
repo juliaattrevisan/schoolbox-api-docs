@@ -31,25 +31,25 @@ class Course extends \External\Canvas\Sync\Bridge\Course
     {
         $minYear = 2019;
         $maxYear = intval(date('Y')) + 1;  // We need to include next year for students who commence Yr 12 curriculum in T4 of Yr 11.
-        $innerPb = new Builder($this->canvasDb, '');
+        $innerPb = new Builder($this->canvasDb->getQuoter(), '');
         for ($year = $minYear; $year <= $maxYear; $year++) {
             $innerPb->like("{$sectionAlias}.sis_source_id", "Y{$year}C%NOT");
         }
-        $stAloyCourses = (new Builder($this->canvasDb, ''))
+        $stAloyCourses = (new Builder($this->canvasDb->getQuoter(), ''))
             ->any($innerPb)
             ->notLike("{$sectionAlias}.sis_source_id", "Y%C%TEACHNOT")
             ->in("{$courseAlias}.workflow_state", ['available', 'completed']);
-        $sbTestCourses = (new Builder($this->canvasDb, ''))
+        $sbTestCourses = (new Builder($this->canvasDb->getQuoter(), ''))
             ->equals("{$courseAlias}.canvas_id", 3137)
             ->notNull("{$sectionAlias}.sis_source_id");
 
         // Uncomment this line to just import the StAloy Schoolbox test course
 //        return (new Builder($this->canvasDb, ''))->all($sbTestCourses);
 
-        $outerPb = (new Builder($this->canvasDb, ''))
+        $outerPb = (new Builder($this->canvasDb->getQuoter(), ''))
             ->all($stAloyCourses)
             ->all($sbTestCourses);
 
-        return (new Builder($this->canvasDb, ''))->any($outerPb);
+        return (new Builder($this->canvasDb->getQuoter(), ''))->any($outerPb);
     }
 }

@@ -25,7 +25,7 @@ class TestPredicateBuilder extends TestCase
     {
         $this->connectSchoolbox();
 
-        $predicateBuilder = new PredicateBuilder($this->schoolbox, 'user');
+        $predicateBuilder = new PredicateBuilder($this->schoolbox->getQuoter(), 'user');
         $predicateBuilder->equals('lastname', 'rhodes');
 
         $this->assertSame('`user`.`lastname` = :lastname_0', $predicateBuilder->getWhere()[0]);

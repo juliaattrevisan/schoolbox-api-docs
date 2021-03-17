@@ -87,7 +87,8 @@ class CliDatabaseCreator extends CliTool\App
         }
 
         // Check whether the credential is correct by connecting to schoolbox database.
-        $rootDb = new Base(new Broker(), new Transactor(new Strategy\Savepoint()));
+        $rootDb = new Base(new Broker(), new Transactor(new Strategy\Savepoint()), new Database\Quoter\Mysql\Quoter());
+        $quoter = new Database\Quoter\Mysql\Quoter();
         try {
             $rootDb->connect($this->dbHost, SQL_db, $this->dbRootUser, $this->dbRootPassword);
         } catch (Database\Exception $e) {
@@ -122,7 +123,7 @@ class CliDatabaseCreator extends CliTool\App
             // Create database.
             try {
                 $rootDb->execute(
-                    "CREATE DATABASE {$rootDb->quoteIdentifier($canvasDbName)} CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'"
+                    "CREATE DATABASE {$quoter->quoteIdentifier($canvasDbName)} CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'"
                 );
             } catch (Database\Exception $e) {
                 $this->getLogger()->warning("Error creating database {$canvasDbName}: {$e->getMessage()}");
@@ -133,10 +134,10 @@ class CliDatabaseCreator extends CliTool\App
             // Grant permissions to schoolbox user to new database
             try {
                 $rootDb->execute(
-                    "GRANT ALL ON {$rootDb->quoteIdentifier($canvasDbName)}.* TO {$rootDb->quoteIdentifier($dbSchoolboxUser)}@{$rootDb->quoteIdentifier($allowedHost)}"
+                    "GRANT ALL ON {$quoter->quoteIdentifier($canvasDbName)}.* TO {$quoter->quoteIdentifier($dbSchoolboxUser)}@{$quoter->quoteIdentifier($allowedHost)}"
                 );
                 $rootDb->execute(
-                    "GRANT file ON *.* TO {$rootDb->quoteIdentifier($dbSchoolboxUser)}@{$rootDb->quoteIdentifier($allowedHost)}"
+                    "GRANT file ON *.* TO {$quoter->quoteIdentifier($dbSchoolboxUser)}@{$quoter->quoteIdentifier($allowedHost)}"
                 );
             } catch (Database\Exception $e) {
                 $this->getLogger()->warning("Error granting access to {$dbSchoolboxUser}@{$allowedHost}: {$e->getMessage()}");
@@ -219,13 +220,13 @@ SYNOPSIS:
 OPTIONS:
     $yellow-h, --help$white
         Print this help and exit
-        
+
     $yellow-p, --perform$white
         If set, updates DB - otherwise, performs a dry run
-        
+
     $yellow--db-user=DB_USER$white
         Username to access schoolbox database
-        
+
     $yellow--db-password=DB_PASSWORD$white
         Password to access schoolbox database
 ";

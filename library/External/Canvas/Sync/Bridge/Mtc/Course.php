@@ -20,11 +20,11 @@ class Course extends \External\Canvas\Sync\Bridge\Course
     public function getCanvasCoursesToImport(string $courseAlias = 'c', string $sectionAlias = 'cs'): Builder
     {
         // TODO: how to determine term?
-        $pb = (new Builder($this->canvasDb, ''))
+        $pb = (new Builder($this->canvasDb->getQuoter(), ''))
 //            ->in('term.sis_source_id', ['2019Whole', '2020Whole', '2020TRANS'])
             ->greaterThan('term.date_start', '2019-11-23')
             ->in("{$courseAlias}.workflow_state", ['available', 'completed']);
-        return (new Builder($this->canvasDb, ''))
+        return (new Builder($this->canvasDb->getQuoter(), ''))
             ->all($pb);
     }
 }

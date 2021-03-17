@@ -36,7 +36,7 @@ trait CanvasDatabaseTrait
      */
     private function buildCanvasDbConnection(): IConnector
     {
-        $connector = new Base(new Broker(), new Transactor(new Strategy\Nested()));
+        $connector = new Base(new Broker(), new Transactor(new Strategy\Nested()), new Database\Quoter\Mysql\Quoter());
 
         $connectionOptions = [
             PDO::ATTR_EMULATE_PREPARES => false,

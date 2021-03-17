@@ -14,7 +14,6 @@ use Alaress\Database\Collector;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Iterator\IIterator;
-use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\FunctionCall\IFunctionCall;
 use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\Query\IQuery;
@@ -23,7 +22,7 @@ use PDO;
 use PDOException;
 use PDOStatement;
 
-interface IBroker extends IQuoter
+interface IBroker
 {
     /**
      * Is this broker available?
@@ -148,47 +147,6 @@ interface IBroker extends IQuoter
      * @return IStoredProcedure
      */
     public function prepareStoredProcedure($procedure);
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Database transaction functions
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Begin database transaction
-     * @return bool
-     */
-    public function beginTransaction();
-
-    /**
-     * Return true/false if in database transaction
-     *
-     * @return bool
-     */
-    public function inTransaction();
-
-    /**
-     * Commit database transaction
-     *
-     * @return bool
-     * @throws PDOException If there is no active transaction.
-     *                      Note: An exception is raised even when the PDO::ATTR_ERRMODE attribute is not PDO::ERRMODE_EXCEPTION.
-     */
-    public function commit();
-
-    /**
-     * Rollback transaction
-     *
-     * @return bool
-     */
-    public function rollBack();
-
-    /**
-     * Return last inserted record ID
-     *
-     * @param string|null $name
-     * @return string
-     */
-    public function lastInsertId($name = null);
 
     // ----------------------------------------------------------------------------------------------------------------
     // Debugging collector functions

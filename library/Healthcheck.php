@@ -198,19 +198,20 @@ class Healthcheck
         // Build an object name
         $objectNamePrefix  = '';
         $objectParamPrefix = '';
+        $quoter            = $this->connector->getQuoter();
         if (isset($db)) {
             $objectNamePrefix  .= $db . '.';
-            $objectParamPrefix .= $this->connector->quoteIdentifier($db) . '.';
+            $objectParamPrefix .= $quoter->quoteIdentifier($db) . '.';
         }
         if (isset($schema)) {
             $objectNamePrefix  .= $schema . '.';
-            $objectParamPrefix .= $this->connector->quoteIdentifier($schema) . '.';
+            $objectParamPrefix .= $quoter->quoteIdentifier($schema) . '.';
         }
 
         foreach ($objects as $object) {
             // Build reporting and escaped object name
             $objectName  = $objectNamePrefix . $object;
-            $objectParam = $objectParamPrefix . $this->connector->quoteIdentifier($object);
+            $objectParam = $objectParamPrefix . $quoter->quoteIdentifier($object);
 
             $this->log .= str_pad(str_pad($method, 15) . $objectName, 50);
 

@@ -45,7 +45,7 @@ abstract class AbstractTestPredicateBuilder extends TestCase
      */
     public function testPredicateBuilder()
     {
-        $predicateBuilder = new PredicateBuilder($this->mssqlTest, 'Community');
+        $predicateBuilder = new PredicateBuilder($this->mssqlTest->getQuoter(), 'Community');
         $predicateBuilder->equals('Surname', 'rhodes');
 
         $this->assertSame('[Community].[Surname] = :Surname_0', $predicateBuilder->getWhere()[0]);

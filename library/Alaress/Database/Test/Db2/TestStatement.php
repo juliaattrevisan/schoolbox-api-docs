@@ -22,21 +22,22 @@ class TestStatement extends TestCase
     use TestConnectorTrait;
 
     /**
-     * Connect to database, begin transaction
+     * Skip DB2 tests for now.
      */
     public function setUp(): void
     {
-        $this->connectDb2Test();
-        $this->db2Test->beginTransaction();
+        $this->markTestSkipped('Skipping DB2 tests, as test database is inaccessible');
+//        $this->connectDb2Test();
+//        $this->db2Test->beginTransaction();
     }
 
-    /**
-     * Roll back when done
-     */
-    public function tearDown(): void
-    {
-        $this->db2Test->rollBack();
-    }
+//    /**
+//     * Roll back when done
+//     */
+//    public function tearDown(): void
+//    {
+//        $this->db2Test->rollBack();
+//    }
 
     /**
      * Test with long-winded preparation and binding

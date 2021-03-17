@@ -86,10 +86,10 @@ class AssignmentOverride
      */
     public function equalsCanvasOverride(int $overrideCanvasId, int $assessmentImplId, string $planTable): Builder
     {
-        $pb = (new Builder($this->schoolboxDb, ''))
+        $pb = (new Builder($this->schoolboxDb->getQuoter(), ''))
             ->regex("{$planTable}.name", "^.+\\({$this::canvasIdPrefix()}-{$overrideCanvasId}\\)$")
             ->equals("{$planTable}.assessment_id", $assessmentImplId);
-        return (new Builder($this->schoolboxDb, ''))->all($pb);
+        return (new Builder($this->schoolboxDb->getQuoter(), ''))->all($pb);
     }
 
 
@@ -102,7 +102,7 @@ class AssignmentOverride
      */
     public function equalsAnyCanvasOverride(string $planTable): Builder
     {
-        return (new Builder($this->schoolboxDb, ''))->regex("{$planTable}.name", "^.+\\({$this::canvasIdPrefix()}-\\d+\\)$");
+        return (new Builder($this->schoolboxDb->getQuoter(), ''))->regex("{$planTable}.name", "^.+\\({$this::canvasIdPrefix()}-\\d+\\)$");
     }
 
 

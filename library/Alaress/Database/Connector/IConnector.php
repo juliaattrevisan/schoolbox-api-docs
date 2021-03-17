@@ -19,7 +19,7 @@ use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use PDOException;
 
-interface IConnector extends IQuoter
+interface IConnector
 {
     /**
      * Connect to database
@@ -329,4 +329,12 @@ interface IConnector extends IQuoter
      * @return IBuilder
      */
     public function buildPredicateBuilder($table);
+
+
+    /**
+     * Retrieve this connector's quoter.
+     *
+     * @return IQuoter
+     */
+    public function getQuoter(): IQuoter;
 }

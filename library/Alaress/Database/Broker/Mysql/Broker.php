@@ -12,7 +12,6 @@ namespace Alaress\Database\Broker\Mysql;
 
 use Alaress\Database\Broker\Base;
 use Alaress\Database\Iterator\Mysql\Iterator;
-use Alaress\Database\Quoter\Mysql\Quoter as MysqlQuoter;
 use Alaress\Database\Statement\FunctionCall\Mysql\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Mysql\StoredProcedure;
 use PDO;
@@ -27,14 +26,6 @@ class Broker extends Base
     public static function isAvailable()
     {
         return in_array('mysql', PDO::getAvailableDrivers(), true);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildQuoter()
-    {
-        return new MysqlQuoter();
     }
 
     /**

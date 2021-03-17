@@ -4,6 +4,8 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
+use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Application\CliTool;
@@ -59,7 +61,7 @@ HELP;
         $db      = $this->getDatabaseInternal();
         $logger  = $this->getLogger();
 
-        $folderName = $db->quoteIdentifier(self::FOLDER_NAME);
+        $folderName = $db->getQuoter()->quoteIdentifier(self::FOLDER_NAME);
 
         $lostQuery = $db->prepareQuery('SELECT `id` FROM `folder` WHERE `name` = :folder_name');
         $lostQuery->execute(['folder_name' => self::FOLDER_NAME]);

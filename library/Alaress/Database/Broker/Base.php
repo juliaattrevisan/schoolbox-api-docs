@@ -14,7 +14,6 @@ namespace Alaress\Database\Broker;
 use Alaress\Database\Collector;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
-use Alaress\Database\Quoter\IQuoter;
 use Alaress\Database\Statement\Query\Base as Query;
 use Alaress\DebugBar\Instance as DebugBar;
 use DebugBar\DataCollector\DataCollectorInterface;
@@ -57,17 +56,6 @@ abstract class Base implements IBroker
 
     /** @var callable[] $postProcessors This contains an array of callbacks that need to be run on all database queries */
     protected $postProcessors = [];
-
-    /** @var IQuoter */
-    private $quoter;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->quoter = $this->buildQuoter();
-    }
 
     /**
      * @inheritdoc
@@ -212,54 +200,6 @@ abstract class Base implements IBroker
     }
 
     // ----------------------------------------------------------------------------------------------------------------
-    // PDO pass-through functions
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * @inheritdoc
-     */
-    public function lastInsertId($name = null)
-    {
-        return $this->pdo->lastInsertId($name);
-    }
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Database transaction stuff
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * @inheritdoc
-     */
-    public function beginTransaction()
-    {
-        return $this->pdo->beginTransaction();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function inTransaction()
-    {
-        return $this->pdo->inTransaction();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function commit()
-    {
-        return $this->pdo->commit();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function rollBack()
-    {
-        return $this->pdo->rollBack();
-    }
-
-    // ----------------------------------------------------------------------------------------------------------------
     // Debugging collector
     // ----------------------------------------------------------------------------------------------------------------
 
@@ -321,44 +261,5 @@ abstract class Base implements IBroker
     public function getPostProcessors()
     {
         return $this->postProcessors;
-    }
-
-    // ----------------------------------------------------------------------------------------------------------------
-    // Quoter stuff
-    // ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Builds the quoter object to which IQuoter method calls are passed to.
-     *
-     * This will be called on construction.
-     *
-     * @return IQuoter
-     */
-    protected abstract function buildQuoter();
-
-    /**
-     * @inheritdoc
-     */
-    public function quoteIdentifier($string)
-    {
-        return $this->quoter->quoteIdentifier($string);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function escapeForLike($string)
-    {
-        return $this->quoter->escapeForLike($string);
-    }
-
-
-    /**
-     * @inheritdoc
-     * @todo This should not live here. This class should NOT implement IQuoter
-     */
-    public function getEscapedOperand(string $defaultTable, string $columnName): string
-    {
-        return $this->quoter->getEscapedOperand($defaultTable, $columnName);
     }
 }

@@ -54,7 +54,7 @@ class Account
      */
     public function equalsAccountFolder(int $accountCanvasId, string $folderTableAlias = null): Builder
     {
-        return (new Builder($this->schoolboxDb, $folderTableAlias ?? 'folder'))
+        return (new Builder($this->schoolboxDb->getQuoter(), $folderTableAlias ?? 'folder'))
             ->regex('name', "^.+\\({$this::canvasIdPrefix()}-{$accountCanvasId}\\)$");
     }
 
@@ -68,7 +68,7 @@ class Account
      */
     public function equalsAnyAccountFolder(string $folderTableAlias = 'folder'): Builder
     {
-        return (new Builder($this->schoolboxDb, $folderTableAlias))
+        return (new Builder($this->schoolboxDb->getQuoter(), $folderTableAlias))
             ->regex('name', "^.+\\({$this::canvasIdPrefix()}-\\d+\\)$");
     }
 

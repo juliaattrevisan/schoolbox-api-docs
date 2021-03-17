@@ -278,7 +278,7 @@ class ArticleResolver implements IArticleResolver
         Collection $relatedAttributes,
         User $user
     ): array {
-        $pb = new Predicate\Builder($this->db, '');
+        $pb = new Predicate\Builder($this->db->getQuoter(), '');
         foreach ($selfAttributes as $entityType => $entityValues) {
             $pb->all($this->buildPredicate('simple', Model::RELATIONSHIP_SELF, $entityType, $entityValues));
         }
@@ -308,8 +308,8 @@ class ArticleResolver implements IArticleResolver
     private function generateComplexSubquery(Collection $selfAttributes): array
     {
         $tableAlias = 'complex';
-        $pb1        = new Predicate\Builder($this->db, '');
-        $pb2        = new Predicate\Builder($this->db, '');
+        $pb1        = new Predicate\Builder($this->db->getQuoter(), '');
+        $pb2        = new Predicate\Builder($this->db->getQuoter(), '');
         foreach ($selfAttributes as $entityType => $entityValues) {
             $pb1->all($this->buildPredicate(
                 $tableAlias,
@@ -329,7 +329,7 @@ class ArticleResolver implements IArticleResolver
             ));
         }
 
-        $pb = (new Predicate\Builder($this->db, ''))
+        $pb = (new Predicate\Builder($this->db->getQuoter(), ''))
             ->any($pb1)
             ->any($pb2);
 
@@ -365,14 +365,14 @@ class ArticleResolver implements IArticleResolver
         string $colEntityType = Simple\Mapper::FIELD_ENTITY_TYPE,
         string $colEntityValue = Simple\Mapper::FIELD_ENTITY_VALUE
     ): Predicate\Builder {
-        $outerPb = (new Predicate\Builder($this->db, $tableAlias))
+        $outerPb = (new Predicate\Builder($this->db->getQuoter(), $tableAlias))
             ->setParamPrefix($tableAlias)
             ->equals($colEntityType, $entityType);
         if ($relationship) {
             $outerPb->equals(Simple\Mapper::FIELD_RELATIONSHIP, $relationship);
         }
 
-        $innerPb = (new Predicate\Builder($this->db, $tableAlias))->setParamPrefix($tableAlias);
+        $innerPb = (new Predicate\Builder($this->db->getQuoter(), $tableAlias))->setParamPrefix($tableAlias);
 
         // Need an inner PB to account for nulls, eg 'entity_value IN (:nonNull) OR entity_value IS NULL'
         $matchNull = $this->simpleStrategies[$entityType]::isValidNullEntityValue() && in_array(null, $entityValues, true);
