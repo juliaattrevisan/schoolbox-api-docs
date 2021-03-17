@@ -366,7 +366,7 @@ $align-class-breakpoints:
     .no-bullet {
       list-style-type: none;
       margin-#{$default-float}: $list-side-margin-no-bullet;
-      
+
       li {
         ul,
         ol {
@@ -477,8 +477,6 @@ $align-class-breakpoints:
       */
       @media print {
         * {
-          background: transparent !important;
-          color: $black !important; /* Black prints faster: h5bp.com/s */
           box-shadow: none !important;
           text-shadow: none !important;
         }
