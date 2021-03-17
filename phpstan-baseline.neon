@@ -10656,11 +10656,6 @@ parameters:
 			path: library/Schoolbox/UserNotifier.php
 
 		-
-			message: "#^Property Schoolbox\\\\Video\\\\Queue\\:\\:\\$processTimeout \\(string\\) does not accept int\\.$#"
-			count: 2
-			path: library/Schoolbox/Video/Queue.php
-
-		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Video/ResourceVideo.php
