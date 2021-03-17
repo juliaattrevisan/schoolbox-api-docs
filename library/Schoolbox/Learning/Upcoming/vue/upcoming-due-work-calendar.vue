@@ -70,10 +70,10 @@ export default {
             views: {
                 day: {
                     titleFormat: this.$_fullCalendarHelper_dayTitleFormat,
-                    columnHeader: false
+                    dayHeaders: false
                 },
                 week: {
-                    columnHeaderFormat: this.formats.displayWeekDay
+                    dayHeaderFormat: this.formats.displayWeekDay
                 }
             },
             eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,

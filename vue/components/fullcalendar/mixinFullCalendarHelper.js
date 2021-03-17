@@ -1,13 +1,14 @@
-import { toMoment }          from '@fullcalendar/moment';
+/**
+ * Helper for Vue.js FullCalendar implementations:
+ * contains common code that can be shared between all implementations.
+ */
+
+import { toMoment } from '@fullcalendar/moment';
 import { ATTENDANCE_STATUS } from '@schoolboxCalendarEvent/attendance-status';
 
 const EVENT_VARIANT_EVENT = 'event';
 const EVENT_VARIANT_TASK  = 'task';
 
-/**
- * Helper for Vue.js FullCalendar implementations:
- * contains common code that can be shared between all implementations.
- */
 export const mixinFullCalendarHelper = {
 
     data () {
@@ -81,7 +82,6 @@ export const mixinFullCalendarHelper = {
             const element = eventRenderInfo.el;
             const inner = element.querySelector('.fc-list-event');
             const title = element.querySelector('.fc-list-event-title');
-            debugger
 
             if (calEvent?.extendedProps?.data?.attendance?.hasAttendance) {
                 // Add a style depending on attendability
@@ -105,21 +105,19 @@ export const mixinFullCalendarHelper = {
                 inputCheckbox.classList.add('plain');
                 inputCheckbox.setAttribute('id', 't' + calEvent?.extendedProps?.data?.meta?.eventId);
 
-                inner.insertBefore(inputCheckbox, inner.firstChild);
+                inner?.insertBefore(inputCheckbox, inner.firstChild);
 
-                // inner.prepend(
-                //     this.jQuery('<input type="checkbox" name="completed" class="plain" />')
-                //         .attr('id', 't' + calEvent?.extendedProps?.data?.meta?.eventId)
-                // );
                 if (Boolean(calEvent?.extendedProps?.data?.meta?.completed)) {
-                    title.classList.add('strike');
-                    // inner.find(':checkbox').prop('checked', true)
+                    title?.classList.add('strike');
                     inputCheckbox.checked = true;
                 }
             }
-
+            
             // Apply the visible class?
-            element.classList.add(calEvent?.extendedProps?.data?.styles?.visible);
+            if (calEvent?.extendedProps?.data?.styles?.visible) {
+                element.classList.add(calEvent?.extendedProps?.data?.styles?.visible);
+            }
+            
             return true;
         },
 

@@ -78,11 +78,11 @@ export default {
             views: {
                 day: {
                     titleFormat: this.dayTitleFormat,
-                    columnHeader: false,
+                    dayHeaders: false,
                     allDaySlot: false,
                 },
                 week: {
-                    columnHeaderFormat: this.formats.displayWeekDay,
+                    dayHeaderFormat: this.formats.displayWeekDay,
                     allDaySlot: false,
                 }
             },

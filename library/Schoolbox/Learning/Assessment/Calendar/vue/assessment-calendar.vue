@@ -148,7 +148,7 @@ export default {
             slotWidth: '50'
         },
         this.resourceTimelineWeek = {
-            columnHeaderFormat: this.formats.displayWeekDay,
+            dayHeaderFormat: this.formats.displayWeekDay,
             duration: { weeks: 1 },
             slotDuration: { days: 1 },
             slotLabelFormat: [

@@ -68,7 +68,7 @@ export default {
                     type: 'list',
                     duration: { days: this.config.days },
                     listDayFormat: this.$_fullCalendarHelper_dayTitleFormat,
-                    listDayAltFormat: false,
+                    listDaySideFormat: false
                 }
             },
             headerToolbar: false,
@@ -77,7 +77,7 @@ export default {
             initialView: 'list',
             events: this.events,
             eventDidMount: this.$_fullCalendarHelper_eventRender,
-            noEventsMessage: null,
+            noEventsDidMount: null, //hide the no events message
             eventClick: this.onEventClick
         }
     },
