@@ -374,6 +374,16 @@ class Controller extends Base
     }
 
     /**
+     * End point for displaying HTML page containing list of users that have not been updated recently
+     * @api GET /adminv2/user/stale
+     */
+    public function getStaleReport(): void
+    {
+        $this->getResponse()->content->set(['template' => '@adminUser/stale.twig']);
+    }
+
+
+    /**
      * Endpoint for returning a list of users that have not been updated recently in the system
      * @api GET /adminv2/user/stale/list
      */
