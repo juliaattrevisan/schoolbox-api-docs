@@ -6,6 +6,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 
 header("Content-Type: text/xml");
 
@@ -15,6 +16,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $userMapper = UserMapper::getInstance();
 $campusMapper = CampusMapper::getInstance();
 $roleMapper = RoleMapper::getInstance();
+$yearLevelMapper = YearLevelMapper::getInstance();
 $passwordService = new PasswordService();
 
 /**
@@ -24,7 +26,7 @@ $passwordService = new PasswordService();
  * @param array $getValues
  * @return User
  */
-$setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMapper, $passwordService) {
+$setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMapper, $yearLevelMapper, $passwordService) {
     // Update only included fields
     if (!empty($getValues['username'])) {
         $user = $user->setUsername($getValues['username']);
@@ -54,7 +56,12 @@ $setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMappe
         $user = $user->setExternalId($getValues['database_id']);
     }
     if (isset($getValues['year'])) {
-        $user = $user->setYear($getValues['year'] == '' ? null : $getValues['year']);
+        try {
+            $year = $yearLevelMapper->findOneByColumn('name', $getValues['year']);
+        } catch (\Exception $e) {
+            $year = null;
+        }
+        $user = $user->setYear($year);
     }
     if (isset($getValues['eportfolio_enabled'])) {
         $user = $user->setEportfolioEnable((bool)$getValues['eportfolio_enabled']);
@@ -73,7 +80,12 @@ $setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMappe
 
     /* Convert campus names into ids */
     if (!empty($getValues['group'])) {
-        $user = $user->setRole($roleMapper->findOneByColumn('name', $getValues['group']));
+        try {
+            $role = $roleMapper->findOneByColumn('name', $getValues['group']);
+        } catch (\Exception $e) {
+            $role = null;
+        }
+        $user = $user->setRole($role);
     }
 
     if (!empty($getValues['campus'])) {
@@ -83,6 +95,8 @@ $setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMappe
                 array_map('trim', explode(',', $getValues['campus']))
             )
         );
+    } else {
+        $user->setCampusCollection($campusMapper->createCollection());
     }
 
     if (isset($getValues['display_grade_graph'])) {
