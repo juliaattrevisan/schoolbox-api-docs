@@ -287,7 +287,8 @@ class Controller extends Base
                 $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER),
                 $config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID),
                 $sessionLength,
-            )
+            ),
+            explode(',', $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS)),
         );
 
         $user        = $tokenParser->findUserFromToken($jwt);
