@@ -7,6 +7,8 @@
 /** Make these styles more specific than topbar styles  **/
 #component-layout .column-top .component-titlebar {
   background-color: var(--top-head-bg);
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 }
 
 #component-layout .column-top .component-titlebar h2,
@@ -21,6 +23,8 @@
 
 #component-layout .column-left .component-titlebar {
   background-color: var(--left-head-bg);
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 }
 
 #component-layout .column-left .component-titlebar h2,
@@ -35,6 +39,8 @@
 
 #component-layout .column-right .component-titlebar {
   background-color: var(--right-head-bg);
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 }
 
 #component-layout .column-right .component-titlebar h2,
@@ -259,6 +265,8 @@ ul.tileList {
         background-size: cover;
         background-position: center;
         transition: background-color 0.1s;
+        color-adjust: exact;
+        -webkit-print-color-adjust: exact;
         &.contained {
             background-size: contain;
         }
