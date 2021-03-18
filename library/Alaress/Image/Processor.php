@@ -38,6 +38,14 @@ use UnexpectedValueException;
 class Processor
 {
     /**
+     * Number of seconds that ImageMagick should timeout after by default.
+     * We may specify a longer time in some cases, eg from CLI, but for php-fpm requests
+     * we need this value to be less than the request execution time limit (usually 60s)
+     * to prevent temp files being left behind when the process is killed.
+     */
+    private const IMAGE_MAGICK_TIMEOUT_DEFAULT = 45;
+
+    /**
      * Original un-transformed file. Contents may be local or remote.
      *
      * @var Storage\Model
@@ -81,8 +89,12 @@ class Processor
      * @param ITransform    $transform
      * @param int           $imageMagickTimeout
      */
-    public function __construct(Storage\Model $file, string $cacheKey, ITransform $transform, int $imageMagickTimeout = 45)
-    {
+    public function __construct(
+        Storage\Model $file,
+        string $cacheKey,
+        ITransform $transform,
+        int $imageMagickTimeout = self::IMAGE_MAGICK_TIMEOUT_DEFAULT
+    ) {
         $this->file               = $file;
         $this->cacheKey           = $cacheKey;
         $this->transform          = $transform;
