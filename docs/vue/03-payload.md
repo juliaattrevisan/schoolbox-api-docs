@@ -15,12 +15,7 @@ Let's set up a hardcoded payload for now, to demonstrate usage.
 In `container.twig` we can construct a twig data structure then json_encode it as input to the `user-list` Vue Component.
 
 ```html
-{% set hardcodedPayload = {
-    'cat': 'Navarre',
-    'dog': 'Benji',
-    'horse': 'Mr. Ed',
-    'elephant': 'Dumbo'
-} %}
+{% set hardcodedPayload = { 'cat': 'Navarre', 'dog': 'Benji', 'horse': 'Mr. Ed', 'elephant': 'Dumbo' } %}
 
 <div id="user-list-container">
     <user-list :payload="{{ hardcodedPayload | json_encode }}"></user-list>
@@ -32,16 +27,27 @@ In `container.twig` we can construct a twig data structure then json_encode it a
 To get to that data, we need to define a `prop` in the Vue Component. In `user-list.vue`,
 
 ```js
-props: [
-    'payload'
-],
+props: {
+    payload: {
+        type: Object,
+        required: true,
+        default: () => {
+            return {
+                cat: 'cat',
+                dog: 'dog',
+                horse: 'horse',
+                elephant: 'elephant'
+            }
+        }
+    }
+},
 ```
 
 This `payload` connects with the `:payload` attribute on `user-list`. Now we can start rendering its contents. Underneath the placeholder text you can add the following:
 
 ```html
 <ul>
-    <li v-for="(key, value) in this.payload">{{ key }}</li>
+    <li v-for="(key, value) in this.payload" :key="key">{{ key }}</li>
 </ul>
 ```
 
@@ -54,25 +60,15 @@ To see the output, `npm run build` and visit the Greenhouse url.
 You can add more args to provide pieces of info to the `user-list` component. See below for some examples. Non-scalar data should be json_encoded, scalars can be provided as-is; however, note the usage of apostrophes in the `:datetime` attribute below.
 
 ```html
-{% set hardcodedPayload = {
-    'cat': 'Navarre',
-    'dog': 'Benji',
-    'horse': 'Mr. Ed',
-    'elephant': 'Dumbo'
-} %}
-
-{% set stuartMahon = {
-    'fullname': 'Stuart Mahon',
-    'firstname': 'stu',
-    'lastname': 'mahon'
-} %}
-
-{% set datetime = 'now'|date('Y-m-d H:i:s') %}
+{% set hardcodedPayload = { 'cat': 'Navarre', 'dog': 'Benji', 'horse': 'Mr. Ed', 'elephant': 'Dumbo' } %} {% set
+stuartMahon = { 'fullname': 'Stuart Mahon', 'firstname': 'stu', 'lastname': 'mahon' } %} {% set datetime =
+'now'|date('Y-m-d H:i:s') %}
 
 <div id="user-list-container">
-    <user-list :payload="{{ hardcodedPayload | json_encode }}"
-               :stuart-mahon="{{ stuartMahon | json_encode }}"
-               :datetime="'{{ datetime }}'"
+    <user-list
+        :payload="{{ hardcodedPayload | json_encode }}"
+        :stuart-mahon="{{ stuartMahon | json_encode }}"
+        :datetime="'{{ datetime }}'"
     ></user-list>
 </div>
 ```
@@ -83,14 +79,26 @@ You can add more args to provide pieces of info to the `user-list` component. Se
 >
 > `:datetime="'some value'"` is synonymous with`var datetime = 'some value'`, which works. Keep this in mind because it applies throughout all Vue templates too.
 
-Define them in the `props`
+Define them in the `props` object.
+At a minimum, define the type of each property.
 
 ```js
-props: [
-    'payload',
-    'stuart-mahon',
-    'datetime'
-],
+props: {
+    payload: {
+        type: Object,
+        required: true,
+        default: () => {
+            return {
+                cat: 'cat',
+                dog: 'dog',
+                horse: 'horse',
+                elephant: 'elephant'
+            }
+        }
+    }
+    stuartMahon: Object,
+    datetime: String
+},
 ```
 
 Then render them out:

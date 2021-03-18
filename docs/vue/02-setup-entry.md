@@ -41,7 +41,7 @@ new Vue({
 ```
 
 -   The `el` arg is the container element's id which we previously named `#user-list-container` but you can call it anything you want here.
--   And the `components` is used to list the Vue Templates that are being referenced within `#user-list-container`
+-   And the `components` is used to list the Vue components that are being referenced within `#user-list-container`
 
 ### 2.1.3 Update webpack.config.js
 
@@ -55,7 +55,7 @@ userList: './library/Schoolbox/Greenhouse/templates/initUserList.js`
 
 ### 2.1.3 Vue Component basics
 
-The `UserList` component requires a basic Vue component javascript to work. This is where the meat of our component will live; it's where we add other components and process data to render on screen. See https://vuejs.org/v2/guide/single-file-components.html for reference
+The `UserList` component requires a basic Vue component javascript to work. This is where the meat of our component will live; it's where we add other components process data to render on screen. See https://vuejs.org/v2/guide/single-file-components.html for futher reference.
 
 If you remember before, our initialiser was set to require from `user-list.vue`, so let's do that.
 
@@ -73,7 +73,7 @@ export default {
      * The name of the component that we have here. This name will be used in the container
      * to spawn this component.
      */
-    name: "user-list",
+    name: 'user-list',
 
     /**
      * Components.
@@ -101,8 +101,20 @@ export default {
      * https://vuejs.org/v2/guide/components-props.html
      *
      */
-    props: [
-    ],
+    props: {
+        users: {
+            type: Array,
+            required: true,
+            default: () => {
+                return [
+                    {
+                        firstName: 'first name',
+                        lastName: 'last name'
+                    }
+                ]
+            }
+        },
+    },
 
     /**
      * Data.
@@ -112,6 +124,7 @@ export default {
      */
     data() {
         return {
+            isLoaded: false
         }
     },
 
@@ -154,7 +167,8 @@ export default {
      * see https://vuejs.org/v2/guide/instance.html#Lifecycle-Diagram for reference
      *
      */
-    mounted: function () {
+    mounted() {
+
     },
 
     /**
