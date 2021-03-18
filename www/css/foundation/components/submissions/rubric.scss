@@ -42,6 +42,8 @@ table.rb {
                     background-color: $content-ui-selected;
                     // DONE use contrasting color
                     color: $content-ui-selected-contrast;
+                    color-adjust: exact;
+                    -webkit-print-color-adjust: exact;
                 }
             }
             + label {

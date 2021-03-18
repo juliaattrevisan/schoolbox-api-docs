@@ -124,6 +124,8 @@
 .fc-event {
     border-radius: 0 !important;
     color: $black !important;
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
 }
 
 @media #{$medium-down} {
