@@ -129,6 +129,11 @@ class Manager
     private int $attemptsPerTransform;
 
     /**
+     * @var int
+     */
+    private int $managerPid;
+
+    /**
      * @param int             $timeInterval    Time period in minutes to look up images for processing
      * @param int             $imageCountLimit Max number of images to process
      * @param int             $workerCount     Max number of concurrent workers
@@ -144,6 +149,7 @@ class Manager
         bool $retryFailed,
         int $attemptsPerTransform
     ) {
+        $this->managerPid           = posix_getpid();
         $this->timeInterval         = $timeInterval;
         $this->imageCountLimit      = $imageCountLimit;
         $this->workerCountLimit     = min($workerCount, $imageCountLimit);
@@ -166,6 +172,8 @@ class Manager
      */
     public function run(): void
     {
+        pcntl_async_signals(true);
+        pcntl_signal(SIGTERM, [$this, 'signalHandler']);
         $this->startTime = time();
         $pdo             = $this->buildPdo();
         $lock = $this->checkOverlappingExecution($pdo);
@@ -173,6 +181,27 @@ class Manager
         unset($pdo);
         $this->processTransformations($transformations, $lock);
         $lock->release();
+    }
+
+
+    /**
+     * signal handler function
+     *
+     * @param int $signal
+     */
+    public function signalHandler(int $signal): void
+    {
+        if ($this->managerPid !== posix_getpid()) {
+            return;
+        }
+        if ($signal === SIGTERM) {
+            $this->logger->warning($this->prefixLog("Caught SIGTERM signal, killing workers"));
+            foreach ($this->workerPids as $workerPid) {
+                $this->logger->warning($this->prefixLog("Killing worker: $workerPid"));
+                posix_kill($workerPid, SIGTERM);
+            }
+            exit(1);
+        }
     }
 
 
@@ -472,7 +501,7 @@ class Manager
         }
         // Remove any children that have exited
         foreach ($this->workerPids as $idx => $workerPid) {
-            if (!posix_kill($workerPid, 0)) {
+            if (!posix_kill($workerPid, SIG_DFL)) {
                 unset($this->workerPids[$idx]);
             }
         }
