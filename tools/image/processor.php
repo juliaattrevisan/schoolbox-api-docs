@@ -40,6 +40,7 @@ Options:
     --max-workers N     Maximum number of concurrent workers. Defaults to CPU count
     --limit N           Maximum number of storage files to transform
     --max-attempts N    Maximum number of times to attempt a transformation if it throws a catchable exception
+
 HELP;
     exit;
 }
