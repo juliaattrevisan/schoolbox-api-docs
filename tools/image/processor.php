@@ -17,13 +17,13 @@ const DEFAULT_TIME_INTERVAL_MINUTES  = 60;                   // default time per
 const DEFAULT_IMAGE_COUNT_LIMIT      = 300;                  // default maximum amount of images to be processed
 const DEFAULT_ATTEMPTS_PER_TRANSFORM = 3;                    // default maximum times to attempt each transformation
 
-$timeInterval         = (int)getenv('TIME_INTERVAL', true) ?: DEFAULT_TIME_INTERVAL_MINUTES;
-$workerCount          = (int)getenv('MAX_WORKERS', true) ?: (int)shell_exec('nproc');
-$imageCountLimit      = (int)getenv('LIMIT', true) ?: DEFAULT_IMAGE_COUNT_LIMIT;
-$retryFailed          = (bool)getenv('RETRY_FAILED', true);
-$attemptsPerTransform = (int)getenv('MAX_ATTEMPTS', true) ?: DEFAULT_ATTEMPTS_PER_TRANSFORM;
+$opt                  = getopt('hv', ['help', 'verbose', 'retry-failed', 'time-interval:', 'max-workers:', 'limit:', 'max-attempts:']);
+$retryFailed          = array_key_exists('retry-failed', $opt);
+$timeInterval         = array_key_exists('time-interval', $opt) ? (int)$opt['time-interval'] : DEFAULT_TIME_INTERVAL_MINUTES;
+$workerCount          = array_key_exists('max-workers', $opt) ? (int)$opt['max-workers'] : (int)shell_exec('nproc');
+$imageCountLimit      = array_key_exists('limit', $opt) ? (int)$opt['limit'] : DEFAULT_IMAGE_COUNT_LIMIT;
+$attemptsPerTransform = array_key_exists('max-attempts', $opt) ? (int)$opt['max-attempts'] : DEFAULT_ATTEMPTS_PER_TRANSFORM;
 
-$opt = getopt('hv', ['help', 'verbose']);
 if (array_key_exists('h', $opt) || array_key_exists('help', $opt)) {
     echo <<<HELP
 
@@ -36,14 +36,11 @@ Usage: tools/image/processor.php
 Options:
     -h,--help           Print this help message and exit
     -v,--verbose        Log with additional verbosity. Can be repeated up to 3 times.
-
-Environment variables:
-    TIME_INTERVAL=N     Produce standard transforms for storages files uploaded in last N minutes. Default: 60
-    MAX_WORKERS=N       Maximum number of concurrent workers. Defaults to CPU count
-    LIMIT=N             Maximum number of storage files to transform
-    RETRY_FAILED=0|1    If true, just retry previously failed transforms. Eg if hash file has now been restored.
-    MAX_ATTEMPTS=N      Maximum number of times to attempt a transformation if it throws a catchable exception
-
+    --retry-failed      If true, just retry previously failed transforms. Eg if hash file has now been restored.
+    --time-interval N   Produce standard transforms for storages files uploaded in last N minutes. Default: 60
+    --max-workers N     Maximum number of concurrent workers. Defaults to CPU count
+    --limit N           Maximum number of storage files to transform
+    --max-attempts N    Maximum number of times to attempt a transformation if it throws a catchable exception
 HELP;
     exit;
 }

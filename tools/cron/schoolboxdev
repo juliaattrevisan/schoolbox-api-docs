@@ -16,7 +16,7 @@ MAILTO="support@schoolbox.com.au"
 */5 * * * *	www-data    /usr/share/schoolboxdev/tools/image/processor.php >> /var/lib/schoolboxdev/cache/logs/image-processor.log 2>&1
 
 # Image Processing - Nightly at 1am. Failed transforms are retried.
-* 1 * * *	www-data    RETRY_FAILED=1 /usr/share/schoolboxdev/tools/image/processor.php >> /var/lib/schoolboxdev/cache/logs/image-processor-failed.log 2>&1
+* 1 * * *	www-data    /usr/share/schoolboxdev/tools/image/processor.php --retry-failed >> /var/lib/schoolboxdev/cache/logs/image-processor-failed.log 2>&1
 
 # Video Processing
 */2 * * * *	www-data	php /usr/share/schoolboxdev/tools/video/processor.php >> /var/lib/schoolboxdev/cache/logs/transcode.log 2>&1
