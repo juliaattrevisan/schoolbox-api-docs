@@ -107,7 +107,9 @@
 }
 
 .component-action{
-    section {
+  @extend .hide-for-print;
+
+  section {
         display: flex;
         justify-content: flex-end;
         background-color: $ghost;
