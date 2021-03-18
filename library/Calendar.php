@@ -467,9 +467,9 @@ class Calendar extends DeprecatedModel
      */
     public function getDayEvents(User $user, User $viewer, $startTimestamp, $endTimestamp, $filter = [])
     {
-        // If campus is NOT provided in $filter, we limit events by campuses which the user has access
+        // If campus is NOT provided in $filter or the viewer is not staff, we limit events by campuses which the user has access
         $campusList = [];
-        if (!isset($filter['campus'])) {
+        if (!isset($filter['campus']) || !$viewer->getRole()->isStaff()) {
             $campusList = $user->getCampusCollection()->getPropertyValues('id');
 
             //Fake in some campusii here from calendar permissions, so user can see events relevant
