@@ -25,15 +25,17 @@
                     <div class="list-item">
 
                         {# Unit title and select-all checkbox for unit asesssments #}
-                        <h3>
-                            <input type="checkbox"
-                               name="unit-assessment-select-all-{{ unitSpec.id }}"
-                               value="1"
-                               />
-                            <label for="unit-assessment-select-all-{{ unitSpec.id }}" class="checkbox-label">
-                                <span class="icon-unit"></span>{{ unitSpec.folder.name }}
-                            </label>
-                        </h3>
+                        <fieldset class="checklist">
+                            <input id="unit-assessment-select-all-{{ unitSpec.id }}"
+                                   type="checkbox"
+                                   checked=""
+                                   name="unit-assessment-select-all-{{ unitSpec.id }}"
+                                   data-select-all-unit-assessment
+                                   >
+                                <label for="unit-assessment-select-all-{{ unitSpec.id }}">
+                                    <span class="icon-unit"></span>{{ unitSpec.folder.name }}
+                                </label>
+                        </fieldset>
                         {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
 
                         {##
@@ -78,3 +80,22 @@
         </section>
     </div>
 </div>
+
+<script>
+    $(function() {
+        $('[data-select-all-unit-assessment]').click(function(e) {
+            if (!$(e.target).prop('checked')) {
+                e.preventDefault();
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to remove this assessment? ' +
+                            'Doing so will delete all associated marks from the markbook.',
+                    confirmEvent: function() {
+                        // Uncheck
+                        $(e.target).prop("checked", false);
+                        $(e.target).trigger('change')
+                    }
+                });
+            }
+        });
+    });
+</script>
