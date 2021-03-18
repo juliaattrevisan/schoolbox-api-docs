@@ -5,6 +5,9 @@
     border-top-color: $snow;
 }
 table.rb {
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  
     [colspan] {
         border-right-width: 0 !important;
     }
@@ -42,8 +45,6 @@ table.rb {
                     background-color: $content-ui-selected;
                     // DONE use contrasting color
                     color: $content-ui-selected-contrast;
-                    color-adjust: exact;
-                    -webkit-print-color-adjust: exact;
                 }
             }
             + label {
@@ -169,10 +170,8 @@ table.rb {
     .rb-group-summary {
         // DONE use CSS lighten
         background-color: css-lighten($input-border-color, 10%) !important;
-
         // DONE use contrasting color
         color: $form-bg-hover-color-contrast;
-        //color: calc-text-color(lighten($input-border-color, 10%));
 
         label {
             font-weight: bold!important;
