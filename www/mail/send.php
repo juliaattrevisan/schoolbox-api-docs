@@ -7,6 +7,8 @@
  */
 
 use Alaress\Mail\AbstractMailer;
+use League\Flysystem\FileNotFoundException;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Alaress\Mail\AttachmentStream;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -17,7 +19,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page = new SitePage();
 
-function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
+function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoader $config)
 {
     $mail = new Swift_Message();
 
@@ -112,16 +114,18 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
     try {
         $factory = new CollectorFactory();
         $files = $factory->build($attachments)->getAll();
+        $streamFactory = new Schoolbox\Resource\Storage\SeekableStream\Factory($config);
 
         foreach ($files as $storage) {
-            $stream = new AttachmentStream($storage->readStream());
+            $stream   = new AttachmentStream($streamFactory->buildSeekableStreamFromStorage($storage));
             $basename = $storage->getBasename();
-            $attach = new Swift_Attachment($stream, $basename, $storage->getMime());
+            $attach   = new Swift_Attachment($stream, $basename, $storage->getMime());
             $mail->attach($attach);
         }
     } catch (Swift_IoException $e) {
-        error(9, $e->getMessage().': '.$basename);
-    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(9, $e->getMessage() . ': ' . $basename);
+        exit; // shut UP, storm.
+    } catch (\Schoolbox\Mapper\Exception|FileNotFoundException $e) {
         error(41);
         exit; // shut UP, storm.
     } catch (\InvalidArgumentException $e) {
@@ -147,7 +151,7 @@ if($hasRecipient && Config::get('mail_enable'))
 {
     $attachments = isset($_POST['attachment']) ? $_POST['attachment'] : array();
 
-    sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message'], $attachments);
+    sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message'], $attachments, $kernel->get('config'));
 
     $page->backToTheFuture(3);
 }
