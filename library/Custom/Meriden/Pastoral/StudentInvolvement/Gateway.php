@@ -558,14 +558,20 @@ class Gateway
     /**
      * Gets the subject outlines and teacher codes for a given subject code.
      *
-     * @param int    $year
-     * @param string $subjectCode
+     * @param int    $year          The calendar year of the subject.
+     * @param string $subjectCode   The code of the subject, split into a code
+     *                              and class.
+     * @param bool   $ignoreTeacher If true: ignore the teacher records for this
+     *                              subject, the year and class will not be used
+     *                              in the query.
+     *                              (Lateral learning classes generally don't
+     *                              have teachers.)
      *
      * @return array
      */
-    public function getSubject($year, $subjectCode)
+    public function getSubject($year, $subjectCode, bool $ignoreTeacher)
     {
-        list(, $code, $class) = explode('-', $subjectCode);
+        [, $code, $class] = explode('-', $subjectCode);
 
         $query = "
             SELECT DISTINCT
@@ -582,9 +588,12 @@ class Gateway
 
         $pb = new PredicateBuilder($this->database->getQuoter(), 'suboutline');
         $pb = $pb->equals('so.sub_code', $code)
-                 ->equals('ts.year_num', $year)
-                 ->equals('ts.class', $class)
                  ->equals('so.cmpy_code', self::COMPANY_CODE);
+
+        if (!$ignoreTeacher) {
+            $pb = $pb->equals('ts.year_num', $year)
+                     ->equals('ts.class', $class);
+        }
 
         $query .= " WHERE " . implode(' AND ', $pb->getWhere());
 

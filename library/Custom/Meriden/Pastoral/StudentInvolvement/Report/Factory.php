@@ -218,9 +218,6 @@ class Factory
         array $subjectList,
         ?string $roleTypeOverride
     ): Subject\Base {
-        $externalData = $this->gateway->getSubject($year, $subjectCode);
-
-        // external data not guaranteed to contain a description, so load folder
         $folderWithGrades = $this->getFolderWithGrades(
             $subjectCode,
             $student,
@@ -232,7 +229,7 @@ class Factory
 
         if (self::isSubjectLateralLearning($folder->getName())) {
             return $this->buildLateralLearning(
-                $externalData,
+                $this->gateway->getSubject($year, $subjectCode, true),
                 $folder,
                 $year,
                 $student,
@@ -242,7 +239,7 @@ class Factory
             );
         }
         return $this->buildStandard(
-            $externalData,
+            $this->gateway->getSubject($year, $subjectCode, false),
             $folder,
             $folderWithGrades['grades'],
             $year,
