@@ -191,14 +191,13 @@ class Manager
      */
     public function signalHandler(int $signal): void
     {
-        if ($this->managerPid !== posix_getpid()) {
-            return;
-        }
         if ($signal === SIGTERM) {
-            $this->logger->warning($this->prefixLog("Caught SIGTERM signal, killing workers"));
-            foreach ($this->workerPids as $workerPid) {
-                $this->logger->warning($this->prefixLog("Killing worker: $workerPid"));
-                posix_kill($workerPid, SIGTERM);
+            if ($this->managerPid === posix_getpid()) {
+                $this->logger->warning($this->prefixLog("Caught SIGTERM signal, killing workers"));
+                foreach ($this->workerPids as $workerPid) {
+                    $this->logger->warning($this->prefixLog("Killing worker: $workerPid"));
+                    posix_kill($workerPid, SIGTERM);
+                }
             }
             exit(1);
         }
