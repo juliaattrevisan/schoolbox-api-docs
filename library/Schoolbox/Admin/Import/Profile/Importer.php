@@ -13,6 +13,7 @@ use Schoolbox\External\Profile;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\Storage\SeekableStream\Factory as StreamFactory;
 use Schoolbox\Role;
 
 /**
@@ -120,9 +121,18 @@ class Importer
     /**
      * The log object to which log entries are written
      *
-     * @var LoggerInterface
+     * @var LoggerInterface|null
      */
     private $logger;
+
+
+    /**
+     * The seekable stream factory: required to create a guaranteed seekable
+     * stream to $this->file`.
+     *
+     * @var StreamFactory
+     */
+    private StreamFactory $streamFactory;
 
 
     /**
@@ -137,6 +147,7 @@ class Importer
      * @param Profile\Staff\Mapper        $staffProfileMapper
      * @param Profile\Relationship\Mapper $relationshipMapper
      * @param LoggerInterface|null        $logger
+     * @param StreamFactory               $streamFactory
      * @throws \InvalidArgumentException
      */
     public function __construct(
@@ -148,7 +159,8 @@ class Importer
         Profile\Student\Mapper $studentProfileMapper,
         Profile\Staff\Mapper $staffProfileMapper,
         Profile\Relationship\Mapper $relationshipMapper,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger,
+        StreamFactory $streamFactory
     ) {
         $this->mapping = new Mapping($type);
 
@@ -160,6 +172,7 @@ class Importer
 
         $this->database = $database;
         $this->logger = $logger;
+        $this->streamFactory = $streamFactory;
 
         $this->type = $type;
         $this->file = $file;
@@ -193,7 +206,12 @@ class Importer
         try {
             $this->log("Starting processing {$this->file->getBasename()}", self::LOG_OK);
 
-            $n = $this->processOne(new Reader($this->file->readStream(), true));
+            $n = $this->processOne(
+                new Reader(
+                    $this->streamFactory->buildSeekableStreamFromStorage($this->file),
+                    true
+                )
+            );
 
             $this->log("Processing {$this->file->getBasename()} containing {$n} rows complete", self::LOG_OK);
         } catch (\InvalidArgumentException $e) {
