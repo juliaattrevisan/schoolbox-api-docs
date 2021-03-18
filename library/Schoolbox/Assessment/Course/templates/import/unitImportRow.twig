@@ -23,19 +23,50 @@
             <ul class="action-list">
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="card small-12">
-                            <h3><span class="icon-unit"></span>{{ unitSpec.folder.name }}</h3>
-                            {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
 
-                            {##
-                             # No read perm on unit spec? don't show the full assessment count, just what was selected.
-                             # This is so that users don't see a count that's greater than what they can actually affect.
-                             #}
-                            {% if not canReadUnitSpec %}
-                                {% set unitAssessmentCount = countSelected %}
-                            {% endif %}
-                            <p class="meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</p>
+                        {# Unit title and select-all checkbox for unit asesssments #}
+                        <h3>
+                            <input type="checkbox"
+                               name="unit-assessment-select-all-{{ unitSpec.id }}"
+                               value="1"
+                               />
+                            <label for="unit-assessment-select-all-{{ unitSpec.id }}" class="checkbox-label">
+                                <span class="icon-unit"></span>{{ unitSpec.folder.name }}
+                            </label>
+                        </h3>
+                        {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
+
+                        {##
+                         # No read perm on unit spec? don't show the full assessment count, just what was selected.
+                         # This is so that users don't see a count that's greater than what they can actually affect.
+                         #}
+                        {% if not canReadUnitSpec %}
+                            {% set unitAssessmentCount = countSelected %}
+                        {% endif %}
+                        <p class="meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</p>
+
+                        {# Unit assessments #}
+                        <div class="row">
+                            <section>
+                                {% if unitAssessmentCount %}
+                                    {% include '@course/import/assessmentRows.twig' with {
+                                        assessmentPairs: assessmentPairs,
+                                        inputPrefix:     'unit[' ~ unitSpec.id ~ '][a]',
+                                        depth:           0,
+                                        unitAction:      unitAction,
+                                        project:         null,
+                                        hideRows:        false,
+                                        unitSpec:        unitSpec,
+                                        unitImpl:        unitImpl,
+                                        defaultDueDate:  unitDefaultDueDates[unitSpec.id],
+                                        canReadUnitSpec: canReadUnitSpec,
+                                    } only %}
+                                {% else %}
+                                    <p class="content">This {{ locale.unit }} contains no coursework.</p>
+                                {% endif %}
+                            </section>
                         </div>
+
                     </div>
                 </li>
             </ul>
@@ -43,26 +74,6 @@
                  data-start_date="{{ unitImpl.openDate.localShort }}"
                  data-finish_date="{{ unitImpl.dueDate.localShort }}"
             >
-                <div class="row">
-                    <section>
-                        {% if unitAssessmentCount %}
-                            {% include '@course/import/assessmentRows.twig' with {
-                                assessmentPairs: assessmentPairs,
-                                inputPrefix:     'unit[' ~ unitSpec.id ~ '][a]',
-                                depth:           0,
-                                unitAction:      unitAction,
-                                project:         null,
-                                hideRows:        false,
-                                unitSpec:        unitSpec,
-                                unitImpl:        unitImpl,
-                                defaultDueDate:  unitDefaultDueDates[unitSpec.id],
-                                canReadUnitSpec: canReadUnitSpec,
-                            } only %}
-                        {% else %}
-                            <p class="content">This {{ locale.unit }} contains no coursework.</p>
-                        {% endif %}
-                    </section>
-                </div>
             </div>
         </section>
     </div>
