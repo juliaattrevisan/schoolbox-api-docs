@@ -37,17 +37,11 @@
                             <p class="meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</p>
                         </div>
                     </div>
-                    <nav>
-                        <a data-collapser="unit-{{ unitSpec.id }}" href="#" class="icon-down-arrow collapse" title="Collapse Content"></a>
-                    </nav>
                 </li>
             </ul>
             <div id="unit-{{ unitSpec.id }}"
-                 data-collapsable="unit-{{ unitSpec.id }}"
                  data-start_date="{{ unitImpl.openDate.localShort }}"
                  data-finish_date="{{ unitImpl.dueDate.localShort }}"
-                 data-collapse-state="collapsed"
-                 class="hide"
             >
                 <div class="row">
                     <section>
