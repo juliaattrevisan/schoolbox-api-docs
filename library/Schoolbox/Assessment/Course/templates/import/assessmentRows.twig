@@ -118,7 +118,7 @@
                             {% if isImplOnly %}disabled data-mage-disabled{% endif %}
                     />
                     <label for="a_import-{{ assessment.id}}" class="checkbox-label" {% if isImplOnly %}title="Created in class. Not imported from Course"{% endif %}>
-                        <span class="{{ icon.renderClass(assessment) }}"></span>
+                        <span class="{{ icon.renderClass(assessment) }}" title="{{ assessment.defaultTypeName }}"></span>
                         <span>{{ assessment.title }} | {{ assessment.defaultTypeName }}</span>
                         {% if assessmentImpl and assessmentSpec and assessmentImpl.title != assessmentSpec.title %}
                             <br><span class="meta">Copied from '{{ assessmentSpec.title }}'</span>
