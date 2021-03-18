@@ -1,13 +1,15 @@
 # 2. Set up a Vue Entry Point
 
-A *Vue Entry Point* is basically a place where the vue frameworks' javascript loads, then starts up a _Vue Component_. From inside this component you can load other components, process data, and do all the fun front-end stuff.
+A _Vue Entry Point_ is basically a place where the vue frameworks' javascript loads, then starts up a _Vue Component_. From inside this component you can load other components, process data, and do all the fun front-end stuff.
 
 We'll just build a boring old user list for now, so let's call our Vue Component `UserList`.
 
 ## 2.1 Vue Component Setup
+
 Every Vue Component, when launched from a twig environment, must have exactly one parent html element to itself. It can't share this container element with other Vue Components launched in the same twig file.
 
 ### 2.1.1 html
+
 In the `container.twig` that we built, add this:
 
 ```html
@@ -23,25 +25,26 @@ Note that we decided our component was called `UserList` - this is referenced vi
 The `UserList` component we're about to build requires its own javascript stuff so it can start. For now, we can just pile everything we need into `library/Schoolbox/Greenhouse/templates`.
 
 ### 2.1.2 Component Javascript initialiser
+
 Create `library/Schoolbox/Greenhouse/templates/user-list.js` and put this inside, which will tell vue how to initialise our `UserList` component into its container element.
 
 ```js
-import Vue from 'vue';
-
-Vue.component('user-list', require('./user-list.vue').default);
+import Vue from "vue";
+import UserList from "./user-list";
 
 new Vue({
-    el: '#user-list-container'
+    el: "#user-list-container",
+    components: {
+        "user-list": UserList
+    }
 });
 ```
 
-* The first arg of `Vue.component` is the component's hyphen-separated name. In our case, it's called `user-list`.
-
- * The second arg `require()` is the .vue file where all the `UserList` javascript lives (we'll add that shortly). Unless you specify the .vue extension it will try to load from a .js file and probably mislead you with an unrelated error, so be sure to specify the extension.
-
- * The `el` arg is the container element's id which we previously named `#user-list-container` but you can call it anything you want here.
+-   The `el` arg is the container element's id which we previously named `#user-list-container` but you can call it anything you want here.
+-
 
 ### 2.1.3 Update webpack.config.js
+
 Next, we need to add a path to this javascript file in `webpack.config.js` so the compiler knows where to look for it.
 
 At the top, there's a `module.exports` object literal definition. You'll find other schoobox vue components there. Simply add the path to the `user-list.js` file to the `entry` node, which is an index of all the Vue entry points that currently exist.
