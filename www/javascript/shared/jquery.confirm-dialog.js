@@ -80,8 +80,8 @@
         var h2 = $('<h2 />');
         h2.text(settings.header );
 
-        var okayButton   = $('<a href="#" class="button submit" />').text(settings.confirmLabel),
-            cancelButton = $('<a href="#" class="button" />').text(settings.cancelLabel),
+        var okayButton   = $('<a href="#" class="button submit" id="confirm-dialog-confirm-button"/>').text(settings.confirmLabel),
+            cancelButton = $('<a href="#" class="button" id="confirm-dialog-cancel-button"/>').text(settings.cancelLabel),
             buttons      = $().add(okayButton).add(cancelButton);
         okayButton.on('click.confirmDialog', function(e) {
             // Immediately prevent further click events
