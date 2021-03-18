@@ -2,14 +2,13 @@
 
 import FullCalendar               from '@fullcalendar/vue'
 import interactionPlugin          from '@fullcalendar/interaction'
-import momentPlugin, {toDuration} from '@fullcalendar/moment'
+import momentPlugin               from '@fullcalendar/moment'
 import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
-import CreateBookingModal         from '@schoolbox/fullcalendar/resourceBooking/createBookingModal';
-import ExportModal                from '@schoolbox/fullcalendar/resourceBooking/exportBookingModal';
-import FilterModal                from '@schoolbox/fullcalendar/resourceBooking/filterModal';
-import FlatPickr                  from '@schoolbox/fullcalendar/flatPickr';
+import CreateBookingModal         from '@schoolbox/fullcalendar/resourceBooking/create-booking-modal';
+import ExportModal                from '@schoolbox/fullcalendar/resourceBooking/export-booking-modal';
+import FilterModal                from '@schoolbox/fullcalendar/resourceBooking/filter-modal';
+import FlatPickr                  from '@schoolbox/fullcalendar/flat-pickr';
 import axios                      from 'axios'
-// import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
 import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 
@@ -81,16 +80,15 @@ export default {
                     slotWidth: '50'
                 }
             },
-            eventTimeFormat: this.helper.eventTimeFormat,
-            // contentHeight: this.contentHeight,
+            eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,
             customButtons: {
                 customExport: {
                     text: 'Export',
-                    click: onExportClick
+                    click: this.onExportClick
                 },
                 customFilters: {
                     text: 'Filters',
-                    click: onFilterClick
+                    click: this.onFilterClick
                 },
                 quickSwitchButton: {
                     text: ' ',
@@ -126,7 +124,7 @@ export default {
             initialDate: this.config.defaultDate,
             initialView: this.config.defaultView,
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
-            eventLimit: this.config.eventLimit,
+            dayMaxEventRows: this.config.eventLimit,
             firstDay: this.config.firstDay,
             events: this.events,
             eventDidMount: this.$_fullCalendarHelper_eventRender,
@@ -156,10 +154,6 @@ export default {
     },
 
     methods: {
-
-        // contentHeight() {
-        //     return this.helper.contentHeight();
-        // },
 
         /**
          * Open the export modal.
@@ -206,13 +200,14 @@ export default {
         /**
          * Event render callback: manually tweaks the event's rendering, and
          * can also conditionally show/hide the event.
-         * @see https://fullcalendar.io/docs/eventRender
+         * @see https://fullcalendar.io/docs/event-render-hooks
          *
          * @param eventRenderInfo
          * @return {boolean}
          */
         eventRender(eventRenderInfo) {
             if (!this.$_fullCalendarHelper_eventRender(eventRenderInfo)) {
+                eventRenderInfo.event.setProp('display', 'none');
                 return false;
             }
 
@@ -225,6 +220,12 @@ export default {
                 eventRenderInfo.el.classList.add('approved');
             } else if (bookingStatus?.isPending) {
                 eventRenderInfo.el.classList.add('pending');
+            }
+
+            if (isEventRendered) {
+                eventRenderInfo.event.setProp('display', 'block');
+            } else {
+                eventRenderInfo.event.setProp('display', 'none');
             }
 
             return isEventRendered;
@@ -259,16 +260,6 @@ export default {
          */
         onEventClick(eventInfo) {
             this.$refs.event.open(eventInfo.event);
-        },
-
-        /**
-         * Helper function for converting a Date object to a Moment object.
-         * @see https://fullcalendar.io/docs/moment-plugins
-         *
-         * @param date
-         */
-        toMoment(date) {
-            return this.$_fullCalendarHelper_toMoment(date);
         },
 
         /**
@@ -356,7 +347,7 @@ export default {
 
         <create-booking-modal 
             ref="createBooking"
-            :to-moment="toMoment"
+            :to-moment="$_fullCalendarHelper_toMoment"
             :booking-path="config.createBookingPath"
             :date-formats="formats"
             :booking-type="'category'"
@@ -364,7 +355,7 @@ export default {
 
         <view-event-modal 
             ref="event"
-            :to-moment="toMoment"
+            :to-moment="$_fullCalendarHelper_toMoment"
             :event-modify-form-url="urls.modifyForm"
             :event-modify-form-action-url="urls.modifyFormAction"
             :event-update-url="urls.update"

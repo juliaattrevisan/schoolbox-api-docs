@@ -8,7 +8,7 @@ import listPlugin         from '@fullcalendar/list'
 import momentPlugin       from '@fullcalendar/moment'
 import RevealModal        from '@schoolbox/reveal-modal'
 import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
-import FlatPickr          from '@schoolbox/fullcalendar/flatPickr';
+import FlatPickr          from '@schoolbox/fullcalendar/flat-pickr';
 import axios              from 'axios'
 import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
 import {stringify}        from 'qs';

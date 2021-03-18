@@ -2,7 +2,7 @@
 
 import RevealModal from '@schoolbox/reveal-modal'
 import axios       from 'axios'
-
+import { mixinFullCalendarHelper } from "@schoolbox/fullcalendar/mixinFullCalendarHelper";
 import {ENDPOINTS} from '@schoolboxCalendarEvent/endpoints';
 
 /* Vue select
@@ -32,7 +32,7 @@ export default {
         'userId',
         'canInvite',
         'eventTypes',
-        // TODO why do I have to pass this method around?
+        // TODO why do I have to pass this method around? -because it's linked to the fullCalenderApi, which is not availble in this context
         'toMoment',
         'eventCreateUrl',
         'eventCreateFormUrl',

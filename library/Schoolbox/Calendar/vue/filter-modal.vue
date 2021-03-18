@@ -130,10 +130,10 @@ export default {
                                 <input type="checkbox"
                                        name="source"
                                        :id="'source' + String(source.ids)"
-                                       :key="'source' + String(source.ids)"
+                                       :key="'input-' + source.id"
                                        :value="source.ids"
                                        v-model="selected.source" />
-                                <label :for="'source' + String(source.ids)" :key="'source' + String(source.ids)">{{ source.name }}</label>
+                                <label :for="'source' + String(source.ids)" :key="'label' + source.id">{{ source.name }}</label>
                             </template>
                         </fieldset>
                     </div>
@@ -150,10 +150,10 @@ export default {
                                 <input type="checkbox"
                                        name="group"
                                        :id="'group' + String(group.id)"
-                                       :key="'group' + String(group.ids)"
+                                       :key="'input-' + group.id"
                                        :value="group.id"
                                        v-model="selected.group" />
-                                <label :for="'group' + String(group.id)" :key="'group' + String(group.ids)">{{ group.name }}</label>
+                                <label :for="'group' + String(group.id)" :key="'label-' + group.id">{{ group.name }}</label>
                             </template>
                         </fieldset>
                     </div>
@@ -170,10 +170,10 @@ export default {
                                 <input type="checkbox"
                                        name="group"
                                        :id="'campus' + String(campus.id)"
-                                       :key="'campus' + String(campus.ids)"
+                                       :key="'input-' + campus.id"
                                        :value="campus.id"
                                        v-model="selected.campus" />
-                                <label :for="'campus' + String(campus.id)" :key="'campus' + String(campus.ids)">{{ campus.name }}</label>
+                                <label :for="'campus' + String(campus.id)" :key="'label-' + campus.id">{{ campus.name }}</label>
                             </template>
                         </fieldset>
                     </div>
@@ -190,12 +190,12 @@ export default {
                                 <input type="checkbox"
                                        name="group"
                                        :id="'eventType' + String(eventType.id)"
-                                       :key="'eventType' + String(eventType.id)"
+                                       :key="'input-' + eventType.id"
                                        :value="eventType.id"
                                        v-model="selected.eventType" />
                                 <label :for="'eventType' + String(eventType.id)"
                                        :style="{backgroundColor: eventType.color}" 
-                                       :key="'eventType' + String(eventType.id)">{{ eventType.name }}</label>
+                                       :key="'label-' + eventType.id">{{ eventType.name }}</label>
                             </template>
                         </fieldset>
                     </div>

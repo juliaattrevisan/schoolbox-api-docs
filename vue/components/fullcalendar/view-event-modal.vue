@@ -5,7 +5,7 @@ import MetaList           from '@schoolbox/meta/list'
 import MetaItem           from '@schoolbox/meta/item'
 import axios              from 'axios';
 import qs                 from 'qs';
-import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
+import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
     */
@@ -58,9 +58,9 @@ export default {
         RevealModal
     },
 
-    // mixins: [
-    //     mixinFullCalendarHelper
-    // ],
+    mixins: [
+        mixinFullCalendarHelper
+    ],
 
     props: {
         toMoment: {},
@@ -164,7 +164,7 @@ export default {
                     target: data?.classAttendance?.target,
                 },
                 task: {
-                    isTask: this.helper.isTask(event),
+                    isTask: this.$_fullCalendarHelper_isTask(event),
                     completed: metadata?.completed,
                 },
                 links: {
@@ -186,10 +186,6 @@ export default {
         this.isAccepted = checks.isAccepted;
         this.isDeclined = checks.isDeclined;
         this.isLimitedAttendance = checks.isLimitedAttendance;
-    },
-
-    beforeMount() {
-        this.helper = new FullCalendarHelper(this, this.window.fullCalendarConfig, this.window.jQuery);
     },
 
     methods: {
@@ -744,7 +740,7 @@ export default {
             <template v-if="eventExtendedProps.booking.related.length">
                 <h3>Related Bookings</h3>
                 <ul>
-                    <li v-for="relatedBooking in eventExtendedProps.booking.related">
+                    <li v-for="(relatedBooking, index) in eventExtendedProps.booking.related" :key="index">
                         ({{ relatedBooking.status.name }})
                         <a :href="relatedBooking.href">{{ relatedBooking.title }}</a>
                     </li>
@@ -808,7 +804,7 @@ export default {
                                    @click.prevent="$refs.eventDeleteModal.open">Delete</a>
                             </span>
                             <!-- Booking buttons: handle random events -->
-                            <span v-for="action in eventExtendedProps.booking.actions">
+                            <span v-for="(action, index) in eventExtendedProps.booking.actions" :key="index">
                                 <a class="button"
                                    :data-booking-action="String(action.action)"
                                    @click="clickBookingButton($event)"

@@ -66,16 +66,19 @@ export const mixinFullCalendarHelper = {
             
             // Always render placeholders in the most basic manner
             if (calEvent.id === 'placeholder') {
+                calEvent.setProp('display', 'block');
                 return true;
             }
 
             // Ignore the phantom event that the API puts there
             if (!calEvent?.extendedProps?.data) {
+                calEvent.setProp('display', 'none');
                 return false;
             }
 
             // Don't render me if I'm marked as do not render
             if ('is_rendered' in calEvent && !calEvent?.is_rendered) {
+                calEvent.setProp('display', 'none');
                 return false;
             }
 
@@ -97,7 +100,7 @@ export const mixinFullCalendarHelper = {
             }
             
             // If this event is a task, alter the state of the checkbox accordingly.
-            if (this.isTask(calEvent)) {
+            if (this.$_fullCalendarHelper_isTask(calEvent)) {
                 
                 const inputCheckbox = document.createElement('input');
                 inputCheckbox.type = 'checkbox';
@@ -118,6 +121,7 @@ export const mixinFullCalendarHelper = {
                 element.classList.add(calEvent?.extendedProps?.data?.styles?.visible);
             }
             
+            calEvent.setProp('display', 'none');
             return true;
         },
 
@@ -138,7 +142,7 @@ export const mixinFullCalendarHelper = {
          * @param {object} event
          * @return {boolean}
          */
-        isTask (event) {
+        $_fullCalendarHelper_isTask (event) {
             return event?.extendedProps?.data?.meta?.variant === EVENT_VARIANT_TASK;
         },
 
@@ -184,8 +188,6 @@ export const mixinFullCalendarHelper = {
             // const footerHeight = document.getElementById('footer').offsetHeight;
             const otherPadding = 32;
             const contentHeight = windowHeight - calendarOffset - footerHeight - otherPadding;
-            
-            // debugger
 
             // Force a min height of 500px
             if (contentHeight < 500) {

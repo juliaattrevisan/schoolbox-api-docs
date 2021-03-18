@@ -164,7 +164,7 @@ export default {
                 resourceTimelineWeek: this.resourceTimelineWeek
             },
             initialView: this.resourceTimelineSemester,
-            weekLabel: "''",
+            weekText: "''",
             eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,
             headerToolbar: {
                 left: 'customToday,customPrev,customNext',
@@ -189,7 +189,7 @@ export default {
                     click: this.clickToday,
                 },
                 customDayGridMonth: {
-                    eventLimit: this.config.eventLimit,
+                    dayMaxEventRows: this.config.eventLimit,
                     text: 'Month',
                     click: this.clickMonthView,
                 },
@@ -208,12 +208,12 @@ export default {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             firstDay: '1',
             initialDate: this.termStartDate,
-            viewSkeletonRender: this.viewSkeletonRender,
+            viewDidMount: this.viewDidMount,
             weekNumberCalculation: "'ISO'",
             loading: this.$_fullCalendarHelper_onLoading,
             eventClick: this.onEventClick,
             dateClick: this.onDateClick,
-            datesRender: this.datesRender
+            datesSet: this.datesSet
         }
     },
 
@@ -375,7 +375,7 @@ export default {
         /**
          * Event render callback: manually tweaks the event's rendering, and
          * can also conditionally show/hide the event.
-         * @see https://fullcalendar.io/docs/eventRender
+         * @see https://fullcalendar.io/docs/event-render-hooks
          *
          * @param eventRenderInfo
          * @return {boolean}
@@ -399,7 +399,7 @@ export default {
                 }
                 element.setAttribute('event-group-id', eventGrouping);
                 element.setAttribute('event-id', eventRenderInfo.event.extendedProps.data.meta.eventId);
-                element.setAttribute('event-group-date', this.toMoment(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
+                element.setAttribute('event-group-date', this.$_fullCalendarHelper_toMoment(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
             }
         },
 
@@ -420,18 +420,6 @@ export default {
         },
 
         /**
-         * Helper function for converting a Date object to a Moment object.
-         * @see https://fullcalendar.io/docs/moment-plugins
-         *
-         * @param date
-         */
-        toMoment(date) {
-            // TODO this method should be unnecessary
-            // (for the same reason as `onLoading` in the main fullCalendar)
-            return this.helper.toMoment(date);
-        },
-
-        /**
          * Callback for when the filters for this calendar are updated.
          *
          * Fired from outer space (i.e. from the outside window).
@@ -449,17 +437,17 @@ export default {
          * @returns {*}
          */
         getTermDateDurations() {
-            return this.helper.dateDiff(this.termStartDate, this.termEndDate);
+            return this.$_fullCalendarHelper_dateDiff(this.termStartDate, this.termEndDate);
         },
 
         /**
          * Callback for when the calendar view changes: preserve the
          * newly selected view for this user.
-         * @see https://fullcalendar.io/docs/viewSkeletonRender
+         * @see https://fullcalendar.io/docs/view-render-hooks
          *
          * @param info
          */
-        viewSkeletonRender(info) {
+        viewDidMount(info) {
 
             const eventSource = this.calendarApi.getEventSourceById('events');
             const groupedEventSource = this.calendarApi.getEventSourceById('groupedEvents');
@@ -633,7 +621,7 @@ export default {
             const termStartDates = Object.values(this.config.termDates).flat().map((row) => {
                 return new Date(row.end);
             });
-            return this.toMoment(new Date(Math.max.apply(null,termStartDates))).format('YYYY-MM-DD');
+            return this.$_fullCalendarHelper_toMoment(new Date(Math.max.apply(null,termStartDates))).format('YYYY-MM-DD');
         },
 
         /**
@@ -645,7 +633,7 @@ export default {
                 return new Date(row.start);
             });
 
-            return this.toMoment(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
+            return this.$_fullCalendarHelper_toMoment(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
         },
 
         /**
@@ -679,7 +667,7 @@ export default {
          * This callback enables/disabled prev/next/today buttons based on
          * whether they're available.
          */
-        datesRender(datesRenderInfo) {
+        datesSet(datesRenderInfo) {
             let todayButton = this.$el.querySelector('button.fc-customToday-button'),
                 nextButton  = this.$el.querySelector('button.fc-customNext-button'),
                 prevButton  = this.$el.querySelector('button.fc-customPrev-button'),
@@ -697,10 +685,10 @@ export default {
                 // is displaying.
                 // That's because the start of the view may overlap another
                 // term (see `determineVisibleRange`)
-                let startMoment     = this.toMoment(start),
-                    endMoment       = this.toMoment(end),
+                let startMoment     = this.$_fullCalendarHelper_toMoment(start),
+                    endMoment       = this.$_fullCalendarHelper_toMoment(end),
                     diff            = endMoment.diff(startMoment, 'day'),
-                    midMoment       = this.toMoment(start).add(Math.ceil(diff / 2), 'day'),
+                    midMoment       = this.$_fullCalendarHelper_toMoment(start).add(Math.ceil(diff / 2), 'day'),
                     currentIndex    = this.findTermIndex(midMoment.format('YYYY-MM-DD'));
 
                 // Next:  disable if there is no next term
@@ -709,7 +697,7 @@ export default {
                 nextButton.disabled = (currentIndex === this.allTerms.length - 1);
                 prevButton.disabled = (currentIndex === 0);
                 if (!todayButton.disabled) {
-                    let todayIndex       = this.findTermIndex(this.toMoment(now).format('YYYY-MM-DD'));
+                    let todayIndex       = this.findTermIndex(this.$_fullCalendarHelper_toMoment(now).format('YYYY-MM-DD'));
                     todayButton.disabled = (todayIndex === -1);
                 }
             } else {
@@ -934,7 +922,7 @@ export default {
         <view-event-modal 
             ref="event"
             return-to="assessmentCalendar"
-            :to-moment="toMoment"
+            :to-moment="$_fullCalendarHelper_toMoment"
             :event-create-form-url="urls.createForm"
             :event-modify-form-url="urls.modifyForm"
             :event-modify-form-action-url="urls.modifyFormAction"
@@ -950,7 +938,7 @@ export default {
         />
         <view-grouped-events-modal 
             ref="groupedEvents"
-            :to-moment="toMoment"
+            :to-moment="$_fullCalendarHelper_toMoment"
             :format-display-date="formats.displayDate"
             :format-display-time="formats.displayTime"
             :format-display-datetime="formats.displayDatetime"

@@ -5,12 +5,12 @@ import interactionPlugin          from '@fullcalendar/interaction'
 import dayGridPlugin              from '@fullcalendar/daygrid'
 import timeGridPlugin             from '@fullcalendar/timegrid'
 import listPlugin                 from '@fullcalendar/list'
-import momentPlugin, {toDuration} from '@fullcalendar/moment'
+import momentPlugin               from '@fullcalendar/moment'
 import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
-import CreateBookingModal         from '@schoolbox/fullcalendar/resourceBooking/createBookingModal';
-import ExportModal                from '@schoolbox/fullcalendar/resourceBooking/exportBookingModal';
-import FilterModal                from '@schoolbox/fullcalendar/resourceBooking/filterModal';
-import FlatPickr                  from '@schoolbox/fullcalendar/flatPickr';
+import CreateBookingModal         from '@schoolbox/fullcalendar/resourceBooking/create-booking-modal';
+import ExportModal                from '@schoolbox/fullcalendar/resourceBooking/export-booking-modal';
+import FilterModal                from '@schoolbox/fullcalendar/resourceBooking/filter-modal';
+import FlatPickr                  from '@schoolbox/fullcalendar/flat-pickr';
 import axios                      from 'axios'
 import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
 
@@ -48,7 +48,7 @@ export default {
     data () {
         return {
             calendarApi: null, //to access the underlying calendar object
-            calendarOptions: {} //will init in beforeMount due to this.helper being needed
+            calendarOptions: {} //will init in beforeMount due to linked vars being needed
         }
     },
 
@@ -126,7 +126,7 @@ export default {
             initialDate: this.config.defaultDate,
             initialView: this.config.defaultView || 'timeGridWeek',
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
-            eventLimit: this.config.eventLimit,
+            dayMaxEventRows: this.config.eventLimit,
             firstDay: this.config.firstDay,
             events: this.events,
             eventDidMount: this.eventRender,
@@ -200,18 +200,20 @@ export default {
         /**
          * Event render callback: manually tweaks the event's rendering, and
          * can also conditionally show/hide the event.
-         * @see https://fullcalendar.io/docs/eventRender
+         * @see https://fullcalendar.io/docs/event-render-hooks
          *
          * @param event
          * @return {boolean}
          */
-        eventRender(event) {
-            if (!this.$_fullCalendarHelper_eventRender(event)) {
+        eventRender(eventRenderInfo) {
+            
+            if (!this.$_fullCalendarHelper_eventRender(eventRenderInfo)) {
+                eventRenderInfo.event.setProp('display', 'none');
                 return false;
             }
 
-            let bookingStatus = event.event.extendedProps.data.booking?.status,
-                element = event.el;
+            let bookingStatus = eventRenderInfo.event.extendedProps.data.booking?.status,
+                element = eventRenderInfo.el;
 
             // Add booking styles
             if (bookingStatus?.isRejected) {
@@ -222,6 +224,7 @@ export default {
                 element.classList.add('pending');
             }
 
+            eventRenderInfo.event.setProp('display', 'block');
             return true;
         },
 
@@ -252,18 +255,6 @@ export default {
          */
         onEventClick(eventInfo) {
             this.$refs.event.open(eventInfo.event);
-        },
-
-        /**
-         * Helper function for converting a Date object to a Moment object.
-         * @see https://fullcalendar.io/docs/moment-plugins
-         *
-         * @param date
-         */
-        toMoment(date) {
-            // TODO this method should be unnecessary
-            // (for the same reason as `onLoading`)
-            return this.$_fullCalendarHelper_toMoment(date);
         },
 
         /**
@@ -341,7 +332,7 @@ export default {
 
         <create-booking-modal 
             ref="createBooking"
-            :to-moment="toMoment"
+            :to-moment="$_fullCalendarHelper_toMoment"
             :booking-path="config.createBookingPath"
             :date-formats="formats"
             :booking-type="'item'"
@@ -349,7 +340,7 @@ export default {
 
         <view-event-modal 
             ref="event"
-            :to-moment="toMoment"
+            :to-moment="$_fullCalendarHelper_toMoment"
             :event-modify-form-url="urls.modifyForm"
             :event-modify-form-action-url="urls.modifyFormAction"
             :event-update-url="urls.update"

@@ -5,12 +5,12 @@ import interactionPlugin          from '@fullcalendar/interaction'
 import dayGridPlugin              from '@fullcalendar/daygrid'
 import timeGridPlugin             from '@fullcalendar/timegrid'
 import listPlugin                 from '@fullcalendar/list'
-import momentPlugin, {toDuration} from '@fullcalendar/moment'
+import momentPlugin               from '@fullcalendar/moment'
 import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
 import CreateEventModal           from './create-event-modal';
 import ExportModal                from "./export-modal";
 import FilterModal                from "./filter-modal";
-import FlatPickr                  from '@schoolbox/fullcalendar/flatPickr';
+import FlatPickr                  from '@schoolbox/fullcalendar/flat-pickr';
 import axios                      from 'axios'
 import qs                         from "qs";
 import { mixinFullCalendarHelper } from "@schoolbox/fullcalendar/mixinFullCalendarHelper";
@@ -176,7 +176,7 @@ export default {
                     events: this.events,
                 }
             ],
-            // eventDidMount: this.eventRender,
+            eventDidMount: this.eventRender,
             viewDidMount: this.viewSkeletonRender,
             loading: this.$_fullCalendarHelper_onLoading,
             dateClick: this.onDateClick,
@@ -198,8 +198,8 @@ export default {
 
         // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
         let quickSwitchIcon = document.createElement('a');
-            quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
-            quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
+        quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
+        quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
 
         document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
         
@@ -303,23 +303,25 @@ export default {
         /**
          * Event render callback: manually tweaks the event's rendering, and
          * can also conditionally show/hide the event.
-         * @see https://fullcalendar.io/docs/eventRender
+         * @see https://fullcalendar.io/docs/event-render-hooks
          *
          * @param eventRenderInfo
          * @return {boolean}
          */
         eventRender (eventRenderInfo) {
+            
+            const calEvent = eventRenderInfo.event;
+
             if (!this.$_fullCalendarHelper_eventRender(eventRenderInfo)) {
+                calEvent.setProp('display', 'none');
                 return false;
             }
-
 
             // Extra condition for rendering events on this calendar:
             // All of the event's attributes must match at least one
             // selected filter: if it doesn't, don't render it.
-            const calEvent = eventRenderInfo.event;
-            const eventAttributes = {};
-            const isEventRendered = true;
+            let eventAttributes = {};
+            let isEventRendered = true;
 
             // Build a list of filters from the event
             calEvent.classNames.forEach((className) => {
@@ -333,8 +335,7 @@ export default {
                     eventAttributes[attributeGroup].push(id);
                 }
             });
-
-
+            
             // All of the event's attributes must match at least one
             // selected filter.
             // If it doesn't, don't render it.
@@ -351,7 +352,7 @@ export default {
                     eventMatchesFilter = true;
                     return;
                 }
-
+                
                 // Otherwise: check id against the list of selected filters.
                 ids.forEach((id) => {
                     let keyspace = [];
@@ -387,7 +388,14 @@ export default {
                 }
             });
 
+            if (isEventRendered) {
+                calEvent.setProp('display', 'block');
+            } else {
+                calEvent.setProp('display', 'none');
+            }
+
             return isEventRendered;
+
         },
 
         /**
@@ -463,8 +471,8 @@ export default {
          */
         moveEvent(event) {
             const data = {
-                start:  this.toMoment(event.start).format(),
-                end:    this.toMoment(event.end).format(),
+                start:  this.$_fullCalendarHelper_toMoment(event.start).format(),
+                end:    this.$_fullCalendarHelper_toMoment(event.end).format(),
                 allDay: event.allDay,
             };
 
@@ -474,7 +482,7 @@ export default {
             // This means that all-day events need their end date set back
             // one day before being sent to Schoolbox.
             if (event.allDay) {
-                data.end = this.toMoment(event.end).add({days: -1}).format();
+                data.end = this.$_fullCalendarHelper_toMoment(event.end).add({days: -1}).format();
             }
 
             // TODO this needs to consider events in series
@@ -482,16 +490,6 @@ export default {
                 ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_EVENT_MOVE, String(event?.extendedProps?.data?.meta?.eventId)),
                 qs.stringify(data)
             );
-        },
-
-        /**
-         * Helper function for converting a Date object to a Moment object.
-         * @see https://fullcalendar.io/docs/moment-plugins
-         *
-         * @param date
-         */
-        toMoment (date) {
-            return this.$_fullCalendarHelper_toMoment(date);
         },
 
         /**
@@ -542,7 +540,7 @@ export default {
         updateSelectedFilters(selectedFilters) {
             // The selected filters in config are read-only and passed by reference.
             // TODO pass it by value into the filter modal, and update in this method
-            this.calendarApi.render();
+            this.calendarApi.refetchEvents();
             axios.post(URL_EVENT_FILTER, qs.stringify({ filters: this.config.selectedFilters, }))
         },
 
@@ -572,7 +570,7 @@ export default {
                 startDate.setAttribute('data-datepicker', '');
                 startDate.setAttribute('data-datepicker-buttontext', '');
                 startDate.setAttribute('value',
-                    (this.listViewDateRange.start) ? this.listViewDateRange.start : this.toMoment(new Date()).format(FORMAT_FLATPICKR_DATE)
+                    (this.listViewDateRange.start) ? this.listViewDateRange.start : this.$_fullCalendarHelper_toMoment(new Date()).format(FORMAT_FLATPICKR_DATE)
                 );
 
 
@@ -582,7 +580,7 @@ export default {
                 endDate.setAttribute('data-datepicker', '');
                 endDate.setAttribute('data-datepicker-buttontext', '');
                 endDate.setAttribute('value',
-                    (this.listViewDateRange.end) ? this.listViewDateRange.end : this.toMoment(new Date()).add(this.duration, 'days').format(FORMAT_FLATPICKR_DATE)
+                    (this.listViewDateRange.end) ? this.listViewDateRange.end : this.$_fullCalendarHelper_toMoment(new Date()).add(this.duration, 'days').format(FORMAT_FLATPICKR_DATE)
                 );
 
 
@@ -634,9 +632,9 @@ export default {
          * I'm not sure if we can use it..
          */
         updateListViewDateRangeField(start, end = null) {
-            window.history.pushState('', '', '/calendar/' + this.toMoment(start).format(FORMAT_FORM_DATE) + '/' + this.config.userId);
-            this.listViewDateRange.start = this.toMoment(start).format(FORMAT_FLATPICKR_DATE);
-            this.listViewDateRange.end = this.toMoment(end || new Date()).add(this.duration, 'days').format(FORMAT_FLATPICKR_DATE);
+            window.history.pushState('', '', '/calendar/' + this.$_fullCalendarHelper_toMoment(start).format(FORMAT_FORM_DATE) + '/' + this.config.userId);
+            this.listViewDateRange.start = this.$_fullCalendarHelper_toMoment(start).format(FORMAT_FLATPICKR_DATE);
+            this.listViewDateRange.end = this.$_fullCalendarHelper_toMoment(end || new Date()).add(this.duration, 'days').format(FORMAT_FLATPICKR_DATE);
 
             let startDate = this.jQuery('#start_date'),
                 endDate   = this.jQuery('#end_date');
@@ -731,7 +729,7 @@ export default {
             :user-id="config.userId"
             :can-invite="config.canInvite"
             :event-types="config.eventTypes"
-            :to-moment="toMoment"
+            :to-moment="$_fullCalendarHelper_toMoment"
             :event-create-url="urls.create"
             :event-create-form-url="urls.createForm"
             :event-modify-form-url="urls.modifyForm"
@@ -744,7 +742,7 @@ export default {
 
         <view-event-modal 
             ref="event"
-            :to-moment="toMoment"
+            :to-moment="$_fullCalendarHelper_toMoment"
             :event-modify-form-url="urls.modifyForm"
             :event-modify-form-action-url="urls.modifyFormAction"
             :event-delete-url="urls.delete"
@@ -787,8 +785,5 @@ export default {
 </style>
 
 <style lang="scss">
-    // @import '~@fullcalendar/core/main.css';
-    // @import '~@fullcalendar/daygrid/main.css';
-    // @import '~@fullcalendar/timegrid/main.css';
-    // @import '~@fullcalendar/list/main.css';
+    
 </style>
