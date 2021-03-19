@@ -244,6 +244,7 @@ class ImportFactory
                 sa.deleted_at         AS 'sa.deleted_at',
                 sa.sequence           AS 'sa.sequence',
                 sa.work_type_id       AS 'sa.work_type_id',
+                lwt.name			  AS 'lwt.name',
                 sa.default_open_span  AS 'sa.default_open_span',
                 sdw.assessment_id     AS 'sdw.id',
                 sdw.accept_submission AS 'sdw.accept_submission',
@@ -269,6 +270,7 @@ class ImportFactory
             JOIN folder usf                               ON usf.id = us.folder_id
             JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
             JOIN assessment sa                            ON sa.id = aus.assessment_id
+            LEFT JOIN lu_work_type lwt ON lwt.id = sa.work_type_id
             LEFT JOIN submission_box sdw                  ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz                          ON sqz.assessment_id = sa.id
             LEFT JOIN task stk                            ON stk.assessment_id = sa.id
@@ -295,6 +297,7 @@ class ImportFactory
                 null              AS 'sa.deleted_at',
                 null              AS 'sa.sequence',
                 null              AS 'sa.work_type_id',
+                null			  AS 'lwt.name',
                 null              AS 'sa.default_open_span',
                 null              AS 'sdw.id',
                 null              AS 'sdw.accept_submission',
@@ -414,6 +417,7 @@ class ImportFactory
                 sa.deleted_at         AS 'sa.deleted_at',
                 sa.sequence           AS 'sa.sequence',
                 sa.work_type_id       AS 'sa.work_type_id',
+                lwt.name			  AS 'lwt.name',
                 sa.default_open_span  AS 'sa.default_open_span',
                 sdw.assessment_id     AS 'sdw.id',
                 sdw.accept_submission AS 'sdw.accept_submission',
@@ -423,6 +427,7 @@ class ImportFactory
             FROM project p
             JOIN project_assessment pa   ON pa.project_id = p.id
             JOIN assessment sa           ON sa.id = pa.assessment_id
+            LEFT JOIN lu_work_type lwt ON lwt.id = sa.work_type_id
             LEFT JOIN assessment_course_unit_implementation pui ON pui.assessment_id = p.assessment_id
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz         ON sqz.assessment_id = sa.id
@@ -491,6 +496,7 @@ class ImportFactory
                 ia.title              AS 'ia.title',
                 ia.sequence           AS 'ia.sequence',
                 ia.work_type_id       AS 'ia.work_type_id',
+                lwt.name			  AS 'lwt.name',
                 ia.publish_date       AS 'ia.publish_date',
                 ia.open_date          AS 'ia.open_date',
                 ia.due_date           AS 'ia.due_date',
@@ -504,6 +510,7 @@ class ImportFactory
             FROM project p
             JOIN project_assessment pa   ON pa.project_id = p.id
             JOIN assessment ia           ON ia.id = pa.assessment_id
+            LEFT JOIN lu_work_type lwt ON lwt.id = ia.work_type_id
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
             LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz         ON iqz.assessment_id = ia.id
