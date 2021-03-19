@@ -734,10 +734,12 @@ class ImportFactory
         $assessmentSpec->setTitle($row['sa.title']);
         $assessmentSpec->setSequence($row['sa.sequence']);
 
-        // TODO handle possible null work type here
         $workType = new WorkType();
-        $workType->setId($row['sa.work_type_id']);
-        $workType->setName($row['lwt.name']);
+        $workTypeId = $row['sa.work_type_id'];
+        if (!is_null($workTypeId)) {
+            $workType->setId($workTypeId);
+            $workType->setName($row['lwt.name']);
+        }
         $assessmentSpec->setWorkType($workType);
 
         $assessmentSpec->setDefaultOpenSpan($row['sa.default_open_span']);
@@ -790,10 +792,12 @@ class ImportFactory
         $assessmentImpl->setTitle($row['ia.title']);
         $assessmentImpl->setSequence($row['ia.sequence']);
 
-        // TODO handle possible null work type here
         $workType = new WorkType();
-        $workType->setId($row['ia.work_type_id']);
-        $workType->setName($row['lwt.name']);
+        $workTypeId = $row['ia.work_type_id'];
+        if (!is_null($workTypeId)) {
+            $workType->setId($workTypeId);
+            $workType->setName($row['lwt.name']);
+        }
         $assessmentImpl->setWorkType($workType);
 
         $assessmentImpl->setPublishAt($this->createDate($row['ia.publish_date']));
