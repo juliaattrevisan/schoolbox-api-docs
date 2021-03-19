@@ -227,7 +227,9 @@ function restart_php_fpm(){
 
 function remove_maintenance_page(){
   # TODO, this will have no effect on cloud
-  "$site_root"/tools/maintenance/site_up.sh
+  if service nginx status >/dev/null 2>&1; then
+    "$site_root"/tools/maintenance/site_up.sh
+  fi
 }
 
 
