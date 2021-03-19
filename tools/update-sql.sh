@@ -26,6 +26,14 @@ if [[ -z "$INSTANCE_ID" ]]; then
   exit 1
 fi
 
+# Check script is running with sufficient permissions. Upgrade scripts must be run as root.
+function check_run_as_root(){
+  if [[ $EUID -ne 0 ]]; then
+     error "This script must be run as root"
+     exit 1
+  fi
+}
+
 echo "Starting SQL update process for instance: '$INSTANCE_ID'";
 
 # Build update version list
@@ -220,3 +228,10 @@ if [ $error_int -ne 0 ]; then
 else
   echo "SQL updates completed";
 fi
+
+
+main(){
+  check_run_as_root
+}
+
+main "$@"
