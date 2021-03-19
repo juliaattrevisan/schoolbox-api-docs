@@ -100,7 +100,7 @@ class Controller extends ConfigController
             'schoolData' => '/adminv2/import/schoolDataImport'
         ];
 
-        foreach($foundConfig as $config) {
+        foreach ($foundConfig as $config) {
             /** @var Config $config */
             $type = $config->getType() ? $config->getType()->getType() : '';
 
@@ -109,9 +109,10 @@ class Controller extends ConfigController
                 'title'         => $config->getTitle(),
                 'description'   => $config->getDescription(),
                 'module'        => $config->getModule(),
-                'url'           => sprintf($module[$config->getModule()], $type)
+                'url'           => sprintf($module[$config->getModule()], $type) . '#' . $config->getName()
             ];
         }
+
         $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
     }
 

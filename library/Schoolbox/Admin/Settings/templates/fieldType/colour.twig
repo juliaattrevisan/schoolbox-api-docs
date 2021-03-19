@@ -4,5 +4,5 @@
     required:      bool
 #}
 <div>
-    <input type="text" value="{{ value }}" name="{{ name }}" {{ required ? 'required ' }}data-colour-picker {% if not editable %}disabled="disabled"{% endif %} />
+    <input id={{ name }}-field" type="text" value="{{ value }}" name="{{ name }}" {{ required ? 'required ' }}data-colour-picker {% if not editable %}disabled="disabled"{% endif %} />
 </div>

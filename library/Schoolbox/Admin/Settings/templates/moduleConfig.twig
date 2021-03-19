@@ -17,6 +17,9 @@
 
         var settingsForm = $('#settings');
 
+        var hash = window.location.hash.substr(1);
+        document.getElementById(hash).parentElement.style.backgroundColor="#ffa";
+
         {% if hasColourPicker %}
         $("[data-colour-picker]").spectrum({
             allowEmpty: false,
@@ -73,7 +76,7 @@
                         {% set data = setting.data %}
                         {% if not data.hidden %}
                             <div class="small-12 columns">
-                            <label for="{{ data.name }}" {{ data.required and data.editable ? 'class="required"' }}>{{ data.title }}</label>
+                            <label id="{{ data.name }}" for="{{ data.name }}-field" {{ data.required and data.editable ? 'class="required"' }}>{{ data.title }}</label>
                             <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="{{ data.description|replace({'<': '&lt;'}) }}">?</span>
                                 {% include '@settings/fieldType/' ~ setting.template with data only %}
                             </div>
