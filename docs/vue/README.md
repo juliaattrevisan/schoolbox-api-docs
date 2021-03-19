@@ -23,8 +23,10 @@ Have a look through all the other rules, keep them in mind while developing. Fro
 -   Prop names should always use camelCase during declaration, but kebab-case in html/twig. (https://vuejs.org/v2/style-guide/#Prop-name-casing-strongly-recommended)
 -   Directive shorthands should be used always. (https://vuejs.org/v2/style-guide/#Directive-shorthands-strongly-recommended)
 -   Single-file components should always order <script> <template> <style> (https://vuejs.org/v2/style-guide/#Single-file-component-top-level-element-order-recommended)
--   Component's should be structured like the examples within (01-setup-entry.md#213-vue-component-basics)
+-   [Component's should be structured with the following order](01-setup-entry.md#213-vue-component-basics)
 
 ## Vue 3
 
 Vue 3 has been released and offers some pretty neat new features as well as performance improvements. For now we'll wait on a Vue 2 to Vue 3 migration file that will be released sometime early this year. Once we've implemented that, we can ensure all our Vue 2 code is aok and move forward to Vue 3 following.
+
+## Setting up new Vue in Schoolbox
