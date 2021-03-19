@@ -318,12 +318,15 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
          * with empty values, like on chub where there were days, but no subjects
          * in them, producing and empty $row and thus empty definitions
          */
+        if (!isset($allDayTimetables[0])) {
+            return $timetable;
+        }
         for ($period = 0; $period < count($allDayTimetables[0]); $period++) {
             for ($day = 1; $day <= $this->getCycleLength(); $day++) {
                 $timetable[$period]['day'][$day] = [];
 
-                if (!empty($allDayTimetables[$day-1][$period]['class'][0])) {
-                    $timetable[$period]['day'][$day][] = $allDayTimetables[$day-1][$period]['class'][0];
+                if (!empty($allDayTimetables[$day - 1][$period]['class'][0])) {
+                    $timetable[$period]['day'][$day][] = $allDayTimetables[$day - 1][$period]['class'][0];
                 }
 
                 /* TODO: Have these use convert(varchar(10), theDate, 120) in stored proc
