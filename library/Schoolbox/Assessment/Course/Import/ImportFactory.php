@@ -324,6 +324,7 @@ class ImportFactory
             JOIN folder usf ON usf.id = us.folder_id
             JOIN assessment_course_unit_implementation aui ON aui.course_unit_implementation_id = ui.id
             JOIN assessment ia ON ia.id = aui.assessment_id
+            LEFT JOIN lu_work_type lwt ON lwt.id = ia.work_type_id
             LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz ON iqz.assessment_id = ia.id
             LEFT JOIN task itk ON itk.assessment_id = ia.id
