@@ -99,6 +99,7 @@ class ImportFactory
                 sa.default_open_span  AS 'sa.default_open_span',
                 sa.sequence           AS 'sa.sequence',
                 sa.work_type_id       AS 'sa.work_type_id',
+                lwt.name			  AS 'lwt.name',
                 sdw.assessment_id     AS 'sdw.id',
                 sdw.accept_submission AS 'sdw.accept_submission',
                 sdw.multi_submission  AS 'sdw.multi_submission',
@@ -109,6 +110,7 @@ class ImportFactory
             LEFT JOIN folder usf ON usf.id = us.folder_id
             LEFT JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
             LEFT JOIN assessment sa ON sa.id = aus.assessment_id
+            LEFT JOIN lu_work_type lwt ON lwt.id = sa.work_type_id
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
             LEFT JOIN task stk ON stk.assessment_id = sa.id
