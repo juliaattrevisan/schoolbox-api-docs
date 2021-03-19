@@ -17,8 +17,6 @@ readonly WORKING_DIR_ORIGINAL=$(pwd)    # Track the working directory so we can 
 file_path=$(readlink -f "$0");
 full_path=${file_path%/*};
 
-conf_file=$(readlink -f "$full_path"/../www/conf/conf.php);
-
 site_root=$(readlink -f "$full_path"/../);
 package=${site_root##*/};
 if [[ $package == 'vagrant' ]]; then
@@ -45,19 +43,19 @@ echo "Starting SQL update process for instance: '$INSTANCE_ID'";
 version_list=$(find "$site_root"/updates -mindepth 1 -maxdepth 1 -type d -printf %f\\n | sort -V)
 new_ver=$(echo "$version_list" | tail -n 1)
 
-if [ ! -f "$conf_file" ]; then
+if [ ! -f "/etc/$package/instances.ini" ]; then
   echo "New installation or conf file missing";
   echo "No cache directories cleaned";
   exit;
 fi
 
-echo "Using db credentials from: $(readlink -f "$conf_file")";
+echo "Using db credentials from: '/etc/$package/instances.ini'";
 
 # Collect Credentials
-sql_user=$(schoolbox-conf --conf="$conf_file" --option=SQL_user);
-sql_pass=$(schoolbox-conf --conf="$conf_file" --option=SQL_passwd);
-sql_host=$(schoolbox-conf --conf="$conf_file" --option=SQL_host);
-sql_db=$(schoolbox-conf --conf="$conf_file" --option=SQL_db);
+sql_user=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_user);
+sql_pass=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_passwd);
+sql_host=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_host);
+sql_db=$(schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_db);
 
 echo "Checking for SQL updates";
 
