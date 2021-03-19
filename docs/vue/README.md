@@ -9,7 +9,7 @@ A guide to setting up the basics of Vue within Schoolbox is available [here](00-
 
 ## Essential Vue Rules
 
-The below is a list of rules considered essential by [Vue](https://vuejs.org/v2/style-guide/), scroll through them all or select an individual link:
+The below is a list of [rules](https://vuejs.org/v2/style-guide/) considered essential by Vue, scroll through them all or select an individual link:
 
 -   [Always use multi-word component names](https://vuejs.org/v2/style-guide/#Multi-word-component-names-essential)
 -   [Component data must be a function](https://vuejs.org/v2/style-guide/#Component-data-essential)
@@ -20,14 +20,15 @@ The below is a list of rules considered essential by [Vue](https://vuejs.org/v2/
 
 ## Encouraged Schoolbox Rules
 
-Have a look through all the other rules, keep them in mind while developing. From these I've proposed the below when adding to Schoolbox Vue. Primarily they're simply to reduce our cognitive load, and make it easier trawling through Vue files now and into the future.
+Have a look through all the other rules and keep them in mind while developing. From these I've proposed the below when adding to Schoolbox Vue. Primarily they're simply to reduce our cognitive load and make it easier trawling through Vue files now and into the future.
 
 -   [Each component should be in its own file](https://vuejs.org/v2/style-guide/#Component-files-strongly-recommended)
 -   [Filenames of single-file components should always be kebab-case](https://vuejs.org/v2/style-guide/#Single-file-component-filename-casing-strongly-recommended)
 -   [Prop names should always use camelCase during declaration, but kebab-case in html/twig](https://vuejs.org/v2/style-guide/#Prop-name-casing-strongly-recommended)
 -   [Directive shorthands should be used always](https://vuejs.org/v2/style-guide/#Directive-shorthands-strongly-recommended)
 -   [Single-file components should always order <script> <template> <style>](https://vuejs.org/v2/style-guide/#Single-file-component-top-level-element-order-recommended)
--   [Component's should be structured with the following order](01-setup-entry.md#213-vue-component-basics)<a/>
+-   [Component's should be structured with the following order](01-setup-entry.md#213-vue-component-basics)
+    <a/>
 
 ## Vue pantry / testing
 
