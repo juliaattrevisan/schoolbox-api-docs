@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\Task\Model as TaskAssessment;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 /**
  * Direct DB access to generate a data structure of UnitSpecs, UnitImpls, AssessmentSpecs + AssessmentImpls.
@@ -97,6 +98,7 @@ class ImportFactory
                 sa.title              AS 'sa.title',
                 sa.default_open_span  AS 'sa.default_open_span',
                 sa.sequence           AS 'sa.sequence',
+                sa.work_type_id       AS 'sa.work_type_id',
                 sdw.assessment_id     AS 'sdw.id',
                 sdw.accept_submission AS 'sdw.accept_submission',
                 sdw.multi_submission  AS 'sdw.multi_submission',
@@ -239,6 +241,7 @@ class ImportFactory
                 sa.title              AS 'sa.title',
                 sa.deleted_at         AS 'sa.deleted_at',
                 sa.sequence           AS 'sa.sequence',
+                sa.work_type_id       AS 'sa.work_type_id',
                 sa.default_open_span  AS 'sa.default_open_span',
                 sdw.assessment_id     AS 'sdw.id',
                 sdw.accept_submission AS 'sdw.accept_submission',
@@ -253,6 +256,7 @@ class ImportFactory
                 ia.due_date           AS 'ia.due_date',
                 ia.close_date         AS 'ia.close_date',
                 ia.sequence           AS 'ia.sequence',
+                ia.work_type_id       AS 'ia.work_type_id',
                 idw.assessment_id     AS 'idw.id',
                 idw.accept_submission AS 'idw.accept_submission',
                 idw.multi_submission  AS 'idw.multi_submission',
@@ -288,6 +292,7 @@ class ImportFactory
                 null              AS 'sa.title',
                 null              AS 'sa.deleted_at',
                 null              AS 'sa.sequence',
+                null              AS 'sa.work_type_id',
                 null              AS 'sa.default_open_span',
                 null              AS 'sdw.id',
                 null              AS 'sdw.accept_submission',
@@ -302,6 +307,7 @@ class ImportFactory
                 ia.due_date       AS 'ia.due_date',
                 ia.close_date     AS 'ia.close_date',
                 ia.sequence       AS 'ia.sequence',
+                ia.work_type_id   AS 'ia.work_type_id',
                 idw.assessment_id AS 'idw.id',
                 idw.accept_submission AS 'idw.accept_submission',
                 idw.multi_submission  AS 'idw.multi_submission',
@@ -405,6 +411,7 @@ class ImportFactory
                 sa.title              AS 'sa.title',
                 sa.deleted_at         AS 'sa.deleted_at',
                 sa.sequence           AS 'sa.sequence',
+                sa.work_type_id       AS 'sa.work_type_id',
                 sa.default_open_span  AS 'sa.default_open_span',
                 sdw.assessment_id     AS 'sdw.id',
                 sdw.accept_submission AS 'sdw.accept_submission',
@@ -481,6 +488,7 @@ class ImportFactory
                 ia.id                 AS 'ia.id',
                 ia.title              AS 'ia.title',
                 ia.sequence           AS 'ia.sequence',
+                ia.work_type_id       AS 'ia.work_type_id',
                 ia.publish_date       AS 'ia.publish_date',
                 ia.open_date          AS 'ia.open_date',
                 ia.due_date           AS 'ia.due_date',
@@ -716,6 +724,7 @@ class ImportFactory
         $assessmentSpec->setId($row['sa.id']);
         $assessmentSpec->setTitle($row['sa.title']);
         $assessmentSpec->setSequence($row['sa.sequence']);
+        $assessmentSpec->setWorkType((new WorkType())->setId($row['sa.work_type_id']));
         $assessmentSpec->setDefaultOpenSpan($row['sa.default_open_span']);
         if (is_null($row['sa.deleted_at'])) {
             $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
@@ -765,6 +774,7 @@ class ImportFactory
         $assessmentImpl->setId($row['ia.id']);
         $assessmentImpl->setTitle($row['ia.title']);
         $assessmentImpl->setSequence($row['ia.sequence']);
+        $assessmentImpl->setWorkType($row['ia.work_type_id']);
         $assessmentImpl->setPublishAt($this->createDate($row['ia.publish_date']));
         $assessmentImpl->setOpenAt($this->createDate($row['ia.open_date']));
         $assessmentImpl->setDueAt($this->createDate($row['ia.due_date']));
