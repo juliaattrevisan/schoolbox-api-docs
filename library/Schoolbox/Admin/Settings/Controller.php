@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings;
@@ -12,6 +14,7 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Alaress;
 use Alaress\Database\Predicate;
@@ -76,6 +79,65 @@ class Controller extends ConfigController
         );
     }
 
+    /**
+     * Provides a JSON list of settings that match the provided keyword;
+     * Searches on; name, title and description
+     * @api /adminv2/setting/search
+     */
+    public function searchSettings(): void
+    {
+        $pb = $this->getConfigMapper()->getPredicateBuilder();
+        $pb->equals('hidden', 'false')
+            ->notEquals('module', 'custom');
+        $foundConfig = $this->getConfigMapper()->findByPredicates($pb);
+
+        $jsonPayload = [];
+
+        $module = [
+            'settings'   => '/adminv2/setting/%s',
+            'comms'      => '/adminv2/news',
+            'oauth'      => '/adminv2/oauth',
+            'schoolData' => '/adminv2/import/schoolDataImport'
+        ];
+
+        foreach ($foundConfig as $config) {
+            /** @var Config $config */
+            $type = $config->getType() ? $config->getType()->getType() : '';
+
+            $jsonPayload[] = [
+                'name'          => $config->getName(),
+                'title'         => $config->getTitle(),
+                'description'   => $config->getDescription(),
+                'module'        => $config->getModule(),
+                'url'           => sprintf($module[$config->getModule()], $type) . '#' . $config->getName()
+            ];
+        }
+
+        //Also include the navigation elements
+        $subnav = new Subnav($this->getConfigLoader());
+        $pageList = $subnav->generate();
+
+        foreach ($pageList as $parentUrl => $parentData) {
+            $jsonPayload[] = [
+                'name' =>  $parentUrl,
+                'title' => $parentData['name'],
+                'description' => $parentData['description'],
+                'url'   => $parentUrl,
+            ];
+
+            foreach ($parentData['children'] as $childUrl => $childData) {
+                $jsonPayload[] = [
+                    'name'  => $childUrl,
+                    'title' => $childData['name'],
+                    'description' => $childData['description'],
+                    'url'   => $childUrl,
+                ];
+            }
+        }
+
+
+        $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
+    }
 
     /**
      * @since 18.

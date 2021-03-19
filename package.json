@@ -25,6 +25,7 @@
     "dayjs": "^1.10.4",
     "filesize": "^6.1.0",
     "flatpickr": "^4.6.3",
+    "gsap": "^3.6.0",
     "locutus": "^2.0.14",
     "lodash": "4.17.19",
     "moment": "^2.29.1",

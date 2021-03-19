@@ -3,4 +3,4 @@
     value:         string
     required:      bool
 #}
-<textarea id="{{ name }}" {{ required ? 'required ' }} name="{{ name }}" rows="5" {% block extraAttributes %}{% endblock %} {% if not editable %}disabled="disabled"{% endif %}>{{ value }}</textarea>
+<textarea id="{{ name }}-field" {{ required ? 'required ' }} name="{{ name }}" rows="5" {% block extraAttributes %}{% endblock %} {% if not editable %}disabled="disabled"{% endif %}>{{ value }}</textarea>

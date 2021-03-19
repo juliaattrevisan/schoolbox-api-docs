@@ -28,7 +28,8 @@ module.exports = {
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.main.js',
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.main.js',
         authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
-        
+        adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/initAdminSettingsSearch.js', 
+
         //Sass
         chromeFoundation: './www/css/foundation/chrome-foundation.scss',
         editor: './www/css/foundation/editor.scss'
