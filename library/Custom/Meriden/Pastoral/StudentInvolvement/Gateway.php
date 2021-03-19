@@ -287,11 +287,23 @@ class Gateway
             return [];
         }
 
+        // Differences to the standard query:
+        // * `act_code` is gone: it isn't needed, and causes duplicate results
+        // * there's some coalescence magic happening with the `act_type` field:
+        //   I think the main difference is the `ecaud21_desc` lookup.
+        //   Could it be rewritten as `COALESCE(ea.act_desc, ea.ecaud21_desc)`?
         $query = "
             SELECT DISTINCT
                 se.stud_code,
-                se.act_code,
-                ea.act_desc,
+                CONCAT(
+                    CASE
+                        WHEN ea.ecaud21_desc IS NULL THEN RTRIM(ea.act_desc)
+                        ELSE RTRIM(ea.ecaud21_desc)
+                    END,
+                    CASE
+                        WHEN el.lev_desc IS NULL THEN ''
+                        ELSE CONCAT (' - ', el.lev_desc)
+                    END) AS act_desc,
                 ea.act_type,
                 el.lev_desc,
                 eu.ud_desc
