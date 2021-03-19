@@ -29,8 +29,6 @@ Have a look through all the other rules and keep them in mind while developing. 
 -   [Single-file components should always order <script> <template> <style>](https://vuejs.org/v2/style-guide/#Single-file-component-top-level-element-order-recommended)
 -   [Component's should be structured with the following order](01-setup-entry.md#213-vue-component-basics)
 
-[//]: # "end list"
-
 ## Vue pantry / testing
 
 Coming soon to a cupboard near you, I'll update this further when implemented.
