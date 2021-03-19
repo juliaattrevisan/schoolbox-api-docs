@@ -89,6 +89,7 @@
         "ext-redis": "*",
         "ext-readline": "*",
         "ext-zip": "*",
+        "ext-pcntl": "*",
         "ext-pdo": "*",
         "firebase/php-jwt": "^5.0",
         "okta/jwt-verifier": "~1.0",
