@@ -38,7 +38,7 @@ class TestPredicateBuilder extends TestCase
     {
         $this->connectDb2Test();
 
-        $predicateBuilder = new PredicateBuilder($this->db2Test, 'USERS');
+        $predicateBuilder = new PredicateBuilder($this->db2Test->getQuoter(), 'USERS');
         $predicateBuilder->equals('NAME_LAST', 'rhodes');
 
         $this->assertSame('"USERS"."NAME_LAST" = :NAME_LAST_0', $predicateBuilder->getWhere()[0]);
