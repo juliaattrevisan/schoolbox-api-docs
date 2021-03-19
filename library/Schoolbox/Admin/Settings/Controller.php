@@ -121,8 +121,7 @@ class Controller extends ConfigController
             $jsonPayload[] = [
                 'name' =>  $parentUrl,
                 'title' => $parentData['name'],
-                'module'        => $config->getModule(),
-
+                'description' => $parentData['description'],
                 'url'   => $parentUrl,
             ];
 
@@ -130,6 +129,7 @@ class Controller extends ConfigController
                 $jsonPayload[] = [
                     'name'  => $childUrl,
                     'title' => $childData['name'],
+                    'description' => $childData['description'],
                     'url'   => $childUrl,
                 ];
             }
