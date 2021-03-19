@@ -133,6 +133,8 @@ class Manager
      */
     private int $managerPid;
 
+    private LockInterface $lock;
+
     /**
      * @param int             $timeInterval    Time period in minutes to look up images for processing
      * @param int             $imageCountLimit Max number of images to process
@@ -176,11 +178,11 @@ class Manager
         pcntl_signal(SIGTERM, [$this, 'signalHandler']);
         $this->startTime = time();
         $pdo             = $this->buildPdo();
-        $lock = $this->checkOverlappingExecution($pdo);
+        $this->lock = $this->checkOverlappingExecution($pdo);
         $transformations = $this->generateTransformations($this->deriveHashList($pdo), $pdo);
         unset($pdo);
-        $this->processTransformations($transformations, $lock);
-        $lock->release();
+        $this->processTransformations($transformations);
+        $this->lock->release();
     }
 
 
@@ -188,11 +190,13 @@ class Manager
      * signal handler function
      *
      * @param int $signal
+     * @throws LockException\LockReleasingException
      */
     public function signalHandler(int $signal): void
     {
         if ($signal === SIGTERM) {
             if ($this->managerPid === posix_getpid()) {
+                $this->lock->release();
                 $this->logger->warning($this->prefixLog("Caught SIGTERM signal, killing workers"));
                 foreach ($this->workerPids as $workerPid) {
                     $this->logger->warning($this->prefixLog("Killing worker: $workerPid"));
@@ -210,16 +214,15 @@ class Manager
      * 1. Continues to hold the lock, and
      * 2. Stays alive
      *
-     * @param LockInterface $lock
      * @throws LockAcquiringException
      * @throws LockConflictedException
      * @throws LockException\LockReleasingException
      */
-    private function renewLockAndMaxExecutionTime(LockInterface $lock): void
+    private function renewLockAndMaxExecutionTime(): void
     {
         // TODO, this should be $lock->refresh(), but that's throwing an exception for some reason?
-        $lock->release();
-        $lock->acquire();
+        $this->lock->release();
+        $this->lock->acquire();
         $maxExecutionTime = time() - $this->startTime + self::IMAGICK_TIME_LIMIT;
         ini_set('max_execution_time', (string)$maxExecutionTime);
     }
@@ -510,7 +513,6 @@ class Manager
      * Process all transformations by launching a worker per transformation
      *
      * @param Transformation[] $transformations
-     * @param LockInterface    $lock
      * @throws AuraDi\Exception
      * @throws AuraDi\Exception\ContainerLocked
      * @throws AuraDi\Exception\ServiceNotFound
@@ -523,7 +525,7 @@ class Manager
      * @throws SchoolboxExternal\Exception
      * @throws UnexpectedValueException
      */
-    private function processTransformations(array $transformations, LockInterface $lock): void
+    private function processTransformations(array $transformations): void
     {
         $pid = posix_getpid();
         $this->logger->debug($this->prefixLog("Manager PID: $pid"));
@@ -535,7 +537,7 @@ class Manager
             if (count($this->workerPids) < $this->workerCountLimit) {
                 // Delegate next hash processing to a new worker
                 $t   = array_shift($transformations);
-                $this->renewLockAndMaxExecutionTime($lock);
+                $this->renewLockAndMaxExecutionTime();
                 $pid = pcntl_fork();
                 if ($pid === -1) {
                     // Unable to fork.
