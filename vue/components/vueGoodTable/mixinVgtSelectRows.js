@@ -11,7 +11,7 @@ export const mixinVgtSelectRows = {
     	return {
 			selectedRows: [], //keep track of which rows could be deleted
 			isShiftKeySelected: false, //to multi-select fields,
-			hasShiftKeySelected: false, //to hide a UI note
+			hasSelectedShiftKey: false, //to hide a UI note
 			consecutiveRowSelectionCount: 0, //to increment on every consecutive row selection, to monitor for shift-select rows
 			currentPage: 1, //which page within pagination is active
 			currentPerPage: 1 //how many rows per pagination
@@ -21,19 +21,21 @@ export const mixinVgtSelectRows = {
 	computed: {
 
 		$_vgtSelectRows_selectedRowsCount () {
-			return this.selectedRows.length
+			return this.selectedRows.length;
 		},
 
 		$_vgtSelectRows_selectedRowsCountWithRowName () {
-			if (this.selectedRows.length > 1) {
-				return this.selectedRows.length + ' ' + this.pluralRowName;
+			if (this.selectedRows.length === 0) {
+				return 'No ' + this.singleRowName;	
+			} else if (this.selectedRows.length === 1) {
+				return this.selectedRows.length + ' ' + this.singleRowName;	
 			} else {
-				return this.selectedRows.length + ' ' + this.singleRowName;		
+				return this.selectedRows.length + ' ' + this.pluralRowName;	
 			}
 		},
 
-		$_vgtSelectRows_hasShiftKeySelected () {
-			return this.hasShiftKeySelected;
+		$_vgtSelectRows_hasSelectedShiftKey () {
+			return this.hasSelectedShiftKey;
 		},
 
 	},
@@ -140,7 +142,7 @@ export const mixinVgtSelectRows = {
             
 			if (this.isShiftKeySelected && this.consecutiveRowSelectionCount >= 2)  {
 				
-				this.hasShiftKeySelected = true;
+				this.hasSelectedShiftKey = true;
 
 				const rowsInCurrentOrder = this.$refs.vueGoodTable.filteredRows[0].children; //the current row list, as reflected by current sorting
 

@@ -12,6 +12,8 @@ import RevealModal from '@schoolbox/reveal-modal';
 import { mixinVgtSelectRows } from '@schoolbox/vueGoodTable/mixinVgtSelectRows';
 import { fetchAsJson } from '@shared/fetch/fetch';
 import dayjs from 'dayjs';
+import { ResizeObserver } from 'vue-resize';
+import 'vue-resize/dist/vue-resize.css';
 
 export default {
 
@@ -20,7 +22,8 @@ export default {
 	components: {
 		VueGoodTable,
         Toast,
-        RevealModal
+        RevealModal,
+		ResizeObserver
 	},
 
 	mixins: [
@@ -80,15 +83,27 @@ export default {
 				}
       		],
 			singleRowName: 'User',
-			pluralRowName: 'Users'
+			pluralRowName: 'Users',
+			selectContainer: null
     	};
   	},
 
 	mounted () {
+		this.selectContainer = document.querySelector('[data-select-container]');
 		this.loadRows();
 	},
 
 	methods: {
+
+		/**
+         * To keep the width of the selected-action-container the same as the parent container
+		 * which will change depending on whether the side menu is opened/closed
+         *
+		 * @returns { width, height } 
+         */
+		onContainerResize (dimensions) {
+			this.selectContainer.style.width = (dimensions.width) + 'px';
+		},
 
 		/**
          * load the stale users for display
@@ -97,19 +112,18 @@ export default {
 		loadRows () {
 			fetchAsJson('/adminv2/user/stale/list')
 			.then((response) => {
-
 				this.rows = response;
 				this.hasRowsLoaded = true;
 				this.customVueGoodTableSetup();
-      }).catch((error) => {
-        this.hasLoadError = true; //display error note in the DOM
-      });
+			}).catch((error) => {
+				this.hasLoadError = true; //display error note in the DOM
+			});
 		},
 
-	  /**
-     * custom fixes to get VGT to do exactly what we want it to
-     *
-     */
+		/**
+         * custom fixes to get VGT to do exactly what we want it to
+         *
+         */
 		customVueGoodTableSetup () {
 			this.$nextTick()
 			.then(() => { //to ensure it exists in the DOM
@@ -187,9 +201,11 @@ export default {
 
 <template>
 	<div>
-
+		
 		<div v-if="!hasRowsLoaded && !hasLoadError" class="loader"></div>
 		<div v-else-if="!hasRowsLoaded && hasLoadError" data-alert class="alert-box alert">Sorry, we are currently unable to load the Stale Users Report.</div>
+		
+		<resize-observer @notify="onContainerResize" />
 
 		<vue-good-table
 			v-if="hasRowsLoaded"
@@ -214,7 +230,6 @@ export default {
 				perPageDropdown: [50, 100, 200],
 				rowsPerPageLabel: 'Users per page',
 				infoFn: (params) => `${params.firstRecordOnPage} - ${params.lastRecordOnPage} of ${params.totalRecords} Users`,
-
 			}"
 			:select-options="{
 				enabled: true,
@@ -244,10 +259,10 @@ export default {
 		</reveal-modal>
 
 		<transition name="slide">
-			<div v-if="$_vgtSelectRows_selectedRowsCount  > 0" class="selected-action-container">
+			<div v-show="$_vgtSelectRows_selectedRowsCount  > 0" class="selected-action-container" data-select-container>
 				<section class="content">
 					<h3><em>{{ $_vgtSelectRows_selectedRowsCountWithRowName }} Selected</em></h3>
-					<span v-if="!$_vgtSelectRows_hasShiftKeySelected" class="shift-select-note">Use Shift+Select to select multiple Users</span>
+					<span v-if="!$_vgtSelectRows_hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple Users</span>
 					<button @click.prevent="onClearUsersToSelected" class="button-clear">Clear User Selection</button>
 					<button @click.prevent="onDeleteUsersSelected" class="button submit">Delete Users</button>
 				</section>
@@ -260,5 +275,6 @@ export default {
 <style lang="scss">
 
 @import '@schoolbox/vueGoodTable/vueGoodTable';
+@import './staleUsersReport';
 
 </style>
