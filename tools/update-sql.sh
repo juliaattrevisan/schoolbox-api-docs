@@ -21,6 +21,11 @@ package=${site_root##*/};
 
 current_dir=$(pwd);
 
+if [[ -z "$INSTANCE_ID" ]]; then
+  echo "Unable to derive an INSTANCE_ID" >&2
+  exit 1
+fi
+
 echo "Starting SQL update process for instance: '$INSTANCE_ID'";
 
 # Build update version list
