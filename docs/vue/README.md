@@ -28,7 +28,8 @@ Have a look through all the other rules and keep them in mind while developing. 
 -   [Directive shorthands should be used always](https://vuejs.org/v2/style-guide/#Directive-shorthands-strongly-recommended)
 -   [Single-file components should always order <script> <template> <style>](https://vuejs.org/v2/style-guide/#Single-file-component-top-level-element-order-recommended)
 -   [Component's should be structured with the following order](01-setup-entry.md#213-vue-component-basics)
-    <a/>
+
+[//]: # "end list"
 
 ## Vue pantry / testing
 
