@@ -7,20 +7,24 @@ As the number of Vue files really starts to grow it's a good time to expand furt
 
 The below is a list of rules considered essential by Vue, scroll through them all or select an individual link:
 
--   Multi-word component names (https://vuejs.org/v2/style-guide/#Multi-word-component-names-essential)
+-   Always use multi-word component names (https://vuejs.org/v2/style-guide/#Multi-word-component-names-essential)
 -   Component data must be a function. (https://vuejs.org/v2/style-guide/#Component-data-essential)
 -   Prop definitions should be as detailed as possible. (https://vuejs.org/v2/style-guide/#Prop-definitions-essential)
 -   Always use key with v-for. (https://vuejs.org/v2/style-guide/#Keyed-v-for-essential)
 -   Component style scoping (https://vuejs.org/v2/style-guide/#Component-style-scoping-essential)
 -   Use module scoping to keep private functions inaccessible from the outside. (https://vuejs.org/v2/style-guide #Private-property-names-essential)
--
 
-## Essential Schoolbox Rules
+## Encouraged Schoolbox Rules
 
-Have a look through all the other rules, with the below proposed when adding to Schoolbox Vue:
+Have a look through all the other rules, keep them in mind while developing. From these I've proposed the below when adding to Schoolbox Vue. Primarily they're simply to reduce our cognitive load, and make it easier trawling through Vue files now and into the future.
 
 -   Each component should be in its own file. (https://vuejs.org/v2/style-guide/#Component-files-strongly-recommended)
 -   Filenames of single-file components should always be kebab-case. (https://vuejs.org/v2/style-guide/#Single-file-component-filename-casing-strongly-recommended)
--   Prop names should always use camelCase during declaration, but kebab-case in templates and JSX. (https://vuejs.org/v2/style-guide/#Prop-name-casing-strongly-recommended)
+-   Prop names should always use camelCase during declaration, but kebab-case in html/twig. (https://vuejs.org/v2/style-guide/#Prop-name-casing-strongly-recommended)
 -   Directive shorthands should be used always. (https://vuejs.org/v2/style-guide/#Directive-shorthands-strongly-recommended)
 -   Single-file components should always order <script> <template> <style> (https://vuejs.org/v2/style-guide/#Single-file-component-top-level-element-order-recommended)
+-   Component's should be structured like the examples within (01-setup-entry.md#213-vue-component-basics)
+
+## Vue 3
+
+Vue 3 has been released and offers some pretty neat new features as well as performance improvements. For now we'll wait on a Vue 2 to Vue 3 migration file that will be released sometime early this year. Once we've implemented that, we can ensure all our Vue 2 code is aok and move forward to Vue 3 following.
