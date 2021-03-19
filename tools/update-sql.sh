@@ -188,10 +188,8 @@ do
             echo "[ ][$(date +%Y-%m-%d\ %H:%M:%S)] Starting script: $script";
             if [[ $script == *".sql" ]]
             then
-                mysql -h "$sqlhost" -u "$sqluser" -p"$sqlpasswd" "$sqldb" < "$script";
                 # Check for and report errors
-                if [ $? -ne 0 ];
-                then
+                if ! mysql -h "$sqlhost" -u "$sqluser" -p"$sqlpasswd" "$sqldb" < "$script"; then
                     echo "[*][$(date +%Y-%m-%d\ %H:%M:%S)] Error running update: $script" >&2;
                     errorint=1;
                     errormsg="$errormsg,$script";
@@ -205,10 +203,8 @@ do
                 cd "$scriptpath" || exit 1;
                 phpscript=${script##*/};
                 echo "$phpscript";
-                php -f "$phpscript" 2>&1;
                 # Check for and report errors
-                if [ $? -ne 0 ];
-                then
+                if ! php -f "$phpscript" 2>&1; then
                     cd "$curdir" || exit 1;
                     echo "[*][$(date +%Y-%m-%d\ %H:%M:%S)] Error running update: $script";
                     errorint=1;
