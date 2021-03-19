@@ -25,16 +25,23 @@
                     <div class="list-item">
 
                         {# Unit title and select-all checkbox for unit asesssments #}
-                        <fieldset class="checklist">
+                        {# Don't show the select-all checkbox if we are modifying a unit implementation #}
+                        {% if unitAction == 'modify' %}
+                            <div class="card small-12">
+                                <h3>
+                                    <span class="icon-unit"></span>{{ unitSpec.folder.name }}
+                                </h3>
+                            </div>
+                        {% else %}
                             <input id="select-all-unit-assessments-{{ unitSpec.id }}"
                                    type="checkbox"
                                    checked=""
                                    data-select-all-unit-assessments="unit-spec-{{ unitSpec.id }}"
-                                   >
-                                <label for="select-all-unit-assessments-{{ unitSpec.id }}">
-                                    <span class="icon-unit"></span>{{ unitSpec.folder.name }}
-                                </label>
-                        </fieldset>
+                            >
+                            <label class="checkbox-label" for="select-all-unit-assessments-{{ unitSpec.id }}">
+                                <span class="icon-unit"></span><span class="unit-heading">{{ unitSpec.folder.name }}</span>
+                            </label>
+                        {% endif %}
                         {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
 
                         {##
