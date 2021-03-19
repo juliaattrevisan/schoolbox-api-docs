@@ -55,7 +55,7 @@ export default {
      * @returns {String} string for v-html with <span></span> wrapped around each found result
      */
     highlightSearchInElement(toHighlight) {
-      return toHighlight.replace(new RegExp(this.currentSearchString, "gi"), match => {
+      return toHighlight?.replace(new RegExp(this.currentSearchString, "gi"), match => {
         return '<mark>' + match + '</mark>';
       });
     }

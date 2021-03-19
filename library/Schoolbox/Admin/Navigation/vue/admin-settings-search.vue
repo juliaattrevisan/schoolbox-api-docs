@@ -62,9 +62,9 @@ export default {
 				return [];
 			}
 			return this.settingsList.filter(setting => { //retrieve all settings that match
-				if (setting.title.toLowerCase().includes(this.currentSearchString.toLowerCase())
-					|| setting.name.toLowerCase().includes(this.currentSearchString.toLowerCase())
-					|| setting.description.toLowerCase().includes(this.currentSearchString.toLowerCase())) {
+				if (setting.title?.toLowerCase().includes(this.currentSearchString.toLowerCase())
+					|| setting.name?.toLowerCase().includes(this.currentSearchString.toLowerCase())
+					|| setting.description?.toLowerCase().includes(this.currentSearchString.toLowerCase())) {
 					return true;
 				} else {
 					return false;

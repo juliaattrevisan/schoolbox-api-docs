@@ -113,6 +113,29 @@ class Controller extends ConfigController
             ];
         }
 
+        //Also include the navigation elements
+        $subnav = new Subnav($this->getConfigLoader());
+        $pageList = $subnav->generate();
+
+        foreach ($pageList as $parentUrl => $parentData) {
+            $jsonPayload[] = [
+                'name' =>  $parentUrl,
+                'title' => $parentData['name'],
+                'module'        => $config->getModule(),
+
+                'url'   => $parentUrl,
+            ];
+
+            foreach ($parentData['children'] as $childUrl => $childData) {
+                $jsonPayload[] = [
+                    'name'  => $childUrl,
+                    'title' => $childData['name'],
+                    'url'   => $childUrl,
+                ];
+            }
+        }
+
+
         $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
     }
 
