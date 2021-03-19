@@ -1,6 +1,6 @@
 # Vue in Schoolbox
 
-Vue is now being used increasingly more throughout Schoolbox. It's gradually replacing older code that relied more on jQuery and in particular Foundation. It's shown it does a pretty good job of parachuting in where ever you like and landing as soft or as heavy as needed.
+[Vue](https://vuejs.org/) is now being used increasingly more throughout Schoolbox. It's gradually replacing older code that relied more on jQuery and in particular Foundation. It's shown it does a pretty good job of parachuting in where ever you like and landing as soft or as heavy as needed.
 As the number of Vue files really starts to grow it's a good time to expand further on recommended best practices.
 
 ## Essential Vue Rules
@@ -25,10 +25,14 @@ Have a look through all the other rules, keep them in mind while developing. Fro
 -   [Single-file components should always order <script> <template> <style>](https://vuejs.org/v2/style-guide/#Single-file-component-top-level-element-order-recommended)
 -   [Component's should be structured with the following order](01-setup-entry.md#213-vue-component-basics)
 
+## Vue pantry / testing
+
+Coming soon to a cupboard near you, I'll update this further when implemented.
+
 ## Vue 3
 
 Vue 3 has been released and offers some pretty neat new features as well as performance improvements. For now we'll wait on a Vue 2 to Vue 3 migration file that will be released sometime early this year. Once we've implemented that, we can ensure all our Vue 2 code is aok and move forward to Vue 3 following.
 
-## Setting up new Vue in Schoolbox
+## Setting up a new Vue in Schoolbox
 
 A guide to setting up the basics is available [here](00-intro.md)
