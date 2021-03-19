@@ -5,14 +5,14 @@ As the number of Vue files really starts to grow it's a good time to expand furt
 
 ## Essential Vue Rules
 
-The below is a list of rules considered essential by Vue, scroll through them all or select an individual link:
+The below is a list of rules considered essential by [Vue](https://vuejs.org/v2/style-guide/), scroll through them all or select an individual link:
 
 -   [Always use multi-word component names](https://vuejs.org/v2/style-guide/#Multi-word-component-names-essential)
 -   [Component data must be a function](https://vuejs.org/v2/style-guide/#Component-data-essential)
 -   [Prop definitions should be as detailed as possible](https://vuejs.org/v2/style-guide/#Prop-definitions-essential)
 -   [Always use key with v-for](https://vuejs.org/v2/style-guide/#Keyed-v-for-essential)
 -   [Component style scoping](https://vuejs.org/v2/style-guide/#Component-style-scoping-essential)
--   [Use module scoping to keep private functions inaccessible from the outside] (https://vuejs.org/v2/style-guide #Private-property-names-essential)
+-   [Use module scoping to keep private functions inaccessible from the outside](https://vuejs.org/v2/style-guide#Private-property-names-essential)
 
 ## Encouraged Schoolbox Rules
 
@@ -30,3 +30,5 @@ Have a look through all the other rules, keep them in mind while developing. Fro
 Vue 3 has been released and offers some pretty neat new features as well as performance improvements. For now we'll wait on a Vue 2 to Vue 3 migration file that will be released sometime early this year. Once we've implemented that, we can ensure all our Vue 2 code is aok and move forward to Vue 3 following.
 
 ## Setting up new Vue in Schoolbox
+
+A guide to setting up the basics is available [here](00-intro.md)
