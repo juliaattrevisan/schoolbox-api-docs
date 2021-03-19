@@ -51,14 +51,14 @@ Underneath your `axios` request to obtain a payload, we can add a little thing w
  *
  * https://stackoverflow.com/questions/50647136/forward-button-not-working-after-history-pushstate
  */
-window.onpopstate = function (event) {
+window.onpopstate = event => {
     if (!event.state) {
         // Return to defaults
-        self.page = 1;
+        this.page = 1;
     } else if (event.state.page) {
-        self.page = event.state.page;
+        this.page = event.state.page;
     }
-}
+};
 ```
 
 Further down, in `methods()` we need to add this:
@@ -70,7 +70,7 @@ Further down, in `methods()` we need to add this:
  *
  * @param page int - The page to change to
  */
-onPaginate: function (page) {
+onPaginate (page) {
     const params = '?' + 'p=' + page;
 
     window.history.pushState({page: page}, '', params);
@@ -88,7 +88,7 @@ The `Paginate` component requires a couple more computed methods. Add these to t
 /**
  * The total number of pages available for the data set obtained
  */
-pageCount: function () {
+pageCount () {
     return Math.ceil(this.allUsers.length / this.numPerPage);
 },
 
@@ -96,7 +96,7 @@ pageCount: function () {
 /**
  * Calculate the paginated subset of all data
  */
-users: function() {
+users () {
     if (!this.allUsers.length) {
         return [];
     }
@@ -116,7 +116,7 @@ In `user-list.vue`,
 
 ```html
 <li v-for="user in this.users">
-...
+    ...
 </li>
 ```
 
@@ -133,28 +133,29 @@ At the bottom of `user-list.vue` w can add the `Paginate` component which will d
 <template v-else>
     <ul class="information-list">
         <li v-for="user in this.users">
-            <user :fullname="user.fullname"
-                  :firstname="user.firstname"
-                  :lastname="user.lastname"
-                  :role="user.role"
-                  :route="user.route"
-                  :nameLength="nameLength(user.fullname)">
+            <user
+                :fullname="user.fullname"
+                :firstname="user.firstname"
+                :lastname="user.lastname"
+                :role="user.role"
+                :route="user.route"
+                :nameLength="nameLength(user.fullname)"
+            >
             </user>
         </li>
     </ul>
     <Paginate
-            v-model="page"
-            :page-count="pageCount"
-            :container-class="'pagination'"
-            :prev-text="'‹'"
-            :next-text="'›'"
-            :prev-link-class="'arrow'"
-            :next-link-class="'arrow'"
-            :disabled-class="'unavailable'"
-            :click-handler="onPaginate"
+        v-model="page"
+        :page-count="pageCount"
+        :container-class="'pagination'"
+        :prev-text="'‹'"
+        :next-text="'›'"
+        :prev-link-class="'arrow'"
+        :next-link-class="'arrow'"
+        :disabled-class="'unavailable'"
+        :click-handler="onPaginate"
     ></Paginate>
 </template>
-
 ```
 
 Recompile and reload; you'll have an asynchronously-powered paginated data set that is fully navigable and simulates browser history, along with user-friendly indicators for loading data and a snappy perceived response because we loaded everything and now it's rendering data locally in the browser. Data is produced by a highly-cohesive decoupled class which can be both unit tested and used in a different context (e.g. phplib/twig instead of vue) without having to copypaste a lot.
