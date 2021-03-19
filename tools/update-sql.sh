@@ -21,6 +21,9 @@ conf_file=$(readlink -f "$full_path"/../www/conf/conf.php);
 
 site_root=$(readlink -f "$full_path"/../);
 package=${site_root##*/};
+if [[ $package == 'vagrant' ]]; then
+  package='schoolbox'
+fi
 
 
 if [[ -z "$INSTANCE_ID" ]]; then
