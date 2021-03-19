@@ -5,7 +5,7 @@ As the number of Vue files really starts to grow it's a good time to expand furt
 
 ## Setting up a new Vue in Schoolbox
 
-A guide to setting up the basics of Vue within Schoolbox is available [here](00-intro.md)
+A guide to setting up the basics of Vue within Schoolbox is available [here.](00-intro.md)
 
 ## Essential Vue Rules
 
@@ -26,7 +26,7 @@ Have a look through all the other rules and keep them in mind while developing. 
 -   [Filenames of single-file components should always be kebab-case](https://vuejs.org/v2/style-guide/#Single-file-component-filename-casing-strongly-recommended)
 -   [Prop names should always use camelCase during declaration, but kebab-case in html/twig](https://vuejs.org/v2/style-guide/#Prop-name-casing-strongly-recommended)
 -   [Directive shorthands should be used always](https://vuejs.org/v2/style-guide/#Directive-shorthands-strongly-recommended)
--   [Single-file components should always order script, template, style](https://vuejs.org/v2/style-guide/#Single-file-component-top-level-element-order-recommended)
+-   [Single-file components should always be in order script, template, style](https://vuejs.org/v2/style-guide/#Single-file-component-top-level-element-order-recommended)
 -   [Component's should be structured with the following order](01-setup-entry.md#213-vue-component-basics)
 
 ## Vue pantry / testing
