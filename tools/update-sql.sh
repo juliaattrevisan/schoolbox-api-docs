@@ -23,12 +23,9 @@ current_dir=$(pwd);
 
 echo "Starting SQL update process for instance: '$INSTANCE_ID'";
 
-version_list=$(find "$site_root"/updates -mindepth 1 -maxdepth 1 -type d -printf %f\\n | sort -V)
-
 # Build update version list
-for release in $version_list; do
-  new_ver=$release;
-done
+version_list=$(find "$site_root"/updates -mindepth 1 -maxdepth 1 -type d -printf %f\\n | sort -V)
+new_ver=$(echo "$version_list" | tail -n 1)
 
 if [ ! -f "$conf_file" ]; then
   echo "New installation or conf file missing";
