@@ -1257,13 +1257,14 @@ $selector-width: 2.25rem;
 }
 
 .grade {
-  &.gradient-none-bg {
-    background-color: $aluminum;
-  }
   font-size: rem-calc(($base-font-size - 4));
   padding: 0.285rem 1rem;
   color-adjust: exact;
   -webkit-print-color-adjust: exact;
+
+  &.gradient-none-bg {
+    background-color: $aluminum;
+  }
   span {
     display: block;
     white-space: nowrap;
@@ -1310,8 +1311,6 @@ $selector-width: 2.25rem;
 
   .grade {
     align-items: center;
-    color-adjust: exact;
-    -webkit-print-color-adjust: exact;
     display: flex;
     flex: 0 0 auto;
     justify-content: center;
@@ -1342,6 +1341,12 @@ $selector-width: 2.25rem;
   }
   ~ blockquote {
     margin-bottom: 0;
+  }
+  @media print {
+    .grade {
+      flex: 0 0 auto;
+      flex-wrap: nowrap;
+    }
   }
 }
 
