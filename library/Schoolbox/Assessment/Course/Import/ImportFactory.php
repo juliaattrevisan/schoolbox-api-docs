@@ -724,6 +724,7 @@ class ImportFactory
         $assessmentSpec->setId($row['sa.id']);
         $assessmentSpec->setTitle($row['sa.title']);
         $assessmentSpec->setSequence($row['sa.sequence']);
+        // TODO set the name, and handle possible null work type here
         $assessmentSpec->setWorkType((new WorkType())->setId($row['sa.work_type_id']));
         $assessmentSpec->setDefaultOpenSpan($row['sa.default_open_span']);
         if (is_null($row['sa.deleted_at'])) {
@@ -774,7 +775,8 @@ class ImportFactory
         $assessmentImpl->setId($row['ia.id']);
         $assessmentImpl->setTitle($row['ia.title']);
         $assessmentImpl->setSequence($row['ia.sequence']);
-        $assessmentImpl->setWorkType($row['ia.work_type_id']);
+        // TODO set the name, and handle possible null work type here
+        $assessmentImpl->setWorkType((new WorkType())->setId($row['sa.work_type_id']));
         $assessmentImpl->setPublishAt($this->createDate($row['ia.publish_date']));
         $assessmentImpl->setOpenAt($this->createDate($row['ia.open_date']));
         $assessmentImpl->setDueAt($this->createDate($row['ia.due_date']));
