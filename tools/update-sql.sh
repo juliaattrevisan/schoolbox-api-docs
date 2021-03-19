@@ -11,6 +11,9 @@
 #
 #
 
+# Global const
+readonly WORKING_DIR_ORIGINAL=$(pwd)    # Track the working directory so we can restore it if we manipulate it. TODO move to local var
+
 file_path=$(readlink -f "$0");
 full_path=${file_path%/*};
 
@@ -19,7 +22,6 @@ conf_file=$(readlink -f "$full_path"/../www/conf/conf.php);
 site_root=$(readlink -f "$full_path"/../);
 package=${site_root##*/};
 
-current_dir=$(pwd);
 
 if [[ -z "$INSTANCE_ID" ]]; then
   echo "Unable to derive an INSTANCE_ID" >&2
@@ -198,14 +200,13 @@ for release in $(echo "$version_list" | sed -n "$start","$end"p ); do
         echo "$php_script";
         # Check for and report errors
         if ! php -f "$php_script" 2>&1; then
-          cd "$current_dir" || exit 1;
           echo "[*][$(date +%Y-%m-%d\ %H:%M:%S)] Error running update: $script";
           error_int=1;
           error_msg="$error_msg,$script";
         else
           echo "[ ][$(date +%Y-%m-%d\ %H:%M:%S)] Success running update: $script";
         fi
-        cd "$current_dir" || exit 1;
+        cd "$WORKING_DIR_ORIGINAL" || exit 1;
       fi
     fi
   done
