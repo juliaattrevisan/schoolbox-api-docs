@@ -282,11 +282,41 @@ class Gateway
      */
     public function getCocurricular($year, User $student)
     {
-        $activities = [];
-        foreach (self::ACTIVITY_TYPES_COCURRICULAR as $activityType) {
-            $activities[] = $this->queryActivities($year, $student, $activityType);
+        $externalId = $student->getExternalId();
+        if (!$externalId) {
+            return [];
         }
-        return array_merge(...$activities);
+
+        $query = "
+            SELECT DISTINCT
+                se.stud_code,
+                se.act_code,
+                ea.act_desc,
+                ea.act_type,
+                el.lev_desc,
+                eu.ud_desc
+            FROM ecactivity ea
+            INNER JOIN studecact se
+                ON se.act_code = ea.act_code
+                AND se.cmpy_code = ea.cmpy_code
+            LEFT JOIN ecalevel el
+                ON el.cmpy_code = se.cmpy_code
+                AND el.lev_code = se.act_level
+            LEFT JOIN ecudtable eu
+                ON eu.ud_code = se.ecud2_code
+                AND eu.cmpy_code = se.cmpy_code
+                AND eu.ref_code = '2'
+        ";
+
+        $pb = new PredicateBuilder($this->database, 'ecactivity');
+        $pb = $pb->equals('se.stud_code', $externalId)
+                 ->equals('se.act_year', $year)
+                 ->in('ea.act_type', self::ACTIVITY_TYPES_COCURRICULAR)
+                 ->equals('ea.cmpy_code', self::COMPANY_CODE);
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere());
+
+        return $this->database->executeQuery($query, $pb->getParams())->fetchAll();
     }
 
     /**
