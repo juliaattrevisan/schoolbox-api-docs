@@ -733,8 +733,13 @@ class ImportFactory
         $assessmentSpec->setId($row['sa.id']);
         $assessmentSpec->setTitle($row['sa.title']);
         $assessmentSpec->setSequence($row['sa.sequence']);
-        // TODO set the name, and handle possible null work type here
-        $assessmentSpec->setWorkType((new WorkType())->setId($row['sa.work_type_id']));
+
+        // TODO handle possible null work type here
+        $workType = new WorkType();
+        $workType->setId($row['sa.work_type_id']);
+        $workType->setName($row['lwt.name']);
+        $assessmentSpec->setWorkType($workType);
+
         $assessmentSpec->setDefaultOpenSpan($row['sa.default_open_span']);
         if (is_null($row['sa.deleted_at'])) {
             $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
@@ -784,8 +789,13 @@ class ImportFactory
         $assessmentImpl->setId($row['ia.id']);
         $assessmentImpl->setTitle($row['ia.title']);
         $assessmentImpl->setSequence($row['ia.sequence']);
-        // TODO set the name, and handle possible null work type here
-        $assessmentImpl->setWorkType((new WorkType())->setId($row['sa.work_type_id']));
+
+        // TODO handle possible null work type here
+        $workType = new WorkType();
+        $workType->setId($row['ia.work_type_id']);
+        $workType->setName($row['lwt.name']);
+        $assessmentImpl->setWorkType($workType);
+
         $assessmentImpl->setPublishAt($this->createDate($row['ia.publish_date']));
         $assessmentImpl->setOpenAt($this->createDate($row['ia.open_date']));
         $assessmentImpl->setDueAt($this->createDate($row['ia.due_date']));
