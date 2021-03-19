@@ -149,6 +149,16 @@ export default {
     },
 
     /**
+     * Directives
+     * Register your own custom directives
+     * https://vuejs.org/v2/guide/custom-directive.html
+     *
+     */
+    directives: {
+
+    },
+
+    /**
      * Watchers.
      * Respond directly to changing data
      * https://vuejs.org/v2/guide/computed.html#Watchers

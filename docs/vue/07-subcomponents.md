@@ -43,7 +43,7 @@ export default {
      * at the top of the file.
      */
     components: {
-        VueGoodTable
+
     },
 
     /**
@@ -101,6 +101,16 @@ export default {
      *
      */
     filters: {
+
+    },
+
+    /**
+     * Directives
+     * Register your own custom directives
+     * https://vuejs.org/v2/guide/custom-directive.html
+     *
+     */
+    directives: {
 
     },
 
@@ -210,7 +220,7 @@ Now we can make the subcomponent render out in a nice format. Inside `user.vue` 
 
 This renders out a card-style layout with a person's firstname, lastname, role name, and length of name as meta data. Each card links to the user's profile screen.
 
-This `user.vue` subcomponent can be imported into any other place and used in a similar manner.
+This `single-user.vue` subcomponent can be imported into any other place and used in a similar manner.
 
 > You can, of course, embellish the output with `computed()` and `methods()` as required.
 
